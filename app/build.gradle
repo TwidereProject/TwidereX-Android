@@ -1,0 +1,98 @@
+plugins {
+    id 'com.android.application'
+    id 'kotlin-android'
+    id 'kotlin-kapt'
+    id 'kotlin-android-extensions'
+    id 'dagger.hilt.android.plugin'
+}
+
+android {
+    compileSdkVersion global.compileSdkVersion
+    buildToolsVersion global.buildToolsVersion
+
+    defaultConfig {
+        applicationId "com.twidere.twiderex"
+        minSdkVersion global.minSdkVersion
+        targetSdkVersion global.targetSdkVersion
+        versionCode global.versionCode
+        versionName global.versionName
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+        useIR = true
+    }
+    buildFeatures {
+        compose true
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion versions.compose
+        kotlinCompilerVersion versions.kotlin
+    }
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$versions.kotlin"
+    implementation 'androidx.core:core-ktx:1.3.1'
+    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation 'com.google.android.material:material:1.2.1'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation "androidx.constraintlayout:constraintlayout:2.0.1"
+
+    implementation project(":services")
+
+    implementation "androidx.ui:ui-tooling:$versions.compose"
+    implementation "androidx.compose.runtime:runtime-dispatch:$versions.compose"
+    implementation "androidx.compose.runtime:runtime:$versions.compose"
+    implementation "androidx.compose.runtime:runtime-livedata:$versions.compose"
+    implementation "androidx.compose.animation:animation-core:$versions.compose"
+    implementation "androidx.compose.animation:animation:$versions.compose"
+    implementation "androidx.compose.foundation:foundation:$versions.compose"
+    implementation "androidx.compose.foundation:foundation-layout:$versions.compose"
+    implementation "androidx.compose.foundation:foundation-text:$versions.compose"
+    implementation "androidx.compose.ui:ui:$versions.compose"
+    implementation "androidx.compose.ui:ui-geometry:$versions.compose"
+    implementation "androidx.compose.ui:ui-graphics:$versions.compose"
+    implementation "androidx.compose.ui:ui-text:$versions.compose"
+    implementation "androidx.compose.ui:ui-text-android:$versions.compose"
+    implementation "androidx.compose.ui:ui-util:$versions.compose"
+    implementation "androidx.compose.ui:ui-viewbinding:$versions.compose"
+    implementation "androidx.compose.material:material:$versions.compose"
+    implementation "androidx.compose.material:material-icons-core:$versions.compose"
+    implementation "androidx.compose.material:material-icons-extended:$versions.compose"
+
+    implementation "androidx.navigation:navigation-fragment-ktx:$versions.navigation"
+    implementation "androidx.navigation:navigation-ui-ktx:$versions.navigation"
+    implementation "androidx.fragment:fragment-ktx:1.3.0-alpha08"
+
+    implementation "com.google.dagger:hilt-android:$versions.hilt"
+    kapt "com.google.dagger:hilt-android-compiler:$versions.hilt"
+    implementation "androidx.hilt:hilt-lifecycle-viewmodel:$versions.androidx_hilt"
+    kapt "androidx.hilt:hilt-compiler:$versions.androidx_hilt"
+
+    implementation "androidx.room:room-runtime:$versions.room"
+    kapt "androidx.room:room-compiler:$versions.room"
+    implementation "androidx.room:room-ktx:$versions.room"
+
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:$versions.lifecycle"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$versions.lifecycle"
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:$versions.lifecycle"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-savedstate:$versions.lifecycle"
+    implementation "androidx.lifecycle:lifecycle-common-java8:$versions.lifecycle"
+
+    testImplementation 'junit:junit:4.13'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+}

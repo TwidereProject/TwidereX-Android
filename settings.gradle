@@ -1,0 +1,3 @@
+rootProject.name = "TwidereX"
+include ':app'
+include ':services'

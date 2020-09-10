@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/splash_fragment">
+    <fragment
+        android:id="@+id/splash_fragment"
+        android:name="com.twidere.twiderex.fragment.SplashFragment">
+        <action
+            android:id="@+id/action_splash_fragment_to_twitter_sign_in_fragment"
+            app:destination="@id/twitter_sign_in_fragment"
+            app:launchSingleTop="true"
+            app:popUpTo="@id/nav_graph"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_splash_fragment_to_home_fragment"
+            app:destination="@id/home_fragment"
+            app:launchSingleTop="true"
+            app:popUpTo="@id/nav_graph"
+            app:popUpToInclusive="true" />
+    </fragment>
+    <fragment
+        android:id="@+id/twitter_sign_in_fragment"
+        android:name="com.twidere.twiderex.fragment.twitter.TwitterSignInFragment" >
+        <action
+            android:id="@+id/action_twitter_sign_in_fragment_to_home_fragment"
+            app:destination="@id/home_fragment"
+            app:launchSingleTop="true"
+            app:popUpTo="@id/nav_graph"
+            app:popUpToInclusive="true" />
+    </fragment>
+    <fragment
+        android:id="@+id/home_fragment"
+        android:name="com.twidere.twiderex.fragment.HomeFragment" />
+    <fragment
+        android:id="@+id/twitter_web_sign_in_fragment"
+        android:name="com.twidere.twiderex.fragment.twitter.TwitterWebSignInFragment" />
+</navigation>
