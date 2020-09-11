@@ -21,18 +21,25 @@
     </fragment>
     <fragment
         android:id="@+id/twitter_sign_in_fragment"
-        android:name="com.twidere.twiderex.fragment.twitter.TwitterSignInFragment" >
+        android:name="com.twidere.twiderex.fragment.twitter.TwitterSignInFragment">
         <action
             android:id="@+id/action_twitter_sign_in_fragment_to_home_fragment"
             app:destination="@id/home_fragment"
             app:launchSingleTop="true"
             app:popUpTo="@id/nav_graph"
             app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_twitter_sign_in_fragment_to_twitter_web_sign_in_fragment"
+            app:destination="@id/twitter_web_sign_in_fragment" />
     </fragment>
     <fragment
         android:id="@+id/home_fragment"
         android:name="com.twidere.twiderex.fragment.HomeFragment" />
     <fragment
         android:id="@+id/twitter_web_sign_in_fragment"
-        android:name="com.twidere.twiderex.fragment.twitter.TwitterWebSignInFragment" />
+        android:name="com.twidere.twiderex.fragment.twitter.TwitterWebSignInFragment">
+        <argument
+            android:name="target"
+            app:argType="string" />
+    </fragment>
 </navigation>

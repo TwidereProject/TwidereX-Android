@@ -11,7 +11,7 @@ inline fun <reified T> String.queryString(charset: Charset = Charsets.UTF_8) : T
         .map {
             it.split("=")
                 .map {
-                    URLDecoder.decode(it, charset)
+                    URLDecoder.decode(it)
                 }
                 .let {
                     it[0] to it[1]

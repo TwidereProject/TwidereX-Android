@@ -10,14 +10,18 @@ import androidx.compose.runtime.onActive
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.vectorResource
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.twidere.twiderex.R
-import kotlinx.coroutines.Dispatchers
+import com.twidere.twiderex.viewmodel.SplashViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.withContext
 
+@AndroidEntryPoint
 class SplashFragment : ComposeFragment() {
+    val viewModel by viewModels<SplashViewModel>()
+
     @Composable
     override fun onCompose() {
         Column(
@@ -31,7 +35,9 @@ class SplashFragment : ComposeFragment() {
         onActive(callback = {
             lifecycleScope.launchWhenCreated {
                 delay(2000)
-                withContext(Dispatchers.Main) {
+                if (viewModel.hasAccount()) {
+                    findNavController().navigate(R.id.action_splash_fragment_to_home_fragment)
+                } else {
                     findNavController().navigate(R.id.action_splash_fragment_to_twitter_sign_in_fragment)
                 }
             }

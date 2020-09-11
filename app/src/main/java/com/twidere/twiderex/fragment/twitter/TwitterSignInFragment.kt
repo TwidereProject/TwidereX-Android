@@ -12,7 +12,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.core.os.bundleOf
 import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -20,11 +19,13 @@ import androidx.navigation.fragment.findNavController
 import com.twidere.twiderex.R
 import com.twidere.twiderex.fragment.ComposeFragment
 import com.twidere.twiderex.viewmodel.twitter.TwitterSignInViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
+@AndroidEntryPoint
 class TwitterSignInFragment : ComposeFragment() {
     private val viewModel: TwitterSignInViewModel by viewModels()
 
@@ -41,7 +42,7 @@ class TwitterSignInFragment : ComposeFragment() {
             } else {
                 Button(onClick = {
                     setIsLoading(true)
-                    lifecycleScope.launch {
+                    activity?.lifecycleScope?.launch {
                         // TODO: dynamic key && secret
                         viewModel.beginOAuth(
                             "MUUBibXUognm6e9vbzrUIqPkt",
@@ -49,14 +50,16 @@ class TwitterSignInFragment : ComposeFragment() {
                         ) { target ->
                             suspendCoroutine {
                                 setFragmentResultListener("request_pin_code") { _, bundle ->
-                                    val pinCode = bundle.getString("pin_Code")
+                                    val pinCode = bundle.getString("pin_code")
                                     if (pinCode != null) {
                                         it.resume(pinCode)
                                     } else {
                                         it.resumeWithException(Error("pin code not found"))
                                     }
                                 }
-                                findNavController().navigate(R.id.twitter_web_sign_in_fragment, bundleOf("target" to target))
+                                TwitterSignInFragmentDirections.actionTwitterSignInFragmentToTwitterWebSignInFragment(target).let {
+                                    findNavController().navigate(it)
+                                }
                             }
                         }
                         setIsLoading(false)

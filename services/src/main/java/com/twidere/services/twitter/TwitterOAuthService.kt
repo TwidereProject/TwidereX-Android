@@ -13,22 +13,25 @@ class TwitterOAuthService(
     private val consumerKey: String,
     private val consumerSecret: String,
 ) {
-    private val twitterOAuth by lazy {
-        retrofit<TwitterOAuthResource>(
+    suspend fun getOAuthToken(): OAuthToken {
+        return retrofit<TwitterOAuthResource>(
             TWITTER_BASE_URL,
             OAuthAuthorization(
                 consumerKey,
                 consumerSecret,
             ),
-        )
+        ).requestToken("oob").queryString()
     }
 
-    suspend fun getOAuthToken(): OAuthToken {
-        return twitterOAuth.requestToken("oob").queryString()
-    }
-
-    suspend fun getAccessToken(pinCode: String): AccessToken {
-        return twitterOAuth.accessToken(pinCode).queryString()
+    suspend fun getAccessToken(pinCode: String, token: OAuthToken): AccessToken {
+        return retrofit<TwitterOAuthResource>(
+            TWITTER_BASE_URL,
+            OAuthAuthorization(
+                consumerKey,
+                consumerSecret,
+                token.oauth_token
+            ),
+        ).accessToken(pinCode).queryString()
     }
 
     suspend fun verifyCredentials(accessToken: AccessToken): User? {
