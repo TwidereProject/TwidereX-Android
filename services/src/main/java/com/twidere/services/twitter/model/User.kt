@@ -1,5 +1,6 @@
 package com.twidere.services.twitter.model
 
+import com.twidere.services.microblog.model.IUser
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -124,5 +125,11 @@ data class User (
     val suspended: Boolean? = null,
 
     @SerialName("needs_phone_verification")
-    val needsPhoneVerification: Boolean? = null
-)
+    val needsPhoneVerification: Boolean? = null,
+
+//    @SerialName("profile_image_extensions_alt_text")
+//    val profileImageExtensionsAltText: Any? = null,
+//
+//    @SerialName("profile_banner_extensions_alt_text")
+//    val profileBannerExtensionsAltText: Any? = null
+): IUser

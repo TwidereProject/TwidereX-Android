@@ -5,7 +5,7 @@ import android.accounts.AccountManager
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.twidere.twiderex.model.AccountDetails
-import com.twidere.twiderex.model.AccountType
+import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.UserKey
 import com.twidere.twiderex.model.cred.CredentialsType
 import javax.inject.Inject
@@ -73,15 +73,7 @@ class AccountRepository @Inject constructor(
 
     fun addAccount(detail: AccountDetails) {
         manager.addAccountExplicitly(detail.account, null, null)
-        manager.setUserData(detail.account, ACCOUNT_USER_DATA_TYPE, detail.type.name)
-        manager.setUserData(detail.account, ACCOUNT_USER_DATA_KEY, detail.key.toString())
-        manager.setUserData(
-            detail.account,
-            ACCOUNT_USER_DATA_CREDS_TYPE,
-            detail.credentials_type.name
-        )
-        manager.setAuthToken(detail.account, ACCOUNT_AUTH_TOKEN_TYPE, detail.credentials_json)
-        manager.setUserData(detail.account, ACCOUNT_USER_DATA_EXTRAS, detail.extras_json)
+        updateAccount(detail)
     }
 
     fun getAccountDetails(
@@ -89,7 +81,7 @@ class AccountRepository @Inject constructor(
     ): AccountDetails {
         return AccountDetails(
             account = account,
-            type = AccountType.valueOf(manager.getUserData(account, ACCOUNT_USER_DATA_TYPE)),
+            type = PlatformType.valueOf(manager.getUserData(account, ACCOUNT_USER_DATA_TYPE)),
             key = getAccountKey(account),
             credentials_type = CredentialsType.valueOf(
                 manager.getUserData(
@@ -107,5 +99,17 @@ class AccountRepository @Inject constructor(
 
     fun containsAccount(key: UserKey) : Boolean {
         return findByAccountKey(key) != null;
+    }
+
+    fun updateAccount(detail: AccountDetails) {
+        manager.setUserData(detail.account, ACCOUNT_USER_DATA_TYPE, detail.type.name)
+        manager.setUserData(detail.account, ACCOUNT_USER_DATA_KEY, detail.key.toString())
+        manager.setUserData(
+            detail.account,
+            ACCOUNT_USER_DATA_CREDS_TYPE,
+            detail.credentials_type.name
+        )
+        manager.setAuthToken(detail.account, ACCOUNT_AUTH_TOKEN_TYPE, detail.credentials_json)
+        manager.setUserData(detail.account, ACCOUNT_USER_DATA_EXTRAS, detail.extras_json)
     }
 }

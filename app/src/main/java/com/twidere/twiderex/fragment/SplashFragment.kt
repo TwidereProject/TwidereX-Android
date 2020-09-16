@@ -34,7 +34,6 @@ class SplashFragment : ComposeFragment() {
         }
         onActive(callback = {
             lifecycleScope.launchWhenCreated {
-                delay(2000)
                 if (viewModel.hasAccount()) {
                     findNavController().navigate(R.id.action_splash_fragment_to_home_fragment)
                 } else {

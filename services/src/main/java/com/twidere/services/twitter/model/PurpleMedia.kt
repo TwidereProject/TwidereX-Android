@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class PurpleMedia (
-    val id: Double? = null,
+    val id: Long? = null,
 
     @SerialName("id_str")
     val idStr: String? = null,

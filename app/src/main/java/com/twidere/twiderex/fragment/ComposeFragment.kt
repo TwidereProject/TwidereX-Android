@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.compose.runtime.Composable
 import androidx.fragment.app.Fragment
 import com.twidere.twiderex.extensions.compose
+import com.twidere.twiderex.ui.TwidereXTheme
 
 abstract class ComposeFragment : Fragment() {
     override fun onCreateView(
@@ -15,7 +16,9 @@ abstract class ComposeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         return compose {
-            onCompose()
+            TwidereXTheme {
+                onCompose()
+            }
         }
     }
 

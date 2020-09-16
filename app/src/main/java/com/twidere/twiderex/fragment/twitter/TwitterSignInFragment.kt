@@ -16,6 +16,7 @@ import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.ui.tooling.preview.Preview
 import com.twidere.twiderex.R
 import com.twidere.twiderex.fragment.ComposeFragment
 import com.twidere.twiderex.viewmodel.twitter.TwitterSignInViewModel
@@ -29,6 +30,7 @@ import kotlin.coroutines.suspendCoroutine
 class TwitterSignInFragment : ComposeFragment() {
     private val viewModel: TwitterSignInViewModel by viewModels()
 
+    @Preview
     @Composable
     override fun onCompose() {
         val (isLoading, setIsLoading) = remember { mutableStateOf(false) }

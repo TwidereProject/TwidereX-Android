@@ -60,7 +60,7 @@ fun WebComponent(
     }
     AndroidView(::WebView) {
         it.settings.javaScriptEnabled = enableJavascript
-        it.webViewClient = BindingWebViewClient(onPageFinished, onPageStarted)
+        it.webViewClient = ComposeWebViewClient(onPageFinished, onPageStarted)
         javascriptInterface.forEach { item ->
             it.addJavascriptInterface(item.value, item.key)
         }
@@ -70,7 +70,7 @@ fun WebComponent(
 }
 
 
-private class BindingWebViewClient(
+private class ComposeWebViewClient(
     val pageFinished: ((view: WebView, url: String) -> Unit)? = null,
     val pageStarted: ((view: WebView, url: String) -> Unit)? = null,
 ) : WebViewClient() {

@@ -4,6 +4,8 @@ import android.accounts.Account
 import android.os.Parcelable
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
+import com.twidere.services.microblog.MicroBlogService
+import com.twidere.services.twitter.TwitterService
 import com.twidere.twiderex.model.cred.*
 import com.twidere.twiderex.utils.fromJson
 import kotlinx.android.parcel.Parcelize
@@ -12,11 +14,11 @@ import kotlinx.android.parcel.Parcelize
 @Parcelize
 data class AccountDetails(
     val account: Account,
-    val type: AccountType,
+    val type: PlatformType,
     val key: UserKey,
     val credentials_type: CredentialsType,
     @Json(name = "credentials")
-    val credentials_json: String,
+    var credentials_json: String,
     @Json(name = "extras")
     val extras_json: String,
 ) : Parcelable {
@@ -28,4 +30,24 @@ data class AccountDetails(
             CredentialsType.Empty -> credentials_json.fromJson<EmptyCredentials>()
             CredentialsType.OAuth2 -> credentials_json.fromJson<OAuth2Credentials>()
         }
+
+    val service by lazy<MicroBlogService> {
+        when (type) {
+            PlatformType.Twitter -> {
+                credentials?.let {
+                    it as? OAuthCredentials
+                }?.let {
+                    TwitterService(
+                        consumer_key = it.consumer_key,
+                        consumer_secret = it.consumer_secret,
+                        access_token = it.access_token,
+                        access_token_secret = it.access_token_secret,
+                    )
+                } as MicroBlogService
+            }
+            PlatformType.StatusNet -> TODO()
+            PlatformType.Fanfou -> TODO()
+            PlatformType.Mastodon -> TODO()
+        }
+    }
 }

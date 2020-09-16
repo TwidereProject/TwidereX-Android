@@ -7,11 +7,12 @@ import kotlinx.serialization.json.Json
 val JSON by lazy {
     Json {
         ignoreUnknownKeys = true
+        isLenient = true
     }
 }
 
-internal inline fun <reified T> T.encodeJson(): String =
+inline fun <reified T> T.encodeJson(): String =
     JSON.encodeToString<T>(this)
 
-internal inline fun <reified T> String.decodeJson(): T =
+inline fun <reified T> String.decodeJson(): T =
     JSON.decodeFromString<T>(this)

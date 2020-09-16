@@ -3,6 +3,8 @@ package com.twidere.twiderex.di
 import android.accounts.AccountManager
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.room.Room
+import com.twidere.twiderex.db.AppDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -19,4 +21,9 @@ object AndroidModule {
     @Provides
     fun provideSharedPreference(@ApplicationContext context: Context): SharedPreferences =
         context.getSharedPreferences("twiderex", Context.MODE_PRIVATE)
+
+    @Provides
+    fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase =
+        Room.databaseBuilder(context, AppDatabase::class.java, "twiderex-db")
+            .build()
 }

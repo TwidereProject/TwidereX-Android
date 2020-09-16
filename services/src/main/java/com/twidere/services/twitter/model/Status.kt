@@ -1,14 +1,18 @@
 package com.twidere.services.twitter.model
 
+import com.twidere.services.microblog.model.IStatus
+import com.twidere.services.serializer.DateSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import java.util.*
 
 @Serializable
-data class Status (
+data class Status(
     @SerialName("created_at")
-    val createdAt: String? = null,
+    @Serializable(with = DateSerializer::class)
+    val createdAt: Date? = null,
 
-    val id: Double? = null,
+    val id: Long? = null,
 
     @SerialName("id_str")
     val idStr: String? = null,
@@ -45,6 +49,9 @@ data class Status (
     @SerialName("retweeted_status")
     val retweetedStatus: Status? = null,
 
+    @SerialName("quoted_status")
+    val quotedStatus: Status? = null,
+
     @SerialName("is_quote_status")
     val isQuoteStatus: Boolean? = null,
 
@@ -60,5 +67,13 @@ data class Status (
     @SerialName("possibly_sensitive")
     val possiblySensitive: Boolean? = null,
 
-    val lang: String? = null
-)
+    val lang: String? = null,
+    @SerialName("full_text")
+    val fullText: String? = null,
+    @SerialName("display_text_range")
+    val displayTextRange: List<Long>? = null,
+    @SerialName("user")
+    val user: User? = null,
+) : IStatus
+
+

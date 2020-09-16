@@ -40,6 +40,7 @@ android {
     }
     buildFeatures {
         compose true
+        viewBinding true
     }
     composeOptions {
         kotlinCompilerExtensionVersion versions.compose
@@ -84,6 +85,7 @@ dependencies {
     // Use moshi for not since Kotlinx.Serialization not compatible with Jetpack Compose
     // https://github.com/Kotlin/kotlinx.serialization/issues/968
     implementation "com.squareup.moshi:moshi:$versions.moshi"
+    implementation "com.squareup.moshi:moshi-kotlin:$versions.moshi"
     kapt "com.squareup.moshi:moshi-kotlin-codegen:$versions.moshi"
 
     implementation "com.google.dagger:hilt-android:$versions.hilt"
@@ -94,6 +96,8 @@ dependencies {
     implementation "androidx.room:room-runtime:$versions.room"
     kapt "androidx.room:room-compiler:$versions.room"
     implementation "androidx.room:room-ktx:$versions.room"
+
+    implementation "androidx.paging:paging-runtime-ktx:$versions.paging"
 
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:$versions.lifecycle"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$versions.lifecycle"

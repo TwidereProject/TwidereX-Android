@@ -1,6 +1,6 @@
 package com.twidere.twiderex.model
 
-enum class AccountType {
+enum class PlatformType {
     Twitter,
     StatusNet,
     Fanfou,

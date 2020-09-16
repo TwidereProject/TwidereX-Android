@@ -5,7 +5,7 @@ import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.ViewModel
 import com.twidere.services.twitter.TwitterOAuthService
 import com.twidere.twiderex.model.AccountDetails
-import com.twidere.twiderex.model.AccountType
+import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.UserKey
 import com.twidere.twiderex.model.cred.CredentialsType
 import com.twidere.twiderex.model.cred.OAuthCredentials
@@ -30,21 +30,27 @@ class TwitterSignInViewModel @ViewModelInject constructor(
             val name = user.screenName
             if (name != null) {
                 val key = UserKey(name, "twitter.com")
+                val credentials_json = OAuthCredentials(
+                    consumer_key = consumerKey,
+                    consumer_secret = consumerSecret,
+                    access_token = accessToken.oauth_token,
+                    access_token_secret = accessToken.oauth_token_secret,
+                ).json()
                 if (repository.containsAccount(key)) {
-
+                    repository.findByAccountKey(key)?.let {
+                        repository.getAccountDetails(it)
+                    }?.let {
+                        it.credentials_json = credentials_json
+                        repository.updateAccount(it)
+                    }
                 } else {
                     repository.addAccount(
                         AccountDetails(
                             account = Account(key.toString(), ACCOUNT_TYPE),
-                            type = AccountType.Twitter,
+                            type = PlatformType.Twitter,
                             key = key,
                             credentials_type = CredentialsType.OAuth,
-                            credentials_json = OAuthCredentials(
-                                consumer_key = consumerKey,
-                                consumer_secret = consumerSecret,
-                                access_token = accessToken.oauth_token,
-                                access_token_secret = accessToken.oauth_token_secret,
-                            ).json(),
+                            credentials_json = credentials_json,
                             extras_json = "",
                         )
                     )
