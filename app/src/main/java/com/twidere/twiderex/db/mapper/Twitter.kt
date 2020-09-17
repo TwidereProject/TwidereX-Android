@@ -1,11 +1,15 @@
 package com.twidere.twiderex.db.mapper
 
+import androidx.compose.ui.util.fastMap
 import com.twidere.services.twitter.model.Status
 import com.twidere.services.twitter.model.User
+import com.twidere.services.utils.decodeJson
 import com.twidere.services.utils.encodeJson
 import com.twidere.twiderex.db.model.DbStatus
 import com.twidere.twiderex.db.model.DbTimeline
 import com.twidere.twiderex.db.model.DbTimelineWithStatus
+import com.twidere.twiderex.model.MediaData
+import com.twidere.twiderex.model.MediaType
 import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.UserKey
 import java.util.*
@@ -37,6 +41,32 @@ fun Status.toDbTimeline(
     )
 }
 
+fun DbStatus.extraTwitterMedia(): List<MediaData>? {
+    val status = this.extra.decodeJson<Status>()
+    return status.let {
+        it.entities?.media ?: it.extendedEntities?.media
+    }?.fastMap { media ->
+        MediaData(
+            getImage(media.mediaURLHTTPS, "thumb"),
+            getImage(media.mediaURLHTTPS, "large"),
+            media.url,
+            media.type?.let { MediaType.valueOf(it) } ?: MediaType.photo,
+        )
+    }
+}
+
+private fun getImage(uri: String?, type: String): String? {
+    if (uri == null) {
+        return null
+    }
+    if (uri.contains(".")) {
+        val index = uri.lastIndexOf(".")
+        val extension = uri.substring(index)
+        return "${uri.removeSuffix(extension)}?format=${extension.removePrefix(".")}&name=${type}"
+    }
+    return uri
+}
+
 private fun Status.toDbStatus(
     userKey: UserKey
 ): DbStatus {
@@ -52,6 +82,8 @@ private fun Status.toDbStatus(
         retweeted = retweeted ?: false,
         liked = favorited ?: false,
         replyCount = 0,
+        placeString = place?.fullName,
+        hasMedia = entities?.media != null || extendedEntities?.media != null,
         extra = encodeJson(),
         user = user?.toDbUser() ?: throw IllegalArgumentException("Status.user should not be null"),
     )

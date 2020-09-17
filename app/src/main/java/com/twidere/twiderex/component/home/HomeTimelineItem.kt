@@ -1,6 +1,5 @@
 package com.twidere.twiderex.component.home
 
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.lazy.LazyColumnForIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
@@ -11,6 +10,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.graphics.vector.VectorAsset
 import androidx.compose.ui.viewinterop.viewModel
 import androidx.ui.tooling.preview.Preview
+import com.twidere.twiderex.component.TimelineStatusComponent
 import com.twidere.twiderex.viewmodel.twitter.HomeTimelineViewModel
 
 class HomeTimelineItem : HomeNavigationItem() {
@@ -28,9 +28,7 @@ class HomeTimelineItem : HomeNavigationItem() {
             viewModel.refresh()
         }
         LazyColumnForIndexed(items = items) { index, item ->
-            Text(text = item.status.text)
+            TimelineStatusComponent(item)
         }
     }
 }
-
-
