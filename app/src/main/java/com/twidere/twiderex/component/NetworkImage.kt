@@ -11,7 +11,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.WithConstraints
 import androidx.compose.ui.graphics.ImageAsset
-import androidx.compose.ui.graphics.asImageAsset
 import androidx.compose.ui.graphics.painter.ImagePainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.ContextAmbient
@@ -71,9 +70,9 @@ fun fetchImage(
 ): ImageAsset? {
     var image by remember(model) { mutableStateOf<ImageAsset?>(null) }
     val context = ContextAmbient.current
-    launchInComposition {
-        image = loadImage(model, context, width, height).asImageAsset()
-    }
+//    launchInComposition {
+//        image = loadImage(model, context, width, height).asImageAsset()
+//    }
     return image
 }
 
