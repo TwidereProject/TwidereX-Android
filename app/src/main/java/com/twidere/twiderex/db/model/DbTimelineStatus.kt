@@ -16,19 +16,30 @@ data class DbTimeline(
     val timestamp: Long,
     var isGap: Boolean,
     val statusId: String,
-    val statusDbId: String,
-    val retweetDbId: String?,
-    val quoteDbId: String?,
+    val retweetId: String?,
+    val quoteId: String?,
 )
 
 data class DbTimelineWithStatus(
     @Embedded
     val timeline: DbTimeline,
 
-    @Relation(parentColumn = "statusDbId", entityColumn = "_id")
-    val status: DbStatus,
-    @Relation(parentColumn = "retweetDbId", entityColumn = "_id")
-    val retweet: DbStatus?,
-    @Relation(parentColumn = "quoteDbId", entityColumn = "_id")
-    val quote: DbStatus?,
+    @Relation(
+        parentColumn = "statusId",
+        entityColumn = "statusId",
+        entity = DbStatus::class,
+    )
+    val status: DbStatusWithMedia,
+    @Relation(
+        parentColumn = "retweetId",
+        entityColumn = "statusId",
+        entity = DbStatus::class,
+    )
+    val retweet: DbStatusWithMedia?,
+    @Relation(
+        parentColumn = "quoteId",
+        entityColumn = "statusId",
+        entity = DbStatus::class,
+    )
+    val quote: DbStatusWithMedia?,
 )

@@ -2,6 +2,7 @@ package com.twidere.twiderex.viewmodel.twitter
 
 import android.accounts.Account
 import androidx.hilt.lifecycle.ViewModelInject
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.twidere.services.twitter.TwitterOAuthService
 import com.twidere.twiderex.model.AccountDetails
@@ -16,11 +17,14 @@ import com.twidere.twiderex.utils.json
 class TwitterSignInViewModel @ViewModelInject constructor(
     private val repository: AccountRepository
 ) : ViewModel() {
+    val isLoading = MutableLiveData(false)
+
     suspend fun beginOAuth(
         consumerKey: String,
         consumerSecret: String,
         pinCodeProvider: suspend (url: String) -> String,
     ) {
+        isLoading.postValue(true)
         val service = TwitterOAuthService(consumerKey, consumerSecret)
         val token = service.getOAuthToken()
         val pinCode = pinCodeProvider.invoke(service.getWebOAuthUrl(token))
@@ -57,5 +61,6 @@ class TwitterSignInViewModel @ViewModelInject constructor(
                 }
             }
         }
+        isLoading.postValue(false)
     }
 }

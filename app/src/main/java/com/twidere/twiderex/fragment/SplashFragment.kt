@@ -16,7 +16,6 @@ import androidx.navigation.fragment.findNavController
 import com.twidere.twiderex.R
 import com.twidere.twiderex.viewmodel.SplashViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.delay
 
 @AndroidEntryPoint
 class SplashFragment : ComposeFragment() {
@@ -27,7 +26,7 @@ class SplashFragment : ComposeFragment() {
         Column(
             modifier = Modifier.fillMaxWidth().fillMaxHeight(),
             verticalArrangement = Arrangement.Center,
-            horizontalGravity = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             //TODO: replace with real icon
             Image(vectorResource(id = R.drawable.ic_launcher_foreground))

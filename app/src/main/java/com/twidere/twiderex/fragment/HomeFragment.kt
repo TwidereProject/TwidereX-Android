@@ -33,7 +33,7 @@ class HomeFragment : ComposeFragment() {
                     icon = { Icon(item.icon) },
                     label = { Text(item.name) },
                     selected = selectedItem == index,
-                    onSelect = { onItemSelected.invoke(index) }
+                    onClick = { onItemSelected.invoke(index) }
                 )
             }
         }

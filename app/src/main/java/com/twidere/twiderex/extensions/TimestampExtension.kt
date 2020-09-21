@@ -18,7 +18,7 @@ private val MINUTE_MILLIS = 60 * SECOND_MILLIS
 private val HOUR_MILLIS = 60 * MINUTE_MILLIS
 private val DAY_MILLIS = 24 * HOUR_MILLIS
 
-fun Long.humanized(): String {
+fun Long.humanizedTimestamp(): String {
     val date = Date(this)
     return if (System.currentTimeMillis() - date.time > 3 * HOUR_MILLIS) {
         DateFormat.getDateTimeInstance().format(date)

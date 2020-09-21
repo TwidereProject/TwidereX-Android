@@ -1,14 +1,9 @@
 package com.twidere.twiderex.db.mapper
 
-import androidx.compose.ui.util.fastMap
 import com.twidere.services.twitter.model.Status
 import com.twidere.services.twitter.model.User
-import com.twidere.services.utils.decodeJson
 import com.twidere.services.utils.encodeJson
-import com.twidere.twiderex.db.model.DbStatus
-import com.twidere.twiderex.db.model.DbTimeline
-import com.twidere.twiderex.db.model.DbTimelineWithStatus
-import com.twidere.twiderex.model.MediaData
+import com.twidere.twiderex.db.model.*
 import com.twidere.twiderex.model.MediaType
 import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.UserKey
@@ -19,40 +14,25 @@ private typealias DbUser = com.twidere.twiderex.db.model.User
 fun Status.toDbTimeline(
     userKey: UserKey
 ): DbTimelineWithStatus {
-    val status = this.toDbStatus(userKey)
-    val retweet = retweetedStatus?.toDbStatus(userKey)
-    val quote = quotedStatus?.toDbStatus(userKey)
+    val status = this.toDbStatusWithMedia(userKey)
+    val retweet = retweetedStatus?.toDbStatusWithMedia(userKey)
+    val quote = quotedStatus?.toDbStatusWithMedia(userKey)
 
     return DbTimelineWithStatus(
         timeline = DbTimeline(
             _id = UUID.randomUUID().toString(),
             userKey = userKey,
             platformType = PlatformType.Twitter,
-            timestamp = status.timestamp,
+            timestamp = status.status.timestamp,
             isGap = false,
-            statusDbId = status._id,
-            retweetDbId = retweet?._id,
-            quoteDbId = quote?._id,
-            statusId = status.statusId,
+            retweetId = retweet?.status?.statusId,
+            quoteId = quote?.status?.statusId,
+            statusId = status.status.statusId,
         ),
         status = status,
         retweet = retweet,
         quote = quote,
     )
-}
-
-fun DbStatus.extraTwitterMedia(): List<MediaData>? {
-    val status = this.extra.decodeJson<Status>()
-    return status.let {
-        it.entities?.media ?: it.extendedEntities?.media
-    }?.fastMap { media ->
-        MediaData(
-            getImage(media.mediaURLHTTPS, "thumb"),
-            getImage(media.mediaURLHTTPS, "large"),
-            media.url,
-            media.type?.let { MediaType.valueOf(it) } ?: MediaType.photo,
-        )
-    }
 }
 
 private fun getImage(uri: String?, type: String): String? {
@@ -67,10 +47,10 @@ private fun getImage(uri: String?, type: String): String? {
     return uri
 }
 
-private fun Status.toDbStatus(
+private fun Status.toDbStatusWithMedia(
     userKey: UserKey
-): DbStatus {
-    return DbStatus(
+): DbStatusWithMedia {
+    val status = DbStatus(
         _id = UUID.randomUUID().toString(),
         statusId = idStr ?: throw IllegalArgumentException("Status.idStr should not be null"),
         userKey = userKey,
@@ -83,9 +63,28 @@ private fun Status.toDbStatus(
         liked = favorited ?: false,
         replyCount = 0,
         placeString = place?.fullName,
-        hasMedia = entities?.media != null || extendedEntities?.media != null,
+        hasMedia = extendedEntities?.media != null || entities?.media != null,
         extra = encodeJson(),
-        user = user?.toDbUser() ?: throw IllegalArgumentException("Status.user should not be null"),
+        user = user?.toDbUser()
+            ?: throw IllegalArgumentException("Status.user should not be null"),
+    )
+    return DbStatusWithMedia(
+        status = status,
+        media = (extendedEntities?.media ?: entities?.media ?: emptyList()).mapIndexed { index, it ->
+            DbMedia(
+                _id = UUID.randomUUID().toString(),
+                statusId = status.statusId,
+                previewUrl = getImage(it.mediaURLHTTPS, "small"),
+                mediaUrl = getImage(it.mediaURLHTTPS, "large"),
+                width = it.sizes?.large?.w ?: 0,
+                height = it.sizes?.large?.h ?: 0,
+                pageUrl = it.url,
+                altText = it.displayURL ?: "",
+                url = it.expandedURL,
+                type = it.type?.let { MediaType.valueOf(it) } ?: MediaType.photo,
+                order = index,
+            )
+        }
     )
 }
 

@@ -1,7 +1,6 @@
 package com.twidere.twiderex.db.model
 
 import androidx.room.*
-import com.twidere.twiderex.model.MediaData
 import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.UserKey
 
@@ -34,14 +33,18 @@ data class DbStatus(
     val hasMedia: Boolean,
     @Embedded(prefix = "user_")
     val user: User,
-) {
-    @Ignore
-    var mediaCache: List<MediaData>? = null
-}
+)
 
 data class User(
     val id: String,
     val name: String,
     val screenName: String,
     val profileImage: String,
+)
+
+data class DbStatusWithMedia(
+    @Embedded
+    val status: DbStatus,
+    @Relation(parentColumn = "statusId", entityColumn = "statusId")
+    val media: List<DbMedia>,
 )

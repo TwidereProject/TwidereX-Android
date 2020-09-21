@@ -8,8 +8,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.Button
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.fragment.app.setFragmentResultListener
@@ -33,17 +33,16 @@ class TwitterSignInFragment : ComposeFragment() {
     @Preview
     @Composable
     override fun onCompose() {
-        val (isLoading, setIsLoading) = remember { mutableStateOf(false) }
+        val isLoading by viewModel.isLoading.observeAsState()
         Column(
             modifier = Modifier.fillMaxWidth().fillMaxHeight(),
             verticalArrangement = Arrangement.Center,
-            horizontalGravity = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            if (isLoading) {
+            if (isLoading == true) {
                 CircularProgressIndicator()
             } else {
                 Button(onClick = {
-                    setIsLoading(true)
                     activity?.lifecycleScope?.launch {
                         // TODO: dynamic key && secret
                         viewModel.beginOAuth(
@@ -64,7 +63,6 @@ class TwitterSignInFragment : ComposeFragment() {
                                 }
                             }
                         }
-                        setIsLoading(false)
                         findNavController().navigate(R.id.action_twitter_sign_in_fragment_to_home_fragment)
                     }
                 }) {

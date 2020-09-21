@@ -1,6 +1,7 @@
 package com.twidere.twiderex.viewmodel.twitter
 
 import androidx.hilt.lifecycle.ViewModelInject
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
 import com.twidere.services.microblog.HomeTimelineService
@@ -14,7 +15,7 @@ class HomeTimelineViewModel @ViewModelInject constructor(
     database: AppDatabase
 ) : ViewModel() {
 
-    val repository by lazy {
+    private val repository by lazy {
         accountRepository.getCurrentAccount().let { account ->
             accountRepository.getCurrentAccount().service.let {
                 it as? HomeTimelineService
@@ -30,20 +31,27 @@ class HomeTimelineViewModel @ViewModelInject constructor(
         }
     }
 
+    val loadingBetween = MutableLiveData(listOf<String>())
+    val loadingMore = MutableLiveData(false)
+
     suspend fun refresh() {
-        repository?.refresh(source.value?.firstOrNull()?.status?.statusId)
+        repository?.refresh(source.value?.firstOrNull()?.status?.status?.statusId)
     }
 
     suspend fun loadBetween(
         max_id: String,
         since_id: String,
     ) {
+        loadingBetween.postValue((loadingBetween.value ?: listOf()) + max_id)
         repository?.loadBetween(max_id = max_id, since_id = since_id)
+        loadingBetween.postValue((loadingBetween.value ?: listOf()) - max_id)
     }
 
     suspend fun loadMore() {
-        source.value?.lastOrNull()?.status?.statusId?.let {
+        loadingMore.postValue(true)
+        source.value?.lastOrNull()?.status?.status?.statusId?.let {
             repository?.loadMore(it)
         }
+        loadingMore.postValue(false)
     }
 }

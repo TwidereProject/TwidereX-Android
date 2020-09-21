@@ -17,7 +17,7 @@ class HomeTimelineRepository(
     }
 
     val liveData by lazy {
-        database.timelineDao().getAllWithLiveData()
+        database.timelineDao().getAllWithLiveData(userKey)
     }
 
     suspend fun refresh(since_id: String?): List<DbTimelineWithStatus> {
@@ -34,12 +34,12 @@ class HomeTimelineRepository(
         if (withGap) {
             timeline.lastOrNull()?.timeline?.isGap = result.size >= count
         }
-        database.statusDao().insertAll(
-            timeline
+        val data = timeline
                 .map { listOf(it.status, it.quote, it.retweet) }
                 .flatten()
                 .filterNotNull()
-        )
+        database.mediaDao().insertAll(data.map { it.media }.flatten())
+        database.statusDao().insertAll(data.map { it.status })
         database.timelineDao().insertAll(timeline.map { it.timeline })
         return timeline
     }

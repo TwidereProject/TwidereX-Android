@@ -16,11 +16,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.VectorAsset
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.twidere.twiderex.db.mapper.extraMedia
-import com.twidere.twiderex.db.model.DbStatus
+import com.twidere.twiderex.db.model.DbMedia
+import com.twidere.twiderex.db.model.DbStatusWithMedia
 import com.twidere.twiderex.db.model.DbTimelineWithStatus
-import com.twidere.twiderex.extensions.humanized
-import com.twidere.twiderex.model.MediaData
+import com.twidere.twiderex.extensions.humanizedTimestamp
 
 val standardPadding = 8.dp
 val profileImageSize = 44.dp
@@ -28,149 +27,153 @@ val profileImageSize = 44.dp
 @Composable
 fun TimelineStatusComponent(
     data: DbTimelineWithStatus,
-    showActions: Boolean = true,
 ) {
-    val status = data.retweet ?: data.status
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(standardPadding),
-    ) {
-        if (data.retweet != null) {
-            Row {
-                Box(
-                    modifier = Modifier
-                        .width(profileImageSize),
-                    gravity = ContentGravity.CenterEnd,
-                ) {
-                    Icon(asset = Icons.Default.Reply, tint = buttonContentColor())
+    Column {
+        val status = (data.retweet ?: data.status)
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable(onClick = {})
+                .padding(standardPadding),
+        ) {
+            if (data.retweet != null) {
+                Row {
+                    Box(
+                        modifier = Modifier
+                            .width(profileImageSize),
+                        gravity = ContentGravity.CenterEnd,
+                    ) {
+                        Icon(asset = Icons.Default.Reply, tint = buttonContentColor())
+                    }
+                    Spacer(modifier = Modifier.width(standardPadding))
+                    Text(
+                        text = data.status.status.user.name + "retweet this tweet",
+                        color = buttonContentColor()
+                    )
                 }
-                Spacer(modifier = Modifier.width(standardPadding))
-                Text(
-                    text = data.status.user.name + "retweet this tweet",
-                    color = buttonContentColor()
+                Spacer(modifier = Modifier.height(standardPadding))
+            }
+            StatusComponent(
+                status = status,
+                quote = data.quote,
+                showActions = true,
+            )
+            Spacer(modifier = Modifier.height(standardPadding))
+            Row {
+                Spacer(modifier = Modifier.width(profileImageSize))
+                StatusActionButton(
+                    icon = Icons.Default.Reply,
+                    count = status.status.replyCount,
+                    onClick = {},
                 )
+                StatusActionButton(
+                    icon = Icons.Default.Comment,
+                    count = status.status.retweetCount,
+                    onClick = {},
+                )
+                StatusActionButton(
+                    icon = Icons.Default.Favorite,
+                    count = status.status.likeCount,
+                    onClick = {},
+                )
+                TextButton(
+                    onClick = {},
+                    contentColor = buttonContentColor(),
+                ) {
+                    Icon(
+                        asset = Icons.Default.Share,
+                    )
+                }
             }
         }
-        StatusComponent(
-            status = status,
-            quote = data.quote,
-            showActions = showActions,
-        )
     }
 }
 
 @Composable
 fun StatusComponent(
-    status: DbStatus,
-    quote: DbStatus? = null,
+    status: DbStatusWithMedia,
+    modifier: Modifier = Modifier,
+    quote: DbStatusWithMedia? = null,
     showActions: Boolean = true,
 ) {
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-        ) {
-            GlideImage(
-                model = status.user.profileImage,
-                modifier = Modifier
-                    .clip(CircleShape)
-                    .width(profileImageSize)
-                    .height(profileImageSize)
-            )
-            Spacer(modifier = Modifier.width(standardPadding))
-            Column(
-                modifier = Modifier.fillMaxWidth()
-            ) {
+    Row(modifier = modifier) {
+        NetworkImage(
+            url = status.status.user.profileImage,
+            modifier = Modifier
+                .clip(CircleShape)
+                .width(profileImageSize)
+                .height(profileImageSize)
+        )
+        Spacer(modifier = Modifier.width(standardPadding))
+        Column {
+            Row {
+                Row(
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text(
+                        text = status.status.user.name,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        color = Color(0XFF4C9EEB)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = "@${status.status.user.screenName}",
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        color = EmphasisAmbient.current.medium.applyEmphasis(
+                            contentColor()
+                        ),
+                    )
+                }
                 Row {
-                    Row(
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Text(
-                            text = status.user.name,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                        )
-                        Text(
-                            text = status.user.screenName,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            color = EmphasisAmbient.current.medium.applyEmphasis(
-                                contentColor()
-                            ),
+                    Text(text = status.status.timestamp.humanizedTimestamp())
+                    if (showActions) {
+                        Icon(
+                            asset = Icons.Default.ArrowDropDown,
+                            modifier = Modifier
+                                .clickable(
+                                    onClick = {},
+                                ),
                         )
                     }
-                    Row {
-                        Text(text = status.timestamp.toString())
-                        if (showActions) {
-                            Icon(
-                                asset = Icons.Default.ArrowDropDown,
-                                modifier = Modifier
-                                    .clickable(
-                                        onClick = {},
-                                    ),
-                            )
-                        }
-                    }
                 }
-                Text(text = status.text)
+            }
 
-                if (status.hasMedia) {
-                    val media = status.extraMedia()
-                    if (media != null) {
-//                        Spacer(modifier = Modifier.height(standardPadding))
-//                        StatusMediaComponent(media = media)
-                    }
+            Spacer(modifier = Modifier.height(4.dp))
+
+            Text(text = status.status.text)
+
+            if (status.media.any()) {
+                Spacer(modifier = Modifier.height(standardPadding))
+                StatusMediaComponent(media = status.media.sortedBy { it.order })
+            }
+
+            if (!status.status.placeString.isNullOrEmpty()) {
+                Row {
+                    Icon(asset = Icons.Default.Place)
+                    Text(text = status.status.placeString)
                 }
+            }
 
-                if (!status.placeString.isNullOrEmpty()) {
-                    Row {
-                        Icon(asset = Icons.Default.Place)
-                        Text(text = status.placeString)
-                    }
-                }
-
-                if (quote != null) {
-                    Box(
+            if (quote != null) {
+                Spacer(modifier = Modifier.height(standardPadding))
+                Box(
+                    modifier = Modifier
+                        .border(
+                            1.dp,
+                            contentColor().copy(alpha = 0.12f),
+                            RoundedCornerShape(8.dp)
+                        )
+                        .clip(RoundedCornerShape(8.dp))
+                ) {
+                    StatusComponent(
+                        status = quote,
+                        showActions = false,
                         modifier = Modifier
-                            .border(
-                                1.dp,
-                                contentColor().copy(alpha = 0.12f),
-                                RoundedCornerShape(8.dp)
-                            )
-                            .padding(standardPadding)
-                    ) {
-                        StatusComponent(status = quote, showActions = false)
-                    }
-                }
-                if (showActions) {
-                    Spacer(modifier = Modifier.height(standardPadding))
-                    Row {
-                        StatusActionButton(
-                            icon = Icons.Default.Reply,
-                            count = status.replyCount,
-                            onClick = {},
-                        )
-                        StatusActionButton(
-                            icon = Icons.Default.Comment,
-                            count = status.retweetCount,
-                            onClick = {},
-                        )
-                        StatusActionButton(
-                            icon = Icons.Default.Favorite,
-                            count = status.likeCount,
-                            onClick = {},
-                        )
-                        TextButton(
-                            onClick = {},
-                            contentColor = buttonContentColor(),
-                        ) {
-                            Icon(
-                                asset = Icons.Default.Share,
-                            )
-                        }
-                    }
+                            .clickable(onClick = {})
+                            .padding(standardPadding),
+                    )
                 }
             }
         }
@@ -179,62 +182,87 @@ fun StatusComponent(
 
 @Composable
 fun StatusMediaComponent(
-    media: List<MediaData>
+    media: List<DbMedia>
 ) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .aspectRatio(270f / 162f)
-            .clip(RoundedCornerShape(8.dp))
-    ) {
-        when (media.size) {
-            1 -> {
-                media.firstOrNull()?.previewUrl?.let {
-                    GlideImage(model = it)
+    if (media.size == 1) {
+        val first = media.first()
+        Box(
+            modifier = Modifier
+                .heightIn(max = 400.dp)
+                .aspectRatio(first.width.toFloat() / first.height.toFloat())
+                .clip(RoundedCornerShape(8.dp))
+        ) {
+            first.previewUrl?.let { StatusMediaPreviewItem(url = it, onClick = {}) }
+        }
+    } else {
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .aspectRatio(270f / 162f)
+                .clip(RoundedCornerShape(8.dp))
+        ) {
+            if (media.size == 3) {
+                Row {
+                    media.firstOrNull()?.previewUrl?.let {
+                        StatusMediaPreviewItem(
+                            url = it,
+                            modifier = Modifier.weight(1f),
+                            onClick = {},
+                        )
+                    }
+                    Column(
+                        modifier = Modifier.weight(1f),
+                    ) {
+                        media.drop(1).forEach {
+                            it.previewUrl?.let {
+                                StatusMediaPreviewItem(
+                                    url = it,
+                                    modifier = Modifier.weight(1f),
+                                    onClick = {},
+                                )
+                            }
+                        }
+                    }
+                }
+            } else {
+                Column {
+                    for (i in media.indices.filter { it % 2 == 0 }) {
+                        Row(
+                            modifier = Modifier.weight(1f),
+                        ) {
+                            for (y in (i until i + 2)) {
+                                media.elementAtOrNull(y)?.let {
+                                    it.previewUrl?.let {
+                                        StatusMediaPreviewItem(
+                                            url = it,
+                                            modifier = Modifier.weight(1f),
+                                            onClick = {},
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
-//            2 -> {
-//                Row {
-//                    media.forEach {
-//                        it.previewUrl?.let {
-//                            GlideImage(model = it, modifier = Modifier.weight(1f))
-//                        }
-//                    }
-//                }
-//            }
-//            3 -> {
-//                Row {
-//                    media.firstOrNull()?.previewUrl?.let {
-//                        GlideImage(model = it, modifier = Modifier.weight(1f))
-//                    }
-//                    Column {
-//                        media.drop(1).forEach {
-//                            it.previewUrl?.let {
-//                                GlideImage(model = it, modifier = Modifier.weight(1f))
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//            4 -> {
-//                Row {
-//                    Column {
-//                        media.dropLast(2).forEach {
-//                            it.previewUrl?.let {
-//                                GlideImage(model = it, modifier = Modifier.weight(1f))
-//                            }
-//                        }
-//                    }
-//                    Column {
-//                        media.drop(2).forEach {
-//                            it.previewUrl?.let {
-//                                GlideImage(model = it, modifier = Modifier.weight(1f))
-//                            }
-//                        }
-//                    }
-//                }
-//            }
         }
+    }
+}
+
+@Composable
+fun StatusMediaPreviewItem(
+    url: String,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
+) {
+    Box(
+        modifier = modifier
+    ) {
+        NetworkImage(
+            url = url,
+            modifier = Modifier.clickable(onClick = onClick),
+        )
     }
 }
 
@@ -245,14 +273,13 @@ fun StatusActionButton(
     count: Long,
     onClick: () -> Unit,
 ) {
-    TextButton(
-        onClick = onClick,
+    Row(
         modifier = modifier,
-        contentColor = buttonContentColor(),
+        horizontalArrangement = Arrangement.Start,
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Start,
+        TextButton(
+            onClick = onClick,
+            contentColor = buttonContentColor(),
         ) {
             Icon(asset = icon)
             if (count > 0) {
