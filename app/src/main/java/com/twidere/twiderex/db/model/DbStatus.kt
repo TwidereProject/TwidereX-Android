@@ -1,10 +1,13 @@
 package com.twidere.twiderex.db.model
 
+import android.os.Parcelable
 import androidx.room.*
 import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.UserKey
+import kotlinx.android.parcel.Parcelize
 
 
+@Parcelize
 @Entity(
     tableName = "status",
     indices = [Index(value = ["statusId"], unique = true)],
@@ -33,18 +36,20 @@ data class DbStatus(
     val hasMedia: Boolean,
     @Embedded(prefix = "user_")
     val user: User,
-)
+): Parcelable
 
+@Parcelize
 data class User(
     val id: String,
     val name: String,
     val screenName: String,
     val profileImage: String,
-)
+): Parcelable
 
+@Parcelize
 data class DbStatusWithMedia(
     @Embedded
     val status: DbStatus,
     @Relation(parentColumn = "statusId", entityColumn = "statusId")
     val media: List<DbMedia>,
-)
+): Parcelable

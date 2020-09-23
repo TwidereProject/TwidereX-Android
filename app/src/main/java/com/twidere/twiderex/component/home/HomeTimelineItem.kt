@@ -4,6 +4,7 @@ import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.ColumnScope.align
 import androidx.compose.foundation.lazy.LazyColumnForIndexed
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -17,8 +18,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.viewModel
 import com.twidere.twiderex.component.SwipeToRefreshLayout
 import com.twidere.twiderex.component.TimelineStatusComponent
-import com.twidere.twiderex.component.profileImageSize
-import com.twidere.twiderex.component.standardPadding
+import com.twidere.twiderex.ui.profileImageSize
+import com.twidere.twiderex.ui.standardPadding
 import com.twidere.twiderex.viewmodel.twitter.HomeTimelineViewModel
 import kotlinx.coroutines.launch
 
@@ -31,11 +32,12 @@ class HomeTimelineItem : HomeNavigationItem() {
     @Composable
     override fun onCompose() {
         val viewModel = viewModel<HomeTimelineViewModel>()
-        val items by viewModel.source.observeAsState(listOf())
+        val items by viewModel.source.observeAsState(initial = listOf())
         val loadingBetween by viewModel.loadingBetween.observeAsState(initial = listOf())
         val loadingMore by viewModel.loadingMore.observeAsState(initial = false)
         var refreshing by remember { mutableStateOf(false) }
         val scope = rememberCoroutineScope()
+        rememberScrollState()
         SwipeToRefreshLayout(
             refreshingState = refreshing,
             onRefresh = {
@@ -83,7 +85,8 @@ class HomeTimelineItem : HomeNavigationItem() {
                                     scope.launch {
                                         viewModel.loadBetween(
                                             item.status.status.statusId,
-                                            items[index + 1].status.status.statusId
+                                            items[index + 1].status.status.statusId,
+                                            item,
                                         )
                                     }
                                 },

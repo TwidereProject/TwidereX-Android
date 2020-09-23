@@ -21,4 +21,7 @@ interface TimelineDao {
 
     @Query("SELECT * FROM timeline WHERE statusId == :id")
     suspend fun findWithId(id: String): DbTimeline?
+
+    @Update
+    suspend fun update(vararg timeline: DbTimeline)
 }

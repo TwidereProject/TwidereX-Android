@@ -2,7 +2,7 @@ package com.twidere.twiderex.component
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.ColumnScope.weight
+import androidx.compose.foundation.layout.RowScope.weight
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.EmphasisAmbient
@@ -16,13 +16,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.VectorAsset
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.twidere.twiderex.db.model.DbMedia
 import com.twidere.twiderex.db.model.DbStatusWithMedia
 import com.twidere.twiderex.db.model.DbTimelineWithStatus
 import com.twidere.twiderex.extensions.humanizedTimestamp
-
-val standardPadding = 8.dp
-val profileImageSize = 44.dp
+import com.twidere.twiderex.ui.buttonContentColor
+import com.twidere.twiderex.ui.profileImageSize
+import com.twidere.twiderex.ui.standardPadding
 
 @Composable
 fun TimelineStatusComponent(
@@ -43,12 +42,12 @@ fun TimelineStatusComponent(
                             .width(profileImageSize),
                         gravity = ContentGravity.CenterEnd,
                     ) {
-                        Icon(asset = Icons.Default.Reply, tint = buttonContentColor())
+                        Icon(asset = Icons.Default.Reply, tint = buttonContentColor)
                     }
                     Spacer(modifier = Modifier.width(standardPadding))
                     Text(
                         text = data.status.status.user.name + "retweet this tweet",
-                        color = buttonContentColor()
+                        color = buttonContentColor
                     )
                 }
                 Spacer(modifier = Modifier.height(standardPadding))
@@ -78,7 +77,7 @@ fun TimelineStatusComponent(
                 )
                 TextButton(
                     onClick = {},
-                    contentColor = buttonContentColor(),
+                    contentColor = buttonContentColor,
                 ) {
                     Icon(
                         asset = Icons.Default.Share,
@@ -90,7 +89,7 @@ fun TimelineStatusComponent(
 }
 
 @Composable
-fun StatusComponent(
+private fun StatusComponent(
     status: DbStatusWithMedia,
     modifier: Modifier = Modifier,
     quote: DbStatusWithMedia? = null,
@@ -146,7 +145,9 @@ fun StatusComponent(
 
             if (status.media.any()) {
                 Spacer(modifier = Modifier.height(standardPadding))
-                StatusMediaComponent(media = status.media.sortedBy { it.order })
+                StatusMediaComponent(
+                    status = status,
+                )
             }
 
             if (!status.status.placeString.isNullOrEmpty()) {
@@ -181,93 +182,7 @@ fun StatusComponent(
 }
 
 @Composable
-fun StatusMediaComponent(
-    media: List<DbMedia>
-) {
-    if (media.size == 1) {
-        val first = media.first()
-        Box(
-            modifier = Modifier
-                .heightIn(max = 400.dp)
-                .aspectRatio(first.width.toFloat() / first.height.toFloat())
-                .clip(RoundedCornerShape(8.dp))
-        ) {
-            first.previewUrl?.let { StatusMediaPreviewItem(url = it, onClick = {}) }
-        }
-    } else {
-
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(270f / 162f)
-                .clip(RoundedCornerShape(8.dp))
-        ) {
-            if (media.size == 3) {
-                Row {
-                    media.firstOrNull()?.previewUrl?.let {
-                        StatusMediaPreviewItem(
-                            url = it,
-                            modifier = Modifier.weight(1f),
-                            onClick = {},
-                        )
-                    }
-                    Column(
-                        modifier = Modifier.weight(1f),
-                    ) {
-                        media.drop(1).forEach {
-                            it.previewUrl?.let {
-                                StatusMediaPreviewItem(
-                                    url = it,
-                                    modifier = Modifier.weight(1f),
-                                    onClick = {},
-                                )
-                            }
-                        }
-                    }
-                }
-            } else {
-                Column {
-                    for (i in media.indices.filter { it % 2 == 0 }) {
-                        Row(
-                            modifier = Modifier.weight(1f),
-                        ) {
-                            for (y in (i until i + 2)) {
-                                media.elementAtOrNull(y)?.let {
-                                    it.previewUrl?.let {
-                                        StatusMediaPreviewItem(
-                                            url = it,
-                                            modifier = Modifier.weight(1f),
-                                            onClick = {},
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun StatusMediaPreviewItem(
-    url: String,
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit,
-) {
-    Box(
-        modifier = modifier
-    ) {
-        NetworkImage(
-            url = url,
-            modifier = Modifier.clickable(onClick = onClick),
-        )
-    }
-}
-
-@Composable
-fun StatusActionButton(
+private fun StatusActionButton(
     modifier: Modifier = Modifier.weight(1f),
     icon: VectorAsset,
     count: Long,
@@ -279,7 +194,7 @@ fun StatusActionButton(
     ) {
         TextButton(
             onClick = onClick,
-            contentColor = buttonContentColor(),
+            contentColor = buttonContentColor,
         ) {
             Icon(asset = icon)
             if (count > 0) {
@@ -289,8 +204,3 @@ fun StatusActionButton(
         }
     }
 }
-
-@Composable
-private fun buttonContentColor(): Color = EmphasisAmbient.current.medium.applyEmphasis(
-    contentColor()
-)

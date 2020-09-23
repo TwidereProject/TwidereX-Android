@@ -54,7 +54,7 @@ class HomeFragment : ComposeFragment() {
         Scaffold(
             topBar = {
                 TopAppBar(
-                    backgroundColor = MaterialTheme.colors.background,
+                    backgroundColor = MaterialTheme.colors.surface,
                     title = {
                         Text(text = menus[selectedItem].name)
                     },

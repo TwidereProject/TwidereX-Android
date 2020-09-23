@@ -3,6 +3,7 @@ package com.twidere.twiderex.repository
 import com.twidere.services.microblog.HomeTimelineService
 import com.twidere.twiderex.db.AppDatabase
 import com.twidere.twiderex.db.mapper.toDbTimeline
+import com.twidere.twiderex.db.model.DbTimeline
 import com.twidere.twiderex.db.model.DbTimelineWithStatus
 import com.twidere.twiderex.model.UserKey
 
@@ -46,5 +47,9 @@ class HomeTimelineRepository(
 
     suspend fun loadMore(max_id: String): List<DbTimelineWithStatus> {
         return loadBetween(max_id = max_id, withGap = false)
+    }
+
+    suspend fun update(timeline: DbTimeline) {
+        database.timelineDao().update(timeline)
     }
 }

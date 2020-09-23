@@ -42,4 +42,22 @@
             android:name="target"
             app:argType="string" />
     </fragment>
+    <fragment
+        android:id="@+id/media_fragment"
+        android:name="com.twidere.twiderex.fragment.MediaFragment">
+        <argument
+            android:name="status"
+            app:argType="com.twidere.twiderex.db.model.DbStatusWithMedia" />
+        <argument
+            android:name="selectedIndex"
+            android:defaultValue="0"
+            app:argType="integer" />
+    </fragment>
+    <fragment
+        android:id="@+id/status_fragment"
+        android:name="com.twidere.twiderex.fragment.StatusFragment">
+        <argument
+            android:name="status"
+            app:argType="com.twidere.twiderex.db.model.DbTimelineWithStatus" />
+    </fragment>
 </navigation>
