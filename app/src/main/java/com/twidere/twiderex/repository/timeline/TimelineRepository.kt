@@ -1,24 +1,23 @@
-package com.twidere.twiderex.repository
+package com.twidere.twiderex.repository.timeline
 
-import com.twidere.services.microblog.HomeTimelineService
+import com.twidere.services.microblog.model.IStatus
 import com.twidere.twiderex.db.AppDatabase
 import com.twidere.twiderex.db.mapper.toDbTimeline
 import com.twidere.twiderex.db.model.DbTimeline
 import com.twidere.twiderex.db.model.DbTimelineWithStatus
+import com.twidere.twiderex.db.model.TimelineType
 import com.twidere.twiderex.model.UserKey
 
-class HomeTimelineRepository(
+
+abstract class TimelineRepository(
     private val userKey: UserKey,
-    private val service: HomeTimelineService,
     private val database: AppDatabase,
     private val count: Int = 20,
 ) {
-    suspend fun loadInitial(): List<DbTimelineWithStatus> {
-        return database.timelineDao().getAll()
-    }
+    protected abstract val type: TimelineType
 
     val liveData by lazy {
-        database.timelineDao().getAllWithLiveData(userKey)
+        database.timelineDao().getAllWithLiveData(userKey, type)
     }
 
     suspend fun refresh(since_id: String?): List<DbTimelineWithStatus> {
@@ -30,15 +29,15 @@ class HomeTimelineRepository(
         since_id: String? = null,
         withGap: Boolean = true,
     ): List<DbTimelineWithStatus> {
-        val result = service.homeTimeline(count = count, since_id = since_id, max_id = max_id)
-        val timeline = result.map { it.toDbTimeline(userKey) }
+        val result = loadData(count = count, since_id = since_id, max_id = max_id)
+        val timeline = result.map { it.toDbTimeline(userKey, type) }
         if (withGap) {
             timeline.lastOrNull()?.timeline?.isGap = result.size >= count
         }
         val data = timeline
-                .map { listOf(it.status, it.quote, it.retweet) }
-                .flatten()
-                .filterNotNull()
+            .map { listOf(it.status, it.quote, it.retweet) }
+            .flatten()
+            .filterNotNull()
         database.mediaDao().insertAll(data.map { it.media }.flatten())
         database.statusDao().insertAll(data.map { it.status })
         database.timelineDao().insertAll(timeline.map { it.timeline })
@@ -52,4 +51,10 @@ class HomeTimelineRepository(
     suspend fun update(timeline: DbTimeline) {
         database.timelineDao().update(timeline)
     }
+
+    protected abstract suspend fun loadData(
+        count: Int = 20,
+        since_id: String? = null,
+        max_id: String? = null,
+    ): List<IStatus>
 }

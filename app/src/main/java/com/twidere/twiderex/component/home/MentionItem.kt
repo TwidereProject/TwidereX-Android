@@ -1,11 +1,12 @@
 package com.twidere.twiderex.component.home
 
-import androidx.compose.foundation.Text
-import androidx.compose.foundation.layout.Column
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AlternateEmail
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.VectorAsset
+import androidx.compose.ui.viewinterop.viewModel
+import com.twidere.twiderex.component.TimelineComponent
+import com.twidere.twiderex.viewmodel.twitter.timeline.MentionsTimelineViewModel
 
 class MentionItem : HomeNavigationItem() {
     override val name: String
@@ -15,8 +16,7 @@ class MentionItem : HomeNavigationItem() {
 
     @Composable
     override fun onCompose() {
-        Column {
-            Text(text = "Mentions")
-        }
+        val viewModel = viewModel<MentionsTimelineViewModel>()
+        TimelineComponent(viewModel = viewModel)
     }
 }

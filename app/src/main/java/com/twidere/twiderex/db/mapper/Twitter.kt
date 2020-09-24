@@ -12,7 +12,8 @@ import java.util.*
 private typealias DbUser = com.twidere.twiderex.db.model.User
 
 fun Status.toDbTimeline(
-    userKey: UserKey
+    userKey: UserKey,
+    timelineType: TimelineType,
 ): DbTimelineWithStatus {
     val status = this.toDbStatusWithMedia(userKey)
     val retweet = retweetedStatus?.toDbStatusWithMedia(userKey)
@@ -28,6 +29,7 @@ fun Status.toDbTimeline(
             retweetId = retweet?.status?.statusId,
             quoteId = quote?.status?.statusId,
             statusId = status.status.statusId,
+            type = timelineType,
         ),
         status = status,
         retweet = retweet,

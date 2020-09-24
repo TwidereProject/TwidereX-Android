@@ -11,6 +11,7 @@ import com.twidere.twiderex.db.model.DbStatus
 import com.twidere.twiderex.db.model.DbTimeline
 import com.twidere.twiderex.db.model.converter.MediaTypeConverter
 import com.twidere.twiderex.db.model.converter.PlatformTypeConverter
+import com.twidere.twiderex.db.model.converter.TimelineTypeConverter
 import com.twidere.twiderex.db.model.converter.UserKeyConverter
 
 @Database(
@@ -25,6 +26,7 @@ import com.twidere.twiderex.db.model.converter.UserKeyConverter
     UserKeyConverter::class,
     PlatformTypeConverter::class,
     MediaTypeConverter::class,
+    TimelineTypeConverter::class,
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun statusDao(): StatusDao

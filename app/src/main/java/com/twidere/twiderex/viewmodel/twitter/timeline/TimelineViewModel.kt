@@ -1,28 +1,16 @@
-package com.twidere.twiderex.viewmodel.twitter
+package com.twidere.twiderex.viewmodel.twitter.timeline
 
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.twidere.services.microblog.HomeTimelineService
 import com.twidere.twiderex.db.AppDatabase
 import com.twidere.twiderex.db.model.DbTimelineWithStatus
-import com.twidere.twiderex.repository.AccountRepository
-import com.twidere.twiderex.repository.HomeTimelineRepository
+import com.twidere.twiderex.repository.timeline.TimelineRepository
 
-class HomeTimelineViewModel @ViewModelInject constructor(
-    accountRepository: AccountRepository,
-    database: AppDatabase
+abstract class TimelineViewModel constructor(
+    database: AppDatabase,
 ) : ViewModel() {
 
-    private val repository by lazy {
-        accountRepository.getCurrentAccount().let { account ->
-            accountRepository.getCurrentAccount().service.let {
-                it as HomeTimelineService
-            }.let { service ->
-                HomeTimelineRepository(account.key, service, database)
-            }
-        }
-    }
+    abstract val repository: TimelineRepository
 
     val source by lazy {
         repository.liveData
@@ -55,3 +43,4 @@ class HomeTimelineViewModel @ViewModelInject constructor(
         loadingMore.postValue(false)
     }
 }
+

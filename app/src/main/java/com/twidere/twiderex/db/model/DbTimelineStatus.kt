@@ -21,7 +21,13 @@ data class DbTimeline(
     val statusId: String,
     val retweetId: String?,
     val quoteId: String?,
+    val type: TimelineType,
 ): Parcelable
+
+enum class TimelineType {
+    Home,
+    Mentions,
+}
 
 @Parcelize
 data class DbTimelineWithStatus(
