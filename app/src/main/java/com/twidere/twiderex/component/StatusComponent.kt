@@ -6,61 +6,109 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.EmphasisAmbient
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Place
-import androidx.compose.material.icons.filled.Reply
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.twidere.twiderex.R
 import com.twidere.twiderex.db.model.DbStatusWithMedia
-import com.twidere.twiderex.db.model.DbTimelineWithStatus
+import com.twidere.twiderex.extensions.AmbientNavController
+import com.twidere.twiderex.extensions.humanizedTimestamp
+import com.twidere.twiderex.fragment.StatusFragmentArgs
 import com.twidere.twiderex.ui.buttonContentColor
 import com.twidere.twiderex.ui.profileImageSize
 import com.twidere.twiderex.ui.standardPadding
 
 @Composable
 fun ExpandedStatusComponent(
-    data: DbTimelineWithStatus,
+    status: DbStatusWithMedia,
+    retweet: DbStatusWithMedia?,
+    quote: DbStatusWithMedia?,
 ) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = {})
-            .padding(standardPadding),
+            .padding(
+                start = standardPadding * 2,
+                top = standardPadding * 2,
+                end = standardPadding * 2
+            ),
     ) {
-        val status = (data.retweet ?: data.status)
-        if (data.retweet != null) {
-            Row {
-                Box(
-                    modifier = Modifier
-                        .width(profileImageSize),
-                    gravity = ContentGravity.CenterEnd,
-                ) {
-                    Icon(asset = Icons.Default.Reply, tint = buttonContentColor)
-                }
-                Spacer(modifier = Modifier.width(standardPadding))
-                Text(
-                    text = data.status.status.user.name + "retweet this tweet",
-                    color = buttonContentColor
-                )
-            }
+        val data = (retweet ?: status)
+        if (retweet != null) {
+            RetweetHeader(data = status)
             Spacer(modifier = Modifier.height(standardPadding))
         }
         StatusComponent(
-            status = status,
-            quote = data.quote,
+            status = data,
+            quote = quote,
             showActions = true,
         )
 
-        if (!status.status.placeString.isNullOrEmpty()) {
+        if (!data.status.placeString.isNullOrEmpty()) {
             Row {
                 Icon(asset = Icons.Default.Place)
-                Text(text = status.status.placeString)
+                Text(text = data.status.placeString)
             }
         }
 
+        Spacer(modifier = Modifier.height(standardPadding))
+
+        Row(
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+        ) {
+            Text(
+                text = status.status.timestamp.humanizedTimestamp(),
+                color = buttonContentColor
+            )
+        }
+
+        Spacer(modifier = Modifier.height(standardPadding))
+
+        Row(
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+        ) {
+            if (status.status.replyCount > 0) {
+                StatusStatistics(count = status.status.replyCount.toString(), text = "reply")
+                Spacer(modifier = Modifier.width(standardPadding * 2))
+            }
+            if (status.status.retweetCount > 0) {
+                StatusStatistics(
+                    count = status.status.retweetCount.toString(),
+                    text = "retweets"
+                )
+                Spacer(modifier = Modifier.width(standardPadding * 2))
+            }
+            if (status.status.likeCount > 0) {
+                StatusStatistics(count = status.status.likeCount.toString(), text = "likes")
+            }
+        }
+
+        Spacer(modifier = Modifier.height(standardPadding))
+
+        Row {
+            Spacer(modifier = Modifier.weight(1f))
+            ActionIconButton(onClick = {}) {
+                Icon(asset = Icons.Default.Reply)
+            }
+            ActionIconButton(onClick = {}) {
+                Icon(asset = Icons.Default.Comment)
+            }
+            ActionIconButton(onClick = {}) {
+                Icon(asset = Icons.Default.Favorite)
+            }
+            ActionIconButton(onClick = {}) {
+                Icon(asset = Icons.Default.Share)
+            }
+            Spacer(modifier = Modifier.weight(1f))
+        }
     }
 }
 
@@ -100,6 +148,8 @@ private fun StatusComponent(
                 }
             }
 
+            Spacer(modifier = Modifier.height(standardPadding))
+
             Text(text = status.status.text)
 
             if (status.media.any()) {
@@ -120,15 +170,36 @@ private fun StatusComponent(
                         )
                         .clip(RoundedCornerShape(8.dp))
                 ) {
+                    val navController = AmbientNavController.current
                     StatusComponent(
                         status = quote,
                         showActions = false,
                         modifier = Modifier
-                            .clickable(onClick = {})
+                            .clickable(onClick = {
+                                navController.navigate(
+                                    R.id.status_fragment, StatusFragmentArgs(
+                                        status = quote,
+                                        quote = null,
+                                        retweet = null
+                                    ).toBundle()
+                                )
+                            })
                             .padding(standardPadding),
                     )
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun StatusStatistics(
+    count: String,
+    text: String,
+) {
+    Row {
+        Text(text = count)
+        Spacer(modifier = Modifier.width(standardPadding))
+        Text(text = text, color = buttonContentColor)
     }
 }

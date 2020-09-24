@@ -58,6 +58,14 @@
         android:name="com.twidere.twiderex.fragment.StatusFragment">
         <argument
             android:name="status"
-            app:argType="com.twidere.twiderex.db.model.DbTimelineWithStatus" />
+            app:argType="com.twidere.twiderex.db.model.DbStatusWithMedia" />
+        <argument
+            android:name="retweet"
+            app:argType="com.twidere.twiderex.db.model.DbStatusWithMedia"
+            app:nullable="true" />
+        <argument
+            android:name="quote"
+            app:argType="com.twidere.twiderex.db.model.DbStatusWithMedia"
+            app:nullable="true" />
     </fragment>
 </navigation>

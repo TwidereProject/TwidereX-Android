@@ -6,9 +6,7 @@ import androidx.compose.foundation.Text
 import androidx.compose.foundation.contentColor
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.ui.tooling.preview.Preview
+import androidx.compose.runtime.savedinstancestate.savedInstanceState
 import com.twidere.twiderex.component.home.*
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -40,10 +38,9 @@ class HomeFragment : ComposeFragment() {
     }
 
 
-    @Preview
     @Composable
     override fun onCompose() {
-        val (selectedItem, setSelectedItem) = remember { mutableStateOf(0) }
+        val (selectedItem, setSelectedItem) = savedInstanceState { 0 }
         val menus = listOf(
             HomeTimelineItem(),
             MentionItem(),

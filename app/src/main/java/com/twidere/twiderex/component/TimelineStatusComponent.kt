@@ -16,9 +16,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.VectorAsset
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.twidere.twiderex.R
 import com.twidere.twiderex.db.model.DbStatusWithMedia
 import com.twidere.twiderex.db.model.DbTimelineWithStatus
+import com.twidere.twiderex.extensions.AmbientNavController
 import com.twidere.twiderex.extensions.humanizedTimestamp
+import com.twidere.twiderex.fragment.StatusFragmentArgs
 import com.twidere.twiderex.ui.buttonContentColor
 import com.twidere.twiderex.ui.profileImageSize
 import com.twidere.twiderex.ui.standardPadding
@@ -29,27 +32,27 @@ fun TimelineStatusComponent(
 ) {
     Column {
         val status = (data.retweet ?: data.status)
+        val navController = AmbientNavController.current
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable(onClick = {})
-                .padding(standardPadding),
+                .clickable(onClick = {
+                    navController.navigate(
+                        R.id.status_fragment, StatusFragmentArgs(
+                            status = data.status,
+                            quote = data.quote,
+                            retweet = data.retweet
+                        ).toBundle()
+                    )
+                })
+                .padding(
+                    start = standardPadding * 2,
+                    top = standardPadding * 2,
+                    end = standardPadding * 2
+                ),
         ) {
             if (data.retweet != null) {
-                Row {
-                    Box(
-                        modifier = Modifier
-                            .width(profileImageSize),
-                        gravity = ContentGravity.CenterEnd,
-                    ) {
-                        Icon(asset = Icons.Default.Reply, tint = buttonContentColor)
-                    }
-                    Spacer(modifier = Modifier.width(standardPadding))
-                    Text(
-                        text = data.status.status.user.name + "retweet this tweet",
-                        color = buttonContentColor
-                    )
-                }
+                RetweetHeader(data = data.status)
                 Spacer(modifier = Modifier.height(standardPadding))
             }
             StatusComponent(
@@ -168,11 +171,20 @@ private fun StatusComponent(
                         )
                         .clip(RoundedCornerShape(8.dp))
                 ) {
+                    val navController = AmbientNavController.current
                     StatusComponent(
                         status = quote,
                         showActions = false,
                         modifier = Modifier
-                            .clickable(onClick = {})
+                            .clickable(onClick = {
+                                navController.navigate(
+                                    R.id.status_fragment, StatusFragmentArgs(
+                                        status = quote,
+                                        quote = null,
+                                        retweet = null
+                                    ).toBundle()
+                                )
+                            })
                             .padding(standardPadding),
                     )
                 }

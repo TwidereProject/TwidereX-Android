@@ -1,21 +1,17 @@
 package com.twidere.twiderex.ui
 
-import androidx.compose.foundation.background
+import android.os.Build
+import android.view.View
+import android.view.Window
+import android.view.WindowInsetsController
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.ContextAmbient
-import androidx.compose.ui.unit.dp
+import androidx.compose.runtime.onActive
 import com.twidere.twiderex.extensions.WindowAmbient
-import com.twidere.twiderex.extensions.px
-import com.twidere.twiderex.extensions.statusBarHeight
+import com.twidere.twiderex.extensions.toColorInt
 
 
 private val DarkColorPalette = darkColors(
@@ -46,19 +42,36 @@ fun TwidereXTheme(
         typography = typography,
         shapes = shapes,
         content = {
-            Column {
-                Spacer(
-                    modifier = Modifier.height(
-                        WindowAmbient.current.statusBarHeight.px(
-                            ContextAmbient.current
-                        ).dp
-                    )
-                        .fillMaxWidth().background(
-                            color = MaterialTheme.colors.surface
-                        )
-                )
-                content()
+            val window = WindowAmbient.current
+            val statusBarColor = MaterialTheme.colors.surface
+            onActive {
+                updateStatusBar(window, darkTheme, statusBarColor)
             }
+            content()
         }
     )
+}
+
+fun updateStatusBar(
+    window: Window,
+    darkTheme: Boolean,
+    statusBarColor: androidx.compose.ui.graphics.Color,
+) {
+    window.statusBarColor = statusBarColor.toColorInt()
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            window.insetsController?.setSystemBarsAppearance(
+                if (darkTheme) 0 else WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS,
+                WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
+            )
+        } else {
+            val decor = window.decorView
+            decor.systemUiVisibility = if (darkTheme) {
+                0
+            } else {
+                View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+            }
+        }
+    }
+
 }

@@ -9,7 +9,5 @@
         <item name="colorSecondary">@color/teal_200</item>
         <item name="colorSecondaryVariant">@color/teal_200</item>
         <item name="colorOnSecondary">@color/black</item>
-        <item name="android:windowTranslucentStatus">true</item>
-        <!--        <item name="android:windowTranslucentNavigation">true</item>-->
     </style>
 </resources>

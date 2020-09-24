@@ -9,7 +9,10 @@ import androidx.compose.foundation.gestures.rememberZoomableController
 import androidx.compose.foundation.gestures.zoomable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.IconButton
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
@@ -21,6 +24,7 @@ import androidx.compose.ui.drawLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.navigation.fragment.navArgs
+import com.twidere.twiderex.component.ActionIconButton
 import com.twidere.twiderex.component.NetworkImage
 import com.twidere.twiderex.component.Pager
 import com.twidere.twiderex.db.model.DbMedia
@@ -68,16 +72,16 @@ class MediaFragment : ComposeFragment() {
                 ) {
                     Row {
                         Spacer(modifier = Modifier.weight(1f))
-                        ActionButton(onClick = {}) {
+                        ActionIconButton(onClick = {}) {
                             Icon(asset = Icons.Default.Reply)
                         }
-                        ActionButton(onClick = {}) {
+                        ActionIconButton(onClick = {}) {
                             Icon(asset = Icons.Default.Comment)
                         }
-                        ActionButton(onClick = {}) {
+                        ActionIconButton(onClick = {}) {
                             Icon(asset = Icons.Default.Favorite)
                         }
-                        ActionButton(onClick = {}) {
+                        ActionIconButton(onClick = {}) {
                             Icon(asset = Icons.Default.Share)
                         }
                         Spacer(modifier = Modifier.weight(1f))
@@ -107,18 +111,6 @@ class MediaFragment : ComposeFragment() {
         }
     }
 
-}
-
-@Composable
-private fun ActionButton(
-    onClick: () -> Unit,
-    icon: @Composable () -> Unit,
-) {
-    IconButton(
-        onClick = onClick,
-        modifier = Modifier.size(ButtonConstants.DefaultMinWidth),
-        icon = icon,
-    )
 }
 
 @Composable

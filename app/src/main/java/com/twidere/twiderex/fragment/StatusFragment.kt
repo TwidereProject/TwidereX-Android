@@ -1,6 +1,7 @@
 package com.twidere.twiderex.fragment
 
 import androidx.compose.foundation.Icon
+import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.Text
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
@@ -10,6 +11,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.navigation.fragment.navArgs
+import com.twidere.twiderex.component.ExpandedStatusComponent
 import com.twidere.twiderex.extensions.AmbientNavController
 
 class StatusFragment : ComposeFragment() {
@@ -36,7 +38,13 @@ class StatusFragment : ComposeFragment() {
                 )
             }
         ) {
-
+            ScrollableColumn {
+                ExpandedStatusComponent(
+                    status = args.status,
+                    retweet = args.retweet,
+                    quote = args.quote,
+                )
+            }
         }
     }
 }
