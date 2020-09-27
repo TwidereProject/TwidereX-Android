@@ -13,20 +13,27 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.onActive
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.focus.ExperimentalFocus
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focusRequester
 import androidx.compose.ui.text.input.TextFieldValue
 import com.twidere.twiderex.component.AppBar
 import com.twidere.twiderex.component.AppBarNavigationButton
 
 class ComposeFragment : JetFragment() {
 
-    @OptIn(ExperimentalFoundationApi::class)
+    @OptIn(ExperimentalFoundationApi::class, ExperimentalFocus::class)
     @Composable
     override fun onCompose() {
         val textState = remember { mutableStateOf(TextFieldValue()) }
+        val focusRequester = FocusRequester()
+        onActive {
+            focusRequester.requestFocus()
+        }
         Scaffold(
             topBar = {
                 AppBar(
@@ -53,9 +60,9 @@ class ComposeFragment : JetFragment() {
                             .fillMaxSize()
                             .align(Alignment.Top)
                             .align(Alignment.Start)
-                            .background(color = Color.Transparent),
+                            .focusRequester(focusRequester),
                         value = textState.value,
-                        onValueChange = { textState.value = it }
+                        onValueChange = { textState.value = it },
                     )
                 }
                 Divider()
