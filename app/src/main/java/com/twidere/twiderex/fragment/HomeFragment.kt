@@ -1,6 +1,7 @@
 package com.twidere.twiderex.fragment
 
 import androidx.compose.animation.Crossfade
+import androidx.compose.foundation.Box
 import androidx.compose.foundation.Icon
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.contentColor
@@ -50,8 +51,7 @@ class HomeFragment : JetFragment() {
 
         Scaffold(
             topBar = {
-                TopAppBar(
-                    backgroundColor = MaterialTheme.colors.surface,
+                com.twidere.twiderex.component.AppBar(
                     title = {
                         Text(text = menus[selectedItem].name)
                     },
@@ -63,8 +63,15 @@ class HomeFragment : JetFragment() {
                 }
             },
         ) {
-            Crossfade(current = selectedItem) {
-                menus[it].onCompose()
+            Box(
+                paddingBottom = it.bottom,
+                paddingTop = it.top,
+                paddingStart = it.start,
+                paddingEnd = it.end,
+            ) {
+                Crossfade(current = selectedItem) {
+                    menus[it].onCompose()
+                }
             }
         }
     }

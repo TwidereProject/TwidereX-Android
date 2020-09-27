@@ -10,20 +10,20 @@ import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.onActive
+import androidx.compose.ui.graphics.toArgb
 import com.twidere.twiderex.extensions.WindowAmbient
-import com.twidere.twiderex.extensions.toColorInt
 
 
 private val DarkColorPalette = darkColors(
-    primary = purple200,
-    primaryVariant = purple700,
-    secondary = teal200
+    primary = blue,
+    primaryVariant = blue,
+    secondary = blue
 )
 
 private val LightColorPalette = lightColors(
-    primary = purple500,
-    primaryVariant = purple700,
-    secondary = teal200
+    primary = blue,
+    primaryVariant = blue,
+    secondary = blue
 )
 
 @Composable
@@ -57,7 +57,7 @@ fun updateStatusBar(
     darkTheme: Boolean,
     statusBarColor: androidx.compose.ui.graphics.Color,
 ) {
-    window.statusBarColor = statusBarColor.toColorInt()
+    window.statusBarColor = statusBarColor.toArgb()
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             window.insetsController?.setSystemBarsAppearance(
