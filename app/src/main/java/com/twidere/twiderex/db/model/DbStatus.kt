@@ -2,6 +2,7 @@ package com.twidere.twiderex.db.model
 
 import android.os.Parcelable
 import androidx.room.*
+import com.squareup.moshi.JsonClass
 import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.UserKey
 import kotlinx.android.parcel.Parcelize
@@ -36,15 +37,20 @@ data class DbStatus(
     val hasMedia: Boolean,
     @Embedded(prefix = "user_")
     val user: User,
-): Parcelable
+) : Parcelable
 
 @Parcelize
+@JsonClass(generateAdapter = true)
 data class User(
     val id: String,
     val name: String,
     val screenName: String,
     val profileImage: String,
-): Parcelable
+    val profileBackgroundImage: String?,
+    val followersCount: Long,
+    val friendsCount: Long,
+    val listedCount: Long,
+) : Parcelable
 
 @Parcelize
 data class DbStatusWithMedia(
@@ -52,4 +58,4 @@ data class DbStatusWithMedia(
     val status: DbStatus,
     @Relation(parentColumn = "statusId", entityColumn = "statusId")
     val media: List<DbMedia>,
-): Parcelable
+) : Parcelable

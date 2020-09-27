@@ -95,4 +95,8 @@ private fun User.toDbUser() = DbUser(
     name = this.name ?: "",
     screenName = this.screenName ?: "",
     profileImage = profileImageURLHTTPS ?: profileImageURL ?: "",
+    profileBackgroundImage = profileBackgroundImageURLHTTPS,
+    followersCount = this.followersCount ?: 0,
+    friendsCount = this.friendsCount ?: 0,
+    listedCount = this.listedCount ?: 0,
 )

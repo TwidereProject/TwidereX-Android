@@ -5,6 +5,7 @@ import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.twidere.services.twitter.TwitterOAuthService
+import com.twidere.twiderex.db.model.User
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.UserKey
@@ -56,6 +57,17 @@ class TwitterSignInViewModel @ViewModelInject constructor(
                             credentials_type = CredentialsType.OAuth,
                             credentials_json = credentials_json,
                             extras_json = "",
+                            user = User(
+                                id = user.idStr
+                                    ?: throw IllegalArgumentException("user.idStr should not be null"),
+                                name = user.name ?: "",
+                                screenName = user.screenName ?: "",
+                                profileImage = user.profileImageURLHTTPS ?: user.profileImageURL ?: "",
+                                profileBackgroundImage = user.profileBackgroundImageURLHTTPS,
+                                followersCount = user.followersCount ?: 0,
+                                friendsCount = user.friendsCount ?: 0,
+                                listedCount = user.listedCount ?: 0,
+                            )
                         )
                     )
                 }
