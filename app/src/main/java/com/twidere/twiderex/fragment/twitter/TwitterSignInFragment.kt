@@ -18,7 +18,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.ui.tooling.preview.Preview
 import com.twidere.twiderex.R
-import com.twidere.twiderex.fragment.ComposeFragment
+import com.twidere.twiderex.fragment.JetFragment
 import com.twidere.twiderex.viewmodel.twitter.TwitterSignInViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -27,7 +27,7 @@ import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
 @AndroidEntryPoint
-class TwitterSignInFragment : ComposeFragment() {
+class TwitterSignInFragment : JetFragment() {
     private val viewModel: TwitterSignInViewModel by viewModels()
 
     @Preview

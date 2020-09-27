@@ -7,12 +7,12 @@ import androidx.fragment.app.setFragmentResult
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.twidere.twiderex.component.WebComponent
-import com.twidere.twiderex.fragment.ComposeFragment
+import com.twidere.twiderex.fragment.JetFragment
 
 private const val INJECT_CONTENT =
     "javascript:window.injector.tryPinCode(document.querySelector('#oauth_pin code').textContent);"
 
-class TwitterWebSignInFragment : ComposeFragment() {
+class TwitterWebSignInFragment : JetFragment() {
 
     private val args by navArgs<TwitterWebSignInFragmentArgs>()
 

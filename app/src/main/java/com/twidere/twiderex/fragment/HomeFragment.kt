@@ -11,7 +11,7 @@ import com.twidere.twiderex.component.home.*
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class HomeFragment : ComposeFragment() {
+class HomeFragment : JetFragment() {
 
     @Composable
     fun BottomNavigation(

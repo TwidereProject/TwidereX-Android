@@ -33,7 +33,7 @@ import com.twidere.twiderex.extensions.compose
 import com.twidere.twiderex.ui.TwidereXTheme
 import kotlin.math.max
 
-class MediaFragment : ComposeFragment() {
+class MediaFragment : JetFragment() {
     private val args by navArgs<MediaFragmentArgs>()
 
     override fun onCreateView(

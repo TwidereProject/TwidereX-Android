@@ -18,7 +18,7 @@ import com.twidere.twiderex.viewmodel.SplashViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class SplashFragment : ComposeFragment() {
+class SplashFragment : JetFragment() {
     val viewModel by viewModels<SplashViewModel>()
 
     @Composable
