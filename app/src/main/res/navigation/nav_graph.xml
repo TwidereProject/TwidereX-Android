@@ -68,4 +68,7 @@
             app:argType="com.twidere.twiderex.db.model.DbStatusWithMedia"
             app:nullable="true" />
     </fragment>
+    <fragment
+        android:id="@+id/compose_fragment"
+        android:name="com.twidere.twiderex.fragment.ComposeFragment" />
 </navigation>
