@@ -20,7 +20,7 @@ import androidx.compose.ui.viewinterop.viewModel
 import com.twidere.twiderex.component.NetworkImage
 import com.twidere.twiderex.component.home.*
 import com.twidere.twiderex.ui.profileImageSize
-import com.twidere.twiderex.viewmodel.twitter.ActiveAccountViewModel
+import com.twidere.twiderex.viewmodel.ActiveAccountViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

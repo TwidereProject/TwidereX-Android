@@ -1,4 +1,4 @@
-package com.twidere.twiderex.viewmodel.twitter
+package com.twidere.twiderex.viewmodel
 
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.ViewModel
