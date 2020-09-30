@@ -29,6 +29,12 @@ abstract class TimelineRepository(
         since_id: String? = null,
         withGap: Boolean = true,
     ): List<DbTimelineWithStatus> {
+        if (max_id != null) {
+            database.timelineDao().findWithStatusId(max_id)?.let {
+                it.isGap = false
+                update(it)
+            }
+        }
         val result = loadData(count = count, since_id = since_id, max_id = max_id)
         val timeline = result.map { it.toDbTimeline(userKey, type) }
         if (withGap) {
