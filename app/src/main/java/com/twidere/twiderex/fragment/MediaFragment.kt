@@ -28,9 +28,9 @@ import com.twidere.twiderex.annotations.IncomingComposeUpdate
 import com.twidere.twiderex.component.ActionIconButton
 import com.twidere.twiderex.component.NetworkImage
 import com.twidere.twiderex.component.Pager
-import com.twidere.twiderex.db.model.DbMedia
 import com.twidere.twiderex.extensions.AmbientNavController
 import com.twidere.twiderex.extensions.compose
+import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.ui.TwidereXTheme
 import kotlin.math.max
 
@@ -57,7 +57,7 @@ class MediaFragment : JetFragment() {
         Scaffold {
             Stack {
                 Pager(
-                    items = args.status.media.sortedBy { it.order },
+                    items = args.status.media,
                     startPage = args.selectedIndex,
                     enableDrag = !lockPager,
                 ) {
@@ -117,7 +117,7 @@ class MediaFragment : JetFragment() {
 
 @Composable
 fun MediaItemView(
-    data: DbMedia,
+    data: UiMedia,
     requestLock: (Boolean) -> Unit,
 ) {
     var scale by remember { mutableStateOf(1f) }

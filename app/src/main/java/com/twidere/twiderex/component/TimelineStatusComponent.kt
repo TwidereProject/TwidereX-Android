@@ -3,7 +3,6 @@ package com.twidere.twiderex.component
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.RowScope.weight
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.EmphasisAmbient
 import androidx.compose.material.TextButton
@@ -17,21 +16,20 @@ import androidx.compose.ui.graphics.vector.VectorAsset
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.R
-import com.twidere.twiderex.db.model.DbStatusWithMedia
-import com.twidere.twiderex.db.model.DbTimelineWithStatus
 import com.twidere.twiderex.extensions.AmbientNavController
 import com.twidere.twiderex.extensions.humanizedTimestamp
 import com.twidere.twiderex.fragment.StatusFragmentArgs
+import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.ui.buttonContentColor
 import com.twidere.twiderex.ui.profileImageSize
 import com.twidere.twiderex.ui.standardPadding
 
 @Composable
 fun TimelineStatusComponent(
-    data: DbTimelineWithStatus,
+    data: UiStatus,
 ) {
     Column {
-        val status = (data.retweet ?: data.status)
+        val status = (data.retweet ?: data)
         val navController = AmbientNavController.current
         Column(
             modifier = Modifier
@@ -39,7 +37,7 @@ fun TimelineStatusComponent(
                 .clickable(onClick = {
                     navController.navigate(
                         R.id.status_fragment, StatusFragmentArgs(
-                            status = data.status,
+                            status = data,
                             quote = data.quote,
                             retweet = data.retweet
                         ).toBundle()
@@ -52,12 +50,11 @@ fun TimelineStatusComponent(
                 ),
         ) {
             if (data.retweet != null) {
-                RetweetHeader(data = data.status)
+                RetweetHeader(data = data)
                 Spacer(modifier = Modifier.height(standardPadding))
             }
             StatusComponent(
                 status = status,
-                quote = data.quote,
                 showActions = true,
             )
             Spacer(modifier = Modifier.height(standardPadding))
@@ -65,17 +62,17 @@ fun TimelineStatusComponent(
                 Spacer(modifier = Modifier.width(profileImageSize))
                 StatusActionButton(
                     icon = Icons.Default.Reply,
-                    count = status.status.replyCount,
+                    count = status.replyCount,
                     onClick = {},
                 )
                 StatusActionButton(
                     icon = Icons.Default.Comment,
-                    count = status.status.retweetCount,
+                    count = status.retweetCount,
                     onClick = {},
                 )
                 StatusActionButton(
                     icon = Icons.Default.Favorite,
-                    count = status.status.likeCount,
+                    count = status.likeCount,
                     onClick = {},
                 )
                 TextButton(
@@ -93,19 +90,12 @@ fun TimelineStatusComponent(
 
 @Composable
 private fun StatusComponent(
-    status: DbStatusWithMedia,
+    status: UiStatus,
     modifier: Modifier = Modifier,
-    quote: DbStatusWithMedia? = null,
     showActions: Boolean = true,
 ) {
     Row(modifier = modifier) {
-        NetworkImage(
-            url = status.status.user.profileImage,
-            modifier = Modifier
-                .clip(CircleShape)
-                .width(profileImageSize)
-                .height(profileImageSize)
-        )
+        UserAvatar(user = status.user)
         Spacer(modifier = Modifier.width(standardPadding))
         Column {
             Row {
@@ -113,14 +103,14 @@ private fun StatusComponent(
                     modifier = Modifier.weight(1f)
                 ) {
                     Text(
-                        text = status.status.user.name,
+                        text = status.user.name,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         color = Color(0XFF4C9EEB)
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = "@${status.status.user.screenName}",
+                        text = "@${status.user.screenName}",
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         color = EmphasisAmbient.current.medium.applyEmphasis(
@@ -129,7 +119,7 @@ private fun StatusComponent(
                     )
                 }
                 Row {
-                    Text(text = status.status.timestamp.humanizedTimestamp())
+                    Text(text = status.timestamp.humanizedTimestamp())
                     if (showActions) {
                         Icon(
                             asset = Icons.Default.ArrowDropDown,
@@ -144,7 +134,7 @@ private fun StatusComponent(
 
             Spacer(modifier = Modifier.height(4.dp))
 
-            Text(text = status.status.text)
+            Text(text = status.text)
 
             if (status.media.any()) {
                 Spacer(modifier = Modifier.height(standardPadding))
@@ -153,14 +143,14 @@ private fun StatusComponent(
                 )
             }
 
-            if (!status.status.placeString.isNullOrEmpty()) {
+            if (!status.placeString.isNullOrEmpty()) {
                 Row {
                     Icon(asset = Icons.Default.Place)
-                    Text(text = status.status.placeString)
+                    Text(text = status.placeString)
                 }
             }
 
-            if (quote != null) {
+            if (status.quote != null) {
                 Spacer(modifier = Modifier.height(standardPadding))
                 Box(
                     modifier = Modifier
@@ -173,13 +163,13 @@ private fun StatusComponent(
                 ) {
                     val navController = AmbientNavController.current
                     StatusComponent(
-                        status = quote,
+                        status = status.quote,
                         showActions = false,
                         modifier = Modifier
                             .clickable(onClick = {
                                 navController.navigate(
                                     R.id.status_fragment, StatusFragmentArgs(
-                                        status = quote,
+                                        status = status.quote,
                                         quote = null,
                                         retweet = null
                                     ).toBundle()

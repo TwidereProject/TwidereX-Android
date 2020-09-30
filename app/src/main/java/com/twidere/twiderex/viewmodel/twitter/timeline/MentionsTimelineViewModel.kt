@@ -10,7 +10,7 @@ import com.twidere.twiderex.repository.timeline.TimelineRepository
 class MentionsTimelineViewModel @ViewModelInject constructor(
     accountRepository: AccountRepository,
     database: AppDatabase,
-) : TimelineViewModel(database) {
+) : TimelineViewModel() {
     override val repository: TimelineRepository =
         accountRepository.getCurrentAccount().let { account ->
             accountRepository.getCurrentAccount().service.let {

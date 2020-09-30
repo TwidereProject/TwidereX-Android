@@ -1,19 +1,16 @@
 package com.twidere.twiderex.model
 
 import android.accounts.Account
-import android.os.Parcelable
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import com.twidere.services.microblog.MicroBlogService
 import com.twidere.services.twitter.TwitterService
-import com.twidere.twiderex.db.model.User
+import com.twidere.twiderex.db.model.DbUser
 import com.twidere.twiderex.model.cred.*
 import com.twidere.twiderex.utils.fromJson
 import kotlinx.android.parcel.IgnoredOnParcel
-import kotlinx.android.parcel.Parcelize
 
 @JsonClass(generateAdapter = true)
-@Parcelize
 data class AccountDetails(
     val account: Account,
     val type: PlatformType,
@@ -23,8 +20,8 @@ data class AccountDetails(
     var credentials_json: String,
     @Json(name = "extras")
     val extras_json: String,
-    val user: User,
-) : Parcelable {
+    val user: DbUser,
+) {
 
     @IgnoredOnParcel
     val credentials: Credentials?

@@ -9,19 +9,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.R
-import com.twidere.twiderex.db.model.DbMedia
-import com.twidere.twiderex.db.model.DbStatusWithMedia
 import com.twidere.twiderex.extensions.AmbientNavController
 import com.twidere.twiderex.fragment.MediaFragmentArgs
+import com.twidere.twiderex.model.ui.UiMedia
+import com.twidere.twiderex.model.ui.UiStatus
 
 
 @Composable
 fun StatusMediaComponent(
-    status: DbStatusWithMedia,
+    status: UiStatus,
 ) {
-    val media = status.media.sortedBy { it.order }
+    val media = status.media
     val navController = AmbientNavController.current
-    val onItemClick = { it: DbMedia ->
+    val onItemClick = { it: UiMedia ->
         val index = media.indexOf(it)
         navController.navigate(R.id.media_fragment, MediaFragmentArgs(status, index).toBundle())
     }
@@ -91,9 +91,9 @@ fun StatusMediaComponent(
 
 @Composable
 fun StatusMediaPreviewItem(
-    media: DbMedia,
+    media: UiMedia,
     modifier: Modifier = Modifier,
-    onClick: (DbMedia) -> Unit,
+    onClick: (UiMedia) -> Unit,
 ) {
     Box(
         modifier = modifier

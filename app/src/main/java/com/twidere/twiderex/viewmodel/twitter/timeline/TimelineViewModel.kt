@@ -2,42 +2,41 @@ package com.twidere.twiderex.viewmodel.twitter.timeline
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.twidere.twiderex.db.AppDatabase
-import com.twidere.twiderex.db.model.DbTimelineWithStatus
+import androidx.lifecycle.map
+import com.twidere.twiderex.model.ui.UiStatus.Companion.toUi
 import com.twidere.twiderex.repository.timeline.TimelineRepository
 
-abstract class TimelineViewModel constructor(
-    database: AppDatabase,
-) : ViewModel() {
+abstract class TimelineViewModel : ViewModel() {
 
     abstract val repository: TimelineRepository
 
     val source by lazy {
-        repository.liveData
+        repository.liveData.map { list ->
+            list.map { status ->
+                status.toUi()
+            }
+        }
     }
 
     val loadingBetween = MutableLiveData(listOf<String>())
     val loadingMore = MutableLiveData(false)
 
     suspend fun refresh() {
-        repository.refresh(source.value?.firstOrNull()?.status?.status?.statusId)
+        repository.refresh(source.value?.firstOrNull()?.statusId)
     }
 
     suspend fun loadBetween(
         max_id: String,
         since_id: String,
-        item: DbTimelineWithStatus,
     ) {
         loadingBetween.postValue((loadingBetween.value ?: listOf()) + max_id)
         repository.loadBetween(max_id = max_id, since_id = since_id)
-        item.timeline.isGap = false
-        repository.update(item.timeline)
         loadingBetween.postValue((loadingBetween.value ?: listOf()) - max_id)
     }
 
     suspend fun loadMore() {
         loadingMore.postValue(true)
-        source.value?.lastOrNull()?.status?.status?.statusId?.let {
+        source.value?.lastOrNull()?.statusId?.let {
             repository.loadMore(it)
         }
         loadingMore.postValue(false)

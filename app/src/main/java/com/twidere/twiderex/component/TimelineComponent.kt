@@ -11,11 +11,13 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.twidere.twiderex.annotations.IncomingComposeUpdate
 import com.twidere.twiderex.ui.profileImageSize
 import com.twidere.twiderex.ui.standardPadding
 import com.twidere.twiderex.viewmodel.twitter.timeline.TimelineViewModel
 import kotlinx.coroutines.launch
 
+@OptIn(IncomingComposeUpdate::class)
 @Composable
 fun TimelineComponent(viewModel: TimelineViewModel) {
     val items by viewModel.source.observeAsState(initial = listOf())
@@ -60,8 +62,8 @@ fun TimelineComponent(viewModel: TimelineViewModel) {
                         )
                     )
                 }
-                if (index != items.size - 1 && item.timeline.isGap) {
-                    if (loadingBetween.contains(item.status.status.statusId)) {
+                if (index != items.size - 1 && item.isGap) {
+                    if (loadingBetween.contains(item.statusId)) {
                         LoadingProgress()
                     } else {
                         TextButton(
@@ -69,9 +71,8 @@ fun TimelineComponent(viewModel: TimelineViewModel) {
                             onClick = {
                                 scope.launch {
                                     viewModel.loadBetween(
-                                        item.status.status.statusId,
-                                        items[index + 1].status.status.statusId,
-                                        item,
+                                        item.statusId,
+                                        items[index + 1].statusId,
                                     )
                                 }
                             },

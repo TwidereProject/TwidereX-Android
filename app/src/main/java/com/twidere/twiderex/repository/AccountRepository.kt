@@ -4,7 +4,7 @@ import android.accounts.Account
 import android.accounts.AccountManager
 import android.content.SharedPreferences
 import androidx.core.content.edit
-import com.twidere.twiderex.db.model.User
+import com.twidere.twiderex.db.model.DbUser
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.UserKey
@@ -94,7 +94,7 @@ class AccountRepository @Inject constructor(
             ),
             credentials_json = manager.peekAuthToken(account, ACCOUNT_AUTH_TOKEN_TYPE),
             extras_json = manager.getUserData(account, ACCOUNT_USER_DATA_EXTRAS),
-            user = manager.getUserData(account, ACCOUNT_USER_DATA_USER).fromJson<User>()!!
+            user = manager.getUserData(account, ACCOUNT_USER_DATA_USER).fromJson<DbUser>()!!
         )
     }
 

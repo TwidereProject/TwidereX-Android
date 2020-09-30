@@ -2,14 +2,13 @@ package com.twidere.twiderex.db.mapper
 
 import com.twidere.services.twitter.model.Status
 import com.twidere.services.twitter.model.User
+import com.twidere.services.twitter.model.UserV2
 import com.twidere.services.utils.encodeJson
 import com.twidere.twiderex.db.model.*
 import com.twidere.twiderex.model.MediaType
 import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.UserKey
 import java.util.*
-
-private typealias DbUser = com.twidere.twiderex.db.model.User
 
 fun Status.toDbTimeline(
     userKey: UserKey,
@@ -72,7 +71,8 @@ private fun Status.toDbStatusWithMedia(
     )
     return DbStatusWithMedia(
         status = status,
-        media = (extendedEntities?.media ?: entities?.media ?: emptyList()).mapIndexed { index, it ->
+        media = (extendedEntities?.media ?: entities?.media
+        ?: emptyList()).mapIndexed { index, it ->
             DbMedia(
                 _id = UUID.randomUUID().toString(),
                 statusId = status.statusId,
@@ -90,7 +90,7 @@ private fun Status.toDbStatusWithMedia(
     )
 }
 
-private fun User.toDbUser() = DbUser(
+fun User.toDbUser() = DbUser(
     id = this.idStr ?: throw IllegalArgumentException("user.idStr should not be null"),
     name = this.name ?: "",
     screenName = this.screenName ?: "",
@@ -99,4 +99,27 @@ private fun User.toDbUser() = DbUser(
     followersCount = this.followersCount ?: 0,
     friendsCount = this.friendsCount ?: 0,
     listedCount = this.listedCount ?: 0,
+    desc = this.description ?: "",
+    location = this.location,
+    website = this.entities?.url?.urls?.firstOrNull { it.url == this.url }?.expandedURL,
+    verified = this.verified ?: false,
+    isProtected = this.protected ?: false
+)
+
+fun UserV2.toDbUser() = DbUser(
+    id = this.id ?: throw IllegalArgumentException("user.idStr should not be null"),
+    name = this.name ?: "",
+    screenName = this.username ?: "",
+    profileImage = profileImageURL ?: "",
+    profileBackgroundImage = this.profileBanner?.sizes?.let {
+        it.getOrElse("mobile_retina", { null }) ?: it.values.firstOrNull()
+    }?.url,
+    followersCount = this.publicMetrics?.followersCount ?: 0,
+    friendsCount = this.publicMetrics?.followingCount ?: 0,
+    listedCount = this.publicMetrics?.listedCount ?: 0,
+    desc = this.description ?: "",
+    location = this.location,
+    website = this.entities?.url?.urls?.firstOrNull { it.url == this.url }?.expandedURL,
+    verified = this.verified ?: false,
+    isProtected = this.protected ?: false
 )

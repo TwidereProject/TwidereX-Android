@@ -30,8 +30,6 @@ class StatusFragment : JetFragment() {
             ScrollableColumn {
                 ExpandedStatusComponent(
                     status = args.status,
-                    retweet = args.retweet,
-                    quote = args.quote,
                 )
             }
         }

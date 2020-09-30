@@ -11,14 +11,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Reply
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.twidere.twiderex.db.model.DbStatusWithMedia
+import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.ui.buttonContentColor
 import com.twidere.twiderex.ui.profileImageSize
 import com.twidere.twiderex.ui.standardPadding
 
 @Composable
 fun RetweetHeader(
-    data: DbStatusWithMedia,
+    data: UiStatus,
 ) {
     Row {
         Box(
@@ -30,7 +30,7 @@ fun RetweetHeader(
         }
         Spacer(modifier = Modifier.width(standardPadding))
         Text(
-            text = data.status.user.name + "retweet this tweet",
+            text = data.user.name + "retweet this tweet",
             color = buttonContentColor
         )
     }

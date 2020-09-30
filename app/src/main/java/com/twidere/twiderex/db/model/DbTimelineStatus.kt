@@ -1,12 +1,9 @@
 package com.twidere.twiderex.db.model
 
-import android.os.Parcelable
 import androidx.room.*
 import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.UserKey
-import kotlinx.android.parcel.Parcelize
 
-@Parcelize
 @Entity(
     tableName = "timeline",
     indices = [Index(value = ["statusId"], unique = true)],
@@ -22,14 +19,13 @@ data class DbTimeline(
     val retweetId: String?,
     val quoteId: String?,
     val type: TimelineType,
-): Parcelable
+)
 
 enum class TimelineType {
     Home,
     Mentions,
 }
 
-@Parcelize
 data class DbTimelineWithStatus(
     @Embedded
     val timeline: DbTimeline,
@@ -52,4 +48,4 @@ data class DbTimelineWithStatus(
         entity = DbStatus::class,
     )
     val quote: DbStatusWithMedia?,
-): Parcelable
+)
