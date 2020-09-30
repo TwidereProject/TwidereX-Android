@@ -71,4 +71,11 @@
     <fragment
         android:id="@+id/compose_fragment"
         android:name="com.twidere.twiderex.fragment.ComposeFragment" />
+    <fragment
+        android:id="@+id/user_fragment"
+        android:name="com.twidere.twiderex.fragment.UserFragment">
+        <argument
+            android:name="user"
+            app:argType="com.twidere.twiderex.model.ui.UiUser" />
+    </fragment>
 </navigation>
