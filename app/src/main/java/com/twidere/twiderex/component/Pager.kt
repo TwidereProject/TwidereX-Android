@@ -14,6 +14,7 @@ import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.platform.AnimationClockAmbient
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.util.lerp
+import com.twidere.twiderex.annotations.IncomingComposeUpdate
 import kotlin.math.roundToInt
 
 class PagerState<T>(
@@ -93,6 +94,7 @@ private data class PageData(val page: Int) : ParentDataModifier {
 private val Measurable.page: Int
     get() = (parentData as? PageData)?.page ?: error("no PageData for measurable $this")
 
+@IncomingComposeUpdate
 @Composable
 fun <T> Pager(
     items: List<T>,

@@ -24,6 +24,7 @@ import androidx.compose.ui.drawLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.navigation.fragment.navArgs
+import com.twidere.twiderex.annotations.IncomingComposeUpdate
 import com.twidere.twiderex.component.ActionIconButton
 import com.twidere.twiderex.component.NetworkImage
 import com.twidere.twiderex.component.Pager
@@ -48,6 +49,7 @@ class MediaFragment : JetFragment() {
         }
     }
 
+    @OptIn(IncomingComposeUpdate::class)
     @Composable
     override fun onCompose() {
         var lockPager by remember { mutableStateOf(false) }

@@ -15,10 +15,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.unit.dp
+import com.twidere.twiderex.annotations.IncomingComposeUpdate
 
 private val RefreshDistance = 80.dp
 
 @OptIn(ExperimentalMaterialApi::class)
+@IncomingComposeUpdate
 @Composable
 fun SwipeToRefreshLayout(
     refreshingState: Boolean,
