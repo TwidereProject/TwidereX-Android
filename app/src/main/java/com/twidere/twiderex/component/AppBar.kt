@@ -12,7 +12,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun AppBar(
-    title: @Composable () -> Unit,
+    title: @Composable () -> Unit = {},
     modifier: Modifier = Modifier,
     navigationIcon: @Composable (() -> Unit)? = null,
     actions: @Composable RowScope.() -> Unit = {},
