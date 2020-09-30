@@ -1,6 +1,6 @@
 package com.twidere.services.twitter
 
-import com.twidere.services.http.authorization.OAuthAuthorization
+import com.twidere.services.http.authorization.OAuth1Authorization
 import com.twidere.services.http.retrofit
 import com.twidere.services.microblog.HomeTimelineService
 import com.twidere.services.microblog.MentionsTimelineService
@@ -18,7 +18,7 @@ class TwitterService(
     private val resources by lazy {
         retrofit<TwitterResources>(
             TWITTER_BASE_URL,
-            OAuthAuthorization(
+            OAuth1Authorization(
                 consumer_key,
                 consumer_secret,
                 access_token,
