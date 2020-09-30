@@ -46,8 +46,8 @@ class TwitterSignInFragment : JetFragment() {
                     activity?.lifecycleScope?.launch {
                         // TODO: dynamic key && secret
                         viewModel.beginOAuth(
-                            "MUUBibXUognm6e9vbzrUIqPkt",
-                            "l2uWAgQkoHvDfM2PrRFx2WN4h7QIUIktmxyeTAqRo6TkGCtNKy"
+                            "wmtrtTaVOjUnH5pWQp4LDI5Qs",
+                            "E9Q9u2yK0COJae2tLcNEdY75OPA3bxqJiGZQztraHaQUtoI2cu"
                         ) { target ->
                             suspendCoroutine {
                                 setFragmentResultListener("request_pin_code") { _, bundle ->
