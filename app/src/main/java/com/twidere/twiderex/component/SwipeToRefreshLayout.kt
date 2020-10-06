@@ -1,7 +1,6 @@
 package com.twidere.twiderex.component
 
-import androidx.compose.foundation.Box
-import androidx.compose.foundation.layout.Stack
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offsetPx
 import androidx.compose.material.ExperimentalMaterialApi
@@ -35,7 +34,7 @@ fun SwipeToRefreshLayout(
         true
     }
 
-    Stack(
+    Box(
         modifier = Modifier
             .swipeable(
                 state = state,

@@ -56,7 +56,7 @@ class MediaFragment : JetFragment() {
         var lockPager by remember { mutableStateOf(false) }
         val controlPanelColor = MaterialTheme.colors.surface.copy(alpha = 0.6f)
         Scaffold {
-            Stack {
+            Box {
                 Pager(
                     items = args.status.media,
                     startPage = args.selectedIndex,

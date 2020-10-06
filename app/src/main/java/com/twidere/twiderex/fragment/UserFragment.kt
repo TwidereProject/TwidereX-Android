@@ -1,9 +1,9 @@
 package com.twidere.twiderex.fragment
 
-import androidx.compose.foundation.Box
 import androidx.compose.foundation.Icon
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.lazy.ExperimentalLazyDsl
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.*
@@ -49,7 +49,7 @@ class UserFragment : JetFragment() {
             viewModel.init(args.user)
         }
         Scaffold {
-            Stack {
+            Box {
                 AppBar(
                     modifier = Modifier.zIndex(1f),
                     navigationIcon = {
@@ -89,7 +89,7 @@ class UserFragment : JetFragment() {
                         Column {
                             Box(
                                 modifier = Modifier.fillMaxWidth(),
-                                gravity = Alignment.Center
+                                alignment = Alignment.Center
                             ) {
                                 UserAvatar(
                                     user = user,

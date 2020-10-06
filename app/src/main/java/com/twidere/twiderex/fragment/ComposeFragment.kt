@@ -71,7 +71,7 @@ class ComposeFragment : JetFragment() {
                                 .height(profileImageSize)
                         )
                         Spacer(modifier = Modifier.weight(1f))
-                        Stack(
+                        Box(
                             modifier = Modifier
                                 .width(profileImageSize / 2)
                                 .height(profileImageSize / 2),
