@@ -2,7 +2,7 @@ package com.twidere.twiderex.component
 
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.ColumnScope.align
+import androidx.compose.foundation.layout.ColumnScope.Companion.align
 import androidx.compose.foundation.lazy.LazyColumnForIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*

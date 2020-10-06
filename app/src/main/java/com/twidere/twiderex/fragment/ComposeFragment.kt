@@ -1,6 +1,7 @@
 package com.twidere.twiderex.fragment
 
 import androidx.compose.foundation.*
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
@@ -91,7 +92,7 @@ class ComposeFragment : JetFragment() {
                         BaseTextField(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .align(Alignment.Top)
+                                .align(Alignment.TopStart)
                                 .focusRequester(focusRequester),
                             value = textState.value,
                             onValueChange = { textState.value = it },
