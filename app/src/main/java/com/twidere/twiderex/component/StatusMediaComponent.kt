@@ -9,7 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.R
-import com.twidere.twiderex.extensions.AmbientNavController
+import com.twidere.twiderex.extensions.NavControllerAmbient
 import com.twidere.twiderex.fragment.MediaFragmentArgs
 import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.model.ui.UiStatus
@@ -20,7 +20,7 @@ fun StatusMediaComponent(
     status: UiStatus,
 ) {
     val media = status.media
-    val navController = AmbientNavController.current
+    val navController = NavControllerAmbient.current
     val onItemClick = { it: UiMedia ->
         val index = media.indexOf(it)
         navController.navigate(R.id.media_fragment, MediaFragmentArgs(status, index).toBundle())

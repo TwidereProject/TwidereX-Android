@@ -17,7 +17,7 @@ import androidx.compose.ui.graphics.vector.VectorAsset
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.R
-import com.twidere.twiderex.extensions.AmbientNavController
+import com.twidere.twiderex.extensions.NavControllerAmbient
 import com.twidere.twiderex.extensions.humanizedTimestamp
 import com.twidere.twiderex.fragment.StatusFragmentArgs
 import com.twidere.twiderex.model.ui.UiStatus
@@ -31,7 +31,7 @@ fun TimelineStatusComponent(
 ) {
     Column {
         val status = (data.retweet ?: data)
-        val navController = AmbientNavController.current
+        val navController = NavControllerAmbient.current
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -162,7 +162,7 @@ private fun StatusComponent(
                         )
                         .clip(RoundedCornerShape(8.dp))
                 ) {
-                    val navController = AmbientNavController.current
+                    val navController = NavControllerAmbient.current
                     StatusComponent(
                         status = status.quote,
                         showActions = false,

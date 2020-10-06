@@ -11,7 +11,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.unit.Dp
 import com.twidere.twiderex.R
-import com.twidere.twiderex.extensions.AmbientNavController
+import com.twidere.twiderex.extensions.NavControllerAmbient
 import com.twidere.twiderex.fragment.UserFragmentArgs
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.ui.profileImageSize
@@ -21,7 +21,7 @@ fun UserAvatar(
     user: UiUser,
     size: Dp = profileImageSize
 ) {
-    val navController = AmbientNavController.current
+    val navController = NavControllerAmbient.current
     Box(
         modifier = Modifier
             .clip(CircleShape)

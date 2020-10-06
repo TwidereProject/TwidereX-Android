@@ -29,7 +29,7 @@ import com.twidere.twiderex.annotations.IncomingComposeUpdate
 import com.twidere.twiderex.component.ActionIconButton
 import com.twidere.twiderex.component.NetworkImage
 import com.twidere.twiderex.component.Pager
-import com.twidere.twiderex.extensions.AmbientNavController
+import com.twidere.twiderex.extensions.NavControllerAmbient
 import com.twidere.twiderex.extensions.compose
 import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.ui.TwidereXTheme
@@ -102,7 +102,7 @@ class MediaFragment : JetFragment() {
                             .background(color = controlPanelColor, shape = RoundedCornerShape(8.dp))
                             .clipToBounds()
                     ) {
-                        val navController = AmbientNavController.current
+                        val navController = NavControllerAmbient.current
                         IconButton(onClick = {
                             navController.popBackStack()
                         }) {

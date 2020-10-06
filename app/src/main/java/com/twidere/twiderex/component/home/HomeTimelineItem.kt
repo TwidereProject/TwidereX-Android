@@ -11,7 +11,7 @@ import androidx.compose.ui.graphics.vector.VectorAsset
 import androidx.compose.ui.viewinterop.viewModel
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.TimelineComponent
-import com.twidere.twiderex.extensions.AmbientNavController
+import com.twidere.twiderex.extensions.NavControllerAmbient
 import com.twidere.twiderex.viewmodel.twitter.timeline.HomeTimelineViewModel
 
 class HomeTimelineItem : HomeNavigationItem() {
@@ -25,7 +25,7 @@ class HomeTimelineItem : HomeNavigationItem() {
         val viewModel = viewModel<HomeTimelineViewModel>()
         Scaffold(
             floatingActionButton = {
-                val navController = AmbientNavController.current
+                val navController = NavControllerAmbient.current
                 FloatingActionButton(
                     onClick = {
                         navController.navigate(R.id.compose_fragment)
