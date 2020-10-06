@@ -4,6 +4,7 @@ import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.ColumnScope.Companion.align
 import androidx.compose.foundation.lazy.LazyColumnForIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
@@ -44,45 +45,52 @@ fun TimelineComponent(viewModel: TimelineViewModel) {
             }
         },
     ) {
-        LazyColumnForIndexed(
-            items = items,
-        ) { index, item ->
-            Column {
-                if (!loadingMore && index == items.size - 1) {
-                    scope.launch {
-                        viewModel.loadMore()
-                    }
-                }
-                TimelineStatusComponent(item)
-                if (index != items.size - 1) {
-                    Divider(
-                        modifier = Modifier.padding(
-                            start = profileImageSize + standardPadding,
-                            end = standardPadding
-                        )
-                    )
-                }
-                if (index != items.size - 1 && item.isGap) {
-                    if (loadingBetween.contains(item.statusId)) {
-                        LoadingProgress()
-                    } else {
-                        TextButton(
-                            modifier = Modifier.fillMaxWidth(),
-                            onClick = {
-                                scope.launch {
-                                    viewModel.loadBetween(
-                                        item.statusId,
-                                        items[index + 1].statusId,
-                                    )
-                                }
-                            },
-                        ) {
-                            Text("Load more")
+        if (items.any()) {
+            val listState = rememberLazyListState()
+            onDispose {
+                // TODO: save scroll position
+            }
+            LazyColumnForIndexed(
+                items = items,
+                state = listState,
+            ) { index, item ->
+                Column {
+                    if (!loadingMore && index == items.size - 1) {
+                        scope.launch {
+                            viewModel.loadMore()
                         }
                     }
-                }
-                if (loadingMore && index == items.size - 1) {
-                    LoadingProgress()
+                    TimelineStatusComponent(item)
+                    if (index != items.size - 1) {
+                        Divider(
+                            modifier = Modifier.padding(
+                                start = profileImageSize + standardPadding,
+                                end = standardPadding
+                            )
+                        )
+                    }
+                    if (index != items.size - 1 && item.isGap) {
+                        if (loadingBetween.contains(item.statusId)) {
+                            LoadingProgress()
+                        } else {
+                            TextButton(
+                                modifier = Modifier.fillMaxWidth(),
+                                onClick = {
+                                    scope.launch {
+                                        viewModel.loadBetween(
+                                            item.statusId,
+                                            items[index + 1].statusId,
+                                        )
+                                    }
+                                },
+                            ) {
+                                Text("Load more")
+                            }
+                        }
+                    }
+                    if (loadingMore && index == items.size - 1) {
+                        LoadingProgress()
+                    }
                 }
             }
         }
