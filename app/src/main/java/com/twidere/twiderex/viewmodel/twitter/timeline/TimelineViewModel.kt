@@ -2,8 +2,6 @@ package com.twidere.twiderex.viewmodel.twitter.timeline
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.map
-import com.twidere.twiderex.model.ui.UiStatus.Companion.toUi
 import com.twidere.twiderex.repository.timeline.TimelineRepository
 
 abstract class TimelineViewModel : ViewModel() {
@@ -11,11 +9,7 @@ abstract class TimelineViewModel : ViewModel() {
     abstract val repository: TimelineRepository
 
     val source by lazy {
-        repository.liveData.map { list ->
-            list.map { status ->
-                status.toUi()
-            }
-        }
+        repository.liveData
     }
 
     val loadingBetween = MutableLiveData(listOf<String>())

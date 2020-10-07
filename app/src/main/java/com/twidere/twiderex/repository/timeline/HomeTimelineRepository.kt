@@ -1,6 +1,6 @@
 package com.twidere.twiderex.repository.timeline
 
-import com.twidere.services.microblog.HomeTimelineService
+import com.twidere.services.microblog.TimelineService
 import com.twidere.services.microblog.model.IStatus
 import com.twidere.twiderex.db.AppDatabase
 import com.twidere.twiderex.db.model.TimelineType
@@ -8,7 +8,7 @@ import com.twidere.twiderex.model.UserKey
 
 class HomeTimelineRepository(
     userKey: UserKey,
-    private val service: HomeTimelineService,
+    private val service: TimelineService,
     database: AppDatabase,
     count: Int = 20,
 ) : TimelineRepository(userKey, database, count) {

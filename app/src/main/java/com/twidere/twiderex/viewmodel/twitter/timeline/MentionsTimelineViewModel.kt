@@ -1,7 +1,7 @@
 package com.twidere.twiderex.viewmodel.twitter.timeline
 
 import androidx.hilt.lifecycle.ViewModelInject
-import com.twidere.services.microblog.MentionsTimelineService
+import com.twidere.services.microblog.TimelineService
 import com.twidere.twiderex.db.AppDatabase
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.timeline.MentionsTimelineRepository
@@ -14,7 +14,7 @@ class MentionsTimelineViewModel @ViewModelInject constructor(
     override val repository: TimelineRepository =
         accountRepository.getCurrentAccount().let { account ->
             accountRepository.getCurrentAccount().service.let {
-                it as MentionsTimelineService
+                it as TimelineService
             }.let { service ->
                 MentionsTimelineRepository(account.key, service, database)
             }

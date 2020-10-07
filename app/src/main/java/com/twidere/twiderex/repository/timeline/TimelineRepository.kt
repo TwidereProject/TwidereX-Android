@@ -1,12 +1,14 @@
 package com.twidere.twiderex.repository.timeline
 
+import androidx.lifecycle.map
 import com.twidere.services.microblog.model.IStatus
 import com.twidere.twiderex.db.AppDatabase
 import com.twidere.twiderex.db.mapper.toDbTimeline
 import com.twidere.twiderex.db.model.DbTimeline
-import com.twidere.twiderex.db.model.DbTimelineWithStatus
 import com.twidere.twiderex.db.model.TimelineType
 import com.twidere.twiderex.model.UserKey
+import com.twidere.twiderex.model.ui.UiStatus
+import com.twidere.twiderex.model.ui.UiStatus.Companion.toUi
 
 
 abstract class TimelineRepository(
@@ -17,10 +19,14 @@ abstract class TimelineRepository(
     protected abstract val type: TimelineType
 
     val liveData by lazy {
-        database.timelineDao().getAllWithLiveData(userKey, type)
+        database.timelineDao().getAllWithLiveData(userKey, type).map { list ->
+            list.map { status ->
+                status.toUi()
+            }
+        }
     }
 
-    suspend fun refresh(since_id: String?): List<DbTimelineWithStatus> {
+    suspend fun refresh(since_id: String?): List<UiStatus> {
         return loadBetween(since_id = since_id)
     }
 
@@ -28,7 +34,7 @@ abstract class TimelineRepository(
         max_id: String? = null,
         since_id: String? = null,
         withGap: Boolean = true,
-    ): List<DbTimelineWithStatus> {
+    ): List<UiStatus> {
         if (max_id != null) {
             database.timelineDao().findWithStatusId(max_id)?.let {
                 it.isGap = false
@@ -47,10 +53,10 @@ abstract class TimelineRepository(
         database.mediaDao().insertAll(data.map { it.media }.flatten())
         database.statusDao().insertAll(data.map { it.status })
         database.timelineDao().insertAll(timeline.map { it.timeline })
-        return timeline
+        return timeline.map { it.toUi() }
     }
 
-    suspend fun loadMore(max_id: String): List<DbTimelineWithStatus> {
+    suspend fun loadMore(max_id: String): List<UiStatus> {
         return loadBetween(max_id = max_id, withGap = false)
     }
 

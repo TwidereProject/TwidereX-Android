@@ -3,10 +3,7 @@ package com.twidere.services.twitter
 import com.twidere.services.http.authorization.OAuth1Authorization
 import com.twidere.services.http.retrofit
 import com.twidere.services.microblog.*
-import com.twidere.services.microblog.model.IRelationship
-import com.twidere.services.microblog.model.IUser
-import com.twidere.services.microblog.model.MicroBlogError
-import com.twidere.services.microblog.model.Relationship
+import com.twidere.services.microblog.model.*
 import com.twidere.services.twitter.api.TwitterResources
 import com.twidere.services.twitter.model.TweetFields
 import com.twidere.services.twitter.model.UserFields
@@ -19,7 +16,7 @@ class TwitterService(
     private val consumer_secret: String,
     private val access_token: String,
     private val access_token_secret: String,
-) : MicroBlogService, HomeTimelineService, MentionsTimelineService, LookupService, RelationshipService {
+) : MicroBlogService, TimelineService, LookupService, RelationshipService {
     private val resources by lazy {
         retrofit<TwitterResources>(
             TWITTER_BASE_URL,
@@ -50,6 +47,21 @@ class TwitterService(
         since_id: String?,
         max_id: String?
     ) = resources.mentionsTimeline(
+        count,
+        since_id,
+        max_id,
+        trim_user = false,
+        exclude_replies = false,
+        include_entities = true,
+    )
+
+    override suspend fun userTimeline(
+        user_id: String,
+        count: Int,
+        since_id: String?,
+        max_id: String?
+    ) = resources.userTimeline(
+        user_id,
         count,
         since_id,
         max_id,

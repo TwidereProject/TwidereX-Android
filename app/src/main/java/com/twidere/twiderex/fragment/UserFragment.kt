@@ -17,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.launchInComposition
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.savedinstancestate.savedInstanceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,23 +25,20 @@ import androidx.compose.ui.WithConstraints
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.VectorAsset
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.viewModel
 import androidx.compose.ui.zIndex
 import androidx.navigation.fragment.navArgs
 import com.twidere.twiderex.annotations.IncomingComposeUpdate
-import com.twidere.twiderex.component.AppBar
-import com.twidere.twiderex.component.AppBarNavigationButton
-import com.twidere.twiderex.component.NetworkImage
-import com.twidere.twiderex.component.UserAvatar
-import com.twidere.twiderex.component.user.UserGalleryItem
-import com.twidere.twiderex.component.user.UserLikeItem
-import com.twidere.twiderex.component.user.UserTabItem
-import com.twidere.twiderex.component.user.UserTimelineItem
+import com.twidere.twiderex.component.*
+import com.twidere.twiderex.ui.profileImageSize
 import com.twidere.twiderex.ui.standardPadding
+import com.twidere.twiderex.viewmodel.UserTimelineViewModel
 import com.twidere.twiderex.viewmodel.UserViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class UserFragment : JetFragment() {
@@ -55,13 +53,22 @@ class UserFragment : JetFragment() {
         val relationship by viewModel.relationship.observeAsState()
         val loaded by viewModel.loaded.observeAsState(initial = false)
         val tabs = listOf(
-            UserTimelineItem(),
-            UserGalleryItem(),
-            UserLikeItem(),
+            Icons.Default.List,
+            Icons.Default.Image,
+            Icons.Default.Favorite,
         )
         val (selectedItem, setSelectedItem) = savedInstanceState { 0 }
+
+
+        val timelineViewModel = viewModel<UserTimelineViewModel>()
+        val timeline by timelineViewModel.timeline.observeAsState(initial = emptyList())
+        val timelineLoadingMore by timelineViewModel.loadingMore.observeAsState(initial = false)
+
+        val coroutineScope = rememberCoroutineScope()
+
         launchInComposition {
             viewModel.init(args.user)
+            timelineViewModel.loadTimeline(args.user)
         }
         Scaffold(
             floatingActionButton = {
@@ -93,9 +100,7 @@ class UserFragment : JetFragment() {
                     state = listState
                 ) {
                     item {
-                        Box(
-                            modifier = Modifier.fillParentMaxWidth()
-                        ) {
+                        Box {
                             //TODO: parallax effect
                             user.profileBackgroundImage?.let {
                                 NetworkImage(
@@ -126,7 +131,7 @@ class UserFragment : JetFragment() {
                                     )
                                 }
                                 Spacer(modifier = Modifier.height(standardPadding * 2))
-                                Row (
+                                Row(
                                     modifier = Modifier.padding(horizontal = standardPadding * 2)
                                 ) {
                                     Column(
@@ -223,18 +228,46 @@ class UserFragment : JetFragment() {
                                     }
                                 }
                                 Spacer(modifier = Modifier.height(standardPadding * 2))
-                                UserTabs(
-                                    items = tabs,
-                                    selectedItem = selectedItem,
-                                    onItemSelected = {
-                                        setSelectedItem(it)
-                                    },
-                                )
                             }
                         }
                     }
-                    item {
 
+                    item {
+                        UserTabs(
+                            items = tabs,
+                            selectedItem = selectedItem,
+                            onItemSelected = {
+                                setSelectedItem(it)
+                            },
+                        )
+                    }
+
+                    if (loaded) {
+                        when (selectedItem) {
+                            0 -> {
+                                itemsIndexed(timeline) { index, item ->
+                                    Column {
+                                        if (!timelineLoadingMore && index == timeline.size - 1) {
+                                            coroutineScope.launch {
+                                                timelineViewModel.loadTimeline(user)
+                                            }
+                                        }
+                                        TimelineStatusComponent(item)
+                                        if (index != timeline.size - 1) {
+                                            Divider(
+                                                modifier = Modifier.padding(
+                                                    start = profileImageSize + standardPadding,
+                                                    end = standardPadding
+                                                )
+                                            )
+                                        }
+                                        if (timelineLoadingMore && index == timeline.size - 1) {
+                                            LoadingProgress()
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -244,7 +277,7 @@ class UserFragment : JetFragment() {
 
 @Composable
 private fun UserTabs(
-    items: List<UserTabItem>,
+    items: List<VectorAsset>,
     selectedItem: Int,
     onItemSelected: (Int) -> Unit,
 ) {
@@ -272,7 +305,7 @@ private fun UserTabs(
                 Box(
                     modifier = Modifier.padding(16.dp)
                 ) {
-                    Icon(asset = items[i].icon)
+                    Icon(asset = items[i])
                 }
             }
         }

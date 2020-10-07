@@ -1,15 +1,19 @@
 package com.twidere.twiderex.component
 
 import androidx.compose.foundation.Text
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.ColumnScope.Companion.align
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.lazy.LazyColumnForIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.*
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.Divider
+import androidx.compose.material.Surface
+import androidx.compose.material.TextButton
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.annotations.IncomingComposeUpdate
@@ -95,16 +99,4 @@ fun TimelineComponent(viewModel: TimelineViewModel) {
             }
         }
     }
-}
-
-@Composable
-private fun LoadingProgress() {
-    CircularProgressIndicator(
-        modifier = Modifier
-            .defaultMinSizeConstraints(
-                minHeight = ButtonConstants.DefaultMinHeight,
-            )
-            .padding(ButtonConstants.DefaultContentPadding)
-            .align(Alignment.CenterHorizontally),
-    )
 }
