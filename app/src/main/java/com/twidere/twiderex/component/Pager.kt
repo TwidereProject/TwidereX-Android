@@ -1,19 +1,16 @@
 package com.twidere.twiderex.component
 
-
 import androidx.compose.animation.AnimatedFloatModel
 import androidx.compose.animation.core.AnimationClockObservable
+import androidx.compose.animation.core.AnimationEndReason
 import androidx.compose.animation.core.fling
-import androidx.compose.foundation.Box
-import androidx.compose.foundation.ContentGravity
 import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
-import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.platform.AnimationClockAmbient
 import androidx.compose.ui.unit.Density
-import androidx.compose.ui.util.lerp
 import com.twidere.twiderex.annotations.IncomingComposeUpdate
 import kotlin.math.roundToInt
 
@@ -77,8 +74,12 @@ class PagerState<T>(
         if (velocity < 0 && currentPage == maxPage) return
         if (velocity > 0 && currentPage == minPage) return
 
-        _currentPageOffset.fling(velocity) { _, _, _ ->
-            selectPage()
+        _currentPageOffset.fling(velocity) { reason, _, _ ->
+            if (reason != AnimationEndReason.Interrupted) {
+                _currentPageOffset.animateTo(currentPageOffset.roundToInt().toFloat()) { _, _ ->
+                    selectPage()
+                }
+            }
         }
     }
 
@@ -116,7 +117,7 @@ fun <T> Pager(
                 val pageData = PageData(page)
                 val scope = PagerScope(state, page)
                 key(pageData) {
-                    Box(gravity = ContentGravity.Center, modifier = pageData) {
+                    Box(alignment = Alignment.Center, modifier = pageData) {
                         scope.pageContent()
                     }
                 }
@@ -163,8 +164,10 @@ fun <T> Pager(
                         pageSize = placeable.width
                     }
 
+                    val xItemOffset = ((page + offset - currentPage) * placeable.width).roundToInt()
+
                     placeable.place(
-                        x = xCenterOffset + ((page - (currentPage - offset)) * placeable.width).roundToInt(),
+                        x = xCenterOffset + xItemOffset,
                         y = yCenterOffset
                     )
                 }
@@ -198,51 +201,4 @@ class PagerScope<T>(
      */
     val selectionState: PagerState.SelectionState
         get() = state.selectionState
-
-    /**
-     * Modifier which scales pager items according to their offset position. Similar in effect
-     * to a carousel.
-     */
-    fun Modifier.scalePagerItems(
-        unselectedScale: Float
-    ): Modifier = Modifier.drawWithContent {
-        if (selectionState == PagerState.SelectionState.Selected) {
-            // If the pager is 'selected', it's stationary so we use a simple if check
-            if (page != currentPage) {
-                scale(
-                    scaleX = unselectedScale,
-                    scaleY = unselectedScale,
-                    pivotX = center.x,
-                    pivotY = center.y
-                ) {
-                    this@drawWithContent.drawContent()
-                }
-            } else {
-                drawContent()
-            }
-        } else {
-            // Otherwise the pager is being scrolled, so we need to look at the swipe progress
-            // and interpolate between the sizes
-            val offsetForPage = page - currentPage + currentPageOffset
-
-            val scale = if (offsetForPage < 0) {
-                // If the page is to the left of the current page, we scale from min -> 1f
-                lerp(
-                    start = unselectedScale,
-                    stop = 1f,
-                    fraction = (1f + offsetForPage).coerceIn(0f, 1f)
-                )
-            } else {
-                // If the page is to the right of the current page, we scale from 1f -> min
-                lerp(
-                    start = 1f,
-                    stop = unselectedScale,
-                    fraction = offsetForPage.coerceIn(0f, 1f)
-                )
-            }
-            scale(scale, scale, center.x, center.y) {
-                this@drawWithContent.drawContent()
-            }
-        }
-    }
 }

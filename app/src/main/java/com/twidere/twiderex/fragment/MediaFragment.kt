@@ -4,9 +4,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.gestures.rememberZoomableController
+import androidx.compose.foundation.Icon
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.zoomable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -22,6 +21,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.drawLayer
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.gesture.DragObserver
+import androidx.compose.ui.gesture.rawDragGestureFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.navigation.fragment.navArgs
@@ -122,7 +124,8 @@ fun MediaItemView(
     requestLock: (Boolean) -> Unit,
 ) {
     var scale by remember { mutableStateOf(1f) }
-    val zoomableController = rememberZoomableController { scale = max(scale * it, 1F) }
+    var translate by remember { mutableStateOf(Offset(0f, 0f)) }
+    var looked by remember { mutableStateOf(false) }
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -131,28 +134,39 @@ fun MediaItemView(
         Box(
             modifier = Modifier
                 .zoomable(
-                    zoomableController,
+                    onZoomDelta = { scale = max(1f, scale * it) },
                     onZoomStarted = {
-                        requestLock(true)
+                        looked = true
+                        requestLock(looked)
                     },
                     onZoomStopped = {
-                        requestLock(false)
+                        looked = scale != 1f
+                        requestLock(looked)
                     },
                 )
-                .clickable(
-                    indication = null,
-                    onDoubleClick = { zoomableController.smoothScaleBy(4f) },
-                    onClick = {}
-                )
+                .rawDragGestureFilter(
+                    object : DragObserver {
+                        override fun onDrag(dragDistance: Offset): Offset {
+                            if (looked) {
+                                translate = translate.plus(dragDistance)
+                            }
+                            return super.onDrag(dragDistance)
+                        }
+                    })
                 .fillMaxSize(),
-            gravity = ContentGravity.Center,
+            alignment = Alignment.Center,
         ) {
             data.mediaUrl?.let {
                 NetworkImage(
                     url = it,
                     contentScale = ContentScale.Fit,
                     modifier = Modifier
-                        .drawLayer(scaleX = scale, scaleY = scale),
+                        .drawLayer(
+                            scaleX = scale,
+                            scaleY = scale,
+                            translationX = translate.x,
+                            translationY = translate.y
+                        ),
                     placeholder = {
                         CircularProgressIndicator()
                     }
