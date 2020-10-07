@@ -50,8 +50,8 @@ class UserFragment : JetFragment() {
     override fun onCompose() {
         val viewModel = viewModel<UserViewModel>()
         val user by viewModel.user.observeAsState(initial = args.user)
-        val relationship by viewModel.relationship.observeAsState()
         val loaded by viewModel.loaded.observeAsState(initial = false)
+
         val tabs = listOf(
             Icons.Default.List,
             Icons.Default.Image,
@@ -70,6 +70,7 @@ class UserFragment : JetFragment() {
             viewModel.init(args.user)
             timelineViewModel.loadTimeline(args.user)
         }
+        
         Scaffold(
             floatingActionButton = {
                 FloatingActionButton(onClick = {}) {
@@ -100,136 +101,7 @@ class UserFragment : JetFragment() {
                     state = listState
                 ) {
                     item {
-                        Box {
-                            //TODO: parallax effect
-                            user.profileBackgroundImage?.let {
-                                NetworkImage(
-                                    url = it,
-                                    modifier = Modifier
-                                        .aspectRatio(320f / 160f)
-                                )
-                            }
-                            Column {
-                                WithConstraints {
-                                    Spacer(modifier = Modifier.height(maxWidth * 160f / 320f - 72.dp / 2))
-                                }
-
-                                Box(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    alignment = Alignment.Center
-                                ) {
-                                    Spacer(
-                                        modifier = Modifier
-                                            .size(80.dp)
-                                            .clip(CircleShape)
-                                            .clipToBounds()
-                                            .background(Color.White)
-                                    )
-                                    UserAvatar(
-                                        user = user,
-                                        size = 72.dp,
-                                    )
-                                }
-                                Spacer(modifier = Modifier.height(standardPadding * 2))
-                                Row(
-                                    modifier = Modifier.padding(horizontal = standardPadding * 2)
-                                ) {
-                                    Column(
-                                        modifier = Modifier.weight(1f),
-                                    ) {
-                                        Text(
-                                            text = user.name,
-                                            style = MaterialTheme.typography.h6,
-                                            maxLines = 1,
-                                            overflow = TextOverflow.Ellipsis,
-                                        )
-                                        Text(
-                                            text = "@${user.screenName}",
-                                        )
-                                    }
-                                    relationship?.let {
-                                        Column(
-                                            horizontalAlignment = Alignment.End
-                                        ) {
-                                            Text(
-                                                text = if (it.followedBy) "Following" else "Follow",
-                                                style = MaterialTheme.typography.h6,
-                                                color = MaterialTheme.colors.primary,
-                                            )
-                                            if (it.following) {
-                                                Text(
-                                                    text = "Follows you",
-                                                    style = MaterialTheme.typography.caption,
-                                                )
-                                            }
-                                        }
-                                    } ?: run {
-                                        if (!loaded) {
-                                            CircularProgressIndicator()
-                                        }
-                                    }
-                                }
-                                Spacer(modifier = Modifier.height(standardPadding * 2))
-                                ListItem(
-                                    text = {
-                                        Text(text = user.desc)
-                                    }
-                                )
-                                user.website?.let {
-                                    ListItem(
-                                        icon = {
-                                            Icon(asset = Icons.Default.Link)
-                                        },
-                                        text = {
-                                            Text(
-                                                text = it,
-                                                maxLines = 1,
-                                                overflow = TextOverflow.Ellipsis,
-                                            )
-                                        }
-                                    )
-                                }
-                                user.location?.let {
-                                    ListItem(
-                                        icon = {
-                                            Icon(asset = Icons.Default.MyLocation)
-                                        },
-                                        text = {
-                                            Text(
-                                                text = it,
-                                                maxLines = 1,
-                                                overflow = TextOverflow.Ellipsis,
-                                            )
-                                        }
-                                    )
-                                }
-                                Spacer(modifier = Modifier.height(standardPadding * 2))
-                                Row {
-                                    Column(
-                                        modifier = Modifier.weight(1f),
-                                        horizontalAlignment = Alignment.CenterHorizontally,
-                                    ) {
-                                        Text(text = user.friendsCount.toString())
-                                        Text(text = "Following")
-                                    }
-                                    Column(
-                                        modifier = Modifier.weight(1f),
-                                        horizontalAlignment = Alignment.CenterHorizontally,
-                                    ) {
-                                        Text(text = user.followersCount.toString())
-                                        Text(text = "Followers")
-                                    }
-                                    Column(
-                                        modifier = Modifier.weight(1f),
-                                        horizontalAlignment = Alignment.CenterHorizontally,
-                                    ) {
-                                        Text(text = user.listedCount.toString())
-                                        Text(text = "Listed")
-                                    }
-                                }
-                                Spacer(modifier = Modifier.height(standardPadding * 2))
-                            }
-                        }
+                        UserInfo()
                     }
 
                     item {
@@ -270,6 +142,145 @@ class UserFragment : JetFragment() {
                         }
                     }
                 }
+            }
+        }
+    }
+
+    @Composable
+    private fun UserInfo() {
+        val viewModel = viewModel<UserViewModel>()
+        val user by viewModel.user.observeAsState(initial = args.user)
+        val loaded by viewModel.loaded.observeAsState(initial = false)
+        val relationship by viewModel.relationship.observeAsState()
+
+        Box {
+            //TODO: parallax effect
+            user.profileBackgroundImage?.let {
+                NetworkImage(
+                    url = it,
+                    modifier = Modifier
+                        .aspectRatio(320f / 160f)
+                )
+            }
+            Column {
+                WithConstraints {
+                    Spacer(modifier = Modifier.height(maxWidth * 160f / 320f - 72.dp / 2))
+                }
+
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    alignment = Alignment.Center
+                ) {
+                    Spacer(
+                        modifier = Modifier
+                            .size(80.dp)
+                            .clip(CircleShape)
+                            .clipToBounds()
+                            .background(Color.White)
+                    )
+                    UserAvatar(
+                        user = user,
+                        size = 72.dp,
+                    )
+                }
+                Spacer(modifier = Modifier.height(standardPadding * 2))
+                Row(
+                    modifier = Modifier.padding(horizontal = standardPadding * 2)
+                ) {
+                    Column(
+                        modifier = Modifier.weight(1f),
+                    ) {
+                        Text(
+                            text = user.name,
+                            style = MaterialTheme.typography.h6,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                        Text(
+                            text = "@${user.screenName}",
+                        )
+                    }
+                    relationship?.let {
+                        Column(
+                            horizontalAlignment = Alignment.End
+                        ) {
+                            Text(
+                                text = if (it.followedBy) "Following" else "Follow",
+                                style = MaterialTheme.typography.h6,
+                                color = MaterialTheme.colors.primary,
+                            )
+                            if (it.following) {
+                                Text(
+                                    text = "Follows you",
+                                    style = MaterialTheme.typography.caption,
+                                )
+                            }
+                        }
+                    } ?: run {
+                        if (!loaded) {
+                            CircularProgressIndicator()
+                        }
+                    }
+                }
+                Spacer(modifier = Modifier.height(standardPadding * 2))
+                ListItem(
+                    text = {
+                        Text(text = user.desc)
+                    }
+                )
+                user.website?.let {
+                    ListItem(
+                        icon = {
+                            Icon(asset = Icons.Default.Link)
+                        },
+                        text = {
+                            Text(
+                                text = it,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                            )
+                        }
+                    )
+                }
+                user.location?.let {
+                    ListItem(
+                        icon = {
+                            Icon(asset = Icons.Default.MyLocation)
+                        },
+                        text = {
+                            Text(
+                                text = it,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                            )
+                        }
+                    )
+                }
+                Spacer(modifier = Modifier.height(standardPadding * 2))
+                Row {
+                    Column(
+                        modifier = Modifier.weight(1f),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        Text(text = user.friendsCount.toString())
+                        Text(text = "Following")
+                    }
+                    Column(
+                        modifier = Modifier.weight(1f),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        Text(text = user.followersCount.toString())
+                        Text(text = "Followers")
+                    }
+                    Column(
+                        modifier = Modifier.weight(1f),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        Text(text = user.listedCount.toString())
+                        Text(text = "Listed")
+                    }
+                }
+                Spacer(modifier = Modifier.height(standardPadding * 2))
             }
         }
     }
