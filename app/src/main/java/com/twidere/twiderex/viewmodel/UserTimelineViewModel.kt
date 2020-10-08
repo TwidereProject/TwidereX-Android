@@ -11,16 +11,24 @@ class UserTimelineViewModel @ViewModelInject constructor(
     private val repository: UserRepository,
 ) : ViewModel() {
     val loadingMore = MutableLiveData(false)
-    val timeline = MutableLiveData<List<UiStatus>>()
+    val timeline = MutableLiveData<List<UiStatus>>(emptyList())
 
-    suspend fun loadTimeline(user: UiUser) {
-        loadingMore.postValue(true)
+    suspend fun refresh(user: UiUser) {
+        if (!timeline.value.isNullOrEmpty()) {
+            return
+        }
+        val result = repository.loadBetween(
+            user.id,
+        )
+        timeline.postValue(result)
+    }
+
+    suspend fun loadMore(user: UiUser) {
         val current = timeline.value ?: emptyList()
         val result = repository.loadBetween(
             user.id,
             max_id = current.lastOrNull()?.statusId
         )
         timeline.postValue(current + result)
-        loadingMore.postValue(false)
     }
 }

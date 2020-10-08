@@ -28,6 +28,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.VectorAsset
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.min
 import androidx.compose.ui.viewinterop.viewModel
 import androidx.compose.ui.zIndex
 import androidx.navigation.fragment.navArgs
@@ -50,7 +51,6 @@ class UserFragment : JetFragment() {
     override fun onCompose() {
         val viewModel = viewModel<UserViewModel>()
         val user by viewModel.user.observeAsState(initial = args.user)
-        val loaded by viewModel.loaded.observeAsState(initial = false)
 
         val tabs = listOf(
             Icons.Default.List,
@@ -68,9 +68,16 @@ class UserFragment : JetFragment() {
 
         launchInComposition {
             viewModel.init(args.user)
-            timelineViewModel.loadTimeline(args.user)
         }
-        
+
+        when {
+            selectedItem == 0 && !timeline.any() -> {
+                coroutineScope.launch {
+                    timelineViewModel.refresh(args.user)
+                }
+            }
+        }
+
         Scaffold(
             floatingActionButton = {
                 FloatingActionButton(onClick = {}) {
@@ -114,14 +121,14 @@ class UserFragment : JetFragment() {
                         )
                     }
 
-                    if (loaded) {
-                        when (selectedItem) {
-                            0 -> {
+                    when (selectedItem) {
+                        0 -> {
+                            if (timeline.any()) {
                                 itemsIndexed(timeline) { index, item ->
                                     Column {
                                         if (!timelineLoadingMore && index == timeline.size - 1) {
                                             coroutineScope.launch {
-                                                timelineViewModel.loadTimeline(user)
+                                                timelineViewModel.loadMore(user)
                                             }
                                         }
                                         TimelineStatusComponent(item)
@@ -133,12 +140,22 @@ class UserFragment : JetFragment() {
                                                 )
                                             )
                                         }
-                                        if (timelineLoadingMore && index == timeline.size - 1) {
-                                            LoadingProgress()
-                                        }
                                     }
                                 }
                             }
+                        }
+                    }
+
+                    item {
+                        Box(
+                            modifier = Modifier.fillParentMaxWidth(),
+                            alignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator(
+                                modifier = Modifier
+                                    .heightIn(min = ButtonConstants.DefaultMinHeight)
+                                    .padding(ButtonConstants.DefaultContentPadding),
+                            )
                         }
                     }
                 }
@@ -152,19 +169,31 @@ class UserFragment : JetFragment() {
         val user by viewModel.user.observeAsState(initial = args.user)
         val loaded by viewModel.loaded.observeAsState(initial = false)
         val relationship by viewModel.relationship.observeAsState()
+        val maxBannerSize = 200.dp
+
 
         Box {
             //TODO: parallax effect
             user.profileBackgroundImage?.let {
-                NetworkImage(
-                    url = it,
+                Box(
                     modifier = Modifier
-                        .aspectRatio(320f / 160f)
-                )
+                        .heightIn(max = maxBannerSize)
+                ) {
+                    NetworkImage(
+                        url = it,
+                    )
+                }
             }
             Column {
                 WithConstraints {
-                    Spacer(modifier = Modifier.height(maxWidth * 160f / 320f - 72.dp / 2))
+                    Spacer(
+                        modifier = Modifier.height(
+                            min(
+                                maxWidth * 160f / 320f - 72.dp / 2,
+                                maxBannerSize - 72.dp / 2
+                            )
+                        )
+                    )
                 }
 
                 Box(
