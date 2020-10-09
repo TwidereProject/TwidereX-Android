@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.ExperimentalLazyDsl
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.TabConstants.defaultTabIndicatorOffset
 import androidx.compose.material.icons.Icons
@@ -32,8 +33,10 @@ import androidx.compose.ui.unit.min
 import androidx.compose.ui.viewinterop.viewModel
 import androidx.compose.ui.zIndex
 import androidx.navigation.fragment.navArgs
+import com.twidere.twiderex.R
 import com.twidere.twiderex.annotations.IncomingComposeUpdate
 import com.twidere.twiderex.component.*
+import com.twidere.twiderex.extensions.NavControllerAmbient
 import com.twidere.twiderex.ui.profileImageSize
 import com.twidere.twiderex.ui.standardPadding
 import com.twidere.twiderex.viewmodel.UserTimelineViewModel
@@ -59,10 +62,11 @@ class UserFragment : JetFragment() {
         )
         val (selectedItem, setSelectedItem) = savedInstanceState { 0 }
 
-
         val timelineViewModel = viewModel<UserTimelineViewModel>()
         val timeline by timelineViewModel.timeline.observeAsState(initial = emptyList())
         val timelineLoadingMore by timelineViewModel.loadingMore.observeAsState(initial = false)
+        val mediaTimeline =
+            timeline.filter { it.hasMedia }.flatMap { it.media.map { media -> media to it } }
 
         val coroutineScope = rememberCoroutineScope()
 
@@ -74,6 +78,11 @@ class UserFragment : JetFragment() {
             selectedItem == 0 && !timeline.any() -> {
                 coroutineScope.launch {
                     timelineViewModel.refresh(args.user)
+                }
+            }
+            selectedItem == 1 && !mediaTimeline.any() -> {
+                coroutineScope.launch {
+                    timelineViewModel.loadMore(args.user)
                 }
             }
         }
@@ -144,18 +153,53 @@ class UserFragment : JetFragment() {
                                 }
                             }
                         }
+                        1 -> {
+                            if (mediaTimeline.any()) {
+                                itemsGridIndexed(
+                                    mediaTimeline,
+                                    rowSize = 2,
+                                    spacing = standardPadding * 2,
+                                    padding = standardPadding * 2,
+                                ) { index, item ->
+                                    val navController = NavControllerAmbient.current
+                                    if (!timelineLoadingMore && index == mediaTimeline.size - 1) {
+                                        coroutineScope.launch {
+                                            timelineViewModel.loadMore(user)
+                                        }
+                                    }
+                                    StatusMediaPreviewItem(
+                                        item.first,
+                                        modifier = Modifier
+                                            .aspectRatio(1F)
+                                            .clip(
+                                                RoundedCornerShape(8.dp)
+                                            ),
+                                        onClick = {
+                                            navController.navigate(
+                                                R.id.media_fragment,
+                                                MediaFragmentArgs(
+                                                    item.second,
+                                                    item.second.media.indexOf(item.first)
+                                                ).toBundle()
+                                            )
+                                        }
+                                    )
+                                }
+                            }
+                        }
                     }
-
-                    item {
-                        Box(
-                            modifier = Modifier.fillParentMaxWidth(),
-                            alignment = Alignment.Center
-                        ) {
-                            CircularProgressIndicator(
-                                modifier = Modifier
-                                    .heightIn(min = ButtonConstants.DefaultMinHeight)
-                                    .padding(ButtonConstants.DefaultContentPadding),
-                            )
+                    if (timelineLoadingMore) {
+                        item {
+                            Box(
+                                modifier = Modifier.fillParentMaxWidth(),
+                                alignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier
+                                        .heightIn(min = ButtonConstants.DefaultMinHeight)
+                                        .padding(ButtonConstants.DefaultContentPadding),
+                                )
+                            }
                         }
                     }
                 }

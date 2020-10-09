@@ -17,18 +17,22 @@ class UserTimelineViewModel @ViewModelInject constructor(
         if (!timeline.value.isNullOrEmpty()) {
             return
         }
+        loadingMore.postValue(true)
         val result = repository.loadBetween(
             user.id,
         )
         timeline.postValue(result)
+        loadingMore.postValue(false)
     }
 
     suspend fun loadMore(user: UiUser) {
+        loadingMore.postValue(true)
         val current = timeline.value ?: emptyList()
         val result = repository.loadBetween(
             user.id,
             max_id = current.lastOrNull()?.statusId
         )
         timeline.postValue(current + result)
+        loadingMore.postValue(false)
     }
 }
