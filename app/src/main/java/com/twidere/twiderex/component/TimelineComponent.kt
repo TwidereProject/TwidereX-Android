@@ -12,8 +12,11 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Divider
 import androidx.compose.material.Surface
 import androidx.compose.material.TextButton
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.onDispose
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.annotations.IncomingComposeUpdate
@@ -28,15 +31,13 @@ fun TimelineComponent(viewModel: TimelineViewModel) {
     val items by viewModel.source.observeAsState(initial = listOf())
     val loadingBetween by viewModel.loadingBetween.observeAsState(initial = listOf())
     val loadingMore by viewModel.loadingMore.observeAsState(initial = false)
-    var refreshing by remember { mutableStateOf(false) }
+    val refreshing by viewModel.refreshing.observeAsState(initial = false)
     val scope = rememberCoroutineScope()
     SwipeToRefreshLayout(
         refreshingState = refreshing,
         onRefresh = {
             scope.launch {
-                refreshing = true
                 viewModel.refresh()
-                refreshing = false
             }
         },
         refreshIndicator = {

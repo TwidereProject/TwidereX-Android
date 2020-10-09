@@ -14,9 +14,12 @@ abstract class TimelineViewModel : ViewModel() {
 
     val loadingBetween = MutableLiveData(listOf<String>())
     val loadingMore = MutableLiveData(false)
+    val refreshing = MutableLiveData(false)
 
     suspend fun refresh() {
+        refreshing.postValue(true)
         repository.refresh(source.value?.firstOrNull()?.statusId)
+        refreshing.postValue(false)
     }
 
     suspend fun loadBetween(
