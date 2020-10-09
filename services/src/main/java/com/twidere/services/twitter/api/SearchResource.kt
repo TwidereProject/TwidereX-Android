@@ -7,7 +7,7 @@ import java.util.*
 
 interface SearchResource {
     @GET("/2/tweets/search/recent")
-    suspend fun tweets(
+    suspend fun search(
         @Query("query") query: String,
         @Query("max_results") max_results: Int? = null,
         @Query("next_token") next_token: String? = null,
