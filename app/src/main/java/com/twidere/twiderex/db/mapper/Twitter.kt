@@ -127,12 +127,23 @@ fun UserV2.toDbUser() = DbUser(
     isProtected = this.protected ?: false
 )
 
-private fun updateProfileImagePath(value: String): String {
+private fun updateProfileImagePath(value: String, size: ProfileImageSize = ProfileImageSize.reasonably_small): String {
     val last = value.split("/").lastOrNull()
-    val id = last?.split("_")?.firstOrNull()
-    return if (id != null) {
-        value.replace(last, "${id}_reasonably_small.${value.split(".").lastOrNull()}")
+    var id = last?.split(".")?.firstOrNull()
+    ProfileImageSize.values().forEach {
+        id = id?.removeSuffix("_${it.name}")
+    }
+    return if (id != null && last != null) {
+        value.replace(last, "${id}_${size.name}.${value.split(".").lastOrNull()}")
     } else {
         value
     }
+}
+
+enum class ProfileImageSize {
+    original,
+    reasonably_small,
+    bigger,
+    normal,
+    mini,
 }
