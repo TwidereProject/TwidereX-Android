@@ -11,9 +11,4 @@ interface LookupService {
     suspend fun lookupUser(
         id: String
     ): IUser
-
-    suspend fun lookupTweets(
-        query: String,
-        nextPage: String? = null,
-    ): ISearchResponse
 }

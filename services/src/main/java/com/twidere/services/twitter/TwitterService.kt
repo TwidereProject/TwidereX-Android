@@ -2,10 +2,7 @@ package com.twidere.services.twitter
 
 import com.twidere.services.http.authorization.OAuth1Authorization
 import com.twidere.services.http.retrofit
-import com.twidere.services.microblog.LookupService
-import com.twidere.services.microblog.MicroBlogService
-import com.twidere.services.microblog.RelationshipService
-import com.twidere.services.microblog.TimelineService
+import com.twidere.services.microblog.*
 import com.twidere.services.microblog.model.IRelationship
 import com.twidere.services.microblog.model.IUser
 import com.twidere.services.microblog.model.MicroBlogError
@@ -21,7 +18,7 @@ class TwitterService(
     private val consumer_secret: String,
     private val access_token: String,
     private val access_token_secret: String,
-) : MicroBlogService, TimelineService, LookupService, RelationshipService {
+) : MicroBlogService, TimelineService, LookupService, RelationshipService, SearchService {
     private val resources by lazy {
         retrofit<TwitterResources>(
             TWITTER_BASE_URL,
@@ -125,7 +122,7 @@ class TwitterService(
         return user.data
     }
 
-    override suspend fun lookupTweets(query: String, nextPage: String?) =
+    override suspend fun searchTweets(query: String, nextPage: String?) =
         resources.tweets(
             query,
             next_token = nextPage,
