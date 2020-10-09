@@ -1,4 +1,4 @@
-package com.twidere.services.twitter.model
+package com.twidere.services.twitter.model.fields
 
 enum class UserFields(val value: String) {
     created_at("created_at"),

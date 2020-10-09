@@ -2,12 +2,17 @@ package com.twidere.services.twitter
 
 import com.twidere.services.http.authorization.OAuth1Authorization
 import com.twidere.services.http.retrofit
-import com.twidere.services.microblog.*
-import com.twidere.services.microblog.model.*
+import com.twidere.services.microblog.LookupService
+import com.twidere.services.microblog.MicroBlogService
+import com.twidere.services.microblog.RelationshipService
+import com.twidere.services.microblog.TimelineService
+import com.twidere.services.microblog.model.IRelationship
+import com.twidere.services.microblog.model.IUser
+import com.twidere.services.microblog.model.MicroBlogError
+import com.twidere.services.microblog.model.Relationship
 import com.twidere.services.twitter.api.TwitterResources
-import com.twidere.services.twitter.model.TweetFields
-import com.twidere.services.twitter.model.UserFields
 import com.twidere.services.twitter.model.UserV2
+import com.twidere.services.twitter.model.fields.*
 
 internal const val TWITTER_BASE_URL = "https://api.twitter.com/"
 
@@ -119,6 +124,36 @@ class TwitterService(
         }.getOrNull()
         return user.data
     }
+
+    override suspend fun lookupTweets(query: String, nextPage: String?) =
+        resources.tweets(
+            query,
+            next_token = nextPage,
+            userFields = UserFields.values().joinToString(",") { it.value },
+            pollFields = PollFields.values().joinToString(",") { it.name },
+            placeFields = PlaceFields.values().joinToString(",") { it.value },
+            mediaFields = MediaFields.values()
+                .filter { it != MediaFields.organic_metrics && it != MediaFields.non_public_metrics && it != MediaFields.promoted_metrics }
+                .joinToString(",") { it.name },
+            expansions = Expansions.values().joinToString(",") { it.value },
+            tweetFields = listOf(
+                TweetFields.attachments,
+                TweetFields.author_id,
+                TweetFields.conversation_id,
+                TweetFields.created_at,
+                TweetFields.entities,
+                TweetFields.geo,
+                TweetFields.id,
+                TweetFields.in_reply_to_user_id,
+                TweetFields.lang,
+                TweetFields.possibly_sensitive,
+                TweetFields.public_metrics,
+                TweetFields.referenced_tweets,
+                TweetFields.source,
+                TweetFields.text,
+                TweetFields.withheld
+            ).joinToString(",") { it.value },
+        )
 
     override suspend fun showRelationship(id: String): IRelationship {
         val response = resources.showFriendships(id)

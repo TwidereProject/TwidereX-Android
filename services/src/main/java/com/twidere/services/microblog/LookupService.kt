@@ -1,5 +1,6 @@
 package com.twidere.services.microblog
 
+import com.twidere.services.microblog.model.ISearchResponse
 import com.twidere.services.microblog.model.IUser
 
 interface LookupService {
@@ -10,4 +11,9 @@ interface LookupService {
     suspend fun lookupUser(
         id: String
     ): IUser
+
+    suspend fun lookupTweets(
+        query: String,
+        nextPage: String? = null,
+    ): ISearchResponse
 }

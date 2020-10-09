@@ -31,5 +31,5 @@ data class UserV2 (
     @SerialName("created_at")
     val createdAt: String? = null,
 
-    var profileBanner: ProfileBanner? = null
+    var profileBanner: ProfileBanner? = null,
 ) : IUser

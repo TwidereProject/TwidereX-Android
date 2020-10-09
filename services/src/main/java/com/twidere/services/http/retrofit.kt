@@ -2,6 +2,7 @@ package com.twidere.services.http
 
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import com.twidere.services.http.authorization.Authorization
+import com.twidere.services.serializer.DateQueryConverterFactory
 import com.twidere.services.utils.DEBUG
 import com.twidere.services.utils.JSON
 import okhttp3.MediaType.Companion.toMediaType
@@ -32,6 +33,7 @@ internal inline fun <reified T> retrofit(
         )
         .addConverterFactory(ScalarsConverterFactory.create())
         .addConverterFactory(JSON.asConverterFactory("application/json".toMediaType()))
+        .addConverterFactory(DateQueryConverterFactory())
         .build()
         .create(T::class.java)
 }

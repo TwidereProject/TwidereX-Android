@@ -3,7 +3,7 @@ package com.twidere.services.twitter.model
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class UserEntities (
-    val url: FluffyURL? = null,
-    val description: Description? = null,
+data class ReferencedTweetV2 (
+    val type: String? = null,
+    val id: String? = null
 )
