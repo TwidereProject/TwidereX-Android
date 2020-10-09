@@ -94,7 +94,7 @@ fun User.toDbUser() = DbUser(
     id = this.idStr ?: throw IllegalArgumentException("user.idStr should not be null"),
     name = this.name ?: "",
     screenName = this.screenName ?: "",
-    profileImage = profileImageURLHTTPS ?: profileImageURL ?: "",
+    profileImage = (profileImageURLHTTPS ?: profileImageURL)?.let { updateProfileImagePath(it) } ?: "",
     profileBackgroundImage = profileBackgroundImageURLHTTPS,
     followersCount = this.followersCount ?: 0,
     friendsCount = this.friendsCount ?: 0,
@@ -110,7 +110,7 @@ fun UserV2.toDbUser() = DbUser(
     id = this.id ?: throw IllegalArgumentException("user.idStr should not be null"),
     name = this.name ?: "",
     screenName = this.username ?: "",
-    profileImage = profileImageURL ?: "",
+    profileImage = profileImageURL?.let { updateProfileImagePath(it) } ?: "",
     profileBackgroundImage = this.profileBanner?.sizes?.let {
         it.getOrElse("mobile_retina", { null }) ?: it.values.firstOrNull()
     }?.url,
@@ -123,3 +123,13 @@ fun UserV2.toDbUser() = DbUser(
     verified = this.verified ?: false,
     isProtected = this.protected ?: false
 )
+
+private fun updateProfileImagePath(value: String): String {
+    val last = value.split("/").lastOrNull()
+    val id = last?.split("_")?.firstOrNull()
+    return if (id != null) {
+        value.replace(last, "${id}_reasonably_small.${value.split(".").lastOrNull()}")
+    } else {
+        value
+    }
+}
