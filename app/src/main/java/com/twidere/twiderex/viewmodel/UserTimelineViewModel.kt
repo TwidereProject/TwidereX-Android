@@ -18,7 +18,7 @@ class UserTimelineViewModel @ViewModelInject constructor(
             return
         }
         loadingMore.postValue(true)
-        val result = repository.loadBetween(
+        val result = repository.loadTimelineBetween(
             user.id,
         )
         timeline.postValue(result)
@@ -28,7 +28,7 @@ class UserTimelineViewModel @ViewModelInject constructor(
     suspend fun loadMore(user: UiUser) {
         loadingMore.postValue(true)
         val current = timeline.value ?: emptyList()
-        val result = repository.loadBetween(
+        val result = repository.loadTimelineBetween(
             user.id,
             max_id = current.lastOrNull()?.statusId
         )

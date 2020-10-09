@@ -1,7 +1,7 @@
 package com.twidere.twiderex.model.ui
 
 import android.os.Parcelable
-import com.twidere.twiderex.db.model.DbStatusWithMedia
+import com.twidere.twiderex.db.model.DbStatusWithMediaAndUser
 import com.twidere.twiderex.db.model.DbTimelineWithStatus
 import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.UserKey
@@ -45,14 +45,14 @@ data class UiStatus(
             extra = status.status.extra,
             placeString = status.status.placeString,
             hasMedia = status.status.hasMedia,
-            user = status.status.user.toUi(),
+            user = status.user.toUi(),
             media = status.media.toUi(),
             retweet = retweet?.toUi(),
             quote = quote?.toUi(),
             isGap = timeline.isGap,
         )
 
-        fun DbStatusWithMedia.toUi() = UiStatus(
+        fun DbStatusWithMediaAndUser.toUi() = UiStatus(
             statusId = status.statusId,
             userKey = status.userKey,
             platformType = status.platformType,
@@ -66,7 +66,7 @@ data class UiStatus(
             extra = status.extra,
             placeString = status.placeString,
             hasMedia = status.hasMedia,
-            user = status.user.toUi(),
+            user = user.toUi(),
             media = media.toUi(),
             retweet = null,
             quote = null,

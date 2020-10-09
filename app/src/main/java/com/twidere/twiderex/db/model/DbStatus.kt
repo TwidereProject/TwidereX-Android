@@ -1,7 +1,6 @@
 package com.twidere.twiderex.db.model
 
 import androidx.room.*
-import com.squareup.moshi.JsonClass
 import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.UserKey
 
@@ -32,30 +31,14 @@ data class DbStatus(
     val extra: String,
     val placeString: String?,
     val hasMedia: Boolean,
-    @Embedded(prefix = "user_")
-    val user: DbUser,
+    val userId: String,
 )
 
-@JsonClass(generateAdapter = true)
-data class DbUser(
-    val id: String,
-    val name: String,
-    val screenName: String,
-    val profileImage: String,
-    val profileBackgroundImage: String?,
-    val followersCount: Long,
-    val friendsCount: Long,
-    val listedCount: Long,
-    val desc: String,
-    val website: String?,
-    val location: String?,
-    val verified: Boolean,
-    val isProtected: Boolean,
-)
-
-data class DbStatusWithMedia(
+data class DbStatusWithMediaAndUser(
     @Embedded
     val status: DbStatus,
     @Relation(parentColumn = "statusId", entityColumn = "statusId")
     val media: List<DbMedia>,
+    @Relation(parentColumn = "userId", entityColumn = "userId")
+    val user: DbUser,
 )

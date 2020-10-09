@@ -36,17 +36,17 @@ data class DbTimelineWithStatus(
         entityColumn = "statusId",
         entity = DbStatus::class,
     )
-    val status: DbStatusWithMedia,
+    val status: DbStatusWithMediaAndUser,
     @Relation(
         parentColumn = "retweetId",
         entityColumn = "statusId",
         entity = DbStatus::class,
     )
-    val retweet: DbStatusWithMedia?,
+    val retweet: DbStatusWithMediaAndUser?,
     @Relation(
         parentColumn = "quoteId",
         entityColumn = "statusId",
         entity = DbStatus::class,
     )
-    val quote: DbStatusWithMedia?,
+    val quote: DbStatusWithMediaAndUser?,
 )

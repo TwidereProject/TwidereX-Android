@@ -22,7 +22,7 @@ data class UiUser(
 ) : Parcelable {
     companion object {
         fun DbUser.toUi() = UiUser(
-            id = id,
+            id = userId,
             name = name,
             screenName = screenName,
             profileImage = profileImage,

@@ -14,9 +14,9 @@ fun Status.toDbTimeline(
     userKey: UserKey,
     timelineType: TimelineType,
 ): DbTimelineWithStatus {
-    val status = this.toDbStatusWithMedia(userKey)
-    val retweet = retweetedStatus?.toDbStatusWithMedia(userKey)
-    val quote = quotedStatus?.toDbStatusWithMedia(userKey)
+    val status = this.toDbStatusWithMediaAndUser(userKey)
+    val retweet = retweetedStatus?.toDbStatusWithMediaAndUser(userKey)
+    val quote = quotedStatus?.toDbStatusWithMediaAndUser(userKey)
 
     return DbTimelineWithStatus(
         timeline = DbTimeline(
@@ -48,9 +48,10 @@ private fun getImage(uri: String?, type: String): String? {
     return uri
 }
 
-private fun Status.toDbStatusWithMedia(
+private fun Status.toDbStatusWithMediaAndUser(
     userKey: UserKey
-): DbStatusWithMedia {
+): DbStatusWithMediaAndUser {
+    val user = user?.toDbUser() ?: throw IllegalArgumentException("Status.user should not be null")
     val status = DbStatus(
         _id = UUID.randomUUID().toString(),
         statusId = idStr ?: throw IllegalArgumentException("Status.idStr should not be null"),
@@ -66,10 +67,9 @@ private fun Status.toDbStatusWithMedia(
         placeString = place?.fullName,
         hasMedia = extendedEntities?.media != null || entities?.media != null,
         extra = encodeJson(),
-        user = user?.toDbUser()
-            ?: throw IllegalArgumentException("Status.user should not be null"),
+        userId = user.userId
     )
-    return DbStatusWithMedia(
+    return DbStatusWithMediaAndUser(
         status = status,
         media = (extendedEntities?.media ?: entities?.media
         ?: emptyList()).mapIndexed { index, it ->
@@ -86,12 +86,14 @@ private fun Status.toDbStatusWithMedia(
                 type = it.type?.let { MediaType.valueOf(it) } ?: MediaType.photo,
                 order = index,
             )
-        }
+        },
+        user = user
     )
 }
 
 fun User.toDbUser() = DbUser(
-    id = this.idStr ?: throw IllegalArgumentException("user.idStr should not be null"),
+    _id = UUID.randomUUID().toString(),
+    userId = this.idStr ?: throw IllegalArgumentException("user.idStr should not be null"),
     name = this.name ?: "",
     screenName = this.screenName ?: "",
     profileImage = (profileImageURLHTTPS ?: profileImageURL)?.let { updateProfileImagePath(it) } ?: "",
@@ -107,7 +109,8 @@ fun User.toDbUser() = DbUser(
 )
 
 fun UserV2.toDbUser() = DbUser(
-    id = this.id ?: throw IllegalArgumentException("user.idStr should not be null"),
+    _id = UUID.randomUUID().toString(),
+    userId = this.id ?: throw IllegalArgumentException("user.idStr should not be null"),
     name = this.name ?: "",
     screenName = this.username ?: "",
     profileImage = profileImageURL?.let { updateProfileImagePath(it) } ?: "",
