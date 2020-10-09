@@ -51,9 +51,9 @@ fun TimelineComponent(viewModel: TimelineViewModel) {
         },
     ) {
         if (items.any()) {
-            val listState = rememberLazyListState()
+            val listState = rememberLazyListState(initialFirstVisibleItemIndex = viewModel.restoreScrollState())
             onDispose {
-                // TODO: save scroll position
+                viewModel.saveScrollState(listState.firstVisibleItemIndex)
             }
             LazyColumnForIndexed(
                 items = items,
@@ -67,30 +67,34 @@ fun TimelineComponent(viewModel: TimelineViewModel) {
                     }
                     TimelineStatusComponent(item)
                     if (index != items.size - 1) {
-                        Divider(
-                            modifier = Modifier.padding(
-                                start = profileImageSize + standardPadding,
-                                end = standardPadding
-                            )
-                        )
-                    }
-                    if (index != items.size - 1 && item.isGap) {
-                        if (loadingBetween.contains(item.statusId)) {
-                            LoadingProgress()
-                        } else {
-                            TextButton(
-                                modifier = Modifier.fillMaxWidth(),
-                                onClick = {
-                                    scope.launch {
-                                        viewModel.loadBetween(
-                                            item.statusId,
-                                            items[index + 1].statusId,
-                                        )
-                                    }
-                                },
-                            ) {
-                                Text("Load more")
+                        if (item.isGap) {
+                            if (loadingBetween.contains(item.statusId)) {
+                                LoadingProgress()
+                            } else {
+                                Divider()
+                                TextButton(
+                                    modifier = Modifier
+                                        .fillMaxWidth(),
+                                    onClick = {
+                                        scope.launch {
+                                            viewModel.loadBetween(
+                                                item.statusId,
+                                                items[index + 1].statusId,
+                                            )
+                                        }
+                                    },
+                                ) {
+                                    Text("Load more")
+                                }
+                                Divider()
                             }
+                        } else {
+                            Divider(
+                                modifier = Modifier.padding(
+                                    start = profileImageSize + standardPadding,
+                                    end = standardPadding
+                                )
+                            )
                         }
                     }
                     if (loadingMore && index == items.size - 1) {

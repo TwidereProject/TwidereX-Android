@@ -1,12 +1,16 @@
 package com.twidere.twiderex.viewmodel.twitter.timeline
 
+import android.content.SharedPreferences
+import androidx.core.content.edit
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.twidere.twiderex.repository.timeline.TimelineRepository
 
-abstract class TimelineViewModel : ViewModel() {
-
+abstract class TimelineViewModel(
+    private val preferences: SharedPreferences
+) : ViewModel() {
     abstract val repository: TimelineRepository
+    abstract val savedStateKey: String
 
     val source by lazy {
         repository.liveData
@@ -37,6 +41,16 @@ abstract class TimelineViewModel : ViewModel() {
             repository.loadMore(it)
         }
         loadingMore.postValue(false)
+    }
+
+    fun restoreScrollState(): Int {
+        return preferences.getInt("${savedStateKey}_offset", 0)
+    }
+
+    fun saveScrollState(offset: Int) {
+        preferences.edit {
+            putInt("${savedStateKey}_offset", offset)
+        }
     }
 }
 

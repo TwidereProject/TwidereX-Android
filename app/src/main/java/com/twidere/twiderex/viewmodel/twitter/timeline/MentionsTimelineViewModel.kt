@@ -1,5 +1,6 @@
 package com.twidere.twiderex.viewmodel.twitter.timeline
 
+import android.content.SharedPreferences
 import androidx.hilt.lifecycle.ViewModelInject
 import com.twidere.services.microblog.TimelineService
 import com.twidere.twiderex.db.AppDatabase
@@ -10,7 +11,8 @@ import com.twidere.twiderex.repository.timeline.TimelineRepository
 class MentionsTimelineViewModel @ViewModelInject constructor(
     accountRepository: AccountRepository,
     database: AppDatabase,
-) : TimelineViewModel() {
+    preferences: SharedPreferences,
+) : TimelineViewModel(preferences) {
     override val repository: TimelineRepository =
         accountRepository.getCurrentAccount().let { account ->
             accountRepository.getCurrentAccount().service.let {
@@ -19,5 +21,6 @@ class MentionsTimelineViewModel @ViewModelInject constructor(
                 MentionsTimelineRepository(account.key, service, database)
             }
         }
+    override val savedStateKey: String = "${accountRepository.getCurrentAccount().key}_mentions"
 }
 
