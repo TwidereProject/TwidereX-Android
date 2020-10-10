@@ -85,6 +85,7 @@ fun TimelineStatusComponent(
                     )
                 }
             }
+            Spacer(modifier = Modifier.height(standardPadding))
         }
     }
 }
