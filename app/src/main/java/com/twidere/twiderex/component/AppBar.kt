@@ -10,6 +10,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
+val TopAppBarElevation = 4.dp
+
 @Composable
 fun AppBar(
     title: @Composable () -> Unit = {},
@@ -18,7 +20,7 @@ fun AppBar(
     actions: @Composable RowScope.() -> Unit = {},
     backgroundColor: Color = MaterialTheme.colors.surface,
     contentColor: Color = contentColorFor(backgroundColor),
-    elevation: Dp = 0.dp
+    elevation: Dp = TopAppBarElevation
 ) {
     TopAppBar(
         title, modifier, navigationIcon, actions, backgroundColor, contentColor, elevation,

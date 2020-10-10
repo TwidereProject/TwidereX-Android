@@ -95,110 +95,131 @@ class UserFragment : JetFragment() {
             }
         ) {
             Box {
-                AppBar(
-                    modifier = Modifier.zIndex(1f),
-                    navigationIcon = {
-                        AppBarNavigationButton()
-                    },
-                    actions = {
-                        IconButton(onClick = {}) {
-                            Icon(asset = Icons.Default.Mail)
-                        }
-                        IconButton(onClick = {}) {
-                            Icon(asset = Icons.Default.MoreVert)
-                        }
-                    }
-                )
-
                 val listState = rememberLazyListState()
-                //TODO: background color
-                //TODO: header paddings
-                LazyColumn(
-                    state = listState
+                val shouldStickyHeaderShown = listState.firstVisibleItemIndex >= 1
+                Surface(
+                    elevation = if (shouldStickyHeaderShown) TopAppBarElevation else 0.dp
                 ) {
-                    item {
-                        UserInfo()
-                    }
-
-                    item {
-                        UserTabs(
-                            items = tabs,
-                            selectedItem = selectedItem,
-                            onItemSelected = {
-                                setSelectedItem(it)
+                    Column(
+                        modifier = Modifier.zIndex(1f),
+                    ) {
+                        AppBar(
+                            navigationIcon = {
+                                AppBarNavigationButton()
                             },
+                            actions = {
+                                IconButton(onClick = {}) {
+                                    Icon(asset = Icons.Default.Mail)
+                                }
+                                IconButton(onClick = {}) {
+                                    Icon(asset = Icons.Default.MoreVert)
+                                }
+                            },
+                            elevation = 0.dp,
                         )
+                        if (shouldStickyHeaderShown) {
+                            UserTabsComponent(
+                                items = tabs,
+                                selectedItem = selectedItem,
+                                onItemSelected = {
+                                    setSelectedItem(it)
+                                },
+                            )
+                        }
                     }
+                }
 
-                    when (selectedItem) {
-                        0 -> {
-                            if (timeline.any()) {
-                                itemsIndexed(timeline) { index, item ->
-                                    Column {
-                                        if (!timelineLoadingMore && index == timeline.size - 1) {
+                Column {
+                    Spacer(modifier = Modifier.height(56.dp))//Appbar height
+                    //TODO: background color
+                    //TODO: header paddings
+                    LazyColumn(
+                        state = listState
+                    ) {
+                        item {
+                            UserInfo()
+                        }
+
+                        item {
+                            UserTabsComponent(
+                                items = tabs,
+                                selectedItem = selectedItem,
+                                onItemSelected = {
+                                    setSelectedItem(it)
+                                },
+                            )
+                        }
+
+                        when (selectedItem) {
+                            0 -> {
+                                if (timeline.any()) {
+                                    itemsIndexed(timeline) { index, item ->
+                                        Column {
+                                            if (!timelineLoadingMore && index == timeline.size - 1) {
+                                                coroutineScope.launch {
+                                                    timelineViewModel.loadMore(user)
+                                                }
+                                            }
+                                            TimelineStatusComponent(item)
+                                            if (index != timeline.size - 1) {
+                                                Divider(
+                                                    modifier = Modifier.padding(
+                                                        start = profileImageSize + standardPadding,
+                                                        end = standardPadding
+                                                    )
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            1 -> {
+                                if (mediaTimeline.any()) {
+                                    itemsGridIndexed(
+                                        mediaTimeline,
+                                        rowSize = 2,
+                                        spacing = standardPadding * 2,
+                                        padding = standardPadding * 2,
+                                    ) { index, item ->
+                                        val navController = NavControllerAmbient.current
+                                        if (!timelineLoadingMore && index == mediaTimeline.size - 1) {
                                             coroutineScope.launch {
                                                 timelineViewModel.loadMore(user)
                                             }
                                         }
-                                        TimelineStatusComponent(item)
-                                        if (index != timeline.size - 1) {
-                                            Divider(
-                                                modifier = Modifier.padding(
-                                                    start = profileImageSize + standardPadding,
-                                                    end = standardPadding
+                                        StatusMediaPreviewItem(
+                                            item.first,
+                                            modifier = Modifier
+                                                .aspectRatio(1F)
+                                                .clip(
+                                                    RoundedCornerShape(8.dp)
+                                                ),
+                                            onClick = {
+                                                navController.navigate(
+                                                    R.id.media_fragment,
+                                                    MediaFragmentArgs(
+                                                        item.second,
+                                                        item.second.media.indexOf(item.first)
+                                                    ).toBundle()
                                                 )
-                                            )
-                                        }
+                                            }
+                                        )
                                     }
                                 }
                             }
                         }
-                        1 -> {
-                            if (mediaTimeline.any()) {
-                                itemsGridIndexed(
-                                    mediaTimeline,
-                                    rowSize = 2,
-                                    spacing = standardPadding * 2,
-                                    padding = standardPadding * 2,
-                                ) { index, item ->
-                                    val navController = NavControllerAmbient.current
-                                    if (!timelineLoadingMore && index == mediaTimeline.size - 1) {
-                                        coroutineScope.launch {
-                                            timelineViewModel.loadMore(user)
-                                        }
-                                    }
-                                    StatusMediaPreviewItem(
-                                        item.first,
+                        if (timelineLoadingMore) {
+                            item {
+                                Box(
+                                    modifier = Modifier.fillParentMaxWidth(),
+                                    alignment = Alignment.Center
+                                ) {
+                                    CircularProgressIndicator(
                                         modifier = Modifier
-                                            .aspectRatio(1F)
-                                            .clip(
-                                                RoundedCornerShape(8.dp)
-                                            ),
-                                        onClick = {
-                                            navController.navigate(
-                                                R.id.media_fragment,
-                                                MediaFragmentArgs(
-                                                    item.second,
-                                                    item.second.media.indexOf(item.first)
-                                                ).toBundle()
-                                            )
-                                        }
+                                            .heightIn(min = ButtonConstants.DefaultMinHeight)
+                                            .padding(ButtonConstants.DefaultContentPadding),
                                     )
                                 }
-                            }
-                        }
-                    }
-                    if (timelineLoadingMore) {
-                        item {
-                            Box(
-                                modifier = Modifier.fillParentMaxWidth(),
-                                alignment = Alignment.Center
-                            ) {
-                                CircularProgressIndicator(
-                                    modifier = Modifier
-                                        .heightIn(min = ButtonConstants.DefaultMinHeight)
-                                        .padding(ButtonConstants.DefaultContentPadding),
-                                )
                             }
                         }
                     }
@@ -360,7 +381,7 @@ class UserFragment : JetFragment() {
 }
 
 @Composable
-private fun UserTabs(
+private fun UserTabsComponent(
     items: List<VectorAsset>,
     selectedItem: Int,
     onItemSelected: (Int) -> Unit,
