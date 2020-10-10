@@ -7,6 +7,7 @@ import androidx.compose.ui.graphics.vector.VectorAsset
 abstract class HomeNavigationItem {
     abstract val name: String
     abstract val icon: VectorAsset
+    open val noActionBar = false
 
     @Composable
     abstract fun onCompose()

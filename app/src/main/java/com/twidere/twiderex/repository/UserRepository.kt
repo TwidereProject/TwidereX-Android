@@ -9,6 +9,7 @@ import com.twidere.twiderex.db.AppDatabase
 import com.twidere.twiderex.db.mapper.toDbTimeline
 import com.twidere.twiderex.db.mapper.toDbUser
 import com.twidere.twiderex.db.model.TimelineType
+import com.twidere.twiderex.model.UserKey
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.model.ui.UiStatus.Companion.toUi
 import com.twidere.twiderex.model.ui.UiUser
@@ -49,6 +50,14 @@ class UserRepository @Inject constructor(
             if (db != null) {
                 user._id = db._id
                 database.userDao().update(user)
+            }
+            val name = user.screenName
+            val key = UserKey(name, "twitter.com")
+            val account = repository.findByAccountKey(key)
+            if (account != null) {
+                val detail = repository.getAccountDetails(account)
+                detail.user = user
+                repository.updateAccount(detail)
             }
         }
         return user?.toUi()

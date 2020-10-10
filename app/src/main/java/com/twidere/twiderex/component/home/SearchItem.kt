@@ -13,6 +13,9 @@ class SearchItem : HomeNavigationItem() {
     override val icon: VectorAsset
         get() = Icons.Default.Search
 
+    override val noActionBar: Boolean
+        get() = true
+
     @Composable
     override fun onCompose() {
         Column {

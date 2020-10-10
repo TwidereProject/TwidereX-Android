@@ -20,7 +20,7 @@ data class AccountDetails(
     var credentials_json: String,
     @Json(name = "extras")
     val extras_json: String,
-    val user: DbUser,
+    var user: DbUser,
 ) {
 
     @IgnoredOnParcel

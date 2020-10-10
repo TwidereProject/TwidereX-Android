@@ -37,6 +37,7 @@ import com.twidere.twiderex.R
 import com.twidere.twiderex.annotations.IncomingComposeUpdate
 import com.twidere.twiderex.component.*
 import com.twidere.twiderex.extensions.NavControllerAmbient
+import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.ui.profileImageSize
 import com.twidere.twiderex.ui.standardPadding
 import com.twidere.twiderex.viewmodel.UserTimelineViewModel
@@ -48,178 +49,190 @@ import kotlinx.coroutines.launch
 class UserFragment : JetFragment() {
     private val args by navArgs<UserFragmentArgs>()
 
-    @OptIn(ExperimentalLazyDsl::class, IncomingComposeUpdate::class)
+    @OptIn(IncomingComposeUpdate::class)
     @Composable
-    @IncomingComposeUpdate
     override fun onCompose() {
-        val viewModel = viewModel<UserViewModel>()
-        val user by viewModel.user.observeAsState(initial = args.user)
+        UserComponent(data = args.user)
+    }
 
-        val tabs = listOf(
-            Icons.Default.List,
-            Icons.Default.Image,
-            Icons.Default.Favorite,
-        )
-        val (selectedItem, setSelectedItem) = savedInstanceState { 0 }
+}
 
-        val timelineViewModel = viewModel<UserTimelineViewModel>()
-        val timeline by timelineViewModel.timeline.observeAsState(initial = emptyList())
-        val timelineLoadingMore by timelineViewModel.loadingMore.observeAsState(initial = false)
-        val mediaTimeline =
-            timeline.filter { it.hasMedia }.flatMap { it.media.map { media -> media to it } }
+@OptIn(ExperimentalLazyDsl::class)
+@Composable
+@IncomingComposeUpdate
+fun UserComponent(data: UiUser) {
+    val viewModel = viewModel<UserViewModel>()
+    val user by viewModel.user.observeAsState(initial = data)
 
-        val coroutineScope = rememberCoroutineScope()
+    val tabs = listOf(
+        Icons.Default.List,
+        Icons.Default.Image,
+        Icons.Default.Favorite,
+    )
+    val (selectedItem, setSelectedItem) = savedInstanceState { 0 }
 
-        launchInComposition {
-            viewModel.init(args.user)
+    val timelineViewModel = viewModel<UserTimelineViewModel>()
+    val timeline by timelineViewModel.timeline.observeAsState(initial = emptyList())
+    val timelineLoadingMore by timelineViewModel.loadingMore.observeAsState(initial = false)
+    val mediaTimeline =
+        timeline.filter { it.hasMedia }.flatMap { it.media.map { media -> media to it } }
+
+    val coroutineScope = rememberCoroutineScope()
+
+    launchInComposition {
+        viewModel.init(user)
+    }
+
+    when {
+        selectedItem == 0 && !timeline.any() -> {
+            coroutineScope.launch {
+                timelineViewModel.refresh(user)
+            }
         }
-
-        when {
-            selectedItem == 0 && !timeline.any() -> {
-                coroutineScope.launch {
-                    timelineViewModel.refresh(args.user)
-                }
-            }
-            selectedItem == 1 && !mediaTimeline.any() -> {
-                coroutineScope.launch {
-                    timelineViewModel.loadMore(args.user)
-                }
+        selectedItem == 1 && !mediaTimeline.any() -> {
+            coroutineScope.launch {
+                timelineViewModel.loadMore(user)
             }
         }
+    }
 
-        Scaffold(
-            floatingActionButton = {
-                FloatingActionButton(onClick = {}) {
-                    Icon(asset = Icons.Default.Reply)
-                }
+    Scaffold(
+        floatingActionButton = {
+            FloatingActionButton(onClick = {}) {
+                Icon(asset = Icons.Default.Reply)
             }
-        ) {
-            Box {
-                val listState = rememberLazyListState()
-                val shouldStickyHeaderShown = listState.firstVisibleItemIndex >= 1
-                Surface(
-                    elevation = if (shouldStickyHeaderShown) TopAppBarElevation else 0.dp
+        }
+    ) {
+        Box {
+            val listState = rememberLazyListState()
+            val shouldStickyHeaderShown = listState.firstVisibleItemIndex >= 1
+            val navController = NavControllerAmbient.current
+            Surface(
+                elevation = if (shouldStickyHeaderShown) TopAppBarElevation else 0.dp
+            ) {
+                Column(
+                    modifier = Modifier.zIndex(1f),
                 ) {
-                    Column(
-                        modifier = Modifier.zIndex(1f),
-                    ) {
-                        AppBar(
-                            navigationIcon = {
+                    AppBar(
+                        navigationIcon = if (navController.backStack.size > 0) {
+                            {
                                 AppBarNavigationButton()
+                            }
+                        } else {
+                            null
+                        },
+                        actions = {
+                            IconButton(onClick = {}) {
+                                Icon(asset = Icons.Default.Mail)
+                            }
+                            IconButton(onClick = {}) {
+                                Icon(asset = Icons.Default.MoreVert)
+                            }
+                        },
+                        elevation = 0.dp,
+                    )
+                    if (shouldStickyHeaderShown) {
+                        UserTabsComponent(
+                            items = tabs,
+                            selectedItem = selectedItem,
+                            onItemSelected = {
+                                setSelectedItem(it)
                             },
-                            actions = {
-                                IconButton(onClick = {}) {
-                                    Icon(asset = Icons.Default.Mail)
-                                }
-                                IconButton(onClick = {}) {
-                                    Icon(asset = Icons.Default.MoreVert)
-                                }
-                            },
-                            elevation = 0.dp,
                         )
-                        if (shouldStickyHeaderShown) {
-                            UserTabsComponent(
-                                items = tabs,
-                                selectedItem = selectedItem,
-                                onItemSelected = {
-                                    setSelectedItem(it)
-                                },
-                            )
-                        }
                     }
                 }
+            }
 
-                Column {
-                    Spacer(modifier = Modifier.height(56.dp))//Appbar height
-                    //TODO: background color
-                    //TODO: header paddings
-                    LazyColumn(
-                        state = listState
-                    ) {
-                        item {
-                            UserInfo()
-                        }
+            Column {
+                Spacer(modifier = Modifier.height(56.dp))//Appbar height
+                //TODO: background color
+                //TODO: header paddings
+                LazyColumn(
+                    state = listState
+                ) {
+                    item {
+                        UserInfo(user)
+                    }
 
-                        item {
-                            UserTabsComponent(
-                                items = tabs,
-                                selectedItem = selectedItem,
-                                onItemSelected = {
-                                    setSelectedItem(it)
-                                },
-                            )
-                        }
+                    item {
+                        UserTabsComponent(
+                            items = tabs,
+                            selectedItem = selectedItem,
+                            onItemSelected = {
+                                setSelectedItem(it)
+                            },
+                        )
+                    }
 
-                        when (selectedItem) {
-                            0 -> {
-                                if (timeline.any()) {
-                                    itemsIndexed(timeline) { index, item ->
-                                        Column {
-                                            if (!timelineLoadingMore && index == timeline.size - 1) {
-                                                coroutineScope.launch {
-                                                    timelineViewModel.loadMore(user)
-                                                }
-                                            }
-                                            TimelineStatusComponent(item)
-                                            if (index != timeline.size - 1) {
-                                                Divider(
-                                                    modifier = Modifier.padding(
-                                                        start = profileImageSize + standardPadding,
-                                                        end = standardPadding
-                                                    )
-                                                )
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                            1 -> {
-                                if (mediaTimeline.any()) {
-                                    itemsGridIndexed(
-                                        mediaTimeline,
-                                        rowSize = 2,
-                                        spacing = standardPadding * 2,
-                                        padding = standardPadding * 2,
-                                    ) { index, item ->
-                                        val navController = NavControllerAmbient.current
-                                        if (!timelineLoadingMore && index == mediaTimeline.size - 1) {
+                    when (selectedItem) {
+                        0 -> {
+                            if (timeline.any()) {
+                                itemsIndexed(timeline) { index, item ->
+                                    Column {
+                                        if (!timelineLoadingMore && index == timeline.size - 1) {
                                             coroutineScope.launch {
                                                 timelineViewModel.loadMore(user)
                                             }
                                         }
-                                        StatusMediaPreviewItem(
-                                            item.first,
-                                            modifier = Modifier
-                                                .aspectRatio(1F)
-                                                .clip(
-                                                    RoundedCornerShape(8.dp)
-                                                ),
-                                            onClick = {
-                                                navController.navigate(
-                                                    R.id.media_fragment,
-                                                    MediaFragmentArgs(
-                                                        item.second,
-                                                        item.second.media.indexOf(item.first)
-                                                    ).toBundle()
+                                        TimelineStatusComponent(item)
+                                        if (index != timeline.size - 1) {
+                                            Divider(
+                                                modifier = Modifier.padding(
+                                                    start = profileImageSize + standardPadding,
+                                                    end = standardPadding
                                                 )
-                                            }
-                                        )
+                                            )
+                                        }
                                     }
                                 }
                             }
                         }
-                        if (timelineLoadingMore) {
-                            item {
-                                Box(
-                                    modifier = Modifier.fillParentMaxWidth(),
-                                    alignment = Alignment.Center
-                                ) {
-                                    CircularProgressIndicator(
+                        1 -> {
+                            if (mediaTimeline.any()) {
+                                itemsGridIndexed(
+                                    mediaTimeline,
+                                    rowSize = 2,
+                                    spacing = standardPadding * 2,
+                                    padding = standardPadding * 2,
+                                ) { index, item ->
+                                    val navController = NavControllerAmbient.current
+                                    if (!timelineLoadingMore && index == mediaTimeline.size - 1) {
+                                        coroutineScope.launch {
+                                            timelineViewModel.loadMore(user)
+                                        }
+                                    }
+                                    StatusMediaPreviewItem(
+                                        item.first,
                                         modifier = Modifier
-                                            .heightIn(min = ButtonConstants.DefaultMinHeight)
-                                            .padding(ButtonConstants.DefaultContentPadding),
+                                            .aspectRatio(1F)
+                                            .clip(
+                                                RoundedCornerShape(8.dp)
+                                            ),
+                                        onClick = {
+                                            navController.navigate(
+                                                R.id.media_fragment,
+                                                MediaFragmentArgs(
+                                                    item.second,
+                                                    item.second.media.indexOf(item.first)
+                                                ).toBundle()
+                                            )
+                                        }
                                     )
                                 }
+                            }
+                        }
+                    }
+                    if (timelineLoadingMore) {
+                        item {
+                            Box(
+                                modifier = Modifier.fillParentMaxWidth(),
+                                alignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier
+                                        .heightIn(min = ButtonConstants.DefaultMinHeight)
+                                        .padding(ButtonConstants.DefaultContentPadding),
+                                )
                             }
                         }
                     }
@@ -227,73 +240,79 @@ class UserFragment : JetFragment() {
             }
         }
     }
+}
 
-    @Composable
-    private fun UserInfo() {
-        val viewModel = viewModel<UserViewModel>()
-        val user by viewModel.user.observeAsState(initial = args.user)
-        val loaded by viewModel.loaded.observeAsState(initial = false)
-        val relationship by viewModel.relationship.observeAsState()
-        val maxBannerSize = 200.dp
+@Composable
+private fun UserInfo(data: UiUser) {
+    val viewModel = viewModel<UserViewModel>()
+    val user by viewModel.user.observeAsState(initial = data)
+    val loaded by viewModel.loaded.observeAsState(initial = false)
+    val relationship by viewModel.relationship.observeAsState()
+    val isMe by viewModel.isMe.observeAsState(initial = false)
+    val maxBannerSize = 200.dp
 
-
-        Box {
-            //TODO: parallax effect
-            user.profileBackgroundImage?.let {
-                Box(
-                    modifier = Modifier
-                        .heightIn(max = maxBannerSize)
-                ) {
-                    NetworkImage(
-                        url = it,
-                    )
-                }
+    Box {
+        //TODO: parallax effect
+        user.profileBackgroundImage?.let {
+            Box(
+                modifier = Modifier
+                    .heightIn(max = maxBannerSize)
+            ) {
+                NetworkImage(
+                    url = it,
+                )
             }
-            Column {
-                WithConstraints {
-                    Spacer(
-                        modifier = Modifier.height(
-                            min(
-                                maxWidth * 160f / 320f - 72.dp / 2,
-                                maxBannerSize - 72.dp / 2
-                            )
+        }
+        Column {
+            WithConstraints {
+                Spacer(
+                    modifier = Modifier.height(
+                        min(
+                            maxWidth * 160f / 320f - 72.dp / 2,
+                            maxBannerSize - 72.dp / 2
                         )
                     )
-                }
+                )
+            }
 
-                Box(
-                    modifier = Modifier.fillMaxWidth(),
-                    alignment = Alignment.Center
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                alignment = Alignment.Center
+            ) {
+                Spacer(
+                    modifier = Modifier
+                        .size(80.dp)
+                        .clip(CircleShape)
+                        .clipToBounds()
+                        .background(Color.White)
+                )
+                UserAvatar(
+                    user = user,
+                    size = 72.dp,
+                )
+            }
+            Spacer(modifier = Modifier.height(standardPadding * 2))
+            Row(
+                modifier = Modifier.padding(horizontal = standardPadding * 2)
+            ) {
+                Column(
+                    modifier = Modifier.weight(1f),
                 ) {
-                    Spacer(
-                        modifier = Modifier
-                            .size(80.dp)
-                            .clip(CircleShape)
-                            .clipToBounds()
-                            .background(Color.White)
+                    Text(
+                        text = user.name,
+                        style = MaterialTheme.typography.h6,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
                     )
-                    UserAvatar(
-                        user = user,
-                        size = 72.dp,
+                    Text(
+                        text = "@${user.screenName}",
                     )
                 }
-                Spacer(modifier = Modifier.height(standardPadding * 2))
-                Row(
-                    modifier = Modifier.padding(horizontal = standardPadding * 2)
-                ) {
-                    Column(
-                        modifier = Modifier.weight(1f),
-                    ) {
-                        Text(
-                            text = user.name,
-                            style = MaterialTheme.typography.h6,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                        )
-                        Text(
-                            text = "@${user.screenName}",
-                        )
+                if (isMe) {
+                    IconButton(onClick = {}) {
+                        Icon(asset = Icons.Default.Edit)
                     }
+                } else {
                     relationship?.let {
                         Column(
                             horizontalAlignment = Alignment.End
@@ -316,69 +335,70 @@ class UserFragment : JetFragment() {
                         }
                     }
                 }
-                Spacer(modifier = Modifier.height(standardPadding * 2))
+            }
+            Spacer(modifier = Modifier.height(standardPadding * 2))
+            ListItem(
+                text = {
+                    Text(text = user.desc)
+                }
+            )
+            user.website?.let {
                 ListItem(
+                    icon = {
+                        Icon(asset = Icons.Default.Link)
+                    },
                     text = {
-                        Text(text = user.desc)
+                        Text(
+                            text = it,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
                     }
                 )
-                user.website?.let {
-                    ListItem(
-                        icon = {
-                            Icon(asset = Icons.Default.Link)
-                        },
-                        text = {
-                            Text(
-                                text = it,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                            )
-                        }
-                    )
-                }
-                user.location?.let {
-                    ListItem(
-                        icon = {
-                            Icon(asset = Icons.Default.MyLocation)
-                        },
-                        text = {
-                            Text(
-                                text = it,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                            )
-                        }
-                    )
-                }
-                Spacer(modifier = Modifier.height(standardPadding * 2))
-                Row {
-                    Column(
-                        modifier = Modifier.weight(1f),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                    ) {
-                        Text(text = user.friendsCount.toString())
-                        Text(text = "Following")
-                    }
-                    Column(
-                        modifier = Modifier.weight(1f),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                    ) {
-                        Text(text = user.followersCount.toString())
-                        Text(text = "Followers")
-                    }
-                    Column(
-                        modifier = Modifier.weight(1f),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                    ) {
-                        Text(text = user.listedCount.toString())
-                        Text(text = "Listed")
-                    }
-                }
-                Spacer(modifier = Modifier.height(standardPadding * 2))
             }
+            user.location?.let {
+                ListItem(
+                    icon = {
+                        Icon(asset = Icons.Default.MyLocation)
+                    },
+                    text = {
+                        Text(
+                            text = it,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                    }
+                )
+            }
+            Spacer(modifier = Modifier.height(standardPadding * 2))
+            Row {
+                Column(
+                    modifier = Modifier.weight(1f),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Text(text = user.friendsCount.toString())
+                    Text(text = "Following")
+                }
+                Column(
+                    modifier = Modifier.weight(1f),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Text(text = user.followersCount.toString())
+                    Text(text = "Followers")
+                }
+                Column(
+                    modifier = Modifier.weight(1f),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Text(text = user.listedCount.toString())
+                    Text(text = "Listed")
+                }
+            }
+            Spacer(modifier = Modifier.height(standardPadding * 2))
         }
     }
 }
+
 
 @Composable
 private fun UserTabsComponent(
