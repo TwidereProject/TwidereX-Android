@@ -11,6 +11,7 @@ abstract class TimelineViewModel(
 ) : ViewModel() {
     abstract val repository: TimelineRepository
     abstract val savedStateKey: String
+    private var hasMore = true
 
     val source by lazy {
         repository.liveData
@@ -36,9 +37,12 @@ abstract class TimelineViewModel(
     }
 
     suspend fun loadMore() {
+        if (!hasMore) {
+            return
+        }
         loadingMore.postValue(true)
         source.value?.lastOrNull()?.statusId?.let {
-            repository.loadMore(it)
+            hasMore = repository.loadMore(it).any()
         }
         loadingMore.postValue(false)
     }
