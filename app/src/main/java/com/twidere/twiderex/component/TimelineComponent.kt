@@ -70,10 +70,11 @@ fun TimelineComponent(viewModel: TimelineViewModel) {
                         item,
                     )
                     if (index != items.size - 1) {
-                        if (item.isGap) {
-                            if (loadingBetween.contains(item.statusId)) {
+                        when {
+                            loadingBetween.contains(item.statusId) -> {
                                 LoadingProgress()
-                            } else {
+                            }
+                            item.isGap -> {
                                 Divider()
                                 TextButton(
                                     modifier = Modifier
@@ -91,13 +92,14 @@ fun TimelineComponent(viewModel: TimelineViewModel) {
                                 }
                                 Divider()
                             }
-                        } else {
-                            Divider(
-                                modifier = Modifier.padding(
-                                    start = profileImageSize + standardPadding,
-                                    end = standardPadding
+                            else -> {
+                                Divider(
+                                    modifier = Modifier.padding(
+                                        start = profileImageSize + standardPadding,
+                                        end = standardPadding
+                                    )
                                 )
-                            )
+                            }
                         }
                     }
                     if (loadingMore && index == items.size - 1) {
