@@ -41,7 +41,11 @@ abstract class TimelineRepository(
                 update(it)
             }
         }
-        val result = loadData(count = count, since_id = since_id, max_id = max_id)
+        val result = runCatching {
+            loadData(count = count, since_id = since_id, max_id = max_id)
+        }.getOrElse {
+            emptyList()
+        }
         val timeline = result.map { it.toDbTimeline(userKey, type) }
         if (withGap) {
             timeline.lastOrNull()?.timeline?.isGap = result.size >= count
