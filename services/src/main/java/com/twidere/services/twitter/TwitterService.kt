@@ -18,7 +18,8 @@ class TwitterService(
     private val consumer_secret: String,
     private val access_token: String,
     private val access_token_secret: String,
-) : MicroBlogService, TimelineService, LookupService, RelationshipService, SearchService {
+) : MicroBlogService, TimelineService, LookupService, RelationshipService, SearchService,
+    StatusService {
     private val resources by lazy {
         retrofit<TwitterResources>(
             TWITTER_BASE_URL,
@@ -186,5 +187,21 @@ class TwitterService(
             followedBy = response.relationship?.target?.followedBy ?: false,
             following = response.relationship?.target?.following ?: false,
         )
+    }
+
+    override suspend fun like(id: String) {
+        resources.like(id)
+    }
+
+    override suspend fun unlike(id: String) {
+        resources.unlike(id)
+    }
+
+    override suspend fun retweet(id: String) {
+        resources.retweet(id)
+    }
+
+    override suspend fun unRetweet(id: String) {
+        resources.unretweet(id)
     }
 }

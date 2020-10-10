@@ -8,7 +8,7 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 
-interface LookupResource {
+interface LookupResources {
     @GET("/2/users/{id}")
     suspend fun user(
         @Path(value = "id") id: String,

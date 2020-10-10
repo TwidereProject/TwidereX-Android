@@ -3,7 +3,8 @@ package com.twidere.twiderex.viewmodel
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.twidere.twiderex.model.ui.UiStatus
+import androidx.lifecycle.liveData
+import androidx.lifecycle.switchMap
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.repository.UserRepository
 
@@ -11,28 +12,37 @@ class UserTimelineViewModel @ViewModelInject constructor(
     private val repository: UserRepository,
 ) : ViewModel() {
     val loadingMore = MutableLiveData(false)
-    val timeline = MutableLiveData<List<UiStatus>>(emptyList())
+    val timeline = liveData {
+        emitSource(repository.getUserTimelineLiveData().switchMap {
+            liveData {
+                emit(it.filter {
+                    timelineIds.contains(it.statusId)
+                })
+            }
+        })
+    }
+    private val timelineIds = arrayListOf<String>()
 
     suspend fun refresh(user: UiUser) {
-        if (!timeline.value.isNullOrEmpty()) {
+        if (!timelineIds.isNullOrEmpty()) {
             return
         }
         loadingMore.postValue(true)
-        val result = repository.loadTimelineBetween(
+        repository.loadTimelineBetween(
             user.id,
-        )
-        timeline.postValue(result)
+        ).map { it.statusId }.let {
+            timelineIds.addAll(it)
+        }
         loadingMore.postValue(false)
     }
 
     suspend fun loadMore(user: UiUser) {
         loadingMore.postValue(true)
-        val current = timeline.value ?: emptyList()
         val result = repository.loadTimelineBetween(
             user.id,
-            max_id = current.lastOrNull()?.statusId
+            max_id = timelineIds.lastOrNull()
         )
-        timeline.postValue(current + result)
+        timelineIds.addAll(result.map { it.statusId })
         loadingMore.postValue(false)
     }
 }

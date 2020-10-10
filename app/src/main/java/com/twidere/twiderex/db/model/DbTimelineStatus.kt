@@ -6,7 +6,7 @@ import com.twidere.twiderex.model.UserKey
 
 @Entity(
     tableName = "timeline",
-    indices = [Index(value = ["statusId"], unique = true)],
+    indices = [Index(value = ["statusId", "userKey", "type"], unique = true)],
 )
 data class DbTimeline(
     @PrimaryKey

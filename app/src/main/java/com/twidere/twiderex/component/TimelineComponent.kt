@@ -51,7 +51,8 @@ fun TimelineComponent(viewModel: TimelineViewModel) {
         },
     ) {
         if (items.any()) {
-            val listState = rememberLazyListState(initialFirstVisibleItemIndex = viewModel.restoreScrollState())
+            val listState =
+                rememberLazyListState(initialFirstVisibleItemIndex = viewModel.restoreScrollState())
             onDispose {
                 viewModel.saveScrollState(listState.firstVisibleItemIndex)
             }
@@ -65,7 +66,9 @@ fun TimelineComponent(viewModel: TimelineViewModel) {
                             viewModel.loadMore()
                         }
                     }
-                    TimelineStatusComponent(item)
+                    TimelineStatusComponent(
+                        item,
+                    )
                     if (index != items.size - 1) {
                         if (item.isGap) {
                             if (loadingBetween.contains(item.statusId)) {

@@ -5,7 +5,7 @@ import retrofit2.http.FormUrlEncoded
 import retrofit2.http.POST
 
 
-interface TwitterOAuthResource {
+interface TwitterOAuthResources {
     @FormUrlEncoded
     @POST("/oauth/request_token")
     suspend fun requestToken(@Field("oauth_callback") oauthCallback: String): String

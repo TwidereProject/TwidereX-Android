@@ -1,8 +1,12 @@
 package com.twidere.twiderex.fragment
 
 import androidx.compose.animation.Crossfade
-import androidx.compose.foundation.*
+import androidx.compose.foundation.Icon
+import androidx.compose.foundation.Text
+import androidx.compose.foundation.contentColor
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.ExperimentalLazyDsl
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -50,7 +54,6 @@ class HomeFragment : JetFragment() {
         }
     }
 
-
     @Composable
     override fun onCompose() {
         val (selectedItem, setSelectedItem) = savedInstanceState { 0 }
@@ -93,10 +96,12 @@ class HomeFragment : JetFragment() {
             }
         ) {
             Box(
-                paddingBottom = it.bottom,
-                paddingTop = it.top,
-                paddingStart = it.start,
-                paddingEnd = it.end,
+                modifier = Modifier.padding(
+                    start = it.start,
+                    bottom = it.bottom,
+                    end = it.end,
+                    top = it.top,
+                )
             ) {
                 Crossfade(current = selectedItem) {
                     menus[it].onCompose()
@@ -106,6 +111,7 @@ class HomeFragment : JetFragment() {
     }
 }
 
+@OptIn(ExperimentalLazyDsl::class)
 @Composable
 private fun HomeDrawer() {
     val viewModel = viewModel<ActiveAccountViewModel>()
@@ -173,19 +179,21 @@ private fun HomeDrawer() {
 
         Divider()
 
-        ScrollableColumn(
+        LazyColumn(
             modifier = Modifier
                 .weight(1f)
         ) {
             for (it in (0 until 10)) {
-                ListItem(
-                    icon = {
-                        Icon(asset = Icons.Default.Settings)
-                    },
-                    text = {
-                        Text(text = "Settings")
-                    }
-                )
+                item {
+                    ListItem(
+                        icon = {
+                            Icon(asset = Icons.Default.Settings)
+                        },
+                        text = {
+                            Text(text = "Settings")
+                        }
+                    )
+                }
             }
         }
 

@@ -5,7 +5,7 @@ import retrofit2.http.GET
 import retrofit2.http.Query
 import java.util.*
 
-interface SearchResource {
+interface SearchResources {
     @GET("/2/tweets/search/recent")
     suspend fun search(
         @Query("query") query: String,

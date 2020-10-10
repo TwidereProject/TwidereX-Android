@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel
 import com.twidere.twiderex.repository.timeline.TimelineRepository
 
 abstract class TimelineViewModel(
-    private val preferences: SharedPreferences
+    private val preferences: SharedPreferences,
 ) : ViewModel() {
     abstract val repository: TimelineRepository
     abstract val savedStateKey: String

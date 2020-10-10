@@ -7,7 +7,7 @@ import com.twidere.twiderex.model.UserKey
 
 @Entity(
     tableName = "status",
-    indices = [Index(value = ["statusId"], unique = true)],
+    indices = [Index(value = ["statusId", "userKey"], unique = true)],
 )
 data class DbStatus(
     /**
@@ -26,8 +26,8 @@ data class DbStatus(
     val retweetCount: Long,
     val likeCount: Long,
     val replyCount: Long,
-    val retweeted: Boolean,
-    val liked: Boolean,
+    var retweeted: Boolean,
+    var liked: Boolean,
     val extra: String,
     val placeString: String?,
     val hasMedia: Boolean,

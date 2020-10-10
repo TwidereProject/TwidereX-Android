@@ -15,7 +15,9 @@ import com.twidere.twiderex.db.model.converter.MediaTypeConverter
 import com.twidere.twiderex.db.model.converter.PlatformTypeConverter
 import com.twidere.twiderex.db.model.converter.TimelineTypeConverter
 import com.twidere.twiderex.db.model.converter.UserKeyConverter
+import javax.inject.Singleton
 
+@Singleton
 @Database(
     entities = [
         DbStatus::class,

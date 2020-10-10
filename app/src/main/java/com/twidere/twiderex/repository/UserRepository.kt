@@ -1,5 +1,7 @@
 package com.twidere.twiderex.repository
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.map
 import com.twidere.services.microblog.LookupService
 import com.twidere.services.microblog.RelationshipService
 import com.twidere.services.microblog.TimelineService
@@ -54,6 +56,14 @@ class UserRepository @Inject constructor(
 
     suspend fun showRelationship(id: String) = getRelationshipService()?.showRelationship(id)
 
+    fun getUserTimelineLiveData(): LiveData<List<UiStatus>> {
+        return database.timelineDao().getAllWithLiveData(repository.getCurrentAccount().key, TimelineType.User).map { list ->
+            list.map { status ->
+                status.toUi()
+            }
+        }
+    }
+
     suspend fun loadTimelineBetween(
         id: String,
         max_id: String? = null,
@@ -63,6 +73,16 @@ class UserRepository @Inject constructor(
         val result = timelineService.userTimeline(id, count = 100, max_id = max_id, since_id = since_id)
         val userKey = repository.getCurrentAccount().key
         val timeline = result.map { it.toDbTimeline(userKey, TimelineType.User) }
+
+        val data = timeline
+            .map { listOf(it.status, it.quote, it.retweet) }
+            .flatten()
+            .filterNotNull()
+        database.userDao().insertAll(data.map { it.user })
+        database.mediaDao().insertAll(data.map { it.media }.flatten())
+        database.statusDao().insertAll(data.map { it.status })
+        database.timelineDao().insertAll(timeline.map { it.timeline })
+
         return timeline.map { it.toUi() }
     }
 }

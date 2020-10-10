@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.RowScope.Companion.weight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.EmphasisAmbient
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -16,6 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.VectorAsset
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.viewModel
 import com.twidere.twiderex.R
 import com.twidere.twiderex.extensions.NavControllerAmbient
 import com.twidere.twiderex.extensions.humanizedTimestamp
@@ -24,11 +26,13 @@ import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.ui.buttonContentColor
 import com.twidere.twiderex.ui.profileImageSize
 import com.twidere.twiderex.ui.standardPadding
+import com.twidere.twiderex.viewmodel.StatusActionsViewModel
 
 @Composable
 fun TimelineStatusComponent(
     data: UiStatus,
 ) {
+    val actionsViewModel = viewModel<StatusActionsViewModel>()
     Column {
         val status = (data.retweet ?: data)
         val navController = NavControllerAmbient.current
@@ -69,12 +73,20 @@ fun TimelineStatusComponent(
                 StatusActionButton(
                     icon = Icons.Default.Comment,
                     count = status.retweetCount,
-                    onClick = {},
+                    colored = status.retweeted,
+                    color = MaterialTheme.colors.primary,
+                    onClick = {
+                        actionsViewModel.retweet(status)
+                    },
                 )
                 StatusActionButton(
                     icon = Icons.Default.Favorite,
                     count = status.likeCount,
-                    onClick = {},
+                    colored = status.liked,
+                    color = Color.Red,
+                    onClick = {
+                        actionsViewModel.like(status)
+                    },
                 )
                 TextButton(
                     onClick = {},
@@ -190,6 +202,8 @@ private fun StatusActionButton(
     modifier: Modifier = Modifier.weight(1f),
     icon: VectorAsset,
     count: Long,
+    colored: Boolean = false,
+    color: Color = contentColor(),
     onClick: () -> Unit,
 ) {
     Row(
@@ -200,7 +214,14 @@ private fun StatusActionButton(
             onClick = onClick,
             contentColor = buttonContentColor,
         ) {
-            Icon(asset = icon)
+            Icon(
+                asset = icon,
+                tint = if (colored) {
+                    EmphasisAmbient.current.medium.applyEmphasis(color)
+                } else {
+                    buttonContentColor
+                }
+            )
             if (count > 0) {
                 Box(modifier = Modifier.width(4.dp))
                 Text(text = count.toString())

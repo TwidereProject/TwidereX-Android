@@ -2,7 +2,7 @@ package com.twidere.services.twitter
 
 import com.twidere.services.http.authorization.OAuth1Authorization
 import com.twidere.services.http.retrofit
-import com.twidere.services.twitter.api.TwitterOAuthResource
+import com.twidere.services.twitter.api.TwitterOAuthResources
 import com.twidere.services.twitter.api.UsersResources
 import com.twidere.services.twitter.model.AccessToken
 import com.twidere.services.twitter.model.OAuthToken
@@ -14,7 +14,7 @@ class TwitterOAuthService(
     private val consumerSecret: String,
 ) {
     suspend fun getOAuthToken(): OAuthToken {
-        return retrofit<TwitterOAuthResource>(
+        return retrofit<TwitterOAuthResources>(
             TWITTER_BASE_URL,
             OAuth1Authorization(
                 consumerKey,
@@ -24,7 +24,7 @@ class TwitterOAuthService(
     }
 
     suspend fun getAccessToken(pinCode: String, token: OAuthToken): AccessToken {
-        return retrofit<TwitterOAuthResource>(
+        return retrofit<TwitterOAuthResources>(
             TWITTER_BASE_URL,
             OAuth1Authorization(
                 consumerKey,

@@ -1,3 +1,4 @@
 package com.twidere.services.twitter.api
 
-interface TwitterResources : TimelineResources, LookupResource, UsersResources, SearchResource
+interface TwitterResources : TimelineResources, LookupResources, UsersResources, SearchResources,
+    StatusResources

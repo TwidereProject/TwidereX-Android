@@ -1,9 +1,6 @@
 package com.twidere.twiderex.db.dao
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 import com.twidere.twiderex.db.model.DbStatus
 
 @Dao
@@ -13,5 +10,11 @@ interface StatusDao {
 
     @Query("SELECT * FROM status")
     suspend fun getAll(): List<DbStatus>
+
+    @Query("SELECT * FROM status WHERE statusId == :id")
+    suspend fun findWithStatusId(id: String): DbStatus?
+
+    @Update
+    suspend fun update(vararg user: DbStatus)
 }
 
