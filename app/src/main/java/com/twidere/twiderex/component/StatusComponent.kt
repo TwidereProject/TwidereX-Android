@@ -20,7 +20,7 @@ import com.twidere.twiderex.extensions.humanizedTimestamp
 import com.twidere.twiderex.fragment.StatusFragmentArgs
 import com.twidere.twiderex.fragment.UserFragmentArgs
 import com.twidere.twiderex.model.ui.UiStatus
-import com.twidere.twiderex.ui.buttonContentColor
+import com.twidere.twiderex.ui.mediumEmphasisContentContentColor
 import com.twidere.twiderex.ui.standardPadding
 
 @Composable
@@ -62,7 +62,7 @@ fun ExpandedStatusComponent(
         ) {
             Text(
                 text = status.timestamp.humanizedTimestamp(),
-                color = buttonContentColor
+                color = mediumEmphasisContentContentColor
             )
         }
 
@@ -195,6 +195,6 @@ private fun StatusStatistics(
     Row {
         Text(text = count)
         Spacer(modifier = Modifier.width(standardPadding))
-        Text(text = text, color = buttonContentColor)
+        Text(text = text, color = mediumEmphasisContentContentColor)
     }
 }

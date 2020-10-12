@@ -12,7 +12,7 @@ import androidx.compose.material.icons.filled.Reply
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.twidere.twiderex.model.ui.UiStatus
-import com.twidere.twiderex.ui.buttonContentColor
+import com.twidere.twiderex.ui.mediumEmphasisContentContentColor
 import com.twidere.twiderex.ui.profileImageSize
 import com.twidere.twiderex.ui.standardPadding
 
@@ -26,12 +26,12 @@ fun RetweetHeader(
                 .width(profileImageSize),
             gravity = ContentGravity.CenterEnd,
         ) {
-            Icon(asset = Icons.Default.Reply, tint = buttonContentColor)
+            Icon(asset = Icons.Default.Reply, tint = mediumEmphasisContentContentColor)
         }
         Spacer(modifier = Modifier.width(standardPadding))
         Text(
             text = data.user.name + "retweet this tweet",
-            color = buttonContentColor
+            color = mediumEmphasisContentContentColor
         )
     }
 }

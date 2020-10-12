@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.RowScope.Companion.weight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.EmphasisAmbient
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.ProvideEmphasis
 import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -23,7 +24,7 @@ import com.twidere.twiderex.extensions.NavControllerAmbient
 import com.twidere.twiderex.extensions.humanizedTimestamp
 import com.twidere.twiderex.fragment.StatusFragmentArgs
 import com.twidere.twiderex.model.ui.UiStatus
-import com.twidere.twiderex.ui.buttonContentColor
+import com.twidere.twiderex.ui.mediumEmphasisContentContentColor
 import com.twidere.twiderex.ui.profileImageSize
 import com.twidere.twiderex.ui.standardPadding
 import com.twidere.twiderex.viewmodel.StatusActionsViewModel
@@ -90,7 +91,7 @@ fun TimelineStatusComponent(
                 )
                 TextButton(
                     onClick = {},
-                    contentColor = buttonContentColor,
+                    contentColor = mediumEmphasisContentContentColor,
                 ) {
                     Icon(
                         asset = Icons.Default.Share,

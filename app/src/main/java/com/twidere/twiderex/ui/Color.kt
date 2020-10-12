@@ -9,7 +9,7 @@ val blue = Color(0xff4C9EEB)
 
 
 @Composable
-val buttonContentColor: Color
+val mediumEmphasisContentContentColor: Color
     get() = EmphasisAmbient.current.medium.applyEmphasis(
         contentColor()
     )
