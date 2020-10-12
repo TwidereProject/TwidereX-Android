@@ -18,10 +18,9 @@
  *  You should have received a copy of the GNU General Public License
  *  along with TwidereX. If not, see <http://www.gnu.org/licenses/>.
  */
-
+ 
 package com.twidere.twiderex.viewmodel
 
-import android.content.SharedPreferences
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
