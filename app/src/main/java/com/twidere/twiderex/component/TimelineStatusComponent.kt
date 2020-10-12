@@ -212,19 +212,20 @@ private fun StatusActionButton(
     ) {
         TextButton(
             onClick = onClick,
-            contentColor = buttonContentColor,
         ) {
-            Icon(
-                asset = icon,
-                tint = if (colored) {
-                    EmphasisAmbient.current.medium.applyEmphasis(color)
-                } else {
-                    buttonContentColor
+            ProvideEmphasis(emphasis = EmphasisAmbient.current.medium) {
+                Icon(
+                    asset = icon,
+                    tint = if (colored) {
+                        color
+                    } else {
+                        contentColor()
+                    }
+                )
+                if (count > 0) {
+                    Box(modifier = Modifier.width(4.dp))
+                    Text(text = count.toString())
                 }
-            )
-            if (count > 0) {
-                Box(modifier = Modifier.width(4.dp))
-                Text(text = count.toString())
             }
         }
     }
