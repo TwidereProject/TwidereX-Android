@@ -27,6 +27,7 @@ subprojects {
             targetExclude('bin/**/*.kt')
 
             ktlint(versions.ktlint)
+            licenseHeaderFile rootProject.file('spotless/license.kt')
         }
     }
 }
