@@ -35,6 +35,7 @@ class UserViewModel @ViewModelInject constructor(
     private val repository: UserRepository,
 ) : ViewModel() {
     val loaded = MutableLiveData(false)
+    val refreshing = MutableLiveData(false)
     val user = MutableLiveData<UiUser>()
     val relationship = MutableLiveData<IRelationship>()
     val isMe = MutableLiveData(false)
@@ -43,6 +44,12 @@ class UserViewModel @ViewModelInject constructor(
         if (loaded.value == true) {
             return
         }
+        refresh(data)
+        loaded.postValue(true)
+    }
+
+    suspend fun refresh(data: UiUser) {
+        refreshing.postValue(true)
         user.postValue(data)
         val name = data.screenName
         val key = UserKey(name, "twitter.com")
@@ -55,6 +62,6 @@ class UserViewModel @ViewModelInject constructor(
                 relationship.postValue(it)
             }
         }
-        loaded.postValue(true)
+        refreshing.postValue(false)
     }
 }

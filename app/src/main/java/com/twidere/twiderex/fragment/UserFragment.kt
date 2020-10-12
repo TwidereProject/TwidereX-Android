@@ -18,7 +18,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with TwidereX. If not, see <http://www.gnu.org/licenses/>.
  */
- 
+
 package com.twidere.twiderex.fragment
 
 import androidx.compose.foundation.Icon
@@ -34,6 +34,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.ExperimentalLazyDsl
 import androidx.compose.foundation.lazy.LazyColumn
@@ -90,6 +91,7 @@ import com.twidere.twiderex.component.AppBar
 import com.twidere.twiderex.component.AppBarNavigationButton
 import com.twidere.twiderex.component.NetworkImage
 import com.twidere.twiderex.component.StatusMediaPreviewItem
+import com.twidere.twiderex.component.SwipeToRefreshLayout
 import com.twidere.twiderex.component.TimelineStatusComponent
 import com.twidere.twiderex.component.TopAppBarElevation
 import com.twidere.twiderex.component.UserAvatar
@@ -152,6 +154,7 @@ fun UserComponent(
     val timelineLoadingMore by timelineViewModel.loadingMore.observeAsState(initial = false)
     val mediaTimeline =
         timeline.filter { it.hasMedia }.flatMap { it.media.map { media -> media to it } }
+    val refreshing by viewModel.refreshing.observeAsState(initial = false)
 
     val coroutineScope = rememberCoroutineScope()
 
@@ -182,11 +185,10 @@ fun UserComponent(
         Box {
             val shouldStickyHeaderShown = lazyListState.firstVisibleItemIndex >= 1
             Surface(
+                modifier = Modifier.zIndex(1f),
                 elevation = if (shouldStickyHeaderShown) TopAppBarElevation else 0.dp
             ) {
-                Column(
-                    modifier = Modifier.zIndex(1f),
-                ) {
+                Column {
                     appBar?.invoke()
                     if (shouldStickyHeaderShown) {
                         UserTabsComponent(
@@ -199,99 +201,115 @@ fun UserComponent(
                     }
                 }
             }
-
-            Column {
-                if (appBar != null) {
-                    Spacer(modifier = Modifier.height(56.dp)) // Appbar height
-                }
-                // TODO: background color
-                // TODO: header paddings
-                LazyColumn(
-                    state = lazyListState
-                ) {
-                    item {
-                        UserInfo(user)
+            SwipeToRefreshLayout(
+                refreshingState = refreshing,
+                onRefresh = {
+                    coroutineScope.launch {
+                        viewModel.refresh(user)
+                        timelineViewModel.refresh(user)
                     }
-
-                    item {
-                        UserTabsComponent(
-                            items = tabs,
-                            selectedItem = selectedItem,
-                            onItemSelected = {
-                                setSelectedItem(it)
-                            },
-                        )
+                },
+                refreshIndicator = {
+                    CircularProgressIndicator(
+                        modifier = Modifier
+                            .preferredSize(36.dp)
+                            .padding(4.dp)
+                    )
+                },
+            ) {
+                Column {
+                    if (appBar != null) {
+                        Spacer(modifier = Modifier.height(56.dp)) // Appbar height
                     }
+                    // TODO: background color
+                    // TODO: header paddings
+                    LazyColumn(
+                        state = lazyListState
+                    ) {
+                        item {
+                            UserInfo(user)
+                        }
 
-                    when (selectedItem) {
-                        0 -> {
-                            if (timeline.any()) {
-                                itemsIndexed(timeline) { index, item ->
-                                    Column {
-                                        if (!timelineLoadingMore && index == timeline.size - 1) {
+                        item {
+                            UserTabsComponent(
+                                items = tabs,
+                                selectedItem = selectedItem,
+                                onItemSelected = {
+                                    setSelectedItem(it)
+                                },
+                            )
+                        }
+
+                        when (selectedItem) {
+                            0 -> {
+                                if (timeline.any()) {
+                                    itemsIndexed(timeline) { index, item ->
+                                        Column {
+                                            if (!timelineLoadingMore && index == timeline.size - 1) {
+                                                coroutineScope.launch {
+                                                    timelineViewModel.loadMore(user)
+                                                }
+                                            }
+                                            TimelineStatusComponent(item)
+                                            if (index != timeline.size - 1) {
+                                                Divider(
+                                                    modifier = Modifier.padding(
+                                                        start = profileImageSize + standardPadding,
+                                                        end = standardPadding
+                                                    )
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            1 -> {
+                                if (mediaTimeline.any()) {
+                                    itemsGridIndexed(
+                                        mediaTimeline,
+                                        rowSize = 2,
+                                        spacing = standardPadding * 2,
+                                        padding = standardPadding * 2,
+                                    ) { index, item ->
+                                        val navController = NavControllerAmbient.current
+                                        if (!timelineLoadingMore && index == mediaTimeline.size - 1) {
                                             coroutineScope.launch {
                                                 timelineViewModel.loadMore(user)
                                             }
                                         }
-                                        TimelineStatusComponent(item)
-                                        if (index != timeline.size - 1) {
-                                            Divider(
-                                                modifier = Modifier.padding(
-                                                    start = profileImageSize + standardPadding,
-                                                    end = standardPadding
+                                        StatusMediaPreviewItem(
+                                            item.first,
+                                            modifier = Modifier
+                                                .aspectRatio(1F)
+                                                .clip(
+                                                    RoundedCornerShape(8.dp)
+                                                ),
+                                            onClick = {
+                                                navController.navigate(
+                                                    R.id.media_fragment,
+                                                    MediaFragmentArgs(
+                                                        item.second,
+                                                        item.second.media.indexOf(item.first)
+                                                    ).toBundle()
                                                 )
-                                            )
-                                        }
+                                            }
+                                        )
                                     }
                                 }
                             }
                         }
-                        1 -> {
-                            if (mediaTimeline.any()) {
-                                itemsGridIndexed(
-                                    mediaTimeline,
-                                    rowSize = 2,
-                                    spacing = standardPadding * 2,
-                                    padding = standardPadding * 2,
-                                ) { index, item ->
-                                    val navController = NavControllerAmbient.current
-                                    if (!timelineLoadingMore && index == mediaTimeline.size - 1) {
-                                        coroutineScope.launch {
-                                            timelineViewModel.loadMore(user)
-                                        }
-                                    }
-                                    StatusMediaPreviewItem(
-                                        item.first,
+                        if (timelineLoadingMore) {
+                            item {
+                                Box(
+                                    modifier = Modifier.fillParentMaxWidth(),
+                                    alignment = Alignment.Center
+                                ) {
+                                    CircularProgressIndicator(
                                         modifier = Modifier
-                                            .aspectRatio(1F)
-                                            .clip(
-                                                RoundedCornerShape(8.dp)
-                                            ),
-                                        onClick = {
-                                            navController.navigate(
-                                                R.id.media_fragment,
-                                                MediaFragmentArgs(
-                                                    item.second,
-                                                    item.second.media.indexOf(item.first)
-                                                ).toBundle()
-                                            )
-                                        }
+                                            .heightIn(min = ButtonConstants.DefaultMinHeight)
+                                            .padding(ButtonConstants.DefaultContentPadding),
                                     )
                                 }
-                            }
-                        }
-                    }
-                    if (timelineLoadingMore) {
-                        item {
-                            Box(
-                                modifier = Modifier.fillParentMaxWidth(),
-                                alignment = Alignment.Center
-                            ) {
-                                CircularProgressIndicator(
-                                    modifier = Modifier
-                                        .heightIn(min = ButtonConstants.DefaultMinHeight)
-                                        .padding(ButtonConstants.DefaultContentPadding),
-                                )
                             }
                         }
                     }

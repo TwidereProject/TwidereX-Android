@@ -50,7 +50,7 @@ class UserTimelineViewModel @ViewModelInject constructor(
 
     suspend fun refresh(user: UiUser) {
         if (!timelineIds.isNullOrEmpty()) {
-            return
+            timelineIds.clear()
         }
         loadingMore.postValue(true)
         repository.loadTimelineBetween(
