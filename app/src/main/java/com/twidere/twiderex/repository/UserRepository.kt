@@ -69,8 +69,7 @@ class UserRepository @Inject constructor(
         if (user != null) {
             val db = database.userDao().findWithUserId(user.userId)
             if (db != null) {
-                user._id = db._id
-                database.userDao().update(user)
+                database.userDao().insertAll(listOf(user))
             }
             val name = user.screenName
             val key = UserKey(name, "twitter.com")
