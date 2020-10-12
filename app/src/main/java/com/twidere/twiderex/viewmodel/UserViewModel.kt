@@ -46,7 +46,7 @@ class UserViewModel @ViewModelInject constructor(
         user.postValue(data)
         val name = data.screenName
         val key = UserKey(name, "twitter.com")
-        isMe.postValue(accountRepository.getCurrentAccount().key != key)
+        isMe.postValue(accountRepository.getCurrentAccount().key == key)
         repository.lookupUser(data.id)?.let {
             user.postValue(it)
         }
