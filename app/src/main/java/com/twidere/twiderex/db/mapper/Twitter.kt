@@ -108,7 +108,6 @@ private fun getImage(uri: String?, type: String): String? {
     return uri
 }
 
-
 private fun StatusV2.toDbStatusWithMediaAndUser(
     userKey: UserKey
 ): DbStatusWithMediaAndUser {
@@ -140,7 +139,7 @@ private fun StatusV2.toDbStatusWithMediaAndUser(
                 mediaUrl = getImage(it.url ?: it.previewImageURL, "large"),
                 width = it.width ?: 0,
                 height = it.height ?: 0,
-                pageUrl = null,//TODO: how to play media under twitter v2 api
+                pageUrl = null, // TODO: how to play media under twitter v2 api
                 altText = it.publicMetrics?.viewCount?.toString() ?: "",
                 url = it.url ?: it.previewImageURL,
                 type = it.type?.let { MediaType.valueOf(it) } ?: MediaType.photo,
@@ -175,23 +174,23 @@ private fun Status.toDbStatusWithMediaAndUser(
     return DbStatusWithMediaAndUser(
         status = status,
         media = (
-                extendedEntities?.media ?: entities?.media
+            extendedEntities?.media ?: entities?.media
                 ?: emptyList()
-                ).mapIndexed { index, it ->
-                DbMedia(
-                    _id = UUID.randomUUID().toString(),
-                    statusId = status.statusId,
-                    previewUrl = getImage(it.mediaURLHTTPS, "small"),
-                    mediaUrl = getImage(it.mediaURLHTTPS, "large"),
-                    width = it.sizes?.large?.w ?: 0,
-                    height = it.sizes?.large?.h ?: 0,
-                    pageUrl = it.url,
-                    altText = it.displayURL ?: "",
-                    url = it.expandedURL,
-                    type = it.type?.let { MediaType.valueOf(it) } ?: MediaType.photo,
-                    order = index,
-                )
-            },
+            ).mapIndexed { index, it ->
+            DbMedia(
+                _id = UUID.randomUUID().toString(),
+                statusId = status.statusId,
+                previewUrl = getImage(it.mediaURLHTTPS, "small"),
+                mediaUrl = getImage(it.mediaURLHTTPS, "large"),
+                width = it.sizes?.large?.w ?: 0,
+                height = it.sizes?.large?.h ?: 0,
+                pageUrl = it.url,
+                altText = it.displayURL ?: "",
+                url = it.expandedURL,
+                type = it.type?.let { MediaType.valueOf(it) } ?: MediaType.photo,
+                order = index,
+            )
+        },
         user = user
     )
 }

@@ -73,7 +73,6 @@ data class StatusV2(
         place = geo?.let { geo ->
             includesV2.places?.firstOrNull { it.id == geo.placeID }
         }
-
     }
 
     @Transient
