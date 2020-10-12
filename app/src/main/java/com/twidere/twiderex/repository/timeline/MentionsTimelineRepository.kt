@@ -24,13 +24,14 @@ import com.twidere.services.microblog.TimelineService
 import com.twidere.services.microblog.model.IStatus
 import com.twidere.twiderex.db.AppDatabase
 import com.twidere.twiderex.db.model.TimelineType
+import com.twidere.twiderex.defaultLoadCount
 import com.twidere.twiderex.model.UserKey
 
 class MentionsTimelineRepository(
     userKey: UserKey,
     val service: TimelineService,
     database: AppDatabase,
-    count: Int = 20
+    count: Int = defaultLoadCount
 ) :
     TimelineRepository(userKey, database, count) {
     override val type: TimelineType

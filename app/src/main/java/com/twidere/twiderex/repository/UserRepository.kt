@@ -30,6 +30,7 @@ import com.twidere.twiderex.db.mapper.toDbTimeline
 import com.twidere.twiderex.db.mapper.toDbUser
 import com.twidere.twiderex.db.model.DbTimelineWithStatus
 import com.twidere.twiderex.db.model.TimelineType
+import com.twidere.twiderex.defaultLoadCount
 import com.twidere.twiderex.model.UserKey
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.model.ui.UiStatus.Companion.toUi
@@ -108,7 +109,7 @@ class UserRepository @Inject constructor(
         since_id: String? = null,
     ): List<UiStatus> {
         val timelineService = getTimelineService() ?: return emptyList()
-        val result = timelineService.userTimeline(id, count = 100, max_id = max_id, since_id = since_id)
+        val result = timelineService.userTimeline(id, count = defaultLoadCount, max_id = max_id, since_id = since_id)
         val userKey = repository.getCurrentAccount().key
         val timeline = result.map { it.toDbTimeline(userKey, TimelineType.User) }
 

@@ -26,6 +26,7 @@ import com.twidere.twiderex.db.AppDatabase
 import com.twidere.twiderex.db.mapper.toDbTimeline
 import com.twidere.twiderex.db.model.DbTimeline
 import com.twidere.twiderex.db.model.TimelineType
+import com.twidere.twiderex.defaultLoadCount
 import com.twidere.twiderex.model.UserKey
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.model.ui.UiStatus.Companion.toUi
@@ -33,7 +34,7 @@ import com.twidere.twiderex.model.ui.UiStatus.Companion.toUi
 abstract class TimelineRepository(
     private val userKey: UserKey,
     private val database: AppDatabase,
-    private val count: Int = 20,
+    private val count: Int = defaultLoadCount,
 ) {
     protected abstract val type: TimelineType
 
@@ -89,7 +90,7 @@ abstract class TimelineRepository(
     }
 
     protected abstract suspend fun loadData(
-        count: Int = 20,
+        count: Int = defaultLoadCount,
         since_id: String? = null,
         max_id: String? = null,
     ): List<IStatus>
