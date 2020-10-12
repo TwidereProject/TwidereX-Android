@@ -35,4 +35,8 @@ interface LookupService {
     suspend fun lookupStatus(
         id: String
     ): IStatus
+
+    suspend fun userPinnedStatus(
+        userId: String,
+    ): IStatus?
 }

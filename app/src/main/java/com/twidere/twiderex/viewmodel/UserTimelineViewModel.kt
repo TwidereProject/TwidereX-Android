@@ -34,11 +34,11 @@ class UserTimelineViewModel @ViewModelInject constructor(
     val loadingMore = MutableLiveData(false)
     val timeline = liveData {
         emitSource(
-            repository.getUserTimelineLiveData().switchMap {
+            repository.getUserTimelineLiveData().switchMap { result ->
                 liveData {
                     emit(
-                        it.filter {
-                            timelineIds.contains(it.statusId)
+                        timelineIds.mapNotNull { id ->
+                            result.firstOrNull { it.statusId == id }
                         }
                     )
                 }
@@ -52,6 +52,10 @@ class UserTimelineViewModel @ViewModelInject constructor(
             timelineIds.clear()
         }
         loadingMore.postValue(true)
+        val pinned = repository.getPinnedStatus(user)
+        if (pinned != null) {
+            timelineIds.add(pinned.statusId)
+        }
         repository.loadTimelineBetween(
             user.id,
         ).map { it.statusId }.let {

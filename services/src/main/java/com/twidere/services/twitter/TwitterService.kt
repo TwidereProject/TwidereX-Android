@@ -29,10 +29,11 @@ import com.twidere.services.microblog.SearchService
 import com.twidere.services.microblog.StatusService
 import com.twidere.services.microblog.TimelineService
 import com.twidere.services.microblog.model.IRelationship
-import com.twidere.services.microblog.model.IUser
+import com.twidere.services.microblog.model.IStatus
 import com.twidere.services.microblog.model.MicroBlogError
 import com.twidere.services.microblog.model.Relationship
 import com.twidere.services.twitter.api.TwitterResources
+import com.twidere.services.twitter.model.StatusV2
 import com.twidere.services.twitter.model.UserV2
 import com.twidere.services.twitter.model.fields.Expansions
 import com.twidere.services.twitter.model.fields.MediaFields
@@ -110,7 +111,7 @@ class TwitterService(
     override suspend fun lookupUserByName(
         name: String
     ): UserV2 {
-        val user = resources.userByName(
+        val user = resources.lookupUserByName(
             name,
             tweetFields = TweetFields.values().joinToString(",") {
                 it.value
@@ -133,8 +134,8 @@ class TwitterService(
         return user.data
     }
 
-    override suspend fun lookupUser(id: String): IUser {
-        val user = resources.user(
+    override suspend fun lookupUser(id: String): UserV2 {
+        val user = resources.lookupUser(
             id,
             tweetFields = TweetFields.values().joinToString(",") {
                 it.value
@@ -157,33 +158,28 @@ class TwitterService(
         return user.data
     }
 
-    override suspend fun lookupStatus(id: String) = resources.tweet(
-        id,
-        userFields = UserFields.values().joinToString(",") { it.value },
-        pollFields = PollFields.values().joinToString(",") { it.name },
-        placeFields = PlaceFields.values().joinToString(",") { it.value },
-        mediaFields = MediaFields.values()
-            .filter { it != MediaFields.organic_metrics && it != MediaFields.non_public_metrics && it != MediaFields.promoted_metrics }
-            .joinToString(",") { it.name },
-        expansions = Expansions.values().joinToString(",") { it.value },
-        tweetFields = listOf(
-            TweetFields.attachments,
-            TweetFields.author_id,
-            TweetFields.conversation_id,
-            TweetFields.created_at,
-            TweetFields.entities,
-            TweetFields.geo,
-            TweetFields.id,
-            TweetFields.in_reply_to_user_id,
-            TweetFields.lang,
-            TweetFields.possibly_sensitive,
-            TweetFields.public_metrics,
-            TweetFields.referenced_tweets,
-            TweetFields.source,
-            TweetFields.text,
-            TweetFields.withheld
-        ).joinToString(",") { it.value },
-    ).data!!
+    override suspend fun lookupStatus(id: String): StatusV2 {
+        val response = resources.lookupTweet(
+            id,
+            userFields = UserFields.values().joinToString(",") { it.value },
+            pollFields = PollFields.values().joinToString(",") { it.name },
+            placeFields = PlaceFields.values().joinToString(",") { it.value },
+            mediaFields = MediaFields.values()
+                .joinToString(",") { it.name },
+            expansions = Expansions.values().joinToString(",") { it.value },
+            tweetFields = TweetFields.values().joinToString(",") { it.value },
+        )
+        val data = response.data ?: throw MicroBlogError("Status not found")
+        response.includes?.let {
+            data.setExtra(it)
+        }
+        return data
+    }
+
+    override suspend fun userPinnedStatus(userId: String): IStatus? {
+        val user = lookupUser(userId) ?: return null
+        return user.pinnedTweetID?.let { lookupStatus(it) }
+    }
 
     override suspend fun searchTweets(query: String, nextPage: String?) =
         resources.search(
@@ -193,26 +189,9 @@ class TwitterService(
             pollFields = PollFields.values().joinToString(",") { it.name },
             placeFields = PlaceFields.values().joinToString(",") { it.value },
             mediaFields = MediaFields.values()
-                .filter { it != MediaFields.organic_metrics && it != MediaFields.non_public_metrics && it != MediaFields.promoted_metrics }
                 .joinToString(",") { it.name },
             expansions = Expansions.values().joinToString(",") { it.value },
-            tweetFields = listOf(
-                TweetFields.attachments,
-                TweetFields.author_id,
-                TweetFields.conversation_id,
-                TweetFields.created_at,
-                TweetFields.entities,
-                TweetFields.geo,
-                TweetFields.id,
-                TweetFields.in_reply_to_user_id,
-                TweetFields.lang,
-                TweetFields.possibly_sensitive,
-                TweetFields.public_metrics,
-                TweetFields.referenced_tweets,
-                TweetFields.source,
-                TweetFields.text,
-                TweetFields.withheld
-            ).joinToString(",") { it.value },
+            tweetFields = TweetFields.values().joinToString(",") { it.value },
         )
 
     override suspend fun showRelationship(id: String): IRelationship {

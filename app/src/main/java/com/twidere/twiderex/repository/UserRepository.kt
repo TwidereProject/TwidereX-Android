@@ -28,6 +28,7 @@ import com.twidere.services.microblog.TimelineService
 import com.twidere.twiderex.db.AppDatabase
 import com.twidere.twiderex.db.mapper.toDbTimeline
 import com.twidere.twiderex.db.mapper.toDbUser
+import com.twidere.twiderex.db.model.DbTimelineWithStatus
 import com.twidere.twiderex.db.model.TimelineType
 import com.twidere.twiderex.model.UserKey
 import com.twidere.twiderex.model.ui.UiStatus
@@ -92,6 +93,15 @@ class UserRepository @Inject constructor(
         }
     }
 
+    suspend fun getPinnedStatus(user: UiUser): UiStatus? {
+        val service = getLookupService() ?: return null
+        val result = service.userPinnedStatus(user.id) ?: return null
+        val userKey = repository.getCurrentAccount().key
+        val timeline = result.toDbTimeline(userKey = userKey, timelineType = TimelineType.User)
+        saveTimeline(listOf(timeline))
+        return timeline.toUi()
+    }
+
     suspend fun loadTimelineBetween(
         id: String,
         max_id: String? = null,
@@ -102,6 +112,12 @@ class UserRepository @Inject constructor(
         val userKey = repository.getCurrentAccount().key
         val timeline = result.map { it.toDbTimeline(userKey, TimelineType.User) }
 
+        saveTimeline(timeline)
+
+        return timeline.map { it.toUi() }
+    }
+
+    private suspend fun saveTimeline(timeline: List<DbTimelineWithStatus>) {
         val data = timeline
             .map { listOf(it.status, it.quote, it.retweet) }
             .flatten()
@@ -110,7 +126,5 @@ class UserRepository @Inject constructor(
         database.mediaDao().insertAll(data.map { it.media }.flatten())
         database.statusDao().insertAll(data.map { it.status })
         database.timelineDao().insertAll(timeline.map { it.timeline })
-
-        return timeline.map { it.toUi() }
     }
 }

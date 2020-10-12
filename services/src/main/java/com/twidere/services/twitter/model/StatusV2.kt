@@ -24,6 +24,7 @@ import com.twidere.services.microblog.model.IStatus
 import com.twidere.services.serializer.DateSerializerV2
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import java.util.Date
 
 @Serializable
@@ -39,6 +40,7 @@ data class StatusV2(
     val id: String? = null,
     val entities: StatusV2Entities? = null,
     val source: String? = null,
+    val geo: StatusV2Geo? = null,
 
     @SerialName("conversation_id")
     val conversationID: String? = null,
@@ -56,4 +58,27 @@ data class StatusV2(
     val publicMetrics: StatusV2PublicMetrics? = null,
 
     val attachments: AttachmentsV2? = null
-) : IStatus
+) : IStatus {
+    internal fun setExtra(includesV2: IncludesV2) {
+        if (authorID != null) {
+            user = includesV2.users?.firstOrNull { it.id == authorID }
+        }
+        if (!referencedTweets.isNullOrEmpty()) {
+            referencedTweets.forEach {
+                it.setExtra(includesV2)
+            }
+        }
+        attachments?.setExtra(includesV2)
+
+        place = geo?.let { geo ->
+            includesV2.places?.firstOrNull { it.id == geo.placeID }
+        }
+
+    }
+
+    @Transient
+    var user: UserV2? = null
+
+    @Transient
+    var place: PlaceV2? = null
+}

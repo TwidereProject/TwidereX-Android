@@ -22,9 +22,19 @@ package com.twidere.services.twitter.model
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
 @Serializable
 data class AttachmentsV2(
     @SerialName("media_keys")
     val mediaKeys: List<String>? = null
-)
+) {
+    internal fun setExtra(includesV2: IncludesV2) {
+        mediaKeys?.let {
+            medias = includesV2.media?.filter { mediaKeys.contains(it.mediaKey) }
+        }
+    }
+
+    @Transient
+    var medias: List<MediaV2>? = null
+}

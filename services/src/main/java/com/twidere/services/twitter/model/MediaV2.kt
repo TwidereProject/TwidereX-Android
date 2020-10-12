@@ -32,5 +32,14 @@ data class MediaV2(
     val mediaKey: String? = null,
 
     val type: String? = null,
-    val width: Long? = null
+    val width: Long? = null,
+
+    @SerialName("public_metrics")
+    val publicMetrics: MediaPublicMetrics? = null,
+
+    @SerialName("duration_ms")
+    val durationMS: Long? = null,
+
+    @SerialName("preview_image_url")
+    val previewImageURL: String? = null
 )

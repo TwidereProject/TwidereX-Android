@@ -20,7 +20,9 @@
  */
 package com.twidere.twiderex.db.mapper
 
+import com.twidere.services.twitter.model.ReferencedTweetType
 import com.twidere.services.twitter.model.Status
+import com.twidere.services.twitter.model.StatusV2
 import com.twidere.services.twitter.model.User
 import com.twidere.services.twitter.model.UserV2
 import com.twidere.services.utils.encodeJson
@@ -35,6 +37,38 @@ import com.twidere.twiderex.model.MediaType
 import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.UserKey
 import java.util.UUID
+
+fun StatusV2.toDbTimeline(
+    userKey: UserKey,
+    timelineType: TimelineType,
+): DbTimelineWithStatus {
+    val status = this.toDbStatusWithMediaAndUser(userKey)
+    val retweet = this.referencedTweets
+        ?.firstOrNull { it.type == ReferencedTweetType.retweeted }?.status?.toDbStatusWithMediaAndUser(
+            userKey
+        )
+    val quote = this.referencedTweets
+        ?.firstOrNull { it.type == ReferencedTweetType.quoted }?.status?.toDbStatusWithMediaAndUser(
+            userKey
+        )
+
+    return DbTimelineWithStatus(
+        timeline = DbTimeline(
+            _id = UUID.randomUUID().toString(),
+            userKey = userKey,
+            platformType = PlatformType.Twitter,
+            timestamp = status.status.timestamp,
+            isGap = false,
+            retweetId = retweet?.status?.statusId,
+            quoteId = quote?.status?.statusId,
+            statusId = status.status.statusId,
+            type = timelineType,
+        ),
+        status = status,
+        retweet = retweet,
+        quote = quote,
+    )
+}
 
 fun Status.toDbTimeline(
     userKey: UserKey,
@@ -74,6 +108,49 @@ private fun getImage(uri: String?, type: String): String? {
     return uri
 }
 
+
+private fun StatusV2.toDbStatusWithMediaAndUser(
+    userKey: UserKey
+): DbStatusWithMediaAndUser {
+    val user = user?.toDbUser() ?: throw IllegalArgumentException("Status.user should not be null")
+    val status = DbStatus(
+        _id = UUID.randomUUID().toString(),
+        statusId = id ?: throw IllegalArgumentException("Status.idStr should not be null"),
+        userKey = userKey,
+        platformType = PlatformType.Twitter,
+        text = text ?: "",
+        timestamp = createdAt?.time ?: 0,
+        retweetCount = publicMetrics?.retweetCount ?: 0,
+        likeCount = publicMetrics?.likeCount ?: 0,
+        retweeted = false, // TODO: twitter v2 api does not return this
+        liked = false, // TODO: twitter v2 api does not return this
+        replyCount = 0,
+        placeString = place?.fullName,
+        hasMedia = !attachments?.medias.isNullOrEmpty(),
+        extra = encodeJson(),
+        userId = user.userId
+    )
+    return DbStatusWithMediaAndUser(
+        status = status,
+        media = (attachments?.medias ?: emptyList()).mapIndexed { index, it ->
+            DbMedia(
+                _id = UUID.randomUUID().toString(),
+                statusId = status.statusId,
+                previewUrl = getImage(it.url ?: it.previewImageURL, "small"),
+                mediaUrl = getImage(it.url ?: it.previewImageURL, "large"),
+                width = it.width ?: 0,
+                height = it.height ?: 0,
+                pageUrl = null,//TODO: how to play media under twitter v2 api
+                altText = it.publicMetrics?.viewCount?.toString() ?: "",
+                url = it.url ?: it.previewImageURL,
+                type = it.type?.let { MediaType.valueOf(it) } ?: MediaType.photo,
+                order = index,
+            )
+        },
+        user = user
+    )
+}
+
 private fun Status.toDbStatusWithMediaAndUser(
     userKey: UserKey
 ): DbStatusWithMediaAndUser {
@@ -98,23 +175,23 @@ private fun Status.toDbStatusWithMediaAndUser(
     return DbStatusWithMediaAndUser(
         status = status,
         media = (
-            extendedEntities?.media ?: entities?.media
+                extendedEntities?.media ?: entities?.media
                 ?: emptyList()
-            ).mapIndexed { index, it ->
-            DbMedia(
-                _id = UUID.randomUUID().toString(),
-                statusId = status.statusId,
-                previewUrl = getImage(it.mediaURLHTTPS, "small"),
-                mediaUrl = getImage(it.mediaURLHTTPS, "large"),
-                width = it.sizes?.large?.w ?: 0,
-                height = it.sizes?.large?.h ?: 0,
-                pageUrl = it.url,
-                altText = it.displayURL ?: "",
-                url = it.expandedURL,
-                type = it.type?.let { MediaType.valueOf(it) } ?: MediaType.photo,
-                order = index,
-            )
-        },
+                ).mapIndexed { index, it ->
+                DbMedia(
+                    _id = UUID.randomUUID().toString(),
+                    statusId = status.statusId,
+                    previewUrl = getImage(it.mediaURLHTTPS, "small"),
+                    mediaUrl = getImage(it.mediaURLHTTPS, "large"),
+                    width = it.sizes?.large?.w ?: 0,
+                    height = it.sizes?.large?.h ?: 0,
+                    pageUrl = it.url,
+                    altText = it.displayURL ?: "",
+                    url = it.expandedURL,
+                    type = it.type?.let { MediaType.valueOf(it) } ?: MediaType.photo,
+                    order = index,
+                )
+            },
         user = user
     )
 }
@@ -124,7 +201,8 @@ fun User.toDbUser() = DbUser(
     userId = this.idStr ?: throw IllegalArgumentException("user.idStr should not be null"),
     name = this.name ?: "",
     screenName = this.screenName ?: "",
-    profileImage = (profileImageURLHTTPS ?: profileImageURL)?.let { updateProfileImagePath(it) } ?: "",
+    profileImage = (profileImageURLHTTPS ?: profileImageURL)?.let { updateProfileImagePath(it) }
+        ?: "",
     profileBackgroundImage = profileBackgroundImageURLHTTPS,
     followersCount = this.followersCount ?: 0,
     friendsCount = this.friendsCount ?: 0,
@@ -133,7 +211,7 @@ fun User.toDbUser() = DbUser(
     location = this.location,
     website = this.entities?.url?.urls?.firstOrNull { it.url == this.url }?.expandedURL,
     verified = this.verified ?: false,
-    isProtected = this.protected ?: false
+    isProtected = this.protected ?: false,
 )
 
 fun UserV2.toDbUser() = DbUser(
@@ -155,7 +233,10 @@ fun UserV2.toDbUser() = DbUser(
     isProtected = this.protected ?: false
 )
 
-private fun updateProfileImagePath(value: String, size: ProfileImageSize = ProfileImageSize.reasonably_small): String {
+private fun updateProfileImagePath(
+    value: String,
+    size: ProfileImageSize = ProfileImageSize.reasonably_small
+): String {
     val last = value.split("/").lastOrNull()
     var id = last?.split(".")?.firstOrNull()
     ProfileImageSize.values().forEach {

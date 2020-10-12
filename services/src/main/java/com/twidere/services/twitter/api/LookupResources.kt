@@ -29,21 +29,21 @@ import retrofit2.http.Query
 
 interface LookupResources {
     @GET("/2/users/{id}")
-    suspend fun user(
+    suspend fun lookupUser(
         @Path(value = "id") id: String,
         @Query("tweet.fields", encoded = true) tweetFields: String? = null,
         @Query("user.fields", encoded = true) userFields: String? = null,
     ): TwitterResponseV2<UserV2>
 
     @GET("/2/users/by/username/{name}")
-    suspend fun userByName(
+    suspend fun lookupUserByName(
         @Path(value = "name") name: String,
         @Query("tweet.fields", encoded = true) tweetFields: String? = null,
         @Query("user.fields", encoded = true) userFields: String? = null,
     ): TwitterResponseV2<UserV2>
 
-    @GET("/2/tweets/:id")
-    suspend fun tweet(
+    @GET("/2/tweets/{id}")
+    suspend fun lookupTweet(
         @Path(value = "id") id: String,
         @Query("tweet.fields", encoded = true) tweetFields: String? = null,
         @Query("expansions", encoded = true) expansions: String? = null,
