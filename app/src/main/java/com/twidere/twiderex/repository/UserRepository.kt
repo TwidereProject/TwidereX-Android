@@ -25,6 +25,7 @@ import androidx.lifecycle.map
 import com.twidere.services.microblog.LookupService
 import com.twidere.services.microblog.RelationshipService
 import com.twidere.services.microblog.TimelineService
+import com.twidere.services.microblog.model.IStatus
 import com.twidere.twiderex.db.AppDatabase
 import com.twidere.twiderex.db.mapper.toDbTimeline
 import com.twidere.twiderex.db.mapper.toDbUser
@@ -108,13 +109,29 @@ class UserRepository @Inject constructor(
         max_id: String? = null,
         since_id: String? = null,
     ): List<UiStatus> {
+        return load {
+            it.userTimeline(id, count = defaultLoadCount, max_id = max_id, since_id = since_id)
+        }
+    }
+
+    suspend fun loadFavouriteTimelineBetween(
+        id: String,
+        max_id: String? = null,
+        since_id: String? = null,
+    ): List<UiStatus> {
+        return load {
+            it.favorites(id, count = defaultLoadCount, max_id = max_id, since_id = since_id)
+        }
+    }
+
+    private suspend fun load(
+        func: suspend (TimelineService) -> List<IStatus>
+    ): List<UiStatus> {
         val timelineService = getTimelineService() ?: return emptyList()
-        val result = timelineService.userTimeline(id, count = defaultLoadCount, max_id = max_id, since_id = since_id)
+        val result = func.invoke(timelineService)
         val userKey = repository.getCurrentAccount().key
         val timeline = result.map { it.toDbTimeline(userKey, TimelineType.User) }
-
         saveTimeline(timeline)
-
         return timeline.map { it.toUi() }
     }
 

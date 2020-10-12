@@ -99,8 +99,9 @@ import com.twidere.twiderex.extensions.NavControllerAmbient
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.ui.profileImageSize
 import com.twidere.twiderex.ui.standardPadding
-import com.twidere.twiderex.viewmodel.UserTimelineViewModel
-import com.twidere.twiderex.viewmodel.UserViewModel
+import com.twidere.twiderex.viewmodel.user.UserFavouriteTimelineViewModel
+import com.twidere.twiderex.viewmodel.user.UserTimelineViewModel
+import com.twidere.twiderex.viewmodel.user.UserViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -153,23 +154,34 @@ fun UserComponent(
     val timelineLoadingMore by timelineViewModel.loadingMore.observeAsState(initial = false)
     val mediaTimeline =
         timeline.filter { it.hasMedia }.flatMap { it.media.map { media -> media to it } }
+
+    val favouriteViewModel = viewModel<UserFavouriteTimelineViewModel>()
+    val favourite by favouriteViewModel.timeline.observeAsState(initial = emptyList())
+    val favouriteLoadingMore by favouriteViewModel.loadingMore.observeAsState(initial = false)
+
     val refreshing by viewModel.refreshing.observeAsState(initial = false)
 
     val coroutineScope = rememberCoroutineScope()
 
-    launchInComposition {
+    launchInComposition(
+        selectedItem
+    ) {
         viewModel.init(user)
-    }
-
-    when {
-        selectedItem == 0 && !timeline.any() -> {
-            coroutineScope.launch {
-                timelineViewModel.refresh(user)
+        when {
+            selectedItem == 0 && !timeline.any() -> {
+                coroutineScope.launch {
+                    timelineViewModel.refresh(user)
+                }
             }
-        }
-        selectedItem == 1 && !mediaTimeline.any() -> {
-            coroutineScope.launch {
-                timelineViewModel.loadMore(user)
+            selectedItem == 1 && !mediaTimeline.any() -> {
+                coroutineScope.launch {
+                    timelineViewModel.loadMore(user)
+                }
+            }
+            selectedItem == 2 && !favourite.any() -> {
+                coroutineScope.launch {
+                    favouriteViewModel.refresh(user)
+                }
             }
         }
     }
@@ -205,7 +217,10 @@ fun UserComponent(
                 onRefresh = {
                     coroutineScope.launch {
                         viewModel.refresh(user)
-                        timelineViewModel.refresh(user)
+                        when (selectedItem) {
+                            0, 1 -> timelineViewModel.refresh(user)
+                            2 -> favouriteViewModel.refresh(user)
+                        }
                     }
                 },
                 refreshIndicator = {
@@ -296,8 +311,30 @@ fun UserComponent(
                                     }
                                 }
                             }
+                            2 -> {
+                                if (favourite.any()) {
+                                    itemsIndexed(favourite) { index, item ->
+                                        Column {
+                                            if (!timelineLoadingMore && index == favourite.size - 1) {
+                                                coroutineScope.launch {
+                                                    favouriteViewModel.loadMore(user)
+                                                }
+                                            }
+                                            TimelineStatusComponent(item)
+                                            if (index != favourite.size - 1) {
+                                                Divider(
+                                                    modifier = Modifier.padding(
+                                                        start = profileImageSize + standardPadding,
+                                                        end = standardPadding
+                                                    )
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         }
-                        if (timelineLoadingMore) {
+                        if (timelineLoadingMore || favouriteLoadingMore) {
                             item {
                                 Box(
                                     modifier = Modifier.fillParentMaxWidth(),

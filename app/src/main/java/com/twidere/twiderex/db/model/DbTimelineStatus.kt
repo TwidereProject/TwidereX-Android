@@ -49,6 +49,7 @@ enum class TimelineType {
     Home,
     Mentions,
     User,
+    UserFavourite
 }
 
 data class DbTimelineWithStatus(

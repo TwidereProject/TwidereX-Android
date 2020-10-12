@@ -108,6 +108,20 @@ class TwitterService(
         include_entities = true,
     )
 
+    override suspend fun favorites(
+        user_id: String,
+        count: Int,
+        since_id: String?,
+        max_id: String?
+    ) =
+        resources.favoritesList(
+            user_id,
+            count,
+            since_id,
+            max_id,
+            include_entities = true,
+        )
+
     override suspend fun lookupUserByName(
         name: String
     ): UserV2 {

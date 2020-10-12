@@ -56,4 +56,14 @@ interface TimelineResources {
         @Query("include_entities") include_entities: Boolean? = null,
         @Query("include_rts") include_rts: Boolean? = null,
     ): List<Status>
+
+
+    @GET("/1.1/favorites/list.json")
+    suspend fun favoritesList(
+        @Query("user_id") user_id: String,
+        @Query("count") count: Int = 20,
+        @Query("since_id") since_id: String? = null,
+        @Query("max_id") max_id: String? = null,
+        @Query("include_entities") include_entities: Boolean? = null,
+    ): List<Status>
 }

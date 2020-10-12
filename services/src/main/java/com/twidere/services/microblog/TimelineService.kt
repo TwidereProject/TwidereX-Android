@@ -41,4 +41,11 @@ interface TimelineService {
         since_id: String? = null,
         max_id: String? = null,
     ): List<IStatus>
+
+    suspend fun favorites(
+        user_id: String,
+        count: Int = 20,
+        since_id: String? = null,
+        max_id: String? = null,
+    ): List<IStatus>
 }
