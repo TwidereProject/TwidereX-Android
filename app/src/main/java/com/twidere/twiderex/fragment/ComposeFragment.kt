@@ -49,6 +49,8 @@ import androidx.compose.material.icons.filled.Pages
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material.icons.filled.Topic
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.onActive
 import androidx.compose.runtime.remember
@@ -76,6 +78,7 @@ class ComposeFragment : JetFragment() {
     override fun onCompose() {
         val textState = remember { mutableStateOf(TextFieldValue()) }
         val activeAccountViewModel = viewModel<ActiveAccountViewModel>()
+        val account by activeAccountViewModel.account.observeAsState()
 
         val focusRequester = FocusRequester()
         onActive {
@@ -104,13 +107,15 @@ class ComposeFragment : JetFragment() {
                         .padding(16.dp)
                 ) {
                     Column {
-                        NetworkImage(
-                            url = activeAccountViewModel.account.user.profileImage,
-                            modifier = Modifier
-                                .clip(CircleShape)
-                                .width(profileImageSize)
-                                .height(profileImageSize)
-                        )
+                        account?.let {
+                            NetworkImage(
+                                url = it.user.profileImage,
+                                modifier = Modifier
+                                    .clip(CircleShape)
+                                    .width(profileImageSize)
+                                    .height(profileImageSize)
+                            )
+                        }
                         Spacer(modifier = Modifier.weight(1f))
                         Box(
                             modifier = Modifier

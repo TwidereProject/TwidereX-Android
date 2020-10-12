@@ -18,7 +18,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with TwidereX. If not, see <http://www.gnu.org/licenses/>.
  */
- 
+
 package com.twidere.twiderex.fragment
 
 import androidx.compose.animation.Crossfade
@@ -49,6 +49,8 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.savedinstancestate.savedInstanceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -56,7 +58,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.viewModel
+import com.twidere.twiderex.component.AppBar
 import com.twidere.twiderex.component.NetworkImage
+import com.twidere.twiderex.component.TopAppBarElevation
 import com.twidere.twiderex.component.home.HomeNavigationItem
 import com.twidere.twiderex.component.home.HomeTimelineItem
 import com.twidere.twiderex.component.home.MeItem
@@ -106,7 +110,7 @@ class HomeFragment : JetFragment() {
         Scaffold(
             scaffoldState = scaffoldState,
             topBar = {
-                com.twidere.twiderex.component.AppBar(
+                AppBar(
                     title = {
                         Text(text = menus[selectedItem].name)
                     },
@@ -122,6 +126,11 @@ class HomeFragment : JetFragment() {
                         ) {
                             Icon(asset = Icons.Default.Menu)
                         }
+                    },
+                    elevation = if (menus[selectedItem].withAppBarShadow) {
+                        TopAppBarElevation
+                    } else {
+                        0.dp
                     }
                 )
             },
@@ -142,7 +151,9 @@ class HomeFragment : JetFragment() {
                     top = it.top,
                 )
             ) {
-                Crossfade(current = selectedItem) {
+                Crossfade(
+                    current = selectedItem,
+                ) {
                     menus[it].onCompose()
                 }
             }
@@ -154,29 +165,32 @@ class HomeFragment : JetFragment() {
 @Composable
 private fun HomeDrawer() {
     val viewModel = viewModel<ActiveAccountViewModel>()
+    val account by viewModel.account.observeAsState()
     Column {
         Spacer(modifier = Modifier.height(16.dp))
 
         ListItem(
             icon = {
-                NetworkImage(
-                    url = viewModel.account.user.profileImage,
-                    modifier = Modifier
-                        .clip(CircleShape)
-                        .width(profileImageSize)
-                        .height(profileImageSize)
-                )
+                account?.let {
+                    NetworkImage(
+                        url = it.user.profileImage,
+                        modifier = Modifier
+                            .clip(CircleShape)
+                            .width(profileImageSize)
+                            .height(profileImageSize)
+                    )
+                }
             },
             text = {
                 Text(
-                    text = viewModel.account.user.name,
+                    text = account?.user?.name ?: "",
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
             },
             secondaryText = {
                 Text(
-                    text = "@${viewModel.account.user.screenName}",
+                    text = "@${account?.user?.screenName}",
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
@@ -195,21 +209,21 @@ private fun HomeDrawer() {
                 modifier = Modifier.weight(1f),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Text(text = viewModel.account.user.friendsCount.toString())
+                Text(text = account?.user?.friendsCount.toString())
                 Text(text = "Following")
             }
             Column(
                 modifier = Modifier.weight(1f),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Text(text = viewModel.account.user.followersCount.toString())
+                Text(text = account?.user?.followersCount.toString())
                 Text(text = "Followers")
             }
             Column(
                 modifier = Modifier.weight(1f),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Text(text = viewModel.account.user.listedCount.toString())
+                Text(text = account?.user?.listedCount.toString())
                 Text(text = "Listed")
             }
         }
