@@ -18,7 +18,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with TwidereX. If not, see <http://www.gnu.org/licenses/>.
  */
- 
+
 package com.twidere.twiderex.fragment
 
 import androidx.compose.foundation.Icon
@@ -37,6 +37,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.ExperimentalLazyDsl
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -109,14 +110,33 @@ class UserFragment : JetFragment() {
     @OptIn(IncomingComposeUpdate::class)
     @Composable
     override fun onCompose() {
-        UserComponent(data = args.user)
+        UserComponent(data = args.user) {
+            AppBar(
+                navigationIcon = {
+                    AppBarNavigationButton()
+                },
+                actions = {
+                    IconButton(onClick = {}) {
+                        Icon(asset = Icons.Default.Mail)
+                    }
+                    IconButton(onClick = {}) {
+                        Icon(asset = Icons.Default.MoreVert)
+                    }
+                },
+                elevation = 0.dp,
+            )
+        }
     }
 }
 
 @OptIn(ExperimentalLazyDsl::class)
 @Composable
 @IncomingComposeUpdate
-fun UserComponent(data: UiUser) {
+fun UserComponent(
+    data: UiUser,
+    lazyListState: LazyListState = rememberLazyListState(),
+    appBar: @Composable (() -> Unit)? = null,
+) {
     val viewModel = viewModel<UserViewModel>()
     val user by viewModel.user.observeAsState(initial = data)
 
@@ -160,33 +180,14 @@ fun UserComponent(data: UiUser) {
         }
     ) {
         Box {
-            val listState = rememberLazyListState()
-            val shouldStickyHeaderShown = listState.firstVisibleItemIndex >= 1
-            val navController = NavControllerAmbient.current
+            val shouldStickyHeaderShown = lazyListState.firstVisibleItemIndex >= 1
             Surface(
                 elevation = if (shouldStickyHeaderShown) TopAppBarElevation else 0.dp
             ) {
                 Column(
                     modifier = Modifier.zIndex(1f),
                 ) {
-                    AppBar(
-                        navigationIcon = if (navController.backStack.size > 0) {
-                            {
-                                AppBarNavigationButton()
-                            }
-                        } else {
-                            null
-                        },
-                        actions = {
-                            IconButton(onClick = {}) {
-                                Icon(asset = Icons.Default.Mail)
-                            }
-                            IconButton(onClick = {}) {
-                                Icon(asset = Icons.Default.MoreVert)
-                            }
-                        },
-                        elevation = 0.dp,
-                    )
+                    appBar?.invoke()
                     if (shouldStickyHeaderShown) {
                         UserTabsComponent(
                             items = tabs,
@@ -200,11 +201,13 @@ fun UserComponent(data: UiUser) {
             }
 
             Column {
-                Spacer(modifier = Modifier.height(56.dp)) // Appbar height
+                if (appBar != null) {
+                    Spacer(modifier = Modifier.height(56.dp)) // Appbar height
+                }
                 // TODO: background color
                 // TODO: header paddings
                 LazyColumn(
-                    state = listState
+                    state = lazyListState
                 ) {
                     item {
                         UserInfo(user)
