@@ -1,3 +1,24 @@
+/*
+ *  TwidereX
+ *
+ *  Copyright (C) 2020 Tlaster <tlaster@outlook.com>
+ * 
+ *  This file is part of TwidereX.
+ * 
+ *  TwidereX is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ * 
+ *  TwidereX is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ * 
+ *  You should have received a copy of the GNU General Public License
+ *  along with TwidereX. If not, see <http://www.gnu.org/licenses/>.
+ */
+ 
 package com.twidere.twiderex.component
 
 import androidx.compose.animation.AnimatedFloatModel
@@ -6,8 +27,19 @@ import androidx.compose.animation.core.AnimationEndReason
 import androidx.compose.animation.core.fling
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.runtime.*
-import androidx.compose.ui.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.structuralEqualityPolicy
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Layout
+import androidx.compose.ui.Measurable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.ParentDataModifier
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.platform.AnimationClockAmbient
 import androidx.compose.ui.unit.Density
@@ -84,7 +116,7 @@ class PagerState<T>(
     }
 
     override fun toString(): String = "PagerState{minPage=$minPage, maxPage=$maxPage, " +
-            "currentPage=$currentPage, currentPageOffset=$currentPageOffset}"
+        "currentPage=$currentPage, currentPageOffset=$currentPageOffset}"
 }
 
 @Immutable

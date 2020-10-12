@@ -1,15 +1,46 @@
+/*
+ *  TwidereX
+ *
+ *  Copyright (C) 2020 Tlaster <tlaster@outlook.com>
+ * 
+ *  This file is part of TwidereX.
+ * 
+ *  TwidereX is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ * 
+ *  TwidereX is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ * 
+ *  You should have received a copy of the GNU General Public License
+ *  along with TwidereX. If not, see <http://www.gnu.org/licenses/>.
+ */
+ 
 package com.twidere.services.twitter
 
 import com.twidere.services.http.authorization.OAuth1Authorization
 import com.twidere.services.http.retrofit
-import com.twidere.services.microblog.*
+import com.twidere.services.microblog.LookupService
+import com.twidere.services.microblog.MicroBlogService
+import com.twidere.services.microblog.RelationshipService
+import com.twidere.services.microblog.SearchService
+import com.twidere.services.microblog.StatusService
+import com.twidere.services.microblog.TimelineService
 import com.twidere.services.microblog.model.IRelationship
 import com.twidere.services.microblog.model.IUser
 import com.twidere.services.microblog.model.MicroBlogError
 import com.twidere.services.microblog.model.Relationship
 import com.twidere.services.twitter.api.TwitterResources
 import com.twidere.services.twitter.model.UserV2
-import com.twidere.services.twitter.model.fields.*
+import com.twidere.services.twitter.model.fields.Expansions
+import com.twidere.services.twitter.model.fields.MediaFields
+import com.twidere.services.twitter.model.fields.PlaceFields
+import com.twidere.services.twitter.model.fields.PollFields
+import com.twidere.services.twitter.model.fields.TweetFields
+import com.twidere.services.twitter.model.fields.UserFields
 
 internal const val TWITTER_BASE_URL = "https://api.twitter.com/"
 
@@ -18,7 +49,11 @@ class TwitterService(
     private val consumer_secret: String,
     private val access_token: String,
     private val access_token_secret: String,
-) : MicroBlogService, TimelineService, LookupService, RelationshipService, SearchService,
+) : MicroBlogService,
+    TimelineService,
+    LookupService,
+    RelationshipService,
+    SearchService,
     StatusService {
     private val resources by lazy {
         retrofit<TwitterResources>(

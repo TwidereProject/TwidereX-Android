@@ -1,19 +1,69 @@
+/*
+ *  TwidereX
+ *
+ *  Copyright (C) 2020 Tlaster <tlaster@outlook.com>
+ * 
+ *  This file is part of TwidereX.
+ * 
+ *  TwidereX is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ * 
+ *  TwidereX is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ * 
+ *  You should have received a copy of the GNU General Public License
+ *  along with TwidereX. If not, see <http://www.gnu.org/licenses/>.
+ */
+ 
 package com.twidere.twiderex.fragment
 
 import androidx.compose.foundation.Icon
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.background
 import androidx.compose.foundation.contentColor
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.ExperimentalLazyDsl
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.ButtonConstants
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.Divider
+import androidx.compose.material.EmphasisAmbient
+import androidx.compose.material.FloatingActionButton
+import androidx.compose.material.IconButton
+import androidx.compose.material.ListItem
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Surface
+import androidx.compose.material.Tab
+import androidx.compose.material.TabConstants
 import androidx.compose.material.TabConstants.defaultTabIndicatorOffset
+import androidx.compose.material.TabRow
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Image
+import androidx.compose.material.icons.filled.Link
+import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.Mail
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.MyLocation
+import androidx.compose.material.icons.filled.Reply
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.launchInComposition
@@ -35,7 +85,14 @@ import androidx.compose.ui.zIndex
 import androidx.navigation.fragment.navArgs
 import com.twidere.twiderex.R
 import com.twidere.twiderex.annotations.IncomingComposeUpdate
-import com.twidere.twiderex.component.*
+import com.twidere.twiderex.component.AppBar
+import com.twidere.twiderex.component.AppBarNavigationButton
+import com.twidere.twiderex.component.NetworkImage
+import com.twidere.twiderex.component.StatusMediaPreviewItem
+import com.twidere.twiderex.component.TimelineStatusComponent
+import com.twidere.twiderex.component.TopAppBarElevation
+import com.twidere.twiderex.component.UserAvatar
+import com.twidere.twiderex.component.itemsGridIndexed
 import com.twidere.twiderex.extensions.NavControllerAmbient
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.ui.profileImageSize
@@ -54,7 +111,6 @@ class UserFragment : JetFragment() {
     override fun onCompose() {
         UserComponent(data = args.user)
     }
-
 }
 
 @OptIn(ExperimentalLazyDsl::class)
@@ -144,9 +200,9 @@ fun UserComponent(data: UiUser) {
             }
 
             Column {
-                Spacer(modifier = Modifier.height(56.dp))//Appbar height
-                //TODO: background color
-                //TODO: header paddings
+                Spacer(modifier = Modifier.height(56.dp)) // Appbar height
+                // TODO: background color
+                // TODO: header paddings
                 LazyColumn(
                     state = listState
                 ) {
@@ -252,7 +308,7 @@ private fun UserInfo(data: UiUser) {
     val maxBannerSize = 200.dp
 
     Box {
-        //TODO: parallax effect
+        // TODO: parallax effect
         user.profileBackgroundImage?.let {
             Box(
                 modifier = Modifier
@@ -398,7 +454,6 @@ private fun UserInfo(data: UiUser) {
         }
     }
 }
-
 
 @Composable
 private fun UserTabsComponent(

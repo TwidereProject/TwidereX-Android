@@ -1,3 +1,24 @@
+/*
+ *  TwidereX
+ *
+ *  Copyright (C) 2020 Tlaster <tlaster@outlook.com>
+ * 
+ *  This file is part of TwidereX.
+ * 
+ *  TwidereX is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ * 
+ *  TwidereX is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ * 
+ *  You should have received a copy of the GNU General Public License
+ *  along with TwidereX. If not, see <http://www.gnu.org/licenses/>.
+ */
+ 
 package com.twidere.services.http.authorization
 
 /*
@@ -16,14 +37,14 @@ package com.twidere.services.http.authorization
 * limitations under the License.
 */
 
-
 import okhttp3.Request
 import okio.Buffer
 import okio.ByteString
 import java.net.URLEncoder
 import java.security.SecureRandom
 import java.sql.Timestamp
-import java.util.*
+import java.util.Random
+import java.util.TreeMap
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
 
@@ -36,7 +57,6 @@ private const val OAUTH_TIMESTAMP = "oauth_timestamp"
 private const val OAUTH_ACCESS_TOKEN = "oauth_token"
 private const val OAUTH_VERSION = "oauth_version"
 private const val OAUTH_VERSION_VALUE = "1.0"
-
 
 class OAuth1Authorization(
     private val consumerKey: String,
@@ -81,7 +101,7 @@ class OAuth1Authorization(
                 while (!body.exhausted()) {
                     val keyEnd = body.indexOf('='.toByte())
                     if (keyEnd == -1L) {
-                        break //throw new IllegalStateException("Key with no value: " + body.readUtf8());
+                        break // throw new IllegalStateException("Key with no value: " + body.readUtf8());
                     }
                     val key = body.readUtf8(keyEnd)
                     body.skip(1) // Equals.
@@ -118,17 +138,21 @@ class OAuth1Authorization(
             mac.init(keySpec)
             val result = mac.doFinal(base.readByteArray())
             val signature: String = ByteString.of(*result).base64()
-            ("OAuth $OAUTH_CONSUMER_KEY=\"$consumerKeyValue\", $OAUTH_NONCE=\"$oauthNonce\", $OAUTH_SIGNATURE=\"${
+            (
+                "OAuth $OAUTH_CONSUMER_KEY=\"$consumerKeyValue\", $OAUTH_NONCE=\"$oauthNonce\", $OAUTH_SIGNATURE=\"${
                 encodeUrl(
                     signature
                 )
-            }\", $OAUTH_SIGNATURE_METHOD=\"$OAUTH_SIGNATURE_METHOD_VALUE\", $OAUTH_TIMESTAMP=\"$oauthTimestamp\", ${
-                (if (accessToken != null) "$OAUTH_ACCESS_TOKEN=\"${
+                }\", $OAUTH_SIGNATURE_METHOD=\"$OAUTH_SIGNATURE_METHOD_VALUE\", $OAUTH_TIMESTAMP=\"$oauthTimestamp\", ${
+                (
+                    if (accessToken != null) "$OAUTH_ACCESS_TOKEN=\"${
                     encodeUrl(
                         accessToken
                     )
-                }\"," else "")
-            } $OAUTH_VERSION=\"$OAUTH_VERSION_VALUE\"")
+                    }\"," else ""
+                    )
+                } $OAUTH_VERSION=\"$OAUTH_VERSION_VALUE\""
+                )
         }
     }
 }

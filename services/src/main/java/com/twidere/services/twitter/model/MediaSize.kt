@@ -1,3 +1,24 @@
+/*
+ *  TwidereX
+ *
+ *  Copyright (C) 2020 Tlaster <tlaster@outlook.com>
+ * 
+ *  This file is part of TwidereX.
+ * 
+ *  TwidereX is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ * 
+ *  TwidereX is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ * 
+ *  You should have received a copy of the GNU General Public License
+ *  along with TwidereX. If not, see <http://www.gnu.org/licenses/>.
+ */
+ 
 package com.twidere.services.twitter.model
 
 import kotlinx.serialization.KSerializer
@@ -9,7 +30,7 @@ import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 
 @Serializable
-data class MediaSize (
+data class MediaSize(
     val w: Long? = null,
     val h: Long? = null,
     val resize: Resize? = null
@@ -29,8 +50,8 @@ enum class Resize(val value: String) {
             }
         override fun deserialize(decoder: Decoder): Resize = when (val value = decoder.decodeString()) {
             "crop" -> Crop
-            "fit"  -> Fit
-            else   -> throw IllegalArgumentException("Resize could not parse: $value")
+            "fit" -> Fit
+            else -> throw IllegalArgumentException("Resize could not parse: $value")
         }
         override fun serialize(encoder: Encoder, value: Resize) {
             return encoder.encodeString(value.value)

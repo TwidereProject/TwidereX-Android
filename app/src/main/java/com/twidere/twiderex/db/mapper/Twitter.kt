@@ -1,14 +1,41 @@
+/*
+ *  TwidereX
+ *
+ *  Copyright (C) 2020 Tlaster <tlaster@outlook.com>
+ * 
+ *  This file is part of TwidereX.
+ * 
+ *  TwidereX is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ * 
+ *  TwidereX is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ * 
+ *  You should have received a copy of the GNU General Public License
+ *  along with TwidereX. If not, see <http://www.gnu.org/licenses/>.
+ */
+ 
 package com.twidere.twiderex.db.mapper
 
 import com.twidere.services.twitter.model.Status
 import com.twidere.services.twitter.model.User
 import com.twidere.services.twitter.model.UserV2
 import com.twidere.services.utils.encodeJson
-import com.twidere.twiderex.db.model.*
+import com.twidere.twiderex.db.model.DbMedia
+import com.twidere.twiderex.db.model.DbStatus
+import com.twidere.twiderex.db.model.DbStatusWithMediaAndUser
+import com.twidere.twiderex.db.model.DbTimeline
+import com.twidere.twiderex.db.model.DbTimelineWithStatus
+import com.twidere.twiderex.db.model.DbUser
+import com.twidere.twiderex.db.model.TimelineType
 import com.twidere.twiderex.model.MediaType
 import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.UserKey
-import java.util.*
+import java.util.UUID
 
 fun Status.toDbTimeline(
     userKey: UserKey,
@@ -43,7 +70,7 @@ private fun getImage(uri: String?, type: String): String? {
     if (uri.contains(".")) {
         val index = uri.lastIndexOf(".")
         val extension = uri.substring(index)
-        return "${uri.removeSuffix(extension)}?format=${extension.removePrefix(".")}&name=${type}"
+        return "${uri.removeSuffix(extension)}?format=${extension.removePrefix(".")}&name=$type"
     }
     return uri
 }
@@ -71,8 +98,10 @@ private fun Status.toDbStatusWithMediaAndUser(
     )
     return DbStatusWithMediaAndUser(
         status = status,
-        media = (extendedEntities?.media ?: entities?.media
-        ?: emptyList()).mapIndexed { index, it ->
+        media = (
+            extendedEntities?.media ?: entities?.media
+                ?: emptyList()
+            ).mapIndexed { index, it ->
             DbMedia(
                 _id = UUID.randomUUID().toString(),
                 statusId = status.statusId,

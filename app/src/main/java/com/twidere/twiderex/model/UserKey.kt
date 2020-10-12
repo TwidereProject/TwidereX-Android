@@ -1,9 +1,29 @@
+/*
+ *  TwidereX
+ *
+ *  Copyright (C) 2020 Tlaster <tlaster@outlook.com>
+ * 
+ *  This file is part of TwidereX.
+ * 
+ *  TwidereX is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ * 
+ *  TwidereX is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ * 
+ *  You should have received a copy of the GNU General Public License
+ *  along with TwidereX. If not, see <http://www.gnu.org/licenses/>.
+ */
+ 
 package com.twidere.twiderex.model
 
 import android.os.Parcelable
 import com.squareup.moshi.JsonClass
 import kotlinx.android.parcel.Parcelize
-
 
 @JsonClass(generateAdapter = true)
 @Parcelize
@@ -11,7 +31,6 @@ data class UserKey(
     val id: String,
     val host: String,
 ) : Parcelable {
-
 
     override fun hashCode(): Int {
         var result = id.hashCode()
@@ -45,11 +64,9 @@ data class UserKey(
         return sb.toString()
     }
 
-
     private fun isSpecialChar(ch: Char): Boolean {
         return ch == '\\' || ch == '@' || ch == ','
     }
-
 
     companion object {
         fun valueOf(str: String): UserKey {

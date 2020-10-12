@@ -1,3 +1,24 @@
+/*
+ *  TwidereX
+ *
+ *  Copyright (C) 2020 Tlaster <tlaster@outlook.com>
+ * 
+ *  This file is part of TwidereX.
+ * 
+ *  TwidereX is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ * 
+ *  TwidereX is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ * 
+ *  You should have received a copy of the GNU General Public License
+ *  along with TwidereX. If not, see <http://www.gnu.org/licenses/>.
+ */
+ 
 package com.twidere.twiderex.service
 
 import android.accounts.AbstractAccountAuthenticator
@@ -10,7 +31,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.IBinder
 import androidx.core.os.bundleOf
-
 
 class AccountAuthenticatorService : Service() {
 
@@ -29,8 +49,10 @@ class AccountAuthenticatorService : Service() {
         AbstractAccountAuthenticator(context) {
 
         override fun addAccount(
-            response: AccountAuthenticatorResponse, accountType: String,
-            authTokenType: String?, requiredFeatures: Array<String>?,
+            response: AccountAuthenticatorResponse,
+            accountType: String,
+            authTokenType: String?,
+            requiredFeatures: Array<String>?,
             options: Bundle?
         ): Bundle {
             // TODO: Launch sign in
@@ -83,11 +105,12 @@ class AccountAuthenticatorService : Service() {
         }
 
         override fun updateCredentials(
-            response: AccountAuthenticatorResponse, account: Account,
-            authTokenType: String, options: Bundle?
+            response: AccountAuthenticatorResponse,
+            account: Account,
+            authTokenType: String,
+            options: Bundle?
         ): Bundle {
             return bundleOf(AccountManager.KEY_BOOLEAN_RESULT to true)
         }
     }
-
 }
