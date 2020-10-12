@@ -18,12 +18,14 @@
  *  You should have received a copy of the GNU General Public License
  *  along with TwidereX. If not, see <http://www.gnu.org/licenses/>.
  */
- 
+
 package com.twidere.twiderex.component.home
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.graphics.vector.VectorAsset
 import androidx.compose.ui.viewinterop.viewModel
 import com.twidere.twiderex.annotations.IncomingComposeUpdate
@@ -35,14 +37,16 @@ class MeItem : HomeNavigationItem() {
         get() = "Me"
     override val icon: VectorAsset
         get() = Icons.Default.AccountCircle
-    override val noActionBar: Boolean
-        get() = true
+    override val withAppBarShadow: Boolean
+        get() = false
 
     @OptIn(IncomingComposeUpdate::class)
     @Composable
     override fun onCompose() {
         val viewModel = viewModel<MeViewModel>()
-        val user = viewModel.user
-        UserComponent(data = user)
+        val user by viewModel.user.observeAsState()
+        user?.let {
+            UserComponent(data = it)
+        }
     }
 }

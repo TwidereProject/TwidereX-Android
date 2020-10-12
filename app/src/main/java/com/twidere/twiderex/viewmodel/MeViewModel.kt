@@ -18,16 +18,20 @@
  *  You should have received a copy of the GNU General Public License
  *  along with TwidereX. If not, see <http://www.gnu.org/licenses/>.
  */
- 
+
 package com.twidere.twiderex.viewmodel
 
+import android.content.SharedPreferences
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.liveData
 import com.twidere.twiderex.model.ui.UiUser.Companion.toUi
 import com.twidere.twiderex.repository.AccountRepository
 
 class MeViewModel @ViewModelInject constructor(
     private val repository: AccountRepository,
 ) : ViewModel() {
-    val user = repository.getCurrentAccount().user.toUi()
+    val user = liveData {
+        emit(repository.getCurrentAccount().user.toUi())
+    }
 }
