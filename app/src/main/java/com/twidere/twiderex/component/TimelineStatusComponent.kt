@@ -256,6 +256,7 @@ private fun StatusActionButton(
     ) {
         TextButton(
             onClick = onClick,
+            contentColor = contentColor(),
         ) {
             ProvideEmphasis(emphasis = EmphasisAmbient.current.medium) {
                 Icon(
