@@ -104,7 +104,7 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-viewmodel-savedstate:$versions.lifecycle"
     implementation "androidx.lifecycle:lifecycle-common-java8:$versions.lifecycle"
 
-    implementation "dev.chrisbanes.accompanist:accompanist-coil:0.2.2"
+    implementation "dev.chrisbanes.accompanist:accompanist-coil:0.3.0"
 
     implementation 'org.ocpsoft.prettytime:prettytime:4.0.4.Final'
 
