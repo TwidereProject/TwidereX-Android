@@ -22,6 +22,7 @@ package com.twidere.twiderex.repository
 
 import com.twidere.services.microblog.StatusService
 import com.twidere.twiderex.db.AppDatabase
+import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.db.model.DbStatus
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -30,8 +31,8 @@ import javax.inject.Singleton
 class StatusRepository @Inject constructor(
     private val repository: AccountRepository,
     private val database: AppDatabase,
+    private val cache: CacheDatabase,
 ) {
-
     private fun getStatusService() = repository.getCurrentAccount().service.let {
         it as? StatusService
     }
@@ -93,9 +94,14 @@ class StatusRepository @Inject constructor(
     }
 
     private suspend fun updateStatus(id: String, action: (DbStatus) -> Unit) {
-        database.statusDao().findWithStatusId(id)?.let {
+        val key = repository.getCurrentAccount().key
+        database.statusDao().findWithStatusId(id, key)?.let {
             action.invoke(it)
-            database.statusDao().update(it)
+            database.statusDao().insertAll(listOf(it))
+            cache.statusDao().insertAll(listOf(it))
+        } ?: cache.statusDao().findWithStatusId(id, key)?.let {
+            action.invoke(it)
+            cache.statusDao().insertAll(listOf(it))
         }
     }
 }

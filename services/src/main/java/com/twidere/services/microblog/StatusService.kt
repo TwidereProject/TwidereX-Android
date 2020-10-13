@@ -20,9 +20,11 @@
  */
 package com.twidere.services.microblog
 
+import com.twidere.services.microblog.model.IStatus
+
 interface StatusService {
-    suspend fun like(id: String)
-    suspend fun unlike(id: String)
-    suspend fun retweet(id: String)
-    suspend fun unRetweet(id: String)
+    suspend fun like(id: String): IStatus
+    suspend fun unlike(id: String): IStatus
+    suspend fun retweet(id: String): IStatus
+    suspend fun unRetweet(id: String): IStatus
 }

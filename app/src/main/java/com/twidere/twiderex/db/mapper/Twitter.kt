@@ -126,7 +126,6 @@ private fun StatusV2.toDbStatusWithMediaAndUser(
         replyCount = 0,
         placeString = place?.fullName,
         hasMedia = !attachments?.medias.isNullOrEmpty(),
-        extra = encodeJson(),
         userId = user.userId
     )
     return DbStatusWithMediaAndUser(
@@ -168,7 +167,6 @@ private fun Status.toDbStatusWithMediaAndUser(
         replyCount = 0,
         placeString = place?.fullName,
         hasMedia = extendedEntities?.media != null || entities?.media != null,
-        extra = encodeJson(),
         userId = user.userId
     )
     return DbStatusWithMediaAndUser(

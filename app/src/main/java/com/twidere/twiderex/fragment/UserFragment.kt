@@ -103,6 +103,7 @@ import com.twidere.twiderex.viewmodel.user.UserFavouriteTimelineViewModel
 import com.twidere.twiderex.viewmodel.user.UserTimelineViewModel
 import com.twidere.twiderex.viewmodel.user.UserViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -164,22 +165,22 @@ fun UserComponent(
     val coroutineScope = rememberCoroutineScope()
 
     launchInComposition(
-        selectedItem
+        selectedItem,
+        timeline,
+        favourite,
     ) {
-        viewModel.init(user)
-        when {
-            selectedItem == 0 && !timeline.any() -> {
-                coroutineScope.launch {
+        async {
+            viewModel.init(user)
+        }
+        async {
+            when {
+                selectedItem == 0 && !timeline.any() -> {
                     timelineViewModel.refresh(user)
                 }
-            }
-            selectedItem == 1 && !mediaTimeline.any() -> {
-                coroutineScope.launch {
+                selectedItem == 1 && !mediaTimeline.any() -> {
                     timelineViewModel.loadMore(user)
                 }
-            }
-            selectedItem == 2 && !favourite.any() -> {
-                coroutineScope.launch {
+                selectedItem == 2 && !favourite.any() -> {
                     favouriteViewModel.refresh(user)
                 }
             }
@@ -215,12 +216,10 @@ fun UserComponent(
             SwipeToRefreshLayout(
                 refreshingState = refreshing,
                 onRefresh = {
+                    timelineViewModel.clear()
+                    favouriteViewModel.clear()
                     coroutineScope.launch {
                         viewModel.refresh(user)
-                        when (selectedItem) {
-                            0, 1 -> timelineViewModel.refresh(user)
-                            2 -> favouriteViewModel.refresh(user)
-                        }
                     }
                 },
                 refreshIndicator = {

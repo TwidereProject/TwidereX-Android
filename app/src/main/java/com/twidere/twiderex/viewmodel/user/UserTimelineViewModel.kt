@@ -21,12 +21,17 @@
 package com.twidere.twiderex.viewmodel.user
 
 import androidx.hilt.lifecycle.ViewModelInject
+import androidx.lifecycle.LiveData
+import com.twidere.twiderex.db.model.TimelineType
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.repository.UserRepository
 
 class UserTimelineViewModel @ViewModelInject constructor(private val repository: UserRepository) :
-    UserTimelineViewModelBase(repository) {
+    UserTimelineViewModelBase() {
+    override val source: LiveData<List<UiStatus>>
+        get() = repository.getUserTimelineLiveData(timelineType = TimelineType.User)
+
     override suspend fun loadBetween(
         user: UiUser,
         max_id: String?,

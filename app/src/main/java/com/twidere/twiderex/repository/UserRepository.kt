@@ -27,9 +27,11 @@ import com.twidere.services.microblog.RelationshipService
 import com.twidere.services.microblog.TimelineService
 import com.twidere.services.microblog.model.IStatus
 import com.twidere.twiderex.db.AppDatabase
+import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.db.mapper.toDbTimeline
 import com.twidere.twiderex.db.mapper.toDbUser
 import com.twidere.twiderex.db.model.DbTimelineWithStatus
+import com.twidere.twiderex.db.model.DbUser
 import com.twidere.twiderex.db.model.TimelineType
 import com.twidere.twiderex.defaultLoadCount
 import com.twidere.twiderex.model.UserKey
@@ -44,6 +46,7 @@ import javax.inject.Singleton
 class UserRepository @Inject constructor(
     private val repository: AccountRepository,
     private val database: AppDatabase,
+    private val cache: CacheDatabase,
 ) {
     private fun getLookupService() =
         repository.getCurrentAccount().let { account ->
@@ -69,10 +72,7 @@ class UserRepository @Inject constructor(
     suspend fun lookupUser(id: String): UiUser? {
         val user = getLookupService()?.lookupUser(id)?.toDbUser()
         if (user != null) {
-            val db = database.userDao().findWithUserId(user.userId)
-            if (db != null) {
-                database.userDao().insertAll(listOf(user))
-            }
+            saveUser(user)
             val name = user.screenName
             val key = UserKey(name, "twitter.com")
             val account = repository.findByAccountKey(key)
@@ -85,10 +85,17 @@ class UserRepository @Inject constructor(
         return user?.toUi()
     }
 
+    private suspend fun saveUser(user: DbUser) {
+        cache.userDao().insertAll(listOf(user))
+        database.userDao().insertAll(listOf(user))
+    }
+
     suspend fun showRelationship(id: String) = getRelationshipService()?.showRelationship(id)
 
-    fun getUserTimelineLiveData(): LiveData<List<UiStatus>> {
-        return database.timelineDao().getAllWithLiveData(repository.getCurrentAccount().key, TimelineType.User).map { list ->
+    fun getUserTimelineLiveData(
+        timelineType: TimelineType
+    ): LiveData<List<UiStatus>> {
+        return cache.timelineDao().getAllWithLiveData(repository.getCurrentAccount().key, timelineType).map { list ->
             list.map { status ->
                 status.toUi()
             }
@@ -109,7 +116,7 @@ class UserRepository @Inject constructor(
         max_id: String? = null,
         since_id: String? = null,
     ): List<UiStatus> {
-        return load {
+        return load(timelineType = TimelineType.User) {
             it.userTimeline(id, count = defaultLoadCount, max_id = max_id, since_id = since_id)
         }
     }
@@ -119,18 +126,19 @@ class UserRepository @Inject constructor(
         max_id: String? = null,
         since_id: String? = null,
     ): List<UiStatus> {
-        return load {
+        return load(timelineType = TimelineType.UserFavourite) {
             it.favorites(id, count = defaultLoadCount, max_id = max_id, since_id = since_id)
         }
     }
 
     private suspend fun load(
+        timelineType: TimelineType,
         func: suspend (TimelineService) -> List<IStatus>
     ): List<UiStatus> {
         val timelineService = getTimelineService() ?: return emptyList()
         val result = func.invoke(timelineService)
         val userKey = repository.getCurrentAccount().key
-        val timeline = result.map { it.toDbTimeline(userKey, TimelineType.User) }
+        val timeline = result.map { it.toDbTimeline(userKey, timelineType) }
         saveTimeline(timeline)
         return timeline.map { it.toUi() }
     }
@@ -140,9 +148,18 @@ class UserRepository @Inject constructor(
             .map { listOf(it.status, it.quote, it.retweet) }
             .flatten()
             .filterNotNull()
-        database.userDao().insertAll(data.map { it.user })
-        database.mediaDao().insertAll(data.map { it.media }.flatten())
-        database.statusDao().insertAll(data.map { it.status })
-        database.timelineDao().insertAll(timeline.map { it.timeline })
+        data.map { it.user }.let {
+            cache.userDao().insertAll(it)
+            database.userDao().update(*it.toTypedArray())
+        }
+        cache.mediaDao().insertAll(data.map { it.media }.flatten())
+        data.map { it.status }.let {
+            cache.statusDao().insertAll(it)
+            database.statusDao().update(*it.toTypedArray())
+        }
+        timeline.map { it.timeline }.let {
+            cache.timelineDao().insertAll(it)
+            database.timelineDao().update(*it.toTypedArray())
+        }
     }
 }

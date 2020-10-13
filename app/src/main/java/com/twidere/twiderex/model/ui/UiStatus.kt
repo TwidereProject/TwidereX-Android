@@ -41,7 +41,6 @@ data class UiStatus(
     val replyCount: Long,
     var retweeted: Boolean,
     var liked: Boolean,
-    val extra: String,
     val placeString: String?,
     val hasMedia: Boolean,
     val user: UiUser,
@@ -50,7 +49,9 @@ data class UiStatus(
     val quote: UiStatus?,
     val isGap: Boolean,
 ) : Parcelable {
+
     companion object {
+
         fun DbTimelineWithStatus.toUi() = UiStatus(
             statusId = status.status.statusId,
             userKey = status.status.userKey,
@@ -62,7 +63,6 @@ data class UiStatus(
             replyCount = status.status.replyCount,
             retweeted = status.status.retweeted,
             liked = status.status.liked,
-            extra = status.status.extra,
             placeString = status.status.placeString,
             hasMedia = status.status.hasMedia,
             user = status.user.toUi(),
@@ -83,7 +83,6 @@ data class UiStatus(
             replyCount = status.replyCount,
             retweeted = status.retweeted,
             liked = status.liked,
-            extra = status.extra,
             placeString = status.placeString,
             hasMedia = status.hasMedia,
             user = user.toUi(),

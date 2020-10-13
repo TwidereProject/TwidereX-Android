@@ -26,6 +26,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.twidere.twiderex.db.model.DbStatus
+import com.twidere.twiderex.model.UserKey
 
 @Dao
 interface StatusDao {
@@ -35,8 +36,8 @@ interface StatusDao {
     @Query("SELECT * FROM status")
     suspend fun getAll(): List<DbStatus>
 
-    @Query("SELECT * FROM status WHERE statusId == :id")
-    suspend fun findWithStatusId(id: String): DbStatus?
+    @Query("SELECT * FROM status WHERE statusId == :id AND userKey == :userKey")
+    suspend fun findWithStatusId(id: String, userKey: UserKey): DbStatus?
 
     @Update
     suspend fun update(vararg user: DbStatus)

@@ -216,19 +216,11 @@ class TwitterService(
         )
     }
 
-    override suspend fun like(id: String) {
-        resources.like(id)
-    }
+    override suspend fun like(id: String) = resources.like(id)
 
-    override suspend fun unlike(id: String) {
-        resources.unlike(id)
-    }
+    override suspend fun unlike(id: String) = resources.unlike(id)
 
-    override suspend fun retweet(id: String) {
-        resources.retweet(id)
-    }
+    override suspend fun retweet(id: String) = resources.retweet(id)
 
-    override suspend fun unRetweet(id: String) {
-        resources.unretweet(id)
-    }
+    override suspend fun unRetweet(id: String) = resources.unretweet(id)
 }

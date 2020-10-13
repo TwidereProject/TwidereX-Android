@@ -25,6 +25,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.room.Room
 import com.twidere.twiderex.db.AppDatabase
+import com.twidere.twiderex.db.CacheDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -47,5 +48,11 @@ object AndroidModule {
     @Provides
     fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase =
         Room.databaseBuilder(context, AppDatabase::class.java, "twiderex-db")
+            .build()
+
+    @Singleton
+    @Provides
+    fun provideCacheAppDatabase(@ApplicationContext context: Context): CacheDatabase =
+        Room.inMemoryDatabaseBuilder(context, CacheDatabase::class.java)
             .build()
 }
