@@ -198,9 +198,12 @@ private fun StatusComponent(
             }
 
             if (!status.placeString.isNullOrEmpty()) {
-                Row {
-                    Icon(asset = Icons.Default.Place)
-                    Text(text = status.placeString)
+                Spacer(modifier = Modifier.height(standardPadding))
+                ProvideEmphasis(emphasis = EmphasisAmbient.current.medium) {
+                    Row {
+                        Icon(asset = Icons.Default.Place)
+                        Text(text = status.placeString)
+                    }
                 }
             }
 
