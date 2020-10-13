@@ -99,6 +99,7 @@ import com.twidere.twiderex.extensions.NavControllerAmbient
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.ui.profileImageSize
 import com.twidere.twiderex.ui.standardPadding
+import com.twidere.twiderex.ui.topBarHeight
 import com.twidere.twiderex.viewmodel.user.UserFavouriteTimelineViewModel
 import com.twidere.twiderex.viewmodel.user.UserTimelineViewModel
 import com.twidere.twiderex.viewmodel.user.UserViewModel
@@ -232,7 +233,7 @@ fun UserComponent(
             ) {
                 Column {
                     if (appBar != null) {
-                        Spacer(modifier = Modifier.height(56.dp)) // Appbar height
+                        Spacer(modifier = Modifier.height(topBarHeight)) // Appbar height
                     }
                     // TODO: background color
                     // TODO: header paddings
