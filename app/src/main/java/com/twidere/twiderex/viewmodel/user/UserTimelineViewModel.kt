@@ -37,7 +37,7 @@ class UserTimelineViewModel @ViewModelInject constructor(private val repository:
         max_id: String?,
         since_Id: String?
     ): List<UiStatus> {
-        //TODO: pinned tweets
+        // TODO: pinned tweets
 //        val pinned = repository.getPinnedStatus(user)
 //        if (pinned != null) {
 //            timelineIds.add(pinned.statusId)
@@ -49,4 +49,3 @@ class UserTimelineViewModel @ViewModelInject constructor(private val repository:
         )
     }
 }
-

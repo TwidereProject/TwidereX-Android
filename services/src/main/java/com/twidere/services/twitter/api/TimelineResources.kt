@@ -57,7 +57,6 @@ interface TimelineResources {
         @Query("include_rts") include_rts: Boolean? = null,
     ): List<Status>
 
-
     @GET("/1.1/favorites/list.json")
     suspend fun favoritesList(
         @Query("user_id") user_id: String,

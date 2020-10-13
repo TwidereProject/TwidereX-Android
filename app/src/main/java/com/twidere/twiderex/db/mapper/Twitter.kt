@@ -25,7 +25,6 @@ import com.twidere.services.twitter.model.Status
 import com.twidere.services.twitter.model.StatusV2
 import com.twidere.services.twitter.model.User
 import com.twidere.services.twitter.model.UserV2
-import com.twidere.services.utils.encodeJson
 import com.twidere.twiderex.db.model.DbMedia
 import com.twidere.twiderex.db.model.DbStatus
 import com.twidere.twiderex.db.model.DbStatusWithMediaAndUser
