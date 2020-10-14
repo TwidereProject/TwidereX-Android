@@ -113,12 +113,7 @@ fun TimelineComponent(viewModel: TimelineViewModel) {
                                 Divider()
                             }
                             else -> {
-                                Divider(
-                                    modifier = Modifier.padding(
-                                        start = profileImageSize + standardPadding,
-                                        end = standardPadding
-                                    )
-                                )
+                                StatusDivider()
                             }
                         }
                     }

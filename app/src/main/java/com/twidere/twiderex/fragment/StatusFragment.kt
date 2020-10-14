@@ -38,12 +38,13 @@ import androidx.navigation.fragment.navArgs
 import com.twidere.twiderex.component.AppBar
 import com.twidere.twiderex.component.AppBarNavigationButton
 import com.twidere.twiderex.component.ExpandedStatusComponent
+import com.twidere.twiderex.component.StatusDivider
 import com.twidere.twiderex.component.TimelineStatusComponent
 import com.twidere.twiderex.component.loading
-import com.twidere.twiderex.ui.profileImageSize
 import com.twidere.twiderex.ui.standardPadding
 import com.twidere.twiderex.viewmodel.twitter.TwitterStatusViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlin.math.max
 
 @AndroidEntryPoint
 class StatusFragment : JetFragment() {
@@ -92,24 +93,19 @@ class StatusFragment : JetFragment() {
                 } else {
                     LazyColumnForIndexed(
                         items = items,
-                        state = rememberLazyListState(initialFirstVisibleItemIndex = index)
+                        state = rememberLazyListState(initialFirstVisibleItemIndex = max(index, 0))
                     ) { index, item ->
                         if (item.statusId == status.statusId) {
                             ExpandedStatusComponent(
                                 status = item,
                             )
                             Divider(
-                                modifier = Modifier.padding(horizontal = standardPadding)
+                                modifier = Modifier.padding(horizontal = standardPadding * 2)
                             )
                         } else {
                             TimelineStatusComponent(data = item)
                             if (index != items.size - 1) {
-                                Divider(
-                                    modifier = Modifier.padding(
-                                        start = profileImageSize + standardPadding,
-                                        end = standardPadding
-                                    )
-                                )
+                                StatusDivider()
                             }
                         }
                     }

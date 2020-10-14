@@ -41,9 +41,7 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ButtonConstants
 import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Divider
 import androidx.compose.material.EmphasisAmbient
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.IconButton
@@ -89,6 +87,7 @@ import com.twidere.twiderex.annotations.IncomingComposeUpdate
 import com.twidere.twiderex.component.AppBar
 import com.twidere.twiderex.component.AppBarNavigationButton
 import com.twidere.twiderex.component.NetworkImage
+import com.twidere.twiderex.component.StatusDivider
 import com.twidere.twiderex.component.StatusMediaPreviewItem
 import com.twidere.twiderex.component.SwipeToRefreshLayout
 import com.twidere.twiderex.component.TimelineStatusComponent
@@ -98,7 +97,6 @@ import com.twidere.twiderex.component.itemsGridIndexed
 import com.twidere.twiderex.component.loading
 import com.twidere.twiderex.extensions.NavControllerAmbient
 import com.twidere.twiderex.model.ui.UiUser
-import com.twidere.twiderex.ui.profileImageSize
 import com.twidere.twiderex.ui.standardPadding
 import com.twidere.twiderex.ui.topBarHeight
 import com.twidere.twiderex.viewmodel.user.UserFavouriteTimelineViewModel
@@ -267,12 +265,7 @@ fun UserComponent(
                                             }
                                             TimelineStatusComponent(item)
                                             if (index != timeline.size - 1) {
-                                                Divider(
-                                                    modifier = Modifier.padding(
-                                                        start = profileImageSize + standardPadding,
-                                                        end = standardPadding
-                                                    )
-                                                )
+                                                StatusDivider()
                                             }
                                         }
                                     }
@@ -323,12 +316,7 @@ fun UserComponent(
                                             }
                                             TimelineStatusComponent(item)
                                             if (index != favourite.size - 1) {
-                                                Divider(
-                                                    modifier = Modifier.padding(
-                                                        start = profileImageSize + standardPadding,
-                                                        end = standardPadding
-                                                    )
-                                                )
+                                                StatusDivider()
                                             }
                                         }
                                     }
