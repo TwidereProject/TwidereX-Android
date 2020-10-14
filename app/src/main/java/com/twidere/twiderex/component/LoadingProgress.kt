@@ -20,9 +20,12 @@
  */
 package com.twidere.twiderex.component
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.ColumnScope.Companion.align
 import androidx.compose.foundation.layout.defaultMinSizeConstraints
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.material.ButtonConstants
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.runtime.Composable
@@ -39,4 +42,19 @@ fun LoadingProgress() {
             .padding(ButtonConstants.DefaultContentPadding)
             .align(Alignment.CenterHorizontally),
     )
+}
+
+fun LazyListScope.loading() {
+    item {
+        Box(
+            modifier = Modifier.fillParentMaxWidth(),
+            alignment = Alignment.Center
+        ) {
+            CircularProgressIndicator(
+                modifier = Modifier
+                    .heightIn(min = ButtonConstants.DefaultMinHeight)
+                    .padding(ButtonConstants.DefaultContentPadding),
+            )
+        }
+    }
 }

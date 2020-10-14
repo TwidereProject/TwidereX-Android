@@ -82,8 +82,6 @@ fun TimelineStatusComponent(
                             R.id.status_fragment,
                             StatusFragmentArgs(
                                 status = data,
-                                quote = data.quote,
-                                retweet = data.retweet
                             ).toBundle()
                         )
                     }
@@ -229,8 +227,6 @@ private fun StatusComponent(
                                         R.id.status_fragment,
                                         StatusFragmentArgs(
                                             status = status.quote,
-                                            quote = null,
-                                            retweet = null
                                         ).toBundle()
                                     )
                                 }

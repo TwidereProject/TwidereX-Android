@@ -95,6 +95,7 @@ import com.twidere.twiderex.component.TimelineStatusComponent
 import com.twidere.twiderex.component.TopAppBarElevation
 import com.twidere.twiderex.component.UserAvatar
 import com.twidere.twiderex.component.itemsGridIndexed
+import com.twidere.twiderex.component.loading
 import com.twidere.twiderex.extensions.NavControllerAmbient
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.ui.profileImageSize
@@ -335,18 +336,7 @@ fun UserComponent(
                             }
                         }
                         if (timelineLoadingMore || favouriteLoadingMore) {
-                            item {
-                                Box(
-                                    modifier = Modifier.fillParentMaxWidth(),
-                                    alignment = Alignment.Center
-                                ) {
-                                    CircularProgressIndicator(
-                                        modifier = Modifier
-                                            .heightIn(min = ButtonConstants.DefaultMinHeight)
-                                            .padding(ButtonConstants.DefaultContentPadding),
-                                    )
-                                }
-                            }
+                            loading()
                         }
                     }
                 }

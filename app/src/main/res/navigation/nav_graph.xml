@@ -59,14 +59,6 @@
         <argument
             android:name="status"
             app:argType="com.twidere.twiderex.model.ui.UiStatus" />
-        <argument
-            android:name="retweet"
-            app:argType="com.twidere.twiderex.model.ui.UiStatus"
-            app:nullable="true" />
-        <argument
-            android:name="quote"
-            app:argType="com.twidere.twiderex.model.ui.UiStatus"
-            app:nullable="true" />
     </fragment>
     <fragment
         android:id="@+id/compose_fragment"

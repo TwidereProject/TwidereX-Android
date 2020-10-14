@@ -212,8 +212,6 @@ private fun StatusComponent(
                                         R.id.status_fragment,
                                         StatusFragmentArgs(
                                             status = status.quote,
-                                            quote = null,
-                                            retweet = null
                                         ).toBundle()
                                     )
                                 }
