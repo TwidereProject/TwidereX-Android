@@ -61,7 +61,7 @@ class TwitterStatusViewModel @ViewModelInject constructor(
         status.postValue(data)
         loadingPrevious.postValue(true)
         loadingMore.postValue(true)
-        val result =repository.loadConversation(data)
+        val result = repository.loadConversation(data)
         val list = listOf(result.root) + result.subs.flatten()
         conversations.addAll(list)
         currentStatusIndex.postValue(list.indexOfFirst { it.id == data.statusId })

@@ -40,8 +40,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.annotations.IncomingComposeUpdate
-import com.twidere.twiderex.ui.profileImageSize
-import com.twidere.twiderex.ui.standardPadding
 import com.twidere.twiderex.viewmodel.twitter.timeline.TimelineViewModel
 import kotlinx.coroutines.launch
 
