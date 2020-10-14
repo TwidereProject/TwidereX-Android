@@ -42,7 +42,7 @@ class DateQueryConverterFactory : Converter.Factory() {
 
     private class DateQueryConverter : Converter<Date?, String?> {
         val simpleDateFormat by lazy {
-            SimpleDateFormat("yyyy-MM-DDTHH:mm:ssZ", Locale.ENGLISH)
+            SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.ENGLISH)
         }
         override fun convert(date: Date?): String? {
             return if (date == null) {
