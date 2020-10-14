@@ -25,6 +25,7 @@ import com.twidere.services.microblog.model.ISearchResponse
 interface SearchService {
     suspend fun searchTweets(
         query: String,
+        count: Int = 20,
         nextPage: String? = null,
     ): ISearchResponse
 }

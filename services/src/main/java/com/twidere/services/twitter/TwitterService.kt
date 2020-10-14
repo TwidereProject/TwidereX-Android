@@ -34,6 +34,7 @@ import com.twidere.services.microblog.model.MicroBlogError
 import com.twidere.services.microblog.model.Relationship
 import com.twidere.services.twitter.api.TwitterResources
 import com.twidere.services.twitter.model.StatusV2
+import com.twidere.services.twitter.model.TwitterSearchResponseV2
 import com.twidere.services.twitter.model.UserV2
 import com.twidere.services.twitter.model.fields.Expansions
 import com.twidere.services.twitter.model.fields.MediaFields
@@ -195,10 +196,15 @@ class TwitterService(
         return user.pinnedTweetID?.let { lookupStatus(it) }
     }
 
-    override suspend fun searchTweets(query: String, nextPage: String?) =
-        resources.search(
+    override suspend fun searchTweets(
+        query: String,
+        count: Int,
+        nextPage: String?,
+    ): TwitterSearchResponseV2 {
+        val result = resources.search(
             query,
             next_token = nextPage,
+            max_results = count,
             userFields = UserFields.values().joinToString(",") { it.value },
             pollFields = PollFields.values().joinToString(",") { it.name },
             placeFields = PlaceFields.values().joinToString(",") { it.value },
@@ -207,6 +213,13 @@ class TwitterService(
             expansions = Expansions.values().joinToString(",") { it.value },
             tweetFields = TweetFields.values().joinToString(",") { it.value },
         )
+        result.data?.forEach { status ->
+            result.includes?.let {
+                status.setExtra(it)
+            }
+        }
+        return result
+    }
 
     override suspend fun showRelationship(id: String): IRelationship {
         val response = resources.showFriendships(id)
