@@ -68,6 +68,8 @@ data class UserKey(
     }
 
     companion object {
+        val Empty: UserKey = UserKey("", "")
+
         fun valueOf(str: String): UserKey {
             var escaping = false
             var idFinished = false

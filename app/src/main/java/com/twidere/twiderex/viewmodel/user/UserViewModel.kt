@@ -23,6 +23,8 @@ package com.twidere.twiderex.viewmodel.user
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.twidere.services.microblog.LookupService
+import com.twidere.services.microblog.RelationshipService
 import com.twidere.services.microblog.model.IRelationship
 import com.twidere.twiderex.model.UserKey
 import com.twidere.twiderex.model.ui.UiUser
@@ -31,8 +33,16 @@ import com.twidere.twiderex.repository.UserRepository
 
 class UserViewModel @ViewModelInject constructor(
     private val accountRepository: AccountRepository,
-    private val repository: UserRepository,
+    private val factory: UserRepository.AssistedFactory,
 ) : ViewModel() {
+
+    private val repository =
+        accountRepository.getCurrentAccount().let { accountDetails ->
+            accountDetails.service.let {
+                factory.create(it as LookupService, it as RelationshipService)
+            }
+        }
+
     val loaded = MutableLiveData(false)
     val refreshing = MutableLiveData(false)
     val user = MutableLiveData<UiUser>()

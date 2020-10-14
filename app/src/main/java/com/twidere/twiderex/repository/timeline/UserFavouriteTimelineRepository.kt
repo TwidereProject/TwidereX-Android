@@ -25,25 +25,36 @@ import com.squareup.inject.assisted.AssistedInject
 import com.twidere.services.microblog.TimelineService
 import com.twidere.services.microblog.model.IStatus
 import com.twidere.twiderex.db.AppDatabase
+import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.db.model.TimelineType
-import com.twidere.twiderex.defaultLoadCount
 import com.twidere.twiderex.model.UserKey
+import com.twidere.twiderex.model.ui.UiUser
 
-class HomeTimelineRepository @AssistedInject constructor(
+class UserFavouriteTimelineRepository @AssistedInject constructor(
+    cache: CacheDatabase,
     database: AppDatabase,
     @Assisted userKey: UserKey,
-    @Assisted val service: TimelineService,
-) : TimelineRepository(userKey, database, defaultLoadCount) {
+    @Assisted private val service: TimelineService,
+) : CacheUserTimelineRepository(cache, database, userKey, 20) {
+    override val type: TimelineType
+        get() = TimelineType.UserFavourite
 
     @AssistedInject.Factory
     interface AssistedFactory {
-        fun create(userKey: UserKey, service: TimelineService): HomeTimelineRepository
+        fun create(userKey: UserKey, service: TimelineService): UserFavouriteTimelineRepository
     }
 
-    override val type: TimelineType
-        get() = TimelineType.Home
-
-    override suspend fun loadData(count: Int, since_id: String?, max_id: String?): List<IStatus> {
-        return service.homeTimeline(count = count, since_id = since_id, max_id = max_id)
+    override suspend fun loadData(
+        user: UiUser,
+        count: Int,
+        since_id: String?,
+        max_id: String?
+    ): List<IStatus> {
+        return service.favorites(
+            user_id = user.id,
+            count = count,
+            since_id = since_id,
+            max_id = max_id,
+        )
     }
 }

@@ -13,6 +13,7 @@ versions.navigation = '2.3.0'
 versions.moshi = '1.9.3'
 versions.paging = '3.0.0-alpha06'
 versions.ktlint = '0.39.0'
+versions.assisted_inject = '0.6.0'
 ext.versions = versions
 def global = [:]
 global.compileSdkVersion = 30

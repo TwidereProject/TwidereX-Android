@@ -20,21 +20,26 @@
  */
 package com.twidere.twiderex.repository
 
+import com.squareup.inject.assisted.Assisted
+import com.squareup.inject.assisted.AssistedInject
 import com.twidere.services.microblog.StatusService
 import com.twidere.twiderex.db.AppDatabase
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.db.model.DbStatus
-import javax.inject.Inject
+import com.twidere.twiderex.model.UserKey
 import javax.inject.Singleton
 
 @Singleton
-class StatusRepository @Inject constructor(
-    private val repository: AccountRepository,
+class StatusRepository @AssistedInject constructor(
     private val database: AppDatabase,
     private val cache: CacheDatabase,
+    @Assisted private val key: UserKey,
+    @Assisted private val service: StatusService,
 ) {
-    private fun getStatusService() = repository.getCurrentAccount().service.let {
-        it as? StatusService
+
+    @AssistedInject.Factory
+    interface AssistedFactory {
+        fun create(key: UserKey, service: StatusService): StatusRepository
     }
 
     suspend fun like(id: String) {
@@ -42,7 +47,7 @@ class StatusRepository @Inject constructor(
             it.liked = true
         }
         runCatching {
-            getStatusService()?.like(id)
+            service.like(id)
         }.onFailure {
             it.printStackTrace()
             updateStatus(id) {
@@ -56,7 +61,7 @@ class StatusRepository @Inject constructor(
             it.liked = false
         }
         runCatching {
-            getStatusService()?.unlike(id)
+            service.unlike(id)
         }.onFailure {
             it.printStackTrace()
             updateStatus(id) {
@@ -70,7 +75,7 @@ class StatusRepository @Inject constructor(
             it.retweeted = true
         }
         runCatching {
-            getStatusService()?.retweet(id)
+            service.retweet(id)
         }.onFailure {
             it.printStackTrace()
             updateStatus(id) {
@@ -84,7 +89,7 @@ class StatusRepository @Inject constructor(
             it.retweeted = false
         }
         runCatching {
-            getStatusService()?.unRetweet(id)
+            service.unRetweet(id)
         }.onFailure {
             it.printStackTrace()
             updateStatus(id) {
@@ -94,7 +99,6 @@ class StatusRepository @Inject constructor(
     }
 
     private suspend fun updateStatus(id: String, action: (DbStatus) -> Unit) {
-        val key = repository.getCurrentAccount().key
         database.statusDao().findWithStatusId(id, key)?.let {
             action.invoke(it)
             database.statusDao().insertAll(listOf(it))

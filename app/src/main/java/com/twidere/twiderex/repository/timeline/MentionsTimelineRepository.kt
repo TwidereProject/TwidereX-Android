@@ -20,6 +20,8 @@
  */
 package com.twidere.twiderex.repository.timeline
 
+import com.squareup.inject.assisted.Assisted
+import com.squareup.inject.assisted.AssistedInject
 import com.twidere.services.microblog.TimelineService
 import com.twidere.services.microblog.model.IStatus
 import com.twidere.twiderex.db.AppDatabase
@@ -27,13 +29,17 @@ import com.twidere.twiderex.db.model.TimelineType
 import com.twidere.twiderex.defaultLoadCount
 import com.twidere.twiderex.model.UserKey
 
-class MentionsTimelineRepository(
-    userKey: UserKey,
-    val service: TimelineService,
+class MentionsTimelineRepository @AssistedInject constructor(
     database: AppDatabase,
-    count: Int = defaultLoadCount
-) :
-    TimelineRepository(userKey, database, count) {
+    @Assisted userKey: UserKey,
+    @Assisted val service: TimelineService,
+) : TimelineRepository(userKey, database, defaultLoadCount) {
+
+    @AssistedInject.Factory
+    interface AssistedFactory {
+        fun create(userKey: UserKey, service: TimelineService): MentionsTimelineRepository
+    }
+
     override val type: TimelineType
         get() = TimelineType.Mentions
 

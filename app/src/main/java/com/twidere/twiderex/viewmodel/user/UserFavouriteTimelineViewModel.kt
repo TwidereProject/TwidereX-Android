@@ -22,22 +22,35 @@ package com.twidere.twiderex.viewmodel.user
 
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
-import com.twidere.twiderex.db.model.TimelineType
+import com.twidere.services.microblog.TimelineService
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.model.ui.UiUser
-import com.twidere.twiderex.repository.UserRepository
+import com.twidere.twiderex.repository.AccountRepository
+import com.twidere.twiderex.repository.timeline.UserFavouriteTimelineRepository
 
-class UserFavouriteTimelineViewModel @ViewModelInject constructor(private val repository: UserRepository) :
-    UserTimelineViewModelBase() {
+class UserFavouriteTimelineViewModel @ViewModelInject constructor(
+    private val accountRepository: AccountRepository,
+    private val factory: UserFavouriteTimelineRepository.AssistedFactory,
+) : UserTimelineViewModelBase() {
+
+    private val repository =
+        accountRepository.getCurrentAccount().let { accountDetails ->
+            accountDetails.service.let {
+                it as TimelineService
+            }.let {
+                factory.create(accountDetails.key, it)
+            }
+        }
+
     override val source: LiveData<List<UiStatus>>
-        get() = repository.getUserTimelineLiveData(timelineType = TimelineType.UserFavourite)
+        get() = repository.liveData
 
     override suspend fun loadBetween(
         user: UiUser,
         max_id: String?,
         since_Id: String?
-    ) = repository.loadFavouriteTimelineBetween(
-        user.id,
+    ) = repository.loadBetween(
+        user = user,
         max_id = max_id,
         since_id = since_Id,
     )

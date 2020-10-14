@@ -23,13 +23,26 @@ package com.twidere.twiderex.viewmodel
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.twidere.services.microblog.StatusService
 import com.twidere.twiderex.model.ui.UiStatus
+import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.StatusRepository
 import kotlinx.coroutines.launch
 
 class StatusActionsViewModel @ViewModelInject constructor(
-    private val repository: StatusRepository
+    private val factory: StatusRepository.AssistedFactory,
+    private val accountRepository: AccountRepository,
 ) : ViewModel() {
+    private val repository by lazy {
+        accountRepository.getCurrentAccount().let { accountDetails ->
+            accountDetails.service.let {
+                it as StatusService
+            }.let {
+                factory.create(accountDetails.key, it)
+            }
+        }
+    }
+
     fun like(status: UiStatus) = viewModelScope.launch {
         if (status.liked) {
             repository.unlike(status.statusId)

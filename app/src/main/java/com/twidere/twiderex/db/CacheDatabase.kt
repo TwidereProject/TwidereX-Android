@@ -53,9 +53,9 @@ import javax.inject.Singleton
     MediaTypeConverter::class,
     TimelineTypeConverter::class,
 )
-abstract class CacheDatabase : RoomDatabase() {
-    abstract fun statusDao(): StatusDao
-    abstract fun timelineDao(): TimelineDao
-    abstract fun mediaDao(): MediaDao
-    abstract fun userDao(): UserDao
+abstract class CacheDatabase : RoomDatabase(), ITimelineDatabase {
+    abstract override fun statusDao(): StatusDao
+    abstract override fun timelineDao(): TimelineDao
+    abstract override fun mediaDao(): MediaDao
+    abstract override fun userDao(): UserDao
 }

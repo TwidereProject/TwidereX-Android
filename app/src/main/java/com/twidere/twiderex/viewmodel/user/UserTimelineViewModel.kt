@@ -22,15 +22,28 @@ package com.twidere.twiderex.viewmodel.user
 
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
-import com.twidere.twiderex.db.model.TimelineType
+import com.twidere.services.microblog.TimelineService
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.model.ui.UiUser
-import com.twidere.twiderex.repository.UserRepository
+import com.twidere.twiderex.repository.AccountRepository
+import com.twidere.twiderex.repository.timeline.UserTimelineRepository
 
-class UserTimelineViewModel @ViewModelInject constructor(private val repository: UserRepository) :
-    UserTimelineViewModelBase() {
+class UserTimelineViewModel @ViewModelInject constructor(
+    private val accountRepository: AccountRepository,
+    private val factory: UserTimelineRepository.AssistedFactory,
+) : UserTimelineViewModelBase() {
+
+    private val repository =
+        accountRepository.getCurrentAccount().let { accountDetails ->
+            accountDetails.service.let {
+                it as TimelineService
+            }.let {
+                factory.create(accountDetails.key, it)
+            }
+        }
+
     override val source: LiveData<List<UiStatus>>
-        get() = repository.getUserTimelineLiveData(timelineType = TimelineType.User)
+        get() = repository.liveData
 
     override suspend fun loadBetween(
         user: UiUser,
@@ -42,8 +55,8 @@ class UserTimelineViewModel @ViewModelInject constructor(private val repository:
 //        if (pinned != null) {
 //            timelineIds.add(pinned.statusId)
 //        }
-        return repository.loadTimelineBetween(
-            user.id,
+        return repository.loadBetween(
+            user = user,
             max_id = max_id,
             since_id = since_Id,
         )
