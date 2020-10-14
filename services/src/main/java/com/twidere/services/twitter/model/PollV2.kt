@@ -20,13 +20,23 @@
  */
 package com.twidere.services.twitter.model
 
+import com.twidere.services.serializer.DateSerializerV2
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import java.util.Date
 
 @Serializable
-data class IncludesV2(
-    val users: List<UserV2>? = null,
-    val tweets: List<StatusV2>? = null,
-    val media: List<MediaV2>? = null,
-    val places: List<PlaceV2>? = null,
-    val polls: List<PollV2>? = null,
+data class PollV2(
+    val id: String? = null,
+    val options: List<PollV2Option>? = null,
+
+    @SerialName("duration_minutes")
+    val durationMinutes: Long? = null,
+
+    @SerialName("end_datetime")
+    @Serializable(with = DateSerializerV2::class)
+    val endDatetime: Date? = null,
+
+    @SerialName("voting_status")
+    val votingStatus: String? = null
 )
