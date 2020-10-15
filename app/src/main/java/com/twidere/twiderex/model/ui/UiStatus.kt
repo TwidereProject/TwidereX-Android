@@ -45,7 +45,7 @@ data class UiStatus(
     val hasMedia: Boolean,
     val user: UiUser,
     val media: List<UiMedia>,
-    val retweet: UiStatus?,
+    var retweet: UiStatus?,
     val quote: UiStatus?,
     val isGap: Boolean,
 ) : Parcelable {

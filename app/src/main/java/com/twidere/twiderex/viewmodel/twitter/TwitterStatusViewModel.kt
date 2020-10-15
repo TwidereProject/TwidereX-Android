@@ -51,7 +51,9 @@ class TwitterStatusViewModel @ViewModelInject constructor(
                     if (status.value?.retweet?.let {
                         it.statusId == result?.statusId
                     } == true) {
-                        status.value
+                        status.value?.apply {
+                            retweet = result
+                        }
                     } else {
                         result
                     }

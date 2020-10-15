@@ -95,7 +95,7 @@ fun ExpandedStatusComponent(
                 .align(Alignment.CenterHorizontally)
         ) {
             Text(
-                text = status.timestamp.humanizedTimestamp(),
+                text = data.timestamp.humanizedTimestamp(),
                 color = mediumEmphasisContentContentColor
             )
         }
@@ -106,19 +106,19 @@ fun ExpandedStatusComponent(
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
         ) {
-            if (status.replyCount > 0) {
-                StatusStatistics(count = status.replyCount.toString(), text = "reply")
+            if (data.replyCount > 0) {
+                StatusStatistics(count = data.replyCount.toString(), text = "reply")
                 Spacer(modifier = Modifier.width(standardPadding * 2))
             }
-            if (status.retweetCount > 0) {
+            if (data.retweetCount > 0) {
                 StatusStatistics(
-                    count = status.retweetCount.toString(),
+                    count = data.retweetCount.toString(),
                     text = "retweets"
                 )
                 Spacer(modifier = Modifier.width(standardPadding * 2))
             }
-            if (status.likeCount > 0) {
-                StatusStatistics(count = status.likeCount.toString(), text = "likes")
+            if (data.likeCount > 0) {
+                StatusStatistics(count = data.likeCount.toString(), text = "likes")
             }
         }
 
