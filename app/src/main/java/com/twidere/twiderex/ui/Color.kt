@@ -20,8 +20,8 @@
  */
 package com.twidere.twiderex.ui
 
-import androidx.compose.foundation.contentColor
-import androidx.compose.material.EmphasisAmbient
+import androidx.compose.foundation.AmbientContentColor
+import androidx.compose.material.AmbientEmphasisLevels
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
@@ -29,6 +29,6 @@ val blue = Color(0xff4C9EEB)
 
 @Composable
 val mediumEmphasisContentContentColor: Color
-    get() = EmphasisAmbient.current.medium.applyEmphasis(
-        contentColor()
+    get() = AmbientEmphasisLevels.current.medium.applyEmphasis(
+        AmbientContentColor.current
     )

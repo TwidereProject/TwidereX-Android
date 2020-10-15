@@ -20,10 +20,10 @@
  */
 package com.twidere.twiderex.fragment
 
+import androidx.compose.foundation.AmbientContentColor
 import androidx.compose.foundation.Icon
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.background
-import androidx.compose.foundation.contentColor
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -41,8 +41,8 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.AmbientEmphasisLevels
 import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.EmphasisAmbient
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.IconButton
 import androidx.compose.material.ListItem
@@ -65,7 +65,7 @@ import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material.icons.filled.Reply
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.launchInComposition
+import androidx.compose.runtime.LaunchedTask
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.savedinstancestate.savedInstanceState
@@ -164,7 +164,7 @@ fun UserComponent(
 
     val coroutineScope = rememberCoroutineScope()
 
-    launchInComposition(
+    LaunchedTask(
         selectedItem,
         timeline,
         favourite,
@@ -513,8 +513,8 @@ private fun UserTabsComponent(
                     onItemSelected(i)
                 },
                 selectedContentColor = MaterialTheme.colors.primary,
-                unselectedContentColor = EmphasisAmbient.current.medium.applyEmphasis(
-                    contentColor()
+                unselectedContentColor = AmbientEmphasisLevels.current.medium.applyEmphasis(
+                    AmbientContentColor.current
                 ),
             ) {
                 Box(

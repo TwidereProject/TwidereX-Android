@@ -1,6 +1,6 @@
 def versions = [:]
 versions.kotlin = "1.4.10"
-versions.compose = '1.0.0-alpha04'
+versions.compose = '1.0.0-alpha05'
 versions.retrofit2 = '2.9.0'
 versions.hilt = '2.28-alpha'
 versions.androidx_hilt = '1.0.0-alpha02'

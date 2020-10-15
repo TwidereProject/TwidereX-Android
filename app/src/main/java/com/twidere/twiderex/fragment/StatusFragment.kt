@@ -29,8 +29,8 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Divider
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedTask
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.launchInComposition
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.viewModel
@@ -60,7 +60,7 @@ class StatusFragment : JetFragment() {
         val status by viewModel.status.observeAsState(initial = args.status)
         val items by viewModel.items.observeAsState(initial = emptyList())
         val index by viewModel.currentStatusIndex.observeAsState(initial = 0)
-        launchInComposition {
+        LaunchedTask {
             viewModel.init(args.status)
         }
         Scaffold(

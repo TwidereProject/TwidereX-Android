@@ -20,11 +20,11 @@
  */
 package com.twidere.twiderex.component
 
+import androidx.compose.foundation.AmbientContentColor
 import androidx.compose.foundation.Icon
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.contentColor
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -36,7 +36,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.EmphasisAmbient
+import androidx.compose.material.AmbientEmphasisLevels
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ProvideEmphasis
 import androidx.compose.material.TextButton
@@ -165,8 +165,8 @@ private fun StatusComponent(
                         text = "@${status.user.screenName}",
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        color = EmphasisAmbient.current.medium.applyEmphasis(
-                            contentColor()
+                        color = AmbientEmphasisLevels.current.medium.applyEmphasis(
+                            AmbientContentColor.current
                         ),
                     )
                 }
@@ -197,7 +197,7 @@ private fun StatusComponent(
 
             if (!status.placeString.isNullOrEmpty()) {
                 Spacer(modifier = Modifier.height(standardPadding))
-                ProvideEmphasis(emphasis = EmphasisAmbient.current.medium) {
+                ProvideEmphasis(emphasis = AmbientEmphasisLevels.current.medium) {
                     Row {
                         Icon(asset = Icons.Default.Place)
                         Text(text = status.placeString)
@@ -211,7 +211,7 @@ private fun StatusComponent(
                     modifier = Modifier
                         .border(
                             1.dp,
-                            contentColor().copy(alpha = 0.12f),
+                            AmbientContentColor.current.copy(alpha = 0.12f),
                             RoundedCornerShape(8.dp)
                         )
                         .clip(RoundedCornerShape(8.dp))
@@ -245,7 +245,7 @@ private fun StatusActionButton(
     icon: VectorAsset,
     count: Long,
     colored: Boolean = false,
-    color: Color = contentColor(),
+    color: Color = AmbientContentColor.current,
     onClick: () -> Unit,
 ) {
     Row(
@@ -254,15 +254,15 @@ private fun StatusActionButton(
     ) {
         TextButton(
             onClick = onClick,
-            contentColor = contentColor(),
+            contentColor = AmbientContentColor.current,
         ) {
-            ProvideEmphasis(emphasis = EmphasisAmbient.current.medium) {
+            ProvideEmphasis(emphasis = AmbientEmphasisLevels.current.medium) {
                 Icon(
                     asset = icon,
                     tint = if (colored) {
                         color
                     } else {
-                        contentColor()
+                        AmbientContentColor.current
                     }
                 )
                 if (count > 0) {

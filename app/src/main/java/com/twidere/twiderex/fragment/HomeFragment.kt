@@ -21,6 +21,7 @@
 package com.twidere.twiderex.fragment
 
 import androidx.compose.animation.Crossfade
+import androidx.compose.foundation.AmbientContentColor
 import androidx.compose.foundation.Icon
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.contentColor
@@ -37,7 +38,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Divider
-import androidx.compose.material.EmphasisAmbient
+import androidx.compose.material.AmbientEmphasisLevels
 import androidx.compose.material.IconButton
 import androidx.compose.material.ListItem
 import androidx.compose.material.MaterialTheme
@@ -84,8 +85,8 @@ class HomeFragment : JetFragment() {
             items.forEachIndexed { index, item ->
                 BottomNavigationItem(
                     selectedContentColor = MaterialTheme.colors.primary,
-                    unselectedContentColor = EmphasisAmbient.current.medium.applyEmphasis(
-                        contentColor()
+                    unselectedContentColor = AmbientEmphasisLevels.current.medium.applyEmphasis(
+                        AmbientContentColor.current
                     ),
                     icon = { Icon(item.icon) },
                     label = { Text(item.name) },
