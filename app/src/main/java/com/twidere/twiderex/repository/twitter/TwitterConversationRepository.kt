@@ -117,7 +117,8 @@ class TwitterConversationRepository @AssistedInject constructor(
             list.sortWith(
                 compareBy(
                     { it.createdAt },
-                    { it.id?.toLongOrNull()?.inv() })
+                    { it.id?.toLongOrNull()?.inv() }
+                )
             )
         }
         result.sortWith(
