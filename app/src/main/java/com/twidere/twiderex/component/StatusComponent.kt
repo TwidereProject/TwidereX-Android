@@ -35,6 +35,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.AmbientEmphasisLevels
+import androidx.compose.material.ProvideEmphasis
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Comment
 import androidx.compose.material.icons.filled.Favorite
@@ -98,6 +99,13 @@ fun ExpandedStatusComponent(
                 text = data.timestamp.humanizedTimestamp(),
                 color = mediumEmphasisContentContentColor
             )
+            Spacer(modifier = Modifier.width(standardPadding))
+            Text(
+                text = data.source,
+                color = mediumEmphasisContentContentColor,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
         }
 
         Spacer(modifier = Modifier.height(standardPadding))
@@ -124,21 +132,23 @@ fun ExpandedStatusComponent(
 
         Spacer(modifier = Modifier.height(standardPadding))
 
-        Row {
-            Spacer(modifier = Modifier.weight(1f))
-            ActionIconButton(onClick = {}) {
-                Icon(asset = Icons.Default.Reply)
+        ProvideEmphasis(emphasis = AmbientEmphasisLevels.current.medium) {
+            Row {
+                Spacer(modifier = Modifier.weight(1f))
+                ActionIconButton(onClick = {}) {
+                    Icon(asset = Icons.Default.Reply)
+                }
+                ActionIconButton(onClick = {}) {
+                    Icon(asset = Icons.Default.Comment)
+                }
+                ActionIconButton(onClick = {}) {
+                    Icon(asset = Icons.Default.Favorite)
+                }
+                ActionIconButton(onClick = {}) {
+                    Icon(asset = Icons.Default.Share)
+                }
+                Spacer(modifier = Modifier.weight(1f))
             }
-            ActionIconButton(onClick = {}) {
-                Icon(asset = Icons.Default.Comment)
-            }
-            ActionIconButton(onClick = {}) {
-                Icon(asset = Icons.Default.Favorite)
-            }
-            ActionIconButton(onClick = {}) {
-                Icon(asset = Icons.Default.Share)
-            }
-            Spacer(modifier = Modifier.weight(1f))
         }
     }
 }
