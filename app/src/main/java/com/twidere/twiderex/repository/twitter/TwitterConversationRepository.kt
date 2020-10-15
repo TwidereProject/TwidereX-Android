@@ -113,7 +113,13 @@ class TwitterConversationRepository @AssistedInject constructor(
             }
         }
 
-        result.forEach { list -> list.sortByDescending { it.createdAt } }
+        result.forEach { list ->
+            list.sortWith(
+                compareBy(
+                    { it.createdAt },
+                    { it.id?.toLongOrNull()?.inv() })
+            )
+        }
         result.sortWith(
             compareBy(
                 // try to figure out how twitter ordering the conversation tweets
