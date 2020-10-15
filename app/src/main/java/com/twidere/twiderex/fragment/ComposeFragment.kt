@@ -51,22 +51,22 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.onActive
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.ExperimentalFocus
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focusRequester
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.viewModel
 import com.twidere.twiderex.component.AppBar
 import com.twidere.twiderex.component.AppBarNavigationButton
 import com.twidere.twiderex.component.NetworkImage
+import com.twidere.twiderex.extensions.NavControllerAmbient
+import com.twidere.twiderex.maxComposeTextLength
 import com.twidere.twiderex.ui.profileImageSize
 import com.twidere.twiderex.viewmodel.ActiveAccountViewModel
+import com.twidere.twiderex.viewmodel.ComposeViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -75,14 +75,12 @@ class ComposeFragment : JetFragment() {
     @OptIn(ExperimentalFoundationApi::class, ExperimentalFocus::class)
     @Composable
     override fun onCompose() {
-        val textState = remember { mutableStateOf(TextFieldValue()) }
+        val (textState, setTextState) = remember { mutableStateOf(TextFieldValue()) }
         val activeAccountViewModel = viewModel<ActiveAccountViewModel>()
+        val viewModel = viewModel<ComposeViewModel>()
         val account by activeAccountViewModel.account.observeAsState()
+        val navController = NavControllerAmbient.current
 
-        val focusRequester = FocusRequester()
-        onActive {
-            focusRequester.requestFocus()
-        }
         Scaffold(
             topBar = {
                 AppBar(
@@ -93,7 +91,10 @@ class ComposeFragment : JetFragment() {
                         AppBarNavigationButton(icon = Icons.Default.Close)
                     },
                     actions = {
-                        IconButton(onClick = {}) {
+                        IconButton(onClick = {
+                            viewModel.compose(textState.text)
+                            navController.popBackStack()
+                        }) {
                             Icon(asset = Icons.Default.Send)
                         }
                     }
@@ -126,7 +127,7 @@ class ComposeFragment : JetFragment() {
                                 color = MaterialTheme.colors.onSurface.copy(alpha = 0.12f),
                             )
                             CircularProgressIndicator(
-                                progress = textState.value.text.length.toFloat() / 1000f,
+                                progress = textState.text.length.toFloat() / maxComposeTextLength.toFloat(),
                             )
                         }
                     }
@@ -137,10 +138,9 @@ class ComposeFragment : JetFragment() {
                         BaseTextField(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .align(Alignment.TopStart)
-                                .focusRequester(focusRequester),
-                            value = textState.value,
-                            onValueChange = { textState.value = it },
+                                .align(Alignment.TopStart),
+                            value = textState,
+                            onValueChange = { setTextState(it) },
                         )
                     }
                 }

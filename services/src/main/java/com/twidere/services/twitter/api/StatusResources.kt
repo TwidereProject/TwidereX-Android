@@ -37,4 +37,9 @@ interface StatusResources {
 
     @POST("/1.1/favorites/destroy.json")
     suspend fun unlike(@Query(value = "id") id: String): Status
+
+    @POST("/1.1/statuses/update.json")
+    suspend fun update(
+        @Query("status") status: String,
+    ): Status
 }

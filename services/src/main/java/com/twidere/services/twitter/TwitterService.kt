@@ -236,4 +236,6 @@ class TwitterService(
     override suspend fun retweet(id: String) = resources.retweet(id)
 
     override suspend fun unRetweet(id: String) = resources.unretweet(id)
+
+    override suspend fun compose(content: String) = resources.update(content)
 }
