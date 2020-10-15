@@ -71,7 +71,6 @@ class TwitterConversationRepository @AssistedInject constructor(
     }
 
     suspend fun loadConversation(data: UiStatus): ConversationData {
-        val isRetweet = data.retweet != null // TODO: retweet
         val tweet = lookupService.lookupStatus((data.retweet ?: data).statusId) as StatusV2
         val conversationId = tweet.conversationID ?: return ConversationData(tweet, emptyList())
         val root = if (conversationId == tweet.id) {

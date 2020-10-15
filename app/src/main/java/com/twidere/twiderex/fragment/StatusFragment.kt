@@ -77,7 +77,6 @@ class StatusFragment : JetFragment() {
         ) {
             if (loadingPrevious) {
                 LazyColumn {
-                    loading()
                     item {
                         ExpandedStatusComponent(
                             status = status,

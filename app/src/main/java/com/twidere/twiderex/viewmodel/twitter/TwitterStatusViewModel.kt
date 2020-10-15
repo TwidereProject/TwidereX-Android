@@ -44,7 +44,18 @@ class TwitterStatusViewModel @ViewModelInject constructor(
     val items = repository.liveData.switchMap { list ->
         liveData {
             emit(
-                conversations.mapNotNull { conversation -> list.firstOrNull { it.statusId == conversation.id } }
+                conversations.mapNotNull { conversation ->
+                    val result = list.firstOrNull {
+                        it.statusId == conversation.id
+                    }
+                    if (status.value?.retweet?.let {
+                        it.statusId == result?.statusId
+                    } == true) {
+                        status.value
+                    } else {
+                        result
+                    }
+                }
             )
         }
     }
