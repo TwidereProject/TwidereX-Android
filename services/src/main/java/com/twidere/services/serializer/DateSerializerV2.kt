@@ -47,7 +47,7 @@ internal object DateSerializerV2 : KSerializer<Date> {
     }
 
     private fun getDateFormat(): SimpleDateFormat {
-        val format = SimpleDateFormat("yyyy-MM-DD'T'HH:mm:ss.SSS'Z'", Locale.ENGLISH)
+        val format = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.ENGLISH)
         format.isLenient = true
         format.timeZone = TimeZone.getTimeZone("UTC")
         return format
