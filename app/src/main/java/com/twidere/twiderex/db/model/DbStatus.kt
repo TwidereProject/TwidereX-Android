@@ -52,6 +52,7 @@ data class DbStatus(
     var retweeted: Boolean,
     var liked: Boolean,
     val placeString: String?,
+    val source: String,
     val hasMedia: Boolean,
     val userId: String,
 )

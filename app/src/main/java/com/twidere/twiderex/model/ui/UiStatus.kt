@@ -46,6 +46,7 @@ data class UiStatus(
     val user: UiUser,
     val media: List<UiMedia>,
     var retweet: UiStatus?,
+    val source: String,
     val quote: UiStatus?,
     val isGap: Boolean,
 ) : Parcelable {
@@ -70,6 +71,7 @@ data class UiStatus(
             retweet = retweet?.toUi(),
             quote = quote?.toUi(),
             isGap = timeline.isGap,
+            source = status.status.source
         )
 
         fun DbStatusWithMediaAndUser.toUi() = UiStatus(
@@ -90,6 +92,7 @@ data class UiStatus(
             retweet = null,
             quote = null,
             isGap = false,
+            source = status.source,
         )
     }
 }
