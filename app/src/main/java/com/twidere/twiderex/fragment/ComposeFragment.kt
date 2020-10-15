@@ -91,10 +91,12 @@ class ComposeFragment : JetFragment() {
                         AppBarNavigationButton(icon = Icons.Default.Close)
                     },
                     actions = {
-                        IconButton(onClick = {
-                            viewModel.compose(textState.text)
-                            navController.popBackStack()
-                        }) {
+                        IconButton(
+                            onClick = {
+                                viewModel.compose(textState.text)
+                                navController.popBackStack()
+                            }
+                        ) {
                             Icon(asset = Icons.Default.Send)
                         }
                     }
