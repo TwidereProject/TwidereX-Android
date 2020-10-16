@@ -27,10 +27,13 @@ import androidx.lifecycle.liveData
 import androidx.lifecycle.switchMap
 import com.twidere.services.microblog.LookupService
 import com.twidere.services.microblog.SearchService
+import com.twidere.services.twitter.model.ReferencedTweetType
 import com.twidere.services.twitter.model.StatusV2
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.twitter.TwitterConversationRepository
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 
 class TwitterStatusViewModel @ViewModelInject constructor(
     private val accountRepository: AccountRepository,
@@ -41,45 +44,56 @@ class TwitterStatusViewModel @ViewModelInject constructor(
             factory.create(accountDetails.key, it as SearchService, it as LookupService)
         }
     }
-    val items = repository.liveData.switchMap { list ->
+    val moreConversations = repository.liveData.switchMap { list ->
         liveData {
             emit(
                 conversations.mapNotNull { conversation ->
-                    val result = list.firstOrNull {
+                    list.firstOrNull {
                         it.statusId == conversation.id
-                    }
-                    if (status.value?.retweet?.let {
-                        it.statusId == result?.statusId
-                    } == true
-                    ) {
-                        status.value?.apply {
-                            retweet = result
-                        }
-                    } else {
-                        result
                     }
                 }
             )
         }
     }
+
+    val previousConversations = repository.liveData.switchMap { list ->
+        liveData {
+            emit(
+                previous.mapNotNull { conversation ->
+                    list.firstOrNull { it.statusId == conversation.id }
+                }
+            )
+        }
+    }
+
     val status = MutableLiveData<UiStatus>()
     val loadingPrevious = MutableLiveData(false)
     val loadingMore = MutableLiveData(false)
     private val conversations = arrayListOf<StatusV2>()
-    val currentStatusIndex = MutableLiveData(0)
+    private val previous = arrayListOf<StatusV2>()
 
-    suspend fun init(data: UiStatus) {
+    suspend fun init(data: UiStatus) = coroutineScope {
         if (conversations.any()) {
-            return
+            return@coroutineScope
         }
         status.postValue(data)
         loadingPrevious.postValue(true)
         loadingMore.postValue(true)
-        val result = repository.loadConversation(data)
-        val list = listOf(result.root) + result.subs.flatten()
-        conversations.addAll(list)
-        currentStatusIndex.postValue(list.indexOfFirst { it.id == data.statusId })
-        loadingMore.postValue(false)
-        loadingPrevious.postValue(false)
+        val tweet = repository.loadTweet(data)
+        val ui = repository.toUiStatus(tweet)
+        val targetTweet =
+            tweet.referencedTweets?.firstOrNull { it.type == ReferencedTweetType.retweeted }?.status
+                ?: tweet
+        status.postValue(ui)
+        async {
+            val list = repository.loadPrevious(targetTweet)
+            previous.addAll(list)
+            loadingPrevious.postValue(false)
+        }
+        async {
+            val list = repository.loadConversation(targetTweet)
+            conversations.addAll(list)
+            loadingMore.postValue(false)
+        }
     }
 }

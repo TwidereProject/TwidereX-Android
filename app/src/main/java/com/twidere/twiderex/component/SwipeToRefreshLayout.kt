@@ -34,6 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import com.twidere.twiderex.annotations.IncomingComposeUpdate
 
 private val RefreshDistance = 80.dp
@@ -68,7 +69,12 @@ fun SwipeToRefreshLayout(
             .fillMaxSize()
     ) {
         content()
-        Box(Modifier.align(Alignment.TopCenter).offsetPx(y = state.offset)) {
+        Box(
+            modifier = Modifier
+                .zIndex(1f)
+                .align(Alignment.TopCenter)
+                .offsetPx(y = state.offset)
+        ) {
             if (state.offset.value != -refreshDistance) {
                 refreshIndicator()
             }

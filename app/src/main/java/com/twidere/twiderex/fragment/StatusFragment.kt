@@ -21,10 +21,10 @@
 package com.twidere.twiderex.fragment
 
 import androidx.compose.foundation.Text
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.ExperimentalLazyDsl
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyColumnForIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Divider
 import androidx.compose.material.Scaffold
@@ -44,7 +44,6 @@ import com.twidere.twiderex.component.loading
 import com.twidere.twiderex.ui.standardPadding
 import com.twidere.twiderex.viewmodel.twitter.TwitterStatusViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlin.math.max
 
 @AndroidEntryPoint
 class StatusFragment : JetFragment() {
@@ -58,8 +57,9 @@ class StatusFragment : JetFragment() {
         val loadingPrevious by viewModel.loadingPrevious.observeAsState(initial = false)
         val loadingMore by viewModel.loadingMore.observeAsState(initial = false)
         val status by viewModel.status.observeAsState(initial = args.status)
-        val items by viewModel.items.observeAsState(initial = emptyList())
-        val index by viewModel.currentStatusIndex.observeAsState(initial = 0)
+        val moreConversations by viewModel.moreConversations.observeAsState(initial = emptyList())
+        val previousConversations by viewModel.previousConversations.observeAsState(initial = emptyList())
+
         LaunchedTask {
             viewModel.init(args.status)
         }
@@ -75,39 +75,37 @@ class StatusFragment : JetFragment() {
                 )
             }
         ) {
-            if (loadingPrevious) {
-                LazyColumn {
-                    item {
+            LazyColumn(
+                state = rememberLazyListState(initialFirstVisibleItemIndex = if (previousConversations.any()) 1 else 0)
+            ) {
+                if (previousConversations.any()) {
+                    itemsIndexed(previousConversations) { index, item ->
+                        TimelineStatusComponent(data = item)
+                        if (index != moreConversations.size - 1) {
+                            StatusDivider()
+                        }
+                    }
+                }
+                item {
+                    Column {
                         ExpandedStatusComponent(
                             status = status,
                         )
+                        Divider(
+                            modifier = Modifier.padding(horizontal = standardPadding * 2)
+                        )
                     }
-                    loading()
                 }
-            } else {
-                if (!items.any()) {
-                    ExpandedStatusComponent(
-                        status = status,
-                    )
-                } else {
-                    LazyColumnForIndexed(
-                        items = items,
-                        state = rememberLazyListState(initialFirstVisibleItemIndex = max(index, 0))
-                    ) { index, item ->
-                        if (item.statusId == status.statusId) {
-                            ExpandedStatusComponent(
-                                status = item,
-                            )
-                            Divider(
-                                modifier = Modifier.padding(horizontal = standardPadding * 2)
-                            )
-                        } else {
-                            TimelineStatusComponent(data = item)
-                            if (index != items.size - 1) {
-                                StatusDivider()
-                            }
+                if (moreConversations.any()) {
+                    itemsIndexed(moreConversations) { index, item ->
+                        TimelineStatusComponent(data = item)
+                        if (index != moreConversations.size - 1) {
+                            StatusDivider()
                         }
                     }
+                }
+                if (loadingMore) {
+                    loading()
                 }
             }
         }

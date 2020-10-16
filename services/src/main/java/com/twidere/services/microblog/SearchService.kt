@@ -26,6 +26,7 @@ interface SearchService {
     suspend fun searchTweets(
         query: String,
         count: Int = 20,
+        since_Id: String? = null,
         nextPage: String? = null,
     ): ISearchResponse
 }

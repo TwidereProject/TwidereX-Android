@@ -199,12 +199,14 @@ class TwitterService(
     override suspend fun searchTweets(
         query: String,
         count: Int,
+        since_id: String?,
         nextPage: String?,
     ): TwitterSearchResponseV2 {
         val result = resources.search(
             query,
             next_token = nextPage,
             max_results = count,
+            since_id = since_id,
             userFields = UserFields.values().joinToString(",") { it.value },
             pollFields = PollFields.values().joinToString(",") { it.name },
             placeFields = PlaceFields.values().joinToString(",") { it.value },
