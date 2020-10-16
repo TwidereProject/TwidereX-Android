@@ -88,7 +88,7 @@ class TwitterConversationRepository @AssistedInject constructor(
         return lookupService.lookupStatus(status.statusId) as StatusV2
     }
 
-    suspend fun toUiStatus(status: StatusV2) : UiStatus {
+    suspend fun toUiStatus(status: StatusV2): UiStatus {
         val db = status.toDbTimeline(userKey, TimelineType.Conversation)
         saveData(listOf(db))
         return db.toUi()
