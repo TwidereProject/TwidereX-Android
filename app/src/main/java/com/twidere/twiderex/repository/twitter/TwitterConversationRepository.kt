@@ -101,66 +101,62 @@ class TwitterConversationRepository @AssistedInject constructor(
             count = defaultLoadCount,
             since_Id = tweet.id
         ) as TwitterSearchResponseV2
-//        val result = arrayListOf<ArrayList<StatusV2>>()
+        val result = arrayListOf<ArrayList<StatusV2>>()
 
-//        searchResponse.data?.forEach { status ->
-//            val referencedTweetId = status.referencedTweets
-//                ?.firstOrNull { it.type == ReferencedTweetType.replied_to }?.id
-//            if (!result.any { list -> list.any { it.id == status.id } }) {
-//                if (referencedTweetId == conversationId) { // direct reply to the main tweet
-//                    result.firstOrNull { list -> // find if the reply tweet has other replies to it
-//                        list.any { statusV2 ->
-//                            statusV2.referencedTweets?.firstOrNull {
-//                                it.type == ReferencedTweetType.replied_to
-//                            }?.id == status.id
-//                        }
-//                    }
-//                        ?.add(status)
-//                        ?: result.add(arrayListOf(status)) // if not, just add to list
-//                } else if (referencedTweetId != null) {
-//                    result.firstOrNull { list -> // find the reply to tweet
-//                        list.any { it.id == referencedTweetId }
-//                    }
-//                        ?.add(status)
-//                        ?: searchResponse.includes?.tweets?.firstOrNull { // if not, add it with reply to tweet
-//                            it.id == referencedTweetId
-//                        }
-//                            ?.let {
-//                                result.add(arrayListOf(it, status))
-//                            }
-//                }
-//            }
-//        }
-//
-//        result.forEach { list ->
-//            list.sortWith(
-//                compareBy(
-//                    { it.createdAt },
-//                    { it.id?.toLongOrNull()?.inv() }
-//                )
-//            )
-//        }
-//        result.sortWith(
-//            compareBy(
-//                // try to figure out how twitter ordering the conversation tweets
-//                { !(it.size == 1 && it.first().authorID == tweet.authorID) },
-//                { it.lastOrNull()?.authorID != tweet.authorID },
-//                { it.lastOrNull()?.publicMetrics?.likeCount?.inv() },
-//                { it.lastOrNull()?.publicMetrics?.retweetCount?.inv() },
-//                { it.lastOrNull()?.createdAt },
-//            )
-//        )
+        searchResponse.data?.forEach { status ->
+            val referencedTweetId = status.referencedTweets
+                ?.firstOrNull { it.type == ReferencedTweetType.replied_to }?.id
+            if (!result.any { list -> list.any { it.id == status.id } }) {
+                if (referencedTweetId == conversationId) { // direct reply to the main tweet
+                    result.firstOrNull { list -> // find if the reply tweet has other replies to it
+                        list.any { statusV2 ->
+                            statusV2.referencedTweets?.firstOrNull {
+                                it.type == ReferencedTweetType.replied_to
+                            }?.id == status.id
+                        }
+                    }
+                        ?.add(status)
+                        ?: result.add(arrayListOf(status)) // if not, just add to list
+                } else if (referencedTweetId != null) {
+                    result.firstOrNull { list -> // find the reply to tweet
+                        list.any { it.id == referencedTweetId }
+                    }
+                        ?.add(status)
+                        ?: searchResponse.includes?.tweets?.firstOrNull { // if not, add it with reply to tweet
+                            it.id == referencedTweetId
+                        }
+                            ?.let {
+                                result.add(arrayListOf(it, status))
+                            }
+                }
+            }
+        }
 
-//        result.forEach { it.reverse() }
-//        val db = result.flatten().let { list ->
-//            listOf(root) + list
-//        }.map { it.toDbTimeline(userKey, TimelineType.Conversation) }
+        result.forEach { list ->
+            list.sortWith(
+                compareBy(
+                    { it.createdAt },
+                    { it.id?.toLongOrNull()?.inv() }
+                )
+            )
+        }
+        result.sortWith(
+            compareBy(
+                // try to figure out how twitter ordering the conversation tweets
+                { !(it.size == 1 && it.first().authorID == tweet.authorID) },
+                { it.lastOrNull()?.authorID != tweet.authorID },
+                { it.lastOrNull()?.publicMetrics?.likeCount?.inv() },
+                { it.lastOrNull()?.publicMetrics?.retweetCount?.inv() },
+                { it.lastOrNull()?.createdAt },
+            )
+        )
 
-        val db = searchResponse.data?.map { it.toDbTimeline(userKey, TimelineType.Conversation) }
-            ?: emptyList()
+        result.forEach { it.reverse() }
+        val db = result.flatten().map { it.toDbTimeline(userKey, TimelineType.Conversation) }
+
         saveData(db)
 
-        return (searchResponse.data ?: emptyList()).asReversed()
+        return result.flatten()
     }
 
     private suspend fun saveData(timeline: List<DbTimelineWithStatus>) {
