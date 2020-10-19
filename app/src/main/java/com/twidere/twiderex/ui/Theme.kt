@@ -32,6 +32,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.onActive
 import androidx.compose.ui.graphics.toArgb
 import com.twidere.twiderex.extensions.WindowAmbient
+import com.twidere.twiderex.extensions.withElevation
 
 private val DarkColorPalette = darkColors(
     primary = blue,
@@ -48,6 +49,7 @@ private val LightColorPalette = lightColors(
 @Composable
 fun TwidereXTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
+    pureStatusBarColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val colors = if (darkTheme) {
@@ -62,7 +64,11 @@ fun TwidereXTheme(
         shapes = shapes,
         content = {
             val window = WindowAmbient.current
-            val statusBarColor = MaterialTheme.colors.surface
+            val statusBarColor = if (pureStatusBarColor) {
+                MaterialTheme.colors.surface
+            } else {
+                MaterialTheme.colors.surface.withElevation()
+            }
             onActive {
                 updateStatusBar(window, darkTheme, statusBarColor)
             }

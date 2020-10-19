@@ -74,7 +74,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.WithConstraints
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.VectorAsset
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -96,6 +95,7 @@ import com.twidere.twiderex.component.UserAvatar
 import com.twidere.twiderex.component.itemsGridIndexed
 import com.twidere.twiderex.component.loading
 import com.twidere.twiderex.extensions.NavControllerAmbient
+import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.ui.standardPadding
 import com.twidere.twiderex.ui.topBarHeight
@@ -115,6 +115,7 @@ class UserFragment : JetFragment() {
     override fun onCompose() {
         UserComponent(data = args.user) {
             AppBar(
+                backgroundColor = MaterialTheme.colors.surface.withElevation(),
                 navigationIcon = {
                     AppBarNavigationButton()
                 },
@@ -342,7 +343,10 @@ private fun UserInfo(data: UiUser) {
     val isMe by viewModel.isMe.observeAsState(initial = false)
     val maxBannerSize = 200.dp
 
-    Box {
+    Box(
+        modifier = Modifier
+            .background(MaterialTheme.colors.surface.withElevation())
+    ) {
         // TODO: parallax effect
         user.profileBackgroundImage?.let {
             Box(
@@ -367,7 +371,8 @@ private fun UserInfo(data: UiUser) {
             }
 
             Box(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth(),
                 alignment = Alignment.Center
             ) {
                 Spacer(
@@ -375,7 +380,7 @@ private fun UserInfo(data: UiUser) {
                         .size(80.dp)
                         .clip(CircleShape)
                         .clipToBounds()
-                        .background(Color.White)
+                        .background(MaterialTheme.colors.surface.withElevation())
                 )
                 UserAvatar(
                     user = user,
@@ -384,7 +389,8 @@ private fun UserInfo(data: UiUser) {
             }
             Spacer(modifier = Modifier.height(standardPadding * 2))
             Row(
-                modifier = Modifier.padding(horizontal = standardPadding * 2)
+                modifier = Modifier
+                    .padding(horizontal = standardPadding * 2)
             ) {
                 Column(
                     modifier = Modifier.weight(1f),
@@ -496,9 +502,12 @@ private fun UserTabsComponent(
     selectedItem: Int,
     onItemSelected: (Int) -> Unit,
 ) {
+    Surface() {
+
+    }
     TabRow(
         selectedTabIndex = selectedItem,
-        backgroundColor = MaterialTheme.colors.background,
+        backgroundColor = MaterialTheme.colors.surface.withElevation(),
         indicator = { tabPositions ->
             TabConstants.DefaultIndicator(
                 modifier = Modifier.defaultTabIndicatorOffset(tabPositions[selectedItem]),

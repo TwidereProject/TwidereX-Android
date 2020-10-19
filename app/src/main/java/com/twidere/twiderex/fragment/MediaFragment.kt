@@ -79,7 +79,10 @@ class MediaFragment : JetFragment() {
         savedInstanceState: Bundle?
     ): View? {
         return compose {
-            TwidereXTheme(darkTheme = true) {
+            TwidereXTheme(
+                darkTheme = true,
+                pureStatusBarColor = true,
+            ) {
                 onCompose()
             }
         }

@@ -65,6 +65,7 @@ import com.twidere.twiderex.component.home.HomeTimelineItem
 import com.twidere.twiderex.component.home.MeItem
 import com.twidere.twiderex.component.home.MentionItem
 import com.twidere.twiderex.component.home.SearchItem
+import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.ui.profileImageSize
 import com.twidere.twiderex.viewmodel.ActiveAccountViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -110,6 +111,7 @@ class HomeFragment : JetFragment() {
             scaffoldState = scaffoldState,
             topBar = {
                 AppBar(
+                    backgroundColor = MaterialTheme.colors.surface.withElevation(),
                     title = {
                         Text(text = menus[selectedItem].name)
                     },
