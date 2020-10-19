@@ -114,8 +114,12 @@ class TwitterConversationRepository @AssistedInject constructor(
             "conversation_id:$conversationId",
             count = defaultLoadCount,
         ) as TwitterSearchResponseV2
-        val status = ((searchResponse.includes?.tweets ?: emptyList()) + (searchResponse.data
-            ?: emptyList())).distinctBy {
+        val status = (
+            (searchResponse.includes?.tweets ?: emptyList()) + (
+                searchResponse.data
+                    ?: emptyList()
+                )
+            ).distinctBy {
             it.id
         }
         val result = buildConversation(tweet, status.distinctBy { it.id })
