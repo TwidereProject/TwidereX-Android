@@ -503,7 +503,6 @@ private fun UserTabsComponent(
     onItemSelected: (Int) -> Unit,
 ) {
     Surface() {
-
     }
     TabRow(
         selectedTabIndex = selectedItem,
