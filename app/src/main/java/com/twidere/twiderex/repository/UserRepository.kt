@@ -34,7 +34,6 @@ import com.twidere.twiderex.model.UserKey
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.model.ui.UiStatus.Companion.toUi
 import com.twidere.twiderex.model.ui.UiUser
-import com.twidere.twiderex.model.ui.UiUser.Companion.toUi
 import javax.inject.Singleton
 
 @Singleton
@@ -53,10 +52,10 @@ class UserRepository @AssistedInject constructor(
         ): UserRepository
     }
 
-    suspend fun lookupUser(id: String): UiUser? {
+    suspend fun lookupUser(id: String): DbUser? {
         val user = lookupService.lookupUser(id).toDbUser()
         saveUser(user)
-        return user.toUi()
+        return user
     }
 
     private suspend fun saveUser(user: DbUser) {

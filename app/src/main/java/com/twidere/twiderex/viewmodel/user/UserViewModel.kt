@@ -28,6 +28,7 @@ import com.twidere.services.microblog.RelationshipService
 import com.twidere.services.microblog.model.IRelationship
 import com.twidere.twiderex.model.UserKey
 import com.twidere.twiderex.model.ui.UiUser
+import com.twidere.twiderex.model.ui.UiUser.Companion.toUi
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.UserRepository
 
@@ -62,12 +63,24 @@ class UserViewModel @ViewModelInject constructor(
         user.postValue(data)
         val name = data.screenName
         val key = UserKey(name, "twitter.com")
-        isMe.postValue(accountRepository.getCurrentAccount().key == key)
-        repository.lookupUser(data.id)?.let {
+        val isme = accountRepository.getCurrentAccount().key == key
+        isMe.postValue(isme)
+        val dbUser = repository.lookupUser(data.id)
+        dbUser?.toUi()?.let {
             user.postValue(it)
         }
-        if (accountRepository.getCurrentAccount().key != key) {
-            repository.showRelationship(data.id)?.let {
+        if (isme) {
+            accountRepository.findByAccountKey(key)?.let {
+                accountRepository.getAccountDetails(it)
+            }?.let { details ->
+                dbUser?.let {
+                    details.user = it
+                    accountRepository.updateAccount(details)
+                }
+            }
+        }
+        if (!isme) {
+            repository.showRelationship(data.id).let {
                 relationship.postValue(it)
             }
         }
