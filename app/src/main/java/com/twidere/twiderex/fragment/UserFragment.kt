@@ -85,6 +85,7 @@ import com.twidere.twiderex.R
 import com.twidere.twiderex.annotations.IncomingComposeUpdate
 import com.twidere.twiderex.component.AppBar
 import com.twidere.twiderex.component.AppBarNavigationButton
+import com.twidere.twiderex.component.LoadingProgress
 import com.twidere.twiderex.component.NetworkImage
 import com.twidere.twiderex.component.StatusDivider
 import com.twidere.twiderex.component.StatusMediaPreviewItem
@@ -93,7 +94,6 @@ import com.twidere.twiderex.component.TimelineStatusComponent
 import com.twidere.twiderex.component.TopAppBarElevation
 import com.twidere.twiderex.component.UserAvatar
 import com.twidere.twiderex.component.itemsGridIndexed
-import com.twidere.twiderex.component.loading
 import com.twidere.twiderex.extensions.NavControllerAmbient
 import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.model.ui.UiUser
@@ -325,7 +325,19 @@ fun UserComponent(
                             }
                         }
                         if (timelineLoadingMore || favouriteLoadingMore) {
-                            loading()
+                            item {
+                                val modifier = when (selectedItem) {
+                                    0, 1 -> if (timeline.any()) Modifier.fillParentMaxWidth() else Modifier.fillParentMaxSize()
+                                    2 -> if (favourite.any()) Modifier.fillParentMaxWidth() else Modifier.fillParentMaxSize()
+                                    else -> Modifier.fillParentMaxWidth()
+                                }
+                                Box(
+                                    modifier = modifier,
+                                    alignment = Alignment.TopCenter
+                                ) {
+                                    LoadingProgress()
+                                }
+                            }
                         }
                     }
                 }
