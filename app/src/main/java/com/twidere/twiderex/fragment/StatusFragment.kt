@@ -21,6 +21,7 @@
 package com.twidere.twiderex.fragment
 
 import androidx.compose.foundation.Text
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.ExperimentalLazyDsl
@@ -38,6 +39,7 @@ import androidx.navigation.fragment.navArgs
 import com.twidere.twiderex.component.AppBar
 import com.twidere.twiderex.component.AppBarNavigationButton
 import com.twidere.twiderex.component.ExpandedStatusComponent
+import com.twidere.twiderex.component.LoadingProgress
 import com.twidere.twiderex.component.StatusDivider
 import com.twidere.twiderex.component.TimelineStatusComponent
 import com.twidere.twiderex.component.loading
@@ -75,37 +77,54 @@ class StatusFragment : JetFragment() {
                 )
             }
         ) {
-            LazyColumn(
-                state = rememberLazyListState(initialFirstVisibleItemIndex = if (previousConversations.any()) 1 else 0)
-            ) {
-                if (previousConversations.any()) {
+            if (loadingPrevious) {
+                Column {
+                    ExpandedStatusComponent(
+                        status = status,
+                    )
+                    Divider(
+                        modifier = Modifier.padding(horizontal = standardPadding * 2)
+                    )
+                    LoadingProgress()
+                }
+            } else {
+                LazyColumn(
+                    state = rememberLazyListState(initialFirstVisibleItemIndex = previousConversations.size)
+                ) {
                     itemsIndexed(previousConversations) { index, item ->
                         TimelineStatusComponent(data = item)
                         if (index != moreConversations.size - 1) {
                             StatusDivider()
                         }
                     }
-                }
-                item {
-                    Column {
-                        ExpandedStatusComponent(
-                            status = status,
-                        )
-                        Divider(
-                            modifier = Modifier.padding(horizontal = standardPadding * 2)
-                        )
-                    }
-                }
-                if (moreConversations.any()) {
-                    itemsIndexed(moreConversations) { index, item ->
-                        TimelineStatusComponent(data = item)
-                        if (index != moreConversations.size - 1) {
-                            StatusDivider()
+                    item {
+                        Column {
+                            ExpandedStatusComponent(
+                                status = status,
+                            )
+                            Divider(
+                                modifier = Modifier.padding(horizontal = standardPadding * 2)
+                            )
                         }
                     }
-                }
-                if (loadingMore) {
-                    loading()
+                    if (moreConversations.any()) {
+                        itemsIndexed(moreConversations) { index, item ->
+                            TimelineStatusComponent(data = item)
+                            if (index != moreConversations.size - 1) {
+                                StatusDivider()
+                            }
+                        }
+                    }
+                    if (loadingMore) {
+                        loading()
+                    }
+                    item {
+                        Box(
+                            modifier = Modifier.fillParentMaxSize()
+                        ) {
+
+                        }
+                    }
                 }
             }
         }
