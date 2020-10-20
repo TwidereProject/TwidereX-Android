@@ -62,7 +62,13 @@
     </fragment>
     <fragment
         android:id="@+id/compose_fragment"
-        android:name="com.twidere.twiderex.fragment.ComposeFragment" />
+        android:name="com.twidere.twiderex.fragment.ComposeFragment">
+        <argument
+            android:name="status"
+            android:defaultValue="@null"
+            app:argType="com.twidere.twiderex.model.ui.UiStatus"
+            app:nullable="true" />
+    </fragment>
     <fragment
         android:id="@+id/user_fragment"
         android:name="com.twidere.twiderex.fragment.UserFragment">

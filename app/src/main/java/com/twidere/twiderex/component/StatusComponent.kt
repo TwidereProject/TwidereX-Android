@@ -61,6 +61,8 @@ import com.twidere.twiderex.ui.standardPadding
 @Composable
 fun ExpandedStatusComponent(
     status: UiStatus,
+    showInfo: Boolean = true,
+    showActions: Boolean = true,
 ) {
     Column(
         modifier = Modifier
@@ -82,72 +84,77 @@ fun ExpandedStatusComponent(
             showActions = true,
         )
 
-        if (!data.placeString.isNullOrEmpty()) {
-            Row {
-                Icon(asset = Icons.Default.Place)
-                Text(text = data.placeString)
+        if (showInfo) {
+            if (!data.placeString.isNullOrEmpty()) {
+                Row {
+                    Icon(asset = Icons.Default.Place)
+                    Text(text = data.placeString)
+                }
             }
-        }
 
-        Spacer(modifier = Modifier.height(standardPadding))
+            Spacer(modifier = Modifier.height(standardPadding))
 
-        Row(
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-        ) {
-            Text(
-                text = data.timestamp.humanizedTimestamp(),
-                color = mediumEmphasisContentContentColor
-            )
-            Spacer(modifier = Modifier.width(standardPadding))
-            Text(
-                text = data.source,
-                color = mediumEmphasisContentContentColor,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-        }
-
-        Spacer(modifier = Modifier.height(standardPadding))
-
-        Row(
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-        ) {
-            if (data.replyCount > 0) {
-                StatusStatistics(count = data.replyCount.toString(), text = "reply")
-                Spacer(modifier = Modifier.width(standardPadding * 2))
-            }
-            if (data.retweetCount > 0) {
-                StatusStatistics(
-                    count = data.retweetCount.toString(),
-                    text = "retweets"
+            Row(
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+            ) {
+                Text(
+                    text = data.timestamp.humanizedTimestamp(),
+                    color = mediumEmphasisContentContentColor
                 )
-                Spacer(modifier = Modifier.width(standardPadding * 2))
+                Spacer(modifier = Modifier.width(standardPadding))
+                Text(
+                    text = data.source,
+                    color = mediumEmphasisContentContentColor,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
             }
-            if (data.likeCount > 0) {
-                StatusStatistics(count = data.likeCount.toString(), text = "likes")
+
+            Spacer(modifier = Modifier.height(standardPadding))
+
+            Row(
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+            ) {
+                if (data.replyCount > 0) {
+                    StatusStatistics(count = data.replyCount.toString(), text = "reply")
+                    Spacer(modifier = Modifier.width(standardPadding * 2))
+                }
+                if (data.retweetCount > 0) {
+                    StatusStatistics(
+                        count = data.retweetCount.toString(),
+                        text = "retweets"
+                    )
+                    Spacer(modifier = Modifier.width(standardPadding * 2))
+                }
+                if (data.likeCount > 0) {
+                    StatusStatistics(count = data.likeCount.toString(), text = "likes")
+                }
             }
+
         }
 
-        Spacer(modifier = Modifier.height(standardPadding))
+        if (showActions) {
+            Spacer(modifier = Modifier.height(standardPadding))
 
-        ProvideEmphasis(emphasis = AmbientEmphasisLevels.current.medium) {
-            Row {
-                Spacer(modifier = Modifier.weight(1f))
-                ActionIconButton(onClick = {}) {
-                    Icon(asset = Icons.Default.Reply)
+            ProvideEmphasis(emphasis = AmbientEmphasisLevels.current.medium) {
+                Row {
+                    Spacer(modifier = Modifier.weight(1f))
+                    ActionIconButton(onClick = {}) {
+                        Icon(asset = Icons.Default.Reply)
+                    }
+                    ActionIconButton(onClick = {}) {
+                        Icon(asset = Icons.Default.Comment)
+                    }
+                    ActionIconButton(onClick = {}) {
+                        Icon(asset = Icons.Default.Favorite)
+                    }
+                    ActionIconButton(onClick = {}) {
+                        Icon(asset = Icons.Default.Share)
+                    }
+                    Spacer(modifier = Modifier.weight(1f))
                 }
-                ActionIconButton(onClick = {}) {
-                    Icon(asset = Icons.Default.Comment)
-                }
-                ActionIconButton(onClick = {}) {
-                    Icon(asset = Icons.Default.Favorite)
-                }
-                ActionIconButton(onClick = {}) {
-                    Icon(asset = Icons.Default.Share)
-                }
-                Spacer(modifier = Modifier.weight(1f))
             }
         }
     }

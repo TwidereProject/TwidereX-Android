@@ -93,7 +93,7 @@ class StatusFragment : JetFragment() {
                 ) {
                     itemsIndexed(previousConversations) { index, item ->
                         TimelineStatusComponent(data = item)
-                        if (index != moreConversations.size - 1) {
+                        if (index != moreConversations.lastIndex) {
                             StatusDivider()
                         }
                     }
@@ -110,7 +110,7 @@ class StatusFragment : JetFragment() {
                     if (moreConversations.any()) {
                         itemsIndexed(moreConversations) { index, item ->
                             TimelineStatusComponent(data = item)
-                            if (index != moreConversations.size - 1) {
+                            if (index != moreConversations.lastIndex) {
                                 StatusDivider()
                             }
                         }

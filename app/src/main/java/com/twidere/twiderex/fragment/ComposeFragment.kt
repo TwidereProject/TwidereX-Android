@@ -20,18 +20,21 @@
  */
 package com.twidere.twiderex.fragment
 
-import androidx.compose.foundation.BaseTextField
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Icon
 import androidx.compose.foundation.Text
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.ExperimentalLazyDsl
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Divider
@@ -56,13 +59,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.ExperimentalFocus
+import androidx.compose.ui.node.Ref
+import androidx.compose.ui.text.SoftwareKeyboardController
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.viewModel
+import androidx.navigation.fragment.navArgs
 import com.twidere.twiderex.component.AppBar
 import com.twidere.twiderex.component.AppBarNavigationButton
 import com.twidere.twiderex.component.NetworkImage
+import com.twidere.twiderex.component.StatusLineComponent
+import com.twidere.twiderex.component.TextInput
+import com.twidere.twiderex.component.TimelineStatusComponent
 import com.twidere.twiderex.extensions.NavControllerAmbient
+import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.maxComposeTextLength
 import com.twidere.twiderex.ui.profileImageSize
 import com.twidere.twiderex.viewmodel.ActiveAccountViewModel
@@ -71,8 +81,9 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class ComposeFragment : JetFragment() {
+    private val args by navArgs<ComposeFragmentArgs>()
 
-    @OptIn(ExperimentalFoundationApi::class, ExperimentalFocus::class)
+    @OptIn(ExperimentalFoundationApi::class, ExperimentalFocus::class, ExperimentalLazyDsl::class)
     @Composable
     override fun onCompose() {
         val (textState, setTextState) = remember { mutableStateOf(TextFieldValue()) }
@@ -80,18 +91,35 @@ class ComposeFragment : JetFragment() {
         val viewModel = viewModel<ComposeViewModel>()
         val account by activeAccountViewModel.account.observeAsState()
         val navController = NavControllerAmbient.current
-
+        val keyboardController = remember { Ref<SoftwareKeyboardController>() }
+        val listState = rememberLazyListState(
+            initialFirstVisibleItemIndex = if (args.status == null) {
+                0
+            } else {
+                1
+            }
+        )
+        args.status?.also {
+            if (listState.firstVisibleItemIndex == 0) {
+                keyboardController.value?.hideSoftwareKeyboard()
+            } else if (listState.firstVisibleItemIndex == 1) {
+                keyboardController.value?.showSoftwareKeyboard()
+            }
+        }
         Scaffold(
             topBar = {
                 AppBar(
                     title = {
-                        Text(text = "Compose")
+                        args.status?.let {
+                            Text(text = "Reply")
+                        } ?: Text(text = "Compose")
                     },
                     navigationIcon = {
                         AppBarNavigationButton(icon = Icons.Default.Close)
                     },
                     actions = {
                         IconButton(
+                            enabled = textState.text.isNotEmpty(),
                             onClick = {
                                 viewModel.compose(textState.text)
                                 navController.popBackStack()
@@ -104,52 +132,85 @@ class ComposeFragment : JetFragment() {
             }
         ) {
             Column {
-                Row(
-                    modifier = Modifier.weight(1F)
-                        .padding(16.dp)
+                LazyColumn(
+                    modifier = Modifier.weight(1F),
+                    state = listState,
                 ) {
-                    Column {
-                        account?.let {
-                            NetworkImage(
-                                url = it.user.profileImage,
+                    args.status?.let { status ->
+                        item {
+                            Box(
                                 modifier = Modifier
-                                    .clip(CircleShape)
-                                    .width(profileImageSize)
-                                    .height(profileImageSize)
-                            )
-                        }
-                        Spacer(modifier = Modifier.weight(1f))
-                        Box(
-                            modifier = Modifier
-                                .width(profileImageSize / 2)
-                                .height(profileImageSize / 2),
-                        ) {
-                            CircularProgressIndicator(
-                                progress = 1f,
-                                color = MaterialTheme.colors.onSurface.copy(alpha = 0.12f),
-                            )
-                            CircularProgressIndicator(
-                                progress = textState.text.length.toFloat() / maxComposeTextLength.toFloat(),
-                            )
+                                    .background(MaterialTheme.colors.surface.withElevation())
+                            ) {
+                                StatusLineComponent(lineDown = true) {
+                                    TimelineStatusComponent(
+                                        data = status,
+                                        showActions = false,
+                                    )
+                                }
+                            }
                         }
                     }
-                    Spacer(modifier = Modifier.width(16.dp))
-                    Box(
-                        modifier = Modifier.weight(1F)
-                    ) {
-                        BaseTextField(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .align(Alignment.TopStart),
-                            value = textState,
-                            onValueChange = { setTextState(it) },
-                        )
+                    item {
+                        StatusLineComponent(
+                            lineUp = args.status != null,
+                        ) {
+                            Row(
+                                modifier = Modifier.fillParentMaxSize()
+                                    .padding(16.dp),
+                            ) {
+                                Column {
+                                    account?.let {
+                                        NetworkImage(
+                                            url = it.user.profileImage,
+                                            modifier = Modifier
+                                                .clip(CircleShape)
+                                                .width(profileImageSize)
+                                                .height(profileImageSize)
+                                        )
+                                    }
+                                    Spacer(modifier = Modifier.weight(1f))
+                                    Box(
+                                        modifier = Modifier
+                                            .width(profileImageSize / 2)
+                                            .height(profileImageSize / 2),
+                                    ) {
+                                        CircularProgressIndicator(
+                                            progress = 1f,
+                                            color = MaterialTheme.colors.onSurface.copy(alpha = 0.12f),
+                                        )
+                                        CircularProgressIndicator(
+                                            progress = textState.text.length.toFloat() / maxComposeTextLength.toFloat(),
+                                        )
+                                    }
+                                }
+                                Spacer(modifier = Modifier.width(16.dp))
+                                Box(
+                                    modifier = Modifier.weight(1F)
+                                ) {
+                                    TextInput(
+                                        modifier = Modifier.align(Alignment.TopCenter),
+                                        value = textState,
+                                        onValueChange = { setTextState(it) },
+                                        autoFocus = true,
+                                        onTextInputStarted = {
+                                            keyboardController.value = it
+                                        },
+                                        onClicked = {
+                                            //TODO: scroll lazyColumn
+                                        }
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
                 Divider()
                 Box {
                     Row {
-                        IconButton(onClick = {}) {
+                        IconButton(onClick = {
+                            openImagePicker()
+                        }) {
                             Icon(asset = Icons.Default.Camera)
                         }
                         IconButton(onClick = {}) {
@@ -172,5 +233,14 @@ class ComposeFragment : JetFragment() {
                 }
             }
         }
+    }
+
+    private val openImagePicker =
+        registerForActivityResult(ActivityResultContracts.GetMultipleContents()) {
+            //TODO: show images
+        }
+
+    private fun openImagePicker() {
+        openImagePicker.launch("image/*")
     }
 }

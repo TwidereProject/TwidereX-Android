@@ -259,13 +259,13 @@ fun UserComponent(
                                 if (timeline.any()) {
                                     itemsIndexed(timeline) { index, item ->
                                         Column {
-                                            if (!timelineLoadingMore && index == timeline.size - 1) {
+                                            if (!timelineLoadingMore && index == timeline.lastIndex) {
                                                 coroutineScope.launch {
                                                     timelineViewModel.loadMore(user)
                                                 }
                                             }
                                             TimelineStatusComponent(item)
-                                            if (index != timeline.size - 1) {
+                                            if (index != timeline.lastIndex) {
                                                 StatusDivider()
                                             }
                                         }
@@ -281,7 +281,7 @@ fun UserComponent(
                                         padding = standardPadding * 2,
                                     ) { index, item ->
                                         val navController = NavControllerAmbient.current
-                                        if (!timelineLoadingMore && index == mediaTimeline.size - 1) {
+                                        if (!timelineLoadingMore && index == mediaTimeline.lastIndex) {
                                             coroutineScope.launch {
                                                 timelineViewModel.loadMore(user)
                                             }
@@ -310,13 +310,13 @@ fun UserComponent(
                                 if (favourite.any()) {
                                     itemsIndexed(favourite) { index, item ->
                                         Column {
-                                            if (!timelineLoadingMore && index == favourite.size - 1) {
+                                            if (!timelineLoadingMore && index == favourite.lastIndex) {
                                                 coroutineScope.launch {
                                                     favouriteViewModel.loadMore(user)
                                                 }
                                             }
                                             TimelineStatusComponent(item)
-                                            if (index != favourite.size - 1) {
+                                            if (index != favourite.lastIndex) {
                                                 StatusDivider()
                                             }
                                         }

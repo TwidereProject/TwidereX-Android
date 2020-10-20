@@ -42,7 +42,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             window.setDecorFitsSystemWindows(false)
-            rootView.setOnApplyWindowInsetsListener { view, insets ->
+            rootView.setOnApplyWindowInsetsListener { _, insets ->
                 val systemInsets = insets.getInsets(WindowInsets.Type.systemBars())
                 rootView.updateLayoutParams<ViewGroup.MarginLayoutParams> {
                     updateMargins(systemInsets)

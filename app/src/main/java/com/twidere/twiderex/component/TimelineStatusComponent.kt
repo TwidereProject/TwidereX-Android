@@ -58,6 +58,7 @@ import androidx.compose.ui.viewinterop.viewModel
 import com.twidere.twiderex.R
 import com.twidere.twiderex.extensions.NavControllerAmbient
 import com.twidere.twiderex.extensions.humanizedTimestamp
+import com.twidere.twiderex.fragment.ComposeFragmentArgs
 import com.twidere.twiderex.fragment.StatusFragmentArgs
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.ui.mediumEmphasisContentContentColor
@@ -68,6 +69,7 @@ import com.twidere.twiderex.viewmodel.StatusActionsViewModel
 @Composable
 fun TimelineStatusComponent(
     data: UiStatus,
+    showActions: Boolean = true,
 ) {
     val actionsViewModel = viewModel<StatusActionsViewModel>()
     Column {
@@ -98,41 +100,48 @@ fun TimelineStatusComponent(
             }
             StatusComponent(
                 status = status,
-                showActions = true,
+                showActions = showActions,
             )
-            Spacer(modifier = Modifier.height(standardPadding))
-            Row {
-                Spacer(modifier = Modifier.width(profileImageSize))
-                StatusActionButton(
-                    icon = Icons.Default.Reply,
-                    count = status.replyCount,
-                    onClick = {},
-                )
-                StatusActionButton(
-                    icon = Icons.Default.Comment,
-                    count = status.retweetCount,
-                    colored = status.retweeted,
-                    color = MaterialTheme.colors.primary,
-                    onClick = {
-                        actionsViewModel.retweet(status)
-                    },
-                )
-                StatusActionButton(
-                    icon = Icons.Default.Favorite,
-                    count = status.likeCount,
-                    colored = status.liked,
-                    color = Color.Red,
-                    onClick = {
-                        actionsViewModel.like(status)
-                    },
-                )
-                TextButton(
-                    onClick = {},
-                    contentColor = mediumEmphasisContentContentColor,
-                ) {
-                    Icon(
-                        asset = Icons.Default.Share,
+            if (showActions) {
+                Spacer(modifier = Modifier.height(standardPadding))
+                Row {
+                    Spacer(modifier = Modifier.width(profileImageSize))
+                    StatusActionButton(
+                        icon = Icons.Default.Reply,
+                        count = status.replyCount,
+                        onClick = {
+                            navController.navigate(
+                                R.id.compose_fragment,
+                                ComposeFragmentArgs(status).toBundle()
+                            )
+                        },
                     )
+                    StatusActionButton(
+                        icon = Icons.Default.Comment,
+                        count = status.retweetCount,
+                        colored = status.retweeted,
+                        color = MaterialTheme.colors.primary,
+                        onClick = {
+                            actionsViewModel.retweet(status)
+                        },
+                    )
+                    StatusActionButton(
+                        icon = Icons.Default.Favorite,
+                        count = status.likeCount,
+                        colored = status.liked,
+                        color = Color.Red,
+                        onClick = {
+                            actionsViewModel.like(status)
+                        },
+                    )
+                    TextButton(
+                        onClick = {},
+                        contentColor = mediumEmphasisContentContentColor,
+                    ) {
+                        Icon(
+                            asset = Icons.Default.Share,
+                        )
+                    }
                 }
             }
             Spacer(modifier = Modifier.height(standardPadding))

@@ -58,12 +58,12 @@ fun <T> LazyListScope.itemsGridIndexed(
                     Box(modifier = Modifier.weight(1f)) {
                         itemContent(data.indexOf(item), item)
                     }
-                    if (i != row.size - 1) {
+                    if (i != row.lastIndex) {
                         Spacer(modifier = Modifier.width(spacing))
                     }
                 }
             }
-            if (index != rows.size - 1) {
+            if (index != rows.lastIndex) {
                 Spacer(modifier = Modifier.height(spacing))
             }
         }

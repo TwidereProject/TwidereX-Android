@@ -58,7 +58,7 @@ class PagerState<T>(
             _currentPage = _currentPage.coerceIn(_minPage, _maxPage)
         }
 
-    private var _maxPage by mutableStateOf(items.size - 1, structuralEqualityPolicy())
+    private var _maxPage by mutableStateOf(items.lastIndex, structuralEqualityPolicy())
     var maxPage: Int
         get() = _maxPage
         set(value) {
@@ -66,7 +66,7 @@ class PagerState<T>(
             _currentPage = _currentPage.coerceIn(_minPage, maxPage)
         }
 
-    private var _currentPage by mutableStateOf(currentPage.coerceIn(0, items.size - 1))
+    private var _currentPage by mutableStateOf(currentPage.coerceIn(0, items.lastIndex))
     var currentPage: Int
         get() = _currentPage
         set(value) {

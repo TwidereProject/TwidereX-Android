@@ -79,7 +79,7 @@ fun TimelineComponent(viewModel: TimelineViewModel) {
                 state = listState,
             ) { index, item ->
                 Column {
-                    if (!loadingMore && index == items.size - 1) {
+                    if (!loadingMore && index == items.lastIndex) {
                         scope.launch {
                             viewModel.loadMore()
                         }
@@ -87,7 +87,7 @@ fun TimelineComponent(viewModel: TimelineViewModel) {
                     TimelineStatusComponent(
                         item,
                     )
-                    if (index != items.size - 1) {
+                    if (index != items.lastIndex) {
                         when {
                             loadingBetween.contains(item.statusId) -> {
                                 LoadingProgress()
@@ -115,7 +115,7 @@ fun TimelineComponent(viewModel: TimelineViewModel) {
                             }
                         }
                     }
-                    if (loadingMore && index == items.size - 1) {
+                    if (loadingMore && index == items.lastIndex) {
                         LoadingProgress()
                     }
                 }
