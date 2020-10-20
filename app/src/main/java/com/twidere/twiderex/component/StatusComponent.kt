@@ -132,7 +132,6 @@ fun ExpandedStatusComponent(
                     StatusStatistics(count = data.likeCount.toString(), text = "likes")
                 }
             }
-
         }
 
         if (showActions) {

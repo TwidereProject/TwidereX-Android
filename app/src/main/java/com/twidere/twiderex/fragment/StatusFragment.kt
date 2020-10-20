@@ -122,7 +122,6 @@ class StatusFragment : JetFragment() {
                         Box(
                             modifier = Modifier.fillParentMaxSize()
                         ) {
-
                         }
                     }
                 }

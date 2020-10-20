@@ -197,7 +197,7 @@ class ComposeFragment : JetFragment() {
                                             keyboardController.value = it
                                         },
                                         onClicked = {
-                                            //TODO: scroll lazyColumn
+                                            // TODO: scroll lazyColumn
                                         }
                                     )
                                 }
@@ -208,9 +208,11 @@ class ComposeFragment : JetFragment() {
                 Divider()
                 Box {
                     Row {
-                        IconButton(onClick = {
-                            openImagePicker()
-                        }) {
+                        IconButton(
+                            onClick = {
+                                openImagePicker()
+                            }
+                        ) {
                             Icon(asset = Icons.Default.Camera)
                         }
                         IconButton(onClick = {}) {
@@ -237,7 +239,7 @@ class ComposeFragment : JetFragment() {
 
     private val openImagePicker =
         registerForActivityResult(ActivityResultContracts.GetMultipleContents()) {
-            //TODO: show images
+            // TODO: show images
         }
 
     private fun openImagePicker() {
