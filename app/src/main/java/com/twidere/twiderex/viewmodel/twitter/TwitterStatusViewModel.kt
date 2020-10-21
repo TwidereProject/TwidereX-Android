@@ -39,6 +39,8 @@ class TwitterStatusViewModel @ViewModelInject constructor(
     private val accountRepository: AccountRepository,
     private val factory: TwitterConversationRepository.AssistedFactory,
 ) : ViewModel() {
+    private lateinit var targetTweet: StatusV2
+    private var nextPage: String? = null
     private val repository = accountRepository.getCurrentAccount().let { accountDetails ->
         accountDetails.service.let {
             factory.create(accountDetails.key, it as SearchService, it as LookupService)
@@ -81,7 +83,7 @@ class TwitterStatusViewModel @ViewModelInject constructor(
         loadingMore.postValue(true)
         val tweet = repository.loadTweet(data)
         val ui = repository.toUiStatus(tweet)
-        val targetTweet =
+        targetTweet =
             tweet.referencedTweets?.firstOrNull { it.type == ReferencedTweetType.retweeted }?.status
                 ?: tweet
         status.postValue(ui)
@@ -91,9 +93,21 @@ class TwitterStatusViewModel @ViewModelInject constructor(
             loadingPrevious.postValue(false)
         }
         async {
-            val list = repository.loadConversation(targetTweet)
-            conversations.addAll(list)
+            val result = repository.loadConversation(targetTweet)
+            nextPage = result.nextPage
+            conversations.addAll(result.result)
             loadingMore.postValue(false)
         }
+    }
+
+    suspend fun loadMore() {
+        if (nextPage == null || loadingMore.value == true) {
+            return
+        }
+        loadingMore.postValue(true)
+        val result = repository.loadConversation(targetTweet, nextPage = nextPage)
+        nextPage = result.nextPage
+        conversations.addAll(result.result)
+        loadingMore.postValue(false)
     }
 }

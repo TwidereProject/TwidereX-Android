@@ -33,6 +33,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedTask
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.viewModel
 import androidx.navigation.fragment.navArgs
@@ -47,6 +48,7 @@ import com.twidere.twiderex.component.loading
 import com.twidere.twiderex.ui.standardPadding
 import com.twidere.twiderex.viewmodel.twitter.TwitterStatusViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class StatusFragment : JetFragment() {
@@ -62,6 +64,7 @@ class StatusFragment : JetFragment() {
         val status by viewModel.status.observeAsState(initial = args.status)
         val moreConversations by viewModel.moreConversations.observeAsState(initial = emptyList())
         val previousConversations by viewModel.previousConversations.observeAsState(initial = emptyList())
+        val scope = rememberCoroutineScope()
 
         LaunchedTask {
             viewModel.init(args.status)
@@ -136,15 +139,15 @@ class StatusFragment : JetFragment() {
                             if (index != moreConversations.lastIndex || loadingMore) {
                                 StatusDivider()
                             }
+                            if (index == moreConversations.lastIndex && !loadingMore) {
+                                scope.launch {
+                                    viewModel.loadMore()
+                                }
+                            }
                         }
                     }
                     if (loadingMore) {
                         loading()
-                    }
-                    item {
-                        Box(
-                            modifier = Modifier.fillParentMaxSize()
-                        )
                     }
                 }
             }
