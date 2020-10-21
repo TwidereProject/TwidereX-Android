@@ -111,32 +111,31 @@ fun ExpandedStatusComponent(
                 )
             }
 
-            Spacer(modifier = Modifier.height(standardPadding))
-
-            Row(
-                modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-            ) {
-                if (data.replyCount > 0) {
-                    StatusStatistics(count = data.replyCount.toString(), text = "reply")
-                    Spacer(modifier = Modifier.width(standardPadding * 2))
-                }
-                if (data.retweetCount > 0) {
-                    StatusStatistics(
-                        count = data.retweetCount.toString(),
-                        text = "retweets"
-                    )
-                    Spacer(modifier = Modifier.width(standardPadding * 2))
-                }
-                if (data.likeCount > 0) {
-                    StatusStatistics(count = data.likeCount.toString(), text = "likes")
+            if (data.replyCount > 0 || data.retweetCount > 0 || data.likeCount > 0) {
+                Spacer(modifier = Modifier.height(standardPadding))
+                Row(
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                ) {
+                    if (data.replyCount > 0) {
+                        StatusStatistics(count = data.replyCount.toString(), text = "reply")
+                        Spacer(modifier = Modifier.width(standardPadding * 2))
+                    }
+                    if (data.retweetCount > 0) {
+                        StatusStatistics(
+                            count = data.retweetCount.toString(),
+                            text = "retweets"
+                        )
+                        Spacer(modifier = Modifier.width(standardPadding * 2))
+                    }
+                    if (data.likeCount > 0) {
+                        StatusStatistics(count = data.likeCount.toString(), text = "likes")
+                    }
                 }
             }
         }
 
         if (showActions) {
-            Spacer(modifier = Modifier.height(standardPadding))
-
             ProvideEmphasis(emphasis = AmbientEmphasisLevels.current.medium) {
                 Row {
                     Spacer(modifier = Modifier.weight(1f))
@@ -171,7 +170,10 @@ private fun StatusComponent(
             Row(
                 modifier = Modifier.clickable(
                     onClick = {
-                        navController.navigate(R.id.user_fragment, UserFragmentArgs(status.user).toBundle())
+                        navController.navigate(
+                            R.id.user_fragment,
+                            UserFragmentArgs(status.user).toBundle()
+                        )
                     }
                 )
             ) {
@@ -217,7 +219,6 @@ private fun StatusComponent(
                         )
                         .clip(RoundedCornerShape(8.dp))
                 ) {
-                    val navController = NavControllerAmbient.current
                     StatusComponent(
                         status = status.quote,
                         showActions = false,
