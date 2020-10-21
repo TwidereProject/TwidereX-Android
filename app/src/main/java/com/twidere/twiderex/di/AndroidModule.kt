@@ -23,6 +23,7 @@ package com.twidere.twiderex.di
 import android.accounts.AccountManager
 import android.content.Context
 import android.content.SharedPreferences
+import android.location.LocationManager
 import androidx.room.Room
 import com.twidere.twiderex.db.AppDatabase
 import com.twidere.twiderex.db.CacheDatabase
@@ -55,4 +56,8 @@ object AndroidModule {
     fun provideCacheAppDatabase(@ApplicationContext context: Context): CacheDatabase =
         Room.inMemoryDatabaseBuilder(context, CacheDatabase::class.java)
             .build()
+
+    @Provides
+    fun provideLocationManager(@ApplicationContext context: Context): LocationManager =
+        context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
 }

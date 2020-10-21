@@ -57,7 +57,7 @@ abstract class TimelineViewModel(
     }
 
     suspend fun loadMore() {
-        if (!hasMore) {
+        if (!hasMore || loadingMore.value == true) {
             return
         }
         loadingMore.postValue(true)
