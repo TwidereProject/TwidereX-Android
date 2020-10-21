@@ -34,34 +34,50 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
+    private var ignoreWindowInsets = false
     val rootView: FragmentContainerView by lazy {
         findViewById(R.id.nav_host_fragment)
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             window.setDecorFitsSystemWindows(false)
             rootView.setOnApplyWindowInsetsListener { _, insets ->
-                val systemInsets = insets.getInsets(WindowInsets.Type.systemBars())
-                rootView.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-                    updateMargins(systemInsets)
+                if (!ignoreWindowInsets) {
+                    val systemInsets =
+                        insets.getInsets(WindowInsets.Type.ime() or WindowInsets.Type.systemBars())
+                    rootView.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                        updateMargins(systemInsets)
+                    }
                 }
                 insets
             }
             rootView.setWindowInsetsAnimationCallback(object :
-                    WindowInsetsAnimation.Callback(DISPATCH_MODE_STOP) {
-                    override fun onProgress(
-                        insets: WindowInsets,
-                        animations: MutableList<WindowInsetsAnimation>
-                    ): WindowInsets {
-                        val systemInsets = insets.getInsets(WindowInsets.Type.ime() or WindowInsets.Type.systemBars())
-                        rootView.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-                            updateMargins(systemInsets)
-                        }
-                        return insets
+                WindowInsetsAnimation.Callback(DISPATCH_MODE_STOP) {
+                override fun onPrepare(animation: WindowInsetsAnimation) {
+                    super.onPrepare(animation)
+                    ignoreWindowInsets = true
+                }
+
+                override fun onEnd(animation: WindowInsetsAnimation) {
+                    super.onEnd(animation)
+                    ignoreWindowInsets = false
+                }
+
+                override fun onProgress(
+                    insets: WindowInsets,
+                    animations: MutableList<WindowInsetsAnimation>
+                ): WindowInsets {
+                    val systemInsets =
+                        insets.getInsets(WindowInsets.Type.ime() or WindowInsets.Type.systemBars())
+                    rootView.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                        updateMargins(systemInsets)
                     }
-                })
+                    return insets
+                }
+            })
         } else {
             window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
         }
