@@ -116,6 +116,7 @@ fun TimelineComponent(viewModel: TimelineViewModel) {
                         }
                     }
                     if (loadingMore && index == items.lastIndex) {
+                        StatusDivider()
                         LoadingProgress()
                     }
                 }

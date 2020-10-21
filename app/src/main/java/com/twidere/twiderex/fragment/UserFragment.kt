@@ -331,6 +331,7 @@ fun UserComponent(
                                     2 -> if (favourite.any()) Modifier.fillParentMaxWidth() else Modifier.fillParentMaxSize()
                                     else -> Modifier.fillParentMaxWidth()
                                 }
+                                StatusDivider()
                                 Box(
                                     modifier = modifier,
                                     alignment = Alignment.TopCenter

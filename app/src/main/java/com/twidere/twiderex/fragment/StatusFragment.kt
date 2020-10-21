@@ -102,7 +102,13 @@ class StatusFragment : JetFragment() {
                         StatusDivider()
                     }
                     item {
-                        Column {
+                        Column(
+                            modifier = if (moreConversations.any()) {
+                                Modifier
+                            } else {
+                                Modifier.fillParentMaxHeight()
+                            }
+                        ) {
                             StatusLineComponent(
                                 lineUp = previousConversations.any(),
                             ) {
@@ -117,8 +123,17 @@ class StatusFragment : JetFragment() {
                     }
                     if (moreConversations.any()) {
                         itemsIndexed(moreConversations) { index, item ->
-                            TimelineStatusComponent(data = item)
-                            if (index != moreConversations.lastIndex) {
+                            val modifier = if (!loadingMore && index == moreConversations.lastIndex) {
+                                Modifier.fillParentMaxHeight()
+                            } else {
+                                Modifier
+                            }
+                            Box(
+                                modifier = modifier
+                            ) {
+                                TimelineStatusComponent(data = item)
+                            }
+                            if (index != moreConversations.lastIndex || loadingMore) {
                                 StatusDivider()
                             }
                         }
