@@ -41,6 +41,7 @@ import com.twidere.twiderex.component.AppBarNavigationButton
 import com.twidere.twiderex.component.ExpandedStatusComponent
 import com.twidere.twiderex.component.LoadingProgress
 import com.twidere.twiderex.component.StatusDivider
+import com.twidere.twiderex.component.StatusLineComponent
 import com.twidere.twiderex.component.TimelineStatusComponent
 import com.twidere.twiderex.component.loading
 import com.twidere.twiderex.ui.standardPadding
@@ -92,16 +93,23 @@ class StatusFragment : JetFragment() {
                     state = rememberLazyListState(initialFirstVisibleItemIndex = previousConversations.size)
                 ) {
                     itemsIndexed(previousConversations) { index, item ->
-                        TimelineStatusComponent(data = item)
-                        if (index != moreConversations.lastIndex) {
-                            StatusDivider()
+                        StatusLineComponent(
+                            lineUp = index != 0,
+                            lineDown = true,
+                        ) {
+                            TimelineStatusComponent(data = item)
                         }
+                        StatusDivider()
                     }
                     item {
                         Column {
-                            ExpandedStatusComponent(
-                                status = status,
-                            )
+                            StatusLineComponent(
+                                lineUp = previousConversations.any(),
+                            ) {
+                                ExpandedStatusComponent(
+                                    status = status,
+                                )
+                            }
                             Divider(
                                 modifier = Modifier.padding(horizontal = standardPadding * 2)
                             )
@@ -121,8 +129,7 @@ class StatusFragment : JetFragment() {
                     item {
                         Box(
                             modifier = Modifier.fillParentMaxSize()
-                        ) {
-                        }
+                        )
                     }
                 }
             }

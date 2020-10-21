@@ -73,7 +73,7 @@ fun StatusLineComponent(
             Box(
                 modifier = Modifier
                     .matchParentSize()
-                    .offset(y = (-1).dp)
+                    .offset(y = (-2).dp)
                     .padding(
                         start = startPadding,
                     )
@@ -81,7 +81,7 @@ fun StatusLineComponent(
                 Box(
                     modifier = Modifier
                         .width(statusLineWidth)
-                        .height(topPoint + 1.dp)
+                        .height(topPoint + 2.dp)
                         .align(Alignment.TopStart)
                         .background(lineColor)
 
