@@ -73,7 +73,7 @@ class TwitterStatusViewModel @ViewModelInject constructor(
     private val previous = arrayListOf<StatusV2>()
 
     suspend fun init(data: UiStatus) = coroutineScope {
-        if (conversations.any()) {
+        if (conversations.any() || previous.any() || loadingPrevious.value == true || loadingMore.value == true) {
             return@coroutineScope
         }
         status.postValue(data)
