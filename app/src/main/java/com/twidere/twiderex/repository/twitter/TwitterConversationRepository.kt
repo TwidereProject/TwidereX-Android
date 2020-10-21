@@ -39,6 +39,11 @@ import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.model.ui.UiStatus.Companion.toUi
 import javax.inject.Singleton
 
+data class ConversationResult(
+    val result: List<StatusV2>,
+    val nextPage: String?,
+)
+
 @Singleton
 class TwitterConversationRepository @AssistedInject constructor(
     private val database: AppDatabase,
@@ -108,24 +113,18 @@ class TwitterConversationRepository @AssistedInject constructor(
             }
     }
 
-    suspend fun loadConversation(tweet: StatusV2): List<StatusV2> {
-        val conversationId = tweet.conversationID ?: return emptyList()
+    suspend fun loadConversation(tweet: StatusV2, nextPage: String? = null): ConversationResult {
+        val conversationId = tweet.conversationID ?: return ConversationResult(emptyList(), null)
         val searchResponse = searchService.searchTweets(
             "conversation_id:$conversationId",
             count = defaultLoadCount,
+            nextPage = nextPage
         ) as TwitterSearchResponseV2
-        val status = (
-            (searchResponse.includes?.tweets ?: emptyList()) + (
-                searchResponse.data
-                    ?: emptyList()
-                )
-            ).distinctBy {
-            it.id
-        }
-        val result = buildConversation(tweet, status.distinctBy { it.id })
+        val status = searchResponse.data ?: emptyList()
+        val result = buildConversation(tweet, status)
         val db = result.flatten().map { it.toDbTimeline(userKey, TimelineType.Conversation) }
         saveData(db)
-        return result.flatten()
+        return ConversationResult(result.flatten(), searchResponse.nextPage)
     }
 
     private suspend fun saveData(timeline: List<DbTimelineWithStatus>) {
