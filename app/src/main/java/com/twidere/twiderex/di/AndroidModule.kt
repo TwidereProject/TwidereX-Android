@@ -27,6 +27,7 @@ import android.location.LocationManager
 import androidx.room.Room
 import com.twidere.twiderex.db.AppDatabase
 import com.twidere.twiderex.db.CacheDatabase
+import com.twidere.twiderex.utils.ComposeQueue
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -60,4 +61,10 @@ object AndroidModule {
     @Provides
     fun provideLocationManager(@ApplicationContext context: Context): LocationManager =
         context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+
+    @Singleton
+    @Provides
+    fun provideComposeQueue(@ApplicationContext context: Context): ComposeQueue {
+        return ComposeQueue(context = context)
+    }
 }

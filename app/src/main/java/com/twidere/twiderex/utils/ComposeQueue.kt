@@ -20,19 +20,32 @@
  */
 package com.twidere.twiderex.utils
 
-import com.twidere.services.microblog.StatusService
+import android.content.Context
+import android.net.Uri
+import com.twidere.services.twitter.TwitterService
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import java.io.File
 
-object ComposeQueue {
+class ComposeQueue(
+    private val context: Context,
+) {
     fun commit(
-        service: StatusService,
+        service: TwitterService,
         content: String,
-        vararg images: File,
+        images: List<Uri>,
     ) {
         GlobalScope.launch {
-            service.compose(content)
+            val mediaIds = arrayListOf<String>()
+            images.forEach { uri ->
+                val contentResolver = context.contentResolver
+                val type = contentResolver.getType(uri)
+                val size = contentResolver.openFileDescriptor(uri, "r")?.statSize
+                val id = contentResolver.openInputStream(uri)?.use {
+                    service.uploadFile(it, type ?: "image/*", size ?: it.available().toLong())
+                } ?: throw Error()
+                mediaIds.add(id)
+            }
+            service.update(content, media_ids = mediaIds)
 //            val picIds = images.mapNotNull { Api.uploadPic(it).picId }
         }
     }

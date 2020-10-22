@@ -41,5 +41,13 @@ interface StatusResources {
     @POST("/1.1/statuses/update.json")
     suspend fun update(
         @Query("status") status: String,
+        @Query("in_reply_to_status_id") in_reply_to_status_id: String? = null,
+        @Query("repost_status_id") repost_status_id: String? = null,
+        @Query("display_coordinates") display_coordinates: Boolean? = null,
+        @Query("lat") lat: Long? = null,
+        @Query("long") long: Long? = null,
+        @Query("media_ids") media_ids: String? = null,
+        @Query("attachment_url") attachment_url: String? = null,
+        @Query("possibly_sensitive") possibly_sensitive: Boolean? = null,
     ): Status
 }

@@ -33,6 +33,7 @@ import com.twidere.services.microblog.model.IStatus
 import com.twidere.services.microblog.model.MicroBlogError
 import com.twidere.services.microblog.model.Relationship
 import com.twidere.services.twitter.api.TwitterResources
+import com.twidere.services.twitter.api.UploadResources
 import com.twidere.services.twitter.model.StatusV2
 import com.twidere.services.twitter.model.TwitterSearchResponseV2
 import com.twidere.services.twitter.model.UserV2
@@ -42,8 +43,13 @@ import com.twidere.services.twitter.model.fields.PlaceFields
 import com.twidere.services.twitter.model.fields.PollFields
 import com.twidere.services.twitter.model.fields.TweetFields
 import com.twidere.services.twitter.model.fields.UserFields
+import com.twidere.services.utils.Base64
+import com.twidere.services.utils.copyToInLength
+import java.io.ByteArrayOutputStream
+import java.io.InputStream
 
 internal const val TWITTER_BASE_URL = "https://api.twitter.com/"
+internal const val UPLOAD_TWITTER_BASE_URL = "https://upload.twitter.com/"
 
 class TwitterService(
     private val consumer_key: String,
@@ -59,6 +65,17 @@ class TwitterService(
     private val resources by lazy {
         retrofit<TwitterResources>(
             TWITTER_BASE_URL,
+            OAuth1Authorization(
+                consumer_key,
+                consumer_secret,
+                access_token,
+                access_token_secret,
+            ),
+        )
+    }
+    private val uploadResources by lazy {
+        retrofit<UploadResources>(
+            UPLOAD_TWITTER_BASE_URL,
             OAuth1Authorization(
                 consumer_key,
                 consumer_secret,
@@ -239,5 +256,49 @@ class TwitterService(
 
     override suspend fun unRetweet(id: String) = resources.unretweet(id)
 
-    override suspend fun compose(content: String) = resources.update(content)
+    override suspend fun compose(content: String) = update(content)
+
+    private val BULK_SIZE: Long = 512 * 1024 // 512 Kib
+
+    suspend fun update(
+        status: String,
+        in_reply_to_status_id: String? = null,
+        repost_status_id: String? = null,
+        display_coordinates: Boolean? = null,
+        lat: Long? = null,
+        long: Long? = null,
+        media_ids: List<String>? = null,
+        attachment_url: String? = null,
+        possibly_sensitive: Boolean? = null,
+    ) = resources.update(
+        status = status,
+        in_reply_to_status_id = in_reply_to_status_id,
+        repost_status_id = repost_status_id,
+        display_coordinates = display_coordinates,
+        lat = lat,
+        long = long,
+        media_ids = media_ids?.joinToString(","),
+        attachment_url = attachment_url,
+        possibly_sensitive = possibly_sensitive,
+    )
+
+    suspend fun uploadFile(stream: InputStream, type: String, length: Long): String {
+        val response =
+            uploadResources.initUpload(type, length)
+        val mediaId = response.mediaIDString ?: throw Error()
+        var streamReadLength = 0
+        var segmentIndex = 0L
+        while (streamReadLength < length) {
+            val currentBulkSize = BULK_SIZE.coerceAtMost(length - streamReadLength).toInt()
+            ByteArrayOutputStream().use { output ->
+                stream.copyToInLength(output, currentBulkSize)
+                val data = Base64.encodeToString(output.toByteArray(), Base64.DEFAULT)
+                uploadResources.appendUpload(mediaId, segmentIndex, data)
+            }
+            segmentIndex++
+            streamReadLength += currentBulkSize
+        }
+
+        return uploadResources.finalizeUpload(mediaId).mediaIDString ?: throw Error()
+    }
 }

@@ -30,7 +30,7 @@ import androidx.annotation.RequiresPermission
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.twidere.services.microblog.StatusService
+import com.twidere.services.twitter.TwitterService
 import com.twidere.twiderex.extensions.getCachedLocation
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.utils.ComposeQueue
@@ -38,16 +38,17 @@ import com.twidere.twiderex.utils.ComposeQueue
 class ComposeViewModel @ViewModelInject constructor(
     private val repository: AccountRepository,
     private val locationManager: LocationManager,
+    private val composeQueue: ComposeQueue,
 ) : ViewModel(), LocationListener {
     private val service by lazy {
-        repository.getCurrentAccount().service as StatusService
+        repository.getCurrentAccount().service as TwitterService
     }
     val images = MutableLiveData<List<Uri>>(emptyList())
     val location = MutableLiveData<Location>()
     val locationEnabled = MutableLiveData(false)
 
     fun compose(content: String) {
-        ComposeQueue.commit(service, content)
+        composeQueue.commit(service, content, images = images.value ?: emptyList())
     }
 
     fun putImages(value: List<Uri>) {
