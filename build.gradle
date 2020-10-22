@@ -29,6 +29,13 @@ subprojects {
             ktlint(versions.ktlint)
             licenseHeaderFile rootProject.file('spotless/license.kt')
         }
+        java {
+            target '**/*.java'
+            targetExclude("$buildDir/**/*.java")
+            targetExclude('bin/**/*.java')
+
+            licenseHeaderFile rootProject.file('spotless/license.kt')
+        }
     }
 }
 
