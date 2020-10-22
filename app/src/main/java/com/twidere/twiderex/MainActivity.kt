@@ -55,29 +55,29 @@ class MainActivity : AppCompatActivity() {
                 insets
             }
             rootView.setWindowInsetsAnimationCallback(object :
-                WindowInsetsAnimation.Callback(DISPATCH_MODE_STOP) {
-                override fun onPrepare(animation: WindowInsetsAnimation) {
-                    super.onPrepare(animation)
-                    ignoreWindowInsets = true
-                }
-
-                override fun onEnd(animation: WindowInsetsAnimation) {
-                    super.onEnd(animation)
-                    ignoreWindowInsets = false
-                }
-
-                override fun onProgress(
-                    insets: WindowInsets,
-                    animations: MutableList<WindowInsetsAnimation>
-                ): WindowInsets {
-                    val systemInsets =
-                        insets.getInsets(WindowInsets.Type.ime() or WindowInsets.Type.systemBars())
-                    rootView.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-                        updateMargins(systemInsets)
+                    WindowInsetsAnimation.Callback(DISPATCH_MODE_STOP) {
+                    override fun onPrepare(animation: WindowInsetsAnimation) {
+                        super.onPrepare(animation)
+                        ignoreWindowInsets = true
                     }
-                    return insets
-                }
-            })
+
+                    override fun onEnd(animation: WindowInsetsAnimation) {
+                        super.onEnd(animation)
+                        ignoreWindowInsets = false
+                    }
+
+                    override fun onProgress(
+                        insets: WindowInsets,
+                        animations: MutableList<WindowInsetsAnimation>
+                    ): WindowInsets {
+                        val systemInsets =
+                            insets.getInsets(WindowInsets.Type.ime() or WindowInsets.Type.systemBars())
+                        rootView.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                            updateMargins(systemInsets)
+                        }
+                        return insets
+                    }
+                })
         } else {
             window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
         }

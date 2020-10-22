@@ -85,7 +85,7 @@ class TwitterStatusViewModel @ViewModelInject constructor(
         val ui = repository.toUiStatus(tweet)
         targetTweet =
             tweet.referencedTweets?.firstOrNull { it.type == ReferencedTweetType.retweeted }?.status
-                ?: tweet
+            ?: tweet
         status.postValue(ui)
         async {
             val list = repository.loadPrevious(targetTweet)

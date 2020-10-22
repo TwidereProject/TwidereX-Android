@@ -102,7 +102,6 @@ class ComposeFragment : JetFragment() {
     override fun onCompose() {
         val (textState, setTextState) = remember { mutableStateOf(TextFieldValue()) }
         val activeAccountViewModel = viewModel<ActiveAccountViewModel>()
-//        val viewModel = viewModel<ComposeViewModel>()
         val images by viewModel.images.observeAsState(initial = emptyList())
         val account by activeAccountViewModel.account.observeAsState()
         val location by viewModel.location.observeAsState()
@@ -302,7 +301,6 @@ class ComposeFragment : JetFragment() {
             viewModel.putImages(it)
         }
 
-
     private val requestLocationPermission =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { map ->
             if (map.values.all { it }) {
@@ -332,7 +330,6 @@ class ComposeFragment : JetFragment() {
     private fun disableLocation() {
         viewModel.disableLocation()
     }
-
 
     private fun openImagePicker() {
         openImagePicker.launch("image/*")
