@@ -20,23 +20,81 @@
  */
 package com.twidere.twiderex.component.home
 
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Icon
+import androidx.compose.foundation.ProvideTextStyle
 import androidx.compose.foundation.Text
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.material.IconButton
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.graphics.vector.VectorAsset
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.TextFieldValue
+import com.twidere.twiderex.R
+import com.twidere.twiderex.component.AppBar
+import com.twidere.twiderex.component.TextInput
+import com.twidere.twiderex.extensions.NavControllerAmbient
 
 class SearchItem : HomeNavigationItem() {
     override val name: String
         get() = "Search"
     override val icon: VectorAsset
         get() = Icons.Default.Search
+    override val withAppBar: Boolean
+        get() = false
 
+    @OptIn(ExperimentalFoundationApi::class, ExperimentalFocus::class)
     @Composable
     override fun onCompose() {
-        Column {
-            Text(text = "Search")
+        val (textState, setTextState) = remember { mutableStateOf(TextFieldValue()) }
+        val navController = NavControllerAmbient.current
+        fun goSearch() {
+            navController.navigate(R.id.search_fragment)
+        }
+        Scaffold(
+            topBar = {
+                AppBar(
+                    title = {
+                        ProvideTextStyle(value = MaterialTheme.typography.body1) {
+                            Row {
+                                TextInput(
+                                    modifier = Modifier
+                                        .align(Alignment.CenterVertically)
+                                        .weight(1F),
+                                    value = textState,
+                                    onValueChange = {
+                                        setTextState(it)
+                                    },
+                                    placeholder = {
+                                        Text(text = "Tap to search...")
+                                    },
+                                    imeAction = ImeAction.Search,
+                                    alignment = Alignment.CenterStart,
+                                    onImeActionPerformed = { _, _ ->
+                                        goSearch()
+                                    }
+                                )
+                                IconButton(onClick = {
+                                    goSearch()
+                                }) {
+                                    Icon(asset = Icons.Default.Search)
+                                }
+                            }
+                        }
+                    }
+                )
+            }
+        ) {
+
         }
     }
 }

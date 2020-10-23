@@ -90,6 +90,7 @@ import com.twidere.twiderex.component.NetworkImage
 import com.twidere.twiderex.component.StatusDivider
 import com.twidere.twiderex.component.StatusMediaPreviewItem
 import com.twidere.twiderex.component.SwipeToRefreshLayout
+import com.twidere.twiderex.component.TabsComponent
 import com.twidere.twiderex.component.TimelineStatusComponent
 import com.twidere.twiderex.component.TopAppBarElevation
 import com.twidere.twiderex.component.UserAvatar
@@ -204,7 +205,7 @@ fun UserComponent(
                 Column {
                     appBar?.invoke()
                     if (shouldStickyHeaderShown) {
-                        UserTabsComponent(
+                        TabsComponent(
                             items = tabs,
                             selectedItem = selectedItem,
                             onItemSelected = {
@@ -245,7 +246,7 @@ fun UserComponent(
                         }
 
                         item {
-                            UserTabsComponent(
+                            TabsComponent(
                                 items = tabs,
                                 selectedItem = selectedItem,
                                 onItemSelected = {
@@ -505,45 +506,6 @@ private fun UserInfo(data: UiUser) {
                 }
             }
             Spacer(modifier = Modifier.height(standardPadding * 2))
-        }
-    }
-}
-
-@Composable
-private fun UserTabsComponent(
-    items: List<VectorAsset>,
-    selectedItem: Int,
-    onItemSelected: (Int) -> Unit,
-) {
-    Surface() {
-    }
-    TabRow(
-        selectedTabIndex = selectedItem,
-        backgroundColor = MaterialTheme.colors.surface.withElevation(),
-        indicator = { tabPositions ->
-            TabConstants.DefaultIndicator(
-                modifier = Modifier.defaultTabIndicatorOffset(tabPositions[selectedItem]),
-                color = MaterialTheme.colors.primary,
-            )
-        }
-    ) {
-        for (i in 0 until items.count()) {
-            Tab(
-                selected = selectedItem == i,
-                onClick = {
-                    onItemSelected(i)
-                },
-                selectedContentColor = MaterialTheme.colors.primary,
-                unselectedContentColor = AmbientEmphasisLevels.current.medium.applyEmphasis(
-                    AmbientContentColor.current
-                ),
-            ) {
-                Box(
-                    modifier = Modifier.padding(16.dp)
-                ) {
-                    Icon(asset = items[i])
-                }
-            }
         }
     }
 }

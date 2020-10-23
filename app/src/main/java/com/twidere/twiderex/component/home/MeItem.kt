@@ -36,7 +36,7 @@ class MeItem : HomeNavigationItem() {
         get() = "Me"
     override val icon: VectorAsset
         get() = Icons.Default.AccountCircle
-    override val withAppBarShadow: Boolean
+    override val withAppBar: Boolean
         get() = false
 
     @OptIn(IncomingComposeUpdate::class)

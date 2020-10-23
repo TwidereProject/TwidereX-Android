@@ -110,30 +110,32 @@ class HomeFragment : JetFragment() {
         Scaffold(
             scaffoldState = scaffoldState,
             topBar = {
-                AppBar(
-                    backgroundColor = MaterialTheme.colors.surface.withElevation(),
-                    title = {
-                        Text(text = menus[selectedItem].name)
-                    },
-                    navigationIcon = {
-                        IconButton(
-                            onClick = {
-                                if (scaffoldState.drawerState.isOpen) {
-                                    scaffoldState.drawerState.close()
-                                } else {
-                                    scaffoldState.drawerState.open()
+                if (menus[selectedItem].withAppBar) {
+                    AppBar(
+                        backgroundColor = MaterialTheme.colors.surface.withElevation(),
+                        title = {
+                            Text(text = menus[selectedItem].name)
+                        },
+                        navigationIcon = {
+                            IconButton(
+                                onClick = {
+                                    if (scaffoldState.drawerState.isOpen) {
+                                        scaffoldState.drawerState.close()
+                                    } else {
+                                        scaffoldState.drawerState.open()
+                                    }
                                 }
+                            ) {
+                                Icon(asset = Icons.Default.Menu)
                             }
-                        ) {
-                            Icon(asset = Icons.Default.Menu)
+                        },
+                        elevation = if (menus[selectedItem].withAppBar) {
+                            TopAppBarElevation
+                        } else {
+                            0.dp
                         }
-                    },
-                    elevation = if (menus[selectedItem].withAppBarShadow) {
-                        TopAppBarElevation
-                    } else {
-                        0.dp
-                    }
-                )
+                    )
+                }
             },
             bottomBar = {
                 BottomNavigation(menus, selectedItem) {

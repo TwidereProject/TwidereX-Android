@@ -76,4 +76,7 @@
             android:name="user"
             app:argType="com.twidere.twiderex.model.ui.UiUser" />
     </fragment>
+    <fragment
+        android:id="@+id/search_fragment"
+        android:name="com.twidere.twiderex.fragment.SearchFragment" />
 </navigation>

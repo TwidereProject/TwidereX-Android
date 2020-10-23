@@ -20,21 +20,28 @@
  */
 package com.twidere.twiderex.component
 
+import androidx.compose.foundation.AmbientTextStyle
 import androidx.compose.foundation.BaseTextField
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.AmbientEmphasisLevels
+import androidx.compose.material.ProvideEmphasis
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.onActive
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focusRequester
 import androidx.compose.ui.node.Ref
 import androidx.compose.ui.text.SoftwareKeyboardController
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 
 @ExperimentalFoundationApi
@@ -43,6 +50,12 @@ import androidx.compose.ui.text.input.TextFieldValue
 fun TextInput(
     autoFocus: Boolean = false,
     modifier: Modifier = Modifier,
+    textStyle: TextStyle = AmbientTextStyle.current,
+    placeholder: @Composable (() -> Unit)? = null,
+    keyboardType: KeyboardType = KeyboardType.Text,
+    alignment: Alignment = Alignment.TopStart,
+    imeAction: ImeAction = ImeAction.Unspecified,
+    onImeActionPerformed: (ImeAction, SoftwareKeyboardController?) -> Unit = { _, _ -> },
     value: TextFieldValue,
     onValueChange: (TextFieldValue) -> Unit,
     onTextInputStarted: ((SoftwareKeyboardController) -> Unit)? = null,
@@ -72,8 +85,15 @@ fun TextInput(
                 //  so that it can show or hide the keyboard based on the focus state.
                 keyboardController.value?.showSoftwareKeyboard()
             },
+        alignment = alignment,
     ) {
         BaseTextField(
+            textStyle = textStyle,
+            keyboardType = keyboardType,
+            imeAction = imeAction,
+            onImeActionPerformed = {
+                onImeActionPerformed(it, keyboardController.value)
+            },
             onTextInputStarted = {
                 keyboardController.value = it
                 onTextInputStarted?.invoke(it)
@@ -81,5 +101,10 @@ fun TextInput(
             value = value,
             onValueChange = onValueChange,
         )
+        if (value.text.isEmpty()) {
+            ProvideEmphasis(emphasis = AmbientEmphasisLevels.current.medium) {
+                placeholder?.invoke()
+            }
+        }
     }
 }
