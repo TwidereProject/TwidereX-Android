@@ -50,7 +50,7 @@ class TwitterWebSignInFragment : JetFragment() {
     override fun onCompose() {
         WebComponent(
             url = args.target,
-            onPageFinished = { view, url ->
+            onPageFinished = { view, _ ->
                 view.loadUrl(INJECT_CONTENT)
             },
             javascriptInterface = mapOf("injector" to this)

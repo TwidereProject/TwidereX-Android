@@ -25,12 +25,14 @@ import com.twidere.services.http.authorization.Authorization
 import com.twidere.services.serializer.DateQueryConverterFactory
 import com.twidere.services.utils.DEBUG
 import com.twidere.services.utils.JSON
+import kotlinx.serialization.ExperimentalSerializationApi
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.scalars.ScalarsConverterFactory
 
+@OptIn(ExperimentalSerializationApi::class)
 internal inline fun <reified T> retrofit(
     baseUrl: String,
     authorization: Authorization,

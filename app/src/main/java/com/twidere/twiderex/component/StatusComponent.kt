@@ -81,7 +81,6 @@ fun ExpandedStatusComponent(
         }
         StatusComponent(
             status = data,
-            showActions = true,
         )
 
         if (showInfo) {
@@ -162,7 +161,6 @@ fun ExpandedStatusComponent(
 private fun StatusComponent(
     status: UiStatus,
     modifier: Modifier = Modifier,
-    showActions: Boolean = true,
 ) {
     Box(modifier = modifier) {
         Column {
@@ -221,7 +219,6 @@ private fun StatusComponent(
                 ) {
                     StatusComponent(
                         status = status.quote,
-                        showActions = false,
                         modifier = Modifier
                             .clickable(
                                 onClick = {

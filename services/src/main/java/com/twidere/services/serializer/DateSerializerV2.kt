@@ -20,6 +20,7 @@
  */
 package com.twidere.services.serializer
 
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializer
 import kotlinx.serialization.descriptors.PrimitiveKind
@@ -32,6 +33,7 @@ import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
 
+@OptIn(ExperimentalSerializationApi::class)
 @Serializer(forClass = Date::class)
 internal object DateSerializerV2 : KSerializer<Date> {
     override val descriptor: SerialDescriptor

@@ -48,6 +48,7 @@ class LollipopFixWebView : WebView {
         defStyleRes: Int
     ) : super(context.fixForLollipop(), attrs, defStyleAttr, defStyleRes)
 
+    @Suppress("DEPRECATION")
     constructor(
         context: Context,
         attrs: AttributeSet?,

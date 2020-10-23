@@ -79,6 +79,7 @@ class MainActivity : AppCompatActivity() {
                     }
                 })
         } else {
+            @Suppress("DEPRECATION")
             window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
         }
     }

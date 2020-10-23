@@ -37,10 +37,10 @@ data class UserKey(
         return result
     }
 
-    override fun equals(o: Any?): Boolean {
-        if (this === o) return true
-        if (o == null || javaClass != o.javaClass) return false
-        val (id1, host1) = o as UserKey
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || javaClass != other.javaClass) return false
+        val (id1, host1) = other as UserKey
         return if (id != id1) false else !if (host.isNotEmpty()) host != host1 else host1.isNotEmpty()
     }
 

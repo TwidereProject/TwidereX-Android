@@ -1,25 +1,26 @@
-def versions = [:]
-versions.kotlin = "1.4.10"
-versions.compose = '1.0.0-alpha05'
-versions.retrofit2 = '2.9.0'
-versions.hilt = '2.28-alpha'
-versions.androidx_hilt = '1.0.0-alpha02'
-versions.room = '2.2.5'
-versions.lifecycle = '2.3.0-beta01'
-versions.okhttp = '4.8.1'
-versions.moshi = '1.9.3'
-versions.kotlinx_serialization = '1.0.0'
-versions.navigation = '2.3.1'
-versions.moshi = '1.9.3'
-versions.paging = '3.0.0-alpha06'
-versions.ktlint = '0.39.0'
-versions.assisted_inject = '0.6.0'
-ext.versions = versions
-def global = [:]
-global.compileSdkVersion = 30
-global.buildToolsVersion = '30.0.2'
-global.minSdkVersion = 21
-global.targetSdkVersion = 30
-global.versionCode = 1
-global.versionName = "1.0.0"
-ext.global = global
+ext {
+    versions = [
+            kotlin               : "1.4.10",
+            compose              : '1.0.0-alpha05',
+            retrofit2            : '2.9.0',
+            hilt                 : '2.28-alpha',
+            androidx_hilt        : '1.0.0-alpha02',
+            room                 : '2.2.5',
+            lifecycle            : '2.3.0-beta01',
+            okhttp               : '4.8.1',
+            moshi                : '1.9.3',
+            kotlinx_serialization: '1.0.0',
+            navigation           : '2.3.1',
+            paging               : '3.0.0-alpha06',
+            ktlint               : '0.39.0',
+            assisted_inject      : '0.6.0',
+    ]
+    global = [
+            compileSdkVersion: 30,
+            buildToolsVersion: '30.0.2',
+            minSdkVersion    : 21,
+            targetSdkVersion : 30,
+            versionCode      : 1,
+            versionName      : "1.0.0"
+    ]
+}

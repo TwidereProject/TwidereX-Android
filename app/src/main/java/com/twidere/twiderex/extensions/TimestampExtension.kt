@@ -30,6 +30,7 @@ private val prettyTime = PrettyTime(
     if (Build.VERSION.SDK_INT > Build.VERSION_CODES.N) {
         Resources.getSystem().configuration.locales[0]
     } else {
+        @Suppress("DEPRECATION")
         Resources.getSystem().configuration.locale
     }
 )

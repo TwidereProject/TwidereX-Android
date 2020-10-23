@@ -209,7 +209,7 @@ class TwitterService(
     }
 
     override suspend fun userPinnedStatus(userId: String): IStatus? {
-        val user = lookupUser(userId) ?: return null
+        val user = lookupUser(userId)
         return user.pinnedTweetID?.let { lookupStatus(it) }
     }
 

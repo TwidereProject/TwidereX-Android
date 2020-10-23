@@ -91,6 +91,7 @@ fun updateStatusBar(
             )
         } else {
             val decor = window.decorView
+            @Suppress("DEPRECATION")
             decor.systemUiVisibility = if (darkTheme) {
                 0
             } else {

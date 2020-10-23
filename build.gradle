@@ -19,6 +19,11 @@ plugins {
 }
 
 subprojects {
+    repositories {
+        google()
+        jcenter()
+    }
+
     apply plugin: 'com.diffplug.spotless'
     spotless {
         kotlin {
@@ -37,11 +42,15 @@ subprojects {
             licenseHeaderFile rootProject.file('spotless/license.kt')
         }
     }
-}
 
-allprojects {
-    repositories {
-        google()
-        jcenter()
+    tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
+        kotlinOptions {
+            // Treat all Kotlin warnings as errors
+            allWarningsAsErrors = true
+            // Set JVM target to 1.8
+            freeCompilerArgs += '-Xopt-in=kotlin.RequiresOptIn'
+            // Enable experimental coroutines APIs, including Flow
+            jvmTarget = "1.8"
+        }
     }
 }
