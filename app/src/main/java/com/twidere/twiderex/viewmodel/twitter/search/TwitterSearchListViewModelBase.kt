@@ -18,22 +18,22 @@
  *  You should have received a copy of the GNU General Public License
  *  along with TwidereX. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.services.microblog
+package com.twidere.twiderex.viewmodel.twitter.search
 
-import com.twidere.services.microblog.model.ISearchResponse
-import com.twidere.services.microblog.model.IUser
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 
-interface SearchService {
-    suspend fun searchTweets(
-        query: String,
-        count: Int = 20,
-        since_id: String? = null,
-        nextPage: String? = null,
-    ): ISearchResponse
+abstract class TwitterSearchListViewModelBase : ViewModel() {
+    protected var hasMore = true
+    val loadingMore = MutableLiveData(false)
+    val refreshing = MutableLiveData(false)
+    protected var keyword = ""
 
-    suspend fun searchUsers(
-        query: String,
-        page: Int? = null,
-        count: Int = 20,
-    ): List<IUser>
+    open fun reset(keyword: String) {
+        this.keyword = keyword
+    }
+
+    abstract suspend fun refresh()
+
+    abstract suspend fun loadMore()
 }

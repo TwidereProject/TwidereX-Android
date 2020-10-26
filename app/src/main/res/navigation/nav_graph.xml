@@ -68,6 +68,10 @@
             android:defaultValue="@null"
             app:argType="com.twidere.twiderex.model.ui.UiStatus"
             app:nullable="true" />
+        <argument
+            android:name="composeType"
+            android:defaultValue="New"
+            app:argType="com.twidere.twiderex.fragment.ComposeType" />
     </fragment>
     <fragment
         android:id="@+id/user_fragment"
@@ -78,5 +82,9 @@
     </fragment>
     <fragment
         android:id="@+id/search_fragment"
-        android:name="com.twidere.twiderex.fragment.SearchFragment" />
+        android:name="com.twidere.twiderex.fragment.SearchFragment">
+        <argument
+            android:name="keyword"
+            app:argType="string" />
+    </fragment>
 </navigation>

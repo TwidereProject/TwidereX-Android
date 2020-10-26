@@ -18,22 +18,11 @@
  *  You should have received a copy of the GNU General Public License
  *  along with TwidereX. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.services.microblog
+package com.twidere.twiderex.repository.twitter.model
 
-import com.twidere.services.microblog.model.ISearchResponse
-import com.twidere.services.microblog.model.IUser
+import com.twidere.services.twitter.model.StatusV2
 
-interface SearchService {
-    suspend fun searchTweets(
-        query: String,
-        count: Int = 20,
-        since_id: String? = null,
-        nextPage: String? = null,
-    ): ISearchResponse
-
-    suspend fun searchUsers(
-        query: String,
-        page: Int? = null,
-        count: Int = 20,
-    ): List<IUser>
-}
+data class SearchResult(
+    val result: List<StatusV2>,
+    val nextPage: String?,
+)

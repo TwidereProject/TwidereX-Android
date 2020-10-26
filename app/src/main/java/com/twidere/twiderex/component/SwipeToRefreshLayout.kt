@@ -23,8 +23,13 @@ package com.twidere.twiderex.component
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offsetPx
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.FractionalThreshold
+import androidx.compose.material.Surface
 import androidx.compose.material.rememberSwipeableState
 import androidx.compose.material.swipeable
 import androidx.compose.runtime.Composable
@@ -45,7 +50,15 @@ private val RefreshDistance = 80.dp
 fun SwipeToRefreshLayout(
     refreshingState: Boolean,
     onRefresh: () -> Unit,
-    refreshIndicator: @Composable () -> Unit,
+    refreshIndicator: @Composable () -> Unit = {
+        Surface(elevation = 10.dp, shape = CircleShape) {
+            CircularProgressIndicator(
+                modifier = Modifier
+                    .preferredSize(36.dp)
+                    .padding(4.dp)
+            )
+        }
+    },
     content: @Composable () -> Unit
 ) {
     val refreshDistance = with(DensityAmbient.current) { RefreshDistance.toPx() }

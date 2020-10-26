@@ -240,6 +240,9 @@ class TwitterService(
         return result
     }
 
+    override suspend fun searchUsers(query: String, page: Int?, count: Int) =
+        resources.searchUser(query, page, count)
+
     override suspend fun showRelationship(id: String): IRelationship {
         val response = resources.showFriendships(id)
         return Relationship(

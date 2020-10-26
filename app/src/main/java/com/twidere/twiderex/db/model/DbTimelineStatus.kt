@@ -25,6 +25,8 @@ import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import androidx.room.Relation
+import com.twidere.twiderex.db.AppDatabase
+import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.UserKey
 
@@ -50,7 +52,8 @@ enum class TimelineType {
     Mentions,
     User,
     UserFavourite,
-    Conversation
+    Conversation,
+    SearchTweets,
 }
 
 data class DbTimelineWithStatus(
@@ -76,3 +79,26 @@ data class DbTimelineWithStatus(
     )
     val quote: DbStatusWithMediaAndUser?,
 )
+
+suspend fun List<DbTimelineWithStatus>.saveToDb(
+    database: AppDatabase,
+    cache: CacheDatabase
+) {
+    val data = this
+        .map { listOf(it.status, it.quote, it.retweet) }
+        .flatten()
+        .filterNotNull()
+    data.map { it.user }.let {
+        cache.userDao().insertAll(it)
+        database.userDao().update(*it.toTypedArray())
+    }
+    cache.mediaDao().insertAll(data.map { it.media }.flatten())
+    data.map { it.status }.let {
+        cache.statusDao().insertAll(it)
+        database.statusDao().update(*it.toTypedArray())
+    }
+    this.map { it.timeline }.let {
+        cache.timelineDao().insertAll(it)
+        database.timelineDao().update(*it.toTypedArray())
+    }
+}

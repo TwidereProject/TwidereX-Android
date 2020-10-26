@@ -59,6 +59,7 @@ import com.twidere.twiderex.R
 import com.twidere.twiderex.extensions.NavControllerAmbient
 import com.twidere.twiderex.extensions.humanizedTimestamp
 import com.twidere.twiderex.fragment.ComposeFragmentArgs
+import com.twidere.twiderex.fragment.ComposeType
 import com.twidere.twiderex.fragment.StatusFragmentArgs
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.ui.mediumEmphasisContentContentColor
@@ -112,7 +113,10 @@ fun TimelineStatusComponent(
                         onClick = {
                             navController.navigate(
                                 R.id.compose_fragment,
-                                ComposeFragmentArgs(status).toBundle()
+                                ComposeFragmentArgs(
+                                    status,
+                                    composeType = ComposeType.Reply,
+                                ).toBundle()
                             )
                         },
                     )

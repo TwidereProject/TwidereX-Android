@@ -32,7 +32,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.ExperimentalLazyDsl
 import androidx.compose.foundation.lazy.LazyColumn
@@ -217,13 +216,6 @@ fun UserComponent(
                         viewModel.refresh(user)
                     }
                 },
-                refreshIndicator = {
-                    CircularProgressIndicator(
-                        modifier = Modifier
-                            .preferredSize(36.dp)
-                            .padding(4.dp)
-                    )
-                },
             ) {
                 Column {
                     if (appBar != null) {
@@ -268,6 +260,9 @@ fun UserComponent(
                             }
                             1 -> {
                                 if (mediaTimeline.any()) {
+                                    item {
+                                        Spacer(modifier = Modifier.height(standardPadding * 2))
+                                    }
                                     itemsGridIndexed(
                                         mediaTimeline,
                                         rowSize = 2,
@@ -297,6 +292,9 @@ fun UserComponent(
                                                 )
                                             }
                                         )
+                                    }
+                                    item {
+                                        Spacer(modifier = Modifier.height(standardPadding * 2))
                                     }
                                 }
                             }

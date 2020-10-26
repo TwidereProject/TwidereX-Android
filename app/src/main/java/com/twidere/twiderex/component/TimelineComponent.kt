@@ -23,14 +23,9 @@ package com.twidere.twiderex.component
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.lazy.LazyColumnForIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Divider
-import androidx.compose.material.Surface
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -38,7 +33,6 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.onDispose
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.annotations.IncomingComposeUpdate
 import com.twidere.twiderex.viewmodel.twitter.timeline.TimelineViewModel
 import kotlinx.coroutines.launch
@@ -56,15 +50,6 @@ fun TimelineComponent(viewModel: TimelineViewModel) {
         onRefresh = {
             scope.launch {
                 viewModel.refresh()
-            }
-        },
-        refreshIndicator = {
-            Surface(elevation = 10.dp, shape = CircleShape) {
-                CircularProgressIndicator(
-                    modifier = Modifier
-                        .preferredSize(36.dp)
-                        .padding(4.dp)
-                )
             }
         },
     ) {

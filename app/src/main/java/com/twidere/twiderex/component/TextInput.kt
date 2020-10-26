@@ -30,16 +30,22 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.AmbientEmphasisLevels
 import androidx.compose.material.ProvideEmphasis
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.onActive
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focusRequester
 import androidx.compose.ui.node.Ref
+import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.SoftwareKeyboardController
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.constrain
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
@@ -56,14 +62,22 @@ fun TextInput(
     alignment: Alignment = Alignment.TopStart,
     imeAction: ImeAction = ImeAction.Unspecified,
     onImeActionPerformed: (ImeAction, SoftwareKeyboardController?) -> Unit = { _, _ -> },
-    value: TextFieldValue,
-    onValueChange: (TextFieldValue) -> Unit,
+    value: String,
+    onValueChange: (String) -> Unit,
     onTextInputStarted: ((SoftwareKeyboardController) -> Unit)? = null,
     onClicked: (() -> Unit)? = null,
 ) {
     val focusRequester = FocusRequester()
     val keyboardController = remember { Ref<SoftwareKeyboardController>() }
     val interactionState = remember { InteractionState() }
+    var selection by remember { mutableStateOf(TextRange.Zero) }
+    var composition by remember { mutableStateOf<TextRange?>(null) }
+    @OptIn(InternalTextApi::class)
+    val textFieldValue = TextFieldValue(
+        text = value,
+        selection = selection.constrain(0, value.length),
+        composition = composition?.constrain(0, value.length)
+    )
     if (autoFocus) {
         onActive {
             focusRequester.requestFocus()
@@ -98,10 +112,16 @@ fun TextInput(
                 keyboardController.value = it
                 onTextInputStarted?.invoke(it)
             },
-            value = value,
-            onValueChange = onValueChange,
+            value = textFieldValue,
+            onValueChange = {
+                selection = it.selection
+                composition = it.composition
+                if (value != it.text) {
+                    onValueChange(it.text)
+                }
+            },
         )
-        if (value.text.isEmpty()) {
+        if (value.isEmpty()) {
             ProvideEmphasis(emphasis = AmbientEmphasisLevels.current.medium) {
                 placeholder?.invoke()
             }

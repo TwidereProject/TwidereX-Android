@@ -29,8 +29,9 @@ import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.model.ui.UiUser
 
 abstract class UserTimelineViewModelBase : ViewModel() {
-    val loadingMore = MutableLiveData(false)
     private val timelineIds = arrayListOf<String>()
+    private var hasMore = true
+    val loadingMore = MutableLiveData(false)
     val timeline = liveData {
         emitSource(
             source.switchMap { result ->
@@ -61,8 +62,12 @@ abstract class UserTimelineViewModelBase : ViewModel() {
     }
 
     suspend fun loadMore(user: UiUser) {
+        if (!hasMore) {
+            return
+        }
         loadingMore.postValue(true)
         val result = loadBetween(user, max_id = timelineIds.lastOrNull())
+        hasMore = result.any()
         timelineIds.addAll(result.map { it.statusId }.filter { !timelineIds.contains(it) })
         loadingMore.postValue(false)
     }

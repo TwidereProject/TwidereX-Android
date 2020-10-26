@@ -21,6 +21,7 @@
 package com.twidere.services.twitter.api
 
 import com.twidere.services.twitter.model.TwitterSearchResponseV2
+import com.twidere.services.twitter.model.User
 import retrofit2.http.GET
 import retrofit2.http.Query
 import java.util.Date
@@ -42,4 +43,11 @@ interface SearchResources {
         @Query("poll.fields", encoded = true) pollFields: String? = null,
         @Query("user.fields", encoded = true) userFields: String? = null,
     ): TwitterSearchResponseV2
+
+    @GET("/1.1/users/search.json")
+    suspend fun searchUser(
+        @Query("q") q: String,
+        @Query("page") page: Int? = null,
+        @Query("count") count: Int? = null,
+    ): List<User>
 }

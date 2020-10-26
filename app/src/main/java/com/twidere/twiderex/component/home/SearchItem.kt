@@ -38,11 +38,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.graphics.vector.VectorAsset
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.TextFieldValue
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.AppBar
 import com.twidere.twiderex.component.TextInput
 import com.twidere.twiderex.extensions.NavControllerAmbient
+import com.twidere.twiderex.fragment.SearchFragmentArgs
 
 class SearchItem : HomeNavigationItem() {
     override val name: String
@@ -55,11 +55,8 @@ class SearchItem : HomeNavigationItem() {
     @OptIn(ExperimentalFoundationApi::class, ExperimentalFocus::class)
     @Composable
     override fun onCompose() {
-        val (textState, setTextState) = remember { mutableStateOf(TextFieldValue()) }
+        val (text, setText) = remember { mutableStateOf("") }
         val navController = NavControllerAmbient.current
-        fun goSearch() {
-            navController.navigate(R.id.search_fragment)
-        }
         Scaffold(
             topBar = {
                 AppBar(
@@ -70,9 +67,9 @@ class SearchItem : HomeNavigationItem() {
                                     modifier = Modifier
                                         .align(Alignment.CenterVertically)
                                         .weight(1F),
-                                    value = textState,
+                                    value = text,
                                     onValueChange = {
-                                        setTextState(it)
+                                        setText(it)
                                     },
                                     placeholder = {
                                         Text(text = "Tap to search...")
@@ -80,12 +77,22 @@ class SearchItem : HomeNavigationItem() {
                                     imeAction = ImeAction.Search,
                                     alignment = Alignment.CenterStart,
                                     onImeActionPerformed = { _, _ ->
-                                        goSearch()
+                                        if (text.isNotEmpty()) {
+                                            navController.navigate(
+                                                R.id.search_fragment,
+                                                SearchFragmentArgs(text).toBundle(),
+                                            )
+                                        }
                                     }
                                 )
                                 IconButton(
                                     onClick = {
-                                        goSearch()
+                                        if (text.isNotEmpty()) {
+                                            navController.navigate(
+                                                R.id.search_fragment,
+                                                SearchFragmentArgs(text).toBundle(),
+                                            )
+                                        }
                                     }
                                 ) {
                                     Icon(asset = Icons.Default.Search)

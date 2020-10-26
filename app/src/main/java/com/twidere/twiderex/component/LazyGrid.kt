@@ -28,7 +28,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.LazyColumnForIndexed
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
@@ -36,7 +36,8 @@ import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.annotations.IncomingComposeUpdate
 
 @IncomingComposeUpdate
-fun <T> LazyListScope.itemsGridIndexed(
+@Composable
+fun <T> LazyGridForIndexed(
     data: List<T>,
     rowSize: Int,
     spacing: Dp = 0.dp,
@@ -44,7 +45,7 @@ fun <T> LazyListScope.itemsGridIndexed(
     itemContent: @Composable BoxScope.(Int, T) -> Unit,
 ) {
     val rows = data.windowed(rowSize, rowSize, true)
-    itemsIndexed(rows) { index, row ->
+    LazyColumnForIndexed(rows) { index, row ->
         Column(
             modifier = Modifier.fillParentMaxWidth().padding(horizontal = padding)
         ) {

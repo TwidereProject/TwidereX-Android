@@ -31,20 +31,14 @@ import com.twidere.services.twitter.model.TwitterSearchResponseV2
 import com.twidere.twiderex.db.AppDatabase
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.db.mapper.toDbTimeline
-import com.twidere.twiderex.db.model.DbTimelineWithStatus
 import com.twidere.twiderex.db.model.TimelineType
+import com.twidere.twiderex.db.model.saveToDb
 import com.twidere.twiderex.defaultLoadCount
 import com.twidere.twiderex.model.UserKey
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.model.ui.UiStatus.Companion.toUi
-import javax.inject.Singleton
+import com.twidere.twiderex.repository.twitter.model.SearchResult
 
-data class ConversationResult(
-    val result: List<StatusV2>,
-    val nextPage: String?,
-)
-
-@Singleton
 class TwitterConversationRepository @AssistedInject constructor(
     private val database: AppDatabase,
     private val cache: CacheDatabase,
@@ -81,7 +75,7 @@ class TwitterConversationRepository @AssistedInject constructor(
             } else {
                 val result = lookupService.lookupStatus(referencedTweetId) as StatusV2
                 val db = result.toDbTimeline(userKey, TimelineType.Conversation)
-                saveData(listOf(db))
+                listOf(db).saveToDb(database, cache)
                 list.add(result)
                 current = result
             }
@@ -95,7 +89,7 @@ class TwitterConversationRepository @AssistedInject constructor(
 
     suspend fun toUiStatus(status: StatusV2): UiStatus {
         val db = status.toDbTimeline(userKey, TimelineType.Conversation)
-        saveData(listOf(db))
+        listOf(db).saveToDb(database, cache)
         return db.toUi()
     }
 
@@ -113,8 +107,8 @@ class TwitterConversationRepository @AssistedInject constructor(
             }
     }
 
-    suspend fun loadConversation(tweet: StatusV2, nextPage: String? = null): ConversationResult {
-        val conversationId = tweet.conversationID ?: return ConversationResult(emptyList(), null)
+    suspend fun loadConversation(tweet: StatusV2, nextPage: String? = null): SearchResult {
+        val conversationId = tweet.conversationID ?: return SearchResult(emptyList(), null)
         val searchResponse = searchService.searchTweets(
             "conversation_id:$conversationId",
             count = defaultLoadCount,
@@ -123,27 +117,7 @@ class TwitterConversationRepository @AssistedInject constructor(
         val status = searchResponse.data ?: emptyList()
         val result = buildConversation(tweet, status)
         val db = result.flatten().map { it.toDbTimeline(userKey, TimelineType.Conversation) }
-        saveData(db)
-        return ConversationResult(result.flatten(), searchResponse.nextPage)
-    }
-
-    private suspend fun saveData(timeline: List<DbTimelineWithStatus>) {
-        val data = timeline
-            .map { listOf(it.status, it.quote, it.retweet) }
-            .flatten()
-            .filterNotNull()
-        data.map { it.user }.let {
-            cache.userDao().insertAll(it)
-            database.userDao().update(*it.toTypedArray())
-        }
-        cache.mediaDao().insertAll(data.map { it.media }.flatten())
-        data.map { it.status }.let {
-            cache.statusDao().insertAll(it)
-            database.statusDao().update(*it.toTypedArray())
-        }
-        timeline.map { it.timeline }.let {
-            cache.timelineDao().insertAll(it)
-            database.timelineDao().update(*it.toTypedArray())
-        }
+        db.saveToDb(database, cache)
+        return SearchResult(result.flatten(), searchResponse.nextPage)
     }
 }

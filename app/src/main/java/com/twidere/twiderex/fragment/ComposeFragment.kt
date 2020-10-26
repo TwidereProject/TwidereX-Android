@@ -70,7 +70,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.node.Ref
 import androidx.compose.ui.text.SoftwareKeyboardController
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.viewModel
 import androidx.fragment.app.viewModels
@@ -92,6 +91,12 @@ import com.twidere.twiderex.viewmodel.ActiveAccountViewModel
 import com.twidere.twiderex.viewmodel.ComposeViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
+enum class ComposeType {
+    New,
+    Reply,
+    Quote,
+}
+
 @AndroidEntryPoint
 class ComposeFragment : JetFragment() {
     private val args by navArgs<ComposeFragmentArgs>()
@@ -100,7 +105,7 @@ class ComposeFragment : JetFragment() {
     @OptIn(ExperimentalFoundationApi::class, ExperimentalFocus::class, ExperimentalLazyDsl::class)
     @Composable
     override fun onCompose() {
-        val (textState, setTextState) = remember { mutableStateOf(TextFieldValue()) }
+        val (text, setText) = remember { mutableStateOf("") }
         val activeAccountViewModel = viewModel<ActiveAccountViewModel>()
         val images by viewModel.images.observeAsState(initial = emptyList())
         val account by activeAccountViewModel.account.observeAsState()
@@ -126,18 +131,22 @@ class ComposeFragment : JetFragment() {
             topBar = {
                 AppBar(
                     title = {
-                        args.status?.let {
-                            Text(text = "Reply")
-                        } ?: Text(text = "Compose")
+                        Text(
+                            text = when (args.composeType) {
+                                ComposeType.Reply -> "Reply"
+                                ComposeType.Quote -> "Quote"
+                                else -> "Compose"
+                            }
+                        )
                     },
                     navigationIcon = {
                         AppBarNavigationButton(icon = Icons.Default.Close)
                     },
                     actions = {
                         IconButton(
-                            enabled = textState.text.isNotEmpty(),
+                            enabled = text.isNotEmpty(),
                             onClick = {
-                                viewModel.compose(textState.text)
+                                viewModel.compose(text)
                                 navController.popBackStack()
                             }
                         ) {
@@ -190,8 +199,8 @@ class ComposeFragment : JetFragment() {
                                 ) {
                                     TextInput(
                                         modifier = Modifier.align(Alignment.TopCenter),
-                                        value = textState,
-                                        onValueChange = { setTextState(it) },
+                                        value = text,
+                                        onValueChange = { setText(it) },
                                         autoFocus = true,
                                         onTextInputStarted = {
                                             keyboardController.value = it
@@ -240,7 +249,7 @@ class ComposeFragment : JetFragment() {
                             color = MaterialTheme.colors.onSurface.copy(alpha = 0.12f),
                         )
                         CircularProgressIndicator(
-                            progress = textState.text.length.toFloat() / maxComposeTextLength.toFloat(),
+                            progress = text.length.toFloat() / maxComposeTextLength.toFloat(),
                         )
                     }
                     Spacer(modifier = Modifier.weight(1F))
