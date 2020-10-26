@@ -83,9 +83,11 @@ class SearchItem : HomeNavigationItem() {
                                         goSearch()
                                     }
                                 )
-                                IconButton(onClick = {
-                                    goSearch()
-                                }) {
+                                IconButton(
+                                    onClick = {
+                                        goSearch()
+                                    }
+                                ) {
                                     Icon(asset = Icons.Default.Search)
                                 }
                             }
@@ -94,7 +96,6 @@ class SearchItem : HomeNavigationItem() {
                 )
             }
         ) {
-
         }
     }
 }
