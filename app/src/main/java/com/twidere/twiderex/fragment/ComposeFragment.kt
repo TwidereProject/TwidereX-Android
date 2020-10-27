@@ -146,7 +146,7 @@ class ComposeFragment : JetFragment() {
                         IconButton(
                             enabled = text.isNotEmpty(),
                             onClick = {
-                                viewModel.compose(text)
+                                viewModel.compose(text, args.composeType, args.status)
                                 navController.popBackStack()
                             }
                         ) {

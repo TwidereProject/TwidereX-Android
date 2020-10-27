@@ -33,6 +33,8 @@ class ComposeQueue(
         service: TwitterService,
         content: String,
         images: List<Uri>,
+        replyTo: String? = null,
+        quoteTo: String? = null,
     ) {
         GlobalScope.launch {
             val mediaIds = arrayListOf<String>()
@@ -45,8 +47,12 @@ class ComposeQueue(
                 } ?: throw Error()
                 mediaIds.add(id)
             }
-            service.update(content, media_ids = mediaIds)
-//            val picIds = images.mapNotNull { Api.uploadPic(it).picId }
+            service.update(
+                content,
+                media_ids = mediaIds,
+                in_reply_to_status_id = replyTo,
+                repost_status_id = quoteTo,
+            )
         }
     }
 }

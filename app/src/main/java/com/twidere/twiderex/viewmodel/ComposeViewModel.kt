@@ -32,6 +32,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.twidere.services.twitter.TwitterService
 import com.twidere.twiderex.extensions.getCachedLocation
+import com.twidere.twiderex.fragment.ComposeType
+import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.utils.ComposeQueue
 
@@ -47,8 +49,14 @@ class ComposeViewModel @ViewModelInject constructor(
     val location = MutableLiveData<Location>()
     val locationEnabled = MutableLiveData(false)
 
-    fun compose(content: String) {
-        composeQueue.commit(service, content, images = images.value ?: emptyList())
+    fun compose(content: String, composeType: ComposeType, status: UiStatus? = null) {
+        composeQueue.commit(
+            service,
+            content,
+            images = images.value ?: emptyList(),
+            replyTo = if (composeType == ComposeType.Reply) status?.statusId else null,
+            quoteTo = if (composeType == ComposeType.Quote) status?.statusId else null,
+        )
     }
 
     fun putImages(value: List<Uri>) {

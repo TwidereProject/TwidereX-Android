@@ -276,6 +276,9 @@ class TwitterService(
     ) = resources.update(
         status = status,
         in_reply_to_status_id = in_reply_to_status_id,
+        auto_populate_reply_metadata = in_reply_to_status_id?.let {
+            true
+        },
         repost_status_id = repost_status_id,
         display_coordinates = display_coordinates,
         lat = lat,

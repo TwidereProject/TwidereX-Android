@@ -41,6 +41,7 @@ interface StatusResources {
     @POST("/1.1/statuses/update.json")
     suspend fun update(
         @Query("status") status: String,
+        @Query("auto_populate_reply_metadata") auto_populate_reply_metadata: Boolean? = null,
         @Query("in_reply_to_status_id") in_reply_to_status_id: String? = null,
         @Query("repost_status_id") repost_status_id: String? = null,
         @Query("display_coordinates") display_coordinates: Boolean? = null,
