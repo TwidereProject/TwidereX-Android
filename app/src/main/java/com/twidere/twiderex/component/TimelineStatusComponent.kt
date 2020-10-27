@@ -171,17 +171,16 @@ private fun StatusComponent(
                         text = status.user.name,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        color = Color(0XFF4C9EEB)
+                        color = MaterialTheme.colors.primary
                     )
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = "@${status.user.screenName}",
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        color = AmbientEmphasisLevels.current.medium.applyEmphasis(
-                            AmbientContentColor.current
-                        ),
-                    )
+                    ProvideEmphasis(emphasis = AmbientEmphasisLevels.current.medium) {
+                        Text(
+                            text = "@${status.user.screenName}",
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                    }
                 }
                 Row {
                     Text(text = status.timestamp.humanizedTimestamp())

@@ -23,6 +23,7 @@ package com.twidere.twiderex.component
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -30,6 +31,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumnForIndexed
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -38,14 +40,22 @@ import com.twidere.twiderex.annotations.IncomingComposeUpdate
 @IncomingComposeUpdate
 @Composable
 fun <T> LazyGridForIndexed(
+    modifier: Modifier = Modifier,
     data: List<T>,
     rowSize: Int,
+    contentPadding: PaddingValues = PaddingValues(0.dp),
+    horizontalAlignment: Alignment.Horizontal = Alignment.Start,
     spacing: Dp = 0.dp,
     padding: Dp = 0.dp,
     itemContent: @Composable BoxScope.(Int, T) -> Unit,
 ) {
     val rows = data.windowed(rowSize, rowSize, true)
-    LazyColumnForIndexed(rows) { index, row ->
+    LazyColumnForIndexed(
+        modifier = modifier,
+        items = rows,
+        contentPadding = contentPadding,
+        horizontalAlignment = horizontalAlignment,
+    ) { index, row ->
         Column(
             modifier = Modifier.fillParentMaxWidth().padding(horizontal = padding)
         ) {

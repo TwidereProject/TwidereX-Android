@@ -65,7 +65,7 @@ class OAuth1Authorization(
     private val random: Random = SecureRandom()
 ) : Authorization {
     private fun encodeUrl(value: String) =
-        URLEncoder.encode(value, "UTF-8").replace("+", "%2B")
+        URLEncoder.encode(value, "UTF-8")
 
     override val hasAuthorization: Boolean
         get() = true

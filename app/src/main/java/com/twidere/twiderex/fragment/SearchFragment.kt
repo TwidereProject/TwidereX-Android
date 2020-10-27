@@ -26,8 +26,11 @@ import androidx.compose.foundation.ProvideTextStyle
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumnForIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.AmbientEmphasisLevels
@@ -58,6 +61,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.viewModel
 import androidx.navigation.fragment.navArgs
@@ -233,6 +237,7 @@ private fun SearchMediasContent() {
         }
     ) {
         LazyGridForIndexed(
+            contentPadding = PaddingValues(top = standardPadding * 2),
             data = items,
             rowSize = 2,
             spacing = standardPadding * 2,
@@ -293,9 +298,19 @@ private fun SearchUsersContent() {
                 },
                 text = {
                     Row {
-                        Text(text = item.name)
+                        Text(
+                            text = item.name,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            color = MaterialTheme.colors.primary
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
                         ProvideEmphasis(emphasis = AmbientEmphasisLevels.current.medium) {
-                            Text(text = item.screenName)
+                            Text(
+                                text = "@${item.screenName}",
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                            )
                         }
                     }
                 },

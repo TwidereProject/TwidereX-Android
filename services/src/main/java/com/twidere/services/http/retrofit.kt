@@ -52,6 +52,13 @@ internal inline fun <reified T> retrofit(
                             }
                         )
                     }
+                    addInterceptor {
+                        it.proceed(
+                            it.request().let { request ->
+                                request.newBuilder().url(request.url.toString().replace("%20", "+")).build()
+                            }
+                        )
+                    }
                 }
                 .build()
         )

@@ -49,8 +49,10 @@ class TwitterSearchUserViewModel @ViewModelInject constructor(
     }
 
     override suspend fun refresh() {
+        refreshing.postValue(true)
         reset(keyword)
-        loadMore()
+        loadData()
+        refreshing.postValue(false)
     }
 
     override suspend fun loadMore() {
@@ -58,9 +60,13 @@ class TwitterSearchUserViewModel @ViewModelInject constructor(
             return
         }
         loadingMore.postValue(true)
+        loadData()
+        loadingMore.postValue(false)
+    }
+
+    private suspend fun loadData() {
         val result = repository.loadUsers(keyword, page = page++)
         source.postValue((source.value ?: emptyList()) + result)
         hasMore = result.any()
-        loadingMore.postValue(false)
     }
 }
