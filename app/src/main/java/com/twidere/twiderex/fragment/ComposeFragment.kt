@@ -22,11 +22,13 @@ package com.twidere.twiderex.fragment
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.net.Uri
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Icon
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -45,6 +47,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.AmbientEmphasisLevels
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Divider
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ProvideEmphasis
@@ -64,6 +68,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -220,14 +225,7 @@ class ComposeFragment : JetFragment() {
                         modifier = Modifier.padding(horizontal = standardPadding * 2),
                         items = images
                     ) { index, item ->
-                        Box(
-                            modifier = Modifier
-                                .heightIn(max = composeImageSize)
-                                .aspectRatio(1F)
-                                .clip(RoundedCornerShape(8.dp)),
-                        ) {
-                            NetworkImage(url = item)
-                        }
+                        ComposeImage(item)
                         if (index != images.lastIndex) {
                             Spacer(modifier = Modifier.width(standardPadding))
                         }
@@ -301,6 +299,38 @@ class ComposeFragment : JetFragment() {
                         }
                     }
                 }
+            }
+        }
+    }
+
+    @Composable
+    private fun ComposeImage(item: Uri) {
+        var expanded by remember { mutableStateOf(false) }
+        val image = @Composable {
+            Box(
+                modifier = Modifier
+                    .heightIn(max = composeImageSize)
+                    .aspectRatio(1F)
+                    .clickable(onClick = {
+                        expanded = true
+                    })
+                    .clip(RoundedCornerShape(8.dp)),
+            ) {
+                NetworkImage(url = item)
+            }
+        }
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            toggle = image,
+        ) {
+            DropdownMenuItem(
+                onClick = {
+                    expanded = false
+                    viewModel.removeImage(item)
+                }
+            ) {
+                Text("Remove")
             }
         }
     }

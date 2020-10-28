@@ -95,4 +95,12 @@ class ComposeViewModel @ViewModelInject constructor(
             locationManager.removeUpdates(this)
         }
     }
+
+    fun removeImage(item: Uri) {
+        images.value?.let {
+            it - item
+        }?.let {
+            images.postValue(it)
+        }
+    }
 }
