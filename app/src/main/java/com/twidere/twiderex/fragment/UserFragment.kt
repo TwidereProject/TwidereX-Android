@@ -86,7 +86,7 @@ import com.twidere.twiderex.component.TabsComponent
 import com.twidere.twiderex.component.TimelineStatusComponent
 import com.twidere.twiderex.component.TopAppBarElevation
 import com.twidere.twiderex.component.UserAvatar
-import com.twidere.twiderex.component.itemsGridIndexed
+import com.twidere.twiderex.component.lazy.itemsGridIndexed
 import com.twidere.twiderex.extensions.NavControllerAmbient
 import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.model.ui.UiUser

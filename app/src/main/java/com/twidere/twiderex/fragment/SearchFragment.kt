@@ -69,7 +69,7 @@ import com.twidere.twiderex.R
 import com.twidere.twiderex.annotations.IncomingComposeUpdate
 import com.twidere.twiderex.component.AppBar
 import com.twidere.twiderex.component.AppBarNavigationButton
-import com.twidere.twiderex.component.LazyGridForIndexed
+import com.twidere.twiderex.component.lazy.LazyGridForIndexed
 import com.twidere.twiderex.component.LoadingProgress
 import com.twidere.twiderex.component.StatusDivider
 import com.twidere.twiderex.component.StatusMediaPreviewItem

@@ -87,4 +87,10 @@
             android:name="keyword"
             app:argType="string" />
     </fragment>
+    <fragment
+        android:id="@+id/settings_fragment"
+        android:name="com.twidere.twiderex.fragment.settings.SettingsFragment" />
+    <fragment
+        android:id="@+id/settings_appearance_fragment"
+        android:name="com.twidere.twiderex.fragment.settings.AppearanceFragment" />
 </navigation>

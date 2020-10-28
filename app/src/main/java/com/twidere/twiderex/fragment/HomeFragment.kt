@@ -24,6 +24,7 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.AmbientContentColor
 import androidx.compose.foundation.Icon
 import androidx.compose.foundation.Text
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -57,6 +58,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.viewModel
+import com.twidere.twiderex.R
 import com.twidere.twiderex.component.AppBar
 import com.twidere.twiderex.component.NetworkImage
 import com.twidere.twiderex.component.TopAppBarElevation
@@ -65,6 +67,7 @@ import com.twidere.twiderex.component.home.HomeTimelineItem
 import com.twidere.twiderex.component.home.MeItem
 import com.twidere.twiderex.component.home.MentionItem
 import com.twidere.twiderex.component.home.SearchItem
+import com.twidere.twiderex.extensions.NavControllerAmbient
 import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.ui.profileImageSize
 import com.twidere.twiderex.viewmodel.ActiveAccountViewModel
@@ -169,6 +172,8 @@ class HomeFragment : JetFragment() {
 private fun HomeDrawer() {
     val viewModel = viewModel<ActiveAccountViewModel>()
     val account by viewModel.account.observeAsState()
+    val navController = NavControllerAmbient.current
+
     Column {
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -254,8 +259,10 @@ private fun HomeDrawer() {
         }
 
         Divider()
-
         ListItem(
+            modifier = Modifier.clickable(onClick = {
+                navController.navigate(R.id.settings_fragment)
+            }),
             icon = {
                 Icon(asset = Icons.Default.Settings)
             },
