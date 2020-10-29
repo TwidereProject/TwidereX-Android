@@ -27,9 +27,24 @@ import android.view.ViewGroup
 import androidx.compose.runtime.Composable
 import androidx.fragment.app.Fragment
 import com.twidere.twiderex.extensions.compose
+import com.twidere.twiderex.settings.PrimaryColorSetting
+import com.twidere.twiderex.settings.TabPositionSetting
+import com.twidere.twiderex.settings.ThemeSetting
 import com.twidere.twiderex.ui.TwidereXTheme
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 abstract class JetFragment : Fragment() {
+    @Inject
+    lateinit var tabPosition: TabPositionSetting
+
+    @Inject
+    lateinit var theme: ThemeSetting
+
+    @Inject
+    lateinit var primaryColor: PrimaryColorSetting
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,

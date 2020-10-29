@@ -18,17 +18,17 @@
  *  You should have received a copy of the GNU General Public License
  *  along with TwidereX. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.ui
+package com.twidere.twiderex.settings.types
 
-import androidx.compose.foundation.AmbientContentColor
-import androidx.compose.material.AmbientEmphasisLevels
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
+import android.content.SharedPreferences
+import androidx.core.content.edit
 
-val blue = Color.Blue
-
-@Composable
-val mediumEmphasisContentContentColor: Color
-    get() = AmbientEmphasisLevels.current.medium.applyEmphasis(
-        AmbientContentColor.current
-    )
+abstract class EnumSettingItem<T : Enum<T>>(
+    private val preferences: SharedPreferences,
+) : SettingItem<T>() {
+    override fun save(value: T) {
+        preferences.edit {
+            putString(key, value.name)
+        }
+    }
+}

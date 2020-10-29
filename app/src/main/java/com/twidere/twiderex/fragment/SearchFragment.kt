@@ -79,7 +79,7 @@ import com.twidere.twiderex.component.TimelineStatusComponent
 import com.twidere.twiderex.component.TopAppBarElevation
 import com.twidere.twiderex.component.UserAvatar
 import com.twidere.twiderex.component.lazy.LazyGridForIndexed
-import com.twidere.twiderex.extensions.NavControllerAmbient
+import com.twidere.twiderex.extensions.AmbientNavController
 import com.twidere.twiderex.ui.standardPadding
 import com.twidere.twiderex.viewmodel.twitter.search.TwitterSearchMediasViewModel
 import com.twidere.twiderex.viewmodel.twitter.search.TwitterSearchTweetsViewModel
@@ -243,7 +243,7 @@ private fun SearchMediasContent() {
             spacing = standardPadding * 2,
             padding = standardPadding * 2,
         ) { index, item ->
-            val navController = NavControllerAmbient.current
+            val navController = AmbientNavController.current
             if (!loadingMore && index == items.lastIndex) {
                 scope.launch {
                     viewModel.loadMore()

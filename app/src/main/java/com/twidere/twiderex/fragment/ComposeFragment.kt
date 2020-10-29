@@ -85,7 +85,7 @@ import com.twidere.twiderex.component.NetworkImage
 import com.twidere.twiderex.component.StatusLineComponent
 import com.twidere.twiderex.component.TextInput
 import com.twidere.twiderex.component.TimelineStatusComponent
-import com.twidere.twiderex.extensions.NavControllerAmbient
+import com.twidere.twiderex.extensions.AmbientNavController
 import com.twidere.twiderex.extensions.checkAllSelfPermissionsGranted
 import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.maxComposeTextLength
@@ -116,7 +116,7 @@ class ComposeFragment : JetFragment() {
         val account by activeAccountViewModel.account.observeAsState()
         val location by viewModel.location.observeAsState()
         val locationEnabled by viewModel.locationEnabled.observeAsState(initial = false)
-        val navController = NavControllerAmbient.current
+        val navController = AmbientNavController.current
         val keyboardController = remember { Ref<SoftwareKeyboardController>() }
         val listState = rememberLazyListState(
             initialFirstVisibleItemIndex = if (args.status == null) {

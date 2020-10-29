@@ -41,7 +41,7 @@ import androidx.compose.ui.text.input.ImeAction
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.AppBar
 import com.twidere.twiderex.component.TextInput
-import com.twidere.twiderex.extensions.NavControllerAmbient
+import com.twidere.twiderex.extensions.AmbientNavController
 import com.twidere.twiderex.fragment.SearchFragmentArgs
 
 class SearchItem : HomeNavigationItem() {
@@ -56,7 +56,7 @@ class SearchItem : HomeNavigationItem() {
     @Composable
     override fun onCompose() {
         val (text, setText) = remember { mutableStateOf("") }
-        val navController = NavControllerAmbient.current
+        val navController = AmbientNavController.current
         Scaffold(
             topBar = {
                 AppBar(

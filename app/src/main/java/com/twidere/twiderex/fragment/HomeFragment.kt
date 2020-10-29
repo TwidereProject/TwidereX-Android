@@ -67,7 +67,7 @@ import com.twidere.twiderex.component.home.HomeTimelineItem
 import com.twidere.twiderex.component.home.MeItem
 import com.twidere.twiderex.component.home.MentionItem
 import com.twidere.twiderex.component.home.SearchItem
-import com.twidere.twiderex.extensions.NavControllerAmbient
+import com.twidere.twiderex.extensions.AmbientNavController
 import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.ui.profileImageSize
 import com.twidere.twiderex.viewmodel.ActiveAccountViewModel
@@ -172,7 +172,7 @@ class HomeFragment : JetFragment() {
 private fun HomeDrawer() {
     val viewModel = viewModel<ActiveAccountViewModel>()
     val account by viewModel.account.observeAsState()
-    val navController = NavControllerAmbient.current
+    val navController = AmbientNavController.current
 
     Column {
         Spacer(modifier = Modifier.height(16.dp))

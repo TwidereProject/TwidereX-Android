@@ -18,17 +18,16 @@
  *  You should have received a copy of the GNU General Public License
  *  along with TwidereX. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.ui
+package com.twidere.twiderex.settings.types
 
-import androidx.compose.foundation.AmbientContentColor
-import androidx.compose.material.AmbientEmphasisLevels
+import android.content.SharedPreferences
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
 
-val blue = Color.Blue
-
-@Composable
-val mediumEmphasisContentContentColor: Color
-    get() = AmbientEmphasisLevels.current.medium.applyEmphasis(
-        AmbientContentColor.current
-    )
+abstract class RadioSettingItem<T : Enum<T>>(preferences: SharedPreferences) :
+    EnumSettingItem<T>(preferences) {
+    override val initialValue: T
+        get() = options.first()
+    abstract val options: List<T>
+    abstract val itemContent: @Composable (item: T) -> Unit
+    abstract val title: @Composable () -> Unit
+}

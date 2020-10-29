@@ -50,7 +50,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.R
-import com.twidere.twiderex.extensions.NavControllerAmbient
+import com.twidere.twiderex.extensions.AmbientNavController
 import com.twidere.twiderex.extensions.humanizedTimestamp
 import com.twidere.twiderex.fragment.StatusFragmentArgs
 import com.twidere.twiderex.fragment.UserFragmentArgs
@@ -164,7 +164,7 @@ private fun StatusComponent(
 ) {
     Box(modifier = modifier) {
         Column {
-            val navController = NavControllerAmbient.current
+            val navController = AmbientNavController.current
             Row(
                 modifier = Modifier.clickable(
                     onClick = {

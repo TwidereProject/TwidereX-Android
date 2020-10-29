@@ -18,17 +18,25 @@
  *  You should have received a copy of the GNU General Public License
  *  along with TwidereX. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.ui
+package com.twidere.twiderex.settings.types
 
-import androidx.compose.foundation.AmbientContentColor
-import androidx.compose.material.AmbientEmphasisLevels
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 
-val blue = Color.Blue
+abstract class SettingItem<T> {
+    private val _data = MutableLiveData<T>()
+    val data: LiveData<T>
+        get() = _data
+    open val initialValue: T
+        get() = load()
 
-@Composable
-val mediumEmphasisContentContentColor: Color
-    get() = AmbientEmphasisLevels.current.medium.applyEmphasis(
-        AmbientContentColor.current
-    )
+    fun apply(value: T) {
+        value?.let {
+            save(it)
+            _data.postValue(it)
+        }
+    }
+    protected open val key: String = javaClass.name
+    protected abstract fun save(value: T)
+    protected abstract fun load(): T
+}

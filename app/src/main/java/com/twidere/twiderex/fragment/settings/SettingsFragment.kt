@@ -38,7 +38,7 @@ import androidx.compose.ui.graphics.vector.VectorAsset
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.AppBar
 import com.twidere.twiderex.component.AppBarNavigationButton
-import com.twidere.twiderex.extensions.NavControllerAmbient
+import com.twidere.twiderex.extensions.AmbientNavController
 import com.twidere.twiderex.fragment.JetFragment
 
 data class SettingItem(
@@ -111,7 +111,7 @@ class SettingsFragment : JetFragment() {
                         )
                     }
                     items(it.value) {
-                        val navController = NavControllerAmbient.current
+                        val navController = AmbientNavController.current
                         ListItem(
                             modifier = Modifier.clickable(
                                 onClick = {

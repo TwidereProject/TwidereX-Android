@@ -87,7 +87,7 @@ import com.twidere.twiderex.component.TimelineStatusComponent
 import com.twidere.twiderex.component.TopAppBarElevation
 import com.twidere.twiderex.component.UserAvatar
 import com.twidere.twiderex.component.lazy.itemsGridIndexed
-import com.twidere.twiderex.extensions.NavControllerAmbient
+import com.twidere.twiderex.extensions.AmbientNavController
 import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.ui.standardPadding
@@ -269,7 +269,7 @@ fun UserComponent(
                                         spacing = standardPadding * 2,
                                         padding = standardPadding * 2,
                                     ) { index, item ->
-                                        val navController = NavControllerAmbient.current
+                                        val navController = AmbientNavController.current
                                         if (!timelineLoadingMore && index == mediaTimeline.lastIndex) {
                                             coroutineScope.launch {
                                                 timelineViewModel.loadMore(user)

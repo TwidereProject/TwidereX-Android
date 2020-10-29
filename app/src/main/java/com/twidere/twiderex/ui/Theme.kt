@@ -29,33 +29,45 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.onActive
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.graphics.toArgb
-import com.twidere.twiderex.extensions.WindowAmbient
+import com.twidere.twiderex.extensions.AmbientWindow
 import com.twidere.twiderex.extensions.withElevation
-
-private val DarkColorPalette = darkColors(
-    primary = blue,
-    primaryVariant = blue,
-    secondary = blue
-)
-
-private val LightColorPalette = lightColors(
-    primary = blue,
-    primaryVariant = blue,
-    secondary = blue
-)
+import com.twidere.twiderex.settings.AmbientPrimaryColor
+import com.twidere.twiderex.settings.AmbientTheme
+import com.twidere.twiderex.settings.Theme
 
 @Composable
 fun TwidereXTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
+    requireDarkTheme: Boolean = false,
     pureStatusBarColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
-    val colors = if (darkTheme) {
-        DarkColorPalette
+    val theme by AmbientTheme.current.data.observeAsState(initial = Theme.Auto)
+    val primaryColor by AmbientPrimaryColor.current.data.observeAsState(initial = blue)
+
+    val darkTheme = if (requireDarkTheme) {
+        true
     } else {
-        LightColorPalette
+        when (theme) {
+            Theme.Auto -> isSystemInDarkTheme()
+            Theme.Light -> false
+            Theme.Dark -> true
+        }
+    }
+    val colors = if (darkTheme) {
+        darkColors(
+            primary = primaryColor,
+            primaryVariant = primaryColor,
+            secondary = primaryColor
+        )
+    } else {
+        lightColors(
+            primary = primaryColor,
+            primaryVariant = primaryColor,
+            secondary = primaryColor
+        )
     }
 
     MaterialTheme(
@@ -63,15 +75,13 @@ fun TwidereXTheme(
         typography = typography,
         shapes = shapes,
         content = {
-            val window = WindowAmbient.current
+            val window = AmbientWindow.current
             val statusBarColor = if (pureStatusBarColor) {
                 MaterialTheme.colors.surface
             } else {
                 MaterialTheme.colors.surface.withElevation()
             }
-            onActive {
-                updateStatusBar(window, darkTheme, statusBarColor)
-            }
+            updateStatusBar(window, darkTheme, statusBarColor)
             content()
         }
     )
