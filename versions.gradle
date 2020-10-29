@@ -3,7 +3,7 @@ ext {
             kotlin               : "1.4.10",
             compose              : '1.0.0-alpha06',
             retrofit2            : '2.9.0',
-            hilt                 : '2.28-alpha',
+            hilt                 : '2.29.1-alpha',
             androidx_hilt        : '1.0.0-alpha02',
             room                 : '2.2.5',
             lifecycle            : '2.3.0-beta01',
