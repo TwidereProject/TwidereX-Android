@@ -22,7 +22,6 @@ package com.twidere.twiderex.fragment
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.AmbientContentColor
-import androidx.compose.material.Icon
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -39,6 +38,7 @@ import androidx.compose.material.AmbientEmphasisLevels
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Divider
+import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.ListItem
 import androidx.compose.material.MaterialTheme
@@ -260,9 +260,11 @@ private fun HomeDrawer() {
 
         Divider()
         ListItem(
-            modifier = Modifier.clickable(onClick = {
-                navController.navigate(R.id.settings_fragment)
-            }),
+            modifier = Modifier.clickable(
+                onClick = {
+                    navController.navigate(R.id.settings_fragment)
+                }
+            ),
             icon = {
                 Icon(asset = Icons.Default.Settings)
             },

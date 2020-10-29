@@ -21,7 +21,6 @@
 package com.twidere.twiderex.fragment
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.material.Icon
 import androidx.compose.foundation.ProvideTextStyle
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.Box
@@ -34,6 +33,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumnForIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.AmbientEmphasisLevels
+import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.ListItem
 import androidx.compose.material.MaterialTheme
@@ -69,7 +69,6 @@ import com.twidere.twiderex.R
 import com.twidere.twiderex.annotations.IncomingComposeUpdate
 import com.twidere.twiderex.component.AppBar
 import com.twidere.twiderex.component.AppBarNavigationButton
-import com.twidere.twiderex.component.lazy.LazyGridForIndexed
 import com.twidere.twiderex.component.LoadingProgress
 import com.twidere.twiderex.component.StatusDivider
 import com.twidere.twiderex.component.StatusMediaPreviewItem
@@ -79,6 +78,7 @@ import com.twidere.twiderex.component.TextInput
 import com.twidere.twiderex.component.TimelineStatusComponent
 import com.twidere.twiderex.component.TopAppBarElevation
 import com.twidere.twiderex.component.UserAvatar
+import com.twidere.twiderex.component.lazy.LazyGridForIndexed
 import com.twidere.twiderex.extensions.NavControllerAmbient
 import com.twidere.twiderex.ui.standardPadding
 import com.twidere.twiderex.viewmodel.twitter.search.TwitterSearchMediasViewModel

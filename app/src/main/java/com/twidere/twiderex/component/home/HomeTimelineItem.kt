@@ -20,8 +20,8 @@
  */
 package com.twidere.twiderex.component.home
 
-import androidx.compose.material.Icon
 import androidx.compose.material.FloatingActionButton
+import androidx.compose.material.Icon
 import androidx.compose.material.Scaffold
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add

@@ -21,7 +21,6 @@
 package com.twidere.twiderex.component
 
 import androidx.compose.foundation.AmbientContentColor
-import androidx.compose.material.Icon
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -38,6 +37,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.AmbientEmphasisLevels
 import androidx.compose.material.ButtonConstants
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ProvideEmphasis
 import androidx.compose.material.TextButton

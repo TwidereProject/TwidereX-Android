@@ -21,10 +21,10 @@
 package com.twidere.twiderex.component
 
 import androidx.compose.foundation.AmbientContentColor
-import androidx.compose.material.Icon
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.AmbientEmphasisLevels
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Tab
 import androidx.compose.material.TabConstants

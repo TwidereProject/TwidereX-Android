@@ -25,7 +25,6 @@ import android.annotation.SuppressLint
 import android.net.Uri
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.material.Icon
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -49,6 +48,7 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Divider
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ProvideEmphasis
@@ -311,9 +311,11 @@ class ComposeFragment : JetFragment() {
                 modifier = Modifier
                     .heightIn(max = composeImageSize)
                     .aspectRatio(1F)
-                    .clickable(onClick = {
-                        expanded = true
-                    })
+                    .clickable(
+                        onClick = {
+                            expanded = true
+                        }
+                    )
                     .clip(RoundedCornerShape(8.dp)),
             ) {
                 NetworkImage(url = item)
