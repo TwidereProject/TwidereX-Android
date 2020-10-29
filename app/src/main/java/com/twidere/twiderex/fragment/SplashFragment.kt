@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.onActive
 import androidx.compose.ui.Alignment
@@ -43,13 +44,15 @@ class SplashFragment : JetFragment() {
 
     @Composable
     override fun onCompose() {
-        Column(
-            modifier = Modifier.fillMaxWidth().fillMaxHeight(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            // TODO: replace with real icon
-            Image(vectorResource(id = R.drawable.ic_launcher_foreground))
+        Scaffold {
+            Column(
+                modifier = Modifier.fillMaxWidth().fillMaxHeight(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                // TODO: replace with real icon
+                Image(vectorResource(id = R.drawable.ic_launcher_foreground))
+            }
         }
         onActive(
             callback = {

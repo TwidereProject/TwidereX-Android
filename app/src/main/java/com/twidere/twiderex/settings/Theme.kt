@@ -43,7 +43,9 @@ class ThemeSetting(
         Text(text = "Theme")
     }
     override fun load(): Theme {
-        return preferences.getString(key, Theme.Auto.name)?.let { enumValueOf<Theme>(it) }
+        return preferences.getString(key, Theme.Auto.name)?.let {
+            enumValueOf<Theme>(it)
+        }
             ?: Theme.Auto
     }
 }

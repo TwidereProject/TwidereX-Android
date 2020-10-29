@@ -44,8 +44,8 @@ fun TwidereXTheme(
     pureStatusBarColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
-    val theme by AmbientTheme.current.data.observeAsState(initial = Theme.Auto)
-    val primaryColor by AmbientPrimaryColor.current.data.observeAsState(initial = blue)
+    val theme by AmbientTheme.current.data.observeAsState(initial = AmbientTheme.current.initialValue)
+    val primaryColor by AmbientPrimaryColor.current.data.observeAsState(initial = AmbientPrimaryColor.current.initialValue)
 
     val darkTheme = if (requireDarkTheme) {
         true

@@ -26,7 +26,7 @@ import androidx.compose.runtime.Composable
 abstract class RadioSettingItem<T : Enum<T>>(preferences: SharedPreferences) :
     EnumSettingItem<T>(preferences) {
     override val initialValue: T
-        get() = options.first()
+        get() = load()
     abstract val options: List<T>
     abstract val itemContent: @Composable (item: T) -> Unit
     abstract val title: @Composable () -> Unit

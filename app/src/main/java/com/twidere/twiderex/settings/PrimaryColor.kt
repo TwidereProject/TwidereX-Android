@@ -59,7 +59,7 @@ class PrimaryColorSetting(
 
     @OptIn(ExperimentalUnsignedTypes::class)
     override fun load(): Color {
-        return Color(preferences.getLong(key, blue.value.toLong()))
+        return Color(preferences.getLong(key, blue.value.toLong()).toULong())
     }
 }
 
