@@ -136,8 +136,8 @@ class MediaFragment : JetFragment() {
                     Box(
                         modifier = Modifier
                             .align(Alignment.TopStart)
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(color = controlPanelColor, shape = RoundedCornerShape(8.dp))
+                            .clip(MaterialTheme.shapes.small)
+                            .background(color = controlPanelColor, shape = MaterialTheme.shapes.small)
                             .clipToBounds()
                     ) {
                         val navController = AmbientNavController.current

@@ -316,7 +316,7 @@ class ComposeFragment : JetFragment() {
                             expanded = true
                         }
                     )
-                    .clip(RoundedCornerShape(8.dp)),
+                    .clip(MaterialTheme.shapes.small),
             ) {
                 NetworkImage(url = item)
             }

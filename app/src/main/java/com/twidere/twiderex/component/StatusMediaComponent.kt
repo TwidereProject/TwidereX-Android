@@ -27,7 +27,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -54,7 +54,7 @@ fun StatusMediaComponent(
             modifier = Modifier
                 .heightIn(max = 400.dp)
                 .aspectRatio(first.width.toFloat() / first.height.toFloat())
-                .clip(RoundedCornerShape(8.dp))
+                .clip(MaterialTheme.shapes.medium)
         ) {
             StatusMediaPreviewItem(
                 media = first,
@@ -66,7 +66,7 @@ fun StatusMediaComponent(
             modifier = Modifier
                 .fillMaxWidth()
                 .aspectRatio(270f / 162f)
-                .clip(RoundedCornerShape(8.dp))
+                .clip(MaterialTheme.shapes.medium)
         ) {
             if (media.size == 3) {
                 Row {

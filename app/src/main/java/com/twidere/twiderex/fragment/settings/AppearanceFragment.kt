@@ -29,7 +29,6 @@ import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.foundation.lazy.ExperimentalLazyDsl
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ListItem
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
@@ -92,7 +91,7 @@ class AppearanceFragment : JetFragment() {
                                 modifier = Modifier
                                     .preferredHeight(24.dp)
                                     .preferredWidth(32.dp)
-                                    .clip(RoundedCornerShape(8.dp))
+                                    .clip(MaterialTheme.shapes.small)
                                     .aspectRatio(1F)
                                     .background(MaterialTheme.colors.primary),
                             ) {

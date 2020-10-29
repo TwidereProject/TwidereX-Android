@@ -31,7 +31,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumnForIndexed
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.AmbientEmphasisLevels
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -254,7 +253,7 @@ private fun SearchMediasContent() {
                 modifier = Modifier
                     .aspectRatio(1F)
                     .clip(
-                        RoundedCornerShape(8.dp)
+                        MaterialTheme.shapes.small
                     ),
                 onClick = {
                     navController.navigate(

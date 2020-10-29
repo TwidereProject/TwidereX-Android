@@ -37,7 +37,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
@@ -280,7 +279,7 @@ fun UserComponent(
                                             modifier = Modifier
                                                 .aspectRatio(1F)
                                                 .clip(
-                                                    RoundedCornerShape(8.dp)
+                                                    MaterialTheme.shapes.medium
                                                 ),
                                             onClick = {
                                                 navController.navigate(

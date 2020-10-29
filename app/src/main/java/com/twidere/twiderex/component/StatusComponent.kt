@@ -32,9 +32,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.AmbientEmphasisLevels
 import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ProvideEmphasis
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Comment
@@ -213,9 +213,9 @@ private fun StatusComponent(
                         .border(
                             1.dp,
                             AmbientContentColor.current.copy(alpha = 0.12f),
-                            RoundedCornerShape(8.dp)
+                            MaterialTheme.shapes.medium,
                         )
-                        .clip(RoundedCornerShape(8.dp))
+                        .clip(MaterialTheme.shapes.medium)
                 ) {
                     StatusComponent(
                         status = status.quote,
