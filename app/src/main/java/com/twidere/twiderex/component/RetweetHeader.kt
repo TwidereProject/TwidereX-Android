@@ -20,7 +20,7 @@
  */
 package com.twidere.twiderex.component
 
-import androidx.compose.foundation.Icon
+import androidx.compose.material.Icon
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row

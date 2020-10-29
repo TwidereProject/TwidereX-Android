@@ -59,25 +59,15 @@ dependencies {
 
     implementation project(":services")
 
-    implementation "androidx.ui:ui-tooling:$versions.compose"
-    implementation "androidx.compose.runtime:runtime-dispatch:$versions.compose"
-    implementation "androidx.compose.runtime:runtime:$versions.compose"
-    implementation "androidx.compose.runtime:runtime-livedata:$versions.compose"
-    implementation "androidx.compose.animation:animation-core:$versions.compose"
-    implementation "androidx.compose.animation:animation:$versions.compose"
-    implementation "androidx.compose.foundation:foundation:$versions.compose"
-    implementation "androidx.compose.foundation:foundation-layout:$versions.compose"
-    implementation "androidx.compose.foundation:foundation-text:$versions.compose"
+
     implementation "androidx.compose.ui:ui:$versions.compose"
-    implementation "androidx.compose.ui:ui-geometry:$versions.compose"
-    implementation "androidx.compose.ui:ui-graphics:$versions.compose"
-    implementation "androidx.compose.ui:ui-text:$versions.compose"
-    implementation "androidx.compose.ui:ui-text-android:$versions.compose"
-    implementation "androidx.compose.ui:ui-util:$versions.compose"
-    implementation "androidx.compose.ui:ui-viewbinding:$versions.compose"
+    implementation "androidx.ui:ui-tooling:$versions.compose"
+    implementation "androidx.compose.foundation:foundation:$versions.compose"
     implementation "androidx.compose.material:material:$versions.compose"
     implementation "androidx.compose.material:material-icons-core:$versions.compose"
     implementation "androidx.compose.material:material-icons-extended:$versions.compose"
+    implementation "androidx.compose.runtime:runtime-livedata:$versions.compose"
+    androidTestImplementation "androidx.ui:ui-test:$versions.compose"
 
     implementation "androidx.navigation:navigation-fragment-ktx:$versions.navigation"
     implementation "androidx.navigation:navigation-ui-ktx:$versions.navigation"

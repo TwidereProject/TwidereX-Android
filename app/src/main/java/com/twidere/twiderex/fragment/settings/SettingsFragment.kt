@@ -1,6 +1,6 @@
 package com.twidere.twiderex.fragment.settings
 
-import androidx.compose.foundation.Icon
+import androidx.compose.material.Icon
 import androidx.compose.foundation.ProvideTextStyle
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.clickable

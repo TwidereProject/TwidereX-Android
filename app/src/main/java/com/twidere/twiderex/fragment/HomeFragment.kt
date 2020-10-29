@@ -22,7 +22,7 @@ package com.twidere.twiderex.fragment
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.AmbientContentColor
-import androidx.compose.foundation.Icon
+import androidx.compose.material.Icon
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box

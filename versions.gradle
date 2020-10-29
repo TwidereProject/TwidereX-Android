@@ -1,7 +1,7 @@
 ext {
     versions = [
             kotlin               : "1.4.10",
-            compose              : '1.0.0-alpha05',
+            compose              : '1.0.0-alpha06',
             retrofit2            : '2.9.0',
             hilt                 : '2.28-alpha',
             androidx_hilt        : '1.0.0-alpha02',
