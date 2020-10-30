@@ -30,9 +30,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.unit.Dp
-import com.twidere.twiderex.R
-import com.twidere.twiderex.extensions.AmbientNavController
-import com.twidere.twiderex.fragment.UserFragmentArgs
+import androidx.navigation.compose.navigate
+import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.ui.profileImageSize
 
@@ -52,7 +51,7 @@ fun UserAvatar(
             modifier = Modifier
                 .clickable(
                     onClick = {
-                        navController.navigate(R.id.user_fragment, UserFragmentArgs(user).toBundle())
+                        navController.navigate("user/${user.screenName}")
                     }
                 )
                 .width(size)

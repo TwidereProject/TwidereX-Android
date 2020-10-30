@@ -22,3 +22,4 @@ package com.twidere.twiderex
 
 const val defaultLoadCount = 50
 const val maxComposeTextLength = 140
+const val twitterHost = "https://twitter.com"

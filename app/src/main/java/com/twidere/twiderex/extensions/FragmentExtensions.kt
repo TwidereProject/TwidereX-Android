@@ -26,26 +26,3 @@ import androidx.compose.runtime.Providers
 import androidx.compose.runtime.ambientOf
 import androidx.compose.ui.platform.ComposeView
 import androidx.navigation.NavController
-import androidx.navigation.fragment.findNavController
-import com.twidere.twiderex.fragment.JetFragment
-import com.twidere.twiderex.settings.AmbientPrimaryColor
-import com.twidere.twiderex.settings.AmbientTabPosition
-import com.twidere.twiderex.settings.AmbientTheme
-
-val AmbientWindow = ambientOf<Window> { error("No Window") }
-val AmbientNavController = ambientOf<NavController> { error("No NavController") }
-fun JetFragment.compose(content: @Composable () -> Unit): ComposeView {
-    return ComposeView(requireContext()).apply {
-        setContent {
-            Providers(
-                AmbientPrimaryColor provides primaryColor,
-                AmbientTabPosition provides tabPosition,
-                AmbientTheme provides theme,
-                AmbientNavController provides findNavController(),
-                AmbientWindow provides activity?.window!!,
-            ) {
-                content.invoke()
-            }
-        }
-    }
-}

@@ -49,11 +49,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.navigation.compose.navigate
 import com.twidere.twiderex.R
-import com.twidere.twiderex.extensions.AmbientNavController
+import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.extensions.humanizedTimestamp
-import com.twidere.twiderex.fragment.StatusFragmentArgs
-import com.twidere.twiderex.fragment.UserFragmentArgs
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.ui.mediumEmphasisContentContentColor
 import com.twidere.twiderex.ui.standardPadding
@@ -168,10 +167,7 @@ private fun StatusComponent(
             Row(
                 modifier = Modifier.clickable(
                     onClick = {
-                        navController.navigate(
-                            R.id.user_fragment,
-                            UserFragmentArgs(status.user).toBundle()
-                        )
+                        navController.navigate("user/${status.user.screenName}")
                     }
                 )
             ) {
@@ -222,12 +218,7 @@ private fun StatusComponent(
                         modifier = Modifier
                             .clickable(
                                 onClick = {
-                                    navController.navigate(
-                                        R.id.status_fragment,
-                                        StatusFragmentArgs(
-                                            status = status.quote,
-                                        ).toBundle()
-                                    )
+                                    navController.navigate("status/${status.quote.statusId}")
                                 }
                             )
                             .padding(standardPadding),

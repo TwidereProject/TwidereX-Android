@@ -1,24 +1,4 @@
-/*
- *  TwidereX
- *
- *  Copyright (C) 2020 Tlaster <tlaster@outlook.com>
- * 
- *  This file is part of TwidereX.
- * 
- *  TwidereX is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- * 
- *  TwidereX is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- * 
- *  You should have received a copy of the GNU General Public License
- *  along with TwidereX. If not, see <http://www.gnu.org/licenses/>.
- */
-package com.twidere.twiderex.fragment
+package com.twidere.twiderex.component
 
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.background
@@ -51,8 +31,6 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.List
-import androidx.compose.material.icons.filled.Mail
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material.icons.filled.Reply
 import androidx.compose.runtime.Composable
@@ -71,22 +49,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
 import androidx.compose.ui.viewinterop.viewModel
 import androidx.compose.ui.zIndex
-import androidx.navigation.fragment.navArgs
-import com.twidere.twiderex.R
+import androidx.navigation.compose.navigate
 import com.twidere.twiderex.annotations.IncomingComposeUpdate
-import com.twidere.twiderex.component.AppBar
-import com.twidere.twiderex.component.AppBarNavigationButton
-import com.twidere.twiderex.component.LoadingProgress
-import com.twidere.twiderex.component.NetworkImage
-import com.twidere.twiderex.component.StatusDivider
-import com.twidere.twiderex.component.StatusMediaPreviewItem
-import com.twidere.twiderex.component.SwipeToRefreshLayout
-import com.twidere.twiderex.component.TabsComponent
-import com.twidere.twiderex.component.TimelineStatusComponent
-import com.twidere.twiderex.component.TopAppBarElevation
-import com.twidere.twiderex.component.UserAvatar
 import com.twidere.twiderex.component.lazy.itemsGridIndexed
-import com.twidere.twiderex.extensions.AmbientNavController
+import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.ui.standardPadding
@@ -94,36 +60,9 @@ import com.twidere.twiderex.ui.topBarHeight
 import com.twidere.twiderex.viewmodel.user.UserFavouriteTimelineViewModel
 import com.twidere.twiderex.viewmodel.user.UserTimelineViewModel
 import com.twidere.twiderex.viewmodel.user.UserViewModel
-import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 
-@AndroidEntryPoint
-class UserFragment : JetFragment() {
-    private val args by navArgs<UserFragmentArgs>()
-
-    @OptIn(IncomingComposeUpdate::class)
-    @Composable
-    override fun onCompose() {
-        UserComponent(data = args.user) {
-            AppBar(
-                backgroundColor = MaterialTheme.colors.surface.withElevation(),
-                navigationIcon = {
-                    AppBarNavigationButton()
-                },
-                actions = {
-                    IconButton(onClick = {}) {
-                        Icon(asset = Icons.Default.Mail)
-                    }
-                    IconButton(onClick = {}) {
-                        Icon(asset = Icons.Default.MoreVert)
-                    }
-                },
-                elevation = 0.dp,
-            )
-        }
-    }
-}
 
 @OptIn(ExperimentalLazyDsl::class)
 @Composable
@@ -282,13 +221,7 @@ fun UserComponent(
                                                     MaterialTheme.shapes.medium
                                                 ),
                                             onClick = {
-                                                navController.navigate(
-                                                    R.id.media_fragment,
-                                                    MediaFragmentArgs(
-                                                        item.second,
-                                                        item.second.media.indexOf(item.first)
-                                                    ).toBundle()
-                                                )
+                                                navController.navigate("media")
                                             }
                                         )
                                     }

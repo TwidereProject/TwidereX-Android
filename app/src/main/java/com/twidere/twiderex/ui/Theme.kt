@@ -32,7 +32,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.graphics.toArgb
-import com.twidere.twiderex.extensions.AmbientWindow
 import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.settings.AmbientPrimaryColor
 import com.twidere.twiderex.settings.AmbientTheme

@@ -1,24 +1,4 @@
-/*
- *  TwidereX
- *
- *  Copyright (C) 2020 Tlaster <tlaster@outlook.com>
- * 
- *  This file is part of TwidereX.
- * 
- *  TwidereX is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- * 
- *  TwidereX is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- * 
- *  You should have received a copy of the GNU General Public License
- *  along with TwidereX. If not, see <http://www.gnu.org/licenses/>.
- */
-package com.twidere.twiderex.fragment
+package com.twidere.twiderex.scenes
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.ProvideTextStyle
@@ -63,8 +43,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.viewModel
-import androidx.navigation.fragment.navArgs
-import com.twidere.twiderex.R
+import androidx.navigation.compose.navigate
 import com.twidere.twiderex.annotations.IncomingComposeUpdate
 import com.twidere.twiderex.component.AppBar
 import com.twidere.twiderex.component.AppBarNavigationButton
@@ -78,99 +57,95 @@ import com.twidere.twiderex.component.TimelineStatusComponent
 import com.twidere.twiderex.component.TopAppBarElevation
 import com.twidere.twiderex.component.UserAvatar
 import com.twidere.twiderex.component.lazy.LazyGridForIndexed
-import com.twidere.twiderex.extensions.AmbientNavController
+import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.ui.standardPadding
 import com.twidere.twiderex.viewmodel.twitter.search.TwitterSearchMediasViewModel
 import com.twidere.twiderex.viewmodel.twitter.search.TwitterSearchTweetsViewModel
 import com.twidere.twiderex.viewmodel.twitter.search.TwitterSearchUserViewModel
-import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
-@AndroidEntryPoint
-class SearchFragment : JetFragment() {
-    private val args by navArgs<SearchFragmentArgs>()
+@OptIn(ExperimentalFoundationApi::class, ExperimentalFocus::class)
+@Composable
+fun SearchScene(keyword: String) {
 
-    @OptIn(ExperimentalFoundationApi::class, ExperimentalFocus::class)
-    @Composable
-    override fun onCompose() {
-        val tweetsViewModel = viewModel<TwitterSearchTweetsViewModel>()
-        val mediasViewModel = viewModel<TwitterSearchMediasViewModel>()
-        val usersViewModel = viewModel<TwitterSearchUserViewModel>()
-        val (text, setText) = remember { mutableStateOf(args.keyword) }
-        var selectedTab by savedInstanceState { 0 }
+    val tweetsViewModel = viewModel<TwitterSearchTweetsViewModel>()
+    val mediasViewModel = viewModel<TwitterSearchMediasViewModel>()
+    val usersViewModel = viewModel<TwitterSearchUserViewModel>()
+    val (text, setText) = remember { mutableStateOf(keyword) }
+    var selectedTab by savedInstanceState { 0 }
 
-        onActive {
-            tweetsViewModel.reset(args.keyword)
-            mediasViewModel.reset(args.keyword)
-            usersViewModel.reset(args.keyword)
-        }
+    onActive {
+        tweetsViewModel.reset(keyword)
+        mediasViewModel.reset(keyword)
+        usersViewModel.reset(keyword)
+    }
 
-        Scaffold {
-            Column {
-                Surface(
-                    elevation = TopAppBarElevation,
-                ) {
-                    Column {
-                        AppBar(
-                            navigationIcon = {
-                                AppBarNavigationButton()
-                            },
-                            elevation = 0.dp,
-                            title = {
-                                ProvideTextStyle(value = MaterialTheme.typography.body1) {
-                                    Row {
-                                        TextInput(
-                                            modifier = Modifier
-                                                .align(Alignment.CenterVertically)
-                                                .weight(1F),
-                                            value = text,
-                                            onValueChange = {
-                                                setText(it)
-                                            },
-                                            placeholder = {
-                                                Text(text = "Tap to search...")
-                                            },
-                                            onImeActionPerformed = { _, _ ->
-                                                usersViewModel.reset(text)
-                                                tweetsViewModel.reset(text)
-                                                mediasViewModel.reset(text)
-                                            },
-                                            imeAction = ImeAction.Search,
-                                            alignment = Alignment.CenterStart,
-                                        )
-                                        IconButton(onClick = {}) {
-                                            Icon(asset = Icons.Default.Save)
-                                        }
+    Scaffold {
+        Column {
+            Surface(
+                elevation = TopAppBarElevation,
+            ) {
+                Column {
+                    AppBar(
+                        navigationIcon = {
+                            AppBarNavigationButton()
+                        },
+                        elevation = 0.dp,
+                        title = {
+                            ProvideTextStyle(value = MaterialTheme.typography.body1) {
+                                Row {
+                                    TextInput(
+                                        modifier = Modifier
+                                            .align(Alignment.CenterVertically)
+                                            .weight(1F),
+                                        value = text,
+                                        onValueChange = {
+                                            setText(it)
+                                        },
+                                        placeholder = {
+                                            Text(text = "Tap to search...")
+                                        },
+                                        onImeActionPerformed = { _, _ ->
+                                            usersViewModel.reset(text)
+                                            tweetsViewModel.reset(text)
+                                            mediasViewModel.reset(text)
+                                        },
+                                        imeAction = ImeAction.Search,
+                                        alignment = Alignment.CenterStart,
+                                    )
+                                    IconButton(onClick = {}) {
+                                        Icon(asset = Icons.Default.Save)
                                     }
                                 }
                             }
-                        )
-                        TabsComponent(
-                            items = listOf(
-                                Icons.Default.List,
-                                Icons.Default.Image,
-                                Icons.Default.AccountBox,
-                            ),
-                            selectedItem = selectedTab,
-                            onItemSelected = {
-                                selectedTab = it
-                            },
-                        )
-                    }
+                        }
+                    )
+                    TabsComponent(
+                        items = listOf(
+                            Icons.Default.List,
+                            Icons.Default.Image,
+                            Icons.Default.AccountBox,
+                        ),
+                        selectedItem = selectedTab,
+                        onItemSelected = {
+                            selectedTab = it
+                        },
+                    )
                 }
-                Box(
-                    modifier = Modifier.weight(1F),
-                ) {
-                    when (selectedTab) {
-                        0 -> SearchTweetsContent()
-                        1 -> SearchMediasContent()
-                        2 -> SearchUsersContent()
-                    }
+            }
+            Box(
+                modifier = Modifier.weight(1F),
+            ) {
+                when (selectedTab) {
+                    0 -> SearchTweetsContent()
+                    1 -> SearchMediasContent()
+                    2 -> SearchUsersContent()
                 }
             }
         }
     }
 }
+
 
 @OptIn(IncomingComposeUpdate::class)
 @Composable
@@ -257,11 +232,11 @@ private fun SearchMediasContent() {
                     ),
                 onClick = {
                     navController.navigate(
-                        R.id.media_fragment,
-                        MediaFragmentArgs(
-                            item.second,
-                            item.second.media.indexOf(item.first)
-                        ).toBundle()
+                        "media/${item.second.statusId}?selectedIndex=${
+                            item.second.media.indexOf(
+                                item.first
+                            )
+                        }"
                     )
                 }
             )

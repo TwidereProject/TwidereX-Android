@@ -29,10 +29,9 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.VectorAsset
 import androidx.compose.ui.viewinterop.viewModel
-import com.twidere.twiderex.R
+import androidx.navigation.compose.navigate
 import com.twidere.twiderex.component.TimelineComponent
-import com.twidere.twiderex.extensions.AmbientNavController
-import com.twidere.twiderex.fragment.ComposeFragmentArgs
+import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.viewmodel.twitter.timeline.HomeTimelineViewModel
 
 class HomeTimelineItem : HomeNavigationItem() {
@@ -49,10 +48,7 @@ class HomeTimelineItem : HomeNavigationItem() {
                 val navController = AmbientNavController.current
                 FloatingActionButton(
                     onClick = {
-                        navController.navigate(
-                            R.id.compose_fragment,
-                            ComposeFragmentArgs().toBundle(),
-                        )
+                        navController.navigate("compose/New")
                     }
                 ) {
                     Icon(asset = Icons.Default.Add)

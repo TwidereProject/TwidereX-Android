@@ -1,29 +1,5 @@
-/*
- *  TwidereX
- *
- *  Copyright (C) 2020 Tlaster <tlaster@outlook.com>
- * 
- *  This file is part of TwidereX.
- * 
- *  TwidereX is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- * 
- *  TwidereX is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- * 
- *  You should have received a copy of the GNU General Public License
- *  along with TwidereX. If not, see <http://www.gnu.org/licenses/>.
- */
-package com.twidere.twiderex.fragment
+package com.twidere.twiderex.scenes
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.zoomable
 import androidx.compose.foundation.layout.Box
@@ -58,101 +34,87 @@ import androidx.compose.ui.gesture.DragObserver
 import androidx.compose.ui.gesture.rawDragGestureFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import androidx.navigation.fragment.navArgs
 import com.twidere.twiderex.annotations.IncomingComposeUpdate
 import com.twidere.twiderex.component.ActionIconButton
 import com.twidere.twiderex.component.NetworkImage
 import com.twidere.twiderex.component.Pager
-import com.twidere.twiderex.extensions.AmbientNavController
-import com.twidere.twiderex.extensions.compose
+import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.model.ui.UiMedia
-import com.twidere.twiderex.ui.TwidereXTheme
+import com.twidere.twiderex.model.ui.UiStatus
 import kotlin.math.max
 
-class MediaFragment : JetFragment() {
-    private val args by navArgs<MediaFragmentArgs>()
+@Composable
+fun MediaScene(statusId: String, selectedIndex: Int) {
+    //TODO: load media
+}
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return compose {
-            TwidereXTheme(
-                requireDarkTheme = true,
-                pureStatusBarColor = true,
+
+@OptIn(IncomingComposeUpdate::class)
+@Composable
+fun MediaScene(status: UiStatus, selectedIndex: Int) {
+    var lockPager by remember { mutableStateOf(false) }
+    val controlPanelColor = MaterialTheme.colors.surface.copy(alpha = 0.6f)
+    Scaffold {
+        Box {
+            Pager(
+                items = status.media,
+                startPage = selectedIndex,
+                enableDrag = !lockPager,
             ) {
-                onCompose()
+                MediaItemView(data) {
+                    lockPager = it
+                }
             }
-        }
-    }
 
-    @OptIn(IncomingComposeUpdate::class)
-    @Composable
-    override fun onCompose() {
-        var lockPager by remember { mutableStateOf(false) }
-        val controlPanelColor = MaterialTheme.colors.surface.copy(alpha = 0.6f)
-        Scaffold {
-            Box {
-                Pager(
-                    items = args.status.media,
-                    startPage = args.selectedIndex,
-                    enableDrag = !lockPager,
-                ) {
-                    MediaItemView(data) {
-                        lockPager = it
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.BottomCenter)
+                    .background(color = controlPanelColor)
+            ) {
+                Row {
+                    Spacer(modifier = Modifier.weight(1f))
+                    ActionIconButton(onClick = {}) {
+                        Icon(asset = Icons.Default.Reply)
                     }
+                    ActionIconButton(onClick = {}) {
+                        Icon(asset = Icons.Default.Comment)
+                    }
+                    ActionIconButton(onClick = {}) {
+                        Icon(asset = Icons.Default.Favorite)
+                    }
+                    ActionIconButton(onClick = {}) {
+                        Icon(asset = Icons.Default.Share)
+                    }
+                    Spacer(modifier = Modifier.weight(1f))
                 }
+            }
 
+            Box(
+                modifier = Modifier
+                    .padding(16.dp)
+            ) {
                 Box(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .align(Alignment.BottomCenter)
-                        .background(color = controlPanelColor)
+                        .align(Alignment.TopStart)
+                        .clip(MaterialTheme.shapes.small)
+                        .background(color = controlPanelColor, shape = MaterialTheme.shapes.small)
+                        .clipToBounds()
                 ) {
-                    Row {
-                        Spacer(modifier = Modifier.weight(1f))
-                        ActionIconButton(onClick = {}) {
-                            Icon(asset = Icons.Default.Reply)
+                    val navController = AmbientNavController.current
+                    IconButton(
+                        onClick = {
+                            navController.popBackStack()
                         }
-                        ActionIconButton(onClick = {}) {
-                            Icon(asset = Icons.Default.Comment)
-                        }
-                        ActionIconButton(onClick = {}) {
-                            Icon(asset = Icons.Default.Favorite)
-                        }
-                        ActionIconButton(onClick = {}) {
-                            Icon(asset = Icons.Default.Share)
-                        }
-                        Spacer(modifier = Modifier.weight(1f))
-                    }
-                }
-
-                Box(
-                    modifier = Modifier
-                        .padding(16.dp)
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .align(Alignment.TopStart)
-                            .clip(MaterialTheme.shapes.small)
-                            .background(color = controlPanelColor, shape = MaterialTheme.shapes.small)
-                            .clipToBounds()
                     ) {
-                        val navController = AmbientNavController.current
-                        IconButton(
-                            onClick = {
-                                navController.popBackStack()
-                            }
-                        ) {
-                            Icon(asset = Icons.Default.Close)
-                        }
+                        Icon(asset = Icons.Default.Close)
                     }
                 }
             }
         }
     }
 }
+
 
 @Composable
 fun MediaItemView(

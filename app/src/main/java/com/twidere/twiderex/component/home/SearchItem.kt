@@ -38,11 +38,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.graphics.vector.VectorAsset
 import androidx.compose.ui.text.input.ImeAction
-import com.twidere.twiderex.R
+import androidx.navigation.compose.navigate
 import com.twidere.twiderex.component.AppBar
 import com.twidere.twiderex.component.TextInput
-import com.twidere.twiderex.extensions.AmbientNavController
-import com.twidere.twiderex.fragment.SearchFragmentArgs
+import com.twidere.twiderex.ui.AmbientNavController
 
 class SearchItem : HomeNavigationItem() {
     override val name: String
@@ -78,20 +77,14 @@ class SearchItem : HomeNavigationItem() {
                                     alignment = Alignment.CenterStart,
                                     onImeActionPerformed = { _, _ ->
                                         if (text.isNotEmpty()) {
-                                            navController.navigate(
-                                                R.id.search_fragment,
-                                                SearchFragmentArgs(text).toBundle(),
-                                            )
+                                            navController.navigate("search/$text")
                                         }
                                     }
                                 )
                                 IconButton(
                                     onClick = {
                                         if (text.isNotEmpty()) {
-                                            navController.navigate(
-                                                R.id.search_fragment,
-                                                SearchFragmentArgs(text).toBundle(),
-                                            )
+                                            navController.navigate("search/$text")
                                         }
                                     }
                                 ) {

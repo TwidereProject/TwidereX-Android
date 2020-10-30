@@ -55,13 +55,12 @@ import androidx.compose.ui.graphics.vector.VectorAsset
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.viewModel
+import androidx.navigation.compose.navigate
 import com.twidere.twiderex.R
-import com.twidere.twiderex.extensions.AmbientNavController
+import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.extensions.humanizedTimestamp
-import com.twidere.twiderex.fragment.ComposeFragmentArgs
-import com.twidere.twiderex.fragment.ComposeType
-import com.twidere.twiderex.fragment.StatusFragmentArgs
 import com.twidere.twiderex.model.ui.UiStatus
+import com.twidere.twiderex.scenes.ComposeType
 import com.twidere.twiderex.ui.mediumEmphasisContentContentColor
 import com.twidere.twiderex.ui.profileImageSize
 import com.twidere.twiderex.ui.standardPadding
@@ -81,12 +80,7 @@ fun TimelineStatusComponent(
                 .fillMaxWidth()
                 .clickable(
                     onClick = {
-                        navController.navigate(
-                            R.id.status_fragment,
-                            StatusFragmentArgs(
-                                status = data,
-                            ).toBundle()
-                        )
+                        navController.navigate("status/${data.statusId}")
                     }
                 )
                 .padding(
@@ -111,13 +105,7 @@ fun TimelineStatusComponent(
                         icon = Icons.Default.Reply,
                         count = status.replyCount,
                         onClick = {
-                            navController.navigate(
-                                R.id.compose_fragment,
-                                ComposeFragmentArgs(
-                                    status,
-                                    composeType = ComposeType.Reply,
-                                ).toBundle()
-                            )
+                            navController.navigate("compose/${ComposeType.Reply.name}?statusId=${status.statusId}")
                         },
                     )
                     StatusActionButton(
@@ -237,12 +225,7 @@ private fun StatusComponent(
                         modifier = Modifier
                             .clickable(
                                 onClick = {
-                                    navController.navigate(
-                                        R.id.status_fragment,
-                                        StatusFragmentArgs(
-                                            status = status.quote,
-                                        ).toBundle()
-                                    )
+                                    navController.navigate("status/${status.quote.statusId}")
                                 }
                             )
                             .padding(standardPadding),

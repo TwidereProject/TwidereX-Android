@@ -1,24 +1,4 @@
-/*
- *  TwidereX
- *
- *  Copyright (C) 2020 Tlaster <tlaster@outlook.com>
- * 
- *  This file is part of TwidereX.
- * 
- *  TwidereX is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- * 
- *  TwidereX is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- * 
- *  You should have received a copy of the GNU General Public License
- *  along with TwidereX. If not, see <http://www.gnu.org/licenses/>.
- */
-package com.twidere.twiderex.fragment
+package com.twidere.twiderex.scenes
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.AmbientContentColor
@@ -43,6 +23,8 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.ListItem
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
+import androidx.compose.material.ScaffoldState
+import androidx.compose.material.Surface
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Menu
@@ -58,61 +40,38 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.viewModel
-import com.twidere.twiderex.R
+import androidx.navigation.compose.navigate
 import com.twidere.twiderex.component.AppBar
 import com.twidere.twiderex.component.NetworkImage
+import com.twidere.twiderex.component.TabsComponent
 import com.twidere.twiderex.component.TopAppBarElevation
 import com.twidere.twiderex.component.home.HomeNavigationItem
 import com.twidere.twiderex.component.home.HomeTimelineItem
 import com.twidere.twiderex.component.home.MeItem
 import com.twidere.twiderex.component.home.MentionItem
 import com.twidere.twiderex.component.home.SearchItem
-import com.twidere.twiderex.extensions.AmbientNavController
+import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.extensions.withElevation
+import com.twidere.twiderex.settings.AmbientTabPosition
+import com.twidere.twiderex.settings.TabPosition
 import com.twidere.twiderex.ui.profileImageSize
 import com.twidere.twiderex.viewmodel.ActiveAccountViewModel
-import dagger.hilt.android.AndroidEntryPoint
 
-@AndroidEntryPoint
-class HomeFragment : JetFragment() {
-
-    @Composable
-    fun BottomNavigation(
-        items: List<HomeNavigationItem>,
-        selectedItem: Int,
-        onItemSelected: (Int) -> Unit,
-    ) {
-        BottomNavigation(
-            backgroundColor = MaterialTheme.colors.background
-        ) {
-            items.forEachIndexed { index, item ->
-                BottomNavigationItem(
-                    selectedContentColor = MaterialTheme.colors.primary,
-                    unselectedContentColor = AmbientEmphasisLevels.current.medium.applyEmphasis(
-                        AmbientContentColor.current
-                    ),
-                    icon = { Icon(item.icon) },
-                    label = { Text(item.name) },
-                    selected = selectedItem == index,
-                    onClick = { onItemSelected.invoke(index) }
-                )
-            }
-        }
-    }
-
-    @Composable
-    override fun onCompose() {
-        val (selectedItem, setSelectedItem) = savedInstanceState { 0 }
-        val menus = listOf(
-            HomeTimelineItem(),
-            MentionItem(),
-            SearchItem(),
-            MeItem(),
-        )
-        val scaffoldState = rememberScaffoldState()
-        Scaffold(
-            scaffoldState = scaffoldState,
-            topBar = {
+@Composable
+fun HomeScene() {
+    val (selectedItem, setSelectedItem) = savedInstanceState { 0 }
+    val tabPosition by AmbientTabPosition.current.data.observeAsState(initial = AmbientTabPosition.current.initialValue)
+    val menus = listOf(
+        HomeTimelineItem(),
+        MentionItem(),
+        SearchItem(),
+        MeItem(),
+    )
+    val scaffoldState = rememberScaffoldState()
+    Scaffold(
+        scaffoldState = scaffoldState,
+        topBar = {
+            if (tabPosition == TabPosition.Bottom) {
                 if (menus[selectedItem].withAppBar) {
                     AppBar(
                         backgroundColor = MaterialTheme.colors.surface.withElevation(),
@@ -139,37 +98,79 @@ class HomeFragment : JetFragment() {
                         }
                     )
                 }
-            },
-            bottomBar = {
-                BottomNavigation(menus, selectedItem) {
+            } else {
+                Surface(
+                    elevation = if (menus[selectedItem].withAppBar) {
+                        TopAppBarElevation
+                    } else {
+                        0.dp
+                    }
+                ) {
+                    TabsComponent(
+                        items = menus.map { it.icon },
+                        selectedItem = selectedItem,
+                        onItemSelected = {
+                            setSelectedItem(it)
+                        },
+                    )
+                }
+            }
+        },
+        bottomBar = {
+            if (tabPosition == TabPosition.Bottom) {
+                HomeBottomNavigation(menus, selectedItem) {
                     setSelectedItem(it)
                 }
-            },
-            drawerContent = {
-                HomeDrawer()
             }
+        },
+        drawerContent = {
+            HomeDrawer(scaffoldState)
+        }
+    ) {
+        Box(
+            modifier = Modifier.padding(
+                start = it.start,
+                bottom = it.bottom,
+                end = it.end,
+                top = it.top,
+            )
         ) {
-            Box(
-                modifier = Modifier.padding(
-                    start = it.start,
-                    bottom = it.bottom,
-                    end = it.end,
-                    top = it.top,
-                )
+            Crossfade(
+                current = selectedItem,
             ) {
-                Crossfade(
-                    current = selectedItem,
-                ) {
-                    menus[it].onCompose()
-                }
+                menus[it].onCompose()
             }
         }
     }
 }
 
+
+@Composable
+fun HomeBottomNavigation(
+    items: List<HomeNavigationItem>,
+    selectedItem: Int,
+    onItemSelected: (Int) -> Unit,
+) {
+    BottomNavigation(
+        backgroundColor = MaterialTheme.colors.background
+    ) {
+        items.forEachIndexed { index, item ->
+            BottomNavigationItem(
+                selectedContentColor = MaterialTheme.colors.primary,
+                unselectedContentColor = AmbientEmphasisLevels.current.medium.applyEmphasis(
+                    AmbientContentColor.current
+                ),
+                icon = { Icon(item.icon) },
+                label = { Text(item.name) },
+                selected = selectedItem == index,
+                onClick = { onItemSelected.invoke(index) }
+            )
+        }
+    }
+}
 @OptIn(ExperimentalLazyDsl::class)
 @Composable
-private fun HomeDrawer() {
+private fun HomeDrawer(scaffoldState: ScaffoldState) {
     val viewModel = viewModel<ActiveAccountViewModel>()
     val account by viewModel.account.observeAsState()
     val navController = AmbientNavController.current
@@ -262,7 +263,9 @@ private fun HomeDrawer() {
         ListItem(
             modifier = Modifier.clickable(
                 onClick = {
-                    navController.navigate(R.id.settings_fragment)
+                    scaffoldState.drawerState.close {
+                        navController.navigate("settings")
+                    }
                 }
             ),
             icon = {

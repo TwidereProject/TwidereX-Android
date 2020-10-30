@@ -32,9 +32,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.twidere.services.twitter.TwitterService
 import com.twidere.twiderex.extensions.getCachedLocation
-import com.twidere.twiderex.fragment.ComposeType
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.repository.AccountRepository
+import com.twidere.twiderex.scenes.ComposeType
 import com.twidere.twiderex.utils.ComposeQueue
 
 class ComposeViewModel @ViewModelInject constructor(
