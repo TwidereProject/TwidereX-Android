@@ -26,9 +26,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.graphics.vector.VectorAsset
-import com.twidere.twiderex.extensions.navViewModel
 import com.twidere.twiderex.annotations.IncomingComposeUpdate
 import com.twidere.twiderex.component.UserComponent
+import com.twidere.twiderex.extensions.navViewModel
 import com.twidere.twiderex.viewmodel.MeViewModel
 
 class MeItem : HomeNavigationItem() {

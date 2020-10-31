@@ -28,9 +28,9 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.VectorAsset
-import com.twidere.twiderex.extensions.navViewModel
 import androidx.navigation.compose.navigate
 import com.twidere.twiderex.component.TimelineComponent
+import com.twidere.twiderex.extensions.navViewModel
 import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.viewmodel.twitter.timeline.HomeTimelineViewModel
 

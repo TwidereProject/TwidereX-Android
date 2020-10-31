@@ -27,7 +27,6 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.vector.VectorAsset
-import androidx.navigation.compose.currentBackStackEntryAsState
 import com.twidere.twiderex.ui.AmbientNavController
 
 @Composable

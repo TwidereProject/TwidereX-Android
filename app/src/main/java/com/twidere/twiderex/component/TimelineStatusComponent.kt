@@ -54,13 +54,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.VectorAsset
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.twidere.twiderex.extensions.navViewModel
 import androidx.navigation.compose.navigate
-import com.twidere.twiderex.R
-import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.extensions.humanizedTimestamp
+import com.twidere.twiderex.extensions.navViewModel
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.scenes.ComposeType
+import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.ui.mediumEmphasisContentContentColor
 import com.twidere.twiderex.ui.profileImageSize
 import com.twidere.twiderex.ui.standardPadding

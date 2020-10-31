@@ -33,9 +33,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.navigate
-import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.model.ui.UiStatus
+import com.twidere.twiderex.ui.AmbientNavController
 
 @Composable
 fun StatusMediaComponent(

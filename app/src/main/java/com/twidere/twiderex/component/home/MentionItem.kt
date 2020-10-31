@@ -24,8 +24,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AlternateEmail
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.VectorAsset
-import com.twidere.twiderex.extensions.navViewModel
 import com.twidere.twiderex.component.TimelineComponent
+import com.twidere.twiderex.extensions.navViewModel
 import com.twidere.twiderex.viewmodel.twitter.timeline.MentionsTimelineViewModel
 
 class MentionItem : HomeNavigationItem() {

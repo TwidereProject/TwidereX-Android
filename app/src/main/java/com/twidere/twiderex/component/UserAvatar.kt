@@ -31,8 +31,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.unit.Dp
 import androidx.navigation.compose.navigate
-import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.model.ui.UiUser
+import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.ui.profileImageSize
 
 @Composable

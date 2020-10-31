@@ -1,3 +1,23 @@
+/*
+ *  TwidereX
+ *
+ *  Copyright (C) 2020 Tlaster <tlaster@outlook.com>
+ * 
+ *  This file is part of TwidereX.
+ * 
+ *  TwidereX is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ * 
+ *  TwidereX is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ * 
+ *  You should have received a copy of the GNU General Public License
+ *  along with TwidereX. If not, see <http://www.gnu.org/licenses/>.
+ */
 package com.twidere.twiderex.scenes
 
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -42,7 +62,6 @@ import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.twidere.twiderex.extensions.navViewModel
 import androidx.navigation.compose.navigate
 import com.twidere.twiderex.annotations.IncomingComposeUpdate
 import com.twidere.twiderex.component.AppBar
@@ -57,6 +76,7 @@ import com.twidere.twiderex.component.TimelineStatusComponent
 import com.twidere.twiderex.component.TopAppBarElevation
 import com.twidere.twiderex.component.UserAvatar
 import com.twidere.twiderex.component.lazy.LazyGridForIndexed
+import com.twidere.twiderex.extensions.navViewModel
 import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.ui.standardPadding
 import com.twidere.twiderex.viewmodel.twitter.search.TwitterSearchMediasViewModel
@@ -146,7 +166,6 @@ fun SearchScene(keyword: String) {
     }
 }
 
-
 @OptIn(IncomingComposeUpdate::class)
 @Composable
 private fun SearchTweetsContent() {
@@ -233,9 +252,9 @@ private fun SearchMediasContent() {
                 onClick = {
                     navController.navigate(
                         "media/${item.second.statusId}?selectedIndex=${
-                            item.second.media.indexOf(
-                                item.first
-                            )
+                        item.second.media.indexOf(
+                            item.first
+                        )
                         }"
                     )
                 }

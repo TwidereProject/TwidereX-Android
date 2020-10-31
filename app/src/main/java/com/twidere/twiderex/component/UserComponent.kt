@@ -1,3 +1,23 @@
+/*
+ *  TwidereX
+ *
+ *  Copyright (C) 2020 Tlaster <tlaster@outlook.com>
+ * 
+ *  This file is part of TwidereX.
+ * 
+ *  TwidereX is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ * 
+ *  TwidereX is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ * 
+ *  You should have received a copy of the GNU General Public License
+ *  along with TwidereX. If not, see <http://www.gnu.org/licenses/>.
+ */
 package com.twidere.twiderex.component
 
 import androidx.compose.foundation.Text
@@ -47,14 +67,14 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
-import com.twidere.twiderex.extensions.navViewModel
 import androidx.compose.ui.zIndex
 import androidx.navigation.compose.navigate
 import com.twidere.twiderex.annotations.IncomingComposeUpdate
 import com.twidere.twiderex.component.lazy.itemsGridIndexed
-import com.twidere.twiderex.ui.AmbientNavController
+import com.twidere.twiderex.extensions.navViewModel
 import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.model.ui.UiUser
+import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.ui.standardPadding
 import com.twidere.twiderex.ui.topBarHeight
 import com.twidere.twiderex.viewmodel.user.UserFavouriteTimelineViewModel
@@ -62,7 +82,6 @@ import com.twidere.twiderex.viewmodel.user.UserTimelineViewModel
 import com.twidere.twiderex.viewmodel.user.UserViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-
 
 @OptIn(ExperimentalLazyDsl::class)
 @Composable

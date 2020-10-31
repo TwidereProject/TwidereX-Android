@@ -1,3 +1,23 @@
+/*
+ *  TwidereX
+ *
+ *  Copyright (C) 2020 Tlaster <tlaster@outlook.com>
+ * 
+ *  This file is part of TwidereX.
+ * 
+ *  TwidereX is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ * 
+ *  TwidereX is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ * 
+ *  You should have received a copy of the GNU General Public License
+ *  along with TwidereX. If not, see <http://www.gnu.org/licenses/>.
+ */
 package com.twidere.twiderex.scenes
 
 import android.net.Uri
@@ -6,15 +26,40 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.ExperimentalLazyDsl
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRowForIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.*
+import androidx.compose.material.AmbientEmphasisLevels
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.Divider
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.ProvideEmphasis
+import androidx.compose.material.Scaffold
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.AlternateEmail
+import androidx.compose.material.icons.filled.Camera
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Gif
+import androidx.compose.material.icons.filled.MyLocation
+import androidx.compose.material.icons.filled.Pages
+import androidx.compose.material.icons.filled.Place
+import androidx.compose.material.icons.filled.Send
+import androidx.compose.material.icons.filled.Topic
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -29,7 +74,12 @@ import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.node.Ref
 import androidx.compose.ui.text.SoftwareKeyboardController
 import androidx.compose.ui.unit.dp
-import com.twidere.twiderex.component.*
+import com.twidere.twiderex.component.AppBar
+import com.twidere.twiderex.component.AppBarNavigationButton
+import com.twidere.twiderex.component.NetworkImage
+import com.twidere.twiderex.component.StatusLineComponent
+import com.twidere.twiderex.component.TextInput
+import com.twidere.twiderex.component.TimelineStatusComponent
 import com.twidere.twiderex.extensions.navViewModel
 import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.maxComposeTextLength
@@ -43,7 +93,6 @@ import com.twidere.twiderex.viewmodel.ActiveAccountViewModel
 import com.twidere.twiderex.viewmodel.ComposeViewModel
 import kotlinx.coroutines.launch
 
-
 enum class ComposeType {
     New,
     Reply,
@@ -52,7 +101,7 @@ enum class ComposeType {
 
 @Composable
 fun ComposeScene(status: ComposeType, composeType: String?) {
-    //TODO: implementation
+    // TODO: implementation
 }
 
 @OptIn(ExperimentalLazyDsl::class, ExperimentalFocus::class, ExperimentalFoundationApi::class)
@@ -262,7 +311,6 @@ private fun ComposeActions() {
         }
     }
 }
-
 
 @Composable
 private fun ComposeImage(item: Uri) {
