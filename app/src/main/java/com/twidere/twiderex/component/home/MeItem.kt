@@ -26,7 +26,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.graphics.vector.VectorAsset
-import androidx.compose.ui.viewinterop.viewModel
+import com.twidere.twiderex.extensions.navViewModel
 import com.twidere.twiderex.annotations.IncomingComposeUpdate
 import com.twidere.twiderex.component.UserComponent
 import com.twidere.twiderex.viewmodel.MeViewModel
@@ -42,7 +42,7 @@ class MeItem : HomeNavigationItem() {
     @OptIn(IncomingComposeUpdate::class)
     @Composable
     override fun onCompose() {
-        val viewModel = viewModel<MeViewModel>()
+        val viewModel = navViewModel<MeViewModel>()
         val user by viewModel.user.observeAsState()
         user?.let {
             UserComponent(data = it)

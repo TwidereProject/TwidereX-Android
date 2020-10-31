@@ -12,13 +12,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.viewinterop.viewModel
+import com.twidere.twiderex.extensions.navViewModel
 import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.viewmodel.twitter.TwitterSignInViewModel
 
 @Composable
 fun TwitterSignInScene() {
-    val viewModel = viewModel<TwitterSignInViewModel>()
+    val viewModel = navViewModel<TwitterSignInViewModel>()
     val isLoading by viewModel.isLoading.observeAsState()
     val navController = AmbientNavController.current
     Column(

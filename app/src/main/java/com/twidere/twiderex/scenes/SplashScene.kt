@@ -12,16 +12,17 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.viewinterop.viewModel
 import androidx.navigation.compose.navigate
 import com.twidere.twiderex.R
+import com.twidere.twiderex.extensions.navViewModel
 import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.viewmodel.SplashViewModel
 import kotlinx.coroutines.launch
 
 @Composable
 fun SplashScene() {
-    val viewModel = viewModel<SplashViewModel>()
+
+    val viewModel = navViewModel<SplashViewModel>()
     val scope = rememberCoroutineScope()
     val navController = AmbientNavController.current
     Scaffold {

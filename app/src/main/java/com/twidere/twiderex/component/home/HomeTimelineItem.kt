@@ -28,7 +28,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.VectorAsset
-import androidx.compose.ui.viewinterop.viewModel
+import com.twidere.twiderex.extensions.navViewModel
 import androidx.navigation.compose.navigate
 import com.twidere.twiderex.component.TimelineComponent
 import com.twidere.twiderex.ui.AmbientNavController
@@ -42,7 +42,7 @@ class HomeTimelineItem : HomeNavigationItem() {
 
     @Composable
     override fun onCompose() {
-        val viewModel = viewModel<HomeTimelineViewModel>()
+        val viewModel = navViewModel<HomeTimelineViewModel>()
         Scaffold(
             floatingActionButton = {
                 val navController = AmbientNavController.current

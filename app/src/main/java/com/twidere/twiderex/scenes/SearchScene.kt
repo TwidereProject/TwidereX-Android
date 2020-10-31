@@ -42,7 +42,7 @@ import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.viewModel
+import com.twidere.twiderex.extensions.navViewModel
 import androidx.navigation.compose.navigate
 import com.twidere.twiderex.annotations.IncomingComposeUpdate
 import com.twidere.twiderex.component.AppBar
@@ -68,9 +68,9 @@ import kotlinx.coroutines.launch
 @Composable
 fun SearchScene(keyword: String) {
 
-    val tweetsViewModel = viewModel<TwitterSearchTweetsViewModel>()
-    val mediasViewModel = viewModel<TwitterSearchMediasViewModel>()
-    val usersViewModel = viewModel<TwitterSearchUserViewModel>()
+    val tweetsViewModel = navViewModel<TwitterSearchTweetsViewModel>()
+    val mediasViewModel = navViewModel<TwitterSearchMediasViewModel>()
+    val usersViewModel = navViewModel<TwitterSearchUserViewModel>()
     val (text, setText) = remember { mutableStateOf(keyword) }
     var selectedTab by savedInstanceState { 0 }
 
@@ -150,7 +150,7 @@ fun SearchScene(keyword: String) {
 @OptIn(IncomingComposeUpdate::class)
 @Composable
 private fun SearchTweetsContent() {
-    val viewModel = viewModel<TwitterSearchTweetsViewModel>()
+    val viewModel = navViewModel<TwitterSearchTweetsViewModel>()
     val refreshing by viewModel.refreshing.observeAsState(initial = false)
     val loadingMore by viewModel.loadingMore.observeAsState(initial = false)
     val items by viewModel.source.observeAsState(initial = emptyList())
@@ -190,7 +190,7 @@ private fun SearchTweetsContent() {
 @OptIn(IncomingComposeUpdate::class)
 @Composable
 private fun SearchMediasContent() {
-    val viewModel = viewModel<TwitterSearchMediasViewModel>()
+    val viewModel = navViewModel<TwitterSearchMediasViewModel>()
     val refreshing by viewModel.refreshing.observeAsState(initial = false)
     val loadingMore by viewModel.loadingMore.observeAsState(initial = false)
     val source by viewModel.source.observeAsState(initial = emptyList())
@@ -247,7 +247,7 @@ private fun SearchMediasContent() {
 @OptIn(IncomingComposeUpdate::class)
 @Composable
 private fun SearchUsersContent() {
-    val viewModel = viewModel<TwitterSearchUserViewModel>()
+    val viewModel = navViewModel<TwitterSearchUserViewModel>()
     val refreshing by viewModel.refreshing.observeAsState(initial = false)
     val loadingMore by viewModel.loadingMore.observeAsState(initial = false)
     val items by viewModel.source.observeAsState(initial = emptyList())

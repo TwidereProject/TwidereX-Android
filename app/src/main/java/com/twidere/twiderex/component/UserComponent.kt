@@ -47,7 +47,7 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
-import androidx.compose.ui.viewinterop.viewModel
+import com.twidere.twiderex.extensions.navViewModel
 import androidx.compose.ui.zIndex
 import androidx.navigation.compose.navigate
 import com.twidere.twiderex.annotations.IncomingComposeUpdate
@@ -72,7 +72,7 @@ fun UserComponent(
     lazyListState: LazyListState = rememberLazyListState(),
     appBar: @Composable (() -> Unit)? = null,
 ) {
-    val viewModel = viewModel<UserViewModel>()
+    val viewModel = navViewModel<UserViewModel>()
     val user by viewModel.user.observeAsState(initial = data)
 
     val tabs = listOf(
@@ -82,13 +82,13 @@ fun UserComponent(
     )
     val (selectedItem, setSelectedItem) = savedInstanceState { 0 }
 
-    val timelineViewModel = viewModel<UserTimelineViewModel>()
+    val timelineViewModel = navViewModel<UserTimelineViewModel>()
     val timeline by timelineViewModel.timeline.observeAsState(initial = emptyList())
     val timelineLoadingMore by timelineViewModel.loadingMore.observeAsState(initial = false)
     val mediaTimeline =
         timeline.filter { it.hasMedia }.flatMap { it.media.map { media -> media to it } }
 
-    val favouriteViewModel = viewModel<UserFavouriteTimelineViewModel>()
+    val favouriteViewModel = navViewModel<UserFavouriteTimelineViewModel>()
     val favourite by favouriteViewModel.timeline.observeAsState(initial = emptyList())
     val favouriteLoadingMore by favouriteViewModel.loadingMore.observeAsState(initial = false)
 
@@ -273,7 +273,7 @@ fun UserComponent(
 
 @Composable
 private fun UserInfo(data: UiUser) {
-    val viewModel = viewModel<UserViewModel>()
+    val viewModel = navViewModel<UserViewModel>()
     val user by viewModel.user.observeAsState(initial = data)
     val loaded by viewModel.loaded.observeAsState(initial = false)
     val relationship by viewModel.relationship.observeAsState()

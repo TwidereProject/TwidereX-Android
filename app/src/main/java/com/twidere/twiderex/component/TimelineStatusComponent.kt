@@ -54,7 +54,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.VectorAsset
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.viewModel
+import com.twidere.twiderex.extensions.navViewModel
 import androidx.navigation.compose.navigate
 import com.twidere.twiderex.R
 import com.twidere.twiderex.ui.AmbientNavController
@@ -71,7 +71,7 @@ fun TimelineStatusComponent(
     data: UiStatus,
     showActions: Boolean = true,
 ) {
-    val actionsViewModel = viewModel<StatusActionsViewModel>()
+    val actionsViewModel = navViewModel<StatusActionsViewModel>()
     Column {
         val status = (data.retweet ?: data)
         val navController = AmbientNavController.current

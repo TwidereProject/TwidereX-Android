@@ -24,12 +24,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Providers
 import androidx.compose.ui.platform.setContent
-import com.twidere.twiderex.settings.AmbientPrimaryColor
-import com.twidere.twiderex.settings.AmbientTabPosition
-import com.twidere.twiderex.settings.AmbientTheme
-import com.twidere.twiderex.settings.PrimaryColorSetting
-import com.twidere.twiderex.settings.TabPositionSetting
-import com.twidere.twiderex.settings.ThemeSetting
+import com.twidere.twiderex.settings.*
+import com.twidere.twiderex.ui.AmbientViewModelProviderFactory
 import com.twidere.twiderex.ui.AmbientWindow
 import com.twidere.twiderex.utils.ActivityLauncher
 import com.twidere.twiderex.utils.AmbientLauncher
@@ -61,6 +57,7 @@ class MainActivity : ComponentActivity() {
                 AmbientTheme provides theme,
                 AmbientLauncher provides launcher,
                 AmbientWindow provides window,
+                AmbientViewModelProviderFactory provides defaultViewModelProviderFactory
             ) {
                 App()
             }

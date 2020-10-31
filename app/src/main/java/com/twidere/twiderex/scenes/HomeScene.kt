@@ -39,7 +39,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.viewModel
+import com.twidere.twiderex.extensions.navViewModel
 import androidx.navigation.compose.navigate
 import com.twidere.twiderex.component.AppBar
 import com.twidere.twiderex.component.NetworkImage
@@ -171,7 +171,7 @@ fun HomeBottomNavigation(
 @OptIn(ExperimentalLazyDsl::class)
 @Composable
 private fun HomeDrawer(scaffoldState: ScaffoldState) {
-    val viewModel = viewModel<ActiveAccountViewModel>()
+    val viewModel = navViewModel<ActiveAccountViewModel>()
     val account by viewModel.account.observeAsState()
     val navController = AmbientNavController.current
 
