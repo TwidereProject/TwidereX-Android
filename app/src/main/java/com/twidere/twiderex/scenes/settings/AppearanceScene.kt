@@ -44,64 +44,65 @@ import com.twidere.twiderex.component.AppBar
 import com.twidere.twiderex.component.AppBarNavigationButton
 import com.twidere.twiderex.component.lazy.itemDivider
 import com.twidere.twiderex.component.settings.radioItem
-import com.twidere.twiderex.settings.AmbientTabPosition
-import com.twidere.twiderex.settings.AmbientTheme
+import com.twidere.twiderex.extensions.navViewModel
 import com.twidere.twiderex.settings.primaryColorDialog
+import com.twidere.twiderex.ui.TwidereXTheme
+import com.twidere.twiderex.viewmodel.settings.AppearanceViewModel
 
 @OptIn(ExperimentalLazyDsl::class)
 @Composable
 fun AppearanceScene() {
-
-    val tabPosition = AmbientTabPosition.current
-    val theme = AmbientTheme.current
+    val viewModel = navViewModel<AppearanceViewModel>()
     var showPrimaryColorDialog by remember { mutableStateOf(false) }
-    Scaffold(
-        topBar = {
-            AppBar(
-                navigationIcon = {
-                    AppBarNavigationButton()
-                },
-                title = {
-                    Text(text = "Appearance")
-                },
-            )
-        }
-    ) {
-        if (showPrimaryColorDialog) {
-            primaryColorDialog(
-                onDismiss = {
-                    showPrimaryColorDialog = false
-                }
-            )
-        }
-        LazyColumn {
-            item {
-                ListItem(
-                    modifier = Modifier.clickable(
-                        onClick = {
-                            showPrimaryColorDialog = true
-                        }
-                    ),
-                    text = {
-                        Text(text = "Highlight color")
+    TwidereXTheme {
+        Scaffold(
+            topBar = {
+                AppBar(
+                    navigationIcon = {
+                        AppBarNavigationButton()
                     },
-                    trailing = {
-                        Box(
-                            modifier = Modifier
-                                .preferredHeight(24.dp)
-                                .preferredWidth(32.dp)
-                                .clip(MaterialTheme.shapes.small)
-                                .aspectRatio(1F)
-                                .background(MaterialTheme.colors.primary),
-                        ) {
-                        }
+                    title = {
+                        Text(text = "Appearance")
+                    },
+                )
+            }
+        ) {
+            if (showPrimaryColorDialog) {
+                primaryColorDialog(
+                    onDismiss = {
+                        showPrimaryColorDialog = false
                     }
                 )
             }
-            itemDivider()
-            radioItem(theme)
-            itemDivider()
-            radioItem(tabPosition)
+            LazyColumn {
+                item {
+                    ListItem(
+                        modifier = Modifier.clickable(
+                            onClick = {
+                                showPrimaryColorDialog = true
+                            }
+                        ),
+                        text = {
+                            Text(text = "Highlight color")
+                        },
+                        trailing = {
+                            Box(
+                                modifier = Modifier
+                                    .preferredHeight(24.dp)
+                                    .preferredWidth(32.dp)
+                                    .clip(MaterialTheme.shapes.small)
+                                    .aspectRatio(1F)
+                                    .background(MaterialTheme.colors.primary),
+                            ) {
+                            }
+                        }
+                    )
+                }
+                itemDivider()
+                radioItem(viewModel.themeSetting)
+                itemDivider()
+                radioItem(viewModel.tabPositionSetting)
+            }
         }
     }
 }

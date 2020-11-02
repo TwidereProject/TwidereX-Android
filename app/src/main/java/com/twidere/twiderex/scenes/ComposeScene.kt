@@ -84,12 +84,12 @@ import com.twidere.twiderex.extensions.navViewModel
 import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.maxComposeTextLength
 import com.twidere.twiderex.model.ui.UiStatus
+import com.twidere.twiderex.ui.AmbientActiveAccount
 import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.ui.composeImageSize
 import com.twidere.twiderex.ui.profileImageSize
 import com.twidere.twiderex.ui.standardPadding
 import com.twidere.twiderex.utils.AmbientLauncher
-import com.twidere.twiderex.viewmodel.ActiveAccountViewModel
 import com.twidere.twiderex.viewmodel.ComposeViewModel
 import kotlinx.coroutines.launch
 
@@ -100,8 +100,10 @@ enum class ComposeType {
 }
 
 @Composable
-fun ComposeScene(status: ComposeType, composeType: String?) {
-    // TODO: implementation
+fun ComposeScene(type: ComposeType, statusId: String?) {
+    if (type == ComposeType.New) {
+        ComposeScene()
+    }
 }
 
 @OptIn(ExperimentalLazyDsl::class, ExperimentalFocus::class, ExperimentalFoundationApi::class)
@@ -109,9 +111,8 @@ fun ComposeScene(status: ComposeType, composeType: String?) {
 fun ComposeScene(status: UiStatus? = null, composeType: ComposeType = ComposeType.New) {
     val viewModel = navViewModel<ComposeViewModel>()
     val (text, setText) = remember { mutableStateOf("") }
-    val activeAccountViewModel = navViewModel<ActiveAccountViewModel>()
     val images by viewModel.images.observeAsState(initial = emptyList())
-    val account by activeAccountViewModel.account.observeAsState()
+    val account = AmbientActiveAccount.current
     val location by viewModel.location.observeAsState()
     val locationEnabled by viewModel.locationEnabled.observeAsState(initial = false)
     val navController = AmbientNavController.current

@@ -33,31 +33,28 @@ import com.twidere.twiderex.component.AppBar
 import com.twidere.twiderex.component.AppBarNavigationButton
 import com.twidere.twiderex.component.UserComponent
 import com.twidere.twiderex.extensions.withElevation
-import com.twidere.twiderex.model.ui.UiUser
-
-@Composable
-fun UserScene(name: String) {
-    // TODO Load UiUser
-}
+import com.twidere.twiderex.ui.TwidereXTheme
 
 @OptIn(IncomingComposeUpdate::class)
 @Composable
-fun UserScene(user: UiUser) {
-    UserComponent(data = user) {
-        AppBar(
-            backgroundColor = MaterialTheme.colors.surface.withElevation(),
-            navigationIcon = {
-                AppBarNavigationButton()
-            },
-            actions = {
-                IconButton(onClick = {}) {
-                    Icon(asset = Icons.Default.Mail)
-                }
-                IconButton(onClick = {}) {
-                    Icon(asset = Icons.Default.MoreVert)
-                }
-            },
-            elevation = 0.dp,
-        )
+fun UserScene(name: String) {
+    TwidereXTheme {
+        UserComponent(screenName = name) {
+            AppBar(
+                backgroundColor = MaterialTheme.colors.surface.withElevation(),
+                navigationIcon = {
+                    AppBarNavigationButton()
+                },
+                actions = {
+                    IconButton(onClick = {}) {
+                        Icon(asset = Icons.Default.Mail)
+                    }
+                    IconButton(onClick = {}) {
+                        Icon(asset = Icons.Default.MoreVert)
+                    }
+                },
+                elevation = 0.dp,
+            )
+        }
     }
 }

@@ -22,9 +22,12 @@ package com.twidere.twiderex.ui
 
 import android.view.Window
 import androidx.compose.runtime.ambientOf
+import androidx.compose.runtime.staticAmbientOf
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
+import com.twidere.twiderex.model.AccountDetails
 
-val AmbientWindow = ambientOf<Window> { error("No Window") }
-val AmbientNavController = ambientOf<NavController> { error("No NavController") }
-val AmbientViewModelProviderFactory = ambientOf<ViewModelProvider.Factory>()
+val AmbientWindow = staticAmbientOf<Window> { error("No Window") }
+val AmbientNavController = staticAmbientOf<NavController> { error("No NavController") }
+val AmbientViewModelProviderFactory = staticAmbientOf<ViewModelProvider.Factory>()
+val AmbientActiveAccount = ambientOf<AccountDetails?>()

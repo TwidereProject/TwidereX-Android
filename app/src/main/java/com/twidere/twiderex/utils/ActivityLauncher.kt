@@ -25,7 +25,7 @@ import androidx.activity.result.contract.ActivityResultContract
 import androidx.compose.runtime.ambientOf
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
-import java.util.*
+import java.util.UUID
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 

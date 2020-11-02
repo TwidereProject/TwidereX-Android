@@ -24,6 +24,7 @@ import android.accounts.Account
 import android.accounts.AccountManager
 import android.content.SharedPreferences
 import androidx.core.content.edit
+import androidx.lifecycle.MutableLiveData
 import com.twidere.twiderex.db.model.DbUser
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.PlatformType
@@ -53,6 +54,9 @@ class AccountRepository @Inject constructor(
     private val manager: AccountManager,
     private val sharedPreferences: SharedPreferences,
 ) {
+    val activeAccount =
+        MutableLiveData<AccountDetails>(if (hasAccount()) getCurrentAccount() else null)
+
     fun getAccounts(): List<Account> {
         return manager.getAccountsByType(ACCOUNT_TYPE).toList()
     }
@@ -74,6 +78,7 @@ class AccountRepository @Inject constructor(
         sharedPreferences.edit {
             putString(PREFERENCE_CURRENT_ACTIVE_ACCOUNT, detail.key.toString())
         }
+        activeAccount.postValue(detail)
     }
 
     fun getCurrentAccount(): AccountDetails {
@@ -96,6 +101,7 @@ class AccountRepository @Inject constructor(
     fun addAccount(detail: AccountDetails) {
         manager.addAccountExplicitly(detail.account, null, null)
         updateAccount(detail)
+        setCurrentAccount(detail)
     }
 
     fun getAccountDetails(

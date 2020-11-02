@@ -29,8 +29,6 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.graphics.toArgb
 import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.settings.AmbientPrimaryColor
@@ -43,8 +41,8 @@ fun TwidereXTheme(
     pureStatusBarColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
-    val theme by AmbientTheme.current.data.observeAsState(initial = AmbientTheme.current.initialValue)
-    val primaryColor by AmbientPrimaryColor.current.data.observeAsState(initial = AmbientPrimaryColor.current.initialValue)
+    val theme = AmbientTheme.current
+    val primaryColor = AmbientPrimaryColor.current
 
     val darkTheme = if (requireDarkTheme) {
         true

@@ -37,6 +37,7 @@ import com.twidere.twiderex.R
 import com.twidere.twiderex.extensions.navViewModel
 import com.twidere.twiderex.extensions.navigate
 import com.twidere.twiderex.ui.AmbientNavController
+import com.twidere.twiderex.ui.TwidereXTheme
 import com.twidere.twiderex.viewmodel.SplashViewModel
 import kotlinx.coroutines.launch
 
@@ -46,14 +47,17 @@ fun SplashScene() {
     val viewModel = navViewModel<SplashViewModel>()
     val scope = rememberCoroutineScope()
     val navController = AmbientNavController.current
-    Scaffold {
-        Column(
-            modifier = Modifier.fillMaxWidth().fillMaxHeight(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            // TODO: replace with real icon
-            Image(vectorResource(id = R.drawable.ic_launcher_foreground))
+    TwidereXTheme {
+
+        Scaffold {
+            Column(
+                modifier = Modifier.fillMaxWidth().fillMaxHeight(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                // TODO: replace with real icon
+                Image(vectorResource(id = R.drawable.ic_launcher_foreground))
+            }
         }
     }
     onActive(

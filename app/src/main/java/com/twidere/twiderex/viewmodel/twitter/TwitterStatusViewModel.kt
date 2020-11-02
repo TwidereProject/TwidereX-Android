@@ -74,14 +74,17 @@ class TwitterStatusViewModel @ViewModelInject constructor(
     private val conversations = arrayListOf<StatusV2>()
     private val previous = arrayListOf<StatusV2>()
 
-    suspend fun init(data: UiStatus) = coroutineScope {
-        if (conversations.any() || previous.any() || loadingPrevious.value == true || loadingMore.value == true) {
+    suspend fun init(statusId: String) = coroutineScope {
+        if (status.value != null || conversations.any() || previous.any() || loadingPrevious.value == true || loadingMore.value == true) {
             return@coroutineScope
         }
-        status.postValue(data)
+        val cache = repository.loadTweetFromCache(statusId)
+        cache?.let {
+            status.postValue(it)
+        }
         loadingPrevious.postValue(true)
         loadingMore.postValue(true)
-        val tweet = repository.loadTweet(data)
+        val tweet = repository.loadTweetFromNetwork(statusId)
         val ui = repository.toUiStatus(tweet)
         targetTweet =
             tweet.referencedTweets?.firstOrNull { it.type == ReferencedTweetType.retweeted }?.status

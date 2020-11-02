@@ -44,108 +44,110 @@ import com.twidere.twiderex.component.StatusLineComponent
 import com.twidere.twiderex.component.TimelineStatusComponent
 import com.twidere.twiderex.component.loading
 import com.twidere.twiderex.extensions.navViewModel
-import com.twidere.twiderex.model.ui.UiStatus
+import com.twidere.twiderex.ui.TwidereXTheme
 import com.twidere.twiderex.ui.standardPadding
 import com.twidere.twiderex.viewmodel.twitter.TwitterStatusViewModel
 import kotlinx.coroutines.launch
 
-@Composable
-fun StatusScene(statusId: String) {
-    // TODO: load status
-}
-
 @OptIn(ExperimentalLazyDsl::class)
 @Composable
-fun StatusScene(data: UiStatus) {
+fun StatusScene(statusId: String) {
     val viewModel = navViewModel<TwitterStatusViewModel>()
     val loadingPrevious by viewModel.loadingPrevious.observeAsState(initial = false)
     val loadingMore by viewModel.loadingMore.observeAsState(initial = false)
-    val status by viewModel.status.observeAsState(initial = data)
+    val status by viewModel.status.observeAsState()
     val moreConversations by viewModel.moreConversations.observeAsState(initial = emptyList())
     val previousConversations by viewModel.previousConversations.observeAsState(initial = emptyList())
     val scope = rememberCoroutineScope()
     LaunchedTask {
-        viewModel.init(status)
+        viewModel.init(statusId)
     }
-    Scaffold(
-        topBar = {
-            AppBar(
-                title = {
-                    Text(text = "Tweet")
-                },
-                navigationIcon = {
-                    AppBarNavigationButton()
-                }
-            )
-        }
-    ) {
-        if (loadingPrevious) {
-            Column {
-                ExpandedStatusComponent(
-                    status = status,
-                )
-                Divider(
-                    modifier = Modifier.padding(horizontal = standardPadding * 2)
-                )
-                LoadingProgress()
-            }
-        } else {
-            LazyColumn(
-                state = rememberLazyListState(initialFirstVisibleItemIndex = previousConversations.size)
-            ) {
-                itemsIndexed(previousConversations) { index, item ->
-                    StatusLineComponent(
-                        lineUp = index != 0,
-                        lineDown = true,
-                    ) {
-                        TimelineStatusComponent(data = item)
+    TwidereXTheme {
+        Scaffold(
+            topBar = {
+                AppBar(
+                    title = {
+                        Text(text = "Tweet")
+                    },
+                    navigationIcon = {
+                        AppBarNavigationButton()
                     }
-                    StatusDivider()
-                }
-                item {
-                    Column(
-                        modifier = if (moreConversations.any()) {
-                            Modifier
-                        } else {
-                            Modifier.fillParentMaxHeight()
-                        }
-                    ) {
-                        StatusLineComponent(
-                            lineUp = previousConversations.any(),
-                        ) {
-                            ExpandedStatusComponent(
-                                status = status,
-                            )
-                        }
-                        Divider(
-                            modifier = Modifier.padding(horizontal = standardPadding * 2)
+                )
+            }
+        ) {
+            if (loadingPrevious) {
+                Column {
+                    status?.let {
+                        ExpandedStatusComponent(
+                            status = it,
                         )
                     }
+                    Divider(
+                        modifier = Modifier.padding(horizontal = standardPadding * 2)
+                    )
+                    LoadingProgress()
                 }
-                if (moreConversations.any()) {
-                    itemsIndexed(moreConversations) { index, item ->
-                        val modifier = if (!loadingMore && index == moreConversations.lastIndex) {
-                            Modifier.fillParentMaxHeight()
-                        } else {
-                            Modifier
-                        }
-                        Box(
-                            modifier = modifier
+            } else {
+                LazyColumn(
+                    state = rememberLazyListState(initialFirstVisibleItemIndex = previousConversations.size)
+                ) {
+                    itemsIndexed(previousConversations) { index, item ->
+                        StatusLineComponent(
+                            lineUp = index != 0,
+                            lineDown = true,
                         ) {
                             TimelineStatusComponent(data = item)
                         }
-                        if (index != moreConversations.lastIndex || loadingMore) {
-                            StatusDivider()
+                        StatusDivider()
+                    }
+                    item {
+                        Column(
+                            modifier = if (moreConversations.any()) {
+                                Modifier
+                            } else {
+                                Modifier.fillParentMaxHeight()
+                            }
+                        ) {
+                            StatusLineComponent(
+                                lineUp = previousConversations.any(),
+                            ) {
+                                status?.let {
+                                    ExpandedStatusComponent(
+                                        status = it,
+                                    )
+                                }
+                            }
+                            Divider(
+                                modifier = Modifier.padding(horizontal = standardPadding * 2)
+                            )
                         }
-                        if (index == moreConversations.lastIndex && !loadingMore) {
-                            scope.launch {
-                                viewModel.loadMore()
+                    }
+                    if (moreConversations.any()) {
+                        itemsIndexed(moreConversations) { index, item ->
+                            val modifier =
+                                if (!loadingMore && index == moreConversations.lastIndex) {
+                                    Modifier.fillParentMaxHeight()
+                                } else {
+                                    Modifier
+                                }
+                            Box(
+                                modifier = modifier
+                            ) {
+                                TimelineStatusComponent(data = item)
+                            }
+                            if (index != moreConversations.lastIndex || loadingMore) {
+                                StatusDivider()
+                            }
+                            if (index == moreConversations.lastIndex && !loadingMore) {
+                                scope.launch {
+                                    viewModel.loadMore()
+                                }
                             }
                         }
                     }
-                }
-                if (loadingMore) {
-                    loading()
+                    if (loadingMore) {
+                        loading()
+                    }
                 }
             }
         }

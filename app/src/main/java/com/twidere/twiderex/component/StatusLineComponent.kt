@@ -40,7 +40,7 @@ import com.twidere.twiderex.ui.statusLineWidth
 
 @Composable
 fun StatusLineComponent(
-    lineColor: Color = MaterialTheme.colors.primary,
+    lineColor: Color = MaterialTheme.colors.onSurface.copy(alpha = 0.12f),
     lineWidth: Dp = statusLineWidth,
     startPadding: Dp = standardPadding * 2 + profileImageSize / 2 - lineWidth / 2,
     topPoint: Dp = standardPadding * 2 + profileImageSize / 2,

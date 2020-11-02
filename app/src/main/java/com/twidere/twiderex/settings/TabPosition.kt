@@ -34,7 +34,6 @@ enum class TabPosition {
 class TabPositionSetting(
     private val preferences: SharedPreferences,
 ) : RadioSettingItem<TabPosition>(preferences) {
-
     override val options: List<TabPosition> = TabPosition.values().toList()
     override val itemContent: @Composable (item: TabPosition) -> Unit = {
         Text(text = it.name)
@@ -49,4 +48,4 @@ class TabPositionSetting(
     }
 }
 
-val AmbientTabPosition = ambientOf<TabPositionSetting>()
+val AmbientTabPosition = ambientOf<TabPosition>()

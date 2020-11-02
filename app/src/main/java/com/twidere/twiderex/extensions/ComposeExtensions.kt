@@ -29,10 +29,12 @@ import androidx.navigation.NavController
 import androidx.navigation.NavDeepLinkRequest
 import androidx.navigation.NavOptions
 import com.twidere.twiderex.ui.AmbientViewModelProviderFactory
+import java.util.UUID
 
 @Composable
 inline fun <reified VM : ViewModel> navViewModel(
-    key: String? = null,
+    key: String? = UUID.randomUUID()
+        .toString(), // FIXME: 2020/11/2 A quick workaround for https://github.com/google/dagger/issues/2166
     factory: ViewModelProvider.Factory? = AmbientViewModelProviderFactory.current,
 ): VM = viewModel(key, factory)
 

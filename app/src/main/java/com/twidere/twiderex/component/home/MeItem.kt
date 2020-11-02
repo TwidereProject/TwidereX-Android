@@ -45,7 +45,7 @@ class MeItem : HomeNavigationItem() {
         val viewModel = navViewModel<MeViewModel>()
         val user by viewModel.user.observeAsState()
         user?.let {
-            UserComponent(data = it)
+            UserComponent(screenName = it.screenName)
         }
     }
 }

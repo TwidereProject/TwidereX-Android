@@ -22,9 +22,12 @@ package com.twidere.twiderex.scenes
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.zoomable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -40,7 +43,9 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Reply
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedTask
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -56,16 +61,44 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.annotations.IncomingComposeUpdate
 import com.twidere.twiderex.component.ActionIconButton
+import com.twidere.twiderex.component.LoadingProgress
 import com.twidere.twiderex.component.NetworkImage
 import com.twidere.twiderex.component.Pager
+import com.twidere.twiderex.extensions.navViewModel
 import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.ui.AmbientNavController
+import com.twidere.twiderex.ui.TwidereXTheme
+import com.twidere.twiderex.viewmodel.MediaViewModel
 import kotlin.math.max
 
 @Composable
 fun MediaScene(statusId: String, selectedIndex: Int) {
-    // TODO: load media
+    val viewModel = navViewModel<MediaViewModel>()
+    val loading by viewModel.loading.observeAsState(initial = false)
+    val status by viewModel.status.observeAsState()
+    LaunchedTask {
+        viewModel.init(statusId)
+    }
+    TwidereXTheme(
+        requireDarkTheme = true,
+        pureStatusBarColor = true,
+    ) {
+        if (loading) {
+            Scaffold {
+                Column(
+                    modifier = Modifier.fillMaxWidth().fillMaxHeight(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    LoadingProgress()
+                }
+            }
+        }
+        status?.let {
+            MediaScene(status = it, selectedIndex = selectedIndex)
+        }
+    }
 }
 
 @OptIn(IncomingComposeUpdate::class)

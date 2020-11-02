@@ -18,7 +18,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with TwidereX. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex
+package com.twidere.twiderex.navigation
 
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
@@ -37,6 +37,7 @@ import com.twidere.twiderex.scenes.settings.AppearanceScene
 import com.twidere.twiderex.scenes.settings.SettingsScene
 import com.twidere.twiderex.scenes.twitter.TwitterSignInScene
 import com.twidere.twiderex.scenes.twitter.TwitterWebSignInScene
+import com.twidere.twiderex.twitterHosts
 import java.net.URLDecoder
 
 const val initialRoute = "splash"
@@ -68,7 +69,7 @@ fun NavGraphBuilder.route() {
         arguments = listOf(
             navArgument("userId") { type = NavType.StringType },
         ),
-        deepLinks = listOf(navDeepLink { uriPattern = "$twitterHost/{screenName}" })
+        deepLinks = twitterHosts.map { navDeepLink { uriPattern = "$it/{screenName}" } }
     ) { backStackEntry ->
         backStackEntry.arguments?.getString("screenName")?.let {
             UserScene(name = it)
@@ -78,11 +79,11 @@ fun NavGraphBuilder.route() {
     composable(
         "status/{statusId}",
         arguments = listOf(navArgument("statusId") { type = NavType.StringType }),
-        deepLinks = listOf(
+        deepLinks = twitterHosts.map {
             navDeepLink {
-                uriPattern = "$twitterHost/{screenName}/status/{statusId}"
+                uriPattern = "$it/{screenName}/status/{statusId}"
             }
-        )
+        }
     ) { backStackEntry ->
         backStackEntry.arguments?.getString("statusId")?.let {
             StatusScene(statusId = it)
@@ -95,11 +96,11 @@ fun NavGraphBuilder.route() {
             navArgument("statusId") { type = NavType.StringType },
             navArgument("selectedIndex") { type = NavType.IntType; defaultValue = 0; },
         ),
-        deepLinks = listOf(
+        deepLinks = twitterHosts.map {
             navDeepLink {
-                uriPattern = "$twitterHost/{screenName}/status/{statusId}/photo/{selectedIndex}"
+                uriPattern = "$it/{screenName}/status/{statusId}/photo/{selectedIndex}"
             }
-        )
+        }
     ) { backStackEntry ->
         backStackEntry.arguments?.let { argument ->
             val statusId = argument.getString("statusId")

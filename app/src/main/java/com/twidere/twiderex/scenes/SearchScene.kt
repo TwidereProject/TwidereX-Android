@@ -78,6 +78,7 @@ import com.twidere.twiderex.component.UserAvatar
 import com.twidere.twiderex.component.lazy.LazyGridForIndexed
 import com.twidere.twiderex.extensions.navViewModel
 import com.twidere.twiderex.ui.AmbientNavController
+import com.twidere.twiderex.ui.TwidereXTheme
 import com.twidere.twiderex.ui.standardPadding
 import com.twidere.twiderex.viewmodel.twitter.search.TwitterSearchMediasViewModel
 import com.twidere.twiderex.viewmodel.twitter.search.TwitterSearchTweetsViewModel
@@ -99,67 +100,69 @@ fun SearchScene(keyword: String) {
         mediasViewModel.reset(keyword)
         usersViewModel.reset(keyword)
     }
+    TwidereXTheme {
 
-    Scaffold {
-        Column {
-            Surface(
-                elevation = TopAppBarElevation,
-            ) {
-                Column {
-                    AppBar(
-                        navigationIcon = {
-                            AppBarNavigationButton()
-                        },
-                        elevation = 0.dp,
-                        title = {
-                            ProvideTextStyle(value = MaterialTheme.typography.body1) {
-                                Row {
-                                    TextInput(
-                                        modifier = Modifier
-                                            .align(Alignment.CenterVertically)
-                                            .weight(1F),
-                                        value = text,
-                                        onValueChange = {
-                                            setText(it)
-                                        },
-                                        placeholder = {
-                                            Text(text = "Tap to search...")
-                                        },
-                                        onImeActionPerformed = { _, _ ->
-                                            usersViewModel.reset(text)
-                                            tweetsViewModel.reset(text)
-                                            mediasViewModel.reset(text)
-                                        },
-                                        imeAction = ImeAction.Search,
-                                        alignment = Alignment.CenterStart,
-                                    )
-                                    IconButton(onClick = {}) {
-                                        Icon(asset = Icons.Default.Save)
+        Scaffold {
+            Column {
+                Surface(
+                    elevation = TopAppBarElevation,
+                ) {
+                    Column {
+                        AppBar(
+                            navigationIcon = {
+                                AppBarNavigationButton()
+                            },
+                            elevation = 0.dp,
+                            title = {
+                                ProvideTextStyle(value = MaterialTheme.typography.body1) {
+                                    Row {
+                                        TextInput(
+                                            modifier = Modifier
+                                                .align(Alignment.CenterVertically)
+                                                .weight(1F),
+                                            value = text,
+                                            onValueChange = {
+                                                setText(it)
+                                            },
+                                            placeholder = {
+                                                Text(text = "Tap to search...")
+                                            },
+                                            onImeActionPerformed = { _, _ ->
+                                                usersViewModel.reset(text)
+                                                tweetsViewModel.reset(text)
+                                                mediasViewModel.reset(text)
+                                            },
+                                            imeAction = ImeAction.Search,
+                                            alignment = Alignment.CenterStart,
+                                        )
+                                        IconButton(onClick = {}) {
+                                            Icon(asset = Icons.Default.Save)
+                                        }
                                     }
                                 }
                             }
-                        }
-                    )
-                    TabsComponent(
-                        items = listOf(
-                            Icons.Default.List,
-                            Icons.Default.Image,
-                            Icons.Default.AccountBox,
-                        ),
-                        selectedItem = selectedTab,
-                        onItemSelected = {
-                            selectedTab = it
-                        },
-                    )
+                        )
+                        TabsComponent(
+                            items = listOf(
+                                Icons.Default.List,
+                                Icons.Default.Image,
+                                Icons.Default.AccountBox,
+                            ),
+                            selectedItem = selectedTab,
+                            onItemSelected = {
+                                selectedTab = it
+                            },
+                        )
+                    }
                 }
-            }
-            Box(
-                modifier = Modifier.weight(1F),
-            ) {
-                when (selectedTab) {
-                    0 -> SearchTweetsContent()
-                    1 -> SearchMediasContent()
-                    2 -> SearchUsersContent()
+                Box(
+                    modifier = Modifier.weight(1F),
+                ) {
+                    when (selectedTab) {
+                        0 -> SearchTweetsContent()
+                        1 -> SearchMediasContent()
+                        2 -> SearchUsersContent()
+                    }
                 }
             }
         }

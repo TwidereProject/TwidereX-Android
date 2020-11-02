@@ -25,8 +25,8 @@ import com.twidere.services.microblog.model.IStatus
 import com.twidere.twiderex.db.AppDatabase
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.db.mapper.toDbTimeline
-import com.twidere.twiderex.db.model.DbTimelineWithStatus
 import com.twidere.twiderex.db.model.TimelineType
+import com.twidere.twiderex.db.model.saveToDb
 import com.twidere.twiderex.defaultLoadCount
 import com.twidere.twiderex.model.UserKey
 import com.twidere.twiderex.model.ui.UiStatus
@@ -60,28 +60,8 @@ abstract class CacheUserTimelineRepository(
             emptyList()
         }
         val timeline = result.map { it.toDbTimeline(userKey, type) }
-        saveData(timeline)
+        timeline.saveToDb(database, cache)
         return timeline.map { it.toUi() }
-    }
-
-    private suspend fun saveData(timeline: List<DbTimelineWithStatus>) {
-        val data = timeline
-            .map { listOf(it.status, it.quote, it.retweet) }
-            .flatten()
-            .filterNotNull()
-        data.map { it.user }.let {
-            cache.userDao().insertAll(it)
-            database.userDao().update(*it.toTypedArray())
-        }
-        cache.mediaDao().insertAll(data.map { it.media }.flatten())
-        data.map { it.status }.let {
-            cache.statusDao().insertAll(it)
-            database.statusDao().update(*it.toTypedArray())
-        }
-        timeline.map { it.timeline }.let {
-            cache.timelineDao().insertAll(it)
-            database.timelineDao().update(*it.toTypedArray())
-        }
     }
 
     protected abstract suspend fun loadData(

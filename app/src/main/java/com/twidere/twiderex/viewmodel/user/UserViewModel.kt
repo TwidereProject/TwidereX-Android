@@ -44,28 +44,27 @@ class UserViewModel @ViewModelInject constructor(
             }
         }
 
-    val loaded = MutableLiveData(false)
     val refreshing = MutableLiveData(false)
     val user = MutableLiveData<UiUser>()
     val relationship = MutableLiveData<IRelationship>()
     val isMe = MutableLiveData(false)
 
-    suspend fun init(data: UiUser) {
-        if (loaded.value == true) {
+    suspend fun init(screenName: String) {
+        if (user.value != null) {
             return
         }
-        refresh(data)
-        loaded.postValue(true)
+        refresh(screenName)
     }
 
-    suspend fun refresh(data: UiUser) {
+    suspend fun refresh(screenName: String) {
         refreshing.postValue(true)
-        user.postValue(data)
-        val name = data.screenName
-        val key = UserKey(name, "twitter.com")
+        repository.getUserFromCache(screenName)?.let {
+            user.postValue(it)
+        }
+        val key = UserKey(screenName, "twitter.com")
         val isme = accountRepository.getCurrentAccount().key == key
         isMe.postValue(isme)
-        val dbUser = repository.lookupUser(data.id)
+        val dbUser = repository.lookupUserByName(screenName)
         dbUser?.toUi()?.let {
             user.postValue(it)
         }
@@ -80,8 +79,10 @@ class UserViewModel @ViewModelInject constructor(
             }
         }
         if (!isme) {
-            repository.showRelationship(data.id).let {
-                relationship.postValue(it)
+            dbUser?.userId?.let { userId ->
+                repository.showRelationship(userId).let {
+                    relationship.postValue(it)
+                }
             }
         }
         refreshing.postValue(false)

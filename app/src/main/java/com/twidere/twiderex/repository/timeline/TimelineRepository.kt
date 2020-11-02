@@ -57,9 +57,9 @@ abstract class TimelineRepository(
         withGap: Boolean = true,
     ): List<UiStatus> {
         if (max_id != null) {
-            database.timelineDao().findWithStatusId(max_id)?.let {
-                it.isGap = false
-                update(it)
+            database.timelineDao().findWithStatusId(max_id, userKey)?.let {
+                it.timeline.isGap = false
+                update(it.timeline)
             }
         }
         val result = runCatching {
@@ -91,7 +91,7 @@ abstract class TimelineRepository(
     }
 
     protected open suspend fun update(timeline: DbTimeline) {
-        database.timelineDao().update(timeline)
+        database.timelineDao().update(listOf(timeline))
     }
 
     protected abstract suspend fun loadData(

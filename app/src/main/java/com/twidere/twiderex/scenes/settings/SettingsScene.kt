@@ -39,6 +39,7 @@ import androidx.navigation.compose.navigate
 import com.twidere.twiderex.component.AppBar
 import com.twidere.twiderex.component.AppBarNavigationButton
 import com.twidere.twiderex.ui.AmbientNavController
+import com.twidere.twiderex.ui.TwidereXTheme
 
 data class SettingItem(
     val name: String,
@@ -83,49 +84,50 @@ private val settings by lazy {
 @OptIn(ExperimentalLazyDsl::class)
 @Composable
 fun SettingsScene() {
-
-    Scaffold(
-        topBar = {
-            AppBar(
-                navigationIcon = {
-                    AppBarNavigationButton()
-                },
-                title = {
-                    Text(text = "Settings")
-                }
-            )
-        }
-    ) {
-        LazyColumn(
-            contentPadding = it
+    TwidereXTheme {
+        Scaffold(
+            topBar = {
+                AppBar(
+                    navigationIcon = {
+                        AppBarNavigationButton()
+                    },
+                    title = {
+                        Text(text = "Settings")
+                    }
+                )
+            }
         ) {
-            settings.forEach {
-                item {
-                    ListItem(
-                        text = {
-                            ProvideTextStyle(value = MaterialTheme.typography.button) {
-                                Text(text = it.key)
-                            }
-                        },
-                    )
-                }
-                items(it.value) {
-                    val navController = AmbientNavController.current
-                    ListItem(
-                        modifier = Modifier.clickable(
-                            onClick = {
-                                if (it.route.isNotEmpty()) {
-                                    navController.navigate(it.route)
+            LazyColumn(
+                contentPadding = it
+            ) {
+                settings.forEach {
+                    item {
+                        ListItem(
+                            text = {
+                                ProvideTextStyle(value = MaterialTheme.typography.button) {
+                                    Text(text = it.key)
                                 }
-                            }
-                        ),
-                        icon = {
-                            Icon(asset = it.icon)
-                        },
-                        text = {
-                            Text(text = it.name)
-                        },
-                    )
+                            },
+                        )
+                    }
+                    items(it.value) {
+                        val navController = AmbientNavController.current
+                        ListItem(
+                            modifier = Modifier.clickable(
+                                onClick = {
+                                    if (it.route.isNotEmpty()) {
+                                        navController.navigate(it.route)
+                                    }
+                                }
+                            ),
+                            icon = {
+                                Icon(asset = it.icon)
+                            },
+                            text = {
+                                Text(text = it.name)
+                            },
+                        )
+                    }
                 }
             }
         }

@@ -87,12 +87,12 @@ import kotlinx.coroutines.launch
 @Composable
 @IncomingComposeUpdate
 fun UserComponent(
-    data: UiUser,
+    screenName: String,
     lazyListState: LazyListState = rememberLazyListState(),
     appBar: @Composable (() -> Unit)? = null,
 ) {
     val viewModel = navViewModel<UserViewModel>()
-    val user by viewModel.user.observeAsState(initial = data)
+    val user by viewModel.user.observeAsState()
 
     val tabs = listOf(
         Icons.Default.List,
@@ -121,18 +121,20 @@ fun UserComponent(
         favourite,
     ) {
         async {
-            viewModel.init(user)
+            viewModel.init(screenName)
         }
-        async {
-            when {
-                selectedItem == 0 && !timeline.any() -> {
-                    timelineViewModel.refresh(user)
-                }
-                selectedItem == 1 && !mediaTimeline.any() -> {
-                    timelineViewModel.loadMore(user)
-                }
-                selectedItem == 2 && !favourite.any() -> {
-                    favouriteViewModel.refresh(user)
+        user?.let {
+            async {
+                when {
+                    selectedItem == 0 && !timeline.any() -> {
+                        timelineViewModel.refresh(it)
+                    }
+                    selectedItem == 1 && !mediaTimeline.any() -> {
+                        timelineViewModel.loadMore(it)
+                    }
+                    selectedItem == 2 && !favourite.any() -> {
+                        favouriteViewModel.refresh(it)
+                    }
                 }
             }
         }
@@ -170,7 +172,7 @@ fun UserComponent(
                     timelineViewModel.clear()
                     favouriteViewModel.clear()
                     coroutineScope.launch {
-                        viewModel.refresh(user)
+                        viewModel.refresh(screenName)
                     }
                 },
             ) {
@@ -183,8 +185,10 @@ fun UserComponent(
                     LazyColumn(
                         state = lazyListState
                     ) {
-                        item {
-                            UserInfo(user)
+                        user?.let {
+                            item {
+                                UserInfo(it)
+                            }
                         }
 
                         item {
@@ -204,7 +208,11 @@ fun UserComponent(
                                         Column {
                                             if (!timelineLoadingMore && index == timeline.lastIndex) {
                                                 coroutineScope.launch {
-                                                    timelineViewModel.loadMore(user)
+                                                    user?.let { it1 ->
+                                                        timelineViewModel.loadMore(
+                                                            it1
+                                                        )
+                                                    }
                                                 }
                                             }
                                             TimelineStatusComponent(item)
@@ -229,7 +237,7 @@ fun UserComponent(
                                         val navController = AmbientNavController.current
                                         if (!timelineLoadingMore && index == mediaTimeline.lastIndex) {
                                             coroutineScope.launch {
-                                                timelineViewModel.loadMore(user)
+                                                user?.let { it1 -> timelineViewModel.loadMore(it1) }
                                             }
                                         }
                                         StatusMediaPreviewItem(
@@ -255,7 +263,11 @@ fun UserComponent(
                                         Column {
                                             if (!timelineLoadingMore && index == favourite.lastIndex) {
                                                 coroutineScope.launch {
-                                                    favouriteViewModel.loadMore(user)
+                                                    user?.let { it1 ->
+                                                        favouriteViewModel.loadMore(
+                                                            it1
+                                                        )
+                                                    }
                                                 }
                                             }
                                             TimelineStatusComponent(item)
@@ -294,7 +306,6 @@ fun UserComponent(
 private fun UserInfo(data: UiUser) {
     val viewModel = navViewModel<UserViewModel>()
     val user by viewModel.user.observeAsState(initial = data)
-    val loaded by viewModel.loaded.observeAsState(initial = false)
     val relationship by viewModel.relationship.observeAsState()
     val isMe by viewModel.isMe.observeAsState(initial = false)
     val maxBannerSize = 200.dp
@@ -383,9 +394,7 @@ private fun UserInfo(data: UiUser) {
                             }
                         }
                     } ?: run {
-                        if (!loaded) {
-                            CircularProgressIndicator()
-                        }
+                        CircularProgressIndicator()
                     }
                 }
             }

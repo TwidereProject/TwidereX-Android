@@ -32,9 +32,9 @@ interface UserDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(user: List<DbUser>)
 
-    @Query("SELECT * FROM user WHERE userId == :id")
-    suspend fun findWithUserId(id: String): DbUser?
+    @Query("SELECT * FROM user WHERE screenName == :name")
+    suspend fun findWithScreenName(name: String): DbUser?
 
-    @Update
-    suspend fun update(vararg user: DbUser)
+    @Update(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun update(user: List<DbUser>)
 }

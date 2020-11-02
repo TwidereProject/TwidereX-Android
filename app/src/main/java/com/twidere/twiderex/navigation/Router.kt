@@ -18,25 +18,22 @@
  *  You should have received a copy of the GNU General Public License
  *  along with TwidereX. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex
+package com.twidere.twiderex.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import com.twidere.twiderex.ui.AmbientNavController
-import com.twidere.twiderex.ui.TwidereXTheme
 
 @Composable
-fun App() {
+fun Router() {
     val navController = rememberNavController()
-    TwidereXTheme {
-        Providers(
-            AmbientNavController provides navController,
-        ) {
-            NavHost(navController = navController, startDestination = initialRoute) {
-                route()
-            }
+    Providers(
+        AmbientNavController provides navController,
+    ) {
+        NavHost(navController = navController, startDestination = initialRoute) {
+            route()
         }
     }
 }

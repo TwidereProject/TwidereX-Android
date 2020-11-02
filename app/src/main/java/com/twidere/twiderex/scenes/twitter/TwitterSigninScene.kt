@@ -38,6 +38,7 @@ import androidx.navigation.navOptions
 import com.twidere.twiderex.extensions.navViewModel
 import com.twidere.twiderex.extensions.navigate
 import com.twidere.twiderex.ui.AmbientNavController
+import com.twidere.twiderex.ui.TwidereXTheme
 import com.twidere.twiderex.viewmodel.twitter.TwitterSignInViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -53,46 +54,54 @@ fun TwitterSignInScene() {
     val isLoading by viewModel.isLoading.observeAsState()
     val navController = AmbientNavController.current
     val lifecycleOwner = LifecycleOwnerAmbient.current
-
-    Column(
-        modifier = Modifier.fillMaxWidth().fillMaxHeight(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        if (isLoading == true) {
-            CircularProgressIndicator()
-        } else {
-            Button(
-                onClick = {
-                    GlobalScope.launch {
-                        withContext(Dispatchers.Main) {
-                            // TODO: dynamic key && secret
-                            viewModel.beginOAuth(
-                                "wmtrtTaVOjUnH5pWQp4LDI5Qs",
-                                "E9Q9u2yK0COJae2tLcNEdY75OPA3bxqJiGZQztraHaQUtoI2cu"
-                            ) { target ->
-                                suspendCoroutine {
-                                    navController.currentBackStackEntry?.savedStateHandle?.getLiveData<String>(
-                                        "pin_code"
-                                    )?.observe(lifecycleOwner) { result ->
-                                        it.resume(result)
+    TwidereXTheme {
+        Column(
+            modifier = Modifier.fillMaxWidth().fillMaxHeight(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            if (isLoading == true) {
+                CircularProgressIndicator()
+            } else {
+                Button(
+                    onClick = {
+                        GlobalScope.launch {
+                            withContext(Dispatchers.Main) {
+                                // TODO: dynamic key && secret
+                                viewModel.beginOAuth(
+                                    "wmtrtTaVOjUnH5pWQp4LDI5Qs",
+                                    "E9Q9u2yK0COJae2tLcNEdY75OPA3bxqJiGZQztraHaQUtoI2cu"
+                                ) { target ->
+                                    suspendCoroutine {
+                                        navController.currentBackStackEntry?.savedStateHandle?.getLiveData<String>(
+                                            "pin_code"
+                                        )?.observe(lifecycleOwner) { result ->
+                                            it.resume(result)
+                                        }
+                                        navController.navigate(
+                                            "signin/twitter/web/${
+                                            URLEncoder.encode(
+                                                target,
+                                                "UTF-8"
+                                            )
+                                            }"
+                                        )
                                     }
-                                    navController.navigate("signin/twitter/web/${URLEncoder.encode(target, "UTF-8")}")
                                 }
+                                navController.navigate(
+                                    "home",
+                                    navOptions {
+                                        popUpTo(0) {
+                                            inclusive = true
+                                        }
+                                    },
+                                )
                             }
-                            navController.navigate(
-                                "home",
-                                navOptions {
-                                    popUpTo(0) {
-                                        inclusive = true
-                                    }
-                                },
-                            )
                         }
                     }
+                ) {
+                    Text(text = "Sign In")
                 }
-            ) {
-                Text(text = "Sign In")
             }
         }
     }

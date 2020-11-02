@@ -34,22 +34,21 @@ import androidx.compose.material.Checkbox
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ambientOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.core.content.edit
+import com.twidere.twiderex.extensions.navViewModel
 import com.twidere.twiderex.settings.types.SettingItem
 import com.twidere.twiderex.ui.blue
 import com.twidere.twiderex.ui.profileImageSize
 import com.twidere.twiderex.ui.standardPadding
+import com.twidere.twiderex.viewmodel.settings.AppearanceViewModel
 
 class PrimaryColorSetting(
     private val preferences: SharedPreferences,
 ) : SettingItem<Color>() {
-
     @OptIn(ExperimentalUnsignedTypes::class)
     override fun save(value: Color) {
         preferences.edit {
@@ -63,12 +62,12 @@ class PrimaryColorSetting(
     }
 }
 
-val AmbientPrimaryColor = ambientOf<PrimaryColorSetting>()
+val AmbientPrimaryColor = ambientOf<Color>()
 
 @Composable
 fun primaryColorDialog(onDismiss: () -> Unit) {
-    val setting = AmbientPrimaryColor.current
-    val current by setting.data.observeAsState(initial = setting.initialValue)
+    val color = AmbientPrimaryColor.current
+    val viewModel = navViewModel<AppearanceViewModel>()
     AlertDialog(
         onDismissRequest = onDismiss,
         title = {
@@ -99,12 +98,12 @@ fun primaryColorDialog(onDismiss: () -> Unit) {
                             .background(it)
                             .clickable(
                                 onClick = {
-                                    setting.apply(it)
+                                    viewModel.primaryColorSettings.apply(it)
                                 }
                             ),
                         alignment = Alignment.Center,
                     ) {
-                        if (current == it) {
+                        if (color == it) {
                             Checkbox(checked = true, onCheckedChange = {})
                         }
                     }

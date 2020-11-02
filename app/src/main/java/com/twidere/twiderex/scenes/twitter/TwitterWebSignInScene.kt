@@ -25,6 +25,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
 import com.twidere.twiderex.component.WebComponent
 import com.twidere.twiderex.ui.AmbientNavController
+import com.twidere.twiderex.ui.TwidereXTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -35,13 +36,19 @@ private const val INJECT_CONTENT =
 
 @Composable
 fun TwitterWebSignInScene(target: String) {
-    WebComponent(
-        url = target,
-        onPageFinished = { view, _ ->
-            view.loadUrl(INJECT_CONTENT)
-        },
-        javascriptInterface = mapOf("injector" to TwitterWebJavascriptInterface(AmbientNavController.current))
-    )
+    TwidereXTheme {
+        WebComponent(
+            url = target,
+            onPageFinished = { view, _ ->
+                view.loadUrl(INJECT_CONTENT)
+            },
+            javascriptInterface = mapOf(
+                "injector" to TwitterWebJavascriptInterface(
+                    AmbientNavController.current
+                )
+            )
+        )
+    }
 }
 
 private class TwitterWebJavascriptInterface(
@@ -53,7 +60,10 @@ private class TwitterWebJavascriptInterface(
             content.toIntOrNull()?.let {
                 GlobalScope.launch {
                     withContext(Dispatchers.Main) {
-                        navController.previousBackStackEntry?.savedStateHandle?.set("pin_code", content)
+                        navController.previousBackStackEntry?.savedStateHandle?.set(
+                            "pin_code",
+                            content
+                        )
                         navController.popBackStack()
                     }
                 }

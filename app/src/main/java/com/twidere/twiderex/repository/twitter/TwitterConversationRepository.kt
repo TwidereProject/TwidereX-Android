@@ -83,8 +83,15 @@ class TwitterConversationRepository @AssistedInject constructor(
         return list.reversed()
     }
 
-    suspend fun loadTweet(status: UiStatus): StatusV2 {
-        return lookupService.lookupStatus(status.statusId) as StatusV2
+    suspend fun loadTweetFromCache(statusId: String): UiStatus? {
+        return (
+            database.timelineDao().findWithStatusId(statusId, userKey) ?: cache.timelineDao()
+                .findWithStatusId(statusId, userKey)
+            )?.toUi()
+    }
+
+    suspend fun loadTweetFromNetwork(statusId: String): StatusV2 {
+        return lookupService.lookupStatus(statusId) as StatusV2
     }
 
     suspend fun toUiStatus(status: StatusV2): UiStatus {

@@ -50,4 +50,4 @@ class ThemeSetting(
     }
 }
 
-val AmbientTheme = ambientOf<ThemeSetting>()
+val AmbientTheme = ambientOf<Theme>()

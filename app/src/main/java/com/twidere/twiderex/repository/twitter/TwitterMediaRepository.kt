@@ -18,71 +18,50 @@
  *  You should have received a copy of the GNU General Public License
  *  along with TwidereX. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.repository
+package com.twidere.twiderex.repository.twitter
 
 import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
 import com.twidere.services.microblog.LookupService
-import com.twidere.services.microblog.RelationshipService
+import com.twidere.services.twitter.model.StatusV2
 import com.twidere.twiderex.db.AppDatabase
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.db.mapper.toDbTimeline
-import com.twidere.twiderex.db.mapper.toDbUser
-import com.twidere.twiderex.db.model.DbUser
 import com.twidere.twiderex.db.model.TimelineType
+import com.twidere.twiderex.db.model.saveToDb
 import com.twidere.twiderex.model.UserKey
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.model.ui.UiStatus.Companion.toUi
-import com.twidere.twiderex.model.ui.UiUser
-import com.twidere.twiderex.model.ui.UiUser.Companion.toUi
-import javax.inject.Singleton
 
-@Singleton
-class UserRepository @AssistedInject constructor(
+class TwitterMediaRepository @AssistedInject constructor(
     private val database: AppDatabase,
     private val cache: CacheDatabase,
+    @Assisted private val userKey: UserKey,
     @Assisted private val lookupService: LookupService,
-    @Assisted private val relationshipService: RelationshipService,
 ) {
-
     @AssistedInject.Factory
     interface AssistedFactory {
         fun create(
+            userKey: UserKey,
             lookupService: LookupService,
-            relationshipService: RelationshipService,
-        ): UserRepository
+        ): TwitterMediaRepository
     }
 
-    suspend fun lookupUserByName(name: String): DbUser? {
-        val user = lookupService.lookupUserByName(name).toDbUser()
-        saveUser(user)
-        return user
-    }
-
-    suspend fun lookupUser(id: String): DbUser? {
-        val user = lookupService.lookupUser(id).toDbUser()
-        saveUser(user)
-        return user
-    }
-
-    suspend fun getUserFromCache(name: String): UiUser? {
+    suspend fun loadTweetFromCache(statusId: String): UiStatus? {
+        // TODO: load from retweet or quote will return null
         return (
-            database.userDao().findWithScreenName(name) ?: cache.userDao()
-                .findWithScreenName(name)
+            database.timelineDao().findWithStatusId(statusId, userKey) ?: cache.timelineDao()
+                .findWithStatusId(statusId, userKey)
             )?.toUi()
     }
 
-    private suspend fun saveUser(user: DbUser) {
-        cache.userDao().update(listOf(user))
-        database.userDao().update(listOf(user))
+    suspend fun loadTweetFromNetwork(statusId: String): UiStatus {
+        return toUiStatus(lookupService.lookupStatus(statusId) as StatusV2)
     }
 
-    suspend fun showRelationship(id: String) = relationshipService.showRelationship(id)
-
-    suspend fun getPinnedStatus(user: UiUser): UiStatus? {
-        val result = lookupService.userPinnedStatus(user.id) ?: return null
-        val userKey = UserKey.Empty
-        val timeline = result.toDbTimeline(userKey = userKey, timelineType = TimelineType.User)
-        return timeline.toUi()
+    private suspend fun toUiStatus(status: StatusV2): UiStatus {
+        val db = status.toDbTimeline(userKey, TimelineType.Conversation)
+        listOf(db).saveToDb(database, cache)
+        return db.toUi()
     }
 }

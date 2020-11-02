@@ -51,8 +51,6 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.savedinstancestate.savedInstanceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -69,18 +67,18 @@ import com.twidere.twiderex.component.home.HomeTimelineItem
 import com.twidere.twiderex.component.home.MeItem
 import com.twidere.twiderex.component.home.MentionItem
 import com.twidere.twiderex.component.home.SearchItem
-import com.twidere.twiderex.extensions.navViewModel
 import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.settings.AmbientTabPosition
 import com.twidere.twiderex.settings.TabPosition
+import com.twidere.twiderex.ui.AmbientActiveAccount
 import com.twidere.twiderex.ui.AmbientNavController
+import com.twidere.twiderex.ui.TwidereXTheme
 import com.twidere.twiderex.ui.profileImageSize
-import com.twidere.twiderex.viewmodel.ActiveAccountViewModel
 
 @Composable
 fun HomeScene() {
     val (selectedItem, setSelectedItem) = savedInstanceState { 0 }
-    val tabPosition by AmbientTabPosition.current.data.observeAsState(initial = AmbientTabPosition.current.initialValue)
+    val tabPosition = AmbientTabPosition.current
     val menus = listOf(
         HomeTimelineItem(),
         MentionItem(),
@@ -88,77 +86,79 @@ fun HomeScene() {
         MeItem(),
     )
     val scaffoldState = rememberScaffoldState()
-    Scaffold(
-        scaffoldState = scaffoldState,
-        topBar = {
-            if (tabPosition == TabPosition.Bottom) {
-                if (menus[selectedItem].withAppBar) {
-                    AppBar(
-                        backgroundColor = MaterialTheme.colors.surface.withElevation(),
-                        title = {
-                            Text(text = menus[selectedItem].name)
-                        },
-                        navigationIcon = {
-                            IconButton(
-                                onClick = {
-                                    if (scaffoldState.drawerState.isOpen) {
-                                        scaffoldState.drawerState.close()
-                                    } else {
-                                        scaffoldState.drawerState.open()
+    TwidereXTheme {
+        Scaffold(
+            scaffoldState = scaffoldState,
+            topBar = {
+                if (tabPosition == TabPosition.Bottom) {
+                    if (menus[selectedItem].withAppBar) {
+                        AppBar(
+                            backgroundColor = MaterialTheme.colors.surface.withElevation(),
+                            title = {
+                                Text(text = menus[selectedItem].name)
+                            },
+                            navigationIcon = {
+                                IconButton(
+                                    onClick = {
+                                        if (scaffoldState.drawerState.isOpen) {
+                                            scaffoldState.drawerState.close()
+                                        } else {
+                                            scaffoldState.drawerState.open()
+                                        }
                                     }
+                                ) {
+                                    Icon(asset = Icons.Default.Menu)
                                 }
-                            ) {
-                                Icon(asset = Icons.Default.Menu)
+                            },
+                            elevation = if (menus[selectedItem].withAppBar) {
+                                TopAppBarElevation
+                            } else {
+                                0.dp
                             }
-                        },
+                        )
+                    }
+                } else {
+                    Surface(
                         elevation = if (menus[selectedItem].withAppBar) {
                             TopAppBarElevation
                         } else {
                             0.dp
                         }
-                    )
-                }
-            } else {
-                Surface(
-                    elevation = if (menus[selectedItem].withAppBar) {
-                        TopAppBarElevation
-                    } else {
-                        0.dp
+                    ) {
+                        TabsComponent(
+                            items = menus.map { it.icon },
+                            selectedItem = selectedItem,
+                            onItemSelected = {
+                                setSelectedItem(it)
+                            },
+                        )
                     }
-                ) {
-                    TabsComponent(
-                        items = menus.map { it.icon },
-                        selectedItem = selectedItem,
-                        onItemSelected = {
-                            setSelectedItem(it)
-                        },
-                    )
                 }
-            }
-        },
-        bottomBar = {
-            if (tabPosition == TabPosition.Bottom) {
-                HomeBottomNavigation(menus, selectedItem) {
-                    setSelectedItem(it)
+            },
+            bottomBar = {
+                if (tabPosition == TabPosition.Bottom) {
+                    HomeBottomNavigation(menus, selectedItem) {
+                        setSelectedItem(it)
+                    }
                 }
+            },
+            drawerContent = {
+                HomeDrawer(scaffoldState)
             }
-        },
-        drawerContent = {
-            HomeDrawer(scaffoldState)
-        }
-    ) {
-        Box(
-            modifier = Modifier.padding(
-                start = it.start,
-                bottom = it.bottom,
-                end = it.end,
-                top = it.top,
-            )
         ) {
-            Crossfade(
-                current = selectedItem,
+            Box(
+                modifier = Modifier.padding(
+                    start = it.start,
+                    bottom = it.bottom,
+                    end = it.end,
+                    top = it.top,
+                )
             ) {
-                menus[it].onCompose()
+                Crossfade(
+                    current = selectedItem,
+                ) {
+                    menus[it].onCompose()
+                }
             }
         }
     }
@@ -187,11 +187,11 @@ fun HomeBottomNavigation(
         }
     }
 }
+
 @OptIn(ExperimentalLazyDsl::class)
 @Composable
 private fun HomeDrawer(scaffoldState: ScaffoldState) {
-    val viewModel = navViewModel<ActiveAccountViewModel>()
-    val account by viewModel.account.observeAsState()
+    val account = AmbientActiveAccount.current
     val navController = AmbientNavController.current
 
     Column {

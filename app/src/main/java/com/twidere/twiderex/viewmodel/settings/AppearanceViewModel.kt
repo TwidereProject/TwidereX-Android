@@ -18,27 +18,16 @@
  *  You should have received a copy of the GNU General Public License
  *  along with TwidereX. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.services.utils
+package com.twidere.twiderex.viewmodel.settings
 
-import kotlinx.serialization.builtins.MapSerializer
-import kotlinx.serialization.builtins.serializer
-import kotlinx.serialization.json.decodeFromJsonElement
-import java.net.URLDecoder
+import androidx.hilt.lifecycle.ViewModelInject
+import androidx.lifecycle.ViewModel
+import com.twidere.twiderex.settings.PrimaryColorSetting
+import com.twidere.twiderex.settings.TabPositionSetting
+import com.twidere.twiderex.settings.ThemeSetting
 
-inline fun <reified T> String.queryString(): T {
-    val map = split("&")
-        .map {
-            it.split("=")
-                .map {
-                    @Suppress("DEPRECATION")
-                    URLDecoder.decode(it)
-                }
-                .let {
-                    it[0] to it[1]
-                }
-        }
-        .toMap()
-    return JSON.encodeToJsonElement(MapSerializer(String.serializer(), String.serializer()), map).let {
-        JSON.decodeFromJsonElement<T>(it)
-    }
-}
+class AppearanceViewModel @ViewModelInject constructor(
+    val tabPositionSetting: TabPositionSetting,
+    val themeSetting: ThemeSetting,
+    val primaryColorSettings: PrimaryColorSetting
+) : ViewModel()

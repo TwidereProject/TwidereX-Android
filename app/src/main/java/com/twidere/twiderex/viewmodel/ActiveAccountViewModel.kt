@@ -29,6 +29,6 @@ class ActiveAccountViewModel @ViewModelInject constructor(
     private val repository: AccountRepository,
 ) : ViewModel() {
     val account = liveData {
-        emit(repository.getCurrentAccount())
+        emitSource(repository.activeAccount)
     }
 }

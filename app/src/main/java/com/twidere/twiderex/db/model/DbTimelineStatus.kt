@@ -90,15 +90,15 @@ suspend fun List<DbTimelineWithStatus>.saveToDb(
         .filterNotNull()
     data.map { it.user }.let {
         cache.userDao().insertAll(it)
-        database.userDao().update(*it.toTypedArray())
+        database.userDao().update(it)
     }
     cache.mediaDao().insertAll(data.map { it.media }.flatten())
     data.map { it.status }.let {
         cache.statusDao().insertAll(it)
-        database.statusDao().update(*it.toTypedArray())
+        database.statusDao().update(it)
     }
     this.map { it.timeline }.let {
         cache.timelineDao().insertAll(it)
-        database.timelineDao().update(*it.toTypedArray())
+        database.timelineDao().update(it)
     }
 }

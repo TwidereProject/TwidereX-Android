@@ -44,9 +44,10 @@ interface TimelineDao {
         timelineType: TimelineType
     ): LiveData<List<DbTimelineWithStatus>>
 
-    @Query("SELECT * FROM timeline WHERE statusId == :id")
-    suspend fun findWithStatusId(id: String): DbTimeline?
+    @Transaction
+    @Query("SELECT * FROM timeline WHERE statusId == :id AND userKey == :userKey")
+    suspend fun findWithStatusId(id: String, userKey: UserKey): DbTimelineWithStatus?
 
-    @Update
-    suspend fun update(vararg timeline: DbTimeline)
+    @Update(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun update(timeline: List<DbTimeline>)
 }

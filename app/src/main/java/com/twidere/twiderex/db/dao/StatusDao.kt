@@ -39,6 +39,6 @@ interface StatusDao {
     @Query("SELECT * FROM status WHERE statusId == :id AND userKey == :userKey")
     suspend fun findWithStatusId(id: String, userKey: UserKey): DbStatus?
 
-    @Update
-    suspend fun update(vararg user: DbStatus)
+    @Update(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun update(status: List<DbStatus>)
 }
