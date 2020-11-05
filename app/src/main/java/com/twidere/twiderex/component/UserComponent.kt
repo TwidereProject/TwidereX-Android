@@ -223,12 +223,9 @@ fun UserComponent(
                             }
                         }
                     }
-
-
                 }
             }
         }
-
     } ?: run {
         Column(
             modifier = Modifier.fillMaxWidth().fillMaxHeight(),

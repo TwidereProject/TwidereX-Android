@@ -48,4 +48,3 @@ interface StatusDao {
     @Update(onConflict = OnConflictStrategy.REPLACE)
     suspend fun update(status: List<DbStatusV2>)
 }
-

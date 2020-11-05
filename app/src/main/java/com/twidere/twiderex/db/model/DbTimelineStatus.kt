@@ -73,16 +73,13 @@ suspend fun List<DbTimelineWithStatus>.saveToDb(
         .flatten()
         .filterNotNull()
     data.map { it.user }.let {
-//        cache.userDao().insertAll(it)
         database.userDao().insertAll(it)
     }
     database.mediaDao().insertAll(data.map { it.media }.flatten())
     data.map { it.data }.let {
-//        cache.statusDao().insertAll(it)
         database.statusDao().insertAll(it)
     }
     this.map { it.timeline }.let {
-//        cache.timelineDao().insertAll(it)
         database.timelineDao().insertAll(it)
     }
 }

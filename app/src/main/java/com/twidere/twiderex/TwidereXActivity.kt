@@ -53,7 +53,6 @@ import com.twidere.twiderex.viewmodel.ActiveAccountViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
-
 @AndroidEntryPoint
 class TwidereXActivity : ComponentActivity() {
 

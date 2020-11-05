@@ -52,8 +52,6 @@ data class UiStatus(
 
     companion object {
 
-
-
         fun DbTimelineWithStatus.toUi() = UiStatus(
             statusId = status.status.data.statusId,
             userKey = status.status.data.userKey,
