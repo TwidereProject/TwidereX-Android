@@ -21,22 +21,58 @@
 package com.twidere.twiderex.extensions
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Providers
 import androidx.compose.ui.viewinterop.viewModel
 import androidx.core.net.toUri
+import androidx.hilt.lifecycle.HiltViewModelFactory
+import androidx.hilt.lifecycle.ViewModelAssistedFactory
+import androidx.lifecycle.SavedStateViewModelFactory
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.NavDeepLinkRequest
 import androidx.navigation.NavOptions
+import androidx.navigation.compose.currentBackStackEntryAsState
+import com.twidere.twiderex.ui.AmbientApplication
+import com.twidere.twiderex.ui.AmbientNavController
+import com.twidere.twiderex.ui.AmbientViewModelFactoriesMap
 import com.twidere.twiderex.ui.AmbientViewModelProviderFactory
-import java.util.UUID
 
 @Composable
 inline fun <reified VM : ViewModel> navViewModel(
-    key: String? = UUID.randomUUID()
-        .toString(), // FIXME: 2020/11/2 A quick workaround for https://github.com/google/dagger/issues/2166
+    key: String? = null,
     factory: ViewModelProvider.Factory? = AmbientViewModelProviderFactory.current,
-): VM = viewModel(key, factory)
+): VM {
+    val navController = AmbientNavController.current
+    val backStackEntry = navController.currentBackStackEntryAsState().value
+    return if (backStackEntry != null) {
+        // Hack for navigation viewModel
+        val application = AmbientApplication.current
+        val viewModelFactories = AmbientViewModelFactoriesMap.current
+        val delegate = SavedStateViewModelFactory(application, backStackEntry, null)
+        val altFactory = HiltViewModelFactory::class.java.declaredConstructors.first()
+            .newInstance(backStackEntry, null, delegate, viewModelFactories) as HiltViewModelFactory
+        viewModel(key, altFactory)
+    } else {
+        viewModel(key, factory)
+    }
+}
+
+@Composable
+fun ProvideNavigationViewModel(factory: HiltViewModelFactory, content: @Composable () -> Unit) {
+    // Hack for navigationViewModel
+    val factories =
+        HiltViewModelFactory::class.java.getDeclaredField("mViewModelFactories").also { it.isAccessible = true }
+            .get(factory).let {
+                @Suppress("UNCHECKED_CAST")
+                it as Map<String, ViewModelAssistedFactory<out ViewModel>>
+            }
+    Providers(
+        AmbientViewModelFactoriesMap provides factories
+    ) {
+        content.invoke()
+    }
+}
 
 // Hack for NavOptions
 fun NavController.navigate(route: String, options: NavOptions? = null) {

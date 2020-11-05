@@ -38,14 +38,14 @@ import com.twidere.twiderex.utils.json
 class TwitterSignInViewModel @ViewModelInject constructor(
     private val repository: AccountRepository
 ) : ViewModel() {
-    val isLoading = MutableLiveData(false)
+    val loading = MutableLiveData(false)
 
     suspend fun beginOAuth(
         consumerKey: String,
         consumerSecret: String,
         pinCodeProvider: suspend (url: String) -> String,
     ) {
-        isLoading.postValue(true)
+        loading.postValue(true)
         val service = TwitterOAuthService(consumerKey, consumerSecret)
         val token = service.getOAuthToken()
         val pinCode = pinCodeProvider.invoke(service.getWebOAuthUrl(token))
@@ -83,6 +83,6 @@ class TwitterSignInViewModel @ViewModelInject constructor(
                 }
             }
         }
-        isLoading.postValue(false)
+        loading.postValue(false)
     }
 }

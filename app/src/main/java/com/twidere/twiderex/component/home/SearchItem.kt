@@ -42,6 +42,7 @@ import androidx.navigation.compose.navigate
 import com.twidere.twiderex.component.AppBar
 import com.twidere.twiderex.component.TextInput
 import com.twidere.twiderex.ui.AmbientNavController
+import java.net.URLEncoder
 
 class SearchItem : HomeNavigationItem() {
     override val name: String
@@ -77,14 +78,14 @@ class SearchItem : HomeNavigationItem() {
                                     alignment = Alignment.CenterStart,
                                     onImeActionPerformed = { _, _ ->
                                         if (text.isNotEmpty()) {
-                                            navController.navigate("search/$text")
+                                            navController.navigate("search/${URLEncoder.encode(text, "UTF-8")}")
                                         }
                                     }
                                 )
                                 IconButton(
                                     onClick = {
                                         if (text.isNotEmpty()) {
-                                            navController.navigate("search/$text")
+                                            navController.navigate("search/${URLEncoder.encode(text, "UTF-8")}")
                                         }
                                     }
                                 ) {

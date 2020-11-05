@@ -59,12 +59,6 @@ class UserRepository @AssistedInject constructor(
         return user
     }
 
-    suspend fun lookupUser(id: String): DbUser? {
-        val user = lookupService.lookupUser(id).toDbUser()
-        saveUser(user)
-        return user
-    }
-
     suspend fun getUserFromCache(name: String): UiUser? {
         return (
             database.userDao().findWithScreenName(name) ?: cache.userDao()
@@ -73,8 +67,12 @@ class UserRepository @AssistedInject constructor(
     }
 
     private suspend fun saveUser(user: DbUser) {
-        cache.userDao().update(listOf(user))
-        database.userDao().update(listOf(user))
+        cache.userDao().findWithScreenName(user.screenName)?.let {
+            cache.userDao().update(listOf(user.copy(_id = it._id)))
+        }
+        database.userDao().findWithScreenName(user.screenName)?.let {
+            database.userDao().update(listOf(user.copy(_id = it._id)))
+        }
     }
 
     suspend fun showRelationship(id: String) = relationshipService.showRelationship(id)

@@ -32,6 +32,8 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.viewinterop.viewModel
+import androidx.hilt.lifecycle.HiltViewModelFactory
+import com.twidere.twiderex.extensions.ProvideNavigationViewModel
 import com.twidere.twiderex.navigation.Router
 import com.twidere.twiderex.settings.AmbientPrimaryColor
 import com.twidere.twiderex.settings.AmbientTabPosition
@@ -40,6 +42,7 @@ import com.twidere.twiderex.settings.PrimaryColorSetting
 import com.twidere.twiderex.settings.TabPositionSetting
 import com.twidere.twiderex.settings.ThemeSetting
 import com.twidere.twiderex.ui.AmbientActiveAccount
+import com.twidere.twiderex.ui.AmbientApplication
 import com.twidere.twiderex.ui.AmbientViewModelProviderFactory
 import com.twidere.twiderex.ui.AmbientWindow
 import com.twidere.twiderex.ui.AmbientWindowPadding
@@ -49,6 +52,7 @@ import com.twidere.twiderex.utils.AmbientLauncher
 import com.twidere.twiderex.viewmodel.ActiveAccountViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+
 
 @AndroidEntryPoint
 class TwidereXActivity : ComponentActivity() {
@@ -80,6 +84,7 @@ class TwidereXActivity : ComponentActivity() {
             val tabPosition by tabPositionSetting.data.observeAsState(initial = tabPositionSetting.initialValue)
             val primaryColor by primaryColorSettings.data.observeAsState(initial = primaryColorSettings.initialValue)
             val theme by themeSetting.data.observeAsState(initial = themeSetting.initialValue)
+
             Providers(
                 AmbientPrimaryColor provides primaryColor,
                 AmbientTabPosition provides tabPosition,
@@ -88,13 +93,16 @@ class TwidereXActivity : ComponentActivity() {
                 AmbientWindow provides window,
                 AmbientViewModelProviderFactory provides defaultViewModelProviderFactory,
                 AmbientActiveAccount provides account,
+                AmbientApplication provides application,
             ) {
-                ProvideWindowPadding {
-                    val windowPadding = AmbientWindowPadding.current
-                    Box(
-                        modifier = Modifier.padding(windowPadding)
-                    ) {
-                        Router()
+                ProvideNavigationViewModel(factory = defaultViewModelProviderFactory as HiltViewModelFactory) {
+                    ProvideWindowPadding {
+                        val windowPadding = AmbientWindowPadding.current
+                        Box(
+                            modifier = Modifier.padding(windowPadding)
+                        ) {
+                            Router()
+                        }
                     }
                 }
             }

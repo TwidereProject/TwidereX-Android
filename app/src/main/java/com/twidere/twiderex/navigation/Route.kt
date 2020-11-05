@@ -117,8 +117,8 @@ fun NavGraphBuilder.route() {
             navArgument("keyword") { type = NavType.StringType }
         )
     ) { backStackEntry ->
-        backStackEntry.arguments?.getString("keyword")?.let {
-            SearchScene(keyword = it)
+        backStackEntry.arguments?.getString("keyword")?.takeIf { it.isNotEmpty() }?.let {
+            SearchScene(keyword = URLDecoder.decode(it, "UTF-8"))
         }
     }
 

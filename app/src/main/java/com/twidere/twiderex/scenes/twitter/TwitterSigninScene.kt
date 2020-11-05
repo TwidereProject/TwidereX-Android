@@ -51,7 +51,7 @@ import kotlin.coroutines.suspendCoroutine
 @Composable
 fun TwitterSignInScene() {
     val viewModel = navViewModel<TwitterSignInViewModel>()
-    val isLoading by viewModel.isLoading.observeAsState()
+    val loading by viewModel.loading.observeAsState(initial = false)
     val navController = AmbientNavController.current
     val lifecycleOwner = LifecycleOwnerAmbient.current
     TwidereXTheme {
@@ -60,7 +60,7 @@ fun TwitterSignInScene() {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            if (isLoading == true) {
+            if (loading == true) {
                 CircularProgressIndicator()
             } else {
                 Button(

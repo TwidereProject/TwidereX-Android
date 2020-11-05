@@ -23,6 +23,7 @@ package com.twidere.twiderex.scenes
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Mail
 import androidx.compose.material.icons.filled.MoreVert
@@ -39,22 +40,26 @@ import com.twidere.twiderex.ui.TwidereXTheme
 @Composable
 fun UserScene(name: String) {
     TwidereXTheme {
-        UserComponent(screenName = name) {
-            AppBar(
-                backgroundColor = MaterialTheme.colors.surface.withElevation(),
-                navigationIcon = {
-                    AppBarNavigationButton()
-                },
-                actions = {
-                    IconButton(onClick = {}) {
-                        Icon(asset = Icons.Default.Mail)
-                    }
-                    IconButton(onClick = {}) {
-                        Icon(asset = Icons.Default.MoreVert)
-                    }
-                },
-                elevation = 0.dp,
-            )
+        Scaffold(
+            topBar = {
+                AppBar(
+                    backgroundColor = MaterialTheme.colors.surface.withElevation(),
+                    navigationIcon = {
+                        AppBarNavigationButton()
+                    },
+                    actions = {
+                        IconButton(onClick = {}) {
+                            Icon(asset = Icons.Default.Mail)
+                        }
+                        IconButton(onClick = {}) {
+                            Icon(asset = Icons.Default.MoreVert)
+                        }
+                    },
+                    elevation = 0.dp,
+                )
+            }
+        ) {
+            UserComponent(screenName = name)
         }
     }
 }

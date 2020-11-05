@@ -49,9 +49,12 @@ class UserViewModel @ViewModelInject constructor(
     val relationship = MutableLiveData<IRelationship>()
     val isMe = MutableLiveData(false)
 
-    suspend fun init(screenName: String) {
+    suspend fun init(screenName: String, data: UiUser?) {
         if (user.value != null) {
             return
+        }
+        data?.let {
+            user.postValue(it)
         }
         refresh(screenName)
     }

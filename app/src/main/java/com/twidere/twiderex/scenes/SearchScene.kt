@@ -159,9 +159,9 @@ fun SearchScene(keyword: String) {
                     modifier = Modifier.weight(1F),
                 ) {
                     when (selectedTab) {
-                        0 -> SearchTweetsContent()
-                        1 -> SearchMediasContent()
-                        2 -> SearchUsersContent()
+                        0 -> SearchTweetsContent(tweetsViewModel)
+                        1 -> SearchMediasContent(mediasViewModel)
+                        2 -> SearchUsersContent(usersViewModel)
                     }
                 }
             }
@@ -171,8 +171,7 @@ fun SearchScene(keyword: String) {
 
 @OptIn(IncomingComposeUpdate::class)
 @Composable
-private fun SearchTweetsContent() {
-    val viewModel = navViewModel<TwitterSearchTweetsViewModel>()
+private fun SearchTweetsContent(viewModel: TwitterSearchTweetsViewModel) {
     val refreshing by viewModel.refreshing.observeAsState(initial = false)
     val loadingMore by viewModel.loadingMore.observeAsState(initial = false)
     val items by viewModel.source.observeAsState(initial = emptyList())
@@ -211,8 +210,7 @@ private fun SearchTweetsContent() {
 
 @OptIn(IncomingComposeUpdate::class)
 @Composable
-private fun SearchMediasContent() {
-    val viewModel = navViewModel<TwitterSearchMediasViewModel>()
+private fun SearchMediasContent(viewModel: TwitterSearchMediasViewModel) {
     val refreshing by viewModel.refreshing.observeAsState(initial = false)
     val loadingMore by viewModel.loadingMore.observeAsState(initial = false)
     val source by viewModel.source.observeAsState(initial = emptyList())
@@ -268,8 +266,7 @@ private fun SearchMediasContent() {
 
 @OptIn(IncomingComposeUpdate::class)
 @Composable
-private fun SearchUsersContent() {
-    val viewModel = navViewModel<TwitterSearchUserViewModel>()
+private fun SearchUsersContent(viewModel: TwitterSearchUserViewModel) {
     val refreshing by viewModel.refreshing.observeAsState(initial = false)
     val loadingMore by viewModel.loadingMore.observeAsState(initial = false)
     val items by viewModel.source.observeAsState(initial = emptyList())
