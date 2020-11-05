@@ -42,8 +42,6 @@ data class DbTimeline(
     val timestamp: Long,
     var isGap: Boolean,
     val statusId: String,
-    val retweetId: String?,
-    val quoteId: String?,
     val type: TimelineType,
 )
 
@@ -63,21 +61,9 @@ data class DbTimelineWithStatus(
     @Relation(
         parentColumn = "statusId",
         entityColumn = "statusId",
-        entity = DbStatus::class,
+        entity = DbStatusV2::class,
     )
-    val status: DbStatusWithMediaAndUser,
-    @Relation(
-        parentColumn = "retweetId",
-        entityColumn = "statusId",
-        entity = DbStatus::class,
-    )
-    val retweet: DbStatusWithMediaAndUser?,
-    @Relation(
-        parentColumn = "quoteId",
-        entityColumn = "statusId",
-        entity = DbStatus::class,
-    )
-    val quote: DbStatusWithMediaAndUser?,
+    val status: DbStatusWithReference,
 )
 
 suspend fun List<DbTimelineWithStatus>.saveToDb(
@@ -85,7 +71,7 @@ suspend fun List<DbTimelineWithStatus>.saveToDb(
     cache: CacheDatabase
 ) {
     val data = this
-        .map { listOf(it.status, it.quote, it.retweet) }
+        .map { listOf(it.status.status, it.status.quote, it.status.retweet) }
         .flatten()
         .filterNotNull()
     data.map { it.user }.let {
@@ -93,7 +79,7 @@ suspend fun List<DbTimelineWithStatus>.saveToDb(
         database.userDao().update(it)
     }
     cache.mediaDao().insertAll(data.map { it.media }.flatten())
-    data.map { it.status }.let {
+    data.map { it.data }.let {
         cache.statusDao().insertAll(it)
         database.statusDao().update(it)
     }

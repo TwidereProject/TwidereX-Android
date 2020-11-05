@@ -22,8 +22,8 @@ package com.twidere.twiderex.model.ui
 
 import android.os.Parcelable
 import com.twidere.twiderex.db.model.DbStatusWithMediaAndUser
+import com.twidere.twiderex.db.model.DbStatusWithReference
 import com.twidere.twiderex.db.model.DbTimelineWithStatus
-import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.UserKey
 import com.twidere.twiderex.model.ui.UiMedia.Companion.toUi
 import com.twidere.twiderex.model.ui.UiUser.Companion.toUi
@@ -33,7 +33,6 @@ import kotlinx.android.parcel.Parcelize
 data class UiStatus(
     val statusId: String,
     val userKey: UserKey,
-    val platformType: PlatformType,
     val text: String,
     val timestamp: Long,
     val retweetCount: Long,
@@ -53,46 +52,65 @@ data class UiStatus(
 
     companion object {
 
+
+
         fun DbTimelineWithStatus.toUi() = UiStatus(
-            statusId = status.status.statusId,
-            userKey = status.status.userKey,
-            platformType = status.status.platformType,
-            text = status.status.text,
-            timestamp = status.status.timestamp,
-            retweetCount = status.status.retweetCount,
-            likeCount = status.status.likeCount,
-            replyCount = status.status.replyCount,
-            retweeted = status.status.retweeted,
-            liked = status.status.liked,
-            placeString = status.status.placeString,
-            hasMedia = status.status.hasMedia,
-            user = status.user.toUi(),
-            media = status.media.toUi(),
-            retweet = retweet?.toUi(),
-            quote = quote?.toUi(),
+            statusId = status.status.data.statusId,
+            userKey = status.status.data.userKey,
+            text = status.status.data.text,
+            timestamp = status.status.data.timestamp,
+            retweetCount = status.status.data.retweetCount,
+            likeCount = status.status.data.likeCount,
+            replyCount = status.status.data.replyCount,
+            retweeted = status.status.data.retweeted,
+            liked = status.status.data.liked,
+            placeString = status.status.data.placeString,
+            hasMedia = status.status.data.hasMedia,
+            user = status.status.user.toUi(),
+            media = status.status.media.toUi(),
+            retweet = status.retweet?.toUi(),
+            quote = status.quote?.toUi(),
             isGap = timeline.isGap,
-            source = status.status.source
+            source = status.status.data.source
         )
 
         fun DbStatusWithMediaAndUser.toUi() = UiStatus(
-            statusId = status.statusId,
-            userKey = status.userKey,
-            platformType = status.platformType,
-            text = status.text,
-            timestamp = status.timestamp,
-            retweetCount = status.retweetCount,
-            likeCount = status.likeCount,
-            replyCount = status.replyCount,
-            retweeted = status.retweeted,
-            liked = status.liked,
-            placeString = status.placeString,
-            hasMedia = status.hasMedia,
+            statusId = data.statusId,
+            userKey = data.userKey,
+            text = data.text,
+            timestamp = data.timestamp,
+            retweetCount = data.retweetCount,
+            likeCount = data.likeCount,
+            replyCount = data.replyCount,
+            retweeted = data.retweeted,
+            liked = data.liked,
+            placeString = data.placeString,
+            hasMedia = data.hasMedia,
             user = user.toUi(),
             media = media.toUi(),
             retweet = null,
             quote = null,
             isGap = false,
-            source = status.source,
+            source = data.source,
+        )
+        fun DbStatusWithReference.toUi() = UiStatus(
+            statusId = status.data.statusId,
+            userKey = status.data.userKey,
+            text = status.data.text,
+            timestamp = status.data.timestamp,
+            retweetCount = status.data.retweetCount,
+            likeCount = status.data.likeCount,
+            replyCount = status.data.replyCount,
+            retweeted = status.data.retweeted,
+            liked = status.data.liked,
+            placeString = status.data.placeString,
+            hasMedia = status.data.hasMedia,
+            user = status.user.toUi(),
+            media = status.media.toUi(),
+            retweet = retweet?.toUi(),
+            quote = quote?.toUi(),
+            isGap = false,
+            source = status.data.source
         )
     }
 }

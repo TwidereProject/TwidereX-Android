@@ -25,14 +25,13 @@ import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import androidx.room.Relation
-import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.UserKey
 
 @Entity(
     tableName = "status",
     indices = [Index(value = ["statusId", "userKey"], unique = true)],
 )
-data class DbStatus(
+data class DbStatusV2(
     /**
      * Id that being used in the database
      */
@@ -43,25 +42,39 @@ data class DbStatus(
      */
     val statusId: String,
     val userKey: UserKey,
-    val platformType: PlatformType,
     val text: String,
     val timestamp: Long,
     val retweetCount: Long,
     val likeCount: Long,
     val replyCount: Long,
-    var retweeted: Boolean,
-    var liked: Boolean,
     val placeString: String?,
     val source: String,
     val hasMedia: Boolean,
     val userId: String,
+    val lang: String?,
+    var retweeted: Boolean,
+    var liked: Boolean,
+    val replyStatusId: String?,
+    val quoteStatusId: String?,
+    val retweetStatusId: String?,
 )
 
 data class DbStatusWithMediaAndUser(
     @Embedded
-    val status: DbStatus,
+    val data: DbStatusV2,
     @Relation(parentColumn = "statusId", entityColumn = "statusId")
     val media: List<DbMedia>,
     @Relation(parentColumn = "userId", entityColumn = "userId")
     val user: DbUser,
+)
+
+data class DbStatusWithReference(
+    @Embedded
+    val status: DbStatusWithMediaAndUser,
+    @Relation(parentColumn = "replyStatusId", entityColumn = "statusId", entity = DbStatusV2::class)
+    val replyTo: DbStatusWithMediaAndUser?,
+    @Relation(parentColumn = "quoteStatusId", entityColumn = "statusId", entity = DbStatusV2::class)
+    val quote: DbStatusWithMediaAndUser?,
+    @Relation(parentColumn = "retweetStatusId", entityColumn = "statusId", entity = DbStatusV2::class)
+    val retweet: DbStatusWithMediaAndUser?,
 )

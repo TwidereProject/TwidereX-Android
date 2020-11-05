@@ -24,21 +24,28 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Update
-import com.twidere.twiderex.db.model.DbStatus
+import com.twidere.twiderex.db.model.DbStatusV2
+import com.twidere.twiderex.db.model.DbStatusWithReference
 import com.twidere.twiderex.model.UserKey
 
 @Dao
 interface StatusDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAll(status: List<DbStatus>)
+    suspend fun insertAll(status: List<DbStatusV2>)
 
     @Query("SELECT * FROM status")
-    suspend fun getAll(): List<DbStatus>
+    suspend fun getAll(): List<DbStatusV2>
 
     @Query("SELECT * FROM status WHERE statusId == :id AND userKey == :userKey")
-    suspend fun findWithStatusId(id: String, userKey: UserKey): DbStatus?
+    suspend fun findWithStatusId(id: String, userKey: UserKey): DbStatusV2?
+
+    @Transaction
+    @Query("SELECT * FROM status WHERE statusId == :id AND userKey == :userKey")
+    suspend fun findWithStatusIdWithReference(id: String, userKey: UserKey): DbStatusWithReference?
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun update(status: List<DbStatus>)
+    suspend fun update(status: List<DbStatusV2>)
 }
+

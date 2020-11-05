@@ -48,10 +48,9 @@ class TwitterMediaRepository @AssistedInject constructor(
     }
 
     suspend fun loadTweetFromCache(statusId: String): UiStatus? {
-        // TODO: load from retweet or quote will return null
         return (
-            database.timelineDao().findWithStatusId(statusId, userKey) ?: cache.timelineDao()
-                .findWithStatusId(statusId, userKey)
+            database.statusDao().findWithStatusIdWithReference(statusId, userKey) ?: cache.statusDao()
+                .findWithStatusIdWithReference(statusId, userKey)
             )?.toUi()
     }
 

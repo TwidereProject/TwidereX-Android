@@ -26,8 +26,9 @@ import com.twidere.services.twitter.model.StatusV2
 import com.twidere.services.twitter.model.User
 import com.twidere.services.twitter.model.UserV2
 import com.twidere.twiderex.db.model.DbMedia
-import com.twidere.twiderex.db.model.DbStatus
+import com.twidere.twiderex.db.model.DbStatusV2
 import com.twidere.twiderex.db.model.DbStatusWithMediaAndUser
+import com.twidere.twiderex.db.model.DbStatusWithReference
 import com.twidere.twiderex.db.model.DbTimeline
 import com.twidere.twiderex.db.model.DbTimelineWithStatus
 import com.twidere.twiderex.db.model.DbUser
@@ -46,6 +47,10 @@ fun StatusV2.toDbTimeline(
         ?.firstOrNull { it.type == ReferencedTweetType.retweeted }?.status?.toDbStatusWithMediaAndUser(
             userKey
         )
+    val replyTo = this.referencedTweets
+        ?.firstOrNull { it.type == ReferencedTweetType.replied_to }?.status?.toDbStatusWithMediaAndUser(
+            userKey
+        )
     val quote = this.referencedTweets
         ?.firstOrNull { it.type == ReferencedTweetType.quoted }?.status?.toDbStatusWithMediaAndUser(
             userKey
@@ -56,16 +61,17 @@ fun StatusV2.toDbTimeline(
             _id = UUID.randomUUID().toString(),
             userKey = userKey,
             platformType = PlatformType.Twitter,
-            timestamp = status.status.timestamp,
+            timestamp = status.data.timestamp,
             isGap = false,
-            retweetId = retweet?.status?.statusId,
-            quoteId = quote?.status?.statusId,
-            statusId = status.status.statusId,
+            statusId = status.data.statusId,
             type = timelineType,
         ),
-        status = status,
-        retweet = retweet,
-        quote = quote,
+        status = DbStatusWithReference(
+            replyTo = replyTo,
+            quote = quote,
+            retweet = retweet,
+            status = status
+        ),
     )
 }
 
@@ -82,16 +88,17 @@ fun Status.toDbTimeline(
             _id = UUID.randomUUID().toString(),
             userKey = userKey,
             platformType = PlatformType.Twitter,
-            timestamp = status.status.timestamp,
+            timestamp = status.data.timestamp,
             isGap = false,
-            retweetId = retweet?.status?.statusId,
-            quoteId = quote?.status?.statusId,
-            statusId = status.status.statusId,
+            statusId = status.data.statusId,
             type = timelineType,
         ),
-        status = status,
-        retweet = retweet,
-        quote = quote,
+        status = DbStatusWithReference(
+            status = status,
+            quote = quote,
+            retweet = retweet,
+            replyTo = null,
+        ),
     )
 }
 
@@ -111,11 +118,16 @@ private fun StatusV2.toDbStatusWithMediaAndUser(
     userKey: UserKey
 ): DbStatusWithMediaAndUser {
     val user = user?.toDbUser() ?: throw IllegalArgumentException("Status.user should not be null")
-    val status = DbStatus(
+    val retweet = this.referencedTweets
+        ?.firstOrNull { it.type == ReferencedTweetType.retweeted }?.id
+    val replyTo = this.referencedTweets
+        ?.firstOrNull { it.type == ReferencedTweetType.replied_to }?.id
+    val quote = this.referencedTweets
+        ?.firstOrNull { it.type == ReferencedTweetType.quoted }?.id
+    val status = DbStatusV2(
         _id = UUID.randomUUID().toString(),
         statusId = id ?: throw IllegalArgumentException("Status.idStr should not be null"),
         userKey = userKey,
-        platformType = PlatformType.Twitter,
         text = text ?: "",
         timestamp = createdAt?.time ?: 0,
         retweetCount = publicMetrics?.retweetCount ?: 0,
@@ -126,10 +138,14 @@ private fun StatusV2.toDbStatusWithMediaAndUser(
         placeString = place?.fullName,
         hasMedia = !attachments?.medias.isNullOrEmpty(),
         source = source ?: "",
-        userId = user.userId
+        userId = user.userId,
+        lang = lang,
+        replyStatusId = replyTo,
+        retweetStatusId = retweet,
+        quoteStatusId = quote,
     )
     return DbStatusWithMediaAndUser(
-        status = status,
+        data = status,
         media = (attachments?.medias ?: emptyList()).mapIndexed { index, it ->
             DbMedia(
                 _id = UUID.randomUUID().toString(),
@@ -153,11 +169,10 @@ private fun Status.toDbStatusWithMediaAndUser(
     userKey: UserKey
 ): DbStatusWithMediaAndUser {
     val user = user?.toDbUser() ?: throw IllegalArgumentException("Status.user should not be null")
-    val status = DbStatus(
+    val status = DbStatusV2(
         _id = UUID.randomUUID().toString(),
         statusId = idStr ?: throw IllegalArgumentException("Status.idStr should not be null"),
         userKey = userKey,
-        platformType = PlatformType.Twitter,
         text = text ?: "",
         timestamp = createdAt?.time ?: 0,
         retweetCount = retweetCount ?: 0,
@@ -168,28 +183,32 @@ private fun Status.toDbStatusWithMediaAndUser(
         placeString = place?.fullName,
         hasMedia = extendedEntities?.media != null || entities?.media != null,
         source = source ?: "",
-        userId = user.userId
+        userId = user.userId,
+        lang = lang,
+        replyStatusId = null,
+        retweetStatusId = retweetedStatus?.idStr,
+        quoteStatusId = quotedStatus?.idStr,
     )
     return DbStatusWithMediaAndUser(
-        status = status,
+        data = status,
         media = (
-            extendedEntities?.media ?: entities?.media
+                extendedEntities?.media ?: entities?.media
                 ?: emptyList()
-            ).mapIndexed { index, it ->
-            DbMedia(
-                _id = UUID.randomUUID().toString(),
-                statusId = status.statusId,
-                previewUrl = getImage(it.mediaURLHTTPS, "small"),
-                mediaUrl = getImage(it.mediaURLHTTPS, "large"),
-                width = it.sizes?.large?.w ?: 0,
-                height = it.sizes?.large?.h ?: 0,
-                pageUrl = it.url,
-                altText = it.displayURL ?: "",
-                url = it.expandedURL,
-                type = it.type?.let { MediaType.valueOf(it) } ?: MediaType.photo,
-                order = index,
-            )
-        },
+                ).mapIndexed { index, it ->
+                DbMedia(
+                    _id = UUID.randomUUID().toString(),
+                    statusId = status.statusId,
+                    previewUrl = getImage(it.mediaURLHTTPS, "small"),
+                    mediaUrl = getImage(it.mediaURLHTTPS, "large"),
+                    width = it.sizes?.large?.w ?: 0,
+                    height = it.sizes?.large?.h ?: 0,
+                    pageUrl = it.url,
+                    altText = it.displayURL ?: "",
+                    url = it.expandedURL,
+                    type = it.type?.let { MediaType.valueOf(it) } ?: MediaType.photo,
+                    order = index,
+                )
+            },
         user = user
     )
 }

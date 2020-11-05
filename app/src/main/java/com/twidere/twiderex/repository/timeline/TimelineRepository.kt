@@ -77,12 +77,12 @@ abstract class TimelineRepository(
 
     protected open suspend fun saveData(timeline: List<DbTimelineWithStatus>) {
         val data = timeline
-            .map { listOf(it.status, it.quote, it.retweet) }
+            .map { listOf(it.status.status, it.status.quote, it.status.retweet) }
             .flatten()
             .filterNotNull()
         database.userDao().insertAll(data.map { it.user })
         database.mediaDao().insertAll(data.map { it.media }.flatten())
-        database.statusDao().insertAll(data.map { it.status })
+        database.statusDao().insertAll(data.map { it.data })
         database.timelineDao().insertAll(timeline.map { it.timeline })
     }
 

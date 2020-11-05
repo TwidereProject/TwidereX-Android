@@ -28,7 +28,7 @@ import com.twidere.twiderex.db.dao.StatusDao
 import com.twidere.twiderex.db.dao.TimelineDao
 import com.twidere.twiderex.db.dao.UserDao
 import com.twidere.twiderex.db.model.DbMedia
-import com.twidere.twiderex.db.model.DbStatus
+import com.twidere.twiderex.db.model.DbStatusV2
 import com.twidere.twiderex.db.model.DbTimeline
 import com.twidere.twiderex.db.model.DbUser
 import com.twidere.twiderex.db.model.converter.MediaTypeConverter
@@ -40,7 +40,7 @@ import javax.inject.Singleton
 @Singleton
 @Database(
     entities = [
-        DbStatus::class,
+        DbStatusV2::class,
         DbTimeline::class,
         DbMedia::class,
         DbUser::class,

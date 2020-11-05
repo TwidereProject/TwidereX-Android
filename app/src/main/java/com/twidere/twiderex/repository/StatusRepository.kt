@@ -25,7 +25,7 @@ import com.squareup.inject.assisted.AssistedInject
 import com.twidere.services.microblog.StatusService
 import com.twidere.twiderex.db.AppDatabase
 import com.twidere.twiderex.db.CacheDatabase
-import com.twidere.twiderex.db.model.DbStatus
+import com.twidere.twiderex.db.model.DbStatusV2
 import com.twidere.twiderex.model.UserKey
 import javax.inject.Singleton
 
@@ -98,7 +98,7 @@ class StatusRepository @AssistedInject constructor(
         }
     }
 
-    private suspend fun updateStatus(id: String, action: (DbStatus) -> Unit) {
+    private suspend fun updateStatus(id: String, action: (DbStatusV2) -> Unit) {
         database.statusDao().findWithStatusId(id, key)?.let {
             action.invoke(it)
             database.statusDao().insertAll(listOf(it))
