@@ -33,7 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.viewinterop.viewModel
 import androidx.hilt.lifecycle.HiltViewModelFactory
-import com.twidere.twiderex.extensions.ProvideNavigationViewModel
+import com.twidere.twiderex.extensions.ProvideNavigationViewModelFactoryMap
 import com.twidere.twiderex.navigation.Router
 import com.twidere.twiderex.settings.AmbientPrimaryColor
 import com.twidere.twiderex.settings.AmbientTabPosition
@@ -95,7 +95,7 @@ class TwidereXActivity : ComponentActivity() {
                 AmbientActiveAccount provides account,
                 AmbientApplication provides application,
             ) {
-                ProvideNavigationViewModel(factory = defaultViewModelProviderFactory as HiltViewModelFactory) {
+                ProvideNavigationViewModelFactoryMap(factory = defaultViewModelProviderFactory as HiltViewModelFactory) {
                     ProvideWindowPadding {
                         val windowPadding = AmbientWindowPadding.current
                         Box(

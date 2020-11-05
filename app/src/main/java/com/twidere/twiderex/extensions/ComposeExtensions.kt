@@ -50,16 +50,19 @@ inline fun <reified VM : ViewModel> navViewModel(
         val application = AmbientApplication.current
         val viewModelFactories = AmbientViewModelFactoriesMap.current
         val delegate = SavedStateViewModelFactory(application, backStackEntry, null)
-        val altFactory = HiltViewModelFactory::class.java.declaredConstructors.first()
+        // https://github.com/google/dagger/issues/1938
+        // idk why people in google like factory pattern,
+        // they might need to take a look at https://github.com/EnterpriseQualityCoding/FizzBuzzEnterpriseEdition
+        val hiltViewModelFactory = HiltViewModelFactory::class.java.declaredConstructors.first()
             .newInstance(backStackEntry, null, delegate, viewModelFactories) as HiltViewModelFactory
-        viewModel(key, altFactory)
+        viewModel(key, hiltViewModelFactory)
     } else {
         viewModel(key, factory)
     }
 }
 
 @Composable
-fun ProvideNavigationViewModel(factory: HiltViewModelFactory, content: @Composable () -> Unit) {
+fun ProvideNavigationViewModelFactoryMap(factory: HiltViewModelFactory, content: @Composable () -> Unit) {
     // Hack for navigationViewModel
     val factories =
         HiltViewModelFactory::class.java.getDeclaredField("mViewModelFactories").also { it.isAccessible = true }
