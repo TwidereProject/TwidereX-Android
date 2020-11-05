@@ -24,7 +24,6 @@ import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
 import com.twidere.services.microblog.StatusService
 import com.twidere.twiderex.db.AppDatabase
-import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.db.model.DbStatusV2
 import com.twidere.twiderex.model.UserKey
 import javax.inject.Singleton
@@ -32,7 +31,6 @@ import javax.inject.Singleton
 @Singleton
 class StatusRepository @AssistedInject constructor(
     private val database: AppDatabase,
-    private val cache: CacheDatabase,
     @Assisted private val key: UserKey,
     @Assisted private val service: StatusService,
 ) {
@@ -102,10 +100,6 @@ class StatusRepository @AssistedInject constructor(
         database.statusDao().findWithStatusId(id, key)?.let {
             action.invoke(it)
             database.statusDao().insertAll(listOf(it))
-            cache.statusDao().insertAll(listOf(it))
-        } ?: cache.statusDao().findWithStatusId(id, key)?.let {
-            action.invoke(it)
-            cache.statusDao().insertAll(listOf(it))
         }
     }
 }

@@ -25,7 +25,6 @@ import com.squareup.inject.assisted.AssistedInject
 import com.twidere.services.microblog.LookupService
 import com.twidere.services.twitter.model.StatusV2
 import com.twidere.twiderex.db.AppDatabase
-import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.db.mapper.toDbTimeline
 import com.twidere.twiderex.db.model.TimelineType
 import com.twidere.twiderex.db.model.saveToDb
@@ -35,7 +34,6 @@ import com.twidere.twiderex.model.ui.UiStatus.Companion.toUi
 
 class TwitterMediaRepository @AssistedInject constructor(
     private val database: AppDatabase,
-    private val cache: CacheDatabase,
     @Assisted private val userKey: UserKey,
     @Assisted private val lookupService: LookupService,
 ) {
@@ -48,10 +46,7 @@ class TwitterMediaRepository @AssistedInject constructor(
     }
 
     suspend fun loadTweetFromCache(statusId: String): UiStatus? {
-        return (
-            database.statusDao().findWithStatusIdWithReference(statusId, userKey) ?: cache.statusDao()
-                .findWithStatusIdWithReference(statusId, userKey)
-            )?.toUi()
+        return database.statusDao().findWithStatusIdWithReference(statusId, userKey)?.toUi()
     }
 
     suspend fun loadTweetFromNetwork(statusId: String): UiStatus {
@@ -60,7 +55,7 @@ class TwitterMediaRepository @AssistedInject constructor(
 
     private suspend fun toUiStatus(status: StatusV2): UiStatus {
         val db = status.toDbTimeline(userKey, TimelineType.Conversation)
-        listOf(db).saveToDb(database, cache)
+        listOf(db).saveToDb(database)
         return db.toUi()
     }
 }

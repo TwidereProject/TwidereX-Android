@@ -23,7 +23,6 @@ package com.twidere.twiderex.repository.timeline
 import androidx.lifecycle.map
 import com.twidere.services.microblog.model.IStatus
 import com.twidere.twiderex.db.AppDatabase
-import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.db.mapper.toDbTimeline
 import com.twidere.twiderex.db.model.TimelineType
 import com.twidere.twiderex.db.model.saveToDb
@@ -34,7 +33,6 @@ import com.twidere.twiderex.model.ui.UiStatus.Companion.toUi
 import com.twidere.twiderex.model.ui.UiUser
 
 abstract class CacheUserTimelineRepository(
-    private val cache: CacheDatabase,
     private val database: AppDatabase,
     private val userKey: UserKey,
     private val count: Int = defaultLoadCount,
@@ -42,7 +40,7 @@ abstract class CacheUserTimelineRepository(
     protected abstract val type: TimelineType
 
     val liveData by lazy {
-        cache.timelineDao().getAllWithLiveData(userKey, type).map { list ->
+        database.timelineDao().getAllWithLiveData(userKey, type).map { list ->
             list.map { status ->
                 status.toUi()
             }
@@ -60,7 +58,7 @@ abstract class CacheUserTimelineRepository(
             emptyList()
         }
         val timeline = result.map { it.toDbTimeline(userKey, type) }
-        timeline.saveToDb(database, cache)
+        timeline.saveToDb(database)
         return timeline.map { it.toUi() }
     }
 

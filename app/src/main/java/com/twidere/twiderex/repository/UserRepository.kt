@@ -25,7 +25,6 @@ import com.squareup.inject.assisted.AssistedInject
 import com.twidere.services.microblog.LookupService
 import com.twidere.services.microblog.RelationshipService
 import com.twidere.twiderex.db.AppDatabase
-import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.db.mapper.toDbTimeline
 import com.twidere.twiderex.db.mapper.toDbUser
 import com.twidere.twiderex.db.model.DbUser
@@ -40,7 +39,6 @@ import javax.inject.Singleton
 @Singleton
 class UserRepository @AssistedInject constructor(
     private val database: AppDatabase,
-    private val cache: CacheDatabase,
     @Assisted private val lookupService: LookupService,
     @Assisted private val relationshipService: RelationshipService,
 ) {
@@ -60,16 +58,11 @@ class UserRepository @AssistedInject constructor(
     }
 
     suspend fun getUserFromCache(name: String): UiUser? {
-        return (
-            database.userDao().findWithScreenName(name) ?: cache.userDao()
-                .findWithScreenName(name)
-            )?.toUi()
+        return database.userDao().findWithScreenName(name)
+            ?.toUi()
     }
 
     private suspend fun saveUser(user: DbUser) {
-        cache.userDao().findWithScreenName(user.screenName)?.let {
-            cache.userDao().update(listOf(user.copy(_id = it._id)))
-        }
         database.userDao().findWithScreenName(user.screenName)?.let {
             database.userDao().update(listOf(user.copy(_id = it._id)))
         }

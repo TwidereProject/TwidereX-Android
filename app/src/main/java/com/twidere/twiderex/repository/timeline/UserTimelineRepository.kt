@@ -25,17 +25,15 @@ import com.squareup.inject.assisted.AssistedInject
 import com.twidere.services.microblog.TimelineService
 import com.twidere.services.microblog.model.IStatus
 import com.twidere.twiderex.db.AppDatabase
-import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.db.model.TimelineType
 import com.twidere.twiderex.model.UserKey
 import com.twidere.twiderex.model.ui.UiUser
 
 class UserTimelineRepository @AssistedInject constructor(
-    cache: CacheDatabase,
     database: AppDatabase,
     @Assisted userKey: UserKey,
     @Assisted private val service: TimelineService,
-) : CacheUserTimelineRepository(cache, database, userKey) {
+) : CacheUserTimelineRepository(database, userKey) {
     override val type: TimelineType
         get() = TimelineType.User
 

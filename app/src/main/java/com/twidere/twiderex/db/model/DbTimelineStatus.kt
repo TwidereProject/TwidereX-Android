@@ -26,7 +26,6 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import androidx.room.Relation
 import com.twidere.twiderex.db.AppDatabase
-import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.UserKey
 
@@ -68,23 +67,22 @@ data class DbTimelineWithStatus(
 
 suspend fun List<DbTimelineWithStatus>.saveToDb(
     database: AppDatabase,
-    cache: CacheDatabase
 ) {
     val data = this
         .map { listOf(it.status.status, it.status.quote, it.status.retweet) }
         .flatten()
         .filterNotNull()
     data.map { it.user }.let {
-        cache.userDao().insertAll(it)
-        database.userDao().update(it)
+//        cache.userDao().insertAll(it)
+        database.userDao().insertAll(it)
     }
-    cache.mediaDao().insertAll(data.map { it.media }.flatten())
+    database.mediaDao().insertAll(data.map { it.media }.flatten())
     data.map { it.data }.let {
-        cache.statusDao().insertAll(it)
-        database.statusDao().update(it)
+//        cache.statusDao().insertAll(it)
+        database.statusDao().insertAll(it)
     }
     this.map { it.timeline }.let {
-        cache.timelineDao().insertAll(it)
-        database.timelineDao().update(it)
+//        cache.timelineDao().insertAll(it)
+        database.timelineDao().insertAll(it)
     }
 }

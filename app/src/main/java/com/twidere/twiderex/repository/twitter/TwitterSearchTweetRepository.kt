@@ -25,7 +25,6 @@ import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
 import com.twidere.services.twitter.TwitterService
 import com.twidere.twiderex.db.AppDatabase
-import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.db.mapper.toDbTimeline
 import com.twidere.twiderex.db.model.TimelineType
 import com.twidere.twiderex.db.model.saveToDb
@@ -36,7 +35,6 @@ import com.twidere.twiderex.repository.twitter.model.SearchResult
 
 class TwitterSearchTweetRepository @AssistedInject constructor(
     private val database: AppDatabase,
-    private val cache: CacheDatabase,
     @Assisted private val userKey: UserKey,
     @Assisted private val service: TwitterService,
 ) {
@@ -49,7 +47,7 @@ class TwitterSearchTweetRepository @AssistedInject constructor(
     }
 
     val liveData by lazy {
-        cache.timelineDao().getAllWithLiveData(userKey, TimelineType.SearchTweets).map { list ->
+        database.timelineDao().getAllWithLiveData(userKey, TimelineType.SearchTweets).map { list ->
             list.map { status ->
                 status.toUi()
             }
@@ -64,7 +62,7 @@ class TwitterSearchTweetRepository @AssistedInject constructor(
         )
         val status = searchResponse.data ?: emptyList()
         val db = status.map { it.toDbTimeline(userKey, TimelineType.SearchTweets) }
-        db.saveToDb(database, cache)
+        db.saveToDb(database)
         return SearchResult(status, searchResponse.nextPage)
     }
 }
