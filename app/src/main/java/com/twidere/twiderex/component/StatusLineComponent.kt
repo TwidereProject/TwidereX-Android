@@ -40,6 +40,7 @@ import com.twidere.twiderex.ui.statusLineWidth
 
 @Composable
 fun StatusLineComponent(
+    modifier: Modifier = Modifier,
     lineColor: Color = MaterialTheme.colors.onSurface.copy(alpha = 0.12f),
     lineWidth: Dp = statusLineWidth,
     startPadding: Dp = standardPadding * 2 + profileImageSize / 2 - lineWidth / 2,
@@ -48,7 +49,9 @@ fun StatusLineComponent(
     lineUp: Boolean = false,
     child: @Composable () -> Unit
 ) {
-    Box {
+    Box(
+        modifier = modifier,
+    ) {
         if (lineDown) {
             Box(
                 modifier = Modifier

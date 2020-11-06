@@ -61,6 +61,7 @@ import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material.icons.filled.Topic
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedTask
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -83,7 +84,7 @@ import com.twidere.twiderex.component.TimelineStatusComponent
 import com.twidere.twiderex.extensions.navViewModel
 import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.maxComposeTextLength
-import com.twidere.twiderex.model.ui.UiStatus
+import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.ui.AmbientActiveAccount
 import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.ui.composeImageSize
@@ -99,17 +100,16 @@ enum class ComposeType {
     Quote,
 }
 
-@Composable
-fun ComposeScene(type: ComposeType, statusId: String?) {
-    if (type == ComposeType.New) {
-        ComposeScene()
-    }
-}
-
 @OptIn(ExperimentalLazyDsl::class, ExperimentalFocus::class, ExperimentalFoundationApi::class)
 @Composable
-fun ComposeScene(status: UiStatus? = null, composeType: ComposeType = ComposeType.New) {
+fun ComposeScene(statusId: String? = null, composeType: ComposeType = ComposeType.New) {
     val viewModel = navViewModel<ComposeViewModel>()
+    val status by viewModel.status.observeAsState()
+    statusId?.let {
+        LaunchedTask {
+            viewModel.initStatus(it)
+        }
+    }
     val (text, setText) = remember { mutableStateOf("") }
     val images by viewModel.images.observeAsState(initial = emptyList())
     val account = AmbientActiveAccount.current
@@ -117,20 +117,6 @@ fun ComposeScene(status: UiStatus? = null, composeType: ComposeType = ComposeTyp
     val locationEnabled by viewModel.locationEnabled.observeAsState(initial = false)
     val navController = AmbientNavController.current
     val keyboardController = remember { Ref<SoftwareKeyboardController>() }
-    val listState = rememberLazyListState(
-        initialFirstVisibleItemIndex = if (status == null) {
-            0
-        } else {
-            1
-        }
-    )
-    status?.also {
-        if (listState.firstVisibleItemIndex == 0) {
-            keyboardController.value?.hideSoftwareKeyboard()
-        } else if (listState.firstVisibleItemIndex == 1) {
-            keyboardController.value?.showSoftwareKeyboard()
-        }
-    }
     Scaffold(
         topBar = {
             AppBar(
@@ -161,63 +147,71 @@ fun ComposeScene(status: UiStatus? = null, composeType: ComposeType = ComposeTyp
         }
     ) {
         Column {
-            LazyColumn(
-                modifier = Modifier.weight(1F),
-                state = listState,
+            Box(
+                modifier = Modifier.weight(1f)
             ) {
-                status?.let { status ->
-                    item {
-                        Box(
-                            modifier = Modifier
-                                .background(MaterialTheme.colors.surface.withElevation())
-                        ) {
-                            StatusLineComponent(lineDown = true) {
-                                TimelineStatusComponent(
-                                    data = status,
-                                    showActions = false,
-                                )
+                if (composeType == ComposeType.New) {
+                    ComposeInput(
+                        account,
+                        text,
+                        setText,
+                        keyboardController
+                    )
+                } else {
+                    status?.let { status ->
+                        val listState = rememberLazyListState(
+                            initialFirstVisibleItemIndex = if (composeType == ComposeType.Reply) {
+                                1
+                            } else {
+                                0
                             }
+                        )
+                        if (listState.firstVisibleItemIndex == 0) {
+                            keyboardController.value?.hideSoftwareKeyboard()
+                        } else if (listState.firstVisibleItemIndex == 1) {
+                            keyboardController.value?.showSoftwareKeyboard()
                         }
-                    }
-                }
-                item {
-                    StatusLineComponent(
-                        lineUp = status != null,
-                    ) {
-                        Row(
-                            modifier = Modifier.fillParentMaxSize()
-                                .padding(16.dp),
+                        LazyColumn(
+                            state = listState,
                         ) {
-                            account?.let {
-                                NetworkImage(
-                                    url = it.user.profileImage,
-                                    modifier = Modifier
-                                        .clip(CircleShape)
-                                        .width(profileImageSize)
-                                        .height(profileImageSize)
-                                )
-                            }
-                            Spacer(modifier = Modifier.width(16.dp))
-                            Box(
-                                modifier = Modifier.weight(1F)
-                            ) {
-                                TextInput(
-                                    modifier = Modifier.align(Alignment.TopCenter),
-                                    value = text,
-                                    onValueChange = { setText(it) },
-                                    autoFocus = true,
-                                    onTextInputStarted = {
-                                        keyboardController.value = it
-                                    },
-                                    onClicked = {
-                                        // TODO: scroll lazyColumn
+                            if (composeType == ComposeType.Reply) {
+                                item {
+                                    Box(
+                                        modifier = Modifier
+                                            .background(MaterialTheme.colors.surface.withElevation())
+                                    ) {
+                                        StatusLineComponent(lineDown = true) {
+                                            TimelineStatusComponent(
+                                                data = status,
+                                                showActions = false,
+                                            )
+                                        }
                                     }
-                                )
+                                }
+                            }
+                            item {
+                                StatusLineComponent(
+                                    modifier = Modifier.fillParentMaxSize(),
+                                    lineUp = composeType == ComposeType.Reply,
+                                ) {
+                                    ComposeInput(
+                                        account,
+                                        text,
+                                        setText,
+                                        keyboardController,
+                                        autoFocus = if (composeType == ComposeType.Reply) {
+                                            listState.firstVisibleItemIndex == 1
+                                        } else {
+                                            true
+                                        }
+                                    )
+                                }
                             }
                         }
                     }
                 }
             }
+
 
             if (images.any()) {
                 LazyRowForIndexed(
@@ -268,6 +262,49 @@ fun ComposeScene(status: UiStatus? = null, composeType: ComposeType = ComposeTyp
     }
 }
 
+@ExperimentalFocus
+@ExperimentalFoundationApi
+@Composable
+private fun ComposeInput(
+    account: AccountDetails?,
+    text: String,
+    setText: (String) -> Unit,
+    keyboardController: Ref<SoftwareKeyboardController>,
+    autoFocus: Boolean = true,
+) {
+    Row(
+        modifier = Modifier
+            .padding(16.dp),
+    ) {
+        account?.let {
+            NetworkImage(
+                url = it.user.profileImage,
+                modifier = Modifier
+                    .clip(CircleShape)
+                    .width(profileImageSize)
+                    .height(profileImageSize)
+            )
+        }
+        Spacer(modifier = Modifier.width(16.dp))
+        Box(
+            modifier = Modifier.weight(1F)
+        ) {
+            TextInput(
+                modifier = Modifier.align(Alignment.TopCenter),
+                value = text,
+                onValueChange = { setText(it) },
+                autoFocus = autoFocus,
+                onTextInputStarted = {
+                    keyboardController.value = it
+                },
+                onClicked = {
+                    // TODO: scroll lazyColumn
+                }
+            )
+        }
+    }
+}
+
 @Composable
 private fun ComposeActions() {
     val viewModel = navViewModel<ComposeViewModel>()
@@ -278,7 +315,8 @@ private fun ComposeActions() {
             IconButton(
                 onClick = {
                     scope.launch {
-                        val item = launcher.launchForResult(ActivityResultContracts.GetMultipleContents())
+                        val item =
+                            launcher.launchForResult(ActivityResultContracts.GetMultipleContents())
                     }
 //                            openImagePicker()
                 }

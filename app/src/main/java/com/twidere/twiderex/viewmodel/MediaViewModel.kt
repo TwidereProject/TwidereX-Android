@@ -26,12 +26,12 @@ import androidx.lifecycle.ViewModel
 import com.twidere.services.microblog.LookupService
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.repository.AccountRepository
-import com.twidere.twiderex.repository.twitter.TwitterMediaRepository
+import com.twidere.twiderex.repository.twitter.TwitterTweetsRepository
 import kotlinx.coroutines.coroutineScope
 
 class MediaViewModel @ViewModelInject constructor(
     accountRepository: AccountRepository,
-    private val factory: TwitterMediaRepository.AssistedFactory,
+    private val factory: TwitterTweetsRepository.AssistedFactory,
 ) : ViewModel() {
 
     private val repository = accountRepository.getCurrentAccount().let { accountDetails ->

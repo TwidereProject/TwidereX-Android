@@ -32,7 +32,7 @@ import com.twidere.twiderex.model.UserKey
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.model.ui.UiStatus.Companion.toUi
 
-class TwitterMediaRepository @AssistedInject constructor(
+class TwitterTweetsRepository @AssistedInject constructor(
     private val database: AppDatabase,
     @Assisted private val userKey: UserKey,
     @Assisted private val lookupService: LookupService,
@@ -42,7 +42,7 @@ class TwitterMediaRepository @AssistedInject constructor(
         fun create(
             userKey: UserKey,
             lookupService: LookupService,
-        ): TwitterMediaRepository
+        ): TwitterTweetsRepository
     }
 
     suspend fun loadTweetFromCache(statusId: String): UiStatus? {

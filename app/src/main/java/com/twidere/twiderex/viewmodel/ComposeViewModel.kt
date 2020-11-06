@@ -30,24 +30,35 @@ import androidx.annotation.RequiresPermission
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.twidere.services.microblog.LookupService
 import com.twidere.services.twitter.TwitterService
 import com.twidere.twiderex.extensions.getCachedLocation
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.repository.AccountRepository
+import com.twidere.twiderex.repository.twitter.TwitterTweetsRepository
 import com.twidere.twiderex.scenes.ComposeType
 import com.twidere.twiderex.utils.ComposeQueue
 
 class ComposeViewModel @ViewModelInject constructor(
-    private val repository: AccountRepository,
+    private val accountRepository: AccountRepository,
     private val locationManager: LocationManager,
     private val composeQueue: ComposeQueue,
+    private val factory: TwitterTweetsRepository.AssistedFactory,
 ) : ViewModel(), LocationListener {
     private val service by lazy {
-        repository.getCurrentAccount().service as TwitterService
+        accountRepository.getCurrentAccount().service as TwitterService
+    }
+    private val repository by lazy {
+        val currentAccount = accountRepository.getCurrentAccount()
+        factory.create(
+            currentAccount.key,
+            currentAccount.service as LookupService,
+        )
     }
     val images = MutableLiveData<List<Uri>>(emptyList())
     val location = MutableLiveData<Location>()
     val locationEnabled = MutableLiveData(false)
+    val status = MutableLiveData<UiStatus>()
 
     fun compose(content: String, composeType: ComposeType, status: UiStatus? = null) {
         composeQueue.commit(
@@ -57,6 +68,12 @@ class ComposeViewModel @ViewModelInject constructor(
             replyTo = if (composeType == ComposeType.Reply) status?.statusId else null,
             quoteTo = if (composeType == ComposeType.Quote) status?.statusId else null,
         )
+    }
+
+    suspend fun initStatus(statusId: String) {
+        repository.loadTweetFromCache(statusId)?.let {
+            status.postValue(it)
+        }
     }
 
     fun putImages(value: List<Uri>) {

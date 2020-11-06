@@ -134,7 +134,7 @@ fun NavGraphBuilder.route() {
                 enumValueOf(it)
             } ?: ComposeType.New
             val statusId = args.getString("statusId")
-            ComposeScene(type, statusId)
+            ComposeScene(statusId, type)
         }
     }
 
