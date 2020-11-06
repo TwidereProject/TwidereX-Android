@@ -54,26 +54,26 @@ data class UiStatus(
         fun DbTimelineWithStatus.toUi(
             userKey: UserKey,
         ) = with(status.status) {
-                val reaction = reactions.firstOrNull { it.userKey == userKey }
-                UiStatus(
-                    statusId = data.statusId,
-                    text = data.text,
-                    timestamp = data.timestamp,
-                    retweetCount = data.retweetCount,
-                    likeCount = data.likeCount,
-                    replyCount = data.replyCount,
-                    retweeted = reaction?.retweeted ?: false,
-                    liked = reaction?.liked ?: false,
-                    placeString = data.placeString,
-                    hasMedia = data.hasMedia,
-                    user = user.toUi(),
-                    media = media.toUi(),
-                    retweet = status.retweet?.toUi(userKey)?.copy(quote = status.quote?.toUi(userKey)),
-                    quote = status.quote?.toUi(userKey),
-                    isGap = timeline.isGap,
-                    source = data.source
-                )
-            }
+            val reaction = reactions.firstOrNull { it.userKey == userKey }
+            UiStatus(
+                statusId = data.statusId,
+                text = data.text,
+                timestamp = data.timestamp,
+                retweetCount = data.retweetCount,
+                likeCount = data.likeCount,
+                replyCount = data.replyCount,
+                retweeted = reaction?.retweeted ?: false,
+                liked = reaction?.liked ?: false,
+                placeString = data.placeString,
+                hasMedia = data.hasMedia,
+                user = user.toUi(),
+                media = media.toUi(),
+                retweet = status.retweet?.toUi(userKey)?.copy(quote = status.quote?.toUi(userKey)),
+                quote = status.quote?.toUi(userKey),
+                isGap = timeline.isGap,
+                source = data.source
+            )
+        }
 
         fun DbStatusWithMediaAndUser.toUi(
             userKey: UserKey,

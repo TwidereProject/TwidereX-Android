@@ -161,7 +161,7 @@ private fun StatusV2.toDbStatusWithMediaAndUser(
             )
         },
         user = user,
-        reactions = emptyList()// TODO: twitter v2 api does not return this
+        reactions = emptyList() // TODO: twitter v2 api does not return this
     )
 }
 
@@ -189,23 +189,23 @@ private fun Status.toDbStatusWithMediaAndUser(
     return DbStatusWithMediaAndUser(
         data = status,
         media = (
-                extendedEntities?.media ?: entities?.media
+            extendedEntities?.media ?: entities?.media
                 ?: emptyList()
-                ).mapIndexed { index, it ->
-                DbMedia(
-                    _id = UUID.randomUUID().toString(),
-                    statusId = status.statusId,
-                    previewUrl = getImage(it.mediaURLHTTPS, "small"),
-                    mediaUrl = getImage(it.mediaURLHTTPS, "large"),
-                    width = it.sizes?.large?.w ?: 0,
-                    height = it.sizes?.large?.h ?: 0,
-                    pageUrl = it.url,
-                    altText = it.displayURL ?: "",
-                    url = it.expandedURL,
-                    type = it.type?.let { MediaType.valueOf(it) } ?: MediaType.photo,
-                    order = index,
-                )
-            },
+            ).mapIndexed { index, it ->
+            DbMedia(
+                _id = UUID.randomUUID().toString(),
+                statusId = status.statusId,
+                previewUrl = getImage(it.mediaURLHTTPS, "small"),
+                mediaUrl = getImage(it.mediaURLHTTPS, "large"),
+                width = it.sizes?.large?.w ?: 0,
+                height = it.sizes?.large?.h ?: 0,
+                pageUrl = it.url,
+                altText = it.displayURL ?: "",
+                url = it.expandedURL,
+                type = it.type?.let { MediaType.valueOf(it) } ?: MediaType.photo,
+                order = index,
+            )
+        },
         user = user,
         reactions = if (favorited == true || retweeted == true) {
             listOf(
