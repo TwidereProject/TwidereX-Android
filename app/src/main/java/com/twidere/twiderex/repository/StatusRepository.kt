@@ -42,62 +42,62 @@ class StatusRepository @AssistedInject constructor(
 
     suspend fun like(id: String) {
         updateStatus(id) {
-            it.liked = true
+//            it.liked = true
         }
         runCatching {
             service.like(id)
         }.onFailure {
             it.printStackTrace()
             updateStatus(id) {
-                it.liked = false
+//                it.liked = false
             }
         }
     }
 
     suspend fun unlike(id: String) {
         updateStatus(id) {
-            it.liked = false
+//            it.liked = false
         }
         runCatching {
             service.unlike(id)
         }.onFailure {
             it.printStackTrace()
             updateStatus(id) {
-                it.liked = true
+//                it.liked = true
             }
         }
     }
 
     suspend fun retweet(id: String) {
         updateStatus(id) {
-            it.retweeted = true
+//            it.retweeted = true
         }
         runCatching {
             service.retweet(id)
         }.onFailure {
             it.printStackTrace()
             updateStatus(id) {
-                it.retweeted = false
+//                it.retweeted = false
             }
         }
     }
 
     suspend fun unRetweet(id: String) {
         updateStatus(id) {
-            it.retweeted = false
+//            it.retweeted = false
         }
         runCatching {
             service.unRetweet(id)
         }.onFailure {
             it.printStackTrace()
             updateStatus(id) {
-                it.retweeted = true
+//                ReferencedTweetType.retweeted = true
             }
         }
     }
 
     private suspend fun updateStatus(id: String, action: (DbStatusV2) -> Unit) {
-        database.statusDao().findWithStatusId(id, key)?.let {
+        database.statusDao().findWithStatusId(id)?.let {
             action.invoke(it)
             database.statusDao().insertAll(listOf(it))
         }

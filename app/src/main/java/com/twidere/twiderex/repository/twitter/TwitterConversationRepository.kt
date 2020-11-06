@@ -57,7 +57,7 @@ class TwitterConversationRepository @AssistedInject constructor(
     val liveData by lazy {
         database.timelineDao().getAllWithLiveData(userKey, TimelineType.Conversation).map { list ->
             list.map { status ->
-                status.toUi()
+                status.toUi(userKey)
             }
         }
     }
@@ -82,7 +82,7 @@ class TwitterConversationRepository @AssistedInject constructor(
     }
 
     suspend fun loadTweetFromCache(statusId: String): UiStatus? {
-        return database.timelineDao().findWithStatusId(statusId, userKey)?.toUi()
+        return database.timelineDao().findWithStatusId(statusId, userKey)?.toUi(userKey)
     }
 
     suspend fun loadTweetFromNetwork(statusId: String): StatusV2 {
@@ -92,7 +92,7 @@ class TwitterConversationRepository @AssistedInject constructor(
     suspend fun toUiStatus(status: StatusV2): UiStatus {
         val db = status.toDbTimeline(userKey, TimelineType.Conversation)
         listOf(db).saveToDb(database)
-        return db.toUi()
+        return db.toUi(userKey)
     }
 
     private fun buildConversation(

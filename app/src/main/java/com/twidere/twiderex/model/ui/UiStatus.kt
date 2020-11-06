@@ -32,7 +32,6 @@ import kotlinx.android.parcel.Parcelize
 @Parcelize
 data class UiStatus(
     val statusId: String,
-    val userKey: UserKey,
     val text: String,
     val timestamp: Long,
     val retweetCount: Long,
@@ -52,63 +51,76 @@ data class UiStatus(
 
     companion object {
 
-        fun DbTimelineWithStatus.toUi() = UiStatus(
-            statusId = status.status.data.statusId,
-            userKey = status.status.data.userKey,
-            text = status.status.data.text,
-            timestamp = status.status.data.timestamp,
-            retweetCount = status.status.data.retweetCount,
-            likeCount = status.status.data.likeCount,
-            replyCount = status.status.data.replyCount,
-            retweeted = status.status.data.retweeted,
-            liked = status.status.data.liked,
-            placeString = status.status.data.placeString,
-            hasMedia = status.status.data.hasMedia,
-            user = status.status.user.toUi(),
-            media = status.status.media.toUi(),
-            retweet = status.retweet?.toUi(),
-            quote = status.quote?.toUi(),
-            isGap = timeline.isGap,
-            source = status.status.data.source
-        )
+        fun DbTimelineWithStatus.toUi(
+            userKey: UserKey,
+        ) = with(status.status) {
+                val reaction = reactions.firstOrNull { it.userKey == userKey }
+                UiStatus(
+                    statusId = data.statusId,
+                    text = data.text,
+                    timestamp = data.timestamp,
+                    retweetCount = data.retweetCount,
+                    likeCount = data.likeCount,
+                    replyCount = data.replyCount,
+                    retweeted = reaction?.retweeted ?: false,
+                    liked = reaction?.liked ?: false,
+                    placeString = data.placeString,
+                    hasMedia = data.hasMedia,
+                    user = user.toUi(),
+                    media = media.toUi(),
+                    retweet = status.retweet?.toUi(userKey)?.copy(quote = status.quote?.toUi(userKey)),
+                    quote = status.quote?.toUi(userKey),
+                    isGap = timeline.isGap,
+                    source = data.source
+                )
+            }
 
-        fun DbStatusWithMediaAndUser.toUi() = UiStatus(
-            statusId = data.statusId,
-            userKey = data.userKey,
-            text = data.text,
-            timestamp = data.timestamp,
-            retweetCount = data.retweetCount,
-            likeCount = data.likeCount,
-            replyCount = data.replyCount,
-            retweeted = data.retweeted,
-            liked = data.liked,
-            placeString = data.placeString,
-            hasMedia = data.hasMedia,
-            user = user.toUi(),
-            media = media.toUi(),
-            retweet = null,
-            quote = null,
-            isGap = false,
-            source = data.source,
-        )
-        fun DbStatusWithReference.toUi() = UiStatus(
-            statusId = status.data.statusId,
-            userKey = status.data.userKey,
-            text = status.data.text,
-            timestamp = status.data.timestamp,
-            retweetCount = status.data.retweetCount,
-            likeCount = status.data.likeCount,
-            replyCount = status.data.replyCount,
-            retweeted = status.data.retweeted,
-            liked = status.data.liked,
-            placeString = status.data.placeString,
-            hasMedia = status.data.hasMedia,
-            user = status.user.toUi(),
-            media = status.media.toUi(),
-            retweet = retweet?.toUi(),
-            quote = quote?.toUi(),
-            isGap = false,
-            source = status.data.source
-        )
+        fun DbStatusWithMediaAndUser.toUi(
+            userKey: UserKey,
+        ): UiStatus {
+            val reaction = reactions.firstOrNull { it.userKey == userKey }
+            return UiStatus(
+                statusId = data.statusId,
+                text = data.text,
+                timestamp = data.timestamp,
+                retweetCount = data.retweetCount,
+                likeCount = data.likeCount,
+                replyCount = data.replyCount,
+                retweeted = reaction?.retweeted ?: false,
+                liked = reaction?.liked ?: false,
+                placeString = data.placeString,
+                hasMedia = data.hasMedia,
+                user = user.toUi(),
+                media = media.toUi(),
+                retweet = null,
+                quote = null,
+                isGap = false,
+                source = data.source,
+            )
+        }
+
+        fun DbStatusWithReference.toUi(
+            userKey: UserKey,
+        ) = with(status) {
+            val reaction = reactions.firstOrNull { it.userKey == userKey }
+            UiStatus(
+                statusId = data.statusId,
+                text = data.text,
+                timestamp = data.timestamp,
+                retweetCount = data.retweetCount,
+                likeCount = data.likeCount,
+                replyCount = data.replyCount,
+                retweeted = reaction?.retweeted ?: false,
+                liked = reaction?.liked ?: false,
+                placeString = data.placeString,
+                hasMedia = data.hasMedia,
+                user = user.toUi(),
+                media = media.toUi(),
+                retweet = retweet?.toUi(userKey)?.copy(quote = quote?.toUi(userKey)),
+                quote = quote?.toUi(userKey),
+                isGap = false,
+                source = data.source
+            )
+        }
     }
 }

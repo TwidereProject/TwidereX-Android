@@ -42,7 +42,7 @@ abstract class CacheUserTimelineRepository(
     val liveData by lazy {
         database.timelineDao().getAllWithLiveData(userKey, type).map { list ->
             list.map { status ->
-                status.toUi()
+                status.toUi(userKey)
             }
         }
     }
@@ -59,7 +59,7 @@ abstract class CacheUserTimelineRepository(
         }
         val timeline = result.map { it.toDbTimeline(userKey, type) }
         timeline.saveToDb(database)
-        return timeline.map { it.toUi() }
+        return timeline.map { it.toUi(userKey) }
     }
 
     protected abstract suspend fun loadData(

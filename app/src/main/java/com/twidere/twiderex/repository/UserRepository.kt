@@ -74,6 +74,6 @@ class UserRepository @AssistedInject constructor(
         val result = lookupService.userPinnedStatus(user.id) ?: return null
         val userKey = UserKey.Empty
         val timeline = result.toDbTimeline(userKey = userKey, timelineType = TimelineType.User)
-        return timeline.toUi()
+        return timeline.toUi(userKey)
     }
 }

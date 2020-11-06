@@ -29,7 +29,7 @@ import com.twidere.twiderex.model.UserKey
 
 @Entity(
     tableName = "status",
-    indices = [Index(value = ["statusId", "userKey"], unique = true)],
+    indices = [Index(value = ["statusId"], unique = true)],
 )
 data class DbStatusV2(
     /**
@@ -41,7 +41,6 @@ data class DbStatusV2(
      * Actual tweet/toots id
      */
     val statusId: String,
-    val userKey: UserKey,
     val text: String,
     val timestamp: Long,
     val retweetCount: Long,
@@ -52,8 +51,6 @@ data class DbStatusV2(
     val hasMedia: Boolean,
     val userId: String,
     val lang: String?,
-    var retweeted: Boolean,
-    var liked: Boolean,
     val replyStatusId: String?,
     val quoteStatusId: String?,
     val retweetStatusId: String?,
@@ -66,6 +63,8 @@ data class DbStatusWithMediaAndUser(
     val media: List<DbMedia>,
     @Relation(parentColumn = "userId", entityColumn = "userId")
     val user: DbUser,
+    @Relation(parentColumn = "statusId", entityColumn = "statusId")
+    val reactions: List<DbStatusReaction>,
 )
 
 data class DbStatusWithReference(
@@ -77,4 +76,23 @@ data class DbStatusWithReference(
     val quote: DbStatusWithMediaAndUser?,
     @Relation(parentColumn = "retweetStatusId", entityColumn = "statusId", entity = DbStatusV2::class)
     val retweet: DbStatusWithMediaAndUser?,
+)
+
+@Entity(
+    tableName = "status_reactions",
+    indices = [Index(value = ["statusId", "userKey"], unique = true)],
+)
+data class DbStatusReaction(
+    /**
+     * Id that being used in the database
+     */
+    @PrimaryKey
+    val _id: String,
+    /**
+     * Actual tweet/toots id
+     */
+    val statusId: String,
+    val userKey: UserKey,
+    val liked: Boolean,
+    val retweeted: Boolean,
 )

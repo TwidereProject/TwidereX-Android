@@ -46,7 +46,7 @@ class TwitterTweetsRepository @AssistedInject constructor(
     }
 
     suspend fun loadTweetFromCache(statusId: String): UiStatus? {
-        return database.statusDao().findWithStatusIdWithReference(statusId, userKey)?.toUi()
+        return database.statusDao().findWithStatusIdWithReference(statusId)?.toUi(userKey)
     }
 
     suspend fun loadTweetFromNetwork(statusId: String): UiStatus {
@@ -56,6 +56,6 @@ class TwitterTweetsRepository @AssistedInject constructor(
     private suspend fun toUiStatus(status: StatusV2): UiStatus {
         val db = status.toDbTimeline(userKey, TimelineType.Conversation)
         listOf(db).saveToDb(database)
-        return db.toUi()
+        return db.toUi(userKey)
     }
 }

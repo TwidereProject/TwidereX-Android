@@ -49,7 +49,7 @@ class TwitterSearchTweetRepository @AssistedInject constructor(
     val liveData by lazy {
         database.timelineDao().getAllWithLiveData(userKey, TimelineType.SearchTweets).map { list ->
             list.map { status ->
-                status.toUi()
+                status.toUi(userKey)
             }
         }
     }

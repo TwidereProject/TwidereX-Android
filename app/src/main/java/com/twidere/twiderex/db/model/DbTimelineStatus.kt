@@ -79,6 +79,9 @@ suspend fun List<DbTimelineWithStatus>.saveToDb(
     data.map { it.data }.let {
         database.statusDao().insertAll(it)
     }
+    data.map { it.reactions }.flatten().let {
+        database.reactionDao().insertAll(it)
+    }
     this.map { it.timeline }.let {
         database.timelineDao().insertAll(it)
     }
