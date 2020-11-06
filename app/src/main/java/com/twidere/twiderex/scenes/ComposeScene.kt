@@ -215,7 +215,6 @@ fun ComposeScene(statusId: String? = null, composeType: ComposeType = ComposeTyp
                 }
             }
 
-
             if (images.any()) {
                 LazyRowForIndexed(
                     modifier = Modifier.padding(horizontal = standardPadding * 2),

@@ -34,6 +34,8 @@ import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.viewinterop.viewModel
 import androidx.hilt.lifecycle.HiltViewModelFactory
 import com.twidere.twiderex.extensions.ProvideNavigationViewModelFactoryMap
+import com.twidere.twiderex.launcher.ActivityLauncher
+import com.twidere.twiderex.launcher.AmbientLauncher
 import com.twidere.twiderex.navigation.Router
 import com.twidere.twiderex.settings.AmbientPrimaryColor
 import com.twidere.twiderex.settings.AmbientTabPosition
@@ -47,8 +49,6 @@ import com.twidere.twiderex.ui.AmbientViewModelProviderFactory
 import com.twidere.twiderex.ui.AmbientWindow
 import com.twidere.twiderex.ui.AmbientWindowPadding
 import com.twidere.twiderex.ui.ProvideWindowPadding
-import com.twidere.twiderex.launcher.ActivityLauncher
-import com.twidere.twiderex.launcher.AmbientLauncher
 import com.twidere.twiderex.viewmodel.ActiveAccountViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
