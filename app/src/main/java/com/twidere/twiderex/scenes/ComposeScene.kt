@@ -20,8 +20,9 @@
  */
 package com.twidere.twiderex.scenes
 
+import android.Manifest
+import android.annotation.SuppressLint
 import android.net.Uri
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.background
@@ -73,6 +74,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.node.Ref
+import androidx.compose.ui.platform.ContextAmbient
 import androidx.compose.ui.text.SoftwareKeyboardController
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.component.AppBar
@@ -81,8 +83,10 @@ import com.twidere.twiderex.component.NetworkImage
 import com.twidere.twiderex.component.StatusLineComponent
 import com.twidere.twiderex.component.TextInput
 import com.twidere.twiderex.component.TimelineStatusComponent
+import com.twidere.twiderex.extensions.checkAllSelfPermissionsGranted
 import com.twidere.twiderex.extensions.navViewModel
 import com.twidere.twiderex.extensions.withElevation
+import com.twidere.twiderex.launcher.AmbientLauncher
 import com.twidere.twiderex.maxComposeTextLength
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.ui.AmbientActiveAccount
@@ -90,7 +94,6 @@ import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.ui.composeImageSize
 import com.twidere.twiderex.ui.profileImageSize
 import com.twidere.twiderex.ui.standardPadding
-import com.twidere.twiderex.utils.AmbientLauncher
 import com.twidere.twiderex.viewmodel.ComposeViewModel
 import kotlinx.coroutines.launch
 
@@ -305,20 +308,23 @@ private fun ComposeInput(
     }
 }
 
+@SuppressLint("MissingPermission")
 @Composable
 private fun ComposeActions() {
     val viewModel = navViewModel<ComposeViewModel>()
+    val locationEnabled by viewModel.locationEnabled.observeAsState(initial = false)
     val launcher = AmbientLauncher.current
     val scope = rememberCoroutineScope()
+    val context = ContextAmbient.current
     Box {
         Row {
             IconButton(
                 onClick = {
                     scope.launch {
                         val item =
-                            launcher.launchForResult(ActivityResultContracts.GetMultipleContents())
+                            launcher.launchMultipleFilePicker("image/*")
+                        viewModel.putImages(item)
                     }
-//                            openImagePicker()
                 }
             ) {
                 Icon(asset = Icons.Default.Camera)
@@ -334,11 +340,26 @@ private fun ComposeActions() {
             }
             IconButton(
                 onClick = {
-//                            if (locationEnabled) {
-//                                disableLocation()
-//                            } else {
-//                                getOrRequestLocation()
-//                            }
+                    if (locationEnabled) {
+                        viewModel.disableLocation()
+                    } else {
+                        scope.launch {
+                            val permissions = arrayOf(
+                                Manifest.permission.ACCESS_COARSE_LOCATION,
+                                Manifest.permission.ACCESS_FINE_LOCATION
+                            )
+                            val hasPermissions =
+                                if (!context.checkAllSelfPermissionsGranted(*permissions)) {
+                                    launcher.requestMultiplePermissions(permissions)
+                                        .all { it.value }
+                                } else {
+                                    true
+                                }
+                            if (hasPermissions) {
+                                viewModel.trackingLocation()
+                            }
+                        }
+                    }
                 },
             ) {
                 Icon(asset = Icons.Default.MyLocation)

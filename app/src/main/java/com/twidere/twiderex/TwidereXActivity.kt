@@ -47,8 +47,8 @@ import com.twidere.twiderex.ui.AmbientViewModelProviderFactory
 import com.twidere.twiderex.ui.AmbientWindow
 import com.twidere.twiderex.ui.AmbientWindowPadding
 import com.twidere.twiderex.ui.ProvideWindowPadding
-import com.twidere.twiderex.utils.ActivityLauncher
-import com.twidere.twiderex.utils.AmbientLauncher
+import com.twidere.twiderex.launcher.ActivityLauncher
+import com.twidere.twiderex.launcher.AmbientLauncher
 import com.twidere.twiderex.viewmodel.ActiveAccountViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject

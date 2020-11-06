@@ -18,34 +18,32 @@
  *  You should have received a copy of the GNU General Public License
  *  along with TwidereX. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.utils
+package com.twidere.twiderex.launcher
 
+import android.net.Uri
 import androidx.activity.result.ActivityResultRegistry
-import androidx.activity.result.contract.ActivityResultContract
 import androidx.compose.runtime.ambientOf
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
-import java.util.UUID
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
-class ActivityLauncher(private val registry: ActivityResultRegistry) : DefaultLifecycleObserver {
+class ActivityLauncher(registry: ActivityResultRegistry) : DefaultLifecycleObserver {
+    private val multipleFilePickerLauncher = MultipleFilePickerLauncher(registry)
+    private val requestMultiplePermissionsLauncher = RequestMultiplePermissionsLauncher(registry)
     private lateinit var owner: LifecycleOwner
 
     override fun onCreate(owner: LifecycleOwner) {
         this.owner = owner
+        multipleFilePickerLauncher.register(owner)
+        requestMultiplePermissionsLauncher.register(owner)
     }
 
-    suspend fun <I, O> launchForResult(contract: ActivityResultContract<I, O>) =
-        suspendCoroutine<O> { response ->
-            registry.register(
-                UUID.randomUUID().toString(),
-                owner,
-                contract
-            ) {
-                response.resume(it)
-            }
-        }
+    suspend fun launchMultipleFilePicker(type: String): List<Uri> {
+        return multipleFilePickerLauncher.launch(type)
+    }
+
+    suspend fun requestMultiplePermissions(permissions: Array<String>): Map<String, Boolean> {
+        return requestMultiplePermissionsLauncher.launch(permissions)
+    }
 }
 
 val AmbientLauncher = ambientOf<ActivityLauncher>()
