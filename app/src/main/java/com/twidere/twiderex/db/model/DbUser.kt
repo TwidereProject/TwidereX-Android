@@ -24,10 +24,11 @@ import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.squareup.moshi.JsonClass
+import com.twidere.twiderex.model.PlatformType
 
 @Entity(
     tableName = "user",
-    indices = [Index(value = ["userId"], unique = true)],
+    indices = [Index(value = ["userId", "screenName", "platformType"], unique = true)],
 )
 @JsonClass(generateAdapter = true)
 data class DbUser(
@@ -38,6 +39,7 @@ data class DbUser(
     var _id: String,
     val userId: String,
     val name: String,
+    val platformType: PlatformType,
     val screenName: String,
     val profileImage: String,
     val profileBackgroundImage: String?,

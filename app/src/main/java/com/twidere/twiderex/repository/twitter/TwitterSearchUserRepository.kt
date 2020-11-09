@@ -24,22 +24,23 @@ import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
 import com.twidere.services.microblog.SearchService
 import com.twidere.twiderex.db.mapper.toDbUser
-import com.twidere.twiderex.defaultLoadCount
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.model.ui.UiUser.Companion.toUi
 
 class TwitterSearchUserRepository @AssistedInject constructor(
     @Assisted private val service: SearchService,
+    @Assisted private val loadCount: Int,
 ) {
     @AssistedInject.Factory
     interface AssistedFactory {
         fun create(
             service: SearchService,
+            loadCount: Int
         ): TwitterSearchUserRepository
     }
 
     suspend fun loadUsers(query: String, page: Int = 0): List<UiUser> {
-        val result = service.searchUsers(query, page, defaultLoadCount)
+        val result = service.searchUsers(query, page, loadCount)
         return result.map { it.toDbUser().toUi() }
     }
 }

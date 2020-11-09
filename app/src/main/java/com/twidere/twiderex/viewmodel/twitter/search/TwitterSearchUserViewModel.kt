@@ -23,6 +23,7 @@ package com.twidere.twiderex.viewmodel.twitter.search
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.MutableLiveData
 import com.twidere.services.microblog.SearchService
+import com.twidere.twiderex.defaultLoadCount
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.twitter.TwitterSearchUserRepository
@@ -36,7 +37,7 @@ class TwitterSearchUserViewModel @ViewModelInject constructor(
         accountRepository.getCurrentAccount().service.let {
             it as SearchService
         }.let {
-            factory.create(it)
+            factory.create(it, defaultLoadCount)
         }
     }
 
@@ -49,9 +50,13 @@ class TwitterSearchUserViewModel @ViewModelInject constructor(
     }
 
     override suspend fun refresh() {
+        if (refreshing.value == true || loaded.value == true) {
+            return
+        }
         refreshing.postValue(true)
         reset(keyword)
         loadData()
+        loaded.postValue(true)
         refreshing.postValue(false)
     }
 
@@ -67,6 +72,6 @@ class TwitterSearchUserViewModel @ViewModelInject constructor(
     private suspend fun loadData() {
         val result = repository.loadUsers(keyword, page = page++)
         source.postValue((source.value ?: emptyList()) + result)
-        hasMore = result.any()
+        hasMore = result.any() && result.count() > defaultLoadCount
     }
 }

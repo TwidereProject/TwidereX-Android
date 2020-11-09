@@ -57,12 +57,13 @@ class TwitterSearchTweetsViewModel @ViewModelInject constructor(
     }
 
     override suspend fun refresh() {
-        if (refreshing.value == true) {
+        if (refreshing.value == true || loaded.value == true) {
             return
         }
         refreshing.postValue(true)
         reset(keyword)
         loadData()
+        loaded.postValue(true)
         refreshing.postValue(false)
     }
 
@@ -76,9 +77,9 @@ class TwitterSearchTweetsViewModel @ViewModelInject constructor(
     }
 
     private suspend fun loadData() {
-        val result = repository.loadTweets(keyword)
+        val result = repository.loadTweets("$keyword -is:retweet")
         nextPage = result.nextPage
-        hasMore = result.result.any()
+        hasMore = result.nextPage != null
         tweets.addAll(result.result)
     }
 }

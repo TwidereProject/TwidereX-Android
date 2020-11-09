@@ -20,6 +20,7 @@
  */
 package com.twidere.twiderex.extensions
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
 import androidx.compose.ui.viewinterop.viewModel
@@ -33,6 +34,8 @@ import androidx.navigation.NavController
 import androidx.navigation.NavDeepLinkRequest
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.twidere.twiderex.settings.AmbientTheme
+import com.twidere.twiderex.settings.Theme
 import com.twidere.twiderex.ui.AmbientApplication
 import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.ui.AmbientViewModelFactoriesMap
@@ -87,3 +90,12 @@ fun NavController.navigate(route: String, options: NavOptions? = null) {
 }
 
 internal fun createRoute(route: String) = "android-app://androidx.navigation.compose/$route"
+
+@Composable
+fun isDarkTheme(): Boolean {
+    return when (AmbientTheme.current) {
+        Theme.Auto -> isSystemInDarkTheme()
+        Theme.Light -> false
+        Theme.Dark -> true
+    }
+}

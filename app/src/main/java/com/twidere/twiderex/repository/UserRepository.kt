@@ -29,6 +29,7 @@ import com.twidere.twiderex.db.mapper.toDbTimeline
 import com.twidere.twiderex.db.mapper.toDbUser
 import com.twidere.twiderex.db.model.DbUser
 import com.twidere.twiderex.db.model.TimelineType
+import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.UserKey
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.model.ui.UiStatus.Companion.toUi
@@ -58,14 +59,13 @@ class UserRepository @AssistedInject constructor(
     }
 
     suspend fun getUserFromCache(name: String): UiUser? {
-        return database.userDao().findWithScreenName(name)
+        //TODO: platform type
+        return database.userDao().findWithScreenName(name, platformType = PlatformType.Twitter)
             ?.toUi()
     }
 
     private suspend fun saveUser(user: DbUser) {
-        database.userDao().findWithScreenName(user.screenName)?.let {
-            database.userDao().update(listOf(user.copy(_id = it._id)))
-        }
+        database.userDao().insertAll(listOf(user))
     }
 
     suspend fun showRelationship(id: String) = relationshipService.showRelationship(id)

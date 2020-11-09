@@ -25,12 +25,14 @@ import androidx.lifecycle.ViewModel
 
 abstract class TwitterSearchListViewModelBase : ViewModel() {
     protected var hasMore = true
+    protected val loaded = MutableLiveData(false)
     val loadingMore = MutableLiveData(false)
     val refreshing = MutableLiveData(false)
     protected var keyword = ""
 
     open fun reset(keyword: String) {
         this.keyword = keyword
+        loaded.postValue(false)
     }
 
     abstract suspend fun refresh()

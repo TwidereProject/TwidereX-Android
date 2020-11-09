@@ -26,14 +26,15 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.twidere.twiderex.db.model.DbUser
+import com.twidere.twiderex.model.PlatformType
 
 @Dao
 interface UserDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(user: List<DbUser>)
 
-    @Query("SELECT * FROM user WHERE screenName == :name")
-    suspend fun findWithScreenName(name: String): DbUser?
+    @Query("SELECT * FROM user WHERE screenName == :name AND platformType == :platformType")
+    suspend fun findWithScreenName(name: String, platformType: PlatformType): DbUser?
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
     suspend fun update(user: List<DbUser>)

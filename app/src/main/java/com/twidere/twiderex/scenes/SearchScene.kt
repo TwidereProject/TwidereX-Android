@@ -50,7 +50,6 @@ import androidx.compose.runtime.LaunchedTask
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.onActive
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.savedinstancestate.savedInstanceState
@@ -88,18 +87,18 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalFoundationApi::class, ExperimentalFocus::class)
 @Composable
 fun SearchScene(keyword: String) {
-
     val tweetsViewModel = navViewModel<TwitterSearchTweetsViewModel>()
     val mediasViewModel = navViewModel<TwitterSearchMediasViewModel>()
     val usersViewModel = navViewModel<TwitterSearchUserViewModel>()
     val (text, setText) = remember { mutableStateOf(keyword) }
     var selectedTab by savedInstanceState { 0 }
 
-    onActive {
+    LaunchedTask(keyword) {
         tweetsViewModel.reset(keyword)
         mediasViewModel.reset(keyword)
         usersViewModel.reset(keyword)
     }
+
     TwidereXTheme {
 
         Scaffold {
@@ -176,10 +175,8 @@ private fun SearchTweetsContent(viewModel: TwitterSearchTweetsViewModel) {
     val loadingMore by viewModel.loadingMore.observeAsState(initial = false)
     val items by viewModel.source.observeAsState(initial = emptyList())
     val scope = rememberCoroutineScope()
-    LaunchedTask(items) {
-        if (items.isEmpty()) {
-            viewModel.refresh()
-        }
+    LaunchedTask {
+        viewModel.refresh()
     }
     SwipeToRefreshLayout(
         refreshingState = refreshing,
@@ -216,10 +213,8 @@ private fun SearchMediasContent(viewModel: TwitterSearchMediasViewModel) {
     val source by viewModel.source.observeAsState(initial = emptyList())
     val items = source.filter { it.hasMedia }.flatMap { it.media.map { media -> media to it } }
     val scope = rememberCoroutineScope()
-    LaunchedTask(items) {
-        if (items.isEmpty()) {
-            viewModel.refresh()
-        }
+    LaunchedTask {
+        viewModel.refresh()
     }
 
     SwipeToRefreshLayout(
@@ -253,9 +248,9 @@ private fun SearchMediasContent(viewModel: TwitterSearchMediasViewModel) {
                 onClick = {
                     navController.navigate(
                         "media/${item.second.statusId}?selectedIndex=${
-                        item.second.media.indexOf(
-                            item.first
-                        )
+                            item.second.media.indexOf(
+                                item.first
+                            )
                         }"
                     )
                 }
@@ -271,10 +266,8 @@ private fun SearchUsersContent(viewModel: TwitterSearchUserViewModel) {
     val loadingMore by viewModel.loadingMore.observeAsState(initial = false)
     val items by viewModel.source.observeAsState(initial = emptyList())
     val scope = rememberCoroutineScope()
-    LaunchedTask(items) {
-        if (items.isEmpty()) {
-            viewModel.refresh()
-        }
+    LaunchedTask {
+        viewModel.refresh()
     }
     SwipeToRefreshLayout(
         refreshingState = refreshing,

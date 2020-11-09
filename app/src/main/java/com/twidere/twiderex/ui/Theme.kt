@@ -36,10 +36,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.settings.AmbientFontScale
-import com.twidere.twiderex.settings.AmbientPrimaryColor
 import com.twidere.twiderex.settings.AmbientTheme
 import com.twidere.twiderex.settings.AmbientUseSystemFontSize
 import com.twidere.twiderex.settings.Theme
+import com.twidere.twiderex.settings.currentPrimaryColor
 
 @Composable
 fun TwidereXTheme(
@@ -48,7 +48,7 @@ fun TwidereXTheme(
     content: @Composable () -> Unit
 ) {
     val theme = AmbientTheme.current
-    val primaryColor = AmbientPrimaryColor.current
+    val primaryColor = currentPrimaryColor()
     val useSystemFontSize = AmbientUseSystemFontSize.current
     val fontScale = AmbientFontScale.current
 

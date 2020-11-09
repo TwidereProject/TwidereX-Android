@@ -230,7 +230,7 @@ fun User.toDbUser() = DbUser(
     screenName = this.screenName ?: "",
     profileImage = (profileImageURLHTTPS ?: profileImageURL)?.let { updateProfileImagePath(it) }
         ?: "",
-    profileBackgroundImage = profileBackgroundImageURLHTTPS,
+    profileBackgroundImage = profileBannerURL,
     followersCount = this.followersCount ?: 0,
     friendsCount = this.friendsCount ?: 0,
     listedCount = this.listedCount ?: 0,
@@ -239,6 +239,7 @@ fun User.toDbUser() = DbUser(
     website = this.entities?.url?.urls?.firstOrNull { it.url == this.url }?.expandedURL,
     verified = this.verified ?: false,
     isProtected = this.protected ?: false,
+    platformType = PlatformType.Twitter,
 )
 
 fun UserV2.toDbUser() = DbUser(
@@ -257,7 +258,8 @@ fun UserV2.toDbUser() = DbUser(
     location = this.location,
     website = this.entities?.url?.urls?.firstOrNull { it.url == this.url }?.expandedURL,
     verified = this.verified ?: false,
-    isProtected = this.protected ?: false
+    isProtected = this.protected ?: false,
+    platformType = PlatformType.Twitter,
 )
 
 private fun updateProfileImagePath(

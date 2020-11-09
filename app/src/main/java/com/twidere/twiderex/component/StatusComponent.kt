@@ -46,14 +46,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.navigate
 import com.twidere.twiderex.extensions.humanizedTimestamp
+import com.twidere.twiderex.extensions.navViewModel
 import com.twidere.twiderex.model.ui.UiStatus
+import com.twidere.twiderex.scenes.ComposeType
 import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.ui.mediumEmphasisContentContentColor
 import com.twidere.twiderex.ui.standardPadding
+import com.twidere.twiderex.viewmodel.StatusActionsViewModel
 
 @Composable
 fun ExpandedStatusComponent(
@@ -61,6 +65,8 @@ fun ExpandedStatusComponent(
     showInfo: Boolean = true,
     showActions: Boolean = true,
 ) {
+    val navController = AmbientNavController.current
+    val actionsViewModel = navViewModel<StatusActionsViewModel>()
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -135,14 +141,40 @@ fun ExpandedStatusComponent(
             ProvideEmphasis(emphasis = AmbientEmphasisLevels.current.medium) {
                 Row {
                     Spacer(modifier = Modifier.weight(1f))
-                    ActionIconButton(onClick = {}) {
+                    ActionIconButton(
+                        onClick = {
+                            navController.navigate("compose/${ComposeType.Reply.name}?statusId=${status.statusId}")
+                        },
+                    ) {
                         Icon(asset = Icons.Default.Reply)
                     }
-                    ActionIconButton(onClick = {}) {
-                        Icon(asset = Icons.Default.Comment)
+                    ActionIconButton(
+                        onClick = {
+                            actionsViewModel.retweet(data)
+                        },
+                    ) {
+                        Icon(
+                            asset = Icons.Default.Comment,
+                            tint = if (status.retweeted) {
+                                MaterialTheme.colors.primary
+                            } else {
+                                AmbientContentColor.current
+                            },
+                        )
                     }
-                    ActionIconButton(onClick = {}) {
-                        Icon(asset = Icons.Default.Favorite)
+                    ActionIconButton(
+                        onClick = {
+                            actionsViewModel.like(data)
+                        },
+                    ) {
+                        Icon(
+                            asset = Icons.Default.Favorite,
+                            tint = if (data.liked) {
+                                Color.Red
+                            } else {
+                                AmbientContentColor.current
+                            },
+                        )
                     }
                     ActionIconButton(onClick = {}) {
                         Icon(asset = Icons.Default.Share)
