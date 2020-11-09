@@ -93,8 +93,6 @@ dependencies {
 
     implementation "dev.chrisbanes.accompanist:accompanist-coil:0.3.2"
 
-    implementation 'org.ocpsoft.prettytime:prettytime:4.0.4.Final'
-
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.5'
 
     testImplementation 'junit:junit:4.13.1'
