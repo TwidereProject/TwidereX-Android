@@ -67,7 +67,7 @@ fun TwidereXTheme(
             primaryVariant = primaryColor,
             secondary = primaryColor,
 
-            )
+        )
     } else {
         lightColors(
             primary = primaryColor,

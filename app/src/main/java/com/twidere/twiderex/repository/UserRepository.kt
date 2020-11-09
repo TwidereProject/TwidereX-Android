@@ -59,7 +59,7 @@ class UserRepository @AssistedInject constructor(
     }
 
     suspend fun getUserFromCache(name: String): UiUser? {
-        //TODO: platform type
+        // TODO: platform type
         return database.userDao().findWithScreenName(name, platformType = PlatformType.Twitter)
             ?.toUi()
     }

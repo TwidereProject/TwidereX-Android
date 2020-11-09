@@ -248,9 +248,9 @@ private fun SearchMediasContent(viewModel: TwitterSearchMediasViewModel) {
                 onClick = {
                     navController.navigate(
                         "media/${item.second.statusId}?selectedIndex=${
-                            item.second.media.indexOf(
-                                item.first
-                            )
+                        item.second.media.indexOf(
+                            item.first
+                        )
                         }"
                     )
                 }

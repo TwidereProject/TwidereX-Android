@@ -46,7 +46,7 @@ import com.twidere.twiderex.ui.profileImageSize
 import com.twidere.twiderex.ui.standardPadding
 import com.twidere.twiderex.viewmodel.settings.AppearanceViewModel
 
-//light to dark
+// light to dark
 val primaryColors = listOf(
     Color(0XFF4C9EEB) to Color(0XFF5CB0FF),
     Color(0XFF1C68F3) to Color(0XFF4B85F0),
