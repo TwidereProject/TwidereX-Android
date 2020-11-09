@@ -34,6 +34,7 @@ import com.twidere.twiderex.scenes.SplashScene
 import com.twidere.twiderex.scenes.StatusScene
 import com.twidere.twiderex.scenes.UserScene
 import com.twidere.twiderex.scenes.settings.AppearanceScene
+import com.twidere.twiderex.scenes.settings.DisplayScene
 import com.twidere.twiderex.scenes.settings.SettingsScene
 import com.twidere.twiderex.scenes.twitter.TwitterSignInScene
 import com.twidere.twiderex.scenes.twitter.TwitterWebSignInScene
@@ -144,5 +145,9 @@ fun NavGraphBuilder.route() {
 
     composable("settings/appearance") {
         AppearanceScene()
+    }
+
+    composable("settings/display") {
+        DisplayScene()
     }
 }

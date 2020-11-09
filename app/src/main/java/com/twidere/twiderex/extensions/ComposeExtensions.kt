@@ -62,10 +62,14 @@ inline fun <reified VM : ViewModel> navViewModel(
 }
 
 @Composable
-fun ProvideNavigationViewModelFactoryMap(factory: HiltViewModelFactory, content: @Composable () -> Unit) {
+fun ProvideNavigationViewModelFactoryMap(
+    factory: HiltViewModelFactory,
+    content: @Composable () -> Unit
+) {
     // Hack for navigationViewModel
     val factories =
-        HiltViewModelFactory::class.java.getDeclaredField("mViewModelFactories").also { it.isAccessible = true }
+        HiltViewModelFactory::class.java.getDeclaredField("mViewModelFactories")
+            .also { it.isAccessible = true }
             .get(factory).let {
                 @Suppress("UNCHECKED_CAST")
                 it as Map<String, ViewModelAssistedFactory<out ViewModel>>

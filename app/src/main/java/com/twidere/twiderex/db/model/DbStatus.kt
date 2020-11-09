@@ -93,6 +93,6 @@ data class DbStatusReaction(
      */
     val statusId: String,
     val userKey: UserKey,
-    val liked: Boolean,
-    val retweeted: Boolean,
+    var liked: Boolean,
+    var retweeted: Boolean,
 )

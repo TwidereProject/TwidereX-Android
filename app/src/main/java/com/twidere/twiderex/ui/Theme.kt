@@ -26,13 +26,19 @@ import android.view.Window
 import android.view.WindowInsetsController
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Typography
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
 import com.twidere.twiderex.extensions.withElevation
+import com.twidere.twiderex.settings.AmbientFontScale
 import com.twidere.twiderex.settings.AmbientPrimaryColor
 import com.twidere.twiderex.settings.AmbientTheme
+import com.twidere.twiderex.settings.AmbientUseSystemFontSize
 import com.twidere.twiderex.settings.Theme
 
 @Composable
@@ -43,6 +49,8 @@ fun TwidereXTheme(
 ) {
     val theme = AmbientTheme.current
     val primaryColor = AmbientPrimaryColor.current
+    val useSystemFontSize = AmbientUseSystemFontSize.current
+    val fontScale = AmbientFontScale.current
 
     val darkTheme = if (requireDarkTheme) {
         true
@@ -57,13 +65,86 @@ fun TwidereXTheme(
         darkColors(
             primary = primaryColor,
             primaryVariant = primaryColor,
-            secondary = primaryColor
-        )
+            secondary = primaryColor,
+
+            )
     } else {
         lightColors(
             primary = primaryColor,
             primaryVariant = primaryColor,
             secondary = primaryColor
+        )
+    }
+
+    val typography = if (useSystemFontSize) {
+        Typography()
+    } else {
+        Typography(
+            h1 = TextStyle(
+                fontWeight = FontWeight.Light,
+                fontSize = 96.sp * fontScale,
+                letterSpacing = (-1.5).sp
+            ),
+            h2 = TextStyle(
+                fontWeight = FontWeight.Light,
+                fontSize = 60.sp * fontScale,
+                letterSpacing = (-0.5).sp
+            ),
+            h3 = TextStyle(
+                fontWeight = FontWeight.Normal,
+                fontSize = 48.sp * fontScale,
+                letterSpacing = 0.sp
+            ),
+            h4 = TextStyle(
+                fontWeight = FontWeight.Normal,
+                fontSize = 34.sp * fontScale,
+                letterSpacing = 0.25.sp
+            ),
+            h5 = TextStyle(
+                fontWeight = FontWeight.Normal,
+                fontSize = 24.sp * fontScale,
+                letterSpacing = 0.sp
+            ),
+            h6 = TextStyle(
+                fontWeight = FontWeight.Medium,
+                fontSize = 20.sp * fontScale,
+                letterSpacing = 0.15.sp
+            ),
+            subtitle1 = TextStyle(
+                fontWeight = FontWeight.Normal,
+                fontSize = 16.sp * fontScale,
+                letterSpacing = 0.15.sp
+            ),
+            subtitle2 = TextStyle(
+                fontWeight = FontWeight.Medium,
+                fontSize = 14.sp * fontScale,
+                letterSpacing = 0.1.sp
+            ),
+            body1 = TextStyle(
+                fontWeight = FontWeight.Normal,
+                fontSize = 16.sp * fontScale,
+                letterSpacing = 0.5.sp
+            ),
+            body2 = TextStyle(
+                fontWeight = FontWeight.Normal,
+                fontSize = 14.sp * fontScale,
+                letterSpacing = 0.25.sp
+            ),
+            button = TextStyle(
+                fontWeight = FontWeight.Medium,
+                fontSize = 14.sp * fontScale,
+                letterSpacing = 1.25.sp
+            ),
+            caption = TextStyle(
+                fontWeight = FontWeight.Normal,
+                fontSize = 12.sp * fontScale,
+                letterSpacing = 0.4.sp
+            ),
+            overline = TextStyle(
+                fontWeight = FontWeight.Normal,
+                fontSize = 10.sp * fontScale,
+                letterSpacing = 1.5.sp
+            )
         )
     }
 

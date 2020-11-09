@@ -59,6 +59,8 @@ import com.twidere.twiderex.extensions.humanizedTimestamp
 import com.twidere.twiderex.extensions.navViewModel
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.scenes.ComposeType
+import com.twidere.twiderex.settings.AmbientMediaPreview
+import com.twidere.twiderex.ui.AmbientInStoryboard
 import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.ui.mediumEmphasisContentContentColor
 import com.twidere.twiderex.ui.profileImageSize
@@ -71,6 +73,7 @@ fun TimelineStatusComponent(
     showActions: Boolean = true,
 ) {
     val actionsViewModel = navViewModel<StatusActionsViewModel>()
+    val inStoryBoard = AmbientInStoryboard.current
     Column {
         val status = (data.retweet ?: data)
         val navController = AmbientNavController.current
@@ -79,7 +82,9 @@ fun TimelineStatusComponent(
                 .fillMaxWidth()
                 .clickable(
                     onClick = {
-                        navController.navigate("status/${data.statusId}")
+                        if (!inStoryBoard) {
+                            navController.navigate("status/${data.statusId}")
+                        }
                     }
                 )
                 .padding(
@@ -104,7 +109,9 @@ fun TimelineStatusComponent(
                         icon = Icons.Default.Reply,
                         count = status.replyCount,
                         onClick = {
-                            navController.navigate("compose/${ComposeType.Reply.name}?statusId=${status.statusId}")
+                            if (!inStoryBoard) {
+                                navController.navigate("compose/${ComposeType.Reply.name}?statusId=${status.statusId}")
+                            }
                         },
                     )
                     StatusActionButton(
@@ -113,7 +120,9 @@ fun TimelineStatusComponent(
                         colored = status.retweeted,
                         color = MaterialTheme.colors.primary,
                         onClick = {
-                            actionsViewModel.retweet(status)
+                            if (!inStoryBoard) {
+                                actionsViewModel.retweet(status)
+                            }
                         },
                     )
                     StatusActionButton(
@@ -122,7 +131,9 @@ fun TimelineStatusComponent(
                         colored = status.liked,
                         color = Color.Red,
                         onClick = {
-                            actionsViewModel.like(status)
+                            if (!inStoryBoard) {
+                                actionsViewModel.like(status)
+                            }
                         },
                     )
                     TextButton(
@@ -148,6 +159,8 @@ private fun StatusComponent(
     modifier: Modifier = Modifier,
     showActions: Boolean = true,
 ) {
+    val inStoryBoard = AmbientInStoryboard.current
+    val isMediaPreviewEnabled = AmbientMediaPreview.current
     Row(modifier = modifier) {
         UserAvatar(user = status.user)
         Spacer(modifier = Modifier.width(standardPadding))
@@ -189,7 +202,7 @@ private fun StatusComponent(
 
             Text(text = status.text)
 
-            if (status.media.any()) {
+            if (status.media.any() && isMediaPreviewEnabled) {
                 Spacer(modifier = Modifier.height(standardPadding))
                 StatusMediaComponent(
                     status = status,
@@ -224,7 +237,9 @@ private fun StatusComponent(
                         modifier = Modifier
                             .clickable(
                                 onClick = {
-                                    navController.navigate("status/${status.quote.statusId}")
+                                    if (!inStoryBoard) {
+                                        navController.navigate("status/${status.quote.statusId}")
+                                    }
                                 }
                             )
                             .padding(standardPadding),

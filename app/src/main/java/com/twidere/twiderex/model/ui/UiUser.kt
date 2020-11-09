@@ -20,16 +20,17 @@
  */
 package com.twidere.twiderex.model.ui
 
-import android.os.Parcelable
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.compose.ui.res.imageResource
+import com.twidere.twiderex.R
 import com.twidere.twiderex.db.model.DbUser
-import kotlinx.android.parcel.Parcelize
 
-@Parcelize
 data class UiUser(
     val id: String,
     val name: String,
     val screenName: String,
-    val profileImage: String,
+    val profileImage: Any,
     val profileBackgroundImage: String?,
     val followersCount: Long,
     val friendsCount: Long,
@@ -39,8 +40,25 @@ data class UiUser(
     val location: String?,
     val verified: Boolean,
     val protected: Boolean,
-) : Parcelable {
+) {
     companion object {
+        @Composable
+        fun sample() = UiUser(
+            id = "",
+            name = "Twidere",
+            screenName = "TwidereProject",
+            profileImage = imageResource(id = R.drawable.ic_profile_image_twidere).asAndroidBitmap(),
+            profileBackgroundImage = null,
+            followersCount = 0,
+            friendsCount = 0,
+            listedCount = 0,
+            desc = "",
+            website = null,
+            location = null,
+            verified = false,
+            protected = false,
+        )
+
         fun DbUser.toUi() = UiUser(
             id = userId,
             name = name,

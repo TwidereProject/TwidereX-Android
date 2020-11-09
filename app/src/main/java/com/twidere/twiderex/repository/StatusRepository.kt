@@ -24,8 +24,9 @@ import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
 import com.twidere.services.microblog.StatusService
 import com.twidere.twiderex.db.AppDatabase
-import com.twidere.twiderex.db.model.DbStatusV2
+import com.twidere.twiderex.db.model.DbStatusReaction
 import com.twidere.twiderex.model.UserKey
+import java.util.UUID
 import javax.inject.Singleton
 
 @Singleton
@@ -42,64 +43,72 @@ class StatusRepository @AssistedInject constructor(
 
     suspend fun like(id: String) {
         updateStatus(id) {
-//            it.liked = true
+            it.liked = true
         }
         runCatching {
             service.like(id)
         }.onFailure {
             it.printStackTrace()
             updateStatus(id) {
-//                it.liked = false
+                it.liked = false
             }
         }
     }
 
     suspend fun unlike(id: String) {
         updateStatus(id) {
-//            it.liked = false
+            it.liked = false
         }
         runCatching {
             service.unlike(id)
         }.onFailure {
             it.printStackTrace()
             updateStatus(id) {
-//                it.liked = true
+                it.liked = true
             }
         }
     }
 
     suspend fun retweet(id: String) {
         updateStatus(id) {
-//            it.retweeted = true
+            it.retweeted = true
         }
         runCatching {
             service.retweet(id)
         }.onFailure {
             it.printStackTrace()
             updateStatus(id) {
-//                it.retweeted = false
+                it.retweeted = false
             }
         }
     }
 
     suspend fun unRetweet(id: String) {
         updateStatus(id) {
-//            it.retweeted = false
+            it.retweeted = false
         }
         runCatching {
             service.unRetweet(id)
         }.onFailure {
             it.printStackTrace()
             updateStatus(id) {
-//                ReferencedTweetType.retweeted = true
+                it.retweeted = true
             }
         }
     }
 
-    private suspend fun updateStatus(id: String, action: (DbStatusV2) -> Unit) {
-        database.statusDao().findWithStatusId(id)?.let {
+    private suspend fun updateStatus(id: String, action: (DbStatusReaction) -> Unit) {
+        database.reactionDao().findWithStatusId(id, key).let {
+            it ?: DbStatusReaction(
+                _id = UUID.randomUUID().toString(),
+                statusId = id,
+                userKey = key,
+                liked = false,
+                retweeted = false,
+            )
+        }.let {
             action.invoke(it)
-            database.statusDao().insertAll(listOf(it))
+            database.reactionDao().insertAll(listOf(it))
         }
     }
 }

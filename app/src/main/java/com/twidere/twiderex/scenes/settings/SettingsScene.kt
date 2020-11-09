@@ -58,7 +58,7 @@ private val settings by lazy {
             SettingItem(
                 "Display",
                 Icons.Default.Home,
-                route = "",
+                route = "settings/display",
             ),
             SettingItem(
                 "Layout",

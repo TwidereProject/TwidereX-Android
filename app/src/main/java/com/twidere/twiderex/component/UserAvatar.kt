@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -32,6 +33,9 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.unit.Dp
 import androidx.navigation.compose.navigate
 import com.twidere.twiderex.model.ui.UiUser
+import com.twidere.twiderex.settings.AmbientAvatarStyle
+import com.twidere.twiderex.settings.AvatarStyle
+import com.twidere.twiderex.ui.AmbientInStoryboard
 import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.ui.profileImageSize
 
@@ -41,9 +45,16 @@ fun UserAvatar(
     size: Dp = profileImageSize
 ) {
     val navController = AmbientNavController.current
+    val inStoryBoard = AmbientInStoryboard.current
+    val avatarStyle = AmbientAvatarStyle.current
     Box(
         modifier = Modifier
-            .clip(CircleShape)
+            .let {
+                when (avatarStyle) {
+                    AvatarStyle.Round -> it.clip(CircleShape)
+                    AvatarStyle.Square -> it.clip(MaterialTheme.shapes.medium)
+                }
+            }
             .clipToBounds()
     ) {
         NetworkImage(
@@ -51,7 +62,9 @@ fun UserAvatar(
             modifier = Modifier
                 .clickable(
                     onClick = {
-                        navController.navigate("user/${user.screenName}")
+                        if (!inStoryBoard) {
+                            navController.navigate("user/${user.screenName}")
+                        }
                     }
                 )
                 .width(size)

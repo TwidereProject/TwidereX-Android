@@ -21,9 +21,13 @@
 package com.twidere.twiderex.di
 
 import android.content.SharedPreferences
+import com.twidere.twiderex.settings.AvatarStyleSettings
+import com.twidere.twiderex.settings.FontScaleSettings
+import com.twidere.twiderex.settings.MediaPreviewSettings
 import com.twidere.twiderex.settings.PrimaryColorSetting
 import com.twidere.twiderex.settings.TabPositionSetting
 import com.twidere.twiderex.settings.ThemeSetting
+import com.twidere.twiderex.settings.UseSystemFontSizeSettings
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -48,4 +52,21 @@ object SettingModule {
     @Singleton
     fun providePrimaryColor(preferences: SharedPreferences): PrimaryColorSetting =
         PrimaryColorSetting(preferences)
+
+    @Provides
+    @Singleton
+    fun provideAvatarStyle(preferences: SharedPreferences) = AvatarStyleSettings(preferences)
+
+    @Provides
+    @Singleton
+    fun provideMediaPreview(preferences: SharedPreferences) = MediaPreviewSettings(preferences)
+
+    @Provides
+    @Singleton
+    fun provideUseSystemFontSize(preferences: SharedPreferences) =
+        UseSystemFontSizeSettings(preferences)
+
+    @Provides
+    @Singleton
+    fun provideFontScale(preferences: SharedPreferences) = FontScaleSettings(preferences)
 }

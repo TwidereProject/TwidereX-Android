@@ -35,17 +35,21 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.navigate
 import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.model.ui.UiStatus
+import com.twidere.twiderex.ui.AmbientInStoryboard
 import com.twidere.twiderex.ui.AmbientNavController
 
 @Composable
 fun StatusMediaComponent(
     status: UiStatus,
 ) {
+    val inStoryBoard = AmbientInStoryboard.current
     val media = status.media
     val navController = AmbientNavController.current
     val onItemClick = { it: UiMedia ->
         val index = media.indexOf(it)
-        navController.navigate("media/${status.statusId}?selectedIndex=$index")
+        if (!inStoryBoard) {
+            navController.navigate("media/${status.statusId}?selectedIndex=$index")
+        }
     }
     if (media.size == 1) {
         val first = media.first()
@@ -123,11 +127,13 @@ fun StatusMediaPreviewItem(
         media.previewUrl?.let {
             NetworkImage(
                 url = it,
-                modifier = Modifier.clickable(
-                    onClick = {
-                        onClick(media)
-                    }
-                ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable(
+                        onClick = {
+                            onClick(media)
+                        }
+                    ),
             )
         }
     }

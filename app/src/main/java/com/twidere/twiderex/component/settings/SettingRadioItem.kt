@@ -20,26 +20,21 @@
  */
 package com.twidere.twiderex.component.settings
 
-import androidx.compose.foundation.ProvideTextStyle
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.material.ListItem
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.RadioButton
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
+import com.twidere.twiderex.component.lazy.itemHeader
 import com.twidere.twiderex.settings.types.RadioSettingItem
 
 fun <T : Enum<T>> LazyListScope.radioItem(
     item: RadioSettingItem<T>,
 ) {
-    item {
-        ListItem {
-            ProvideTextStyle(value = MaterialTheme.typography.button) {
-                item.title.invoke()
-            }
-        }
+    itemHeader {
+        item.title.invoke()
     }
 
     items(item.options) {

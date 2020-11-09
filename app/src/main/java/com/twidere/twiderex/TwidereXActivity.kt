@@ -37,12 +37,20 @@ import com.twidere.twiderex.extensions.ProvideNavigationViewModelFactoryMap
 import com.twidere.twiderex.launcher.ActivityLauncher
 import com.twidere.twiderex.launcher.AmbientLauncher
 import com.twidere.twiderex.navigation.Router
+import com.twidere.twiderex.settings.AmbientAvatarStyle
+import com.twidere.twiderex.settings.AmbientFontScale
+import com.twidere.twiderex.settings.AmbientMediaPreview
 import com.twidere.twiderex.settings.AmbientPrimaryColor
 import com.twidere.twiderex.settings.AmbientTabPosition
 import com.twidere.twiderex.settings.AmbientTheme
+import com.twidere.twiderex.settings.AmbientUseSystemFontSize
+import com.twidere.twiderex.settings.AvatarStyleSettings
+import com.twidere.twiderex.settings.FontScaleSettings
+import com.twidere.twiderex.settings.MediaPreviewSettings
 import com.twidere.twiderex.settings.PrimaryColorSetting
 import com.twidere.twiderex.settings.TabPositionSetting
 import com.twidere.twiderex.settings.ThemeSetting
+import com.twidere.twiderex.settings.UseSystemFontSizeSettings
 import com.twidere.twiderex.ui.AmbientActiveAccount
 import com.twidere.twiderex.ui.AmbientApplication
 import com.twidere.twiderex.ui.AmbientViewModelProviderFactory
@@ -67,6 +75,18 @@ class TwidereXActivity : ComponentActivity() {
     @Inject
     lateinit var primaryColorSettings: PrimaryColorSetting
 
+    @Inject
+    lateinit var avatarStyleSettings: AvatarStyleSettings
+
+    @Inject
+    lateinit var mediaPreviewSettings: MediaPreviewSettings
+
+    @Inject
+    lateinit var useSystemFontSizeSettings: UseSystemFontSizeSettings
+
+    @Inject
+    lateinit var fontScaleSettings: FontScaleSettings
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         launcher = ActivityLauncher(activityResultRegistry)
@@ -83,6 +103,10 @@ class TwidereXActivity : ComponentActivity() {
             val tabPosition by tabPositionSetting.data.observeAsState(initial = tabPositionSetting.initialValue)
             val primaryColor by primaryColorSettings.data.observeAsState(initial = primaryColorSettings.initialValue)
             val theme by themeSetting.data.observeAsState(initial = themeSetting.initialValue)
+            val avatarStyle by avatarStyleSettings.data.observeAsState(initial = avatarStyleSettings.initialValue)
+            val mediaPreview by mediaPreviewSettings.data.observeAsState(initial = mediaPreviewSettings.initialValue)
+            val useSystemFontSize by useSystemFontSizeSettings.data.observeAsState(initial = useSystemFontSizeSettings.initialValue)
+            val fontScale by fontScaleSettings.data.observeAsState(initial = fontScaleSettings.initialValue)
 
             Providers(
                 AmbientPrimaryColor provides primaryColor,
@@ -93,6 +117,10 @@ class TwidereXActivity : ComponentActivity() {
                 AmbientViewModelProviderFactory provides defaultViewModelProviderFactory,
                 AmbientActiveAccount provides account,
                 AmbientApplication provides application,
+                AmbientAvatarStyle provides avatarStyle,
+                AmbientMediaPreview provides mediaPreview,
+                AmbientUseSystemFontSize provides useSystemFontSize,
+                AmbientFontScale provides fontScale,
             ) {
                 ProvideNavigationViewModelFactoryMap(factory = defaultViewModelProviderFactory as HiltViewModelFactory) {
                     ProvideWindowPadding {

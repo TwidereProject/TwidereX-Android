@@ -20,23 +20,38 @@
  */
 package com.twidere.twiderex.model.ui
 
-import android.os.Parcelable
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.compose.ui.res.imageResource
+import com.twidere.twiderex.R
 import com.twidere.twiderex.db.model.DbMedia
 import com.twidere.twiderex.model.MediaType
-import kotlinx.android.parcel.Parcelize
 
-@Parcelize
 data class UiMedia(
     val url: String?,
     val mediaUrl: String?,
-    val previewUrl: String?,
+    val previewUrl: Any?,
     val type: MediaType,
     val width: Long,
     val height: Long,
     val pageUrl: String?,
     val altText: String,
-) : Parcelable {
+) {
     companion object {
+        @Composable
+        fun sample() = listOf(
+            UiMedia(
+                url = null,
+                mediaUrl = null,
+                previewUrl = imageResource(id = R.drawable.featured_graphics).asAndroidBitmap(),
+                type = MediaType.photo,
+                width = imageResource(id = R.drawable.featured_graphics).width.toLong(),
+                height = imageResource(id = R.drawable.featured_graphics).height.toLong(),
+                pageUrl = null,
+                altText = "",
+            ),
+        )
+
         fun List<DbMedia>.toUi() = sortedBy { it.order }.map {
             UiMedia(
                 url = it.url,

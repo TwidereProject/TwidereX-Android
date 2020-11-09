@@ -20,16 +20,14 @@
  */
 package com.twidere.twiderex.model.ui
 
-import android.os.Parcelable
+import androidx.compose.runtime.Composable
 import com.twidere.twiderex.db.model.DbStatusWithMediaAndUser
 import com.twidere.twiderex.db.model.DbStatusWithReference
 import com.twidere.twiderex.db.model.DbTimelineWithStatus
 import com.twidere.twiderex.model.UserKey
 import com.twidere.twiderex.model.ui.UiMedia.Companion.toUi
 import com.twidere.twiderex.model.ui.UiUser.Companion.toUi
-import kotlinx.android.parcel.Parcelize
 
-@Parcelize
 data class UiStatus(
     val statusId: String,
     val text: String,
@@ -47,9 +45,28 @@ data class UiStatus(
     val source: String,
     val quote: UiStatus?,
     val isGap: Boolean,
-) : Parcelable {
+) {
 
     companion object {
+        @Composable
+        fun sample() = UiStatus(
+            statusId = "",
+            text = "Thanks for using @TwidereProject!",
+            timestamp = System.currentTimeMillis(),
+            retweetCount = 1200,
+            likeCount = 123,
+            replyCount = 1100,
+            retweeted = false,
+            liked = false,
+            placeString = null,
+            hasMedia = true,
+            user = UiUser.sample(),
+            media = UiMedia.sample(),
+            retweet = null,
+            source = "TwidereX",
+            quote = null,
+            isGap = false,
+        )
 
         fun DbTimelineWithStatus.toUi(
             userKey: UserKey,

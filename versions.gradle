@@ -11,7 +11,7 @@ ext {
             moshi                : '1.9.3',
             kotlinx_serialization: '1.0.0',
             navigation           : '2.3.1',
-            paging               : '3.0.0-alpha06',
+            paging               : '3.0.0-alpha07',
             ktlint               : '0.39.0',
             assisted_inject      : '0.6.0',
     ]

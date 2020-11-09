@@ -99,9 +99,9 @@ fun AppearanceScene() {
                     )
                 }
                 itemDivider()
-                radioItem(viewModel.themeSetting)
-                itemDivider()
                 radioItem(viewModel.tabPositionSetting)
+                itemDivider()
+                radioItem(viewModel.themeSetting)
             }
         }
     }

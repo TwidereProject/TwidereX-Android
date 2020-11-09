@@ -23,10 +23,15 @@ package com.twidere.twiderex.db.dao
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
+import androidx.room.Query
 import com.twidere.twiderex.db.model.DbStatusReaction
+import com.twidere.twiderex.model.UserKey
 
 @Dao
 interface ReactionDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(media: List<DbStatusReaction>)
+
+    @Query("SELECT * FROM status_reactions WHERE statusId == :statusId AND userKey == :userKey")
+    suspend fun findWithStatusId(statusId: String, userKey: UserKey): DbStatusReaction?
 }
