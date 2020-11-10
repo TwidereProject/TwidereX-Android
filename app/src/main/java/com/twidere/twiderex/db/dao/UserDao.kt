@@ -20,6 +20,7 @@
  */
 package com.twidere.twiderex.db.dao
 
+import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -35,6 +36,9 @@ interface UserDao {
 
     @Query("SELECT * FROM user WHERE screenName == :name AND platformType == :platformType")
     suspend fun findWithScreenName(name: String, platformType: PlatformType): DbUser?
+
+    @Query("SELECT * FROM user WHERE screenName == :name AND platformType == :platformType")
+    fun findWithScreenNameLiveData(name: String, platformType: PlatformType): LiveData<DbUser?>
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
     suspend fun update(user: List<DbUser>)

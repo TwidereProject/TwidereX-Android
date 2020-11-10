@@ -23,12 +23,13 @@ package com.twidere.twiderex.viewmodel.twitter.search
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
-abstract class TwitterSearchListViewModelBase : ViewModel() {
+abstract class TwitterSearchListViewModelBase(
+    protected var keyword: String = ""
+) : ViewModel() {
     protected var hasMore = true
     protected val loaded = MutableLiveData(false)
     val loadingMore = MutableLiveData(false)
     val refreshing = MutableLiveData(false)
-    protected var keyword = ""
 
     open fun reset(keyword: String) {
         if (this.keyword == keyword) {

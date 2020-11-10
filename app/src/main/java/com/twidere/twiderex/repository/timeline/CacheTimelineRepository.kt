@@ -30,7 +30,6 @@ import com.twidere.twiderex.defaultLoadCount
 import com.twidere.twiderex.model.UserKey
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.model.ui.UiStatus.Companion.toUi
-import com.twidere.twiderex.model.ui.UiUser
 
 abstract class CacheUserTimelineRepository(
     private val database: AppDatabase,
@@ -48,12 +47,12 @@ abstract class CacheUserTimelineRepository(
     }
 
     suspend fun loadBetween(
-        user: UiUser,
+        screenName: String,
         max_id: String? = null,
         since_id: String? = null,
     ): List<UiStatus> {
         val result = runCatching {
-            loadData(user, count = count, since_id = since_id, max_id = max_id)
+            loadData(screenName, count = count, since_id = since_id, max_id = max_id)
         }.getOrElse {
             emptyList()
         }
@@ -63,7 +62,7 @@ abstract class CacheUserTimelineRepository(
     }
 
     protected abstract suspend fun loadData(
-        user: UiUser,
+        screenName: String,
         count: Int = this.count,
         since_id: String? = null,
         max_id: String? = null,

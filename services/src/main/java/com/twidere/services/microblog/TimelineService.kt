@@ -36,14 +36,14 @@ interface TimelineService {
     ): List<IStatus>
 
     suspend fun userTimeline(
-        user_id: String,
+        screen_name: String,
         count: Int = 20,
         since_id: String? = null,
         max_id: String? = null,
     ): List<IStatus>
 
     suspend fun favorites(
-        user_id: String,
+        screen_name: String,
         count: Int = 20,
         since_id: String? = null,
         max_id: String? = null,

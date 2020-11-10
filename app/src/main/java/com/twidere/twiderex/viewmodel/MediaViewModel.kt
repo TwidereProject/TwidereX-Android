@@ -20,23 +20,30 @@
  */
 package com.twidere.twiderex.viewmodel
 
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.squareup.inject.assisted.Assisted
+import com.squareup.inject.assisted.AssistedInject
 import com.twidere.services.microblog.LookupService
+import com.twidere.twiderex.di.assisted.IAssistedFactory
+import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.ui.UiStatus
-import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.twitter.TwitterTweetsRepository
 import kotlinx.coroutines.coroutineScope
 
-class MediaViewModel @ViewModelInject constructor(
-    accountRepository: AccountRepository,
+class MediaViewModel @AssistedInject constructor(
     private val factory: TwitterTweetsRepository.AssistedFactory,
+    @Assisted private val account: AccountDetails
 ) : ViewModel() {
 
-    private val repository = accountRepository.getCurrentAccount().let { accountDetails ->
-        accountDetails.service.let {
-            factory.create(accountDetails.key, it as LookupService)
+    @AssistedInject.Factory
+    interface AssistedFactory : IAssistedFactory {
+        fun create(account: AccountDetails): MediaViewModel
+    }
+
+    private val repository by lazy {
+        account.service.let {
+            factory.create(account.key, it as LookupService)
         }
     }
     val loading = MutableLiveData(false)

@@ -20,32 +20,41 @@
  */
 package com.twidere.twiderex.viewmodel.twitter
 
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
 import androidx.lifecycle.switchMap
+import com.squareup.inject.assisted.Assisted
+import com.squareup.inject.assisted.AssistedInject
 import com.twidere.services.microblog.LookupService
 import com.twidere.services.microblog.SearchService
 import com.twidere.services.twitter.model.ReferencedTweetType
 import com.twidere.services.twitter.model.StatusV2
-import com.twidere.twiderex.model.ui.UiStatus
-import com.twidere.twiderex.repository.AccountRepository
+import com.twidere.twiderex.di.assisted.IAssistedFactory
+import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.repository.twitter.TwitterConversationRepository
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 
-class TwitterStatusViewModel @ViewModelInject constructor(
-    private val accountRepository: AccountRepository,
+class TwitterStatusViewModel @AssistedInject constructor(
     private val factory: TwitterConversationRepository.AssistedFactory,
+    @Assisted private val account: AccountDetails,
+    @Assisted private val statusId: String,
 ) : ViewModel() {
+
+    @AssistedInject.Factory
+    interface AssistedFactory : IAssistedFactory {
+        fun create(account: AccountDetails, statusId: String): TwitterStatusViewModel
+    }
+
     private lateinit var targetTweet: StatusV2
     private var nextPage: String? = null
-    private val repository = accountRepository.getCurrentAccount().let { accountDetails ->
-        accountDetails.service.let {
-            factory.create(accountDetails.key, it as SearchService, it as LookupService)
+    private val repository by lazy {
+        account.service.let {
+            factory.create(account.key, it as SearchService, it as LookupService)
         }
     }
+
     val moreConversations = repository.liveData.switchMap { list ->
         liveData {
             emit(
@@ -68,7 +77,9 @@ class TwitterStatusViewModel @ViewModelInject constructor(
         }
     }
 
-    val status = MutableLiveData<UiStatus>()
+    val status = liveData {
+        emitSource(repository.getStatusLiveData(statusId))
+    }
     val loadingPrevious = MutableLiveData(false)
     val loadingMore = MutableLiveData(false)
     private val conversations = arrayListOf<StatusV2>()
@@ -78,18 +89,13 @@ class TwitterStatusViewModel @ViewModelInject constructor(
         if (status.value != null || conversations.any() || previous.any() || loadingPrevious.value == true || loadingMore.value == true) {
             return@coroutineScope
         }
-        val cache = repository.loadTweetFromCache(statusId)
-        cache?.let {
-            status.postValue(it)
-        }
         loadingPrevious.postValue(true)
         loadingMore.postValue(true)
         val tweet = repository.loadTweetFromNetwork(statusId)
-        val ui = repository.toUiStatus(tweet)
+        repository.toUiStatus(tweet)
         targetTweet =
             tweet.referencedTweets?.firstOrNull { it.type == ReferencedTweetType.retweeted }?.status
-            ?: tweet
-        status.postValue(ui)
+                ?: tweet
         async {
             val list = repository.loadPrevious(targetTweet)
             previous.addAll(list)

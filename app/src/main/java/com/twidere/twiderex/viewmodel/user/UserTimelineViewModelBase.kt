@@ -26,9 +26,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
 import androidx.lifecycle.switchMap
 import com.twidere.twiderex.model.ui.UiStatus
-import com.twidere.twiderex.model.ui.UiUser
 
-abstract class UserTimelineViewModelBase : ViewModel() {
+abstract class UserTimelineViewModelBase(
+    val screenName: String,
+) : ViewModel() {
     private val timelineIds = arrayListOf<String>()
     private var hasMore = true
     val loadingMore = MutableLiveData(false)
@@ -51,29 +52,28 @@ abstract class UserTimelineViewModelBase : ViewModel() {
         timelineIds.clear()
     }
 
-    suspend fun refresh(user: UiUser) {
+    suspend fun refresh() {
         if (!timelineIds.isNullOrEmpty()) {
             timelineIds.clear()
         }
         loadingMore.postValue(true)
-        val result = loadBetween(user)
+        val result = loadBetween()
         timelineIds.addAll(result.map { it.statusId }.filter { !timelineIds.contains(it) })
         loadingMore.postValue(false)
     }
 
-    suspend fun loadMore(user: UiUser) {
+    suspend fun loadMore() {
         if (!hasMore) {
             return
         }
         loadingMore.postValue(true)
-        val result = loadBetween(user, max_id = timelineIds.lastOrNull())
+        val result = loadBetween(max_id = timelineIds.lastOrNull())
         hasMore = result.any()
         timelineIds.addAll(result.map { it.statusId }.filter { !timelineIds.contains(it) })
         loadingMore.postValue(false)
     }
 
     protected abstract suspend fun loadBetween(
-        user: UiUser,
         max_id: String? = null,
         since_Id: String? = null,
     ): List<UiStatus>

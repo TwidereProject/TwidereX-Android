@@ -20,57 +20,58 @@
  */
 package com.twidere.twiderex.viewmodel.user
 
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.liveData
+import androidx.lifecycle.map
+import com.squareup.inject.assisted.Assisted
+import com.squareup.inject.assisted.AssistedInject
 import com.twidere.services.microblog.LookupService
 import com.twidere.services.microblog.RelationshipService
 import com.twidere.services.microblog.model.IRelationship
+import com.twidere.twiderex.di.assisted.IAssistedFactory
+import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.UserKey
-import com.twidere.twiderex.model.ui.UiUser
-import com.twidere.twiderex.model.ui.UiUser.Companion.toUi
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.UserRepository
 
-class UserViewModel @ViewModelInject constructor(
-    private val accountRepository: AccountRepository,
+class UserViewModel @AssistedInject constructor(
     private val factory: UserRepository.AssistedFactory,
+    private val accountRepository: AccountRepository,
+    @Assisted private val account: AccountDetails,
+    @Assisted private val screenName: String,
 ) : ViewModel() {
 
-    private val repository =
-        accountRepository.getCurrentAccount().let { accountDetails ->
-            accountDetails.service.let {
-                factory.create(it as LookupService, it as RelationshipService)
-            }
-        }
+    private var loaded = false
 
-    val refreshing = MutableLiveData(false)
-    val user = MutableLiveData<UiUser>()
-    val relationship = MutableLiveData<IRelationship>()
-    val isMe = MutableLiveData(false)
-
-    suspend fun init(screenName: String, data: UiUser?) {
-        if (user.value != null) {
-            return
-        }
-        data?.let {
-            user.postValue(it)
-        }
-        refresh(screenName)
+    @AssistedInject.Factory
+    interface AssistedFactory : IAssistedFactory {
+        fun create(account: AccountDetails, screenName: String): UserViewModel
     }
 
-    suspend fun refresh(screenName: String) {
+    private val repository by lazy {
+        account.service.let {
+            factory.create(it as LookupService, it as RelationshipService)
+        }
+    }
+
+    val refreshing = MutableLiveData(false)
+    val user = liveData {
+        emitSource(repository.getUserLiveData(screenName))
+    }
+    val relationship = MutableLiveData<IRelationship>()
+    val isMe = liveData {
+        emitSource(user.map {
+            val key = UserKey(screenName, "twitter.com")
+            key == account.key
+        })
+    }
+
+    suspend fun refresh() {
         refreshing.postValue(true)
-        repository.getUserFromCache(screenName)?.let {
-            user.postValue(it)
-        }
         val key = UserKey(screenName, "twitter.com")
-        val isme = accountRepository.getCurrentAccount().key == key
-        isMe.postValue(isme)
+        val isme = account.key == key
         val dbUser = repository.lookupUserByName(screenName)
-        dbUser?.toUi()?.let {
-            user.postValue(it)
-        }
         if (isme) {
             accountRepository.findByAccountKey(key)?.let {
                 accountRepository.getAccountDetails(it)
@@ -89,5 +90,13 @@ class UserViewModel @ViewModelInject constructor(
             }
         }
         refreshing.postValue(false)
+    }
+
+    suspend fun init() {
+        if (loaded) {
+            return
+        }
+        loaded = true
+        refresh()
     }
 }

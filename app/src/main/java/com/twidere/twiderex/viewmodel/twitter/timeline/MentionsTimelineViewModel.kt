@@ -21,24 +21,29 @@
 package com.twidere.twiderex.viewmodel.twitter.timeline
 
 import android.content.SharedPreferences
-import androidx.hilt.lifecycle.ViewModelInject
+import com.squareup.inject.assisted.Assisted
+import com.squareup.inject.assisted.AssistedInject
 import com.twidere.services.microblog.TimelineService
-import com.twidere.twiderex.repository.AccountRepository
+import com.twidere.twiderex.di.assisted.IAssistedFactory
+import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.repository.timeline.MentionsTimelineRepository
 import com.twidere.twiderex.repository.timeline.TimelineRepository
 
-class MentionsTimelineViewModel @ViewModelInject constructor(
-    accountRepository: AccountRepository,
+class MentionsTimelineViewModel @AssistedInject constructor(
     preferences: SharedPreferences,
     factory: MentionsTimelineRepository.AssistedFactory,
+    @Assisted private val account: AccountDetails
 ) : TimelineViewModel(preferences) {
-    override val repository: TimelineRepository =
-        accountRepository.getCurrentAccount().let { account ->
-            accountRepository.getCurrentAccount().service.let {
-                it as TimelineService
-            }.let { service ->
-                factory.create(account.key, service)
-            }
+    @AssistedInject.Factory
+    interface AssistedFactory: IAssistedFactory {
+        fun create(account: AccountDetails): MentionsTimelineViewModel
+    }
+    override val repository: TimelineRepository by lazy {
+        account.service.let {
+            it as TimelineService
+        }.let { service ->
+            factory.create(account.key, service)
         }
-    override val savedStateKey: String = "${accountRepository.getCurrentAccount().key}_mentions"
+    }
+    override val savedStateKey: String = "${account.key}_mentions"
 }

@@ -33,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.viewinterop.viewModel
 import androidx.hilt.lifecycle.HiltViewModelFactory
+import com.twidere.twiderex.di.assisted.ProvideAssistedFactory
 import com.twidere.twiderex.extensions.ProvideNavigationViewModelFactoryMap
 import com.twidere.twiderex.launcher.ActivityLauncher
 import com.twidere.twiderex.launcher.AmbientLauncher
@@ -60,6 +61,17 @@ import com.twidere.twiderex.ui.AmbientWindow
 import com.twidere.twiderex.ui.AmbientWindowPadding
 import com.twidere.twiderex.ui.ProvideWindowPadding
 import com.twidere.twiderex.viewmodel.ActiveAccountViewModel
+import com.twidere.twiderex.viewmodel.ComposeViewModel
+import com.twidere.twiderex.viewmodel.MediaViewModel
+import com.twidere.twiderex.viewmodel.twitter.TwitterStatusViewModel
+import com.twidere.twiderex.viewmodel.twitter.search.TwitterSearchMediasViewModel
+import com.twidere.twiderex.viewmodel.twitter.search.TwitterSearchTweetsViewModel
+import com.twidere.twiderex.viewmodel.twitter.search.TwitterSearchUserViewModel
+import com.twidere.twiderex.viewmodel.twitter.timeline.HomeTimelineViewModel
+import com.twidere.twiderex.viewmodel.twitter.timeline.MentionsTimelineViewModel
+import com.twidere.twiderex.viewmodel.user.UserFavouriteTimelineViewModel
+import com.twidere.twiderex.viewmodel.user.UserTimelineViewModel
+import com.twidere.twiderex.viewmodel.user.UserViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -91,6 +103,39 @@ class TwidereXActivity : ComponentActivity() {
 
     @Inject
     lateinit var statusActions: StatusActions
+
+    @Inject
+    lateinit var homeTimelineViewModelFactory: HomeTimelineViewModel.AssistedFactory
+
+    @Inject
+    lateinit var twitterStatusViewModelFactory: TwitterStatusViewModel.AssistedFactory
+
+    @Inject
+    lateinit var mentionsTimelineViewModelFactory: MentionsTimelineViewModel.AssistedFactory
+
+    @Inject
+    lateinit var twitterSearchMediasViewModelFactory: TwitterSearchMediasViewModel.AssistedFactory
+
+    @Inject
+    lateinit var twitterSearchTweetsViewModelFactory: TwitterSearchTweetsViewModel.AssistedFactory
+
+    @Inject
+    lateinit var twitterSearchUserViewModelFactory: TwitterSearchUserViewModel.AssistedFactory
+
+    @Inject
+    lateinit var userFavouriteTimelineViewModelFactory: UserFavouriteTimelineViewModel.AssistedFactory
+
+    @Inject
+    lateinit var userTimelineViewModelFactory: UserTimelineViewModel.AssistedFactory
+
+    @Inject
+    lateinit var userViewModelFactory: UserViewModel.AssistedFactory
+
+    @Inject
+    lateinit var composeViewModelFactory: ComposeViewModel.AssistedFactory
+
+    @Inject
+    lateinit var mediaViewModelFactory: MediaViewModel.AssistedFactory
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -128,13 +173,27 @@ class TwidereXActivity : ComponentActivity() {
                 AmbientFontScale provides fontScale,
                 AmbientStatusActions provides statusActions,
             ) {
-                ProvideNavigationViewModelFactoryMap(factory = defaultViewModelProviderFactory as HiltViewModelFactory) {
-                    ProvideWindowPadding {
-                        val windowPadding = AmbientWindowPadding.current
-                        Box(
-                            modifier = Modifier.padding(windowPadding)
-                        ) {
-                            Router()
+                ProvideAssistedFactory(
+                    homeTimelineViewModelFactory,
+                    twitterStatusViewModelFactory,
+                    mentionsTimelineViewModelFactory,
+                    twitterSearchMediasViewModelFactory,
+                    twitterSearchTweetsViewModelFactory,
+                    twitterSearchUserViewModelFactory,
+                    userFavouriteTimelineViewModelFactory,
+                    userTimelineViewModelFactory,
+                    userViewModelFactory,
+                    composeViewModelFactory,
+                    mediaViewModelFactory,
+                ) {
+                    ProvideNavigationViewModelFactoryMap(factory = defaultViewModelProviderFactory as HiltViewModelFactory) {
+                        ProvideWindowPadding {
+                            val windowPadding = AmbientWindowPadding.current
+                            Box(
+                                modifier = Modifier.padding(windowPadding)
+                            ) {
+                                Router()
+                            }
                         }
                     }
                 }

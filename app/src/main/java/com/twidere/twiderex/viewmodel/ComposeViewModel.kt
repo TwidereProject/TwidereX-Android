@@ -27,32 +27,38 @@ import android.location.LocationListener
 import android.location.LocationManager
 import android.net.Uri
 import androidx.annotation.RequiresPermission
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.squareup.inject.assisted.Assisted
+import com.squareup.inject.assisted.AssistedInject
 import com.twidere.services.microblog.LookupService
 import com.twidere.services.twitter.TwitterService
+import com.twidere.twiderex.di.assisted.IAssistedFactory
 import com.twidere.twiderex.extensions.getCachedLocation
+import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.ui.UiStatus
-import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.twitter.TwitterTweetsRepository
 import com.twidere.twiderex.scenes.ComposeType
 import com.twidere.twiderex.utils.ComposeQueue
 
-class ComposeViewModel @ViewModelInject constructor(
-    private val accountRepository: AccountRepository,
+class ComposeViewModel @AssistedInject constructor(
     private val locationManager: LocationManager,
     private val composeQueue: ComposeQueue,
     private val factory: TwitterTweetsRepository.AssistedFactory,
+    @Assisted private val account: AccountDetails
 ) : ViewModel(), LocationListener {
+    @AssistedInject.Factory
+    interface AssistedFactory : IAssistedFactory {
+        fun create(account: AccountDetails): ComposeViewModel
+    }
+
     private val service by lazy {
-        accountRepository.getCurrentAccount().service as TwitterService
+        account.service as TwitterService
     }
     private val repository by lazy {
-        val currentAccount = accountRepository.getCurrentAccount()
         factory.create(
-            currentAccount.key,
-            currentAccount.service as LookupService,
+            account.key,
+            account.service as LookupService,
         )
     }
     val images = MutableLiveData<List<Uri>>(emptyList())

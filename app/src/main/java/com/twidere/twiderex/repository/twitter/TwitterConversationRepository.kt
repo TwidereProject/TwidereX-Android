@@ -20,6 +20,7 @@
  */
 package com.twidere.twiderex.repository.twitter
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.map
 import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
@@ -83,6 +84,12 @@ class TwitterConversationRepository @AssistedInject constructor(
 
     suspend fun loadTweetFromCache(statusId: String): UiStatus? {
         return database.timelineDao().findWithStatusId(statusId, userKey)?.toUi(userKey)
+    }
+
+    fun getStatusLiveData(statusId: String): LiveData<UiStatus?> {
+        return database.statusDao().findWithStatusIdWithReferenceLiveData(statusId).map {
+            it?.toUi(userKey)
+        }
     }
 
     suspend fun loadTweetFromNetwork(statusId: String): StatusV2 {

@@ -20,33 +20,37 @@
  */
 package com.twidere.twiderex.viewmodel.user
 
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
+import com.squareup.inject.assisted.Assisted
+import com.squareup.inject.assisted.AssistedInject
 import com.twidere.services.microblog.TimelineService
+import com.twidere.twiderex.di.assisted.IAssistedFactory
+import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.ui.UiStatus
-import com.twidere.twiderex.model.ui.UiUser
-import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.timeline.UserTimelineRepository
 
-class UserTimelineViewModel @ViewModelInject constructor(
-    private val accountRepository: AccountRepository,
+class UserTimelineViewModel @AssistedInject constructor(
     private val factory: UserTimelineRepository.AssistedFactory,
-) : UserTimelineViewModelBase() {
+    @Assisted private val account: AccountDetails,
+    @Assisted screenName: String,
+) : UserTimelineViewModelBase(screenName = screenName) {
 
-    private val repository =
-        accountRepository.getCurrentAccount().let { accountDetails ->
-            accountDetails.service.let {
-                it as TimelineService
-            }.let {
-                factory.create(accountDetails.key, it)
-            }
+    @AssistedInject.Factory
+    interface AssistedFactory : IAssistedFactory {
+        fun create(account: AccountDetails, screenName: String): UserTimelineViewModel
+    }
+    private val repository by lazy {
+        account.service.let {
+            it as TimelineService
+        }.let {
+            factory.create(account.key, it)
         }
+    }
 
     override val source: LiveData<List<UiStatus>>
         get() = repository.liveData
 
     override suspend fun loadBetween(
-        user: UiUser,
         max_id: String?,
         since_Id: String?
     ): List<UiStatus> {
@@ -56,7 +60,7 @@ class UserTimelineViewModel @ViewModelInject constructor(
 //            timelineIds.add(pinned.statusId)
 //        }
         return repository.loadBetween(
-            user = user,
+            screenName = screenName,
             max_id = max_id,
             since_id = since_Id,
         )

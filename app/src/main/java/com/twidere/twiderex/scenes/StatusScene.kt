@@ -37,13 +37,14 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
-import com.twidere.twiderex.component.status.ExpandedStatusComponent
 import com.twidere.twiderex.component.foundation.LoadingProgress
+import com.twidere.twiderex.component.foundation.loading
+import com.twidere.twiderex.component.status.ExpandedStatusComponent
 import com.twidere.twiderex.component.status.StatusDivider
 import com.twidere.twiderex.component.status.StatusLineComponent
 import com.twidere.twiderex.component.status.TimelineStatusComponent
-import com.twidere.twiderex.component.foundation.loading
-import com.twidere.twiderex.extensions.navViewModel
+import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.ui.AmbientActiveAccount
 import com.twidere.twiderex.ui.TwidereXTheme
 import com.twidere.twiderex.ui.standardPadding
 import com.twidere.twiderex.viewmodel.twitter.TwitterStatusViewModel
@@ -52,7 +53,10 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalLazyDsl::class)
 @Composable
 fun StatusScene(statusId: String) {
-    val viewModel = navViewModel<TwitterStatusViewModel>()
+    val account = AmbientActiveAccount.current ?: return
+    val viewModel = assistedViewModel<TwitterStatusViewModel.AssistedFactory, TwitterStatusViewModel> {
+        it.create(account, statusId)
+    }
     val loadingPrevious by viewModel.loadingPrevious.observeAsState(initial = false)
     val loadingMore by viewModel.loadingMore.observeAsState(initial = false)
     val status by viewModel.status.observeAsState()

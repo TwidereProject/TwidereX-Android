@@ -66,16 +66,17 @@ import com.twidere.twiderex.annotations.IncomingComposeUpdate
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.LoadingProgress
-import com.twidere.twiderex.component.status.StatusDivider
-import com.twidere.twiderex.component.status.StatusMediaPreviewItem
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
 import com.twidere.twiderex.component.foundation.TabsComponent
 import com.twidere.twiderex.component.foundation.TextInput
-import com.twidere.twiderex.component.status.TimelineStatusComponent
 import com.twidere.twiderex.component.foundation.TopAppBarElevation
-import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.component.lazy.LazyGridForIndexed
-import com.twidere.twiderex.extensions.navViewModel
+import com.twidere.twiderex.component.status.StatusDivider
+import com.twidere.twiderex.component.status.StatusMediaPreviewItem
+import com.twidere.twiderex.component.status.TimelineStatusComponent
+import com.twidere.twiderex.component.status.UserAvatar
+import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.ui.AmbientActiveAccount
 import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.ui.TwidereXTheme
 import com.twidere.twiderex.ui.standardPadding
@@ -87,17 +88,21 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalFoundationApi::class, ExperimentalFocus::class)
 @Composable
 fun SearchScene(keyword: String) {
-    val tweetsViewModel = navViewModel<TwitterSearchTweetsViewModel>()
-    val mediasViewModel = navViewModel<TwitterSearchMediasViewModel>()
-    val usersViewModel = navViewModel<TwitterSearchUserViewModel>()
+    val account = AmbientActiveAccount.current ?: return
+    val tweetsViewModel =
+        assistedViewModel<TwitterSearchTweetsViewModel.AssistedFactory, TwitterSearchTweetsViewModel> {
+            it.create(account, keyword)
+        }
+    val mediasViewModel =
+        assistedViewModel<TwitterSearchMediasViewModel.AssistedFactory, TwitterSearchMediasViewModel> {
+            it.create(account, keyword)
+        }
+    val usersViewModel =
+        assistedViewModel<TwitterSearchUserViewModel.AssistedFactory, TwitterSearchUserViewModel> {
+            it.create(account, keyword)
+        }
     val (text, setText) = remember { mutableStateOf(keyword) }
     var selectedTab by savedInstanceState { 0 }
-
-    LaunchedTask(keyword) {
-        tweetsViewModel.reset(keyword)
-        mediasViewModel.reset(keyword)
-        usersViewModel.reset(keyword)
-    }
 
     TwidereXTheme {
 
@@ -248,9 +253,9 @@ private fun SearchMediasContent(viewModel: TwitterSearchMediasViewModel) {
                 onClick = {
                     navController.navigate(
                         "media/${item.second.statusId}?selectedIndex=${
-                        item.second.media.indexOf(
-                            item.first
-                        )
+                            item.second.media.indexOf(
+                                item.first
+                            )
                         }"
                     )
                 }

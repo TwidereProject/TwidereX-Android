@@ -20,25 +20,33 @@
  */
 package com.twidere.twiderex.viewmodel.twitter.search
 
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.liveData
 import androidx.lifecycle.switchMap
+import com.squareup.inject.assisted.Assisted
+import com.squareup.inject.assisted.AssistedInject
 import com.twidere.services.twitter.TwitterService
 import com.twidere.services.twitter.model.StatusV2
-import com.twidere.twiderex.repository.AccountRepository
+import com.twidere.twiderex.di.assisted.IAssistedFactory
+import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.repository.twitter.TwitterSearchTweetRepository
 
-class TwitterSearchTweetsViewModel @ViewModelInject constructor(
-    private val accountRepository: AccountRepository,
+class TwitterSearchTweetsViewModel @AssistedInject constructor(
     private val factory: TwitterSearchTweetRepository.AssistedFactory,
-) : TwitterSearchListViewModelBase() {
+    @Assisted private val account: AccountDetails,
+    @Assisted keyword: String,
+) : TwitterSearchListViewModelBase(keyword = keyword) {
+
+    @AssistedInject.Factory
+    interface AssistedFactory: IAssistedFactory {
+        fun create(account: AccountDetails, keyword: String): TwitterSearchTweetsViewModel
+    }
     private var nextPage: String? = null
     private val tweets = arrayListOf<StatusV2>()
     private val service by lazy {
-        accountRepository.getCurrentAccount().service as TwitterService
+        account.service as TwitterService
     }
     private val repository by lazy {
-        factory.create(accountRepository.getCurrentAccount().key, service)
+        factory.create(account.key, service)
     }
 
     val source by lazy {

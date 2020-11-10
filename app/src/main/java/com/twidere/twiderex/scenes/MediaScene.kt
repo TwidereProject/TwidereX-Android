@@ -73,9 +73,11 @@ import com.twidere.twiderex.component.status.LikeButton
 import com.twidere.twiderex.component.status.ReplyButton
 import com.twidere.twiderex.component.status.RetweetButton
 import com.twidere.twiderex.component.status.UserAvatar
+import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.extensions.navViewModel
 import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.model.ui.UiStatus
+import com.twidere.twiderex.ui.AmbientActiveAccount
 import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.ui.TwidereXTheme
 import com.twidere.twiderex.ui.standardPadding
@@ -84,7 +86,10 @@ import kotlin.math.max
 
 @Composable
 fun MediaScene(statusId: String, selectedIndex: Int) {
-    val viewModel = navViewModel<MediaViewModel>()
+    val account = AmbientActiveAccount.current ?: return
+    val viewModel = assistedViewModel<MediaViewModel.AssistedFactory, MediaViewModel>{
+        it.create(account)
+    }
     val loading by viewModel.loading.observeAsState(initial = false)
     val status by viewModel.status.observeAsState()
     LaunchedTask {

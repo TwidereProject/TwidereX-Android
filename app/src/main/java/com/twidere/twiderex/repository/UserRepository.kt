@@ -20,6 +20,8 @@
  */
 package com.twidere.twiderex.repository
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.map
 import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
 import com.twidere.services.microblog.LookupService
@@ -58,10 +60,11 @@ class UserRepository @AssistedInject constructor(
         return user
     }
 
-    suspend fun getUserFromCache(name: String): UiUser? {
+    fun getUserLiveData(name: String): LiveData<UiUser?> {
         // TODO: platform type
-        return database.userDao().findWithScreenName(name, platformType = PlatformType.Twitter)
-            ?.toUi()
+        return database.userDao().findWithScreenNameLiveData(name = name, platformType = PlatformType.Twitter).map {
+            it?.toUi()
+        }
     }
 
     private suspend fun saveUser(user: DbUser) {

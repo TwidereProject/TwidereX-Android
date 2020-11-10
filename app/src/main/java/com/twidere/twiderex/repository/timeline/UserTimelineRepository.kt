@@ -27,7 +27,6 @@ import com.twidere.services.microblog.model.IStatus
 import com.twidere.twiderex.db.AppDatabase
 import com.twidere.twiderex.db.model.TimelineType
 import com.twidere.twiderex.model.UserKey
-import com.twidere.twiderex.model.ui.UiUser
 
 class UserTimelineRepository @AssistedInject constructor(
     database: AppDatabase,
@@ -43,13 +42,13 @@ class UserTimelineRepository @AssistedInject constructor(
     }
 
     override suspend fun loadData(
-        user: UiUser,
+        screenName: String,
         count: Int,
         since_id: String?,
         max_id: String?
     ): List<IStatus> {
         return service.userTimeline(
-            user_id = user.id,
+            screen_name = screenName,
             count = count,
             since_id = since_id,
             max_id = max_id,

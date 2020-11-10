@@ -112,12 +112,12 @@ class TwitterService(
     )
 
     override suspend fun userTimeline(
-        user_id: String,
+        screen_name: String,
         count: Int,
         since_id: String?,
         max_id: String?
     ) = resources.userTimeline(
-        user_id,
+        screen_name,
         count,
         since_id,
         max_id,
@@ -127,13 +127,13 @@ class TwitterService(
     )
 
     override suspend fun favorites(
-        user_id: String,
+        screen_name: String,
         count: Int,
         since_id: String?,
         max_id: String?
     ) =
         resources.favoritesList(
-            user_id,
+            screen_name,
             count,
             since_id,
             max_id,

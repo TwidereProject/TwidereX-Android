@@ -80,11 +80,12 @@ import com.twidere.twiderex.component.status.StatusDivider
 import com.twidere.twiderex.component.status.StatusMediaPreviewItem
 import com.twidere.twiderex.component.status.TimelineStatusComponent
 import com.twidere.twiderex.component.status.UserAvatar
-import com.twidere.twiderex.extensions.navViewModel
+import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.model.ui.UiUser
+import com.twidere.twiderex.ui.AmbientActiveAccount
 import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.ui.standardPadding
 import com.twidere.twiderex.viewmodel.user.UserFavouriteTimelineViewModel
@@ -102,9 +103,18 @@ fun UserComponent(
     initialData: UiUser? = null,
     lazyListState: LazyListState = rememberLazyListState(),
 ) {
-    val viewModel = navViewModel<UserViewModel>()
-    val timelineViewModel = navViewModel<UserTimelineViewModel>()
-    val favouriteViewModel = navViewModel<UserFavouriteTimelineViewModel>()
+    val account = AmbientActiveAccount.current ?: return
+    val viewModel = assistedViewModel<UserViewModel.AssistedFactory, UserViewModel> {
+        it.create(account, screenName)
+    }
+    val timelineViewModel =
+        assistedViewModel<UserTimelineViewModel.AssistedFactory, UserTimelineViewModel> {
+            it.create(account, screenName)
+        }
+    val favouriteViewModel =
+        assistedViewModel<UserFavouriteTimelineViewModel.AssistedFactory, UserFavouriteTimelineViewModel> {
+            it.create(account, screenName)
+        }
 
     val refreshing by viewModel.refreshing.observeAsState(initial = false)
     val coroutineScope = rememberCoroutineScope()
@@ -124,17 +134,15 @@ fun UserComponent(
 
     LaunchedTask(
         selectedItem,
-        timeline,
-        favourite,
     ) {
-        viewModel.init(screenName, initialData)
-        viewModelUser?.let { user ->
-            async {
-                when {
-                    selectedItem == 0 && !timeline.any() -> timelineViewModel.refresh(user)
-                    selectedItem == 1 && !mediaTimeline.any() -> timelineViewModel.loadMore(user)
-                    selectedItem == 2 && !favourite.any() -> favouriteViewModel.refresh(user)
-                }
+        async {
+            viewModel.init()
+        }
+        async {
+            when {
+                selectedItem == 0 && !timeline.any() -> timelineViewModel.refresh()
+                selectedItem == 1 && !mediaTimeline.any() -> timelineViewModel.loadMore()
+                selectedItem == 2 && !favourite.any() -> favouriteViewModel.refresh()
             }
         }
     }
@@ -160,7 +168,7 @@ fun UserComponent(
                 refreshingState = refreshing,
                 onRefresh = {
                     coroutineScope.launch {
-                        viewModel.refresh(screenName)
+                        viewModel.refresh()
                     }
                 },
             ) {
@@ -168,7 +176,7 @@ fun UserComponent(
                     state = lazyListState,
                 ) {
                     item {
-                        UserInfo(user = user)
+                        UserInfo(user = user, viewModel = viewModel)
                     }
 
                     item {
@@ -189,7 +197,6 @@ fun UserComponent(
                                     timelineLoadingMore,
                                     coroutineScope,
                                     timelineViewModel,
-                                    user
                                 )
                             }
                         }
@@ -200,7 +207,6 @@ fun UserComponent(
                                     timelineLoadingMore,
                                     coroutineScope,
                                     timelineViewModel,
-                                    user,
                                 )
                             }
                         }
@@ -211,7 +217,6 @@ fun UserComponent(
                                     timelineLoadingMore,
                                     coroutineScope,
                                     favouriteViewModel,
-                                    user
                                 )
                             }
                         }
@@ -251,13 +256,12 @@ private fun LazyListScope.likeTimeline(
     timelineLoadingMore: Boolean,
     coroutineScope: CoroutineScope,
     favouriteViewModel: UserFavouriteTimelineViewModel,
-    user: UiUser
 ) {
     itemsIndexed(favourite) { index, item ->
         Column {
             if (!timelineLoadingMore && index == favourite.lastIndex) {
                 coroutineScope.launch {
-                    favouriteViewModel.loadMore(user)
+                    favouriteViewModel.loadMore()
                 }
             }
             TimelineStatusComponent(item)
@@ -273,13 +277,12 @@ private fun LazyListScope.statusTimeline(
     timelineLoadingMore: Boolean,
     coroutineScope: CoroutineScope,
     timelineViewModel: UserTimelineViewModel,
-    user: UiUser
 ) {
     itemsIndexed(timeline) { index, item ->
         Column {
             if (!timelineLoadingMore && index == timeline.lastIndex) {
                 coroutineScope.launch {
-                    timelineViewModel.loadMore(user)
+                    timelineViewModel.loadMore()
                 }
             }
             TimelineStatusComponent(item)
@@ -296,7 +299,6 @@ private fun LazyListScope.mediaTimeline(
     timelineLoadingMore: Boolean,
     coroutineScope: CoroutineScope,
     timelineViewModel: UserTimelineViewModel,
-    user: UiUser
 ) {
     item {
         Spacer(modifier = Modifier.height(standardPadding * 2))
@@ -310,7 +312,7 @@ private fun LazyListScope.mediaTimeline(
         val navController = AmbientNavController.current
         if (!timelineLoadingMore && index == items.lastIndex) {
             coroutineScope.launch {
-                timelineViewModel.loadMore(user)
+                timelineViewModel.loadMore()
             }
         }
         StatusMediaPreviewItem(
@@ -331,8 +333,7 @@ private fun LazyListScope.mediaTimeline(
 }
 
 @Composable
-private fun UserInfo(user: UiUser) {
-    val viewModel = navViewModel<UserViewModel>()
+private fun UserInfo(user: UiUser, viewModel: UserViewModel) {
     val isMe by viewModel.isMe.observeAsState(initial = false)
     val relationship by viewModel.relationship.observeAsState(initial = null)
     val maxBannerSize = 200.dp

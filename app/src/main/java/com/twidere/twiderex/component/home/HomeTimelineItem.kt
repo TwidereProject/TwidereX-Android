@@ -30,7 +30,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.VectorAsset
 import androidx.navigation.compose.navigate
 import com.twidere.twiderex.component.TimelineComponent
-import com.twidere.twiderex.extensions.navViewModel
+import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.ui.AmbientActiveAccount
 import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.viewmodel.twitter.timeline.HomeTimelineViewModel
 
@@ -42,7 +43,10 @@ class HomeTimelineItem : HomeNavigationItem() {
 
     @Composable
     override fun onCompose() {
-        val viewModel = navViewModel<HomeTimelineViewModel>()
+        val account = AmbientActiveAccount.current ?: return
+        val viewModel = assistedViewModel<HomeTimelineViewModel.AssistedFactory, HomeTimelineViewModel> {
+            it.create(account)
+        }
         Scaffold(
             floatingActionButton = {
                 val navController = AmbientNavController.current

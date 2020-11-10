@@ -21,24 +21,29 @@
 package com.twidere.twiderex.viewmodel.twitter.timeline
 
 import android.content.SharedPreferences
-import androidx.hilt.lifecycle.ViewModelInject
+import com.squareup.inject.assisted.Assisted
+import com.squareup.inject.assisted.AssistedInject
 import com.twidere.services.microblog.TimelineService
-import com.twidere.twiderex.repository.AccountRepository
+import com.twidere.twiderex.di.assisted.IAssistedFactory
+import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.repository.timeline.HomeTimelineRepository
 import com.twidere.twiderex.repository.timeline.TimelineRepository
 
-class HomeTimelineViewModel @ViewModelInject constructor(
-    accountRepository: AccountRepository,
+class HomeTimelineViewModel @AssistedInject constructor(
     preferences: SharedPreferences,
     factory: HomeTimelineRepository.AssistedFactory,
+    @Assisted account: AccountDetails,
 ) : TimelineViewModel(preferences) {
+    @AssistedInject.Factory
+    interface AssistedFactory : IAssistedFactory {
+        fun create(account: AccountDetails): HomeTimelineViewModel
+    }
+
     override val repository: TimelineRepository =
-        accountRepository.getCurrentAccount().let { account ->
-            account.service.let {
-                it as TimelineService
-            }.let { service ->
-                factory.create(account.key, service)
-            }
+        account.service.let {
+            it as TimelineService
+        }.let { service ->
+            factory.create(account.key, service)
         }
-    override val savedStateKey: String = "${accountRepository.getCurrentAccount().key}_home"
+    override val savedStateKey: String = "${account.key}_home"
 }

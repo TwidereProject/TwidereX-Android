@@ -25,7 +25,8 @@ import androidx.compose.material.icons.filled.AlternateEmail
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.VectorAsset
 import com.twidere.twiderex.component.TimelineComponent
-import com.twidere.twiderex.extensions.navViewModel
+import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.ui.AmbientActiveAccount
 import com.twidere.twiderex.viewmodel.twitter.timeline.MentionsTimelineViewModel
 
 class MentionItem : HomeNavigationItem() {
@@ -36,7 +37,11 @@ class MentionItem : HomeNavigationItem() {
 
     @Composable
     override fun onCompose() {
-        val viewModel = navViewModel<MentionsTimelineViewModel>()
+        val account = AmbientActiveAccount.current ?: return
+        val viewModel =
+            assistedViewModel<MentionsTimelineViewModel.AssistedFactory, MentionsTimelineViewModel> {
+                it.create(account)
+            }
         TimelineComponent(viewModel = viewModel)
     }
 }

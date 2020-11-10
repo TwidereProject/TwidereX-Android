@@ -20,6 +20,7 @@
  */
 package com.twidere.twiderex.db.dao
 
+import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -43,6 +44,10 @@ interface StatusDao {
     @Transaction
     @Query("SELECT * FROM status WHERE statusId == :id")
     suspend fun findWithStatusIdWithReference(id: String): DbStatusWithReference?
+
+    @Transaction
+    @Query("SELECT * FROM status WHERE statusId == :id")
+    fun findWithStatusIdWithReferenceLiveData(id: String): LiveData<DbStatusWithReference?>
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
     suspend fun update(status: List<DbStatusV2>)
