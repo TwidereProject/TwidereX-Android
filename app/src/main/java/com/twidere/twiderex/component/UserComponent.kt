@@ -85,6 +85,8 @@ import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.model.ui.UiUser
+import com.twidere.twiderex.settings.AmbientAvatarStyle
+import com.twidere.twiderex.settings.AvatarStyle
 import com.twidere.twiderex.ui.AmbientActiveAccount
 import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.ui.standardPadding
@@ -369,10 +371,16 @@ private fun UserInfo(user: UiUser, viewModel: UserViewModel) {
                     .fillMaxWidth(),
                 alignment = Alignment.Center
             ) {
+                val avatarStyle = AmbientAvatarStyle.current
                 Spacer(
                     modifier = Modifier
                         .size(80.dp)
-                        .clip(CircleShape)
+                        .let {
+                            when (avatarStyle) {
+                                AvatarStyle.Round -> it.clip(CircleShape)
+                                AvatarStyle.Square -> it.clip(MaterialTheme.shapes.medium)
+                            }
+                        }
                         .clipToBounds()
                         .background(MaterialTheme.colors.surface.withElevation())
                 )

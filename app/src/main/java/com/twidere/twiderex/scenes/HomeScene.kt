@@ -30,10 +30,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.ExperimentalLazyDsl
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.AmbientEmphasisLevels
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
@@ -54,12 +52,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.savedinstancestate.savedInstanceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.navigate
 import com.twidere.twiderex.component.foundation.AppBar
-import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.foundation.TabsComponent
 import com.twidere.twiderex.component.foundation.TopAppBarElevation
 import com.twidere.twiderex.component.home.HomeNavigationItem
@@ -67,13 +63,15 @@ import com.twidere.twiderex.component.home.HomeTimelineItem
 import com.twidere.twiderex.component.home.MeItem
 import com.twidere.twiderex.component.home.MentionItem
 import com.twidere.twiderex.component.home.SearchItem
+import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.extensions.withElevation
+import com.twidere.twiderex.model.ui.UiUser
+import com.twidere.twiderex.model.ui.UiUser.Companion.toUi
 import com.twidere.twiderex.settings.AmbientTabPosition
 import com.twidere.twiderex.settings.TabPosition
 import com.twidere.twiderex.ui.AmbientActiveAccount
 import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.ui.TwidereXTheme
-import com.twidere.twiderex.ui.profileImageSize
 
 @Composable
 fun HomeScene() {
@@ -191,44 +189,14 @@ fun HomeBottomNavigation(
 @OptIn(ExperimentalLazyDsl::class)
 @Composable
 private fun HomeDrawer(scaffoldState: ScaffoldState) {
-    val account = AmbientActiveAccount.current
-    val navController = AmbientNavController.current
 
     Column {
         Spacer(modifier = Modifier.height(16.dp))
 
-        ListItem(
-            icon = {
-                account?.let {
-                    NetworkImage(
-                        url = it.user.profileImage,
-                        modifier = Modifier
-                            .clip(CircleShape)
-                            .width(profileImageSize)
-                            .height(profileImageSize)
-                    )
-                }
-            },
-            text = {
-                Text(
-                    text = account?.user?.name ?: "",
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
-            },
-            secondaryText = {
-                Text(
-                    text = "@${account?.user?.screenName}",
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
-            },
-            trailing = {
-                IconButton(onClick = {}) {
-                    Icon(asset = Icons.Default.ArrowDropDown)
-                }
-            }
-        )
+        val account = AmbientActiveAccount.current
+        val user = account?.user?.toUi()
+        val navController = AmbientNavController.current
+        DrawerUserHeader(user)
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -237,21 +205,21 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
                 modifier = Modifier.weight(1f),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Text(text = account?.user?.friendsCount.toString())
+                Text(text = user?.friendsCount.toString())
                 Text(text = "Following")
             }
             Column(
                 modifier = Modifier.weight(1f),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Text(text = account?.user?.followersCount.toString())
+                Text(text = user?.followersCount.toString())
                 Text(text = "Followers")
             }
             Column(
                 modifier = Modifier.weight(1f),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Text(text = account?.user?.listedCount.toString())
+                Text(text = user?.listedCount.toString())
                 Text(text = "Listed")
             }
         }
@@ -295,4 +263,39 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
             }
         )
     }
+}
+
+@Composable
+private fun DrawerUserHeader(user: UiUser?) {
+    ListItem(
+        icon = {
+            user?.let {
+                UserAvatar(
+                    user = it,
+                )
+            }
+        },
+        text = {
+            Text(
+                text = user?.name ?: "",
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        },
+        secondaryText = {
+            Text(
+                text = "@${user?.screenName}",
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        },
+        trailing = {
+            IconButton(
+                onClick = {
+                }
+            ) {
+                Icon(asset = Icons.Default.ArrowDropDown)
+            }
+        }
+    )
 }
