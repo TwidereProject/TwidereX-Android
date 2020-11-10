@@ -20,7 +20,9 @@
  */
 package com.twidere.twiderex.scenes
 
+import androidx.compose.foundation.Text
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.zoomable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -30,11 +32,15 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.AmbientEmphasisLevels
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.ProvideEmphasis
 import androidx.compose.material.Scaffold
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -58,17 +64,21 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.DragObserver
 import androidx.compose.ui.gesture.rawDragGestureFilter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.navigation.compose.navigate
 import com.twidere.twiderex.annotations.IncomingComposeUpdate
 import com.twidere.twiderex.component.ActionIconButton
 import com.twidere.twiderex.component.LoadingProgress
 import com.twidere.twiderex.component.NetworkImage
 import com.twidere.twiderex.component.Pager
+import com.twidere.twiderex.component.UserAvatar
 import com.twidere.twiderex.extensions.navViewModel
 import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.ui.TwidereXTheme
+import com.twidere.twiderex.ui.standardPadding
 import com.twidere.twiderex.viewmodel.MediaViewModel
 import kotlin.math.max
 
@@ -105,10 +115,19 @@ fun MediaScene(statusId: String, selectedIndex: Int) {
 @Composable
 fun MediaScene(status: UiStatus, selectedIndex: Int) {
     var lockPager by remember { mutableStateOf(false) }
+    var hideControls by remember { mutableStateOf(false) }
     val controlPanelColor = MaterialTheme.colors.surface.copy(alpha = 0.6f)
+    val navController = AmbientNavController.current
     Scaffold {
         Box {
             Pager(
+                modifier = Modifier
+                    .clickable(
+                        onClick = {
+                            hideControls = !hideControls
+                        },
+                        indication = null,
+                    ),
                 items = status.media,
                 startPage = selectedIndex,
                 enableDrag = !lockPager,
@@ -117,49 +136,90 @@ fun MediaScene(status: UiStatus, selectedIndex: Int) {
                     lockPager = it
                 }
             }
-
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.BottomCenter)
-                    .background(color = controlPanelColor)
-            ) {
-                Row {
-                    Spacer(modifier = Modifier.weight(1f))
-                    ActionIconButton(onClick = {}) {
-                        Icon(asset = Icons.Default.Reply)
-                    }
-                    ActionIconButton(onClick = {}) {
-                        Icon(asset = Icons.Default.Comment)
-                    }
-                    ActionIconButton(onClick = {}) {
-                        Icon(asset = Icons.Default.Favorite)
-                    }
-                    ActionIconButton(onClick = {}) {
-                        Icon(asset = Icons.Default.Share)
-                    }
-                    Spacer(modifier = Modifier.weight(1f))
-                }
-            }
-
-            Box(
-                modifier = Modifier
-                    .padding(16.dp)
-            ) {
+            if (!hideControls) {
                 Box(
                     modifier = Modifier
-                        .align(Alignment.TopStart)
-                        .clip(MaterialTheme.shapes.small)
-                        .background(color = controlPanelColor, shape = MaterialTheme.shapes.small)
-                        .clipToBounds()
+                        .fillMaxWidth()
+                        .align(Alignment.BottomCenter)
+                        .background(color = controlPanelColor),
                 ) {
-                    val navController = AmbientNavController.current
-                    IconButton(
-                        onClick = {
-                            navController.popBackStack()
-                        }
+                    Column(
+                        modifier = Modifier
+                            .padding(standardPadding),
                     ) {
-                        Icon(asset = Icons.Default.Close)
+                        Text(
+                            modifier = Modifier
+                                .clickable(
+                                    onClick = {
+                                        navController.navigate("status/${status.statusId}")
+                                    }
+                                ),
+                            text = status.text,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                        Spacer(modifier = Modifier.height(standardPadding))
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .weight(1f),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                UserAvatar(user = status.user)
+                                Spacer(modifier = Modifier.width(standardPadding))
+                                Text(
+                                    text = status.user.name,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                )
+                                Spacer(modifier = Modifier.width(standardPadding))
+                                ProvideEmphasis(emphasis = AmbientEmphasisLevels.current.medium) {
+                                    Text(
+                                        text = "@${status.user.screenName}",
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis,
+                                    )
+                                }
+                            }
+                            ActionIconButton(onClick = {}) {
+                                Icon(asset = Icons.Default.Reply)
+                            }
+                            ActionIconButton(onClick = {}) {
+                                Icon(asset = Icons.Default.Comment)
+                            }
+                            ActionIconButton(onClick = {}) {
+                                Icon(asset = Icons.Default.Favorite)
+                            }
+                            ActionIconButton(onClick = {}) {
+                                Icon(asset = Icons.Default.Share)
+                            }
+                        }
+                    }
+                }
+
+                Box(
+                    modifier = Modifier
+                        .padding(16.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.TopStart)
+                            .clip(MaterialTheme.shapes.small)
+                            .background(
+                                color = controlPanelColor,
+                                shape = MaterialTheme.shapes.small
+                            )
+                            .clipToBounds()
+                    ) {
+                        IconButton(
+                            onClick = {
+                                navController.popBackStack()
+                            }
+                        ) {
+                            Icon(asset = Icons.Default.Close)
+                        }
                     }
                 }
             }
