@@ -1,5 +1,5 @@
 # Twidere X
-![Build Status](https://github.com/TwidereProject/TwidereX-Android/workflows/DebugBuild/badge.svg)
+![Build Status](https://github.com/TwidereProject/TwidereX-Android/workflows/Android%20CI/badge.svg)
 
 Next generation of Twidere for Android 5.0+. **Still in early stage.**  
 
