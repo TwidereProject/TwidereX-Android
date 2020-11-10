@@ -61,10 +61,12 @@ class UserViewModel @AssistedInject constructor(
     }
     val relationship = MutableLiveData<IRelationship>()
     val isMe = liveData {
-        emitSource(user.map {
-            val key = UserKey(screenName, "twitter.com")
-            key == account.key
-        })
+        emitSource(
+            user.map {
+                val key = UserKey(screenName, "twitter.com")
+                key == account.key
+            }
+        )
     }
 
     suspend fun refresh() {

@@ -37,7 +37,7 @@ class TwitterSearchMediasViewModel @AssistedInject constructor(
 ) : TwitterSearchListViewModelBase(keyword = keyword) {
 
     @AssistedInject.Factory
-    interface AssistedFactory: IAssistedFactory {
+    interface AssistedFactory : IAssistedFactory {
         fun create(account: AccountDetails, keyword: String): TwitterSearchMediasViewModel
     }
 

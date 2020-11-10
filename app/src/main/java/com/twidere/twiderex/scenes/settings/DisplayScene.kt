@@ -33,11 +33,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
-import com.twidere.twiderex.component.status.TimelineStatusComponent
 import com.twidere.twiderex.component.lazy.itemDivider
 import com.twidere.twiderex.component.lazy.itemHeader
 import com.twidere.twiderex.component.settings.radioItem
 import com.twidere.twiderex.component.settings.switchItem
+import com.twidere.twiderex.component.status.TimelineStatusComponent
 import com.twidere.twiderex.extensions.navViewModel
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.settings.AmbientFontScale

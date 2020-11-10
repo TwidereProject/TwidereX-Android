@@ -49,7 +49,6 @@ import androidx.navigation.compose.navigate
 import com.twidere.twiderex.component.foundation.ActionIconButton
 import com.twidere.twiderex.extensions.humanizedTimestamp
 import com.twidere.twiderex.model.ui.UiStatus
-import com.twidere.twiderex.providers.AmbientStatusActions
 import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.ui.mediumEmphasisContentContentColor
 import com.twidere.twiderex.ui.standardPadding

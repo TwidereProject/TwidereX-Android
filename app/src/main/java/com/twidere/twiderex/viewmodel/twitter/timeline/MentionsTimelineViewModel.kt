@@ -35,7 +35,7 @@ class MentionsTimelineViewModel @AssistedInject constructor(
     @Assisted private val account: AccountDetails
 ) : TimelineViewModel(preferences) {
     @AssistedInject.Factory
-    interface AssistedFactory: IAssistedFactory {
+    interface AssistedFactory : IAssistedFactory {
         fun create(account: AccountDetails): MentionsTimelineViewModel
     }
     override val repository: TimelineRepository by lazy {

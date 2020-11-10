@@ -30,9 +30,9 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.annotations.IncomingComposeUpdate
+import com.twidere.twiderex.component.UserComponent
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
-import com.twidere.twiderex.component.UserComponent
 import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.ui.TwidereXTheme
 

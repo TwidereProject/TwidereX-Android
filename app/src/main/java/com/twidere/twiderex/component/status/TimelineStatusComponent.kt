@@ -50,7 +50,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.navigate
 import com.twidere.twiderex.extensions.humanizedTimestamp
 import com.twidere.twiderex.model.ui.UiStatus
-import com.twidere.twiderex.providers.AmbientStatusActions
 import com.twidere.twiderex.settings.AmbientMediaPreview
 import com.twidere.twiderex.ui.AmbientInStoryboard
 import com.twidere.twiderex.ui.AmbientNavController

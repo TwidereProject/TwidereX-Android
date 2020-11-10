@@ -74,7 +74,6 @@ import com.twidere.twiderex.component.status.ReplyButton
 import com.twidere.twiderex.component.status.RetweetButton
 import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.di.assisted.assistedViewModel
-import com.twidere.twiderex.extensions.navViewModel
 import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.ui.AmbientActiveAccount
@@ -87,7 +86,7 @@ import kotlin.math.max
 @Composable
 fun MediaScene(statusId: String, selectedIndex: Int) {
     val account = AmbientActiveAccount.current ?: return
-    val viewModel = assistedViewModel<MediaViewModel.AssistedFactory, MediaViewModel>{
+    val viewModel = assistedViewModel<MediaViewModel.AssistedFactory, MediaViewModel> {
         it.create(account)
     }
     val loading by viewModel.loading.observeAsState(initial = false)
