@@ -44,6 +44,9 @@ class TwitterSearchUserViewModel @ViewModelInject constructor(
     val source = MutableLiveData<List<UiUser>>()
 
     override fun reset(keyword: String) {
+        if (this.keyword == keyword) {
+            return
+        }
         super.reset(keyword)
         source.postValue(emptyList())
         page = 0

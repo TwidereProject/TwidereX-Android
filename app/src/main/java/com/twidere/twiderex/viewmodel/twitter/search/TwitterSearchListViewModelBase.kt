@@ -31,6 +31,9 @@ abstract class TwitterSearchListViewModelBase : ViewModel() {
     protected var keyword = ""
 
     open fun reset(keyword: String) {
+        if (this.keyword == keyword) {
+            return
+        }
         this.keyword = keyword
         loaded.postValue(false)
     }

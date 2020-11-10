@@ -50,6 +50,9 @@ class TwitterSearchMediasViewModel @ViewModelInject constructor(
     }
 
     override fun reset(keyword: String) {
+        if (this.keyword == keyword) {
+            return
+        }
         super.reset(keyword)
         hasMore = true
         nextPage = null
