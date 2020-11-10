@@ -22,23 +22,24 @@ package com.twidere.twiderex.viewmodel
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.liveData
 import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
 import com.twidere.services.microblog.LookupService
 import com.twidere.twiderex.di.assisted.IAssistedFactory
 import com.twidere.twiderex.model.AccountDetails
-import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.repository.twitter.TwitterTweetsRepository
 import kotlinx.coroutines.coroutineScope
 
 class MediaViewModel @AssistedInject constructor(
     private val factory: TwitterTweetsRepository.AssistedFactory,
-    @Assisted private val account: AccountDetails
+    @Assisted private val account: AccountDetails,
+    @Assisted private val statusId: String,
 ) : ViewModel() {
 
     @AssistedInject.Factory
     interface AssistedFactory : IAssistedFactory {
-        fun create(account: AccountDetails): MediaViewModel
+        fun create(account: AccountDetails, statusId: String): MediaViewModel
     }
 
     private val repository by lazy {
@@ -47,20 +48,16 @@ class MediaViewModel @AssistedInject constructor(
         }
     }
     val loading = MutableLiveData(false)
-    val status = MutableLiveData<UiStatus>()
+    val status = liveData {
+        emitSource(repository.loadTweetFromCache(statusId))
+    }
 
     suspend fun init(statusId: String) = coroutineScope {
         if (status.value != null) {
             return@coroutineScope
         }
         loading.postValue(true)
-        repository.loadTweetFromCache(statusId)?.let {
-            status.postValue(it)
-        } ?: run {
-            repository.loadTweetFromNetwork(statusId).let {
-                status.postValue(it)
-            }
-        }
+        repository.loadTweetFromNetwork(statusId)
         loading.postValue(false)
     }
 }

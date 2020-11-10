@@ -29,6 +29,7 @@ import android.net.Uri
 import androidx.annotation.RequiresPermission
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.liveData
 import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
 import com.twidere.services.microblog.LookupService
@@ -45,11 +46,12 @@ class ComposeViewModel @AssistedInject constructor(
     private val locationManager: LocationManager,
     private val composeQueue: ComposeQueue,
     private val factory: TwitterTweetsRepository.AssistedFactory,
-    @Assisted private val account: AccountDetails
+    @Assisted private val account: AccountDetails,
+    @Assisted private val statusId: String?,
 ) : ViewModel(), LocationListener {
     @AssistedInject.Factory
     interface AssistedFactory : IAssistedFactory {
-        fun create(account: AccountDetails): ComposeViewModel
+        fun create(account: AccountDetails, statusId: String?): ComposeViewModel
     }
 
     private val service by lazy {
@@ -64,7 +66,13 @@ class ComposeViewModel @AssistedInject constructor(
     val images = MutableLiveData<List<Uri>>(emptyList())
     val location = MutableLiveData<Location>()
     val locationEnabled = MutableLiveData(false)
-    val status = MutableLiveData<UiStatus>()
+    val status = liveData {
+        statusId?.let {
+            emitSource(repository.loadTweetFromCache(it))
+        } ?: run {
+            emit(null)
+        }
+    }
 
     fun compose(content: String, composeType: ComposeType, status: UiStatus? = null) {
         composeQueue.commit(
@@ -74,12 +82,6 @@ class ComposeViewModel @AssistedInject constructor(
             replyTo = if (composeType == ComposeType.Reply) status?.statusId else null,
             quoteTo = if (composeType == ComposeType.Quote) status?.statusId else null,
         )
-    }
-
-    suspend fun initStatus(statusId: String) {
-        repository.loadTweetFromCache(statusId)?.let {
-            status.postValue(it)
-        }
     }
 
     fun putImages(value: List<Uri>) {

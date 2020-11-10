@@ -62,7 +62,6 @@ import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material.icons.filled.Topic
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedTask
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -109,14 +108,9 @@ enum class ComposeType {
 fun ComposeScene(statusId: String? = null, composeType: ComposeType = ComposeType.New) {
     val account = AmbientActiveAccount.current ?: return
     val viewModel = assistedViewModel<ComposeViewModel.AssistedFactory, ComposeViewModel> {
-        it.create(account)
+        it.create(account, statusId)
     }
     val status by viewModel.status.observeAsState()
-    statusId?.let {
-        LaunchedTask {
-            viewModel.initStatus(it)
-        }
-    }
     val (text, setText) = remember { mutableStateOf("") }
     val images by viewModel.images.observeAsState(initial = emptyList())
     val location by viewModel.location.observeAsState()

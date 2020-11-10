@@ -20,6 +20,8 @@
  */
 package com.twidere.twiderex.repository.twitter
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.map
 import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
 import com.twidere.services.microblog.LookupService
@@ -45,8 +47,10 @@ class TwitterTweetsRepository @AssistedInject constructor(
         ): TwitterTweetsRepository
     }
 
-    suspend fun loadTweetFromCache(statusId: String): UiStatus? {
-        return database.statusDao().findWithStatusIdWithReference(statusId)?.toUi(userKey)
+    fun loadTweetFromCache(statusId: String): LiveData<UiStatus?> {
+        return database.statusDao().findWithStatusIdWithReferenceLiveData(statusId).map {
+            it?.toUi(userKey)
+        }
     }
 
     suspend fun loadTweetFromNetwork(statusId: String): UiStatus {

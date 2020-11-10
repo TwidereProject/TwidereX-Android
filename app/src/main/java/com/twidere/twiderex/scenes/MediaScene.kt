@@ -87,7 +87,7 @@ import kotlin.math.max
 fun MediaScene(statusId: String, selectedIndex: Int) {
     val account = AmbientActiveAccount.current ?: return
     val viewModel = assistedViewModel<MediaViewModel.AssistedFactory, MediaViewModel> {
-        it.create(account)
+        it.create(account, statusId)
     }
     val loading by viewModel.loading.observeAsState(initial = false)
     val status by viewModel.status.observeAsState()
