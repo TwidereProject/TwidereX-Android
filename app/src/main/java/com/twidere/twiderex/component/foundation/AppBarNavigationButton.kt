@@ -18,18 +18,27 @@
  *  You should have received a copy of the GNU General Public License
  *  along with TwidereX. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.extensions
+package com.twidere.twiderex.component.foundation
 
-import androidx.compose.material.AmbientElevationOverlay
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.Dp
-import com.twidere.twiderex.component.foundation.TopAppBarElevation
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.graphics.vector.VectorAsset
+import com.twidere.twiderex.ui.AmbientNavController
 
 @Composable
-fun Color.withElevation(elevation: Dp = TopAppBarElevation): Color {
-    return AmbientElevationOverlay.current?.apply(
-        color = this,
-        elevation = elevation
-    ) ?: this
+fun AppBarNavigationButton(
+    icon: VectorAsset = Icons.Default.ArrowBack,
+) {
+    val navController = AmbientNavController.current
+    IconButton(
+        onClick = {
+            navController.popBackStack()
+        }
+    ) {
+        Icon(asset = icon)
+    }
 }

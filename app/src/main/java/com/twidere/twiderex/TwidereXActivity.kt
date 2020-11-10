@@ -37,6 +37,8 @@ import com.twidere.twiderex.extensions.ProvideNavigationViewModelFactoryMap
 import com.twidere.twiderex.launcher.ActivityLauncher
 import com.twidere.twiderex.launcher.AmbientLauncher
 import com.twidere.twiderex.navigation.Router
+import com.twidere.twiderex.providers.AmbientStatusActions
+import com.twidere.twiderex.providers.StatusActions
 import com.twidere.twiderex.settings.AmbientAvatarStyle
 import com.twidere.twiderex.settings.AmbientFontScale
 import com.twidere.twiderex.settings.AmbientMediaPreview
@@ -87,6 +89,9 @@ class TwidereXActivity : ComponentActivity() {
     @Inject
     lateinit var fontScaleSettings: FontScaleSettings
 
+    @Inject
+    lateinit var statusActions: StatusActions
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         launcher = ActivityLauncher(activityResultRegistry)
@@ -121,6 +126,7 @@ class TwidereXActivity : ComponentActivity() {
                 AmbientMediaPreview provides mediaPreview,
                 AmbientUseSystemFontSize provides useSystemFontSize,
                 AmbientFontScale provides fontScale,
+                AmbientStatusActions provides statusActions,
             ) {
                 ProvideNavigationViewModelFactoryMap(factory = defaultViewModelProviderFactory as HiltViewModelFactory) {
                     ProvideWindowPadding {

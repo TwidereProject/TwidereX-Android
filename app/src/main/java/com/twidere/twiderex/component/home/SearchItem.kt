@@ -39,8 +39,8 @@ import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.graphics.vector.VectorAsset
 import androidx.compose.ui.text.input.ImeAction
 import androidx.navigation.compose.navigate
-import com.twidere.twiderex.component.AppBar
-import com.twidere.twiderex.component.TextInput
+import com.twidere.twiderex.component.foundation.AppBar
+import com.twidere.twiderex.component.foundation.TextInput
 import com.twidere.twiderex.ui.AmbientNavController
 import java.net.URLEncoder
 

@@ -18,7 +18,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with TwidereX. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.component
+package com.twidere.twiderex.component.status
 
 import androidx.compose.foundation.AmbientContentColor
 import androidx.compose.foundation.Text
@@ -37,27 +37,22 @@ import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ProvideEmphasis
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Comment
-import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Place
-import androidx.compose.material.icons.filled.Reply
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.navigate
+import com.twidere.twiderex.component.foundation.ActionIconButton
 import com.twidere.twiderex.extensions.humanizedTimestamp
-import com.twidere.twiderex.extensions.navViewModel
 import com.twidere.twiderex.model.ui.UiStatus
-import com.twidere.twiderex.scenes.ComposeType
+import com.twidere.twiderex.providers.AmbientStatusActions
 import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.ui.mediumEmphasisContentContentColor
 import com.twidere.twiderex.ui.standardPadding
-import com.twidere.twiderex.viewmodel.StatusActionsViewModel
 
 @Composable
 fun ExpandedStatusComponent(
@@ -65,8 +60,6 @@ fun ExpandedStatusComponent(
     showInfo: Boolean = true,
     showActions: Boolean = true,
 ) {
-    val navController = AmbientNavController.current
-    val actionsViewModel = navViewModel<StatusActionsViewModel>()
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -141,41 +134,9 @@ fun ExpandedStatusComponent(
             ProvideEmphasis(emphasis = AmbientEmphasisLevels.current.medium) {
                 Row {
                     Spacer(modifier = Modifier.weight(1f))
-                    ActionIconButton(
-                        onClick = {
-                            navController.navigate("compose/${ComposeType.Reply.name}?statusId=${status.statusId}")
-                        },
-                    ) {
-                        Icon(asset = Icons.Default.Reply)
-                    }
-                    ActionIconButton(
-                        onClick = {
-                            actionsViewModel.retweet(data)
-                        },
-                    ) {
-                        Icon(
-                            asset = Icons.Default.Comment,
-                            tint = if (status.retweeted) {
-                                MaterialTheme.colors.primary
-                            } else {
-                                AmbientContentColor.current
-                            },
-                        )
-                    }
-                    ActionIconButton(
-                        onClick = {
-                            actionsViewModel.like(data)
-                        },
-                    ) {
-                        Icon(
-                            asset = Icons.Default.Favorite,
-                            tint = if (data.liked) {
-                                Color.Red
-                            } else {
-                                AmbientContentColor.current
-                            },
-                        )
-                    }
+                    ReplyButton(status = status, withNumber = false)
+                    RetweetButton(status = status, withNumber = false)
+                    LikeButton(status = status, withNumber = false)
                     ActionIconButton(onClick = {}) {
                         Icon(asset = Icons.Default.Share)
                     }

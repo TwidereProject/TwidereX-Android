@@ -44,9 +44,6 @@ import androidx.compose.material.ProvideEmphasis
 import androidx.compose.material.Scaffold
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Comment
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Reply
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedTask
@@ -68,11 +65,14 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.navigate
 import com.twidere.twiderex.annotations.IncomingComposeUpdate
-import com.twidere.twiderex.component.ActionIconButton
-import com.twidere.twiderex.component.LoadingProgress
-import com.twidere.twiderex.component.NetworkImage
-import com.twidere.twiderex.component.Pager
-import com.twidere.twiderex.component.UserAvatar
+import com.twidere.twiderex.component.foundation.ActionIconButton
+import com.twidere.twiderex.component.foundation.LoadingProgress
+import com.twidere.twiderex.component.foundation.NetworkImage
+import com.twidere.twiderex.component.foundation.Pager
+import com.twidere.twiderex.component.status.LikeButton
+import com.twidere.twiderex.component.status.ReplyButton
+import com.twidere.twiderex.component.status.RetweetButton
+import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.extensions.navViewModel
 import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.model.ui.UiStatus
@@ -183,15 +183,9 @@ fun MediaScene(status: UiStatus, selectedIndex: Int) {
                                     )
                                 }
                             }
-                            ActionIconButton(onClick = {}) {
-                                Icon(asset = Icons.Default.Reply)
-                            }
-                            ActionIconButton(onClick = {}) {
-                                Icon(asset = Icons.Default.Comment)
-                            }
-                            ActionIconButton(onClick = {}) {
-                                Icon(asset = Icons.Default.Favorite)
-                            }
+                            ReplyButton(status = status, withNumber = false)
+                            RetweetButton(status = status, withNumber = false)
+                            LikeButton(status = status, withNumber = false)
                             ActionIconButton(onClick = {}) {
                                 Icon(asset = Icons.Default.Share)
                             }

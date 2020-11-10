@@ -18,27 +18,22 @@
  *  You should have received a copy of the GNU General Public License
  *  along with TwidereX. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.component
+package com.twidere.twiderex.component.foundation
 
-import androidx.compose.material.Icon
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.ButtonConstants
 import androidx.compose.material.IconButton
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.ui.graphics.vector.VectorAsset
-import com.twidere.twiderex.ui.AmbientNavController
+import androidx.compose.ui.Modifier
 
 @Composable
-fun AppBarNavigationButton(
-    icon: VectorAsset = Icons.Default.ArrowBack,
+fun ActionIconButton(
+    onClick: () -> Unit,
+    icon: @Composable () -> Unit,
 ) {
-    val navController = AmbientNavController.current
     IconButton(
-        onClick = {
-            navController.popBackStack()
-        }
-    ) {
-        Icon(asset = icon)
-    }
+        onClick = onClick,
+        modifier = Modifier.size(ButtonConstants.DefaultMinWidth),
+        icon = icon,
+    )
 }

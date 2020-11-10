@@ -58,10 +58,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.navigate
-import com.twidere.twiderex.component.AppBar
-import com.twidere.twiderex.component.NetworkImage
-import com.twidere.twiderex.component.TabsComponent
-import com.twidere.twiderex.component.TopAppBarElevation
+import com.twidere.twiderex.component.foundation.AppBar
+import com.twidere.twiderex.component.foundation.NetworkImage
+import com.twidere.twiderex.component.foundation.TabsComponent
+import com.twidere.twiderex.component.foundation.TopAppBarElevation
 import com.twidere.twiderex.component.home.HomeNavigationItem
 import com.twidere.twiderex.component.home.HomeTimelineItem
 import com.twidere.twiderex.component.home.MeItem

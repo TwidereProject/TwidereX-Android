@@ -23,7 +23,7 @@ package com.twidere.twiderex.scenes.twitter
 import android.webkit.JavascriptInterface
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
-import com.twidere.twiderex.component.WebComponent
+import com.twidere.twiderex.component.foundation.WebComponent
 import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.ui.TwidereXTheme
 import kotlinx.coroutines.Dispatchers

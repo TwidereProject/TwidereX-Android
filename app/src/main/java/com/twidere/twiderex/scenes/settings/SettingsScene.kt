@@ -36,8 +36,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.VectorAsset
 import androidx.navigation.compose.navigate
-import com.twidere.twiderex.component.AppBar
-import com.twidere.twiderex.component.AppBarNavigationButton
+import com.twidere.twiderex.component.foundation.AppBar
+import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.ui.TwidereXTheme
 

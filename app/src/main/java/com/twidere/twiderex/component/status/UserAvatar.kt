@@ -18,7 +18,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with TwidereX. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.component
+package com.twidere.twiderex.component.status
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -32,6 +32,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.unit.Dp
 import androidx.navigation.compose.navigate
+import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.settings.AmbientAvatarStyle
 import com.twidere.twiderex.settings.AvatarStyle

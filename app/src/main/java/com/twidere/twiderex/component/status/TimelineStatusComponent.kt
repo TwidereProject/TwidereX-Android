@@ -18,17 +18,15 @@
  *  You should have received a copy of the GNU General Public License
  *  along with TwidereX. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.component
+package com.twidere.twiderex.component.status
 
 import androidx.compose.foundation.AmbientContentColor
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope.Companion.weight
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -42,37 +40,29 @@ import androidx.compose.material.ProvideEmphasis
 import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.Comment
-import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Place
-import androidx.compose.material.icons.filled.Reply
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.VectorAsset
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.navigate
 import com.twidere.twiderex.extensions.humanizedTimestamp
-import com.twidere.twiderex.extensions.navViewModel
 import com.twidere.twiderex.model.ui.UiStatus
-import com.twidere.twiderex.scenes.ComposeType
+import com.twidere.twiderex.providers.AmbientStatusActions
 import com.twidere.twiderex.settings.AmbientMediaPreview
 import com.twidere.twiderex.ui.AmbientInStoryboard
 import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.ui.mediumEmphasisContentContentColor
 import com.twidere.twiderex.ui.profileImageSize
 import com.twidere.twiderex.ui.standardPadding
-import com.twidere.twiderex.viewmodel.StatusActionsViewModel
 
 @Composable
 fun TimelineStatusComponent(
     data: UiStatus,
     showActions: Boolean = true,
 ) {
-    val actionsViewModel = navViewModel<StatusActionsViewModel>()
     val inStoryBoard = AmbientInStoryboard.current
     Column {
         val status = (data.retweet ?: data)
@@ -105,37 +95,9 @@ fun TimelineStatusComponent(
                 Spacer(modifier = Modifier.height(standardPadding))
                 Row {
                     Spacer(modifier = Modifier.width(profileImageSize))
-                    StatusActionButton(
-                        icon = Icons.Default.Reply,
-                        count = status.replyCount,
-                        onClick = {
-                            if (!inStoryBoard) {
-                                navController.navigate("compose/${ComposeType.Reply.name}?statusId=${status.statusId}")
-                            }
-                        },
-                    )
-                    StatusActionButton(
-                        icon = Icons.Default.Comment,
-                        count = status.retweetCount,
-                        colored = status.retweeted,
-                        color = MaterialTheme.colors.primary,
-                        onClick = {
-                            if (!inStoryBoard) {
-                                actionsViewModel.retweet(status)
-                            }
-                        },
-                    )
-                    StatusActionButton(
-                        icon = Icons.Default.Favorite,
-                        count = status.likeCount,
-                        colored = status.liked,
-                        color = Color.Red,
-                        onClick = {
-                            if (!inStoryBoard) {
-                                actionsViewModel.like(status)
-                            }
-                        },
-                    )
+                    ReplyButton(status = status)
+                    RetweetButton(status = status)
+                    LikeButton(status = status)
                     TextButton(
                         onClick = {},
                         colors = ButtonConstants.defaultTextButtonColors(
@@ -244,43 +206,6 @@ private fun StatusComponent(
                             )
                             .padding(standardPadding),
                     )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun StatusActionButton(
-    modifier: Modifier = Modifier.weight(1f),
-    icon: VectorAsset,
-    count: Long,
-    colored: Boolean = false,
-    color: Color = AmbientContentColor.current,
-    onClick: () -> Unit,
-) {
-    Row(
-        modifier = modifier,
-        horizontalArrangement = Arrangement.Start,
-    ) {
-        TextButton(
-            onClick = onClick,
-            colors = ButtonConstants.defaultTextButtonColors(
-                contentColor = AmbientContentColor.current
-            )
-        ) {
-            ProvideEmphasis(emphasis = AmbientEmphasisLevels.current.medium) {
-                Icon(
-                    asset = icon,
-                    tint = if (colored) {
-                        color
-                    } else {
-                        AmbientContentColor.current
-                    }
-                )
-                if (count > 0) {
-                    Box(modifier = Modifier.width(4.dp))
-                    Text(text = count.toString())
                 }
             }
         }

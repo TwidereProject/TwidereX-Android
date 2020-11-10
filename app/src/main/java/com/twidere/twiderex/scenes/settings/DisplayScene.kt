@@ -31,9 +31,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
-import com.twidere.twiderex.component.AppBar
-import com.twidere.twiderex.component.AppBarNavigationButton
-import com.twidere.twiderex.component.TimelineStatusComponent
+import com.twidere.twiderex.component.foundation.AppBar
+import com.twidere.twiderex.component.foundation.AppBarNavigationButton
+import com.twidere.twiderex.component.status.TimelineStatusComponent
 import com.twidere.twiderex.component.lazy.itemDivider
 import com.twidere.twiderex.component.lazy.itemHeader
 import com.twidere.twiderex.component.settings.radioItem

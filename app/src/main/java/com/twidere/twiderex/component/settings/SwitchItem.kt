@@ -26,7 +26,7 @@ import androidx.compose.material.ListItem
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
-import com.twidere.twiderex.component.ColoredSwitch
+import com.twidere.twiderex.component.foundation.ColoredSwitch
 import com.twidere.twiderex.settings.types.BooleanSettingItem
 
 fun LazyListScope.switchItem(

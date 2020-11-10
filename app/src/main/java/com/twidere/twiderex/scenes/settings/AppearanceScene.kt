@@ -40,8 +40,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import com.twidere.twiderex.component.AppBar
-import com.twidere.twiderex.component.AppBarNavigationButton
+import com.twidere.twiderex.component.foundation.AppBar
+import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.lazy.itemDivider
 import com.twidere.twiderex.component.settings.radioItem
 import com.twidere.twiderex.extensions.navViewModel
