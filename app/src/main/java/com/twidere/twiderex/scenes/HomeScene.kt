@@ -179,7 +179,6 @@ fun HomeBottomNavigation(
                     AmbientContentColor.current
                 ),
                 icon = { Icon(item.icon) },
-                label = { Text(item.name) },
                 selected = selectedItem == index,
                 onClick = { onItemSelected.invoke(index) }
             )
