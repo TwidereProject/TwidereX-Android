@@ -94,7 +94,6 @@ import com.twidere.twiderex.viewmodel.user.UserFavouriteTimelineViewModel
 import com.twidere.twiderex.viewmodel.user.UserTimelineViewModel
 import com.twidere.twiderex.viewmodel.user.UserViewModel
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 
 @IncomingComposeUpdate
@@ -137,15 +136,10 @@ fun UserComponent(
     LaunchedTask(
         selectedItem,
     ) {
-        async {
-            viewModel.init()
-        }
-        async {
-            when {
-                selectedItem == 0 && !timeline.any() -> timelineViewModel.refresh()
-                selectedItem == 1 && !mediaTimeline.any() -> timelineViewModel.loadMore()
-                selectedItem == 2 && !favourite.any() -> favouriteViewModel.refresh()
-            }
+        when {
+            selectedItem == 0 && !timeline.any() -> timelineViewModel.refresh()
+            selectedItem == 1 && !mediaTimeline.any() -> timelineViewModel.loadMore()
+            selectedItem == 2 && !favourite.any() -> favouriteViewModel.refresh()
         }
     }
     viewModelUser?.let { user ->

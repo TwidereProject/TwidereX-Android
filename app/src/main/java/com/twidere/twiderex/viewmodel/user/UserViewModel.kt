@@ -24,6 +24,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
 import androidx.lifecycle.map
+import androidx.lifecycle.viewModelScope
 import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
 import com.twidere.services.microblog.LookupService
@@ -34,6 +35,7 @@ import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.UserKey
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.UserRepository
+import kotlinx.coroutines.launch
 
 class UserViewModel @AssistedInject constructor(
     private val factory: UserRepository.AssistedFactory,
@@ -41,8 +43,6 @@ class UserViewModel @AssistedInject constructor(
     @Assisted private val account: AccountDetails,
     @Assisted private val screenName: String,
 ) : ViewModel() {
-
-    private var loaded = false
 
     @AssistedInject.Factory
     interface AssistedFactory : IAssistedFactory {
@@ -70,6 +70,9 @@ class UserViewModel @AssistedInject constructor(
     }
 
     suspend fun refresh() {
+        if (refreshing.value == true) {
+            return
+        }
         refreshing.postValue(true)
         val key = UserKey(screenName, "twitter.com")
         val isme = account.key == key
@@ -93,12 +96,9 @@ class UserViewModel @AssistedInject constructor(
         }
         refreshing.postValue(false)
     }
-
-    suspend fun init() {
-        if (loaded) {
-            return
+    init {
+        viewModelScope.launch {
+            refresh()
         }
-        loaded = true
-        refresh()
     }
 }
