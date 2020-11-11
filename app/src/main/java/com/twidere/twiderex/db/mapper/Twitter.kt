@@ -135,7 +135,7 @@ private fun StatusV2.toDbStatusWithMediaAndUser(
         likeCount = publicMetrics?.likeCount ?: 0,
         replyCount = 0,
         placeString = place?.fullName,
-        hasMedia = !attachments?.medias.isNullOrEmpty(),
+        hasMedia = !attachments?.media.isNullOrEmpty(),
         source = source ?: "",
         userId = user.userId,
         lang = lang,
@@ -145,7 +145,7 @@ private fun StatusV2.toDbStatusWithMediaAndUser(
     )
     return DbStatusWithMediaAndUser(
         data = status,
-        media = (attachments?.medias ?: emptyList()).mapIndexed { index, it ->
+        media = (attachments?.media ?: emptyList()).mapIndexed { index, it ->
             DbMedia(
                 _id = UUID.randomUUID().toString(),
                 statusId = status.statusId,

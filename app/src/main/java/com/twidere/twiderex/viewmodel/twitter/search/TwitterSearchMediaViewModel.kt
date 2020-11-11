@@ -30,7 +30,7 @@ import com.twidere.twiderex.di.assisted.IAssistedFactory
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.repository.twitter.TwitterSearchTweetRepository
 
-class TwitterSearchMediasViewModel @AssistedInject constructor(
+class TwitterSearchMediaViewModel @AssistedInject constructor(
     private val factory: TwitterSearchTweetRepository.AssistedFactory,
     @Assisted private val account: AccountDetails,
     @Assisted keyword: String,
@@ -38,7 +38,7 @@ class TwitterSearchMediasViewModel @AssistedInject constructor(
 
     @AssistedInject.Factory
     interface AssistedFactory : IAssistedFactory {
-        fun create(account: AccountDetails, keyword: String): TwitterSearchMediasViewModel
+        fun create(account: AccountDetails, keyword: String): TwitterSearchMediaViewModel
     }
 
     private var nextPage: String? = null

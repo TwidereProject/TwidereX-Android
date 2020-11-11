@@ -76,7 +76,7 @@ import com.twidere.twiderex.ui.AmbientActiveAccount
 import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.ui.TwidereXTheme
 import com.twidere.twiderex.ui.standardPadding
-import com.twidere.twiderex.viewmodel.twitter.search.TwitterSearchMediasViewModel
+import com.twidere.twiderex.viewmodel.twitter.search.TwitterSearchMediaViewModel
 import com.twidere.twiderex.viewmodel.twitter.search.TwitterSearchTweetsViewModel
 import com.twidere.twiderex.viewmodel.twitter.search.TwitterSearchUserViewModel
 import kotlinx.coroutines.launch
@@ -89,8 +89,8 @@ fun SearchScene(keyword: String) {
         assistedViewModel<TwitterSearchTweetsViewModel.AssistedFactory, TwitterSearchTweetsViewModel> {
             it.create(account, keyword)
         }
-    val mediasViewModel =
-        assistedViewModel<TwitterSearchMediasViewModel.AssistedFactory, TwitterSearchMediasViewModel> {
+    val mediaViewModel =
+        assistedViewModel<TwitterSearchMediaViewModel.AssistedFactory, TwitterSearchMediaViewModel> {
             it.create(account, keyword)
         }
     val usersViewModel =
@@ -130,7 +130,7 @@ fun SearchScene(keyword: String) {
                                             onImeActionPerformed = { _, _ ->
                                                 usersViewModel.reset(text)
                                                 tweetsViewModel.reset(text)
-                                                mediasViewModel.reset(text)
+                                                mediaViewModel.reset(text)
                                             },
                                             imeAction = ImeAction.Search,
                                             alignment = Alignment.CenterStart,
@@ -160,7 +160,7 @@ fun SearchScene(keyword: String) {
                 ) {
                     when (selectedTab) {
                         0 -> SearchTweetsContent(tweetsViewModel)
-                        1 -> SearchMediasContent(mediasViewModel)
+                        1 -> SearchMediasContent(mediaViewModel)
                         2 -> SearchUsersContent(usersViewModel)
                     }
                 }
@@ -208,7 +208,7 @@ private fun SearchTweetsContent(viewModel: TwitterSearchTweetsViewModel) {
 
 @OptIn(IncomingComposeUpdate::class)
 @Composable
-private fun SearchMediasContent(viewModel: TwitterSearchMediasViewModel) {
+private fun SearchMediasContent(viewModel: TwitterSearchMediaViewModel) {
     val refreshing by viewModel.refreshing.observeAsState(initial = false)
     val loadingMore by viewModel.loadingMore.observeAsState(initial = false)
     val source by viewModel.source.observeAsState(initial = emptyList())

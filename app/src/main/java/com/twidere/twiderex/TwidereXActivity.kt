@@ -64,7 +64,7 @@ import com.twidere.twiderex.viewmodel.ActiveAccountViewModel
 import com.twidere.twiderex.viewmodel.ComposeViewModel
 import com.twidere.twiderex.viewmodel.MediaViewModel
 import com.twidere.twiderex.viewmodel.twitter.TwitterStatusViewModel
-import com.twidere.twiderex.viewmodel.twitter.search.TwitterSearchMediasViewModel
+import com.twidere.twiderex.viewmodel.twitter.search.TwitterSearchMediaViewModel
 import com.twidere.twiderex.viewmodel.twitter.search.TwitterSearchTweetsViewModel
 import com.twidere.twiderex.viewmodel.twitter.search.TwitterSearchUserViewModel
 import com.twidere.twiderex.viewmodel.twitter.timeline.HomeTimelineViewModel
@@ -114,7 +114,7 @@ class TwidereXActivity : ComponentActivity() {
     lateinit var mentionsTimelineViewModelFactory: MentionsTimelineViewModel.AssistedFactory
 
     @Inject
-    lateinit var twitterSearchMediasViewModelFactory: TwitterSearchMediasViewModel.AssistedFactory
+    lateinit var twitterSearchMediaViewModelFactory: TwitterSearchMediaViewModel.AssistedFactory
 
     @Inject
     lateinit var twitterSearchTweetsViewModelFactory: TwitterSearchTweetsViewModel.AssistedFactory
@@ -177,7 +177,7 @@ class TwidereXActivity : ComponentActivity() {
                     homeTimelineViewModelFactory,
                     twitterStatusViewModelFactory,
                     mentionsTimelineViewModelFactory,
-                    twitterSearchMediasViewModelFactory,
+                    twitterSearchMediaViewModelFactory,
                     twitterSearchTweetsViewModelFactory,
                     twitterSearchUserViewModelFactory,
                     userFavouriteTimelineViewModelFactory,
