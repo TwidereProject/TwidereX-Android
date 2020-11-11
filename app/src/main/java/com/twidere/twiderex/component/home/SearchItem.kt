@@ -28,8 +28,6 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -37,8 +35,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.graphics.vector.VectorAsset
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.navigation.compose.navigate
+import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.TextInput
 import com.twidere.twiderex.ui.AmbientNavController
@@ -47,8 +47,9 @@ import java.net.URLEncoder
 class SearchItem : HomeNavigationItem() {
     override val name: String
         get() = "Search"
+    @Composable
     override val icon: VectorAsset
-        get() = Icons.Default.Search
+        get() = vectorResource(id = R.drawable.ic_search)
     override val withAppBar: Boolean
         get() = false
 
@@ -78,18 +79,32 @@ class SearchItem : HomeNavigationItem() {
                                     alignment = Alignment.CenterStart,
                                     onImeActionPerformed = { _, _ ->
                                         if (text.isNotEmpty()) {
-                                            navController.navigate("search/${URLEncoder.encode(text, "UTF-8")}")
+                                            navController.navigate(
+                                                "search/${
+                                                    URLEncoder.encode(
+                                                        text,
+                                                        "UTF-8"
+                                                    )
+                                                }"
+                                            )
                                         }
                                     }
                                 )
                                 IconButton(
                                     onClick = {
                                         if (text.isNotEmpty()) {
-                                            navController.navigate("search/${URLEncoder.encode(text, "UTF-8")}")
+                                            navController.navigate(
+                                                "search/${
+                                                    URLEncoder.encode(
+                                                        text,
+                                                        "UTF-8"
+                                                    )
+                                                }"
+                                            )
                                         }
                                     }
                                 ) {
-                                    Icon(asset = Icons.Default.Search)
+                                    Icon(asset = vectorResource(id = R.drawable.ic_search))
                                 }
                             }
                         }

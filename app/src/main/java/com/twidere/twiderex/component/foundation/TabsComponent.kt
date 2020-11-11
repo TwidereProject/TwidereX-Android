@@ -21,6 +21,7 @@
 package com.twidere.twiderex.component.foundation
 
 import androidx.compose.foundation.AmbientContentColor
+import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.AmbientEmphasisLevels
@@ -37,10 +38,49 @@ import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.extensions.withElevation
 
 @Composable
-fun TabsComponent(
+fun IconTabsComponent(
     items: List<VectorAsset>,
     selectedItem: Int,
     onItemSelected: (Int) -> Unit,
+) {
+    TabsComponent(
+        count = items.count(),
+        selectedItem = selectedItem,
+        onItemSelected = onItemSelected
+    ) {
+        Box(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Icon(asset = items[it])
+        }
+    }
+}
+
+@Composable
+fun TextTabsComponent(
+    items: List<String>,
+    selectedItem: Int,
+    onItemSelected: (Int) -> Unit,
+) {
+    TabsComponent(
+        count = items.count(),
+        selectedItem = selectedItem,
+        onItemSelected = onItemSelected
+    ) {
+        Box(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Text(text = items[it])
+        }
+    }
+}
+
+@Composable
+fun TabsComponent(
+    count: Int,
+    selectedItem: Int,
+    onItemSelected: (Int) -> Unit,
+    tabContent: @Composable (Int) -> Unit,
 ) {
     TabRow(
         selectedTabIndex = selectedItem,
@@ -52,7 +92,7 @@ fun TabsComponent(
             )
         }
     ) {
-        for (i in 0 until items.count()) {
+        for (i in 0 until count) {
             Tab(
                 selected = selectedItem == i,
                 onClick = {
@@ -63,11 +103,7 @@ fun TabsComponent(
                     AmbientContentColor.current
                 ),
             ) {
-                Box(
-                    modifier = Modifier.padding(16.dp)
-                ) {
-                    Icon(asset = items[i])
-                }
+                tabContent.invoke(i)
             }
         }
     }

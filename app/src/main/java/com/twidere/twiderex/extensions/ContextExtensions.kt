@@ -21,7 +21,9 @@
 package com.twidere.twiderex.extensions
 
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
+import androidx.compose.ui.platform.ContextAmbient
 import androidx.core.content.ContextCompat
 
 fun Context.checkAllSelfPermissionsGranted(vararg permissions: String): Boolean {
@@ -30,4 +32,14 @@ fun Context.checkAllSelfPermissionsGranted(vararg permissions: String): Boolean 
 
 fun Context.checkAnySelfPermissionsGranted(vararg permissions: String): Boolean {
     return permissions.any { ContextCompat.checkSelfPermission(this, it) == PackageManager.PERMISSION_GRANTED }
+}
+
+fun Context.shareText(content: String) {
+    startActivity(Intent().apply {
+        action = Intent.ACTION_SEND
+        putExtra(Intent.EXTRA_TEXT, content)
+        type = "text/plain"
+    }.let {
+        Intent.createChooser(it, null)
+    })
 }

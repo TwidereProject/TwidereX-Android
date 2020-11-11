@@ -33,27 +33,24 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.AmbientEmphasisLevels
-import androidx.compose.material.ButtonConstants
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ProvideEmphasis
-import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.Place
-import androidx.compose.material.icons.filled.Share
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.navigate
+import com.twidere.twiderex.R
 import com.twidere.twiderex.extensions.humanizedTimestamp
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.settings.AmbientMediaPreview
 import com.twidere.twiderex.ui.AmbientInStoryboard
 import com.twidere.twiderex.ui.AmbientNavController
-import com.twidere.twiderex.ui.mediumEmphasisContentContentColor
 import com.twidere.twiderex.ui.profileImageSize
 import com.twidere.twiderex.ui.standardPadding
 
@@ -91,21 +88,14 @@ fun TimelineStatusComponent(
                 showActions = showActions,
             )
             if (showActions) {
-                Spacer(modifier = Modifier.height(standardPadding))
-                Row {
-                    Spacer(modifier = Modifier.width(profileImageSize))
-                    ReplyButton(status = status)
-                    RetweetButton(status = status)
-                    LikeButton(status = status)
-                    TextButton(
-                        onClick = {},
-                        colors = ButtonConstants.defaultTextButtonColors(
-                            contentColor = mediumEmphasisContentContentColor
-                        )
-                    ) {
-                        Icon(
-                            asset = Icons.Default.Share,
-                        )
+                ProvideEmphasis(emphasis = AmbientEmphasisLevels.current.medium) {
+                    Spacer(modifier = Modifier.height(standardPadding))
+                    Row {
+                        Spacer(modifier = Modifier.width(profileImageSize))
+                        ReplyButton(status = status)
+                        RetweetButton(status = status)
+                        LikeButton(status = status)
+                        ShareButton(status = status, compat = true)
                     }
                 }
             }
@@ -174,7 +164,7 @@ private fun StatusComponent(
                 Spacer(modifier = Modifier.height(standardPadding))
                 ProvideEmphasis(emphasis = AmbientEmphasisLevels.current.medium) {
                     Row {
-                        Icon(asset = Icons.Default.Place)
+                        Icon(asset = vectorResource(id = R.drawable.ic_map_pin))
                         Text(text = status.placeString)
                     }
                 }

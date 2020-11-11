@@ -51,16 +51,6 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ProvideEmphasis
 import androidx.compose.material.Scaffold
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AlternateEmail
-import androidx.compose.material.icons.filled.Camera
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Gif
-import androidx.compose.material.icons.filled.MyLocation
-import androidx.compose.material.icons.filled.Pages
-import androidx.compose.material.icons.filled.Place
-import androidx.compose.material.icons.filled.Send
-import androidx.compose.material.icons.filled.Topic
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -74,8 +64,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.node.Ref
 import androidx.compose.ui.platform.ContextAmbient
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.SoftwareKeyboardController
 import androidx.compose.ui.unit.dp
+import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.NetworkImage
@@ -131,7 +123,7 @@ fun ComposeScene(statusId: String? = null, composeType: ComposeType = ComposeTyp
                         )
                     },
                     navigationIcon = {
-                        AppBarNavigationButton(icon = Icons.Default.Close)
+                        AppBarNavigationButton(icon = vectorResource(id = R.drawable.ic_x))
                     },
                     actions = {
                         IconButton(
@@ -141,7 +133,7 @@ fun ComposeScene(statusId: String? = null, composeType: ComposeType = ComposeTyp
                                 navController.popBackStack()
                             }
                         ) {
-                            Icon(asset = Icons.Default.Send)
+                            Icon(asset = vectorResource(id = R.drawable.ic_send))
                         }
                     }
                 )
@@ -248,7 +240,7 @@ fun ComposeScene(statusId: String? = null, composeType: ComposeType = ComposeTyp
                         location?.let {
                             ProvideEmphasis(emphasis = AmbientEmphasisLevels.current.medium) {
                                 Row {
-                                    Icon(asset = Icons.Default.Place)
+                                    Icon(asset = vectorResource(id = R.drawable.ic_map_pin))
                                     Text(text = "${it.latitude}, ${it.longitude}")
                                 }
                             }
@@ -324,16 +316,16 @@ private fun ComposeActions(viewModel: ComposeViewModel) {
                     }
                 }
             ) {
-                Icon(asset = Icons.Default.Camera)
+                Icon(asset = vectorResource(id = R.drawable.ic_camera))
             }
             IconButton(onClick = {}) {
-                Icon(asset = Icons.Default.Gif)
+                Icon(asset = vectorResource(id = R.drawable.ic_gif))
             }
             IconButton(onClick = {}) {
-                Icon(asset = Icons.Default.AlternateEmail)
+                Icon(asset = vectorResource(id = R.drawable.ic_at_sign))
             }
             IconButton(onClick = {}) {
-                Icon(asset = Icons.Default.Topic)
+                Icon(asset = vectorResource(id = R.drawable.ic_hash))
             }
             IconButton(
                 onClick = {
@@ -359,11 +351,11 @@ private fun ComposeActions(viewModel: ComposeViewModel) {
                     }
                 },
             ) {
-                Icon(asset = Icons.Default.MyLocation)
+                Icon(asset = vectorResource(id = R.drawable.ic_map_pin))
             }
             Spacer(modifier = Modifier.weight(1f))
             IconButton(onClick = {}) {
-                Icon(asset = Icons.Default.Pages)
+                Icon(asset = vectorResource(id = R.drawable.ic_note))
             }
         }
     }

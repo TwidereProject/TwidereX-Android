@@ -21,6 +21,7 @@
 package com.twidere.twiderex.scenes.settings
 
 import androidx.compose.foundation.Text
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.ExperimentalLazyDsl
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Icon
@@ -31,6 +32,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.lazy.itemDivider
@@ -85,7 +88,10 @@ fun DisplayScene() {
                     item {
                         ListItem(
                             icon = {
-                                Icon(asset = Icons.Default.TextFields)
+                                Icon(
+                                    modifier = Modifier.size(12.dp),
+                                    asset = Icons.Default.TextFields,
+                                )
                             },
                             text = {
                                 Slider(

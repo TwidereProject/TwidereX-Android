@@ -20,10 +20,10 @@
  */
 package com.twidere.twiderex.component.home
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.VectorAsset
+import androidx.compose.ui.res.vectorResource
+import com.twidere.twiderex.R
 import com.twidere.twiderex.annotations.IncomingComposeUpdate
 import com.twidere.twiderex.component.UserComponent
 import com.twidere.twiderex.model.ui.UiUser.Companion.toUi
@@ -32,8 +32,9 @@ import com.twidere.twiderex.ui.AmbientActiveAccount
 class MeItem : HomeNavigationItem() {
     override val name: String
         get() = "Me"
+    @Composable
     override val icon: VectorAsset
-        get() = Icons.Default.AccountCircle
+        get() = vectorResource(id = R.drawable.ic_user)
     override val withAppBar: Boolean
         get() = false
 

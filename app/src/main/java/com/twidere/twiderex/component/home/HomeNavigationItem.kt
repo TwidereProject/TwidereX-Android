@@ -25,6 +25,7 @@ import androidx.compose.ui.graphics.vector.VectorAsset
 
 abstract class HomeNavigationItem {
     abstract val name: String
+    @Composable
     abstract val icon: VectorAsset
     open val withAppBar = true
 

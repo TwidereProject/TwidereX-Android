@@ -27,29 +27,29 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope.Companion.weight
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.AmbientEmphasisLevels
 import androidx.compose.material.ButtonConstants
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.ProvideEmphasis
 import androidx.compose.material.TextButton
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Comment
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Reply
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.VectorAsset
+import androidx.compose.ui.platform.ContextAmbient
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.navigate
+import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.ActionIconButton
+import com.twidere.twiderex.extensions.humanizedCount
+import com.twidere.twiderex.extensions.shareText
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.providers.AmbientStatusActions
 import com.twidere.twiderex.scenes.ComposeType
 import com.twidere.twiderex.ui.AmbientActiveAccount
 import com.twidere.twiderex.ui.AmbientInStoryboard
 import com.twidere.twiderex.ui.AmbientNavController
+import com.twidere.twiderex.ui.mediumEmphasisContentContentColor
 
 @Composable
 fun ReplyButton(
@@ -58,7 +58,7 @@ fun ReplyButton(
 ) {
     val inStoryBoard = AmbientInStoryboard.current
     val navController = AmbientNavController.current
-    val icon = Icons.Default.Reply
+    val icon = vectorResource(id = R.drawable.ic_corner_up_left)
     val action = {
         if (!inStoryBoard) {
             navController.navigate("compose/${ComposeType.Reply.name}?statusId=${status.statusId}")
@@ -96,7 +96,7 @@ fun LikeButton(
     } else {
         AmbientContentColor.current
     }
-    val icon = Icons.Default.Favorite
+    val icon = vectorResource(id = R.drawable.ic_heart)
     val action = {
         if (!inStoryBoard && account != null) {
             actionsViewModel.like(status, account)
@@ -118,7 +118,7 @@ fun LikeButton(
             },
         ) {
             Icon(
-                asset = Icons.Default.Favorite,
+                asset = icon,
                 tint = color,
             )
         }
@@ -138,7 +138,7 @@ fun RetweetButton(
     } else {
         AmbientContentColor.current
     }
-    val icon = Icons.Default.Comment
+    val icon = vectorResource(id = R.drawable.ic_repeat)
     val action = {
         if (!inStoryBoard && account != null) {
             actionsViewModel.retweet(status, account)
@@ -168,6 +168,40 @@ fun RetweetButton(
 }
 
 @Composable
+fun ShareButton(
+    status: UiStatus,
+    compat: Boolean = false,
+) {
+    val context = ContextAmbient.current
+    val action = {
+        context.shareText(status.text)
+    }
+    val icon = vectorResource(id = R.drawable.ic_share)
+    if (compat) {
+        TextButton(
+            onClick = {
+                action.invoke()
+            },
+            colors = ButtonConstants.defaultTextButtonColors(
+                contentColor = mediumEmphasisContentContentColor
+            )
+        ) {
+            Icon(
+                asset = icon,
+            )
+        }
+    } else {
+        ActionIconButton(
+            onClick = {
+                action.invoke()
+            },
+        ) {
+            Icon(asset = icon)
+        }
+    }
+}
+
+@Composable
 private fun StatusActionButtonWithNumbers(
     modifier: Modifier = Modifier.weight(1f),
     icon: VectorAsset,
@@ -182,19 +216,18 @@ private fun StatusActionButtonWithNumbers(
         TextButton(
             onClick = onClick,
             colors = ButtonConstants.defaultTextButtonColors(
-                contentColor = AmbientContentColor.current
+                contentColor = color
             )
         ) {
-            ProvideEmphasis(emphasis = AmbientEmphasisLevels.current.medium) {
-                Icon(
-                    asset = icon,
-                    tint = color
-                )
-                if (count > 0) {
-                    Box(modifier = Modifier.width(4.dp))
-                    Text(text = count.toString())
-                }
+            Icon(
+                asset = icon,
+                tint = color
+            )
+            if (count > 0) {
+                Box(modifier = Modifier.width(4.dp))
+                Text(text = count.humanizedCount())
             }
+
         }
     }
 }

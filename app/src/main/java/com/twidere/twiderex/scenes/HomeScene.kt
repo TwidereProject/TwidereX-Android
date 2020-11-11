@@ -46,17 +46,18 @@ import androidx.compose.material.Surface
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.savedinstancestate.savedInstanceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.navigate
+import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.AppBar
-import com.twidere.twiderex.component.foundation.TabsComponent
+import com.twidere.twiderex.component.foundation.IconTabsComponent
 import com.twidere.twiderex.component.foundation.TopAppBarElevation
 import com.twidere.twiderex.component.home.HomeNavigationItem
 import com.twidere.twiderex.component.home.HomeTimelineItem
@@ -123,7 +124,7 @@ fun HomeScene() {
                             0.dp
                         }
                     ) {
-                        TabsComponent(
+                        IconTabsComponent(
                             items = menus.map { it.icon },
                             selectedItem = selectedItem,
                             onItemSelected = {
@@ -236,7 +237,7 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
                 item {
                     ListItem(
                         icon = {
-                            Icon(asset = Icons.Default.Settings)
+                            Icon(asset = vectorResource(id = R.drawable.ic_adjustments_horizontal))
                         },
                         text = {
                             Text(text = "Settings")
@@ -256,7 +257,7 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
                 }
             ),
             icon = {
-                Icon(asset = Icons.Default.Settings)
+                Icon(asset = vectorResource(id = R.drawable.ic_adjustments_horizontal))
             },
             text = {
                 Text(text = "Settings")

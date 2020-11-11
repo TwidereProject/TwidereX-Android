@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumnForIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Divider
+import androidx.compose.material.Icon
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -33,6 +34,8 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.onDispose
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.vectorResource
+import com.twidere.twiderex.R
 import com.twidere.twiderex.annotations.IncomingComposeUpdate
 import com.twidere.twiderex.component.foundation.LoadingProgress
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
@@ -95,6 +98,7 @@ fun TimelineComponent(viewModel: TimelineViewModel) {
                                         }
                                     },
                                 ) {
+                                    Icon(asset = vectorResource(id = R.drawable.ic_refresh))
                                     Text("Load more")
                                 }
                                 Divider()

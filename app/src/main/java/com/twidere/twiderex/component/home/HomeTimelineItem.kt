@@ -25,10 +25,11 @@ import androidx.compose.material.Icon
 import androidx.compose.material.Scaffold
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.VectorAsset
+import androidx.compose.ui.res.vectorResource
 import androidx.navigation.compose.navigate
+import com.twidere.twiderex.R
 import com.twidere.twiderex.component.TimelineComponent
 import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.ui.AmbientActiveAccount
@@ -38,8 +39,10 @@ import com.twidere.twiderex.viewmodel.twitter.timeline.HomeTimelineViewModel
 class HomeTimelineItem : HomeNavigationItem() {
     override val name: String
         get() = "Home"
+
+    @Composable
     override val icon: VectorAsset
-        get() = Icons.Default.Home
+        get() = vectorResource(id = R.drawable.ic_home)
 
     @Composable
     override fun onCompose() {

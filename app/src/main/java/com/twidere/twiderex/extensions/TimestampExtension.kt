@@ -21,6 +21,7 @@
 package com.twidere.twiderex.extensions
 
 import android.text.format.DateUtils
+import java.util.Locale
 
 fun Long.humanizedTimestamp(): String {
     return DateUtils.getRelativeTimeSpanString(
@@ -28,4 +29,27 @@ fun Long.humanizedTimestamp(): String {
         DateUtils.MINUTE_IN_MILLIS,
         DateUtils.FORMAT_ABBREV_ALL
     ).toString()
+}
+
+
+val countUnits = arrayOf(null, "K", "M", "B")
+
+fun Long.humanizedCount(): String {
+    if (this < 1000) {
+        return this.toString()
+    }
+    var value = this.toDouble()
+    var index = 0
+    while (index < countUnits.size) {
+        if (value < 1000) {
+            break
+        }
+        value /= 1000.0
+        index++
+    }
+    return if (value < 10 && value % 1.0 >= 0.049 && value % 1.0 < 0.5) {
+        String.format(Locale.getDefault(), "%.1f %s", value, countUnits[index])
+    } else {
+        String.format(Locale.getDefault(), "%.0f %s", value, countUnits[index])
+    }
 }

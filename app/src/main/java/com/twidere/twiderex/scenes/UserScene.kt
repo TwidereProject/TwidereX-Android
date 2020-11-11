@@ -24,11 +24,10 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Mail
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
+import com.twidere.twiderex.R
 import com.twidere.twiderex.annotations.IncomingComposeUpdate
 import com.twidere.twiderex.component.UserComponent
 import com.twidere.twiderex.component.foundation.AppBar
@@ -49,10 +48,10 @@ fun UserScene(name: String) {
                     },
                     actions = {
                         IconButton(onClick = {}) {
-                            Icon(asset = Icons.Default.Mail)
+                            Icon(asset = vectorResource(id = R.drawable.ic_mail))
                         }
                         IconButton(onClick = {}) {
-                            Icon(asset = Icons.Default.MoreVert)
+                            Icon(asset = vectorResource(id = R.drawable.ic_dots_vertical))
                         }
                     },
                     elevation = 0.dp,

@@ -29,13 +29,12 @@ import androidx.compose.material.Icon
 import androidx.compose.material.ListItem
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.VectorAsset
+import androidx.compose.ui.res.vectorResource
 import androidx.navigation.compose.navigate
+import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.ui.AmbientNavController
@@ -47,43 +46,42 @@ data class SettingItem(
     val route: String,
 )
 
-private val settings by lazy {
-    mapOf(
-        "GENERAL" to listOf(
-            SettingItem(
-                "Appearance",
-                Icons.Default.Home,
-                route = "settings/appearance",
-            ),
-            SettingItem(
-                "Display",
-                Icons.Default.Home,
-                route = "settings/display",
-            ),
-            SettingItem(
-                "Layout",
-                Icons.Default.Home,
-                route = "",
-            ),
-            SettingItem(
-                "Web Browser",
-                Icons.Default.Home,
-                route = "",
-            ),
-        ),
-        "ABOUT" to listOf(
-            SettingItem(
-                "About",
-                Icons.Default.Info,
-                route = "",
-            ),
-        )
-    )
-}
-
 @OptIn(ExperimentalLazyDsl::class)
 @Composable
 fun SettingsScene() {
+    val settings =
+        mapOf(
+            "GENERAL" to listOf(
+                SettingItem(
+                    "Appearance",
+                    vectorResource(id = R.drawable.ic_shirt),
+                    route = "settings/appearance",
+                ),
+                SettingItem(
+                    "Display",
+                    vectorResource(id = R.drawable.ic_template),
+                    route = "settings/display",
+                ),
+                SettingItem(
+                    "Layout",
+                    vectorResource(id = R.drawable.ic_layout_sidebar),
+                    route = "",
+                ),
+                SettingItem(
+                    "Web Browser",
+                    vectorResource(id = R.drawable.ic_browser),
+                    route = "",
+                ),
+            ),
+            "ABOUT" to listOf(
+                SettingItem(
+                    "About",
+                    vectorResource(id = R.drawable.ic_info_circle),
+                    route = "",
+                ),
+            )
+        )
+
     TwidereXTheme {
         Scaffold(
             topBar = {

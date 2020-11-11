@@ -24,13 +24,16 @@ import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.Icon
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Reply
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.unit.dp
+import com.twidere.twiderex.R
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.ui.mediumEmphasisContentContentColor
 import com.twidere.twiderex.ui.profileImageSize
@@ -40,18 +43,24 @@ import com.twidere.twiderex.ui.standardPadding
 fun RetweetHeader(
     data: UiStatus,
 ) {
-    Row {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
         Box(
             modifier = Modifier
                 .width(profileImageSize),
-            alignment = Alignment.CenterEnd
+            alignment = Alignment.CenterEnd,
         ) {
-            Icon(asset = Icons.Default.Reply, tint = mediumEmphasisContentContentColor)
+            Icon(
+                modifier = Modifier.size(12.dp),
+                asset = vectorResource(id = R.drawable.ic_repeat),
+                tint = mediumEmphasisContentContentColor,
+            )
         }
         Spacer(modifier = Modifier.width(standardPadding))
         Text(
-            text = data.user.name + "retweet this tweet",
-            color = mediumEmphasisContentContentColor
+            style = MaterialTheme.typography.caption,
+            text = data.user.name + " retweet this tweet",
         )
     }
 }

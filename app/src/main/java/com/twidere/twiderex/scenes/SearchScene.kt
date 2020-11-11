@@ -39,12 +39,6 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ProvideEmphasis
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountBox
-import androidx.compose.material.icons.filled.Image
-import androidx.compose.material.icons.filled.List
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.Save
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedTask
 import androidx.compose.runtime.getValue
@@ -58,17 +52,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.ExperimentalFocus
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.navigate
+import com.twidere.twiderex.R
 import com.twidere.twiderex.annotations.IncomingComposeUpdate
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.LoadingProgress
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
-import com.twidere.twiderex.component.foundation.TabsComponent
 import com.twidere.twiderex.component.foundation.TextInput
+import com.twidere.twiderex.component.foundation.TextTabsComponent
 import com.twidere.twiderex.component.foundation.TopAppBarElevation
 import com.twidere.twiderex.component.lazy.LazyGridForIndexed
 import com.twidere.twiderex.component.status.StatusDivider
@@ -140,17 +136,17 @@ fun SearchScene(keyword: String) {
                                             alignment = Alignment.CenterStart,
                                         )
                                         IconButton(onClick = {}) {
-                                            Icon(asset = Icons.Default.Save)
+                                            Icon(asset = vectorResource(id = R.drawable.ic_device_floppy))
                                         }
                                     }
                                 }
                             }
                         )
-                        TabsComponent(
+                        TextTabsComponent(
                             items = listOf(
-                                Icons.Default.List,
-                                Icons.Default.Image,
-                                Icons.Default.AccountBox,
+                                "TWEETS",
+                                "MEDIA",
+                                "USERS",
                             ),
                             selectedItem = selectedTab,
                             onItemSelected = {
@@ -310,7 +306,7 @@ private fun SearchUsersContent(viewModel: TwitterSearchUserViewModel) {
                 },
                 trailing = {
                     IconButton(onClick = {}) {
-                        Icon(asset = Icons.Default.MoreVert)
+                        Icon(asset = vectorResource(id = R.drawable.ic_dots_vertical))
                     }
                 }
             )
