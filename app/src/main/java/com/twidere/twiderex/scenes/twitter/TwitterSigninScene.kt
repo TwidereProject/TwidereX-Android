@@ -40,8 +40,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LifecycleOwnerAmbient
-import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.navigate
 import com.twidere.twiderex.R
@@ -81,7 +81,7 @@ fun TwitterSignInScene() {
                     Image(
                         modifier = Modifier.preferredWidth(200.dp),
                         contentScale = ContentScale.FillWidth,
-                        asset = imageResource(id = R.drawable.ic_login_logo),
+                        asset = vectorResource(id = R.drawable.ic_login_logo),
                     )
                     Text(
                         text = stringResource(id = R.string.app_name),
