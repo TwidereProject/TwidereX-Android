@@ -4,6 +4,7 @@ plugins {
     id 'kotlin-kapt'
     id 'kotlin-android-extensions'
     id 'dagger.hilt.android.plugin'
+    id "com.google.protobuf"
 }
 
 android {
@@ -48,6 +49,21 @@ android {
     }
 }
 
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:$versions.protobuf"
+    }
+    generateProtoTasks {
+        all().each { task ->
+            task.builtins {
+                java {
+                    option "lite"
+                }
+            }
+        }
+    }
+}
+
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$versions.kotlin"
     implementation "org.jetbrains.kotlin:kotlin-reflect:$versions.kotlin"
@@ -66,6 +82,7 @@ dependencies {
 
     implementation "androidx.navigation:navigation-compose:1.0.0-alpha02"
     implementation "androidx.activity:activity-ktx:1.2.0-beta01"
+    implementation "androidx.datastore:datastore:1.0.0-alpha03"
 
     // Use moshi for not since Kotlinx.Serialization not compatible with Jetpack Compose
     // https://github.com/Kotlin/kotlinx.serialization/issues/968
@@ -94,6 +111,8 @@ dependencies {
     implementation "dev.chrisbanes.accompanist:accompanist-coil:0.3.3.1"
 
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.5'
+
+    implementation "com.google.protobuf:protobuf-javalite:$versions.protobuf"
 
     testImplementation 'junit:junit:4.13.1'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'

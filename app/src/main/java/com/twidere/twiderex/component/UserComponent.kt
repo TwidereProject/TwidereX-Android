@@ -37,14 +37,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.ListItem
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
-import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -74,13 +72,13 @@ import com.twidere.twiderex.component.status.StatusDivider
 import com.twidere.twiderex.component.status.StatusMediaPreviewItem
 import com.twidere.twiderex.component.status.TimelineStatusComponent
 import com.twidere.twiderex.component.status.UserAvatar
+import com.twidere.twiderex.component.status.withAvatarClip
 import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.model.ui.UiUser
-import com.twidere.twiderex.settings.AmbientAvatarStyle
-import com.twidere.twiderex.settings.AvatarStyle
+import com.twidere.twiderex.preferences.AmbientDisplayPreferences
 import com.twidere.twiderex.ui.AmbientActiveAccount
 import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.ui.standardPadding
@@ -358,16 +356,10 @@ private fun UserInfo(user: UiUser, viewModel: UserViewModel) {
                     .fillMaxWidth(),
                 alignment = Alignment.Center
             ) {
-                val avatarStyle = AmbientAvatarStyle.current
                 Spacer(
                     modifier = Modifier
                         .size(80.dp)
-                        .let {
-                            when (avatarStyle) {
-                                AvatarStyle.Round -> it.clip(CircleShape)
-                                AvatarStyle.Square -> it.clip(MaterialTheme.shapes.medium)
-                            }
-                        }
+                        .withAvatarClip()
                         .clipToBounds()
                         .background(MaterialTheme.colors.surface.withElevation())
                 )
@@ -395,15 +387,11 @@ private fun UserInfo(user: UiUser, viewModel: UserViewModel) {
                     )
                 }
                 if (isMe) {
-                    TextButton(
-                        onClick = {},
-                    ) {
-                        Text(
-                            style = MaterialTheme.typography.h6,
-                            color = MaterialTheme.colors.primary,
-                            text = "Edit",
-                        )
-                    }
+                    Text(
+                        style = MaterialTheme.typography.h6,
+                        color = MaterialTheme.colors.primary,
+                        text = "Edit",
+                    )
                 } else {
                     relationship?.let {
                         Column(

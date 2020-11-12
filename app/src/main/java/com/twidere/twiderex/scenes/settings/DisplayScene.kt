@@ -20,13 +20,13 @@
  */
 package com.twidere.twiderex.scenes.settings
 
-import androidx.compose.material.Text
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Icon
 import androidx.compose.material.ListItem
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Slider
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.runtime.Composable
@@ -42,16 +42,16 @@ import com.twidere.twiderex.component.settings.switchItem
 import com.twidere.twiderex.component.status.TimelineStatusComponent
 import com.twidere.twiderex.extensions.navViewModel
 import com.twidere.twiderex.model.ui.UiStatus
-import com.twidere.twiderex.settings.AmbientFontScale
-import com.twidere.twiderex.settings.AmbientUseSystemFontSize
+import com.twidere.twiderex.preferences.AmbientDisplayPreferences
+import com.twidere.twiderex.preferences.proto.DisplayPreferences
 import com.twidere.twiderex.ui.AmbientInStoryboard
 import com.twidere.twiderex.ui.TwidereXTheme
 import com.twidere.twiderex.viewmodel.settings.DisplayViewModel
+
 @Composable
 fun DisplayScene() {
     val viewModel = navViewModel<DisplayViewModel>()
-    val useSystemFontSize = AmbientUseSystemFontSize.current
-    val fontScale = AmbientFontScale.current
+    val display = AmbientDisplayPreferences.current
     TwidereXTheme {
         Scaffold(
             topBar = {
@@ -80,8 +80,16 @@ fun DisplayScene() {
                 itemHeader {
                     Text(text = "TEXT")
                 }
-                switchItem(viewModel.useSystemFontSizeSettings)
-                if (!useSystemFontSize) {
+                switchItem(
+                    value = display.useSystemFontSize,
+                    onChanged = {
+                        viewModel.setUseSystemFontSize(it)
+                    },
+                    title = {
+                        Text(text = "Use system font size")
+                    },
+                )
+                if (!display.useSystemFontSize) {
                     item {
                         ListItem(
                             icon = {
@@ -92,8 +100,8 @@ fun DisplayScene() {
                             },
                             text = {
                                 Slider(
-                                    value = fontScale,
-                                    onValueChange = { viewModel.fontScaleSettings.apply(it) },
+                                    value = display.fontScale,
+                                    onValueChange = { viewModel.setFontScale(it) },
                                     valueRange = 0.1f..2f
                                 )
                             },
@@ -104,12 +112,35 @@ fun DisplayScene() {
                     }
                 }
                 itemDivider()
-                radioItem(viewModel.avatarStyleSettings)
+                radioItem(
+                    options = listOf(
+                        DisplayPreferences.AvatarStyle.Round,
+                        DisplayPreferences.AvatarStyle.Square,
+                    ),
+                    value = display.avatarStyle,
+                    onChanged = {
+                        viewModel.setAvatarStyle(it)
+                    },
+                    title = {
+                        Text(text = "Avatar Style")
+                    },
+                    itemContent = {
+                        Text(text = it.name)
+                    }
+                )
                 itemDivider()
                 itemHeader {
                     Text(text = "MEDIA")
                 }
-                switchItem(viewModel.mediaPreviewSettings)
+                switchItem(
+                    value = display.mediaPreview,
+                    onChanged = {
+                        viewModel.setMediaPreview(it)
+                    },
+                    title = {
+                        Text(text = "Media preview")
+                    }
+                )
             }
         }
     }

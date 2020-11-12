@@ -20,16 +20,37 @@
  */
 package com.twidere.twiderex.viewmodel.settings
 
+import androidx.datastore.core.DataStore
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.ViewModel
-import com.twidere.twiderex.settings.AvatarStyleSettings
-import com.twidere.twiderex.settings.FontScaleSettings
-import com.twidere.twiderex.settings.MediaPreviewSettings
-import com.twidere.twiderex.settings.UseSystemFontSizeSettings
+import androidx.lifecycle.viewModelScope
+import com.twidere.twiderex.preferences.proto.DisplayPreferences
+import kotlinx.coroutines.launch
 
 class DisplayViewModel @ViewModelInject constructor(
-    val avatarStyleSettings: AvatarStyleSettings,
-    val mediaPreviewSettings: MediaPreviewSettings,
-    val useSystemFontSizeSettings: UseSystemFontSizeSettings,
-    val fontScaleSettings: FontScaleSettings,
-) : ViewModel()
+    private val displayPreferences: DataStore<DisplayPreferences>
+) : ViewModel() {
+    fun setUseSystemFontSize(value: Boolean) = viewModelScope.launch {
+        displayPreferences.updateData {
+            it.toBuilder().setUseSystemFontSize(value).build()
+        }
+    }
+
+    fun setFontScale(value: Float) = viewModelScope.launch {
+        displayPreferences.updateData {
+            it.toBuilder().setFontScale(value).build()
+        }
+    }
+
+    fun setAvatarStyle(value: DisplayPreferences.AvatarStyle) = viewModelScope.launch {
+        displayPreferences.updateData {
+            it.toBuilder().setAvatarStyle(value).build()
+        }
+    }
+
+    fun setMediaPreview(value: Boolean) = viewModelScope.launch {
+        displayPreferences.updateData {
+            it.toBuilder().setMediaPreview(value).build()
+        }
+    }
+}

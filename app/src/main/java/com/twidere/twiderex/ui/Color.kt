@@ -24,9 +24,31 @@ import androidx.compose.material.AmbientContentColor
 import androidx.compose.material.ContentAlpha
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-
-val blue = Color.Blue
+import com.twidere.twiderex.extensions.isDarkTheme
+import com.twidere.twiderex.preferences.AmbientAppearancePreferences
 
 @Composable
 val mediumEmphasisContentContentColor: Color
     get() = AmbientContentColor.current.copy(alpha = ContentAlpha.medium)
+
+val primaryColors = listOf(
+    Color(0XFF4C9EEB) to Color(0XFF5CB0FF),
+    Color(0XFF1C68F3) to Color(0XFF4B85F0),
+    Color(0XFF8D47EE) to Color(0XFF9254DE),
+    Color(0XFFBC5077) to Color(0XFFF4769B),
+    Color(0XFFFA541C) to Color(0XFFFF7A45),
+    Color(0XFFFAAD14) to Color(0XFFFFC53D),
+    Color(0XFF9ACB1E) to Color(0XFFBBE739),
+    Color(0XFF38D29B) to Color(0XFF44ECAE),
+)
+
+@Composable
+fun currentPrimaryColor(): Color {
+    val appearance = AmbientAppearancePreferences.current
+    val colorIndex = appearance.primaryColorIndex
+    return if (isDarkTheme()) {
+        primaryColors[colorIndex].second
+    } else {
+        primaryColors[colorIndex].first
+    }
+}

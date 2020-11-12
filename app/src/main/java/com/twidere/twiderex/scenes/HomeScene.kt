@@ -64,13 +64,13 @@ import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.model.ui.UiUser.Companion.toUi
+import com.twidere.twiderex.preferences.AmbientAppearancePreferences
+import com.twidere.twiderex.preferences.proto.AppearancePreferences
 import com.twidere.twiderex.scenes.home.HomeNavigationItem
 import com.twidere.twiderex.scenes.home.HomeTimelineItem
 import com.twidere.twiderex.scenes.home.MeItem
 import com.twidere.twiderex.scenes.home.MentionItem
 import com.twidere.twiderex.scenes.home.SearchItem
-import com.twidere.twiderex.settings.AmbientTabPosition
-import com.twidere.twiderex.settings.TabPosition
 import com.twidere.twiderex.ui.AmbientActiveAccount
 import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.ui.TwidereXTheme
@@ -80,7 +80,7 @@ import com.twidere.twiderex.ui.mediumEmphasisContentContentColor
 fun HomeScene() {
     val navController = rememberNavController()
     var selectedItem by savedInstanceState { 0 }
-    val tabPosition = AmbientTabPosition.current
+    val tabPosition = AmbientAppearancePreferences.current.tapPosition
     val menus = listOf(
         HomeTimelineItem(),
         MentionItem(),
@@ -92,7 +92,7 @@ fun HomeScene() {
         Scaffold(
             scaffoldState = scaffoldState,
             topBar = {
-                if (tabPosition == TabPosition.Bottom) {
+                if (tabPosition == AppearancePreferences.TabPosition.Bottom) {
                     if (menus[selectedItem].withAppBar) {
                         AppBar(
                             backgroundColor = MaterialTheme.colors.surface.withElevation(),
@@ -144,7 +144,7 @@ fun HomeScene() {
                 }
             },
             bottomBar = {
-                if (tabPosition == TabPosition.Bottom) {
+                if (tabPosition == AppearancePreferences.TabPosition.Bottom) {
                     HomeBottomNavigation(menus, selectedItem) {
                         selectedItem = it
 

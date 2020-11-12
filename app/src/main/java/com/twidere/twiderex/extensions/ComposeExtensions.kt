@@ -30,8 +30,8 @@ import androidx.lifecycle.SavedStateViewModelFactory
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.twidere.twiderex.settings.AmbientTheme
-import com.twidere.twiderex.settings.Theme
+import com.twidere.twiderex.preferences.AmbientAppearancePreferences
+import com.twidere.twiderex.preferences.proto.AppearancePreferences
 import com.twidere.twiderex.ui.AmbientApplication
 import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.ui.AmbientViewModelFactoriesMap
@@ -82,9 +82,10 @@ fun ProvideNavigationViewModelFactoryMap(
 
 @Composable
 fun isDarkTheme(): Boolean {
-    return when (AmbientTheme.current) {
-        Theme.Auto -> isSystemInDarkTheme()
-        Theme.Light -> false
-        Theme.Dark -> true
+    return when (AmbientAppearancePreferences.current.theme) {
+        AppearancePreferences.Theme.Auto -> isSystemInDarkTheme()
+        AppearancePreferences.Theme.Light -> false
+        AppearancePreferences.Theme.Dark -> true
+        else -> false
     }
 }

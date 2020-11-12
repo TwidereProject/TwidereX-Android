@@ -32,28 +32,18 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.viewinterop.viewModel
+import androidx.datastore.core.DataStore
 import androidx.hilt.lifecycle.HiltViewModelFactory
 import com.twidere.twiderex.di.assisted.ProvideAssistedFactory
 import com.twidere.twiderex.extensions.ProvideNavigationViewModelFactoryMap
 import com.twidere.twiderex.launcher.ActivityLauncher
 import com.twidere.twiderex.launcher.AmbientLauncher
 import com.twidere.twiderex.navigation.Router
+import com.twidere.twiderex.preferences.ProvidePreferences
+import com.twidere.twiderex.preferences.proto.AppearancePreferences
+import com.twidere.twiderex.preferences.proto.DisplayPreferences
 import com.twidere.twiderex.providers.AmbientStatusActions
 import com.twidere.twiderex.providers.StatusActions
-import com.twidere.twiderex.settings.AmbientAvatarStyle
-import com.twidere.twiderex.settings.AmbientFontScale
-import com.twidere.twiderex.settings.AmbientMediaPreview
-import com.twidere.twiderex.settings.AmbientPrimaryColor
-import com.twidere.twiderex.settings.AmbientTabPosition
-import com.twidere.twiderex.settings.AmbientTheme
-import com.twidere.twiderex.settings.AmbientUseSystemFontSize
-import com.twidere.twiderex.settings.AvatarStyleSettings
-import com.twidere.twiderex.settings.FontScaleSettings
-import com.twidere.twiderex.settings.MediaPreviewSettings
-import com.twidere.twiderex.settings.PrimaryColorSetting
-import com.twidere.twiderex.settings.TabPositionSetting
-import com.twidere.twiderex.settings.ThemeSetting
-import com.twidere.twiderex.settings.UseSystemFontSizeSettings
 import com.twidere.twiderex.ui.AmbientActiveAccount
 import com.twidere.twiderex.ui.AmbientApplication
 import com.twidere.twiderex.ui.AmbientViewModelProviderFactory
@@ -79,27 +69,6 @@ import javax.inject.Inject
 class TwidereXActivity : ComponentActivity() {
 
     private lateinit var launcher: ActivityLauncher
-
-    @Inject
-    lateinit var tabPositionSetting: TabPositionSetting
-
-    @Inject
-    lateinit var themeSetting: ThemeSetting
-
-    @Inject
-    lateinit var primaryColorSettings: PrimaryColorSetting
-
-    @Inject
-    lateinit var avatarStyleSettings: AvatarStyleSettings
-
-    @Inject
-    lateinit var mediaPreviewSettings: MediaPreviewSettings
-
-    @Inject
-    lateinit var useSystemFontSizeSettings: UseSystemFontSizeSettings
-
-    @Inject
-    lateinit var fontScaleSettings: FontScaleSettings
 
     @Inject
     lateinit var statusActions: StatusActions
@@ -137,6 +106,12 @@ class TwidereXActivity : ComponentActivity() {
     @Inject
     lateinit var mediaViewModelFactory: MediaViewModel.AssistedFactory
 
+    @Inject
+    lateinit var appearancePreferences: DataStore<AppearancePreferences>
+
+    @Inject
+    lateinit var displayPreferences: DataStore<DisplayPreferences>
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         launcher = ActivityLauncher(activityResultRegistry)
@@ -150,49 +125,40 @@ class TwidereXActivity : ComponentActivity() {
         setContent {
             val accountViewModel = viewModel<ActiveAccountViewModel>()
             val account by accountViewModel.account.observeAsState()
-            val tabPosition by tabPositionSetting.data.observeAsState(initial = tabPositionSetting.initialValue)
-            val primaryColor by primaryColorSettings.data.observeAsState(initial = primaryColorSettings.initialValue)
-            val theme by themeSetting.data.observeAsState(initial = themeSetting.initialValue)
-            val avatarStyle by avatarStyleSettings.data.observeAsState(initial = avatarStyleSettings.initialValue)
-            val mediaPreview by mediaPreviewSettings.data.observeAsState(initial = mediaPreviewSettings.initialValue)
-            val useSystemFontSize by useSystemFontSizeSettings.data.observeAsState(initial = useSystemFontSizeSettings.initialValue)
-            val fontScale by fontScaleSettings.data.observeAsState(initial = fontScaleSettings.initialValue)
 
             Providers(
-                AmbientPrimaryColor provides primaryColor,
-                AmbientTabPosition provides tabPosition,
-                AmbientTheme provides theme,
                 AmbientLauncher provides launcher,
                 AmbientWindow provides window,
                 AmbientViewModelProviderFactory provides defaultViewModelProviderFactory,
                 AmbientActiveAccount provides account,
                 AmbientApplication provides application,
-                AmbientAvatarStyle provides avatarStyle,
-                AmbientMediaPreview provides mediaPreview,
-                AmbientUseSystemFontSize provides useSystemFontSize,
-                AmbientFontScale provides fontScale,
                 AmbientStatusActions provides statusActions,
             ) {
-                ProvideAssistedFactory(
-                    homeTimelineViewModelFactory,
-                    twitterStatusViewModelFactory,
-                    mentionsTimelineViewModelFactory,
-                    twitterSearchMediaViewModelFactory,
-                    twitterSearchTweetsViewModelFactory,
-                    twitterSearchUserViewModelFactory,
-                    userFavouriteTimelineViewModelFactory,
-                    userTimelineViewModelFactory,
-                    userViewModelFactory,
-                    composeViewModelFactory,
-                    mediaViewModelFactory,
+                ProvidePreferences(
+                    appearancePreferences = appearancePreferences,
+                    displayPreferences = displayPreferences
                 ) {
-                    ProvideNavigationViewModelFactoryMap(factory = defaultViewModelProviderFactory as HiltViewModelFactory) {
-                        ProvideWindowPadding {
-                            val windowPadding = AmbientWindowPadding.current
-                            Box(
-                                modifier = Modifier.padding(windowPadding)
-                            ) {
-                                Router()
+                    ProvideAssistedFactory(
+                        homeTimelineViewModelFactory,
+                        twitterStatusViewModelFactory,
+                        mentionsTimelineViewModelFactory,
+                        twitterSearchMediaViewModelFactory,
+                        twitterSearchTweetsViewModelFactory,
+                        twitterSearchUserViewModelFactory,
+                        userFavouriteTimelineViewModelFactory,
+                        userTimelineViewModelFactory,
+                        userViewModelFactory,
+                        composeViewModelFactory,
+                        mediaViewModelFactory,
+                    ) {
+                        ProvideNavigationViewModelFactoryMap(factory = defaultViewModelProviderFactory as HiltViewModelFactory) {
+                            ProvideWindowPadding {
+                                val windowPadding = AmbientWindowPadding.current
+                                Box(
+                                    modifier = Modifier.padding(windowPadding)
+                                ) {
+                                    Router()
+                                }
                             }
                         }
                     }

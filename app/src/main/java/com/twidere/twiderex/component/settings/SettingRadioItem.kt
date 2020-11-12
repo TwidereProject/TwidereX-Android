@@ -24,28 +24,29 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.material.ListItem
 import androidx.compose.material.RadioButton
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.twidere.twiderex.component.lazy.itemHeader
-import com.twidere.twiderex.settings.types.RadioSettingItem
 
 fun <T : Enum<T>> LazyListScope.radioItem(
-    item: RadioSettingItem<T>,
+    options: List<T>,
+    value: T,
+    onChanged: (T) -> Unit,
+    title: @Composable () -> Unit,
+    itemContent: @Composable (T)-> Unit,
 ) {
     itemHeader {
-        item.title.invoke()
+        title.invoke()
     }
 
-    items(item.options) {
-        val selectedItem by item.data.observeAsState(initial = item.initialValue)
+    items(options) {
         ListItem(
-            modifier = Modifier.clickable(onClick = { item.apply(it) }),
+            modifier = Modifier.clickable(onClick = { onChanged.invoke(it) }),
             text = {
-                item.itemContent.invoke(it)
+                itemContent.invoke(it)
             },
             trailing = {
-                RadioButton(selected = it == selectedItem, onClick = { item.apply(it) })
+                RadioButton(selected = it == value, onClick = { onChanged.invoke(it) })
             }
         )
     }

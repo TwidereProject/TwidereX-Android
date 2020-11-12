@@ -35,11 +35,9 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.twidere.twiderex.extensions.withElevation
-import com.twidere.twiderex.settings.AmbientFontScale
-import com.twidere.twiderex.settings.AmbientTheme
-import com.twidere.twiderex.settings.AmbientUseSystemFontSize
-import com.twidere.twiderex.settings.Theme
-import com.twidere.twiderex.settings.currentPrimaryColor
+import com.twidere.twiderex.preferences.AmbientAppearancePreferences
+import com.twidere.twiderex.preferences.AmbientDisplayPreferences
+import com.twidere.twiderex.preferences.proto.AppearancePreferences
 
 @Composable
 fun TwidereXTheme(
@@ -47,18 +45,21 @@ fun TwidereXTheme(
     pureStatusBarColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
-    val theme = AmbientTheme.current
+    val appearance = AmbientAppearancePreferences.current
+    val display = AmbientDisplayPreferences.current
+    val theme = appearance.theme
     val primaryColor = currentPrimaryColor()
-    val useSystemFontSize = AmbientUseSystemFontSize.current
-    val fontScale = AmbientFontScale.current
+    val useSystemFontSize = display.useSystemFontSize
+    val fontScale = display.fontScale
 
     val darkTheme = if (requireDarkTheme) {
         true
     } else {
         when (theme) {
-            Theme.Auto -> isSystemInDarkTheme()
-            Theme.Light -> false
-            Theme.Dark -> true
+            AppearancePreferences.Theme.Auto -> isSystemInDarkTheme()
+            AppearancePreferences.Theme.Light -> false
+            AppearancePreferences.Theme.Dark -> true
+            else -> false
         }
     }
     val colors = if (darkTheme) {

@@ -49,7 +49,7 @@ import androidx.navigation.compose.navigate
 import com.twidere.twiderex.R
 import com.twidere.twiderex.extensions.humanizedTimestamp
 import com.twidere.twiderex.model.ui.UiStatus
-import com.twidere.twiderex.settings.AmbientMediaPreview
+import com.twidere.twiderex.preferences.AmbientDisplayPreferences
 import com.twidere.twiderex.ui.AmbientInStoryboard
 import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.ui.profileImageSize
@@ -114,7 +114,7 @@ private fun StatusComponent(
     showActions: Boolean = true,
 ) {
     val inStoryBoard = AmbientInStoryboard.current
-    val isMediaPreviewEnabled = AmbientMediaPreview.current
+    val isMediaPreviewEnabled = AmbientDisplayPreferences.current.mediaPreview
     Row(modifier = modifier) {
         UserAvatar(user = status.user)
         Spacer(modifier = Modifier.width(standardPadding))

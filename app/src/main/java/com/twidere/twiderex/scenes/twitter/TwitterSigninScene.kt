@@ -21,7 +21,6 @@
 package com.twidere.twiderex.scenes.twitter
 
 import androidx.compose.foundation.Image
-import androidx.compose.material.Text
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -33,6 +32,7 @@ import androidx.compose.material.Button
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -83,7 +83,6 @@ fun TwitterSignInScene() {
                         contentScale = ContentScale.FillWidth,
                         asset = imageResource(id = R.drawable.ic_login_logo),
                     )
-                    Box(modifier = Modifier.height(32.dp))
                     Text(
                         text = stringResource(id = R.string.app_name),
                         style = MaterialTheme.typography.h4,

@@ -20,14 +20,31 @@
  */
 package com.twidere.twiderex.viewmodel.settings
 
+import androidx.datastore.core.DataStore
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.ViewModel
-import com.twidere.twiderex.settings.PrimaryColorSetting
-import com.twidere.twiderex.settings.TabPositionSetting
-import com.twidere.twiderex.settings.ThemeSetting
+import androidx.lifecycle.viewModelScope
+import com.twidere.twiderex.preferences.proto.AppearancePreferences
+import kotlinx.coroutines.launch
 
 class AppearanceViewModel @ViewModelInject constructor(
-    val tabPositionSetting: TabPositionSetting,
-    val themeSetting: ThemeSetting,
-    val primaryColorSettings: PrimaryColorSetting
-) : ViewModel()
+    private val appearancePreferences: DataStore<AppearancePreferences>
+) : ViewModel() {
+    fun setPrimaryColorIndex(index: Int) = viewModelScope.launch {
+        appearancePreferences.updateData {
+            it.toBuilder().setPrimaryColorIndex(index).build()
+        }
+    }
+
+    fun setTabPosition(position: AppearancePreferences.TabPosition) = viewModelScope.launch {
+        appearancePreferences.updateData {
+            it.toBuilder().setTapPosition(position).build()
+        }
+    }
+
+    fun setTheme(theme: AppearancePreferences.Theme) = viewModelScope.launch {
+        appearancePreferences.updateData {
+            it.toBuilder().setTheme(theme).build()
+        }
+    }
+}

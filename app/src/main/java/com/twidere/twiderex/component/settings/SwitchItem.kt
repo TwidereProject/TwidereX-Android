@@ -23,27 +23,26 @@ package com.twidere.twiderex.component.settings
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.material.ListItem
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.twidere.twiderex.component.foundation.ColoredSwitch
-import com.twidere.twiderex.settings.types.BooleanSettingItem
 
 fun LazyListScope.switchItem(
-    data: BooleanSettingItem,
+    value: Boolean,
+    onChanged: (Boolean) -> Unit,
+    title: @Composable () -> Unit,
 ) {
     item {
-        val checked by data.data.observeAsState(initial = data.initialValue)
         ListItem(
-            modifier = Modifier.clickable(onClick = { data.apply(!checked) }),
+            modifier = Modifier.clickable(onClick = { onChanged.invoke(!value) }),
             text = {
-                data.title.invoke()
+                title.invoke()
             },
             trailing = {
                 ColoredSwitch(
-                    checked = checked,
+                    checked = value,
                     onCheckedChange = {
-                        data.apply(it)
+                        onChanged.invoke(it)
                     },
                 )
             }

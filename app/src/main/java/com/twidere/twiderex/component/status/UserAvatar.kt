@@ -34,8 +34,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.navigation.compose.navigate
 import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.model.ui.UiUser
-import com.twidere.twiderex.settings.AmbientAvatarStyle
-import com.twidere.twiderex.settings.AvatarStyle
+import com.twidere.twiderex.preferences.AmbientDisplayPreferences
+import com.twidere.twiderex.preferences.proto.DisplayPreferences
 import com.twidere.twiderex.ui.AmbientInStoryboard
 import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.ui.profileImageSize
@@ -47,15 +47,9 @@ fun UserAvatar(
 ) {
     val navController = AmbientNavController.current
     val inStoryBoard = AmbientInStoryboard.current
-    val avatarStyle = AmbientAvatarStyle.current
     Box(
         modifier = Modifier
-            .let {
-                when (avatarStyle) {
-                    AvatarStyle.Round -> it.clip(CircleShape)
-                    AvatarStyle.Square -> it.clip(MaterialTheme.shapes.medium)
-                }
-            }
+            .withAvatarClip()
             .clipToBounds()
     ) {
         NetworkImage(
@@ -71,5 +65,14 @@ fun UserAvatar(
                 .width(size)
                 .height(size)
         )
+    }
+}
+
+@Composable
+fun Modifier.withAvatarClip(): Modifier {
+    return when (AmbientDisplayPreferences.current.avatarStyle) {
+        DisplayPreferences.AvatarStyle.Round -> this.clip(CircleShape)
+        DisplayPreferences.AvatarStyle.Square -> this.clip(MaterialTheme.shapes.medium)
+        else -> this.clip(CircleShape)
     }
 }

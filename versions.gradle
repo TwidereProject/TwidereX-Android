@@ -14,6 +14,7 @@ ext {
             paging               : '3.0.0-alpha07',
             ktlint               : '0.39.0',
             assisted_inject      : '0.6.0',
+            protobuf : '3.13.0'
     ]
     global = [
             compileSdkVersion: 30,
