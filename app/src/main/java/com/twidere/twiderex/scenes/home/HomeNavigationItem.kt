@@ -18,13 +18,14 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.component.home
+package com.twidere.twiderex.scenes.home
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.VectorAsset
 
 abstract class HomeNavigationItem {
     abstract val name: String
+    abstract val route: String
     @Composable
     abstract val icon: VectorAsset
     open val withAppBar = true

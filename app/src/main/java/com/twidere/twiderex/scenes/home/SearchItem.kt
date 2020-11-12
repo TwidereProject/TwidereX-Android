@@ -18,16 +18,16 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.component.home
+package com.twidere.twiderex.scenes.home
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.material.ProvideTextStyle
-import androidx.compose.material.Text
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,6 +47,9 @@ import java.net.URLEncoder
 class SearchItem : HomeNavigationItem() {
     override val name: String
         get() = "Search"
+    override val route: String
+        get() = "search"
+
     @Composable
     override val icon: VectorAsset
         get() = vectorResource(id = R.drawable.ic_search)

@@ -18,7 +18,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.component.home
+package com.twidere.twiderex.scenes.home
 
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
@@ -39,6 +39,8 @@ import com.twidere.twiderex.viewmodel.twitter.timeline.HomeTimelineViewModel
 class HomeTimelineItem : HomeNavigationItem() {
     override val name: String
         get() = "Home"
+    override val route: String
+        get() = "home"
 
     @Composable
     override val icon: VectorAsset

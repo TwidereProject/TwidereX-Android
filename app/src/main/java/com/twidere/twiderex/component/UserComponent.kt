@@ -312,7 +312,7 @@ private fun LazyListScope.mediaTimeline(
                     MaterialTheme.shapes.medium
                 ),
             onClick = {
-                navController.navigate("media")
+                navController.navigate("media/${item.second.statusId}?selectedIndex=${index}")
             }
         )
     }

@@ -20,13 +20,15 @@
  */
 package com.twidere.twiderex.component
 
-import androidx.compose.material.Text
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumnForIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
+import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -41,6 +43,7 @@ import com.twidere.twiderex.component.foundation.LoadingProgress
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
 import com.twidere.twiderex.component.status.StatusDivider
 import com.twidere.twiderex.component.status.TimelineStatusComponent
+import com.twidere.twiderex.ui.standardPadding
 import com.twidere.twiderex.viewmodel.twitter.timeline.TimelineViewModel
 import kotlinx.coroutines.launch
 
@@ -99,6 +102,7 @@ fun TimelineComponent(viewModel: TimelineViewModel) {
                                     },
                                 ) {
                                     Icon(asset = vectorResource(id = R.drawable.ic_refresh))
+                                    Box(modifier = Modifier.width(standardPadding))
                                     Text("Load more")
                                 }
                                 Divider()

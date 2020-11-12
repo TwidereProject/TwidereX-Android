@@ -18,7 +18,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.component.home
+package com.twidere.twiderex.scenes.home
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.VectorAsset
@@ -32,6 +32,9 @@ import com.twidere.twiderex.ui.AmbientActiveAccount
 class MeItem : HomeNavigationItem() {
     override val name: String
         get() = "Me"
+    override val route: String
+        get() = "me"
+
     @Composable
     override val icon: VectorAsset
         get() = vectorResource(id = R.drawable.ic_user)

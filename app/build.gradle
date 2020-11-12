@@ -91,7 +91,7 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-viewmodel-savedstate:$versions.lifecycle"
     implementation "androidx.lifecycle:lifecycle-common-java8:$versions.lifecycle"
 
-    implementation "dev.chrisbanes.accompanist:accompanist-coil:0.3.3.1 "
+    implementation "dev.chrisbanes.accompanist:accompanist-coil:0.3.3.1"
 
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.5'
 

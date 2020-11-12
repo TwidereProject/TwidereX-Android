@@ -20,7 +20,6 @@
  */
 package com.twidere.twiderex.scenes
 
-import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -45,26 +44,31 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.savedinstancestate.savedInstanceState
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigate
+import androidx.navigation.compose.rememberNavController
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.IconTabsComponent
 import com.twidere.twiderex.component.foundation.TopAppBarElevation
-import com.twidere.twiderex.component.home.HomeNavigationItem
-import com.twidere.twiderex.component.home.HomeTimelineItem
-import com.twidere.twiderex.component.home.MeItem
-import com.twidere.twiderex.component.home.MentionItem
-import com.twidere.twiderex.component.home.SearchItem
 import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.model.ui.UiUser.Companion.toUi
+import com.twidere.twiderex.scenes.home.HomeNavigationItem
+import com.twidere.twiderex.scenes.home.HomeTimelineItem
+import com.twidere.twiderex.scenes.home.MeItem
+import com.twidere.twiderex.scenes.home.MentionItem
+import com.twidere.twiderex.scenes.home.SearchItem
 import com.twidere.twiderex.settings.AmbientTabPosition
 import com.twidere.twiderex.settings.TabPosition
 import com.twidere.twiderex.ui.AmbientActiveAccount
@@ -74,7 +78,8 @@ import com.twidere.twiderex.ui.mediumEmphasisContentContentColor
 
 @Composable
 fun HomeScene() {
-    val (selectedItem, setSelectedItem) = savedInstanceState { 0 }
+    val navController = rememberNavController()
+    var selectedItem by savedInstanceState { 0 }
     val tabPosition = AmbientTabPosition.current
     val menus = listOf(
         HomeTimelineItem(),
@@ -126,7 +131,13 @@ fun HomeScene() {
                             items = menus.map { it.icon },
                             selectedItem = selectedItem,
                             onItemSelected = {
-                                setSelectedItem(it)
+                                selectedItem = it
+
+                                navController.navigate(menus[selectedItem].route) {
+                                    popUpTo(0) {
+                                        inclusive = true
+                                    }
+                                }
                             },
                         )
                     }
@@ -135,7 +146,13 @@ fun HomeScene() {
             bottomBar = {
                 if (tabPosition == TabPosition.Bottom) {
                     HomeBottomNavigation(menus, selectedItem) {
-                        setSelectedItem(it)
+                        selectedItem = it
+
+                        navController.navigate(menus[selectedItem].route) {
+                            popUpTo(0) {
+                                inclusive = true
+                            }
+                        }
                     }
                 }
             },
@@ -151,10 +168,12 @@ fun HomeScene() {
                     top = it.top,
                 )
             ) {
-                Crossfade(
-                    current = selectedItem,
-                ) {
-                    menus[it].onCompose()
+                NavHost(navController = navController, startDestination = menus.first().route) {
+                    menus.forEach { item ->
+                        composable(item.route) {
+                            item.onCompose()
+                        }
+                    }
                 }
             }
         }
