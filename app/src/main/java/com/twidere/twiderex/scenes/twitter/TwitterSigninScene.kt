@@ -20,21 +20,32 @@
  */
 package com.twidere.twiderex.scenes.twitter
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.material.Button
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LifecycleOwnerAmbient
+import androidx.compose.ui.res.imageResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.navigate
 import androidx.navigation.navOptions
+import com.twidere.twiderex.R
 import com.twidere.twiderex.extensions.navViewModel
 import com.twidere.twiderex.extensions.navigate
 import com.twidere.twiderex.ui.AmbientNavController
@@ -55,52 +66,87 @@ fun TwitterSignInScene() {
     val navController = AmbientNavController.current
     val lifecycleOwner = LifecycleOwnerAmbient.current
     TwidereXTheme {
-        Column(
-            modifier = Modifier.fillMaxWidth().fillMaxHeight(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            if (loading == true) {
-                CircularProgressIndicator()
-            } else {
-                Button(
-                    onClick = {
-                        GlobalScope.launch {
-                            withContext(Dispatchers.Main) {
-                                // TODO: dynamic key && secret
-                                viewModel.beginOAuth(
-                                    "wmtrtTaVOjUnH5pWQp4LDI5Qs",
-                                    "E9Q9u2yK0COJae2tLcNEdY75OPA3bxqJiGZQztraHaQUtoI2cu"
-                                ) { target ->
-                                    suspendCoroutine {
-                                        navController.currentBackStackEntry?.savedStateHandle?.getLiveData<String>(
-                                            "pin_code"
-                                        )?.observe(lifecycleOwner) { result ->
-                                            it.resume(result)
-                                        }
-                                        navController.navigate(
-                                            "signin/twitter/web/${
-                                            URLEncoder.encode(
-                                                target,
-                                                "UTF-8"
+        Scaffold {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(),
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight()
+                        .weight(1F),
+                    verticalArrangement = Arrangement.Bottom,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Image(
+                        modifier = Modifier.preferredWidth(200.dp),
+                        contentScale = ContentScale.FillWidth,
+                        asset = imageResource(id = R.drawable.ic_login_logo),
+                    )
+                    Box(modifier = Modifier.height(32.dp))
+                    Text(
+                        text = stringResource(id = R.string.app_name),
+                        style = MaterialTheme.typography.h4,
+                    )
+                }
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight()
+                        .weight(1F),
+                    verticalArrangement = Arrangement.Bottom,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    if (loading == true) {
+                        CircularProgressIndicator()
+                    } else {
+                        Button(
+                            onClick = {
+                                GlobalScope.launch {
+                                    withContext(Dispatchers.Main) {
+                                        // TODO: dynamic key && secret
+                                        viewModel.beginOAuth(
+                                            "wmtrtTaVOjUnH5pWQp4LDI5Qs",
+                                            "E9Q9u2yK0COJae2tLcNEdY75OPA3bxqJiGZQztraHaQUtoI2cu"
+                                        ) { target ->
+                                            suspendCoroutine {
+                                                navController.currentBackStackEntry?.savedStateHandle?.getLiveData<String>(
+                                                    "pin_code"
+                                                )?.observe(lifecycleOwner) { result ->
+                                                    it.resume(result)
+                                                    navController.currentBackStackEntry?.savedStateHandle?.remove<String>(
+                                                        "pin_code"
+                                                    )
+                                                }
+                                                navController.navigate(
+                                                    "signin/twitter/web/${
+                                                        URLEncoder.encode(
+                                                            target,
+                                                            "UTF-8"
+                                                        )
+                                                    }"
+                                                )
+                                            }
+                                        }.takeIf { it }?.let {
+                                            navController.navigate(
+                                                "home",
+                                                navOptions {
+                                                    popUpTo(0) {
+                                                        inclusive = true
+                                                    }
+                                                },
                                             )
-                                            }"
-                                        )
+                                        }
                                     }
                                 }
-                                navController.navigate(
-                                    "home",
-                                    navOptions {
-                                        popUpTo(0) {
-                                            inclusive = true
-                                        }
-                                    },
-                                )
                             }
+                        ) {
+                            Text(text = "Sign in with Twitter")
                         }
                     }
-                ) {
-                    Text(text = "Sign In")
+                    Box(modifier = Modifier.height(100.dp))
                 }
             }
         }

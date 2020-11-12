@@ -44,45 +44,53 @@ class TwitterSignInViewModel @ViewModelInject constructor(
         consumerKey: String,
         consumerSecret: String,
         pinCodeProvider: suspend (url: String) -> String,
-    ) {
+    ): Boolean {
         loading.postValue(true)
         val service = TwitterOAuthService(consumerKey, consumerSecret)
         val token = service.getOAuthToken()
         val pinCode = pinCodeProvider.invoke(service.getWebOAuthUrl(token))
-        val accessToken = service.getAccessToken(pinCode, token)
-        val user = service.verifyCredentials(accessToken)
-        if (user != null) {
-            val name = user.screenName
-            if (name != null) {
-                val key = UserKey(name, "twitter.com")
-                val credentials_json = OAuthCredentials(
-                    consumer_key = consumerKey,
-                    consumer_secret = consumerSecret,
-                    access_token = accessToken.oauth_token,
-                    access_token_secret = accessToken.oauth_token_secret,
-                ).json()
-                if (repository.containsAccount(key)) {
-                    repository.findByAccountKey(key)?.let {
-                        repository.getAccountDetails(it)
-                    }?.let {
-                        it.credentials_json = credentials_json
-                        repository.updateAccount(it)
-                    }
-                } else {
-                    repository.addAccount(
-                        AccountDetails(
-                            account = Account(key.toString(), ACCOUNT_TYPE),
-                            type = PlatformType.Twitter,
-                            key = key,
-                            credentials_type = CredentialsType.OAuth,
-                            credentials_json = credentials_json,
-                            extras_json = "",
-                            user = user.toDbUser()
+        if (pinCode.isNotEmpty()) {
+            val accessToken = service.getAccessToken(pinCode, token)
+            val user = service.verifyCredentials(accessToken)
+            if (user != null) {
+                val name = user.screenName
+                if (name != null) {
+                    val key = UserKey(name, "twitter.com")
+                    val credentials_json = OAuthCredentials(
+                        consumer_key = consumerKey,
+                        consumer_secret = consumerSecret,
+                        access_token = accessToken.oauth_token,
+                        access_token_secret = accessToken.oauth_token_secret,
+                    ).json()
+                    if (repository.containsAccount(key)) {
+                        repository.findByAccountKey(key)?.let {
+                            repository.getAccountDetails(it)
+                        }?.let {
+                            it.credentials_json = credentials_json
+                            repository.updateAccount(it)
+                        }
+                    } else {
+                        repository.addAccount(
+                            AccountDetails(
+                                account = Account(key.toString(), ACCOUNT_TYPE),
+                                type = PlatformType.Twitter,
+                                key = key,
+                                credentials_type = CredentialsType.OAuth,
+                                credentials_json = credentials_json,
+                                extras_json = "",
+                                user = user.toDbUser()
+                            )
                         )
-                    )
+                    }
+                    return true
                 }
             }
         }
+        loading.postValue(false)
+        return false
+    }
+
+    fun cancel() {
         loading.postValue(false)
     }
 }

@@ -21,7 +21,9 @@
 package com.twidere.twiderex.scenes.twitter
 
 import android.webkit.JavascriptInterface
+import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.onDispose
 import androidx.navigation.NavController
 import com.twidere.twiderex.component.foundation.WebComponent
 import com.twidere.twiderex.ui.AmbientNavController
@@ -36,18 +38,27 @@ private const val INJECT_CONTENT =
 
 @Composable
 fun TwitterWebSignInScene(target: String) {
+    val navController = AmbientNavController.current
     TwidereXTheme {
-        WebComponent(
-            url = target,
-            onPageFinished = { view, _ ->
-                view.loadUrl(INJECT_CONTENT)
-            },
-            javascriptInterface = mapOf(
-                "injector" to TwitterWebJavascriptInterface(
-                    AmbientNavController.current
+        onDispose {
+            navController.currentBackStackEntry?.savedStateHandle?.set(
+                "pin_code",
+                "",
+            )
+        }
+        Scaffold {
+            WebComponent(
+                url = target,
+                onPageFinished = { view, _ ->
+                    view.loadUrl(INJECT_CONTENT)
+                },
+                javascriptInterface = mapOf(
+                    "injector" to TwitterWebJavascriptInterface(
+                        navController
+                    )
                 )
             )
-        )
+        }
     }
 }
 

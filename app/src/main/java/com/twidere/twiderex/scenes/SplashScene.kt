@@ -31,7 +31,7 @@ import androidx.compose.runtime.onActive
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.res.imageResource
 import androidx.navigation.navOptions
 import com.twidere.twiderex.R
 import com.twidere.twiderex.extensions.navViewModel
@@ -55,8 +55,7 @@ fun SplashScene() {
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // TODO: replace with real icon
-                Image(vectorResource(id = R.drawable.ic_launcher_foreground))
+                Image(asset = imageResource(id = R.mipmap.ic_launcher_foreground))
             }
         }
     }
