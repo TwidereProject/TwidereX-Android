@@ -20,8 +20,6 @@
  */
 package com.twidere.twiderex.component.status
 
-import androidx.compose.foundation.AmbientContentColor
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -32,11 +30,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.AmbientEmphasisLevels
+import androidx.compose.material.AmbientContentAlpha
+import androidx.compose.material.AmbientContentColor
+import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.ProvideEmphasis
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Providers
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -128,7 +129,9 @@ fun ExpandedStatusComponent(
         }
 
         if (showActions) {
-            ProvideEmphasis(emphasis = AmbientEmphasisLevels.current.medium) {
+            Providers(
+                AmbientContentAlpha provides ContentAlpha.medium
+            ) {
                 Row {
                     Spacer(modifier = Modifier.weight(1f))
                     ReplyButton(status = status, withNumber = false)
@@ -170,9 +173,7 @@ private fun StatusComponent(
                         text = "@${status.user.screenName}",
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        color = AmbientEmphasisLevels.current.medium.applyEmphasis(
-                            AmbientContentColor.current
-                        ),
+                        color = mediumEmphasisContentContentColor,
                     )
                 }
             }

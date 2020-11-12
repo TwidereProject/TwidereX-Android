@@ -21,7 +21,7 @@
 package com.twidere.twiderex.settings
 
 import android.content.SharedPreferences
-import androidx.compose.foundation.Text
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ambientOf
 import com.twidere.twiderex.settings.types.BooleanSettingItem

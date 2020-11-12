@@ -20,16 +20,16 @@
  */
 package com.twidere.twiderex.component.status
 
-import androidx.compose.foundation.AmbientContentColor
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope.Companion.weight
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.AmbientContentColor
 import androidx.compose.material.ButtonConstants
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier

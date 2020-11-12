@@ -20,7 +20,6 @@
  */
 package com.twidere.twiderex.scenes
 
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.zoomable
@@ -35,15 +34,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.AmbientEmphasisLevels
+import androidx.compose.material.AmbientContentAlpha
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.ProvideEmphasis
 import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedTask
+import androidx.compose.runtime.Providers
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -90,9 +90,6 @@ fun MediaScene(statusId: String, selectedIndex: Int) {
     }
     val loading by viewModel.loading.observeAsState(initial = false)
     val status by viewModel.status.observeAsState()
-    LaunchedTask {
-        viewModel.init(statusId)
-    }
     TwidereXTheme(
         requireDarkTheme = true,
         pureStatusBarColor = true,
@@ -178,7 +175,9 @@ fun MediaScene(status: UiStatus, selectedIndex: Int) {
                                     overflow = TextOverflow.Ellipsis,
                                 )
                                 Spacer(modifier = Modifier.width(standardPadding))
-                                ProvideEmphasis(emphasis = AmbientEmphasisLevels.current.medium) {
+                                Providers(
+                                    AmbientContentAlpha provides ContentAlpha.medium
+                                ) {
                                     Text(
                                         text = "@${status.user.screenName}",
                                         maxLines = 1,

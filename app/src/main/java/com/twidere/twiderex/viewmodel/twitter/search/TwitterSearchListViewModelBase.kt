@@ -27,7 +27,6 @@ abstract class TwitterSearchListViewModelBase(
     protected var keyword: String = ""
 ) : ViewModel() {
     protected var hasMore = true
-    protected val loaded = MutableLiveData(false)
     val loadingMore = MutableLiveData(false)
     val refreshing = MutableLiveData(false)
 
@@ -36,7 +35,6 @@ abstract class TwitterSearchListViewModelBase(
             return
         }
         this.keyword = keyword
-        loaded.postValue(false)
     }
 
     abstract suspend fun refresh()

@@ -20,16 +20,18 @@
  */
 package com.twidere.twiderex.component.foundation
 
-import androidx.compose.foundation.AmbientTextStyle
-import androidx.compose.foundation.BaseTextField
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.AmbientEmphasisLevels
-import androidx.compose.material.ProvideEmphasis
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.AmbientContentAlpha
+import androidx.compose.material.AmbientTextStyle
+import androidx.compose.material.ContentAlpha
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Providers
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.onActive
@@ -72,6 +74,7 @@ fun TextInput(
     val interactionState = remember { InteractionState() }
     var selection by remember { mutableStateOf(TextRange.Zero) }
     var composition by remember { mutableStateOf<TextRange?>(null) }
+
     @OptIn(InternalTextApi::class)
     val textFieldValue = TextFieldValue(
         text = value,
@@ -84,7 +87,6 @@ fun TextInput(
             keyboardController.value?.showSoftwareKeyboard()
         }
     }
-
     Box(
         modifier = modifier
             .focusRequester(focusRequester)
@@ -101,10 +103,12 @@ fun TextInput(
             },
         alignment = alignment,
     ) {
-        BaseTextField(
+        BasicTextField(
+            keyboardOptions = KeyboardOptions(
+                keyboardType = keyboardType,
+                imeAction = imeAction,
+            ),
             textStyle = textStyle,
-            keyboardType = keyboardType,
-            imeAction = imeAction,
             onImeActionPerformed = {
                 onImeActionPerformed(it, keyboardController.value)
             },
@@ -122,7 +126,9 @@ fun TextInput(
             },
         )
         if (value.isEmpty()) {
-            ProvideEmphasis(emphasis = AmbientEmphasisLevels.current.medium) {
+            Providers(
+                AmbientContentAlpha provides ContentAlpha.medium
+            ) {
                 placeholder?.invoke()
             }
         }

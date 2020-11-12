@@ -21,8 +21,6 @@
 package com.twidere.twiderex.scenes
 
 import androidx.compose.animation.Crossfade
-import androidx.compose.foundation.AmbientContentColor
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,9 +28,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.ExperimentalLazyDsl
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.AmbientEmphasisLevels
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Divider
@@ -43,6 +39,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.ScaffoldState
 import androidx.compose.material.Surface
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Menu
@@ -73,6 +70,7 @@ import com.twidere.twiderex.settings.TabPosition
 import com.twidere.twiderex.ui.AmbientActiveAccount
 import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.ui.TwidereXTheme
+import com.twidere.twiderex.ui.mediumEmphasisContentContentColor
 
 @Composable
 fun HomeScene() {
@@ -175,9 +173,7 @@ fun HomeBottomNavigation(
         items.forEachIndexed { index, item ->
             BottomNavigationItem(
                 selectedContentColor = MaterialTheme.colors.primary,
-                unselectedContentColor = AmbientEmphasisLevels.current.medium.applyEmphasis(
-                    AmbientContentColor.current
-                ),
+                unselectedContentColor = mediumEmphasisContentContentColor,
                 icon = { Icon(item.icon) },
                 selected = selectedItem == index,
                 onClick = { onItemSelected.invoke(index) }
@@ -185,8 +181,6 @@ fun HomeBottomNavigation(
         }
     }
 }
-
-@OptIn(ExperimentalLazyDsl::class)
 @Composable
 private fun HomeDrawer(scaffoldState: ScaffoldState) {
 

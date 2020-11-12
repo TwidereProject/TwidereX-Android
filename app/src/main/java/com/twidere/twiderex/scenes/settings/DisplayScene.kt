@@ -20,9 +20,8 @@
  */
 package com.twidere.twiderex.scenes.settings
 
-import androidx.compose.foundation.Text
+import androidx.compose.material.Text
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.ExperimentalLazyDsl
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Icon
 import androidx.compose.material.ListItem
@@ -48,8 +47,6 @@ import com.twidere.twiderex.settings.AmbientUseSystemFontSize
 import com.twidere.twiderex.ui.AmbientInStoryboard
 import com.twidere.twiderex.ui.TwidereXTheme
 import com.twidere.twiderex.viewmodel.settings.DisplayViewModel
-
-@OptIn(ExperimentalLazyDsl::class)
 @Composable
 fun DisplayScene() {
     val viewModel = navViewModel<DisplayViewModel>()

@@ -20,22 +20,21 @@
  */
 package com.twidere.twiderex.component.foundation
 
-import androidx.compose.foundation.AmbientContentColor
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.AmbientEmphasisLevels
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Tab
 import androidx.compose.material.TabConstants
 import androidx.compose.material.TabConstants.defaultTabIndicatorOffset
 import androidx.compose.material.TabRow
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.VectorAsset
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.extensions.withElevation
+import com.twidere.twiderex.ui.mediumEmphasisContentContentColor
 
 @Composable
 fun IconTabsComponent(
@@ -93,15 +92,14 @@ fun TabsComponent(
         }
     ) {
         for (i in 0 until count) {
+
             Tab(
                 selected = selectedItem == i,
                 onClick = {
                     onItemSelected(i)
                 },
                 selectedContentColor = MaterialTheme.colors.primary,
-                unselectedContentColor = AmbientEmphasisLevels.current.medium.applyEmphasis(
-                    AmbientContentColor.current
-                ),
+                unselectedContentColor = mediumEmphasisContentContentColor,
             ) {
                 tabContent.invoke(i)
             }

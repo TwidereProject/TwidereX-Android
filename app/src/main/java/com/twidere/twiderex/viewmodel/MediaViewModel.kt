@@ -23,6 +23,7 @@ package com.twidere.twiderex.viewmodel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
+import androidx.lifecycle.viewModelScope
 import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
 import com.twidere.services.microblog.LookupService
@@ -30,6 +31,7 @@ import com.twidere.twiderex.di.assisted.IAssistedFactory
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.repository.twitter.TwitterTweetsRepository
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 
 class MediaViewModel @AssistedInject constructor(
     private val factory: TwitterTweetsRepository.AssistedFactory,
@@ -52,12 +54,11 @@ class MediaViewModel @AssistedInject constructor(
         emitSource(repository.loadTweetFromCache(statusId))
     }
 
-    suspend fun init(statusId: String) = coroutineScope {
-        if (status.value != null) {
-            return@coroutineScope
+    init {
+        viewModelScope.launch {
+            loading.postValue(true)
+            repository.loadTweetFromNetwork(statusId)
+            loading.postValue(false)
         }
-        loading.postValue(true)
-        repository.loadTweetFromNetwork(statusId)
-        loading.postValue(false)
     }
 }

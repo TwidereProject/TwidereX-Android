@@ -21,8 +21,8 @@
 package com.twidere.twiderex.component.home
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.ProvideTextStyle
-import androidx.compose.foundation.Text
+import androidx.compose.material.ProvideTextStyle
+import androidx.compose.material.Text
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton

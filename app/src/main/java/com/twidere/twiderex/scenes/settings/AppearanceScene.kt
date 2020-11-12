@@ -20,14 +20,13 @@
  */
 package com.twidere.twiderex.scenes.settings
 
-import androidx.compose.foundation.Text
+import androidx.compose.material.Text
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredWidth
-import androidx.compose.foundation.lazy.ExperimentalLazyDsl
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.ListItem
 import androidx.compose.material.MaterialTheme
@@ -48,8 +47,6 @@ import com.twidere.twiderex.extensions.navViewModel
 import com.twidere.twiderex.settings.primaryColorDialog
 import com.twidere.twiderex.ui.TwidereXTheme
 import com.twidere.twiderex.viewmodel.settings.AppearanceViewModel
-
-@OptIn(ExperimentalLazyDsl::class)
 @Composable
 fun AppearanceScene() {
     val viewModel = navViewModel<AppearanceViewModel>()

@@ -21,8 +21,6 @@
 package com.twidere.twiderex.scenes
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.ProvideTextStyle
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -31,16 +29,18 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumnForIndexed
-import androidx.compose.material.AmbientEmphasisLevels
+import androidx.compose.material.AmbientContentAlpha
+import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.ListItem
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.ProvideEmphasis
+import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedTask
+import androidx.compose.runtime.Providers
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -176,9 +176,6 @@ private fun SearchTweetsContent(viewModel: TwitterSearchTweetsViewModel) {
     val loadingMore by viewModel.loadingMore.observeAsState(initial = false)
     val items by viewModel.source.observeAsState(initial = emptyList())
     val scope = rememberCoroutineScope()
-    LaunchedTask {
-        viewModel.refresh()
-    }
     SwipeToRefreshLayout(
         refreshingState = refreshing,
         onRefresh = {
@@ -214,10 +211,6 @@ private fun SearchMediasContent(viewModel: TwitterSearchMediaViewModel) {
     val source by viewModel.source.observeAsState(initial = emptyList())
     val items = source.filter { it.hasMedia }.flatMap { it.media.map { media -> media to it } }
     val scope = rememberCoroutineScope()
-    LaunchedTask {
-        viewModel.refresh()
-    }
-
     SwipeToRefreshLayout(
         refreshingState = refreshing,
         onRefresh = {
@@ -267,9 +260,6 @@ private fun SearchUsersContent(viewModel: TwitterSearchUserViewModel) {
     val loadingMore by viewModel.loadingMore.observeAsState(initial = false)
     val items by viewModel.source.observeAsState(initial = emptyList())
     val scope = rememberCoroutineScope()
-    LaunchedTask {
-        viewModel.refresh()
-    }
     SwipeToRefreshLayout(
         refreshingState = refreshing,
         onRefresh = {
@@ -292,7 +282,9 @@ private fun SearchUsersContent(viewModel: TwitterSearchUserViewModel) {
                             color = MaterialTheme.colors.primary
                         )
                         Spacer(modifier = Modifier.width(4.dp))
-                        ProvideEmphasis(emphasis = AmbientEmphasisLevels.current.medium) {
+                        Providers(
+                            AmbientContentAlpha provides ContentAlpha.medium
+                        ) {
                             Text(
                                 text = "@${item.screenName}",
                                 maxLines = 1,

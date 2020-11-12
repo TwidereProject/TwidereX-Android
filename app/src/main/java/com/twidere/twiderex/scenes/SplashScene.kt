@@ -32,10 +32,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.imageResource
-import androidx.navigation.navOptions
+import androidx.navigation.compose.navigate
 import com.twidere.twiderex.R
 import com.twidere.twiderex.extensions.navViewModel
-import com.twidere.twiderex.extensions.navigate
 import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.ui.TwidereXTheme
 import com.twidere.twiderex.viewmodel.SplashViewModel
@@ -65,21 +64,19 @@ fun SplashScene() {
                 if (viewModel.hasAccount()) {
                     navController.navigate(
                         "home",
-                        navOptions {
-                            popUpTo(0) {
-                                inclusive = true
-                            }
-                        },
-                    )
+                    ) {
+                        popUpTo(0) {
+                            inclusive = true
+                        }
+                    }
                 } else {
                     navController.navigate(
                         "signin/twitter",
-                        navOptions {
-                            popUpTo(0) {
-                                inclusive = true
-                            }
-                        },
-                    )
+                    ) {
+                        popUpTo(0) {
+                            inclusive = true
+                        }
+                    }
                 }
             }
         }

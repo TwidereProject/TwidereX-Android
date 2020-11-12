@@ -24,15 +24,11 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
 import androidx.compose.ui.viewinterop.viewModel
-import androidx.core.net.toUri
 import androidx.hilt.lifecycle.HiltViewModelFactory
 import androidx.hilt.lifecycle.ViewModelAssistedFactory
 import androidx.lifecycle.SavedStateViewModelFactory
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.NavController
-import androidx.navigation.NavDeepLinkRequest
-import androidx.navigation.NavOptions
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.twidere.twiderex.settings.AmbientTheme
 import com.twidere.twiderex.settings.Theme
@@ -83,13 +79,6 @@ fun ProvideNavigationViewModelFactoryMap(
         content.invoke()
     }
 }
-
-// Hack for NavOptions
-fun NavController.navigate(route: String, options: NavOptions? = null) {
-    navigate(NavDeepLinkRequest.Builder.fromUri(createRoute(route).toUri()).build(), options)
-}
-
-internal fun createRoute(route: String) = "android-app://androidx.navigation.compose/$route"
 
 @Composable
 fun isDarkTheme(): Boolean {

@@ -24,7 +24,6 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.net.Uri
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -36,22 +35,23 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.ExperimentalLazyDsl
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRowForIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.AmbientEmphasisLevels
+import androidx.compose.material.AmbientContentAlpha
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Divider
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.ProvideEmphasis
 import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Providers
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -95,7 +95,7 @@ enum class ComposeType {
     Quote,
 }
 
-@OptIn(ExperimentalLazyDsl::class, ExperimentalFocus::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFocus::class, ExperimentalFoundationApi::class)
 @Composable
 fun ComposeScene(statusId: String? = null, composeType: ComposeType = ComposeType.New) {
     val account = AmbientActiveAccount.current ?: return
@@ -238,7 +238,9 @@ fun ComposeScene(statusId: String? = null, composeType: ComposeType = ComposeTyp
                     Spacer(modifier = Modifier.weight(1F))
                     if (locationEnabled) {
                         location?.let {
-                            ProvideEmphasis(emphasis = AmbientEmphasisLevels.current.medium) {
+                            Providers(
+                                AmbientContentAlpha provides ContentAlpha.medium
+                            ) {
                                 Row {
                                     Icon(asset = vectorResource(id = R.drawable.ic_map_pin))
                                     Text(text = "${it.latitude}, ${it.longitude}")

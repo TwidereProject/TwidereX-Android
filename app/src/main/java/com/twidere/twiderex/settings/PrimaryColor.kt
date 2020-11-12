@@ -21,7 +21,7 @@
 package com.twidere.twiderex.settings
 
 import android.content.SharedPreferences
-import androidx.compose.foundation.Text
+import androidx.compose.material.Text
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box

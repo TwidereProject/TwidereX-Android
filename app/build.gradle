@@ -64,7 +64,7 @@ dependencies {
     implementation "androidx.compose.runtime:runtime-livedata:$versions.compose"
     androidTestImplementation "androidx.ui:ui-test:$versions.compose"
 
-    implementation "androidx.navigation:navigation-compose:1.0.0-alpha01"
+    implementation "androidx.navigation:navigation-compose:1.0.0-alpha02"
     implementation "androidx.activity:activity-ktx:1.2.0-beta01"
 
     // Use moshi for not since Kotlinx.Serialization not compatible with Jetpack Compose
@@ -91,7 +91,7 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-viewmodel-savedstate:$versions.lifecycle"
     implementation "androidx.lifecycle:lifecycle-common-java8:$versions.lifecycle"
 
-    implementation "dev.chrisbanes.accompanist:accompanist-coil:0.3.2"
+    implementation "dev.chrisbanes.accompanist:accompanist-coil:0.3.3.1 "
 
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.5'
 

@@ -21,6 +21,7 @@
 package com.twidere.twiderex.viewmodel.twitter.search
 
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
 import com.twidere.services.microblog.SearchService
@@ -29,6 +30,7 @@ import com.twidere.twiderex.di.assisted.IAssistedFactory
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.repository.twitter.TwitterSearchUserRepository
+import kotlinx.coroutines.launch
 
 class TwitterSearchUserViewModel @AssistedInject constructor(
     private val factory: TwitterSearchUserRepository.AssistedFactory,
@@ -62,18 +64,14 @@ class TwitterSearchUserViewModel @AssistedInject constructor(
     }
 
     override suspend fun refresh() {
-        if (refreshing.value == true || loaded.value == true) {
-            return
-        }
         refreshing.postValue(true)
         reset(keyword)
         loadData()
-        loaded.postValue(true)
         refreshing.postValue(false)
     }
 
     override suspend fun loadMore() {
-        if (!hasMore || loadingMore.value == true) {
+        if (!hasMore) {
             return
         }
         loadingMore.postValue(true)
@@ -85,5 +83,11 @@ class TwitterSearchUserViewModel @AssistedInject constructor(
         val result = repository.loadUsers(keyword, page = page++)
         source.postValue((source.value ?: emptyList()) + result)
         hasMore = result.any() && result.count() > defaultLoadCount
+    }
+
+    init {
+        viewModelScope.launch {
+            refresh()
+        }
     }
 }

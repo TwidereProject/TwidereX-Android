@@ -21,7 +21,7 @@
 package com.twidere.twiderex.scenes.twitter
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.Text
+import androidx.compose.material.Text
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -44,10 +44,8 @@ import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.navigate
-import androidx.navigation.navOptions
 import com.twidere.twiderex.R
 import com.twidere.twiderex.extensions.navViewModel
-import com.twidere.twiderex.extensions.navigate
 import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.ui.TwidereXTheme
 import com.twidere.twiderex.viewmodel.twitter.TwitterSignInViewModel
@@ -132,12 +130,11 @@ fun TwitterSignInScene() {
                                         }.takeIf { it }?.let {
                                             navController.navigate(
                                                 "home",
-                                                navOptions {
-                                                    popUpTo(0) {
-                                                        inclusive = true
-                                                    }
-                                                },
-                                            )
+                                            ) {
+                                                popUpTo(0) {
+                                                    inclusive = true
+                                                }
+                                            }
                                         }
                                     }
                                 }

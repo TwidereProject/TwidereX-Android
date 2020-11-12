@@ -20,17 +20,15 @@
  */
 package com.twidere.twiderex.scenes
 
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.ExperimentalLazyDsl
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Divider
 import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedTask
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberCoroutineScope
@@ -49,8 +47,6 @@ import com.twidere.twiderex.ui.TwidereXTheme
 import com.twidere.twiderex.ui.standardPadding
 import com.twidere.twiderex.viewmodel.twitter.TwitterStatusViewModel
 import kotlinx.coroutines.launch
-
-@OptIn(ExperimentalLazyDsl::class)
 @Composable
 fun StatusScene(statusId: String) {
     val account = AmbientActiveAccount.current ?: return
@@ -63,9 +59,6 @@ fun StatusScene(statusId: String) {
     val moreConversations by viewModel.moreConversations.observeAsState(initial = emptyList())
     val previousConversations by viewModel.previousConversations.observeAsState(initial = emptyList())
     val scope = rememberCoroutineScope()
-    LaunchedTask {
-        viewModel.init(statusId)
-    }
     TwidereXTheme {
         Scaffold(
             topBar = {

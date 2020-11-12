@@ -20,8 +20,6 @@
  */
 package com.twidere.twiderex.component.status
 
-import androidx.compose.foundation.AmbientContentColor
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -32,13 +30,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.AmbientEmphasisLevels
+import androidx.compose.material.AmbientContentAlpha
+import androidx.compose.material.AmbientContentColor
+import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.ProvideEmphasis
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Providers
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.vectorResource
@@ -88,7 +89,9 @@ fun TimelineStatusComponent(
                 showActions = showActions,
             )
             if (showActions) {
-                ProvideEmphasis(emphasis = AmbientEmphasisLevels.current.medium) {
+                Providers(
+                    AmbientContentAlpha provides ContentAlpha.medium
+                ) {
                     Spacer(modifier = Modifier.height(standardPadding))
                     Row {
                         Spacer(modifier = Modifier.width(profileImageSize))
@@ -127,7 +130,9 @@ private fun StatusComponent(
                         color = MaterialTheme.colors.primary
                     )
                     Spacer(modifier = Modifier.width(4.dp))
-                    ProvideEmphasis(emphasis = AmbientEmphasisLevels.current.medium) {
+                    Providers(
+                        AmbientContentAlpha provides ContentAlpha.medium
+                    ) {
                         Text(
                             text = "@${status.user.screenName}",
                             maxLines = 1,
@@ -162,7 +167,9 @@ private fun StatusComponent(
 
             if (!status.placeString.isNullOrEmpty()) {
                 Spacer(modifier = Modifier.height(standardPadding))
-                ProvideEmphasis(emphasis = AmbientEmphasisLevels.current.medium) {
+                Providers(
+                    AmbientContentAlpha provides ContentAlpha.medium
+                ) {
                     Row {
                         Icon(asset = vectorResource(id = R.drawable.ic_map_pin))
                         Text(text = status.placeString)

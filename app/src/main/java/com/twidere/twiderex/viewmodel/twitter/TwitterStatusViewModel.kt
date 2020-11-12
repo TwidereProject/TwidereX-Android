@@ -24,6 +24,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
 import androidx.lifecycle.switchMap
+import androidx.lifecycle.viewModelScope
 import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
 import com.twidere.services.microblog.LookupService
@@ -35,6 +36,7 @@ import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.repository.twitter.TwitterConversationRepository
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 
 class TwitterStatusViewModel @AssistedInject constructor(
     private val factory: TwitterConversationRepository.AssistedFactory,
@@ -85,27 +87,26 @@ class TwitterStatusViewModel @AssistedInject constructor(
     private val conversations = arrayListOf<StatusV2>()
     private val previous = arrayListOf<StatusV2>()
 
-    suspend fun init(statusId: String) = coroutineScope {
-        if (status.value != null || conversations.any() || previous.any() || loadingPrevious.value == true || loadingMore.value == true) {
-            return@coroutineScope
-        }
-        loadingPrevious.postValue(true)
-        loadingMore.postValue(true)
-        val tweet = repository.loadTweetFromNetwork(statusId)
-        repository.toUiStatus(tweet)
-        targetTweet =
-            tweet.referencedTweets?.firstOrNull { it.type == ReferencedTweetType.retweeted }?.status
-            ?: tweet
-        async {
-            val list = repository.loadPrevious(targetTweet)
-            previous.addAll(list)
-            loadingPrevious.postValue(false)
-        }
-        async {
-            val result = repository.loadConversation(targetTweet)
-            nextPage = result.nextPage
-            conversations.addAll(result.result)
-            loadingMore.postValue(false)
+    init {
+        viewModelScope.launch {
+            loadingPrevious.postValue(true)
+            loadingMore.postValue(true)
+            val tweet = repository.loadTweetFromNetwork(statusId)
+            repository.toUiStatus(tweet)
+            targetTweet =
+                tweet.referencedTweets?.firstOrNull { it.type == ReferencedTweetType.retweeted }?.status
+                    ?: tweet
+            async {
+                val list = repository.loadPrevious(targetTweet)
+                previous.addAll(list)
+                loadingPrevious.postValue(false)
+            }
+            async {
+                val result = repository.loadConversation(targetTweet)
+                nextPage = result.nextPage
+                conversations.addAll(result.result)
+                loadingMore.postValue(false)
+            }
         }
     }
 

@@ -20,7 +20,7 @@
  */
 package com.twidere.twiderex.component.lazy
 
-import androidx.compose.foundation.ProvideTextStyle
+import androidx.compose.material.ProvideTextStyle
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.material.ListItem
 import androidx.compose.material.MaterialTheme
