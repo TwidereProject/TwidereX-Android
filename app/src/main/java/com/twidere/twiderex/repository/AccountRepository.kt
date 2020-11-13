@@ -78,7 +78,7 @@ class AccountRepository @Inject constructor(
         sharedPreferences.edit {
             putString(PREFERENCE_CURRENT_ACTIVE_ACCOUNT, detail.key.toString())
         }
-        activeAccount.postValue(detail)
+        activeAccount.value = (detail)
     }
 
     fun getCurrentAccount(): AccountDetails {

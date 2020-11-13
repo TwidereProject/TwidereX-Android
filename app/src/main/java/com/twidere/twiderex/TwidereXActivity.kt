@@ -45,6 +45,7 @@ import com.twidere.twiderex.preferences.proto.DisplayPreferences
 import com.twidere.twiderex.providers.AmbientStatusActions
 import com.twidere.twiderex.providers.StatusActions
 import com.twidere.twiderex.ui.AmbientActiveAccount
+import com.twidere.twiderex.ui.AmbientActivity
 import com.twidere.twiderex.ui.AmbientApplication
 import com.twidere.twiderex.ui.AmbientViewModelProviderFactory
 import com.twidere.twiderex.ui.AmbientWindow
@@ -133,6 +134,7 @@ class TwidereXActivity : ComponentActivity() {
                 AmbientActiveAccount provides account,
                 AmbientApplication provides application,
                 AmbientStatusActions provides statusActions,
+                AmbientActivity provides this,
             ) {
                 ProvidePreferences(
                     appearancePreferences = appearancePreferences,

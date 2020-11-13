@@ -122,13 +122,7 @@ fun TwitterSignInScene() {
                                                 )
                                             }
                                         }.takeIf { it }?.let {
-                                            navController.navigate(
-                                                Route.Home,
-                                            ) {
-                                                popUpTo(0) {
-                                                    inclusive = true
-                                                }
-                                            }
+                                            navController.popBackStack()
                                         }
                                     }
                                 }

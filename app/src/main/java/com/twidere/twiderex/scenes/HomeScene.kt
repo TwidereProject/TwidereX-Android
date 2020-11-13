@@ -45,6 +45,7 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.onActive
 import androidx.compose.runtime.savedinstancestate.savedInstanceState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -80,6 +81,9 @@ import com.twidere.twiderex.ui.mediumEmphasisContentContentColor
 @Composable
 fun HomeScene() {
     val navController = rememberNavController()
+    onActive {
+        navController.enableOnBackPressed(false)
+    }
     var selectedItem by savedInstanceState { 0 }
     val tabPosition = AmbientAppearancePreferences.current.tapPosition
     val menus = listOf(
@@ -150,9 +154,9 @@ fun HomeScene() {
                         selectedItem = it
 
                         navController.navigate(menus[selectedItem].route) {
-                            popUpTo(0) {
-                                inclusive = true
-                            }
+//                            popUpTo(0) {
+//                                inclusive = true
+//                            }
                         }
                     }
                 }

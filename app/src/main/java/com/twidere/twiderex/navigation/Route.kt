@@ -20,18 +20,21 @@
  */
 package com.twidere.twiderex.navigation
 
+import androidx.compose.runtime.Composable
+import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavDeepLink
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
+import androidx.navigation.compose.NamedNavArgument
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navArgument
 import androidx.navigation.navDeepLink
-import com.twidere.services.twitter.model.fields.TweetFields
+import com.twidere.twiderex.component.requireAuthorization
 import com.twidere.twiderex.scenes.ComposeScene
 import com.twidere.twiderex.scenes.ComposeType
 import com.twidere.twiderex.scenes.HomeScene
 import com.twidere.twiderex.scenes.MediaScene
 import com.twidere.twiderex.scenes.SearchScene
-import com.twidere.twiderex.scenes.SplashScene
 import com.twidere.twiderex.scenes.StatusScene
 import com.twidere.twiderex.scenes.UserScene
 import com.twidere.twiderex.scenes.settings.AppearanceScene
@@ -43,7 +46,7 @@ import com.twidere.twiderex.twitterHosts
 import java.net.URLDecoder
 import java.net.URLEncoder
 
-const val initialRoute = "splash"
+const val initialRoute = "home"
 
 object Route {
     val Home = "home"
@@ -80,13 +83,22 @@ object Route {
     }
 }
 
+fun NavGraphBuilder.authorizedComposable(
+    route: String,
+    arguments: List<NamedNavArgument> = emptyList(),
+    deepLinks: List<NavDeepLink> = emptyList(),
+    content: @Composable (NavBackStackEntry) -> Unit,
+) {
+    composable(route, arguments, deepLinks) {
+        requireAuthorization {
+            content.invoke(it)
+        }
+    }
+}
 
 fun NavGraphBuilder.route() {
-    composable("splash") {
-        SplashScene()
-    }
 
-    composable("home") {
+    authorizedComposable("home") {
         HomeScene()
     }
 
@@ -103,7 +115,7 @@ fun NavGraphBuilder.route() {
         }
     }
 
-    composable(
+    authorizedComposable(
         "user/{screenName}",
         arguments = listOf(
             navArgument("screenName") { type = NavType.StringType },
@@ -115,7 +127,7 @@ fun NavGraphBuilder.route() {
         }
     }
 
-    composable(
+    authorizedComposable(
         "status/{statusId}",
         arguments = listOf(navArgument("statusId") { type = NavType.StringType }),
         deepLinks = twitterHosts.map {
@@ -129,7 +141,7 @@ fun NavGraphBuilder.route() {
         }
     }
 
-    composable(
+    authorizedComposable(
         "media/{statusId}?selectedIndex={selectedIndex}",
         arguments = listOf(
             navArgument("statusId") { type = NavType.StringType },
@@ -150,7 +162,7 @@ fun NavGraphBuilder.route() {
         }
     }
 
-    composable(
+    authorizedComposable(
         "search/{keyword}",
         arguments = listOf(
             navArgument("keyword") { type = NavType.StringType }
@@ -161,7 +173,7 @@ fun NavGraphBuilder.route() {
         }
     }
 
-    composable(
+    authorizedComposable(
         "compose/{composeType}?statusId={statusId}",
         arguments = listOf(
             navArgument("composeType") { type = NavType.StringType },

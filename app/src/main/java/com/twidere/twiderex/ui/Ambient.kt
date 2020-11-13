@@ -20,6 +20,7 @@
  */
 package com.twidere.twiderex.ui
 
+import android.app.Activity
 import android.app.Application
 import android.view.Window
 import androidx.compose.runtime.ambientOf
@@ -38,3 +39,4 @@ val AmbientViewModelFactoriesMap =
     staticAmbientOf<Map<String, ViewModelAssistedFactory<out ViewModel>>>()
 val AmbientApplication = staticAmbientOf<Application>()
 val AmbientInStoryboard = staticAmbientOf { false }
+val AmbientActivity = staticAmbientOf<Activity>()

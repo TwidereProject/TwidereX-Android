@@ -20,14 +20,14 @@
  */
 package com.twidere.twiderex.scenes.settings
 
-import androidx.compose.material.ProvideTextStyle
-import androidx.compose.material.Text
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Icon
 import androidx.compose.material.ListItem
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.VectorAsset
@@ -36,6 +36,7 @@ import androidx.navigation.compose.navigate
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
+import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.ui.TwidereXTheme
 
@@ -52,12 +53,12 @@ fun SettingsScene() {
                 SettingItem(
                     "Appearance",
                     vectorResource(id = R.drawable.ic_shirt),
-                    route = "settings/appearance",
+                    route = Route.Settings.Appearance,
                 ),
                 SettingItem(
                     "Display",
                     vectorResource(id = R.drawable.ic_template),
-                    route = "settings/display",
+                    route = Route.Settings.Display,
                 ),
                 SettingItem(
                     "Layout",
