@@ -31,7 +31,6 @@ fun Long.humanizedTimestamp(): String {
     ).toString()
 }
 
-
 val countUnits = arrayOf(null, "K", "M", "B")
 
 fun Long.humanizedCount(): String {

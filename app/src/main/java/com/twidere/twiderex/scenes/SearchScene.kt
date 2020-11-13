@@ -243,10 +243,11 @@ private fun SearchMediasContent(viewModel: TwitterSearchMediaViewModel) {
                 onClick = {
                     navController.navigate(
                         Route.Media(
-                            item.second.statusId, selectedIndex =
-                            item.second.media.indexOf(
-                                item.first
-                            )
+                            item.second.statusId,
+                            selectedIndex =
+                                item.second.media.indexOf(
+                                    item.first
+                                )
                         )
                     )
                 }

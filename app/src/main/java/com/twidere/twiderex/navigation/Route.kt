@@ -54,10 +54,10 @@ object Route {
     object SignIn {
         val Twitter = "signin/twitter"
         fun TwitterWeb(target: String) = "signin/twitter/web/${
-            URLEncoder.encode(
-                target,
-                "UTF-8"
-            )
+        URLEncoder.encode(
+            target,
+            "UTF-8"
+        )
         }"
     }
 
@@ -67,10 +67,10 @@ object Route {
         "media/$statusId?selectedIndex=$selectedIndex"
 
     fun Search(keyword: String) = "search/${
-        URLEncoder.encode(
-            keyword,
-            "UTF-8"
-        )
+    URLEncoder.encode(
+        keyword,
+        "UTF-8"
+    )
     }"
 
     fun Compose(composeType: ComposeType, statusId: String? = null) =

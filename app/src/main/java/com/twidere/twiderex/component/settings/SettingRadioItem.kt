@@ -33,7 +33,7 @@ fun <T : Enum<T>> LazyListScope.radioItem(
     value: T,
     onChanged: (T) -> Unit,
     title: @Composable () -> Unit,
-    itemContent: @Composable (T)-> Unit,
+    itemContent: @Composable (T) -> Unit,
 ) {
     itemHeader {
         title.invoke()

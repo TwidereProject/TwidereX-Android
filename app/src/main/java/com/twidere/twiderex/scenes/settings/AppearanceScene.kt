@@ -151,7 +151,6 @@ fun AppearanceScene() {
     }
 }
 
-
 @Composable
 fun primaryColorDialog(
     viewModel: AppearanceViewModel,

@@ -228,7 +228,6 @@ private fun StatusActionButtonWithNumbers(
                 Box(modifier = Modifier.width(4.dp))
                 Text(text = count.humanizedCount())
             }
-
         }
     }
 }

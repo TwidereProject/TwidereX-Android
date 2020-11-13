@@ -30,7 +30,6 @@ import com.twidere.services.microblog.LookupService
 import com.twidere.twiderex.di.assisted.IAssistedFactory
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.repository.twitter.TwitterTweetsRepository
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
 class MediaViewModel @AssistedInject constructor(

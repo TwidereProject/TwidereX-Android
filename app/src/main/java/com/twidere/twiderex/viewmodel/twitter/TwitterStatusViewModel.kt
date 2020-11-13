@@ -35,7 +35,6 @@ import com.twidere.twiderex.di.assisted.IAssistedFactory
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.repository.twitter.TwitterConversationRepository
 import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
 class TwitterStatusViewModel @AssistedInject constructor(
@@ -95,7 +94,7 @@ class TwitterStatusViewModel @AssistedInject constructor(
             repository.toUiStatus(tweet)
             targetTweet =
                 tweet.referencedTweets?.firstOrNull { it.type == ReferencedTweetType.retweeted }?.status
-                    ?: tweet
+                ?: tweet
             async {
                 val list = repository.loadPrevious(targetTweet)
                 previous.addAll(list)
