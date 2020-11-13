@@ -33,7 +33,7 @@ import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.onDispose
+import androidx.compose.runtime.onCommit
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.vectorResource
@@ -66,8 +66,10 @@ fun TimelineComponent(viewModel: TimelineViewModel) {
         if (items.any()) {
             val listState =
                 rememberLazyListState(initialFirstVisibleItemIndex = viewModel.restoreScrollState())
-            onDispose {
-                viewModel.saveScrollState(listState.firstVisibleItemIndex)
+            onCommit(listState.isAnimationRunning) {
+                if (!listState.isAnimationRunning) {
+                    viewModel.saveScrollState(listState.firstVisibleItemIndex)
+                }
             }
             LazyColumnForIndexed(
                 items = items,
