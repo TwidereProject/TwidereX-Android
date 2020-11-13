@@ -40,17 +40,21 @@ import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.ParentDataModifier
-import androidx.compose.ui.platform.AnimationClockAmbient
 import androidx.compose.ui.unit.Density
-import com.twidere.twiderex.annotations.IncomingComposeUpdate
 import kotlin.math.roundToInt
 
-class PagerState<T>(
+/**
+ * This is a modified version of:
+ * https://gist.github.com/adamp/07d468f4bcfe632670f305ce3734f511
+ */
+
+class PagerState(
     clock: AnimationClockObservable,
     currentPage: Int = 0,
-    val items: List<T>,
+    minPage: Int = 0,
+    maxPage: Int = 0
 ) {
-    private var _minPage by mutableStateOf(0)
+    private var _minPage by mutableStateOf(minPage)
     var minPage: Int
         get() = _minPage
         set(value) {
@@ -58,7 +62,7 @@ class PagerState<T>(
             _currentPage = _currentPage.coerceIn(_minPage, _maxPage)
         }
 
-    private var _maxPage by mutableStateOf(items.lastIndex, structuralEqualityPolicy())
+    private var _maxPage by mutableStateOf(maxPage, structuralEqualityPolicy())
     var maxPage: Int
         get() = _maxPage
         set(value) {
@@ -66,7 +70,7 @@ class PagerState<T>(
             _currentPage = _currentPage.coerceIn(_minPage, maxPage)
         }
 
-    private var _currentPage by mutableStateOf(currentPage.coerceIn(0, items.lastIndex))
+    private var _currentPage by mutableStateOf(currentPage.coerceIn(minPage, maxPage))
     var currentPage: Int
         get() = _currentPage
         set(value) {
@@ -77,7 +81,7 @@ class PagerState<T>(
 
     var selectionState by mutableStateOf(SelectionState.Selected)
 
-    inline fun <R> selectPage(block: PagerState<T>.() -> R): R = try {
+    inline fun <R> selectPage(block: PagerState.() -> R): R = try {
         selectionState = SelectionState.Undecided
         block()
     } finally {
@@ -115,7 +119,7 @@ class PagerState<T>(
     }
 
     override fun toString(): String = "PagerState{minPage=$minPage, maxPage=$maxPage, " +
-        "currentPage=$currentPage, currentPageOffset=$currentPageOffset}"
+            "currentPage=$currentPage, currentPageOffset=$currentPageOffset}"
 }
 
 @Immutable
@@ -126,18 +130,14 @@ private data class PageData(val page: Int) : ParentDataModifier {
 private val Measurable.page: Int
     get() = (parentData as? PageData)?.page ?: error("no PageData for measurable $this")
 
-@IncomingComposeUpdate
 @Composable
-fun <T> Pager(
-    items: List<T>,
-    startPage: Int = 0,
-    enableDrag: Boolean = true,
+fun Pager(
+    state: PagerState,
     offscreenLimit: Int = 2,
     modifier: Modifier = Modifier,
-    pageContent: @Composable PagerScope<T>.() -> Unit
+    dragEnabled: Boolean = true,
+    pageContent: @Composable PagerScope.() -> Unit
 ) {
-    val clock = AnimationClockAmbient.current
-    val state = remember(clock) { PagerState(clock, items = items, currentPage = startPage) }
     var pageSize by remember { mutableStateOf(0) }
     Layout(
         children = {
@@ -165,7 +165,7 @@ fun <T> Pager(
                 state.fling(velocity / pageSize)
             }
         ) { dy ->
-            if (enableDrag) {
+            if (dragEnabled) {
                 with(state) {
                     val pos = pageSize * currentPageOffset
                     val max = if (currentPage == minPage) 0 else pageSize * offscreenLimit
@@ -209,12 +209,10 @@ fun <T> Pager(
 /**
  * Scope for [Pager] content.
  */
-class PagerScope<T>(
-    private val state: PagerState<T>,
+class PagerScope(
+    private val state: PagerState,
     val page: Int
 ) {
-    val data: T
-        get() = state.items[page]
     /**
      * Returns the current selected page
      */

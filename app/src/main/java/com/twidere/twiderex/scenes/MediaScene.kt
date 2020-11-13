@@ -58,6 +58,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.DragObserver
 import androidx.compose.ui.gesture.rawDragGestureFilter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.AnimationClockAmbient
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -67,6 +68,7 @@ import com.twidere.twiderex.annotations.IncomingComposeUpdate
 import com.twidere.twiderex.component.foundation.LoadingProgress
 import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.foundation.Pager
+import com.twidere.twiderex.component.foundation.PagerState
 import com.twidere.twiderex.component.status.LikeButton
 import com.twidere.twiderex.component.status.ReplyButton
 import com.twidere.twiderex.component.status.RetweetButton
@@ -120,6 +122,15 @@ fun MediaScene(status: UiStatus, selectedIndex: Int) {
     val navController = AmbientNavController.current
     Scaffold {
         Box {
+
+            val clock = AnimationClockAmbient.current
+            val pagerState = remember(clock) {
+                PagerState(
+                    clock,
+                    currentPage = selectedIndex,
+                    maxPage = status.media.lastIndex,
+                )
+            }
             Pager(
                 modifier = Modifier
                     .clickable(
@@ -128,10 +139,10 @@ fun MediaScene(status: UiStatus, selectedIndex: Int) {
                         },
                         indication = null,
                     ),
-                items = status.media,
-                startPage = selectedIndex,
-                enableDrag = !lockPager,
+                state = pagerState,
+                dragEnabled = !lockPager,
             ) {
+                val data = status.media[this.page]
                 MediaItemView(data) {
                     lockPager = it
                 }
