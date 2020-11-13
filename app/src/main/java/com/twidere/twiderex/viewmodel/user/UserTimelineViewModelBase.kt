@@ -67,9 +67,10 @@ abstract class UserTimelineViewModelBase(
             return
         }
         loadingMore.postValue(true)
-        val result = loadBetween(max_id = timelineIds.lastOrNull())
+        val result = loadBetween(max_id = timelineIds.lastOrNull()).map { it.statusId }
+            .filter { !timelineIds.contains(it) }
         hasMore = result.any()
-        timelineIds.addAll(result.map { it.statusId }.filter { !timelineIds.contains(it) })
+        timelineIds.addAll(result)
         loadingMore.postValue(false)
     }
 

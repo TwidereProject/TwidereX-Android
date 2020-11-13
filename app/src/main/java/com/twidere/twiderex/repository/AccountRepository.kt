@@ -57,6 +57,12 @@ class AccountRepository @Inject constructor(
     val activeAccount =
         MutableLiveData<AccountDetails>(if (hasAccount()) getCurrentAccount() else null)
 
+    val accounts = MutableLiveData(
+        getAccounts().map {
+            getAccountDetails(it)
+        }
+    )
+
     fun getAccounts(): List<Account> {
         return manager.getAccountsByType(ACCOUNT_TYPE).toList()
     }
@@ -102,6 +108,11 @@ class AccountRepository @Inject constructor(
         manager.addAccountExplicitly(detail.account, null, null)
         updateAccount(detail)
         setCurrentAccount(detail)
+        accounts.postValue(
+            getAccounts().map {
+                getAccountDetails(it)
+            }
+        )
     }
 
     fun getAccountDetails(

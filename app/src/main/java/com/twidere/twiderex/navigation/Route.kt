@@ -102,7 +102,14 @@ fun NavGraphBuilder.route() {
         HomeScene()
     }
 
-    composable("signin/twitter") {
+    composable(
+        "signin/twitter",
+        deepLinks = listOf(
+            navDeepLink {
+                uriPattern = "twiderex://signin"
+            }
+        )
+    ) {
         TwitterSignInScene()
     }
 

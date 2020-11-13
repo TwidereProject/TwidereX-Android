@@ -45,7 +45,10 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.onActive
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.savedinstancestate.savedInstanceState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -61,6 +64,7 @@ import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.IconTabsComponent
 import com.twidere.twiderex.component.foundation.TopAppBarElevation
+import com.twidere.twiderex.component.lazy.itemDivider
 import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.model.ui.UiUser
@@ -74,6 +78,7 @@ import com.twidere.twiderex.scenes.home.MeItem
 import com.twidere.twiderex.scenes.home.MentionItem
 import com.twidere.twiderex.scenes.home.SearchItem
 import com.twidere.twiderex.ui.AmbientActiveAccount
+import com.twidere.twiderex.ui.AmbientActiveAccountViewModel
 import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.ui.TwidereXTheme
 import com.twidere.twiderex.ui.mediumEmphasisContentContentColor
@@ -152,12 +157,7 @@ fun HomeScene() {
                 if (tabPosition == AppearancePreferences.TabPosition.Bottom) {
                     HomeBottomNavigation(menus, selectedItem) {
                         selectedItem = it
-
-                        navController.navigate(menus[selectedItem].route) {
-//                            popUpTo(0) {
-//                                inclusive = true
-//                            }
-                        }
+                        navController.navigate(menus[selectedItem].route)
                     }
                 }
             },
@@ -205,16 +205,22 @@ fun HomeBottomNavigation(
         }
     }
 }
+
 @Composable
 private fun HomeDrawer(scaffoldState: ScaffoldState) {
+    var showAccounts by remember { mutableStateOf(false) }
 
     Column {
         Spacer(modifier = Modifier.height(16.dp))
 
         val account = AmbientActiveAccount.current
-        val user = account?.user?.toUi()
+        val currentUser = account?.user?.toUi()
         val navController = AmbientNavController.current
-        DrawerUserHeader(user)
+        DrawerUserHeader(
+            currentUser
+        ) {
+            showAccounts = !showAccounts
+        }
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -223,21 +229,21 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
                 modifier = Modifier.weight(1f),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Text(text = user?.friendsCount.toString())
+                Text(text = currentUser?.friendsCount.toString())
                 Text(text = "Following")
             }
             Column(
                 modifier = Modifier.weight(1f),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Text(text = user?.followersCount.toString())
+                Text(text = currentUser?.followersCount.toString())
                 Text(text = "Followers")
             }
             Column(
                 modifier = Modifier.weight(1f),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Text(text = user?.listedCount.toString())
+                Text(text = currentUser?.listedCount.toString())
                 Text(text = "Listed")
             }
         }
@@ -245,21 +251,83 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
         Spacer(modifier = Modifier.height(24.dp))
 
         Divider()
-
-        LazyColumn(
+        Box(
             modifier = Modifier
                 .weight(1f)
         ) {
-            for (it in (0 until 10)) {
-                item {
-                    ListItem(
-                        icon = {
-                            Icon(asset = vectorResource(id = R.drawable.ic_adjustments_horizontal))
-                        },
-                        text = {
-                            Text(text = "Settings")
+            if (showAccounts) {
+                val activeAccountViewModel = AmbientActiveAccountViewModel.current
+                val accounts by activeAccountViewModel.allAccounts.observeAsState(initial = emptyList())
+                val allAccounts = accounts.filter { it.key != account?.key }
+                LazyColumn {
+                    items(allAccounts) {
+                        val user = it.user.toUi()
+                        ListItem(
+                            modifier = Modifier.clickable(
+                                onClick = {
+                                    activeAccountViewModel.setActiveAccount(it)
+                                }
+                            ),
+                            icon = {
+                                UserAvatar(
+                                    user = user,
+                                )
+                            },
+                            text = {
+                                Text(
+                                    text = user.name,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                )
+                            },
+                            secondaryText = {
+                                Text(
+                                    text = "@${user.screenName}",
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                )
+                            },
+                        )
+                    }
+                    if (allAccounts.any()) {
+                        itemDivider()
+                    }
+                    item {
+                        ListItem(
+                            modifier = Modifier.clickable(
+                                onClick = {
+                                    navController.navigate(Route.SignIn.Twitter)
+                                }
+                            ),
+                            text = {
+                                Text(text = "Sign in to Twitter")
+                            }
+                        )
+                    }
+                    itemDivider()
+                    item {
+                        ListItem(
+                            modifier = Modifier.clickable(onClick = {}),
+                            text = {
+                                Text(text = "Manage accounts")
+                            }
+                        )
+                    }
+                }
+            } else {
+                LazyColumn {
+                    for (it in (0 until 10)) {
+                        item {
+                            ListItem(
+                                icon = {
+                                    Icon(asset = vectorResource(id = R.drawable.ic_adjustments_horizontal))
+                                },
+                                text = {
+                                    Text(text = "Settings")
+                                }
+                            )
                         }
-                    )
+                    }
                 }
             }
         }
@@ -284,7 +352,10 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
 }
 
 @Composable
-private fun DrawerUserHeader(user: UiUser?) {
+private fun DrawerUserHeader(
+    user: UiUser?,
+    onTrailingClicked: () -> Unit = {},
+) {
     ListItem(
         icon = {
             user?.let {
@@ -310,6 +381,7 @@ private fun DrawerUserHeader(user: UiUser?) {
         trailing = {
             IconButton(
                 onClick = {
+                    onTrailingClicked.invoke()
                 }
             ) {
                 Icon(asset = Icons.Default.ArrowDropDown)

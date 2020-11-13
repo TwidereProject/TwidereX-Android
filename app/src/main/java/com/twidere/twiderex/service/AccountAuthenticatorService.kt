@@ -27,6 +27,7 @@ import android.accounts.AccountManager
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.os.IBinder
 import androidx.core.os.bundleOf
@@ -54,8 +55,11 @@ class AccountAuthenticatorService : Service() {
             requiredFeatures: Array<String>?,
             options: Bundle?
         ): Bundle {
-            // TODO: Launch sign in
-            return bundleOf()
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("twiderex://signin"))
+            intent.putExtra(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE, response)
+            return bundleOf(
+                AccountManager.KEY_INTENT to intent,
+            )
         }
 
         override fun getAuthToken(
@@ -67,7 +71,11 @@ class AccountAuthenticatorService : Service() {
             val am = AccountManager.get(context)
             val authToken = am.peekAuthToken(account, authTokenType)
             if (authToken.isNullOrEmpty()) {
-                // TODO: Launch sign in
+                val intent = Intent(Intent.ACTION_VIEW, Uri.parse("twiderex://signin"))
+                intent.putExtra(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE, response)
+                return bundleOf(
+                    AccountManager.KEY_INTENT to intent,
+                )
             }
             return bundleOf(
                 AccountManager.KEY_ACCOUNT_NAME to account.name,

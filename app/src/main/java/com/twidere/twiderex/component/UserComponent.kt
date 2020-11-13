@@ -97,15 +97,24 @@ fun UserComponent(
     lazyListState: LazyListState = rememberLazyListState(),
 ) {
     val account = AmbientActiveAccount.current ?: return
-    val viewModel = assistedViewModel<UserViewModel.AssistedFactory, UserViewModel> {
+    val viewModel = assistedViewModel<UserViewModel.AssistedFactory, UserViewModel>(
+        account,
+        screenName,
+    ) {
         it.create(account, screenName)
     }
     val timelineViewModel =
-        assistedViewModel<UserTimelineViewModel.AssistedFactory, UserTimelineViewModel> {
+        assistedViewModel<UserTimelineViewModel.AssistedFactory, UserTimelineViewModel>(
+            account,
+            screenName,
+        ) {
             it.create(account, screenName)
         }
     val favouriteViewModel =
-        assistedViewModel<UserFavouriteTimelineViewModel.AssistedFactory, UserFavouriteTimelineViewModel> {
+        assistedViewModel<UserFavouriteTimelineViewModel.AssistedFactory, UserFavouriteTimelineViewModel>(
+            account,
+            screenName,
+        ) {
             it.create(account, screenName)
         }
 
@@ -398,13 +407,15 @@ private fun UserInfo(user: UiUser, viewModel: UserViewModel) {
                         Column(
                             horizontalAlignment = Alignment.End
                         ) {
-                            TextButton(onClick = {
-                                if (it.followedBy) {
-                                    viewModel.unfollow()
-                                } else {
-                                    viewModel.follow()
+                            TextButton(
+                                onClick = {
+                                    if (it.followedBy) {
+                                        viewModel.unfollow()
+                                    } else {
+                                        viewModel.follow()
+                                    }
                                 }
-                            }) {
+                            ) {
                                 Text(
                                     text = if (it.followedBy) "Following" else "Follow",
                                     style = MaterialTheme.typography.h6,

@@ -29,13 +29,17 @@ import androidx.lifecycle.ViewModelProvider
 
 @Composable
 inline fun <reified AF : IAssistedFactory, reified VM : ViewModel> assistedViewModel(
-    key: String? = null,
+    vararg dependsOn: Any,
     noinline creator: ((AF) -> VM)? = null,
 ): VM {
     val factories = AmbientAssistedFactories.current
     val factory = factories.firstOrNull { AF::class.java.isInstance(it) } as? AF
     return viewModel(
-        key,
+        if (dependsOn.any()) {
+            dependsOn.joinToString { it.hashCode().toString() } + VM::class.java.canonicalName
+        } else {
+            null
+        },
         factory = object : ViewModelProvider.Factory {
             override fun <T : ViewModel?> create(modelClass: Class<T>): T {
                 @Suppress("UNCHECKED_CAST")

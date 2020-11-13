@@ -20,6 +20,7 @@
  */
 package com.twidere.twiderex.scenes.twitter
 
+import android.webkit.CookieManager
 import android.webkit.JavascriptInterface
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
@@ -56,7 +57,11 @@ fun TwitterWebSignInScene(target: String) {
                     "injector" to TwitterWebJavascriptInterface(
                         navController
                     )
-                )
+                ),
+                config = {
+                    CookieManager.getInstance().removeAllCookies {
+                    }
+                }
             )
         }
     }

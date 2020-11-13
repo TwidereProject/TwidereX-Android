@@ -74,6 +74,7 @@ fun WebComponent(
     javascriptInterface: Map<String, Any> = mapOf(),
     onPageFinished: ((view: WebView, url: String) -> Unit)? = null,
     onPageStarted: ((view: WebView, url: String) -> Unit)? = null,
+    config: (WebView) -> Unit = {},
 ) {
     if (WebContext.debug) {
         Log.d("WebComponent", "WebComponent compose $url")
@@ -85,6 +86,7 @@ fun WebComponent(
             it.addJavascriptInterface(item.value, item.key)
         }
         it.setRef { view -> webContext.webView = view }
+        config.invoke(it)
         it.setUrl(url)
     }
 }

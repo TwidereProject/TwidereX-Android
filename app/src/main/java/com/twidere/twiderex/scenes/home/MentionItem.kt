@@ -43,7 +43,9 @@ class MentionItem : HomeNavigationItem() {
     override fun onCompose() {
         val account = AmbientActiveAccount.current ?: return
         val viewModel =
-            assistedViewModel<MentionsTimelineViewModel.AssistedFactory, MentionsTimelineViewModel> {
+            assistedViewModel<MentionsTimelineViewModel.AssistedFactory, MentionsTimelineViewModel>(
+                account
+            ) {
                 it.create(account)
             }
         TimelineComponent(viewModel = viewModel)

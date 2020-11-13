@@ -30,6 +30,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import com.twidere.twiderex.model.AccountDetails
+import com.twidere.twiderex.viewmodel.ActiveAccountViewModel
 
 val AmbientWindow = staticAmbientOf<Window> { error("No Window") }
 val AmbientNavController = staticAmbientOf<NavController> { error("No NavController") }
@@ -37,6 +38,7 @@ val AmbientViewModelProviderFactory = staticAmbientOf<ViewModelProvider.Factory>
 val AmbientActiveAccount = ambientOf<AccountDetails?>()
 val AmbientViewModelFactoriesMap =
     staticAmbientOf<Map<String, ViewModelAssistedFactory<out ViewModel>>>()
+val AmbientActiveAccountViewModel = ambientOf<ActiveAccountViewModel>()
 val AmbientApplication = staticAmbientOf<Application>()
 val AmbientInStoryboard = staticAmbientOf { false }
 val AmbientActivity = staticAmbientOf<Activity>()

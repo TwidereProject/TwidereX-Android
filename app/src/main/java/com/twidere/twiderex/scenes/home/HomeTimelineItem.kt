@@ -51,7 +51,9 @@ class HomeTimelineItem : HomeNavigationItem() {
     @Composable
     override fun onCompose() {
         val account = AmbientActiveAccount.current ?: return
-        val viewModel = assistedViewModel<HomeTimelineViewModel.AssistedFactory, HomeTimelineViewModel> {
+        val viewModel = assistedViewModel<HomeTimelineViewModel.AssistedFactory, HomeTimelineViewModel>(
+            account
+        ) {
             it.create(account)
         }
         Scaffold(

@@ -45,6 +45,7 @@ import com.twidere.twiderex.preferences.proto.DisplayPreferences
 import com.twidere.twiderex.providers.AmbientStatusActions
 import com.twidere.twiderex.providers.StatusActions
 import com.twidere.twiderex.ui.AmbientActiveAccount
+import com.twidere.twiderex.ui.AmbientActiveAccountViewModel
 import com.twidere.twiderex.ui.AmbientActivity
 import com.twidere.twiderex.ui.AmbientApplication
 import com.twidere.twiderex.ui.AmbientViewModelProviderFactory
@@ -126,7 +127,6 @@ class TwidereXActivity : ComponentActivity() {
         setContent {
             val accountViewModel = viewModel<ActiveAccountViewModel>()
             val account by accountViewModel.account.observeAsState()
-
             Providers(
                 AmbientLauncher provides launcher,
                 AmbientWindow provides window,
@@ -135,6 +135,7 @@ class TwidereXActivity : ComponentActivity() {
                 AmbientApplication provides application,
                 AmbientStatusActions provides statusActions,
                 AmbientActivity provides this,
+                AmbientActiveAccountViewModel provides accountViewModel,
             ) {
                 ProvidePreferences(
                     appearancePreferences = appearancePreferences,
