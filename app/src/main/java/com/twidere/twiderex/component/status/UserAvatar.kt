@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.navigation.compose.navigate
 import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.model.ui.UiUser
+import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.preferences.AmbientDisplayPreferences
 import com.twidere.twiderex.preferences.proto.DisplayPreferences
 import com.twidere.twiderex.ui.AmbientInStoryboard
@@ -58,7 +59,7 @@ fun UserAvatar(
                 .clickable(
                     onClick = {
                         if (!inStoryBoard) {
-                            navController.navigate("user/${user.screenName}")
+                            navController.navigate(Route.User(user.screenName))
                         }
                     }
                 )

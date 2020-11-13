@@ -49,6 +49,7 @@ import androidx.navigation.compose.navigate
 import com.twidere.twiderex.R
 import com.twidere.twiderex.extensions.humanizedTimestamp
 import com.twidere.twiderex.model.ui.UiStatus
+import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.preferences.AmbientDisplayPreferences
 import com.twidere.twiderex.ui.AmbientInStoryboard
 import com.twidere.twiderex.ui.AmbientNavController
@@ -70,7 +71,7 @@ fun TimelineStatusComponent(
                 .clickable(
                     onClick = {
                         if (!inStoryBoard) {
-                            navController.navigate("status/${data.statusId}")
+                            navController.navigate(Route.Status(data.statusId))
                         }
                     }
                 )
@@ -196,7 +197,7 @@ private fun StatusComponent(
                             .clickable(
                                 onClick = {
                                     if (!inStoryBoard) {
-                                        navController.navigate("status/${status.quote.statusId}")
+                                        navController.navigate(Route.Status(status.quote.statusId))
                                     }
                                 }
                             )

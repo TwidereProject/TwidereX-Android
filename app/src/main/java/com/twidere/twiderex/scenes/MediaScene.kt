@@ -77,6 +77,7 @@ import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.model.ui.UiStatus
+import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.ui.AmbientActiveAccount
 import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.ui.TwidereXTheme
@@ -162,7 +163,7 @@ fun MediaScene(status: UiStatus, selectedIndex: Int) {
                             modifier = Modifier
                                 .clickable(
                                     onClick = {
-                                        navController.navigate("status/${status.statusId}")
+                                        navController.navigate(Route.Status(status.statusId))
                                     }
                                 ),
                             text = status.text,

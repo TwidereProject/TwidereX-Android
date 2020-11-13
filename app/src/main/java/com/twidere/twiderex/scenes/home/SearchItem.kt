@@ -41,8 +41,8 @@ import androidx.navigation.compose.navigate
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.TextInput
+import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.ui.AmbientNavController
-import java.net.URLEncoder
 
 class SearchItem : HomeNavigationItem() {
     override val name: String
@@ -83,12 +83,7 @@ class SearchItem : HomeNavigationItem() {
                                     onImeActionPerformed = { _, _ ->
                                         if (text.isNotEmpty()) {
                                             navController.navigate(
-                                                "search/${
-                                                    URLEncoder.encode(
-                                                        text,
-                                                        "UTF-8"
-                                                    )
-                                                }"
+                                                Route.Search(text)
                                             )
                                         }
                                     }
@@ -97,12 +92,7 @@ class SearchItem : HomeNavigationItem() {
                                     onClick = {
                                         if (text.isNotEmpty()) {
                                             navController.navigate(
-                                                "search/${
-                                                    URLEncoder.encode(
-                                                        text,
-                                                        "UTF-8"
-                                                    )
-                                                }"
+                                                Route.Search(text)
                                             )
                                         }
                                     }

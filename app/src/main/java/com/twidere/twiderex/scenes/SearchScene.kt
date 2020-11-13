@@ -72,6 +72,7 @@ import com.twidere.twiderex.component.status.StatusMediaPreviewItem
 import com.twidere.twiderex.component.status.TimelineStatusComponent
 import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.ui.AmbientActiveAccount
 import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.ui.TwidereXTheme
@@ -241,11 +242,12 @@ private fun SearchMediasContent(viewModel: TwitterSearchMediaViewModel) {
                     ),
                 onClick = {
                     navController.navigate(
-                        "media/${item.second.statusId}?selectedIndex=${
-                        item.second.media.indexOf(
-                            item.first
+                        Route.Media(
+                            item.second.statusId, selectedIndex =
+                            item.second.media.indexOf(
+                                item.first
+                            )
                         )
-                        }"
                     )
                 }
             )

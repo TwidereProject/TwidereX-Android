@@ -25,6 +25,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navArgument
 import androidx.navigation.navDeepLink
+import com.twidere.services.twitter.model.fields.TweetFields
 import com.twidere.twiderex.scenes.ComposeScene
 import com.twidere.twiderex.scenes.ComposeType
 import com.twidere.twiderex.scenes.HomeScene
@@ -40,8 +41,45 @@ import com.twidere.twiderex.scenes.twitter.TwitterSignInScene
 import com.twidere.twiderex.scenes.twitter.TwitterWebSignInScene
 import com.twidere.twiderex.twitterHosts
 import java.net.URLDecoder
+import java.net.URLEncoder
 
 const val initialRoute = "splash"
+
+object Route {
+    val Home = "home"
+
+    object SignIn {
+        val Twitter = "signin/twitter"
+        fun TwitterWeb(target: String) = "signin/twitter/web/${
+            URLEncoder.encode(
+                target,
+                "UTF-8"
+            )
+        }"
+    }
+
+    fun User(screenName: String) = "user/$screenName"
+    fun Status(statusId: String) = "status/$statusId"
+    fun Media(statusId: String, selectedIndex: Int = 0) =
+        "media/$statusId?selectedIndex=$selectedIndex"
+
+    fun Search(keyword: String) = "search/${
+        URLEncoder.encode(
+            keyword,
+            "UTF-8"
+        )
+    }"
+
+    fun Compose(composeType: ComposeType, statusId: String? = null) =
+        "compose/${composeType.name}?statusId=$statusId"
+
+    object Settings {
+        val Home = "settings"
+        val Appearance = "settings/appearance"
+        val Display = "settings/display"
+    }
+}
+
 
 fun NavGraphBuilder.route() {
     composable("splash") {
@@ -68,7 +106,7 @@ fun NavGraphBuilder.route() {
     composable(
         "user/{screenName}",
         arguments = listOf(
-            navArgument("userId") { type = NavType.StringType },
+            navArgument("screenName") { type = NavType.StringType },
         ),
         deepLinks = twitterHosts.map { navDeepLink { uriPattern = "$it/{screenName}" } }
     ) { backStackEntry ->

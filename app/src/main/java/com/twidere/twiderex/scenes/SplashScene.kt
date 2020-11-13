@@ -35,6 +35,7 @@ import androidx.compose.ui.res.imageResource
 import androidx.navigation.compose.navigate
 import com.twidere.twiderex.R
 import com.twidere.twiderex.extensions.navViewModel
+import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.ui.TwidereXTheme
 import com.twidere.twiderex.viewmodel.SplashViewModel
@@ -63,7 +64,7 @@ fun SplashScene() {
             scope.launch {
                 if (viewModel.hasAccount()) {
                     navController.navigate(
-                        "home",
+                        Route.Home,
                     ) {
                         popUpTo(0) {
                             inclusive = true
@@ -71,7 +72,7 @@ fun SplashScene() {
                     }
                 } else {
                     navController.navigate(
-                        "signin/twitter",
+                        Route.SignIn.Twitter,
                     ) {
                         popUpTo(0) {
                             inclusive = true

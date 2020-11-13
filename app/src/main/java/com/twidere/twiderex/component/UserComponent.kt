@@ -78,7 +78,7 @@ import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.model.ui.UiUser
-import com.twidere.twiderex.preferences.AmbientDisplayPreferences
+import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.ui.AmbientActiveAccount
 import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.ui.standardPadding
@@ -310,7 +310,7 @@ private fun LazyListScope.mediaTimeline(
                     MaterialTheme.shapes.medium
                 ),
             onClick = {
-                navController.navigate("media/${item.second.statusId}?selectedIndex=${index}")
+                navController.navigate(Route.Media(item.second.statusId, selectedIndex = index))
             }
         )
     }

@@ -36,6 +36,7 @@ import androidx.navigation.compose.navigate
 import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.model.ui.UiStatus
+import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.ui.AmbientInStoryboard
 import com.twidere.twiderex.ui.AmbientNavController
 
@@ -49,7 +50,7 @@ fun StatusMediaComponent(
     val onItemClick = { it: UiMedia ->
         val index = media.indexOf(it)
         if (!inStoryBoard) {
-            navController.navigate("media/${status.statusId}?selectedIndex=$index")
+            navController.navigate(Route.Media(statusId = status.statusId, selectedIndex = index))
         }
     }
     if (media.size == 1) {

@@ -44,6 +44,7 @@ import com.twidere.twiderex.component.foundation.ActionIconButton
 import com.twidere.twiderex.extensions.humanizedCount
 import com.twidere.twiderex.extensions.shareText
 import com.twidere.twiderex.model.ui.UiStatus
+import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.providers.AmbientStatusActions
 import com.twidere.twiderex.scenes.ComposeType
 import com.twidere.twiderex.ui.AmbientActiveAccount
@@ -61,7 +62,7 @@ fun ReplyButton(
     val icon = vectorResource(id = R.drawable.ic_corner_up_left)
     val action = {
         if (!inStoryBoard) {
-            navController.navigate("compose/${ComposeType.Reply.name}?statusId=${status.statusId}")
+            navController.navigate(Route.Compose(ComposeType.Reply, statusId = status.statusId))
         }
     }
     if (withNumber) {

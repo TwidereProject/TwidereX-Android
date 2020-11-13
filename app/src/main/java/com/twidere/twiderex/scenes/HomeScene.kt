@@ -64,6 +64,7 @@ import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.model.ui.UiUser.Companion.toUi
+import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.preferences.AmbientAppearancePreferences
 import com.twidere.twiderex.preferences.proto.AppearancePreferences
 import com.twidere.twiderex.scenes.home.HomeNavigationItem
@@ -264,7 +265,7 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
             modifier = Modifier.clickable(
                 onClick = {
                     scaffoldState.drawerState.close {
-                        navController.navigate("settings")
+                        navController.navigate(Route.Settings.Home)
                     }
                 }
             ),

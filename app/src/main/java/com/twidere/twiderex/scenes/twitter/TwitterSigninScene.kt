@@ -46,6 +46,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.navigate
 import com.twidere.twiderex.R
 import com.twidere.twiderex.extensions.navViewModel
+import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.ui.TwidereXTheme
 import com.twidere.twiderex.viewmodel.twitter.TwitterSignInViewModel
@@ -53,7 +54,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.net.URLEncoder
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -118,17 +118,12 @@ fun TwitterSignInScene() {
                                                     )
                                                 }
                                                 navController.navigate(
-                                                    "signin/twitter/web/${
-                                                        URLEncoder.encode(
-                                                            target,
-                                                            "UTF-8"
-                                                        )
-                                                    }"
+                                                    Route.SignIn.TwitterWeb(target)
                                                 )
                                             }
                                         }.takeIf { it }?.let {
                                             navController.navigate(
-                                                "home",
+                                                Route.Home,
                                             ) {
                                                 popUpTo(0) {
                                                     inclusive = true
