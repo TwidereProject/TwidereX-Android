@@ -8,6 +8,7 @@ Next generation of Twidere for Android 5.0+. **Still in early stage.**
 - Modern Material Design
 - Dark mode
 - Tweet with photos
+- Multiple account support
 - Free, open source, NO ads, forever!
 
 
@@ -18,8 +19,9 @@ Initial release for Twidere X!
 ### What is being planned for next release - November 2020
 
 - Stability
-- Multiple account support
 - UI/UX tweaking
+- List timeline
+- Following/Follower list
 
 ## Contributing
 
@@ -33,11 +35,9 @@ Twidere X is still in an early stage and will be periodically re-structuring/ref
 
 ## License
 ```
-Twidere X
+                       Twidere X
 
-Copyright (C) 2020 Tlaster <tlaster@outlook.com>
-
-This file is part of Twidere X.
+     Copyright (C) 2020 Tlaster <tlaster@outlook.com>
 
 Twidere X is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
