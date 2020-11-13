@@ -23,5 +23,7 @@ package com.twidere.services.microblog
 import com.twidere.services.microblog.model.IRelationship
 
 interface RelationshipService {
-    suspend fun showRelationship(id: String): IRelationship
+    suspend fun showRelationship(target_screen_name: String): IRelationship
+    suspend fun follow(screenName: String)
+    suspend fun unfollow(screenName: String)
 }

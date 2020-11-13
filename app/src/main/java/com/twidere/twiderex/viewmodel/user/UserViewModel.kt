@@ -35,6 +35,7 @@ import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.UserKey
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.UserRepository
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 
 class UserViewModel @AssistedInject constructor(
@@ -56,6 +57,7 @@ class UserViewModel @AssistedInject constructor(
     }
 
     val refreshing = MutableLiveData(false)
+    val loadingRelationship = MutableLiveData(false)
     val user = liveData {
         emitSource(repository.getUserLiveData(screenName))
     }
@@ -69,10 +71,7 @@ class UserViewModel @AssistedInject constructor(
         )
     }
 
-    suspend fun refresh() {
-        if (refreshing.value == true) {
-            return
-        }
+    fun refresh() = viewModelScope.launch {
         refreshing.postValue(true)
         val key = UserKey(screenName, "twitter.com")
         val isme = account.key == key
@@ -87,18 +86,37 @@ class UserViewModel @AssistedInject constructor(
                 }
             }
         }
-        if (!isme) {
-            dbUser?.userId?.let { userId ->
-                repository.showRelationship(userId).let {
-                    relationship.postValue(it)
-                }
-            }
-        }
         refreshing.postValue(false)
     }
+
+    fun follow() = viewModelScope.launch {
+        loadingRelationship.postValue(true)
+        repository.follow(screenName)
+        loadRelationShip()
+    }
+
+    fun unfollow() = viewModelScope.launch {
+        loadingRelationship.postValue(true)
+        repository.unfollow(screenName)
+        loadRelationShip()
+    }
+
+    private suspend fun loadRelationShip() {
+        loadingRelationship.postValue(true)
+        repository.showRelationship(screenName).let {
+            relationship.postValue(it)
+        }
+        loadingRelationship.postValue(false)
+    }
+
     init {
         viewModelScope.launch {
-            refresh()
+            async {
+                refresh()
+            }
+            async {
+                loadRelationShip()
+            }
         }
     }
 }

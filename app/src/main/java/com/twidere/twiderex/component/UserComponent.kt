@@ -43,6 +43,7 @@ import androidx.compose.material.ListItem
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -154,9 +155,7 @@ fun UserComponent(
             SwipeToRefreshLayout(
                 refreshingState = refreshing,
                 onRefresh = {
-                    coroutineScope.launch {
-                        viewModel.refresh()
-                    }
+                    viewModel.refresh()
                 },
             ) {
                 LazyColumn(
@@ -323,6 +322,7 @@ private fun LazyListScope.mediaTimeline(
 private fun UserInfo(user: UiUser, viewModel: UserViewModel) {
     val isMe by viewModel.isMe.observeAsState(initial = false)
     val relationship by viewModel.relationship.observeAsState(initial = null)
+    val loadingRelationship by viewModel.loadingRelationship.observeAsState(initial = false)
     val maxBannerSize = 200.dp
     Box(
         modifier = Modifier
@@ -387,21 +387,30 @@ private fun UserInfo(user: UiUser, viewModel: UserViewModel) {
                     )
                 }
                 if (isMe) {
-                    Text(
-                        style = MaterialTheme.typography.h6,
-                        color = MaterialTheme.colors.primary,
-                        text = "Edit",
-                    )
+                    // TODO: edit button
+//                    Text(
+//                        style = MaterialTheme.typography.h6,
+//                        color = MaterialTheme.colors.primary,
+//                        text = "Edit",
+//                    )
                 } else {
-                    relationship?.let {
+                    relationship?.takeIf { !loadingRelationship }?.let {
                         Column(
                             horizontalAlignment = Alignment.End
                         ) {
-                            Text(
-                                text = if (it.followedBy) "Following" else "Follow",
-                                style = MaterialTheme.typography.h6,
-                                color = MaterialTheme.colors.primary,
-                            )
+                            TextButton(onClick = {
+                                if (it.followedBy) {
+                                    viewModel.unfollow()
+                                } else {
+                                    viewModel.follow()
+                                }
+                            }) {
+                                Text(
+                                    text = if (it.followedBy) "Following" else "Follow",
+                                    style = MaterialTheme.typography.h6,
+                                    color = MaterialTheme.colors.primary,
+                                )
+                            }
                             if (it.following) {
                                 Text(
                                     text = "Follows you",

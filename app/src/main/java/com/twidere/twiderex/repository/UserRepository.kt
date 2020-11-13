@@ -71,12 +71,20 @@ class UserRepository @AssistedInject constructor(
         database.userDao().insertAll(listOf(user))
     }
 
-    suspend fun showRelationship(id: String) = relationshipService.showRelationship(id)
+    suspend fun showRelationship(target_screen_name: String) = relationshipService.showRelationship(target_screen_name)
 
     suspend fun getPinnedStatus(user: UiUser): UiStatus? {
         val result = lookupService.userPinnedStatus(user.id) ?: return null
         val userKey = UserKey.Empty
         val timeline = result.toDbTimeline(userKey = userKey, timelineType = TimelineType.User)
         return timeline.toUi(userKey)
+    }
+
+    suspend fun unfollow(screenName: String) {
+        relationshipService.unfollow(screenName)
+    }
+
+    suspend fun follow(screenName: String) {
+        relationshipService.follow(screenName)
     }
 }

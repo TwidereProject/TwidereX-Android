@@ -245,12 +245,20 @@ class TwitterService(
     override suspend fun searchUsers(query: String, page: Int?, count: Int) =
         resources.searchUser(query, page, count)
 
-    override suspend fun showRelationship(id: String): IRelationship {
-        val response = resources.showFriendships(id)
+    override suspend fun showRelationship(target_screen_name: String): IRelationship {
+        val response = resources.showFriendships(target_screen_name)
         return Relationship(
             followedBy = response.relationship?.target?.followedBy ?: false,
             following = response.relationship?.target?.following ?: false,
         )
+    }
+
+    override suspend fun follow(screenName: String) {
+        resources.follow(screenName)
+    }
+
+    override suspend fun unfollow(screenName: String) {
+        resources.unfollow(screenName)
     }
 
     override suspend fun like(id: String) = resources.like(id)
