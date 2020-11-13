@@ -184,9 +184,11 @@ class TwitterService(
                 throw MicroBlogError()
             }
         }
-        user.data.profileBanner = runCatching {
-            resources.profileBanners(user.data.username!!)
-        }.getOrNull()
+        user.data.profileBanner = user.data.username?.let { userName ->
+            runCatching {
+                resources.profileBanners(userName)
+            }.getOrNull()
+        }
         return user.data
     }
 
