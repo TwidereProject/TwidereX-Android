@@ -225,9 +225,11 @@ private fun SearchUsersContent(viewModel: TwitterSearchUserViewModel) {
             itemsPaging(source) { item ->
                 item?.let {
                     ListItem(
-                        modifier = Modifier.clickable(onClick = {
-                            navController.navigate(Route.User(item.screenName))
-                        }),
+                        modifier = Modifier.clickable(
+                            onClick = {
+                                navController.navigate(Route.User(item.screenName))
+                            }
+                        ),
                         icon = {
                             UserAvatar(user = item)
                         },

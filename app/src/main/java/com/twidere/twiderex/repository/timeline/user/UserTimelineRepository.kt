@@ -33,7 +33,7 @@ class UserTimelineRepository @AssistedInject constructor(
     private val database: AppDatabase,
     @Assisted private val userKey: UserKey,
     @Assisted private val service: TimelineService,
-): PagingTimelineRepositoryBase(database, userKey) {
+) : PagingTimelineRepositoryBase(database, userKey) {
     @AssistedInject.Factory
     interface AssistedFactory {
         fun create(userKey: UserKey, service: TimelineService): UserTimelineRepository

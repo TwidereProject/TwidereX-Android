@@ -58,7 +58,6 @@ abstract class TimelineViewModel(
         runCatching {
             pagingMediator.loadBetween(defaultLoadCount, max_id = max_id, since_id = since_id)
         }.onFailure {
-
         }
         loadingBetween.postValue((loadingBetween.value ?: listOf()) - max_id)
     }

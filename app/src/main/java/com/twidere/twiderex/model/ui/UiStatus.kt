@@ -141,7 +141,6 @@ data class UiStatus(
             )
         }
 
-
         fun DbPagingTimelineWithStatus.toUi(
             userKey: UserKey,
         ) = with(status.status) {
