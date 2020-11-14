@@ -34,3 +34,4 @@ class TimelineTypeConverter {
         return string?.let { TimelineType.valueOf(it) }
     }
 }
+

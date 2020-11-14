@@ -115,14 +115,15 @@ class TwitterService(
         screen_name: String,
         count: Int,
         since_id: String?,
-        max_id: String?
+        max_id: String?,
+        exclude_replies: Boolean,
     ) = resources.userTimeline(
         screen_name,
         count,
         since_id,
         max_id,
         trim_user = false,
-        exclude_replies = false,
+        exclude_replies = exclude_replies,
         include_entities = true,
     )
 

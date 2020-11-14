@@ -28,15 +28,18 @@ import com.twidere.twiderex.db.dao.ReactionDao
 import com.twidere.twiderex.db.dao.StatusDao
 import com.twidere.twiderex.db.dao.TimelineDao
 import com.twidere.twiderex.db.dao.UserDao
+import com.twidere.twiderex.db.dao.UserTimelineDao
 import com.twidere.twiderex.db.model.DbMedia
 import com.twidere.twiderex.db.model.DbStatusReaction
 import com.twidere.twiderex.db.model.DbStatusV2
 import com.twidere.twiderex.db.model.DbTimeline
 import com.twidere.twiderex.db.model.DbUser
+import com.twidere.twiderex.db.model.DbUserTimeline
 import com.twidere.twiderex.db.model.converter.MediaTypeConverter
 import com.twidere.twiderex.db.model.converter.PlatformTypeConverter
 import com.twidere.twiderex.db.model.converter.TimelineTypeConverter
 import com.twidere.twiderex.db.model.converter.UserKeyConverter
+import com.twidere.twiderex.db.model.converter.UserTimelineTypeConverter
 import javax.inject.Singleton
 
 @Singleton
@@ -47,6 +50,7 @@ import javax.inject.Singleton
         DbMedia::class,
         DbUser::class,
         DbStatusReaction::class,
+        DbUserTimeline::class,
     ],
     version = 1,
 )
@@ -55,6 +59,7 @@ import javax.inject.Singleton
     PlatformTypeConverter::class,
     MediaTypeConverter::class,
     TimelineTypeConverter::class,
+    UserTimelineTypeConverter::class,
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun statusDao(): StatusDao
@@ -62,4 +67,5 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun mediaDao(): MediaDao
     abstract fun userDao(): UserDao
     abstract fun reactionDao(): ReactionDao
+    abstract fun userTimelineDao(): UserTimelineDao
 }

@@ -62,6 +62,7 @@ import com.twidere.twiderex.viewmodel.twitter.search.TwitterSearchUserViewModel
 import com.twidere.twiderex.viewmodel.twitter.timeline.HomeTimelineViewModel
 import com.twidere.twiderex.viewmodel.twitter.timeline.MentionsTimelineViewModel
 import com.twidere.twiderex.viewmodel.user.UserFavouriteTimelineViewModel
+import com.twidere.twiderex.viewmodel.user.UserMediaTimelineViewModel
 import com.twidere.twiderex.viewmodel.user.UserTimelineViewModel
 import com.twidere.twiderex.viewmodel.user.UserViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -98,6 +99,9 @@ class TwidereXActivity : ComponentActivity() {
 
     @Inject
     lateinit var userTimelineViewModelFactory: UserTimelineViewModel.AssistedFactory
+
+    @Inject
+    lateinit var userMediaTimelineViewModelFactory: UserMediaTimelineViewModel.AssistedFactory
 
     @Inject
     lateinit var userViewModelFactory: UserViewModel.AssistedFactory
@@ -153,6 +157,7 @@ class TwidereXActivity : ComponentActivity() {
                         userViewModelFactory,
                         composeViewModelFactory,
                         mediaViewModelFactory,
+                        userMediaTimelineViewModelFactory,
                     ) {
                         ProvideNavigationViewModelFactoryMap(factory = defaultViewModelProviderFactory as HiltViewModelFactory) {
                             ProvideWindowPadding {

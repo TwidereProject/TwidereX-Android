@@ -40,7 +40,9 @@ interface TimelineService {
         count: Int = 20,
         since_id: String? = null,
         max_id: String? = null,
+        exclude_replies: Boolean = false,
     ): List<IStatus>
+
 
     suspend fun favorites(
         screen_name: String,

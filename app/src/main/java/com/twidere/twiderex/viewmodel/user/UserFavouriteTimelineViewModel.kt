@@ -20,20 +20,24 @@
  */
 package com.twidere.twiderex.viewmodel.user
 
-import androidx.lifecycle.LiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
 import com.twidere.services.microblog.TimelineService
 import com.twidere.twiderex.di.assisted.IAssistedFactory
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.ui.UiStatus
-import com.twidere.twiderex.repository.timeline.UserFavouriteTimelineRepository
+import com.twidere.twiderex.repository.timeline.user.UserFavouriteTimelineRepository
+import kotlinx.coroutines.flow.Flow
 
 class UserFavouriteTimelineViewModel @AssistedInject constructor(
     private val factory: UserFavouriteTimelineRepository.AssistedFactory,
     @Assisted private val account: AccountDetails,
     @Assisted screenName: String,
-) : UserTimelineViewModelBase(screenName = screenName) {
+) : ViewModel() {
 
     @AssistedInject.Factory
     interface AssistedFactory : IAssistedFactory {
@@ -48,15 +52,7 @@ class UserFavouriteTimelineViewModel @AssistedInject constructor(
         }
     }
 
-    override val source: LiveData<List<UiStatus>>
-        get() = repository.liveData
-
-    override suspend fun loadBetween(
-        max_id: String?,
-        since_Id: String?
-    ) = repository.loadBetween(
-        screenName = screenName,
-        max_id = max_id,
-        since_id = since_Id,
-    )
+    val source: Flow<PagingData<UiStatus>> by lazy {
+        repository.getPager(screenName).cachedIn(viewModelScope)
+    }
 }

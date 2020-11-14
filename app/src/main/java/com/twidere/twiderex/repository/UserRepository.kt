@@ -27,14 +27,9 @@ import com.squareup.inject.assisted.AssistedInject
 import com.twidere.services.microblog.LookupService
 import com.twidere.services.microblog.RelationshipService
 import com.twidere.twiderex.db.AppDatabase
-import com.twidere.twiderex.db.mapper.toDbTimeline
 import com.twidere.twiderex.db.mapper.toDbUser
 import com.twidere.twiderex.db.model.DbUser
-import com.twidere.twiderex.db.model.TimelineType
 import com.twidere.twiderex.model.PlatformType
-import com.twidere.twiderex.model.UserKey
-import com.twidere.twiderex.model.ui.UiStatus
-import com.twidere.twiderex.model.ui.UiStatus.Companion.toUi
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.model.ui.UiUser.Companion.toUi
 import javax.inject.Singleton
@@ -73,12 +68,12 @@ class UserRepository @AssistedInject constructor(
 
     suspend fun showRelationship(target_screen_name: String) = relationshipService.showRelationship(target_screen_name)
 
-    suspend fun getPinnedStatus(user: UiUser): UiStatus? {
-        val result = lookupService.userPinnedStatus(user.id) ?: return null
-        val userKey = UserKey.Empty
-        val timeline = result.toDbTimeline(userKey = userKey, timelineType = TimelineType.User)
-        return timeline.toUi(userKey)
-    }
+//    suspend fun getPinnedStatus(user: UiUser): UiStatus? {
+//        val result = lookupService.userPinnedStatus(user.id) ?: return null
+//        val userKey = UserKey.Empty
+//        val timeline = result.toDbTimeline(userKey = userKey, timelineType = TimelineType.User)
+//        return timeline.toUi(userKey)
+//    }
 
     suspend fun unfollow(screenName: String) {
         relationshipService.unfollow(screenName)

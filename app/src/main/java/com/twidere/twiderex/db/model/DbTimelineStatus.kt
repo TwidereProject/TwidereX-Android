@@ -26,7 +26,6 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import androidx.room.Relation
 import com.twidere.twiderex.db.AppDatabase
-import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.UserKey
 
 @Entity(
@@ -37,7 +36,6 @@ data class DbTimeline(
     @PrimaryKey
     val _id: String,
     val userKey: UserKey,
-    val platformType: PlatformType,
     val timestamp: Long,
     var isGap: Boolean,
     val statusId: String,
@@ -47,10 +45,9 @@ data class DbTimeline(
 enum class TimelineType {
     Home,
     Mentions,
-    User,
-    UserFavourite,
     Conversation,
     SearchTweets,
+    Custom,
 }
 
 data class DbTimelineWithStatus(
@@ -72,16 +69,7 @@ suspend fun List<DbTimelineWithStatus>.saveToDb(
         .map { listOf(it.status.status, it.status.quote, it.status.retweet) }
         .flatten()
         .filterNotNull()
-    data.map { it.user }.let {
-        database.userDao().insertAll(it)
-    }
-    database.mediaDao().insertAll(data.map { it.media }.flatten())
-    data.map { it.data }.let {
-        database.statusDao().insertAll(it)
-    }
-    data.map { it.reactions }.flatten().let {
-        database.reactionDao().insertAll(it)
-    }
+    data.saveToDb(database)
     this.map { it.timeline }.let {
         database.timelineDao().insertAll(it)
     }

@@ -25,6 +25,7 @@ import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import androidx.room.Relation
+import com.twidere.twiderex.db.AppDatabase
 import com.twidere.twiderex.model.UserKey
 
 @Entity(
@@ -96,3 +97,18 @@ data class DbStatusReaction(
     var liked: Boolean,
     var retweeted: Boolean,
 )
+
+suspend fun List<DbStatusWithMediaAndUser>.saveToDb(
+    database: AppDatabase
+) {
+    map { it.user }.let {
+        database.userDao().insertAll(it)
+    }
+    database.mediaDao().insertAll(map { it.media }.flatten())
+    map { it.data }.let {
+        database.statusDao().insertAll(it)
+    }
+    map { it.reactions }.flatten().let {
+        database.reactionDao().insertAll(it)
+    }
+}

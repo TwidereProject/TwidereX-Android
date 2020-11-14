@@ -61,7 +61,6 @@ fun StatusV2.toDbTimeline(
         timeline = DbTimeline(
             _id = UUID.randomUUID().toString(),
             userKey = userKey,
-            platformType = PlatformType.Twitter,
             timestamp = status.data.timestamp,
             isGap = false,
             statusId = status.data.statusId,
@@ -88,7 +87,6 @@ fun Status.toDbTimeline(
         timeline = DbTimeline(
             _id = UUID.randomUUID().toString(),
             userKey = userKey,
-            platformType = PlatformType.Twitter,
             timestamp = status.data.timestamp,
             isGap = false,
             statusId = status.data.statusId,

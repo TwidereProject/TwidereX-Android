@@ -80,6 +80,8 @@ dependencies {
     implementation "androidx.compose.runtime:runtime-livedata:$versions.compose"
     androidTestImplementation "androidx.ui:ui-test:$versions.compose"
 
+    implementation "androidx.paging:paging-runtime-ktx:$versions.paging"
+    implementation "androidx.paging:paging-compose:1.0.0-alpha02"
     implementation "androidx.navigation:navigation-compose:1.0.0-alpha02"
     implementation "androidx.activity:activity-ktx:1.2.0-beta01"
     implementation "androidx.datastore:datastore:1.0.0-alpha03"

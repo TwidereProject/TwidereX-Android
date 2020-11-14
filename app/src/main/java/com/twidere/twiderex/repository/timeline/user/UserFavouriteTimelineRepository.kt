@@ -18,40 +18,31 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.repository.timeline
+package com.twidere.twiderex.repository.timeline.user
 
 import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
 import com.twidere.services.microblog.TimelineService
-import com.twidere.services.microblog.model.IStatus
 import com.twidere.twiderex.db.AppDatabase
-import com.twidere.twiderex.db.model.TimelineType
+import com.twidere.twiderex.db.model.UserTimelineType
 import com.twidere.twiderex.model.UserKey
+import com.twidere.twiderex.paging.mediator.user.UserFavouriteMediator
+import com.twidere.twiderex.paging.mediator.user.UserTimelineMediatorBase
 
 class UserFavouriteTimelineRepository @AssistedInject constructor(
-    database: AppDatabase,
-    @Assisted userKey: UserKey,
+    private val database: AppDatabase,
+    @Assisted private val userKey: UserKey,
     @Assisted private val service: TimelineService,
-) : CacheUserTimelineRepository(database, userKey, 20) {
-    override val type: TimelineType
-        get() = TimelineType.UserFavourite
-
+) : UserTimelineRepositoryBase(database, userKey) {
     @AssistedInject.Factory
     interface AssistedFactory {
         fun create(userKey: UserKey, service: TimelineService): UserFavouriteTimelineRepository
     }
 
-    override suspend fun loadData(
-        screenName: String,
-        count: Int,
-        since_id: String?,
-        max_id: String?
-    ): List<IStatus> {
-        return service.favorites(
-            screen_name = screenName,
-            count = count,
-            since_id = since_id,
-            max_id = max_id,
-        )
+    override val timelineType: UserTimelineType
+        get() = UserTimelineType.Favourite
+
+    override fun createRemoteMediator(screenName: String): UserTimelineMediatorBase {
+        return UserFavouriteMediator(screenName, database, userKey, service)
     }
 }

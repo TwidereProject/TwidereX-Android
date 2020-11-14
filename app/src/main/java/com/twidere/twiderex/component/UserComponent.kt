@@ -26,7 +26,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -34,7 +33,6 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.CircularProgressIndicator
@@ -48,11 +46,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.savedinstancestate.savedInstanceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.layout.WithConstraints
 import androidx.compose.ui.res.vectorResource
@@ -60,7 +56,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
 import androidx.compose.ui.zIndex
-import androidx.navigation.compose.navigate
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.twidere.twiderex.R
 import com.twidere.twiderex.annotations.IncomingComposeUpdate
 import com.twidere.twiderex.component.foundation.IconTabsComponent
@@ -68,26 +64,20 @@ import com.twidere.twiderex.component.foundation.LoadingProgress
 import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
 import com.twidere.twiderex.component.foundation.TopAppBarElevation
-import com.twidere.twiderex.component.lazy.itemsGridIndexed
+import com.twidere.twiderex.component.lazy.itemsPaging
 import com.twidere.twiderex.component.status.StatusDivider
-import com.twidere.twiderex.component.status.StatusMediaPreviewItem
 import com.twidere.twiderex.component.status.TimelineStatusComponent
 import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.component.status.withAvatarClip
 import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.extensions.withElevation
-import com.twidere.twiderex.model.ui.UiMedia
-import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.model.ui.UiUser
-import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.ui.AmbientActiveAccount
-import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.ui.standardPadding
 import com.twidere.twiderex.viewmodel.user.UserFavouriteTimelineViewModel
+import com.twidere.twiderex.viewmodel.user.UserMediaTimelineViewModel
 import com.twidere.twiderex.viewmodel.user.UserTimelineViewModel
 import com.twidere.twiderex.viewmodel.user.UserViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 
 @IncomingComposeUpdate
 @Composable
@@ -110,6 +100,13 @@ fun UserComponent(
         ) {
             it.create(account, screenName)
         }
+    val mediaViewModel =
+        assistedViewModel<UserMediaTimelineViewModel.AssistedFactory, UserMediaTimelineViewModel>(
+            account,
+            screenName
+        ) {
+            it.create(account, screenName)
+        }
     val favouriteViewModel =
         assistedViewModel<UserFavouriteTimelineViewModel.AssistedFactory, UserFavouriteTimelineViewModel>(
             account,
@@ -118,15 +115,11 @@ fun UserComponent(
             it.create(account, screenName)
         }
 
+    val timelineSource = timelineViewModel.source.collectAsLazyPagingItems()
+    val mediaSource = mediaViewModel.source.collectAsLazyPagingItems()
+    val favouriteSource = favouriteViewModel.source.collectAsLazyPagingItems()
     val refreshing by viewModel.refreshing.observeAsState(initial = false)
-    val coroutineScope = rememberCoroutineScope()
     val viewModelUser by viewModel.user.observeAsState(initial = initialData)
-    val timeline by timelineViewModel.timeline.observeAsState(initial = emptyList())
-    val timelineLoadingMore by timelineViewModel.loadingMore.observeAsState(initial = false)
-    val mediaTimeline =
-        timeline.filter { it.hasMedia }.flatMap { it.media.map { media -> media to it } }
-    val favourite by favouriteViewModel.timeline.observeAsState(initial = emptyList())
-    val favouriteLoadingMore by favouriteViewModel.loadingMore.observeAsState(initial = false)
     val tabs = listOf(
         vectorResource(id = R.drawable.ic_float_left),
         vectorResource(id = R.drawable.ic_photo),
@@ -134,15 +127,6 @@ fun UserComponent(
     )
     val (selectedItem, setSelectedItem) = savedInstanceState { 0 }
 
-    LaunchedEffect(
-        selectedItem,
-    ) {
-        when {
-            selectedItem == 0 && !timeline.any() -> timelineViewModel.refresh()
-            selectedItem == 1 && !mediaTimeline.any() -> timelineViewModel.loadMore()
-            selectedItem == 2 && !favourite.any() -> favouriteViewModel.refresh()
-        }
-    }
     viewModelUser?.let { user ->
         Box {
             val shouldStickyHeaderShown = lazyListState.firstVisibleItemIndex >= 1
@@ -165,6 +149,11 @@ fun UserComponent(
                 refreshingState = refreshing,
                 onRefresh = {
                     viewModel.refresh()
+                    when (selectedItem) {
+                        0 -> timelineSource.refresh()
+                        1 -> mediaSource.refresh()
+                        2 -> favouriteSource.refresh()
+                    }
                 },
             ) {
                 LazyColumn(
@@ -186,49 +175,33 @@ fun UserComponent(
 
                     when (selectedItem) {
                         0 -> {
-                            if (timeline.any()) {
-                                statusTimeline(
-                                    timeline,
-                                    timelineLoadingMore,
-                                    coroutineScope,
-                                    timelineViewModel,
-                                )
+                            itemsPaging(timelineSource) { item ->
+                                item?.let {
+                                    Column {
+                                        TimelineStatusComponent(it)
+                                        StatusDivider()
+                                    }
+                                }
                             }
                         }
                         1 -> {
-                            if (mediaTimeline.any()) {
-                                mediaTimeline(
-                                    mediaTimeline,
-                                    timelineLoadingMore,
-                                    coroutineScope,
-                                    timelineViewModel,
-                                )
+                            itemsPaging(mediaSource) { item ->
+                                item?.let {
+                                    Column {
+                                        TimelineStatusComponent(it)
+                                        StatusDivider()
+                                    }
+                                }
                             }
                         }
                         2 -> {
-                            if (favourite.any()) {
-                                likeTimeline(
-                                    favourite,
-                                    timelineLoadingMore,
-                                    coroutineScope,
-                                    favouriteViewModel,
-                                )
-                            }
-                        }
-                    }
-                    if (timelineLoadingMore || favouriteLoadingMore) {
-                        item {
-                            val modifier = when (selectedItem) {
-                                0, 1 -> if (timeline.any()) Modifier.fillParentMaxWidth() else Modifier.fillParentMaxSize()
-                                2 -> if (favourite.any()) Modifier.fillParentMaxWidth() else Modifier.fillParentMaxSize()
-                                else -> Modifier.fillParentMaxWidth()
-                            }
-                            StatusDivider()
-                            Box(
-                                modifier = modifier,
-                                alignment = Alignment.TopCenter
-                            ) {
-                                LoadingProgress()
+                            itemsPaging(favouriteSource) { item ->
+                                item?.let {
+                                    Column {
+                                        TimelineStatusComponent(it)
+                                        StatusDivider()
+                                    }
+                                }
                             }
                         }
                     }
@@ -243,87 +216,6 @@ fun UserComponent(
         ) {
             LoadingProgress()
         }
-    }
-}
-
-private fun LazyListScope.likeTimeline(
-    favourite: List<UiStatus>,
-    timelineLoadingMore: Boolean,
-    coroutineScope: CoroutineScope,
-    favouriteViewModel: UserFavouriteTimelineViewModel,
-) {
-    itemsIndexed(favourite) { index, item ->
-        Column {
-            if (!timelineLoadingMore && index == favourite.lastIndex) {
-                coroutineScope.launch {
-                    favouriteViewModel.loadMore()
-                }
-            }
-            TimelineStatusComponent(item)
-            if (index != favourite.lastIndex) {
-                StatusDivider()
-            }
-        }
-    }
-}
-
-private fun LazyListScope.statusTimeline(
-    timeline: List<UiStatus>,
-    timelineLoadingMore: Boolean,
-    coroutineScope: CoroutineScope,
-    timelineViewModel: UserTimelineViewModel,
-) {
-    itemsIndexed(timeline) { index, item ->
-        Column {
-            if (!timelineLoadingMore && index == timeline.lastIndex) {
-                coroutineScope.launch {
-                    timelineViewModel.loadMore()
-                }
-            }
-            TimelineStatusComponent(item)
-            if (index != timeline.lastIndex) {
-                StatusDivider()
-            }
-        }
-    }
-}
-
-@IncomingComposeUpdate
-private fun LazyListScope.mediaTimeline(
-    items: List<Pair<UiMedia, UiStatus>>,
-    timelineLoadingMore: Boolean,
-    coroutineScope: CoroutineScope,
-    timelineViewModel: UserTimelineViewModel,
-) {
-    item {
-        Spacer(modifier = Modifier.height(standardPadding * 2))
-    }
-    itemsGridIndexed(
-        items,
-        rowSize = 2,
-        spacing = standardPadding * 2,
-        padding = standardPadding * 2,
-    ) { index, item ->
-        val navController = AmbientNavController.current
-        if (!timelineLoadingMore && index == items.lastIndex) {
-            coroutineScope.launch {
-                timelineViewModel.loadMore()
-            }
-        }
-        StatusMediaPreviewItem(
-            item.first,
-            modifier = Modifier
-                .aspectRatio(1F)
-                .clip(
-                    MaterialTheme.shapes.medium
-                ),
-            onClick = {
-                navController.navigate(Route.Media(item.second.statusId, selectedIndex = index))
-            }
-        )
-    }
-    item {
-        Spacer(modifier = Modifier.height(standardPadding * 2))
     }
 }
 
@@ -454,7 +346,7 @@ private fun UserInfo(user: UiUser, viewModel: UserViewModel) {
                     }
                 )
             }
-            user.location?.let {
+            user.location?.takeIf { it.isNotEmpty() }?.let {
                 ListItem(
                     icon = {
                         Icon(asset = vectorResource(id = R.drawable.ic_map_pin))

@@ -5,16 +5,16 @@ ext {
             retrofit2            : '2.9.0',
             hilt                 : '2.29.1-alpha',
             androidx_hilt        : '1.0.0-alpha02',
-            room                 : '2.2.5',
+            room                 : '2.3.0-alpha03',
             lifecycle            : '2.3.0-beta01',
             okhttp               : '4.8.1',
             moshi                : '1.9.3',
             kotlinx_serialization: '1.0.0',
             navigation           : '2.3.1',
-            paging               : '3.0.0-alpha07',
+            paging               : '3.0.0-alpha09',
             ktlint               : '0.39.0',
             assisted_inject      : '0.6.0',
-            protobuf : '3.13.0'
+            protobuf             : '3.13.0',
     ]
     global = [
             compileSdkVersion: 30,

@@ -20,25 +20,30 @@
  */
 package com.twidere.twiderex.viewmodel.user
 
-import androidx.lifecycle.LiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
 import com.twidere.services.microblog.TimelineService
 import com.twidere.twiderex.di.assisted.IAssistedFactory
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.ui.UiStatus
-import com.twidere.twiderex.repository.timeline.UserTimelineRepository
+import com.twidere.twiderex.repository.timeline.user.UserTimelineRepository
+import kotlinx.coroutines.flow.Flow
 
 class UserTimelineViewModel @AssistedInject constructor(
     private val factory: UserTimelineRepository.AssistedFactory,
     @Assisted private val account: AccountDetails,
-    @Assisted screenName: String,
-) : UserTimelineViewModelBase(screenName = screenName) {
+    @Assisted private val screenName: String,
+) : ViewModel() {
 
     @AssistedInject.Factory
     interface AssistedFactory : IAssistedFactory {
         fun create(account: AccountDetails, screenName: String): UserTimelineViewModel
     }
+
     private val repository by lazy {
         account.service.let {
             it as TimelineService
@@ -47,22 +52,7 @@ class UserTimelineViewModel @AssistedInject constructor(
         }
     }
 
-    override val source: LiveData<List<UiStatus>>
-        get() = repository.liveData
-
-    override suspend fun loadBetween(
-        max_id: String?,
-        since_Id: String?
-    ): List<UiStatus> {
-        // TODO: pinned tweets
-//        val pinned = repository.getPinnedStatus(user)
-//        if (pinned != null) {
-//            timelineIds.add(pinned.statusId)
-//        }
-        return repository.loadBetween(
-            screenName = screenName,
-            max_id = max_id,
-            since_id = since_Id,
-        )
+    val source: Flow<PagingData<UiStatus>> by lazy {
+        repository.getPager(screenName).cachedIn(viewModelScope)
     }
 }
