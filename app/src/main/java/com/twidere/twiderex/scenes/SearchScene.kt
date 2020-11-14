@@ -21,14 +21,13 @@
 package com.twidere.twiderex.scenes
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumnForIndexed
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.AmbientContentAlpha
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Icon
@@ -42,33 +41,30 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.savedinstancestate.savedInstanceState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.navigate
+import androidx.paging.LoadState
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.twidere.twiderex.R
 import com.twidere.twiderex.annotations.IncomingComposeUpdate
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
-import com.twidere.twiderex.component.foundation.LoadingProgress
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
 import com.twidere.twiderex.component.foundation.TextInput
 import com.twidere.twiderex.component.foundation.TextTabsComponent
 import com.twidere.twiderex.component.foundation.TopAppBarElevation
-import com.twidere.twiderex.component.lazy.LazyGridForIndexed
+import com.twidere.twiderex.component.lazy.itemsPaging
 import com.twidere.twiderex.component.status.StatusDivider
-import com.twidere.twiderex.component.status.StatusMediaPreviewItem
 import com.twidere.twiderex.component.status.TimelineStatusComponent
 import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.di.assisted.assistedViewModel
@@ -76,11 +72,9 @@ import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.ui.AmbientActiveAccount
 import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.ui.TwidereXTheme
-import com.twidere.twiderex.ui.standardPadding
 import com.twidere.twiderex.viewmodel.twitter.search.TwitterSearchMediaViewModel
 import com.twidere.twiderex.viewmodel.twitter.search.TwitterSearchTweetsViewModel
 import com.twidere.twiderex.viewmodel.twitter.search.TwitterSearchUserViewModel
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalFocus::class)
 @Composable
@@ -129,9 +123,9 @@ fun SearchScene(keyword: String) {
                                                 Text(text = "Tap to search...")
                                             },
                                             onImeActionPerformed = { _, _ ->
-                                                usersViewModel.reset(text)
-                                                tweetsViewModel.reset(text)
-                                                mediaViewModel.reset(text)
+//                                                usersViewModel.reset(text)
+//                                                tweetsViewModel.reset(text)
+//                                                mediaViewModel.reset(text)
                                             },
                                             imeAction = ImeAction.Search,
                                             alignment = Alignment.CenterStart,
@@ -173,31 +167,20 @@ fun SearchScene(keyword: String) {
 @OptIn(IncomingComposeUpdate::class)
 @Composable
 private fun SearchTweetsContent(viewModel: TwitterSearchTweetsViewModel) {
-    val refreshing by viewModel.refreshing.observeAsState(initial = false)
-    val loadingMore by viewModel.loadingMore.observeAsState(initial = false)
-    val items by viewModel.source.observeAsState(initial = emptyList())
-    val scope = rememberCoroutineScope()
+    val source = viewModel.source.collectAsLazyPagingItems()
     SwipeToRefreshLayout(
-        refreshingState = refreshing,
+        refreshingState = source.loadState.refresh == LoadState.Loading,
         onRefresh = {
-            scope.launch {
-                viewModel.refresh()
-            }
+            source.refresh()
         }
     ) {
-        LazyColumnForIndexed(items = items) { index, item ->
-            Column {
-                TimelineStatusComponent(
-                    item,
-                )
-                if (loadingMore && index == items.lastIndex) {
+        LazyColumn {
+            itemsPaging(source) { item ->
+                item?.let {
+                    TimelineStatusComponent(
+                        it,
+                    )
                     StatusDivider()
-                    LoadingProgress()
-                }
-            }
-            if (index == items.lastIndex && !loadingMore) {
-                scope.launch {
-                    viewModel.loadMore()
                 }
             }
         }
@@ -207,51 +190,22 @@ private fun SearchTweetsContent(viewModel: TwitterSearchTweetsViewModel) {
 @OptIn(IncomingComposeUpdate::class)
 @Composable
 private fun SearchMediasContent(viewModel: TwitterSearchMediaViewModel) {
-    val refreshing by viewModel.refreshing.observeAsState(initial = false)
-    val loadingMore by viewModel.loadingMore.observeAsState(initial = false)
-    val source by viewModel.source.observeAsState(initial = emptyList())
-    val items = source.filter { it.hasMedia }.flatMap { it.media.map { media -> media to it } }
-    val scope = rememberCoroutineScope()
+    val source = viewModel.source.collectAsLazyPagingItems()
     SwipeToRefreshLayout(
-        refreshingState = refreshing,
+        refreshingState = source.loadState.refresh == LoadState.Loading,
         onRefresh = {
-            scope.launch {
-                viewModel.refresh()
-            }
+            source.refresh()
         }
     ) {
-        LazyGridForIndexed(
-            contentPadding = PaddingValues(top = standardPadding * 2),
-            data = items,
-            rowSize = 2,
-            spacing = standardPadding * 2,
-            padding = standardPadding * 2,
-        ) { index, item ->
-            val navController = AmbientNavController.current
-            if (!loadingMore && index == items.lastIndex) {
-                scope.launch {
-                    viewModel.loadMore()
+        LazyColumn {
+            itemsPaging(source) { item ->
+                item?.let {
+                    TimelineStatusComponent(
+                        it,
+                    )
+                    StatusDivider()
                 }
             }
-            StatusMediaPreviewItem(
-                item.first,
-                modifier = Modifier
-                    .aspectRatio(1F)
-                    .clip(
-                        MaterialTheme.shapes.small
-                    ),
-                onClick = {
-                    navController.navigate(
-                        Route.Media(
-                            item.second.statusId,
-                            selectedIndex =
-                                item.second.media.indexOf(
-                                    item.first
-                                )
-                        )
-                    )
-                }
-            )
         }
     }
 }
@@ -259,55 +213,48 @@ private fun SearchMediasContent(viewModel: TwitterSearchMediaViewModel) {
 @OptIn(IncomingComposeUpdate::class)
 @Composable
 private fun SearchUsersContent(viewModel: TwitterSearchUserViewModel) {
-    val refreshing by viewModel.refreshing.observeAsState(initial = false)
-    val loadingMore by viewModel.loadingMore.observeAsState(initial = false)
-    val items by viewModel.source.observeAsState(initial = emptyList())
-    val scope = rememberCoroutineScope()
+    val source = viewModel.source.collectAsLazyPagingItems()
+    val navController = AmbientNavController.current
     SwipeToRefreshLayout(
-        refreshingState = refreshing,
+        refreshingState = source.loadState.refresh == LoadState.Loading,
         onRefresh = {
-            scope.launch {
-                viewModel.refresh()
-            }
+            source.refresh()
         }
     ) {
-        LazyColumnForIndexed(items = items) { index, item ->
-            ListItem(
-                icon = {
-                    UserAvatar(user = item)
-                },
-                text = {
-                    Row {
-                        Text(
-                            text = item.name,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            color = MaterialTheme.colors.primary
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Providers(
-                            AmbientContentAlpha provides ContentAlpha.medium
-                        ) {
-                            Text(
-                                text = "@${item.screenName}",
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                            )
-                        }
-                    }
-                },
-                secondaryText = {
-                    Text(text = item.desc, maxLines = 1)
-                },
-                trailing = {
-                    IconButton(onClick = {}) {
-                        Icon(asset = vectorResource(id = R.drawable.ic_dots_vertical))
-                    }
-                }
-            )
-            if (index == items.lastIndex && !loadingMore) {
-                scope.launch {
-                    viewModel.loadMore()
+        LazyColumn {
+            itemsPaging(source) { item ->
+                item?.let {
+                    ListItem(
+                        modifier = Modifier.clickable(onClick = {
+                            navController.navigate(Route.User(item.screenName))
+                        }),
+                        icon = {
+                            UserAvatar(user = item)
+                        },
+                        text = {
+                            Row {
+                                Text(
+                                    text = item.name,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    color = MaterialTheme.colors.primary
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Providers(
+                                    AmbientContentAlpha provides ContentAlpha.medium
+                                ) {
+                                    Text(
+                                        text = "@${item.screenName}",
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis,
+                                    )
+                                }
+                            }
+                        },
+                        secondaryText = {
+                            Text(text = item.desc, maxLines = 1)
+                        },
+                    )
                 }
             }
         }

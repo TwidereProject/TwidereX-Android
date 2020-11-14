@@ -24,25 +24,22 @@ import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
 import com.twidere.services.microblog.TimelineService
 import com.twidere.twiderex.db.AppDatabase
-import com.twidere.twiderex.db.model.UserTimelineType
 import com.twidere.twiderex.model.UserKey
+import com.twidere.twiderex.paging.mediator.PagingTimelineMediatorBase
 import com.twidere.twiderex.paging.mediator.user.UserFavouriteMediator
-import com.twidere.twiderex.paging.mediator.user.UserTimelineMediatorBase
+import com.twidere.twiderex.repository.timeline.PagingTimelineRepositoryBase
 
 class UserFavouriteTimelineRepository @AssistedInject constructor(
     private val database: AppDatabase,
     @Assisted private val userKey: UserKey,
     @Assisted private val service: TimelineService,
-) : UserTimelineRepositoryBase(database, userKey) {
+) : PagingTimelineRepositoryBase(database, userKey) {
     @AssistedInject.Factory
     interface AssistedFactory {
         fun create(userKey: UserKey, service: TimelineService): UserFavouriteTimelineRepository
     }
 
-    override val timelineType: UserTimelineType
-        get() = UserTimelineType.Favourite
-
-    override fun createRemoteMediator(screenName: String): UserTimelineMediatorBase {
+    override fun createRemoteMediator(screenName: String): PagingTimelineMediatorBase {
         return UserFavouriteMediator(screenName, database, userKey, service)
     }
 }

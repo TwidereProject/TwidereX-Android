@@ -11,34 +11,31 @@ import java.util.*
 
 
 @Entity(
-    tableName = "user_timeline",
+    tableName = "paging_timeline",
     indices = [Index(
-        value = ["screenName", "userKey", "statusId", "type"],
+        value = ["userKey", "statusId", "pagingKey"],
         unique = true
     )],
 )
-data class DbUserTimeline(
+data class DbPagingTimeline(
     @PrimaryKey
     val _id: String,
     val userKey: UserKey,
-    val screenName: String,
-    val type: UserTimelineType,
+    val pagingKey: String,
     val statusId: String,
     val timestamp: Long,
 ) {
     companion object {
-        fun DbTimelineWithStatus.toUserDbTimeline(
-            screenName: String,
-            type: UserTimelineType,
-        ): DbUserTimelineWithStatus {
-            return DbUserTimelineWithStatus(
+        fun DbTimelineWithStatus.toPagingDbTimeline(
+            pagingKey: String
+        ): DbPagingTimelineWithStatus {
+            return DbPagingTimelineWithStatus(
                 timeline = with(timeline) {
-                    DbUserTimeline(
+                    DbPagingTimeline(
                         _id = UUID.randomUUID().toString(),
                         userKey = userKey,
-                        screenName = screenName,
+                        pagingKey = pagingKey,
                         timestamp = timestamp,
-                        type = type,
                         statusId = statusId,
                     )
                 },
@@ -48,9 +45,9 @@ data class DbUserTimeline(
     }
 }
 
-data class DbUserTimelineWithStatus(
+data class DbPagingTimelineWithStatus(
     @Embedded
-    val timeline: DbUserTimeline,
+    val timeline: DbPagingTimeline,
 
     @Relation(
         parentColumn = "statusId",
@@ -66,7 +63,9 @@ enum class UserTimelineType {
     Favourite
 }
 
-suspend fun List<DbUserTimelineWithStatus>.saveToDb(
+fun UserTimelineType.pagingKey(screenName: String) = "user:$screenName:$this"
+
+suspend fun List<DbPagingTimelineWithStatus>.saveToDb(
     database: AppDatabase,
 ) {
     val data = this
@@ -75,6 +74,6 @@ suspend fun List<DbUserTimelineWithStatus>.saveToDb(
         .filterNotNull()
     data.saveToDb(database)
     this.map { it.timeline }.let {
-        database.userTimelineDao().insertAll(it)
+        database.pagingTimelineDao().insertAll(it)
     }
 }

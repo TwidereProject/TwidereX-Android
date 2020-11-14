@@ -20,74 +20,32 @@
  */
 package com.twidere.twiderex.viewmodel.twitter.search
 
-import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.cachedIn
 import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
 import com.twidere.services.microblog.SearchService
 import com.twidere.twiderex.defaultLoadCount
 import com.twidere.twiderex.di.assisted.IAssistedFactory
 import com.twidere.twiderex.model.AccountDetails
-import com.twidere.twiderex.model.ui.UiUser
-import com.twidere.twiderex.repository.twitter.TwitterSearchUserRepository
-import kotlinx.coroutines.launch
+import com.twidere.twiderex.paging.source.SearchUserPagingSource
 
 class TwitterSearchUserViewModel @AssistedInject constructor(
-    private val factory: TwitterSearchUserRepository.AssistedFactory,
     @Assisted private val account: AccountDetails,
     @Assisted keyword: String,
-) : TwitterSearchListViewModelBase(keyword = keyword) {
+) : ViewModel() {
 
     @AssistedInject.Factory
     interface AssistedFactory : IAssistedFactory {
         fun create(account: AccountDetails, keyword: String): TwitterSearchUserViewModel
     }
 
-    private var page = 0
-    private val repository by lazy {
-        account.service.let {
-            it as SearchService
-        }.let {
-            factory.create(it, defaultLoadCount)
-        }
-    }
-
-    val source = MutableLiveData<List<UiUser>>()
-
-    override fun reset(keyword: String) {
-        if (this.keyword == keyword) {
-            return
-        }
-        super.reset(keyword)
-        source.postValue(emptyList())
-        page = 0
-    }
-
-    override suspend fun refresh() {
-        refreshing.postValue(true)
-        reset(keyword)
-        loadData()
-        refreshing.postValue(false)
-    }
-
-    override suspend fun loadMore() {
-        if (!hasMore) {
-            return
-        }
-        loadingMore.postValue(true)
-        loadData()
-        loadingMore.postValue(false)
-    }
-
-    private suspend fun loadData() {
-        val result = repository.loadUsers(keyword, page = page++)
-        source.postValue((source.value ?: emptyList()) + result)
-        hasMore = result.any() && result.count() > defaultLoadCount
-    }
-
-    init {
-        viewModelScope.launch {
-            refresh()
-        }
+    val source by lazy {
+        Pager(config = PagingConfig(pageSize = defaultLoadCount)) {
+            SearchUserPagingSource(keyword, account.service as SearchService)
+        }.flow.cachedIn(viewModelScope)
     }
 }

@@ -24,17 +24,17 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.twidere.twiderex.db.dao.MediaDao
+import com.twidere.twiderex.db.dao.PagingTimelineDao
 import com.twidere.twiderex.db.dao.ReactionDao
 import com.twidere.twiderex.db.dao.StatusDao
 import com.twidere.twiderex.db.dao.TimelineDao
 import com.twidere.twiderex.db.dao.UserDao
-import com.twidere.twiderex.db.dao.UserTimelineDao
 import com.twidere.twiderex.db.model.DbMedia
+import com.twidere.twiderex.db.model.DbPagingTimeline
 import com.twidere.twiderex.db.model.DbStatusReaction
 import com.twidere.twiderex.db.model.DbStatusV2
 import com.twidere.twiderex.db.model.DbTimeline
 import com.twidere.twiderex.db.model.DbUser
-import com.twidere.twiderex.db.model.DbUserTimeline
 import com.twidere.twiderex.db.model.converter.MediaTypeConverter
 import com.twidere.twiderex.db.model.converter.PlatformTypeConverter
 import com.twidere.twiderex.db.model.converter.TimelineTypeConverter
@@ -50,7 +50,7 @@ import javax.inject.Singleton
         DbMedia::class,
         DbUser::class,
         DbStatusReaction::class,
-        DbUserTimeline::class,
+        DbPagingTimeline::class,
     ],
     version = 1,
 )
@@ -67,5 +67,5 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun mediaDao(): MediaDao
     abstract fun userDao(): UserDao
     abstract fun reactionDao(): ReactionDao
-    abstract fun userTimelineDao(): UserTimelineDao
+    abstract fun pagingTimelineDao(): PagingTimelineDao
 }

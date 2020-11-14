@@ -2,32 +2,28 @@ package com.twidere.twiderex.paging.mediator.user
 
 import androidx.paging.ExperimentalPagingApi
 import com.twidere.services.microblog.TimelineService
+import com.twidere.services.microblog.model.IStatus
 import com.twidere.twiderex.db.AppDatabase
-import com.twidere.twiderex.db.mapper.toDbTimeline
-import com.twidere.twiderex.db.model.DbUserTimeline.Companion.toUserDbTimeline
-import com.twidere.twiderex.db.model.DbUserTimelineWithStatus
-import com.twidere.twiderex.db.model.TimelineType
 import com.twidere.twiderex.db.model.UserTimelineType
+import com.twidere.twiderex.db.model.pagingKey
 import com.twidere.twiderex.model.UserKey
+import com.twidere.twiderex.paging.mediator.PagingTimelineMediatorBase
 
 @OptIn(ExperimentalPagingApi::class)
 class UserStatusMediator(
     private val screenName: String,
     database: AppDatabase,
-    private val userKey: UserKey,
+    userKey: UserKey,
     private val service: TimelineService,
-) : UserTimelineMediatorBase(database) {
-    override suspend fun load(pageSize: Int, max_id: String?): List<DbUserTimelineWithStatus> {
+) : PagingTimelineMediatorBase(userKey, database) {
+    override val pagingKey: String
+        get() = UserTimelineType.Status.pagingKey(screenName)
+
+    override suspend fun load(pageSize: Int, max_id: String?): List<IStatus> {
         return service.userTimeline(
             screen_name = screenName,
             count = pageSize,
             max_id = max_id,
-        ).map {
-            it.toDbTimeline(userKey, TimelineType.Custom)
-                .toUserDbTimeline(screenName, UserTimelineType.Status)
-        }
-    }
-    override suspend fun clearData(database: AppDatabase) {
-        database.userTimelineDao().clearAll(screenName, timelineType = UserTimelineType.Status, userKey = userKey)
+        )
     }
 }

@@ -42,5 +42,8 @@ fun LazyListScope.loadState(
                 )
             }
         }
+        else -> {
+
+        }
     }
 }
