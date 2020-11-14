@@ -142,11 +142,8 @@ fun HomeScene() {
                             selectedItem = selectedItem,
                             onItemSelected = {
                                 selectedItem = it
-
                                 navController.navigate(menus[selectedItem].route) {
-                                    popUpTo(0) {
-                                        inclusive = true
-                                    }
+                                    launchSingleTop = true
                                 }
                             },
                         )
@@ -157,7 +154,9 @@ fun HomeScene() {
                 if (tabPosition == AppearancePreferences.TabPosition.Bottom) {
                     HomeBottomNavigation(menus, selectedItem) {
                         selectedItem = it
-                        navController.navigate(menus[selectedItem].route)
+                        navController.navigate(menus[selectedItem].route) {
+                            launchSingleTop = true
+                        }
                     }
                 }
             },

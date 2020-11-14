@@ -16,7 +16,7 @@ import com.twidere.twiderex.model.UserKey
 import java.io.IOException
 
 @OptIn(ExperimentalPagingApi::class)
-abstract class PagingTimelineMediatorBase(
+abstract class PagingWithGapMediator(
     userKey: UserKey,
     database: AppDatabase,
 ) : PagingMediator(userKey = userKey, database = database) {
@@ -40,23 +40,9 @@ abstract class PagingTimelineMediatorBase(
                     null
                 }
             }
-            val pageSize = state.config.pageSize
-
-            val result = load(pageSize, key).map {
-                it.toDbTimeline(userKey, TimelineType.Custom).toPagingDbTimeline(pagingKey)
-            }.let {
-                transform(it)
-            }
-
-            database.withTransaction {
-                if (loadType == LoadType.REFRESH) {
-                    clearData(database)
-                }
-                result.saveToDb(database)
-            }
-
+            val result = loadBetween(pageSize = state.config.pageSize, max_id = key)
             return MediatorResult.Success(
-                endOfPaginationReached = hasMore(result, pageSize)
+                endOfPaginationReached = result.isEmpty()
             )
         } catch (e: IOException) {
             return MediatorResult.Error(e)
@@ -65,21 +51,30 @@ abstract class PagingTimelineMediatorBase(
         }
     }
 
-    open fun transform(data: List<DbPagingTimelineWithStatus>): List<DbPagingTimelineWithStatus> {
-        return data
-    }
-
-    protected open fun hasMore(
-        result: List<DbPagingTimelineWithStatus>,
-        pageSize: Int
-    ) = result.size < pageSize
-
-    protected open suspend fun clearData(database: AppDatabase) {
-        database.pagingTimelineDao().clearAll(pagingKey, userKey = userKey)
-    }
-
-    protected abstract suspend fun load(
+    suspend fun loadBetween(
         pageSize: Int,
-        max_id: String?
+        max_id: String? = null,
+        since_id: String? = null,
+    ): List<DbPagingTimelineWithStatus> {
+        val result = loadBetweenImpl(pageSize, max_id = max_id, since_id = since_id).map {
+            it.toDbTimeline(userKey, TimelineType.Custom).toPagingDbTimeline(pagingKey)
+        }
+        database.withTransaction {
+            if (max_id != null) {
+                database.pagingTimelineDao().findWithStatusId(max_id, userKey)?.let {
+                    it.isGap = false
+                    database.pagingTimelineDao().insertAll(listOf(it))
+                }
+            }
+            result.lastOrNull()?.timeline?.isGap = result.size >= pageSize
+            result.saveToDb(database)
+        }
+        return result
+    }
+
+    protected abstract suspend fun loadBetweenImpl(
+        pageSize: Int,
+        max_id: String? = null,
+        since_id: String? = null,
     ): List<IStatus>
 }

@@ -24,6 +24,7 @@ data class DbPagingTimeline(
     val pagingKey: String,
     val statusId: String,
     val timestamp: Long,
+    var isGap: Boolean,
 ) {
     companion object {
         fun DbTimelineWithStatus.toPagingDbTimeline(
@@ -37,6 +38,7 @@ data class DbPagingTimeline(
                         pagingKey = pagingKey,
                         timestamp = timestamp,
                         statusId = statusId,
+                        isGap = isGap,
                     )
                 },
                 status = status,

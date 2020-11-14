@@ -24,26 +24,22 @@ import android.content.SharedPreferences
 import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
 import com.twidere.services.microblog.TimelineService
+import com.twidere.twiderex.db.AppDatabase
 import com.twidere.twiderex.di.assisted.IAssistedFactory
 import com.twidere.twiderex.model.AccountDetails
-import com.twidere.twiderex.repository.timeline.MentionsTimelineRepository
-import com.twidere.twiderex.repository.timeline.TimelineRepository
+import com.twidere.twiderex.paging.mediator.MentionTimelineMediator
+import com.twidere.twiderex.paging.mediator.PagingWithGapMediator
 
 class MentionsTimelineViewModel @AssistedInject constructor(
     preferences: SharedPreferences,
-    factory: MentionsTimelineRepository.AssistedFactory,
+    database: AppDatabase,
     @Assisted private val account: AccountDetails
 ) : TimelineViewModel(preferences) {
     @AssistedInject.Factory
     interface AssistedFactory : IAssistedFactory {
         fun create(account: AccountDetails): MentionsTimelineViewModel
     }
-    override val repository: TimelineRepository by lazy {
-        account.service.let {
-            it as TimelineService
-        }.let { service ->
-            factory.create(account.key, service)
-        }
-    }
+    override val pagingMediator: PagingWithGapMediator =
+        MentionTimelineMediator(account.service as TimelineService, account.key, database)
     override val savedStateKey: String = "${account.key}_mentions"
 }

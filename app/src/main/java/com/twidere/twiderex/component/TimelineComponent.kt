@@ -24,7 +24,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumnForIndexed
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
@@ -37,10 +37,14 @@ import androidx.compose.runtime.onCommit
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.vectorResource
+import androidx.paging.LoadState
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.itemsIndexed
 import com.twidere.twiderex.R
 import com.twidere.twiderex.annotations.IncomingComposeUpdate
 import com.twidere.twiderex.component.foundation.LoadingProgress
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
+import com.twidere.twiderex.component.lazy.loadState
 import com.twidere.twiderex.component.status.StatusDivider
 import com.twidere.twiderex.component.status.TimelineStatusComponent
 import com.twidere.twiderex.ui.standardPadding
@@ -50,41 +54,33 @@ import kotlinx.coroutines.launch
 @OptIn(IncomingComposeUpdate::class)
 @Composable
 fun TimelineComponent(viewModel: TimelineViewModel) {
-    val items by viewModel.source.observeAsState(initial = listOf())
+    val items = viewModel.source.collectAsLazyPagingItems()
     val loadingBetween by viewModel.loadingBetween.observeAsState(initial = listOf())
-    val loadingMore by viewModel.loadingMore.observeAsState(initial = false)
-    val refreshing by viewModel.refreshing.observeAsState(initial = false)
     val scope = rememberCoroutineScope()
     SwipeToRefreshLayout(
-        refreshingState = refreshing,
+        refreshingState = items.loadState.refresh == LoadState.Loading,
         onRefresh = {
             scope.launch {
-                viewModel.refresh()
+                items.refresh()
             }
         },
     ) {
-        if (items.any()) {
-            val listState =
-                rememberLazyListState(initialFirstVisibleItemIndex = viewModel.restoreScrollState())
-            onCommit(listState.isAnimationRunning) {
-                if (!listState.isAnimationRunning) {
-                    viewModel.saveScrollState(listState.firstVisibleItemIndex)
-                }
+        val listState =
+            rememberLazyListState(initialFirstVisibleItemIndex = viewModel.restoreScrollState())
+        onCommit(listState.isAnimationRunning) {
+            if (!listState.isAnimationRunning) {
+                viewModel.saveScrollState(listState.firstVisibleItemIndex)
             }
-            LazyColumnForIndexed(
-                items = items,
-                state = listState,
-            ) { index, item ->
-                Column {
-                    if (!loadingMore && index == items.lastIndex) {
-                        scope.launch {
-                            viewModel.loadMore()
-                        }
-                    }
-                    TimelineStatusComponent(
-                        item,
-                    )
-                    if (index != items.lastIndex) {
+        }
+        LazyColumn(
+            state = listState
+        ) {
+            itemsIndexed(items) { index, it ->
+                it?.let { item ->
+                    Column {
+                        TimelineStatusComponent(
+                            item,
+                        )
                         when {
                             loadingBetween.contains(item.statusId) -> {
                                 LoadingProgress()
@@ -96,10 +92,12 @@ fun TimelineComponent(viewModel: TimelineViewModel) {
                                         .fillMaxWidth(),
                                     onClick = {
                                         scope.launch {
-                                            viewModel.loadBetween(
-                                                item.statusId,
-                                                items[index + 1].statusId,
-                                            )
+                                            items[index + 1]?.let { next ->
+                                                viewModel.loadBetween(
+                                                    item.statusId,
+                                                    next.statusId,
+                                                )
+                                            }
                                         }
                                     },
                                 ) {
@@ -114,11 +112,10 @@ fun TimelineComponent(viewModel: TimelineViewModel) {
                             }
                         }
                     }
-                    if (loadingMore && index == items.lastIndex) {
-                        StatusDivider()
-                        LoadingProgress()
-                    }
                 }
+            }
+            loadState(items.loadState.append) {
+                items.retry()
             }
         }
     }

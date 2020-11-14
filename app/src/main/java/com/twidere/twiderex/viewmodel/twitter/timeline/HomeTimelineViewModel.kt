@@ -24,14 +24,15 @@ import android.content.SharedPreferences
 import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
 import com.twidere.services.microblog.TimelineService
+import com.twidere.twiderex.db.AppDatabase
 import com.twidere.twiderex.di.assisted.IAssistedFactory
 import com.twidere.twiderex.model.AccountDetails
-import com.twidere.twiderex.repository.timeline.HomeTimelineRepository
-import com.twidere.twiderex.repository.timeline.TimelineRepository
+import com.twidere.twiderex.paging.mediator.HomeTimelineMediator
+import com.twidere.twiderex.paging.mediator.PagingWithGapMediator
 
 class HomeTimelineViewModel @AssistedInject constructor(
     preferences: SharedPreferences,
-    factory: HomeTimelineRepository.AssistedFactory,
+    database: AppDatabase,
     @Assisted account: AccountDetails,
 ) : TimelineViewModel(preferences) {
     @AssistedInject.Factory
@@ -39,11 +40,7 @@ class HomeTimelineViewModel @AssistedInject constructor(
         fun create(account: AccountDetails): HomeTimelineViewModel
     }
 
-    override val repository: TimelineRepository =
-        account.service.let {
-            it as TimelineService
-        }.let { service ->
-            factory.create(account.key, service)
-        }
+    override val pagingMediator: PagingWithGapMediator =
+        HomeTimelineMediator(account.service as TimelineService, account.key, database)
     override val savedStateKey: String = "${account.key}_home"
 }

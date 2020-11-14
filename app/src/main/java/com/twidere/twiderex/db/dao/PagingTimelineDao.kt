@@ -16,6 +16,9 @@ interface PagingTimelineDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(timeline: List<DbPagingTimeline>)
 
+    @Query("SELECT * FROM paging_timeline WHERE statusId == :id AND userKey == :userKey")
+    suspend fun findWithStatusId(id: String, userKey: UserKey): DbPagingTimeline?
+
     @Transaction
     @Query("SELECT * FROM paging_timeline WHERE pagingKey == :pagingKey AND userKey == :userKey ORDER BY timestamp DESC")
     fun getPagingSource(

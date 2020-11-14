@@ -22,8 +22,6 @@ package com.twidere.twiderex.viewmodel.twitter.search
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
 import androidx.paging.map
 import com.squareup.inject.assisted.Assisted
@@ -33,6 +31,7 @@ import com.twidere.twiderex.db.AppDatabase
 import com.twidere.twiderex.di.assisted.IAssistedFactory
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.ui.UiStatus.Companion.toUi
+import com.twidere.twiderex.paging.mediator.pager
 import com.twidere.twiderex.paging.mediator.search.SearchStatusMediator
 import kotlinx.coroutines.flow.map
 
@@ -50,9 +49,7 @@ class TwitterSearchTweetsViewModel @AssistedInject constructor(
         account.service as SearchService
     }
     val source by lazy {
-        val mediator = SearchStatusMediator(keyword, database, account.key, service)
-        Pager(config = PagingConfig(pageSize = 50), remoteMediator = mediator) {
-            database.pagingTimelineDao().getPagingSource(mediator.pagingKey, account.key)
-        }.flow.map { it.map { it.status.toUi(account.key) } }.cachedIn(viewModelScope)
+        SearchStatusMediator(keyword, database, account.key, service).pager()
+            .flow.map { it.map { it.status.toUi(account.key) } }.cachedIn(viewModelScope)
     }
 }

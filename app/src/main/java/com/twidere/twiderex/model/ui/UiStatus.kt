@@ -21,6 +21,7 @@
 package com.twidere.twiderex.model.ui
 
 import androidx.compose.runtime.Composable
+import com.twidere.twiderex.db.model.DbPagingTimelineWithStatus
 import com.twidere.twiderex.db.model.DbStatusWithMediaAndUser
 import com.twidere.twiderex.db.model.DbStatusWithReference
 import com.twidere.twiderex.db.model.DbTimelineWithStatus
@@ -136,6 +137,31 @@ data class UiStatus(
                 retweet = retweet?.toUi(userKey)?.copy(quote = quote?.toUi(userKey)),
                 quote = quote?.toUi(userKey),
                 isGap = false,
+                source = data.source
+            )
+        }
+
+
+        fun DbPagingTimelineWithStatus.toUi(
+            userKey: UserKey,
+        ) = with(status.status) {
+            val reaction = reactions.firstOrNull { it.userKey == userKey }
+            UiStatus(
+                statusId = data.statusId,
+                text = data.text,
+                timestamp = data.timestamp,
+                retweetCount = data.retweetCount,
+                likeCount = data.likeCount,
+                replyCount = data.replyCount,
+                retweeted = reaction?.retweeted ?: false,
+                liked = reaction?.liked ?: false,
+                placeString = data.placeString,
+                hasMedia = data.hasMedia,
+                user = user.toUi(),
+                media = media.toUi(),
+                retweet = status.retweet?.toUi(userKey)?.copy(quote = status.quote?.toUi(userKey)),
+                quote = status.quote?.toUi(userKey),
+                isGap = timeline.isGap,
                 source = data.source
             )
         }
