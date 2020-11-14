@@ -46,6 +46,8 @@ abstract class PagingTimelineMediatorBase(
 
             val result = load(pageSize, key).map {
                 it.toDbTimeline(userKey, TimelineType.Custom).toPagingDbTimeline(pagingKey)
+            }.let {
+                transform(it)
             }
 
             database.withTransaction {
@@ -56,7 +58,7 @@ abstract class PagingTimelineMediatorBase(
             }
 
             return MediatorResult.Success(
-                endOfPaginationReached = result.size < pageSize
+                endOfPaginationReached = hasMore(result, pageSize)
             )
         } catch (e: IOException) {
             return MediatorResult.Error(e)
@@ -64,6 +66,15 @@ abstract class PagingTimelineMediatorBase(
             return MediatorResult.Error(e)
         }
     }
+
+    open fun transform(data: List<DbPagingTimelineWithStatus>): List<DbPagingTimelineWithStatus> {
+        return data
+    }
+
+    protected open fun hasMore(
+        result: List<DbPagingTimelineWithStatus>,
+        pageSize: Int
+    ) = result.size < pageSize
 
     protected open suspend fun clearData(database: AppDatabase) {
         database.pagingTimelineDao().clearAll(pagingKey, userKey = userKey)
