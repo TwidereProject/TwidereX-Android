@@ -76,7 +76,7 @@ fun SettingsScene() {
                 SettingItem(
                     "About",
                     vectorResource(id = R.drawable.ic_info_circle),
-                    route = "",
+                    route = Route.Settings.About,
                 ),
             )
         )

@@ -37,6 +37,7 @@ import com.twidere.twiderex.scenes.MediaScene
 import com.twidere.twiderex.scenes.SearchScene
 import com.twidere.twiderex.scenes.StatusScene
 import com.twidere.twiderex.scenes.UserScene
+import com.twidere.twiderex.scenes.settings.AboutScene
 import com.twidere.twiderex.scenes.settings.AppearanceScene
 import com.twidere.twiderex.scenes.settings.DisplayScene
 import com.twidere.twiderex.scenes.settings.SettingsScene
@@ -80,6 +81,7 @@ object Route {
         val Home = "settings"
         val Appearance = "settings/appearance"
         val Display = "settings/display"
+        val About = "settings/about"
     }
 }
 
@@ -206,5 +208,9 @@ fun NavGraphBuilder.route() {
 
     composable("settings/display") {
         DisplayScene()
+    }
+
+    composable("settings/about") {
+        AboutScene()
     }
 }
