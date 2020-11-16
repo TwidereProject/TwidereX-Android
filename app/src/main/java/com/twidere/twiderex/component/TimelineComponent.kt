@@ -48,6 +48,7 @@ import com.twidere.twiderex.component.lazy.loadState
 import com.twidere.twiderex.component.status.StatusDivider
 import com.twidere.twiderex.component.status.TimelineStatusComponent
 import com.twidere.twiderex.ui.standardPadding
+import com.twidere.twiderex.viewmodel.twitter.timeline.TimelineScrollState
 import com.twidere.twiderex.viewmodel.twitter.timeline.TimelineViewModel
 import kotlinx.coroutines.launch
 
@@ -65,57 +66,68 @@ fun TimelineComponent(viewModel: TimelineViewModel) {
             }
         },
     ) {
-        val listState =
-            rememberLazyListState(initialFirstVisibleItemIndex = viewModel.restoreScrollState())
-        onCommit(listState.isAnimationRunning) {
-            if (!listState.isAnimationRunning) {
-                viewModel.saveScrollState(listState.firstVisibleItemIndex)
-            }
-        }
-        LazyColumn(
-            state = listState
-        ) {
-            itemsIndexed(items) { index, it ->
-                it?.let { item ->
-                    Column {
-                        TimelineStatusComponent(
-                            item,
+        if (items.itemCount > 0) {
+            val lastScrollState = viewModel.restoreScrollState()
+            val listState =
+                rememberLazyListState(
+                    initialFirstVisibleItemIndex = lastScrollState.firstVisibleItemIndex,
+                    initialFirstVisibleItemScrollOffset = lastScrollState.firstVisibleItemScrollOffset,
+                )
+            onCommit(listState.isAnimationRunning) {
+                if (!listState.isAnimationRunning) {
+                    viewModel.saveScrollState(
+                        TimelineScrollState(
+                            firstVisibleItemIndex = listState.firstVisibleItemIndex,
+                            firstVisibleItemScrollOffset = listState.firstVisibleItemScrollOffset,
                         )
-                        when {
-                            loadingBetween.contains(item.statusId) -> {
-                                LoadingProgress()
-                            }
-                            item.isGap -> {
-                                Divider()
-                                TextButton(
-                                    modifier = Modifier
-                                        .fillMaxWidth(),
-                                    onClick = {
-                                        scope.launch {
-                                            items[index + 1]?.let { next ->
-                                                viewModel.loadBetween(
-                                                    item.statusId,
-                                                    next.statusId,
-                                                )
-                                            }
-                                        }
-                                    },
-                                ) {
-                                    Icon(asset = vectorResource(id = R.drawable.ic_refresh))
-                                    Box(modifier = Modifier.width(standardPadding))
-                                    Text("Load more")
+                    )
+                }
+            }
+            LazyColumn(
+                state = listState
+            ) {
+                itemsIndexed(items) { index, it ->
+                    it?.let { item ->
+                        Column {
+                            TimelineStatusComponent(
+                                item,
+                            )
+                            when {
+                                loadingBetween.contains(item.statusId) -> {
+                                    LoadingProgress()
                                 }
-                                Divider()
-                            }
-                            else -> {
-                                StatusDivider()
+                                item.isGap -> {
+                                    Divider()
+                                    TextButton(
+                                        modifier = Modifier
+                                            .fillMaxWidth(),
+                                        onClick = {
+                                            scope.launch {
+                                                items[index + 1]?.let { next ->
+                                                    viewModel.loadBetween(
+                                                        item.statusId,
+                                                        next.statusId,
+                                                    )
+                                                }
+                                            }
+                                        },
+                                    ) {
+                                        Icon(asset = vectorResource(id = R.drawable.ic_refresh))
+                                        Box(modifier = Modifier.width(standardPadding))
+                                        Text("Load more")
+                                    }
+                                    Divider()
+                                }
+                                else -> {
+                                    StatusDivider()
+                                }
                             }
                         }
                     }
                 }
-            }
-            loadState(items.loadState.append) {
-                items.retry()
+                loadState(items.loadState.append) {
+                    items.retry()
+                }
             }
         }
     }

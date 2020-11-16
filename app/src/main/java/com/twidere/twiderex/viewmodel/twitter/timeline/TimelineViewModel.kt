@@ -43,13 +43,22 @@ abstract class TimelineViewModel(
         pagingMediator.loadBetween(defaultLoadCount, max_id = max_id, since_id = since_id)
     }
 
-    fun restoreScrollState(): Int {
-        return preferences.getInt("${savedStateKey}_offset", 0)
+    fun restoreScrollState(): TimelineScrollState {
+        return TimelineScrollState(
+            firstVisibleItemIndex = preferences.getInt("${savedStateKey}_firstVisibleItemIndex", 0),
+            firstVisibleItemScrollOffset = preferences.getInt("${savedStateKey}_firstVisibleItemScrollOffset", 0),
+        )
     }
 
-    fun saveScrollState(offset: Int) {
+    fun saveScrollState(offset: TimelineScrollState) {
         preferences.edit {
-            putInt("${savedStateKey}_offset", offset)
+            putInt("${savedStateKey}_firstVisibleItemIndex", offset.firstVisibleItemIndex)
+            putInt("${savedStateKey}_firstVisibleItemScrollOffset", offset.firstVisibleItemScrollOffset)
         }
     }
 }
+
+data class TimelineScrollState(
+    val firstVisibleItemIndex: Int = 0,
+    val firstVisibleItemScrollOffset: Int = 0,
+)
