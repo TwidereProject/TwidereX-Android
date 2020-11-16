@@ -27,6 +27,7 @@ import com.twidere.twiderex.db.model.DbStatusWithReference
 import com.twidere.twiderex.db.model.DbTimelineWithStatus
 import com.twidere.twiderex.model.UserKey
 import com.twidere.twiderex.model.ui.UiMedia.Companion.toUi
+import com.twidere.twiderex.model.ui.UiUrlEntity.Companion.toUi
 import com.twidere.twiderex.model.ui.UiUser.Companion.toUi
 
 data class UiStatus(
@@ -46,6 +47,7 @@ data class UiStatus(
     val source: String,
     val quote: UiStatus?,
     val isGap: Boolean,
+    val url: List<UiUrlEntity>
 ) {
 
     companion object {
@@ -67,6 +69,7 @@ data class UiStatus(
             source = "TwidereX",
             quote = null,
             isGap = false,
+            url = emptyList()
         )
 
         fun DbTimelineWithStatus.toUi(
@@ -89,7 +92,8 @@ data class UiStatus(
                 retweet = status.retweet?.toUi(userKey)?.copy(quote = status.quote?.toUi(userKey)),
                 quote = status.quote?.toUi(userKey),
                 isGap = timeline.isGap,
-                source = data.source
+                source = data.source,
+                url = url.toUi(),
             )
         }
 
@@ -114,6 +118,7 @@ data class UiStatus(
                 quote = null,
                 isGap = false,
                 source = data.source,
+                url = url.toUi(),
             )
         }
 
@@ -137,7 +142,8 @@ data class UiStatus(
                 retweet = retweet?.toUi(userKey)?.copy(quote = quote?.toUi(userKey)),
                 quote = quote?.toUi(userKey),
                 isGap = false,
-                source = data.source
+                source = data.source,
+                url = url.toUi(),
             )
         }
 
@@ -161,7 +167,8 @@ data class UiStatus(
                 retweet = status.retweet?.toUi(userKey)?.copy(quote = status.quote?.toUi(userKey)),
                 quote = status.quote?.toUi(userKey),
                 isGap = timeline.isGap,
-                source = data.source
+                source = data.source,
+                url = url.toUi(),
             )
         }
     }

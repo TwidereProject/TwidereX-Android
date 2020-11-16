@@ -66,6 +66,8 @@ data class DbStatusWithMediaAndUser(
     val user: DbUser,
     @Relation(parentColumn = "statusId", entityColumn = "statusId")
     val reactions: List<DbStatusReaction>,
+    @Relation(parentColumn = "statusId", entityColumn = "statusId")
+    val url: List<DbUrlEntity>,
 )
 
 data class DbStatusWithReference(

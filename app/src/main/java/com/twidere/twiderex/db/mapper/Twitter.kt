@@ -32,6 +32,7 @@ import com.twidere.twiderex.db.model.DbStatusWithMediaAndUser
 import com.twidere.twiderex.db.model.DbStatusWithReference
 import com.twidere.twiderex.db.model.DbTimeline
 import com.twidere.twiderex.db.model.DbTimelineWithStatus
+import com.twidere.twiderex.db.model.DbUrlEntity
 import com.twidere.twiderex.db.model.DbUser
 import com.twidere.twiderex.db.model.TimelineType
 import com.twidere.twiderex.model.MediaType
@@ -159,7 +160,19 @@ private fun StatusV2.toDbStatusWithMediaAndUser(
             )
         },
         user = user,
-        reactions = emptyList() // TODO: twitter v2 api does not return this
+        reactions = emptyList(), // TODO: twitter v2 api does not return this
+        url = entities?.urls?.map {
+            DbUrlEntity(
+                _id = UUID.randomUUID().toString(),
+                statusId = status.statusId,
+                url = it.url ?: "",
+                expandedUrl = it.expandedURL ?: "",
+                displayUrl = it.displayURL ?: "",
+                title = it.title,
+                description = it.description,
+                image = it.images?.maxByOrNull { it.width ?: it.height ?: 0 }?.url
+            )
+        } ?: emptyList()
     )
 }
 
@@ -217,7 +230,19 @@ private fun Status.toDbStatusWithMediaAndUser(
             )
         } else {
             emptyList()
-        }
+        },
+        url = entities?.url?.urls?.map {
+            DbUrlEntity(
+                _id = UUID.randomUUID().toString(),
+                statusId = status.statusId,
+                url = it.url ?: "",
+                expandedUrl = it.expandedURL ?: "",
+                displayUrl = it.displayURL ?: "",
+                title = null,
+                description = null,
+                image = null,
+            )
+        } ?: emptyList()
     )
 }
 

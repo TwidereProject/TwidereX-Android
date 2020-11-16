@@ -18,21 +18,24 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.services.twitter.model
+package com.twidere.twiderex.db.model
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonArray
+import androidx.room.Entity
+import androidx.room.Index
+import androidx.room.PrimaryKey
 
-@Serializable
-data class StatusEntities(
-    val hashtags: List<Hashtags>? = null,
-    val symbols: JsonArray? = null,
-
-    @SerialName("user_mentions")
-    val userMentions: List<UserMention>? = null,
-
-    val media: List<PurpleMedia>? = null,
-    val url: Urls? = null,
-    val description: Description? = null
+@Entity(
+    tableName = "url_entity",
+    indices = [Index(value = ["statusId", "url"], unique = true)],
+)
+data class DbUrlEntity(
+    @PrimaryKey
+    val _id: String,
+    val statusId: String,
+    val url: String,
+    val expandedUrl: String,
+    val displayUrl: String,
+    val title: String?,
+    val description: String?,
+    val image: String?,
 )

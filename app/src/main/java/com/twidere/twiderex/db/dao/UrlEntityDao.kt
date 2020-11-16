@@ -18,21 +18,15 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.services.twitter.model
+package com.twidere.twiderex.db.dao
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonArray
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import com.twidere.twiderex.db.model.DbUrlEntity
 
-@Serializable
-data class StatusEntities(
-    val hashtags: List<Hashtags>? = null,
-    val symbols: JsonArray? = null,
-
-    @SerialName("user_mentions")
-    val userMentions: List<UserMention>? = null,
-
-    val media: List<PurpleMedia>? = null,
-    val url: Urls? = null,
-    val description: Description? = null
-)
+@Dao
+interface UrlEntityDao {
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAll(media: List<DbUrlEntity>)
+}

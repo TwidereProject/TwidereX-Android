@@ -20,19 +20,10 @@
  */
 package com.twidere.services.twitter.model
 
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonArray
 
 @Serializable
-data class StatusEntities(
-    val hashtags: List<Hashtags>? = null,
-    val symbols: JsonArray? = null,
-
-    @SerialName("user_mentions")
-    val userMentions: List<UserMention>? = null,
-
-    val media: List<PurpleMedia>? = null,
-    val url: Urls? = null,
-    val description: Description? = null
+data class Hashtags(
+    val text: String? = null,
+    val indices: List<Long>? = null
 )
