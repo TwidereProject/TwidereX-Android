@@ -48,5 +48,4 @@ class UserTimelineViewModel @AssistedInject constructor(
             account.key,
             account.service as TimelineService
         )
-
 }
