@@ -20,6 +20,8 @@
  */
 package com.twidere.twiderex.scenes.settings
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -41,14 +43,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.ContextAmbient
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
-import androidx.ui.tooling.preview.Preview
+import androidx.navigation.compose.navigate
 import com.twidere.twiderex.BuildConfig
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
+import com.twidere.twiderex.navigation.Route
+import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.ui.TwidereXTheme
 
 @Composable
@@ -71,9 +76,10 @@ fun AboutScene() {
     }
 }
 
-@Preview
 @Composable
 private fun AboutContent() {
+    val navController = AmbientNavController.current
+    val context = ContextAmbient.current
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -115,16 +121,32 @@ private fun AboutContent() {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Row {
-                IconButton(onClick = {}) {
+                IconButton(onClick = {
+                    navController.navigate(Route.User("TwidereProject"))
+                }) {
                     Image(asset = vectorResource(id = R.drawable.ic_twitter))
                 }
                 Box(modifier = Modifier.width(32.dp))
-                IconButton(onClick = {}) {
+                IconButton(onClick = {
+                    context.startActivity(
+                        Intent(
+                            Intent.ACTION_VIEW,
+                            Uri.parse("https://github.com/TwidereProject/TwidereX-Android")
+                        )
+                    )
+                }) {
                     Image(asset = vectorResource(id = R.drawable.ic_github))
                 }
             }
             Box(modifier = Modifier.height(32.dp))
-            TextButton(onClick = {}) {
+            TextButton(onClick = {
+                context.startActivity(
+                    Intent(
+                        Intent.ACTION_VIEW,
+                        Uri.parse("https://github.com/TwidereProject/TwidereX-Android/blob/develop/LICENSE")
+                    )
+                )
+            }) {
                 Text(text = "License")
             }
         }
