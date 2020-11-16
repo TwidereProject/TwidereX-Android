@@ -175,17 +175,19 @@ private fun SearchTweetsContent(viewModel: TwitterSearchTweetsViewModel) {
             source.refresh()
         }
     ) {
-        LazyColumn {
-            items(source) { item ->
-                item?.let {
-                    TimelineStatusComponent(
-                        it,
-                    )
-                    StatusDivider()
+        if (source.itemCount > 0) {
+            LazyColumn {
+                items(source) { item ->
+                    item?.let {
+                        TimelineStatusComponent(
+                            it,
+                        )
+                        StatusDivider()
+                    }
                 }
-            }
-            loadState(source.loadState.append) {
-                source.retry()
+                loadState(source.loadState.append) {
+                    source.retry()
+                }
             }
         }
     }
@@ -201,17 +203,19 @@ private fun SearchMediasContent(viewModel: TwitterSearchMediaViewModel) {
             source.refresh()
         }
     ) {
-        LazyColumn {
-            items(source) { item ->
-                item?.let {
-                    TimelineStatusComponent(
-                        it,
-                    )
-                    StatusDivider()
+        if (source.itemCount > 0) {
+            LazyColumn {
+                items(source) { item ->
+                    item?.let {
+                        TimelineStatusComponent(
+                            it,
+                        )
+                        StatusDivider()
+                    }
                 }
-            }
-            loadState(source.loadState.append) {
-                source.retry()
+                loadState(source.loadState.append) {
+                    source.retry()
+                }
             }
         }
     }
@@ -228,46 +232,48 @@ private fun SearchUsersContent(viewModel: TwitterSearchUserViewModel) {
             source.refresh()
         }
     ) {
-        LazyColumn {
-            items(source) { item ->
-                item?.let {
-                    ListItem(
-                        modifier = Modifier.clickable(
-                            onClick = {
-                                navController.navigate(Route.User(item.screenName))
-                            }
-                        ),
-                        icon = {
-                            UserAvatar(user = item)
-                        },
-                        text = {
-                            Row {
-                                Text(
-                                    text = item.name,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis,
-                                    color = MaterialTheme.colors.primary
-                                )
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Providers(
-                                    AmbientContentAlpha provides ContentAlpha.medium
-                                ) {
+        if (source.itemCount > 0) {
+            LazyColumn {
+                items(source) { item ->
+                    item?.let {
+                        ListItem(
+                            modifier = Modifier.clickable(
+                                onClick = {
+                                    navController.navigate(Route.User(item.screenName))
+                                }
+                            ),
+                            icon = {
+                                UserAvatar(user = item)
+                            },
+                            text = {
+                                Row {
                                     Text(
-                                        text = "@${item.screenName}",
+                                        text = item.name,
                                         maxLines = 1,
                                         overflow = TextOverflow.Ellipsis,
+                                        color = MaterialTheme.colors.primary
                                     )
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Providers(
+                                        AmbientContentAlpha provides ContentAlpha.medium
+                                    ) {
+                                        Text(
+                                            text = "@${item.screenName}",
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis,
+                                        )
+                                    }
                                 }
-                            }
-                        },
-                        secondaryText = {
-                            Text(text = item.desc, maxLines = 1)
-                        },
-                    )
+                            },
+                            secondaryText = {
+                                Text(text = item.desc, maxLines = 1)
+                            },
+                        )
+                    }
                 }
-            }
-            loadState(source.loadState.append) {
-                source.retry()
+                loadState(source.loadState.append) {
+                    source.retry()
+                }
             }
         }
     }
