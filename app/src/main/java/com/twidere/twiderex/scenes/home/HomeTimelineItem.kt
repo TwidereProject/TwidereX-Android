@@ -23,8 +23,6 @@ package com.twidere.twiderex.scenes.home
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.Scaffold
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.VectorAsset
 import androidx.compose.ui.res.vectorResource
@@ -64,7 +62,7 @@ class HomeTimelineItem : HomeNavigationItem() {
                         navController.navigate(Route.Compose(ComposeType.New))
                     }
                 ) {
-                    Icon(asset = Icons.Default.Add)
+                    Icon(asset = vectorResource(id = R.drawable.ic_feather))
                 }
             }
         ) {
