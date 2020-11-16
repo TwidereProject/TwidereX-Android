@@ -23,43 +23,24 @@ package com.twidere.twiderex.viewmodel.twitter.timeline
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import androidx.paging.cachedIn
-import androidx.paging.map
 import com.twidere.twiderex.defaultLoadCount
-import com.twidere.twiderex.model.ui.UiStatus.Companion.toUi
 import com.twidere.twiderex.paging.mediator.PagingWithGapMediator
-import com.twidere.twiderex.paging.mediator.pager
-import kotlinx.coroutines.flow.map
+import com.twidere.twiderex.viewmodel.PagingViewModel
 
 abstract class TimelineViewModel(
     private val preferences: SharedPreferences,
-) : ViewModel() {
+) : PagingViewModel() {
 
-    abstract val pagingMediator: PagingWithGapMediator
+    abstract override val pagingMediator: PagingWithGapMediator
     abstract val savedStateKey: String
-
-    val source by lazy {
-        pagingMediator.pager().flow.map {
-            it.map {
-                it.toUi(pagingMediator.userKey)
-            }
-        }.cachedIn(viewModelScope)
-    }
-
-    val loadingBetween = MutableLiveData(listOf<String>())
+    val loadingBetween: MutableLiveData<List<String>>
+        get() = pagingMediator.loadingBetween
 
     suspend fun loadBetween(
         max_id: String,
         since_id: String,
     ) {
-        loadingBetween.postValue((loadingBetween.value ?: listOf()) + max_id)
-        runCatching {
-            pagingMediator.loadBetween(defaultLoadCount, max_id = max_id, since_id = since_id)
-        }.onFailure {
-        }
-        loadingBetween.postValue((loadingBetween.value ?: listOf()) - max_id)
+        pagingMediator.loadBetween(defaultLoadCount, max_id = max_id, since_id = since_id)
     }
 
     fun restoreScrollState(): Int {
