@@ -55,6 +55,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.navigate
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.items
 import com.twidere.twiderex.R
 import com.twidere.twiderex.annotations.IncomingComposeUpdate
 import com.twidere.twiderex.component.foundation.AppBar
@@ -63,7 +64,7 @@ import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
 import com.twidere.twiderex.component.foundation.TextInput
 import com.twidere.twiderex.component.foundation.TextTabsComponent
 import com.twidere.twiderex.component.foundation.TopAppBarElevation
-import com.twidere.twiderex.component.lazy.itemsPaging
+import com.twidere.twiderex.component.lazy.loadState
 import com.twidere.twiderex.component.status.StatusDivider
 import com.twidere.twiderex.component.status.TimelineStatusComponent
 import com.twidere.twiderex.component.status.UserAvatar
@@ -175,13 +176,16 @@ private fun SearchTweetsContent(viewModel: TwitterSearchTweetsViewModel) {
         }
     ) {
         LazyColumn {
-            itemsPaging(source) { item ->
+            items(source) { item ->
                 item?.let {
                     TimelineStatusComponent(
                         it,
                     )
                     StatusDivider()
                 }
+            }
+            loadState(source.loadState.append) {
+                source.retry()
             }
         }
     }
@@ -198,13 +202,16 @@ private fun SearchMediasContent(viewModel: TwitterSearchMediaViewModel) {
         }
     ) {
         LazyColumn {
-            itemsPaging(source) { item ->
+            items(source) { item ->
                 item?.let {
                     TimelineStatusComponent(
                         it,
                     )
                     StatusDivider()
                 }
+            }
+            loadState(source.loadState.append) {
+                source.retry()
             }
         }
     }
@@ -222,7 +229,7 @@ private fun SearchUsersContent(viewModel: TwitterSearchUserViewModel) {
         }
     ) {
         LazyColumn {
-            itemsPaging(source) { item ->
+            items(source) { item ->
                 item?.let {
                     ListItem(
                         modifier = Modifier.clickable(
@@ -258,6 +265,9 @@ private fun SearchUsersContent(viewModel: TwitterSearchUserViewModel) {
                         },
                     )
                 }
+            }
+            loadState(source.loadState.append) {
+                source.retry()
             }
         }
     }
