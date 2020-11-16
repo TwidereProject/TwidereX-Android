@@ -40,7 +40,12 @@ abstract class PagingMediator(
 fun PagingMediator.pager(
     pageSize: Int = defaultLoadCount,
 ): Pager<Int, DbPagingTimelineWithStatus> {
-    return Pager(config = PagingConfig(pageSize = pageSize), remoteMediator = this) {
+    return Pager(
+        config = PagingConfig(
+            pageSize = pageSize,
+        ),
+        remoteMediator = this,
+    ) {
         database.pagingTimelineDao().getPagingSource(pagingKey = pagingKey, userKey = userKey)
     }
 }

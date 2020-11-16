@@ -25,7 +25,6 @@ import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
 import androidx.paging.PagingState
 import androidx.room.withTransaction
-import coil.network.HttpException
 import com.twidere.services.microblog.model.IStatus
 import com.twidere.twiderex.db.AppDatabase
 import com.twidere.twiderex.db.mapper.toDbTimeline
@@ -34,6 +33,7 @@ import com.twidere.twiderex.db.model.DbPagingTimelineWithStatus
 import com.twidere.twiderex.db.model.TimelineType
 import com.twidere.twiderex.db.model.saveToDb
 import com.twidere.twiderex.model.UserKey
+import retrofit2.HttpException
 import java.io.IOException
 
 @OptIn(ExperimentalPagingApi::class)
@@ -41,12 +41,20 @@ abstract class PagingWithGapMediator(
     userKey: UserKey,
     database: AppDatabase,
 ) : PagingMediator(userKey = userKey, database = database) {
+    private var loadCount = 0
+    protected open val skipInitialLoad = true
     val loadingBetween = MutableLiveData(listOf<String>())
 
     override suspend fun load(
         loadType: LoadType,
         state: PagingState<Int, DbPagingTimelineWithStatus>
     ): MediatorResult {
+        if (skipInitialLoad && loadCount == 0 && loadType == LoadType.REFRESH) {
+            loadCount++
+            return MediatorResult.Success(
+                endOfPaginationReached = false
+            )
+        }
         val max_id = when (loadType) {
             LoadType.APPEND -> {
                 val lastItem = state.lastItemOrNull()
