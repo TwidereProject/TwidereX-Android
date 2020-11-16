@@ -27,7 +27,7 @@ import com.twidere.twiderex.db.AppDatabase
 import com.twidere.twiderex.di.assisted.IAssistedFactory
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.paging.mediator.PagingMediator
-import com.twidere.twiderex.paging.mediator.user.UserFavouriteMediator
+import com.twidere.twiderex.paging.mediator.user.UserStatusMediator
 import com.twidere.twiderex.viewmodel.PagingViewModel
 
 class UserTimelineViewModel @AssistedInject constructor(
@@ -42,7 +42,7 @@ class UserTimelineViewModel @AssistedInject constructor(
     }
 
     override val pagingMediator: PagingMediator =
-        UserFavouriteMediator(
+        UserStatusMediator(
             screenName,
             database,
             account.key,
