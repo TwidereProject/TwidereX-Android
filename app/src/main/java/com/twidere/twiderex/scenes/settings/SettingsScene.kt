@@ -60,16 +60,17 @@ fun SettingsScene() {
                     vectorResource(id = R.drawable.ic_template),
                     route = Route.Settings.Display,
                 ),
-                SettingItem(
-                    "Layout",
-                    vectorResource(id = R.drawable.ic_layout_sidebar),
-                    route = "",
-                ),
-                SettingItem(
-                    "Web Browser",
-                    vectorResource(id = R.drawable.ic_browser),
-                    route = "",
-                ),
+                // TODO
+//                SettingItem(
+//                    "Layout",
+//                    vectorResource(id = R.drawable.ic_layout_sidebar),
+//                    route = "",
+//                ),
+//                SettingItem(
+//                    "Web Browser",
+//                    vectorResource(id = R.drawable.ic_browser),
+//                    route = "",
+//                ),
             ),
             "ABOUT" to listOf(
                 SettingItem(

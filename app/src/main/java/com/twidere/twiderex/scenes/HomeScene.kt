@@ -314,20 +314,7 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
                     }
                 }
             } else {
-                LazyColumn {
-                    for (it in (0 until 10)) {
-                        item {
-                            ListItem(
-                                icon = {
-                                    Icon(asset = vectorResource(id = R.drawable.ic_adjustments_horizontal))
-                                },
-                                text = {
-                                    Text(text = "Settings")
-                                }
-                            )
-                        }
-                    }
-                }
+                // TODO
             }
         }
 
