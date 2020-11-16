@@ -34,6 +34,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.Divider
+import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
@@ -121,32 +122,44 @@ private fun AboutContent() {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Row {
-                IconButton(onClick = {
-                    navController.navigate(Route.User("TwidereProject"))
-                }) {
-                    Image(asset = vectorResource(id = R.drawable.ic_twitter))
+                IconButton(
+                    onClick = {
+                        navController.navigate(Route.User("TwidereProject"))
+                    }
+                ) {
+                    Icon(
+                        asset = vectorResource(id = R.drawable.ic_twitter),
+                        tint = MaterialTheme.colors.onBackground,
+                    )
                 }
                 Box(modifier = Modifier.width(32.dp))
-                IconButton(onClick = {
-                    context.startActivity(
-                        Intent(
-                            Intent.ACTION_VIEW,
-                            Uri.parse("https://github.com/TwidereProject/TwidereX-Android")
+                IconButton(
+                    onClick = {
+                        context.startActivity(
+                            Intent(
+                                Intent.ACTION_VIEW,
+                                Uri.parse("https://github.com/TwidereProject/TwidereX-Android")
+                            )
                         )
+                    }
+                ) {
+                    Icon(
+                        asset = vectorResource(id = R.drawable.ic_github),
+                        tint = MaterialTheme.colors.onBackground,
                     )
-                }) {
-                    Image(asset = vectorResource(id = R.drawable.ic_github))
                 }
             }
             Box(modifier = Modifier.height(32.dp))
-            TextButton(onClick = {
-                context.startActivity(
-                    Intent(
-                        Intent.ACTION_VIEW,
-                        Uri.parse("https://github.com/TwidereProject/TwidereX-Android/blob/develop/LICENSE")
+            TextButton(
+                onClick = {
+                    context.startActivity(
+                        Intent(
+                            Intent.ACTION_VIEW,
+                            Uri.parse("https://github.com/TwidereProject/TwidereX-Android/blob/develop/LICENSE")
+                        )
                     )
-                )
-            }) {
+                }
+            ) {
                 Text(text = "License")
             }
         }
