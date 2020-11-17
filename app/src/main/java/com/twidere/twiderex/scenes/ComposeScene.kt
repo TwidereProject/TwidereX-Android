@@ -64,6 +64,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.node.Ref
 import androidx.compose.ui.platform.ContextAmbient
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.SoftwareKeyboardController
 import androidx.compose.ui.unit.dp
@@ -116,9 +117,9 @@ fun ComposeScene(statusId: String? = null, composeType: ComposeType = ComposeTyp
                     title = {
                         Text(
                             text = when (composeType) {
-                                ComposeType.Reply -> "Reply"
-                                ComposeType.Quote -> "Quote"
-                                else -> "Compose"
+                                ComposeType.Reply -> stringResource(id = R.string.title_reply)
+                                ComposeType.Quote -> stringResource(id = R.string.title_quote)
+                                else -> stringResource(id = R.string.title_compose)
                             }
                         )
                     },
@@ -392,7 +393,7 @@ private fun ComposeImage(item: Uri, viewModel: ComposeViewModel) {
                 viewModel.removeImage(item)
             }
         ) {
-            Text("Remove")
+            Text(text = stringResource(id = R.string.action_remove))
         }
     }
 }

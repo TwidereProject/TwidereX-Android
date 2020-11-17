@@ -128,7 +128,7 @@ fun TwitterSignInScene() {
                                 }
                             }
                         ) {
-                            Text(text = "Sign in with Twitter")
+                            Text(text = stringResource(id = R.string.sign_in_with_twitter))
                         }
                     }
                     Box(modifier = Modifier.height(100.dp))

@@ -48,6 +48,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.ExperimentalFocus
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
@@ -121,7 +122,7 @@ fun SearchScene(keyword: String) {
                                                 setText(it)
                                             },
                                             placeholder = {
-                                                Text(text = "Tap to search...")
+                                                Text(text = stringResource(id = R.string.search_hint))
                                             },
                                             onImeActionPerformed = { _, _ ->
 //                                                usersViewModel.reset(text)
@@ -140,9 +141,9 @@ fun SearchScene(keyword: String) {
                         )
                         TextTabsComponent(
                             items = listOf(
-                                "TWEETS",
-                                "MEDIA",
-                                "USERS",
+                                stringResource(id = R.string.search_title_tweets),
+                                stringResource(id = R.string.search_title_media),
+                                stringResource(id = R.string.search_title_users),
                             ),
                             selectedItem = selectedTab,
                             onItemSelected = {

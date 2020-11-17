@@ -35,6 +35,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.graphics.vector.VectorAsset
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.navigation.compose.navigate
@@ -45,8 +46,9 @@ import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.ui.AmbientNavController
 
 class SearchItem : HomeNavigationItem() {
+    @Composable
     override val name: String
-        get() = "Search"
+        get() = stringResource(R.string.title_search)
     override val route: String
         get() = "search"
 
@@ -77,7 +79,7 @@ class SearchItem : HomeNavigationItem() {
                                         setText(it)
                                     },
                                     placeholder = {
-                                        Text(text = "Tap to search...")
+                                        Text(text = stringResource(id = R.string.search_hint))
                                     },
                                     imeAction = ImeAction.Search,
                                     alignment = Alignment.CenterStart,

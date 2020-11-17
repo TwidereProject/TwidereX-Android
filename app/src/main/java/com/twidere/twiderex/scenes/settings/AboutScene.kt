@@ -62,7 +62,7 @@ fun AboutScene() {
                         AppBarNavigationButton()
                     },
                     title = {
-                        Text(text = "About")
+                        Text(text = stringResource(id = R.string.title_about))
                     }
                 )
             }
@@ -144,7 +144,7 @@ private fun AboutContent() {
                     navigator.openLink("https://github.com/TwidereProject/TwidereX-Android/blob/develop/LICENSE")
                 }
             ) {
-                Text(text = "License")
+                Text(text = stringResource(id = R.string.license))
             }
         }
     }

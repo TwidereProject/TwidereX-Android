@@ -46,7 +46,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringArrayResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.lazy.itemDivider
@@ -74,7 +77,7 @@ fun AppearanceScene() {
                         AppBarNavigationButton()
                     },
                     title = {
-                        Text(text = "Appearance")
+                        Text(text = stringResource(id = R.string.title_appearance))
                     },
                 )
             }
@@ -96,7 +99,7 @@ fun AppearanceScene() {
                             }
                         ),
                         text = {
-                            Text(text = "Highlight color")
+                            Text(text = stringResource(id = R.string.settings_primary_color))
                         },
                         trailing = {
                             Box(
@@ -122,10 +125,10 @@ fun AppearanceScene() {
                         viewModel.setTabPosition(it)
                     },
                     title = {
-                        Text(text = "Tab Position")
+                        Text(text = stringResource(id = R.string.settings_tab_position))
                     },
                     itemContent = {
-                        Text(text = it.name)
+                        Text(text = stringArrayResource(id = R.array.entries_tab_position)[it.ordinal])
                     }
                 )
                 itemDivider()
@@ -140,10 +143,10 @@ fun AppearanceScene() {
                         viewModel.setTheme(it)
                     },
                     title = {
-                        Text(text = "Theme")
+                        Text(text = stringResource(id = R.string.settings_theme))
                     },
                     itemContent = {
-                        Text(text = it.name)
+                        Text(text = stringArrayResource(id = R.array.entries_theme)[it.ordinal])
                     }
                 )
             }
@@ -166,7 +169,7 @@ fun primaryColorDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         title = {
-            Text(text = "Select color")
+            Text(text = stringResource(id = R.string.pick_color))
         },
         text = {
             LazyRowForIndexed(
@@ -197,7 +200,7 @@ fun primaryColorDialog(
         },
         confirmButton = {
             TextButton(onClick = onDismiss) {
-                Text(text = "CLOSE")
+                Text(text = stringResource(id = R.string.action_Close))
             }
         }
     )

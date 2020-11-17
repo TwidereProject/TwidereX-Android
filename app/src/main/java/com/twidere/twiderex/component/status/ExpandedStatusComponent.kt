@@ -41,6 +41,7 @@ import androidx.compose.runtime.Providers
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -110,18 +111,24 @@ fun ExpandedStatusComponent(
                         .align(Alignment.CenterHorizontally)
                 ) {
                     if (data.replyCount > 0) {
-                        StatusStatistics(count = data.replyCount.toString(), text = "reply")
+                        StatusStatistics(
+                            count = data.replyCount.toString(),
+                            text = R.string.count_reply,
+                        )
                         Spacer(modifier = Modifier.width(standardPadding * 2))
                     }
                     if (data.retweetCount > 0) {
                         StatusStatistics(
                             count = data.retweetCount.toString(),
-                            text = "retweets"
+                            text = R.string.count_retweet,
                         )
                         Spacer(modifier = Modifier.width(standardPadding * 2))
                     }
                     if (data.likeCount > 0) {
-                        StatusStatistics(count = data.likeCount.toString(), text = "likes")
+                        StatusStatistics(
+                            count = data.likeCount.toString(),
+                            text = R.string.count_like,
+                        )
                     }
                 }
             }
@@ -222,11 +229,14 @@ private fun StatusComponent(
 @Composable
 private fun StatusStatistics(
     count: String,
-    text: String,
+    text: Int,
 ) {
     Row {
         Text(text = count)
         Spacer(modifier = Modifier.width(standardPadding))
-        Text(text = text, color = mediumEmphasisContentContentColor)
+        Text(
+            text = stringResource(id = text, count),
+            color = mediumEmphasisContentContentColor
+        )
     }
 }

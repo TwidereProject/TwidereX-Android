@@ -50,6 +50,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.layout.WithConstraints
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -308,14 +309,18 @@ private fun UserInfo(user: UiUser, viewModel: UserViewModel) {
                                 }
                             ) {
                                 Text(
-                                    text = if (it.followedBy) "Following" else "Follow",
+                                    text = if (it.followedBy) {
+                                        stringResource(id = R.string.action_unfollow)
+                                    } else {
+                                        stringResource(id = R.string.action_follow)
+                                    },
                                     style = MaterialTheme.typography.h6,
                                     color = MaterialTheme.colors.primary,
                                 )
                             }
                             if (it.following) {
                                 Text(
-                                    text = "Follows you",
+                                    text = stringResource(id = R.string.following_you),
                                     style = MaterialTheme.typography.caption,
                                 )
                             }
@@ -366,21 +371,21 @@ private fun UserInfo(user: UiUser, viewModel: UserViewModel) {
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Text(text = user.friendsCount.toString())
-                    Text(text = "Following")
+                    Text(text = stringResource(id = R.string.title_following))
                 }
                 Column(
                     modifier = Modifier.weight(1f),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Text(text = user.followersCount.toString())
-                    Text(text = "Followers")
+                    Text(text = stringResource(id = R.string.title_followers))
                 }
                 Column(
                     modifier = Modifier.weight(1f),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Text(text = user.listedCount.toString())
-                    Text(text = "Listed")
+                    Text(text = stringResource(id = R.string.title_listed))
                 }
             }
             Spacer(modifier = Modifier.height(standardPadding * 2))

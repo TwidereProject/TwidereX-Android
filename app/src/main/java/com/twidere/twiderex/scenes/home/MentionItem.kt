@@ -22,6 +22,7 @@ package com.twidere.twiderex.scenes.home
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.VectorAsset
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.TimelineComponent
@@ -30,8 +31,9 @@ import com.twidere.twiderex.ui.AmbientActiveAccount
 import com.twidere.twiderex.viewmodel.twitter.timeline.MentionsTimelineViewModel
 
 class MentionItem : HomeNavigationItem() {
+    @Composable
     override val name: String
-        get() = "Mentions"
+        get() = stringResource(R.string.title_mentions)
     override val route: String
         get() = "mentions"
 

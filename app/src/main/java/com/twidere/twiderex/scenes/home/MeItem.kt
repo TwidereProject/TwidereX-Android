@@ -22,6 +22,7 @@ package com.twidere.twiderex.scenes.home
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.VectorAsset
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import com.twidere.twiderex.R
 import com.twidere.twiderex.annotations.IncomingComposeUpdate
@@ -30,8 +31,9 @@ import com.twidere.twiderex.model.ui.UiUser.Companion.toUi
 import com.twidere.twiderex.ui.AmbientActiveAccount
 
 class MeItem : HomeNavigationItem() {
+    @Composable
     override val name: String
-        get() = "Me"
+        get() = stringResource(R.string.title_me)
     override val route: String
         get() = "me"
 

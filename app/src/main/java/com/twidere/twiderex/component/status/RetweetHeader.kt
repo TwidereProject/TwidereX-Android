@@ -31,6 +31,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.R
@@ -60,7 +61,7 @@ fun RetweetHeader(
         Spacer(modifier = Modifier.width(standardPadding))
         Text(
             style = MaterialTheme.typography.caption,
-            text = data.user.name + " retweet this tweet",
+            text = stringResource(id = R.string.name_retweeted, data.user.name),
         )
     }
 }

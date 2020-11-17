@@ -33,6 +33,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.LoadingProgress
@@ -64,7 +66,7 @@ fun StatusScene(statusId: String) {
             topBar = {
                 AppBar(
                     title = {
-                        Text(text = "Tweet")
+                        Text(text = stringResource(id = R.string.title_tweet))
                     },
                     navigationIcon = {
                         AppBarNavigationButton()

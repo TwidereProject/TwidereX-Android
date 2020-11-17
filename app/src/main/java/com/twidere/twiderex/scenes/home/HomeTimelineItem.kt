@@ -25,6 +25,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.VectorAsset
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.navigation.compose.navigate
 import com.twidere.twiderex.R
@@ -37,8 +38,9 @@ import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.viewmodel.twitter.timeline.HomeTimelineViewModel
 
 class HomeTimelineItem : HomeNavigationItem() {
+    @Composable
     override val name: String
-        get() = "Home"
+        get() = stringResource(R.string.title_home)
     override val route: String
         get() = "home"
 

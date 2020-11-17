@@ -31,6 +31,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.VectorAsset
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.navigation.compose.navigate
 import com.twidere.twiderex.R
@@ -49,14 +50,14 @@ data class SettingItem(
 fun SettingsScene() {
     val settings =
         mapOf(
-            "GENERAL" to listOf(
+            stringResource(id = R.string.group_title_general) to listOf(
                 SettingItem(
-                    "Appearance",
+                    stringResource(id = R.string.title_appearance),
                     vectorResource(id = R.drawable.ic_shirt),
                     route = Route.Settings.Appearance,
                 ),
                 SettingItem(
-                    "Display",
+                    stringResource(id = R.string.title_display),
                     vectorResource(id = R.drawable.ic_template),
                     route = Route.Settings.Display,
                 ),
@@ -72,9 +73,9 @@ fun SettingsScene() {
 //                    route = "",
 //                ),
             ),
-            "ABOUT" to listOf(
+            stringResource(id = R.string.group_title_about) to listOf(
                 SettingItem(
-                    "About",
+                    stringResource(id = R.string.title_about),
                     vectorResource(id = R.drawable.ic_info_circle),
                     route = Route.Settings.About,
                 ),
@@ -89,7 +90,7 @@ fun SettingsScene() {
                         AppBarNavigationButton()
                     },
                     title = {
-                        Text(text = "Settings")
+                        Text(text = stringResource(id = R.string.title_settings))
                     }
                 )
             }

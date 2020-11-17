@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="title_home">首页</string>
+    <string name="title_me">我</string>
+    <string name="title_mentions">提及</string>
+    <string name="title_search">搜索</string>
+    <string name="title_settings">设置</string>
+    <string name="title_display">显示</string>
+    <string name="title_about">关于</string>
+    <string name="title_appearance">外观</string>
+    <string name="title_compose">发推</string>
+    <string name="title_reply">回复</string>
+    <string name="title_quote">转推</string>
+    <string name="title_following">正在关注</string>
+    <string name="title_followers">关注者</string>
+    <string name="title_listed">列表中</string>
+    <string name="title_sign_in">登录</string>
+    <string name="title_tweet">推文</string>
+    <string name="search_title_tweets">推文</string>
+    <string name="search_title_media">媒体</string>
+    <string name="search_title_users">用户</string>
+    <string name="action_remove">删除</string>
+    <string name="action_follow">关注</string>
+    <string name="action_unfollow">取消关注</string>
+    <string name="load_more">加载</string>
+    <string name="following_you">关注了你</string>
+    <string name="sign_in_with_twitter">通过Twitter登录</string>
+    <string name="search_hint">点击搜索</string>
+    <string name="list_load_state_error">错误</string>
+    <string name="count_reply"><xliff:g id="user_name">%d</xliff:g> 回复</string>
+    <string name="count_retweet"><xliff:g id="user_name">%d</xliff:g> 转推</string>
+    <string name="count_like"><xliff:g id="user_name">%d</xliff:g> 喜欢</string>
+    <string name="name_retweeted"><xliff:g id="user_name">%s</xliff:g> 转推了</string>
+    <string name="group_title_general">通用</string>
+    <string name="group_title_about">关于</string>
+    <string name="group_title_preview">预览</string>
+    <string name="group_title_text">文字</string>
+    <string name="group_title_avatar_style">头像风格</string>
+    <string name="group_title_media">媒体</string>
+    <string name="action_Close">关闭</string>
+    <string name="pick_color">选择颜色</string>
+    <string name="settings_primary_color">颜色</string>
+    <string name="settings_tab_position">标签位置</string>
+    <string name="settings_theme">主题</string>
+    <string name="settings_use_system_font_size">使用系统文字尺寸</string>
+    <string name="settings_media_preview">媒体预览</string>
+    <string name="license">开源协议</string>
+</resources>

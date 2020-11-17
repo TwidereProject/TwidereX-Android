@@ -36,6 +36,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.onCommit
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -114,7 +115,7 @@ fun TimelineComponent(viewModel: TimelineViewModel) {
                                     ) {
                                         Icon(asset = vectorResource(id = R.drawable.ic_refresh))
                                         Box(modifier = Modifier.width(standardPadding))
-                                        Text("Load more")
+                                        Text(text = stringResource(id = R.string.load_more))
                                     }
                                     Divider()
                                 }

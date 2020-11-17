@@ -24,6 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.VectorAsset
 
 abstract class HomeNavigationItem {
+    @Composable
     abstract val name: String
     abstract val route: String
     @Composable
