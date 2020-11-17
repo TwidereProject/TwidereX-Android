@@ -47,7 +47,8 @@ import com.twidere.twiderex.twitterHosts
 import java.net.URLDecoder
 import java.net.URLEncoder
 
-const val initialRoute = "home"
+val initialRoute = Route.Home
+val twidereXSchema = "twiderex://"
 
 object Route {
     val Home = "home"
@@ -85,6 +86,11 @@ object Route {
     }
 }
 
+object DeepLinks {
+    val Search = "${twidereXSchema}search/"
+    val User = "${twidereXSchema}user/"
+}
+
 fun NavGraphBuilder.authorizedComposable(
     route: String,
     arguments: List<NamedNavArgument> = emptyList(),
@@ -108,7 +114,7 @@ fun NavGraphBuilder.route() {
         "signin/twitter",
         deepLinks = listOf(
             navDeepLink {
-                uriPattern = "twiderex://signin"
+                uriPattern = "${twidereXSchema}signin"
             }
         )
     ) {
@@ -129,7 +135,13 @@ fun NavGraphBuilder.route() {
         arguments = listOf(
             navArgument("screenName") { type = NavType.StringType },
         ),
-        deepLinks = twitterHosts.map { navDeepLink { uriPattern = "$it/{screenName}" } }
+        deepLinks = twitterHosts.map {
+            navDeepLink {
+                uriPattern = "$it/{screenName}"
+            }
+        } + navDeepLink {
+            uriPattern = "${DeepLinks.User}{screenName}"
+        }
     ) { backStackEntry ->
         backStackEntry.arguments?.getString("screenName")?.let {
             UserScene(name = it)
@@ -175,7 +187,14 @@ fun NavGraphBuilder.route() {
         "search/{keyword}",
         arguments = listOf(
             navArgument("keyword") { type = NavType.StringType }
-        )
+        ),
+        deepLinks = twitterHosts.map {
+            navDeepLink {
+                uriPattern = "$it/search?q={keyword}"
+            }
+        } + navDeepLink {
+            uriPattern = "${DeepLinks.Search}{keyword}"
+        }
     ) { backStackEntry ->
         backStackEntry.arguments?.getString("keyword")?.takeIf { it.isNotEmpty() }?.let {
             SearchScene(keyword = URLDecoder.decode(it, "UTF-8"))

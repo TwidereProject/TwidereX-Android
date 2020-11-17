@@ -181,7 +181,7 @@ private fun StatusComponent(
 
             Spacer(modifier = Modifier.height(standardPadding))
 
-            Text(text = status.text)
+            StatusText(status = status)
 
             if (status.media.any()) {
                 Spacer(modifier = Modifier.height(standardPadding))

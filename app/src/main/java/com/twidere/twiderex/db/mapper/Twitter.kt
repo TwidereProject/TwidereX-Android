@@ -154,7 +154,7 @@ private fun StatusV2.toDbStatusWithMediaAndUser(
                 height = it.height ?: 0,
                 pageUrl = null, // TODO: how to play media under twitter v2 api
                 altText = it.publicMetrics?.viewCount?.toString() ?: "",
-                url = it.url ?: it.previewImageURL,
+                url = it.url,
                 type = it.type?.let { MediaType.valueOf(it) } ?: MediaType.photo,
                 order = index,
             )
@@ -210,9 +210,9 @@ private fun Status.toDbStatusWithMediaAndUser(
                 mediaUrl = getImage(it.mediaURLHTTPS, "large"),
                 width = it.sizes?.large?.w ?: 0,
                 height = it.sizes?.large?.h ?: 0,
-                pageUrl = it.url,
+                pageUrl = it.expandedURL,
                 altText = it.displayURL ?: "",
-                url = it.expandedURL,
+                url = it.url,
                 type = it.type?.let { MediaType.valueOf(it) } ?: MediaType.photo,
                 order = index,
             )
@@ -231,7 +231,7 @@ private fun Status.toDbStatusWithMediaAndUser(
         } else {
             emptyList()
         },
-        url = entities?.url?.urls?.map {
+        url = entities?.urls?.map {
             DbUrlEntity(
                 _id = UUID.randomUUID().toString(),
                 statusId = status.statusId,

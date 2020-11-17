@@ -33,6 +33,6 @@ data class StatusEntities(
     val userMentions: List<UserMention>? = null,
 
     val media: List<PurpleMedia>? = null,
-    val url: Urls? = null,
+    val urls: List<URL>? = null,
     val description: Description? = null
 )

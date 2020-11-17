@@ -110,6 +110,9 @@ suspend fun List<DbStatusWithMediaAndUser>.saveToDb(
     map { it.data }.let {
         database.statusDao().insertAll(it)
     }
+    map { it.url }.flatten().let {
+        database.urlEntityDao().insertAll(it)
+    }
     map { it.reactions }.flatten().let {
         database.reactionDao().insertAll(it)
     }
