@@ -112,21 +112,21 @@ fun ExpandedStatusComponent(
                 ) {
                     if (data.replyCount > 0) {
                         StatusStatistics(
-                            count = data.replyCount.toString(),
+                            count = data.replyCount,
                             text = R.string.count_reply,
                         )
                         Spacer(modifier = Modifier.width(standardPadding * 2))
                     }
                     if (data.retweetCount > 0) {
                         StatusStatistics(
-                            count = data.retweetCount.toString(),
+                            count = data.retweetCount,
                             text = R.string.count_retweet,
                         )
                         Spacer(modifier = Modifier.width(standardPadding * 2))
                     }
                     if (data.likeCount > 0) {
                         StatusStatistics(
-                            count = data.likeCount.toString(),
+                            count = data.likeCount,
                             text = R.string.count_like,
                         )
                     }
@@ -228,15 +228,11 @@ private fun StatusComponent(
 
 @Composable
 private fun StatusStatistics(
-    count: String,
+    count: Long,
     text: Int,
 ) {
-    Row {
-        Text(text = count)
-        Spacer(modifier = Modifier.width(standardPadding))
-        Text(
-            text = stringResource(id = text, count),
-            color = mediumEmphasisContentContentColor
-        )
-    }
+    Text(
+        text = stringResource(id = text, count),
+        color = mediumEmphasisContentContentColor
+    )
 }
