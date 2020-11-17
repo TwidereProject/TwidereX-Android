@@ -20,16 +20,15 @@
  */
 package com.twidere.twiderex.component.status
 
-import android.net.Uri
 import androidx.compose.foundation.ClickableText
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.annotatedString
+import com.twidere.twiderex.component.navigation.AmbientNavigator
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.navigation.DeepLinks
-import com.twidere.twiderex.ui.AmbientNavController
 import com.twitter.twittertext.Autolink
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
@@ -49,12 +48,12 @@ private val autolink by lazy {
 
 @Composable
 fun StatusText(status: UiStatus) {
-    val navController = AmbientNavController.current
+    val navigator = AmbientNavigator.current
     RenderText(
         html = autolink.autoLink(status.text),
         status = status,
     ) {
-        navController.navigate(Uri.parse(it))
+        navigator.openLink(it)
     }
 }
 

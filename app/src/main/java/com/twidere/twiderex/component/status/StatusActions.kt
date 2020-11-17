@@ -38,18 +38,15 @@ import androidx.compose.ui.graphics.vector.VectorAsset
 import androidx.compose.ui.platform.ContextAmbient
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
-import androidx.navigation.compose.navigate
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.ActionIconButton
+import com.twidere.twiderex.component.navigation.AmbientNavigator
 import com.twidere.twiderex.extensions.humanizedCount
 import com.twidere.twiderex.extensions.shareText
 import com.twidere.twiderex.model.ui.UiStatus
-import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.providers.AmbientStatusActions
 import com.twidere.twiderex.scenes.ComposeType
 import com.twidere.twiderex.ui.AmbientActiveAccount
-import com.twidere.twiderex.ui.AmbientInStoryboard
-import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.ui.mediumEmphasisContentContentColor
 
 @Composable
@@ -57,13 +54,10 @@ fun ReplyButton(
     status: UiStatus,
     withNumber: Boolean = true,
 ) {
-    val inStoryBoard = AmbientInStoryboard.current
-    val navController = AmbientNavController.current
+    val navigator = AmbientNavigator.current
     val icon = vectorResource(id = R.drawable.ic_corner_up_left)
     val action = {
-        if (!inStoryBoard) {
-            navController.navigate(Route.Compose(ComposeType.Reply, statusId = status.statusId))
-        }
+        navigator.compose(ComposeType.Reply, statusId = status.statusId)
     }
     if (withNumber) {
         StatusActionButtonWithNumbers(
@@ -90,7 +84,6 @@ fun LikeButton(
     withNumber: Boolean = true,
 ) {
     val actionsViewModel = AmbientStatusActions.current
-    val inStoryBoard = AmbientInStoryboard.current
     val account = AmbientActiveAccount.current
     val color = if (status.liked) {
         Color.Red
@@ -99,7 +92,7 @@ fun LikeButton(
     }
     val icon = vectorResource(id = R.drawable.ic_heart)
     val action = {
-        if (!inStoryBoard && account != null) {
+        if (account != null) {
             actionsViewModel.like(status, account)
         }
     }
@@ -132,7 +125,6 @@ fun RetweetButton(
     withNumber: Boolean = true,
 ) {
     val actionsViewModel = AmbientStatusActions.current
-    val inStoryBoard = AmbientInStoryboard.current
     val account = AmbientActiveAccount.current
     val color = if (status.retweeted) {
         MaterialTheme.colors.primary
@@ -141,7 +133,7 @@ fun RetweetButton(
     }
     val icon = vectorResource(id = R.drawable.ic_repeat)
     val action = {
-        if (!inStoryBoard && account != null) {
+        if (account != null) {
             actionsViewModel.retweet(status, account)
         }
     }

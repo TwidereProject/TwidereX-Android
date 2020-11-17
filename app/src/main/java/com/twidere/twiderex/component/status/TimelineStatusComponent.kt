@@ -45,14 +45,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.navigation.compose.navigate
 import com.twidere.twiderex.R
+import com.twidere.twiderex.component.navigation.AmbientNavigator
 import com.twidere.twiderex.extensions.humanizedTimestamp
 import com.twidere.twiderex.model.ui.UiStatus
-import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.preferences.AmbientDisplayPreferences
-import com.twidere.twiderex.ui.AmbientInStoryboard
-import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.ui.profileImageSize
 import com.twidere.twiderex.ui.standardPadding
 
@@ -61,18 +58,15 @@ fun TimelineStatusComponent(
     data: UiStatus,
     showActions: Boolean = true,
 ) {
-    val inStoryBoard = AmbientInStoryboard.current
+    val navigator = AmbientNavigator.current
     Column {
         val status = (data.retweet ?: data)
-        val navController = AmbientNavController.current
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable(
                     onClick = {
-                        if (!inStoryBoard) {
-                            navController.navigate(Route.Status(data.statusId))
-                        }
+                        navigator.status(data.statusId)
                     }
                 )
                 .padding(
@@ -114,7 +108,7 @@ private fun StatusComponent(
     modifier: Modifier = Modifier,
     showActions: Boolean = true,
 ) {
-    val inStoryBoard = AmbientInStoryboard.current
+    val navigator = AmbientNavigator.current
     val isMediaPreviewEnabled = AmbientDisplayPreferences.current.mediaPreview
     Row(modifier = modifier) {
         UserAvatar(user = status.user)
@@ -189,16 +183,13 @@ private fun StatusComponent(
                         )
                         .clip(MaterialTheme.shapes.medium)
                 ) {
-                    val navController = AmbientNavController.current
                     StatusComponent(
                         status = status.quote,
                         showActions = false,
                         modifier = Modifier
                             .clickable(
                                 onClick = {
-                                    if (!inStoryBoard) {
-                                        navController.navigate(Route.Status(status.quote.statusId))
-                                    }
+                                    navigator.status(statusId = status.quote.statusId)
                                 }
                             )
                             .padding(standardPadding),

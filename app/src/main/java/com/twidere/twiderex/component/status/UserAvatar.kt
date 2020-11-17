@@ -31,14 +31,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.unit.Dp
-import androidx.navigation.compose.navigate
 import com.twidere.twiderex.component.foundation.NetworkImage
+import com.twidere.twiderex.component.navigation.AmbientNavigator
 import com.twidere.twiderex.model.ui.UiUser
-import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.preferences.AmbientDisplayPreferences
 import com.twidere.twiderex.preferences.proto.DisplayPreferences
-import com.twidere.twiderex.ui.AmbientInStoryboard
-import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.ui.profileImageSize
 
 @Composable
@@ -46,8 +43,7 @@ fun UserAvatar(
     user: UiUser,
     size: Dp = profileImageSize
 ) {
-    val navController = AmbientNavController.current
-    val inStoryBoard = AmbientInStoryboard.current
+    val navigator = AmbientNavigator.current
     Box(
         modifier = Modifier
             .withAvatarClip()
@@ -58,9 +54,7 @@ fun UserAvatar(
             modifier = Modifier
                 .clickable(
                     onClick = {
-                        if (!inStoryBoard) {
-                            navController.navigate(Route.User(user.screenName))
-                        }
+                        navigator.user(user.screenName)
                     }
                 )
                 .width(size)

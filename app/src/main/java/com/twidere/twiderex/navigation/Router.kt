@@ -22,15 +22,20 @@ package com.twidere.twiderex.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
+import androidx.compose.ui.platform.ContextAmbient
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
+import com.twidere.twiderex.component.navigation.AmbientNavigator
+import com.twidere.twiderex.component.navigation.Navigator
 import com.twidere.twiderex.ui.AmbientNavController
 
 @Composable
 fun Router() {
     val navController = rememberNavController()
+    val context = ContextAmbient.current
     Providers(
         AmbientNavController provides navController,
+        AmbientNavigator provides Navigator(navController, context),
     ) {
         NavHost(navController = navController, startDestination = initialRoute) {
             route()

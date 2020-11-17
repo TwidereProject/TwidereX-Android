@@ -44,12 +44,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.navigation.compose.navigate
 import com.twidere.twiderex.R
+import com.twidere.twiderex.component.navigation.AmbientNavigator
 import com.twidere.twiderex.extensions.humanizedTimestamp
 import com.twidere.twiderex.model.ui.UiStatus
-import com.twidere.twiderex.navigation.Route
-import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.ui.mediumEmphasisContentContentColor
 import com.twidere.twiderex.ui.standardPadding
 
@@ -151,13 +149,13 @@ private fun StatusComponent(
     status: UiStatus,
     modifier: Modifier = Modifier,
 ) {
+    val navigator = AmbientNavigator.current
     Box(modifier = modifier) {
         Column {
-            val navController = AmbientNavController.current
             Row(
                 modifier = Modifier.clickable(
                     onClick = {
-                        navController.navigate(Route.User(status.user.screenName))
+                        navigator.user(status.user.screenName)
                     }
                 )
             ) {
@@ -206,7 +204,7 @@ private fun StatusComponent(
                         modifier = Modifier
                             .clickable(
                                 onClick = {
-                                    navController.navigate(Route.Status(status.quote.statusId))
+                                    navigator.status(status.quote.statusId)
                                 }
                             )
                             .padding(standardPadding),

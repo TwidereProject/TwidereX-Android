@@ -29,11 +29,16 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-val AmbientStatusActions = ambientOf<StatusActions>()
+val AmbientStatusActions = ambientOf<IStatusActions>()
+
+interface IStatusActions {
+    fun like(status: UiStatus, account: AccountDetails)
+    fun retweet(status: UiStatus, account: AccountDetails)
+}
 
 class StatusActions @Inject constructor(
     private val factory: StatusRepository.AssistedFactory,
-) {
+) : IStatusActions {
     private val repositoryFactory = { account: AccountDetails ->
         account.service.let {
             it as StatusService
@@ -42,21 +47,33 @@ class StatusActions @Inject constructor(
         }
     }
 
-    fun like(status: UiStatus, account: AccountDetails) = GlobalScope.launch {
-        val repository = repositoryFactory.invoke(account)
-        if (status.liked) {
-            repository.unlike(status.statusId)
-        } else {
-            repository.like(status.statusId)
+    override fun like(status: UiStatus, account: AccountDetails) {
+        GlobalScope.launch {
+            val repository = repositoryFactory.invoke(account)
+            if (status.liked) {
+                repository.unlike(status.statusId)
+            } else {
+                repository.like(status.statusId)
+            }
         }
     }
 
-    fun retweet(status: UiStatus, account: AccountDetails) = GlobalScope.launch {
-        val repository = repositoryFactory.invoke(account)
-        if (status.retweeted) {
-            repository.unRetweet(status.statusId)
-        } else {
-            repository.retweet(status.statusId)
+    override fun retweet(status: UiStatus, account: AccountDetails) {
+        GlobalScope.launch {
+            val repository = repositoryFactory.invoke(account)
+            if (status.retweeted) {
+                repository.unRetweet(status.statusId)
+            } else {
+                repository.retweet(status.statusId)
+            }
         }
+    }
+}
+
+object FakeStatusActions : IStatusActions {
+    override fun like(status: UiStatus, account: AccountDetails) {
+    }
+
+    override fun retweet(status: UiStatus, account: AccountDetails) {
     }
 }

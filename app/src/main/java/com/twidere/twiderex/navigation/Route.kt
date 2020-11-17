@@ -48,7 +48,7 @@ import java.net.URLDecoder
 import java.net.URLEncoder
 
 val initialRoute = Route.Home
-val twidereXSchema = "twiderex://"
+val twidereXSchema = "twiderex"
 
 object Route {
     val Home = "home"
@@ -87,8 +87,9 @@ object Route {
 }
 
 object DeepLinks {
-    val Search = "${twidereXSchema}search/"
-    val User = "${twidereXSchema}user/"
+    val Search = "$twidereXSchema://search/"
+    val User = "$twidereXSchema://user/"
+    val SignIn = "$twidereXSchema://signin"
 }
 
 fun NavGraphBuilder.authorizedComposable(
@@ -114,7 +115,7 @@ fun NavGraphBuilder.route() {
         "signin/twitter",
         deepLinks = listOf(
             navDeepLink {
-                uriPattern = "${twidereXSchema}signin"
+                uriPattern = DeepLinks.SignIn
             }
         )
     ) {

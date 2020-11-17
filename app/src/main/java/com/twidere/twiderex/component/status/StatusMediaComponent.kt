@@ -32,26 +32,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import androidx.navigation.compose.navigate
 import com.twidere.twiderex.component.foundation.NetworkImage
+import com.twidere.twiderex.component.navigation.AmbientNavigator
 import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.model.ui.UiStatus
-import com.twidere.twiderex.navigation.Route
-import com.twidere.twiderex.ui.AmbientInStoryboard
-import com.twidere.twiderex.ui.AmbientNavController
 
 @Composable
 fun StatusMediaComponent(
     status: UiStatus,
 ) {
-    val inStoryBoard = AmbientInStoryboard.current
+    val navigator = AmbientNavigator.current
     val media = status.media
-    val navController = AmbientNavController.current
     val onItemClick = { it: UiMedia ->
         val index = media.indexOf(it)
-        if (!inStoryBoard) {
-            navController.navigate(Route.Media(statusId = status.statusId, selectedIndex = index))
-        }
+        navigator.media(statusId = status.statusId, selectedIndex = index)
     }
     if (media.size == 1) {
         val first = media.first()

@@ -40,5 +40,4 @@ val AmbientViewModelFactoriesMap =
     staticAmbientOf<Map<String, ViewModelAssistedFactory<out ViewModel>>>()
 val AmbientActiveAccountViewModel = ambientOf<ActiveAccountViewModel>()
 val AmbientApplication = staticAmbientOf<Application>()
-val AmbientInStoryboard = staticAmbientOf { false }
 val AmbientActivity = staticAmbientOf<Activity>()

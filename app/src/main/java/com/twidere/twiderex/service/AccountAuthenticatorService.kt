@@ -31,6 +31,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.IBinder
 import androidx.core.os.bundleOf
+import com.twidere.twiderex.navigation.DeepLinks
 
 class AccountAuthenticatorService : Service() {
 
@@ -55,7 +56,7 @@ class AccountAuthenticatorService : Service() {
             requiredFeatures: Array<String>?,
             options: Bundle?
         ): Bundle {
-            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("twiderex://signin"))
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(DeepLinks.SignIn))
             intent.putExtra(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE, response)
             return bundleOf(
                 AccountManager.KEY_INTENT to intent,
@@ -71,7 +72,7 @@ class AccountAuthenticatorService : Service() {
             val am = AccountManager.get(context)
             val authToken = am.peekAuthToken(account, authTokenType)
             if (authToken.isNullOrEmpty()) {
-                val intent = Intent(Intent.ACTION_VIEW, Uri.parse("twiderex://signin"))
+                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(DeepLinks.SignIn))
                 intent.putExtra(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE, response)
                 return bundleOf(
                     AccountManager.KEY_INTENT to intent,
