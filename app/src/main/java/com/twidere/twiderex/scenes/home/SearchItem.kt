@@ -72,6 +72,7 @@ class SearchItem : HomeNavigationItem() {
                                         .align(Alignment.CenterVertically)
                                         .weight(1F),
                                     value = text,
+                                    maxLines = 1,
                                     onValueChange = {
                                         setText(it)
                                     },

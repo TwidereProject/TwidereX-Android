@@ -97,7 +97,6 @@ fun SearchScene(keyword: String) {
     var selectedTab by savedInstanceState { 0 }
 
     TwidereXTheme {
-
         Scaffold {
             Column {
                 Surface(
@@ -117,6 +116,7 @@ fun SearchScene(keyword: String) {
                                                 .align(Alignment.CenterVertically)
                                                 .weight(1F),
                                             value = text,
+                                            maxLines = 1,
                                             onValueChange = {
                                                 setText(it)
                                             },

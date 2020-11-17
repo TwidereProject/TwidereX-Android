@@ -61,6 +61,7 @@ fun TextInput(
     textStyle: TextStyle = AmbientTextStyle.current,
     placeholder: @Composable (() -> Unit)? = null,
     keyboardType: KeyboardType = KeyboardType.Text,
+    maxLines: Int = Int.MAX_VALUE,
     alignment: Alignment = Alignment.TopStart,
     imeAction: ImeAction = ImeAction.Unspecified,
     onImeActionPerformed: (ImeAction, SoftwareKeyboardController?) -> Unit = { _, _ -> },
@@ -104,6 +105,7 @@ fun TextInput(
         alignment = alignment,
     ) {
         BasicTextField(
+            maxLines = maxLines,
             keyboardOptions = KeyboardOptions(
                 keyboardType = keyboardType,
                 imeAction = imeAction,
