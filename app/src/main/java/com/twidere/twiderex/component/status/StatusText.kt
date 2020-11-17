@@ -47,14 +47,21 @@ private val autolink by lazy {
 }
 
 @Composable
-fun StatusText(status: UiStatus) {
+fun StatusText(
+    status: UiStatus,
+    onStatusTextClicked: () -> Unit = {},
+) {
     val navigator = AmbientNavigator.current
     RenderText(
         html = autolink.autoLink(status.text),
         status = status,
-    ) {
-        navigator.openLink(it)
-    }
+        onLinkClicked = {
+            navigator.openLink(it)
+        },
+        onStatusTextClicked = {
+            onStatusTextClicked.invoke()
+        },
+    )
 }
 
 @Composable
@@ -62,6 +69,7 @@ private fun RenderText(
     html: String,
     status: UiStatus,
     onLinkClicked: (String) -> Unit = {},
+    onStatusTextClicked: () -> Unit = {},
 ) {
     val document = Jsoup.parse(html.replace("\n", "<br>"))
     val value = annotatedString {
@@ -78,7 +86,9 @@ private fun RenderText(
                         when (annotation.tag) {
                             TAG_URL -> onLinkClicked.invoke(annotation.item)
                         }
-                    }
+                    } ?: run {
+                    onStatusTextClicked.invoke()
+                }
             },
             text = value,
         )
