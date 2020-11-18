@@ -32,7 +32,7 @@ import kotlinx.coroutines.flow.map
 abstract class PagingViewModel : ViewModel() {
     abstract val pagingMediator: PagingMediator
 
-    val source by lazy {
+    open val source by lazy {
         pagingMediator.pager().flow.map { pagingData ->
             pagingData.map {
                 it.toUi(pagingMediator.userKey)

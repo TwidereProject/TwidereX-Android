@@ -51,8 +51,12 @@ class UserMediaMediator(
 
     override fun transform(data: List<DbPagingTimelineWithStatus>): List<DbPagingTimelineWithStatus> {
         return data.filter {
-            val content = it.status.retweet ?: it.status.status
-            content.data.hasMedia && content.user.screenName == screenName
+            val content = it.status.status
+            it.status.retweet == null && content.data.hasMedia && content.user.screenName == screenName
         }
+    }
+
+    override fun hasMore(result: List<DbPagingTimelineWithStatus>, pageSize: Int): Boolean {
+        return result.isNotEmpty()
     }
 }

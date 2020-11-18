@@ -46,6 +46,9 @@ interface PagingTimelineDao {
         userKey: UserKey,
     ): PagingSource<Int, DbPagingTimelineWithStatus>
 
+    @Query("SELECT * FROM paging_timeline WHERE pagingKey == :pagingKey AND userKey == :userKey ORDER BY timestamp DESC")
+    fun getLatest(pagingKey: String, userKey: UserKey) : DbPagingTimeline?
+
     @Query("DELETE FROM paging_timeline WHERE pagingKey == :pagingKey AND userKey == :userKey")
     suspend fun clearAll(
         pagingKey: String,

@@ -33,8 +33,11 @@ import com.twidere.twiderex.db.model.DbPagingTimelineWithStatus
 import com.twidere.twiderex.db.model.TimelineType
 import com.twidere.twiderex.db.model.saveToDb
 import com.twidere.twiderex.model.UserKey
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import java.io.IOException
+import java.net.SocketTimeoutException
 
 @OptIn(ExperimentalPagingApi::class)
 abstract class PagingWithGapMediator(
@@ -78,8 +81,9 @@ abstract class PagingWithGapMediator(
                 return MediatorResult.Success(endOfPaginationReached = true)
             }
             LoadType.REFRESH -> {
-                val firstItem = state.firstItemOrNull()
-                firstItem?.status?.status?.data?.statusId
+                withContext(Dispatchers.IO) {
+                    database.pagingTimelineDao().getLatest(pagingKey, userKey)?.statusId
+                }
             }
         }
         return loadBetween(pageSize = state.config.pageSize, max_id = max_id, since_id = since_id)
@@ -113,6 +117,8 @@ abstract class PagingWithGapMediator(
         } catch (e: IOException) {
             return MediatorResult.Error(e)
         } catch (e: HttpException) {
+            return MediatorResult.Error(e)
+        } catch (e: SocketTimeoutException) {
             return MediatorResult.Error(e)
         } finally {
             if (max_id != null && since_id != null) {

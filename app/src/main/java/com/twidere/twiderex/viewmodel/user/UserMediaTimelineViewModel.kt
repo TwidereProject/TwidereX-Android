@@ -20,15 +20,24 @@
  */
 package com.twidere.twiderex.viewmodel.user
 
+import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
+import androidx.paging.map
 import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
 import com.twidere.services.microblog.TimelineService
 import com.twidere.twiderex.db.AppDatabase
 import com.twidere.twiderex.di.assisted.IAssistedFactory
 import com.twidere.twiderex.model.AccountDetails
+import com.twidere.twiderex.model.ui.UiStatus
+import com.twidere.twiderex.model.ui.UiStatus.Companion.toUi
 import com.twidere.twiderex.paging.mediator.PagingMediator
+import com.twidere.twiderex.paging.mediator.pager
 import com.twidere.twiderex.paging.mediator.user.UserMediaMediator
 import com.twidere.twiderex.viewmodel.PagingViewModel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 class UserMediaTimelineViewModel @AssistedInject constructor(
     database: AppDatabase,
@@ -39,6 +48,14 @@ class UserMediaTimelineViewModel @AssistedInject constructor(
     @AssistedInject.Factory
     interface AssistedFactory : IAssistedFactory {
         fun create(account: AccountDetails, screenName: String): UserMediaTimelineViewModel
+    }
+
+    override val source: Flow<PagingData<UiStatus>>  by lazy {
+        pagingMediator.pager(pageSize = 200).flow.map { pagingData ->
+            pagingData.map {
+                it.toUi(pagingMediator.userKey)
+            }
+        }.cachedIn(viewModelScope)
     }
 
     override val pagingMediator: PagingMediator =
