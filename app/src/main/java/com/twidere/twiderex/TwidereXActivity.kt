@@ -23,7 +23,6 @@ package com.twidere.twiderex
 import android.os.Build
 import android.os.Bundle
 import android.view.WindowManager
-import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Providers
@@ -33,7 +32,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.viewinterop.viewModel
 import androidx.datastore.core.DataStore
+import androidx.fragment.app.FragmentActivity
 import androidx.hilt.lifecycle.HiltViewModelFactory
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.ComposeNavigator
+import androidx.navigation.fragment.DialogFragmentNavigator
 import com.twidere.twiderex.di.assisted.ProvideAssistedFactory
 import com.twidere.twiderex.extensions.ProvideNavigationViewModelFactoryMap
 import com.twidere.twiderex.launcher.ActivityLauncher
@@ -69,7 +72,16 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class TwidereXActivity : ComponentActivity() {
+class TwidereXActivity : FragmentActivity() {
+
+    val navController by lazy {
+        NavHostController(this).apply {
+            navigatorProvider.apply {
+                addNavigator(ComposeNavigator())
+                addNavigator(DialogFragmentNavigator(this@TwidereXActivity, supportFragmentManager))
+            }
+        }
+    }
 
     private lateinit var launcher: ActivityLauncher
 
@@ -165,7 +177,9 @@ class TwidereXActivity : ComponentActivity() {
                                 Box(
                                     modifier = Modifier.padding(windowPadding)
                                 ) {
-                                    Router()
+                                    Router(
+                                        navController = navController
+                                    )
                                 }
                             }
                         }

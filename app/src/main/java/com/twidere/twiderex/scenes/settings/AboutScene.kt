@@ -20,7 +20,6 @@
  */
 package com.twidere.twiderex.scenes.settings
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -41,12 +40,12 @@ import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.BuildConfig
 import com.twidere.twiderex.R
+import com.twidere.twiderex.component.LoginLogo
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.navigation.AmbientNavigator
@@ -88,11 +87,7 @@ private fun AboutContent() {
             verticalArrangement = Arrangement.Bottom,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Image(
-                modifier = Modifier.preferredWidth(150.dp),
-                contentScale = ContentScale.FillWidth,
-                asset = vectorResource(id = R.drawable.ic_login_logo),
-            )
+            LoginLogo(modifier = Modifier.preferredWidth(150.dp))
             Box(modifier = Modifier.height(32.dp))
             Text(
                 text = stringResource(id = R.string.app_name),

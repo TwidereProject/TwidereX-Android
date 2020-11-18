@@ -52,8 +52,9 @@ inline fun <reified VM : ViewModel> navViewModel(
         // https://github.com/google/dagger/issues/1938
         // idk why people in google like factory pattern,
         // they might need to take a look at https://github.com/EnterpriseQualityCoding/FizzBuzzEnterpriseEdition
-        val hiltViewModelFactory = HiltViewModelFactory::class.java.declaredConstructors.first()
-            .newInstance(backStackEntry, null, delegate, viewModelFactories) as HiltViewModelFactory
+        val hiltViewModelFactory = HiltViewModelFactory::class.java.declaredConstructors.first()?.also {
+            it.isAccessible = true
+        }?.newInstance(backStackEntry, null, delegate, viewModelFactories) as HiltViewModelFactory
         viewModel(key, hiltViewModelFactory)
     } else {
         viewModel(key, factory)

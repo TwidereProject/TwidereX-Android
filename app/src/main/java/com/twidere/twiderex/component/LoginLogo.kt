@@ -18,29 +18,32 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.navigation
+package com.twidere.twiderex.component
 
+import android.os.Build
+import androidx.compose.foundation.Image
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
-import androidx.compose.ui.platform.ContextAmbient
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.rememberNavController
-import com.twidere.twiderex.component.navigation.AmbientNavigator
-import com.twidere.twiderex.component.navigation.Navigator
-import com.twidere.twiderex.ui.AmbientNavController
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.imageResource
+import androidx.compose.ui.res.vectorResource
+import com.twidere.twiderex.R
 
 @Composable
-fun Router(
-    navController: NavHostController = rememberNavController()
+fun LoginLogo(
+    modifier: Modifier = Modifier,
 ) {
-    val context = ContextAmbient.current
-    Providers(
-        AmbientNavController provides navController,
-        AmbientNavigator provides Navigator(navController, context),
-    ) {
-        NavHost(navController = navController, startDestination = initialRoute) {
-            route()
-        }
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+        Image(
+            modifier = modifier,
+            contentScale = ContentScale.FillWidth,
+            asset = imageResource(id = R.drawable.ic_login_logo),
+        )
+    } else {
+        Image(
+            modifier = modifier,
+            contentScale = ContentScale.FillWidth,
+            asset = vectorResource(id = R.drawable.ic_login_logo),
+        )
     }
 }

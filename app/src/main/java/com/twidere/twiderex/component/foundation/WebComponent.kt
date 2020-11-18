@@ -22,18 +22,25 @@ package com.twidere.twiderex.component.foundation
 
 import android.graphics.Bitmap
 import android.print.PrintDocumentAdapter
-import android.util.Log
+import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
-import com.twidere.twiderex.BuildConfig
+import androidx.compose.ui.zIndex
+import com.twidere.twiderex.view.LollipopFixWebView
 
 class WebContext {
-    companion object {
-        val debug = BuildConfig.DEBUG
-    }
-
     fun createPrintDocumentAdapter(documentName: String): PrintDocumentAdapter {
         return webView.createPrintDocumentAdapter(documentName)
     }
@@ -59,9 +66,6 @@ private fun WebView.setRef(ref: (WebView) -> Unit) {
 
 private fun WebView.setUrl(url: String) {
     if (originalUrl != url) {
-        if (WebContext.debug) {
-            Log.d("WebComponent", "WebComponent load url")
-        }
         loadUrl(url)
     }
 }
@@ -76,18 +80,39 @@ fun WebComponent(
     onPageStarted: ((view: WebView, url: String) -> Unit)? = null,
     config: (WebView) -> Unit = {},
 ) {
-    if (WebContext.debug) {
-        Log.d("WebComponent", "WebComponent compose $url")
-    }
-    AndroidView(::WebView) {
-        it.settings.javaScriptEnabled = enableJavascript
-        it.webViewClient = ComposeWebViewClient(onPageFinished, onPageStarted)
-        javascriptInterface.forEach { item ->
-            it.addJavascriptInterface(item.value, item.key)
+    var progress by remember { mutableStateOf(0f) }
+    Box {
+        if (progress != 1f) {
+            LinearProgressIndicator(
+                modifier = Modifier.fillMaxWidth().align(Alignment.TopStart).zIndex(1f),
+                progress = progress
+            )
         }
-        it.setRef { view -> webContext.webView = view }
-        config.invoke(it)
-        it.setUrl(url)
+        AndroidView(::LollipopFixWebView, modifier = Modifier.fillMaxSize()) {
+            it.settings.apply {
+                javaScriptEnabled = enableJavascript
+            }
+            it.webChromeClient = ComposeWebChromeClient(
+                onProgress = {
+                    progress = it
+                }
+            )
+            it.webViewClient = ComposeWebViewClient(onPageFinished, onPageStarted)
+            javascriptInterface.forEach { item ->
+                it.addJavascriptInterface(item.value, item.key)
+            }
+            it.setRef { view -> webContext.webView = view }
+            config.invoke(it)
+            it.setUrl(url)
+        }
+    }
+}
+
+private class ComposeWebChromeClient(
+    private val onProgress: (Float) -> Unit = {}
+) : WebChromeClient() {
+    override fun onProgressChanged(view: WebView?, newProgress: Int) {
+        onProgress.invoke(newProgress.toFloat() / 100f)
     }
 }
 

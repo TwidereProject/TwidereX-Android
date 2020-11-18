@@ -20,7 +20,6 @@
  */
 package com.twidere.twiderex.scenes.twitter
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -38,15 +37,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LifecycleOwnerAmbient
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
-import androidx.navigation.compose.navigate
 import com.twidere.twiderex.R
+import com.twidere.twiderex.component.LoginLogo
+import com.twidere.twiderex.component.navigation.AmbientNavigator
 import com.twidere.twiderex.extensions.navViewModel
-import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.ui.TwidereXTheme
 import com.twidere.twiderex.viewmodel.twitter.TwitterSignInViewModel
@@ -63,6 +60,7 @@ fun TwitterSignInScene() {
     val loading by viewModel.loading.observeAsState(initial = false)
     val navController = AmbientNavController.current
     val lifecycleOwner = LifecycleOwnerAmbient.current
+    val navigator = AmbientNavigator.current
     TwidereXTheme {
         Scaffold {
             Column(
@@ -78,11 +76,7 @@ fun TwitterSignInScene() {
                     verticalArrangement = Arrangement.Bottom,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Image(
-                        modifier = Modifier.preferredWidth(200.dp),
-                        contentScale = ContentScale.FillWidth,
-                        asset = vectorResource(id = R.drawable.ic_login_logo),
-                    )
+                    LoginLogo(modifier = Modifier.preferredWidth(200.dp))
                     Text(
                         text = stringResource(id = R.string.app_name),
                         style = MaterialTheme.typography.h4,
@@ -117,9 +111,7 @@ fun TwitterSignInScene() {
                                                         "pin_code"
                                                     )
                                                 }
-                                                navController.navigate(
-                                                    Route.SignIn.TwitterWeb(target)
-                                                )
+                                                navigator.twitterSignInWeb(target)
                                             }
                                         }.takeIf { it }?.let {
                                             navController.popBackStack()

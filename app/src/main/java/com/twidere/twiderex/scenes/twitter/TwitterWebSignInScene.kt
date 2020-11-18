@@ -20,21 +20,15 @@
  */
 package com.twidere.twiderex.scenes.twitter
 
-import android.webkit.CookieManager
-import android.webkit.JavascriptInterface
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.onDispose
-import androidx.navigation.NavController
 import com.twidere.twiderex.component.foundation.WebComponent
 import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.ui.TwidereXTheme
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import com.twidere.twiderex.utils.TwitterWebJavascriptInterface
 
-private const val INJECT_CONTENT =
+const val INJECT_CONTENT =
     "javascript:window.injector.tryPinCode(document.querySelector('#oauth_pin code').textContent);"
 
 @Composable
@@ -58,32 +52,7 @@ fun TwitterWebSignInScene(target: String) {
                         navController
                     )
                 ),
-                config = {
-                    CookieManager.getInstance().removeAllCookies {
-                    }
-                }
             )
-        }
-    }
-}
-
-private class TwitterWebJavascriptInterface(
-    val navController: NavController,
-) {
-    @JavascriptInterface
-    fun tryPinCode(content: String?) {
-        if (!content.isNullOrEmpty()) {
-            content.toIntOrNull()?.let {
-                GlobalScope.launch {
-                    withContext(Dispatchers.Main) {
-                        navController.previousBackStackEntry?.savedStateHandle?.set(
-                            "pin_code",
-                            content
-                        )
-                        navController.popBackStack()
-                    }
-                }
-            }
         }
     }
 }

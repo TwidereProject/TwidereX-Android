@@ -24,7 +24,10 @@ import android.content.Context
 import android.content.Intent
 import android.content.Intent.ACTION_VIEW
 import android.net.Uri
+import android.os.Build
+import android.webkit.CookieManager
 import androidx.compose.runtime.staticAmbientOf
+import androidx.core.os.bundleOf
 import androidx.navigation.NavController
 import androidx.navigation.compose.navigate
 import com.twidere.twiderex.navigation.Route
@@ -34,12 +37,13 @@ import com.twidere.twiderex.scenes.ComposeType
 val AmbientNavigator = staticAmbientOf<INavigator>()
 
 interface INavigator {
-    fun user(screenName: String)
-    fun status(statusId: String)
-    fun media(statusId: String, selectedIndex: Int = 0)
-    fun search(keyword: String)
-    fun compose(composeType: ComposeType, statusId: String? = null)
-    fun openLink(it: String)
+    fun user(screenName: String) {}
+    fun status(statusId: String) {}
+    fun media(statusId: String, selectedIndex: Int = 0) {}
+    fun search(keyword: String) {}
+    fun compose(composeType: ComposeType, statusId: String? = null) {}
+    fun openLink(it: String) {}
+    fun twitterSignInWeb(target: String) {}
 }
 
 class Navigator(
@@ -78,24 +82,18 @@ class Navigator(
             context.startActivity(Intent(ACTION_VIEW, uri))
         }
     }
-}
 
-object FakeNavigator : INavigator {
-    override fun user(screenName: String) {
-    }
-
-    override fun status(statusId: String) {
-    }
-
-    override fun media(statusId: String, selectedIndex: Int) {
-    }
-
-    override fun search(keyword: String) {
-    }
-
-    override fun compose(composeType: ComposeType, statusId: String?) {
-    }
-
-    override fun openLink(it: String) {
+    override fun twitterSignInWeb(target: String) {
+        CookieManager.getInstance().removeAllCookies {
+        }
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.N) {
+            navController.navigate(
+                Route.SignIn.TwitterWeb(target)
+            )
+        } else {
+            navController.navigate(Route.SignIn.TwitterWebSignInDialog, bundleOf("target" to target))
+        }
     }
 }
+
+object FakeNavigator : INavigator

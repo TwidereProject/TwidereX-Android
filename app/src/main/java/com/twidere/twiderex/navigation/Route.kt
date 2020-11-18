@@ -28,7 +28,9 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NamedNavArgument
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navArgument
+import androidx.navigation.fragment.dialog
 import androidx.navigation.navDeepLink
+import com.twidere.twiderex.activity.TwitterWebSignInDialog
 import com.twidere.twiderex.component.requireAuthorization
 import com.twidere.twiderex.scenes.ComposeScene
 import com.twidere.twiderex.scenes.ComposeType
@@ -61,6 +63,7 @@ object Route {
             "UTF-8"
         )
         }"
+        val TwitterWebSignInDialog = 1
     }
 
     fun User(screenName: String) = "user/$screenName"
@@ -128,6 +131,13 @@ fun NavGraphBuilder.route() {
     ) { backStackEntry ->
         backStackEntry.arguments?.getString("target")?.let {
             TwitterWebSignInScene(target = URLDecoder.decode(it, "UTF-8"))
+        }
+    }
+
+    dialog<TwitterWebSignInDialog>(Route.SignIn.TwitterWebSignInDialog) {
+        argument("target") {
+            nullable = false
+            type = NavType.StringType
         }
     }
 
