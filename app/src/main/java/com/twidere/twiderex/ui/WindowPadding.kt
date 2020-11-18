@@ -21,20 +21,19 @@
 package com.twidere.twiderex.ui
 
 import android.os.Build
-import android.view.View
 import android.view.WindowInsets
-import android.view.WindowInsetsAnimation
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.ambientOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.onCommit
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.platform.ViewAmbient
+import com.twidere.twiderex.utils.RootViewDeferringInsetsCallback
 
 val AmbientWindowPadding = ambientOf<PaddingValues>()
 
@@ -42,71 +41,28 @@ val AmbientWindowPadding = ambientOf<PaddingValues>()
 fun ProvideWindowPadding(
     content: @Composable () -> Unit,
 ) {
-    val density = DensityAmbient.current
-    var ignoreWindowInsets by remember { mutableStateOf(false) }
     var windowPadding by remember { mutableStateOf(PaddingValues()) }
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
         val view = ViewAmbient.current
-        DisposableEffect(subject = view) {
-            view.setOnApplyWindowInsetsListener { _, insets ->
-                if (!ignoreWindowInsets) {
-                    val systemInsets =
-                        insets.getInsets(WindowInsets.Type.ime() or WindowInsets.Type.systemBars())
-                    with(density) {
-                        windowPadding = PaddingValues(
-                            start = systemInsets.left.toDp(),
-                            top = systemInsets.top.toDp(),
-                            end = systemInsets.right.toDp(),
-                            bottom = systemInsets.bottom.toDp(),
-                        )
-                    }
+        val density = DensityAmbient.current
+        val deferringInsetsListener = remember {
+            RootViewDeferringInsetsCallback(
+                persistentInsetTypes = WindowInsets.Type.systemBars(),
+                deferredInsetTypes = WindowInsets.Type.ime()
+            ) { left, top, right, bottom ->
+                with(density) {
+                    windowPadding = PaddingValues(
+                        start = left.toDp(),
+                        top = top.toDp(),
+                        end = right.toDp(),
+                        bottom = bottom.toDp(),
+                    )
                 }
-                insets
             }
-
-            view.setWindowInsetsAnimationCallback(object :
-                    WindowInsetsAnimation.Callback(DISPATCH_MODE_STOP) {
-                    override fun onPrepare(animation: WindowInsetsAnimation) {
-                        super.onPrepare(animation)
-                        ignoreWindowInsets = true
-                    }
-
-                    override fun onEnd(animation: WindowInsetsAnimation) {
-                        super.onEnd(animation)
-                        ignoreWindowInsets = false
-                    }
-
-                    override fun onProgress(
-                        insets: WindowInsets,
-                        animations: MutableList<WindowInsetsAnimation>
-                    ): WindowInsets {
-                        val systemInsets =
-                            insets.getInsets(WindowInsets.Type.ime() or WindowInsets.Type.systemBars())
-                        with(density) {
-                            windowPadding = PaddingValues(
-                                start = systemInsets.left.toDp(),
-                                top = systemInsets.top.toDp(),
-                                end = systemInsets.right.toDp(),
-                                bottom = systemInsets.bottom.toDp(),
-                            )
-                        }
-                        return insets
-                    }
-                })
-
-            val attachListener = object : View.OnAttachStateChangeListener {
-                override fun onViewAttachedToWindow(v: View) = v.requestApplyInsets()
-                override fun onViewDetachedFromWindow(v: View) = Unit
-            }
-            view.addOnAttachStateChangeListener(attachListener)
-
-            if (view.isAttachedToWindow) {
-                view.requestApplyInsets()
-            }
-
-            onDispose {
-                view.removeOnAttachStateChangeListener(attachListener)
-            }
+        }
+        onCommit(view) {
+            view.setWindowInsetsAnimationCallback(deferringInsetsListener)
+            view.setOnApplyWindowInsetsListener(deferringInsetsListener)
         }
     }
     Providers(
