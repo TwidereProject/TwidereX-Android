@@ -30,7 +30,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navArgument
 import androidx.navigation.fragment.dialog
 import androidx.navigation.navDeepLink
-import com.twidere.twiderex.activity.TwitterWebSignInDialog
+import com.twidere.twiderex.dialog.TwitterWebSignInDialog
 import com.twidere.twiderex.component.requireAuthorization
 import com.twidere.twiderex.scenes.ComposeScene
 import com.twidere.twiderex.scenes.ComposeType
