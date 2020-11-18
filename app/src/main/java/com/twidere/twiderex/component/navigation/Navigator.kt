@@ -86,7 +86,7 @@ class Navigator(
     override fun twitterSignInWeb(target: String) {
         CookieManager.getInstance().removeAllCookies {
         }
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             navController.navigate(
                 Route.SignIn.TwitterWeb(target)
             )
