@@ -50,7 +50,7 @@ class UserMediaTimelineViewModel @AssistedInject constructor(
         fun create(account: AccountDetails, screenName: String): UserMediaTimelineViewModel
     }
 
-    override val source: Flow<PagingData<UiStatus>>  by lazy {
+    override val source: Flow<PagingData<UiStatus>> by lazy {
         pagingMediator.pager(pageSize = 200).flow.map { pagingData ->
             pagingData.map {
                 it.toUi(pagingMediator.userKey)
