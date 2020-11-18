@@ -118,7 +118,6 @@ class ComposeViewModel @AssistedInject constructor(
 
     // compatibility fix for Api < 22
     override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {
-
     }
 
     override fun onCleared() {
