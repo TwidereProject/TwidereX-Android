@@ -36,6 +36,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ContextAmbient
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.zIndex
 import com.twidere.twiderex.view.LollipopFixWebView
@@ -81,14 +82,9 @@ fun WebComponent(
     config: (WebView) -> Unit = {},
 ) {
     var progress by remember { mutableStateOf(0f) }
-    Box {
-        if (progress != 1f) {
-            LinearProgressIndicator(
-                modifier = Modifier.fillMaxWidth().align(Alignment.TopStart).zIndex(1f),
-                progress = progress
-            )
-        }
-        AndroidView(::LollipopFixWebView, modifier = Modifier.fillMaxSize()) {
+    val context = ContextAmbient.current
+    val webView = remember {
+        LollipopFixWebView(context).also {
             it.settings.apply {
                 javaScriptEnabled = enableJavascript
             }
@@ -105,6 +101,15 @@ fun WebComponent(
             config.invoke(it)
             it.setUrl(url)
         }
+    }
+    Box {
+        if (progress != 1f) {
+            LinearProgressIndicator(
+                modifier = Modifier.fillMaxWidth().align(Alignment.TopStart).zIndex(1f),
+                progress = progress
+            )
+        }
+        AndroidView({ webView }, modifier = Modifier.fillMaxSize())
     }
 }
 
