@@ -52,12 +52,6 @@ abstract class PagingWithGapMediator(
         loadType: LoadType,
         state: PagingState<Int, DbPagingTimelineWithStatus>
     ): MediatorResult {
-        if (skipInitialLoad && loadCount == 0 && loadType == LoadType.REFRESH) {
-            loadCount++
-            return MediatorResult.Success(
-                endOfPaginationReached = false
-            )
-        }
         val max_id = when (loadType) {
             LoadType.APPEND -> {
                 val lastItem = state.lastItemOrNull()
@@ -85,6 +79,12 @@ abstract class PagingWithGapMediator(
                     database.pagingTimelineDao().getLatest(pagingKey, userKey)?.statusId
                 }
             }
+        }
+        if (skipInitialLoad && loadCount == 0 && loadType == LoadType.REFRESH && since_id != null) {
+            loadCount++
+            return MediatorResult.Success(
+                endOfPaginationReached = false
+            )
         }
         return loadBetween(pageSize = state.config.pageSize, max_id = max_id, since_id = since_id)
     }
