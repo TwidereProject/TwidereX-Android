@@ -64,6 +64,7 @@ fun ReplyButton(
     if (withNumber) {
         StatusActionButtonWithNumbers(
             icon = icon,
+            color = mediumEmphasisContentContentColor,
             count = status.replyCount,
             onClick = {
                 action.invoke()
