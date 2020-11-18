@@ -26,6 +26,7 @@ import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.net.Uri
+import android.os.Bundle
 import androidx.annotation.RequiresPermission
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -113,6 +114,11 @@ class ComposeViewModel @AssistedInject constructor(
 
     override fun onLocationChanged(location: Location) {
         this.location.postValue(location)
+    }
+
+    // compatibility fix for Api < 22
+    override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {
+
     }
 
     override fun onCleared() {
