@@ -27,3 +27,4 @@ val profileImageSize = 44.dp
 val composeImageSize = 72.dp
 val topBarHeight = 56.dp
 val statusLineWidth = 2.dp
+val statusActionIconSize = 16.dp

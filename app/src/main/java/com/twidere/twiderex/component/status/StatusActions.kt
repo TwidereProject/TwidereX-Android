@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope.Companion.weight
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.AmbientContentColor
 import androidx.compose.material.ButtonConstants
@@ -48,6 +49,7 @@ import com.twidere.twiderex.providers.AmbientStatusActions
 import com.twidere.twiderex.scenes.ComposeType
 import com.twidere.twiderex.ui.AmbientActiveAccount
 import com.twidere.twiderex.ui.mediumEmphasisContentContentColor
+import com.twidere.twiderex.ui.statusActionIconSize
 
 @Composable
 fun ReplyButton(
@@ -88,7 +90,7 @@ fun LikeButton(
     val color = if (status.liked) {
         Color.Red
     } else {
-        AmbientContentColor.current
+        mediumEmphasisContentContentColor
     }
     val icon = vectorResource(id = R.drawable.ic_heart)
     val action = {
@@ -129,7 +131,7 @@ fun RetweetButton(
     val color = if (status.retweeted) {
         MaterialTheme.colors.primary
     } else {
-        AmbientContentColor.current
+        mediumEmphasisContentContentColor
     }
     val icon = vectorResource(id = R.drawable.ic_repeat)
     val action = {
@@ -180,6 +182,7 @@ fun ShareButton(
             )
         ) {
             Icon(
+                modifier = Modifier.size(statusActionIconSize),
                 asset = icon,
             )
         }
@@ -213,8 +216,9 @@ private fun StatusActionButtonWithNumbers(
             )
         ) {
             Icon(
+                modifier = Modifier.size(statusActionIconSize),
                 asset = icon,
-                tint = color
+                tint = color,
             )
             if (count > 0) {
                 Box(modifier = Modifier.width(4.dp))

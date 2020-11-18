@@ -29,6 +29,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.AmbientContentAlpha
 import androidx.compose.material.AmbientContentColor
@@ -40,6 +41,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.vectorResource
@@ -52,6 +54,7 @@ import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.preferences.AmbientDisplayPreferences
 import com.twidere.twiderex.ui.profileImageSize
 import com.twidere.twiderex.ui.standardPadding
+import com.twidere.twiderex.ui.statusActionIconSize
 
 @Composable
 fun TimelineStatusComponent(
@@ -169,8 +172,14 @@ private fun StatusComponent(
                 Providers(
                     AmbientContentAlpha provides ContentAlpha.medium
                 ) {
-                    Row {
-                        Icon(asset = vectorResource(id = R.drawable.ic_map_pin))
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Icon(
+                            modifier = Modifier.size(statusActionIconSize),
+                            asset = vectorResource(id = R.drawable.ic_map_pin)
+                        )
+                        Box(modifier = Modifier.width(standardPadding))
                         Text(text = status.placeString)
                     }
                 }
