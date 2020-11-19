@@ -1,0 +1,77 @@
+name: Release CI
+
+on:
+  push:
+    branches: [ release ]
+    tags: 
+      - '*'
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Set up JDK
+      uses: actions/setup-java@v1
+      with:
+        java-version: 15
+
+    - name: Build with Gradle
+      run: ./gradlew spotlessCheck lintRelease bundleRelease assembleRelease --stacktrace
+      
+    - name: Android Sign
+      uses: Tlaster/android-sign@v1
+      with:
+        releaseDirectory: |
+          app/build/outputs/apk/release
+          app/build/outputs/bundle/release
+        signingKeyBase64: ${{ secrets.SIGNING_KEY }}
+        output: build/release/signed
+        alias: ${{ secrets.ALIAS }}
+        keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
+        keyPassword: ${{ secrets.KEY_PASSWORD }}
+    
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        prerelease: true
+    
+    - name: Create Release
+      uses: actions/github-script@v2
+      with:
+        github-token: ${{secrets.GITHUB_TOKEN}}
+        script: |
+          console.log('environment', process.versions);
+      
+          const fs = require('fs').promises;
+      
+          const { repo: { owner, repo }, sha } = context;
+          console.log({ owner, repo, sha });
+
+          const release = await github.repos.createRelease({
+            owner, repo,
+            tag_name: process.env.GITHUB_REF,
+            prerelease: true
+            target_commitish: sha
+          });
+
+          console.log('created release', { release });
+  
+          for (let file of await fs.readdir('build/release/signed')) {
+            console.log('uploading', file);
+            await github.repos.uploadReleaseAsset({
+              owner, repo,
+              release_id: release.data.id,
+              name: file,
+              data: await fs.readFile(`./${file}`)
+            });            
+          }
+
