@@ -2,7 +2,6 @@ name: Release CI
 
 on:
   push:
-    branches: [ release ]
     tags: 
       - '*'
 
@@ -33,16 +32,6 @@ jobs:
         alias: ${{ secrets.ALIAS }}
         keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
         keyPassword: ${{ secrets.KEY_PASSWORD }}
-    
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ github.ref }}
-        release_name: Release ${{ github.ref }}
-        prerelease: true
     
     - name: Create Release
       uses: actions/github-script@v2
