@@ -35,7 +35,6 @@ import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.UserKey
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.UserRepository
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 
 class UserViewModel @AssistedInject constructor(
@@ -111,10 +110,10 @@ class UserViewModel @AssistedInject constructor(
 
     init {
         viewModelScope.launch {
-            async {
+            launch {
                 refresh()
             }
-            async {
+            launch {
                 loadRelationShip()
             }
         }
