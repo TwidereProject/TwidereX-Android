@@ -20,16 +20,13 @@
  */
 package com.twidere.twiderex.model
 
-import android.os.Parcelable
 import com.squareup.moshi.JsonClass
-import kotlinx.android.parcel.Parcelize
 
 @JsonClass(generateAdapter = true)
-@Parcelize
 data class UserKey(
     val id: String,
     val host: String,
-) : Parcelable {
+) {
 
     override fun hashCode(): Int {
         var result = id.hashCode()
