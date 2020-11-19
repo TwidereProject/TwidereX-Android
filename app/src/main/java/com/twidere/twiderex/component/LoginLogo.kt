@@ -20,30 +20,26 @@
  */
 package com.twidere.twiderex.component
 
-import android.os.Build
 import androidx.compose.foundation.Image
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.vectorResource
 import com.twidere.twiderex.R
+import com.twidere.twiderex.extensions.isDarkTheme
 
 @Composable
 fun LoginLogo(
     modifier: Modifier = Modifier,
 ) {
-    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
-        Image(
-            modifier = modifier,
-            contentScale = ContentScale.FillWidth,
-            asset = imageResource(id = R.drawable.ic_login_logo),
-        )
+    val resource = if (isDarkTheme()) {
+        vectorResource(id = R.drawable.ic_login_logo_dark)
     } else {
-        Image(
-            modifier = modifier,
-            contentScale = ContentScale.FillWidth,
-            asset = vectorResource(id = R.drawable.ic_login_logo),
-        )
+        vectorResource(id = R.drawable.ic_login_logo)
     }
+    Image(
+        modifier = modifier,
+        contentScale = ContentScale.FillWidth,
+        asset = resource,
+    )
 }
