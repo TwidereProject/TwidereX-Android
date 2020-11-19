@@ -23,7 +23,7 @@ jobs:
       run: ./gradlew spotlessCheck lintRelease bundleRelease assembleRelease --stacktrace
 
     - name: Android Sign
-      uses: Tlaster/android-sign@v1.1
+      uses: Tlaster/android-sign@v1.2
       with:
         releaseDirectory: |
           app/build/outputs/apk/release
