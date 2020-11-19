@@ -76,7 +76,10 @@ fun ReplyButton(
                 action.invoke()
             },
         ) {
-            Icon(asset = icon)
+            Icon(
+                asset = icon,
+                tint = mediumEmphasisContentContentColor,
+            )
         }
     }
 }
@@ -193,7 +196,10 @@ fun ShareButton(
                 action.invoke()
             },
         ) {
-            Icon(asset = icon)
+            Icon(
+                asset = icon,
+                tint = mediumEmphasisContentContentColor,
+            )
         }
     }
 }
