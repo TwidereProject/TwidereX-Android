@@ -56,6 +56,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
 import androidx.compose.ui.zIndex
+import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.twidere.twiderex.R
 import com.twidere.twiderex.annotations.IncomingComposeUpdate
@@ -146,7 +147,10 @@ fun UserComponent(
             }
 
             SwipeToRefreshLayout(
-                refreshingState = refreshing,
+                refreshingState = refreshing ||
+                    selectedItem == 0 && timelineSource.loadState.refresh == LoadState.Loading ||
+                    selectedItem == 1 && mediaSource.loadState.refresh == LoadState.Loading ||
+                    selectedItem == 2 && favouriteSource.loadState.refresh == LoadState.Loading,
                 onRefresh = {
                     viewModel.refresh()
                     when (selectedItem) {
@@ -156,50 +160,57 @@ fun UserComponent(
                     }
                 },
             ) {
-                LazyColumn(
-                    state = lazyListState,
+                // TODO: not work if the user not posting anything
+                if (
+                    selectedItem == 0 && timelineSource.itemCount > 0 ||
+                    selectedItem == 1 && mediaSource.itemCount > 0 ||
+                    selectedItem == 2 && favouriteSource.itemCount > 0
                 ) {
-                    item {
-                        UserInfo(user = user, viewModel = viewModel)
-                    }
+                    LazyColumn(
+                        state = lazyListState,
+                    ) {
+                        item {
+                            UserInfo(user = user, viewModel = viewModel)
+                        }
 
-                    item {
-                        IconTabsComponent(
-                            items = tabs,
-                            selectedItem = selectedItem,
-                            onItemSelected = {
-                                setSelectedItem(it)
-                            },
-                        )
-                    }
+                        item {
+                            IconTabsComponent(
+                                items = tabs,
+                                selectedItem = selectedItem,
+                                onItemSelected = {
+                                    setSelectedItem(it)
+                                },
+                            )
+                        }
 
-                    when (selectedItem) {
-                        0 -> {
-                            itemsPaging(timelineSource) { item ->
-                                item?.let {
-                                    Column {
-                                        TimelineStatusComponent(it)
-                                        StatusDivider()
+                        when (selectedItem) {
+                            0 -> {
+                                itemsPaging(timelineSource) { item ->
+                                    item?.let {
+                                        Column {
+                                            TimelineStatusComponent(it)
+                                            StatusDivider()
+                                        }
                                     }
                                 }
                             }
-                        }
-                        1 -> {
-                            itemsPaging(mediaSource) { item ->
-                                item?.let {
-                                    Column {
-                                        TimelineStatusComponent(it)
-                                        StatusDivider()
+                            1 -> {
+                                itemsPaging(mediaSource) { item ->
+                                    item?.let {
+                                        Column {
+                                            TimelineStatusComponent(it)
+                                            StatusDivider()
+                                        }
                                     }
                                 }
                             }
-                        }
-                        2 -> {
-                            itemsPaging(favouriteSource) { item ->
-                                item?.let {
-                                    Column {
-                                        TimelineStatusComponent(it)
-                                        StatusDivider()
+                            2 -> {
+                                itemsPaging(favouriteSource) { item ->
+                                    item?.let {
+                                        Column {
+                                            TimelineStatusComponent(it)
+                                            StatusDivider()
+                                        }
                                     }
                                 }
                             }
