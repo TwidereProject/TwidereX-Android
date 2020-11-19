@@ -20,16 +20,27 @@ jobs:
         java-version: 15
 
     - name: Build with Gradle
-      run: ./gradlew spotlessCheck assembleDebug lintDebug --stacktrace
+      run: ./gradlew spotlessCheck lintRelease bundleRelease assembleRelease --stacktrace
 
-    - name: Upload build outputs (APKs)
+    - name: Android Sign
+      uses: Tlaster/android-sign@v1.1
+      with:
+        releaseDirectory: |
+          app/build/outputs/apk/release
+          app/build/outputs/bundle/release
+        signingKeyBase64: ${{ secrets.SIGNING_KEY }}
+        output: build/release/signed
+        alias: ${{ secrets.ALIAS }}
+        keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
+        keyPassword: ${{ secrets.KEY_PASSWORD }}
+
+    - name: Upload build outputs
       uses: actions/upload-artifact@v2
       with:
         name: build-outputs
-        path: ./app/build/outputs
+        path: ./build/release/signed
         
     - name: Upload build reports
-      if: always()
       uses: actions/upload-artifact@v2
       with:
         name: build-reports
