@@ -34,6 +34,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.onCommit
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -68,12 +69,13 @@ fun TimelineComponent(viewModel: TimelineViewModel) {
         },
     ) {
         if (items.itemCount > 0) {
-            val lastScrollState = viewModel.restoreScrollState()
-            val listState =
-                rememberLazyListState(
-                    initialFirstVisibleItemIndex = lastScrollState.firstVisibleItemIndex,
-                    initialFirstVisibleItemScrollOffset = lastScrollState.firstVisibleItemScrollOffset,
-                )
+            val lastScrollState = remember {
+                viewModel.restoreScrollState()
+            }
+            val listState = rememberLazyListState(
+                initialFirstVisibleItemIndex = lastScrollState.firstVisibleItemIndex,
+                initialFirstVisibleItemScrollOffset = lastScrollState.firstVisibleItemScrollOffset,
+            )
             onCommit(listState.isAnimationRunning) {
                 if (!listState.isAnimationRunning) {
                     viewModel.saveScrollState(
