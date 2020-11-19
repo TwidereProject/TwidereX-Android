@@ -108,7 +108,9 @@ abstract class PagingWithGapMediator(
                         database.pagingTimelineDao().insertAll(listOf(it))
                     }
                 }
-                result.lastOrNull()?.timeline?.isGap = result.size == pageSize
+                if (since_id != null) {
+                    result.lastOrNull()?.timeline?.isGap = result.size >= pageSize - 1
+                }
                 result.saveToDb(database)
             }
             return MediatorResult.Success(
