@@ -61,7 +61,6 @@ import com.twidere.twiderex.viewmodel.MediaViewModel
 import com.twidere.twiderex.viewmodel.twitter.TwitterStatusViewModel
 import com.twidere.twiderex.viewmodel.twitter.search.TwitterSearchMediaViewModel
 import com.twidere.twiderex.viewmodel.twitter.search.TwitterSearchTweetsViewModel
-import com.twidere.twiderex.viewmodel.twitter.search.TwitterSearchUserViewModel
 import com.twidere.twiderex.viewmodel.twitter.timeline.HomeTimelineViewModel
 import com.twidere.twiderex.viewmodel.twitter.timeline.MentionsTimelineViewModel
 import com.twidere.twiderex.viewmodel.user.UserFavouriteTimelineViewModel
@@ -102,9 +101,6 @@ class TwidereXActivity : FragmentActivity() {
 
     @Inject
     lateinit var twitterSearchTweetsViewModelFactory: TwitterSearchTweetsViewModel.AssistedFactory
-
-    @Inject
-    lateinit var twitterSearchUserViewModelFactory: TwitterSearchUserViewModel.AssistedFactory
 
     @Inject
     lateinit var userFavouriteTimelineViewModelFactory: UserFavouriteTimelineViewModel.AssistedFactory
@@ -163,7 +159,6 @@ class TwidereXActivity : FragmentActivity() {
                         mentionsTimelineViewModelFactory,
                         twitterSearchMediaViewModelFactory,
                         twitterSearchTweetsViewModelFactory,
-                        twitterSearchUserViewModelFactory,
                         userFavouriteTimelineViewModelFactory,
                         userTimelineViewModelFactory,
                         userViewModelFactory,

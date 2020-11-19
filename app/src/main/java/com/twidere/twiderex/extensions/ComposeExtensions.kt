@@ -62,6 +62,26 @@ inline fun <reified VM : ViewModel> navViewModel(
 }
 
 @Composable
+inline fun <reified VM : ViewModel> viewModel(
+    vararg dependsOn: Any,
+    noinline creator: (() -> VM)? = null,
+): VM {
+    return viewModel(
+        if (dependsOn.any()) {
+            dependsOn.joinToString { it.hashCode().toString() } + VM::class.java.canonicalName
+        } else {
+            null
+        },
+        factory = object : ViewModelProvider.Factory {
+            override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+                @Suppress("UNCHECKED_CAST")
+                return creator?.invoke() as T
+            }
+        }
+    )
+}
+
+@Composable
 fun ProvideNavigationViewModelFactoryMap(
     factory: HiltViewModelFactory,
     content: @Composable () -> Unit

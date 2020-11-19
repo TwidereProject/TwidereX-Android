@@ -70,6 +70,7 @@ import com.twidere.twiderex.component.status.StatusDivider
 import com.twidere.twiderex.component.status.TimelineStatusComponent
 import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.extensions.viewModel
 import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.ui.AmbientActiveAccount
 import com.twidere.twiderex.ui.AmbientNavController
@@ -90,10 +91,9 @@ fun SearchScene(keyword: String) {
         assistedViewModel<TwitterSearchMediaViewModel.AssistedFactory, TwitterSearchMediaViewModel> {
             it.create(account, keyword)
         }
-    val usersViewModel =
-        assistedViewModel<TwitterSearchUserViewModel.AssistedFactory, TwitterSearchUserViewModel> {
-            it.create(account, keyword)
-        }
+    val usersViewModel = viewModel {
+        TwitterSearchUserViewModel(account, keyword)
+    }
     val (text, setText) = remember { mutableStateOf(keyword) }
     var selectedTab by savedInstanceState { 0 }
 
