@@ -107,9 +107,10 @@ fun DisplayScene() {
                             },
                             text = {
                                 Slider(
+                                    steps = ((1.4f - 0.8f) * 10).toInt(),
                                     value = display.fontScale,
                                     onValueChange = { viewModel.setFontScale(it) },
-                                    valueRange = 0.1f..2f
+                                    valueRange = 0.8f..1.4f
                                 )
                             },
                             trailing = {
