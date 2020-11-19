@@ -21,10 +21,11 @@
 package com.twidere.twiderex.component.status
 
 import androidx.compose.foundation.ClickableText
+import androidx.compose.material.AmbientTextStyle
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Providers
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.annotatedString
 import com.twidere.twiderex.component.navigation.AmbientNavigator
 import com.twidere.twiderex.model.ui.UiStatus
@@ -52,20 +53,24 @@ fun StatusText(
     onStatusTextClicked: () -> Unit = {},
 ) {
     val navigator = AmbientNavigator.current
-    RenderText(
-        html = autolink.autoLink(status.text),
-        status = status,
-        onLinkClicked = {
-            navigator.openLink(it)
-        },
-        onStatusTextClicked = {
-            onStatusTextClicked.invoke()
-        },
-    )
+    Providers(
+        AmbientTextStyle provides MaterialTheme.typography.body1.copy(color = MaterialTheme.colors.onBackground)
+    ) {
+        RenderContent(
+            html = autolink.autoLink(status.text),
+            status = status,
+            onLinkClicked = {
+                navigator.openLink(it)
+            },
+            onStatusTextClicked = {
+                onStatusTextClicked.invoke()
+            },
+        )
+    }
 }
 
 @Composable
-private fun RenderText(
+private fun RenderContent(
     html: String,
     status: UiStatus,
     onLinkClicked: (String) -> Unit = {},
@@ -102,9 +107,18 @@ private fun AnnotatedString.Builder.RenderNode(node: Node, status: UiStatus) {
             this.RenderElement(node, status = status)
         }
         is TextNode -> {
-            append(node.text())
+            RenderText(node.text())
         }
     }
+}
+
+@Composable
+private fun AnnotatedString.Builder.RenderText(text: String) {
+    pushStyle(
+        AmbientTextStyle.current.toSpanStyle()
+    )
+    append(text)
+    pop()
 }
 
 @Composable
@@ -114,7 +128,7 @@ private fun AnnotatedString.Builder.RenderElement(element: Element, status: UiSt
             RenderLink(element, status)
         }
         "br" -> {
-            append("\n")
+            RenderText("\n")
         }
     }
 }
@@ -124,24 +138,26 @@ private fun AnnotatedString.Builder.RenderLink(element: Element, status: UiStatu
     val href = element.attr("href")
     val entity = status.url.firstOrNull { it.url == href }
     val media = status.media.firstOrNull { it.url == href }
-    pushStyle(SpanStyle(color = MaterialTheme.colors.primary))
-    when {
-        entity != null -> {
-            if (!entity.displayUrl.contains("pic.twitter.com")) {
-                pushStringAnnotation(TAG_URL, entity.expandedUrl)
-                append(entity.displayUrl)
+    Providers(
+        AmbientTextStyle provides AmbientTextStyle.current.copy(color = MaterialTheme.colors.primary)
+    ) {
+        when {
+            entity != null -> {
+                if (!entity.displayUrl.contains("pic.twitter.com")) {
+                    pushStringAnnotation(TAG_URL, entity.expandedUrl)
+                    RenderText(entity.displayUrl)
+                    pop()
+                }
+            }
+            media != null -> {
+            }
+            else -> {
+                pushStringAnnotation(TAG_URL, href)
+                element.childNodes().forEach {
+                    RenderNode(node = it, status = status)
+                }
                 pop()
             }
         }
-        media != null -> {
-        }
-        else -> {
-            pushStringAnnotation(TAG_URL, href)
-            element.childNodes().forEach {
-                RenderNode(node = it, status = status)
-            }
-            pop()
-        }
     }
-    pop()
 }
