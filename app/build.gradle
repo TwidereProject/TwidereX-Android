@@ -27,7 +27,7 @@ android {
         }
     }
     
-    def file = rootProject.file('build/signing.properties')
+    def file = rootProject.file('signing.properties')
     def hasSigningProps = file.exists()
 
     signingConfigs {

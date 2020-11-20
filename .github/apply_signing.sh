@@ -1,5 +1,6 @@
-cat $SIGNING_KEY | base64 -d > build/key.jks
-echo 'storeFile=../build/key.jks
-storePassword='+ $KEY_STORE_PASSWORD +
-'keyAlias=' + $ALIAS +
-'keyPassword=' + $KEY_PASSWORD >build/signing.properties
+mkdir build
+cat $SIGNING_KEY | base64 -d > key.jks
+echo "storeFile=../key.jks
+storePassword=$KEY_STORE_PASSWORD
+keyAlias=$ALIAS
+keyPassword=$KEY_PASSWORD" >signing.properties
