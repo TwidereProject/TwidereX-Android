@@ -1,5 +1,5 @@
 mkdir build
-cat $SIGNING_KEY | base64 -d > key.jks
+echo $SIGNING_KEY | base64 -d > key.jks
 echo "storeFile=../key.jks
 storePassword=$KEY_STORE_PASSWORD
 keyAlias=$ALIAS
