@@ -26,9 +26,34 @@ android {
             }
         }
     }
+    
+    def file = rootProject.file('build/signing.properties')
+    def hasSigningProps = file.exists()
+
+    signingConfigs {
+        if (hasSigningProps) {
+            twidere {
+                Properties signingProp = new Properties()
+                signingProp.load(file.newInputStream())
+                storeFile = rootProject.file(signingProp.get('storeFile'))
+                storePassword = (String) signingProp.get('storePassword')
+                keyAlias = (String) signingProp.get('keyAlias')
+                keyPassword = (String) signingProp.get('keyPassword')
+            }
+        }
+    }
+
 
     buildTypes {
+        debug {
+            if (hasSigningProps) {
+                signingConfig signingConfigs.twidere
+            }
+        }
         release {
+            if (hasSigningProps) {
+                signingConfig signingConfigs.twidere
+            }
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.debug
