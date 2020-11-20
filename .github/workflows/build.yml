@@ -20,6 +20,11 @@ jobs:
         java-version: 15
 
     - name: Apply Signing
+      env:
+        ALIAS: ${{ secrets.ALIAS }}
+        KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        KEY_STORE_PASSWORD: ${{ secrets.KEY_STORE_PASSWORD }}
+        SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
       run: ./.github/apply_signing.sh
 
     - name: Build with Gradle
