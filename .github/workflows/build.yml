@@ -25,7 +25,7 @@ jobs:
     - name: Build with Gradle
       run: ./gradlew spotlessCheck lintRelease bundleRelease assembleRelease --stacktrace
 
-      - name: Upload build outputs
+    - name: Upload build outputs
       uses: actions/upload-artifact@v2
       with:
         name: build-outputs
