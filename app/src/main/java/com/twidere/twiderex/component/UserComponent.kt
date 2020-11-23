@@ -150,9 +150,9 @@ fun UserComponent(
 
             SwipeToRefreshLayout(
                 refreshingState = refreshing ||
-                        selectedItem == 0 && timelineSource.loadState.refresh == LoadState.Loading ||
-                        selectedItem == 1 && mediaSource.loadState.refresh == LoadState.Loading ||
-                        selectedItem == 2 && favouriteSource.loadState.refresh == LoadState.Loading,
+                    selectedItem == 0 && timelineSource.loadState.refresh == LoadState.Loading ||
+                    selectedItem == 1 && mediaSource.loadState.refresh == LoadState.Loading ||
+                    selectedItem == 2 && favouriteSource.loadState.refresh == LoadState.Loading,
                 onRefresh = {
                     viewModel.refresh()
                     when (selectedItem) {
@@ -352,9 +352,11 @@ private fun UserInfo(user: UiUser, viewModel: UserViewModel) {
                 val navigator = AmbientNavigator.current
                 Column(
                     modifier = Modifier
-                        .clickable(onClick = {
-                            navigator.openLink(it)
-                        })
+                        .clickable(
+                            onClick = {
+                                navigator.openLink(it)
+                            }
+                        )
                         .padding(horizontal = standardPadding * 2)
                         .fillMaxWidth(),
                 ) {

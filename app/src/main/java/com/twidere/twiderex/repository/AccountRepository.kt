@@ -22,11 +22,7 @@ package com.twidere.twiderex.repository
 
 import android.accounts.Account
 import android.accounts.AccountManager
-import android.accounts.AccountManagerCallback
-import android.accounts.AccountManagerFuture
-import android.content.SharedPreferences
 import android.os.Build
-import androidx.core.content.edit
 import androidx.lifecycle.MutableLiveData
 import com.twidere.twiderex.db.model.DbUser
 import com.twidere.twiderex.model.AccountDetails
