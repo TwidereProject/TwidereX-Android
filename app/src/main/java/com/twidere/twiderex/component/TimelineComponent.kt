@@ -22,10 +22,14 @@ package com.twidere.twiderex.component
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.defaultMinSizeConstraints
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.ButtonConstants
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
@@ -97,12 +101,18 @@ fun TimelineComponent(viewModel: TimelineViewModel) {
                             )
                             when {
                                 loadingBetween.contains(item.statusId) -> {
+                                    Divider()
                                     LoadingProgress()
+                                    Divider()
                                 }
                                 item.isGap -> {
                                     Divider()
                                     TextButton(
                                         modifier = Modifier
+                                            .defaultMinSizeConstraints(
+                                                minHeight = ButtonConstants.DefaultMinHeight,
+                                            )
+                                            .padding(ButtonConstants.DefaultContentPadding)
                                             .fillMaxWidth(),
                                         onClick = {
                                             scope.launch {
