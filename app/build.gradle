@@ -110,7 +110,7 @@ dependencies {
     implementation "androidx.navigation:navigation-compose:1.0.0-alpha02"
     implementation "androidx.navigation:navigation-fragment-ktx:2.3.1"
     implementation "androidx.activity:activity-ktx:1.2.0-beta01"
-    implementation "androidx.datastore:datastore:1.0.0-alpha03"
+    implementation "androidx.datastore:datastore:1.0.0-alpha04"
 
     // Use moshi for not since Kotlinx.Serialization not compatible with Jetpack Compose
     // https://github.com/Kotlin/kotlinx.serialization/issues/968
