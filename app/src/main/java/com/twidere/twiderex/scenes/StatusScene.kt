@@ -49,12 +49,14 @@ import com.twidere.twiderex.ui.TwidereXTheme
 import com.twidere.twiderex.ui.standardPadding
 import com.twidere.twiderex.viewmodel.twitter.TwitterStatusViewModel
 import kotlinx.coroutines.launch
+
 @Composable
 fun StatusScene(statusId: String) {
     val account = AmbientActiveAccount.current ?: return
-    val viewModel = assistedViewModel<TwitterStatusViewModel.AssistedFactory, TwitterStatusViewModel> {
-        it.create(account, statusId)
-    }
+    val viewModel =
+        assistedViewModel<TwitterStatusViewModel.AssistedFactory, TwitterStatusViewModel> {
+            it.create(account, statusId)
+        }
     val loadingPrevious by viewModel.loadingPrevious.observeAsState(initial = false)
     val loadingMore by viewModel.loadingMore.observeAsState(initial = false)
     val status by viewModel.status.observeAsState()
@@ -100,13 +102,7 @@ fun StatusScene(statusId: String) {
                         StatusDivider()
                     }
                     item {
-                        Column(
-                            modifier = if (moreConversations.any()) {
-                                Modifier
-                            } else {
-                                Modifier.fillParentMaxHeight()
-                            }
-                        ) {
+                        Column {
                             StatusLineComponent(
                                 lineUp = previousConversations.any(),
                             ) {
@@ -123,15 +119,7 @@ fun StatusScene(statusId: String) {
                     }
                     if (moreConversations.any()) {
                         itemsIndexed(moreConversations) { index, item ->
-                            val modifier =
-                                if (!loadingMore && index == moreConversations.lastIndex) {
-                                    Modifier.fillParentMaxHeight()
-                                } else {
-                                    Modifier
-                                }
-                            Box(
-                                modifier = modifier
-                            ) {
+                            Box {
                                 TimelineStatusComponent(data = item)
                             }
                             if (index != moreConversations.lastIndex || loadingMore) {
