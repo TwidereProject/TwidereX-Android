@@ -21,6 +21,7 @@
 package com.twidere.twiderex.component
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -32,12 +33,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
-import androidx.compose.material.ListItem
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -66,6 +67,7 @@ import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
 import com.twidere.twiderex.component.foundation.TopAppBarElevation
 import com.twidere.twiderex.component.lazy.itemsPaging
+import com.twidere.twiderex.component.navigation.AmbientNavigator
 import com.twidere.twiderex.component.status.StatusDivider
 import com.twidere.twiderex.component.status.TimelineStatusComponent
 import com.twidere.twiderex.component.status.UserAvatar
@@ -148,9 +150,9 @@ fun UserComponent(
 
             SwipeToRefreshLayout(
                 refreshingState = refreshing ||
-                    selectedItem == 0 && timelineSource.loadState.refresh == LoadState.Loading ||
-                    selectedItem == 1 && mediaSource.loadState.refresh == LoadState.Loading ||
-                    selectedItem == 2 && favouriteSource.loadState.refresh == LoadState.Loading,
+                        selectedItem == 0 && timelineSource.loadState.refresh == LoadState.Loading ||
+                        selectedItem == 1 && mediaSource.loadState.refresh == LoadState.Loading ||
+                        selectedItem == 2 && favouriteSource.loadState.refresh == LoadState.Loading,
                 onRefresh = {
                     viewModel.refresh()
                     when (selectedItem) {
@@ -280,7 +282,7 @@ private fun UserInfo(user: UiUser, viewModel: UserViewModel) {
                     size = 72.dp,
                 )
             }
-            Spacer(modifier = Modifier.height(standardPadding * 2))
+            Spacer(modifier = Modifier.height(standardPadding))
             Row(
                 modifier = Modifier
                     .padding(horizontal = standardPadding * 2)
@@ -342,40 +344,51 @@ private fun UserInfo(user: UiUser, viewModel: UserViewModel) {
                 }
             }
             Spacer(modifier = Modifier.height(standardPadding))
-            ListItem(
-                text = {
-                    Text(text = user.desc)
-                }
+            Text(
+                modifier = Modifier.padding(horizontal = standardPadding * 2),
+                text = user.desc,
             )
             user.website?.let {
-                ListItem(
-                    icon = {
+                val navigator = AmbientNavigator.current
+                Column(
+                    modifier = Modifier
+                        .clickable(onClick = {
+                            navigator.openLink(it)
+                        })
+                        .padding(horizontal = standardPadding * 2)
+                        .fillMaxWidth(),
+                ) {
+                    Spacer(modifier = Modifier.height(standardPadding))
+                    Row {
                         Icon(asset = vectorResource(id = R.drawable.ic_globe))
-                    },
-                    text = {
+                        Spacer(modifier = Modifier.width(standardPadding))
                         Text(
                             text = it,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
+                            color = MaterialTheme.colors.primary
                         )
                     }
-                )
+                    Spacer(modifier = Modifier.height(standardPadding))
+                }
             }
             user.location?.takeIf { it.isNotEmpty() }?.let {
-                ListItem(
-                    icon = {
-                        Icon(asset = vectorResource(id = R.drawable.ic_map_pin))
-                    },
-                    text = {
-                        Text(
-                            text = it,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                        )
-                    }
-                )
+                Spacer(modifier = Modifier.height(standardPadding))
+                Row(
+                    modifier = Modifier
+                        .padding(horizontal = standardPadding * 2),
+                ) {
+                    Icon(asset = vectorResource(id = R.drawable.ic_map_pin))
+                    Spacer(modifier = Modifier.width(standardPadding))
+                    Text(
+                        text = it,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
+                Spacer(modifier = Modifier.height(standardPadding))
             }
-            Spacer(modifier = Modifier.height(standardPadding * 2))
+            Spacer(modifier = Modifier.height(standardPadding))
             Row {
                 Column(
                     modifier = Modifier.weight(1f),
@@ -399,7 +412,7 @@ private fun UserInfo(user: UiUser, viewModel: UserViewModel) {
                     Text(text = stringResource(id = R.string.title_listed))
                 }
             }
-            Spacer(modifier = Modifier.height(standardPadding * 2))
+            Spacer(modifier = Modifier.height(standardPadding))
         }
     }
 }
