@@ -25,6 +25,7 @@ jobs:
         KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         KEY_STORE_PASSWORD: ${{ secrets.KEY_STORE_PASSWORD }}
         SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
+        GOOGLE_SERVICES: ${{ secrets.GOOGLE_SERVICES }}
       run: ./.github/apply_signing.sh
 
     - name: Build with Gradle
@@ -41,3 +42,37 @@ jobs:
       with:
         name: build-reports
         path: ./app/build/reports
+
+    - name: Create Release
+      if: startsWith(github.ref, 'refs/tags/v')
+      uses: actions/github-script@v2
+      with:
+        github-token: ${{secrets.GITHUB_TOKEN}}
+        script: |
+          console.log('environment', process.versions);
+      
+          const fs = require('fs').promises;
+      
+          const { repo: { owner, repo }, sha } = context;
+          console.log({ owner, repo, sha });
+
+          const release = await github.repos.createRelease({
+            owner, repo,
+            tag_name: process.env.GITHUB_REF,
+            prerelease: true
+            target_commitish: sha
+          });
+
+          console.log('created release', { release });
+  
+          for (let file of await fs.readdir('build/release/signed')) {
+            console.log('uploading', file);
+            await github.repos.uploadReleaseAsset({
+              owner, repo,
+              release_id: release.data.id,
+              name: file,
+              data: await fs.readFile(`./${file}`)
+            });            
+          }
+
+

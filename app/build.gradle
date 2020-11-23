@@ -1,11 +1,35 @@
+buildscript {
+    ext {
+        enableGoogleVariant = project.file('google-services.json').exists()
+    }
+    repositories {
+        google()
+    }
+
+    dependencies {
+        classpath "com.google.dagger:hilt-android-gradle-plugin:$versions.hilt"
+        if (enableGoogleVariant) {
+            // START Non-FOSS component
+            classpath 'com.google.gms:google-services:4.3.4'
+            // END Non-FOSS component
+        }
+    }
+}
+
 plugins {
     id 'com.android.application'
     id 'kotlin-android'
     id 'kotlin-kapt'
     id 'kotlin-android-extensions'
-    id 'dagger.hilt.android.plugin'
-    id "com.google.protobuf"
+    id "com.google.protobuf" version "0.8.14"
 }
+
+if (enableGoogleVariant) {
+    // START Non-FOSS component
+    apply plugin: 'com.google.gms.google-services'
+    // END Non-FOSS component
+}
+apply plugin: 'dagger.hilt.android.plugin'
 
 android {
     compileSdkVersion global.compileSdkVersion
@@ -144,6 +168,13 @@ dependencies {
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.5'
 
     implementation "com.google.protobuf:protobuf-javalite:$versions.protobuf"
+
+    if (enableGoogleVariant) {
+        // START Non-FOSS component
+        implementation platform('com.google.firebase:firebase-bom:26.1.0')
+        implementation 'com.google.firebase:firebase-analytics-ktx'
+        // END Non-FOSS component
+    }
 
     testImplementation 'junit:junit:4.13.1'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'

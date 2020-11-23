@@ -8,9 +8,6 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:4.2.0-alpha16'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$versions.kotlin"
-        classpath "org.jetbrains.kotlin:kotlin-serialization:$versions.kotlin"
-        classpath "com.google.dagger:hilt-android-gradle-plugin:$versions.hilt"
-        classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.13'
     }
 }
 
