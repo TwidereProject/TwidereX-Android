@@ -18,13 +18,10 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.scenes.home
+package com.twidere.twiderex.scenes.search
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
-import androidx.compose.material.AmbientContentAlpha
-import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
@@ -32,58 +29,64 @@ import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.ExperimentalFocus
-import androidx.compose.ui.graphics.vector.VectorAsset
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.input.ImeAction
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.AppBar
+import com.twidere.twiderex.component.foundation.AppBarNavigationButton
+import com.twidere.twiderex.component.foundation.TextInput
 import com.twidere.twiderex.component.navigation.AmbientNavigator
+import com.twidere.twiderex.ui.TwidereXTheme
 
-class SearchItem : HomeNavigationItem() {
-    @Composable
-    override val name: String
-        get() = stringResource(R.string.title_search)
-    override val route: String
-        get() = "search"
-
-    @Composable
-    override val icon: VectorAsset
-        get() = vectorResource(id = R.drawable.ic_search)
-    override val withAppBar: Boolean
-        get() = false
-
-    @OptIn(ExperimentalFoundationApi::class, ExperimentalFocus::class)
-    @Composable
-    override fun onCompose() {
-        val navigator = AmbientNavigator.current
+@OptIn(ExperimentalFoundationApi::class, ExperimentalFocus::class)
+@Composable
+fun SearchInputScene(initial: String? = null) {
+    var text by remember { mutableStateOf(initial ?: "") }
+    val navigator = AmbientNavigator.current
+    TwidereXTheme {
         Scaffold(
             topBar = {
                 AppBar(
+                    navigationIcon = {
+                        AppBarNavigationButton()
+                    },
                     title = {
                         ProvideTextStyle(value = MaterialTheme.typography.body1) {
-                            Row(
-                                modifier = Modifier.clickable(
-                                    onClick = {
-                                        navigator.searchInput()
-                                    }
+                            Row {
+                                TextInput(
+                                    modifier = Modifier
+                                        .align(Alignment.CenterVertically)
+                                        .weight(1F),
+                                    value = text,
+                                    maxLines = 1,
+                                    onValueChange = {
+                                        text = it
+                                    },
+                                    placeholder = {
+                                        Text(text = stringResource(id = R.string.search_hint))
+                                    },
+                                    onImeActionPerformed = { _, _ ->
+                                        if (text.isNotEmpty()) {
+                                            navigator.search(text)
+                                        }
+                                    },
+                                    autoFocus = true,
+                                    imeAction = ImeAction.Search,
+                                    alignment = Alignment.CenterStart,
                                 )
-                            ) {
-                                Providers(
-                                    AmbientContentAlpha provides ContentAlpha.medium
-                                ) {
-                                    Text(
-                                        modifier = Modifier.weight(1F)
-                                            .align(Alignment.CenterVertically),
-                                        text = stringResource(id = R.string.search_hint),
-                                    )
-                                }
                                 IconButton(
                                     onClick = {
-                                        navigator.searchInput()
+                                        if (text.isNotEmpty()) {
+                                            navigator.search(text)
+                                        }
                                     }
                                 ) {
                                     Icon(asset = vectorResource(id = R.drawable.ic_search))

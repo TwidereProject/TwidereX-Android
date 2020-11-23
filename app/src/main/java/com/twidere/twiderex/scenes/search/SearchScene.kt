@@ -18,7 +18,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.scenes
+package com.twidere.twiderex.scenes.search
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
@@ -41,8 +41,6 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.savedinstancestate.savedInstanceState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -50,7 +48,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.navigate
@@ -62,10 +60,10 @@ import com.twidere.twiderex.annotations.IncomingComposeUpdate
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
-import com.twidere.twiderex.component.foundation.TextInput
 import com.twidere.twiderex.component.foundation.TextTabsComponent
 import com.twidere.twiderex.component.foundation.TopAppBarElevation
 import com.twidere.twiderex.component.lazy.loadState
+import com.twidere.twiderex.component.navigation.AmbientNavigator
 import com.twidere.twiderex.component.status.StatusDivider
 import com.twidere.twiderex.component.status.TimelineStatusComponent
 import com.twidere.twiderex.component.status.UserAvatar
@@ -94,8 +92,8 @@ fun SearchScene(keyword: String) {
     val usersViewModel = viewModel {
         TwitterSearchUserViewModel(account, keyword)
     }
-    val (text, setText) = remember { mutableStateOf(keyword) }
     var selectedTab by savedInstanceState { 0 }
+    val navigator = AmbientNavigator.current
 
     TwidereXTheme {
         Scaffold {
@@ -112,27 +110,24 @@ fun SearchScene(keyword: String) {
                             title = {
                                 ProvideTextStyle(value = MaterialTheme.typography.body1) {
                                     Row {
-                                        TextInput(
+                                        Text(
                                             modifier = Modifier
+                                                .clickable(
+                                                    onClick = {
+                                                        navigator.searchInput(keyword)
+                                                    },
+                                                    indication = null,
+                                                )
                                                 .align(Alignment.CenterVertically)
                                                 .weight(1F),
-                                            value = text,
+                                            text = keyword,
                                             maxLines = 1,
-                                            onValueChange = {
-                                                setText(it)
-                                            },
-                                            placeholder = {
-                                                Text(text = stringResource(id = R.string.search_hint))
-                                            },
-                                            onImeActionPerformed = { _, _ ->
-//                                                usersViewModel.reset(text)
-//                                                tweetsViewModel.reset(text)
-//                                                mediaViewModel.reset(text)
-                                            },
-                                            imeAction = ImeAction.Search,
-                                            alignment = Alignment.CenterStart,
+                                            textAlign = TextAlign.Start,
                                         )
-                                        IconButton(onClick = {}) {
+                                        IconButton(
+                                            onClick = {
+                                            }
+                                        ) {
                                             Icon(asset = vectorResource(id = R.drawable.ic_device_floppy))
                                         }
                                     }

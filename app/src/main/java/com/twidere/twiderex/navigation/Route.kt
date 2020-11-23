@@ -36,9 +36,10 @@ import com.twidere.twiderex.scenes.ComposeScene
 import com.twidere.twiderex.scenes.ComposeType
 import com.twidere.twiderex.scenes.HomeScene
 import com.twidere.twiderex.scenes.MediaScene
-import com.twidere.twiderex.scenes.SearchScene
 import com.twidere.twiderex.scenes.StatusScene
 import com.twidere.twiderex.scenes.UserScene
+import com.twidere.twiderex.scenes.search.SearchInputScene
+import com.twidere.twiderex.scenes.search.SearchScene
 import com.twidere.twiderex.scenes.settings.AboutScene
 import com.twidere.twiderex.scenes.settings.AccountManagementScene
 import com.twidere.twiderex.scenes.settings.AppearanceScene
@@ -64,6 +65,7 @@ object Route {
             "UTF-8"
         )
         }"
+
         val TwitterWebSignInDialog = 1
     }
 
@@ -72,12 +74,24 @@ object Route {
     fun Media(statusId: String, selectedIndex: Int = 0) =
         "media/$statusId?selectedIndex=$selectedIndex"
 
-    fun Search(keyword: String) = "search/${
+    fun Search(keyword: String) = "search/result/${
     URLEncoder.encode(
         keyword,
         "UTF-8"
     )
     }"
+
+    fun SearchInput(keyword: String? = null): String {
+        if (keyword == null) {
+            return "search/input"
+        }
+        return "search/input?keyword=${
+        URLEncoder.encode(
+            keyword,
+            "UTF-8"
+        )
+        }"
+    }
 
     fun Compose(composeType: ComposeType, statusId: String? = null) =
         "compose/${composeType.name}?statusId=$statusId"
@@ -197,7 +211,18 @@ fun NavGraphBuilder.route() {
     }
 
     authorizedComposable(
-        "search/{keyword}",
+        "search/input?keyword={keyword}",
+        arguments = listOf(
+            navArgument("keyword") { type = NavType.StringType; nullable = true; }
+        )
+    ) { backStackEntry ->
+        SearchInputScene(
+            backStackEntry.arguments?.getString("keyword")?.let { URLDecoder.decode(it, "UTF-8") }
+        )
+    }
+
+    authorizedComposable(
+        "search/result/{keyword}",
         arguments = listOf(
             navArgument("keyword") { type = NavType.StringType }
         ),

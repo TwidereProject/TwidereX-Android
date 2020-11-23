@@ -30,6 +30,7 @@ import androidx.compose.runtime.staticAmbientOf
 import androidx.core.os.bundleOf
 import androidx.navigation.NavController
 import androidx.navigation.compose.navigate
+import androidx.navigation.compose.popUpTo
 import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.navigation.twidereXSchema
 import com.twidere.twiderex.scenes.ComposeType
@@ -44,6 +45,7 @@ interface INavigator {
     fun compose(composeType: ComposeType, statusId: String? = null) {}
     fun openLink(it: String) {}
     fun twitterSignInWeb(target: String) {}
+    fun searchInput(initial: String? = null) {}
 }
 
 class Navigator(
@@ -63,7 +65,19 @@ class Navigator(
     }
 
     override fun search(keyword: String) {
-        navController.navigate(Route.Search(keyword))
+        navController.navigate(Route.Search(keyword)) {
+            popUpTo(Route.Home) {
+                inclusive = false
+            }
+        }
+    }
+
+    override fun searchInput(initial: String?) {
+        navController.navigate(Route.SearchInput(initial)) {
+            popUpTo(Route.Home) {
+                inclusive = false
+            }
+        }
     }
 
     override fun compose(composeType: ComposeType, statusId: String?) {
