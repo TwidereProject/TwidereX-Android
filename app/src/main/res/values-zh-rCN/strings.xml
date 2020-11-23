@@ -45,4 +45,6 @@
     <string name="settings_use_system_font_size">使用系统文字尺寸</string>
     <string name="settings_media_preview">媒体预览</string>
     <string name="license">开源协议</string>
+    <string name="title_accounts">账号</string>
+    <string name="title_account_management">账号管理</string>
 </resources>

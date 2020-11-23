@@ -22,7 +22,10 @@ package com.twidere.twiderex.repository
 
 import android.accounts.Account
 import android.accounts.AccountManager
+import android.accounts.AccountManagerCallback
+import android.accounts.AccountManagerFuture
 import android.content.SharedPreferences
+import android.os.Build
 import androidx.core.content.edit
 import androidx.lifecycle.MutableLiveData
 import com.twidere.twiderex.db.model.DbUser
@@ -46,16 +49,14 @@ private const val ACCOUNT_USER_DATA_EXTRAS = "extras"
 private const val ACCOUNT_USER_DATA_COLOR = "color"
 private const val ACCOUNT_USER_DATA_POSITION = "position"
 private const val ACCOUNT_USER_DATA_TEST = "test"
-
-private const val PREFERENCE_CURRENT_ACTIVE_ACCOUNT = "current_active_account"
+private const val ACCOUNT_USER_DATA_LAST_ACTIVE = "last_active"
 
 @Singleton
 class AccountRepository @Inject constructor(
     private val manager: AccountManager,
-    private val sharedPreferences: SharedPreferences,
 ) {
     val activeAccount =
-        MutableLiveData<AccountDetails>(if (hasAccount()) getCurrentAccount() else null)
+        MutableLiveData<AccountDetails?>(if (hasAccount()) getCurrentAccount() else null)
 
     val accounts = MutableLiveData(
         getAccounts().map {
@@ -81,27 +82,14 @@ class AccountRepository @Inject constructor(
     }
 
     fun setCurrentAccount(detail: AccountDetails) {
-        sharedPreferences.edit {
-            putString(PREFERENCE_CURRENT_ACTIVE_ACCOUNT, detail.key.toString())
-        }
-        activeAccount.value = (detail)
+        detail.lastActive = System.currentTimeMillis()
+        updateAccount(detail)
+        activeAccount.value = detail
     }
 
-    fun getCurrentAccount(): AccountDetails {
-        return if (sharedPreferences.contains(PREFERENCE_CURRENT_ACTIVE_ACCOUNT)) {
-            sharedPreferences.getString(PREFERENCE_CURRENT_ACTIVE_ACCOUNT, "")
-                ?.takeIf {
-                    it.isNotEmpty()
-                }?.let {
-                    UserKey.valueOf(it)
-                }?.let {
-                    findByAccountKey(it)
-                }?.let {
-                    getAccountDetails(it)
-                } ?: getAccountDetails(getAccounts().first())
-        } else {
-            getAccountDetails(getAccounts().first())
-        }
+    private fun getCurrentAccount(): AccountDetails? {
+        return getAccounts()
+            .map { getAccountDetails(it) }.maxByOrNull { it.lastActive }
     }
 
     fun addAccount(detail: AccountDetails) {
@@ -130,7 +118,9 @@ class AccountRepository @Inject constructor(
             ),
             credentials_json = manager.peekAuthToken(account, ACCOUNT_AUTH_TOKEN_TYPE),
             extras_json = manager.getUserData(account, ACCOUNT_USER_DATA_EXTRAS),
-            user = manager.getUserData(account, ACCOUNT_USER_DATA_USER).fromJson<DbUser>()!!
+            user = manager.getUserData(account, ACCOUNT_USER_DATA_USER).fromJson<DbUser>()!!,
+            lastActive = manager.getUserData(account, ACCOUNT_USER_DATA_LAST_ACTIVE)?.toLongOrNull()
+                ?: 0
         )
     }
 
@@ -152,5 +142,20 @@ class AccountRepository @Inject constructor(
         manager.setAuthToken(detail.account, ACCOUNT_AUTH_TOKEN_TYPE, detail.credentials_json)
         manager.setUserData(detail.account, ACCOUNT_USER_DATA_EXTRAS, detail.extras_json)
         manager.setUserData(detail.account, ACCOUNT_USER_DATA_USER, detail.user.json())
+        manager.setUserData(
+            detail.account,
+            ACCOUNT_USER_DATA_LAST_ACTIVE,
+            detail.lastActive.toString()
+        )
+    }
+
+    fun delete(detail: AccountDetails) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
+            manager.removeAccountExplicitly(detail.account)
+            accounts.value = getAccounts().map {
+                getAccountDetails(it)
+            }
+            activeAccount.value = getCurrentAccount()
+        }
     }
 }

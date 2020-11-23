@@ -40,6 +40,7 @@ import com.twidere.twiderex.scenes.SearchScene
 import com.twidere.twiderex.scenes.StatusScene
 import com.twidere.twiderex.scenes.UserScene
 import com.twidere.twiderex.scenes.settings.AboutScene
+import com.twidere.twiderex.scenes.settings.AccountManagementScene
 import com.twidere.twiderex.scenes.settings.AppearanceScene
 import com.twidere.twiderex.scenes.settings.DisplayScene
 import com.twidere.twiderex.scenes.settings.SettingsScene
@@ -86,6 +87,7 @@ object Route {
         val Appearance = "settings/appearance"
         val Display = "settings/display"
         val About = "settings/about"
+        val AccountManagement = "settings/accountmanagement"
     }
 }
 
@@ -110,12 +112,12 @@ fun NavGraphBuilder.authorizedComposable(
 
 fun NavGraphBuilder.route() {
 
-    authorizedComposable("home") {
+    authorizedComposable(Route.Home) {
         HomeScene()
     }
 
     composable(
-        "signin/twitter",
+        Route.SignIn.Twitter,
         deepLinks = listOf(
             navDeepLink {
                 uriPattern = DeepLinks.SignIn
@@ -228,19 +230,23 @@ fun NavGraphBuilder.route() {
         }
     }
 
-    composable("settings") {
+    composable(Route.Settings.Home) {
         SettingsScene()
     }
 
-    composable("settings/appearance") {
+    composable(Route.Settings.Appearance) {
         AppearanceScene()
     }
 
-    composable("settings/display") {
+    composable(Route.Settings.Display) {
         DisplayScene()
     }
 
-    composable("settings/about") {
+    composable(Route.Settings.AccountManagement) {
+        AccountManagementScene()
+    }
+
+    composable(Route.Settings.About) {
         AboutScene()
     }
 }

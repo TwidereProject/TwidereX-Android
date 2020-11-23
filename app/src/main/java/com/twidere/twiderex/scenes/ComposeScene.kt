@@ -62,6 +62,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.ExperimentalFocus
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.node.Ref
 import androidx.compose.ui.platform.ContextAmbient
 import androidx.compose.ui.res.stringResource
@@ -393,7 +394,10 @@ private fun ComposeImage(item: Uri, viewModel: ComposeViewModel) {
                 viewModel.removeImage(item)
             }
         ) {
-            Text(text = stringResource(id = R.string.action_remove))
+            Text(
+                text = stringResource(id = R.string.action_remove),
+                color = Color.Red,
+            )
         }
     }
 }

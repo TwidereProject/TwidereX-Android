@@ -307,9 +307,11 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
                     itemDivider()
                     item {
                         ListItem(
-                            modifier = Modifier.clickable(onClick = {}),
+                            modifier = Modifier.clickable(onClick = {
+                                navController.navigate(Route.Settings.AccountManagement)
+                            }),
                             text = {
-                                Text(text = "Manage accounts")
+                                Text(text = stringResource(id = R.string.title_account_management))
                             }
                         )
                     }

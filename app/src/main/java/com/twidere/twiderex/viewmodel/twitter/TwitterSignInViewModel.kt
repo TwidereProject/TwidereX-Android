@@ -78,7 +78,8 @@ class TwitterSignInViewModel @ViewModelInject constructor(
                                 credentials_type = CredentialsType.OAuth,
                                 credentials_json = credentials_json,
                                 extras_json = "",
-                                user = user.toDbUser()
+                                user = user.toDbUser(),
+                                lastActive = System.currentTimeMillis()
                             )
                         )
                     }

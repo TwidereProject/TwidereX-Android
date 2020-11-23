@@ -33,6 +33,10 @@ class ActiveAccountViewModel @ViewModelInject constructor(
         repository.setCurrentAccount(it)
     }
 
+    fun deleteAccount(detail: AccountDetails) {
+        repository.delete(detail)
+    }
+
     val account = liveData {
         emitSource(repository.activeAccount)
     }

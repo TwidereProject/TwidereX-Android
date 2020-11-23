@@ -45,6 +45,7 @@ data class AccountDetails(
     @Json(name = "extras")
     val extras_json: String,
     var user: DbUser,
+    var lastActive: Long,
 ) {
 
     val credentials: Credentials?
