@@ -33,7 +33,6 @@ import com.twidere.twiderex.model.cred.EmptyCredentials
 import com.twidere.twiderex.model.cred.OAuth2Credentials
 import com.twidere.twiderex.model.cred.OAuthCredentials
 import com.twidere.twiderex.utils.fromJson
-import kotlinx.android.parcel.IgnoredOnParcel
 
 @JsonClass(generateAdapter = true)
 data class AccountDetails(
@@ -48,7 +47,6 @@ data class AccountDetails(
     var user: DbUser,
 ) {
 
-    @IgnoredOnParcel
     val credentials: Credentials?
         get() = when (credentials_type) {
             CredentialsType.OAuth,
@@ -58,7 +56,6 @@ data class AccountDetails(
             CredentialsType.OAuth2 -> credentials_json.fromJson<OAuth2Credentials>()
         }
 
-    @IgnoredOnParcel
     val service by lazy<MicroBlogService> {
         when (type) {
             PlatformType.Twitter -> {
