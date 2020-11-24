@@ -21,7 +21,6 @@
 package com.twidere.twiderex.scenes.search
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.layout.Row
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
@@ -34,16 +33,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.TextRange
-import androidx.compose.ui.text.constrain
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
-import com.twidere.services.twitter.model.fields.TweetFields
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
@@ -56,10 +51,12 @@ import com.twidere.twiderex.ui.TwidereXTheme
 fun SearchInputScene(initial: String? = null) {
     val initialText = initial ?: ""
     var textFieldValue by remember {
-        mutableStateOf(TextFieldValue(
-            text = initialText,
-            selection = TextRange(initialText.length),
-        ))
+        mutableStateOf(
+            TextFieldValue(
+                text = initialText,
+                selection = TextRange(initialText.length),
+            )
+        )
     }
     val navigator = AmbientNavigator.current
     TwidereXTheme {
