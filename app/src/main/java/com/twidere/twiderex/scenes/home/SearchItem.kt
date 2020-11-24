@@ -69,7 +69,8 @@ class SearchItem : HomeNavigationItem() {
                                 modifier = Modifier.clickable(
                                     onClick = {
                                         navigator.searchInput()
-                                    }
+                                    },
+                                    indication = null,
                                 )
                             ) {
                                 Providers(

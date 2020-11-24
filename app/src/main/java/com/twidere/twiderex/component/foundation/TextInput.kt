@@ -70,9 +70,6 @@ fun TextInput(
     onTextInputStarted: ((SoftwareKeyboardController) -> Unit)? = null,
     onClicked: (() -> Unit)? = null,
 ) {
-    val focusRequester = FocusRequester()
-    val keyboardController = remember { Ref<SoftwareKeyboardController>() }
-    val interactionState = remember { InteractionState() }
     var selection by remember { mutableStateOf(TextRange.Zero) }
     var composition by remember { mutableStateOf<TextRange?>(null) }
 
@@ -82,6 +79,50 @@ fun TextInput(
         selection = selection.constrain(0, value.length),
         composition = composition?.constrain(0, value.length)
     )
+    TextInput(
+        autoFocus = autoFocus,
+        modifier = modifier,
+        textStyle = textStyle,
+        placeholder = placeholder,
+        keyboardType = keyboardType,
+        maxLines = maxLines,
+        alignment = alignment,
+        imeAction = imeAction,
+        onImeActionPerformed = onImeActionPerformed,
+        value = textFieldValue,
+        onValueChange = {
+            selection = it.selection
+            composition = it.composition
+            if (value != it.text) {
+                onValueChange(it.text)
+            }
+        },
+        onTextInputStarted = onTextInputStarted,
+        onClicked = onClicked,
+    )
+}
+
+@ExperimentalFoundationApi
+@ExperimentalFocus
+@Composable
+fun TextInput(
+    autoFocus: Boolean = false,
+    modifier: Modifier = Modifier,
+    textStyle: TextStyle = AmbientTextStyle.current,
+    placeholder: @Composable (() -> Unit)? = null,
+    keyboardType: KeyboardType = KeyboardType.Text,
+    maxLines: Int = Int.MAX_VALUE,
+    alignment: Alignment = Alignment.TopStart,
+    imeAction: ImeAction = ImeAction.Unspecified,
+    onImeActionPerformed: (ImeAction, SoftwareKeyboardController?) -> Unit = { _, _ -> },
+    value: TextFieldValue,
+    onValueChange: (TextFieldValue) -> Unit,
+    onTextInputStarted: ((SoftwareKeyboardController) -> Unit)? = null,
+    onClicked: (() -> Unit)? = null,
+) {
+    val focusRequester = FocusRequester()
+    val keyboardController = remember { Ref<SoftwareKeyboardController>() }
+    val interactionState = remember { InteractionState() }
     if (autoFocus) {
         onActive {
             focusRequester.requestFocus()
@@ -118,16 +159,12 @@ fun TextInput(
                 keyboardController.value = it
                 onTextInputStarted?.invoke(it)
             },
-            value = textFieldValue,
+            value = value,
             onValueChange = {
-                selection = it.selection
-                composition = it.composition
-                if (value != it.text) {
-                    onValueChange(it.text)
-                }
+                onValueChange(it)
             },
         )
-        if (value.isEmpty()) {
+        if (value.text.isEmpty()) {
             Providers(
                 AmbientContentAlpha provides ContentAlpha.medium
             ) {

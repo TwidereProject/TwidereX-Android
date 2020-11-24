@@ -38,7 +38,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.InternalTextApi
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.constrain
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.TextFieldValue
+import com.twidere.services.twitter.model.fields.TweetFields
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
@@ -49,7 +54,13 @@ import com.twidere.twiderex.ui.TwidereXTheme
 @OptIn(ExperimentalFoundationApi::class, ExperimentalFocus::class)
 @Composable
 fun SearchInputScene(initial: String? = null) {
-    var text by remember { mutableStateOf(initial ?: "") }
+    val initialText = initial ?: ""
+    var textFieldValue by remember {
+        mutableStateOf(TextFieldValue(
+            text = initialText,
+            selection = TextRange(initialText.length),
+        ))
+    }
     val navigator = AmbientNavigator.current
     TwidereXTheme {
         Scaffold(
@@ -60,38 +71,35 @@ fun SearchInputScene(initial: String? = null) {
                     },
                     title = {
                         ProvideTextStyle(value = MaterialTheme.typography.body1) {
-                            Row {
-                                TextInput(
-                                    modifier = Modifier
-                                        .align(Alignment.CenterVertically)
-                                        .weight(1F),
-                                    value = text,
-                                    maxLines = 1,
-                                    onValueChange = {
-                                        text = it
-                                    },
-                                    placeholder = {
-                                        Text(text = stringResource(id = R.string.search_hint))
-                                    },
-                                    onImeActionPerformed = { _, _ ->
-                                        if (text.isNotEmpty()) {
-                                            navigator.search(text)
-                                        }
-                                    },
-                                    autoFocus = true,
-                                    imeAction = ImeAction.Search,
-                                    alignment = Alignment.CenterStart,
-                                )
-                                IconButton(
-                                    onClick = {
-                                        if (text.isNotEmpty()) {
-                                            navigator.search(text)
-                                        }
+                            TextInput(
+                                value = textFieldValue,
+                                onValueChange = {
+                                    textFieldValue = it
+                                },
+                                maxLines = 1,
+                                placeholder = {
+                                    Text(text = stringResource(id = R.string.search_hint))
+                                },
+                                onImeActionPerformed = { _, _ ->
+                                    if (textFieldValue.text.isNotEmpty()) {
+                                        navigator.search(textFieldValue.text)
                                     }
-                                ) {
-                                    Icon(asset = vectorResource(id = R.drawable.ic_search))
+                                },
+                                autoFocus = true,
+                                imeAction = ImeAction.Search,
+                                alignment = Alignment.CenterStart,
+                            )
+                        }
+                    },
+                    actions = {
+                        IconButton(
+                            onClick = {
+                                if (textFieldValue.text.isNotEmpty()) {
+                                    navigator.search(textFieldValue.text)
                                 }
                             }
+                        ) {
+                            Icon(asset = vectorResource(id = R.drawable.ic_search))
                         }
                     }
                 )
