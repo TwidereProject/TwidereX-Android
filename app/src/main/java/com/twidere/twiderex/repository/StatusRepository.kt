@@ -27,9 +27,7 @@ import com.twidere.twiderex.db.AppDatabase
 import com.twidere.twiderex.db.model.DbStatusReaction
 import com.twidere.twiderex.model.UserKey
 import java.util.UUID
-import javax.inject.Singleton
 
-@Singleton
 class StatusRepository @AssistedInject constructor(
     private val database: AppDatabase,
     @Assisted private val key: UserKey,

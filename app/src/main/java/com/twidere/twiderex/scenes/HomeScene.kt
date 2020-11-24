@@ -319,7 +319,23 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
                     }
                 }
             } else {
-                // TODO
+                LazyColumn {
+                    item {
+                        ListItem(
+                            modifier = Modifier.clickable(
+                                onClick = {
+                                    navController.navigate(Route.Draft.List)
+                                }
+                            ),
+                            text = {
+                                Text(text = stringResource(id = R.string.title_drafts))
+                            },
+                            icon = {
+                                Icon(asset = vectorResource(id = R.drawable.ic_note))
+                            },
+                        )
+                    }
+                }
             }
         }
 

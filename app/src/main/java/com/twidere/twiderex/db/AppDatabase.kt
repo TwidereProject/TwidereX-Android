@@ -23,6 +23,7 @@ package com.twidere.twiderex.db
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import com.twidere.twiderex.db.dao.DraftDao
 import com.twidere.twiderex.db.dao.MediaDao
 import com.twidere.twiderex.db.dao.PagingTimelineDao
 import com.twidere.twiderex.db.dao.ReactionDao
@@ -30,6 +31,7 @@ import com.twidere.twiderex.db.dao.StatusDao
 import com.twidere.twiderex.db.dao.TimelineDao
 import com.twidere.twiderex.db.dao.UrlEntityDao
 import com.twidere.twiderex.db.dao.UserDao
+import com.twidere.twiderex.db.model.DbDraft
 import com.twidere.twiderex.db.model.DbMedia
 import com.twidere.twiderex.db.model.DbPagingTimeline
 import com.twidere.twiderex.db.model.DbStatusReaction
@@ -37,8 +39,10 @@ import com.twidere.twiderex.db.model.DbStatusV2
 import com.twidere.twiderex.db.model.DbTimeline
 import com.twidere.twiderex.db.model.DbUrlEntity
 import com.twidere.twiderex.db.model.DbUser
+import com.twidere.twiderex.db.model.converter.ComposeTypeConverter
 import com.twidere.twiderex.db.model.converter.MediaTypeConverter
 import com.twidere.twiderex.db.model.converter.PlatformTypeConverter
+import com.twidere.twiderex.db.model.converter.StringListConverter
 import com.twidere.twiderex.db.model.converter.TimelineTypeConverter
 import com.twidere.twiderex.db.model.converter.UserKeyConverter
 import com.twidere.twiderex.db.model.converter.UserTimelineTypeConverter
@@ -54,6 +58,7 @@ import javax.inject.Singleton
         DbStatusReaction::class,
         DbPagingTimeline::class,
         DbUrlEntity::class,
+        DbDraft::class,
     ],
     version = 1,
 )
@@ -63,6 +68,8 @@ import javax.inject.Singleton
     MediaTypeConverter::class,
     TimelineTypeConverter::class,
     UserTimelineTypeConverter::class,
+    StringListConverter::class,
+    ComposeTypeConverter::class,
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun statusDao(): StatusDao
@@ -72,4 +79,5 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun reactionDao(): ReactionDao
     abstract fun pagingTimelineDao(): PagingTimelineDao
     abstract fun urlEntityDao(): UrlEntityDao
+    abstract fun draftDao(): DraftDao
 }

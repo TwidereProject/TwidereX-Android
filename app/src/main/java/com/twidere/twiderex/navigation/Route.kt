@@ -34,6 +34,8 @@ import com.twidere.twiderex.component.requireAuthorization
 import com.twidere.twiderex.dialog.TwitterWebSignInDialog
 import com.twidere.twiderex.scenes.ComposeScene
 import com.twidere.twiderex.scenes.ComposeType
+import com.twidere.twiderex.scenes.DraftComposeScene
+import com.twidere.twiderex.scenes.DraftListScene
 import com.twidere.twiderex.scenes.HomeScene
 import com.twidere.twiderex.scenes.MediaScene
 import com.twidere.twiderex.scenes.StatusScene
@@ -56,6 +58,11 @@ val twidereXSchema = "twiderex"
 
 object Route {
     val Home = "home"
+
+    object Draft {
+        val List = "draft/list"
+        fun Compose(draftId: String) = "draft/compose/$draftId"
+    }
 
     object SignIn {
         val Twitter = "signin/twitter"
@@ -273,5 +280,20 @@ fun NavGraphBuilder.route() {
 
     composable(Route.Settings.About) {
         AboutScene()
+    }
+
+    composable(Route.Draft.List) {
+        DraftListScene()
+    }
+
+    composable(
+        "draft/compose/{draftId}",
+        arguments = listOf(
+            navArgument("draftId") { type = NavType.StringType }
+        )
+    ) { backStackEntry ->
+        backStackEntry.arguments?.getString("draftId")?.let {
+            DraftComposeScene(draftId = it)
+        }
     }
 }

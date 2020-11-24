@@ -39,6 +39,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRowForIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.AlertDialog
 import androidx.compose.material.AmbientContentAlpha
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ContentAlpha
@@ -50,6 +51,7 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
+import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.getValue
@@ -70,8 +72,8 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.SoftwareKeyboardController
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.R
+import com.twidere.twiderex.component.BackButtonHandler
 import com.twidere.twiderex.component.foundation.AppBar
-import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.foundation.TextInput
 import com.twidere.twiderex.component.status.StatusLineComponent
@@ -89,6 +91,8 @@ import com.twidere.twiderex.ui.composeImageSize
 import com.twidere.twiderex.ui.profileImageSize
 import com.twidere.twiderex.ui.standardPadding
 import com.twidere.twiderex.viewmodel.ComposeViewModel
+import com.twidere.twiderex.viewmodel.DraftComposeViewModel
+import com.twidere.twiderex.viewmodel.DraftItemViewModel
 import kotlinx.coroutines.launch
 
 enum class ComposeType {
@@ -97,21 +101,89 @@ enum class ComposeType {
     Quote,
 }
 
-@OptIn(ExperimentalFocus::class, ExperimentalFoundationApi::class)
 @Composable
-fun ComposeScene(statusId: String? = null, composeType: ComposeType = ComposeType.New) {
+fun DraftComposeScene(
+    draftId: String,
+) {
+    val account = AmbientActiveAccount.current ?: return
+    val draftItemViewModel =
+        assistedViewModel<DraftItemViewModel.AssistedFactory, DraftItemViewModel> {
+            it.create(draftId = draftId)
+        }
+    val data by draftItemViewModel.draft.observeAsState()
+    data?.let { draft ->
+        val viewModel =
+            assistedViewModel<DraftComposeViewModel.AssistedFactory, DraftComposeViewModel> {
+                it.create(
+                    account = account,
+                    statusId = draft.statusId,
+                    composeType = draft.composeType,
+                    initialText = draft.content,
+                    initialMedia = draft.media,
+                    draftId = draftId,
+                )
+            }
+        ComposeBody(viewModel = viewModel, account = account)
+    }
+}
+
+@Composable
+fun ComposeScene(
+    statusId: String? = null,
+    composeType: ComposeType = ComposeType.New,
+) {
     val account = AmbientActiveAccount.current ?: return
     val viewModel = assistedViewModel<ComposeViewModel.AssistedFactory, ComposeViewModel> {
-        it.create(account, statusId)
+        it.create(account, statusId, composeType)
     }
+    ComposeBody(viewModel = viewModel, account = account)
+}
+
+@OptIn(ExperimentalFocus::class, ExperimentalFoundationApi::class)
+@Composable
+private fun ComposeBody(
+    viewModel: ComposeViewModel,
+    account: AccountDetails,
+) {
+    val composeType = viewModel.composeType
     val status by viewModel.status.observeAsState()
-    val (text, setText) = remember { mutableStateOf("") }
     val images by viewModel.images.observeAsState(initial = emptyList())
     val location by viewModel.location.observeAsState()
     val locationEnabled by viewModel.locationEnabled.observeAsState(initial = false)
     val navController = AmbientNavController.current
+    val text by viewModel.text.observeAsState(initial = "")
     val keyboardController = remember { Ref<SoftwareKeyboardController>() }
+    val canSaveDraft by viewModel.canSaveDraft.observeAsState(initial = false)
+    var showSaveDraftDialog by remember { mutableStateOf(false) }
     TwidereXTheme {
+        if (showSaveDraftDialog) {
+            ConfirmDraftDialog(
+                onDismiss = {
+                    showSaveDraftDialog = false
+                },
+                onConfirm = {
+                    showSaveDraftDialog = false
+                    viewModel.saveDraft()
+                    navController.popBackStack()
+                },
+                onCancel = {
+                    navController.popBackStack()
+                }
+            )
+        }
+        BackButtonHandler {
+            when {
+                showSaveDraftDialog -> {
+                    showSaveDraftDialog = false
+                }
+                canSaveDraft -> {
+                    showSaveDraftDialog = true
+                }
+                else -> {
+                    navController.popBackStack()
+                }
+            }
+        }
         Scaffold(
             topBar = {
                 AppBar(
@@ -125,13 +197,23 @@ fun ComposeScene(statusId: String? = null, composeType: ComposeType = ComposeTyp
                         )
                     },
                     navigationIcon = {
-                        AppBarNavigationButton(icon = vectorResource(id = R.drawable.ic_x))
+                        IconButton(
+                            onClick = {
+                                if (canSaveDraft) {
+                                    showSaveDraftDialog = true
+                                } else {
+                                    navController.popBackStack()
+                                }
+                            }
+                        ) {
+                            Icon(asset = vectorResource(id = R.drawable.ic_x))
+                        }
                     },
                     actions = {
                         IconButton(
                             enabled = text.isNotEmpty(),
                             onClick = {
-                                viewModel.compose(text, composeType, status)
+                                viewModel.compose()
                                 navController.popBackStack()
                             }
                         ) {
@@ -149,7 +231,7 @@ fun ComposeScene(statusId: String? = null, composeType: ComposeType = ComposeTyp
                         ComposeInput(
                             account,
                             text,
-                            setText,
+                            { viewModel.setText(it) },
                             keyboardController
                         )
                     } else {
@@ -192,7 +274,7 @@ fun ComposeScene(statusId: String? = null, composeType: ComposeType = ComposeTyp
                                         ComposeInput(
                                             account,
                                             text,
-                                            setText,
+                                            { viewModel.setText(it) },
                                             keyboardController,
                                             autoFocus = if (composeType == ComposeType.Reply) {
                                                 listState.firstVisibleItemIndex == 1
@@ -257,6 +339,33 @@ fun ComposeScene(statusId: String? = null, composeType: ComposeType = ComposeTyp
             }
         }
     }
+}
+
+@Composable
+private fun ConfirmDraftDialog(
+    onDismiss: () -> Unit = {},
+    onConfirm: () -> Unit = {},
+    onCancel: () -> Unit = {},
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        text = {
+            Text(
+                text = stringResource(id = R.string.message_save_draft),
+                style = MaterialTheme.typography.body2
+            )
+        },
+        dismissButton = {
+            TextButton(onClick = onCancel) {
+                Text(text = stringResource(id = R.string.action_cancel))
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onConfirm) {
+                Text(text = stringResource(id = R.string.action_yes))
+            }
+        },
+    )
 }
 
 @ExperimentalFocus

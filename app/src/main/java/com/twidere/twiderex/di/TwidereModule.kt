@@ -20,12 +20,10 @@
  */
 package com.twidere.twiderex.di
 
-import android.accounts.AccountManager
 import android.content.Context
-import android.content.SharedPreferences
-import android.location.LocationManager
-import androidx.room.Room
 import com.twidere.twiderex.db.AppDatabase
+import com.twidere.twiderex.repository.DraftRepository
+import com.twidere.twiderex.utils.ComposeQueue
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -35,22 +33,16 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(ApplicationComponent::class)
-object AndroidModule {
+object TwidereModule {
+    @Singleton
     @Provides
-    fun provideAccountManager(@ApplicationContext context: Context): AccountManager =
-        AccountManager.get(context)
-
-    @Provides
-    fun provideSharedPreference(@ApplicationContext context: Context): SharedPreferences =
-        context.getSharedPreferences("twiderex", Context.MODE_PRIVATE)
+    fun provideComposeQueue(
+        @ApplicationContext context: Context,
+        repository: DraftRepository
+    ): ComposeQueue = ComposeQueue(context = context, repository = repository)
 
     @Singleton
     @Provides
-    fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase =
-        Room.databaseBuilder(context, AppDatabase::class.java, "twiderex-db")
-            .build()
-
-    @Provides
-    fun provideLocationManager(@ApplicationContext context: Context): LocationManager =
-        context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+    fun provideDraftRepository(database: AppDatabase): DraftRepository =
+        DraftRepository(database = database)
 }

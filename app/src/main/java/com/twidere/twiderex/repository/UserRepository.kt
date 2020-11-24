@@ -32,9 +32,7 @@ import com.twidere.twiderex.db.model.DbUser
 import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.model.ui.UiUser.Companion.toUi
-import javax.inject.Singleton
 
-@Singleton
 class UserRepository @AssistedInject constructor(
     private val database: AppDatabase,
     @Assisted private val lookupService: LookupService,

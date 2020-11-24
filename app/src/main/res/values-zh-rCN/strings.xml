@@ -47,4 +47,9 @@
     <string name="license">开源协议</string>
     <string name="title_accounts">账号</string>
     <string name="title_account_management">账号管理</string>
+    <string name="title_drafts">草稿箱</string>
+    <string name="action_yes">确认</string>
+    <string name="action_cancel">取消</string>
+    <string name="action_edit">编辑</string>
+    <string name="message_save_draft">保存草稿？</string>
 </resources>

@@ -57,6 +57,8 @@ import com.twidere.twiderex.ui.AmbientWindowPadding
 import com.twidere.twiderex.ui.ProvideWindowPadding
 import com.twidere.twiderex.viewmodel.ActiveAccountViewModel
 import com.twidere.twiderex.viewmodel.ComposeViewModel
+import com.twidere.twiderex.viewmodel.DraftComposeViewModel
+import com.twidere.twiderex.viewmodel.DraftItemViewModel
 import com.twidere.twiderex.viewmodel.MediaViewModel
 import com.twidere.twiderex.viewmodel.twitter.TwitterStatusViewModel
 import com.twidere.twiderex.viewmodel.twitter.search.TwitterSearchMediaViewModel
@@ -121,6 +123,12 @@ class TwidereXActivity : FragmentActivity() {
     lateinit var mediaViewModelFactory: MediaViewModel.AssistedFactory
 
     @Inject
+    lateinit var draftItemViewModelFactory: DraftItemViewModel.AssistedFactory
+
+    @Inject
+    lateinit var draftComposeViewModelFactory: DraftComposeViewModel.AssistedFactory
+
+    @Inject
     lateinit var appearancePreferences: DataStore<AppearancePreferences>
 
     @Inject
@@ -165,6 +173,8 @@ class TwidereXActivity : FragmentActivity() {
                         composeViewModelFactory,
                         mediaViewModelFactory,
                         userMediaTimelineViewModelFactory,
+                        draftItemViewModelFactory,
+                        draftComposeViewModelFactory,
                     ) {
                         ProvideNavigationViewModelFactoryMap(factory = defaultViewModelProviderFactory as HiltViewModelFactory) {
                             ProvideWindowPadding {

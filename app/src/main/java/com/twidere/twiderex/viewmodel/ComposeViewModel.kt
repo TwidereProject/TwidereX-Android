@@ -38,32 +38,123 @@ import com.twidere.services.twitter.TwitterService
 import com.twidere.twiderex.di.assisted.IAssistedFactory
 import com.twidere.twiderex.extensions.getCachedLocation
 import com.twidere.twiderex.model.AccountDetails
-import com.twidere.twiderex.model.ui.UiStatus
+import com.twidere.twiderex.repository.DraftRepository
 import com.twidere.twiderex.repository.twitter.TwitterTweetsRepository
 import com.twidere.twiderex.scenes.ComposeType
 import com.twidere.twiderex.utils.ComposeQueue
 
-class ComposeViewModel @AssistedInject constructor(
-    private val locationManager: LocationManager,
-    private val composeQueue: ComposeQueue,
-    private val factory: TwitterTweetsRepository.AssistedFactory,
-    @Assisted private val account: AccountDetails,
-    @Assisted private val statusId: String?,
+class DraftItemViewModel @AssistedInject constructor(
+    private val repository: DraftRepository,
+    @Assisted private val draftId: String,
+) : ViewModel() {
+
+    val draft = liveData {
+        repository.get(draftId)?.let {
+            emit(it)
+        }
+    }
+
+    @AssistedInject.Factory
+    interface AssistedFactory : IAssistedFactory {
+        fun create(
+            draftId: String,
+        ): DraftItemViewModel
+    }
+}
+
+class DraftComposeViewModel @AssistedInject constructor(
+    draftRepository: DraftRepository,
+    locationManager: LocationManager,
+    composeQueue: ComposeQueue,
+    factory: TwitterTweetsRepository.AssistedFactory,
+    @Assisted account: AccountDetails,
+    @Assisted statusId: String?,
+    @Assisted composeType: ComposeType,
+    @Assisted initialText: String,
+    @Assisted initialMedia: List<String>,
+    @Assisted private val draftId: String,
+) : ComposeViewModel(
+    draftRepository,
+    locationManager,
+    composeQueue,
+    factory,
+    account,
+    statusId,
+    composeType
+) {
+
+    init {
+        setText(initialText)
+        putImages(initialMedia.map { Uri.parse(it) })
+    }
+
+    @AssistedInject.Factory
+    interface AssistedFactory : IAssistedFactory {
+        fun create(
+            account: AccountDetails,
+            statusId: String?,
+            composeType: ComposeType,
+            initialText: String,
+            initialMedia: List<String>,
+            draftId: String,
+        ): DraftComposeViewModel
+    }
+
+    override fun saveDraft() {
+        text.value?.let { text ->
+            draftRepository.saveOrUpgrade(
+                text,
+                images.value?.map { it.toString() } ?: emptyList(),
+                composeType,
+                statusId,
+                draftId = draftId,
+            )
+        }
+    }
+
+    override fun compose() {
+        text.value?.let {
+            composeQueue.commit(
+                service,
+                it,
+                images = images.value ?: emptyList(),
+                replyTo = if (composeType == ComposeType.Reply) status.value?.statusId else null,
+                quoteTo = if (composeType == ComposeType.Quote) status.value?.statusId else null,
+                draftId = draftId
+            )
+        }
+    }
+}
+
+open class ComposeViewModel @AssistedInject constructor(
+    protected val draftRepository: DraftRepository,
+    protected val locationManager: LocationManager,
+    protected val composeQueue: ComposeQueue,
+    protected val factory: TwitterTweetsRepository.AssistedFactory,
+    @Assisted protected val account: AccountDetails,
+    @Assisted protected val statusId: String?,
+    @Assisted val composeType: ComposeType,
 ) : ViewModel(), LocationListener {
     @AssistedInject.Factory
     interface AssistedFactory : IAssistedFactory {
-        fun create(account: AccountDetails, statusId: String?): ComposeViewModel
+        fun create(
+            account: AccountDetails,
+            statusId: String?,
+            composeType: ComposeType
+        ): ComposeViewModel
     }
 
-    private val service by lazy {
+    protected val service by lazy {
         account.service as TwitterService
     }
-    private val repository by lazy {
+    protected val repository by lazy {
         factory.create(
             account.key,
             account.service as LookupService,
         )
     }
+    val canSaveDraft = MutableLiveData(false)
+    val text = MutableLiveData("")
     val images = MutableLiveData<List<Uri>>(emptyList())
     val location = MutableLiveData<Location>()
     val locationEnabled = MutableLiveData(false)
@@ -75,14 +166,32 @@ class ComposeViewModel @AssistedInject constructor(
         }
     }
 
-    fun compose(content: String, composeType: ComposeType, status: UiStatus? = null) {
-        composeQueue.commit(
-            service,
-            content,
-            images = images.value ?: emptyList(),
-            replyTo = if (composeType == ComposeType.Reply) status?.statusId else null,
-            quoteTo = if (composeType == ComposeType.Quote) status?.statusId else null,
-        )
+    fun setText(value: String) {
+        text.postValue(value)
+        canSaveDraft.postValue(true)
+    }
+
+    open fun compose() {
+        text.value?.let {
+            composeQueue.commit(
+                service,
+                it,
+                images = images.value ?: emptyList(),
+                replyTo = if (composeType == ComposeType.Reply) status.value?.statusId else null,
+                quoteTo = if (composeType == ComposeType.Quote) status.value?.statusId else null,
+            )
+        }
+    }
+
+    open fun saveDraft() {
+        text.value?.let { text ->
+            draftRepository.saveOrUpgrade(
+                text,
+                images.value?.map { it.toString() } ?: emptyList(),
+                composeType,
+                statusId,
+            )
+        }
     }
 
     fun putImages(value: List<Uri>) {
@@ -93,6 +202,7 @@ class ComposeViewModel @AssistedInject constructor(
         }?.let {
             images.postValue(it)
         }
+        canSaveDraft.postValue(true)
     }
 
     @RequiresPermission(anyOf = [permission.ACCESS_COARSE_LOCATION, permission.ACCESS_FINE_LOCATION])

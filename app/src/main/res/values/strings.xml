@@ -18,6 +18,7 @@
     <string name="title_tweet">Tweet</string>
     <string name="title_accounts">Accounts</string>
     <string name="title_account_management">Account management</string>
+    <string name="title_drafts">Drafts</string>
     <string name="group_title_general">GENERAL</string>
     <string name="group_title_about">ABOUT</string>
     <string name="group_title_preview">PREVIEW</string>
@@ -28,11 +29,15 @@
     <string name="search_title_media">MEDIA</string>
     <string name="search_title_users">USERS</string>
     <string name="action_remove">Remove</string>
+    <string name="action_yes">Yes</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_edit">edit</string>
     <string name="action_Close">Close</string>
     <string name="action_follow">Follow</string>
     <string name="action_unfollow">Unfollow</string>
     <string name="pick_color">Pick color</string>
     <string name="load_more">Load more</string>
+    <string name="message_save_draft">Save draft?</string>
     <string name="following_you">Following you</string>
     <string name="sign_in_with_twitter">Sign in with Twitter</string>
     <string name="search_hint">Tap to search…</string>
