@@ -48,8 +48,8 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.R
+import com.twidere.twiderex.component.HumanizedTime
 import com.twidere.twiderex.component.navigation.AmbientNavigator
-import com.twidere.twiderex.extensions.humanizedTimestamp
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.preferences.AmbientDisplayPreferences
 import com.twidere.twiderex.ui.profileImageSize
@@ -143,7 +143,7 @@ private fun StatusComponent(
                     }
                 }
                 Row {
-                    Text(text = status.timestamp.humanizedTimestamp())
+                    HumanizedTime(time = status.timestamp)
                     if (showActions) {
                         Icon(
                             asset = Icons.Default.ArrowDropDown,

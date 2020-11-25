@@ -46,8 +46,8 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.R
+import com.twidere.twiderex.component.HumanizedTime
 import com.twidere.twiderex.component.navigation.AmbientNavigator
-import com.twidere.twiderex.extensions.humanizedTimestamp
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.ui.mediumEmphasisContentContentColor
 import com.twidere.twiderex.ui.standardPadding
@@ -91,17 +91,17 @@ fun ExpandedStatusComponent(
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
             ) {
-                Text(
-                    text = data.timestamp.humanizedTimestamp(),
-                    color = mediumEmphasisContentContentColor
-                )
-                Spacer(modifier = Modifier.width(standardPadding))
-                Text(
-                    text = data.source,
-                    color = mediumEmphasisContentContentColor,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
+                Providers(
+                    AmbientContentAlpha provides ContentAlpha.medium
+                ) {
+                    HumanizedTime(time = data.timestamp)
+                    Spacer(modifier = Modifier.width(standardPadding))
+                    Text(
+                        text = data.source,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
             }
 
             if (data.replyCount > 0 || data.retweetCount > 0 || data.likeCount > 0) {
