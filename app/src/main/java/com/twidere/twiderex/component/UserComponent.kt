@@ -73,6 +73,7 @@ import com.twidere.twiderex.component.status.TimelineStatusComponent
 import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.component.status.withAvatarClip
 import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.extensions.refreshOrRetry
 import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.ui.AmbientActiveAccount
@@ -150,15 +151,15 @@ fun UserComponent(
 
             SwipeToRefreshLayout(
                 refreshingState = refreshing ||
-                    selectedItem == 0 && timelineSource.loadState.refresh == LoadState.Loading ||
-                    selectedItem == 1 && mediaSource.loadState.refresh == LoadState.Loading ||
-                    selectedItem == 2 && favouriteSource.loadState.refresh == LoadState.Loading,
+                    selectedItem == 0 && timelineSource.loadState.refresh is LoadState.Loading ||
+                    selectedItem == 1 && mediaSource.loadState.refresh is LoadState.Loading ||
+                    selectedItem == 2 && favouriteSource.loadState.refresh is LoadState.Loading,
                 onRefresh = {
                     viewModel.refresh()
                     when (selectedItem) {
-                        0 -> timelineSource.refresh()
-                        1 -> mediaSource.refresh()
-                        2 -> favouriteSource.refresh()
+                        0 -> timelineSource.refreshOrRetry()
+                        1 -> mediaSource.refreshOrRetry()
+                        2 -> favouriteSource.refreshOrRetry()
                     }
                 },
             ) {

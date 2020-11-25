@@ -23,9 +23,11 @@ package com.twidere.twiderex.viewmodel.twitter.timeline
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.twidere.twiderex.defaultLoadCount
 import com.twidere.twiderex.paging.mediator.PagingWithGapMediator
 import com.twidere.twiderex.viewmodel.PagingViewModel
+import kotlinx.coroutines.launch
 
 abstract class TimelineViewModel(
     private val preferences: SharedPreferences,
@@ -36,10 +38,10 @@ abstract class TimelineViewModel(
     val loadingBetween: MutableLiveData<List<String>>
         get() = pagingMediator.loadingBetween
 
-    suspend fun loadBetween(
+    fun loadBetween(
         max_id: String,
         since_id: String,
-    ) {
+    ) = viewModelScope.launch {
         pagingMediator.loadBetween(defaultLoadCount, max_id = max_id, since_id = since_id)
     }
 

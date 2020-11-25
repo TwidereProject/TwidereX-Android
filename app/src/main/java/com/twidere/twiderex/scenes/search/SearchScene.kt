@@ -68,6 +68,7 @@ import com.twidere.twiderex.component.status.StatusDivider
 import com.twidere.twiderex.component.status.TimelineStatusComponent
 import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.extensions.refreshOrRetry
 import com.twidere.twiderex.extensions.viewModel
 import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.ui.AmbientActiveAccount
@@ -166,9 +167,9 @@ fun SearchScene(keyword: String) {
 private fun SearchTweetsContent(viewModel: TwitterSearchTweetsViewModel) {
     val source = viewModel.source.collectAsLazyPagingItems()
     SwipeToRefreshLayout(
-        refreshingState = source.loadState.refresh == LoadState.Loading,
+        refreshingState = source.loadState.refresh is LoadState.Loading,
         onRefresh = {
-            source.refresh()
+            source.refreshOrRetry()
         }
     ) {
         if (source.itemCount > 0) {
@@ -194,9 +195,9 @@ private fun SearchTweetsContent(viewModel: TwitterSearchTweetsViewModel) {
 private fun SearchMediasContent(viewModel: TwitterSearchMediaViewModel) {
     val source = viewModel.source.collectAsLazyPagingItems()
     SwipeToRefreshLayout(
-        refreshingState = source.loadState.refresh == LoadState.Loading,
+        refreshingState = source.loadState.refresh is LoadState.Loading,
         onRefresh = {
-            source.refresh()
+            source.refreshOrRetry()
         }
     ) {
         if (source.itemCount > 0) {
@@ -223,9 +224,9 @@ private fun SearchUsersContent(viewModel: TwitterSearchUserViewModel) {
     val source = viewModel.source.collectAsLazyPagingItems()
     val navController = AmbientNavController.current
     SwipeToRefreshLayout(
-        refreshingState = source.loadState.refresh == LoadState.Loading,
+        refreshingState = source.loadState.refresh is LoadState.Loading,
         onRefresh = {
-            source.refresh()
+            source.refreshOrRetry()
         }
     ) {
         if (source.itemCount > 0) {

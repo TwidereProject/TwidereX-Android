@@ -38,7 +38,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.onCommit
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -52,23 +51,20 @@ import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
 import com.twidere.twiderex.component.lazy.loadState
 import com.twidere.twiderex.component.status.StatusDivider
 import com.twidere.twiderex.component.status.TimelineStatusComponent
+import com.twidere.twiderex.extensions.refreshOrRetry
 import com.twidere.twiderex.ui.standardPadding
 import com.twidere.twiderex.viewmodel.twitter.timeline.TimelineScrollState
 import com.twidere.twiderex.viewmodel.twitter.timeline.TimelineViewModel
-import kotlinx.coroutines.launch
 
 @OptIn(IncomingComposeUpdate::class)
 @Composable
 fun TimelineComponent(viewModel: TimelineViewModel) {
     val items = viewModel.source.collectAsLazyPagingItems()
     val loadingBetween by viewModel.loadingBetween.observeAsState(initial = listOf())
-    val scope = rememberCoroutineScope()
     SwipeToRefreshLayout(
-        refreshingState = items.loadState.refresh == LoadState.Loading,
+        refreshingState = items.loadState.refresh is LoadState.Loading,
         onRefresh = {
-            scope.launch {
-                items.refresh()
-            }
+            items.refreshOrRetry()
         },
     ) {
         if (items.itemCount > 0) {
@@ -114,13 +110,11 @@ fun TimelineComponent(viewModel: TimelineViewModel) {
                                             .padding(ButtonConstants.DefaultContentPadding)
                                             .fillMaxWidth(),
                                         onClick = {
-                                            scope.launch {
-                                                items[index + 1]?.let { next ->
-                                                    viewModel.loadBetween(
-                                                        item.statusId,
-                                                        next.statusId,
-                                                    )
-                                                }
+                                            items[index + 1]?.let { next ->
+                                                viewModel.loadBetween(
+                                                    item.statusId,
+                                                    next.statusId,
+                                                )
                                             }
                                         },
                                     ) {
