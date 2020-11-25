@@ -13,6 +13,7 @@ buildscript {
         if (enableGoogleVariant) {
             // START Non-FOSS component
             classpath 'com.google.gms:google-services:4.3.4'
+            classpath 'com.google.firebase:firebase-crashlytics-gradle:2.4.1'
             // END Non-FOSS component
         }
     }
@@ -28,6 +29,7 @@ plugins {
 if (enableGoogleVariant) {
     // START Non-FOSS component
     apply plugin: 'com.google.gms.google-services'
+    apply plugin: 'com.google.firebase.crashlytics'
     // END Non-FOSS component
 }
 apply plugin: 'dagger.hilt.android.plugin'
@@ -174,6 +176,7 @@ dependencies {
         // START Non-FOSS component
         implementation platform('com.google.firebase:firebase-bom:26.1.0')
         implementation 'com.google.firebase:firebase-analytics-ktx'
+        implementation 'com.google.firebase:firebase-crashlytics-ktx'
         // END Non-FOSS component
     }
 
