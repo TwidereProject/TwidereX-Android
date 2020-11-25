@@ -27,6 +27,7 @@ import com.twidere.twiderex.db.dao.DraftDao
 import com.twidere.twiderex.db.dao.MediaDao
 import com.twidere.twiderex.db.dao.PagingTimelineDao
 import com.twidere.twiderex.db.dao.ReactionDao
+import com.twidere.twiderex.db.dao.SearchDao
 import com.twidere.twiderex.db.dao.StatusDao
 import com.twidere.twiderex.db.dao.TimelineDao
 import com.twidere.twiderex.db.dao.UrlEntityDao
@@ -34,6 +35,7 @@ import com.twidere.twiderex.db.dao.UserDao
 import com.twidere.twiderex.db.model.DbDraft
 import com.twidere.twiderex.db.model.DbMedia
 import com.twidere.twiderex.db.model.DbPagingTimeline
+import com.twidere.twiderex.db.model.DbSearch
 import com.twidere.twiderex.db.model.DbStatusReaction
 import com.twidere.twiderex.db.model.DbStatusV2
 import com.twidere.twiderex.db.model.DbTimeline
@@ -59,6 +61,7 @@ import javax.inject.Singleton
         DbPagingTimeline::class,
         DbUrlEntity::class,
         DbDraft::class,
+        DbSearch::class,
     ],
     version = 1,
 )
@@ -80,4 +83,5 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun pagingTimelineDao(): PagingTimelineDao
     abstract fun urlEntityDao(): UrlEntityDao
     abstract fun draftDao(): DraftDao
+    abstract fun searchDao(): SearchDao
 }

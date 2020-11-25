@@ -21,18 +21,25 @@
 package com.twidere.twiderex.scenes.search
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.lazy.LazyColumnFor
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.ListItem
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.History
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -44,11 +51,22 @@ import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.TextInput
 import com.twidere.twiderex.component.navigation.AmbientNavigator
+import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.ui.AmbientActiveAccount
 import com.twidere.twiderex.ui.TwidereXTheme
+import com.twidere.twiderex.viewmodel.search.SearchInputViewModel
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalFocus::class)
 @Composable
 fun SearchInputScene(initial: String? = null) {
+    val account = AmbientActiveAccount.current ?: return
+    val viewModel =
+        assistedViewModel<SearchInputViewModel.AssistedFactory, SearchInputViewModel>(
+            account
+        ) {
+            it.create(account = account)
+        }
+    val source by viewModel.source.observeAsState(initial = emptyList())
     val initialText = initial ?: ""
     var textFieldValue by remember {
         mutableStateOf(
@@ -79,6 +97,7 @@ fun SearchInputScene(initial: String? = null) {
                                 },
                                 onImeActionPerformed = { _, _ ->
                                     if (textFieldValue.text.isNotEmpty()) {
+                                        viewModel.addOrUpgrade(textFieldValue.text)
                                         navigator.search(textFieldValue.text)
                                     }
                                 },
@@ -92,6 +111,7 @@ fun SearchInputScene(initial: String? = null) {
                         IconButton(
                             onClick = {
                                 if (textFieldValue.text.isNotEmpty()) {
+                                    viewModel.addOrUpgrade(textFieldValue.text)
                                     navigator.search(textFieldValue.text)
                                 }
                             }
@@ -102,6 +122,31 @@ fun SearchInputScene(initial: String? = null) {
                 )
             }
         ) {
+            LazyColumnFor(items = source) {
+                ListItem(
+                    modifier = Modifier.clickable(
+                        onClick = {
+                            viewModel.addOrUpgrade(it.content)
+                            navigator.search(it.content)
+                        }
+                    ),
+                    icon = {
+                        Icon(asset = Icons.Default.History)
+                    },
+                    trailing = {
+                        IconButton(
+                            onClick = {
+                                viewModel.remove(it)
+                            }
+                        ) {
+                            Icon(asset = vectorResource(id = R.drawable.ic_x))
+                        }
+                    },
+                    text = {
+                        Text(text = it.content)
+                    },
+                )
+            }
         }
     }
 }

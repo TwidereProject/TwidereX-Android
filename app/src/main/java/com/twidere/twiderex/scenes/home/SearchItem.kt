@@ -23,16 +23,22 @@ package com.twidere.twiderex.scenes.home
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.lazy.LazyColumnFor
 import androidx.compose.material.AmbientContentAlpha
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.ListItem
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.History
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.ExperimentalFocus
@@ -42,6 +48,9 @@ import androidx.compose.ui.res.vectorResource
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.navigation.AmbientNavigator
+import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.ui.AmbientActiveAccount
+import com.twidere.twiderex.viewmodel.search.SearchInputViewModel
 
 class SearchItem : HomeNavigationItem() {
     @Composable
@@ -59,6 +68,14 @@ class SearchItem : HomeNavigationItem() {
     @OptIn(ExperimentalFoundationApi::class, ExperimentalFocus::class)
     @Composable
     override fun onCompose() {
+        val account = AmbientActiveAccount.current ?: return
+        val viewModel =
+            assistedViewModel<SearchInputViewModel.AssistedFactory, SearchInputViewModel>(
+                account
+            ) {
+                it.create(account = account)
+            }
+        val source by viewModel.source.observeAsState(initial = emptyList())
         val navigator = AmbientNavigator.current
         Scaffold(
             topBar = {
@@ -95,6 +112,31 @@ class SearchItem : HomeNavigationItem() {
                 )
             }
         ) {
+            LazyColumnFor(items = source) {
+                ListItem(
+                    modifier = Modifier.clickable(
+                        onClick = {
+                            viewModel.addOrUpgrade(it.content)
+                            navigator.search(it.content)
+                        }
+                    ),
+                    icon = {
+                        Icon(asset = Icons.Default.History)
+                    },
+                    trailing = {
+                        IconButton(
+                            onClick = {
+                                viewModel.remove(it)
+                            }
+                        ) {
+                            Icon(asset = vectorResource(id = R.drawable.ic_x))
+                        }
+                    },
+                    text = {
+                        Text(text = it.content)
+                    },
+                )
+            }
         }
     }
 }

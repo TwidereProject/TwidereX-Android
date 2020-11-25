@@ -62,7 +62,7 @@ class ComposeQueue(
             }.onSuccess {
                 repository.remove(draftId)
             }.onFailure {
-                repository.saveOrUpgrade(
+                repository.addOrUpgrade(
                     content,
                     images.map { it.toString() },
                     composeType = if (replyTo != null) ComposeType.Reply else if (quoteTo != null) ComposeType.Quote else ComposeType.New,

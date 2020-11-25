@@ -21,56 +21,35 @@
 package com.twidere.twiderex.repository
 
 import com.twidere.twiderex.db.AppDatabase
-import com.twidere.twiderex.db.model.DbDraft
-import com.twidere.twiderex.scenes.ComposeType
+import com.twidere.twiderex.db.model.DbSearch
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.util.UUID
-import javax.inject.Singleton
 
-@Singleton
-class DraftRepository(
+class SearchRepository(
     private val database: AppDatabase
 ) {
     val source by lazy {
-        database.draftDao().getAll()
+        database.searchDao().getAll()
     }
+
     fun addOrUpgrade(
         content: String,
-        media: List<String>,
-        composeType: ComposeType,
-        statusId: String?,
-        draftId: String = UUID.randomUUID().toString()
     ) {
         GlobalScope.launch {
-            DbDraft(
-                _id = draftId,
-                content = content,
-                composeType = composeType,
-                media = media,
-                statusId = statusId,
-                createdAt = System.currentTimeMillis(),
-            ).let {
-                database.draftDao().insertAll(it)
-            }
+            database.searchDao().insertAll(
+                DbSearch(
+                    _id = UUID.randomUUID().toString(),
+                    content = content,
+                    lastActive = System.currentTimeMillis()
+                )
+            )
         }
     }
 
-    suspend fun get(draftId: String): DbDraft? {
-        return database.draftDao().get(draftId)
-    }
-
-    fun remove(draftId: String) {
+    fun remove(item: DbSearch) {
         GlobalScope.launch {
-            database.draftDao().get(draftId)?.let {
-                remove(it)
-            }
-        }
-    }
-
-    fun remove(draft: DbDraft) {
-        GlobalScope.launch {
-            database.draftDao().remove(draft)
+            database.searchDao().remove(item)
         }
     }
 }

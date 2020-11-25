@@ -60,6 +60,7 @@ import com.twidere.twiderex.viewmodel.ComposeViewModel
 import com.twidere.twiderex.viewmodel.DraftComposeViewModel
 import com.twidere.twiderex.viewmodel.DraftItemViewModel
 import com.twidere.twiderex.viewmodel.MediaViewModel
+import com.twidere.twiderex.viewmodel.search.SearchInputViewModel
 import com.twidere.twiderex.viewmodel.twitter.TwitterStatusViewModel
 import com.twidere.twiderex.viewmodel.twitter.search.TwitterSearchMediaViewModel
 import com.twidere.twiderex.viewmodel.twitter.search.TwitterSearchTweetsViewModel
@@ -123,6 +124,9 @@ class TwidereXActivity : FragmentActivity() {
     lateinit var mediaViewModelFactory: MediaViewModel.AssistedFactory
 
     @Inject
+    lateinit var searchInputViewModelFactory: SearchInputViewModel.AssistedFactory
+
+    @Inject
     lateinit var draftItemViewModelFactory: DraftItemViewModel.AssistedFactory
 
     @Inject
@@ -175,6 +179,7 @@ class TwidereXActivity : FragmentActivity() {
                         userMediaTimelineViewModelFactory,
                         draftItemViewModelFactory,
                         draftComposeViewModelFactory,
+                        searchInputViewModelFactory,
                     ) {
                         ProvideNavigationViewModelFactoryMap(factory = defaultViewModelProviderFactory as HiltViewModelFactory) {
                             ProvideWindowPadding {

@@ -23,6 +23,7 @@ package com.twidere.twiderex.di
 import android.content.Context
 import com.twidere.twiderex.db.AppDatabase
 import com.twidere.twiderex.repository.DraftRepository
+import com.twidere.twiderex.repository.SearchRepository
 import com.twidere.twiderex.utils.ComposeQueue
 import dagger.Module
 import dagger.Provides
@@ -45,4 +46,8 @@ object TwidereModule {
     @Provides
     fun provideDraftRepository(database: AppDatabase): DraftRepository =
         DraftRepository(database = database)
+
+    @Provides
+    fun provideSearchRepository(database: AppDatabase): SearchRepository =
+        SearchRepository(database = database)
 }

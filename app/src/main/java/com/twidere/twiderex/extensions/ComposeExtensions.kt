@@ -49,7 +49,7 @@ inline fun <reified VM : ViewModel> navViewModel(
         val application = AmbientApplication.current
         val viewModelFactories = AmbientViewModelFactoriesMap.current
         val delegate = SavedStateViewModelFactory(application, backStackEntry, null)
-        // https://github.com/google/dagger/issues/1938
+        // https://github.com/google/dagger/issues/2166
         // idk why people in google like factory pattern,
         // they might need to take a look at https://github.com/EnterpriseQualityCoding/FizzBuzzEnterpriseEdition
         val hiltViewModelFactory = HiltViewModelFactory::class.java.declaredConstructors.first()?.also {

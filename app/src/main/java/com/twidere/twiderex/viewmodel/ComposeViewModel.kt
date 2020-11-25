@@ -102,7 +102,7 @@ class DraftComposeViewModel @AssistedInject constructor(
 
     override fun saveDraft() {
         text.value?.let { text ->
-            draftRepository.saveOrUpgrade(
+            draftRepository.addOrUpgrade(
                 text,
                 images.value?.map { it.toString() } ?: emptyList(),
                 composeType,
@@ -185,7 +185,7 @@ open class ComposeViewModel @AssistedInject constructor(
 
     open fun saveDraft() {
         text.value?.let { text ->
-            draftRepository.saveOrUpgrade(
+            draftRepository.addOrUpgrade(
                 text,
                 images.value?.map { it.toString() } ?: emptyList(),
                 composeType,
