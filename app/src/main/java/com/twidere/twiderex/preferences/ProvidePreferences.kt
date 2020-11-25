@@ -28,20 +28,25 @@ import androidx.compose.runtime.getValue
 import androidx.datastore.core.DataStore
 import com.twidere.twiderex.preferences.proto.AppearancePreferences
 import com.twidere.twiderex.preferences.proto.DisplayPreferences
+import javax.inject.Inject
 
 val AmbientAppearancePreferences = ambientOf<AppearancePreferences>()
 val AmbientDisplayPreferences = ambientOf<DisplayPreferences>()
 
+data class PreferencesHolder @Inject constructor(
+    val appearancePreferences: DataStore<AppearancePreferences>,
+    val displayPreferences: DataStore<DisplayPreferences>,
+)
+
 @Composable
 fun ProvidePreferences(
-    appearancePreferences: DataStore<AppearancePreferences>,
-    displayPreferences: DataStore<DisplayPreferences>,
+    holder: PreferencesHolder,
     content: @Composable () -> Unit,
 ) {
-    val appearances by appearancePreferences
+    val appearances by holder.appearancePreferences
         .data
         .collectAsState(initial = AppearancePreferences.getDefaultInstance())
-    val display by displayPreferences
+    val display by holder.displayPreferences
         .data
         .collectAsState(initial = DisplayPreferences.getDefaultInstance())
 

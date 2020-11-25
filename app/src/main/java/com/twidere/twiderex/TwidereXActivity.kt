@@ -31,20 +31,19 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.viewinterop.viewModel
-import androidx.datastore.core.DataStore
 import androidx.fragment.app.FragmentActivity
 import androidx.hilt.lifecycle.HiltViewModelFactory
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.ComposeNavigator
 import androidx.navigation.fragment.DialogFragmentNavigator
+import com.twidere.twiderex.di.assisted.AssistedViewModelFactoryHolder
 import com.twidere.twiderex.di.assisted.ProvideAssistedFactory
 import com.twidere.twiderex.extensions.ProvideNavigationViewModelFactoryMap
 import com.twidere.twiderex.launcher.ActivityLauncher
 import com.twidere.twiderex.launcher.AmbientLauncher
 import com.twidere.twiderex.navigation.Router
+import com.twidere.twiderex.preferences.PreferencesHolder
 import com.twidere.twiderex.preferences.ProvidePreferences
-import com.twidere.twiderex.preferences.proto.AppearancePreferences
-import com.twidere.twiderex.preferences.proto.DisplayPreferences
 import com.twidere.twiderex.providers.AmbientStatusActions
 import com.twidere.twiderex.providers.StatusActions
 import com.twidere.twiderex.ui.AmbientActiveAccount
@@ -56,20 +55,6 @@ import com.twidere.twiderex.ui.AmbientWindow
 import com.twidere.twiderex.ui.AmbientWindowPadding
 import com.twidere.twiderex.ui.ProvideWindowPadding
 import com.twidere.twiderex.viewmodel.ActiveAccountViewModel
-import com.twidere.twiderex.viewmodel.ComposeViewModel
-import com.twidere.twiderex.viewmodel.DraftComposeViewModel
-import com.twidere.twiderex.viewmodel.DraftItemViewModel
-import com.twidere.twiderex.viewmodel.MediaViewModel
-import com.twidere.twiderex.viewmodel.search.SearchInputViewModel
-import com.twidere.twiderex.viewmodel.twitter.TwitterStatusViewModel
-import com.twidere.twiderex.viewmodel.twitter.search.TwitterSearchMediaViewModel
-import com.twidere.twiderex.viewmodel.twitter.search.TwitterSearchTweetsViewModel
-import com.twidere.twiderex.viewmodel.twitter.timeline.HomeTimelineViewModel
-import com.twidere.twiderex.viewmodel.twitter.timeline.MentionsTimelineViewModel
-import com.twidere.twiderex.viewmodel.user.UserFavouriteTimelineViewModel
-import com.twidere.twiderex.viewmodel.user.UserMediaTimelineViewModel
-import com.twidere.twiderex.viewmodel.user.UserTimelineViewModel
-import com.twidere.twiderex.viewmodel.user.UserViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -91,52 +76,10 @@ class TwidereXActivity : FragmentActivity() {
     lateinit var statusActions: StatusActions
 
     @Inject
-    lateinit var homeTimelineViewModelFactory: HomeTimelineViewModel.AssistedFactory
+    lateinit var preferencesHolder: PreferencesHolder
 
     @Inject
-    lateinit var twitterStatusViewModelFactory: TwitterStatusViewModel.AssistedFactory
-
-    @Inject
-    lateinit var mentionsTimelineViewModelFactory: MentionsTimelineViewModel.AssistedFactory
-
-    @Inject
-    lateinit var twitterSearchMediaViewModelFactory: TwitterSearchMediaViewModel.AssistedFactory
-
-    @Inject
-    lateinit var twitterSearchTweetsViewModelFactory: TwitterSearchTweetsViewModel.AssistedFactory
-
-    @Inject
-    lateinit var userFavouriteTimelineViewModelFactory: UserFavouriteTimelineViewModel.AssistedFactory
-
-    @Inject
-    lateinit var userTimelineViewModelFactory: UserTimelineViewModel.AssistedFactory
-
-    @Inject
-    lateinit var userMediaTimelineViewModelFactory: UserMediaTimelineViewModel.AssistedFactory
-
-    @Inject
-    lateinit var userViewModelFactory: UserViewModel.AssistedFactory
-
-    @Inject
-    lateinit var composeViewModelFactory: ComposeViewModel.AssistedFactory
-
-    @Inject
-    lateinit var mediaViewModelFactory: MediaViewModel.AssistedFactory
-
-    @Inject
-    lateinit var searchInputViewModelFactory: SearchInputViewModel.AssistedFactory
-
-    @Inject
-    lateinit var draftItemViewModelFactory: DraftItemViewModel.AssistedFactory
-
-    @Inject
-    lateinit var draftComposeViewModelFactory: DraftComposeViewModel.AssistedFactory
-
-    @Inject
-    lateinit var appearancePreferences: DataStore<AppearancePreferences>
-
-    @Inject
-    lateinit var displayPreferences: DataStore<DisplayPreferences>
+    lateinit var assistedViewModelFactoryHolder: AssistedViewModelFactoryHolder
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -162,24 +105,10 @@ class TwidereXActivity : FragmentActivity() {
                 AmbientActiveAccountViewModel provides accountViewModel,
             ) {
                 ProvidePreferences(
-                    appearancePreferences = appearancePreferences,
-                    displayPreferences = displayPreferences
+                    preferencesHolder,
                 ) {
                     ProvideAssistedFactory(
-                        homeTimelineViewModelFactory,
-                        twitterStatusViewModelFactory,
-                        mentionsTimelineViewModelFactory,
-                        twitterSearchMediaViewModelFactory,
-                        twitterSearchTweetsViewModelFactory,
-                        userFavouriteTimelineViewModelFactory,
-                        userTimelineViewModelFactory,
-                        userViewModelFactory,
-                        composeViewModelFactory,
-                        mediaViewModelFactory,
-                        userMediaTimelineViewModelFactory,
-                        draftItemViewModelFactory,
-                        draftComposeViewModelFactory,
-                        searchInputViewModelFactory,
+                        assistedViewModelFactoryHolder
                     ) {
                         ProvideNavigationViewModelFactoryMap(factory = defaultViewModelProviderFactory as HiltViewModelFactory) {
                             ProvideWindowPadding {
