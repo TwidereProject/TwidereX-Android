@@ -171,20 +171,22 @@ fun updateStatusBar(
     darkTheme: Boolean,
     statusBarColor: androidx.compose.ui.graphics.Color,
 ) {
-    window.statusBarColor = statusBarColor.toArgb()
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            window.insetsController?.setSystemBarsAppearance(
-                if (darkTheme) 0 else WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS,
-                WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
-            )
-        } else {
-            val decor = window.decorView
-            @Suppress("DEPRECATION")
-            decor.systemUiVisibility = if (darkTheme) {
-                0
+    if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1) {
+        window.statusBarColor = statusBarColor.toArgb()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                window.insetsController?.setSystemBarsAppearance(
+                    if (darkTheme) 0 else WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS,
+                    WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
+                )
             } else {
-                View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+                val decor = window.decorView
+                @Suppress("DEPRECATION")
+                decor.systemUiVisibility = if (darkTheme) {
+                    0
+                } else {
+                    View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+                }
             }
         }
     }
