@@ -33,11 +33,11 @@ import com.twidere.twiderex.db.model.DbPagingTimelineWithStatus
 import com.twidere.twiderex.db.model.TimelineType
 import com.twidere.twiderex.db.model.saveToDb
 import com.twidere.twiderex.model.UserKey
+import java.io.IOException
+import java.net.SocketTimeoutException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
-import java.io.IOException
-import java.net.SocketTimeoutException
 
 @OptIn(ExperimentalPagingApi::class)
 abstract class PagingWithGapMediator(
@@ -86,7 +86,14 @@ abstract class PagingWithGapMediator(
                 endOfPaginationReached = false
             )
         }
-        return loadBetween(pageSize = state.config.pageSize, max_id = max_id, since_id = since_id)
+        return loadBetween(pageSize = state.config.pageSize, max_id = max_id, since_id = since_id).let {
+            // TODO: workaround for https://issuetracker.google.com/issues/173435602
+            if (loadType == LoadType.REFRESH) {
+                MediatorResult.Error(Error())
+            } else {
+                it
+            }
+        }
     }
 
     suspend fun loadBetween(
