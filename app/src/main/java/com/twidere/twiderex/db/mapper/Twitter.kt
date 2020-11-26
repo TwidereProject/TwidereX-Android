@@ -149,7 +149,7 @@ private fun StatusV2.toDbStatusWithMediaAndUser(
                 _id = UUID.randomUUID().toString(),
                 statusId = status.statusId,
                 previewUrl = getImage(it.url ?: it.previewImageURL, "small"),
-                mediaUrl = getImage(it.url ?: it.previewImageURL, "large"),
+                mediaUrl = getImage(it.url ?: it.previewImageURL, "orig"),
                 width = it.width ?: 0,
                 height = it.height ?: 0,
                 pageUrl = null, // TODO: how to play media under twitter v2 api
@@ -207,7 +207,7 @@ private fun Status.toDbStatusWithMediaAndUser(
                 _id = UUID.randomUUID().toString(),
                 statusId = status.statusId,
                 previewUrl = getImage(it.mediaURLHTTPS, "small"),
-                mediaUrl = getImage(it.mediaURLHTTPS, "large"),
+                mediaUrl = getImage(it.mediaURLHTTPS, "orig"),
                 width = it.sizes?.large?.w ?: 0,
                 height = it.sizes?.large?.h ?: 0,
                 pageUrl = it.expandedURL,
