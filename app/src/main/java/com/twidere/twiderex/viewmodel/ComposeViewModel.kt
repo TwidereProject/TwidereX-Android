@@ -31,17 +31,24 @@ import androidx.annotation.RequiresPermission
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
+import androidx.lifecycle.map
+import androidx.lifecycle.switchMap
 import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
 import com.twidere.services.microblog.LookupService
+import com.twidere.services.microblog.RelationshipService
 import com.twidere.services.twitter.TwitterService
+import com.twidere.twiderex.db.model.DbDraft
 import com.twidere.twiderex.di.assisted.IAssistedFactory
 import com.twidere.twiderex.extensions.getCachedLocation
 import com.twidere.twiderex.model.AccountDetails
+import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.repository.DraftRepository
+import com.twidere.twiderex.repository.UserRepository
 import com.twidere.twiderex.repository.twitter.TwitterTweetsRepository
 import com.twidere.twiderex.scenes.ComposeType
 import com.twidere.twiderex.utils.ComposeQueue
+import com.twitter.twittertext.Extractor
 import java.util.UUID
 
 class DraftItemViewModel @AssistedInject constructor(
@@ -68,40 +75,35 @@ class DraftComposeViewModel @AssistedInject constructor(
     locationManager: LocationManager,
     composeQueue: ComposeQueue,
     factory: TwitterTweetsRepository.AssistedFactory,
+    userRepositoryFactory: UserRepository.AssistedFactory,
     @Assisted account: AccountDetails,
-    @Assisted statusId: String?,
-    @Assisted composeType: ComposeType,
-    @Assisted initialText: String,
-    @Assisted initialMedia: List<String>,
-    @Assisted override val draftId: String,
+    @Assisted private val draft: DbDraft,
 ) : ComposeViewModel(
     draftRepository,
     locationManager,
     composeQueue,
     factory,
+    userRepositoryFactory,
     account,
-    statusId,
-    composeType
+    draft.statusId,
+    draft.composeType,
 ) {
 
+    override val draftId: String = draft._id
+
     init {
-        setText(initialText)
-        putImages(initialMedia.map { Uri.parse(it) })
+        setText(draft.content)
+        putImages(draft.media.map { Uri.parse(it) })
+        excludedReplyUserIds.postValue(draft.excludedReplyUserIds ?: emptyList())
     }
 
     @AssistedInject.Factory
     interface AssistedFactory : IAssistedFactory {
         fun create(
             account: AccountDetails,
-            statusId: String?,
-            composeType: ComposeType,
-            initialText: String,
-            initialMedia: List<String>,
-            draftId: String,
+            draft: DbDraft,
         ): DraftComposeViewModel
     }
-
-
 }
 
 open class ComposeViewModel @AssistedInject constructor(
@@ -109,11 +111,13 @@ open class ComposeViewModel @AssistedInject constructor(
     protected val locationManager: LocationManager,
     protected val composeQueue: ComposeQueue,
     protected val factory: TwitterTweetsRepository.AssistedFactory,
+    protected val userRepositoryFactory: UserRepository.AssistedFactory,
     @Assisted protected val account: AccountDetails,
     @Assisted protected val statusId: String?,
     @Assisted val composeType: ComposeType,
 ) : ViewModel(), LocationListener {
     open val draftId: String = UUID.randomUUID().toString()
+
     @AssistedInject.Factory
     interface AssistedFactory : IAssistedFactory {
         fun create(
@@ -130,6 +134,45 @@ open class ComposeViewModel @AssistedInject constructor(
         factory.create(
             account.key,
             account.service as LookupService,
+        )
+    }
+
+    protected val userRepository by lazy {
+        userRepositoryFactory.create(
+            account.service as LookupService,
+            account.service as RelationshipService,
+        )
+    }
+
+    val excludedReplyUserIds = MutableLiveData<List<String>>(emptyList())
+
+    val replyToUserName = liveData {
+        if (composeType == ComposeType.Reply && statusId != null) {
+            emitSource(
+                status.map {
+                    it?.let { status ->
+                        Extractor().extractMentionedScreennames(
+                            status.text
+                        ).filter { it != account.user.screenName }
+                    } ?: run {
+                        emptyList<String>()
+                    }
+                },
+            )
+        } else {
+            emit(emptyList<String>())
+        }
+    }
+
+    val replyToUser = liveData {
+        emitSource(
+            replyToUserName.switchMap {
+                liveData {
+                    if (it.isNotEmpty()) {
+                        emit(userRepository.lookupUsersByName(it))
+                    }
+                }
+            },
         )
     }
     val canSaveDraft = MutableLiveData(false)
@@ -157,10 +200,11 @@ open class ComposeViewModel @AssistedInject constructor(
                 it,
                 draftId = draftId,
                 images = images.value ?: emptyList(),
-                replyTo = if (composeType == ComposeType.Reply) status.value?.statusId else null,
-                quoteTo = if (composeType == ComposeType.Quote) status.value?.statusId else null,
+                composeType = composeType,
+                statusId = statusId,
                 lat = location.value?.latitude,
                 long = location.value?.longitude,
+                excludedReplyUserIds = excludedReplyUserIds.value
             )
         }
     }
@@ -173,6 +217,7 @@ open class ComposeViewModel @AssistedInject constructor(
                 composeType,
                 statusId,
                 draftId = draftId,
+                excludedReplyUserIds = excludedReplyUserIds.value ?: emptyList()
             )
         }
     }
@@ -225,6 +270,18 @@ open class ComposeViewModel @AssistedInject constructor(
             it - item
         }?.let {
             images.postValue(it)
+        }
+    }
+
+    fun excludeReplyUser(user: UiUser) {
+        excludedReplyUserIds.value?.let {
+            excludedReplyUserIds.postValue(it + user.id)
+        }
+    }
+
+    fun includeReplyUser(user: UiUser) {
+        excludedReplyUserIds.value?.let {
+            excludedReplyUserIds.postValue(it - user.id)
         }
     }
 }

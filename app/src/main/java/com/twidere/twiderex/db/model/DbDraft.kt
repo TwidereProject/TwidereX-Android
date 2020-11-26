@@ -38,4 +38,5 @@ data class DbDraft(
     val createdAt: Long,
     val composeType: ComposeType,
     val statusId: String?,
+    val excludedReplyUserIds: List<String>?,
 )

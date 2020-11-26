@@ -37,11 +37,12 @@ class ComposeQueue(
         service: TwitterService,
         content: String,
         images: List<Uri>,
-        replyTo: String? = null,
-        quoteTo: String? = null,
+        composeType: ComposeType = ComposeType.New,
+        statusId: String? = null,
         lat: Double? = null,
         long: Double? = null,
         draftId: String = UUID.randomUUID().toString(),
+        excludedReplyUserIds: List<String>? = null,
     ) {
         GlobalScope.launch {
             runCatching {
@@ -58,10 +59,11 @@ class ComposeQueue(
                 service.update(
                     content,
                     media_ids = mediaIds,
-                    in_reply_to_status_id = replyTo,
-                    repost_status_id = quoteTo,
+                    in_reply_to_status_id = if (composeType == ComposeType.Reply) statusId else null,
+                    repost_status_id = if (composeType == ComposeType.Quote) statusId else null,
                     lat = lat,
                     long = long,
+                    exclude_reply_user_ids = excludedReplyUserIds
                 )
             }.onSuccess {
                 repository.remove(draftId)
@@ -69,9 +71,10 @@ class ComposeQueue(
                 repository.addOrUpgrade(
                     content,
                     images.map { it.toString() },
-                    composeType = if (replyTo != null) ComposeType.Reply else if (quoteTo != null) ComposeType.Quote else ComposeType.New,
-                    statusId = replyTo ?: quoteTo,
-                    draftId
+                    composeType = composeType,
+                    statusId = statusId,
+                    draftId = draftId,
+                    excludedReplyUserIds = excludedReplyUserIds,
                 )
             }
         }

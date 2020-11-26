@@ -31,6 +31,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
@@ -41,17 +42,23 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.AmbientContentAlpha
+import androidx.compose.material.BottomSheetScaffold
+import androidx.compose.material.BottomSheetScaffoldState
+import androidx.compose.material.Checkbox
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Divider
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.LinearProgressIndicator
+import androidx.compose.material.ListItem
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
+import androidx.compose.material.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.getValue
@@ -78,6 +85,7 @@ import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.foundation.TextInput
 import com.twidere.twiderex.component.status.StatusLineComponent
 import com.twidere.twiderex.component.status.TimelineStatusComponent
+import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.extensions.checkAllSelfPermissionsGranted
 import com.twidere.twiderex.extensions.withElevation
@@ -116,11 +124,7 @@ fun DraftComposeScene(
             assistedViewModel<DraftComposeViewModel.AssistedFactory, DraftComposeViewModel> {
                 it.create(
                     account = account,
-                    statusId = draft.statusId,
-                    composeType = draft.composeType,
-                    initialText = draft.content,
-                    initialMedia = draft.media,
-                    draftId = draftId,
+                    draft = draft,
                 )
             }
         ComposeBody(viewModel = viewModel, account = account)
@@ -139,7 +143,7 @@ fun ComposeScene(
     ComposeBody(viewModel = viewModel, account = account)
 }
 
-@OptIn(ExperimentalFocus::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFocus::class, ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
 private fun ComposeBody(
     viewModel: ComposeViewModel,
@@ -155,6 +159,20 @@ private fun ComposeBody(
     val keyboardController = remember { Ref<SoftwareKeyboardController>() }
     val canSaveDraft by viewModel.canSaveDraft.observeAsState(initial = false)
     var showSaveDraftDialog by remember { mutableStateOf(false) }
+    val scaffoldState = rememberBottomSheetScaffoldState()
+    BackButtonHandler {
+        when {
+            showSaveDraftDialog -> {
+                showSaveDraftDialog = false
+            }
+            canSaveDraft -> {
+                showSaveDraftDialog = true
+            }
+            else -> {
+                navController.popBackStack()
+            }
+        }
+    }
     TwidereXTheme {
         if (showSaveDraftDialog) {
             ConfirmDraftDialog(
@@ -171,20 +189,12 @@ private fun ComposeBody(
                 }
             )
         }
-        BackButtonHandler {
-            when {
-                showSaveDraftDialog -> {
-                    showSaveDraftDialog = false
-                }
-                canSaveDraft -> {
-                    showSaveDraftDialog = true
-                }
-                else -> {
-                    navController.popBackStack()
-                }
-            }
-        }
-        Scaffold(
+        BottomSheetScaffold(
+            sheetPeekHeight = 0.dp,
+            scaffoldState = scaffoldState,
+            sheetContent = {
+                ReplySheetContent(viewModel = viewModel, scaffoldState = scaffoldState)
+            },
             topBar = {
                 AppBar(
                     title = {
@@ -229,6 +239,8 @@ private fun ComposeBody(
                 ) {
                     if (composeType == ComposeType.New) {
                         ComposeInput(
+                            scaffoldState,
+                            viewModel,
                             account,
                             text,
                             { viewModel.setText(it) },
@@ -272,6 +284,8 @@ private fun ComposeBody(
                                         lineUp = composeType == ComposeType.Reply,
                                     ) {
                                         ComposeInput(
+                                            scaffoldState,
+                                            viewModel,
                                             account,
                                             text,
                                             { viewModel.setText(it) },
@@ -341,6 +355,103 @@ private fun ComposeBody(
     }
 }
 
+@ExperimentalMaterialApi
+@Composable
+private fun ReplySheetContent(
+    viewModel: ComposeViewModel,
+    scaffoldState: BottomSheetScaffoldState,
+) {
+    if (viewModel.composeType != ComposeType.Reply) {
+        return
+    }
+    val replyToUser by viewModel.replyToUser.observeAsState(initial = emptyList())
+    val excludedUserIds by viewModel.excludedReplyUserIds.observeAsState(initial = emptyList())
+    val status by viewModel.status.observeAsState(initial = null)
+    ListItem(
+        icon = {
+            IconButton(
+                onClick = {
+                    scaffoldState.bottomSheetState.collapse()
+                }
+            ) {
+                Icon(asset = vectorResource(id = R.drawable.ic_x))
+            }
+        },
+        text = {
+            Text(text = "Replying to")
+        }
+    )
+    status?.let {
+        ListItem(
+            icon = {
+                UserAvatar(
+                    user = it.user,
+                )
+            },
+            text = {
+                Text(text = it.user.name)
+            },
+            secondaryText = {
+                Text(text = it.user.screenName)
+            },
+            trailing = {
+                IconButton(onClick = {}) {
+                    Checkbox(
+                        checked = true,
+                        onCheckedChange = {},
+                        enabled = false,
+                    )
+                }
+            }
+        )
+    }
+    if (replyToUser.any()) {
+        ListItem {
+            Text(text = "Others in this conversation:")
+        }
+        Divider(modifier = Modifier.padding(horizontal = 16.dp))
+        replyToUser.forEach { user ->
+            val excluded = excludedUserIds.contains(user.id)
+            ListItem(
+                modifier = Modifier.clickable(
+                    onClick = {
+                        if (excluded) {
+                            viewModel.includeReplyUser(user)
+                        } else {
+                            viewModel.excludeReplyUser(user)
+                        }
+                    }
+                ),
+                icon = {
+                    UserAvatar(
+                        user = user,
+                    )
+                },
+                text = {
+                    Text(text = user.name)
+                },
+                secondaryText = {
+                    Text(text = user.screenName)
+                },
+                trailing = {
+                    IconButton(onClick = {}) {
+                        Checkbox(
+                            checked = !excluded,
+                            onCheckedChange = {
+                                if (excluded) {
+                                    viewModel.includeReplyUser(user)
+                                } else {
+                                    viewModel.excludeReplyUser(user)
+                                }
+                            },
+                        )
+                    }
+                }
+            )
+        }
+    }
+}
+
 @Composable
 private fun ConfirmDraftDialog(
     onDismiss: () -> Unit = {},
@@ -368,45 +479,109 @@ private fun ConfirmDraftDialog(
     )
 }
 
+@ExperimentalMaterialApi
 @ExperimentalFocus
 @ExperimentalFoundationApi
 @Composable
 private fun ComposeInput(
+    scaffoldState: BottomSheetScaffoldState,
+    composeViewModel: ComposeViewModel,
     account: AccountDetails?,
     text: String,
     setText: (String) -> Unit,
     keyboardController: Ref<SoftwareKeyboardController>,
     autoFocus: Boolean = true,
 ) {
-    Row(
-        modifier = Modifier
-            .padding(16.dp),
-    ) {
-        account?.let {
-            NetworkImage(
-                url = it.user.profileImage,
+    Column {
+        ComposeReply(composeViewModel = composeViewModel, scaffoldState = scaffoldState)
+        if (composeViewModel.composeType != ComposeType.Reply) {
+            Box(modifier = Modifier.height(16.dp))
+        }
+        Row(
+            modifier = Modifier
+                .padding(start = 16.dp, bottom = 16.dp, end = 16.dp),
+        ) {
+            account?.let {
+                NetworkImage(
+                    url = it.user.profileImage,
+                    modifier = Modifier
+                        .clip(CircleShape)
+                        .width(profileImageSize)
+                        .height(profileImageSize)
+                )
+            }
+            Spacer(modifier = Modifier.width(16.dp))
+            Box(
+                modifier = Modifier.weight(1F)
+            ) {
+                TextInput(
+                    modifier = Modifier.align(Alignment.TopCenter),
+                    value = text,
+                    onValueChange = { setText(it) },
+                    autoFocus = autoFocus,
+                    onTextInputStarted = {
+                        keyboardController.value = it
+                    },
+                    onClicked = {
+                        // TODO: scroll lazyColumn
+                    }
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+private fun ComposeReply(
+    composeViewModel: ComposeViewModel,
+    scaffoldState: BottomSheetScaffoldState,
+) {
+    val composeType = composeViewModel.composeType
+    if (composeType != ComposeType.Reply) {
+        return
+    }
+    val viewModelStatus by composeViewModel.status.observeAsState(initial = null)
+    viewModelStatus?.let { status ->
+        val replyToUser by composeViewModel.replyToUser.observeAsState(initial = emptyList())
+        val replyToUserName by composeViewModel.replyToUserName.observeAsState(initial = emptyList())
+        val excludedUserIds by composeViewModel.excludedReplyUserIds.observeAsState(initial = emptyList())
+        Row(
+            modifier = Modifier
+                .clickable(
+                    onClick = {
+                        if (scaffoldState.bottomSheetState.isExpanded) {
+                            scaffoldState.bottomSheetState.collapse()
+                        } else {
+                            scaffoldState.bottomSheetState.expand()
+                        }
+                    }
+                ).fillMaxWidth()
+                .padding(top = 16.dp, start = 16.dp, end = 16.dp),
+        ) {
+            Box(
                 modifier = Modifier
-                    .clip(CircleShape)
                     .width(profileImageSize)
                     .height(profileImageSize)
             )
-        }
-        Spacer(modifier = Modifier.width(16.dp))
-        Box(
-            modifier = Modifier.weight(1F)
-        ) {
-            TextInput(
-                modifier = Modifier.align(Alignment.TopCenter),
-                value = text,
-                onValueChange = { setText(it) },
-                autoFocus = autoFocus,
-                onTextInputStarted = {
-                    keyboardController.value = it
-                },
-                onClicked = {
-                    // TODO: scroll lazyColumn
+            Spacer(modifier = Modifier.width(16.dp))
+            Box(
+                modifier = Modifier.weight(1F)
+            ) {
+                if (replyToUser.isEmpty() && replyToUserName.isNotEmpty()) {
+                    LinearProgressIndicator()
+                } else {
+                    Text(
+                        text = (listOf(status.user) + replyToUser).filter {
+                            !excludedUserIds.contains(
+                                it.id
+                            )
+                        }
+                            .joinToString(",") { "@${it.screenName}" },
+                        color = MaterialTheme.colors.primary,
+                    )
                 }
-            )
+            }
         }
     }
 }

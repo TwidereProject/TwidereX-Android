@@ -28,6 +28,10 @@ interface LookupService {
         name: String
     ): IUser
 
+    suspend fun lookupUsersByName(
+        name: List<String>
+    ): List<IUser>
+
     suspend fun lookupUser(
         id: String
     ): IUser

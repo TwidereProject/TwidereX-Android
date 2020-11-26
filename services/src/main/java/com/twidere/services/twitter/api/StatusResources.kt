@@ -45,6 +45,7 @@ interface StatusResources {
         @Query("in_reply_to_status_id") in_reply_to_status_id: String? = null,
         @Query("repost_status_id") repost_status_id: String? = null,
         @Query("display_coordinates") display_coordinates: Boolean? = null,
+        @Query("exclude_reply_user_ids") exclude_reply_user_ids: String? = null,
         @Query("lat") lat: Double? = null,
         @Query("long") long: Double? = null,
         @Query("media_ids") media_ids: String? = null,

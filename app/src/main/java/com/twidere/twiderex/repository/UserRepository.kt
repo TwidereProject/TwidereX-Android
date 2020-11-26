@@ -53,6 +53,10 @@ class UserRepository @AssistedInject constructor(
         return user
     }
 
+    suspend fun lookupUsersByName(name: List<String>): List<UiUser> {
+        return lookupService.lookupUsersByName(name = name).map { it.toDbUser().toUi() }
+    }
+
     fun getUserLiveData(name: String): LiveData<UiUser?> {
         // TODO: platform type
         return database.userDao().findWithScreenNameLiveData(name = name, platformType = PlatformType.Twitter).map {

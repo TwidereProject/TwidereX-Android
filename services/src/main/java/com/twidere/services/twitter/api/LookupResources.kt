@@ -42,6 +42,13 @@ interface LookupResources {
         @Query("user.fields", encoded = true) userFields: String? = null,
     ): TwitterResponseV2<UserV2>
 
+    @GET("/2/users/by")
+    suspend fun lookupUsersByName(
+        @Query(value = "usernames") names: String,
+        @Query("tweet.fields", encoded = true) tweetFields: String? = null,
+        @Query("user.fields", encoded = true) userFields: String? = null,
+    ): TwitterResponseV2<List<UserV2>>
+
     @GET("/2/tweets/{id}")
     suspend fun lookupTweet(
         @Path(value = "id") id: String,

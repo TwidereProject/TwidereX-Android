@@ -40,7 +40,8 @@ class DraftRepository(
         media: List<String>,
         composeType: ComposeType,
         statusId: String?,
-        draftId: String = UUID.randomUUID().toString()
+        draftId: String = UUID.randomUUID().toString(),
+        excludedReplyUserIds: List<String>? = null,
     ) {
         GlobalScope.launch {
             DbDraft(
@@ -50,6 +51,7 @@ class DraftRepository(
                 media = media,
                 statusId = statusId,
                 createdAt = System.currentTimeMillis(),
+                excludedReplyUserIds = excludedReplyUserIds
             ).let {
                 database.draftDao().insertAll(it)
             }
