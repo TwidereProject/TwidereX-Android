@@ -25,9 +25,9 @@ import android.net.Uri
 import com.twidere.services.twitter.TwitterService
 import com.twidere.twiderex.repository.DraftRepository
 import com.twidere.twiderex.scenes.ComposeType
+import java.util.UUID
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import java.util.UUID
 
 class ComposeQueue(
     private val context: Context,
@@ -39,6 +39,8 @@ class ComposeQueue(
         images: List<Uri>,
         replyTo: String? = null,
         quoteTo: String? = null,
+        lat: Double? = null,
+        long: Double? = null,
         draftId: String = UUID.randomUUID().toString(),
     ) {
         GlobalScope.launch {
@@ -58,6 +60,8 @@ class ComposeQueue(
                     media_ids = mediaIds,
                     in_reply_to_status_id = replyTo,
                     repost_status_id = quoteTo,
+                    lat = lat,
+                    long = long,
                 )
             }.onSuccess {
                 repository.remove(draftId)

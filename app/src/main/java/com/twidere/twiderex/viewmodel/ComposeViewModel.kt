@@ -42,6 +42,7 @@ import com.twidere.twiderex.repository.DraftRepository
 import com.twidere.twiderex.repository.twitter.TwitterTweetsRepository
 import com.twidere.twiderex.scenes.ComposeType
 import com.twidere.twiderex.utils.ComposeQueue
+import java.util.UUID
 
 class DraftItemViewModel @AssistedInject constructor(
     private val repository: DraftRepository,
@@ -72,7 +73,7 @@ class DraftComposeViewModel @AssistedInject constructor(
     @Assisted composeType: ComposeType,
     @Assisted initialText: String,
     @Assisted initialMedia: List<String>,
-    @Assisted private val draftId: String,
+    @Assisted override val draftId: String,
 ) : ComposeViewModel(
     draftRepository,
     locationManager,
@@ -100,30 +101,7 @@ class DraftComposeViewModel @AssistedInject constructor(
         ): DraftComposeViewModel
     }
 
-    override fun saveDraft() {
-        text.value?.let { text ->
-            draftRepository.addOrUpgrade(
-                text,
-                images.value?.map { it.toString() } ?: emptyList(),
-                composeType,
-                statusId,
-                draftId = draftId,
-            )
-        }
-    }
 
-    override fun compose() {
-        text.value?.let {
-            composeQueue.commit(
-                service,
-                it,
-                images = images.value ?: emptyList(),
-                replyTo = if (composeType == ComposeType.Reply) status.value?.statusId else null,
-                quoteTo = if (composeType == ComposeType.Quote) status.value?.statusId else null,
-                draftId = draftId
-            )
-        }
-    }
 }
 
 open class ComposeViewModel @AssistedInject constructor(
@@ -135,6 +113,7 @@ open class ComposeViewModel @AssistedInject constructor(
     @Assisted protected val statusId: String?,
     @Assisted val composeType: ComposeType,
 ) : ViewModel(), LocationListener {
+    open val draftId: String = UUID.randomUUID().toString()
     @AssistedInject.Factory
     interface AssistedFactory : IAssistedFactory {
         fun create(
@@ -156,7 +135,7 @@ open class ComposeViewModel @AssistedInject constructor(
     val canSaveDraft = MutableLiveData(false)
     val text = MutableLiveData("")
     val images = MutableLiveData<List<Uri>>(emptyList())
-    val location = MutableLiveData<Location>()
+    val location = MutableLiveData<Location?>()
     val locationEnabled = MutableLiveData(false)
     val status = liveData {
         statusId?.let {
@@ -171,25 +150,29 @@ open class ComposeViewModel @AssistedInject constructor(
         canSaveDraft.postValue(true)
     }
 
-    open fun compose() {
+    fun compose() {
         text.value?.let {
             composeQueue.commit(
                 service,
                 it,
+                draftId = draftId,
                 images = images.value ?: emptyList(),
                 replyTo = if (composeType == ComposeType.Reply) status.value?.statusId else null,
                 quoteTo = if (composeType == ComposeType.Quote) status.value?.statusId else null,
+                lat = location.value?.latitude,
+                long = location.value?.longitude,
             )
         }
     }
 
-    open fun saveDraft() {
+    fun saveDraft() {
         text.value?.let { text ->
             draftRepository.addOrUpgrade(
                 text,
                 images.value?.map { it.toString() } ?: emptyList(),
                 composeType,
                 statusId,
+                draftId = draftId,
             )
         }
     }
@@ -218,6 +201,7 @@ open class ComposeViewModel @AssistedInject constructor(
     }
 
     fun disableLocation() {
+        location.postValue(null)
         locationEnabled.postValue(false)
         locationManager.removeUpdates(this)
     }
