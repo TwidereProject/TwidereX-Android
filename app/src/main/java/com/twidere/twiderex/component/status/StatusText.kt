@@ -143,7 +143,9 @@ private fun AnnotatedString.Builder.RenderLink(element: Element, status: UiStatu
     ) {
         when {
             entity != null -> {
-                if (!entity.displayUrl.contains("pic.twitter.com")) {
+                if (!entity.displayUrl.contains("pic.twitter.com") &&
+                    status.quote?.statusId != null && !entity.expandedUrl.endsWith(status.quote.statusId)
+                ) {
                     pushStringAnnotation(TAG_URL, entity.expandedUrl)
                     RenderText(entity.displayUrl)
                     pop()
