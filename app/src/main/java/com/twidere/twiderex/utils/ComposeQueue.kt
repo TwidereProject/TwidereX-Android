@@ -25,9 +25,9 @@ import android.net.Uri
 import com.twidere.services.twitter.TwitterService
 import com.twidere.twiderex.repository.DraftRepository
 import com.twidere.twiderex.scenes.ComposeType
-import java.util.UUID
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import java.util.UUID
 
 class ComposeQueue(
     private val context: Context,

@@ -52,4 +52,6 @@
     <string name="action_cancel">取消</string>
     <string name="action_edit">编辑</string>
     <string name="message_save_draft">保存草稿？</string>
+    <string name="replying_to">回复给</string>
+    <string name="others_in_this_conversation">在此对话中的其他用户</string>
 </resources>

@@ -378,7 +378,7 @@ private fun ReplySheetContent(
             }
         },
         text = {
-            Text(text = "Replying to")
+            Text(text = stringResource(id = R.string.replying_to))
         }
     )
     status?.let {
@@ -407,7 +407,7 @@ private fun ReplySheetContent(
     }
     if (replyToUser.any()) {
         ListItem {
-            Text(text = "Others in this conversation:")
+            Text(text = stringResource(id = R.string.others_in_this_conversation))
         }
         Divider(modifier = Modifier.padding(horizontal = 16.dp))
         replyToUser.forEach { user ->

@@ -36,6 +36,8 @@
     <string name="action_follow">Follow</string>
     <string name="action_unfollow">Unfollow</string>
     <string name="pick_color">Pick color</string>
+    <string name="replying_to">Replying to</string>
+    <string name="others_in_this_conversation">Others in this conversation:</string>
     <string name="load_more">Load more</string>
     <string name="message_save_draft">Save draft?</string>
     <string name="following_you">Following you</string>
