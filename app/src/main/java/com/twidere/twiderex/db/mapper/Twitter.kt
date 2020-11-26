@@ -132,7 +132,7 @@ private fun StatusV2.toDbStatusWithMediaAndUser(
         timestamp = createdAt?.time ?: 0,
         retweetCount = publicMetrics?.retweetCount ?: 0,
         likeCount = publicMetrics?.likeCount ?: 0,
-        replyCount = 0,
+        replyCount = publicMetrics?.replyCount ?: 0,
         placeString = place?.fullName,
         hasMedia = !attachments?.media.isNullOrEmpty(),
         source = source ?: "",
