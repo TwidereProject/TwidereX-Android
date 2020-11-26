@@ -32,7 +32,7 @@ import kotlin.concurrent.timer
 
 @Composable
 fun HumanizedTime(time: Long) {
-    var text by remember { mutableStateOf(time.humanizedTimestamp()) }
+    var text by remember(time) { mutableStateOf(time.humanizedTimestamp()) }
     onActive {
         val timer = timer(period = 1000) {
             text = time.humanizedTimestamp()
