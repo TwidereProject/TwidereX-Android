@@ -28,7 +28,7 @@ import androidx.room.Query
 import androidx.room.Transaction
 import com.twidere.twiderex.db.model.DbPagingTimeline
 import com.twidere.twiderex.db.model.DbPagingTimelineWithStatus
-import com.twidere.twiderex.model.UserKey
+import com.twidere.twiderex.model.MicroBlogKey
 
 @Dao
 interface PagingTimelineDao {
@@ -36,22 +36,23 @@ interface PagingTimelineDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(timeline: List<DbPagingTimeline>)
 
-    @Query("SELECT * FROM paging_timeline WHERE statusId == :id AND userKey == :userKey")
-    suspend fun findWithStatusId(id: String, userKey: UserKey): DbPagingTimeline?
+    @Query("SELECT * FROM paging_timeline WHERE statusKey == :statusKey AND accountKey == :accountKey")
+    suspend fun findWithStatusKey(statusKey: MicroBlogKey, accountKey: MicroBlogKey): DbPagingTimeline?
 
     @Transaction
-    @Query("SELECT * FROM paging_timeline WHERE pagingKey == :pagingKey AND userKey == :userKey ORDER BY timestamp DESC")
+    @Query("SELECT * FROM paging_timeline WHERE pagingKey == :pagingKey AND accountKey == :accountKey ORDER BY timestamp DESC")
     fun getPagingSource(
         pagingKey: String,
-        userKey: UserKey,
+        accountKey: MicroBlogKey,
     ): PagingSource<Int, DbPagingTimelineWithStatus>
 
-    @Query("SELECT * FROM paging_timeline WHERE pagingKey == :pagingKey AND userKey == :userKey ORDER BY timestamp DESC")
-    fun getLatest(pagingKey: String, userKey: UserKey): DbPagingTimeline?
+    @Transaction
+    @Query("SELECT * FROM paging_timeline WHERE pagingKey == :pagingKey AND accountKey == :accountKey ORDER BY timestamp DESC")
+    fun getLatest(pagingKey: String, accountKey: MicroBlogKey): DbPagingTimelineWithStatus?
 
-    @Query("DELETE FROM paging_timeline WHERE pagingKey == :pagingKey AND userKey == :userKey")
+    @Query("DELETE FROM paging_timeline WHERE pagingKey == :pagingKey AND accountKey == :accountKey")
     suspend fun clearAll(
         pagingKey: String,
-        userKey: UserKey,
+        accountKey: MicroBlogKey,
     )
 }

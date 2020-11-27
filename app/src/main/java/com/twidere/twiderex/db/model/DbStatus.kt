@@ -26,11 +26,11 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import androidx.room.Relation
 import com.twidere.twiderex.db.AppDatabase
-import com.twidere.twiderex.model.UserKey
+import com.twidere.twiderex.model.MicroBlogKey
 
 @Entity(
     tableName = "status",
-    indices = [Index(value = ["statusId"], unique = true)],
+    indices = [Index(value = ["statusKey"], unique = true)],
 )
 data class DbStatusV2(
     /**
@@ -42,6 +42,7 @@ data class DbStatusV2(
      * Actual tweet/toots id
      */
     val statusId: String,
+    val statusKey: MicroBlogKey,
     val text: String,
     val timestamp: Long,
     val retweetCount: Long,
@@ -50,7 +51,7 @@ data class DbStatusV2(
     val placeString: String?,
     val source: String,
     val hasMedia: Boolean,
-    val userId: String,
+    val userKey: MicroBlogKey,
     val lang: String?,
     val replyStatusId: String?,
     val quoteStatusId: String?,
@@ -60,13 +61,13 @@ data class DbStatusV2(
 data class DbStatusWithMediaAndUser(
     @Embedded
     val data: DbStatusV2,
-    @Relation(parentColumn = "statusId", entityColumn = "statusId")
+    @Relation(parentColumn = "statusKey", entityColumn = "statusKey")
     val media: List<DbMedia>,
-    @Relation(parentColumn = "userId", entityColumn = "userId")
+    @Relation(parentColumn = "userKey", entityColumn = "userKey")
     val user: DbUser,
-    @Relation(parentColumn = "statusId", entityColumn = "statusId")
+    @Relation(parentColumn = "statusKey", entityColumn = "statusKey")
     val reactions: List<DbStatusReaction>,
-    @Relation(parentColumn = "statusId", entityColumn = "statusId")
+    @Relation(parentColumn = "statusKey", entityColumn = "statusKey")
     val url: List<DbUrlEntity>,
 )
 
@@ -83,7 +84,7 @@ data class DbStatusWithReference(
 
 @Entity(
     tableName = "status_reactions",
-    indices = [Index(value = ["statusId", "userKey"], unique = true)],
+    indices = [Index(value = ["statusKey", "accountKey"], unique = true)],
 )
 data class DbStatusReaction(
     /**
@@ -94,8 +95,8 @@ data class DbStatusReaction(
     /**
      * Actual tweet/toots id
      */
-    val statusId: String,
-    val userKey: UserKey,
+    val statusKey: MicroBlogKey,
+    val accountKey: MicroBlogKey,
     var liked: Boolean,
     var retweeted: Boolean,
 )

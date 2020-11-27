@@ -48,7 +48,7 @@ class MeItem : HomeNavigationItem() {
     override fun onCompose() {
         val account = AmbientActiveAccount.current
         account?.user?.toUi()?.let {
-            UserComponent(screenName = it.screenName, it)
+            UserComponent(screenName = it.screenName, host = it.userKey.host, initialData = it)
         }
     }
 }

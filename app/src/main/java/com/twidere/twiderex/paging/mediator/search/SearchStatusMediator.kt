@@ -23,15 +23,15 @@ package com.twidere.twiderex.paging.mediator.search
 import com.twidere.services.microblog.SearchService
 import com.twidere.services.microblog.model.IStatus
 import com.twidere.twiderex.db.AppDatabase
-import com.twidere.twiderex.model.UserKey
+import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.paging.mediator.PagingTimelineMediatorBase
 
 class SearchStatusMediator(
     private val query: String,
     database: AppDatabase,
-    userKey: UserKey,
+    accountKey: MicroBlogKey,
     private val service: SearchService,
-) : PagingTimelineMediatorBase(userKey, database) {
+) : PagingTimelineMediatorBase(accountKey, database) {
     override val pagingKey = "search:$query:status"
     private var nextPage: String? = null
     override suspend fun load(pageSize: Int, max_id: String?): List<IStatus> {

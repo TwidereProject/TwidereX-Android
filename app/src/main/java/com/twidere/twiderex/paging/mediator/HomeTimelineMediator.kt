@@ -23,15 +23,15 @@ package com.twidere.twiderex.paging.mediator
 import androidx.paging.ExperimentalPagingApi
 import com.twidere.services.microblog.TimelineService
 import com.twidere.twiderex.db.AppDatabase
-import com.twidere.twiderex.model.UserKey
+import com.twidere.twiderex.model.MicroBlogKey
 
 @OptIn(ExperimentalPagingApi::class)
 class HomeTimelineMediator(
     private val service: TimelineService,
-    userKey: UserKey,
+    accountKey: MicroBlogKey,
     database: AppDatabase,
-) : PagingWithGapMediator(userKey, database) {
-    override val pagingKey: String = "home:$userKey"
+) : PagingWithGapMediator(accountKey, database) {
+    override val pagingKey: String = "home:$accountKey"
     override suspend fun loadBetweenImpl(pageSize: Int, max_id: String?, since_id: String?) =
         service.homeTimeline(pageSize, max_id = max_id, since_id = since_id)
 }

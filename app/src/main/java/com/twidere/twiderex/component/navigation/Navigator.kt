@@ -31,6 +31,8 @@ import androidx.core.os.bundleOf
 import androidx.navigation.NavController
 import androidx.navigation.compose.navigate
 import androidx.navigation.compose.popUpTo
+import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.navigation.twidereXSchema
 import com.twidere.twiderex.scenes.ComposeType
@@ -38,11 +40,11 @@ import com.twidere.twiderex.scenes.ComposeType
 val AmbientNavigator = staticAmbientOf<INavigator>()
 
 interface INavigator {
-    fun user(screenName: String) {}
-    fun status(statusId: String) {}
-    fun media(statusId: String, selectedIndex: Int = 0) {}
+    fun user(user: UiUser) {}
+    fun status(statusKey: MicroBlogKey) {}
+    fun media(statusKey: MicroBlogKey, selectedIndex: Int = 0) {}
     fun search(keyword: String) {}
-    fun compose(composeType: ComposeType, statusId: String? = null) {}
+    fun compose(composeType: ComposeType, statusKey: MicroBlogKey? = null) {}
     fun openLink(it: String) {}
     fun twitterSignInWeb(target: String) {}
     fun searchInput(initial: String? = null) {}
@@ -52,16 +54,16 @@ class Navigator(
     private val navController: NavController,
     private val context: Context,
 ) : INavigator {
-    override fun user(screenName: String) {
-        navController.navigate(Route.User(screenName))
+    override fun user(user: UiUser) {
+        navController.navigate(Route.User(user.userKey.copy(id = user.screenName)))
     }
 
-    override fun status(statusId: String) {
-        navController.navigate(Route.Status(statusId))
+    override fun status(statusKey: MicroBlogKey) {
+        navController.navigate(Route.Status(statusKey))
     }
 
-    override fun media(statusId: String, selectedIndex: Int) {
-        navController.navigate(Route.Media(statusId, selectedIndex))
+    override fun media(statusKey: MicroBlogKey, selectedIndex: Int) {
+        navController.navigate(Route.Media(statusKey, selectedIndex))
     }
 
     override fun search(keyword: String) {
@@ -80,8 +82,8 @@ class Navigator(
         }
     }
 
-    override fun compose(composeType: ComposeType, statusId: String?) {
-        navController.navigate(Route.Compose(composeType, statusId))
+    override fun compose(composeType: ComposeType, statusKey: MicroBlogKey?) {
+        navController.navigate(Route.Compose(composeType, statusKey))
     }
 
     override fun openLink(it: String) {

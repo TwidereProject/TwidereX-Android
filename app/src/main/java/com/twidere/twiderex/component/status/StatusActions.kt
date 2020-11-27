@@ -59,7 +59,7 @@ fun ReplyButton(
     val navigator = AmbientNavigator.current
     val icon = vectorResource(id = R.drawable.ic_corner_up_left)
     val action = {
-        navigator.compose(ComposeType.Reply, statusId = status.statusId)
+        navigator.compose(ComposeType.Reply, statusKey = status.statusKey)
     }
     if (withNumber) {
         StatusActionButtonWithNumbers(

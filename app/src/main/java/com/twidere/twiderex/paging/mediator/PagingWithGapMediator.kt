@@ -32,7 +32,7 @@ import com.twidere.twiderex.db.model.DbPagingTimeline.Companion.toPagingDbTimeli
 import com.twidere.twiderex.db.model.DbPagingTimelineWithStatus
 import com.twidere.twiderex.db.model.TimelineType
 import com.twidere.twiderex.db.model.saveToDb
-import com.twidere.twiderex.model.UserKey
+import com.twidere.twiderex.model.MicroBlogKey
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
@@ -41,24 +41,24 @@ import java.net.SocketTimeoutException
 
 @OptIn(ExperimentalPagingApi::class)
 abstract class PagingWithGapMediator(
-    userKey: UserKey,
+    accountKey: MicroBlogKey,
     database: AppDatabase,
-) : PagingMediator(userKey = userKey, database = database) {
+) : PagingMediator(accountKey = accountKey, database = database) {
     private var loadCount = 0
     protected open val skipInitialLoad = true
-    val loadingBetween = MutableLiveData(listOf<String>())
+    val loadingBetween = MutableLiveData(listOf<MicroBlogKey>())
 
     override suspend fun load(
         loadType: LoadType,
         state: PagingState<Int, DbPagingTimelineWithStatus>
     ): MediatorResult {
-        val max_id = when (loadType) {
+        val maxStatusKey = when (loadType) {
             LoadType.APPEND -> {
                 val lastItem = state.lastItemOrNull()
                     ?: return MediatorResult.Success(
                         endOfPaginationReached = true
                     )
-                lastItem.status.status.data.statusId
+                lastItem.status.status.data.statusKey
             }
             LoadType.PREPEND -> {
                 return MediatorResult.Success(endOfPaginationReached = true)
@@ -67,7 +67,7 @@ abstract class PagingWithGapMediator(
                 null
             }
         }
-        val since_id = when (loadType) {
+        val sinceStatueKey = when (loadType) {
             LoadType.APPEND -> {
                 null
             }
@@ -76,17 +76,22 @@ abstract class PagingWithGapMediator(
             }
             LoadType.REFRESH -> {
                 withContext(Dispatchers.IO) {
-                    database.pagingTimelineDao().getLatest(pagingKey, userKey)?.statusId
+                    database.pagingTimelineDao()
+                        .getLatest(pagingKey, accountKey)?.status?.status?.data?.statusKey
                 }
             }
         }
-        if (skipInitialLoad && loadCount == 0 && loadType == LoadType.REFRESH && since_id != null) {
+        if (skipInitialLoad && loadCount == 0 && loadType == LoadType.REFRESH && sinceStatueKey != null) {
             loadCount++
             return MediatorResult.Success(
                 endOfPaginationReached = false
             )
         }
-        return loadBetween(pageSize = state.config.pageSize, max_id = max_id, since_id = since_id).let {
+        return loadBetween(
+            pageSize = state.config.pageSize,
+            maxStatusKey = maxStatusKey,
+            sinceStatueKey = sinceStatueKey
+        ).let {
             // TODO: workaround for https://issuetracker.google.com/issues/173435602
             if (loadType == LoadType.REFRESH) {
                 MediatorResult.Error(Error())
@@ -98,24 +103,30 @@ abstract class PagingWithGapMediator(
 
     suspend fun loadBetween(
         pageSize: Int,
-        max_id: String? = null,
-        since_id: String? = null,
+        maxStatusKey: MicroBlogKey? = null,
+        sinceStatueKey: MicroBlogKey? = null,
     ): MediatorResult {
-        if (max_id != null && since_id != null) {
-            loadingBetween.postValue((loadingBetween.value ?: listOf()) + max_id)
+        if (maxStatusKey != null && sinceStatueKey != null) {
+            loadingBetween.postValue((loadingBetween.value ?: listOf()) + maxStatusKey)
         }
         try {
+            val max_id = withContext(Dispatchers.IO) {
+                maxStatusKey?.let { database.statusDao().findWithStatusId(it)?.statusId }
+            }
+            val since_id = withContext(Dispatchers.IO) {
+                sinceStatueKey?.let { database.statusDao().findWithStatusId(it)?.statusId }
+            }
             val result = loadBetweenImpl(pageSize, max_id = max_id, since_id = since_id).map {
-                it.toDbTimeline(userKey, TimelineType.Custom).toPagingDbTimeline(pagingKey)
+                it.toDbTimeline(accountKey, TimelineType.Custom).toPagingDbTimeline(pagingKey)
             }
             database.withTransaction {
-                if (max_id != null) {
-                    database.pagingTimelineDao().findWithStatusId(max_id, userKey)?.let {
+                if (maxStatusKey != null) {
+                    database.pagingTimelineDao().findWithStatusKey(maxStatusKey, accountKey)?.let {
                         it.isGap = false
                         database.pagingTimelineDao().insertAll(listOf(it))
                     }
                 }
-                if (since_id != null) {
+                if (sinceStatueKey != null) {
                     result.lastOrNull()?.timeline?.isGap = result.size >= pageSize - 1
                 }
                 result.saveToDb(database)
@@ -130,8 +141,8 @@ abstract class PagingWithGapMediator(
         } catch (e: SocketTimeoutException) {
             return MediatorResult.Error(e)
         } finally {
-            if (max_id != null && since_id != null) {
-                loadingBetween.postValue((loadingBetween.value ?: listOf()) - max_id)
+            if (maxStatusKey != null && sinceStatueKey != null) {
+                loadingBetween.postValue((loadingBetween.value ?: listOf()) - maxStatusKey)
             }
         }
     }

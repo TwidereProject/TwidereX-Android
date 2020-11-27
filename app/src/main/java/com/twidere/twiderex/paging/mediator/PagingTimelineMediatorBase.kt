@@ -31,16 +31,16 @@ import com.twidere.twiderex.db.model.DbPagingTimeline.Companion.toPagingDbTimeli
 import com.twidere.twiderex.db.model.DbPagingTimelineWithStatus
 import com.twidere.twiderex.db.model.TimelineType
 import com.twidere.twiderex.db.model.saveToDb
-import com.twidere.twiderex.model.UserKey
+import com.twidere.twiderex.model.MicroBlogKey
 import retrofit2.HttpException
 import java.io.IOException
 import java.net.SocketTimeoutException
 
 @OptIn(ExperimentalPagingApi::class)
 abstract class PagingTimelineMediatorBase(
-    userKey: UserKey,
+    accountKey: MicroBlogKey,
     database: AppDatabase,
-) : PagingMediator(userKey = userKey, database = database) {
+) : PagingMediator(accountKey = accountKey, database = database) {
     override suspend fun load(
         loadType: LoadType,
         state: PagingState<Int, DbPagingTimelineWithStatus>
@@ -64,7 +64,7 @@ abstract class PagingTimelineMediatorBase(
             val pageSize = state.config.pageSize
 
             val result = load(pageSize, key).map {
-                it.toDbTimeline(userKey, TimelineType.Custom).toPagingDbTimeline(pagingKey)
+                it.toDbTimeline(accountKey, TimelineType.Custom).toPagingDbTimeline(pagingKey)
             }.let {
                 transform(it)
             }
@@ -98,7 +98,7 @@ abstract class PagingTimelineMediatorBase(
     ) = result.size < pageSize
 
     protected open suspend fun clearData(database: AppDatabase) {
-        database.pagingTimelineDao().clearAll(pagingKey, userKey = userKey)
+        database.pagingTimelineDao().clearAll(pagingKey, accountKey = accountKey)
     }
 
     protected abstract suspend fun load(

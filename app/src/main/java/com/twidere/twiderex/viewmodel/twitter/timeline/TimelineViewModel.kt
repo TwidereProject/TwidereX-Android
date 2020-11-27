@@ -25,6 +25,7 @@ import androidx.core.content.edit
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.twidere.twiderex.defaultLoadCount
+import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.paging.mediator.PagingWithGapMediator
 import com.twidere.twiderex.viewmodel.PagingViewModel
 import kotlinx.coroutines.launch
@@ -35,14 +36,14 @@ abstract class TimelineViewModel(
 
     abstract override val pagingMediator: PagingWithGapMediator
     abstract val savedStateKey: String
-    val loadingBetween: MutableLiveData<List<String>>
+    val loadingBetween: MutableLiveData<List<MicroBlogKey>>
         get() = pagingMediator.loadingBetween
 
     fun loadBetween(
-        max_id: String,
-        since_id: String,
+        maxStatusKey: MicroBlogKey,
+        sinceStatueKey: MicroBlogKey,
     ) = viewModelScope.launch {
-        pagingMediator.loadBetween(defaultLoadCount, max_id = max_id, since_id = since_id)
+        pagingMediator.loadBetween(defaultLoadCount, maxStatusKey = maxStatusKey, sinceStatueKey = sinceStatueKey)
     }
 
     fun restoreScrollState(): TimelineScrollState {

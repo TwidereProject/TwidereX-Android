@@ -26,6 +26,7 @@ import com.twidere.services.microblog.TimelineService
 import com.twidere.twiderex.db.AppDatabase
 import com.twidere.twiderex.di.assisted.IAssistedFactory
 import com.twidere.twiderex.model.AccountDetails
+import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.paging.mediator.PagingMediator
 import com.twidere.twiderex.paging.mediator.user.UserFavouriteMediator
 import com.twidere.twiderex.viewmodel.PagingViewModel
@@ -33,19 +34,22 @@ import com.twidere.twiderex.viewmodel.PagingViewModel
 class UserFavouriteTimelineViewModel @AssistedInject constructor(
     database: AppDatabase,
     @Assisted account: AccountDetails,
-    @Assisted screenName: String,
+    @Assisted user: UiUser,
 ) : PagingViewModel() {
 
     @AssistedInject.Factory
     interface AssistedFactory : IAssistedFactory {
-        fun create(account: AccountDetails, screenName: String): UserFavouriteTimelineViewModel
+        fun create(
+            account: AccountDetails,
+            user: UiUser,
+        ): UserFavouriteTimelineViewModel
     }
 
     override val pagingMediator: PagingMediator =
         UserFavouriteMediator(
-            screenName,
+            user,
             database,
-            account.key,
+            account.accountKey,
             account.service as TimelineService
         )
 }

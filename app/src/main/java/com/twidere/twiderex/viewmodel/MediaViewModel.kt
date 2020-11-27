@@ -29,34 +29,35 @@ import com.squareup.inject.assisted.AssistedInject
 import com.twidere.services.microblog.LookupService
 import com.twidere.twiderex.di.assisted.IAssistedFactory
 import com.twidere.twiderex.model.AccountDetails
+import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.repository.twitter.TwitterTweetsRepository
 import kotlinx.coroutines.launch
 
 class MediaViewModel @AssistedInject constructor(
     private val factory: TwitterTweetsRepository.AssistedFactory,
     @Assisted private val account: AccountDetails,
-    @Assisted private val statusId: String,
+    @Assisted private val statusKey: MicroBlogKey,
 ) : ViewModel() {
 
     @AssistedInject.Factory
     interface AssistedFactory : IAssistedFactory {
-        fun create(account: AccountDetails, statusId: String): MediaViewModel
+        fun create(account: AccountDetails, statusKey: MicroBlogKey): MediaViewModel
     }
 
     private val repository by lazy {
         account.service.let {
-            factory.create(account.key, it as LookupService)
+            factory.create(account.accountKey, it as LookupService)
         }
     }
     val loading = MutableLiveData(false)
     val status = liveData {
-        emitSource(repository.loadTweetFromCache(statusId))
+        emitSource(repository.loadTweetFromCache(statusKey))
     }
 
     init {
         viewModelScope.launch {
             loading.postValue(true)
-            repository.loadTweetFromNetwork(statusId)
+            repository.loadTweetFromNetwork(statusKey.id)
             loading.postValue(false)
         }
     }

@@ -25,9 +25,11 @@ import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.res.imageResource
 import com.twidere.twiderex.R
 import com.twidere.twiderex.db.model.DbUser
+import com.twidere.twiderex.model.MicroBlogKey
 
 data class UiUser(
     val id: String,
+    val userKey: MicroBlogKey,
     val name: String,
     val screenName: String,
     val profileImage: Any,
@@ -57,6 +59,7 @@ data class UiUser(
             location = null,
             verified = false,
             protected = false,
+            userKey = MicroBlogKey.Empty,
         )
 
         fun DbUser.toUi() = UiUser(
@@ -73,6 +76,7 @@ data class UiUser(
             location = location,
             verified = verified,
             protected = isProtected,
+            userKey = userKey,
         )
     }
 }

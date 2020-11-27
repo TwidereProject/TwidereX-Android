@@ -36,35 +36,34 @@ import com.twidere.twiderex.db.model.DbUrlEntity
 import com.twidere.twiderex.db.model.DbUser
 import com.twidere.twiderex.db.model.TimelineType
 import com.twidere.twiderex.model.MediaType
-import com.twidere.twiderex.model.PlatformType
-import com.twidere.twiderex.model.UserKey
+import com.twidere.twiderex.model.MicroBlogKey
 import java.util.UUID
 
 fun StatusV2.toDbTimeline(
-    userKey: UserKey,
+    accountKey: MicroBlogKey,
     timelineType: TimelineType,
 ): DbTimelineWithStatus {
-    val status = this.toDbStatusWithMediaAndUser(userKey)
+    val status = this.toDbStatusWithMediaAndUser(accountKey)
     val retweet = this.referencedTweets
         ?.firstOrNull { it.type == ReferencedTweetType.retweeted }?.status?.toDbStatusWithMediaAndUser(
-            userKey
+            accountKey
         )
     val replyTo = this.referencedTweets
         ?.firstOrNull { it.type == ReferencedTweetType.replied_to }?.status?.toDbStatusWithMediaAndUser(
-            userKey
+            accountKey
         )
     val quote = this.referencedTweets
         ?.firstOrNull { it.type == ReferencedTweetType.quoted }?.status?.toDbStatusWithMediaAndUser(
-            userKey
+            accountKey
         )
 
     return DbTimelineWithStatus(
         timeline = DbTimeline(
             _id = UUID.randomUUID().toString(),
-            userKey = userKey,
+            accountKey = accountKey,
             timestamp = status.data.timestamp,
             isGap = false,
-            statusId = status.data.statusId,
+            statusKey = status.data.statusKey,
             type = timelineType,
         ),
         status = DbStatusWithReference(
@@ -77,20 +76,20 @@ fun StatusV2.toDbTimeline(
 }
 
 fun Status.toDbTimeline(
-    userKey: UserKey,
+    accountKey: MicroBlogKey,
     timelineType: TimelineType,
 ): DbTimelineWithStatus {
-    val status = this.toDbStatusWithMediaAndUser(userKey)
-    val retweet = retweetedStatus?.toDbStatusWithMediaAndUser(userKey)
-    val quote = (retweetedStatus?.quotedStatus ?: quotedStatus)?.toDbStatusWithMediaAndUser(userKey)
+    val status = this.toDbStatusWithMediaAndUser(accountKey)
+    val retweet = retweetedStatus?.toDbStatusWithMediaAndUser(accountKey)
+    val quote = (retweetedStatus?.quotedStatus ?: quotedStatus)?.toDbStatusWithMediaAndUser(accountKey)
 
     return DbTimelineWithStatus(
         timeline = DbTimeline(
             _id = UUID.randomUUID().toString(),
-            userKey = userKey,
+            accountKey = accountKey,
             timestamp = status.data.timestamp,
             isGap = false,
-            statusId = status.data.statusId,
+            statusKey = status.data.statusKey,
             type = timelineType,
         ),
         status = DbStatusWithReference(
@@ -116,7 +115,7 @@ private fun getImage(uri: String?, type: String): String? {
 
 private fun StatusV2.toDbStatusWithMediaAndUser(
     @Suppress("UNUSED_PARAMETER")
-    userKey: UserKey
+    accountKey: MicroBlogKey
 ): DbStatusWithMediaAndUser {
     val user = user?.toDbUser() ?: throw IllegalArgumentException("Status.user should not be null")
     val retweet = this.referencedTweets
@@ -136,18 +135,21 @@ private fun StatusV2.toDbStatusWithMediaAndUser(
         placeString = place?.fullName,
         hasMedia = !attachments?.media.isNullOrEmpty(),
         source = source ?: "",
-        userId = user.userId,
+        userKey = user.userKey,
         lang = lang,
         replyStatusId = replyTo,
         retweetStatusId = retweet,
         quoteStatusId = quote,
+        statusKey = MicroBlogKey.twitter(
+            id ?: throw IllegalArgumentException("Status.idStr should not be null")
+        )
     )
     return DbStatusWithMediaAndUser(
         data = status,
         media = (attachments?.media ?: emptyList()).mapIndexed { index, it ->
             DbMedia(
                 _id = UUID.randomUUID().toString(),
-                statusId = status.statusId,
+                statusKey = status.statusKey,
                 previewUrl = getImage(it.url ?: it.previewImageURL, "small"),
                 mediaUrl = getImage(it.url ?: it.previewImageURL, "orig"),
                 width = it.width ?: 0,
@@ -164,7 +166,7 @@ private fun StatusV2.toDbStatusWithMediaAndUser(
         url = entities?.urls?.map {
             DbUrlEntity(
                 _id = UUID.randomUUID().toString(),
-                statusId = status.statusId,
+                statusKey = status.statusKey,
                 url = it.url ?: "",
                 expandedUrl = it.expandedURL ?: "",
                 displayUrl = it.displayURL ?: "",
@@ -177,7 +179,7 @@ private fun StatusV2.toDbStatusWithMediaAndUser(
 }
 
 private fun Status.toDbStatusWithMediaAndUser(
-    userKey: UserKey
+    accountKey: MicroBlogKey
 ): DbStatusWithMediaAndUser {
     val user = user?.toDbUser() ?: throw IllegalArgumentException("Status.user should not be null")
     val status = DbStatusV2(
@@ -191,11 +193,14 @@ private fun Status.toDbStatusWithMediaAndUser(
         placeString = place?.fullName,
         hasMedia = extendedEntities?.media != null || entities?.media != null,
         source = source ?: "",
-        userId = user.userId,
+        userKey = user.userKey,
         lang = lang,
         replyStatusId = null,
         retweetStatusId = retweetedStatus?.idStr,
         quoteStatusId = (retweetedStatus?.quotedStatus ?: quotedStatus)?.idStr,
+        statusKey = MicroBlogKey.twitter(
+            idStr ?: throw IllegalArgumentException("Status.idStr should not be null")
+        )
     )
     return DbStatusWithMediaAndUser(
         data = status,
@@ -205,7 +210,7 @@ private fun Status.toDbStatusWithMediaAndUser(
             ).mapIndexed { index, it ->
             DbMedia(
                 _id = UUID.randomUUID().toString(),
-                statusId = status.statusId,
+                statusKey = status.statusKey,
                 previewUrl = getImage(it.mediaURLHTTPS, "small"),
                 mediaUrl = getImage(it.mediaURLHTTPS, "orig"),
                 width = it.sizes?.large?.w ?: 0,
@@ -222,8 +227,8 @@ private fun Status.toDbStatusWithMediaAndUser(
             listOf(
                 DbStatusReaction(
                     _id = UUID.randomUUID().toString(),
-                    statusId = status.statusId,
-                    userKey = userKey,
+                    statusKey = status.statusKey,
+                    accountKey = accountKey,
                     liked = favorited == true,
                     retweeted = retweeted == true,
                 ),
@@ -234,7 +239,7 @@ private fun Status.toDbStatusWithMediaAndUser(
         url = entities?.urls?.map {
             DbUrlEntity(
                 _id = UUID.randomUUID().toString(),
-                statusId = status.statusId,
+                statusKey = status.statusKey,
                 url = it.url ?: "",
                 expandedUrl = it.expandedURL ?: "",
                 displayUrl = it.displayURL ?: "",
@@ -262,7 +267,9 @@ fun User.toDbUser() = DbUser(
     website = this.entities?.url?.urls?.firstOrNull { it.url == this.url }?.expandedURL,
     verified = this.verified ?: false,
     isProtected = this.protected ?: false,
-    platformType = PlatformType.Twitter,
+    userKey = MicroBlogKey.twitter(
+        idStr ?: throw IllegalArgumentException("user.idStr should not be null")
+    )
 )
 
 fun UserV2.toDbUser() = DbUser(
@@ -282,7 +289,9 @@ fun UserV2.toDbUser() = DbUser(
     website = this.entities?.url?.urls?.firstOrNull { it.url == this.url }?.expandedURL,
     verified = this.verified ?: false,
     isProtected = this.protected ?: false,
-    platformType = PlatformType.Twitter,
+    userKey = MicroBlogKey.twitter(
+        id ?: throw IllegalArgumentException("user.idStr should not be null")
+    )
 )
 
 private fun updateProfileImagePath(

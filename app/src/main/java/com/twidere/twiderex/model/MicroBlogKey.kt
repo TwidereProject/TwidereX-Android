@@ -23,7 +23,7 @@ package com.twidere.twiderex.model
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
-data class UserKey(
+data class MicroBlogKey(
     val id: String,
     val host: String,
 ) {
@@ -37,7 +37,7 @@ data class UserKey(
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other == null || javaClass != other.javaClass) return false
-        val (id1, host1) = other as UserKey
+        val (id1, host1) = other as MicroBlogKey
         return if (id != id1) false else !if (host.isNotEmpty()) host != host1 else host1.isNotEmpty()
     }
 
@@ -65,9 +65,11 @@ data class UserKey(
     }
 
     companion object {
-        val Empty: UserKey = UserKey("", "")
+        val TwitterHost = "twitter.com"
+        val Empty: MicroBlogKey = MicroBlogKey("", "")
+        fun twitter(id: String) = MicroBlogKey(id, TwitterHost)
 
-        fun valueOf(str: String): UserKey {
+        fun valueOf(str: String): MicroBlogKey {
             var escaping = false
             var idFinished = false
             val idBuilder = StringBuilder(str.length)
@@ -101,9 +103,9 @@ data class UserKey(
                 i++
             }
             return if (hostBuilder.isNotEmpty()) {
-                UserKey(idBuilder.toString(), hostBuilder.toString())
+                MicroBlogKey(idBuilder.toString(), hostBuilder.toString())
             } else {
-                UserKey(idBuilder.toString(), "")
+                MicroBlogKey(idBuilder.toString(), "")
             }
         }
     }

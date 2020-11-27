@@ -40,6 +40,6 @@ class MentionsTimelineViewModel @AssistedInject constructor(
         fun create(account: AccountDetails): MentionsTimelineViewModel
     }
     override val pagingMediator: PagingWithGapMediator =
-        MentionTimelineMediator(account.service as TimelineService, account.key, database)
-    override val savedStateKey: String = "${account.key}_mentions"
+        MentionTimelineMediator(account.service as TimelineService, account.accountKey, database)
+    override val savedStateKey: String = "${account.accountKey}_mentions"
 }

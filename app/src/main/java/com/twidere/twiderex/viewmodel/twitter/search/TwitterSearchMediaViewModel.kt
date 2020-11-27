@@ -49,7 +49,7 @@ class TwitterSearchMediaViewModel @AssistedInject constructor(
         account.service as SearchService
     }
     val source by lazy {
-        SearchMediaMediator(keyword, database, account.key, service).pager()
-            .flow.map { it.map { it.status.toUi(account.key) } }.cachedIn(viewModelScope)
+        SearchMediaMediator(keyword, database, account.accountKey, service).pager()
+            .flow.map { it.map { it.status.toUi(account.accountKey) } }.cachedIn(viewModelScope)
     }
 }

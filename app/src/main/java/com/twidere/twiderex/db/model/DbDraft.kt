@@ -22,6 +22,7 @@ package com.twidere.twiderex.db.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.scenes.ComposeType
 
 @Entity(
@@ -37,6 +38,6 @@ data class DbDraft(
     val media: List<String>,
     val createdAt: Long,
     val composeType: ComposeType,
-    val statusId: String?,
+    val statusKey: MicroBlogKey?,
     val excludedReplyUserIds: List<String>?,
 )

@@ -26,19 +26,19 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import androidx.room.Relation
 import com.twidere.twiderex.db.AppDatabase
-import com.twidere.twiderex.model.UserKey
+import com.twidere.twiderex.model.MicroBlogKey
 
 @Entity(
     tableName = "timeline",
-    indices = [Index(value = ["statusId", "userKey", "type"], unique = true)],
+    indices = [Index(value = ["statusKey", "accountKey", "type"], unique = true)],
 )
 data class DbTimeline(
     @PrimaryKey
     val _id: String,
-    val userKey: UserKey,
+    val accountKey: MicroBlogKey,
     val timestamp: Long,
     var isGap: Boolean,
-    val statusId: String,
+    val statusKey: MicroBlogKey,
     val type: TimelineType,
 )
 
@@ -55,8 +55,8 @@ data class DbTimelineWithStatus(
     val timeline: DbTimeline,
 
     @Relation(
-        parentColumn = "statusId",
-        entityColumn = "statusId",
+        parentColumn = "statusKey",
+        entityColumn = "statusKey",
         entity = DbStatusV2::class,
     )
     val status: DbStatusWithReference,

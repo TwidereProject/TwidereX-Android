@@ -38,7 +38,8 @@ import com.twidere.twiderex.utils.fromJson
 data class AccountDetails(
     val account: Account,
     val type: PlatformType,
-    val key: UserKey,
+    // Note that UserKey that being used in AccountDetails is idStr@domain, not screenName@domain
+    val accountKey: MicroBlogKey,
     val credentials_type: CredentialsType,
     @Json(name = "credentials")
     var credentials_json: String,

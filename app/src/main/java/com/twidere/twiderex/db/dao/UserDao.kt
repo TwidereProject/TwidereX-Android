@@ -27,18 +27,15 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.twidere.twiderex.db.model.DbUser
-import com.twidere.twiderex.model.PlatformType
+import com.twidere.twiderex.model.MicroBlogKey
 
 @Dao
 interface UserDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(user: List<DbUser>)
 
-    @Query("SELECT * FROM user WHERE screenName == :name AND platformType == :platformType")
-    suspend fun findWithScreenName(name: String, platformType: PlatformType): DbUser?
-
-    @Query("SELECT * FROM user WHERE screenName == :name AND platformType == :platformType")
-    fun findWithScreenNameLiveData(name: String, platformType: PlatformType): LiveData<DbUser?>
+    @Query("SELECT * FROM user WHERE userKey == :userKey")
+    fun findWithUserKeyLiveData(userKey: MicroBlogKey): LiveData<DbUser?>
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
     suspend fun update(user: List<DbUser>)

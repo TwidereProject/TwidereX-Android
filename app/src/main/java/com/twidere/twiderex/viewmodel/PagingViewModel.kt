@@ -35,7 +35,7 @@ abstract class PagingViewModel : ViewModel() {
     open val source by lazy {
         pagingMediator.pager().flow.map { pagingData ->
             pagingData.map {
-                it.toUi(pagingMediator.userKey)
+                it.toUi(pagingMediator.accountKey)
             }
         }.cachedIn(viewModelScope)
     }

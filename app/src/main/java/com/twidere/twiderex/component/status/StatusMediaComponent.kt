@@ -45,7 +45,7 @@ fun StatusMediaComponent(
     val media = status.media
     val onItemClick = { it: UiMedia ->
         val index = media.indexOf(it)
-        navigator.media(statusId = status.statusId, selectedIndex = index)
+        navigator.media(statusKey = status.statusKey, selectedIndex = index)
     }
     if (media.size == 1) {
         val first = media.first()

@@ -258,7 +258,7 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
             if (showAccounts) {
                 val activeAccountViewModel = AmbientActiveAccountViewModel.current
                 val accounts by activeAccountViewModel.allAccounts.observeAsState(initial = emptyList())
-                val allAccounts = accounts.filter { it.key != account?.key }
+                val allAccounts = accounts.filter { it.accountKey != account?.accountKey }
                 LazyColumn {
                     items(allAccounts) {
                         val user = it.user.toUi()

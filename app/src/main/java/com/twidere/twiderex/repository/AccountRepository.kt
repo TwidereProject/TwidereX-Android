@@ -26,8 +26,8 @@ import android.os.Build
 import androidx.lifecycle.MutableLiveData
 import com.twidere.twiderex.db.model.DbUser
 import com.twidere.twiderex.model.AccountDetails
+import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.PlatformType
-import com.twidere.twiderex.model.UserKey
 import com.twidere.twiderex.model.cred.CredentialsType
 import com.twidere.twiderex.utils.fromJson
 import com.twidere.twiderex.utils.json
@@ -68,9 +68,10 @@ class AccountRepository @Inject constructor(
         return getAccounts().isNotEmpty()
     }
 
-    fun findByAccountKey(userKey: UserKey): Account? {
+    // Note that UserKey that being used in AccountRepository is idStr@domain, not screenName@domain
+    fun findByAccountKey(accountKey: MicroBlogKey): Account? {
         for (account in getAccounts()) {
-            if (userKey == getAccountKey(account)) {
+            if (accountKey == getAccountKey(account)) {
                 return account
             }
         }
@@ -105,7 +106,7 @@ class AccountRepository @Inject constructor(
         return AccountDetails(
             account = account,
             type = PlatformType.valueOf(manager.getUserData(account, ACCOUNT_USER_DATA_TYPE)),
-            key = getAccountKey(account),
+            accountKey = getAccountKey(account),
             credentials_type = CredentialsType.valueOf(
                 manager.getUserData(
                     account,
@@ -120,16 +121,16 @@ class AccountRepository @Inject constructor(
         )
     }
 
-    private fun getAccountKey(account: Account): UserKey =
-        UserKey.valueOf(manager.getUserData(account, ACCOUNT_USER_DATA_KEY))
+    private fun getAccountKey(account: Account): MicroBlogKey =
+        MicroBlogKey.valueOf(manager.getUserData(account, ACCOUNT_USER_DATA_KEY))
 
-    fun containsAccount(key: UserKey): Boolean {
+    fun containsAccount(key: MicroBlogKey): Boolean {
         return findByAccountKey(key) != null
     }
 
     fun updateAccount(detail: AccountDetails) {
         manager.setUserData(detail.account, ACCOUNT_USER_DATA_TYPE, detail.type.name)
-        manager.setUserData(detail.account, ACCOUNT_USER_DATA_KEY, detail.key.toString())
+        manager.setUserData(detail.account, ACCOUNT_USER_DATA_KEY, detail.accountKey.toString())
         manager.setUserData(
             detail.account,
             ACCOUNT_USER_DATA_CREDS_TYPE,

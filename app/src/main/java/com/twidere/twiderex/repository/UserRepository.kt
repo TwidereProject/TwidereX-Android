@@ -29,12 +29,13 @@ import com.twidere.services.microblog.RelationshipService
 import com.twidere.twiderex.db.AppDatabase
 import com.twidere.twiderex.db.mapper.toDbUser
 import com.twidere.twiderex.db.model.DbUser
-import com.twidere.twiderex.model.PlatformType
+import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.model.ui.UiUser.Companion.toUi
 
 class UserRepository @AssistedInject constructor(
     private val database: AppDatabase,
+    private val accountRepository: AccountRepository,
     @Assisted private val lookupService: LookupService,
     @Assisted private val relationshipService: RelationshipService,
 ) {
@@ -47,25 +48,32 @@ class UserRepository @AssistedInject constructor(
         ): UserRepository
     }
 
-    suspend fun lookupUserByName(name: String): DbUser? {
+    suspend fun lookupUserByName(name: String): UiUser {
         val user = lookupService.lookupUserByName(name).toDbUser()
         saveUser(user)
-        return user
+        return user.toUi()
     }
 
     suspend fun lookupUsersByName(name: List<String>): List<UiUser> {
         return lookupService.lookupUsersByName(name = name).map { it.toDbUser().toUi() }
     }
 
-    fun getUserLiveData(name: String): LiveData<UiUser?> {
-        // TODO: platform type
-        return database.userDao().findWithScreenNameLiveData(name = name, platformType = PlatformType.Twitter).map {
+    fun getUserLiveData(userKey: MicroBlogKey): LiveData<UiUser?> {
+        return database.userDao().findWithUserKeyLiveData(userKey = userKey).map {
             it?.toUi()
         }
     }
 
     private suspend fun saveUser(user: DbUser) {
         database.userDao().insertAll(listOf(user))
+        accountRepository.findByAccountKey(user.userKey)?.let {
+            accountRepository.getAccountDetails(it)
+        }?.let { details ->
+            user.let {
+                details.user = it
+                accountRepository.updateAccount(details)
+            }
+        }
     }
 
     suspend fun showRelationship(target_screen_name: String) = relationshipService.showRelationship(target_screen_name)

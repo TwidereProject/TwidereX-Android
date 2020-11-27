@@ -25,82 +25,83 @@ import com.squareup.inject.assisted.AssistedInject
 import com.twidere.services.microblog.StatusService
 import com.twidere.twiderex.db.AppDatabase
 import com.twidere.twiderex.db.model.DbStatusReaction
-import com.twidere.twiderex.model.UserKey
+import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.ui.UiStatus
 import java.util.UUID
 
 class StatusRepository @AssistedInject constructor(
     private val database: AppDatabase,
-    @Assisted private val key: UserKey,
+    @Assisted private val key: MicroBlogKey,
     @Assisted private val service: StatusService,
 ) {
 
     @AssistedInject.Factory
     interface AssistedFactory {
-        fun create(key: UserKey, service: StatusService): StatusRepository
+        fun create(key: MicroBlogKey, service: StatusService): StatusRepository
     }
 
-    suspend fun like(id: String) {
-        updateStatus(id) {
+    suspend fun like(status: UiStatus) {
+        updateStatus(status.statusKey) {
             it.liked = true
         }
         runCatching {
-            service.like(id)
+            service.like(status.statusId)
         }.onFailure {
             it.printStackTrace()
-            updateStatus(id) {
+            updateStatus(status.statusKey) {
                 it.liked = false
             }
         }
     }
 
-    suspend fun unlike(id: String) {
-        updateStatus(id) {
+    suspend fun unlike(status: UiStatus) {
+        updateStatus(status.statusKey) {
             it.liked = false
         }
         runCatching {
-            service.unlike(id)
+            service.unlike(status.statusId)
         }.onFailure {
             it.printStackTrace()
-            updateStatus(id) {
+            updateStatus(status.statusKey) {
                 it.liked = true
             }
         }
     }
 
-    suspend fun retweet(id: String) {
-        updateStatus(id) {
+    suspend fun retweet(status: UiStatus) {
+        updateStatus(status.statusKey) {
             it.retweeted = true
         }
         runCatching {
-            service.retweet(id)
+            service.retweet(status.statusId)
         }.onFailure {
             it.printStackTrace()
-            updateStatus(id) {
+            updateStatus(status.statusKey) {
                 it.retweeted = false
             }
         }
     }
 
-    suspend fun unRetweet(id: String) {
-        updateStatus(id) {
+    suspend fun unRetweet(status: UiStatus) {
+        updateStatus(status.statusKey) {
             it.retweeted = false
         }
         runCatching {
-            service.unRetweet(id)
+            service.unRetweet(status.statusId)
         }.onFailure {
             it.printStackTrace()
-            updateStatus(id) {
+            updateStatus(status.statusKey) {
                 it.retweeted = true
             }
         }
     }
 
-    private suspend fun updateStatus(id: String, action: (DbStatusReaction) -> Unit) {
-        database.reactionDao().findWithStatusId(id, key).let {
+    private suspend fun updateStatus(statusKey: MicroBlogKey, action: (DbStatusReaction) -> Unit) {
+        database.reactionDao().findWithStatusKey(statusKey, key).let {
             it ?: DbStatusReaction(
                 _id = UUID.randomUUID().toString(),
-                statusId = id,
-                userKey = key,
+                statusKey = statusKey,
+                accountKey = key,
                 liked = false,
                 retweeted = false,
             )

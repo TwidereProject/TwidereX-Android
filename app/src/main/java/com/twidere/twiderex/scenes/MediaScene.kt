@@ -75,6 +75,7 @@ import com.twidere.twiderex.component.status.RetweetButton
 import com.twidere.twiderex.component.status.ShareButton
 import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.navigation.Route
@@ -86,10 +87,10 @@ import com.twidere.twiderex.viewmodel.MediaViewModel
 import kotlin.math.max
 
 @Composable
-fun MediaScene(statusId: String, selectedIndex: Int) {
+fun MediaScene(statusKey: MicroBlogKey, selectedIndex: Int) {
     val account = AmbientActiveAccount.current ?: return
     val viewModel = assistedViewModel<MediaViewModel.AssistedFactory, MediaViewModel> {
-        it.create(account, statusId)
+        it.create(account, statusKey)
     }
     val loading by viewModel.loading.observeAsState(initial = false)
     val status by viewModel.status.observeAsState()
@@ -163,7 +164,7 @@ fun MediaScene(status: UiStatus, selectedIndex: Int) {
                             modifier = Modifier
                                 .clickable(
                                     onClick = {
-                                        navController.navigate(Route.Status(status.statusId))
+                                        navController.navigate(Route.Status(status.statusKey))
                                     }
                                 ),
                             text = status.text,

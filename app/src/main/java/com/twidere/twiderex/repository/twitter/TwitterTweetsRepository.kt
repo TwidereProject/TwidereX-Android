@@ -30,26 +30,26 @@ import com.twidere.twiderex.db.AppDatabase
 import com.twidere.twiderex.db.mapper.toDbTimeline
 import com.twidere.twiderex.db.model.TimelineType
 import com.twidere.twiderex.db.model.saveToDb
-import com.twidere.twiderex.model.UserKey
+import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.model.ui.UiStatus.Companion.toUi
 
 class TwitterTweetsRepository @AssistedInject constructor(
     private val database: AppDatabase,
-    @Assisted private val userKey: UserKey,
+    @Assisted private val accountKey: MicroBlogKey,
     @Assisted private val lookupService: LookupService,
 ) {
     @AssistedInject.Factory
     interface AssistedFactory {
         fun create(
-            userKey: UserKey,
+            accountKey: MicroBlogKey,
             lookupService: LookupService,
         ): TwitterTweetsRepository
     }
 
-    fun loadTweetFromCache(statusId: String): LiveData<UiStatus?> {
-        return database.statusDao().findWithStatusIdWithReferenceLiveData(statusId).map {
-            it?.toUi(userKey)
+    fun loadTweetFromCache(statusKey: MicroBlogKey): LiveData<UiStatus?> {
+        return database.statusDao().findWithStatusIdWithReferenceLiveData(statusKey).map {
+            it?.toUi(accountKey)
         }
     }
 
@@ -58,8 +58,8 @@ class TwitterTweetsRepository @AssistedInject constructor(
     }
 
     private suspend fun toUiStatus(status: StatusV2): UiStatus {
-        val db = status.toDbTimeline(userKey, TimelineType.Conversation)
+        val db = status.toDbTimeline(accountKey, TimelineType.Conversation)
         listOf(db).saveToDb(database)
-        return db.toUi(userKey)
+        return db.toUi(accountKey)
     }
 }

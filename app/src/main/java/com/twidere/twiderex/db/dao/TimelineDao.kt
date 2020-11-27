@@ -30,7 +30,7 @@ import androidx.room.Update
 import com.twidere.twiderex.db.model.DbTimeline
 import com.twidere.twiderex.db.model.DbTimelineWithStatus
 import com.twidere.twiderex.db.model.TimelineType
-import com.twidere.twiderex.model.UserKey
+import com.twidere.twiderex.model.MicroBlogKey
 
 @Dao
 interface TimelineDao {
@@ -38,15 +38,15 @@ interface TimelineDao {
     suspend fun insertAll(timeline: List<DbTimeline>)
 
     @Transaction
-    @Query("SELECT * FROM timeline WHERE userKey == :userKey AND type == :timelineType ORDER BY timestamp DESC")
+    @Query("SELECT * FROM timeline WHERE accountKey == :accountKey AND type == :timelineType ORDER BY timestamp DESC")
     fun getAllWithLiveData(
-        userKey: UserKey,
-        timelineType: TimelineType
+        accountKey: MicroBlogKey,
+        timelineType: TimelineType,
     ): LiveData<List<DbTimelineWithStatus>>
 
     @Transaction
-    @Query("SELECT * FROM timeline WHERE statusId == :id AND userKey == :userKey")
-    suspend fun findWithStatusId(id: String, userKey: UserKey): DbTimelineWithStatus?
+    @Query("SELECT * FROM timeline WHERE statusKey == :statusKey AND accountKey == :accountKey")
+    suspend fun findWithStatusId(statusKey: MicroBlogKey, accountKey: MicroBlogKey): DbTimelineWithStatus?
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
     suspend fun update(timeline: List<DbTimeline>)

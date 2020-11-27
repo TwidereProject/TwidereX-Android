@@ -21,16 +21,16 @@
 package com.twidere.twiderex.db.model.converter
 
 import androidx.room.TypeConverter
-import com.twidere.twiderex.model.UserKey
+import com.twidere.twiderex.model.MicroBlogKey
 
-class UserKeyConverter {
+class MicroBlogKeyConverter {
     @TypeConverter
-    fun fromUserKey(userKey: UserKey?): String? {
-        return userKey?.toString()
+    fun fromMicroBlogKey(microBlogKey: MicroBlogKey?): String? {
+        return microBlogKey?.toString()
     }
 
     @TypeConverter
-    fun fromString(string: String?): UserKey? {
-        return string?.let { UserKey.valueOf(it) }
+    fun fromString(string: String?): MicroBlogKey? {
+        return string?.let { MicroBlogKey.valueOf(it) }
     }
 }

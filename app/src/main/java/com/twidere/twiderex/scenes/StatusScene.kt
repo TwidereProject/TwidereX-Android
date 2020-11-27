@@ -44,6 +44,7 @@ import com.twidere.twiderex.component.status.StatusDivider
 import com.twidere.twiderex.component.status.StatusLineComponent
 import com.twidere.twiderex.component.status.TimelineStatusComponent
 import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.ui.AmbientActiveAccount
 import com.twidere.twiderex.ui.TwidereXTheme
 import com.twidere.twiderex.ui.standardPadding
@@ -51,11 +52,11 @@ import com.twidere.twiderex.viewmodel.twitter.TwitterStatusViewModel
 import kotlinx.coroutines.launch
 
 @Composable
-fun StatusScene(statusId: String) {
+fun StatusScene(statusKey: MicroBlogKey) {
     val account = AmbientActiveAccount.current ?: return
     val viewModel =
         assistedViewModel<TwitterStatusViewModel.AssistedFactory, TwitterStatusViewModel> {
-            it.create(account, statusId)
+            it.create(account, statusKey)
         }
     val loadingPrevious by viewModel.loadingPrevious.observeAsState(initial = false)
     val loadingMore by viewModel.loadingMore.observeAsState(initial = false)

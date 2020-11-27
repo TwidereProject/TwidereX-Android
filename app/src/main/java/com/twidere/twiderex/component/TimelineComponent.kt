@@ -95,7 +95,7 @@ fun TimelineComponent(viewModel: TimelineViewModel) {
                                 item,
                             )
                             when {
-                                loadingBetween.contains(item.statusId) -> {
+                                loadingBetween.contains(item.statusKey) -> {
                                     Divider()
                                     LoadingProgress()
                                     Divider()
@@ -112,8 +112,8 @@ fun TimelineComponent(viewModel: TimelineViewModel) {
                                         onClick = {
                                             items[index + 1]?.let { next ->
                                                 viewModel.loadBetween(
-                                                    item.statusId,
-                                                    next.statusId,
+                                                    item.statusKey,
+                                                    next.statusKey,
                                                 )
                                             }
                                         },

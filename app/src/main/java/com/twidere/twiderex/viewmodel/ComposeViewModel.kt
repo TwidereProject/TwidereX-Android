@@ -42,6 +42,7 @@ import com.twidere.twiderex.db.model.DbDraft
 import com.twidere.twiderex.di.assisted.IAssistedFactory
 import com.twidere.twiderex.extensions.getCachedLocation
 import com.twidere.twiderex.model.AccountDetails
+import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.repository.DraftRepository
 import com.twidere.twiderex.repository.UserRepository
@@ -85,7 +86,7 @@ class DraftComposeViewModel @AssistedInject constructor(
     factory,
     userRepositoryFactory,
     account,
-    draft.statusId,
+    draft.statusKey,
     draft.composeType,
 ) {
 
@@ -113,7 +114,7 @@ open class ComposeViewModel @AssistedInject constructor(
     protected val factory: TwitterTweetsRepository.AssistedFactory,
     protected val userRepositoryFactory: UserRepository.AssistedFactory,
     @Assisted protected val account: AccountDetails,
-    @Assisted protected val statusId: String?,
+    @Assisted protected val statusKey: MicroBlogKey?,
     @Assisted val composeType: ComposeType,
 ) : ViewModel(), LocationListener {
     open val draftId: String = UUID.randomUUID().toString()
@@ -122,7 +123,7 @@ open class ComposeViewModel @AssistedInject constructor(
     interface AssistedFactory : IAssistedFactory {
         fun create(
             account: AccountDetails,
-            statusId: String?,
+            statusKey: MicroBlogKey?,
             composeType: ComposeType
         ): ComposeViewModel
     }
@@ -132,7 +133,7 @@ open class ComposeViewModel @AssistedInject constructor(
     }
     protected val repository by lazy {
         factory.create(
-            account.key,
+            account.accountKey,
             account.service as LookupService,
         )
     }
@@ -147,7 +148,7 @@ open class ComposeViewModel @AssistedInject constructor(
     val excludedReplyUserIds = MutableLiveData<List<String>>(emptyList())
 
     val replyToUserName = liveData {
-        if (composeType == ComposeType.Reply && statusId != null) {
+        if (composeType == ComposeType.Reply && statusKey != null) {
             emitSource(
                 status.map {
                     it?.let { status ->
@@ -181,7 +182,7 @@ open class ComposeViewModel @AssistedInject constructor(
     val location = MutableLiveData<Location?>()
     val locationEnabled = MutableLiveData(false)
     val status = liveData {
-        statusId?.let {
+        statusKey?.let {
             emitSource(repository.loadTweetFromCache(it))
         } ?: run {
             emit(null)
@@ -201,7 +202,7 @@ open class ComposeViewModel @AssistedInject constructor(
                 draftId = draftId,
                 images = images.value ?: emptyList(),
                 composeType = composeType,
-                statusId = statusId,
+                statusKey = statusKey,
                 lat = location.value?.latitude,
                 long = location.value?.longitude,
                 excludedReplyUserIds = excludedReplyUserIds.value
@@ -215,7 +216,7 @@ open class ComposeViewModel @AssistedInject constructor(
                 text,
                 images.value?.map { it.toString() } ?: emptyList(),
                 composeType,
-                statusId,
+                statusKey,
                 draftId = draftId,
                 excludedReplyUserIds = excludedReplyUserIds.value ?: emptyList()
             )

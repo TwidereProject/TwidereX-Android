@@ -92,6 +92,7 @@ import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.launcher.AmbientLauncher
 import com.twidere.twiderex.maxComposeTextLength
 import com.twidere.twiderex.model.AccountDetails
+import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.ui.AmbientActiveAccount
 import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.ui.TwidereXTheme
@@ -133,12 +134,12 @@ fun DraftComposeScene(
 
 @Composable
 fun ComposeScene(
-    statusId: String? = null,
+    statusKey: MicroBlogKey? = null,
     composeType: ComposeType = ComposeType.New,
 ) {
     val account = AmbientActiveAccount.current ?: return
     val viewModel = assistedViewModel<ComposeViewModel.AssistedFactory, ComposeViewModel> {
-        it.create(account, statusId, composeType)
+        it.create(account, statusKey, composeType)
     }
     ComposeBody(viewModel = viewModel, account = account)
 }

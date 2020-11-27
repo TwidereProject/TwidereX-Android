@@ -25,13 +25,14 @@ import com.twidere.twiderex.db.model.DbPagingTimelineWithStatus
 import com.twidere.twiderex.db.model.DbStatusWithMediaAndUser
 import com.twidere.twiderex.db.model.DbStatusWithReference
 import com.twidere.twiderex.db.model.DbTimelineWithStatus
-import com.twidere.twiderex.model.UserKey
+import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiMedia.Companion.toUi
 import com.twidere.twiderex.model.ui.UiUrlEntity.Companion.toUi
 import com.twidere.twiderex.model.ui.UiUser.Companion.toUi
 
 data class UiStatus(
     val statusId: String,
+    val statusKey: MicroBlogKey,
     val text: String,
     val timestamp: Long,
     val retweetCount: Long,
@@ -69,13 +70,14 @@ data class UiStatus(
             source = "TwidereX",
             quote = null,
             isGap = false,
-            url = emptyList()
+            url = emptyList(),
+            statusKey = MicroBlogKey.Empty,
         )
 
         fun DbTimelineWithStatus.toUi(
-            userKey: UserKey,
+            userKey: MicroBlogKey,
         ) = with(status.status) {
-            val reaction = reactions.firstOrNull { it.userKey == userKey }
+            val reaction = reactions.firstOrNull { it.accountKey == userKey }
             UiStatus(
                 statusId = data.statusId,
                 text = data.text,
@@ -94,13 +96,14 @@ data class UiStatus(
                 isGap = timeline.isGap,
                 source = data.source,
                 url = url.toUi(),
+                statusKey = data.statusKey,
             )
         }
 
         fun DbStatusWithMediaAndUser.toUi(
-            userKey: UserKey,
+            userKey: MicroBlogKey,
         ): UiStatus {
-            val reaction = reactions.firstOrNull { it.userKey == userKey }
+            val reaction = reactions.firstOrNull { it.accountKey == userKey }
             return UiStatus(
                 statusId = data.statusId,
                 text = data.text,
@@ -119,13 +122,14 @@ data class UiStatus(
                 isGap = false,
                 source = data.source,
                 url = url.toUi(),
+                statusKey = data.statusKey,
             )
         }
 
         fun DbStatusWithReference.toUi(
-            userKey: UserKey,
+            userKey: MicroBlogKey,
         ) = with(status) {
-            val reaction = reactions.firstOrNull { it.userKey == userKey }
+            val reaction = reactions.firstOrNull { it.accountKey == userKey }
             UiStatus(
                 statusId = data.statusId,
                 text = data.text,
@@ -144,13 +148,14 @@ data class UiStatus(
                 isGap = false,
                 source = data.source,
                 url = url.toUi(),
+                statusKey = data.statusKey,
             )
         }
 
         fun DbPagingTimelineWithStatus.toUi(
-            userKey: UserKey,
+            userKey: MicroBlogKey,
         ) = with(status.status) {
-            val reaction = reactions.firstOrNull { it.userKey == userKey }
+            val reaction = reactions.firstOrNull { it.accountKey == userKey }
             UiStatus(
                 statusId = data.statusId,
                 text = data.text,
@@ -169,6 +174,7 @@ data class UiStatus(
                 isGap = timeline.isGap,
                 source = data.source,
                 url = url.toUi(),
+                statusKey = data.statusKey,
             )
         }
     }

@@ -32,8 +32,8 @@ import javax.inject.Inject
 val AmbientStatusActions = ambientOf<IStatusActions>()
 
 interface IStatusActions {
-    fun like(status: UiStatus, account: AccountDetails)
-    fun retweet(status: UiStatus, account: AccountDetails)
+    fun like(status: UiStatus, account: AccountDetails) {}
+    fun retweet(status: UiStatus, account: AccountDetails) {}
 }
 
 class StatusActions @Inject constructor(
@@ -43,7 +43,7 @@ class StatusActions @Inject constructor(
         account.service.let {
             it as StatusService
         }.let {
-            factory.create(account.key, it)
+            factory.create(account.accountKey, it)
         }
     }
 
@@ -51,9 +51,9 @@ class StatusActions @Inject constructor(
         GlobalScope.launch {
             val repository = repositoryFactory.invoke(account)
             if (status.liked) {
-                repository.unlike(status.statusId)
+                repository.unlike(status)
             } else {
-                repository.like(status.statusId)
+                repository.like(status)
             }
         }
     }
@@ -62,18 +62,12 @@ class StatusActions @Inject constructor(
         GlobalScope.launch {
             val repository = repositoryFactory.invoke(account)
             if (status.retweeted) {
-                repository.unRetweet(status.statusId)
+                repository.unRetweet(status)
             } else {
-                repository.retweet(status.statusId)
+                repository.retweet(status)
             }
         }
     }
 }
 
-object FakeStatusActions : IStatusActions {
-    override fun like(status: UiStatus, account: AccountDetails) {
-    }
-
-    override fun retweet(status: UiStatus, account: AccountDetails) {
-    }
-}
+object FakeStatusActions : IStatusActions

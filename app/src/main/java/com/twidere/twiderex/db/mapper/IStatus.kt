@@ -23,7 +23,7 @@ package com.twidere.twiderex.db.mapper
 import com.twidere.services.microblog.model.IStatus
 import com.twidere.services.microblog.model.IUser
 import com.twidere.twiderex.db.model.TimelineType
-import com.twidere.twiderex.model.UserKey
+import com.twidere.twiderex.model.MicroBlogKey
 
 private typealias TwitterUser = com.twidere.services.twitter.model.User
 private typealias TwitterUserV2 = com.twidere.services.twitter.model.UserV2
@@ -31,15 +31,15 @@ private typealias TwitterStatus = com.twidere.services.twitter.model.Status
 private typealias TwitterStatusV2 = com.twidere.services.twitter.model.StatusV2
 
 fun IStatus.toDbTimeline(
-    userKey: UserKey,
+    accountKey: MicroBlogKey,
     timelineType: TimelineType,
 ) = when (this) {
     is TwitterStatus -> this.toDbTimeline(
-        userKey = userKey,
+        accountKey = accountKey,
         timelineType = timelineType,
     )
     is TwitterStatusV2 -> this.toDbTimeline(
-        userKey = userKey,
+        accountKey = accountKey,
         timelineType = timelineType,
     )
     else -> throw NotImplementedError()

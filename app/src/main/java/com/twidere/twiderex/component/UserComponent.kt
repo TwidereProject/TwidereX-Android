@@ -35,7 +35,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
@@ -87,141 +86,21 @@ import com.twidere.twiderex.viewmodel.user.UserViewModel
 @Composable
 fun UserComponent(
     screenName: String,
+    host: String,
     initialData: UiUser? = null,
-    lazyListState: LazyListState = rememberLazyListState(),
 ) {
     val account = AmbientActiveAccount.current ?: return
     val viewModel = assistedViewModel<UserViewModel.AssistedFactory, UserViewModel>(
         account,
         screenName,
+        host,
     ) {
-        it.create(account, screenName)
+        it.create(account, screenName, host)
     }
-    val timelineViewModel =
-        assistedViewModel<UserTimelineViewModel.AssistedFactory, UserTimelineViewModel>(
-            account,
-            screenName,
-        ) {
-            it.create(account, screenName)
-        }
-    val mediaViewModel =
-        assistedViewModel<UserMediaTimelineViewModel.AssistedFactory, UserMediaTimelineViewModel>(
-            account,
-            screenName
-        ) {
-            it.create(account, screenName)
-        }
-    val favouriteViewModel =
-        assistedViewModel<UserFavouriteTimelineViewModel.AssistedFactory, UserFavouriteTimelineViewModel>(
-            account,
-            screenName,
-        ) {
-            it.create(account, screenName)
-        }
-
-    val timelineSource = timelineViewModel.source.collectAsLazyPagingItems()
-    val mediaSource = mediaViewModel.source.collectAsLazyPagingItems()
-    val favouriteSource = favouriteViewModel.source.collectAsLazyPagingItems()
-    val refreshing by viewModel.refreshing.observeAsState(initial = false)
     val viewModelUser by viewModel.user.observeAsState(initial = initialData)
-    val tabs = listOf(
-        vectorResource(id = R.drawable.ic_float_left),
-        vectorResource(id = R.drawable.ic_photo),
-        vectorResource(id = R.drawable.ic_heart),
-    )
-    val (selectedItem, setSelectedItem) = savedInstanceState { 0 }
 
     viewModelUser?.let { user ->
-        Box {
-            val shouldStickyHeaderShown = lazyListState.firstVisibleItemIndex >= 1
-            Surface(
-                modifier = Modifier.zIndex(1f),
-                elevation = if (shouldStickyHeaderShown) TopAppBarElevation else 0.dp
-            ) {
-                if (shouldStickyHeaderShown) {
-                    IconTabsComponent(
-                        items = tabs,
-                        selectedItem = selectedItem,
-                        onItemSelected = {
-                            setSelectedItem(it)
-                        },
-                    )
-                }
-            }
-
-            SwipeToRefreshLayout(
-                refreshingState = refreshing ||
-                    selectedItem == 0 && timelineSource.loadState.refresh is LoadState.Loading ||
-                    selectedItem == 1 && mediaSource.loadState.refresh is LoadState.Loading ||
-                    selectedItem == 2 && favouriteSource.loadState.refresh is LoadState.Loading,
-                onRefresh = {
-                    viewModel.refresh()
-                    when (selectedItem) {
-                        0 -> timelineSource.refreshOrRetry()
-                        1 -> mediaSource.refreshOrRetry()
-                        2 -> favouriteSource.refreshOrRetry()
-                    }
-                },
-            ) {
-                // TODO: not work if the user not posting anything
-                if (
-                    selectedItem == 0 && timelineSource.itemCount > 0 ||
-                    selectedItem == 1 && mediaSource.itemCount > 0 ||
-                    selectedItem == 2 && favouriteSource.itemCount > 0
-                ) {
-                    LazyColumn(
-                        state = lazyListState,
-                    ) {
-                        item {
-                            UserInfo(user = user, viewModel = viewModel)
-                        }
-
-                        item {
-                            IconTabsComponent(
-                                items = tabs,
-                                selectedItem = selectedItem,
-                                onItemSelected = {
-                                    setSelectedItem(it)
-                                },
-                            )
-                        }
-
-                        when (selectedItem) {
-                            0 -> {
-                                itemsPaging(timelineSource) { item ->
-                                    item?.let {
-                                        Column {
-                                            TimelineStatusComponent(it)
-                                            StatusDivider()
-                                        }
-                                    }
-                                }
-                            }
-                            1 -> {
-                                itemsPaging(mediaSource) { item ->
-                                    item?.let {
-                                        Column {
-                                            TimelineStatusComponent(it)
-                                            StatusDivider()
-                                        }
-                                    }
-                                }
-                            }
-                            2 -> {
-                                itemsPaging(favouriteSource) { item ->
-                                    item?.let {
-                                        Column {
-                                            TimelineStatusComponent(it)
-                                            StatusDivider()
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        UserContent(user, viewModel)
     } ?: run {
         Column(
             modifier = Modifier.fillMaxWidth().fillMaxHeight(),
@@ -229,6 +108,139 @@ fun UserComponent(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             LoadingProgress()
+        }
+    }
+}
+
+@IncomingComposeUpdate
+@Composable
+private fun UserContent(
+    user: UiUser,
+    viewModel: UserViewModel
+) {
+    val account = AmbientActiveAccount.current ?: return
+    val lazyListState = rememberLazyListState()
+    val timelineViewModel =
+        assistedViewModel<UserTimelineViewModel.AssistedFactory, UserTimelineViewModel>(
+            account,
+            user,
+        ) {
+            it.create(account, user)
+        }
+    val mediaViewModel =
+        assistedViewModel<UserMediaTimelineViewModel.AssistedFactory, UserMediaTimelineViewModel>(
+            account,
+            user,
+        ) {
+            it.create(account, user)
+        }
+    val favouriteViewModel =
+        assistedViewModel<UserFavouriteTimelineViewModel.AssistedFactory, UserFavouriteTimelineViewModel>(
+            account,
+            user,
+        ) {
+            it.create(account, user)
+        }
+
+    val timelineSource = timelineViewModel.source.collectAsLazyPagingItems()
+    val mediaSource = mediaViewModel.source.collectAsLazyPagingItems()
+    val favouriteSource = favouriteViewModel.source.collectAsLazyPagingItems()
+
+    Box {
+        val tabs = listOf(
+            vectorResource(id = R.drawable.ic_float_left),
+            vectorResource(id = R.drawable.ic_photo),
+            vectorResource(id = R.drawable.ic_heart),
+        )
+        val (selectedItem, setSelectedItem) = savedInstanceState { 0 }
+        val shouldStickyHeaderShown = lazyListState.firstVisibleItemIndex >= 1
+        Surface(
+            modifier = Modifier.zIndex(1f),
+            elevation = if (shouldStickyHeaderShown) TopAppBarElevation else 0.dp
+        ) {
+            if (shouldStickyHeaderShown) {
+                IconTabsComponent(
+                    items = tabs,
+                    selectedItem = selectedItem,
+                    onItemSelected = {
+                        setSelectedItem(it)
+                    },
+                )
+            }
+        }
+
+        val refreshing by viewModel.refreshing.observeAsState(initial = false)
+        SwipeToRefreshLayout(
+            refreshingState = refreshing ||
+                selectedItem == 0 && timelineSource.loadState.refresh is LoadState.Loading ||
+                selectedItem == 1 && mediaSource.loadState.refresh is LoadState.Loading ||
+                selectedItem == 2 && favouriteSource.loadState.refresh is LoadState.Loading,
+            onRefresh = {
+                viewModel.refresh()
+                when (selectedItem) {
+                    0 -> timelineSource.refreshOrRetry()
+                    1 -> mediaSource.refreshOrRetry()
+                    2 -> favouriteSource.refreshOrRetry()
+                }
+            },
+        ) {
+            // TODO: not work if the user not posting anything
+            if (
+                selectedItem == 0 && timelineSource.itemCount > 0 ||
+                selectedItem == 1 && mediaSource.itemCount > 0 ||
+                selectedItem == 2 && favouriteSource.itemCount > 0
+            ) {
+                LazyColumn(
+                    state = lazyListState,
+                ) {
+                    item {
+                        UserInfo(user = user, viewModel = viewModel)
+                    }
+
+                    item {
+                        IconTabsComponent(
+                            items = tabs,
+                            selectedItem = selectedItem,
+                            onItemSelected = {
+                                setSelectedItem(it)
+                            },
+                        )
+                    }
+
+                    when (selectedItem) {
+                        0 -> {
+                            itemsPaging(timelineSource) { item ->
+                                item?.let {
+                                    Column {
+                                        TimelineStatusComponent(it)
+                                        StatusDivider()
+                                    }
+                                }
+                            }
+                        }
+                        1 -> {
+                            itemsPaging(mediaSource) { item ->
+                                item?.let {
+                                    Column {
+                                        TimelineStatusComponent(it)
+                                        StatusDivider()
+                                    }
+                                }
+                            }
+                        }
+                        2 -> {
+                            itemsPaging(favouriteSource) { item ->
+                                item?.let {
+                                    Column {
+                                        TimelineStatusComponent(it)
+                                        StatusDivider()
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }

@@ -24,10 +24,11 @@ import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.twidere.twiderex.model.MediaType
+import com.twidere.twiderex.model.MicroBlogKey
 
 @Entity(
     tableName = "media",
-    indices = [Index(value = ["statusId", "mediaUrl"], unique = true)],
+    indices = [Index(value = ["statusKey", "mediaUrl"], unique = true)],
 )
 data class DbMedia(
     /**
@@ -35,7 +36,7 @@ data class DbMedia(
      */
     @PrimaryKey
     val _id: String,
-    val statusId: String,
+    val statusKey: MicroBlogKey,
     val url: String?,
     val mediaUrl: String?,
     val previewUrl: String?,

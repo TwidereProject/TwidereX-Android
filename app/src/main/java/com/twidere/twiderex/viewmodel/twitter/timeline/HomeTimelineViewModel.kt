@@ -41,6 +41,6 @@ class HomeTimelineViewModel @AssistedInject constructor(
     }
 
     override val pagingMediator: PagingWithGapMediator =
-        HomeTimelineMediator(account.service as TimelineService, account.key, database)
-    override val savedStateKey: String = "${account.key}_home"
+        HomeTimelineMediator(account.service as TimelineService, account.accountKey, database)
+    override val savedStateKey: String = "${account.accountKey}_home"
 }

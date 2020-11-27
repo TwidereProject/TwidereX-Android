@@ -69,7 +69,7 @@ fun TimelineStatusComponent(
                 .fillMaxWidth()
                 .clickable(
                     onClick = {
-                        navigator.status(data.statusId)
+                        navigator.status(data.statusKey)
                     }
                 )
                 .padding(
@@ -86,7 +86,7 @@ fun TimelineStatusComponent(
                 status = status,
                 showActions = showActions,
                 onStatusTextClicked = {
-                    navigator.status(data.statusId)
+                    navigator.status(data.statusKey)
                 }
             )
             if (showActions) {
@@ -202,12 +202,12 @@ private fun StatusComponent(
                         modifier = Modifier
                             .clickable(
                                 onClick = {
-                                    navigator.status(statusId = status.quote.statusId)
+                                    navigator.status(statusKey = status.quote.statusKey)
                                 }
                             )
                             .padding(standardPadding),
                         onStatusTextClicked = {
-                            navigator.status(statusId = status.quote.statusId)
+                            navigator.status(statusKey = status.quote.statusKey)
                         }
                     )
                 }

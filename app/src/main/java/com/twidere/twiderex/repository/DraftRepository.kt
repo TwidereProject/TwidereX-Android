@@ -22,6 +22,7 @@ package com.twidere.twiderex.repository
 
 import com.twidere.twiderex.db.AppDatabase
 import com.twidere.twiderex.db.model.DbDraft
+import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.scenes.ComposeType
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -39,7 +40,7 @@ class DraftRepository(
         content: String,
         media: List<String>,
         composeType: ComposeType,
-        statusId: String?,
+        statusKey: MicroBlogKey?,
         draftId: String = UUID.randomUUID().toString(),
         excludedReplyUserIds: List<String>? = null,
     ) {
@@ -49,7 +50,7 @@ class DraftRepository(
                 content = content,
                 composeType = composeType,
                 media = media,
-                statusId = statusId,
+                statusKey = statusKey,
                 createdAt = System.currentTimeMillis(),
                 excludedReplyUserIds = excludedReplyUserIds
             ).let {

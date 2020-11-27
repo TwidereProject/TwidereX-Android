@@ -163,7 +163,7 @@ private fun StatusComponent(
             Row(
                 modifier = Modifier.clickable(
                     onClick = {
-                        navigator.user(status.user.screenName)
+                        navigator.user(status.user)
                     }
                 )
             ) {
@@ -212,12 +212,12 @@ private fun StatusComponent(
                         modifier = Modifier
                             .clickable(
                                 onClick = {
-                                    navigator.status(status.quote.statusId)
+                                    navigator.status(status.quote.statusKey)
                                 }
                             )
                             .padding(standardPadding),
                         onStatusTextClicked = {
-                            navigator.status(status.quote.statusId)
+                            navigator.status(status.quote.statusKey)
                         }
                     )
                 }

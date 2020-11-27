@@ -32,6 +32,7 @@ import androidx.navigation.fragment.dialog
 import androidx.navigation.navDeepLink
 import com.twidere.twiderex.component.requireAuthorization
 import com.twidere.twiderex.dialog.TwitterWebSignInDialog
+import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.scenes.ComposeScene
 import com.twidere.twiderex.scenes.ComposeType
 import com.twidere.twiderex.scenes.DraftComposeScene
@@ -76,10 +77,12 @@ object Route {
         val TwitterWebSignInDialog = 1
     }
 
-    fun User(screenName: String) = "user/$screenName"
-    fun Status(statusId: String) = "status/$statusId"
-    fun Media(statusId: String, selectedIndex: Int = 0) =
-        "media/$statusId?selectedIndex=$selectedIndex"
+    fun User(userKey: MicroBlogKey) =
+        "user/${userKey.id}?host=${userKey.host}"
+
+    fun Status(statusKey: MicroBlogKey) = "status/${statusKey.id}?host=${statusKey.host}"
+    fun Media(statusKey: MicroBlogKey, selectedIndex: Int = 0) =
+        "media/${statusKey.id}?selectedIndex=$selectedIndex&host=${statusKey.host}"
 
     fun Search(keyword: String) = "search/result/${
     URLEncoder.encode(
@@ -100,8 +103,8 @@ object Route {
         }"
     }
 
-    fun Compose(composeType: ComposeType, statusId: String? = null) =
-        "compose/${composeType.name}?statusId=$statusId"
+    fun Compose(composeType: ComposeType, statusKey: MicroBlogKey? = null) =
+        "compose/${composeType.name}?statusId=${statusKey?.id}&host=${statusKey?.host}"
 
     object Settings {
         val Home = "settings"
@@ -165,9 +168,10 @@ fun NavGraphBuilder.route() {
     }
 
     authorizedComposable(
-        "user/{screenName}",
+        "user/{screenName}?host={host}",
         arguments = listOf(
             navArgument("screenName") { type = NavType.StringType },
+            navArgument("host") { type = NavType.StringType; nullable = true; },
         ),
         deepLinks = twitterHosts.map {
             navDeepLink {
@@ -177,30 +181,40 @@ fun NavGraphBuilder.route() {
             uriPattern = "${DeepLinks.User}{screenName}"
         }
     ) { backStackEntry ->
-        backStackEntry.arguments?.getString("screenName")?.let {
-            UserScene(name = it)
+        backStackEntry.arguments?.let { arguments ->
+            arguments.getString("screenName")?.let {
+                val host = arguments.getString("host") ?: MicroBlogKey.TwitterHost
+                UserScene(it, host = host)
+            }
         }
     }
 
     authorizedComposable(
-        "status/{statusId}",
-        arguments = listOf(navArgument("statusId") { type = NavType.StringType }),
+        "status/{statusId}?host={host}",
+        arguments = listOf(
+            navArgument("statusId") { type = NavType.StringType },
+            navArgument("host") { type = NavType.StringType; nullable = true; },
+        ),
         deepLinks = twitterHosts.map {
             navDeepLink {
                 uriPattern = "$it/{screenName}/status/{statusId}"
             }
         }
     ) { backStackEntry ->
-        backStackEntry.arguments?.getString("statusId")?.let {
-            StatusScene(statusId = it)
+        backStackEntry.arguments?.let { argument ->
+            val host = argument.getString("host") ?: MicroBlogKey.TwitterHost
+            argument.getString("statusId")?.let {
+                StatusScene(statusKey = MicroBlogKey(it, host))
+            }
         }
     }
 
     authorizedComposable(
-        "media/{statusId}?selectedIndex={selectedIndex}",
+        "media/{statusId}?selectedIndex={selectedIndex}&host={host}",
         arguments = listOf(
             navArgument("statusId") { type = NavType.StringType },
             navArgument("selectedIndex") { type = NavType.IntType; defaultValue = 0; },
+            navArgument("host") { type = NavType.StringType; nullable = true; },
         ),
         deepLinks = twitterHosts.map {
             navDeepLink {
@@ -211,8 +225,9 @@ fun NavGraphBuilder.route() {
         backStackEntry.arguments?.let { argument ->
             val statusId = argument.getString("statusId")
             val selectedIndex = argument.getInt("selectedIndex", 0)
+            val host = argument.getString("host") ?: MicroBlogKey.TwitterHost
             if (statusId != null) {
-                MediaScene(statusId = statusId, selectedIndex = selectedIndex)
+                MediaScene(statusKey = MicroBlogKey(statusId, host), selectedIndex = selectedIndex)
             }
         }
     }
@@ -247,18 +262,20 @@ fun NavGraphBuilder.route() {
     }
 
     authorizedComposable(
-        "compose/{composeType}?statusId={statusId}",
+        "compose/{composeType}?statusId={statusId}&host={host}",
         arguments = listOf(
             navArgument("composeType") { type = NavType.StringType },
-            navArgument("statusId") { nullable = true }
+            navArgument("statusId") { nullable = true },
+            navArgument("host") { type = NavType.StringType; nullable = true; },
         )
     ) { backStackEntry ->
         backStackEntry.arguments?.let { args ->
+            val host = args.getString("host") ?: MicroBlogKey.TwitterHost
             val type = args.getString("composeType")?.let {
                 enumValueOf(it)
             } ?: ComposeType.New
             val statusId = args.getString("statusId")
-            ComposeScene(statusId, type)
+            ComposeScene(statusId?.let { MicroBlogKey(it, host) }, type)
         }
     }
 

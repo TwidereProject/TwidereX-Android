@@ -113,7 +113,7 @@ private fun AboutContent() {
             Row {
                 IconButton(
                     onClick = {
-                        navigator.user("TwidereProject")
+//                        navigator.user("TwidereProject")
                     }
                 ) {
                     Icon(

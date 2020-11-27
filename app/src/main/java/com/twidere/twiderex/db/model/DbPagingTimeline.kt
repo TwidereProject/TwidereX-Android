@@ -26,14 +26,14 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import androidx.room.Relation
 import com.twidere.twiderex.db.AppDatabase
-import com.twidere.twiderex.model.UserKey
+import com.twidere.twiderex.model.MicroBlogKey
 import java.util.UUID
 
 @Entity(
     tableName = "paging_timeline",
     indices = [
         Index(
-            value = ["userKey", "statusId", "pagingKey"],
+            value = ["accountKey", "statusKey", "pagingKey"],
             unique = true
         )
     ],
@@ -41,9 +41,9 @@ import java.util.UUID
 data class DbPagingTimeline(
     @PrimaryKey
     val _id: String,
-    val userKey: UserKey,
+    val accountKey: MicroBlogKey,
     val pagingKey: String,
-    val statusId: String,
+    val statusKey: MicroBlogKey,
     val timestamp: Long,
     var isGap: Boolean,
 ) {
@@ -55,10 +55,10 @@ data class DbPagingTimeline(
                 timeline = with(timeline) {
                     DbPagingTimeline(
                         _id = UUID.randomUUID().toString(),
-                        userKey = userKey,
+                        accountKey = accountKey,
                         pagingKey = pagingKey,
                         timestamp = timestamp,
-                        statusId = statusId,
+                        statusKey = statusKey,
                         isGap = isGap,
                     )
                 },
@@ -73,8 +73,8 @@ data class DbPagingTimelineWithStatus(
     val timeline: DbPagingTimeline,
 
     @Relation(
-        parentColumn = "statusId",
-        entityColumn = "statusId",
+        parentColumn = "statusKey",
+        entityColumn = "statusKey",
         entity = DbStatusV2::class,
     )
     val status: DbStatusWithReference,
@@ -86,7 +86,7 @@ enum class UserTimelineType {
     Favourite
 }
 
-fun UserTimelineType.pagingKey(screenName: String) = "user:$screenName:$this"
+fun UserTimelineType.pagingKey(accountKey: MicroBlogKey) = "user:$accountKey:$this"
 
 suspend fun List<DbPagingTimelineWithStatus>.saveToDb(
     database: AppDatabase,

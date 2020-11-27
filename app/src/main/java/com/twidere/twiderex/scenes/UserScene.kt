@@ -37,7 +37,10 @@ import com.twidere.twiderex.ui.TwidereXTheme
 
 @OptIn(IncomingComposeUpdate::class)
 @Composable
-fun UserScene(name: String) {
+fun UserScene(
+    screenName: String,
+    host: String,
+) {
     TwidereXTheme {
         Scaffold(
             topBar = {
@@ -58,7 +61,7 @@ fun UserScene(name: String) {
                 )
             }
         ) {
-            UserComponent(screenName = name)
+            UserComponent(screenName, host)
         }
     }
 }

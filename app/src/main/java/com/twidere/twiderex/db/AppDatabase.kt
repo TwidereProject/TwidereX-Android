@@ -43,10 +43,10 @@ import com.twidere.twiderex.db.model.DbUrlEntity
 import com.twidere.twiderex.db.model.DbUser
 import com.twidere.twiderex.db.model.converter.ComposeTypeConverter
 import com.twidere.twiderex.db.model.converter.MediaTypeConverter
+import com.twidere.twiderex.db.model.converter.MicroBlogKeyConverter
 import com.twidere.twiderex.db.model.converter.PlatformTypeConverter
 import com.twidere.twiderex.db.model.converter.StringListConverter
 import com.twidere.twiderex.db.model.converter.TimelineTypeConverter
-import com.twidere.twiderex.db.model.converter.UserKeyConverter
 import com.twidere.twiderex.db.model.converter.UserTimelineTypeConverter
 import javax.inject.Singleton
 
@@ -66,7 +66,7 @@ import javax.inject.Singleton
     version = 1,
 )
 @TypeConverters(
-    UserKeyConverter::class,
+    MicroBlogKeyConverter::class,
     PlatformTypeConverter::class,
     MediaTypeConverter::class,
     TimelineTypeConverter::class,

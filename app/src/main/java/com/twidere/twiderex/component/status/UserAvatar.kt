@@ -54,7 +54,7 @@ fun UserAvatar(
             modifier = Modifier
                 .clickable(
                     onClick = {
-                        navigator.user(user.screenName)
+                        navigator.user(user)
                     }
                 )
                 .width(size)
