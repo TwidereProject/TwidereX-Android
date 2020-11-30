@@ -29,23 +29,12 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.annotatedString
 import com.twidere.twiderex.component.navigation.AmbientNavigator
 import com.twidere.twiderex.model.ui.UiStatus
-import com.twidere.twiderex.navigation.DeepLinks
-import com.twitter.twittertext.Autolink
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import org.jsoup.nodes.Node
 import org.jsoup.nodes.TextNode
 
 private const val TAG_URL = "url"
-
-private val autolink by lazy {
-    Autolink().apply {
-        setUsernameIncludeSymbol(true)
-        hashtagUrlBase = "${DeepLinks.Search}%23"
-        cashtagUrlBase = "${DeepLinks.Search}%24"
-        usernameUrlBase = DeepLinks.User
-    }
-}
 
 @Composable
 fun StatusText(
@@ -57,7 +46,7 @@ fun StatusText(
         AmbientTextStyle provides MaterialTheme.typography.body1.copy(color = MaterialTheme.colors.onBackground)
     ) {
         RenderContent(
-            html = autolink.autoLink(status.text),
+            html = status.text,
             status = status,
             onLinkClicked = {
                 navigator.openLink(it)
@@ -129,6 +118,11 @@ private fun AnnotatedString.Builder.RenderElement(element: Element, status: UiSt
         }
         "br" -> {
             RenderText("\n")
+        }
+        "span", "p" -> {
+            element.childNodes().forEach {
+                RenderNode(node = it, status = status)
+            }
         }
     }
 }

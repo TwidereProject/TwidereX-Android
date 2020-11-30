@@ -53,8 +53,8 @@ import com.twidere.twiderex.component.status.StatusDivider
 import com.twidere.twiderex.component.status.TimelineStatusComponent
 import com.twidere.twiderex.extensions.refreshOrRetry
 import com.twidere.twiderex.ui.standardPadding
-import com.twidere.twiderex.viewmodel.twitter.timeline.TimelineScrollState
-import com.twidere.twiderex.viewmodel.twitter.timeline.TimelineViewModel
+import com.twidere.twiderex.viewmodel.timeline.TimelineScrollState
+import com.twidere.twiderex.viewmodel.timeline.TimelineViewModel
 
 @OptIn(IncomingComposeUpdate::class)
 @Composable

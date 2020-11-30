@@ -55,7 +55,7 @@ class UserViewModel @AssistedInject constructor(
 
     private val repository by lazy {
         account.service.let {
-            factory.create(it as LookupService, it as RelationshipService)
+            factory.create(account.accountKey, it as LookupService, it as RelationshipService)
         }
     }
     val userKey = MutableLiveData<MicroBlogKey>()

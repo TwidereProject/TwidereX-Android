@@ -42,7 +42,7 @@ fun requireAuthorization(
         val (isSignInShown, setIsSignInShown) = savedInstanceState(key = key) { false }
         if (!isSignInShown) {
             setIsSignInShown(true)
-            navController.navigate(Route.SignIn.Twitter)
+            navController.navigate(Route.SignIn.Default)
         } else {
             activity.finish()
         }

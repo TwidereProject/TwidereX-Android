@@ -43,7 +43,8 @@ data class DbStatusV2(
      */
     val statusId: String,
     val statusKey: MicroBlogKey,
-    val text: String,
+    val htmlText: String,
+    val rawText: String,
     val timestamp: Long,
     val retweetCount: Long,
     val likeCount: Long,

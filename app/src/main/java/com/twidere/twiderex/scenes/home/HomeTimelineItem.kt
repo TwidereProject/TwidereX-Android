@@ -35,7 +35,7 @@ import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.scenes.ComposeType
 import com.twidere.twiderex.ui.AmbientActiveAccount
 import com.twidere.twiderex.ui.AmbientNavController
-import com.twidere.twiderex.viewmodel.twitter.timeline.HomeTimelineViewModel
+import com.twidere.twiderex.viewmodel.timeline.HomeTimelineViewModel
 
 class HomeTimelineItem : HomeNavigationItem() {
     @Composable

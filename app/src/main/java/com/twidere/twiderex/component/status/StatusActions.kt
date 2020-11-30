@@ -229,7 +229,7 @@ private fun StatusActionButtonWithNumbers(
             )
             if (count > 0) {
                 Box(modifier = Modifier.width(4.dp))
-                Text(text = count.humanizedCount())
+                Text(text = count.humanizedCount(), maxLines = 1)
             }
         }
     }

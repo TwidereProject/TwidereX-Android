@@ -28,7 +28,7 @@ import com.twidere.twiderex.R
 import com.twidere.twiderex.component.TimelineComponent
 import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.ui.AmbientActiveAccount
-import com.twidere.twiderex.viewmodel.twitter.timeline.MentionsTimelineViewModel
+import com.twidere.twiderex.viewmodel.timeline.MentionsTimelineViewModel
 
 class MentionItem : HomeNavigationItem() {
     @Composable

@@ -20,4 +20,54 @@
  */
 package com.twidere.services.mastodon
 
-interface MastodonService
+import com.twidere.services.http.authorization.BearerAuthorization
+import com.twidere.services.http.retrofit
+import com.twidere.services.mastodon.api.MastodonResources
+import com.twidere.services.microblog.MicroBlogService
+import com.twidere.services.microblog.TimelineService
+import com.twidere.services.microblog.model.IStatus
+
+class MastodonService(
+    private val host: String,
+    private val accessToken: String,
+) : MicroBlogService, TimelineService {
+    private val resources by lazy {
+        retrofit<MastodonResources>(
+            "https://$host",
+            BearerAuthorization(accessToken)
+        )
+    }
+
+    override suspend fun homeTimeline(
+        count: Int,
+        since_id: String?,
+        max_id: String?
+    ) = resources.homeTimeline(max_id, since_id, limit = count)
+
+    override suspend fun mentionsTimeline(
+        count: Int,
+        since_id: String?,
+        max_id: String?
+    ): List<IStatus> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun userTimeline(
+        screen_name: String,
+        count: Int,
+        since_id: String?,
+        max_id: String?,
+        exclude_replies: Boolean
+    ): List<IStatus> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun favorites(
+        screen_name: String,
+        count: Int,
+        since_id: String?,
+        max_id: String?
+    ): List<IStatus> {
+        TODO("Not yet implemented")
+    }
+}

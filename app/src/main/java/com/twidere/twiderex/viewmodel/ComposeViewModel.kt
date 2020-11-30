@@ -140,6 +140,7 @@ open class ComposeViewModel @AssistedInject constructor(
 
     protected val userRepository by lazy {
         userRepositoryFactory.create(
+            accountKey = account.accountKey,
             account.service as LookupService,
             account.service as RelationshipService,
         )

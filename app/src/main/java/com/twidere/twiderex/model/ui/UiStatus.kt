@@ -80,7 +80,7 @@ data class UiStatus(
             val reaction = reactions.firstOrNull { it.accountKey == userKey }
             UiStatus(
                 statusId = data.statusId,
-                text = data.text,
+                text = data.htmlText,
                 timestamp = data.timestamp,
                 retweetCount = data.retweetCount,
                 likeCount = data.likeCount,
@@ -106,7 +106,7 @@ data class UiStatus(
             val reaction = reactions.firstOrNull { it.accountKey == userKey }
             return UiStatus(
                 statusId = data.statusId,
-                text = data.text,
+                text = data.htmlText,
                 timestamp = data.timestamp,
                 retweetCount = data.retweetCount,
                 likeCount = data.likeCount,
@@ -132,7 +132,7 @@ data class UiStatus(
             val reaction = reactions.firstOrNull { it.accountKey == userKey }
             UiStatus(
                 statusId = data.statusId,
-                text = data.text,
+                text = data.htmlText,
                 timestamp = data.timestamp,
                 retweetCount = data.retweetCount,
                 likeCount = data.likeCount,
@@ -158,7 +158,7 @@ data class UiStatus(
             val reaction = reactions.firstOrNull { it.accountKey == userKey }
             UiStatus(
                 statusId = data.statusId,
-                text = data.text,
+                text = data.htmlText,
                 timestamp = data.timestamp,
                 retweetCount = data.retweetCount,
                 likeCount = data.likeCount,

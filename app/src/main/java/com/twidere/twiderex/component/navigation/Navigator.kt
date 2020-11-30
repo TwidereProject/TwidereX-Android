@@ -47,6 +47,7 @@ interface INavigator {
     fun compose(composeType: ComposeType, statusKey: MicroBlogKey? = null) {}
     fun openLink(it: String) {}
     fun twitterSignInWeb(target: String) {}
+    fun mastodonSignInWeb(target: String) {}
     fun searchInput(initial: String? = null) {}
 }
 
@@ -104,10 +105,21 @@ class Navigator(
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             navController.navigate(
-                Route.SignIn.TwitterWeb(target)
+                Route.SignIn.Web.Twitter(target)
             )
         } else {
             navController.navigate(Route.SignIn.TwitterWebSignInDialog, bundleOf("target" to target))
+        }
+    }
+
+    override fun mastodonSignInWeb(target: String) {
+        CookieManager.getInstance().removeAllCookies {
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            navController.navigate(
+                Route.SignIn.Web.Mastodon(target)
+            )
+        } else {
         }
     }
 }

@@ -18,7 +18,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.viewmodel.twitter.timeline
+package com.twidere.twiderex.viewmodel.timeline
 
 import android.content.SharedPreferences
 import com.squareup.inject.assisted.Assisted
@@ -27,20 +27,19 @@ import com.twidere.services.microblog.TimelineService
 import com.twidere.twiderex.db.AppDatabase
 import com.twidere.twiderex.di.assisted.IAssistedFactory
 import com.twidere.twiderex.model.AccountDetails
-import com.twidere.twiderex.paging.mediator.HomeTimelineMediator
+import com.twidere.twiderex.paging.mediator.MentionTimelineMediator
 import com.twidere.twiderex.paging.mediator.PagingWithGapMediator
 
-class HomeTimelineViewModel @AssistedInject constructor(
+class MentionsTimelineViewModel @AssistedInject constructor(
     preferences: SharedPreferences,
     database: AppDatabase,
-    @Assisted account: AccountDetails,
+    @Assisted private val account: AccountDetails
 ) : TimelineViewModel(preferences) {
     @AssistedInject.Factory
     interface AssistedFactory : IAssistedFactory {
-        fun create(account: AccountDetails): HomeTimelineViewModel
+        fun create(account: AccountDetails): MentionsTimelineViewModel
     }
-
     override val pagingMediator: PagingWithGapMediator =
-        HomeTimelineMediator(account.service as TimelineService, account.accountKey, database)
-    override val savedStateKey: String = "${account.accountKey}_home"
+        MentionTimelineMediator(account.service as TimelineService, account.accountKey, database)
+    override val savedStateKey: String = "${account.accountKey}_mentions"
 }

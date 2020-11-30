@@ -37,7 +37,18 @@ import com.twidere.twiderex.db.model.DbUser
 import com.twidere.twiderex.db.model.TimelineType
 import com.twidere.twiderex.model.MediaType
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.navigation.DeepLinks
+import com.twitter.twittertext.Autolink
 import java.util.UUID
+
+private val autolink by lazy {
+    Autolink().apply {
+        setUsernameIncludeSymbol(true)
+        hashtagUrlBase = "${DeepLinks.Search}%23"
+        cashtagUrlBase = "${DeepLinks.Search}%24"
+        usernameUrlBase = DeepLinks.User
+    }
+}
 
 fun StatusV2.toDbTimeline(
     accountKey: MicroBlogKey,
@@ -81,7 +92,8 @@ fun Status.toDbTimeline(
 ): DbTimelineWithStatus {
     val status = this.toDbStatusWithMediaAndUser(accountKey)
     val retweet = retweetedStatus?.toDbStatusWithMediaAndUser(accountKey)
-    val quote = (retweetedStatus?.quotedStatus ?: quotedStatus)?.toDbStatusWithMediaAndUser(accountKey)
+    val quote =
+        (retweetedStatus?.quotedStatus ?: quotedStatus)?.toDbStatusWithMediaAndUser(accountKey)
 
     return DbTimelineWithStatus(
         timeline = DbTimeline(
@@ -127,7 +139,35 @@ private fun StatusV2.toDbStatusWithMediaAndUser(
     val status = DbStatusV2(
         _id = UUID.randomUUID().toString(),
         statusId = id ?: throw IllegalArgumentException("Status.idStr should not be null"),
-        text = text ?: "",
+        rawText = text ?: "",
+        htmlText = autolink.autoLink(text ?: ""),
+//        htmlText = autolink.autoLinkEntities(text ?: "", entities?.let {
+//            (it.mentions?.map {
+//                Extractor.Entity(
+//                    it.start?.toInt() ?: 0,
+//                    it.end?.toInt() ?: 0,
+//                    it.username ?: "",
+//                    Extractor.Entity.Type.MENTION
+//                )
+//            } ?: emptyList()) + (it.hashtags?.map {
+//                Extractor.Entity(
+//                    it.start?.toInt() ?: 0,
+//                    it.end?.toInt() ?: 0,
+//                    it.tag ?: "",
+//                    Extractor.Entity.Type.HASHTAG
+//                )
+//            } ?: emptyList()) + (it.urls?.map {
+//                Extractor.Entity(
+//                    it.start?.toInt() ?: 0,
+//                    it.end?.toInt() ?: 0,
+//                    it.url ?: "",
+//                    Extractor.Entity.Type.URL
+//                ).apply {
+//                    displayURL = it.displayURL
+//                    expandedURL = it.expandedURL
+//                }
+//            } ?: emptyList())
+//        }?.distinctBy { it.start }?.sortedBy { it.start } ?: emptyList<Extractor.Entity>()),
         timestamp = createdAt?.time ?: 0,
         retweetCount = publicMetrics?.retweetCount ?: 0,
         likeCount = publicMetrics?.likeCount ?: 0,
@@ -185,7 +225,35 @@ private fun Status.toDbStatusWithMediaAndUser(
     val status = DbStatusV2(
         _id = UUID.randomUUID().toString(),
         statusId = idStr ?: throw IllegalArgumentException("Status.idStr should not be null"),
-        text = text ?: "",
+        rawText = fullText ?: text ?: "",
+        htmlText = autolink.autoLink(fullText ?: text ?: ""),
+//        htmlText = autolink.autoLinkEntities(fullText ?: text ?: "", entities?.let {
+//            (it.userMentions?.map {
+//                Extractor.Entity(
+//                    it.indices?.elementAtOrNull(0)?.toInt() ?: 0,
+//                    it.indices?.elementAtOrNull(1)?.toInt() ?: 0,
+//                    it.screenName ?: "",
+//                    Extractor.Entity.Type.MENTION
+//                )
+//            } ?: emptyList()) + (it.hashtags?.map {
+//                Extractor.Entity(
+//                    it.indices?.elementAtOrNull(0)?.toInt() ?: 0,
+//                    it.indices?.elementAtOrNull(1)?.toInt() ?: 0,
+//                    it.text ?: "",
+//                    Extractor.Entity.Type.HASHTAG
+//                )
+//            } ?: emptyList()) + (it.urls?.map {
+//                Extractor.Entity(
+//                    it.indices?.elementAtOrNull(0)?.toInt() ?: 0,
+//                    it.indices?.elementAtOrNull(1)?.toInt() ?: 0,
+//                    it.url ?: "",
+//                    Extractor.Entity.Type.URL
+//                ).apply {
+//                    displayURL = it.displayURL
+//                    expandedURL = it.expandedURL
+//                }
+//            } ?: emptyList())
+//        }?.sortedBy { it.start } ?: emptyList<Extractor.Entity>()),
         timestamp = createdAt?.time ?: 0,
         retweetCount = retweetCount ?: 0,
         likeCount = favoriteCount ?: 0,

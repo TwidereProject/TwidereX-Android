@@ -18,11 +18,20 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.services.http.authorization
+package com.twidere.services.mastodon.model
 
-import okhttp3.Request
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonArray
 
-interface Authorization {
-    val hasAuthorization: Boolean
-    fun getAuthorizationHeader(request: Request): String = ""
-}
+@Serializable
+data class Source(
+    val privacy: String? = null,
+    val sensitive: Boolean? = null,
+    val language: String? = null,
+    val note: String? = null,
+    val fields: JsonArray? = null,
+
+    @SerialName("follow_requests_count")
+    val followRequestsCount: Long? = null
+)

@@ -18,11 +18,19 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.services.http.authorization
+package com.twidere.services.mastodon.api
 
-import okhttp3.Request
+import com.twidere.services.mastodon.model.Status
+import retrofit2.http.GET
+import retrofit2.http.Query
 
-interface Authorization {
-    val hasAuthorization: Boolean
-    fun getAuthorizationHeader(request: Request): String = ""
+interface TimelineResources {
+    @GET("/api/v1/timelines/home")
+    suspend fun homeTimeline(
+        @Query("max_id") max_id: String? = null,
+        @Query("since_id") since_id: String? = null,
+        @Query("min_id") min_id: String? = null,
+        @Query("limit") limit: Int? = null,
+        @Query("local") local: Boolean? = null,
+    ): List<Status>
 }

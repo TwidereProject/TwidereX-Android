@@ -18,11 +18,27 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.services.http.authorization
+package com.twidere.services.mastodon.model
 
-import okhttp3.Request
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-interface Authorization {
-    val hasAuthorization: Boolean
-    fun getAuthorizationHeader(request: Request): String = ""
-}
+@Serializable
+data class Attachment(
+    val id: String? = null,
+    val type: MediaType? = null,
+    val url: String? = null,
+
+    @SerialName("preview_url")
+    val previewURL: String? = null,
+
+    @SerialName("remote_url")
+    val remoteURL: String? = null,
+
+    @SerialName("text_url")
+    val textURL: String? = null,
+
+    val meta: Meta? = null,
+    val description: String? = null,
+    val blurhash: String? = null
+)

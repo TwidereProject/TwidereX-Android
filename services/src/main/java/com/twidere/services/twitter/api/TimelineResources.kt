@@ -33,6 +33,8 @@ interface TimelineResources {
         @Query("trim_user") trim_user: Boolean? = null,
         @Query("exclude_replies") exclude_replies: Boolean? = null,
         @Query("include_entities") include_entities: Boolean? = null,
+        @Query("tweet_mode") tweet_mode: String = "extended",
+        @Query("include_ext_alt_text") include_ext_alt_text: Boolean = true,
     ): List<Status>
 
     @GET("/1.1/statuses/mentions_timeline.json")

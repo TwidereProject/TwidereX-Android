@@ -41,6 +41,8 @@ import com.twidere.twiderex.scenes.HomeScene
 import com.twidere.twiderex.scenes.MediaScene
 import com.twidere.twiderex.scenes.StatusScene
 import com.twidere.twiderex.scenes.UserScene
+import com.twidere.twiderex.scenes.mastodon.MastodonSignInScene
+import com.twidere.twiderex.scenes.mastodon.MastodonWebSignInScene
 import com.twidere.twiderex.scenes.search.SearchInputScene
 import com.twidere.twiderex.scenes.search.SearchScene
 import com.twidere.twiderex.scenes.settings.AboutScene
@@ -66,13 +68,27 @@ object Route {
     }
 
     object SignIn {
+        val Default by lazy {
+            Twitter
+        }
         val Twitter = "signin/twitter"
-        fun TwitterWeb(target: String) = "signin/twitter/web/${
-        URLEncoder.encode(
-            target,
-            "UTF-8"
-        )
-        }"
+        val Mastodon = "signin/mastodon"
+
+        object Web {
+            fun Twitter(target: String) = "signin/twitter/web/${
+            URLEncoder.encode(
+                target,
+                "UTF-8"
+            )
+            }"
+
+            fun Mastodon(target: String) = "signin/mastodon/web/${
+            URLEncoder.encode(
+                target,
+                "UTF-8"
+            )
+            }"
+        }
 
         val TwitterWebSignInDialog = 1
     }
@@ -151,12 +167,30 @@ fun NavGraphBuilder.route() {
         TwitterSignInScene()
     }
 
+    composable(Route.SignIn.Mastodon) {
+        MastodonSignInScene()
+    }
+
     composable(
         "signin/twitter/web/{target}",
         arguments = listOf(navArgument("target") { type = NavType.StringType }),
     ) { backStackEntry ->
         backStackEntry.arguments?.getString("target")?.let {
             TwitterWebSignInScene(target = URLDecoder.decode(it, "UTF-8"))
+        }
+    }
+
+    composable(
+        "signin/mastodon/web/{target}",
+        arguments = listOf(
+            navArgument("target") {
+                type =
+                    NavType.StringType
+            },
+        ),
+    ) { backStackEntry ->
+        backStackEntry.arguments?.getString("target")?.let {
+            MastodonWebSignInScene(target = URLDecoder.decode(it, "UTF-8"))
         }
     }
 

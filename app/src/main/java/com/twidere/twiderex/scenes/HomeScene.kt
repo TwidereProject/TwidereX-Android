@@ -296,7 +296,7 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
                         ListItem(
                             modifier = Modifier.clickable(
                                 onClick = {
-                                    navController.navigate(Route.SignIn.Twitter)
+                                    navController.navigate(Route.SignIn.Default)
                                 }
                             ),
                             text = {

@@ -37,7 +37,11 @@ class TwitterSearchUserViewModel(
 
     val source by lazy {
         Pager(config = PagingConfig(pageSize = defaultLoadCount)) {
-            SearchUserPagingSource(keyword, account.service as SearchService)
+            SearchUserPagingSource(
+                accountKey = account.accountKey,
+                keyword,
+                account.service as SearchService
+            )
         }.flow.cachedIn(viewModelScope)
     }
 }

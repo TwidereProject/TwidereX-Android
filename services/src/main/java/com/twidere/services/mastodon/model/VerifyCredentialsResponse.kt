@@ -18,11 +18,16 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.services.http.authorization
+package com.twidere.services.mastodon.model
 
-import okhttp3.Request
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-interface Authorization {
-    val hasAuthorization: Boolean
-    fun getAuthorizationHeader(request: Request): String = ""
-}
+@Serializable
+data class VerifyCredentialsResponse(
+    val name: String? = null,
+    val website: String? = null,
+
+    @SerialName("vapid_key")
+    val vapidKey: String? = null
+)

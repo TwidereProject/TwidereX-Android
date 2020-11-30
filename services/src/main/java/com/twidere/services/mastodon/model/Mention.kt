@@ -18,11 +18,14 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.services.http.authorization
+package com.twidere.services.mastodon.model
 
-import okhttp3.Request
+import kotlinx.serialization.Serializable
 
-interface Authorization {
-    val hasAuthorization: Boolean
-    fun getAuthorizationHeader(request: Request): String = ""
-}
+@Serializable
+data class Mention(
+    val id: String? = null,
+    val username: String? = null,
+    val url: String? = null,
+    val acct: String? = null
+)

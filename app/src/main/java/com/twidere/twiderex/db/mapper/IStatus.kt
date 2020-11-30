@@ -29,6 +29,8 @@ private typealias TwitterUser = com.twidere.services.twitter.model.User
 private typealias TwitterUserV2 = com.twidere.services.twitter.model.UserV2
 private typealias TwitterStatus = com.twidere.services.twitter.model.Status
 private typealias TwitterStatusV2 = com.twidere.services.twitter.model.StatusV2
+private typealias MastodonStatus = com.twidere.services.mastodon.model.Status
+private typealias MastodonUser = com.twidere.services.mastodon.model.Account
 
 fun IStatus.toDbTimeline(
     accountKey: MicroBlogKey,
@@ -42,11 +44,20 @@ fun IStatus.toDbTimeline(
         accountKey = accountKey,
         timelineType = timelineType,
     )
+    is MastodonStatus -> this.toDbTimeline(
+        accountKey = accountKey,
+        timelineType = timelineType
+    )
     else -> throw NotImplementedError()
 }
 
-fun IUser.toDbUser() = when (this) {
+fun IUser.toDbUser(
+    accountKey: MicroBlogKey
+) = when (this) {
     is TwitterUser -> this.toDbUser()
     is TwitterUserV2 -> this.toDbUser()
+    is MastodonUser -> this.toDbUser(
+        accountKey = accountKey
+    )
     else -> throw NotImplementedError()
 }

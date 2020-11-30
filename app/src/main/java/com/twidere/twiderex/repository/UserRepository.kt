@@ -36,6 +36,7 @@ import com.twidere.twiderex.model.ui.UiUser.Companion.toUi
 class UserRepository @AssistedInject constructor(
     private val database: AppDatabase,
     private val accountRepository: AccountRepository,
+    @Assisted private val accountKey: MicroBlogKey,
     @Assisted private val lookupService: LookupService,
     @Assisted private val relationshipService: RelationshipService,
 ) {
@@ -43,19 +44,20 @@ class UserRepository @AssistedInject constructor(
     @AssistedInject.Factory
     interface AssistedFactory {
         fun create(
+            accountKey: MicroBlogKey,
             lookupService: LookupService,
             relationshipService: RelationshipService,
         ): UserRepository
     }
 
     suspend fun lookupUserByName(name: String): UiUser {
-        val user = lookupService.lookupUserByName(name).toDbUser()
+        val user = lookupService.lookupUserByName(name).toDbUser(accountKey)
         saveUser(user)
         return user.toUi()
     }
 
     suspend fun lookupUsersByName(name: List<String>): List<UiUser> {
-        return lookupService.lookupUsersByName(name = name).map { it.toDbUser().toUi() }
+        return lookupService.lookupUsersByName(name = name).map { it.toDbUser(accountKey).toUi() }
     }
 
     fun getUserLiveData(userKey: MicroBlogKey): LiveData<UiUser?> {

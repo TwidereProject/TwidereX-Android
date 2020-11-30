@@ -32,11 +32,11 @@ import com.twidere.twiderex.viewmodel.DraftComposeViewModel
 import com.twidere.twiderex.viewmodel.DraftItemViewModel
 import com.twidere.twiderex.viewmodel.MediaViewModel
 import com.twidere.twiderex.viewmodel.search.SearchInputViewModel
+import com.twidere.twiderex.viewmodel.timeline.HomeTimelineViewModel
+import com.twidere.twiderex.viewmodel.timeline.MentionsTimelineViewModel
 import com.twidere.twiderex.viewmodel.twitter.TwitterStatusViewModel
 import com.twidere.twiderex.viewmodel.twitter.search.TwitterSearchMediaViewModel
 import com.twidere.twiderex.viewmodel.twitter.search.TwitterSearchTweetsViewModel
-import com.twidere.twiderex.viewmodel.twitter.timeline.HomeTimelineViewModel
-import com.twidere.twiderex.viewmodel.twitter.timeline.MentionsTimelineViewModel
 import com.twidere.twiderex.viewmodel.user.UserFavouriteTimelineViewModel
 import com.twidere.twiderex.viewmodel.user.UserMediaTimelineViewModel
 import com.twidere.twiderex.viewmodel.user.UserTimelineViewModel

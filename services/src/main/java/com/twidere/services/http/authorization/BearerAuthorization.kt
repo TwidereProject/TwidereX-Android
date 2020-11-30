@@ -18,17 +18,17 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.model
+package com.twidere.services.http.authorization
 
-// data class MediaData(
-//    val previewUrl: String?,
-//    val sourceUrl: String?,
-//    val pageUrl: String?,
-//    val type: MediaType,
-// )
+import okhttp3.Request
 
-enum class MediaType {
-    photo,
-    video,
-    animated_gif,
+class BearerAuthorization(
+    private val accessToken: String,
+) : Authorization {
+    override val hasAuthorization: Boolean
+        get() = true
+
+    override fun getAuthorizationHeader(request: Request): String {
+        return "Bearer $accessToken"
+    }
 }

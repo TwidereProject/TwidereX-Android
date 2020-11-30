@@ -67,7 +67,7 @@ fun AccountManagementScene() {
                         val navController = AmbientNavController.current
                         IconButton(
                             onClick = {
-                                navController.navigate(Route.SignIn.Twitter)
+                                navController.navigate(Route.SignIn.Default)
                             }
                         ) {
                             Icon(asset = Icons.Default.Add)
