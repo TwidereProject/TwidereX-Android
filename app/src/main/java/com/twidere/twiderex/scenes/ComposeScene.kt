@@ -647,9 +647,11 @@ private fun ComposeActions(viewModel: ComposeViewModel) {
                 Icon(asset = vectorResource(id = R.drawable.ic_map_pin))
             }
             Spacer(modifier = Modifier.weight(1f))
-            IconButton(onClick = {
-                navController.navigate(Route.Draft.List)
-            }) {
+            IconButton(
+                onClick = {
+                    navController.navigate(Route.Draft.List)
+                }
+            ) {
                 Icon(asset = vectorResource(id = R.drawable.ic_note))
             }
         }

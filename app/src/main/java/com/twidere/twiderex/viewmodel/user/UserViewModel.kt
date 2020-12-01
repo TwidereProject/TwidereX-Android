@@ -80,7 +80,6 @@ class UserViewModel @AssistedInject constructor(
             val user = repository.lookupUserByName(screenName)
             userKey.postValue(user.userKey)
         } catch (e: MicroBlogException) {
-            
         }
         refreshing.postValue(false)
     }

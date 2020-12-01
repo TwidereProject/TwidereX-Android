@@ -167,18 +167,20 @@ class TwitterService(
         )
         if (user.data == null) {
             if (user.errors != null && user.errors.any()) {
-                throw MicroBlogException(errors = user.errors.map {
-                    Errors(
-                        code = null,
-                        message = null,
-                        detail = it.detail,
-                        title = it.title,
-                        resource_type = it.resourceType,
-                        parameter = it.parameter,
-                        value = it.value,
-                        type = it.type,
-                    )
-                })
+                throw MicroBlogException(
+                    errors = user.errors.map {
+                        Errors(
+                            code = null,
+                            message = null,
+                            detail = it.detail,
+                            title = it.title,
+                            resource_type = it.resourceType,
+                            parameter = it.parameter,
+                            value = it.value,
+                            type = it.type,
+                        )
+                    }
+                )
             } else {
                 // Shouldn't happen?
                 throw Exception()
@@ -214,18 +216,20 @@ class TwitterService(
         )
         if (user.data == null) {
             if (user.errors != null && user.errors.any()) {
-                throw MicroBlogException(errors = user.errors.map {
-                    Errors(
-                        code = null,
-                        message = null,
-                        detail = it.detail,
-                        title = it.title,
-                        resource_type = it.resourceType,
-                        parameter = it.parameter,
-                        value = it.value,
-                        type = it.type,
-                    )
-                })
+                throw MicroBlogException(
+                    errors = user.errors.map {
+                        Errors(
+                            code = null,
+                            message = null,
+                            detail = it.detail,
+                            title = it.title,
+                            resource_type = it.resourceType,
+                            parameter = it.parameter,
+                            value = it.value,
+                            type = it.type,
+                        )
+                    }
+                )
             } else {
                 // Shouldn't happen?
                 throw Exception()
