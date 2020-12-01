@@ -26,8 +26,10 @@ import com.twidere.services.serializer.DateQueryConverterFactory
 import com.twidere.services.utils.DEBUG
 import com.twidere.services.utils.JSON
 import kotlinx.serialization.ExperimentalSerializationApi
+import okhttp3.Interceptor
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
+import okhttp3.Response
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.scalars.ScalarsConverterFactory
@@ -36,6 +38,7 @@ import retrofit2.converter.scalars.ScalarsConverterFactory
 internal inline fun <reified T> retrofit(
     baseUrl: String,
     authorization: Authorization,
+    vararg interceptors: (chain: Interceptor.Chain) -> Response
 ): T {
     return Retrofit
         .Builder()
@@ -58,6 +61,9 @@ internal inline fun <reified T> retrofit(
                                 request.newBuilder().url(request.url.toString().replace("%20", "+")).build()
                             }
                         )
+                    }
+                    interceptors.forEach {
+                        addInterceptor(it)
                     }
                 }
                 .build()

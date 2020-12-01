@@ -24,6 +24,7 @@ import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
 import androidx.paging.PagingState
 import androidx.room.withTransaction
+import com.twidere.services.http.MicroBlogException
 import com.twidere.services.microblog.model.IStatus
 import com.twidere.twiderex.db.AppDatabase
 import com.twidere.twiderex.db.mapper.toDbTimeline
@@ -32,9 +33,9 @@ import com.twidere.twiderex.db.model.DbPagingTimelineWithStatus
 import com.twidere.twiderex.db.model.TimelineType
 import com.twidere.twiderex.db.model.saveToDb
 import com.twidere.twiderex.model.MicroBlogKey
-import retrofit2.HttpException
 import java.io.IOException
 import java.net.SocketTimeoutException
+import retrofit2.HttpException
 
 @OptIn(ExperimentalPagingApi::class)
 abstract class PagingTimelineMediatorBase(
@@ -79,6 +80,8 @@ abstract class PagingTimelineMediatorBase(
             return MediatorResult.Success(
                 endOfPaginationReached = hasMore(result, pageSize)
             )
+        } catch (e: MicroBlogException) {
+            return MediatorResult.Error(e)
         } catch (e: IOException) {
             return MediatorResult.Error(e)
         } catch (e: HttpException) {

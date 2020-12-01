@@ -28,6 +28,7 @@ import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
+import com.twidere.services.http.MicroBlogException
 import com.twidere.services.microblog.LookupService
 import com.twidere.services.microblog.RelationshipService
 import com.twidere.services.microblog.model.IRelationship
@@ -75,7 +76,12 @@ class UserViewModel @AssistedInject constructor(
 
     fun refresh() = viewModelScope.launch {
         refreshing.postValue(true)
-        userKey.postValue(repository.lookupUserByName(screenName).userKey)
+        try {
+            val user = repository.lookupUserByName(screenName)
+            userKey.postValue(user.userKey)
+        } catch (e: MicroBlogException) {
+            
+        }
         refreshing.postValue(false)
     }
 

@@ -20,6 +20,8 @@
  */
 package com.twidere.services.twitter
 
+import com.twidere.services.http.Errors
+import com.twidere.services.http.MicroBlogException
 import com.twidere.services.http.authorization.OAuth1Authorization
 import com.twidere.services.http.retrofit
 import com.twidere.services.microblog.LookupService
@@ -31,7 +33,6 @@ import com.twidere.services.microblog.TimelineService
 import com.twidere.services.microblog.model.IRelationship
 import com.twidere.services.microblog.model.IStatus
 import com.twidere.services.microblog.model.IUser
-import com.twidere.services.microblog.model.MicroBlogError
 import com.twidere.services.microblog.model.Relationship
 import com.twidere.services.twitter.api.TwitterResources
 import com.twidere.services.twitter.api.UploadResources
@@ -46,6 +47,7 @@ import com.twidere.services.twitter.model.fields.TweetFields
 import com.twidere.services.twitter.model.fields.UserFields
 import com.twidere.services.utils.Base64
 import com.twidere.services.utils.copyToInLength
+import com.twidere.services.utils.decodeJson
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
 
@@ -72,6 +74,15 @@ class TwitterService(
                 access_token,
                 access_token_secret,
             ),
+            { chain ->
+                val response = chain.proceed(chain.request())
+                if (response.code != 200) {
+                    response.body?.string()?.decodeJson<MicroBlogException>()?.let {
+                        throw it
+                    }
+                }
+                response
+            }
         )
     }
     private val uploadResources by lazy {
@@ -156,10 +167,21 @@ class TwitterService(
         )
         if (user.data == null) {
             if (user.errors != null && user.errors.any()) {
-                throw MicroBlogError(user.errors.first().detail)
+                throw MicroBlogException(errors = user.errors.map {
+                    Errors(
+                        code = null,
+                        message = null,
+                        detail = it.detail,
+                        title = it.title,
+                        resource_type = it.resourceType,
+                        parameter = it.parameter,
+                        value = it.value,
+                        type = it.type,
+                    )
+                })
             } else {
                 // Shouldn't happen?
-                throw MicroBlogError()
+                throw Exception()
             }
         }
         user.data.profileBanner = runCatching {
@@ -192,10 +214,21 @@ class TwitterService(
         )
         if (user.data == null) {
             if (user.errors != null && user.errors.any()) {
-                throw MicroBlogError(user.errors.first().detail)
+                throw MicroBlogException(errors = user.errors.map {
+                    Errors(
+                        code = null,
+                        message = null,
+                        detail = it.detail,
+                        title = it.title,
+                        resource_type = it.resourceType,
+                        parameter = it.parameter,
+                        value = it.value,
+                        type = it.type,
+                    )
+                })
             } else {
                 // Shouldn't happen?
-                throw MicroBlogError()
+                throw Exception()
             }
         }
         user.data.profileBanner = user.data.username?.let { userName ->
@@ -217,7 +250,7 @@ class TwitterService(
             expansions = Expansions.values().joinToString(",") { it.value },
             tweetFields = TweetFields.values().joinToString(",") { it.value },
         )
-        val data = response.data ?: throw MicroBlogError("Status not found")
+        val data = response.data ?: throw MicroBlogException("Status not found")
         response.includes?.let {
             data.setExtra(it)
         }
