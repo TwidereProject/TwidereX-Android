@@ -78,6 +78,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.SoftwareKeyboardController
 import androidx.compose.ui.unit.dp
+import androidx.navigation.compose.navigate
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.BackButtonHandler
 import com.twidere.twiderex.component.foundation.AppBar
@@ -93,6 +94,7 @@ import com.twidere.twiderex.launcher.AmbientLauncher
 import com.twidere.twiderex.maxComposeTextLength
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.ui.AmbientActiveAccount
 import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.ui.TwidereXTheme
@@ -594,6 +596,7 @@ private fun ComposeActions(viewModel: ComposeViewModel) {
     val launcher = AmbientLauncher.current
     val scope = rememberCoroutineScope()
     val context = ContextAmbient.current
+    val navController = AmbientNavController.current
     Box {
         Row {
             IconButton(
@@ -607,15 +610,16 @@ private fun ComposeActions(viewModel: ComposeViewModel) {
             ) {
                 Icon(asset = vectorResource(id = R.drawable.ic_camera))
             }
-            IconButton(onClick = {}) {
-                Icon(asset = vectorResource(id = R.drawable.ic_gif))
-            }
-            IconButton(onClick = {}) {
-                Icon(asset = vectorResource(id = R.drawable.ic_at_sign))
-            }
-            IconButton(onClick = {}) {
-                Icon(asset = vectorResource(id = R.drawable.ic_hash))
-            }
+            // TODO:
+//            IconButton(onClick = {}) {
+//                Icon(asset = vectorResource(id = R.drawable.ic_gif))
+//            }
+//            IconButton(onClick = {}) {
+//                Icon(asset = vectorResource(id = R.drawable.ic_at_sign))
+//            }
+//            IconButton(onClick = {}) {
+//                Icon(asset = vectorResource(id = R.drawable.ic_hash))
+//            }
             IconButton(
                 onClick = {
                     if (locationEnabled) {
@@ -643,7 +647,9 @@ private fun ComposeActions(viewModel: ComposeViewModel) {
                 Icon(asset = vectorResource(id = R.drawable.ic_map_pin))
             }
             Spacer(modifier = Modifier.weight(1f))
-            IconButton(onClick = {}) {
+            IconButton(onClick = {
+                navController.navigate(Route.Draft.List)
+            }) {
                 Icon(asset = vectorResource(id = R.drawable.ic_note))
             }
         }
