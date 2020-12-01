@@ -139,6 +139,7 @@ private fun StatusV2.toDbStatusWithMediaAndUser(
     val status = DbStatusV2(
         _id = UUID.randomUUID().toString(),
         statusId = id ?: throw IllegalArgumentException("Status.idStr should not be null"),
+        is_possibly_sensitive = possiblySensitive ?: false,
         rawText = text ?: "",
         htmlText = autolink.autoLink(text ?: ""),
 //        htmlText = autolink.autoLinkEntities(text ?: "", entities?.let {
@@ -225,6 +226,7 @@ private fun Status.toDbStatusWithMediaAndUser(
     val status = DbStatusV2(
         _id = UUID.randomUUID().toString(),
         statusId = idStr ?: throw IllegalArgumentException("Status.idStr should not be null"),
+        is_possibly_sensitive = possiblySensitive ?: false,
         rawText = fullText ?: text ?: "",
         htmlText = autolink.autoLink(fullText ?: text ?: ""),
 //        htmlText = autolink.autoLinkEntities(fullText ?: text ?: "", entities?.let {

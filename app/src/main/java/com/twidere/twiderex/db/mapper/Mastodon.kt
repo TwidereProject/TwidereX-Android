@@ -88,7 +88,8 @@ private fun Status.toDbStatusWithMediaAndUser(
         statusKey = MicroBlogKey(
             id ?: throw IllegalArgumentException("mastodon Status.idStr should not be null"),
             host = user.userKey.host,
-        )
+        ),
+        is_possibly_sensitive = sensitive ?: false
     )
     return DbStatusWithMediaAndUser(
         data = status,

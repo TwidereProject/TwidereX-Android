@@ -57,6 +57,7 @@ data class DbStatusV2(
     val replyStatusId: String?,
     val quoteStatusId: String?,
     val retweetStatusId: String?,
+    val is_possibly_sensitive: Boolean,
 )
 
 data class DbStatusWithMediaAndUser(
