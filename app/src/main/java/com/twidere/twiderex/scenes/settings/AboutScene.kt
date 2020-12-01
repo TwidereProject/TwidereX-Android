@@ -43,12 +43,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.compose.navigate
 import com.twidere.twiderex.BuildConfig
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.LoginLogo
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.navigation.AmbientNavigator
+import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.navigation.Route
+import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.ui.TwidereXTheme
 
 @Composable
@@ -74,6 +78,7 @@ fun AboutScene() {
 @Composable
 private fun AboutContent() {
     val navigator = AmbientNavigator.current
+    val navController = AmbientNavController.current
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -113,7 +118,7 @@ private fun AboutContent() {
             Row {
                 IconButton(
                     onClick = {
-//                        navigator.user("TwidereProject")
+                        navController.navigate(Route.User(MicroBlogKey.twitter("TwidereProject")))
                     }
                 ) {
                     Icon(
