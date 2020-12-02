@@ -248,7 +248,7 @@ open class ComposeViewModel @AssistedInject constructor(
     }
 
     fun disableLocation() {
-        location.postValue(null)
+        location.value = null
         locationEnabled.postValue(false)
         locationManager.removeUpdates(this)
     }
