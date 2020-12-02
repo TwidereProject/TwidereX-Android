@@ -146,6 +146,7 @@ open class ComposeViewModel @AssistedInject constructor(
         )
     }
 
+    val location = MutableLiveData<Location?>()
     val excludedReplyUserIds = MutableLiveData<List<String>>(emptyList())
 
     val replyToUserName = liveData {
@@ -180,7 +181,6 @@ open class ComposeViewModel @AssistedInject constructor(
     val canSaveDraft = MutableLiveData(false)
     val text = MutableLiveData("")
     val images = MutableLiveData<List<Uri>>(emptyList())
-    val location = MutableLiveData<Location?>()
     val locationEnabled = MutableLiveData(false)
     val status = liveData {
         statusKey?.let {
@@ -248,7 +248,7 @@ open class ComposeViewModel @AssistedInject constructor(
     }
 
     fun disableLocation() {
-        location.value = null
+        location.postValue(null)
         locationEnabled.postValue(false)
         locationManager.removeUpdates(this)
     }
