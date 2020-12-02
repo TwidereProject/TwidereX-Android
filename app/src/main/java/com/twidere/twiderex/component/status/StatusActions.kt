@@ -173,7 +173,7 @@ fun ShareButton(
 ) {
     val context = ContextAmbient.current
     val action = {
-        context.shareText(status.text)
+        context.shareText(status.rawText)
     }
     val icon = vectorResource(id = R.drawable.ic_share)
     if (compat) {

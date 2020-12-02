@@ -167,7 +167,7 @@ fun MediaScene(status: UiStatus, selectedIndex: Int) {
                                         navController.navigate(Route.Status(status.statusKey))
                                     }
                                 ),
-                            text = status.text,
+                            text = status.rawText,
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis,
                         )

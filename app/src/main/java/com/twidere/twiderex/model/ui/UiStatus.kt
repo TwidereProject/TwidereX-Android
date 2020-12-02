@@ -33,7 +33,8 @@ import com.twidere.twiderex.model.ui.UiUser.Companion.toUi
 data class UiStatus(
     val statusId: String,
     val statusKey: MicroBlogKey,
-    val text: String,
+    val htmlText: String,
+    val rawText: String,
     val timestamp: Long,
     val retweetCount: Long,
     val likeCount: Long,
@@ -55,7 +56,7 @@ data class UiStatus(
         @Composable
         fun sample() = UiStatus(
             statusId = "",
-            text = "Thanks for using @TwidereProject!",
+            htmlText = "Thanks for using @TwidereProject!",
             timestamp = System.currentTimeMillis(),
             retweetCount = 1200,
             likeCount = 123,
@@ -72,6 +73,7 @@ data class UiStatus(
             isGap = false,
             url = emptyList(),
             statusKey = MicroBlogKey.Empty,
+            rawText = "",
         )
 
         fun DbTimelineWithStatus.toUi(
@@ -80,7 +82,7 @@ data class UiStatus(
             val reaction = reactions.firstOrNull { it.accountKey == userKey }
             UiStatus(
                 statusId = data.statusId,
-                text = data.htmlText,
+                htmlText = data.htmlText,
                 timestamp = data.timestamp,
                 retweetCount = data.retweetCount,
                 likeCount = data.likeCount,
@@ -97,6 +99,7 @@ data class UiStatus(
                 source = data.source,
                 url = url.toUi(),
                 statusKey = data.statusKey,
+                rawText = data.rawText,
             )
         }
 
@@ -106,7 +109,7 @@ data class UiStatus(
             val reaction = reactions.firstOrNull { it.accountKey == userKey }
             return UiStatus(
                 statusId = data.statusId,
-                text = data.htmlText,
+                htmlText = data.htmlText,
                 timestamp = data.timestamp,
                 retweetCount = data.retweetCount,
                 likeCount = data.likeCount,
@@ -123,6 +126,7 @@ data class UiStatus(
                 source = data.source,
                 url = url.toUi(),
                 statusKey = data.statusKey,
+                rawText = data.rawText,
             )
         }
 
@@ -132,7 +136,7 @@ data class UiStatus(
             val reaction = reactions.firstOrNull { it.accountKey == userKey }
             UiStatus(
                 statusId = data.statusId,
-                text = data.htmlText,
+                htmlText = data.htmlText,
                 timestamp = data.timestamp,
                 retweetCount = data.retweetCount,
                 likeCount = data.likeCount,
@@ -149,6 +153,7 @@ data class UiStatus(
                 source = data.source,
                 url = url.toUi(),
                 statusKey = data.statusKey,
+                rawText = data.rawText,
             )
         }
 
@@ -158,7 +163,7 @@ data class UiStatus(
             val reaction = reactions.firstOrNull { it.accountKey == userKey }
             UiStatus(
                 statusId = data.statusId,
-                text = data.htmlText,
+                htmlText = data.htmlText,
                 timestamp = data.timestamp,
                 retweetCount = data.retweetCount,
                 likeCount = data.likeCount,
@@ -175,6 +180,7 @@ data class UiStatus(
                 source = data.source,
                 url = url.toUi(),
                 statusKey = data.statusKey,
+                rawText = data.rawText,
             )
         }
     }

@@ -155,7 +155,7 @@ open class ComposeViewModel @AssistedInject constructor(
                 status.map {
                     it?.let { status ->
                         Extractor().extractMentionedScreennames(
-                            status.text
+                            status.htmlText
                         ).filter { it != account.user.screenName }
                     } ?: run {
                         emptyList<String>()

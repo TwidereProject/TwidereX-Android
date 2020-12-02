@@ -46,7 +46,7 @@ fun StatusText(
         AmbientTextStyle provides MaterialTheme.typography.body1.copy(color = MaterialTheme.colors.onBackground)
     ) {
         RenderContent(
-            html = status.text,
+            html = status.htmlText,
             status = status,
             onLinkClicked = {
                 navigator.openLink(it)
