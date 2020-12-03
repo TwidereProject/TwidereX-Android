@@ -123,17 +123,17 @@ dependencies {
     implementation project(":services")
 
     implementation "androidx.compose.ui:ui:$versions.compose"
-    implementation "androidx.ui:ui-tooling:$versions.compose"
+    implementation "androidx.compose.ui:ui-tooling:$versions.compose"
     implementation "androidx.compose.foundation:foundation:$versions.compose"
     implementation "androidx.compose.material:material:$versions.compose"
     implementation "androidx.compose.material:material-icons-core:$versions.compose"
     implementation "androidx.compose.material:material-icons-extended:$versions.compose"
     implementation "androidx.compose.runtime:runtime-livedata:$versions.compose"
-    androidTestImplementation "androidx.ui:ui-test:$versions.compose"
+    androidTestImplementation "androidx.compose.ui:ui-test:$versions.compose"
 
     implementation "androidx.paging:paging-runtime-ktx:$versions.paging"
-    implementation "androidx.paging:paging-compose:1.0.0-alpha02"
-    implementation "androidx.navigation:navigation-compose:1.0.0-alpha02"
+    implementation "androidx.paging:paging-compose:1.0.0-alpha03"
+    implementation "androidx.navigation:navigation-compose:1.0.0-alpha03"
     implementation "androidx.navigation:navigation-fragment-ktx:2.3.1"
     implementation "androidx.activity:activity-ktx:1.2.0-beta01"
     implementation "androidx.datastore:datastore:1.0.0-alpha04"
@@ -162,7 +162,7 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-viewmodel-savedstate:$versions.lifecycle"
     implementation "androidx.lifecycle:lifecycle-common-java8:$versions.lifecycle"
 
-    implementation "dev.chrisbanes.accompanist:accompanist-coil:0.3.3.1"
+    implementation "dev.chrisbanes.accompanist:accompanist-coil:0.4.0"
 
     implementation "com.twitter.twittertext:twitter-text:3.1.0"
     implementation 'org.jsoup:jsoup:1.13.1'

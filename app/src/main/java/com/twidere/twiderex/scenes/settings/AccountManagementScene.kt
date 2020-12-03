@@ -70,7 +70,7 @@ fun AccountManagementScene() {
                                 navController.navigate(Route.SignIn.Default)
                             }
                         ) {
-                            Icon(asset = Icons.Default.Add)
+                            Icon(imageVector = Icons.Default.Add)
                         }
                     }
                 )
@@ -111,7 +111,7 @@ fun AccountManagementScene() {
                                             expanded = true
                                         },
                                     ) {
-                                        Icon(asset = Icons.Default.MoreVert)
+                                        Icon(imageVector = Icons.Default.MoreVert)
                                     }
                                 },
                             ) {

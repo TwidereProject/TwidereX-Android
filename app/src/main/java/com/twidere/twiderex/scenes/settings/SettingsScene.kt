@@ -30,7 +30,7 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.VectorAsset
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.navigation.compose.navigate
@@ -43,7 +43,7 @@ import com.twidere.twiderex.ui.TwidereXTheme
 
 data class SettingItem(
     val name: String,
-    val icon: VectorAsset,
+    val icon: ImageVector,
     val route: String,
 )
 @Composable
@@ -119,7 +119,7 @@ fun SettingsScene() {
                                 }
                             ),
                             icon = {
-                                Icon(asset = it.icon)
+                                Icon(imageVector = it.icon)
                             },
                             text = {
                                 Text(text = it.name)

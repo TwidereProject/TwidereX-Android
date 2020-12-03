@@ -281,7 +281,7 @@ private fun UserInfo(user: UiUser, viewModel: UserViewModel) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth(),
-                alignment = Alignment.Center
+                contentAlignment = Alignment.Center
             ) {
                 Spacer(
                     modifier = Modifier
@@ -375,7 +375,7 @@ private fun UserInfo(user: UiUser, viewModel: UserViewModel) {
                 ) {
                     Spacer(modifier = Modifier.height(standardPadding))
                     Row {
-                        Icon(asset = vectorResource(id = R.drawable.ic_globe))
+                        Icon(imageVector = vectorResource(id = R.drawable.ic_globe))
                         Spacer(modifier = Modifier.width(standardPadding))
                         Text(
                             text = it,
@@ -393,7 +393,7 @@ private fun UserInfo(user: UiUser, viewModel: UserViewModel) {
                     modifier = Modifier
                         .padding(horizontal = standardPadding * 2),
                 ) {
-                    Icon(asset = vectorResource(id = R.drawable.ic_map_pin))
+                    Icon(imageVector = vectorResource(id = R.drawable.ic_map_pin))
                     Spacer(modifier = Modifier.width(standardPadding))
                     Text(
                         text = it,

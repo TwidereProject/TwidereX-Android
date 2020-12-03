@@ -129,7 +129,7 @@ fun SearchScene(keyword: String) {
                                             onClick = {
                                             }
                                         ) {
-                                            Icon(asset = vectorResource(id = R.drawable.ic_device_floppy))
+                                            Icon(imageVector = vectorResource(id = R.drawable.ic_device_floppy))
                                         }
                                     }
                                 }

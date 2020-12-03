@@ -21,7 +21,7 @@
 package com.twidere.twiderex.scenes.home
 
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.vector.VectorAsset
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import com.twidere.twiderex.R
@@ -38,7 +38,7 @@ class MentionItem : HomeNavigationItem() {
         get() = "mentions"
 
     @Composable
-    override val icon: VectorAsset
+    override val icon: ImageVector
         get() = vectorResource(id = R.drawable.ic_message_circle)
 
     @Composable

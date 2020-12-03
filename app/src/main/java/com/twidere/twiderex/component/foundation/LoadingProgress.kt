@@ -48,7 +48,7 @@ fun LazyListScope.loading() {
     item {
         Box(
             modifier = Modifier.fillParentMaxWidth(),
-            alignment = Alignment.Center
+            contentAlignment = Alignment.Center
         ) {
             CircularProgressIndicator(
                 modifier = Modifier

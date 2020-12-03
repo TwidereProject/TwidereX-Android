@@ -24,7 +24,7 @@ import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.vector.VectorAsset
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.navigation.compose.navigate
@@ -45,7 +45,7 @@ class HomeTimelineItem : HomeNavigationItem() {
         get() = "home"
 
     @Composable
-    override val icon: VectorAsset
+    override val icon: ImageVector
         get() = vectorResource(id = R.drawable.ic_home)
 
     @Composable
@@ -64,7 +64,7 @@ class HomeTimelineItem : HomeNavigationItem() {
                         navController.navigate(Route.Compose(ComposeType.New))
                     }
                 ) {
-                    Icon(asset = vectorResource(id = R.drawable.ic_feather))
+                    Icon(imageVector = vectorResource(id = R.drawable.ic_feather))
                 }
             }
         ) {

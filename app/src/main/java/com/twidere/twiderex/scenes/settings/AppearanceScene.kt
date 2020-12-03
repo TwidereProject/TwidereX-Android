@@ -189,7 +189,7 @@ fun primaryColorDialog(
                                     viewModel.setPrimaryColorIndex(index)
                                 }
                             ),
-                        alignment = Alignment.Center,
+                        contentAlignment = Alignment.Center,
                     ) {
                         if (colorIndex == index) {
                             Checkbox(checked = true, onCheckedChange = {})

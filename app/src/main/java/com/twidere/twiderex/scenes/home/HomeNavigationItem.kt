@@ -21,14 +21,14 @@
 package com.twidere.twiderex.scenes.home
 
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.vector.VectorAsset
+import androidx.compose.ui.graphics.vector.ImageVector
 
 abstract class HomeNavigationItem {
     @Composable
     abstract val name: String
     abstract val route: String
     @Composable
-    abstract val icon: VectorAsset
+    abstract val icon: ImageVector
     open val withAppBar = true
 
     @Composable

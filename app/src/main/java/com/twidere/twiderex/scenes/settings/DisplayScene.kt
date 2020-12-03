@@ -102,7 +102,7 @@ fun DisplayScene() {
                             icon = {
                                 Icon(
                                     modifier = Modifier.size(12.dp),
-                                    asset = Icons.Default.TextFields,
+                                    imageVector = Icons.Default.TextFields,
                                 )
                             },
                             text = {
@@ -114,7 +114,7 @@ fun DisplayScene() {
                                 )
                             },
                             trailing = {
-                                Icon(asset = Icons.Default.TextFields)
+                                Icon(imageVector = Icons.Default.TextFields)
                             }
                         )
                     }

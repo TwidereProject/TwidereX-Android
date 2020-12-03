@@ -31,14 +31,14 @@ import androidx.compose.material.TabRow
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.VectorAsset
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.ui.mediumEmphasisContentContentColor
 
 @Composable
 fun IconTabsComponent(
-    items: List<VectorAsset>,
+    items: List<ImageVector>,
     selectedItem: Int,
     onItemSelected: (Int) -> Unit,
 ) {
@@ -50,7 +50,7 @@ fun IconTabsComponent(
         Box(
             modifier = Modifier.padding(16.dp)
         ) {
-            Icon(asset = items[it])
+            Icon(imageVector = items[it])
         }
     }
 }

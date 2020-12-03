@@ -42,7 +42,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.ExperimentalFocus
-import androidx.compose.ui.graphics.vector.VectorAsset
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import com.twidere.twiderex.R
@@ -60,7 +60,7 @@ class SearchItem : HomeNavigationItem() {
         get() = "search"
 
     @Composable
-    override val icon: VectorAsset
+    override val icon: ImageVector
         get() = vectorResource(id = R.drawable.ic_search)
     override val withAppBar: Boolean
         get() = false
@@ -104,7 +104,7 @@ class SearchItem : HomeNavigationItem() {
                                         navigator.searchInput()
                                     }
                                 ) {
-                                    Icon(asset = vectorResource(id = R.drawable.ic_search))
+                                    Icon(imageVector = vectorResource(id = R.drawable.ic_search))
                                 }
                             }
                         }
@@ -121,7 +121,7 @@ class SearchItem : HomeNavigationItem() {
                         }
                     ),
                     icon = {
-                        Icon(asset = Icons.Default.History)
+                        Icon(imageVector = Icons.Default.History)
                     },
                     trailing = {
                         IconButton(
@@ -129,7 +129,7 @@ class SearchItem : HomeNavigationItem() {
                                 viewModel.remove(it)
                             }
                         ) {
-                            Icon(asset = vectorResource(id = R.drawable.ic_x))
+                            Icon(imageVector = vectorResource(id = R.drawable.ic_x))
                         }
                     },
                     text = {

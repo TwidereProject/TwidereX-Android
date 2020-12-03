@@ -40,6 +40,6 @@ fun LoginLogo(
     Image(
         modifier = modifier,
         contentScale = ContentScale.FillWidth,
-        asset = resource,
+        imageVector = resource,
     )
 }

@@ -146,7 +146,7 @@ private fun StatusComponent(
                     HumanizedTime(time = status.timestamp)
                     if (showActions) {
                         Icon(
-                            asset = Icons.Default.ArrowDropDown,
+                            imageVector = Icons.Default.ArrowDropDown,
                             modifier = Modifier
                                 .clickable(
                                     onClick = {},
@@ -177,7 +177,7 @@ private fun StatusComponent(
                     ) {
                         Icon(
                             modifier = Modifier.size(statusActionIconSize),
-                            asset = vectorResource(id = R.drawable.ic_map_pin)
+                            imageVector = vectorResource(id = R.drawable.ic_map_pin)
                         )
                         Box(modifier = Modifier.width(standardPadding))
                         Text(text = status.placeString)

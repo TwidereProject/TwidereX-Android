@@ -50,11 +50,11 @@ fun RetweetHeader(
         Box(
             modifier = Modifier
                 .width(profileImageSize),
-            alignment = Alignment.CenterEnd,
+            contentAlignment = Alignment.CenterEnd,
         ) {
             Icon(
                 modifier = Modifier.size(12.dp),
-                asset = vectorResource(id = R.drawable.ic_repeat),
+                imageVector = vectorResource(id = R.drawable.ic_repeat),
                 tint = mediumEmphasisContentContentColor,
             )
         }

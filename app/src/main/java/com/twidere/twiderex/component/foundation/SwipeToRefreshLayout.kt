@@ -22,7 +22,7 @@ package com.twidere.twiderex.component.foundation
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.offsetPx
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.shape.CircleShape
@@ -37,7 +37,7 @@ import androidx.compose.runtime.onCommit
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
-import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.twidere.twiderex.annotations.IncomingComposeUpdate
@@ -61,7 +61,7 @@ fun SwipeToRefreshLayout(
     },
     content: @Composable () -> Unit
 ) {
-    val refreshDistance = with(DensityAmbient.current) { RefreshDistance.toPx() }
+    val refreshDistance = with(AmbientDensity.current) { RefreshDistance.toPx() }
     val state = rememberSwipeableState(refreshingState) { newValue ->
         // compare both copies of the swipe state before calling onRefresh(). This is a workaround.
         if (newValue && !refreshingState) onRefresh()
@@ -86,7 +86,7 @@ fun SwipeToRefreshLayout(
             modifier = Modifier
                 .zIndex(1f)
                 .align(Alignment.TopCenter)
-                .offsetPx(y = state.offset)
+                .offset(y = { state.offset.value })
         ) {
             if (state.offset.value != -refreshDistance) {
                 refreshIndicator()

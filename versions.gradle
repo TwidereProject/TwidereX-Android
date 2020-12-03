@@ -1,7 +1,7 @@
 ext {
     versions = [
-            kotlin               : "1.4.10",
-            compose              : '1.0.0-alpha07',
+            kotlin               : "1.4.20",
+            compose              : '1.0.0-alpha08',
             retrofit2            : '2.9.0',
             hilt                 : '2.29.1-alpha',
             androidx_hilt        : '1.0.0-alpha02',
@@ -11,9 +11,7 @@ ext {
             moshi                : '1.11.0',
             kotlinx_serialization: '1.0.1',
             navigation           : '2.3.1',
-            // check if https://issuetracker.google.com/issues/173435602 got fixed
-            // and update PagingWithGapMediator.kt after upgrade paging
-            paging               : '3.0.0-alpha09',
+            paging               : '3.0.0-alpha10',
             ktlint               : '0.39.0',
             assisted_inject      : '0.6.0',
             protobuf             : '3.13.0',

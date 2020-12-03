@@ -116,7 +116,7 @@ fun SearchInputScene(initial: String? = null) {
                                 }
                             }
                         ) {
-                            Icon(asset = vectorResource(id = R.drawable.ic_search))
+                            Icon(imageVector = vectorResource(id = R.drawable.ic_search))
                         }
                     }
                 )
@@ -131,7 +131,7 @@ fun SearchInputScene(initial: String? = null) {
                         }
                     ),
                     icon = {
-                        Icon(asset = Icons.Default.History)
+                        Icon(imageVector = Icons.Default.History)
                     },
                     trailing = {
                         IconButton(
@@ -139,7 +139,7 @@ fun SearchInputScene(initial: String? = null) {
                                 viewModel.remove(it)
                             }
                         ) {
-                            Icon(asset = vectorResource(id = R.drawable.ic_x))
+                            Icon(imageVector = vectorResource(id = R.drawable.ic_x))
                         }
                     },
                     text = {

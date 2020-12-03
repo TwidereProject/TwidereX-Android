@@ -53,12 +53,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
-import androidx.compose.ui.drawLayer
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.DragObserver
 import androidx.compose.ui.gesture.rawDragGestureFilter
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.AnimationClockAmbient
+import androidx.compose.ui.platform.AmbientAnimationClock
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -125,7 +125,7 @@ fun MediaScene(status: UiStatus, selectedIndex: Int) {
     Scaffold {
         Box {
 
-            val clock = AnimationClockAmbient.current
+            val clock = AmbientAnimationClock.current
             val pagerState = remember(clock) {
                 PagerState(
                     clock,
@@ -225,7 +225,7 @@ fun MediaScene(status: UiStatus, selectedIndex: Int) {
                                 navController.popBackStack()
                             }
                         ) {
-                            Icon(asset = vectorResource(id = R.drawable.ic_x))
+                            Icon(imageVector = vectorResource(id = R.drawable.ic_x))
                         }
                     }
                 }
@@ -270,14 +270,14 @@ fun MediaItemView(
                         }
                     })
                 .fillMaxSize(),
-            alignment = Alignment.Center,
+            contentAlignment = Alignment.Center,
         ) {
             data.mediaUrl?.let {
                 NetworkImage(
                     url = it,
                     contentScale = ContentScale.Fit,
                     modifier = Modifier
-                        .drawLayer(
+                        .graphicsLayer(
                             scaleX = scale,
                             scaleY = scale,
                             translationX = translate.x,

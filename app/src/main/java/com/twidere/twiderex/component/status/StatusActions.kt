@@ -35,8 +35,8 @@ import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.VectorAsset
-import androidx.compose.ui.platform.ContextAmbient
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.AmbientContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.R
@@ -77,7 +77,7 @@ fun ReplyButton(
             },
         ) {
             Icon(
-                asset = icon,
+                imageVector = icon,
                 tint = mediumEmphasisContentContentColor,
             )
         }
@@ -118,7 +118,7 @@ fun LikeButton(
             },
         ) {
             Icon(
-                asset = icon,
+                imageVector = icon,
                 tint = color,
             )
         }
@@ -159,7 +159,7 @@ fun RetweetButton(
             },
         ) {
             Icon(
-                asset = icon,
+                imageVector = icon,
                 tint = color,
             )
         }
@@ -171,7 +171,7 @@ fun ShareButton(
     status: UiStatus,
     compat: Boolean = false,
 ) {
-    val context = ContextAmbient.current
+    val context = AmbientContext.current
     val action = {
         context.shareText(status.rawText)
     }
@@ -187,7 +187,7 @@ fun ShareButton(
         ) {
             Icon(
                 modifier = Modifier.size(statusActionIconSize),
-                asset = icon,
+                imageVector = icon,
             )
         }
     } else {
@@ -197,7 +197,7 @@ fun ShareButton(
             },
         ) {
             Icon(
-                asset = icon,
+                imageVector = icon,
                 tint = mediumEmphasisContentContentColor,
             )
         }
@@ -206,14 +206,14 @@ fun ShareButton(
 
 @Composable
 private fun StatusActionButtonWithNumbers(
-    modifier: Modifier = Modifier.weight(1f),
-    icon: VectorAsset,
+    modifier: Modifier = Modifier,
+    icon: ImageVector,
     count: Long,
     color: Color = AmbientContentColor.current,
     onClick: () -> Unit,
 ) {
     Row(
-        modifier = modifier,
+        modifier = modifier.weight(1f),
         horizontalArrangement = Arrangement.Start,
     ) {
         TextButton(
@@ -224,7 +224,7 @@ private fun StatusActionButtonWithNumbers(
         ) {
             Icon(
                 modifier = Modifier.size(statusActionIconSize),
-                asset = icon,
+                imageVector = icon,
                 tint = color,
             )
             if (count > 0) {

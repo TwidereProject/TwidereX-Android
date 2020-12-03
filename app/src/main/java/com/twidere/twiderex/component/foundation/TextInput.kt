@@ -33,7 +33,6 @@ import androidx.compose.material.ContentAlpha
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.onActive
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -43,11 +42,8 @@ import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focusRequester
 import androidx.compose.ui.node.Ref
-import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.SoftwareKeyboardController
-import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.constrain
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
@@ -56,8 +52,8 @@ import androidx.compose.ui.text.input.TextFieldValue
 @ExperimentalFocus
 @Composable
 fun TextInput(
-    autoFocus: Boolean = false,
     modifier: Modifier = Modifier,
+    autoFocus: Boolean = false,
     textStyle: TextStyle = AmbientTextStyle.current,
     placeholder: @Composable (() -> Unit)? = null,
     keyboardType: KeyboardType = KeyboardType.Text,
@@ -70,14 +66,8 @@ fun TextInput(
     onTextInputStarted: ((SoftwareKeyboardController) -> Unit)? = null,
     onClicked: (() -> Unit)? = null,
 ) {
-    var selection by remember { mutableStateOf(TextRange.Zero) }
-    var composition by remember { mutableStateOf<TextRange?>(null) }
-
-    @OptIn(InternalTextApi::class)
     val textFieldValue = TextFieldValue(
         text = value,
-        selection = selection.constrain(0, value.length),
-        composition = composition?.constrain(0, value.length)
     )
     TextInput(
         autoFocus = autoFocus,
@@ -91,8 +81,6 @@ fun TextInput(
         onImeActionPerformed = onImeActionPerformed,
         value = textFieldValue,
         onValueChange = {
-            selection = it.selection
-            composition = it.composition
             if (value != it.text) {
                 onValueChange(it.text)
             }
@@ -106,8 +94,8 @@ fun TextInput(
 @ExperimentalFocus
 @Composable
 fun TextInput(
-    autoFocus: Boolean = false,
     modifier: Modifier = Modifier,
+    autoFocus: Boolean = false,
     textStyle: TextStyle = AmbientTextStyle.current,
     placeholder: @Composable (() -> Unit)? = null,
     keyboardType: KeyboardType = KeyboardType.Text,
@@ -143,7 +131,7 @@ fun TextInput(
                 //  so that it can show or hide the keyboard based on the focus state.
                 keyboardController.value?.showSoftwareKeyboard()
             },
-        alignment = alignment,
+        contentAlignment = alignment,
     ) {
         BasicTextField(
             maxLines = maxLines,

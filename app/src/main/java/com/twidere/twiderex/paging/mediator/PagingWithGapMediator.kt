@@ -92,14 +92,7 @@ abstract class PagingWithGapMediator(
             pageSize = state.config.pageSize,
             maxStatusKey = maxStatusKey,
             sinceStatueKey = sinceStatueKey
-        ).let {
-            // TODO: workaround for https://issuetracker.google.com/issues/173435602
-            if (loadType == LoadType.REFRESH) {
-                MediatorResult.Error(Error())
-            } else {
-                it
-            }
-        }
+        )
     }
 
     suspend fun loadBetween(

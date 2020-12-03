@@ -73,7 +73,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.node.Ref
-import androidx.compose.ui.platform.ContextAmbient
+import androidx.compose.ui.platform.AmbientContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.SoftwareKeyboardController
@@ -219,7 +219,7 @@ private fun ComposeBody(
                                 }
                             }
                         ) {
-                            Icon(asset = vectorResource(id = R.drawable.ic_x))
+                            Icon(imageVector = vectorResource(id = R.drawable.ic_x))
                         }
                     },
                     actions = {
@@ -230,7 +230,7 @@ private fun ComposeBody(
                                 navController.popBackStack()
                             }
                         ) {
-                            Icon(asset = vectorResource(id = R.drawable.ic_send))
+                            Icon(imageVector = vectorResource(id = R.drawable.ic_send))
                         }
                     }
                 )
@@ -343,7 +343,7 @@ private fun ComposeBody(
                                 AmbientContentAlpha provides ContentAlpha.medium
                             ) {
                                 Row {
-                                    Icon(asset = vectorResource(id = R.drawable.ic_map_pin))
+                                    Icon(imageVector = vectorResource(id = R.drawable.ic_map_pin))
                                     Text(text = "${it.latitude}, ${it.longitude}")
                                 }
                             }
@@ -377,7 +377,7 @@ private fun ReplySheetContent(
                     scaffoldState.bottomSheetState.collapse()
                 }
             ) {
-                Icon(asset = vectorResource(id = R.drawable.ic_x))
+                Icon(imageVector = vectorResource(id = R.drawable.ic_x))
             }
         },
         text = {
@@ -595,7 +595,7 @@ private fun ComposeActions(viewModel: ComposeViewModel) {
     val locationEnabled by viewModel.locationEnabled.observeAsState(initial = false)
     val launcher = AmbientLauncher.current
     val scope = rememberCoroutineScope()
-    val context = ContextAmbient.current
+    val context = AmbientContext.current
     val navController = AmbientNavController.current
     Box {
         Row {
@@ -608,17 +608,17 @@ private fun ComposeActions(viewModel: ComposeViewModel) {
                     }
                 }
             ) {
-                Icon(asset = vectorResource(id = R.drawable.ic_camera))
+                Icon(imageVector = vectorResource(id = R.drawable.ic_camera))
             }
             // TODO:
 //            IconButton(onClick = {}) {
-//                Icon(asset = vectorResource(id = R.drawable.ic_gif))
+//                Icon(imageVector = vectorResource(id = R.drawable.ic_gif))
 //            }
 //            IconButton(onClick = {}) {
-//                Icon(asset = vectorResource(id = R.drawable.ic_at_sign))
+//                Icon(imageVector = vectorResource(id = R.drawable.ic_at_sign))
 //            }
 //            IconButton(onClick = {}) {
-//                Icon(asset = vectorResource(id = R.drawable.ic_hash))
+//                Icon(imageVector = vectorResource(id = R.drawable.ic_hash))
 //            }
             IconButton(
                 onClick = {
@@ -644,7 +644,7 @@ private fun ComposeActions(viewModel: ComposeViewModel) {
                     }
                 },
             ) {
-                Icon(asset = vectorResource(id = R.drawable.ic_map_pin))
+                Icon(imageVector = vectorResource(id = R.drawable.ic_map_pin))
             }
             Spacer(modifier = Modifier.weight(1f))
             IconButton(
@@ -652,7 +652,7 @@ private fun ComposeActions(viewModel: ComposeViewModel) {
                     navController.navigate(Route.Draft.List)
                 }
             ) {
-                Icon(asset = vectorResource(id = R.drawable.ic_note))
+                Icon(imageVector = vectorResource(id = R.drawable.ic_note))
             }
         }
     }

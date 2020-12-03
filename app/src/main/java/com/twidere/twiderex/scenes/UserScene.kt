@@ -51,10 +51,10 @@ fun UserScene(
                     },
                     actions = {
                         IconButton(onClick = {}) {
-                            Icon(asset = vectorResource(id = R.drawable.ic_mail))
+                            Icon(imageVector = vectorResource(id = R.drawable.ic_mail))
                         }
                         IconButton(onClick = {}) {
-                            Icon(asset = vectorResource(id = R.drawable.ic_dots_vertical))
+                            Icon(imageVector = vectorResource(id = R.drawable.ic_dots_vertical))
                         }
                     },
                     elevation = 0.dp,

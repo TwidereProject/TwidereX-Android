@@ -120,7 +120,7 @@ fun HomeScene() {
                                         }
                                     }
                                 ) {
-                                    Icon(asset = Icons.Default.Menu)
+                                    Icon(imageVector = Icons.Default.Menu)
                                 }
                             },
                             elevation = if (menus[selectedItem].withAppBar) {
@@ -198,7 +198,7 @@ fun HomeBottomNavigation(
             BottomNavigationItem(
                 selectedContentColor = MaterialTheme.colors.primary,
                 unselectedContentColor = mediumEmphasisContentContentColor,
-                icon = { Icon(item.icon) },
+                icon = { Icon(imageVector = item.icon) },
                 selected = selectedItem == index,
                 onClick = { onItemSelected.invoke(index) }
             )
@@ -331,7 +331,7 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
                                 Text(text = stringResource(id = R.string.title_drafts))
                             },
                             icon = {
-                                Icon(asset = vectorResource(id = R.drawable.ic_note))
+                                Icon(imageVector = vectorResource(id = R.drawable.ic_note))
                             },
                         )
                     }
@@ -349,7 +349,7 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
                 }
             ),
             icon = {
-                Icon(asset = vectorResource(id = R.drawable.ic_adjustments_horizontal))
+                Icon(imageVector = vectorResource(id = R.drawable.ic_adjustments_horizontal))
             },
             text = {
                 Text(text = stringResource(id = R.string.title_settings))
@@ -391,7 +391,7 @@ private fun DrawerUserHeader(
                     onTrailingClicked.invoke()
                 }
             ) {
-                Icon(asset = Icons.Default.ArrowDropDown)
+                Icon(imageVector = Icons.Default.ArrowDropDown)
             }
         }
     )

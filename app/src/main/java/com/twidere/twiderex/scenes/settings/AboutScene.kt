@@ -122,7 +122,7 @@ private fun AboutContent() {
                     }
                 ) {
                     Icon(
-                        asset = vectorResource(id = R.drawable.ic_twitter),
+                        imageVector = vectorResource(id = R.drawable.ic_twitter),
                         tint = MaterialTheme.colors.onBackground,
                     )
                 }
@@ -133,7 +133,7 @@ private fun AboutContent() {
                     }
                 ) {
                     Icon(
-                        asset = vectorResource(id = R.drawable.ic_github),
+                        imageVector = vectorResource(id = R.drawable.ic_github),
                         tint = MaterialTheme.colors.onBackground,
                     )
                 }

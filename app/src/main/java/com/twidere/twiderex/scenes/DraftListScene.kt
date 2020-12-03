@@ -76,7 +76,7 @@ fun DraftListScene() {
                         DropdownMenu(
                             toggle = {
                                 IconButton(onClick = { expanded = true }) {
-                                    Icon(asset = Icons.Default.MoreVert)
+                                    Icon(imageVector = Icons.Default.MoreVert)
                                 }
                             },
                             expanded = expanded,

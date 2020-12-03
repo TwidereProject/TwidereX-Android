@@ -118,7 +118,7 @@ fun TimelineComponent(viewModel: TimelineViewModel) {
                                             }
                                         },
                                     ) {
-                                        Icon(asset = vectorResource(id = R.drawable.ic_refresh))
+                                        Icon(imageVector = vectorResource(id = R.drawable.ic_refresh))
                                         Box(modifier = Modifier.width(standardPadding))
                                         Text(text = stringResource(id = R.string.load_more))
                                     }

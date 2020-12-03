@@ -31,8 +31,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.onCommit
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.DensityAmbient
-import androidx.compose.ui.platform.ViewAmbient
+import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.AmbientView
 import com.twidere.twiderex.utils.RootViewDeferringInsetsCallback
 
 val AmbientWindowPadding = ambientOf<PaddingValues>()
@@ -43,8 +43,8 @@ fun ProvideWindowPadding(
 ) {
     var windowPadding by remember { mutableStateOf(PaddingValues()) }
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-        val view = ViewAmbient.current
-        val density = DensityAmbient.current
+        val view = AmbientView.current
+        val density = AmbientDensity.current
         val deferringInsetsListener = remember {
             RootViewDeferringInsetsCallback(
                 persistentInsetTypes = WindowInsets.Type.systemBars(),
