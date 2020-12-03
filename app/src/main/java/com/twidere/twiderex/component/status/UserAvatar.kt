@@ -28,6 +28,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.unit.Dp
@@ -63,11 +64,12 @@ fun UserAvatar(
     }
 }
 
-@Composable
 fun Modifier.withAvatarClip(): Modifier {
-    return when (AmbientDisplayPreferences.current.avatarStyle) {
-        DisplayPreferences.AvatarStyle.Round -> this.clip(CircleShape)
-        DisplayPreferences.AvatarStyle.Square -> this.clip(MaterialTheme.shapes.medium)
-        else -> this.clip(CircleShape)
+    return composed {
+        when (AmbientDisplayPreferences.current.avatarStyle) {
+            DisplayPreferences.AvatarStyle.Round -> this.clip(CircleShape)
+            DisplayPreferences.AvatarStyle.Square -> this.clip(MaterialTheme.shapes.medium)
+            else -> this.clip(CircleShape)
+        }
     }
 }

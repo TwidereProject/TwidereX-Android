@@ -34,8 +34,8 @@ val TopAppBarElevation = 4.dp
 
 @Composable
 fun AppBar(
-    title: @Composable () -> Unit = {},
     modifier: Modifier = Modifier,
+    title: @Composable () -> Unit = {},
     navigationIcon: @Composable (() -> Unit)? = null,
     actions: @Composable RowScope.() -> Unit = {},
     backgroundColor: Color = MaterialTheme.colors.surface,
