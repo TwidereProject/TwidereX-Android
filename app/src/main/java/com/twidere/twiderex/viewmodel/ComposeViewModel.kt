@@ -28,6 +28,7 @@ import android.location.LocationManager
 import android.net.Uri
 import android.os.Bundle
 import androidx.annotation.RequiresPermission
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
@@ -40,6 +41,7 @@ import com.twidere.services.microblog.RelationshipService
 import com.twidere.services.twitter.TwitterService
 import com.twidere.twiderex.db.model.DbDraft
 import com.twidere.twiderex.di.assisted.IAssistedFactory
+import com.twidere.twiderex.extensions.combineWith
 import com.twidere.twiderex.extensions.getCachedLocation
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
@@ -178,9 +180,9 @@ open class ComposeViewModel @AssistedInject constructor(
             },
         )
     }
-    val canSaveDraft = MutableLiveData(false)
     val text = MutableLiveData("")
     val images = MutableLiveData<List<Uri>>(emptyList())
+    val canSaveDraft = text.combineWith(images) { text, imgs -> !text.isNullOrEmpty() || !imgs.isNullOrEmpty() }
     val locationEnabled = MutableLiveData(false)
     val status = liveData {
         statusKey?.let {
@@ -192,7 +194,6 @@ open class ComposeViewModel @AssistedInject constructor(
 
     fun setText(value: String) {
         text.postValue(value)
-        canSaveDraft.postValue(true)
     }
 
     fun compose() {
@@ -232,7 +233,6 @@ open class ComposeViewModel @AssistedInject constructor(
         }?.let {
             images.postValue(it)
         }
-        canSaveDraft.postValue(true)
     }
 
     @RequiresPermission(anyOf = [permission.ACCESS_COARSE_LOCATION, permission.ACCESS_FINE_LOCATION])
