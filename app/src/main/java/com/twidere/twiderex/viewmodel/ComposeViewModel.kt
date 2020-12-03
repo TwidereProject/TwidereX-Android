@@ -28,7 +28,6 @@ import android.location.LocationManager
 import android.net.Uri
 import android.os.Bundle
 import androidx.annotation.RequiresPermission
-import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
