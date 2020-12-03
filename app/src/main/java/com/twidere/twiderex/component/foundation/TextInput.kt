@@ -33,6 +33,7 @@ import androidx.compose.material.ContentAlpha
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.onActive
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -66,9 +67,10 @@ fun TextInput(
     onTextInputStarted: ((SoftwareKeyboardController) -> Unit)? = null,
     onClicked: (() -> Unit)? = null,
 ) {
-    val textFieldValue = TextFieldValue(
-        text = value,
-    )
+
+    var textFieldValueState by remember { mutableStateOf(TextFieldValue(text = value)) }
+    val textFieldValue = textFieldValueState.copy(text = value)
+
     TextInput(
         autoFocus = autoFocus,
         modifier = modifier,
@@ -81,6 +83,7 @@ fun TextInput(
         onImeActionPerformed = onImeActionPerformed,
         value = textFieldValue,
         onValueChange = {
+            textFieldValueState = it
             if (value != it.text) {
                 onValueChange(it.text)
             }
