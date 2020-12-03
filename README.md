@@ -1,6 +1,8 @@
 # Twidere X
 ![Build Status](https://github.com/TwidereProject/TwidereX-Android/workflows/Android%20CI/badge.svg)
 
+[<img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt="Get it on Google Play" height="80">](https://play.google.com/store/apps/details?id=com.twidere.twiderex)
+
 Next generation of Twidere for Android 5.0+. **Still in early stage.**  
 
 ## Features
