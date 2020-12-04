@@ -64,7 +64,7 @@ data class Status(
     val geo: GeoPoint? = null,
 //    val coordinates: Any? = null,
     val place: Place? = null,
-    val contributors: List<Contributor>? = null,
+//    val contributors: List<Contributor>? = null,
 
     @SerialName("retweeted_status")
     val retweetedStatus: Status? = null,
