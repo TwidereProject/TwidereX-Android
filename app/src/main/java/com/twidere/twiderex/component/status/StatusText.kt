@@ -31,7 +31,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.useOrElse
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.annotatedString
-import androidx.compose.ui.text.platform.toAccessibilitySpannableString
 import com.twidere.twiderex.component.navigation.AmbientNavigator
 import com.twidere.twiderex.model.ui.UiStatus
 import org.jsoup.Jsoup
