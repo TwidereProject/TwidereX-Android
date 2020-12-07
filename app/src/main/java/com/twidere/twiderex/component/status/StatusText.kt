@@ -21,12 +21,17 @@
 package com.twidere.twiderex.component.status
 
 import androidx.compose.foundation.ClickableText
+import androidx.compose.material.AmbientContentAlpha
+import androidx.compose.material.AmbientContentColor
 import androidx.compose.material.AmbientTextStyle
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.useOrElse
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.annotatedString
+import androidx.compose.ui.text.platform.toAccessibilitySpannableString
 import com.twidere.twiderex.component.navigation.AmbientNavigator
 import com.twidere.twiderex.model.ui.UiStatus
 import org.jsoup.Jsoup
@@ -39,11 +44,15 @@ private const val TAG_URL = "url"
 @Composable
 fun StatusText(
     status: UiStatus,
+    color: Color = Color.Unspecified,
     onStatusTextClicked: () -> Unit = {},
 ) {
     val navigator = AmbientNavigator.current
+    val textColor = color.useOrElse {
+        AmbientContentColor.current.copy(alpha = AmbientContentAlpha.current)
+    }
     Providers(
-        AmbientTextStyle provides MaterialTheme.typography.body1.copy(color = MaterialTheme.colors.onBackground)
+        AmbientTextStyle provides MaterialTheme.typography.body1.copy(color = textColor)
     ) {
         RenderContent(
             html = status.htmlText,

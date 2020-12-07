@@ -28,8 +28,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.AmbientContentAlpha
+import androidx.compose.material.AmbientContentColor
 import androidx.compose.material.AmbientTextStyle
 import androidx.compose.material.ContentAlpha
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.OutlinedTextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.getValue
@@ -42,6 +45,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focusRequester
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.useOrElse
 import androidx.compose.ui.node.Ref
 import androidx.compose.ui.text.SoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
@@ -55,7 +60,8 @@ import androidx.compose.ui.text.input.TextFieldValue
 fun TextInput(
     modifier: Modifier = Modifier,
     autoFocus: Boolean = false,
-    textStyle: TextStyle = AmbientTextStyle.current,
+    textStyle: TextStyle = MaterialTheme.typography.body1,
+    color: Color = Color.Unspecified,
     placeholder: @Composable (() -> Unit)? = null,
     keyboardType: KeyboardType = KeyboardType.Text,
     maxLines: Int = Int.MAX_VALUE,
@@ -75,6 +81,7 @@ fun TextInput(
         autoFocus = autoFocus,
         modifier = modifier,
         textStyle = textStyle,
+        color = color,
         placeholder = placeholder,
         keyboardType = keyboardType,
         maxLines = maxLines,
@@ -99,7 +106,8 @@ fun TextInput(
 fun TextInput(
     modifier: Modifier = Modifier,
     autoFocus: Boolean = false,
-    textStyle: TextStyle = AmbientTextStyle.current,
+    textStyle: TextStyle = MaterialTheme.typography.body1,
+    color: Color = Color.Unspecified,
     placeholder: @Composable (() -> Unit)? = null,
     keyboardType: KeyboardType = KeyboardType.Text,
     maxLines: Int = Int.MAX_VALUE,
@@ -114,6 +122,9 @@ fun TextInput(
     val focusRequester = FocusRequester()
     val keyboardController = remember { Ref<SoftwareKeyboardController>() }
     val interactionState = remember { InteractionState() }
+    val textColor = color.useOrElse {
+        AmbientContentColor.current.copy(alpha = AmbientContentAlpha.current)
+    }
     if (autoFocus) {
         onActive {
             focusRequester.requestFocus()
@@ -142,7 +153,8 @@ fun TextInput(
                 keyboardType = keyboardType,
                 imeAction = imeAction,
             ),
-            textStyle = textStyle,
+            cursorColor = textColor,
+            textStyle = textStyle.copy(color = textColor),
             onImeActionPerformed = {
                 onImeActionPerformed(it, keyboardController.value)
             },
