@@ -25,13 +25,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.onActive
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.withRunningRecomposer
 import com.twidere.twiderex.extensions.humanizedTimestamp
 import kotlin.concurrent.timer
-import kotlin.concurrent.timerTask
 
 @Composable
 fun HumanizedTime(time: Long) {
