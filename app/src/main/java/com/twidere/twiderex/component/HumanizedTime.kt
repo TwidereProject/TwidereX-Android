@@ -22,18 +22,21 @@ package com.twidere.twiderex.component
 
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.onActive
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.withRunningRecomposer
 import com.twidere.twiderex.extensions.humanizedTimestamp
 import kotlin.concurrent.timer
+import kotlin.concurrent.timerTask
 
 @Composable
 fun HumanizedTime(time: Long) {
     var text by remember(time) { mutableStateOf(time.humanizedTimestamp()) }
-    onActive {
+    DisposableEffect(time) {
         val timer = timer(period = 1000) {
             text = time.humanizedTimestamp()
         }
