@@ -25,7 +25,7 @@ jobs:
       run: ./.github/apply_signing.sh
 
     - name: Build with Gradle
-      run: ./gradlew spotlessCheck lintRelease bundleRelease assembleRelease --stacktrace
+      run: ./gradlew spotlessCheck lint bundle assemble --stacktrace
 
     - name: Upload build outputs
       uses: actions/upload-artifact@v2
