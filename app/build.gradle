@@ -54,6 +54,20 @@ android {
         }
     }
 
+    flavorDimensions 'channel'
+    productFlavors {
+        if (enableGoogleVariant) {
+            // START Non-FOSS component
+            google {
+                dimension 'channel'
+            }
+            // END Non-FOSS component
+        }
+        fdroid {
+            dimension 'channel'
+        }
+    }
+
     def file = rootProject.file('signing.properties')
     def hasSigningProps = file.exists()
 
@@ -83,6 +97,10 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
+    }
+    sourceSets.each {
+        it.res.srcDirs += project.files("src/${it.name}/res-localized")
+        it.java.srcDirs += "src/${it.name}/kotlin"
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -173,9 +191,9 @@ dependencies {
 
     if (enableGoogleVariant) {
         // START Non-FOSS component
-        implementation platform('com.google.firebase:firebase-bom:26.1.0')
-        implementation 'com.google.firebase:firebase-analytics-ktx'
-        implementation 'com.google.firebase:firebase-crashlytics-ktx'
+        googleImplementation platform('com.google.firebase:firebase-bom:26.1.0')
+        googleImplementation 'com.google.firebase:firebase-analytics-ktx'
+        googleImplementation 'com.google.firebase:firebase-crashlytics-ktx'
         // END Non-FOSS component
     }
 
