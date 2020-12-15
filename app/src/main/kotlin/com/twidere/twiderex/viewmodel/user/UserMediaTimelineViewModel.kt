@@ -30,6 +30,7 @@ import com.twidere.services.microblog.TimelineService
 import com.twidere.twiderex.db.AppDatabase
 import com.twidere.twiderex.di.assisted.IAssistedFactory
 import com.twidere.twiderex.model.AccountDetails
+import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.model.ui.UiStatus.Companion.toUi
 import com.twidere.twiderex.model.ui.UiUser
@@ -43,14 +44,16 @@ import kotlinx.coroutines.flow.map
 class UserMediaTimelineViewModel @AssistedInject constructor(
     database: AppDatabase,
     @Assisted account: AccountDetails,
-    @Assisted user: UiUser,
+    @Assisted screenName: String,
+    @Assisted userKey: MicroBlogKey,
 ) : PagingViewModel() {
 
     @AssistedInject.Factory
     interface AssistedFactory : IAssistedFactory {
         fun create(
             account: AccountDetails,
-            user: UiUser,
+            screenName: String,
+            userKey: MicroBlogKey,
         ): UserMediaTimelineViewModel
     }
 
@@ -64,7 +67,8 @@ class UserMediaTimelineViewModel @AssistedInject constructor(
 
     override val pagingMediator: PagingMediator =
         UserMediaMediator(
-            user,
+            screenName = screenName,
+            userKey = userKey,
             database,
             account.accountKey,
             account.service as TimelineService

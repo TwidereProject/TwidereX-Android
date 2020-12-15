@@ -32,17 +32,18 @@ import com.twidere.twiderex.paging.mediator.PagingTimelineMediatorBase
 
 @OptIn(ExperimentalPagingApi::class)
 class UserFavouriteMediator(
-    private val user: UiUser,
+    private val screenName: String,
+    private val userKey: MicroBlogKey,
     database: AppDatabase,
     accountKey: MicroBlogKey,
     private val service: TimelineService,
 ) : PagingTimelineMediatorBase(accountKey, database) {
     override val pagingKey: String
-        get() = UserTimelineType.Favourite.pagingKey(user.userKey)
+        get() = UserTimelineType.Favourite.pagingKey(userKey)
 
     override suspend fun load(pageSize: Int, max_id: String?): List<IStatus> {
         return service.favorites(
-            screen_name = user.screenName,
+            screen_name = screenName,
             count = pageSize,
             max_id = max_id,
         )

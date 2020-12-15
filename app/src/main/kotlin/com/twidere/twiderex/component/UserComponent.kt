@@ -74,6 +74,7 @@ import com.twidere.twiderex.component.status.withAvatarClip
 import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.extensions.refreshOrRetry
 import com.twidere.twiderex.extensions.withElevation
+import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.ui.AmbientActiveAccount
 import com.twidere.twiderex.ui.standardPadding
@@ -97,49 +98,32 @@ fun UserComponent(
     ) {
         it.create(account, screenName, host)
     }
-    val viewModelUser by viewModel.user.observeAsState(initial = initialData)
+    val user by viewModel.user.observeAsState(initial = initialData)
 
-    viewModelUser?.let { user ->
-        UserContent(user, viewModel)
-    } ?: run {
-        Column(
-            modifier = Modifier.fillMaxWidth().fillMaxHeight(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            LoadingProgress()
-        }
-    }
-}
-
-@IncomingComposeUpdate
-@Composable
-private fun UserContent(
-    user: UiUser,
-    viewModel: UserViewModel
-) {
-    val account = AmbientActiveAccount.current ?: return
     val lazyListState = rememberLazyListState()
     val timelineViewModel =
         assistedViewModel<UserTimelineViewModel.AssistedFactory, UserTimelineViewModel>(
             account,
-            user,
+            screenName,
+            host,
         ) {
-            it.create(account, user)
+            it.create(account, screenName = screenName, MicroBlogKey(screenName, host))
         }
     val mediaViewModel =
         assistedViewModel<UserMediaTimelineViewModel.AssistedFactory, UserMediaTimelineViewModel>(
             account,
-            user,
+            screenName,
+            host,
         ) {
-            it.create(account, user)
+            it.create(account, screenName = screenName, MicroBlogKey(screenName, host))
         }
     val favouriteViewModel =
         assistedViewModel<UserFavouriteTimelineViewModel.AssistedFactory, UserFavouriteTimelineViewModel>(
             account,
-            user,
+            screenName,
+            host,
         ) {
-            it.create(account, user)
+            it.create(account, screenName = screenName, MicroBlogKey(screenName, host))
         }
 
     val timelineSource = timelineViewModel.source.collectAsLazyPagingItems()
@@ -172,9 +156,9 @@ private fun UserContent(
         val refreshing by viewModel.refreshing.observeAsState(initial = false)
         SwipeToRefreshLayout(
             refreshingState = refreshing ||
-                selectedItem == 0 && timelineSource.loadState.refresh is LoadState.Loading ||
-                selectedItem == 1 && mediaSource.loadState.refresh is LoadState.Loading ||
-                selectedItem == 2 && favouriteSource.loadState.refresh is LoadState.Loading,
+                    selectedItem == 0 && timelineSource.loadState.refresh is LoadState.Loading ||
+                    selectedItem == 1 && mediaSource.loadState.refresh is LoadState.Loading ||
+                    selectedItem == 2 && favouriteSource.loadState.refresh is LoadState.Loading,
             onRefresh = {
                 viewModel.refresh()
                 when (selectedItem) {
@@ -193,8 +177,10 @@ private fun UserContent(
                 LazyColumn(
                     state = lazyListState,
                 ) {
-                    item {
-                        UserInfo(user = user, viewModel = viewModel)
+                    user?.let {
+                        item {
+                            UserInfo(user = it, viewModel = viewModel)
+                        }
                     }
 
                     item {
