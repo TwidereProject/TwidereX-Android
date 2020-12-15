@@ -27,7 +27,6 @@ import com.twidere.twiderex.db.AppDatabase
 import com.twidere.twiderex.di.assisted.IAssistedFactory
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.paging.mediator.PagingMediator
 import com.twidere.twiderex.paging.mediator.user.UserFavouriteMediator
 import com.twidere.twiderex.viewmodel.PagingViewModel

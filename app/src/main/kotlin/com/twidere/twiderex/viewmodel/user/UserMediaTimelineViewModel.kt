@@ -33,7 +33,6 @@ import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.model.ui.UiStatus.Companion.toUi
-import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.paging.mediator.PagingMediator
 import com.twidere.twiderex.paging.mediator.pager
 import com.twidere.twiderex.paging.mediator.user.UserMediaMediator

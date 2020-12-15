@@ -22,12 +22,10 @@ package com.twidere.twiderex.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -61,7 +59,6 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.twidere.twiderex.R
 import com.twidere.twiderex.annotations.IncomingComposeUpdate
 import com.twidere.twiderex.component.foundation.IconTabsComponent
-import com.twidere.twiderex.component.foundation.LoadingProgress
 import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
 import com.twidere.twiderex.component.foundation.TopAppBarElevation
@@ -156,9 +153,9 @@ fun UserComponent(
         val refreshing by viewModel.refreshing.observeAsState(initial = false)
         SwipeToRefreshLayout(
             refreshingState = refreshing ||
-                    selectedItem == 0 && timelineSource.loadState.refresh is LoadState.Loading ||
-                    selectedItem == 1 && mediaSource.loadState.refresh is LoadState.Loading ||
-                    selectedItem == 2 && favouriteSource.loadState.refresh is LoadState.Loading,
+                selectedItem == 0 && timelineSource.loadState.refresh is LoadState.Loading ||
+                selectedItem == 1 && mediaSource.loadState.refresh is LoadState.Loading ||
+                selectedItem == 2 && favouriteSource.loadState.refresh is LoadState.Loading,
             onRefresh = {
                 viewModel.refresh()
                 when (selectedItem) {

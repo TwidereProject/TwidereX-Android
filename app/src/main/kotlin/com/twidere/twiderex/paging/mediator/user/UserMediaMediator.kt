@@ -28,7 +28,6 @@ import com.twidere.twiderex.db.model.DbPagingTimelineWithStatus
 import com.twidere.twiderex.db.model.UserTimelineType
 import com.twidere.twiderex.db.model.pagingKey
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.paging.mediator.PagingTimelineMediatorBase
 
 @OptIn(ExperimentalPagingApi::class)
