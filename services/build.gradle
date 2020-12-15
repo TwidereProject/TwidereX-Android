@@ -1,6 +1,6 @@
 plugins {
     id 'org.jetbrains.kotlin.jvm'
-    id "org.jetbrains.kotlin.plugin.serialization" version '1.4.20'
+    id "org.jetbrains.kotlin.plugin.serialization" version '1.4.21'
 }
 
 java {
@@ -16,7 +16,7 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$versions.kotlin"
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.1"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.2"
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$versions.kotlinx_serialization")
     
     api "com.squareup.retrofit2:retrofit:$versions.retrofit2"
