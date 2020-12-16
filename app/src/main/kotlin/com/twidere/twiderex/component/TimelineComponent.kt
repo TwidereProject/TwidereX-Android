@@ -120,7 +120,7 @@ fun TimelineComponent(viewModel: TimelineViewModel) {
                                     ) {
                                         Icon(imageVector = vectorResource(id = R.drawable.ic_refresh))
                                         Box(modifier = Modifier.width(standardPadding))
-                                        Text(text = stringResource(id = R.string.load_more))
+                                        Text(text = stringResource(id = R.string.common_controls_timeline_load_more))
                                     }
                                     Divider()
                                 }

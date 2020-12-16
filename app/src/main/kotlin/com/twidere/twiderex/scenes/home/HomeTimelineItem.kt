@@ -40,7 +40,7 @@ import com.twidere.twiderex.viewmodel.timeline.HomeTimelineViewModel
 class HomeTimelineItem : HomeNavigationItem() {
     @Composable
     override val name: String
-        get() = stringResource(R.string.title_home)
+        get() = stringResource(R.string.scene_timeline_title)
     override val route: String
         get() = "home"
 

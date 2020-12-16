@@ -93,7 +93,7 @@ fun SearchInputScene(initial: String? = null) {
                                 },
                                 maxLines = 1,
                                 placeholder = {
-                                    Text(text = stringResource(id = R.string.search_hint))
+                                    Text(text = stringResource(id = R.string.scene_search_search_bar_placeholder))
                                 },
                                 onImeActionPerformed = { _, _ ->
                                     if (textFieldValue.text.isNotEmpty()) {

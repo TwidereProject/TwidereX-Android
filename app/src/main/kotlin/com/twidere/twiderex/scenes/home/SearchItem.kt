@@ -55,7 +55,7 @@ import com.twidere.twiderex.viewmodel.search.SearchInputViewModel
 class SearchItem : HomeNavigationItem() {
     @Composable
     override val name: String
-        get() = stringResource(R.string.title_search)
+        get() = stringResource(R.string.scene_search_title)
     override val route: String
         get() = "search"
 
@@ -96,7 +96,7 @@ class SearchItem : HomeNavigationItem() {
                                     Text(
                                         modifier = Modifier.weight(1F)
                                             .align(Alignment.CenterVertically),
-                                        text = stringResource(id = R.string.search_hint),
+                                        text = stringResource(id = R.string.scene_search_search_bar_placeholder),
                                     )
                                 }
                                 IconButton(

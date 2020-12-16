@@ -50,14 +50,14 @@ data class SettingItem(
 fun SettingsScene() {
     val settings =
         mapOf(
-            stringResource(id = R.string.group_title_general) to listOf(
+            stringResource(id = R.string.scene_settings_section_header_general) to listOf(
                 SettingItem(
-                    stringResource(id = R.string.title_appearance),
+                    stringResource(id = R.string.scene_settings_appearance_title),
                     vectorResource(id = R.drawable.ic_shirt),
                     route = Route.Settings.Appearance,
                 ),
                 SettingItem(
-                    stringResource(id = R.string.title_display),
+                    stringResource(id = R.string.scene_settings_display_title),
                     vectorResource(id = R.drawable.ic_template),
                     route = Route.Settings.Display,
                 ),
@@ -73,9 +73,9 @@ fun SettingsScene() {
 //                    route = "",
 //                ),
             ),
-            stringResource(id = R.string.group_title_about) to listOf(
+            stringResource(id = R.string.scene_settings_section_header_about) to listOf(
                 SettingItem(
-                    stringResource(id = R.string.title_about),
+                    stringResource(id = R.string.scene_settings_about_title),
                     vectorResource(id = R.drawable.ic_info_circle),
                     route = Route.Settings.About,
                 ),
@@ -90,7 +90,7 @@ fun SettingsScene() {
                         AppBarNavigationButton()
                     },
                     title = {
-                        Text(text = stringResource(id = R.string.title_settings))
+                        Text(text = stringResource(id = R.string.scene_settings_title))
                     }
                 )
             }

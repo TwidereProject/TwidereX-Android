@@ -46,7 +46,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.R
@@ -77,7 +76,7 @@ fun AppearanceScene() {
                         AppBarNavigationButton()
                     },
                     title = {
-                        Text(text = stringResource(id = R.string.title_appearance))
+                        Text(text = stringResource(id = R.string.scene_settings_appearance_title))
                     },
                 )
             }
@@ -99,7 +98,7 @@ fun AppearanceScene() {
                             }
                         ),
                         text = {
-                            Text(text = stringResource(id = R.string.settings_primary_color))
+                            Text(text = stringResource(id = R.string.scene_settings_appearance_highlight_color))
                         },
                         trailing = {
                             Box(
@@ -125,10 +124,17 @@ fun AppearanceScene() {
                         viewModel.setTabPosition(it)
                     },
                     title = {
-                        Text(text = stringResource(id = R.string.settings_tab_position))
+                        Text(text = stringResource(id = R.string.scene_settings_appearance_section_header_tab_position))
                     },
                     itemContent = {
-                        Text(text = stringArrayResource(id = R.array.entries_tab_position)[it.ordinal])
+                        Text(
+                            text = stringResource(
+                                arrayOf(
+                                    R.string.scene_settings_appearance_tab_position_top,
+                                    R.string.scene_settings_appearance_tab_position_bottom
+                                )[it.ordinal]
+                            )
+                        )
                     }
                 )
                 itemDivider()
@@ -143,10 +149,18 @@ fun AppearanceScene() {
                         viewModel.setTheme(it)
                     },
                     title = {
-                        Text(text = stringResource(id = R.string.settings_theme))
+                        Text(text = stringResource(id = R.string.scene_settings_appearance_section_header_theme))
                     },
                     itemContent = {
-                        Text(text = stringArrayResource(id = R.array.entries_theme)[it.ordinal])
+                        Text(
+                            text = stringResource(
+                                arrayOf(
+                                    R.string.scene_settings_appearance_theme_auto,
+                                    R.string.scene_settings_appearance_theme_light,
+                                    R.string.scene_settings_appearance_theme_dark,
+                                )[it.ordinal]
+                            )
+                        )
                     }
                 )
             }
@@ -169,7 +183,7 @@ fun primaryColorDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         title = {
-            Text(text = stringResource(id = R.string.pick_color))
+            Text(text = stringResource(id = R.string.scene_settings_appearance_pick_color))
         },
         text = {
             LazyRowForIndexed(
@@ -200,7 +214,7 @@ fun primaryColorDialog(
         },
         confirmButton = {
             TextButton(onClick = onDismiss) {
-                Text(text = stringResource(id = R.string.action_Close))
+                Text(text = stringResource(id = R.string.common_controls_actions_ok))
             }
         }
     )

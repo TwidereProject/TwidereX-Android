@@ -230,21 +230,21 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Text(text = currentUser?.friendsCount.toString())
-                Text(text = stringResource(id = R.string.title_following))
+                Text(text = stringResource(id = R.string.common_controls_profile_dashboard_following))
             }
             Column(
                 modifier = Modifier.weight(1f),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Text(text = currentUser?.followersCount.toString())
-                Text(text = stringResource(id = R.string.title_followers))
+                Text(text = stringResource(id = R.string.common_controls_profile_dashboard_followers))
             }
             Column(
                 modifier = Modifier.weight(1f),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Text(text = currentUser?.listedCount.toString())
-                Text(text = stringResource(id = R.string.title_listed))
+                Text(text = stringResource(id = R.string.common_controls_profile_dashboard_listed))
             }
         }
 
@@ -300,7 +300,7 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
                                 }
                             ),
                             text = {
-                                Text(text = stringResource(id = R.string.title_sign_in))
+                                Text(text = stringResource(id = R.string.scene_drawer_sign_in))
                             }
                         )
                     }
@@ -313,7 +313,7 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
                                 }
                             ),
                             text = {
-                                Text(text = stringResource(id = R.string.title_account_management))
+                                Text(text = stringResource(id = R.string.scene_manage_accounts_title))
                             }
                         )
                     }
@@ -328,7 +328,7 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
                                 }
                             ),
                             text = {
-                                Text(text = stringResource(id = R.string.title_drafts))
+                                Text(text = stringResource(id = R.string.scene_drafts_title))
                             },
                             icon = {
                                 Icon(imageVector = vectorResource(id = R.drawable.ic_note))
@@ -352,7 +352,7 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
                 Icon(imageVector = vectorResource(id = R.drawable.ic_adjustments_horizontal))
             },
             text = {
-                Text(text = stringResource(id = R.string.title_settings))
+                Text(text = stringResource(id = R.string.scene_settings_title))
             }
         )
     }

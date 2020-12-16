@@ -33,7 +33,7 @@ import com.twidere.twiderex.ui.AmbientActiveAccount
 class MeItem : HomeNavigationItem() {
     @Composable
     override val name: String
-        get() = stringResource(R.string.title_me)
+        get() = stringResource(R.string.scene_profile_title)
     override val route: String
         get() = "me"
 

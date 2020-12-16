@@ -20,6 +20,7 @@
  */
 package com.twidere.twiderex.paging.mediator.user
 
+import android.view.View
 import androidx.paging.ExperimentalPagingApi
 import com.twidere.services.microblog.TimelineService
 import com.twidere.services.microblog.model.IStatus

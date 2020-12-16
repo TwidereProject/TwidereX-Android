@@ -61,7 +61,7 @@ fun RetweetHeader(
         Spacer(modifier = Modifier.width(standardPadding))
         Text(
             style = MaterialTheme.typography.caption,
-            text = stringResource(id = R.string.name_retweeted, data.user.name),
+            text = stringResource(id = R.string.common_controls_status_user_retweeted, data.user.name),
         )
     }
 }

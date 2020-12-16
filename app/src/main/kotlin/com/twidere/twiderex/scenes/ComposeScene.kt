@@ -203,9 +203,9 @@ private fun ComposeBody(
                     title = {
                         Text(
                             text = when (composeType) {
-                                ComposeType.Reply -> stringResource(id = R.string.title_reply)
-                                ComposeType.Quote -> stringResource(id = R.string.title_quote)
-                                else -> stringResource(id = R.string.title_compose)
+                                ComposeType.Reply -> stringResource(id = R.string.scene_compose_title_reply)
+                                ComposeType.Quote -> stringResource(id = R.string.scene_compose_title_quote)
+                                else -> stringResource(id = R.string.scene_compose_title_compose)
                             }
                         )
                     },
@@ -381,7 +381,7 @@ private fun ReplySheetContent(
             }
         },
         text = {
-            Text(text = stringResource(id = R.string.replying_to))
+            Text(text = stringResource(id = R.string.scene_compose_replying_to))
         }
     )
     status?.let {
@@ -410,7 +410,7 @@ private fun ReplySheetContent(
     }
     if (replyToUser.any()) {
         ListItem {
-            Text(text = stringResource(id = R.string.others_in_this_conversation))
+            Text(text = stringResource(id = R.string.scene_compose_others_in_this_conversation))
         }
         Divider(modifier = Modifier.padding(horizontal = 16.dp))
         replyToUser.forEach { user ->
@@ -465,18 +465,18 @@ private fun ConfirmDraftDialog(
         onDismissRequest = onDismiss,
         text = {
             Text(
-                text = stringResource(id = R.string.message_save_draft),
+                text = stringResource(id = R.string.scene_compose_save_draft_message),
                 style = MaterialTheme.typography.body2
             )
         },
         dismissButton = {
             TextButton(onClick = onCancel) {
-                Text(text = stringResource(id = R.string.action_cancel))
+                Text(text = stringResource(id = R.string.common_controls_actions_cancel))
             }
         },
         confirmButton = {
             TextButton(onClick = onConfirm) {
-                Text(text = stringResource(id = R.string.action_yes))
+                Text(text = stringResource(id = R.string.scene_compose_save_draft_action))
             }
         },
     )
@@ -688,7 +688,7 @@ private fun ComposeImage(item: Uri, viewModel: ComposeViewModel) {
             }
         ) {
             Text(
-                text = stringResource(id = R.string.action_remove),
+                text = stringResource(id = R.string.common_controls_actions_remove),
                 color = Color.Red,
             )
         }

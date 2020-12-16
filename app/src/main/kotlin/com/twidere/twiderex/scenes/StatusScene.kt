@@ -69,7 +69,7 @@ fun StatusScene(statusKey: MicroBlogKey) {
             topBar = {
                 AppBar(
                     title = {
-                        Text(text = stringResource(id = R.string.title_tweet))
+                        Text(text = stringResource(id = R.string.scene_search_tabs_tweets))
                     },
                     navigationIcon = {
                         AppBarNavigationButton()

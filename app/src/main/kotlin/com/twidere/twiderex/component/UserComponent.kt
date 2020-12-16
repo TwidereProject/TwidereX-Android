@@ -319,9 +319,9 @@ private fun UserInfo(user: UiUser, viewModel: UserViewModel) {
                             ) {
                                 Text(
                                     text = if (it.followedBy) {
-                                        stringResource(id = R.string.action_unfollow)
+                                        stringResource(id = R.string.common_controls_friendship_actions_unfollow)
                                     } else {
-                                        stringResource(id = R.string.action_follow)
+                                        stringResource(id = R.string.common_controls_friendship_actions_follow)
                                     },
                                     style = MaterialTheme.typography.h6,
                                     color = MaterialTheme.colors.primary,
@@ -329,7 +329,7 @@ private fun UserInfo(user: UiUser, viewModel: UserViewModel) {
                             }
                             if (it.following) {
                                 Text(
-                                    text = stringResource(id = R.string.following_you),
+                                    text = stringResource(id = R.string.common_controls_friendship_follows_you),
                                     style = MaterialTheme.typography.caption,
                                 )
                             }
@@ -393,21 +393,21 @@ private fun UserInfo(user: UiUser, viewModel: UserViewModel) {
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Text(text = user.friendsCount.toString())
-                    Text(text = stringResource(id = R.string.title_following))
+                    Text(text = stringResource(id = R.string.common_controls_profile_dashboard_following))
                 }
                 Column(
                     modifier = Modifier.weight(1f),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Text(text = user.followersCount.toString())
-                    Text(text = stringResource(id = R.string.title_followers))
+                    Text(text = stringResource(id = R.string.common_controls_profile_dashboard_followers))
                 }
                 Column(
                     modifier = Modifier.weight(1f),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Text(text = user.listedCount.toString())
-                    Text(text = stringResource(id = R.string.title_listed))
+                    Text(text = stringResource(id = R.string.common_controls_profile_dashboard_listed))
                 }
             }
             Spacer(modifier = Modifier.height(standardPadding))

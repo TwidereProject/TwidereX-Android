@@ -61,7 +61,7 @@ fun DraftListScene() {
                         AppBarNavigationButton()
                     },
                     title = {
-                        Text(text = stringResource(id = R.string.title_drafts))
+                        Text(text = stringResource(id = R.string.scene_drafts_title))
                     }
                 )
             }
@@ -87,7 +87,7 @@ fun DraftListScene() {
                                     navController.navigate(Route.Draft.Compose(it._id))
                                 }
                             ) {
-                                Text(text = stringResource(id = R.string.action_edit))
+                                Text(text = stringResource(id = R.string.scene_drafts_actions_edit_draft))
                             }
                             DropdownMenuItem(
                                 onClick = {
@@ -95,7 +95,7 @@ fun DraftListScene() {
                                 }
                             ) {
                                 Text(
-                                    text = stringResource(id = R.string.action_remove),
+                                    text = stringResource(id = R.string.common_controls_actions_remove),
                                     color = Color.Red,
                                 )
                             }

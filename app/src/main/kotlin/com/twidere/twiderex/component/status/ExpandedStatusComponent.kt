@@ -113,21 +113,21 @@ fun ExpandedStatusComponent(
                     if (data.replyCount > 0) {
                         StatusStatistics(
                             count = data.replyCount,
-                            text = R.string.count_reply,
+                            text = R.string.common_countable_reply_mutiple,
                         )
                         Spacer(modifier = Modifier.width(standardPadding * 2))
                     }
                     if (data.retweetCount > 0) {
                         StatusStatistics(
                             count = data.retweetCount,
-                            text = R.string.count_retweet,
+                            text = R.string.common_countable_retweet_mutiple,
                         )
                         Spacer(modifier = Modifier.width(standardPadding * 2))
                     }
                     if (data.likeCount > 0) {
                         StatusStatistics(
                             count = data.likeCount,
-                            text = R.string.count_like,
+                            text = R.string.common_countable_like_multiple,
                         )
                     }
                 }

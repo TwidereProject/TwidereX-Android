@@ -137,9 +137,9 @@ fun SearchScene(keyword: String) {
                         )
                         TextTabsComponent(
                             items = listOf(
-                                stringResource(id = R.string.search_title_tweets),
-                                stringResource(id = R.string.search_title_media),
-                                stringResource(id = R.string.search_title_users),
+                                stringResource(id = R.string.scene_search_tabs_tweets),
+                                stringResource(id = R.string.scene_search_tabs_media),
+                                stringResource(id = R.string.scene_search_tabs_users),
                             ),
                             selectedItem = selectedTab,
                             onItemSelected = {

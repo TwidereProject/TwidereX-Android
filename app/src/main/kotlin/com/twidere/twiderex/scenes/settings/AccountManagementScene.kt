@@ -61,7 +61,7 @@ fun AccountManagementScene() {
                         AppBarNavigationButton()
                     },
                     title = {
-                        Text(text = stringResource(id = R.string.title_accounts))
+                        Text(text = stringResource(id = R.string.scene_manage_accounts_title))
                     },
                     actions = {
                         val navController = AmbientNavController.current
@@ -121,7 +121,7 @@ fun AccountManagementScene() {
                                     },
                                 ) {
                                     Text(
-                                        text = stringResource(id = R.string.action_remove),
+                                        text = stringResource(id = R.string.common_controls_actions_remove),
                                         color = Color.Red,
                                     )
                                 }

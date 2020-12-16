@@ -24,14 +24,11 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.material.ListItem
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.items
-import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.loading
 
 fun <T : Any> LazyListScope.itemsPaging(
@@ -58,7 +55,7 @@ fun LazyListScope.loadState(
                 ListItem(
                     modifier = Modifier.clickable(onClick = { onReloadRequested.invoke() }),
                     text = {
-                        Text(text = stringResource(id = R.string.list_load_state_error))
+//                        Text(text = stringResource(id = R.string.list_load_state_error))
                     }
                 )
             }

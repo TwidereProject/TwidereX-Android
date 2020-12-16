@@ -48,12 +48,12 @@ import com.twidere.twiderex.extensions.navViewModel
 import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.ui.TwidereXTheme
 import com.twidere.twiderex.viewmodel.mastodon.MastodonSignInViewModel
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
 @Composable
 fun MastodonSignInScene() {
@@ -122,7 +122,7 @@ fun MastodonSignInScene() {
                                 }
                             }
                         ) {
-                            Text(text = stringResource(id = R.string.sign_in_with_twitter))
+                            Text(text = stringResource(id = R.string.scene_sign_in_sign_in_with_twitter))
                         }
                     }
                     Box(modifier = Modifier.height(100.dp))

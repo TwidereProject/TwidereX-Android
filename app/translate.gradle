@@ -1,0 +1,41 @@
+import groovy.json.JsonSlurper
+
+task generateTranslate {
+    def translate = project.file('translate')
+    println(translate.absolutePath.toString())
+    def files = translate.listFiles()
+    for (def file : files) {
+        def jsonFile = new File(file, "app.json")
+        if (!jsonFile.exists()) {
+            continue
+        }
+        def text = jsonFile.getText()
+        def json = new JsonSlurper().parseText(text)
+        def result = flattenMap(json).dropWhile {
+            it.value.isEmpty()
+        }
+        if (result.size() == 0) {
+            continue
+        }
+        def xml = """<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">""" + System.lineSeparator() +
+                result.collect {
+                    '    <string name="'+it.key+'">'+it.value+'</string>'
+                }.join(System.lineSeparator()) + System.lineSeparator() +
+                "</resources>"
+        def target = project.file('src/main/res-localied' + '/values-' + file.name.split('_').first() + '-r' + file.name.split('_').last() + "/strings.xml")
+        target.getParentFile().mkdirs()
+        target.createNewFile()
+        target.write(xml)
+    }
+}
+
+def flattenMap(Map map) {
+    map.collectEntries { k, v ->
+        v instanceof Map ?
+                flattenMap(v).collectEntries { k1, v1 ->
+                    [ "${k}_${k1}": v1 ]
+                }
+                :
+                [ (k): v ]
+    }
+}

@@ -33,7 +33,7 @@ import com.twidere.twiderex.viewmodel.timeline.MentionsTimelineViewModel
 class MentionItem : HomeNavigationItem() {
     @Composable
     override val name: String
-        get() = stringResource(R.string.title_mentions)
+        get() = stringResource(R.string.scene_mentions_title)
     override val route: String
         get() = "mentions"
 

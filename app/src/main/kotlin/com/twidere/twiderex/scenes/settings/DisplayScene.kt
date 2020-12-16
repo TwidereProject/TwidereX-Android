@@ -32,7 +32,6 @@ import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.R
@@ -66,14 +65,14 @@ fun DisplayScene() {
                         AppBarNavigationButton()
                     },
                     title = {
-                        Text(text = stringResource(id = R.string.title_display))
+                        Text(text = stringResource(id = R.string.scene_settings_display_title))
                     }
                 )
             }
         ) {
             LazyColumn {
                 itemHeader {
-                    Text(text = stringResource(id = R.string.group_title_preview))
+                    Text(text = stringResource(id = R.string.scene_settings_display_section_header_preview))
                 }
                 item {
                     Providers(
@@ -85,7 +84,7 @@ fun DisplayScene() {
                 }
                 itemDivider()
                 itemHeader {
-                    Text(text = stringResource(id = R.string.group_title_text))
+                    Text(text = stringResource(id = R.string.scene_settings_display_section_header_text))
                 }
                 switchItem(
                     value = display.useSystemFontSize,
@@ -93,7 +92,7 @@ fun DisplayScene() {
                         viewModel.setUseSystemFontSize(it)
                     },
                     title = {
-                        Text(text = stringResource(id = R.string.settings_use_system_font_size))
+                        Text(text = stringResource(id = R.string.scene_settings_display_text_use_the_system_font_size))
                     },
                 )
                 if (!display.useSystemFontSize) {
@@ -130,15 +129,18 @@ fun DisplayScene() {
                         viewModel.setAvatarStyle(it)
                     },
                     title = {
-                        Text(text = stringResource(id = R.string.group_title_avatar_style))
+                        Text(text = stringResource(id = R.string.scene_settings_display_text_avatar_style))
                     },
                     itemContent = {
-                        Text(text = stringArrayResource(id = R.array.entries_profile_image_style)[it.ordinal])
+                        Text(text = stringResource(arrayOf(
+                            R.string.scene_settings_display_text_circle,
+                            R.string.scene_settings_display_text_rounded_square,
+                        )[it.ordinal]))
                     }
                 )
                 itemDivider()
                 itemHeader {
-                    Text(text = stringResource(id = R.string.group_title_media))
+                    Text(text = stringResource(id = R.string.scene_settings_display_section_header_media))
                 }
                 switchItem(
                     value = display.mediaPreview,
@@ -146,7 +148,7 @@ fun DisplayScene() {
                         viewModel.setMediaPreview(it)
                     },
                     title = {
-                        Text(text = stringResource(id = R.string.settings_media_preview))
+                        Text(text = stringResource(id = R.string.scene_settings_display_media_media_previews))
                     }
                 )
             }

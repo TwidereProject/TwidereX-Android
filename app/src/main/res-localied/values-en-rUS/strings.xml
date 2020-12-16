@@ -1,5 +1,4 @@
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-    <string name="app_name" translatable="false">Twidere X</string>
     <string name="common_alerts_account_temporarily_locked_title">Account Temporarily Locked</string>
     <string name="common_alerts_account_temporarily_locked_message">Open Twitter to unlock</string>
     <string name="common_alerts_unfollow_user_message">Unfollow user %s?</string>
@@ -119,8 +118,8 @@
     <string name="scene_settings_appearance_tab_position_top">Top</string>
     <string name="scene_settings_appearance_tab_position_bottom">Bottom</string>
     <string name="scene_settings_appearance_theme_auto">Auto</string>
-    <string name="scene_settings_appearance_theme_light">Light</string>
-    <string name="scene_settings_appearance_theme_dark">Dark</string>
+    <string name="scene_settings_appearance_theme_light">light</string>
+    <string name="scene_settings_appearance_theme_dark">dark</string>
     <string name="scene_settings_display_title">Display</string>
     <string name="scene_settings_display_section_header_preview">Preview</string>
     <string name="scene_settings_display_section_header_text">Text</string>
