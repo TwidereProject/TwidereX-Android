@@ -31,6 +31,9 @@ import com.twidere.twiderex.preferences.AmbientAppearancePreferences
 val mediumEmphasisContentContentColor: Color
     get() = AmbientContentColor.current.copy(alpha = ContentAlpha.medium)
 
+val Orange: Color
+    get() = Color(0XFFFF9500)
+
 val primaryColors = listOf(
     Color(0XFF4C9EEB) to Color(0XFF5CB0FF),
     Color(0XFF1C68F3) to Color(0XFF4B85F0),

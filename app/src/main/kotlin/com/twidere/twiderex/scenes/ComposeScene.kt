@@ -96,6 +96,7 @@ import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.ui.AmbientActiveAccount
 import com.twidere.twiderex.ui.AmbientNavController
+import com.twidere.twiderex.ui.Orange
 import com.twidere.twiderex.ui.TwidereXTheme
 import com.twidere.twiderex.ui.composeImageSize
 import com.twidere.twiderex.ui.profileImageSize
@@ -324,6 +325,15 @@ private fun ComposeBody(
                     modifier = Modifier
                         .padding(horizontal = standardPadding * 2)
                 ) {
+                    val maxLength = remember {
+                        TwitterTextConfiguration.getDefaultConfig().maxWeightedTweetLength
+                    }
+                    val textLength = remember(text) {
+                        TwitterTextParser.parseTweet(text).weightedLength
+                    }
+                    val progress = remember(textLength) {
+                        textLength.toFloat() / maxLength.toFloat()
+                    }
                     Box(
                         modifier = Modifier
                             .width(profileImageSize / 2)
@@ -333,12 +343,18 @@ private fun ComposeBody(
                             progress = 1f,
                             color = MaterialTheme.colors.onSurface.copy(alpha = 0.12f),
                         )
-                        val maxLength = remember {
-                            TwitterTextConfiguration.getDefaultConfig().maxWeightedTweetLength
-                        }
                         CircularProgressIndicator(
-                            progress = TwitterTextParser.parseTweet(text).weightedLength.toFloat() / maxLength.toFloat(),
+                            progress = progress,
+                            color = when {
+                                progress < 0.9 -> MaterialTheme.colors.primary
+                                progress >= 0.9 && progress < 1.0 -> Orange
+                                else -> Color.Red
+                            },
                         )
+                    }
+                    Box(modifier = Modifier.width(4.dp))
+                    if (progress > 1.0) {
+                        Text(text = (maxLength - textLength).toString(), color = Color.Red)
                     }
                     Spacer(modifier = Modifier.weight(1F))
                     if (locationEnabled) {
