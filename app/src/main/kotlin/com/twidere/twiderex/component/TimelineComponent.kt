@@ -34,10 +34,12 @@ import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ambientOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.onCommit
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -55,6 +57,7 @@ import com.twidere.twiderex.extensions.refreshOrRetry
 import com.twidere.twiderex.ui.standardPadding
 import com.twidere.twiderex.viewmodel.timeline.TimelineScrollState
 import com.twidere.twiderex.viewmodel.timeline.TimelineViewModel
+import kotlinx.coroutines.launch
 
 @OptIn(IncomingComposeUpdate::class)
 @Composable
@@ -75,6 +78,12 @@ fun TimelineComponent(viewModel: TimelineViewModel) {
                 initialFirstVisibleItemIndex = lastScrollState.firstVisibleItemIndex,
                 initialFirstVisibleItemScrollOffset = lastScrollState.firstVisibleItemScrollOffset,
             )
+            val scope = rememberCoroutineScope()
+            AmbientTimelineController.current.requestScrollTop = {
+                scope.launch {
+                    listState.snapToItemIndex(0)
+                }
+            }
             onCommit(listState.isAnimationRunning) {
                 if (!listState.isAnimationRunning) {
                     viewModel.saveScrollState(
@@ -138,3 +147,13 @@ fun TimelineComponent(viewModel: TimelineViewModel) {
         }
     }
 }
+
+class TimelineController {
+    internal var requestScrollTop: () -> Unit = {}
+
+    fun scrollToTop() {
+        requestScrollTop.invoke()
+    }
+}
+
+val AmbientTimelineController = ambientOf { TimelineController() }

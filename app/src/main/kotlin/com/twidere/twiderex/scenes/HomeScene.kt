@@ -44,6 +44,7 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Providers
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -62,6 +63,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigate
 import androidx.navigation.compose.rememberNavController
 import com.twidere.twiderex.R
+import com.twidere.twiderex.component.AmbientTimelineController
+import com.twidere.twiderex.component.TimelineController
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.IconTabsComponent
 import com.twidere.twiderex.component.foundation.TopAppBarElevation
@@ -91,6 +94,9 @@ fun HomeScene() {
         navController.enableOnBackPressed(false)
     }
     var selectedItem by savedInstanceState { 0 }
+    val timelineController = remember {
+        TimelineController()
+    }
     val tabPosition = AmbientAppearancePreferences.current.tapPosition
     val menus = listOf(
         HomeTimelineItem(),
@@ -142,6 +148,9 @@ fun HomeScene() {
                             items = menus.map { it.icon },
                             selectedItem = selectedItem,
                             onItemSelected = {
+                                if (selectedItem == it) {
+                                    timelineController.scrollToTop()
+                                }
                                 selectedItem = it
                                 navController.navigate(menus[selectedItem].route) {
                                     launchSingleTop = true
@@ -154,6 +163,9 @@ fun HomeScene() {
             bottomBar = {
                 if (tabPosition == AppearancePreferences.TabPosition.Bottom) {
                     HomeBottomNavigation(menus, selectedItem) {
+                        if (selectedItem == it) {
+                            timelineController.scrollToTop()
+                        }
                         selectedItem = it
                         navController.navigate(menus[selectedItem].route) {
                             launchSingleTop = true
@@ -173,10 +185,14 @@ fun HomeScene() {
                     top = it.top,
                 )
             ) {
-                NavHost(navController = navController, startDestination = menus.first().route) {
-                    menus.forEach { item ->
-                        composable(item.route) {
-                            item.onCompose()
+                Providers(
+                    AmbientTimelineController provides timelineController
+                ) {
+                    NavHost(navController = navController, startDestination = menus.first().route) {
+                        menus.forEach { item ->
+                            composable(item.route) {
+                                item.onCompose()
+                            }
                         }
                     }
                 }
