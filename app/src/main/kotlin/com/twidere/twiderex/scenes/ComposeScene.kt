@@ -91,7 +91,6 @@ import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.extensions.checkAllSelfPermissionsGranted
 import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.launcher.AmbientLauncher
-import com.twidere.twiderex.maxComposeTextLength
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.navigation.Route
@@ -104,6 +103,8 @@ import com.twidere.twiderex.ui.standardPadding
 import com.twidere.twiderex.viewmodel.ComposeViewModel
 import com.twidere.twiderex.viewmodel.DraftComposeViewModel
 import com.twidere.twiderex.viewmodel.DraftItemViewModel
+import com.twitter.twittertext.TwitterTextConfiguration
+import com.twitter.twittertext.TwitterTextParser
 import kotlinx.coroutines.launch
 
 enum class ComposeType {
@@ -332,8 +333,11 @@ private fun ComposeBody(
                             progress = 1f,
                             color = MaterialTheme.colors.onSurface.copy(alpha = 0.12f),
                         )
+                        val maxLength = remember {
+                            TwitterTextConfiguration.getDefaultConfig().maxWeightedTweetLength
+                        }
                         CircularProgressIndicator(
-                            progress = text.length.toFloat() / maxComposeTextLength.toFloat(),
+                            progress = TwitterTextParser.parseTweet(text).weightedLength.toFloat() / maxLength.toFloat(),
                         )
                     }
                     Spacer(modifier = Modifier.weight(1F))

@@ -132,10 +132,14 @@ fun DisplayScene() {
                         Text(text = stringResource(id = R.string.scene_settings_display_text_avatar_style))
                     },
                     itemContent = {
-                        Text(text = stringResource(arrayOf(
-                            R.string.scene_settings_display_text_circle,
-                            R.string.scene_settings_display_text_rounded_square,
-                        )[it.ordinal]))
+                        Text(
+                            text = stringResource(
+                                arrayOf(
+                                    R.string.scene_settings_display_text_circle,
+                                    R.string.scene_settings_display_text_rounded_square,
+                                )[it.ordinal]
+                            )
+                        )
                     }
                 )
                 itemDivider()
