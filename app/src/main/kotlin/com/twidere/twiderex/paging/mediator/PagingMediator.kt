@@ -37,6 +37,7 @@ abstract class PagingMediator(
     abstract val pagingKey: String
 }
 
+@OptIn(ExperimentalPagingApi::class)
 fun PagingMediator.pager(
     pageSize: Int = defaultLoadCount,
 ): Pager<Int, DbPagingTimelineWithStatus> {

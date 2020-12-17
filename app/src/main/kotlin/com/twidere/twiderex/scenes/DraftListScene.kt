@@ -20,7 +20,7 @@
  */
 package com.twidere.twiderex.scenes
 
-import androidx.compose.foundation.lazy.LazyColumnFor
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
@@ -66,42 +66,44 @@ fun DraftListScene() {
                 )
             }
         ) {
-            LazyColumnFor(items = source) {
-                ListItem(
-                    text = {
-                        Text(text = it.content)
-                    },
-                    trailing = {
-                        var expanded by remember { mutableStateOf(false) }
-                        DropdownMenu(
-                            toggle = {
-                                IconButton(onClick = { expanded = true }) {
-                                    Icon(imageVector = Icons.Default.MoreVert)
-                                }
-                            },
-                            expanded = expanded,
-                            onDismissRequest = { expanded = false },
-                        ) {
-                            DropdownMenuItem(
-                                onClick = {
-                                    navController.navigate(Route.Draft.Compose(it._id))
-                                }
+            LazyColumn {
+                items(items = source) {
+                    ListItem(
+                        text = {
+                            Text(text = it.content)
+                        },
+                        trailing = {
+                            var expanded by remember { mutableStateOf(false) }
+                            DropdownMenu(
+                                toggle = {
+                                    IconButton(onClick = { expanded = true }) {
+                                        Icon(imageVector = Icons.Default.MoreVert)
+                                    }
+                                },
+                                expanded = expanded,
+                                onDismissRequest = { expanded = false },
                             ) {
-                                Text(text = stringResource(id = R.string.scene_drafts_actions_edit_draft))
-                            }
-                            DropdownMenuItem(
-                                onClick = {
-                                    viewModel.delete(it)
+                                DropdownMenuItem(
+                                    onClick = {
+                                        navController.navigate(Route.Draft.Compose(it._id))
+                                    }
+                                ) {
+                                    Text(text = stringResource(id = R.string.scene_drafts_actions_edit_draft))
                                 }
-                            ) {
-                                Text(
-                                    text = stringResource(id = R.string.common_controls_actions_remove),
-                                    color = Color.Red,
-                                )
+                                DropdownMenuItem(
+                                    onClick = {
+                                        viewModel.delete(it)
+                                    }
+                                ) {
+                                    Text(
+                                        text = stringResource(id = R.string.common_controls_actions_remove),
+                                        color = Color.Red,
+                                    )
+                                }
                             }
                         }
-                    }
-                )
+                    )
+                }
             }
         }
     }

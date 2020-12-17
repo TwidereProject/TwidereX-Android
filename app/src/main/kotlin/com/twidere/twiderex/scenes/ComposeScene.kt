@@ -37,7 +37,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRowForIndexed
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.AlertDialog
@@ -70,7 +70,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.node.Ref
 import androidx.compose.ui.platform.AmbientContext
@@ -148,7 +147,7 @@ fun ComposeScene(
     ComposeBody(viewModel = viewModel, account = account)
 }
 
-@OptIn(ExperimentalFocus::class, ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
 private fun ComposeBody(
     viewModel: ComposeViewModel,
@@ -309,13 +308,16 @@ private fun ComposeBody(
                 }
 
                 if (images.any()) {
-                    LazyRowForIndexed(
+                    LazyRow(
                         modifier = Modifier.padding(horizontal = standardPadding * 2),
-                        items = images
-                    ) { index, item ->
-                        ComposeImage(item, viewModel)
-                        if (index != images.lastIndex) {
-                            Spacer(modifier = Modifier.width(standardPadding))
+                    ) {
+                        itemsIndexed(
+                            items = images,
+                        ) { index, item ->
+                            ComposeImage(item, viewModel)
+                            if (index != images.lastIndex) {
+                                Spacer(modifier = Modifier.width(standardPadding))
+                            }
                         }
                     }
                     Spacer(modifier = Modifier.height(standardPadding * 2))
@@ -503,7 +505,6 @@ private fun ConfirmDraftDialog(
 }
 
 @ExperimentalMaterialApi
-@ExperimentalFocus
 @ExperimentalFoundationApi
 @Composable
 private fun ComposeInput(

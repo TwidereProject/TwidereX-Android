@@ -25,8 +25,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Tab
-import androidx.compose.material.TabConstants
-import androidx.compose.material.TabConstants.defaultTabIndicatorOffset
+import androidx.compose.material.TabDefaults
+import androidx.compose.material.TabDefaults.tabIndicatorOffset
 import androidx.compose.material.TabRow
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -85,8 +85,8 @@ fun TabsComponent(
         selectedTabIndex = selectedItem,
         backgroundColor = MaterialTheme.colors.surface.withElevation(),
         indicator = { tabPositions ->
-            TabConstants.DefaultIndicator(
-                modifier = Modifier.defaultTabIndicatorOffset(tabPositions[selectedItem]),
+            TabDefaults.Indicator(
+                modifier = Modifier.tabIndicatorOffset(tabPositions[selectedItem]),
                 color = MaterialTheme.colors.primary,
             )
         }

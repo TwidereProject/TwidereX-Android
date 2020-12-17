@@ -38,14 +38,14 @@ import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.viewmodel.timeline.HomeTimelineViewModel
 
 class HomeTimelineItem : HomeNavigationItem() {
-    @Composable
     override val name: String
+        @Composable
         get() = stringResource(R.string.scene_timeline_title)
     override val route: String
         get() = "home"
 
-    @Composable
     override val icon: ImageVector
+        @Composable
         get() = vectorResource(id = R.drawable.ic_home)
 
     @Composable

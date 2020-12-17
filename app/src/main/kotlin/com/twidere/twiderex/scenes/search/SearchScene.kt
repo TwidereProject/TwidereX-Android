@@ -45,7 +45,6 @@ import androidx.compose.runtime.savedinstancestate.savedInstanceState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
@@ -78,7 +77,7 @@ import com.twidere.twiderex.viewmodel.twitter.search.TwitterSearchMediaViewModel
 import com.twidere.twiderex.viewmodel.twitter.search.TwitterSearchTweetsViewModel
 import com.twidere.twiderex.viewmodel.twitter.search.TwitterSearchUserViewModel
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalFocus::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SearchScene(keyword: String) {
     val account = AmbientActiveAccount.current ?: return

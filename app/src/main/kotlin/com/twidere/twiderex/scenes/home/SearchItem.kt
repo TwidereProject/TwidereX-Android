@@ -23,7 +23,7 @@ package com.twidere.twiderex.scenes.home
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.lazy.LazyColumnFor
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.AmbientContentAlpha
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Icon
@@ -41,7 +41,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -53,19 +52,19 @@ import com.twidere.twiderex.ui.AmbientActiveAccount
 import com.twidere.twiderex.viewmodel.search.SearchInputViewModel
 
 class SearchItem : HomeNavigationItem() {
-    @Composable
     override val name: String
+        @Composable
         get() = stringResource(R.string.scene_search_title)
     override val route: String
         get() = "search"
 
-    @Composable
     override val icon: ImageVector
+        @Composable
         get() = vectorResource(id = R.drawable.ic_search)
     override val withAppBar: Boolean
         get() = false
 
-    @OptIn(ExperimentalFoundationApi::class, ExperimentalFocus::class)
+    @OptIn(ExperimentalFoundationApi::class)
     @Composable
     override fun onCompose() {
         val account = AmbientActiveAccount.current ?: return
@@ -112,30 +111,32 @@ class SearchItem : HomeNavigationItem() {
                 )
             }
         ) {
-            LazyColumnFor(items = source) {
-                ListItem(
-                    modifier = Modifier.clickable(
-                        onClick = {
-                            viewModel.addOrUpgrade(it.content)
-                            navigator.search(it.content)
-                        }
-                    ),
-                    icon = {
-                        Icon(imageVector = Icons.Default.History)
-                    },
-                    trailing = {
-                        IconButton(
+            LazyColumn {
+                items(items = source) {
+                    ListItem(
+                        modifier = Modifier.clickable(
                             onClick = {
-                                viewModel.remove(it)
+                                viewModel.addOrUpgrade(it.content)
+                                navigator.search(it.content)
                             }
-                        ) {
-                            Icon(imageVector = vectorResource(id = R.drawable.ic_x))
-                        }
-                    },
-                    text = {
-                        Text(text = it.content)
-                    },
-                )
+                        ),
+                        icon = {
+                            Icon(imageVector = Icons.Default.History)
+                        },
+                        trailing = {
+                            IconButton(
+                                onClick = {
+                                    viewModel.remove(it)
+                                }
+                            ) {
+                                Icon(imageVector = vectorResource(id = R.drawable.ic_x))
+                            }
+                        },
+                        text = {
+                            Text(text = it.content)
+                        },
+                    )
+                }
             }
         }
     }

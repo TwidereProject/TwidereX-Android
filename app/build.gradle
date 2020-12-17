@@ -150,10 +150,10 @@ dependencies {
     androidTestImplementation "androidx.compose.ui:ui-test:$versions.compose"
 
     implementation "androidx.paging:paging-runtime-ktx:$versions.paging"
-    implementation "androidx.paging:paging-compose:1.0.0-alpha03"
-    implementation "androidx.navigation:navigation-compose:1.0.0-alpha03"
+    implementation "androidx.paging:paging-compose:1.0.0-alpha04"
+    implementation "androidx.navigation:navigation-compose:1.0.0-alpha04"
     implementation "androidx.navigation:navigation-fragment-ktx:2.3.2"
-    implementation "androidx.activity:activity-ktx:1.2.0-beta02"
+    implementation "androidx.activity:activity-ktx:1.2.0-rc01"
     implementation "androidx.datastore:datastore:1.0.0-alpha05"
 
     // Use moshi for not since Kotlinx.Serialization not compatible with Jetpack Compose

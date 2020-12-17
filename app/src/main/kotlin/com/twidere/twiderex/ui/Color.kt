@@ -27,8 +27,8 @@ import androidx.compose.ui.graphics.Color
 import com.twidere.twiderex.extensions.isDarkTheme
 import com.twidere.twiderex.preferences.AmbientAppearancePreferences
 
-@Composable
 val mediumEmphasisContentContentColor: Color
+    @Composable
     get() = AmbientContentColor.current.copy(alpha = ContentAlpha.medium)
 
 val Orange: Color

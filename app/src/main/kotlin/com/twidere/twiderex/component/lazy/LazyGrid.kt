@@ -29,7 +29,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumnForIndexed
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -50,28 +50,29 @@ fun <T> LazyGridForIndexed(
     itemContent: @Composable BoxScope.(Int, T) -> Unit,
 ) {
     val rows = data.windowed(rowSize, rowSize, true)
-    LazyColumnForIndexed(
+    LazyColumn(
         modifier = modifier,
-        items = rows,
         contentPadding = contentPadding,
         horizontalAlignment = horizontalAlignment,
-    ) { index, row ->
-        Column(
-            modifier = Modifier.fillParentMaxWidth().padding(horizontal = padding)
-        ) {
-            Row {
-                for (i in row.indices) {
-                    val item = row[i]
-                    Box(modifier = Modifier.weight(1f)) {
-                        itemContent(data.indexOf(item), item)
-                    }
-                    if (i != row.lastIndex) {
-                        Spacer(modifier = Modifier.width(spacing))
+    ) {
+        itemsIndexed(items = rows) { index, row ->
+            Column(
+                modifier = Modifier.fillParentMaxWidth().padding(horizontal = padding)
+            ) {
+                Row {
+                    for (i in row.indices) {
+                        val item = row[i]
+                        Box(modifier = Modifier.weight(1f)) {
+                            itemContent(data.indexOf(item), item)
+                        }
+                        if (i != row.lastIndex) {
+                            Spacer(modifier = Modifier.width(spacing))
+                        }
                     }
                 }
-            }
-            if (index != rows.lastIndex) {
-                Spacer(modifier = Modifier.height(spacing))
+                if (index != rows.lastIndex) {
+                    Spacer(modifier = Modifier.height(spacing))
+                }
             }
         }
     }

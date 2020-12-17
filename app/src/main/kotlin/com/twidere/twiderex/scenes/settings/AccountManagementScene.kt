@@ -20,7 +20,7 @@
  */
 package com.twidere.twiderex.scenes.settings
 
-import androidx.compose.foundation.lazy.LazyColumnFor
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
@@ -78,56 +78,58 @@ fun AccountManagementScene() {
         ) {
             val activeAccountViewModel = AmbientActiveAccountViewModel.current
             val accounts by activeAccountViewModel.allAccounts.observeAsState(initial = emptyList())
-            LazyColumnFor(items = accounts) { detail ->
-                detail.user.toUi().let {
-                    ListItem(
-                        icon = {
-                            UserAvatar(
-                                user = it,
-                            )
-                        },
-                        text = {
-                            Text(
-                                text = it.name,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                            )
-                        },
-                        secondaryText = {
-                            Text(
-                                text = "@${it.screenName}",
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                            )
-                        },
-                        trailing = {
-                            var expanded by remember { mutableStateOf(false) }
-                            DropdownMenu(
-                                expanded = expanded,
-                                onDismissRequest = { expanded = false },
-                                toggle = {
-                                    IconButton(
-                                        onClick = {
-                                            expanded = true
-                                        },
-                                    ) {
-                                        Icon(imageVector = Icons.Default.MoreVert)
-                                    }
-                                },
-                            ) {
-                                DropdownMenuItem(
-                                    onClick = {
-                                        activeAccountViewModel.deleteAccount(detail)
+            LazyColumn {
+                items(items = accounts) { detail ->
+                    detail.user.toUi().let {
+                        ListItem(
+                            icon = {
+                                UserAvatar(
+                                    user = it,
+                                )
+                            },
+                            text = {
+                                Text(
+                                    text = it.name,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                )
+                            },
+                            secondaryText = {
+                                Text(
+                                    text = "@${it.screenName}",
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                )
+                            },
+                            trailing = {
+                                var expanded by remember { mutableStateOf(false) }
+                                DropdownMenu(
+                                    expanded = expanded,
+                                    onDismissRequest = { expanded = false },
+                                    toggle = {
+                                        IconButton(
+                                            onClick = {
+                                                expanded = true
+                                            },
+                                        ) {
+                                            Icon(imageVector = Icons.Default.MoreVert)
+                                        }
                                     },
                                 ) {
-                                    Text(
-                                        text = stringResource(id = R.string.common_controls_actions_remove),
-                                        color = Color.Red,
-                                    )
+                                    DropdownMenuItem(
+                                        onClick = {
+                                            activeAccountViewModel.deleteAccount(detail)
+                                        },
+                                    ) {
+                                        Text(
+                                            text = stringResource(id = R.string.common_controls_actions_remove),
+                                            color = Color.Red,
+                                        )
+                                    }
                                 }
                             }
-                        }
-                    )
+                        )
+                    }
                 }
             }
         }

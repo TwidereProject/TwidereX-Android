@@ -31,14 +31,14 @@ import com.twidere.twiderex.ui.AmbientActiveAccount
 import com.twidere.twiderex.viewmodel.timeline.MentionsTimelineViewModel
 
 class MentionItem : HomeNavigationItem() {
-    @Composable
     override val name: String
+        @Composable
         get() = stringResource(R.string.scene_mentions_title)
     override val route: String
         get() = "mentions"
 
-    @Composable
     override val icon: ImageVector
+        @Composable
         get() = vectorResource(id = R.drawable.ic_message_circle)
 
     @Composable

@@ -27,7 +27,7 @@ import androidx.compose.foundation.layout.RowScope.Companion.weight
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.AmbientContentColor
-import androidx.compose.material.ButtonConstants
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -181,7 +181,7 @@ fun ShareButton(
             onClick = {
                 action.invoke()
             },
-            colors = ButtonConstants.defaultTextButtonColors(
+            colors = ButtonDefaults.textButtonColors(
                 contentColor = mediumEmphasisContentContentColor
             )
         ) {
@@ -218,7 +218,7 @@ private fun StatusActionButtonWithNumbers(
     ) {
         TextButton(
             onClick = onClick,
-            colors = ButtonConstants.defaultTextButtonColors(
+            colors = ButtonDefaults.textButtonColors(
                 contentColor = color
             )
         ) {

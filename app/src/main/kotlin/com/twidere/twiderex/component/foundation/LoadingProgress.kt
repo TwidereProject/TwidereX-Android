@@ -26,7 +26,7 @@ import androidx.compose.foundation.layout.defaultMinSizeConstraints
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListScope
-import androidx.compose.material.ButtonConstants
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -37,9 +37,9 @@ fun LoadingProgress() {
     CircularProgressIndicator(
         modifier = Modifier
             .defaultMinSizeConstraints(
-                minHeight = ButtonConstants.DefaultMinHeight,
+                minHeight = ButtonDefaults.MinHeight,
             )
-            .padding(ButtonConstants.DefaultContentPadding)
+            .padding(ButtonDefaults.ContentPadding)
             .align(Alignment.CenterHorizontally),
     )
 }
@@ -52,8 +52,8 @@ fun LazyListScope.loading() {
         ) {
             CircularProgressIndicator(
                 modifier = Modifier
-                    .heightIn(min = ButtonConstants.DefaultMinHeight)
-                    .padding(ButtonConstants.DefaultContentPadding),
+                    .heightIn(min = ButtonDefaults.MinHeight)
+                    .padding(ButtonDefaults.ContentPadding),
             )
         }
     }

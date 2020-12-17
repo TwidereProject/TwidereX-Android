@@ -22,7 +22,7 @@ package com.twidere.twiderex.scenes.search
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.lazy.LazyColumnFor
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.ListItem
@@ -40,7 +40,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextRange
@@ -56,7 +55,7 @@ import com.twidere.twiderex.ui.AmbientActiveAccount
 import com.twidere.twiderex.ui.TwidereXTheme
 import com.twidere.twiderex.viewmodel.search.SearchInputViewModel
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalFocus::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SearchInputScene(initial: String? = null) {
     val account = AmbientActiveAccount.current ?: return
@@ -122,30 +121,32 @@ fun SearchInputScene(initial: String? = null) {
                 )
             }
         ) {
-            LazyColumnFor(items = source) {
-                ListItem(
-                    modifier = Modifier.clickable(
-                        onClick = {
-                            viewModel.addOrUpgrade(it.content)
-                            navigator.search(it.content)
-                        }
-                    ),
-                    icon = {
-                        Icon(imageVector = Icons.Default.History)
-                    },
-                    trailing = {
-                        IconButton(
+            LazyColumn {
+                items(items = source) {
+                    ListItem(
+                        modifier = Modifier.clickable(
                             onClick = {
-                                viewModel.remove(it)
+                                viewModel.addOrUpgrade(it.content)
+                                navigator.search(it.content)
                             }
-                        ) {
-                            Icon(imageVector = vectorResource(id = R.drawable.ic_x))
-                        }
-                    },
-                    text = {
-                        Text(text = it.content)
-                    },
-                )
+                        ),
+                        icon = {
+                            Icon(imageVector = Icons.Default.History)
+                        },
+                        trailing = {
+                            IconButton(
+                                onClick = {
+                                    viewModel.remove(it)
+                                }
+                            ) {
+                                Icon(imageVector = vectorResource(id = R.drawable.ic_x))
+                            }
+                        },
+                        text = {
+                            Text(text = it.content)
+                        },
+                    )
+                }
             }
         }
     }

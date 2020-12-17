@@ -40,7 +40,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focusRequester
 import androidx.compose.ui.graphics.Color
@@ -53,7 +52,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 
 @ExperimentalFoundationApi
-@ExperimentalFocus
 @Composable
 fun TextInput(
     modifier: Modifier = Modifier,
@@ -99,7 +97,6 @@ fun TextInput(
 }
 
 @ExperimentalFoundationApi
-@ExperimentalFocus
 @Composable
 fun TextInput(
     modifier: Modifier = Modifier,

@@ -31,14 +31,14 @@ import com.twidere.twiderex.model.ui.UiUser.Companion.toUi
 import com.twidere.twiderex.ui.AmbientActiveAccount
 
 class MeItem : HomeNavigationItem() {
-    @Composable
     override val name: String
+        @Composable
         get() = stringResource(R.string.scene_profile_title)
     override val route: String
         get() = "me"
 
-    @Composable
     override val icon: ImageVector
+        @Composable
         get() = vectorResource(id = R.drawable.ic_user)
     override val withAppBar: Boolean
         get() = false

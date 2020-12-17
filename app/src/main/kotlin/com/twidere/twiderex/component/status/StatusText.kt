@@ -30,7 +30,7 @@ import androidx.compose.runtime.Providers
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.useOrElse
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.annotatedString
+import androidx.compose.ui.text.buildAnnotatedString
 import com.twidere.twiderex.component.navigation.AmbientNavigator
 import com.twidere.twiderex.model.ui.UiStatus
 import org.jsoup.Jsoup
@@ -74,7 +74,7 @@ private fun RenderContent(
     onStatusTextClicked: () -> Unit = {},
 ) {
     val document = Jsoup.parse(html.replace("\n", "<br>"))
-    val value = annotatedString {
+    val value = buildAnnotatedString {
         document.body().childNodes().forEach {
             RenderNode(it, status)
         }

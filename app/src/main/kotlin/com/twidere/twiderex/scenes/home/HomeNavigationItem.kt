@@ -24,11 +24,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
 
 abstract class HomeNavigationItem {
-    @Composable
+
     abstract val name: String
+        @Composable get
     abstract val route: String
-    @Composable
     abstract val icon: ImageVector
+        @Composable get
     open val withAppBar = true
 
     @Composable

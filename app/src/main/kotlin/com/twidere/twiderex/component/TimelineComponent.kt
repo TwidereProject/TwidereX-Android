@@ -28,7 +28,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.ButtonConstants
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
@@ -114,9 +114,9 @@ fun TimelineComponent(viewModel: TimelineViewModel) {
                                     TextButton(
                                         modifier = Modifier
                                             .defaultMinSizeConstraints(
-                                                minHeight = ButtonConstants.DefaultMinHeight,
+                                                minHeight = ButtonDefaults.MinHeight,
                                             )
-                                            .padding(ButtonConstants.DefaultContentPadding)
+                                            .padding(ButtonDefaults.ContentPadding)
                                             .fillMaxWidth(),
                                         onClick = {
                                             items[index + 1]?.let { next ->

@@ -29,7 +29,7 @@ import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRowForIndexed
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Checkbox
@@ -186,27 +186,27 @@ fun primaryColorDialog(
             Text(text = stringResource(id = R.string.scene_settings_appearance_pick_color))
         },
         text = {
-            LazyRowForIndexed(
-                items = colors
-            ) { index, it ->
-                Box(
-                    modifier = Modifier
-                        .padding(end = standardPadding)
-                ) {
+            LazyRow() {
+                itemsIndexed(items = colors) { index, it ->
                     Box(
                         modifier = Modifier
-                            .size(profileImageSize)
-                            .clip(CircleShape)
-                            .background(it)
-                            .clickable(
-                                onClick = {
-                                    viewModel.setPrimaryColorIndex(index)
-                                }
-                            ),
-                        contentAlignment = Alignment.Center,
+                            .padding(end = standardPadding)
                     ) {
-                        if (colorIndex == index) {
-                            Checkbox(checked = true, onCheckedChange = {})
+                        Box(
+                            modifier = Modifier
+                                .size(profileImageSize)
+                                .clip(CircleShape)
+                                .background(it)
+                                .clickable(
+                                    onClick = {
+                                        viewModel.setPrimaryColorIndex(index)
+                                    }
+                                ),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            if (colorIndex == index) {
+                                Checkbox(checked = true, onCheckedChange = {})
+                            }
                         }
                     }
                 }

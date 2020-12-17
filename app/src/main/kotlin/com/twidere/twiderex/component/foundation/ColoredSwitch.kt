@@ -25,7 +25,7 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Switch
 import androidx.compose.material.SwitchColors
-import androidx.compose.material.SwitchConstants
+import androidx.compose.material.SwitchDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -38,7 +38,7 @@ fun ColoredSwitch(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     interactionState: InteractionState = remember { InteractionState() },
-    colors: SwitchColors = SwitchConstants.defaultColors(
+    colors: SwitchColors = SwitchDefaults.colors(
         checkedThumbColor = MaterialTheme.colors.primaryVariant,
     )
 ) {
