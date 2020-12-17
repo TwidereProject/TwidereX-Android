@@ -20,6 +20,8 @@
  */
 package com.twidere.twiderex.scenes
 
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.zoomable
@@ -51,6 +53,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
@@ -124,7 +127,6 @@ fun MediaScene(status: UiStatus, selectedIndex: Int) {
     val navController = AmbientNavController.current
     Scaffold {
         Box {
-
             val clock = AmbientAnimationClock.current
             val pagerState = remember(clock) {
                 PagerState(
@@ -149,83 +151,93 @@ fun MediaScene(status: UiStatus, selectedIndex: Int) {
                     lockPager = it
                 }
             }
-            if (!hideControls) {
+            val transition = updateTransition(targetState = !hideControls)
+            val alpha by transition.animateFloat {
+                if (it) 1f else 0f
+            }
+            if (alpha != 0f) {
                 Box(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .align(Alignment.BottomCenter)
-                        .background(color = controlPanelColor),
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .padding(standardPadding),
-                    ) {
-                        Text(
-                            modifier = Modifier
-                                .clickable(
-                                    onClick = {
-                                        navController.navigate(Route.Status(status.statusKey))
-                                    }
-                                ),
-                            text = status.rawText,
-                            maxLines = 2,
-                            overflow = TextOverflow.Ellipsis,
-                        )
-                        Spacer(modifier = Modifier.height(standardPadding))
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            Row(
-                                modifier = Modifier
-                                    .weight(1f),
-                                verticalAlignment = Alignment.CenterVertically,
-                            ) {
-                                UserAvatar(user = status.user)
-                                Spacer(modifier = Modifier.width(standardPadding))
-                                Text(
-                                    text = status.user.name,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis,
-                                )
-                                Spacer(modifier = Modifier.width(standardPadding))
-                                Providers(
-                                    AmbientContentAlpha provides ContentAlpha.medium
-                                ) {
-                                    Text(
-                                        text = "@${status.user.screenName}",
-                                        maxLines = 1,
-                                        overflow = TextOverflow.Ellipsis,
-                                    )
-                                }
-                            }
-                            ReplyButton(status = status, withNumber = false)
-                            RetweetButton(status = status, withNumber = false)
-                            LikeButton(status = status, withNumber = false)
-                            ShareButton(status = status)
-                        }
-                    }
-                }
-
-                Box(
-                    modifier = Modifier
-                        .padding(16.dp)
+                        .fillMaxSize()
+                        .alpha(alpha),
                 ) {
                     Box(
                         modifier = Modifier
-                            .align(Alignment.TopStart)
-                            .clip(MaterialTheme.shapes.small)
-                            .background(
-                                color = controlPanelColor,
-                                shape = MaterialTheme.shapes.small
-                            )
-                            .clipToBounds()
+                            .fillMaxWidth()
+                            .align(Alignment.BottomCenter)
+                            .background(color = controlPanelColor),
                     ) {
-                        IconButton(
-                            onClick = {
-                                navController.popBackStack()
-                            }
+                        Column(
+                            modifier = Modifier
+                                .padding(standardPadding),
                         ) {
-                            Icon(imageVector = vectorResource(id = R.drawable.ic_x))
+                            Text(
+                                modifier = Modifier
+                                    .clickable(
+                                        onClick = {
+                                            navController.navigate(Route.Status(status.statusKey))
+                                        }
+                                    ),
+                                text = status.rawText,
+                                maxLines = 2,
+                                overflow = TextOverflow.Ellipsis,
+                            )
+                            Spacer(modifier = Modifier.height(standardPadding))
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Row(
+                                    modifier = Modifier
+                                        .weight(1f),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                ) {
+                                    UserAvatar(user = status.user)
+                                    Spacer(modifier = Modifier.width(standardPadding))
+                                    Text(
+                                        text = status.user.name,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis,
+                                    )
+                                    Spacer(modifier = Modifier.width(standardPadding))
+                                    Providers(
+                                        AmbientContentAlpha provides ContentAlpha.medium
+                                    ) {
+                                        Text(
+                                            text = "@${status.user.screenName}",
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis,
+                                        )
+                                    }
+                                }
+                                ReplyButton(status = status, withNumber = false)
+                                RetweetButton(status = status, withNumber = false)
+                                LikeButton(status = status, withNumber = false)
+                                ShareButton(status = status)
+                            }
+                        }
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .padding(16.dp)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .align(Alignment.TopStart)
+                                .clip(MaterialTheme.shapes.small)
+                                .background(
+                                    color = controlPanelColor,
+                                    shape = MaterialTheme.shapes.small
+                                )
+                                .clipToBounds()
+                        ) {
+                            IconButton(
+                                onClick = {
+                                    navController.popBackStack()
+                                }
+                            ) {
+                                Icon(imageVector = vectorResource(id = R.drawable.ic_x))
+                            }
                         }
                     }
                 }
