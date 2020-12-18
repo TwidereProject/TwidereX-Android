@@ -102,7 +102,7 @@
     <string name="scene_lists_details_descriptions_single_subscriber">1 フォロワー</string>
     <string name="scene_lists_details_descriptions_multiple_subscribers">%d フォロワー</string>
     <string name="scene_lists_details_menu_actions_add_member">メンバーを追加</string>
-    <string name="scene_lists_details_menu_actions_Edit List">リストを編集</string>
+    <string name="scene_lists_details_menu_actions_edit_list">リストを編集</string>
     <string name="scene_lists_details_tabs_members">メンバー</string>
     <string name="scene_lists_details_tabs_subscriber">フォロワー</string>
     <string name="scene_lists_details_no_members_found">メンバーが見つかりません。</string>

@@ -102,7 +102,7 @@
     <string name="scene_lists_details_descriptions_single_subscriber">1 名订阅者</string>
     <string name="scene_lists_details_descriptions_multiple_subscribers">%d 名订阅者</string>
     <string name="scene_lists_details_menu_actions_add_member">添加成员</string>
-    <string name="scene_lists_details_menu_actions_Edit List">编辑列表</string>
+    <string name="scene_lists_details_menu_actions_edit_list">编辑列表</string>
     <string name="scene_lists_details_tabs_members">成员</string>
     <string name="scene_lists_details_tabs_subscriber">订阅者</string>
     <string name="scene_lists_details_no_members_found">没有找到成员。</string>

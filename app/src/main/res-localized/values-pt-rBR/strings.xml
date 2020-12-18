@@ -102,7 +102,7 @@
     <string name="scene_lists_details_descriptions_single_subscriber">1 Inscrito</string>
     <string name="scene_lists_details_descriptions_multiple_subscribers">%d Inscritos</string>
     <string name="scene_lists_details_menu_actions_add_member">Adicionar Membro</string>
-    <string name="scene_lists_details_menu_actions_Edit List">Editar Lista</string>
+    <string name="scene_lists_details_menu_actions_edit_list">Editar Lista</string>
     <string name="scene_lists_details_tabs_members">Membros</string>
     <string name="scene_lists_details_tabs_subscriber">Inscrito</string>
     <string name="scene_lists_details_no_members_found">Nenhum Membro Encontrado.</string>

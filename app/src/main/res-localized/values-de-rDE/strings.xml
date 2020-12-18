@@ -102,7 +102,7 @@
     <string name="scene_lists_details_descriptions_single_subscriber">1 Abonnent</string>
     <string name="scene_lists_details_descriptions_multiple_subscribers">%d Abonnenten</string>
     <string name="scene_lists_details_menu_actions_add_member">Mitglied hinzufügen</string>
-    <string name="scene_lists_details_menu_actions_Edit List">Liste bearbeiten</string>
+    <string name="scene_lists_details_menu_actions_edit_list">Liste bearbeiten</string>
     <string name="scene_lists_details_tabs_members">Mitglieder</string>
     <string name="scene_lists_details_tabs_subscriber">Abonnent</string>
     <string name="scene_lists_details_no_members_found">Keine Mitglieder gefunden.</string>
