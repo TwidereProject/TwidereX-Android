@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -46,6 +47,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.savedinstancestate.savedInstanceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.layout.WithConstraints
 import androidx.compose.ui.res.stringResource
@@ -54,6 +56,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
 import androidx.compose.ui.zIndex
+import androidx.navigation.compose.navigate
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.twidere.twiderex.R
@@ -63,8 +66,10 @@ import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
 import com.twidere.twiderex.component.foundation.TopAppBarElevation
 import com.twidere.twiderex.component.lazy.itemsPaging
+import com.twidere.twiderex.component.lazy.itemsPagingGridIndexed
 import com.twidere.twiderex.component.navigation.AmbientNavigator
 import com.twidere.twiderex.component.status.StatusDivider
+import com.twidere.twiderex.component.status.StatusMediaPreviewItem
 import com.twidere.twiderex.component.status.TimelineStatusComponent
 import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.component.status.withAvatarClip
@@ -73,7 +78,9 @@ import com.twidere.twiderex.extensions.refreshOrRetry
 import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiUser
+import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.ui.AmbientActiveAccount
+import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.ui.standardPadding
 import com.twidere.twiderex.viewmodel.user.UserFavouriteTimelineViewModel
 import com.twidere.twiderex.viewmodel.user.UserMediaTimelineViewModel
@@ -165,7 +172,6 @@ fun UserComponent(
                 }
             },
         ) {
-            // TODO: not work if the user not posting anything
             if (
                 selectedItem == 0 && timelineSource.itemCount > 0 ||
                 selectedItem == 1 && mediaSource.itemCount > 0 ||
@@ -202,13 +208,37 @@ fun UserComponent(
                             }
                         }
                         1 -> {
-                            itemsPaging(mediaSource) { item ->
-                                item?.let {
-                                    Column {
-                                        TimelineStatusComponent(it)
-                                        StatusDivider()
-                                    }
+                            item {
+                                Box(modifier = Modifier.height(standardPadding))
+                            }
+                            itemsPagingGridIndexed(
+                                mediaSource,
+                                rowSize = 2,
+                                spacing = standardPadding,
+                                padding = standardPadding
+                            ) { index, pair ->
+                                pair?.let { item ->
+                                    val navController = AmbientNavController.current
+                                    StatusMediaPreviewItem(
+                                        item.first,
+                                        modifier = Modifier
+                                            .aspectRatio(1F)
+                                            .clip(
+                                                MaterialTheme.shapes.medium
+                                            ),
+                                        onClick = {
+                                            navController.navigate(
+                                                Route.Media(
+                                                    item.second.statusKey,
+                                                    selectedIndex = index
+                                                )
+                                            )
+                                        }
+                                    )
                                 }
+                            }
+                            item {
+                                Box(modifier = Modifier.height(standardPadding))
                             }
                         }
                         2 -> {
@@ -221,6 +251,19 @@ fun UserComponent(
                                 }
                             }
                         }
+                    }
+                }
+            } else {
+                user?.let {
+                    Column {
+                        UserInfo(user = it, viewModel = viewModel)
+                        IconTabsComponent(
+                            items = tabs,
+                            selectedItem = selectedItem,
+                            onItemSelected = {
+                                setSelectedItem(it)
+                            },
+                        )
                     }
                 }
             }

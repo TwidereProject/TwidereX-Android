@@ -23,6 +23,7 @@ package com.twidere.twiderex.viewmodel.twitter.search
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
+import androidx.paging.flatMap
 import androidx.paging.map
 import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
@@ -51,5 +52,10 @@ class TwitterSearchMediaViewModel @AssistedInject constructor(
     val source by lazy {
         SearchMediaMediator(keyword, database, account.accountKey, service).pager()
             .flow.map { it.map { it.status.toUi(account.accountKey) } }.cachedIn(viewModelScope)
+            .map {
+                it.flatMap {
+                    it.media.map { media -> media to it }
+                }
+            }
     }
 }

@@ -20,9 +20,11 @@
  */
 package com.twidere.twiderex.viewmodel.user
 
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import androidx.paging.flatMap
 import androidx.paging.map
 import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
@@ -31,12 +33,12 @@ import com.twidere.twiderex.db.AppDatabase
 import com.twidere.twiderex.di.assisted.IAssistedFactory
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.model.ui.UiStatus.Companion.toUi
 import com.twidere.twiderex.paging.mediator.PagingMediator
 import com.twidere.twiderex.paging.mediator.pager
 import com.twidere.twiderex.paging.mediator.user.UserMediaMediator
-import com.twidere.twiderex.viewmodel.PagingViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -45,7 +47,7 @@ class UserMediaTimelineViewModel @AssistedInject constructor(
     @Assisted account: AccountDetails,
     @Assisted screenName: String,
     @Assisted userKey: MicroBlogKey,
-) : PagingViewModel() {
+) : ViewModel() {
 
     @AssistedInject.Factory
     interface AssistedFactory : IAssistedFactory {
@@ -56,15 +58,19 @@ class UserMediaTimelineViewModel @AssistedInject constructor(
         ): UserMediaTimelineViewModel
     }
 
-    override val source: Flow<PagingData<UiStatus>> by lazy {
+    val source: Flow<PagingData<Pair<UiMedia, UiStatus>>> by lazy {
         pagingMediator.pager(pageSize = 200).flow.map { pagingData ->
             pagingData.map {
                 it.toUi(pagingMediator.accountKey)
             }
-        }.cachedIn(viewModelScope)
+        }.cachedIn(viewModelScope).map {
+            it.flatMap {
+                it.media.map { media -> media to it }
+            }
+        }
     }
 
-    override val pagingMediator: PagingMediator =
+    val pagingMediator: PagingMediator =
         UserMediaMediator(
             screenName = screenName,
             userKey = userKey,
