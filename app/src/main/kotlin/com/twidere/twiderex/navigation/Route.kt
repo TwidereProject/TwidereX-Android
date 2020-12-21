@@ -93,8 +93,8 @@ object Route {
         val TwitterWebSignInDialog = 1
     }
 
-    fun User(userKey: MicroBlogKey) =
-        "user/${userKey.id}?host=${userKey.host}"
+    fun User(name: String, host: String, userKey: MicroBlogKey) =
+        "user/$name?host=$host&userKey=$userKey"
 
     fun Status(statusKey: MicroBlogKey) = "status/${statusKey.id}?host=${statusKey.host}"
     fun Media(statusKey: MicroBlogKey, selectedIndex: Int = 0) =
@@ -202,10 +202,11 @@ fun NavGraphBuilder.route() {
     }
 
     authorizedComposable(
-        "user/{screenName}?host={host}",
+        "user/{screenName}?host={host}&userKey={userKey}",
         arguments = listOf(
             navArgument("screenName") { type = NavType.StringType },
             navArgument("host") { type = NavType.StringType; nullable = true; },
+            navArgument("userKey") { type = NavType.StringType; nullable = true; },
         ),
         deepLinks = twitterHosts.map {
             navDeepLink {
@@ -218,7 +219,10 @@ fun NavGraphBuilder.route() {
         backStackEntry.arguments?.let { arguments ->
             arguments.getString("screenName")?.let {
                 val host = arguments.getString("host") ?: MicroBlogKey.TwitterHost
-                UserScene(it, host = host)
+                val userKey = arguments.getString("userKey")?.let {
+                    MicroBlogKey.valueOf(it)
+                }
+                UserScene(it, host = host, userKey = userKey)
             }
         }
     }

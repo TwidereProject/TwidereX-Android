@@ -92,6 +92,7 @@ import com.twidere.twiderex.viewmodel.user.UserViewModel
 fun UserComponent(
     screenName: String,
     host: String,
+    initialUserKey: MicroBlogKey? = null,
     initialData: UiUser? = null,
 ) {
     val account = AmbientActiveAccount.current ?: return
@@ -100,7 +101,7 @@ fun UserComponent(
         screenName,
         host,
     ) {
-        it.create(account, screenName, host)
+        it.create(account, screenName, host, initialUserKey)
     }
     val user by viewModel.user.observeAsState(initial = initialData)
 

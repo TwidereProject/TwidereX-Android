@@ -118,7 +118,13 @@ private fun AboutContent() {
             Row {
                 IconButton(
                     onClick = {
-                        navController.navigate(Route.User(MicroBlogKey.twitter("TwidereProject")))
+                        navController.navigate(
+                            Route.User(
+                                "TwidereProject",
+                                MicroBlogKey.TwitterHost,
+                                MicroBlogKey.twitter("TwidereProject")
+                            )
+                        )
                     }
                 ) {
                     Icon(

@@ -33,6 +33,7 @@ import com.twidere.twiderex.component.UserComponent
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.extensions.withElevation
+import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.ui.TwidereXTheme
 
 @OptIn(IncomingComposeUpdate::class)
@@ -40,6 +41,7 @@ import com.twidere.twiderex.ui.TwidereXTheme
 fun UserScene(
     screenName: String,
     host: String,
+    userKey: MicroBlogKey?,
 ) {
     TwidereXTheme {
         Scaffold(
@@ -61,7 +63,7 @@ fun UserScene(
                 )
             }
         ) {
-            UserComponent(screenName, host)
+            UserComponent(screenName, host, userKey)
         }
     }
 }

@@ -63,11 +63,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigate
 import androidx.navigation.compose.rememberNavController
 import com.twidere.twiderex.R
-import com.twidere.twiderex.component.AmbientTimelineController
-import com.twidere.twiderex.component.TimelineController
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.IconTabsComponent
 import com.twidere.twiderex.component.foundation.TopAppBarElevation
+import com.twidere.twiderex.component.lazy.AmbientLazyListController
+import com.twidere.twiderex.component.lazy.LazyListController
 import com.twidere.twiderex.component.lazy.itemDivider
 import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.extensions.withElevation
@@ -95,7 +95,7 @@ fun HomeScene() {
     }
     var selectedItem by savedInstanceState { 0 }
     val timelineController = remember {
-        TimelineController()
+        LazyListController()
     }
     val tabPosition = AmbientAppearancePreferences.current.tapPosition
     val menus = listOf(
@@ -186,7 +186,7 @@ fun HomeScene() {
                 )
             ) {
                 Providers(
-                    AmbientTimelineController provides timelineController
+                    AmbientLazyListController provides timelineController
                 ) {
                     NavHost(navController = navController, startDestination = menus.first().route) {
                         menus.forEach { item ->

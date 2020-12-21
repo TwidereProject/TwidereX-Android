@@ -34,7 +34,6 @@ import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ambientOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.onCommit
@@ -50,6 +49,7 @@ import com.twidere.twiderex.R
 import com.twidere.twiderex.annotations.IncomingComposeUpdate
 import com.twidere.twiderex.component.foundation.LoadingProgress
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
+import com.twidere.twiderex.component.lazy.AmbientLazyListController
 import com.twidere.twiderex.component.lazy.loadState
 import com.twidere.twiderex.component.status.StatusDivider
 import com.twidere.twiderex.component.status.TimelineStatusComponent
@@ -79,7 +79,7 @@ fun TimelineComponent(viewModel: TimelineViewModel) {
                 initialFirstVisibleItemScrollOffset = lastScrollState.firstVisibleItemScrollOffset,
             )
             val scope = rememberCoroutineScope()
-            AmbientTimelineController.current.requestScrollTop = {
+            AmbientLazyListController.current.requestScrollTop = {
                 scope.launch {
                     listState.snapToItemIndex(0)
                 }
@@ -147,13 +147,3 @@ fun TimelineComponent(viewModel: TimelineViewModel) {
         }
     }
 }
-
-class TimelineController {
-    internal var requestScrollTop: () -> Unit = {}
-
-    fun scrollToTop() {
-        requestScrollTop.invoke()
-    }
-}
-
-val AmbientTimelineController = ambientOf { TimelineController() }
