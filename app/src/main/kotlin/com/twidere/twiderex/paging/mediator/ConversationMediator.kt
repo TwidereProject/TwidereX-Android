@@ -51,7 +51,7 @@ class ConversationMediator(
     }
 
     override fun hasMore(result: List<DbPagingTimelineWithStatus>, pageSize: Int): Boolean {
-        return nextPage == null
+        return nextPage != null
     }
 
     private fun buildConversation(

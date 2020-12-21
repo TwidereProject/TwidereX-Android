@@ -46,7 +46,7 @@ class UserMediaMediator(
             screen_name = screenName,
             count = pageSize,
             max_id = max_id,
-            exclude_replies = true
+            exclude_replies = false
         )
     }
 

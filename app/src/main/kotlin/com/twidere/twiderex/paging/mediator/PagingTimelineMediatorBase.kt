@@ -33,9 +33,9 @@ import com.twidere.twiderex.db.model.DbPagingTimelineWithStatus
 import com.twidere.twiderex.db.model.TimelineType
 import com.twidere.twiderex.db.model.saveToDb
 import com.twidere.twiderex.model.MicroBlogKey
-import retrofit2.HttpException
 import java.io.IOException
 import java.net.SocketTimeoutException
+import retrofit2.HttpException
 
 @OptIn(ExperimentalPagingApi::class)
 abstract class PagingTimelineMediatorBase(
@@ -78,7 +78,7 @@ abstract class PagingTimelineMediatorBase(
             }
 
             return MediatorResult.Success(
-                endOfPaginationReached = hasMore(result, pageSize)
+                endOfPaginationReached = !hasMore(result, pageSize)
             )
         } catch (e: MicroBlogException) {
             return MediatorResult.Error(e)
@@ -91,14 +91,14 @@ abstract class PagingTimelineMediatorBase(
         }
     }
 
-    open fun transform(data: List<DbPagingTimelineWithStatus>): List<DbPagingTimelineWithStatus> {
+    protected open fun transform(data: List<DbPagingTimelineWithStatus>): List<DbPagingTimelineWithStatus> {
         return data
     }
 
     protected open fun hasMore(
         result: List<DbPagingTimelineWithStatus>,
         pageSize: Int
-    ) = result.size < pageSize
+    ) = result.size == pageSize
 
     protected open suspend fun clearData(database: AppDatabase) {
         database.pagingTimelineDao().clearAll(pagingKey, accountKey = accountKey)
