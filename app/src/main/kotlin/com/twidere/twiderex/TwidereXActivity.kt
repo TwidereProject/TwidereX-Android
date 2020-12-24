@@ -36,6 +36,8 @@ import androidx.hilt.lifecycle.HiltViewModelFactory
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.ComposeNavigator
 import androidx.navigation.fragment.DialogFragmentNavigator
+import com.twidere.twiderex.action.AmbientStatusActions
+import com.twidere.twiderex.action.StatusActions
 import com.twidere.twiderex.di.assisted.AssistedViewModelFactoryHolder
 import com.twidere.twiderex.di.assisted.ProvideAssistedFactory
 import com.twidere.twiderex.extensions.ProvideNavigationViewModelFactoryMap
@@ -44,8 +46,6 @@ import com.twidere.twiderex.launcher.AmbientLauncher
 import com.twidere.twiderex.navigation.Router
 import com.twidere.twiderex.preferences.PreferencesHolder
 import com.twidere.twiderex.preferences.ProvidePreferences
-import com.twidere.twiderex.providers.AmbientStatusActions
-import com.twidere.twiderex.providers.StatusActions
 import com.twidere.twiderex.ui.AmbientActiveAccount
 import com.twidere.twiderex.ui.AmbientActiveAccountViewModel
 import com.twidere.twiderex.ui.AmbientActivity

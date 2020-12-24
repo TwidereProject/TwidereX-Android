@@ -35,6 +35,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.R
+import com.twidere.twiderex.action.AmbientStatusActions
+import com.twidere.twiderex.action.FakeStatusActions
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.lazy.itemDivider
@@ -48,8 +50,6 @@ import com.twidere.twiderex.extensions.navViewModel
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.preferences.AmbientDisplayPreferences
 import com.twidere.twiderex.preferences.proto.DisplayPreferences
-import com.twidere.twiderex.providers.AmbientStatusActions
-import com.twidere.twiderex.providers.FakeStatusActions
 import com.twidere.twiderex.ui.TwidereXTheme
 import com.twidere.twiderex.viewmodel.settings.DisplayViewModel
 

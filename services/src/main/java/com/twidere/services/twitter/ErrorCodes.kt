@@ -18,21 +18,9 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex
+package com.twidere.services.twitter
 
-import android.app.Application
-import androidx.hilt.work.HiltWorkerFactory
-import androidx.work.Configuration
-import dagger.hilt.android.HiltAndroidApp
-import javax.inject.Inject
-
-@HiltAndroidApp
-class TwidereApp : Application(), Configuration.Provider {
-    @Inject
-    lateinit var workerFactory: HiltWorkerFactory
-
-    override fun getWorkManagerConfiguration() =
-        Configuration.Builder()
-            .setWorkerFactory(workerFactory)
-            .build()
+object TwitterErrorCodes {
+    const val AlreadyFavorited = 139
+    const val AlreadyRetweeted = 327
 }

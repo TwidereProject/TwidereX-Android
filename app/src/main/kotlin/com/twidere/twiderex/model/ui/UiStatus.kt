@@ -39,13 +39,13 @@ data class UiStatus(
     val retweetCount: Long,
     val likeCount: Long,
     val replyCount: Long,
-    var retweeted: Boolean,
-    var liked: Boolean,
+    val retweeted: Boolean,
+    val liked: Boolean,
     val placeString: String?,
     val hasMedia: Boolean,
     val user: UiUser,
     val media: List<UiMedia>,
-    var retweet: UiStatus?,
+    val retweet: UiStatus?,
     val source: String,
     val quote: UiStatus?,
     val isGap: Boolean,
@@ -77,9 +77,9 @@ data class UiStatus(
         )
 
         fun DbTimelineWithStatus.toUi(
-            userKey: MicroBlogKey,
+            accountKey: MicroBlogKey,
         ) = with(status.status) {
-            val reaction = reactions.firstOrNull { it.accountKey == userKey }
+            val reaction = reactions.firstOrNull { it.accountKey == accountKey }
             UiStatus(
                 statusId = data.statusId,
                 htmlText = data.htmlText,
@@ -93,8 +93,8 @@ data class UiStatus(
                 hasMedia = data.hasMedia,
                 user = user.toUi(),
                 media = media.toUi(),
-                retweet = status.retweet?.toUi(userKey)?.copy(quote = status.quote?.toUi(userKey)),
-                quote = status.quote?.toUi(userKey),
+                retweet = status.retweet?.toUi(accountKey)?.copy(quote = status.quote?.toUi(accountKey)),
+                quote = status.quote?.toUi(accountKey),
                 isGap = timeline.isGap,
                 source = data.source,
                 url = url.toUi(),
@@ -104,9 +104,9 @@ data class UiStatus(
         }
 
         fun DbStatusWithMediaAndUser.toUi(
-            userKey: MicroBlogKey,
+            accountKey: MicroBlogKey,
         ): UiStatus {
-            val reaction = reactions.firstOrNull { it.accountKey == userKey }
+            val reaction = reactions.firstOrNull { it.accountKey == accountKey }
             return UiStatus(
                 statusId = data.statusId,
                 htmlText = data.htmlText,
@@ -131,9 +131,9 @@ data class UiStatus(
         }
 
         fun DbStatusWithReference.toUi(
-            userKey: MicroBlogKey,
+            accountKey: MicroBlogKey,
         ) = with(status) {
-            val reaction = reactions.firstOrNull { it.accountKey == userKey }
+            val reaction = reactions.firstOrNull { it.accountKey == accountKey }
             UiStatus(
                 statusId = data.statusId,
                 htmlText = data.htmlText,
@@ -147,8 +147,8 @@ data class UiStatus(
                 hasMedia = data.hasMedia,
                 user = user.toUi(),
                 media = media.toUi(),
-                retweet = retweet?.toUi(userKey)?.copy(quote = quote?.toUi(userKey)),
-                quote = quote?.toUi(userKey),
+                retweet = retweet?.toUi(accountKey)?.copy(quote = quote?.toUi(accountKey)),
+                quote = quote?.toUi(accountKey),
                 isGap = false,
                 source = data.source,
                 url = url.toUi(),
@@ -158,9 +158,9 @@ data class UiStatus(
         }
 
         fun DbPagingTimelineWithStatus.toUi(
-            userKey: MicroBlogKey,
+            accountKey: MicroBlogKey,
         ) = with(status.status) {
-            val reaction = reactions.firstOrNull { it.accountKey == userKey }
+            val reaction = reactions.firstOrNull { it.accountKey == accountKey }
             UiStatus(
                 statusId = data.statusId,
                 htmlText = data.htmlText,
@@ -174,8 +174,8 @@ data class UiStatus(
                 hasMedia = data.hasMedia,
                 user = user.toUi(),
                 media = media.toUi(),
-                retweet = status.retweet?.toUi(userKey)?.copy(quote = status.quote?.toUi(userKey)),
-                quote = status.quote?.toUi(userKey),
+                retweet = status.retweet?.toUi(accountKey)?.copy(quote = status.quote?.toUi(accountKey)),
+                quote = status.quote?.toUi(accountKey),
                 isGap = timeline.isGap,
                 source = data.source,
                 url = url.toUi(),

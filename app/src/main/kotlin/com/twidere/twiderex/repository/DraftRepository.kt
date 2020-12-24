@@ -24,8 +24,6 @@ import com.twidere.twiderex.db.AppDatabase
 import com.twidere.twiderex.db.model.DbDraft
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.scenes.ComposeType
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import java.util.UUID
 import javax.inject.Singleton
 
@@ -36,7 +34,8 @@ class DraftRepository(
     val source by lazy {
         database.draftDao().getAll()
     }
-    fun addOrUpgrade(
+
+    suspend fun addOrUpgrade(
         content: String,
         media: List<String>,
         composeType: ComposeType,
@@ -44,18 +43,16 @@ class DraftRepository(
         draftId: String = UUID.randomUUID().toString(),
         excludedReplyUserIds: List<String>? = null,
     ) {
-        GlobalScope.launch {
-            DbDraft(
-                _id = draftId,
-                content = content,
-                composeType = composeType,
-                media = media,
-                statusKey = statusKey,
-                createdAt = System.currentTimeMillis(),
-                excludedReplyUserIds = excludedReplyUserIds
-            ).let {
-                database.draftDao().insertAll(it)
-            }
+        DbDraft(
+            _id = draftId,
+            content = content,
+            composeType = composeType,
+            media = media,
+            statusKey = statusKey,
+            createdAt = System.currentTimeMillis(),
+            excludedReplyUserIds = excludedReplyUserIds
+        ).let {
+            database.draftDao().insertAll(it)
         }
     }
 
@@ -63,17 +60,13 @@ class DraftRepository(
         return database.draftDao().get(draftId)
     }
 
-    fun remove(draftId: String) {
-        GlobalScope.launch {
-            database.draftDao().get(draftId)?.let {
-                remove(it)
-            }
+    suspend fun remove(draftId: String) {
+        database.draftDao().get(draftId)?.let {
+            remove(it)
         }
     }
 
-    fun remove(draft: DbDraft) {
-        GlobalScope.launch {
-            database.draftDao().remove(draft)
-        }
+    suspend fun remove(draft: DbDraft) {
+        database.draftDao().remove(draft)
     }
 }

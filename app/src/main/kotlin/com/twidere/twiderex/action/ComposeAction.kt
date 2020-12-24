@@ -18,21 +18,26 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex
+package com.twidere.twiderex.action
 
-import android.app.Application
-import androidx.hilt.work.HiltWorkerFactory
-import androidx.work.Configuration
-import dagger.hilt.android.HiltAndroidApp
-import javax.inject.Inject
+import androidx.work.WorkManager
+import com.twidere.twiderex.model.ComposeData
+import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.worker.TwitterComposeWorker
+import com.twidere.twiderex.worker.draft.RemoveDraftWorker
+import com.twidere.twiderex.worker.draft.SaveDraftWorker
 
-@HiltAndroidApp
-class TwidereApp : Application(), Configuration.Provider {
-    @Inject
-    lateinit var workerFactory: HiltWorkerFactory
-
-    override fun getWorkManagerConfiguration() =
-        Configuration.Builder()
-            .setWorkerFactory(workerFactory)
-            .build()
+class ComposeAction(
+    private val workManager: WorkManager,
+) {
+    fun commit(
+        accountKey: MicroBlogKey,
+        data: ComposeData,
+    ) {
+        workManager
+            .beginWith(SaveDraftWorker.create(data = data))
+            .then(TwitterComposeWorker.create(accountKey = accountKey, data = data))
+            .then(RemoveDraftWorker.create(draftId = data.draftId))
+            .enqueue()
+    }
 }

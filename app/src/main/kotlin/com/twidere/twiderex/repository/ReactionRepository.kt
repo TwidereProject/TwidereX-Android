@@ -20,33 +20,30 @@
  */
 package com.twidere.twiderex.repository
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.map
 import com.twidere.twiderex.db.AppDatabase
-import com.twidere.twiderex.db.model.DbStatusV2
+import com.twidere.twiderex.db.model.DbStatusReaction
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.ui.UiStatus
-import com.twidere.twiderex.model.ui.UiStatus.Companion.toUi
+import java.util.UUID
 
-class StatusRepository(
+class ReactionRepository(
     private val database: AppDatabase,
 ) {
-    fun loadLiveDataFromCache(statusKey: MicroBlogKey, accountKey: MicroBlogKey): LiveData<UiStatus?> {
-        return database.statusDao().findWithStatusIdWithReferenceLiveData(statusKey).map {
-            it?.toUi(accountKey)
-        }
-    }
-
-    suspend fun loadFromCache(statusKey: MicroBlogKey, accountKey: MicroBlogKey): UiStatus? {
-        return database.statusDao().findWithStatusIdWithReference(statusKey).let {
-            it?.toUi(accountKey)
-        }
-    }
-
-    suspend fun updateStatus(statusKey: MicroBlogKey, action: (DbStatusV2) -> Unit) {
-        database.statusDao().findWithStatusId(statusKey)?.let {
+    suspend fun updateReaction(
+        accountKey: MicroBlogKey,
+        statusKey: MicroBlogKey,
+        action: (DbStatusReaction) -> Unit,
+    ) {
+        database.reactionDao().findWithStatusKey(statusKey, accountKey).let {
+            it ?: DbStatusReaction(
+                _id = UUID.randomUUID().toString(),
+                statusKey = statusKey,
+                accountKey = accountKey,
+                liked = false,
+                retweeted = false,
+            )
+        }.let {
             action.invoke(it)
-            database.statusDao().insertAll(listOf(it))
+            database.reactionDao().insertAll(listOf(it))
         }
     }
 }

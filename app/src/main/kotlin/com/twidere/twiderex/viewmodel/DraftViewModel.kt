@@ -22,14 +22,17 @@ package com.twidere.twiderex.viewmodel
 
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.ViewModel
+import androidx.work.WorkManager
 import com.twidere.twiderex.db.model.DbDraft
 import com.twidere.twiderex.repository.DraftRepository
+import com.twidere.twiderex.worker.draft.RemoveDraftWorker
 
 class DraftViewModel @ViewModelInject constructor(
-    private val repository: DraftRepository
+    private val repository: DraftRepository,
+    private val workManager: WorkManager,
 ) : ViewModel() {
     fun delete(it: DbDraft) {
-        repository.remove(it)
+        workManager.beginWith(RemoveDraftWorker.create(it._id)).enqueue()
     }
 
     val source by lazy {

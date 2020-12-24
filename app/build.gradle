@@ -165,6 +165,7 @@ dependencies {
     implementation "com.google.dagger:hilt-android:$versions.hilt"
     kapt "com.google.dagger:hilt-android-compiler:$versions.hilt"
     implementation "androidx.hilt:hilt-lifecycle-viewmodel:$versions.androidx_hilt"
+    implementation "androidx.hilt:hilt-work:$versions.androidx_hilt"
     kapt "androidx.hilt:hilt-compiler:$versions.androidx_hilt"
 
     compileOnly "com.squareup.inject:assisted-inject-annotations-dagger2:$versions.assisted_inject"
@@ -179,6 +180,8 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:$versions.lifecycle"
     implementation "androidx.lifecycle:lifecycle-viewmodel-savedstate:$versions.lifecycle"
     implementation "androidx.lifecycle:lifecycle-common-java8:$versions.lifecycle"
+
+    implementation "androidx.work:work-runtime-ktx:2.5.0-beta02"
 
     implementation "dev.chrisbanes.accompanist:accompanist-coil:0.4.0"
 

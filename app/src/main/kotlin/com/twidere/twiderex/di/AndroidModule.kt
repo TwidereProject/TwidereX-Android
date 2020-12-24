@@ -25,6 +25,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.location.LocationManager
 import androidx.room.Room
+import androidx.work.WorkManager
 import com.twidere.twiderex.db.AppDatabase
 import dagger.Module
 import dagger.Provides
@@ -36,6 +37,10 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AndroidModule {
+    @Provides
+    fun provideWorkManager(@ApplicationContext context: Context): WorkManager =
+        WorkManager.getInstance(context)
+
     @Provides
     fun provideAccountManager(@ApplicationContext context: Context): AccountManager =
         AccountManager.get(context)

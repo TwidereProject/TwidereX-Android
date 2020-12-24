@@ -18,21 +18,13 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex
+package com.twidere.twiderex.extensions
 
-import android.app.Application
-import androidx.hilt.work.HiltWorkerFactory
-import androidx.work.Configuration
-import dagger.hilt.android.HiltAndroidApp
-import javax.inject.Inject
+import androidx.work.Data
+import androidx.work.hasKeyWithValueOfType
 
-@HiltAndroidApp
-class TwidereApp : Application(), Configuration.Provider {
-    @Inject
-    lateinit var workerFactory: HiltWorkerFactory
+fun Data.getNullableLong(name: String) =
+    takeIf { hasKeyWithValueOfType<Long>(name) }?.getLong(name, 0)
 
-    override fun getWorkManagerConfiguration() =
-        Configuration.Builder()
-            .setWorkerFactory(workerFactory)
-            .build()
-}
+fun Data.getNullableDouble(name: String) =
+    takeIf { hasKeyWithValueOfType<Double>(name) }?.getDouble(name, 0.0)

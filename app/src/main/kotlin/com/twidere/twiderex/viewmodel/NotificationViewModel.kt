@@ -18,21 +18,11 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex
+package com.twidere.twiderex.viewmodel
 
-import android.app.Application
-import androidx.hilt.work.HiltWorkerFactory
-import androidx.work.Configuration
-import dagger.hilt.android.HiltAndroidApp
-import javax.inject.Inject
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 
-@HiltAndroidApp
-class TwidereApp : Application(), Configuration.Provider {
-    @Inject
-    lateinit var workerFactory: HiltWorkerFactory
-
-    override fun getWorkManagerConfiguration() =
-        Configuration.Builder()
-            .setWorkerFactory(workerFactory)
-            .build()
+class NotificationViewModel : ViewModel() {
+    val error = MutableLiveData<Throwable?>()
 }
