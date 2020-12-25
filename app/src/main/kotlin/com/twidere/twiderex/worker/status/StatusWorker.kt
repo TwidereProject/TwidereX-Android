@@ -27,13 +27,9 @@ import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.twidere.services.http.MicroBlogException
 import com.twidere.services.microblog.StatusService
-import com.twidere.services.microblog.model.IStatus
 import com.twidere.services.twitter.TwitterErrorCodes
-import com.twidere.twiderex.db.mapper.toDbTimeline
-import com.twidere.twiderex.db.model.TimelineType
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiStatus
-import com.twidere.twiderex.model.ui.UiStatus.Companion.toUi
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.StatusRepository
 
@@ -55,16 +51,6 @@ abstract class StatusWorker(
                 )
             )
             .build()
-
-        fun createWorkData(accountKey: MicroBlogKey, status: UiStatus) =
-            workDataOf(
-                "statusKey" to status.statusKey.toString(),
-                "accountKey" to accountKey.toString(),
-                "liked" to status.liked,
-                "retweeted" to status.retweeted,
-                "retweetCount" to status.retweetCount,
-                "likeCount" to status.likeCount,
-            )
     }
 
     override suspend fun doWork(): Result {
@@ -82,23 +68,29 @@ abstract class StatusWorker(
             it.service as? StatusService
         } ?: return Result.failure()
         return try {
-            val result = doWork(service, status)
-                .toDbTimeline(accountKey = accountKey, timelineType = TimelineType.Custom)
-                .toUi(accountKey = accountKey)
+            val result = doWork(accountKey, service, status)
             Result.success(
-                createWorkData(accountKey = accountKey, status = result)
+                result.toWorkData()
             )
         } catch (e: MicroBlogException) {
             e.errors?.firstOrNull()?.let {
                 when (it.code) {
                     TwitterErrorCodes.AlreadyRetweeted -> {
                         Result.success(
-                            createWorkData(accountKey, status.copy(retweeted = true))
+                            StatusResult(
+                                accountKey = accountKey,
+                                statusKey = status.statusKey,
+                                retweeted = true,
+                            ).toWorkData()
                         )
                     }
                     TwitterErrorCodes.AlreadyFavorited -> {
                         Result.success(
-                            createWorkData(accountKey, status.copy(liked = true))
+                            StatusResult(
+                                accountKey = accountKey,
+                                statusKey = status.statusKey,
+                                liked = true,
+                            ).toWorkData()
                         )
                     }
                     else -> {
@@ -112,7 +104,8 @@ abstract class StatusWorker(
     }
 
     protected abstract suspend fun doWork(
+        accountKey: MicroBlogKey,
         service: StatusService,
         status: UiStatus,
-    ): IStatus
+    ): StatusResult
 }

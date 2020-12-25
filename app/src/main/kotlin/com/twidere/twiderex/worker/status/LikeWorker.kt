@@ -25,8 +25,11 @@ import androidx.hilt.Assisted
 import androidx.hilt.work.WorkerInject
 import androidx.work.WorkerParameters
 import com.twidere.services.microblog.StatusService
-import com.twidere.services.microblog.model.IStatus
+import com.twidere.twiderex.db.mapper.toDbTimeline
+import com.twidere.twiderex.db.model.TimelineType
+import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiStatus
+import com.twidere.twiderex.model.ui.UiStatus.Companion.toUi
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.StatusRepository
 
@@ -36,6 +39,20 @@ class LikeWorker @WorkerInject constructor(
     accountRepository: AccountRepository,
     statusRepository: StatusRepository
 ) : StatusWorker(appContext, params, accountRepository, statusRepository) {
-    override suspend fun doWork(service: StatusService, status: UiStatus): IStatus =
-        service.like(status.statusId)
+    override suspend fun doWork(
+        accountKey: MicroBlogKey,
+        service: StatusService,
+        status: UiStatus
+    ): StatusResult {
+        val newStatus = service.like(status.statusId)
+            .toDbTimeline(accountKey = accountKey, timelineType = TimelineType.Custom)
+            .toUi(accountKey = accountKey)
+        return StatusResult(
+            statusKey = status.statusKey,
+            accountKey = accountKey,
+            liked = true,
+            retweetCount = newStatus.retweetCount,
+            likeCount = newStatus.likeCount,
+        )
+    }
 }

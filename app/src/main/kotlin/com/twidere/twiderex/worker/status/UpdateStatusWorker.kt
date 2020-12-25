@@ -28,6 +28,8 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.OverwritingInputMerger
 import androidx.work.WorkerParameters
 import androidx.work.setInputMerger
+import com.twidere.twiderex.extensions.getNullableBoolean
+import com.twidere.twiderex.extensions.getNullableLong
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.repository.ReactionRepository
 import com.twidere.twiderex.repository.StatusRepository
@@ -51,17 +53,25 @@ class UpdateStatusWorker @WorkerInject constructor(
         val statusKey = inputData.getString("statusKey")?.let {
             MicroBlogKey.valueOf(it)
         } ?: return Result.failure()
-        val liked = inputData.getBoolean("liked", false)
-        val retweeted = inputData.getBoolean("retweeted", false)
-        val retweetCount = inputData.getLong("retweetCount", 0)
-        val likeCount = inputData.getLong("likeCount", 0)
+        val liked = inputData.getNullableBoolean("liked")
+        val retweeted = inputData.getNullableBoolean("retweeted")
+        val retweetCount = inputData.getNullableLong("retweetCount")
+        val likeCount = inputData.getNullableLong("likeCount")
         repository.updateReaction(accountKey = accountKey, statusKey = statusKey) {
-            it.liked = liked
-            it.retweeted = retweeted
+            if (liked != null) {
+                it.liked = liked
+            }
+            if (retweeted != null) {
+                it.retweeted = retweeted
+            }
         }
         statusRepository.updateStatus(statusKey = statusKey) {
-            it.retweetCount = retweetCount
-            it.likeCount = likeCount
+            if (retweetCount != null) {
+                it.retweetCount = retweetCount
+            }
+            if (likeCount != null) {
+                it.likeCount = likeCount
+            }
         }
         return Result.success()
     }

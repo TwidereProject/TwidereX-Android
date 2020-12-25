@@ -28,3 +28,6 @@ fun Data.getNullableLong(name: String) =
 
 fun Data.getNullableDouble(name: String) =
     takeIf { hasKeyWithValueOfType<Double>(name) }?.getDouble(name, 0.0)
+
+fun Data.getNullableBoolean(name: String) =
+    takeIf { hasKeyWithValueOfType<Boolean>(name) }?.getBoolean(name, false)
