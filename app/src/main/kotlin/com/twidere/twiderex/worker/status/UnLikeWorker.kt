@@ -55,5 +55,4 @@ class UnLikeWorker @WorkerInject constructor(
             likeCount = newStatus.likeCount,
         )
     }
-
 }
