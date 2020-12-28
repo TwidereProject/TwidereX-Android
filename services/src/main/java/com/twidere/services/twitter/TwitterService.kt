@@ -370,4 +370,20 @@ class TwitterService(
 
         return uploadResources.finalizeUpload(mediaId).mediaIDString ?: throw Error()
     }
+
+    suspend fun followers(id: String, cursor: String? = null) = resources.followers(
+        id,
+        pagination_token = cursor,
+        userFields = UserFields.values().joinToString(",") { it.value },
+        expansions = UserFields.pinned_tweet_id.name,
+        tweetFields = TweetFields.values().joinToString(",") { it.value },
+    )
+
+    suspend fun following(id: String, cursor: String? = null) = resources.following(
+        id,
+        pagination_token = cursor,
+        userFields = UserFields.values().joinToString(",") { it.value },
+        expansions = UserFields.pinned_tweet_id.name,
+        tweetFields = TweetFields.values().joinToString(",") { it.value },
+    )
 }

@@ -278,6 +278,7 @@ private fun UserInfo(user: UiUser, viewModel: UserViewModel) {
     val relationship by viewModel.relationship.observeAsState(initial = null)
     val loadingRelationship by viewModel.loadingRelationship.observeAsState(initial = false)
     val maxBannerSize = 200.dp
+    val navController = AmbientNavController.current
     Box(
         modifier = Modifier
             .background(MaterialTheme.colors.surface.withElevation())
@@ -433,14 +434,24 @@ private fun UserInfo(user: UiUser, viewModel: UserViewModel) {
             Spacer(modifier = Modifier.height(standardPadding))
             Row {
                 Column(
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(1f)
+                        .clickable {
+                            if (user.userKey.host == MicroBlogKey.TwitterHost) {
+                                navController.navigate(Route.Twitter.User.Following(user.userKey))
+                            }
+                        },
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Text(text = user.friendsCount.toString())
                     Text(text = stringResource(id = R.string.common_controls_profile_dashboard_following))
                 }
                 Column(
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(1f)
+                        .clickable {
+                            if (user.userKey.host == MicroBlogKey.TwitterHost) {
+                                navController.navigate(Route.Twitter.User.Followers(user.userKey))
+                            }
+                        },
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Text(text = user.followersCount.toString())

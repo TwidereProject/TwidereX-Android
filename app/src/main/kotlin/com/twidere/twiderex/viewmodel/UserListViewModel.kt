@@ -18,14 +18,13 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.services.twitter.model
+package com.twidere.twiderex.viewmodel
 
-import kotlinx.serialization.Serializable
+import androidx.lifecycle.ViewModel
+import androidx.paging.PagingData
+import com.twidere.twiderex.model.ui.UiUser
+import kotlinx.coroutines.flow.Flow
 
-@Serializable
-data class TwitterResponseV2<T> (
-    val meta: Meta? = null,
-    val data: T? = null,
-    val errors: List<TwitterErrorV2>? = null,
-    val includes: IncludesV2? = null,
-)
+abstract class UserListViewModel : ViewModel() {
+    abstract val source: Flow<PagingData<UiUser>>
+}

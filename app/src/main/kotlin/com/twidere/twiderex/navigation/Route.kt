@@ -50,8 +50,10 @@ import com.twidere.twiderex.scenes.settings.AccountManagementScene
 import com.twidere.twiderex.scenes.settings.AppearanceScene
 import com.twidere.twiderex.scenes.settings.DisplayScene
 import com.twidere.twiderex.scenes.settings.SettingsScene
+import com.twidere.twiderex.scenes.twitter.TwitterFollowersScene
 import com.twidere.twiderex.scenes.twitter.TwitterSignInScene
 import com.twidere.twiderex.scenes.twitter.TwitterWebSignInScene
+import com.twidere.twiderex.scenes.twitter.user.TwitterFollowingScene
 import com.twidere.twiderex.twitterHosts
 import java.net.URLDecoder
 import java.net.URLEncoder
@@ -121,6 +123,13 @@ object Route {
 
     fun Compose(composeType: ComposeType, statusKey: MicroBlogKey? = null) =
         "compose/${composeType.name}?statusId=${statusKey?.id}&host=${statusKey?.host}"
+
+    object Twitter {
+        object User {
+            fun Following(userKey: MicroBlogKey) = "twitter/$userKey/following"
+            fun Followers(userKey: MicroBlogKey) = "twitter/$userKey/followers"
+        }
+    }
 
     object Settings {
         val Home = "settings"
@@ -314,6 +323,36 @@ fun NavGraphBuilder.route() {
             } ?: ComposeType.New
             val statusId = args.getString("statusId")
             ComposeScene(statusId?.let { MicroBlogKey(it, host) }, type)
+        }
+    }
+
+    authorizedComposable(
+        "twitter/{userKey}/followers",
+        arguments = listOf(
+            navArgument("userKey") { type = NavType.StringType }
+        )
+    ) { backStackEntry ->
+        backStackEntry.arguments?.let { args ->
+            args.getString("userKey")?.let {
+                MicroBlogKey.valueOf(it)
+            }?.let {
+                TwitterFollowersScene(it)
+            }
+        }
+    }
+
+    authorizedComposable(
+        "twitter/{userKey}/following",
+        arguments = listOf(
+            navArgument("userKey") { type = NavType.StringType }
+        )
+    ) { backStackEntry ->
+        backStackEntry.arguments?.let { args ->
+            args.getString("userKey")?.let {
+                MicroBlogKey.valueOf(it)
+            }?.let {
+                TwitterFollowingScene(it)
+            }
         }
     }
 
