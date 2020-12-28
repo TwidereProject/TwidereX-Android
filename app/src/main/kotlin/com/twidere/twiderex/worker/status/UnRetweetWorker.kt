@@ -55,4 +55,12 @@ class UnRetweetWorker @WorkerInject constructor(
             likeCount = newStatus.likeCount,
         )
     }
+    override fun fallback(
+        accountKey: MicroBlogKey,
+        status: UiStatus,
+    ) = StatusResult(
+        accountKey = accountKey,
+        statusKey = status.statusKey,
+        retweeted = true,
+    )
 }

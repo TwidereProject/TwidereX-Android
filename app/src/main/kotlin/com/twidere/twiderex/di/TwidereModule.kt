@@ -23,6 +23,7 @@ package com.twidere.twiderex.di
 import androidx.work.WorkManager
 import com.twidere.twiderex.action.ComposeAction
 import com.twidere.twiderex.db.AppDatabase
+import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.DraftRepository
 import com.twidere.twiderex.repository.ReactionRepository
 import com.twidere.twiderex.repository.SearchRepository
@@ -58,4 +59,8 @@ object TwidereModule {
     @Provides
     fun provideReactionRepository(database: AppDatabase): ReactionRepository =
         ReactionRepository(database = database)
+
+    @Singleton
+    @Provides
+    fun provideInAppNotification(): InAppNotification = InAppNotification()
 }

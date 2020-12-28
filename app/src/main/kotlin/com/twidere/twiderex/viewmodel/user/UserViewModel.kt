@@ -36,11 +36,13 @@ import com.twidere.twiderex.di.assisted.IAssistedFactory
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiUser
+import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.UserRepository
 import kotlinx.coroutines.launch
 
 class UserViewModel @AssistedInject constructor(
     private val factory: UserRepository.AssistedFactory,
+    private val inAppNotification: InAppNotification,
     @Assisted private val account: AccountDetails,
     @Assisted private val screenName: String,
     @Assisted private val host: String,
@@ -85,6 +87,7 @@ class UserViewModel @AssistedInject constructor(
                 userKey.postValue(user.userKey)
             }
         } catch (e: MicroBlogException) {
+            e.microBlogErrorMessage?.let { inAppNotification.show(it) }
         }
         refreshing.postValue(false)
     }

@@ -24,6 +24,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.map
 import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
+import com.twidere.services.http.MicroBlogException
 import com.twidere.services.microblog.LookupService
 import com.twidere.services.microblog.SearchService
 import com.twidere.services.twitter.model.ReferencedTweetType
@@ -72,11 +73,16 @@ class TwitterConversationRepository @AssistedInject constructor(
             if (referencedTweetId == null) {
                 break
             } else {
-                val result = lookupService.lookupStatus(referencedTweetId) as StatusV2
-                val db = result.toDbTimeline(accountKey, TimelineType.Conversation)
-                listOf(db).saveToDb(database)
-                list.add(result)
-                current = result
+                try {
+                    val result = lookupService.lookupStatus(referencedTweetId) as StatusV2
+                    val db = result.toDbTimeline(accountKey, TimelineType.Conversation)
+                    listOf(db).saveToDb(database)
+                    list.add(result)
+                    current = result
+                } catch (e: MicroBlogException) {
+                    // TODO: show error
+                    break
+                }
             }
         }
         return list.reversed()

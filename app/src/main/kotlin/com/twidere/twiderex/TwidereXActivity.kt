@@ -38,12 +38,14 @@ import androidx.navigation.compose.ComposeNavigator
 import androidx.navigation.fragment.DialogFragmentNavigator
 import com.twidere.twiderex.action.AmbientStatusActions
 import com.twidere.twiderex.action.StatusActions
+import com.twidere.twiderex.component.foundation.AmbientInAppNotification
 import com.twidere.twiderex.di.assisted.AssistedViewModelFactoryHolder
 import com.twidere.twiderex.di.assisted.ProvideAssistedFactory
 import com.twidere.twiderex.extensions.ProvideNavigationViewModelFactoryMap
 import com.twidere.twiderex.launcher.ActivityLauncher
 import com.twidere.twiderex.launcher.AmbientLauncher
 import com.twidere.twiderex.navigation.Router
+import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.preferences.PreferencesHolder
 import com.twidere.twiderex.preferences.ProvidePreferences
 import com.twidere.twiderex.ui.AmbientActiveAccount
@@ -81,6 +83,9 @@ class TwidereXActivity : FragmentActivity() {
     @Inject
     lateinit var assistedViewModelFactoryHolder: AssistedViewModelFactoryHolder
 
+    @Inject
+    lateinit var inAppNotification: InAppNotification
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         launcher = ActivityLauncher(activityResultRegistry)
@@ -95,6 +100,7 @@ class TwidereXActivity : FragmentActivity() {
             val accountViewModel = viewModel<ActiveAccountViewModel>()
             val account by accountViewModel.account.observeAsState()
             Providers(
+                AmbientInAppNotification provides inAppNotification,
                 AmbientLauncher provides launcher,
                 AmbientWindow provides window,
                 AmbientViewModelProviderFactory provides defaultViewModelProviderFactory,

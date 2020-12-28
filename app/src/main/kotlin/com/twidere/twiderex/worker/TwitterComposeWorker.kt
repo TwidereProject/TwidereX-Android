@@ -104,11 +104,11 @@ class TwitterComposeWorker @WorkerInject constructor(
                 long = long,
                 exclude_reply_user_ids = draft.excludedReplyUserIds
             )
-            Result.success()
+            successResult()
         } catch (e: MicroBlogException) {
-            Result.failure()
+            failureResult(e.errors?.firstOrNull()?.message ?: e.error ?: "")
         } catch (e: Throwable) {
-            Result.failure()
+            failureResult(e.message ?: "")
         }
     }
 }

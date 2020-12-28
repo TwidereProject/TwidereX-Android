@@ -55,4 +55,13 @@ class LikeWorker @WorkerInject constructor(
             likeCount = newStatus.likeCount,
         )
     }
+
+    override fun fallback(
+        accountKey: MicroBlogKey,
+        status: UiStatus,
+    ) = StatusResult(
+        accountKey = accountKey,
+        statusKey = status.statusKey,
+        liked = false,
+    )
 }

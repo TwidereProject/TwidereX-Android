@@ -21,9 +21,9 @@
 package com.twidere.twiderex.scenes.mastodon
 
 import android.net.Uri
-import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.onDispose
+import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.WebComponent
 import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.ui.TwidereXTheme
@@ -40,7 +40,7 @@ fun MastodonWebSignInScene(target: String) {
                 "",
             )
         }
-        Scaffold {
+        InAppNotificationScaffold {
             WebComponent(
                 url = target,
                 onPageStarted = { _, url ->

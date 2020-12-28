@@ -18,19 +18,13 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.services.http
+package com.twidere.twiderex.notification
 
-import kotlinx.serialization.Serializable
-import java.io.IOException
+import androidx.lifecycle.MutableLiveData
+import com.twidere.twiderex.utils.Event
 
-@Serializable
-data class MicroBlogException(
-    val error: String? = null,
-    val request: String? = null,
-    val errors: List<Errors>? = null,
-) : IOException() {
-    val microBlogErrorMessage: String?
-        get() = error ?: errors?.firstOrNull()?.let {
-            it.detail ?: it.message
-        }
+class InAppNotification : MutableLiveData<Event<String?>>() {
+    fun show(message: String) {
+        postValue(Event(message))
+    }
 }

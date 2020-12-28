@@ -68,6 +68,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.navigate
 import com.twidere.twiderex.R
 import com.twidere.twiderex.annotations.IncomingComposeUpdate
+import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.LoadingProgress
 import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.foundation.Pager
@@ -102,7 +103,7 @@ fun MediaScene(statusKey: MicroBlogKey, selectedIndex: Int) {
         pureStatusBarColor = true,
     ) {
         if (loading) {
-            Scaffold {
+            InAppNotificationScaffold {
                 Column(
                     modifier = Modifier.fillMaxWidth().fillMaxHeight(),
                     verticalArrangement = Arrangement.Center,

@@ -42,7 +42,6 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.AmbientContentAlpha
-import androidx.compose.material.BottomSheetScaffold
 import androidx.compose.material.BottomSheetScaffoldState
 import androidx.compose.material.Checkbox
 import androidx.compose.material.CircularProgressIndicator
@@ -81,6 +80,7 @@ import androidx.navigation.compose.navigate
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.BackButtonHandler
 import com.twidere.twiderex.component.foundation.AppBar
+import com.twidere.twiderex.component.foundation.InAppNotificationBottomSheetScaffold
 import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.foundation.TextInput
 import com.twidere.twiderex.component.status.StatusLineComponent
@@ -193,7 +193,7 @@ private fun ComposeBody(
                 }
             )
         }
-        BottomSheetScaffold(
+        InAppNotificationBottomSheetScaffold(
             sheetPeekHeight = 0.dp,
             scaffoldState = scaffoldState,
             sheetContent = {

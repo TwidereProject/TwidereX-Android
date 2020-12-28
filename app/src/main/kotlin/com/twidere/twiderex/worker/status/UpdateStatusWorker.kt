@@ -33,6 +33,7 @@ import com.twidere.twiderex.extensions.getNullableLong
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.repository.ReactionRepository
 import com.twidere.twiderex.repository.StatusRepository
+import com.twidere.twiderex.worker.successResult
 
 class UpdateStatusWorker @WorkerInject constructor(
     @Assisted appContext: Context,
@@ -41,8 +42,13 @@ class UpdateStatusWorker @WorkerInject constructor(
     private val statusRepository: StatusRepository,
 ) : CoroutineWorker(appContext, params) {
     companion object {
-        fun create() = OneTimeWorkRequestBuilder<UpdateStatusWorker>()
+        fun create(statusResult: StatusResult? = null) = OneTimeWorkRequestBuilder<UpdateStatusWorker>()
             .setInputMerger(OverwritingInputMerger::class)
+            .apply {
+                statusResult?.let {
+                    setInputData(it.toWorkData())
+                }
+            }
             .build()
     }
 
@@ -73,6 +79,6 @@ class UpdateStatusWorker @WorkerInject constructor(
                 it.likeCount = likeCount
             }
         }
-        return Result.success()
+        return successResult()
     }
 }

@@ -32,6 +32,8 @@ import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.StatusRepository
+import com.twidere.twiderex.worker.failureResult
+import com.twidere.twiderex.worker.successResult
 
 abstract class StatusWorker(
     appContext: Context,
@@ -69,14 +71,15 @@ abstract class StatusWorker(
         } ?: return Result.failure()
         return try {
             val result = doWork(accountKey, service, status)
-            Result.success(
+            successResult(
                 result.toWorkData()
             )
         } catch (e: MicroBlogException) {
             e.errors?.firstOrNull()?.let {
                 when (it.code) {
                     TwitterErrorCodes.AlreadyRetweeted -> {
-                        Result.success(
+                        failureResult(
+                            it.message ?: "",
                             StatusResult(
                                 accountKey = accountKey,
                                 statusKey = status.statusKey,
@@ -85,7 +88,8 @@ abstract class StatusWorker(
                         )
                     }
                     TwitterErrorCodes.AlreadyFavorited -> {
-                        Result.success(
+                        failureResult(
+                            it.message ?: "",
                             StatusResult(
                                 accountKey = accountKey,
                                 statusKey = status.statusKey,
@@ -94,14 +98,24 @@ abstract class StatusWorker(
                         )
                     }
                     else -> {
-                        Result.failure()
+                        failureResult(it.message ?: "", fallback(accountKey, status).toWorkData())
                     }
                 }
-            } ?: Result.failure()
+            } ?: failureResult(e.error ?: "", fallback(accountKey, status).toWorkData())
         } catch (e: Throwable) {
-            Result.failure()
+            failureResult(e.message ?: "", fallback(accountKey, status).toWorkData())
         }
     }
+
+    protected open fun fallback(
+        accountKey: MicroBlogKey,
+        status: UiStatus,
+    ) = StatusResult(
+        accountKey = accountKey,
+        statusKey = status.statusKey,
+        liked = status.liked,
+        retweeted = status.retweeted,
+    )
 
     protected abstract suspend fun doWork(
         accountKey: MicroBlogKey,

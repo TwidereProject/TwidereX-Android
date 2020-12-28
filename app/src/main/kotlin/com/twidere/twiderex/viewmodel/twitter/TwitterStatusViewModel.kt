@@ -27,6 +27,7 @@ import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
+import com.twidere.services.http.MicroBlogException
 import com.twidere.services.microblog.LookupService
 import com.twidere.services.microblog.SearchService
 import com.twidere.services.twitter.model.ReferencedTweetType
@@ -34,11 +35,13 @@ import com.twidere.services.twitter.model.StatusV2
 import com.twidere.twiderex.di.assisted.IAssistedFactory
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.twitter.TwitterConversationRepository
 import kotlinx.coroutines.launch
 
 class TwitterStatusViewModel @AssistedInject constructor(
     private val factory: TwitterConversationRepository.AssistedFactory,
+    private val inAppNotification: InAppNotification,
     @Assisted private val account: AccountDetails,
     @Assisted private val statusKey: MicroBlogKey,
 ) : ViewModel() {
@@ -90,21 +93,25 @@ class TwitterStatusViewModel @AssistedInject constructor(
         viewModelScope.launch {
             loadingPrevious.postValue(true)
             loadingMore.postValue(true)
-            val tweet = repository.loadTweetFromNetwork(statusKey.id)
-            repository.toUiStatus(tweet)
-            targetTweet =
-                tweet.referencedTweets?.firstOrNull { it.type == ReferencedTweetType.retweeted }?.status
-                ?: tweet
-            launch {
-                val list = repository.loadPrevious(targetTweet)
-                previous.addAll(list)
-                loadingPrevious.postValue(false)
-            }
-            launch {
-                val result = repository.loadConversation(targetTweet)
-                nextPage = result.nextPage
-                conversations.addAll(result.result)
-                loadingMore.postValue(false)
+            try {
+                val tweet = repository.loadTweetFromNetwork(statusKey.id)
+                repository.toUiStatus(tweet)
+                targetTweet =
+                    tweet.referencedTweets?.firstOrNull { it.type == ReferencedTweetType.retweeted }?.status
+                    ?: tweet
+                launch {
+                    val list = repository.loadPrevious(targetTweet)
+                    previous.addAll(list)
+                    loadingPrevious.postValue(false)
+                }
+                launch {
+                    val result = repository.loadConversation(targetTweet)
+                    nextPage = result.nextPage
+                    conversations.addAll(result.result)
+                    loadingMore.postValue(false)
+                }
+            } catch (e: MicroBlogException) {
+                e.microBlogErrorMessage?.let { inAppNotification.show(it) }
             }
         }
     }

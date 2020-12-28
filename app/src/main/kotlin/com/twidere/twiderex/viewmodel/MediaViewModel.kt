@@ -26,15 +26,18 @@ import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
+import com.twidere.services.http.MicroBlogException
 import com.twidere.services.microblog.LookupService
 import com.twidere.twiderex.di.assisted.IAssistedFactory
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.twitter.TwitterTweetsRepository
 import kotlinx.coroutines.launch
 
 class MediaViewModel @AssistedInject constructor(
     private val factory: TwitterTweetsRepository.AssistedFactory,
+    private val inAppNotification: InAppNotification,
     @Assisted private val account: AccountDetails,
     @Assisted private val statusKey: MicroBlogKey,
 ) : ViewModel() {
@@ -57,7 +60,11 @@ class MediaViewModel @AssistedInject constructor(
     init {
         viewModelScope.launch {
             loading.postValue(true)
-            repository.loadTweetFromNetwork(statusKey.id)
+            try {
+                repository.loadTweetFromNetwork(statusKey.id)
+            } catch (e: MicroBlogException) {
+                e.microBlogErrorMessage?.let { inAppNotification.show(it) }
+            }
             loading.postValue(false)
         }
     }

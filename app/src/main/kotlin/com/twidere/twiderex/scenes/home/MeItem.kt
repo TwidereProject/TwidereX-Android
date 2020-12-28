@@ -27,6 +27,7 @@ import androidx.compose.ui.res.vectorResource
 import com.twidere.twiderex.R
 import com.twidere.twiderex.annotations.IncomingComposeUpdate
 import com.twidere.twiderex.component.UserComponent
+import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.model.ui.UiUser.Companion.toUi
 import com.twidere.twiderex.ui.AmbientActiveAccount
 
@@ -47,8 +48,10 @@ class MeItem : HomeNavigationItem() {
     @Composable
     override fun onCompose() {
         val account = AmbientActiveAccount.current
-        account?.user?.toUi()?.let {
-            UserComponent(screenName = it.screenName, host = it.userKey.host, initialData = it)
+        account?.user?.toUi()?.let { user ->
+            InAppNotificationScaffold {
+                UserComponent(screenName = user.screenName, host = user.userKey.host, initialData = user)
+            }
         }
     }
 }

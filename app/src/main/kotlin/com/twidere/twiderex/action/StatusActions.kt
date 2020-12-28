@@ -24,8 +24,10 @@ import androidx.compose.runtime.ambientOf
 import androidx.work.WorkManager
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.ui.UiStatus
+import com.twidere.twiderex.worker.NotificationWorker
 import com.twidere.twiderex.worker.status.LikeWorker
 import com.twidere.twiderex.worker.status.RetweetWorker
+import com.twidere.twiderex.worker.status.StatusResult
 import com.twidere.twiderex.worker.status.StatusWorker
 import com.twidere.twiderex.worker.status.UnLikeWorker
 import com.twidere.twiderex.worker.status.UnRetweetWorker
@@ -44,39 +46,51 @@ class StatusActions @Inject constructor(
 ) : IStatusActions {
 
     override fun like(status: UiStatus, account: AccountDetails) {
-        if (status.liked) {
-            workManager.beginWith(
+        workManager.beginWith(
+            UpdateStatusWorker.create(
+                StatusResult(
+                    accountKey = account.accountKey,
+                    statusKey = status.statusKey,
+                    liked = !status.liked
+                )
+            )
+        ).then(
+            if (status.liked) {
                 StatusWorker.create<UnLikeWorker>(
                     accountKey = account.accountKey,
                     status = status
                 )
-            )
-        } else {
-            workManager.beginWith(
+            } else {
                 StatusWorker.create<LikeWorker>(
                     accountKey = account.accountKey,
                     status = status
                 )
-            )
-        }.then(UpdateStatusWorker.create()).enqueue()
+            }
+        ).then(listOf(UpdateStatusWorker.create(), NotificationWorker.create())).enqueue()
     }
 
     override fun retweet(status: UiStatus, account: AccountDetails) {
-        if (status.retweeted) {
-            workManager.beginWith(
+        workManager.beginWith(
+            UpdateStatusWorker.create(
+                StatusResult(
+                    accountKey = account.accountKey,
+                    statusKey = status.statusKey,
+                    retweeted = !status.retweeted
+                )
+            )
+        ).then(
+            if (status.retweeted) {
                 StatusWorker.create<UnRetweetWorker>(
                     accountKey = account.accountKey,
                     status = status
                 )
-            )
-        } else {
-            workManager.beginWith(
+            } else {
                 StatusWorker.create<RetweetWorker>(
                     accountKey = account.accountKey,
                     status = status
                 )
-            )
-        }.then(UpdateStatusWorker.create()).enqueue()
+            }
+        ).then(listOf(UpdateStatusWorker.create(), NotificationWorker.create())).enqueue()
     }
 }
 
