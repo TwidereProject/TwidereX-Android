@@ -29,51 +29,65 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.twidere.twiderex.annotations.IncomingComposeUpdate
+import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
 import com.twidere.twiderex.component.lazy.itemsPaging
 import com.twidere.twiderex.component.navigation.AmbientNavigator
 import com.twidere.twiderex.component.status.UserAvatar
+import com.twidere.twiderex.extensions.refreshOrRetry
 import com.twidere.twiderex.ui.mediumEmphasisContentContentColor
 import com.twidere.twiderex.viewmodel.UserListViewModel
 
+@OptIn(IncomingComposeUpdate::class)
 @Composable
 fun UserListComponent(
     viewModel: UserListViewModel,
 ) {
     val source = viewModel.source.collectAsLazyPagingItems()
     val navigator = AmbientNavigator.current
-    LazyColumn {
-        itemsPaging(source) {
-            it?.let {
-                ListItem(
-                    modifier = Modifier.clickable {
-                        navigator.user(it)
-                    },
-                    icon = {
-                        UserAvatar(
-                            user = it,
+    SwipeToRefreshLayout(
+        refreshingState = source.loadState.refresh is LoadState.Loading,
+        onRefresh = {
+            source.refreshOrRetry()
+        }
+    ) {
+        if (source.itemCount > 0) {
+            LazyColumn {
+                itemsPaging(source) {
+                    it?.let {
+                        ListItem(
+                            modifier = Modifier.clickable {
+                                navigator.user(it)
+                            },
+                            icon = {
+                                UserAvatar(
+                                    user = it,
+                                )
+                            },
+                            text = {
+                                Row {
+                                    Text(
+                                        text = it.name,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis,
+                                        color = MaterialTheme.colors.primary,
+                                    )
+                                    Text(
+                                        text = "@${it.screenName}",
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis,
+                                        color = mediumEmphasisContentContentColor,
+                                    )
+                                }
+                            },
+                            secondaryText = {
+                                Text("followers: ${it.followersCount}")
+                            }
                         )
-                    },
-                    text = {
-                        Row {
-                            Text(
-                                text = it.name,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                                color = MaterialTheme.colors.primary,
-                            )
-                            Text(
-                                text = "@${it.screenName}",
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                                color = mediumEmphasisContentContentColor,
-                            )
-                        }
-                    },
-                    secondaryText = {
-                        Text("followers: ${it.followersCount}")
                     }
-                )
+                }
             }
         }
     }
