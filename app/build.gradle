@@ -192,6 +192,8 @@ dependencies {
 
     implementation "com.google.protobuf:protobuf-javalite:$versions.protobuf"
 
+    implementation 'com.google.android.exoplayer:exoplayer:2.12.2'
+
     if (enableGoogleVariant) {
         // START Non-FOSS component
         googleImplementation platform('com.google.firebase:firebase-bom:26.1.0')

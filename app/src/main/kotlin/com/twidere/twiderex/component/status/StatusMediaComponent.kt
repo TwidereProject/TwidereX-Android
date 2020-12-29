@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.material.MaterialTheme
@@ -33,7 +34,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.component.foundation.NetworkImage
+import com.twidere.twiderex.component.foundation.VideoPlayer
 import com.twidere.twiderex.component.navigation.AmbientNavigator
+import com.twidere.twiderex.model.MediaType
 import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.model.ui.UiStatus
 
@@ -120,17 +123,34 @@ fun StatusMediaPreviewItem(
     Box(
         modifier = modifier
     ) {
-        media.previewUrl?.let {
-            NetworkImage(
-                url = it,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable(
-                        onClick = {
-                            onClick(media)
-                        }
-                    ),
-            )
+        when (media.type) {
+            MediaType.photo ->
+                media.previewUrl?.let {
+                    NetworkImage(
+                        url = it,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable(
+                                onClick = {
+                                    onClick(media)
+                                }
+                            ),
+                    )
+                }
+            MediaType.video, MediaType.animated_gif -> media.mediaUrl?.let {
+                VideoPlayer(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clickable(
+                            onClick = {
+                                onClick(media)
+                            }
+                        ),
+                    url = it,
+                    showControls = false,
+                    volume = 0F,
+                )
+            }
         }
     }
 }

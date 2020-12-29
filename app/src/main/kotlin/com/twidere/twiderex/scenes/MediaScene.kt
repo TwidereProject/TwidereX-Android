@@ -73,12 +73,14 @@ import com.twidere.twiderex.component.foundation.LoadingProgress
 import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.foundation.Pager
 import com.twidere.twiderex.component.foundation.PagerState
+import com.twidere.twiderex.component.foundation.VideoPlayer
 import com.twidere.twiderex.component.status.LikeButton
 import com.twidere.twiderex.component.status.ReplyButton
 import com.twidere.twiderex.component.status.RetweetButton
 import com.twidere.twiderex.component.status.ShareButton
 import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.model.MediaType
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.model.ui.UiStatus
@@ -286,20 +288,29 @@ fun MediaItemView(
             contentAlignment = Alignment.Center,
         ) {
             data.mediaUrl?.let {
-                NetworkImage(
-                    url = it,
-                    contentScale = ContentScale.Fit,
-                    modifier = Modifier
-                        .graphicsLayer(
-                            scaleX = scale,
-                            scaleY = scale,
-                            translationX = translate.x,
-                            translationY = translate.y
-                        ),
-                    placeholder = {
-                        CircularProgressIndicator()
-                    }
-                )
+                when (data.type) {
+                    MediaType.photo ->
+                        NetworkImage(
+                            url = it,
+                            contentScale = ContentScale.Fit,
+                            modifier = Modifier
+                                .graphicsLayer(
+                                    scaleX = scale,
+                                    scaleY = scale,
+                                    translationX = translate.x,
+                                    translationY = translate.y
+                                ),
+                            placeholder = {
+                                CircularProgressIndicator()
+                            }
+                        )
+                    MediaType.video, MediaType.animated_gif ->
+                        Box {
+                            VideoPlayer(
+                                url = it,
+                            )
+                        }
+                }
             }
         }
     }
