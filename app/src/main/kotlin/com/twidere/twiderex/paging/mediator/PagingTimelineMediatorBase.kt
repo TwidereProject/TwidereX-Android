@@ -67,6 +67,10 @@ abstract class PagingTimelineMediatorBase(
             val result = load(pageSize, key).map {
                 it.toDbTimeline(accountKey, TimelineType.Custom).toPagingDbTimeline(pagingKey)
             }.let {
+                it.filter {
+                    it.status.status.data.statusId != key
+                }
+            }.let {
                 transform(it)
             }
 
