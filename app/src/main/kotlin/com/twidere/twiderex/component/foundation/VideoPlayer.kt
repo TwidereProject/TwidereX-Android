@@ -36,7 +36,9 @@ import androidx.lifecycle.OnLifecycleEvent
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SimpleExoPlayer
+import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.ui.PlayerView
+import com.twidere.twiderex.utils.CacheDataSourceFactory
 
 @Composable
 fun VideoPlayer(
@@ -51,12 +53,18 @@ fun VideoPlayer(
     val context = AmbientContext.current
     val lifecycle = AmbientLifecycleOwner.current.lifecycle
     val player = remember {
-        SimpleExoPlayer.Builder(context).apply {
-        }.build().apply {
+        SimpleExoPlayer.Builder(context).build().apply {
             repeatMode = Player.REPEAT_MODE_ALL
             playWhenReady = autoPlay
             setVolume(volume)
-            setMediaItem(MediaItem.fromUri(url))
+            ProgressiveMediaSource.Factory(
+                CacheDataSourceFactory(
+                    context,
+                    5 * 1024 * 1024,
+                )
+            ).createMediaSource(MediaItem.fromUri(url)).also {
+                setMediaSource(it)
+            }
             prepare()
             seekTo(window, position)
         }
