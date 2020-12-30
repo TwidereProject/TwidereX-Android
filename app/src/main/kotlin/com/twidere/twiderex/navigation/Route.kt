@@ -50,9 +50,9 @@ import com.twidere.twiderex.scenes.settings.AccountManagementScene
 import com.twidere.twiderex.scenes.settings.AppearanceScene
 import com.twidere.twiderex.scenes.settings.DisplayScene
 import com.twidere.twiderex.scenes.settings.SettingsScene
-import com.twidere.twiderex.scenes.twitter.TwitterFollowersScene
 import com.twidere.twiderex.scenes.twitter.TwitterSignInScene
 import com.twidere.twiderex.scenes.twitter.TwitterWebSignInScene
+import com.twidere.twiderex.scenes.twitter.user.TwitterFollowersScene
 import com.twidere.twiderex.scenes.twitter.user.TwitterFollowingScene
 import com.twidere.twiderex.twitterHosts
 import java.net.URLDecoder

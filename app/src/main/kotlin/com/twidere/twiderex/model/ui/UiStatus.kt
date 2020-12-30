@@ -21,6 +21,8 @@
 package com.twidere.twiderex.model.ui
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
+import com.twidere.twiderex.R
 import com.twidere.twiderex.db.model.DbPagingTimelineWithStatus
 import com.twidere.twiderex.db.model.DbStatusWithMediaAndUser
 import com.twidere.twiderex.db.model.DbStatusWithReference
@@ -56,7 +58,7 @@ data class UiStatus(
         @Composable
         fun sample() = UiStatus(
             statusId = "",
-            htmlText = "Thanks for using @TwidereProject!",
+            htmlText = stringResource(id = R.string.scene_settings_display_preview_thank_for_using_twidere_x),
             timestamp = System.currentTimeMillis(),
             retweetCount = 1200,
             likeCount = 123,

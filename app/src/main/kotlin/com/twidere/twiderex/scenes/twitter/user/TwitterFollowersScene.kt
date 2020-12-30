@@ -18,10 +18,12 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.scenes.twitter
+package com.twidere.twiderex.scenes.twitter.user
 
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
+import com.twidere.twiderex.R
 import com.twidere.twiderex.component.UserListComponent
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
@@ -51,7 +53,7 @@ fun TwitterFollowersScene(
                         AppBarNavigationButton()
                     },
                     title = {
-                        Text("Followers")
+                        Text(stringResource(id = R.string.scene_followers_title))
                     }
                 )
             },

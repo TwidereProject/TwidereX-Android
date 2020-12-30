@@ -1,4 +1,5 @@
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="app_name" translatable="false">Twidere X</string>
     <string name="common_alerts_account_temporarily_locked_title">Account Temporarily Locked</string>
     <string name="common_alerts_account_temporarily_locked_message">Open Twitter to unlock</string>
     <string name="common_alerts_rate_limit_exceeded_title">Rate Limit Exceeded</string>
@@ -94,7 +95,7 @@
     <string name="scene_profile_title">Me</string>
     <string name="scene_profile_hide_reply">Hide reply</string>
     <string name="scene_profile_permission_denied_title">Permission Denied</string>
-    <string name="scene_profile_permission_denied_message">You have been blocked from viewing this user鈥檚 profile.</string>
+    <string name="scene_profile_permission_denied_message">You have been blocked from viewing this user\'s profile.</string>
     <string name="scene_following_title">Following</string>
     <string name="scene_followers_title">Followers</string>
     <string name="scene_listed_title">Listed</string>

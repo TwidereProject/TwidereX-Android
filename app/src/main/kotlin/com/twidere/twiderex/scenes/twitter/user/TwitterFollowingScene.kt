@@ -22,6 +22,8 @@ package com.twidere.twiderex.scenes.twitter.user
 
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
+import com.twidere.twiderex.R
 import com.twidere.twiderex.component.UserListComponent
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
@@ -51,7 +53,7 @@ fun TwitterFollowingScene(
                         AppBarNavigationButton()
                     },
                     title = {
-                        Text("Following")
+                        Text(stringResource(id = R.string.scene_following_title))
                     }
                 )
             },
