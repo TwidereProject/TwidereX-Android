@@ -11,8 +11,8 @@ task generateTranslate {
         }
         def text = jsonFile.getText()
         def json = new JsonSlurper().parseText(text)
-        def result = flattenMap(json).dropWhile {
-            it.value.isEmpty()
+        def result = flattenMap(json).findAll {
+            !it.value.isEmpty() && !it.value.isAllWhitespace()
         }
         if (result.size() == 0) {
             continue

@@ -1,6 +1,10 @@
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="common_alerts_account_temporarily_locked_title">帐户临时锁定</string>
     <string name="common_alerts_account_temporarily_locked_message">打开 Twitter 以解锁</string>
+    <string name="common_alerts_rate_limit_exceeded_title">超出用量限制</string>
+    <string name="common_alerts_rate_limit_exceeded_message">已超过 Twitter API 用量限制</string>
+    <string name="common_alerts_permission_denied_title">权限已被拒绝</string>
+    <string name="common_alerts_permission_denied_message">对不起，您没有被授权</string>
     <string name="common_alerts_unfollow_user_message">是否取消关注用户 %s？</string>
     <string name="common_alerts_cancel_follow_request_message">取消关注 %s 的请求？</string>
     <string name="common_alerts_tweet_sent_title">推文已发送</string>
@@ -9,6 +13,15 @@
     <string name="common_alerts_photo_saved_title">照片已保存</string>
     <string name="common_alerts_photo_save_fail_title">保存照片失败</string>
     <string name="common_alerts_photo_save_fail_message">请重试</string>
+    <string name="common_alerts_failed_to_load_title">加载失败</string>
+    <string name="common_alerts_failed_to_load_message">请重试</string>
+    <string name="common_alerts_failed_to_following_title">关注失败</string>
+    <string name="common_alerts_failed_to_following_message">请重试</string>
+    <string name="common_alerts_failed_to_unfollowing_title">取消关注失败</string>
+    <string name="common_alerts_failed_to_unfollowing_message">请重试</string>
+    <string name="common_alerts_following_success_title">关注成功</string>
+    <string name="common_alerts_unfollowing_success_title">取消关注成功</string>
+    <string name="common_alerts_following_request_sent_title">已发送关注请求</string>
     <string name="common_controls_actions_add">添加</string>
     <string name="common_controls_actions_remove">删除</string>
     <string name="common_controls_actions_edit">编辑</string>
@@ -29,6 +42,8 @@
     <string name="common_controls_friendship_follower">关注者</string>
     <string name="common_controls_friendship_followers">关注者</string>
     <string name="common_controls_friendship_follows_you">关注了你</string>
+    <string name="common_controls_friendship_user_is_not_following_you">%s 尚未关注你</string>
+    <string name="common_controls_friendship_user_is_following_you">%s 正在关注你</string>
     <string name="common_controls_profile_dashboard_following">正在关注</string>
     <string name="common_controls_profile_dashboard_followers">关注者</string>
     <string name="common_controls_profile_dashboard_listed">列表中</string>
@@ -61,6 +76,7 @@
     <string name="scene_likes_title">喜欢</string>
     <string name="scene_bookmark_title">书签</string>
     <string name="scene_trends_title">趋势</string>
+    <string name="scene_status_title">推文</string>
     <string name="scene_status_reply_single">1 条回复</string>
     <string name="scene_status_reply_mutiple">%d 条回复</string>
     <string name="scene_status_quote_single">1 引用</string>
@@ -79,6 +95,9 @@
     <string name="scene_profile_hide_reply">隐藏回复</string>
     <string name="scene_profile_permission_denied_title">权限已被拒绝</string>
     <string name="scene_profile_permission_denied_message">您已被阻止查看此用户的个人资料。</string>
+    <string name="scene_following_title">正在关注</string>
+    <string name="scene_followers_title">关注者</string>
+    <string name="scene_listed_title">列表中</string>
     <string name="scene_compose_title_compose">撰写</string>
     <string name="scene_compose_title_reply">回复</string>
     <string name="scene_compose_title_quote">引用</string>

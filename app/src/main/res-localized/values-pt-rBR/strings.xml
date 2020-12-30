@@ -1,6 +1,9 @@
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="common_alerts_account_temporarily_locked_title">Conta Temporariamente Bloqueada</string>
     <string name="common_alerts_account_temporarily_locked_message">Abra o Twitter para desbloquear</string>
+    <string name="common_alerts_rate_limit_exceeded_title">Limite de Taxa Excedido</string>
+    <string name="common_alerts_rate_limit_exceeded_message">Atingiu o limite de uso da API do Twitter</string>
+    <string name="common_alerts_permission_denied_title">Permissão negada</string>
     <string name="common_alerts_unfollow_user_message">Deixar de seguir o usuário %s?</string>
     <string name="common_alerts_cancel_follow_request_message">Cancelar pedido para seguir %s?</string>
     <string name="common_alerts_tweet_sent_title">Tweet Enviado</string>
@@ -9,6 +12,15 @@
     <string name="common_alerts_photo_saved_title">Foto Salva</string>
     <string name="common_alerts_photo_save_fail_title">Falha ao Salvar Foto</string>
     <string name="common_alerts_photo_save_fail_message">Por favor, tente novamente</string>
+    <string name="common_alerts_failed_to_load_title">Falha ao Carregar</string>
+    <string name="common_alerts_failed_to_load_message">Por favor, tente novamente</string>
+    <string name="common_alerts_failed_to_following_title">Falha ao Seguir</string>
+    <string name="common_alerts_failed_to_following_message">Por favor, tente novamente</string>
+    <string name="common_alerts_failed_to_unfollowing_title">Falha ao Deixar de Seguir</string>
+    <string name="common_alerts_failed_to_unfollowing_message">Por favor, tente novamente</string>
+    <string name="common_alerts_following_success_title">Seguiu com Sucesso</string>
+    <string name="common_alerts_unfollowing_success_title">Deixou de Seguir com Sucesso</string>
+    <string name="common_alerts_following_request_sent_title">Pedido para Seguir Enviado</string>
     <string name="common_controls_actions_add">Adicionar</string>
     <string name="common_controls_actions_remove">Remover</string>
     <string name="common_controls_actions_edit">Editar</string>
@@ -29,6 +41,8 @@
     <string name="common_controls_friendship_follower">seguidor</string>
     <string name="common_controls_friendship_followers">seguidores</string>
     <string name="common_controls_friendship_follows_you">Segue você</string>
+    <string name="common_controls_friendship_user_is_not_following_you">%s não está seguindo você</string>
+    <string name="common_controls_friendship_user_is_following_you">%s está seguindo você</string>
     <string name="common_controls_profile_dashboard_following">Seguindo</string>
     <string name="common_controls_profile_dashboard_followers">Seguidores</string>
     <string name="common_controls_profile_dashboard_listed">Listado</string>
@@ -61,6 +75,7 @@
     <string name="scene_likes_title">Curtidas</string>
     <string name="scene_bookmark_title">Favorito</string>
     <string name="scene_trends_title">Trends</string>
+    <string name="scene_status_title">Tweet</string>
     <string name="scene_status_reply_single">1 Resposta</string>
     <string name="scene_status_reply_mutiple">%d Respostas</string>
     <string name="scene_status_quote_single">1 Citação</string>
@@ -79,6 +94,9 @@
     <string name="scene_profile_hide_reply">Ocultar resposta</string>
     <string name="scene_profile_permission_denied_title">Permissão negada</string>
     <string name="scene_profile_permission_denied_message">Você foi impedido de visualizar o perfil deste usuário.</string>
+    <string name="scene_following_title">Seguindo</string>
+    <string name="scene_followers_title">Seguidores</string>
+    <string name="scene_listed_title">Listado</string>
     <string name="scene_compose_title_compose">Compor</string>
     <string name="scene_compose_title_reply">Responder</string>
     <string name="scene_compose_title_quote">Citação</string>
