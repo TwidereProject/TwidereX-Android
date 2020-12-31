@@ -54,6 +54,10 @@ android {
         }
     }
 
+    lintOptions{
+        disable 'MissingTranslation'
+    }
+
     flavorDimensions 'channel'
     productFlavors {
         if (enableGoogleVariant) {
