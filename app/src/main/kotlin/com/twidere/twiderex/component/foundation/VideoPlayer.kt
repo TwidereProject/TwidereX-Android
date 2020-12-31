@@ -20,8 +20,10 @@
  */
 package com.twidere.twiderex.component.foundation
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.onActive
 import androidx.compose.runtime.onDispose
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.savedinstancestate.savedInstanceState
@@ -37,22 +39,24 @@ import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
-import com.google.android.exoplayer2.ui.PlayerView
-import com.twidere.twiderex.utils.CacheDataSourceFactory
+import com.google.android.exoplayer2.ui.PlayerControlView
+import com.google.android.exoplayer2.ui.StyledPlayerView
+import com.twidere.twiderex.utils.video.CacheDataSourceFactory
+import com.twidere.twiderex.utils.video.VideoPool
 
 @Composable
 fun VideoPlayer(
     modifier: Modifier = Modifier,
     url: String,
-    showControls: Boolean = true,
-    volume: Float = 1f
+    volume: Float = 1f,
+    customControl: PlayerControlView? = null,
+    showControls: Boolean = customControl == null,
 ) {
-    var autoPlay by savedInstanceState { true }
-    var window by savedInstanceState { 0 }
-    var position by savedInstanceState { 0L }
+    var autoPlay by savedInstanceState(url) { true }
+    var window by savedInstanceState(url) { 0 }
     val context = AmbientContext.current
     val lifecycle = AmbientLifecycleOwner.current.lifecycle
-    val player = remember {
+    val player = remember(url) {
         SimpleExoPlayer.Builder(context).build().apply {
             repeatMode = Player.REPEAT_MODE_ALL
             playWhenReady = autoPlay
@@ -66,18 +70,18 @@ fun VideoPlayer(
                 setMediaSource(it)
             }
             prepare()
-            seekTo(window, position)
+            seekTo(window, VideoPool.get(url))
         }
     }
 
     fun updateState() {
         autoPlay = player.playWhenReady
         window = player.currentWindowIndex
-        position = 0L.coerceAtLeast(player.contentPosition)
+        VideoPool.set(url, 0L.coerceAtLeast(player.contentPosition))
     }
 
     val playerView = remember {
-        PlayerView(context).also { playerView ->
+        StyledPlayerView(context).also { playerView ->
             playerView.useController = showControls
             lifecycle.addObserver(object : LifecycleObserver {
                 @OnLifecycleEvent(Lifecycle.Event.ON_START)
@@ -96,15 +100,23 @@ fun VideoPlayer(
         }
     }
 
+    onActive {
+        if (customControl != null) {
+            customControl.player = player
+        }
+    }
+
     onDispose {
         updateState()
         player.release()
     }
 
-    AndroidView(
-        modifier = modifier,
-        viewBlock = { playerView }
-    ) {
-        playerView.player = player
+    Box {
+        AndroidView(
+            modifier = modifier,
+            viewBlock = { playerView }
+        ) {
+            playerView.player = player
+        }
     }
 }

@@ -62,10 +62,13 @@ import androidx.compose.ui.gesture.rawDragGestureFilter
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.AmbientAnimationClock
+import androidx.compose.ui.platform.AmbientContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.compose.navigate
+import com.google.android.exoplayer2.ui.PlayerControlView
 import com.twidere.twiderex.R
 import com.twidere.twiderex.annotations.IncomingComposeUpdate
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
@@ -138,6 +141,16 @@ fun MediaScene(status: UiStatus, selectedIndex: Int) {
                     maxPage = status.media.lastIndex,
                 )
             }
+            val context = AmbientContext.current
+            val videoControl = remember(pagerState.currentPage) {
+                if (status.media[pagerState.currentPage].type == MediaType.video) {
+                    PlayerControlView(context).apply {
+                        showTimeoutMs = 0
+                    }
+                } else {
+                    null
+                }
+            }
             Pager(
                 modifier = Modifier
                     .clickable(
@@ -150,7 +163,7 @@ fun MediaScene(status: UiStatus, selectedIndex: Int) {
                 dragEnabled = !lockPager,
             ) {
                 val data = status.media[this.page]
-                MediaItemView(data) {
+                MediaItemView(data, customControl = videoControl) {
                     lockPager = it
                 }
             }
@@ -174,6 +187,9 @@ fun MediaScene(status: UiStatus, selectedIndex: Int) {
                             modifier = Modifier
                                 .padding(standardPadding),
                         ) {
+                            if (videoControl != null) {
+                                AndroidView(viewBlock = { videoControl })
+                            }
                             Text(
                                 modifier = Modifier
                                     .clickable(
@@ -252,6 +268,7 @@ fun MediaScene(status: UiStatus, selectedIndex: Int) {
 @Composable
 fun MediaItemView(
     data: UiMedia,
+    customControl: PlayerControlView? = null,
     requestLock: (Boolean) -> Unit,
 ) {
     var scale by remember { mutableStateOf(1f) }
@@ -308,6 +325,7 @@ fun MediaItemView(
                         Box {
                             VideoPlayer(
                                 url = it,
+                                customControl = customControl
                             )
                         }
                 }
