@@ -38,9 +38,9 @@ import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.UserRepository
-import java.io.IOException
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
+import java.io.IOException
 
 class UserViewModel @AssistedInject constructor(
     private val factory: UserRepository.AssistedFactory,

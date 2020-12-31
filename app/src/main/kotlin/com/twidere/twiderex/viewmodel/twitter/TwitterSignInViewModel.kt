@@ -36,8 +36,8 @@ import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.ACCOUNT_TYPE
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.utils.json
-import java.io.IOException
 import retrofit2.HttpException
+import java.io.IOException
 
 class TwitterSignInViewModel @ViewModelInject constructor(
     private val repository: AccountRepository,
