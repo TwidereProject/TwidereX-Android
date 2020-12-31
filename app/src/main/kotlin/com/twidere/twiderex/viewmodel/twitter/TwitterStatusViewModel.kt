@@ -37,7 +37,9 @@ import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.twitter.TwitterConversationRepository
+import java.io.IOException
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
 
 class TwitterStatusViewModel @AssistedInject constructor(
     private val factory: TwitterConversationRepository.AssistedFactory,
@@ -112,6 +114,10 @@ class TwitterStatusViewModel @AssistedInject constructor(
                 }
             } catch (e: MicroBlogException) {
                 e.microBlogErrorMessage?.let { inAppNotification.show(it) }
+            } catch (e: IOException) {
+                e.message?.let { inAppNotification.show(it) }
+            } catch (e: HttpException) {
+                e.message?.let { inAppNotification.show(it) }
             }
         }
     }

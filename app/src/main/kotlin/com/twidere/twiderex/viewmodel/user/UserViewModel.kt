@@ -38,7 +38,9 @@ import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.UserRepository
+import java.io.IOException
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
 
 class UserViewModel @AssistedInject constructor(
     private val factory: UserRepository.AssistedFactory,
@@ -88,6 +90,10 @@ class UserViewModel @AssistedInject constructor(
             }
         } catch (e: MicroBlogException) {
             e.microBlogErrorMessage?.let { inAppNotification.show(it) }
+        } catch (e: IOException) {
+            e.message?.let { inAppNotification.show(it) }
+        } catch (e: HttpException) {
+            e.message?.let { inAppNotification.show(it) }
         }
         refreshing.postValue(false)
     }
@@ -111,6 +117,8 @@ class UserViewModel @AssistedInject constructor(
                 relationship.postValue(it)
             }
         } catch (e: MicroBlogException) {
+        } catch (e: IOException) {
+        } catch (e: HttpException) {
         }
         loadingRelationship.postValue(false)
     }
