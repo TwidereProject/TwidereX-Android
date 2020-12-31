@@ -102,7 +102,7 @@ abstract class PagingTimelineMediatorBase(
     protected open fun hasMore(
         result: List<DbPagingTimelineWithStatus>,
         pageSize: Int
-    ) = result.size == pageSize
+    ) = result.isNotEmpty()
 
     protected open suspend fun clearData(database: AppDatabase) {
         database.pagingTimelineDao().clearAll(pagingKey, accountKey = accountKey)
