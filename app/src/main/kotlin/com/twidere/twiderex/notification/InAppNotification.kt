@@ -20,11 +20,20 @@
  */
 package com.twidere.twiderex.notification
 
+import androidx.annotation.StringRes
 import androidx.lifecycle.MutableLiveData
 import com.twidere.twiderex.utils.Event
 
-class InAppNotification : MutableLiveData<Event<String?>>() {
+interface NotificationEvent
+data class StringNotificationEvent(val message: String) : NotificationEvent
+data class StringResNotificationEvent(@StringRes val messageId: Int) : NotificationEvent
+
+class InAppNotification : MutableLiveData<Event<NotificationEvent?>>() {
     fun show(message: String) {
-        postValue(Event(message))
+        postValue(Event(StringNotificationEvent(message)))
+    }
+
+    fun show(@StringRes messageId: Int) {
+        postValue(Event(StringResNotificationEvent(messageId = messageId)))
     }
 }

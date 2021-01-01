@@ -27,6 +27,7 @@ import com.twidere.twiderex.db.AppDatabase
 import com.twidere.twiderex.db.model.UserTimelineType
 import com.twidere.twiderex.db.model.pagingKey
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.paging.mediator.PagingTimelineMediatorBase
 
 @OptIn(ExperimentalPagingApi::class)
@@ -36,7 +37,8 @@ class UserFavouriteMediator(
     database: AppDatabase,
     accountKey: MicroBlogKey,
     private val service: TimelineService,
-) : PagingTimelineMediatorBase(accountKey, database) {
+    inAppNotification: InAppNotification,
+) : PagingTimelineMediatorBase(accountKey, database, inAppNotification) {
     override val pagingKey: String
         get() = UserTimelineType.Favourite.pagingKey(userKey)
 

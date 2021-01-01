@@ -38,6 +38,7 @@ import com.twidere.services.twitter.api.TwitterResources
 import com.twidere.services.twitter.api.UploadResources
 import com.twidere.services.twitter.model.StatusV2
 import com.twidere.services.twitter.model.TwitterSearchResponseV2
+import com.twidere.services.twitter.model.User
 import com.twidere.services.twitter.model.UserV2
 import com.twidere.services.twitter.model.fields.Expansions
 import com.twidere.services.twitter.model.fields.MediaFields
@@ -386,4 +387,8 @@ class TwitterService(
         expansions = UserFields.pinned_tweet_id.name,
         tweetFields = TweetFields.values().joinToString(",") { it.value },
     )
+
+    suspend fun verifyCredentials(): User? {
+        return resources.verifyCredentials()
+    }
 }

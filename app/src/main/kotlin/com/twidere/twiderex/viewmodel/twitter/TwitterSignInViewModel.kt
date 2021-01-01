@@ -26,6 +26,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.twidere.services.http.MicroBlogException
 import com.twidere.services.twitter.TwitterOAuthService
+import com.twidere.services.twitter.TwitterService
 import com.twidere.twiderex.db.mapper.toDbUser
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
@@ -36,6 +37,7 @@ import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.ACCOUNT_TYPE
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.utils.json
+import com.twidere.twiderex.utils.show
 import retrofit2.HttpException
 import java.io.IOException
 
@@ -57,7 +59,12 @@ class TwitterSignInViewModel @ViewModelInject constructor(
             val pinCode = pinCodeProvider.invoke(service.getWebOAuthUrl(token))
             if (pinCode.isNotEmpty()) {
                 val accessToken = service.getAccessToken(pinCode, token)
-                val user = service.verifyCredentials(accessToken)
+                val user = TwitterService(
+                    consumer_key = consumerKey,
+                    consumer_secret = consumerSecret,
+                    access_token = accessToken.oauth_token,
+                    access_token_secret = accessToken.oauth_token_secret,
+                ).verifyCredentials()
                 if (user != null) {
                     val name = user.screenName
                     val id = user.idStr
@@ -96,7 +103,7 @@ class TwitterSignInViewModel @ViewModelInject constructor(
                 }
             }
         } catch (e: MicroBlogException) {
-            e.microBlogErrorMessage?.let { inAppNotification.show(it) }
+            e.show(inAppNotification)
         } catch (e: IOException) {
             e.message?.let { inAppNotification.show(it) }
         } catch (e: HttpException) {

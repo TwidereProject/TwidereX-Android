@@ -18,24 +18,20 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.paging.mediator
+package com.twidere.twiderex.utils
 
-import com.twidere.services.microblog.TimelineService
-import com.twidere.twiderex.db.AppDatabase
-import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.services.http.MicroBlogException
+import com.twidere.services.twitter.TwitterErrorCodes
+import com.twidere.twiderex.R
 import com.twidere.twiderex.notification.InAppNotification
 
-class MentionTimelineMediator(
-    private val service: TimelineService,
-    accountKey: MicroBlogKey,
-    database: AppDatabase,
-    inAppNotification: InAppNotification,
-) : PagingWithGapMediator(accountKey, database, inAppNotification) {
-    override suspend fun loadBetweenImpl(
-        pageSize: Int,
-        max_id: String?,
-        since_id: String?
-    ) = service.mentionsTimeline(pageSize, max_id = max_id, since_id = since_id)
-
-    override val pagingKey: String = "mentions:$accountKey"
+fun MicroBlogException.show(notification: InAppNotification) {
+    when (this.errors?.firstOrNull()?.code) {
+        TwitterErrorCodes.TemporarilyLocked -> {
+            notification.show(R.string.common_alerts_account_temporarily_locked_title)
+        }
+        else -> {
+            microBlogErrorMessage?.let { notification.show(it) }
+        }
+    }
 }

@@ -46,8 +46,11 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import com.twidere.twiderex.notification.InAppNotification
+import com.twidere.twiderex.notification.StringNotificationEvent
+import com.twidere.twiderex.notification.StringResNotificationEvent
 
 val AmbientInAppNotification = ambientOf { InAppNotification() }
 
@@ -79,14 +82,7 @@ fun InAppNotificationBottomSheetScaffold(
     contentColor: Color = contentColorFor(backgroundColor),
     bodyContent: @Composable (PaddingValues) -> Unit,
 ) {
-    val inAppNotification = AmbientInAppNotification.current
-    val notification by inAppNotification.observeAsState()
-
-    LaunchedEffect(notification) {
-        notification?.getContentIfNotHandled()?.let {
-            scaffoldState.snackbarHostState.showSnackbar(it)
-        }
-    }
+    ApplyNotification(scaffoldState.snackbarHostState)
 
     BottomSheetScaffold(
         sheetContent = sheetContent,
@@ -115,6 +111,32 @@ fun InAppNotificationBottomSheetScaffold(
     )
 }
 
+@ExperimentalMaterialApi
+@Composable
+private fun ApplyNotification(
+    snackbarHostState: SnackbarHostState
+) {
+    val inAppNotification = AmbientInAppNotification.current
+    val notification by inAppNotification.observeAsState()
+    val message = notification?.getContentIfNotHandled()?.let {
+        when (it) {
+            is StringNotificationEvent -> {
+                it.message
+            }
+            is StringResNotificationEvent -> {
+                stringResource(id = it.messageId)
+            }
+            else -> null
+        }
+    }
+
+    LaunchedEffect(message) {
+        message?.let {
+            snackbarHostState.showSnackbar(message = it)
+        }
+    }
+}
+
 @Composable
 @OptIn(ExperimentalMaterialApi::class)
 fun InAppNotificationScaffold(
@@ -137,15 +159,7 @@ fun InAppNotificationScaffold(
     contentColor: Color = contentColorFor(backgroundColor),
     bodyContent: @Composable (PaddingValues) -> Unit
 ) {
-    val inAppNotification = AmbientInAppNotification.current
-    val notification by inAppNotification.observeAsState()
-
-    LaunchedEffect(notification) {
-        notification?.getContentIfNotHandled()?.let {
-            scaffoldState.snackbarHostState.showSnackbar(it)
-        }
-    }
-
+    ApplyNotification(scaffoldState.snackbarHostState)
     Scaffold(
         modifier = modifier,
         scaffoldState = scaffoldState,

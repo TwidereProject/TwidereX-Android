@@ -33,6 +33,7 @@ import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.twitter.TwitterTweetsRepository
+import com.twidere.twiderex.utils.show
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
@@ -65,7 +66,7 @@ class MediaViewModel @AssistedInject constructor(
             try {
                 repository.loadTweetFromNetwork(statusKey.id)
             } catch (e: MicroBlogException) {
-                e.microBlogErrorMessage?.let { inAppNotification.show(it) }
+                e.show(inAppNotification)
             } catch (e: IOException) {
                 e.message?.let { inAppNotification.show(it) }
             } catch (e: HttpException) {

@@ -33,6 +33,8 @@ import com.twidere.twiderex.db.model.DbPagingTimelineWithStatus
 import com.twidere.twiderex.db.model.TimelineType
 import com.twidere.twiderex.db.model.saveToDb
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.notification.InAppNotification
+import com.twidere.twiderex.utils.show
 import retrofit2.HttpException
 import java.io.IOException
 import java.net.SocketTimeoutException
@@ -41,6 +43,7 @@ import java.net.SocketTimeoutException
 abstract class PagingTimelineMediatorBase(
     accountKey: MicroBlogKey,
     database: AppDatabase,
+    private val inAppNotification: InAppNotification
 ) : PagingMediator(accountKey = accountKey, database = database) {
     override suspend fun load(
         loadType: LoadType,
@@ -85,6 +88,7 @@ abstract class PagingTimelineMediatorBase(
                 endOfPaginationReached = !hasMore(result, pageSize)
             )
         } catch (e: MicroBlogException) {
+            e.show(inAppNotification)
             return MediatorResult.Error(e)
         } catch (e: IOException) {
             return MediatorResult.Error(e)
