@@ -27,7 +27,6 @@ import androidx.work.CoroutineWorker
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkerParameters
 import com.twidere.twiderex.notification.InAppNotification
-import com.twidere.twiderex.utils.Event
 
 class NotificationWorker @WorkerInject constructor(
     @Assisted appContext: Context,
@@ -42,7 +41,7 @@ class NotificationWorker @WorkerInject constructor(
     override suspend fun doWork(): Result {
         val message = inputData.getString("message") ?: ""
         if (!inputData.success) {
-            inAppNotification.postValue(Event(message))
+            inAppNotification.show(message)
             return Result.failure()
         }
         return Result.success()
