@@ -75,8 +75,10 @@ import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.extensions.refreshOrRetry
 import com.twidere.twiderex.extensions.viewModel
 import com.twidere.twiderex.navigation.Route
+import com.twidere.twiderex.preferences.proto.DisplayPreferences
 import com.twidere.twiderex.ui.AmbientActiveAccount
 import com.twidere.twiderex.ui.AmbientNavController
+import com.twidere.twiderex.ui.AmbientVideoPlayback
 import com.twidere.twiderex.ui.TwidereXTheme
 import com.twidere.twiderex.ui.standardPadding
 import com.twidere.twiderex.viewmodel.twitter.search.TwitterSearchMediaViewModel
@@ -199,48 +201,52 @@ private fun SearchTweetsContent(viewModel: TwitterSearchTweetsViewModel) {
 @Composable
 private fun SearchMediasContent(viewModel: TwitterSearchMediaViewModel) {
     val source = viewModel.source.collectAsLazyPagingItems()
-    SwipeToRefreshLayout(
-        refreshingState = source.loadState.refresh is LoadState.Loading,
-        onRefresh = {
-            source.refreshOrRetry()
-        }
+    Providers(
+        AmbientVideoPlayback provides DisplayPreferences.AutoPlayback.Off
     ) {
-        if (source.itemCount > 0) {
-            LazyColumn {
-                item {
-                    Box(modifier = Modifier.height(standardPadding))
-                }
-                itemsPagingGridIndexed(
-                    source,
-                    rowSize = 2,
-                    spacing = standardPadding,
-                    padding = standardPadding
-                ) { index, pair ->
-                    pair?.let { item ->
-                        val navController = AmbientNavController.current
-                        StatusMediaPreviewItem(
-                            item.first,
-                            modifier = Modifier
-                                .aspectRatio(1F)
-                                .clip(
-                                    MaterialTheme.shapes.medium
-                                ),
-                            onClick = {
-                                navController.navigate(
-                                    Route.Media(
-                                        item.second.statusKey,
-                                        selectedIndex = index
-                                    )
-                                )
-                            }
-                        )
+        SwipeToRefreshLayout(
+            refreshingState = source.loadState.refresh is LoadState.Loading,
+            onRefresh = {
+                source.refreshOrRetry()
+            }
+        ) {
+            if (source.itemCount > 0) {
+                LazyColumn {
+                    item {
+                        Box(modifier = Modifier.height(standardPadding))
                     }
-                }
-                item {
-                    Box(modifier = Modifier.height(standardPadding))
-                }
-                loadState(source.loadState.append) {
-                    source.retry()
+                    itemsPagingGridIndexed(
+                        source,
+                        rowSize = 2,
+                        spacing = standardPadding,
+                        padding = standardPadding
+                    ) { index, pair ->
+                        pair?.let { item ->
+                            val navController = AmbientNavController.current
+                            StatusMediaPreviewItem(
+                                item.first,
+                                modifier = Modifier
+                                    .aspectRatio(1F)
+                                    .clip(
+                                        MaterialTheme.shapes.medium
+                                    ),
+                                onClick = {
+                                    navController.navigate(
+                                        Route.Media(
+                                            item.second.statusKey,
+                                            selectedIndex = index
+                                        )
+                                    )
+                                }
+                            )
+                        }
+                    }
+                    item {
+                        Box(modifier = Modifier.height(standardPadding))
+                    }
+                    loadState(source.loadState.append) {
+                        source.retry()
+                    }
                 }
             }
         }

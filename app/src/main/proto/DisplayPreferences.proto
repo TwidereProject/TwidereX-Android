@@ -9,8 +9,15 @@ message DisplayPreferences {
     Square = 1;
   }
 
+  enum AutoPlayback {
+    Auto = 0;
+    Always = 1;
+    Off = 2;
+  }
+
   bool useSystemFontSize = 1;
   float fontScale = 2;
   AvatarStyle avatarStyle = 3;
   bool mediaPreview = 4;
+  AutoPlayback autoPlayback = 5;
 }

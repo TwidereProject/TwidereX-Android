@@ -24,6 +24,7 @@ import android.accounts.AccountManager
 import android.content.Context
 import android.content.SharedPreferences
 import android.location.LocationManager
+import android.net.ConnectivityManager
 import androidx.room.Room
 import androidx.work.WorkManager
 import com.twidere.twiderex.db.AppDatabase
@@ -58,4 +59,8 @@ object AndroidModule {
     @Provides
     fun provideLocationManager(@ApplicationContext context: Context): LocationManager =
         context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+
+    @Provides
+    fun provideConnectivityManager(@ApplicationContext context: Context): ConnectivityManager =
+        context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 }

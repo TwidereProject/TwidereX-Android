@@ -20,15 +20,26 @@
  */
 package com.twidere.twiderex.component.foundation
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.AmbientContentAlpha
+import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.onActive
 import androidx.compose.runtime.onDispose
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.savedinstancestate.savedInstanceState
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.AmbientContext
 import androidx.compose.ui.platform.AmbientLifecycleOwner
 import androidx.compose.ui.viewinterop.AndroidView
@@ -41,6 +52,10 @@ import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.ui.PlayerControlView
 import com.google.android.exoplayer2.ui.StyledPlayerView
+import com.twidere.twiderex.preferences.proto.DisplayPreferences
+import com.twidere.twiderex.ui.AmbientIsActiveNetworkMetered
+import com.twidere.twiderex.ui.AmbientVideoPlayback
+import com.twidere.twiderex.ui.profileImageSize
 import com.twidere.twiderex.utils.video.CacheDataSourceFactory
 import com.twidere.twiderex.utils.video.VideoPool
 
@@ -51,8 +66,19 @@ fun VideoPlayer(
     volume: Float = 1f,
     customControl: PlayerControlView? = null,
     showControls: Boolean = customControl == null,
+    thumb: @Composable (() -> Unit)? = null,
 ) {
-    var autoPlay by savedInstanceState(url) { true }
+    val playBackMode = AmbientVideoPlayback.current
+    val isActiveNetworkMetered = AmbientIsActiveNetworkMetered.current
+    var shouldShowThumb by remember { mutableStateOf(false) }
+    var autoPlay by savedInstanceState(url) {
+        when (playBackMode) {
+            DisplayPreferences.AutoPlayback.Auto -> !isActiveNetworkMetered
+            DisplayPreferences.AutoPlayback.Always -> true
+            DisplayPreferences.AutoPlayback.Off -> false
+            DisplayPreferences.AutoPlayback.UNRECOGNIZED -> true
+        }
+    }
     var window by savedInstanceState(url) { 0 }
     val context = AmbientContext.current
     val lifecycle = AmbientLifecycleOwner.current.lifecycle
@@ -60,6 +86,12 @@ fun VideoPlayer(
         SimpleExoPlayer.Builder(context).build().apply {
             repeatMode = Player.REPEAT_MODE_ALL
             playWhenReady = autoPlay
+            addListener(object : Player.EventListener {
+                override fun onPlaybackStateChanged(state: Int) {
+                    shouldShowThumb = state != Player.STATE_READY
+                }
+            })
+
             setVolume(volume)
             ProgressiveMediaSource.Factory(
                 CacheDataSourceFactory(
@@ -117,6 +149,16 @@ fun VideoPlayer(
             viewBlock = { playerView }
         ) {
             playerView.player = player
+        }
+        if ((shouldShowThumb || !player.isPlaying) && thumb != null) {
+            thumb()
+            Icon(
+                imageVector = Icons.Default.PlayArrow,
+                tint = Color.White.copy(alpha = AmbientContentAlpha.current),
+                modifier = Modifier.align(Alignment.Center)
+                    .preferredSize(profileImageSize)
+                    .background(MaterialTheme.colors.primary, CircleShape),
+            )
         }
     }
 }

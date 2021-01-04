@@ -20,6 +20,10 @@
  */
 package com.twidere.twiderex
 
+import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkCapabilities
+import android.net.NetworkRequest
 import android.os.Build
 import android.os.Bundle
 import android.view.WindowManager
@@ -31,8 +35,10 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.viewinterop.viewModel
+import androidx.core.net.ConnectivityManagerCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.hilt.lifecycle.HiltViewModelFactory
+import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.ComposeNavigator
 import androidx.navigation.fragment.DialogFragmentNavigator
@@ -52,6 +58,7 @@ import com.twidere.twiderex.ui.AmbientActiveAccount
 import com.twidere.twiderex.ui.AmbientActiveAccountViewModel
 import com.twidere.twiderex.ui.AmbientActivity
 import com.twidere.twiderex.ui.AmbientApplication
+import com.twidere.twiderex.ui.AmbientIsActiveNetworkMetered
 import com.twidere.twiderex.ui.AmbientViewModelProviderFactory
 import com.twidere.twiderex.ui.AmbientWindow
 import com.twidere.twiderex.ui.AmbientWindowPadding
@@ -73,6 +80,7 @@ class TwidereXActivity : FragmentActivity() {
     }
 
     private lateinit var launcher: ActivityLauncher
+    private val isActiveNetworkMetered = MutableLiveData(false)
 
     @Inject
     lateinit var statusActions: StatusActions
@@ -86,10 +94,33 @@ class TwidereXActivity : FragmentActivity() {
     @Inject
     lateinit var inAppNotification: InAppNotification
 
+    @Inject
+    lateinit var connectivityManager: ConnectivityManager
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         launcher = ActivityLauncher(activityResultRegistry)
         lifecycle.addObserver(launcher)
+        isActiveNetworkMetered.postValue(
+            ConnectivityManagerCompat.isActiveNetworkMetered(
+                connectivityManager
+            )
+        )
+        connectivityManager.registerNetworkCallback(
+            NetworkRequest.Builder().build(),
+            object : ConnectivityManager.NetworkCallback() {
+                override fun onCapabilitiesChanged(
+                    network: Network,
+                    networkCapabilities: NetworkCapabilities
+                ) {
+                    isActiveNetworkMetered.postValue(
+                        ConnectivityManagerCompat.isActiveNetworkMetered(
+                            connectivityManager
+                        )
+                    )
+                }
+            },
+        )
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             window.setDecorFitsSystemWindows(false)
         } else {
@@ -99,6 +130,7 @@ class TwidereXActivity : FragmentActivity() {
         setContent {
             val accountViewModel = viewModel<ActiveAccountViewModel>()
             val account by accountViewModel.account.observeAsState()
+            val isActiveNetworkMetered by isActiveNetworkMetered.observeAsState(initial = false)
             Providers(
                 AmbientInAppNotification provides inAppNotification,
                 AmbientLauncher provides launcher,
@@ -109,6 +141,7 @@ class TwidereXActivity : FragmentActivity() {
                 AmbientStatusActions provides statusActions,
                 AmbientActivity provides this,
                 AmbientActiveAccountViewModel provides accountViewModel,
+                AmbientIsActiveNetworkMetered provides isActiveNetworkMetered
             ) {
                 ProvidePreferences(
                     preferencesHolder,

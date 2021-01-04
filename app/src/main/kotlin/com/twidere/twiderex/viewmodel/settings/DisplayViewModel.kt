@@ -53,4 +53,10 @@ class DisplayViewModel @ViewModelInject constructor(
             it.toBuilder().setMediaPreview(value).build()
         }
     }
+
+    fun setAutoPlayback(value: DisplayPreferences.AutoPlayback) = viewModelScope.launch {
+        displayPreferences.updateData {
+            it.toBuilder().setAutoPlayback(value).build()
+        }
+    }
 }

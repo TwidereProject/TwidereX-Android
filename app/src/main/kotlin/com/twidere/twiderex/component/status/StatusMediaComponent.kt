@@ -148,8 +148,21 @@ fun StatusMediaPreviewItem(
                         ),
                     url = it,
                     showControls = false,
-                    volume = 0F,
-                )
+                    volume = 0F
+                ) {
+                    media.previewUrl?.let {
+                        NetworkImage(
+                            url = it,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable(
+                                    onClick = {
+                                        onClick(media)
+                                    }
+                                ),
+                        )
+                    }
+                }
             }
         }
     }

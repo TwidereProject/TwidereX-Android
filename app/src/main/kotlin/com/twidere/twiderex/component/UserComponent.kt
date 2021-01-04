@@ -42,6 +42,7 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Providers
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.savedinstancestate.savedInstanceState
@@ -79,8 +80,10 @@ import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.navigation.Route
+import com.twidere.twiderex.preferences.proto.DisplayPreferences
 import com.twidere.twiderex.ui.AmbientActiveAccount
 import com.twidere.twiderex.ui.AmbientNavController
+import com.twidere.twiderex.ui.AmbientVideoPlayback
 import com.twidere.twiderex.ui.standardPadding
 import com.twidere.twiderex.viewmodel.user.UserFavouriteTimelineViewModel
 import com.twidere.twiderex.viewmodel.user.UserMediaTimelineViewModel
@@ -220,22 +223,26 @@ fun UserComponent(
                             ) { index, pair ->
                                 pair?.let { item ->
                                     val navController = AmbientNavController.current
-                                    StatusMediaPreviewItem(
-                                        item.first,
-                                        modifier = Modifier
-                                            .aspectRatio(1F)
-                                            .clip(
-                                                MaterialTheme.shapes.medium
-                                            ),
-                                        onClick = {
-                                            navController.navigate(
-                                                Route.Media(
-                                                    item.second.statusKey,
-                                                    selectedIndex = index
+                                    Providers(
+                                        AmbientVideoPlayback provides DisplayPreferences.AutoPlayback.Off,
+                                    ) {
+                                        StatusMediaPreviewItem(
+                                            item.first,
+                                            modifier = Modifier
+                                                .aspectRatio(1F)
+                                                .clip(
+                                                    MaterialTheme.shapes.medium
+                                                ),
+                                            onClick = {
+                                                navController.navigate(
+                                                    Route.Media(
+                                                        item.second.statusKey,
+                                                        selectedIndex = index
+                                                    )
                                                 )
-                                            )
-                                        }
-                                    )
+                                            }
+                                        )
+                                    }
                                 }
                             }
                             item {

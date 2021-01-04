@@ -88,8 +88,10 @@ import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.navigation.Route
+import com.twidere.twiderex.preferences.proto.DisplayPreferences
 import com.twidere.twiderex.ui.AmbientActiveAccount
 import com.twidere.twiderex.ui.AmbientNavController
+import com.twidere.twiderex.ui.AmbientVideoPlayback
 import com.twidere.twiderex.ui.TwidereXTheme
 import com.twidere.twiderex.ui.standardPadding
 import com.twidere.twiderex.viewmodel.MediaViewModel
@@ -119,7 +121,11 @@ fun MediaScene(statusKey: MicroBlogKey, selectedIndex: Int) {
             }
         }
         status?.let {
-            MediaScene(status = it, selectedIndex = selectedIndex)
+            Providers(
+                AmbientVideoPlayback provides DisplayPreferences.AutoPlayback.Always
+            ) {
+                MediaScene(status = it, selectedIndex = selectedIndex)
+            }
         }
     }
 }
