@@ -1,7 +1,7 @@
 /*
  *  Twidere X
  *
- *  Copyright (C) 2020 Tlaster <tlaster@outlook.com>
+ *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
  * 
  *  This file is part of Twidere X.
  * 
@@ -28,4 +28,9 @@ data class MicroBlogException(
     val error: String? = null,
     val request: String? = null,
     val errors: List<Errors>? = null,
-) : IOException()
+) : IOException() {
+    val microBlogErrorMessage: String?
+        get() = error ?: errors?.firstOrNull()?.let {
+            it.detail ?: it.message
+        }
+}

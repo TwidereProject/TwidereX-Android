@@ -1,7 +1,7 @@
 /*
  *  Twidere X
  *
- *  Copyright (C) 2020 Tlaster <tlaster@outlook.com>
+ *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
  * 
  *  This file is part of Twidere X.
  * 
@@ -26,4 +26,5 @@ interface TwitterResources :
     UsersResources,
     SearchResources,
     StatusResources,
-    FriendshipResources
+    FriendshipResources,
+    FollowsResources

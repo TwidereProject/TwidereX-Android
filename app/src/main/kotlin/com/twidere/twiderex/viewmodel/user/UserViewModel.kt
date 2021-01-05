@@ -1,7 +1,7 @@
 /*
  *  Twidere X
  *
- *  Copyright (C) 2020 Tlaster <tlaster@outlook.com>
+ *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
  * 
  *  This file is part of Twidere X.
  * 
@@ -35,14 +35,21 @@ import com.twidere.services.microblog.model.IRelationship
 import com.twidere.twiderex.di.assisted.IAssistedFactory
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.ui.UiUser
+import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.UserRepository
+import com.twidere.twiderex.utils.notify
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
+import java.io.IOException
 
 class UserViewModel @AssistedInject constructor(
     private val factory: UserRepository.AssistedFactory,
+    private val inAppNotification: InAppNotification,
     @Assisted private val account: AccountDetails,
     @Assisted private val screenName: String,
     @Assisted private val host: String,
+    @Assisted private val initialUserKey: MicroBlogKey?,
 ) : ViewModel() {
 
     @AssistedInject.Factory
@@ -51,6 +58,7 @@ class UserViewModel @AssistedInject constructor(
             account: AccountDetails,
             screenName: String,
             host: String,
+            initialUserKey: MicroBlogKey?,
         ): UserViewModel
     }
 
@@ -59,27 +67,34 @@ class UserViewModel @AssistedInject constructor(
             factory.create(account.accountKey, it as LookupService, it as RelationshipService)
         }
     }
-    val userKey = MutableLiveData<MicroBlogKey>()
+    val userKey = MutableLiveData(initialUserKey)
     val refreshing = MutableLiveData(false)
     val loadingRelationship = MutableLiveData(false)
-    val user = liveData {
-        emitSource(userKey.switchMap { repository.getUserLiveData(it) })
+    val user = userKey.switchMap {
+        if (it != null) {
+            repository.getUserLiveData(it)
+        } else {
+            liveData<UiUser?> { emit(null) }
+        }
     }
     val relationship = MutableLiveData<IRelationship>()
-    val isMe = liveData {
-        emitSource(
-            userKey.map {
-                it == account.accountKey
-            }
-        )
+    val isMe = userKey.map {
+        it == account.accountKey
     }
 
     fun refresh() = viewModelScope.launch {
         refreshing.postValue(true)
         try {
             val user = repository.lookupUserByName(screenName)
-            userKey.postValue(user.userKey)
+            if (initialUserKey != user.userKey) {
+                userKey.postValue(user.userKey)
+            }
         } catch (e: MicroBlogException) {
+            e.notify(inAppNotification)
+        } catch (e: IOException) {
+            e.message?.let { inAppNotification.show(it) }
+        } catch (e: HttpException) {
+            e.message?.let { inAppNotification.show(it) }
         }
         refreshing.postValue(false)
     }
@@ -96,22 +111,21 @@ class UserViewModel @AssistedInject constructor(
         loadRelationShip()
     }
 
-    private suspend fun loadRelationShip() {
+    private fun loadRelationShip() = viewModelScope.launch {
         loadingRelationship.postValue(true)
-        repository.showRelationship(screenName).let {
-            relationship.postValue(it)
+        try {
+            repository.showRelationship(screenName).let {
+                relationship.postValue(it)
+            }
+        } catch (e: MicroBlogException) {
+        } catch (e: IOException) {
+        } catch (e: HttpException) {
         }
         loadingRelationship.postValue(false)
     }
 
     init {
-        viewModelScope.launch {
-            launch {
-                refresh()
-            }
-            launch {
-                loadRelationShip()
-            }
-        }
+        refresh()
+        loadRelationShip()
     }
 }

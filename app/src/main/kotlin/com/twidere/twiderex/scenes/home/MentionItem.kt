@@ -1,7 +1,7 @@
 /*
  *  Twidere X
  *
- *  Copyright (C) 2020 Tlaster <tlaster@outlook.com>
+ *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
  * 
  *  This file is part of Twidere X.
  * 
@@ -26,6 +26,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.TimelineComponent
+import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.ui.AmbientActiveAccount
 import com.twidere.twiderex.viewmodel.timeline.MentionsTimelineViewModel
@@ -50,6 +51,8 @@ class MentionItem : HomeNavigationItem() {
             ) {
                 it.create(account)
             }
-        TimelineComponent(viewModel = viewModel)
+        InAppNotificationScaffold {
+            TimelineComponent(viewModel = viewModel)
+        }
     }
 }

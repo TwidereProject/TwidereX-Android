@@ -1,7 +1,7 @@
 /*
  *  Twidere X
  *
- *  Copyright (C) 2020 Tlaster <tlaster@outlook.com>
+ *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
  * 
  *  This file is part of Twidere X.
  * 
@@ -20,15 +20,17 @@
  */
 package com.twidere.twiderex.di
 
-import android.content.Context
+import androidx.work.WorkManager
+import com.twidere.twiderex.action.ComposeAction
 import com.twidere.twiderex.db.AppDatabase
+import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.DraftRepository
+import com.twidere.twiderex.repository.ReactionRepository
 import com.twidere.twiderex.repository.SearchRepository
-import com.twidere.twiderex.utils.ComposeQueue
+import com.twidere.twiderex.repository.StatusRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
@@ -38,9 +40,8 @@ object TwidereModule {
     @Singleton
     @Provides
     fun provideComposeQueue(
-        @ApplicationContext context: Context,
-        repository: DraftRepository
-    ): ComposeQueue = ComposeQueue(context = context, repository = repository)
+        workManager: WorkManager,
+    ): ComposeAction = ComposeAction(workManager = workManager)
 
     @Singleton
     @Provides
@@ -50,4 +51,16 @@ object TwidereModule {
     @Provides
     fun provideSearchRepository(database: AppDatabase): SearchRepository =
         SearchRepository(database = database)
+
+    @Provides
+    fun provideStatusRepository(database: AppDatabase): StatusRepository =
+        StatusRepository(database = database)
+
+    @Provides
+    fun provideReactionRepository(database: AppDatabase): ReactionRepository =
+        ReactionRepository(database = database)
+
+    @Singleton
+    @Provides
+    fun provideInAppNotification(): InAppNotification = InAppNotification()
 }

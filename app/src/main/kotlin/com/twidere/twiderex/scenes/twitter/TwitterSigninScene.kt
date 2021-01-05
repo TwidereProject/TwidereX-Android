@@ -1,7 +1,7 @@
 /*
  *  Twidere X
  *
- *  Copyright (C) 2020 Tlaster <tlaster@outlook.com>
+ *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
  * 
  *  This file is part of Twidere X.
  * 
@@ -30,7 +30,6 @@ import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.material.Button
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -42,6 +41,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.LoginLogo
+import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.navigation.AmbientNavigator
 import com.twidere.twiderex.extensions.navViewModel
 import com.twidere.twiderex.ui.AmbientNavController
@@ -62,7 +62,7 @@ fun TwitterSignInScene() {
     val lifecycleOwner = AmbientLifecycleOwner.current
     val navigator = AmbientNavigator.current
     TwidereXTheme {
-        Scaffold {
+        InAppNotificationScaffold {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()

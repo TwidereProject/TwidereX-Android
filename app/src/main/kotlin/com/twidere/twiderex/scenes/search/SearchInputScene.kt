@@ -1,7 +1,7 @@
 /*
  *  Twidere X
  *
- *  Copyright (C) 2020 Tlaster <tlaster@outlook.com>
+ *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
  * 
  *  This file is part of Twidere X.
  * 
@@ -28,7 +28,6 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.ListItem
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ProvideTextStyle
-import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.History
@@ -48,6 +47,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
+import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.TextInput
 import com.twidere.twiderex.component.navigation.AmbientNavigator
 import com.twidere.twiderex.di.assisted.assistedViewModel
@@ -77,7 +77,7 @@ fun SearchInputScene(initial: String? = null) {
     }
     val navigator = AmbientNavigator.current
     TwidereXTheme {
-        Scaffold(
+        InAppNotificationScaffold(
             topBar = {
                 AppBar(
                     navigationIcon = {

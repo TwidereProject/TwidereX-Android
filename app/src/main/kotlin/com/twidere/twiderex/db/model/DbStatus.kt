@@ -1,7 +1,7 @@
 /*
  *  Twidere X
  *
- *  Copyright (C) 2020 Tlaster <tlaster@outlook.com>
+ *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
  * 
  *  This file is part of Twidere X.
  * 
@@ -46,8 +46,8 @@ data class DbStatusV2(
     val htmlText: String,
     val rawText: String,
     val timestamp: Long,
-    val retweetCount: Long,
-    val likeCount: Long,
+    var retweetCount: Long,
+    var likeCount: Long,
     val replyCount: Long,
     val placeString: String?,
     val source: String,

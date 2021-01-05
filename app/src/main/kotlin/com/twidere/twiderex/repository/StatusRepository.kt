@@ -1,7 +1,7 @@
 /*
  *  Twidere X
  *
- *  Copyright (C) 2020 Tlaster <tlaster@outlook.com>
+ *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
  * 
  *  This file is part of Twidere X.
  * 
@@ -20,94 +20,33 @@
  */
 package com.twidere.twiderex.repository
 
-import com.squareup.inject.assisted.Assisted
-import com.squareup.inject.assisted.AssistedInject
-import com.twidere.services.microblog.StatusService
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.map
 import com.twidere.twiderex.db.AppDatabase
-import com.twidere.twiderex.db.model.DbStatusReaction
+import com.twidere.twiderex.db.model.DbStatusV2
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiStatus
-import java.util.UUID
+import com.twidere.twiderex.model.ui.UiStatus.Companion.toUi
 
-class StatusRepository @AssistedInject constructor(
+class StatusRepository(
     private val database: AppDatabase,
-    @Assisted private val key: MicroBlogKey,
-    @Assisted private val service: StatusService,
 ) {
-
-    @AssistedInject.Factory
-    interface AssistedFactory {
-        fun create(key: MicroBlogKey, service: StatusService): StatusRepository
-    }
-
-    suspend fun like(status: UiStatus) {
-        updateStatus(status.statusKey) {
-            it.liked = true
-        }
-        runCatching {
-            service.like(status.statusId)
-        }.onFailure {
-            it.printStackTrace()
-            updateStatus(status.statusKey) {
-                it.liked = false
-            }
+    fun loadLiveDataFromCache(statusKey: MicroBlogKey, accountKey: MicroBlogKey): LiveData<UiStatus?> {
+        return database.statusDao().findWithStatusIdWithReferenceLiveData(statusKey).map {
+            it?.toUi(accountKey)
         }
     }
 
-    suspend fun unlike(status: UiStatus) {
-        updateStatus(status.statusKey) {
-            it.liked = false
-        }
-        runCatching {
-            service.unlike(status.statusId)
-        }.onFailure {
-            it.printStackTrace()
-            updateStatus(status.statusKey) {
-                it.liked = true
-            }
+    suspend fun loadFromCache(statusKey: MicroBlogKey, accountKey: MicroBlogKey): UiStatus? {
+        return database.statusDao().findWithStatusIdWithReference(statusKey).let {
+            it?.toUi(accountKey)
         }
     }
 
-    suspend fun retweet(status: UiStatus) {
-        updateStatus(status.statusKey) {
-            it.retweeted = true
-        }
-        runCatching {
-            service.retweet(status.statusId)
-        }.onFailure {
-            it.printStackTrace()
-            updateStatus(status.statusKey) {
-                it.retweeted = false
-            }
-        }
-    }
-
-    suspend fun unRetweet(status: UiStatus) {
-        updateStatus(status.statusKey) {
-            it.retweeted = false
-        }
-        runCatching {
-            service.unRetweet(status.statusId)
-        }.onFailure {
-            it.printStackTrace()
-            updateStatus(status.statusKey) {
-                it.retweeted = true
-            }
-        }
-    }
-
-    private suspend fun updateStatus(statusKey: MicroBlogKey, action: (DbStatusReaction) -> Unit) {
-        database.reactionDao().findWithStatusKey(statusKey, key).let {
-            it ?: DbStatusReaction(
-                _id = UUID.randomUUID().toString(),
-                statusKey = statusKey,
-                accountKey = key,
-                liked = false,
-                retweeted = false,
-            )
-        }.let {
+    suspend fun updateStatus(statusKey: MicroBlogKey, action: (DbStatusV2) -> Unit) {
+        database.statusDao().findWithStatusId(statusKey)?.let {
             action.invoke(it)
-            database.reactionDao().insertAll(listOf(it))
+            database.statusDao().insertAll(listOf(it))
         }
     }
 }

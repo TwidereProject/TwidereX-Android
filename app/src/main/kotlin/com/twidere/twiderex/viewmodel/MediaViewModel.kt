@@ -1,7 +1,7 @@
 /*
  *  Twidere X
  *
- *  Copyright (C) 2020 Tlaster <tlaster@outlook.com>
+ *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
  * 
  *  This file is part of Twidere X.
  * 
@@ -26,15 +26,21 @@ import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
+import com.twidere.services.http.MicroBlogException
 import com.twidere.services.microblog.LookupService
 import com.twidere.twiderex.di.assisted.IAssistedFactory
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.twitter.TwitterTweetsRepository
+import com.twidere.twiderex.utils.notify
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
+import java.io.IOException
 
 class MediaViewModel @AssistedInject constructor(
     private val factory: TwitterTweetsRepository.AssistedFactory,
+    private val inAppNotification: InAppNotification,
     @Assisted private val account: AccountDetails,
     @Assisted private val statusKey: MicroBlogKey,
 ) : ViewModel() {
@@ -57,7 +63,15 @@ class MediaViewModel @AssistedInject constructor(
     init {
         viewModelScope.launch {
             loading.postValue(true)
-            repository.loadTweetFromNetwork(statusKey.id)
+            try {
+                repository.loadTweetFromNetwork(statusKey.id)
+            } catch (e: MicroBlogException) {
+                e.notify(inAppNotification)
+            } catch (e: IOException) {
+                e.message?.let { inAppNotification.show(it) }
+            } catch (e: HttpException) {
+                e.message?.let { inAppNotification.show(it) }
+            }
             loading.postValue(false)
         }
     }

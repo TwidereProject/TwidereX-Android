@@ -1,7 +1,7 @@
 /*
  *  Twidere X
  *
- *  Copyright (C) 2020 Tlaster <tlaster@outlook.com>
+ *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
  * 
  *  This file is part of Twidere X.
  * 
@@ -28,6 +28,7 @@ import androidx.compose.runtime.getValue
 import androidx.datastore.core.DataStore
 import com.twidere.twiderex.preferences.proto.AppearancePreferences
 import com.twidere.twiderex.preferences.proto.DisplayPreferences
+import com.twidere.twiderex.ui.AmbientVideoPlayback
 import javax.inject.Inject
 
 val AmbientAppearancePreferences = ambientOf<AppearancePreferences>()
@@ -53,6 +54,7 @@ fun ProvidePreferences(
     Providers(
         AmbientAppearancePreferences provides appearances,
         AmbientDisplayPreferences provides display,
+        AmbientVideoPlayback provides display.autoPlayback,
     ) {
         content.invoke()
     }

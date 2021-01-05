@@ -1,7 +1,7 @@
 /*
  *  Twidere X
  *
- *  Copyright (C) 2020 Tlaster <tlaster@outlook.com>
+ *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
  * 
  *  This file is part of Twidere X.
  * 
@@ -24,6 +24,7 @@ import com.twidere.services.microblog.SearchService
 import com.twidere.services.microblog.model.IStatus
 import com.twidere.twiderex.db.AppDatabase
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.paging.mediator.PagingTimelineMediatorBase
 
 class SearchMediaMediator(
@@ -31,7 +32,8 @@ class SearchMediaMediator(
     database: AppDatabase,
     accountKey: MicroBlogKey,
     private val service: SearchService,
-) : PagingTimelineMediatorBase(accountKey, database) {
+    inAppNotification: InAppNotification,
+) : PagingTimelineMediatorBase(accountKey, database, inAppNotification) {
     override val pagingKey = "search:$query:media"
     private var nextPage: String? = null
     override suspend fun load(pageSize: Int, max_id: String?): List<IStatus> {

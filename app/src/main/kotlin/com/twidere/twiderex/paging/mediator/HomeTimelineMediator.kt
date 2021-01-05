@@ -1,7 +1,7 @@
 /*
  *  Twidere X
  *
- *  Copyright (C) 2020 Tlaster <tlaster@outlook.com>
+ *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
  * 
  *  This file is part of Twidere X.
  * 
@@ -24,13 +24,15 @@ import androidx.paging.ExperimentalPagingApi
 import com.twidere.services.microblog.TimelineService
 import com.twidere.twiderex.db.AppDatabase
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.notification.InAppNotification
 
 @OptIn(ExperimentalPagingApi::class)
 class HomeTimelineMediator(
     private val service: TimelineService,
     accountKey: MicroBlogKey,
     database: AppDatabase,
-) : PagingWithGapMediator(accountKey, database) {
+    inAppNotification: InAppNotification,
+) : PagingWithGapMediator(accountKey, database, inAppNotification) {
     override val pagingKey: String = "home:$accountKey"
     override suspend fun loadBetweenImpl(pageSize: Int, max_id: String?, since_id: String?) =
         service.homeTimeline(pageSize, max_id = max_id, since_id = since_id)

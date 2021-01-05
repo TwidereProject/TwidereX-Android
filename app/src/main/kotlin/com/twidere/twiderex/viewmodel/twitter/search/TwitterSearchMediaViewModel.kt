@@ -1,7 +1,7 @@
 /*
  *  Twidere X
  *
- *  Copyright (C) 2020 Tlaster <tlaster@outlook.com>
+ *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
  * 
  *  This file is part of Twidere X.
  * 
@@ -23,6 +23,7 @@ package com.twidere.twiderex.viewmodel.twitter.search
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
+import androidx.paging.flatMap
 import androidx.paging.map
 import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
@@ -31,12 +32,14 @@ import com.twidere.twiderex.db.AppDatabase
 import com.twidere.twiderex.di.assisted.IAssistedFactory
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.ui.UiStatus.Companion.toUi
+import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.paging.mediator.pager
 import com.twidere.twiderex.paging.mediator.search.SearchMediaMediator
 import kotlinx.coroutines.flow.map
 
 class TwitterSearchMediaViewModel @AssistedInject constructor(
     val database: AppDatabase,
+    inAppNotification: InAppNotification,
     @Assisted private val account: AccountDetails,
     @Assisted keyword: String,
 ) : ViewModel() {
@@ -49,7 +52,12 @@ class TwitterSearchMediaViewModel @AssistedInject constructor(
         account.service as SearchService
     }
     val source by lazy {
-        SearchMediaMediator(keyword, database, account.accountKey, service).pager()
+        SearchMediaMediator(keyword, database, account.accountKey, service, inAppNotification).pager()
             .flow.map { it.map { it.status.toUi(account.accountKey) } }.cachedIn(viewModelScope)
+            .map {
+                it.flatMap {
+                    it.media.map { media -> media to it }
+                }
+            }
     }
 }

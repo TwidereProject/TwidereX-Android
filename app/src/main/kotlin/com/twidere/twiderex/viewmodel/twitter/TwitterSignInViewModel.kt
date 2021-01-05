@@ -1,7 +1,7 @@
 /*
  *  Twidere X
  *
- *  Copyright (C) 2020 Tlaster <tlaster@outlook.com>
+ *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
  * 
  *  This file is part of Twidere X.
  * 
@@ -24,19 +24,26 @@ import android.accounts.Account
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.twidere.services.http.MicroBlogException
 import com.twidere.services.twitter.TwitterOAuthService
+import com.twidere.services.twitter.TwitterService
 import com.twidere.twiderex.db.mapper.toDbUser
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.cred.CredentialsType
 import com.twidere.twiderex.model.cred.OAuthCredentials
+import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.ACCOUNT_TYPE
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.utils.json
+import com.twidere.twiderex.utils.notify
+import retrofit2.HttpException
+import java.io.IOException
 
 class TwitterSignInViewModel @ViewModelInject constructor(
-    private val repository: AccountRepository
+    private val repository: AccountRepository,
+    private val inAppNotification: InAppNotification,
 ) : ViewModel() {
     val loading = MutableLiveData(false)
 
@@ -46,48 +53,61 @@ class TwitterSignInViewModel @ViewModelInject constructor(
         pinCodeProvider: suspend (url: String) -> String,
     ): Boolean {
         loading.postValue(true)
-        val service = TwitterOAuthService(consumerKey, consumerSecret)
-        val token = service.getOAuthToken()
-        val pinCode = pinCodeProvider.invoke(service.getWebOAuthUrl(token))
-        if (pinCode.isNotEmpty()) {
-            val accessToken = service.getAccessToken(pinCode, token)
-            val user = service.verifyCredentials(accessToken)
-            if (user != null) {
-                val name = user.screenName
-                val id = user.idStr
-                if (name != null && id != null) {
-                    val displayKey = MicroBlogKey.twitter(name)
-                    val internalKey = MicroBlogKey.twitter(id)
-                    val credentials_json = OAuthCredentials(
-                        consumer_key = consumerKey,
-                        consumer_secret = consumerSecret,
-                        access_token = accessToken.oauth_token,
-                        access_token_secret = accessToken.oauth_token_secret,
-                    ).json()
-                    if (repository.containsAccount(internalKey)) {
-                        repository.findByAccountKey(internalKey)?.let {
-                            repository.getAccountDetails(it)
-                        }?.let {
-                            it.credentials_json = credentials_json
-                            repository.updateAccount(it)
-                        }
-                    } else {
-                        repository.addAccount(
-                            AccountDetails(
-                                account = Account(displayKey.toString(), ACCOUNT_TYPE),
-                                type = PlatformType.Twitter,
-                                accountKey = internalKey,
-                                credentials_type = CredentialsType.OAuth,
-                                credentials_json = credentials_json,
-                                extras_json = "",
-                                user = user.toDbUser(),
-                                lastActive = System.currentTimeMillis()
+        try {
+            val service = TwitterOAuthService(consumerKey, consumerSecret)
+            val token = service.getOAuthToken()
+            val pinCode = pinCodeProvider.invoke(service.getWebOAuthUrl(token))
+            if (pinCode.isNotEmpty()) {
+                val accessToken = service.getAccessToken(pinCode, token)
+                val user = TwitterService(
+                    consumer_key = consumerKey,
+                    consumer_secret = consumerSecret,
+                    access_token = accessToken.oauth_token,
+                    access_token_secret = accessToken.oauth_token_secret,
+                ).verifyCredentials()
+                if (user != null) {
+                    val name = user.screenName
+                    val id = user.idStr
+                    if (name != null && id != null) {
+                        val displayKey = MicroBlogKey.twitter(name)
+                        val internalKey = MicroBlogKey.twitter(id)
+                        val credentials_json = OAuthCredentials(
+                            consumer_key = consumerKey,
+                            consumer_secret = consumerSecret,
+                            access_token = accessToken.oauth_token,
+                            access_token_secret = accessToken.oauth_token_secret,
+                        ).json()
+                        if (repository.containsAccount(internalKey)) {
+                            repository.findByAccountKey(internalKey)?.let {
+                                repository.getAccountDetails(it)
+                            }?.let {
+                                it.credentials_json = credentials_json
+                                repository.updateAccount(it)
+                            }
+                        } else {
+                            repository.addAccount(
+                                AccountDetails(
+                                    account = Account(displayKey.toString(), ACCOUNT_TYPE),
+                                    type = PlatformType.Twitter,
+                                    accountKey = internalKey,
+                                    credentials_type = CredentialsType.OAuth,
+                                    credentials_json = credentials_json,
+                                    extras_json = "",
+                                    user = user.toDbUser(),
+                                    lastActive = System.currentTimeMillis()
+                                )
                             )
-                        )
+                        }
+                        return true
                     }
-                    return true
                 }
             }
+        } catch (e: MicroBlogException) {
+            e.notify(inAppNotification)
+        } catch (e: IOException) {
+            e.message?.let { inAppNotification.show(it) }
+        } catch (e: HttpException) {
+            e.message?.let { inAppNotification.show(it) }
         }
         loading.postValue(false)
         return false

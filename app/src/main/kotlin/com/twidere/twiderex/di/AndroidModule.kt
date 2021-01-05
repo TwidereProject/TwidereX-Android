@@ -1,7 +1,7 @@
 /*
  *  Twidere X
  *
- *  Copyright (C) 2020 Tlaster <tlaster@outlook.com>
+ *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
  * 
  *  This file is part of Twidere X.
  * 
@@ -24,7 +24,9 @@ import android.accounts.AccountManager
 import android.content.Context
 import android.content.SharedPreferences
 import android.location.LocationManager
+import android.net.ConnectivityManager
 import androidx.room.Room
+import androidx.work.WorkManager
 import com.twidere.twiderex.db.AppDatabase
 import dagger.Module
 import dagger.Provides
@@ -36,6 +38,10 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AndroidModule {
+    @Provides
+    fun provideWorkManager(@ApplicationContext context: Context): WorkManager =
+        WorkManager.getInstance(context)
+
     @Provides
     fun provideAccountManager(@ApplicationContext context: Context): AccountManager =
         AccountManager.get(context)
@@ -53,4 +59,8 @@ object AndroidModule {
     @Provides
     fun provideLocationManager(@ApplicationContext context: Context): LocationManager =
         context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+
+    @Provides
+    fun provideConnectivityManager(@ApplicationContext context: Context): ConnectivityManager =
+        context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 }

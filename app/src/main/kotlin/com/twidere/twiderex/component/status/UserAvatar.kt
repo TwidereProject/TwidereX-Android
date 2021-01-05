@@ -1,7 +1,7 @@
 /*
  *  Twidere X
  *
- *  Copyright (C) 2020 Tlaster <tlaster@outlook.com>
+ *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
  * 
  *  This file is part of Twidere X.
  * 
@@ -20,13 +20,15 @@
  */
 package com.twidere.twiderex.component.status
 
+import androidx.compose.animation.core.animateInt
+import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.MaterialTheme
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.clip
@@ -66,10 +68,14 @@ fun UserAvatar(
 
 fun Modifier.withAvatarClip(): Modifier {
     return composed {
-        when (AmbientDisplayPreferences.current.avatarStyle) {
-            DisplayPreferences.AvatarStyle.Round -> this.clip(CircleShape)
-            DisplayPreferences.AvatarStyle.Square -> this.clip(MaterialTheme.shapes.medium)
-            else -> this.clip(CircleShape)
+        val transition =
+            updateTransition(targetState = AmbientDisplayPreferences.current.avatarStyle)
+        val percent by transition.animateInt {
+            when (it) {
+                DisplayPreferences.AvatarStyle.Round -> 50
+                DisplayPreferences.AvatarStyle.Square, DisplayPreferences.AvatarStyle.UNRECOGNIZED, null -> 10
+            }
         }
+        this.clip(RoundedCornerShape(percent = percent))
     }
 }

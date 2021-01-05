@@ -1,7 +1,7 @@
 /*
  *  Twidere X
  *
- *  Copyright (C) 2020 Tlaster <tlaster@outlook.com>
+ *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
  * 
  *  This file is part of Twidere X.
  * 
@@ -26,7 +26,6 @@ import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.ListItem
-import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
@@ -42,6 +41,7 @@ import androidx.navigation.compose.navigate
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
+import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.extensions.navViewModel
 import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.ui.AmbientNavController
@@ -54,7 +54,7 @@ fun DraftListScene() {
     val source by viewModel.source.observeAsState(initial = emptyList())
     val navController = AmbientNavController.current
     TwidereXTheme {
-        Scaffold(
+        InAppNotificationScaffold(
             topBar = {
                 AppBar(
                     navigationIcon = {

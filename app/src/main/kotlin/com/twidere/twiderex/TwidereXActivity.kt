@@ -1,7 +1,7 @@
 /*
  *  Twidere X
  *
- *  Copyright (C) 2020 Tlaster <tlaster@outlook.com>
+ *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
  * 
  *  This file is part of Twidere X.
  * 
@@ -20,6 +20,10 @@
  */
 package com.twidere.twiderex
 
+import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkCapabilities
+import android.net.NetworkRequest
 import android.os.Build
 import android.os.Bundle
 import android.view.WindowManager
@@ -31,25 +35,30 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.viewinterop.viewModel
+import androidx.core.net.ConnectivityManagerCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.hilt.lifecycle.HiltViewModelFactory
+import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.ComposeNavigator
 import androidx.navigation.fragment.DialogFragmentNavigator
+import com.twidere.twiderex.action.AmbientStatusActions
+import com.twidere.twiderex.action.StatusActions
+import com.twidere.twiderex.component.foundation.AmbientInAppNotification
 import com.twidere.twiderex.di.assisted.AssistedViewModelFactoryHolder
 import com.twidere.twiderex.di.assisted.ProvideAssistedFactory
 import com.twidere.twiderex.extensions.ProvideNavigationViewModelFactoryMap
 import com.twidere.twiderex.launcher.ActivityLauncher
 import com.twidere.twiderex.launcher.AmbientLauncher
 import com.twidere.twiderex.navigation.Router
+import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.preferences.PreferencesHolder
 import com.twidere.twiderex.preferences.ProvidePreferences
-import com.twidere.twiderex.providers.AmbientStatusActions
-import com.twidere.twiderex.providers.StatusActions
 import com.twidere.twiderex.ui.AmbientActiveAccount
 import com.twidere.twiderex.ui.AmbientActiveAccountViewModel
 import com.twidere.twiderex.ui.AmbientActivity
 import com.twidere.twiderex.ui.AmbientApplication
+import com.twidere.twiderex.ui.AmbientIsActiveNetworkMetered
 import com.twidere.twiderex.ui.AmbientViewModelProviderFactory
 import com.twidere.twiderex.ui.AmbientWindow
 import com.twidere.twiderex.ui.AmbientWindowPadding
@@ -71,6 +80,21 @@ class TwidereXActivity : FragmentActivity() {
     }
 
     private lateinit var launcher: ActivityLauncher
+    private val isActiveNetworkMetered = MutableLiveData(false)
+    private val networkCallback by lazy {
+        object : ConnectivityManager.NetworkCallback() {
+            override fun onCapabilitiesChanged(
+                network: Network,
+                networkCapabilities: NetworkCapabilities
+            ) {
+                isActiveNetworkMetered.postValue(
+                    ConnectivityManagerCompat.isActiveNetworkMetered(
+                        connectivityManager
+                    )
+                )
+            }
+        }
+    }
 
     @Inject
     lateinit var statusActions: StatusActions
@@ -81,10 +105,21 @@ class TwidereXActivity : FragmentActivity() {
     @Inject
     lateinit var assistedViewModelFactoryHolder: AssistedViewModelFactoryHolder
 
+    @Inject
+    lateinit var inAppNotification: InAppNotification
+
+    @Inject
+    lateinit var connectivityManager: ConnectivityManager
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         launcher = ActivityLauncher(activityResultRegistry)
         lifecycle.addObserver(launcher)
+        isActiveNetworkMetered.postValue(
+            ConnectivityManagerCompat.isActiveNetworkMetered(
+                connectivityManager
+            )
+        )
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             window.setDecorFitsSystemWindows(false)
         } else {
@@ -94,7 +129,9 @@ class TwidereXActivity : FragmentActivity() {
         setContent {
             val accountViewModel = viewModel<ActiveAccountViewModel>()
             val account by accountViewModel.account.observeAsState()
+            val isActiveNetworkMetered by isActiveNetworkMetered.observeAsState(initial = false)
             Providers(
+                AmbientInAppNotification provides inAppNotification,
                 AmbientLauncher provides launcher,
                 AmbientWindow provides window,
                 AmbientViewModelProviderFactory provides defaultViewModelProviderFactory,
@@ -103,6 +140,7 @@ class TwidereXActivity : FragmentActivity() {
                 AmbientStatusActions provides statusActions,
                 AmbientActivity provides this,
                 AmbientActiveAccountViewModel provides accountViewModel,
+                AmbientIsActiveNetworkMetered provides isActiveNetworkMetered
             ) {
                 ProvidePreferences(
                     preferencesHolder,
@@ -126,5 +164,18 @@ class TwidereXActivity : FragmentActivity() {
                 }
             }
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        connectivityManager.registerNetworkCallback(
+            NetworkRequest.Builder().build(),
+            networkCallback,
+        )
+    }
+
+    override fun onPause() {
+        super.onPause()
+        connectivityManager.unregisterNetworkCallback(networkCallback)
     }
 }

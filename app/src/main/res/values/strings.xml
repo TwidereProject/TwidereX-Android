@@ -2,6 +2,10 @@
     <string name="app_name" translatable="false">Twidere X</string>
     <string name="common_alerts_account_temporarily_locked_title">Account Temporarily Locked</string>
     <string name="common_alerts_account_temporarily_locked_message">Open Twitter to unlock</string>
+    <string name="common_alerts_rate_limit_exceeded_title">Rate Limit Exceeded</string>
+    <string name="common_alerts_rate_limit_exceeded_message">Reached Twitter API usage limit</string>
+    <string name="common_alerts_permission_denied_title">Permission Denied</string>
+    <string name="common_alerts_permission_denied_message">Sorry, you are not authorized</string>
     <string name="common_alerts_unfollow_user_message">Unfollow user %s?</string>
     <string name="common_alerts_cancel_follow_request_message">Cancel follow request for %s?</string>
     <string name="common_alerts_tweet_sent_title">Tweet Sent</string>
@@ -10,6 +14,15 @@
     <string name="common_alerts_photo_saved_title">Photo Saved</string>
     <string name="common_alerts_photo_save_fail_title">Failed to Save Photo</string>
     <string name="common_alerts_photo_save_fail_message">Please try again</string>
+    <string name="common_alerts_failed_to_load_title">Failed to Load</string>
+    <string name="common_alerts_failed_to_load_message">Please try again</string>
+    <string name="common_alerts_failed_to_following_title">Failed to Following</string>
+    <string name="common_alerts_failed_to_following_message">Please try again</string>
+    <string name="common_alerts_failed_to_unfollowing_title">Failed to Unfollowing</string>
+    <string name="common_alerts_failed_to_unfollowing_message">Please try again</string>
+    <string name="common_alerts_following_success_title">Following Succeeded</string>
+    <string name="common_alerts_unfollowing_success_title">Unfollowing Succeeded</string>
+    <string name="common_alerts_following_request_sent_title">Following Request Sent</string>
     <string name="common_controls_actions_add">Add</string>
     <string name="common_controls_actions_remove">Remove</string>
     <string name="common_controls_actions_edit">Edit</string>
@@ -30,6 +43,8 @@
     <string name="common_controls_friendship_follower">follower</string>
     <string name="common_controls_friendship_followers">followers</string>
     <string name="common_controls_friendship_follows_you">Follows you</string>
+    <string name="common_controls_friendship_user_is_not_following_you">%s is not following you</string>
+    <string name="common_controls_friendship_user_is_following_you">%s is following you</string>
     <string name="common_controls_profile_dashboard_following">Following</string>
     <string name="common_controls_profile_dashboard_followers">Followers</string>
     <string name="common_controls_profile_dashboard_listed">Listed</string>
@@ -62,6 +77,7 @@
     <string name="scene_likes_title">Likes</string>
     <string name="scene_bookmark_title">Bookmark</string>
     <string name="scene_trends_title">Trends</string>
+    <string name="scene_status_title">Tweet</string>
     <string name="scene_status_reply_single">1 Reply</string>
     <string name="scene_status_reply_mutiple">%d Replies</string>
     <string name="scene_status_quote_single">1 Quote</string>
@@ -79,7 +95,10 @@
     <string name="scene_profile_title">Me</string>
     <string name="scene_profile_hide_reply">Hide reply</string>
     <string name="scene_profile_permission_denied_title">Permission Denied</string>
-    <string name="scene_profile_permission_denied_message">You have been blocked from viewing this user’s profile.</string>
+    <string name="scene_profile_permission_denied_message">You have been blocked from viewing this user\'s profile.</string>
+    <string name="scene_following_title">Following</string>
+    <string name="scene_followers_title">Followers</string>
+    <string name="scene_listed_title">Listed</string>
     <string name="scene_compose_title_compose">Compose</string>
     <string name="scene_compose_title_reply">Reply</string>
     <string name="scene_compose_title_quote">Quote</string>
@@ -119,8 +138,8 @@
     <string name="scene_settings_appearance_tab_position_top">Top</string>
     <string name="scene_settings_appearance_tab_position_bottom">Bottom</string>
     <string name="scene_settings_appearance_theme_auto">Auto</string>
-    <string name="scene_settings_appearance_theme_light">Light</string>
-    <string name="scene_settings_appearance_theme_dark">Dark</string>
+    <string name="scene_settings_appearance_theme_light">light</string>
+    <string name="scene_settings_appearance_theme_dark">dark</string>
     <string name="scene_settings_display_title">Display</string>
     <string name="scene_settings_display_section_header_preview">Preview</string>
     <string name="scene_settings_display_section_header_text">Text</string>

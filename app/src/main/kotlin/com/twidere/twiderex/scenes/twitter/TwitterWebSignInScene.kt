@@ -1,7 +1,7 @@
 /*
  *  Twidere X
  *
- *  Copyright (C) 2020 Tlaster <tlaster@outlook.com>
+ *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
  * 
  *  This file is part of Twidere X.
  * 
@@ -20,9 +20,9 @@
  */
 package com.twidere.twiderex.scenes.twitter
 
-import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.onDispose
+import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.WebComponent
 import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.ui.TwidereXTheme
@@ -41,7 +41,7 @@ fun TwitterWebSignInScene(target: String) {
                 "",
             )
         }
-        Scaffold {
+        InAppNotificationScaffold {
             WebComponent(
                 url = target,
                 onPageFinished = { view, _ ->

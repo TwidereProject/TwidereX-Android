@@ -1,7 +1,7 @@
 /*
  *  Twidere X
  *
- *  Copyright (C) 2020 Tlaster <tlaster@outlook.com>
+ *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
  * 
  *  This file is part of Twidere X.
  * 
@@ -24,6 +24,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class TwitterResponseV2<T> (
+    val meta: Meta? = null,
     val data: T? = null,
     val errors: List<TwitterErrorV2>? = null,
     val includes: IncludesV2? = null,

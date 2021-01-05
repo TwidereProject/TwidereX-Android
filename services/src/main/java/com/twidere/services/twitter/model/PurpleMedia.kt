@@ -1,7 +1,7 @@
 /*
  *  Twidere X
  *
- *  Copyright (C) 2020 Tlaster <tlaster@outlook.com>
+ *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
  * 
  *  This file is part of Twidere X.
  * 
@@ -59,5 +59,8 @@ data class PurpleMedia(
     val sourceUserID: Long? = null,
 
     @SerialName("source_user_id_str")
-    val sourceUserIDStr: String? = null
+    val sourceUserIDStr: String? = null,
+
+    @SerialName("video_info")
+    val videoInfo: VideoInfo? = null,
 )

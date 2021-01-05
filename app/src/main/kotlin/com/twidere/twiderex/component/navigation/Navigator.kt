@@ -1,7 +1,7 @@
 /*
  *  Twidere X
  *
- *  Copyright (C) 2020 Tlaster <tlaster@outlook.com>
+ *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
  * 
  *  This file is part of Twidere X.
  * 
@@ -56,7 +56,7 @@ class Navigator(
     private val context: Context,
 ) : INavigator {
     override fun user(user: UiUser) {
-        navController.navigate(Route.User(user.userKey.copy(id = user.screenName)))
+        navController.navigate(Route.User(user.screenName, user.userKey.host, user.userKey))
     }
 
     override fun status(statusKey: MicroBlogKey) {
@@ -108,7 +108,10 @@ class Navigator(
                 Route.SignIn.Web.Twitter(target)
             )
         } else {
-            navController.navigate(Route.SignIn.TwitterWebSignInDialog, bundleOf("target" to target))
+            navController.navigate(
+                Route.SignIn.TwitterWebSignInDialog,
+                bundleOf("target" to target)
+            )
         }
     }
 

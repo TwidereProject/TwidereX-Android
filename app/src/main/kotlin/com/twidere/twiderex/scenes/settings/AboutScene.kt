@@ -1,7 +1,7 @@
 /*
  *  Twidere X
  *
- *  Copyright (C) 2020 Tlaster <tlaster@outlook.com>
+ *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
  * 
  *  This file is part of Twidere X.
  * 
@@ -34,7 +34,6 @@ import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
@@ -49,6 +48,7 @@ import com.twidere.twiderex.R
 import com.twidere.twiderex.component.LoginLogo
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
+import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.navigation.AmbientNavigator
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.navigation.Route
@@ -58,7 +58,7 @@ import com.twidere.twiderex.ui.TwidereXTheme
 @Composable
 fun AboutScene() {
     TwidereXTheme {
-        Scaffold(
+        InAppNotificationScaffold(
             topBar = {
                 AppBar(
                     navigationIcon = {
@@ -118,7 +118,13 @@ private fun AboutContent() {
             Row {
                 IconButton(
                     onClick = {
-                        navController.navigate(Route.User(MicroBlogKey.twitter("TwidereProject")))
+                        navController.navigate(
+                            Route.User(
+                                "TwidereProject",
+                                MicroBlogKey.TwitterHost,
+                                MicroBlogKey.twitter("TwidereProject")
+                            )
+                        )
                     }
                 ) {
                     Icon(

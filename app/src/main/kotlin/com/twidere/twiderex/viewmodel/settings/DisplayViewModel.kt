@@ -1,7 +1,7 @@
 /*
  *  Twidere X
  *
- *  Copyright (C) 2020 Tlaster <tlaster@outlook.com>
+ *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
  * 
  *  This file is part of Twidere X.
  * 
@@ -51,6 +51,12 @@ class DisplayViewModel @ViewModelInject constructor(
     fun setMediaPreview(value: Boolean) = viewModelScope.launch {
         displayPreferences.updateData {
             it.toBuilder().setMediaPreview(value).build()
+        }
+    }
+
+    fun setAutoPlayback(value: DisplayPreferences.AutoPlayback) = viewModelScope.launch {
+        displayPreferences.updateData {
+            it.toBuilder().setAutoPlayback(value).build()
         }
     }
 }

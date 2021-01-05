@@ -11,8 +11,8 @@ task generateTranslate {
         }
         def text = jsonFile.getText()
         def json = new JsonSlurper().parseText(text)
-        def result = flattenMap(json).dropWhile {
-            it.value.isEmpty()
+        def result = flattenMap(json).findAll {
+            !it.value.isEmpty() && !it.value.isAllWhitespace()
         }
         if (result.size() == 0) {
             continue
@@ -22,7 +22,7 @@ task generateTranslate {
                     '    <string name="'+it.key+'">'+it.value+'</string>'
                 }.join(System.lineSeparator()) + System.lineSeparator() +
                 "</resources>"
-        def target = project.file('src/main/res-localied' + '/values-' + file.name.split('_').first() + '-r' + file.name.split('_').last() + "/strings.xml")
+        def target = project.file('src/main/res-localized' + '/values-' + file.name.split('_').first() + '-r' + file.name.split('_').last() + "/strings.xml")
         target.getParentFile().mkdirs()
         target.createNewFile()
         target.write(xml)

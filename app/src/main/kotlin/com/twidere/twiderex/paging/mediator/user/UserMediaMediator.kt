@@ -1,7 +1,7 @@
 /*
  *  Twidere X
  *
- *  Copyright (C) 2020 Tlaster <tlaster@outlook.com>
+ *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
  * 
  *  This file is part of Twidere X.
  * 
@@ -28,6 +28,7 @@ import com.twidere.twiderex.db.model.DbPagingTimelineWithStatus
 import com.twidere.twiderex.db.model.UserTimelineType
 import com.twidere.twiderex.db.model.pagingKey
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.paging.mediator.PagingTimelineMediatorBase
 
 @OptIn(ExperimentalPagingApi::class)
@@ -37,7 +38,8 @@ class UserMediaMediator(
     database: AppDatabase,
     accountKey: MicroBlogKey,
     private val service: TimelineService,
-) : PagingTimelineMediatorBase(accountKey, database) {
+    inAppNotification: InAppNotification,
+) : PagingTimelineMediatorBase(accountKey, database, inAppNotification) {
     override val pagingKey: String
         get() = UserTimelineType.Media.pagingKey(userKey)
 
@@ -46,7 +48,7 @@ class UserMediaMediator(
             screen_name = screenName,
             count = pageSize,
             max_id = max_id,
-            exclude_replies = true
+            exclude_replies = false
         )
     }
 

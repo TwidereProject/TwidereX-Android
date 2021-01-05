@@ -1,7 +1,7 @@
 /*
  *  Twidere X
  *
- *  Copyright (C) 2020 Tlaster <tlaster@outlook.com>
+ *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
  * 
  *  This file is part of Twidere X.
  * 
@@ -57,6 +57,8 @@ interface TimelineResources {
         @Query("exclude_replies") exclude_replies: Boolean? = null,
         @Query("include_entities") include_entities: Boolean? = null,
         @Query("include_rts") include_rts: Boolean? = null,
+        @Query("tweet_mode") tweet_mode: String = "extended",
+        @Query("include_ext_alt_text") include_ext_alt_text: Boolean = true,
     ): List<Status>
 
     @GET("/1.1/favorites/list.json")
@@ -66,5 +68,7 @@ interface TimelineResources {
         @Query("since_id") since_id: String? = null,
         @Query("max_id") max_id: String? = null,
         @Query("include_entities") include_entities: Boolean? = null,
+        @Query("tweet_mode") tweet_mode: String = "extended",
+        @Query("include_ext_alt_text") include_ext_alt_text: Boolean = true,
     ): List<Status>
 }

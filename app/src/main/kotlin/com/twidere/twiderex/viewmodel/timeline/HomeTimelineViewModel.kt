@@ -1,7 +1,7 @@
 /*
  *  Twidere X
  *
- *  Copyright (C) 2020 Tlaster <tlaster@outlook.com>
+ *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
  * 
  *  This file is part of Twidere X.
  * 
@@ -27,12 +27,14 @@ import com.twidere.services.microblog.TimelineService
 import com.twidere.twiderex.db.AppDatabase
 import com.twidere.twiderex.di.assisted.IAssistedFactory
 import com.twidere.twiderex.model.AccountDetails
+import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.paging.mediator.HomeTimelineMediator
 import com.twidere.twiderex.paging.mediator.PagingWithGapMediator
 
 class HomeTimelineViewModel @AssistedInject constructor(
     preferences: SharedPreferences,
     database: AppDatabase,
+    inAppNotification: InAppNotification,
     @Assisted account: AccountDetails,
 ) : TimelineViewModel(preferences) {
     @AssistedInject.Factory
@@ -41,6 +43,11 @@ class HomeTimelineViewModel @AssistedInject constructor(
     }
 
     override val pagingMediator: PagingWithGapMediator =
-        HomeTimelineMediator(account.service as TimelineService, account.accountKey, database)
+        HomeTimelineMediator(
+            account.service as TimelineService,
+            account.accountKey,
+            database,
+            inAppNotification,
+        )
     override val savedStateKey: String = "${account.accountKey}_home"
 }

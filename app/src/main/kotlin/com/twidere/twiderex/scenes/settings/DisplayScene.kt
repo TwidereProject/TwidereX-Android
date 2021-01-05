@@ -1,7 +1,7 @@
 /*
  *  Twidere X
  *
- *  Copyright (C) 2020 Tlaster <tlaster@outlook.com>
+ *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
  * 
  *  This file is part of Twidere X.
  * 
@@ -24,7 +24,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Icon
 import androidx.compose.material.ListItem
-import androidx.compose.material.Scaffold
 import androidx.compose.material.Slider
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
@@ -35,8 +34,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.R
+import com.twidere.twiderex.action.AmbientStatusActions
+import com.twidere.twiderex.action.FakeStatusActions
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
+import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.lazy.itemDivider
 import com.twidere.twiderex.component.lazy.itemHeader
 import com.twidere.twiderex.component.navigation.AmbientNavigator
@@ -48,8 +50,6 @@ import com.twidere.twiderex.extensions.navViewModel
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.preferences.AmbientDisplayPreferences
 import com.twidere.twiderex.preferences.proto.DisplayPreferences
-import com.twidere.twiderex.providers.AmbientStatusActions
-import com.twidere.twiderex.providers.FakeStatusActions
 import com.twidere.twiderex.ui.TwidereXTheme
 import com.twidere.twiderex.viewmodel.settings.DisplayViewModel
 
@@ -58,7 +58,7 @@ fun DisplayScene() {
     val viewModel = navViewModel<DisplayViewModel>()
     val display = AmbientDisplayPreferences.current
     TwidereXTheme {
-        Scaffold(
+        InAppNotificationScaffold(
             topBar = {
                 AppBar(
                     navigationIcon = {
@@ -153,6 +153,31 @@ fun DisplayScene() {
                     },
                     title = {
                         Text(text = stringResource(id = R.string.scene_settings_display_media_media_previews))
+                    }
+                )
+                radioItem(
+                    options = listOf(
+                        DisplayPreferences.AutoPlayback.Auto,
+                        DisplayPreferences.AutoPlayback.Always,
+                        DisplayPreferences.AutoPlayback.Off,
+                    ),
+                    value = display.autoPlayback,
+                    onChanged = {
+                        viewModel.setAutoPlayback(it)
+                    },
+                    title = {
+                        Text(text = stringResource(id = R.string.scene_settings_display_media_auto_playback))
+                    },
+                    itemContent = {
+                        Text(
+                            text = stringResource(
+                                arrayOf(
+                                    R.string.scene_settings_display_media_automatic,
+                                    R.string.scene_settings_display_media_always,
+                                    R.string.scene_settings_display_media_off,
+                                )[it.ordinal]
+                            )
+                        )
                     }
                 )
             }

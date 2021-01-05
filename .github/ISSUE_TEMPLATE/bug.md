@@ -17,8 +17,8 @@ Network type:
 
 ## Build Variant
 
-- [ ] App Store
-- [ ] TestFlight
+- [ ] Google Play
+- [ ] FDroid
 
 App version: 
 <!--Version Code here-->

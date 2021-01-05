@@ -1,7 +1,7 @@
 /*
  *  Twidere X
  *
- *  Copyright (C) 2020 Tlaster <tlaster@outlook.com>
+ *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
  * 
  *  This file is part of Twidere X.
  * 
@@ -28,6 +28,7 @@ import com.twidere.services.twitter.model.StatusV2
 import com.twidere.twiderex.db.AppDatabase
 import com.twidere.twiderex.db.model.DbPagingTimelineWithStatus
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.notification.InAppNotification
 
 @OptIn(ExperimentalPagingApi::class)
 class ConversationMediator(
@@ -36,7 +37,8 @@ class ConversationMediator(
     private val service: TwitterService,
     accountKey: MicroBlogKey,
     database: AppDatabase,
-) : PagingTimelineMediatorBase(accountKey, database) {
+    inAppNotification: InAppNotification
+) : PagingTimelineMediatorBase(accountKey, database, inAppNotification) {
     override val pagingKey: String
         get() = "conversation:$conversationId"
     private var nextPage: String? = null
@@ -51,7 +53,7 @@ class ConversationMediator(
     }
 
     override fun hasMore(result: List<DbPagingTimelineWithStatus>, pageSize: Int): Boolean {
-        return nextPage == null
+        return nextPage != null
     }
 
     private fun buildConversation(

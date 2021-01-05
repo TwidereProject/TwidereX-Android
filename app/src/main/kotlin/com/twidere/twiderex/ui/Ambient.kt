@@ -1,7 +1,7 @@
 /*
  *  Twidere X
  *
- *  Copyright (C) 2020 Tlaster <tlaster@outlook.com>
+ *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
  * 
  *  This file is part of Twidere X.
  * 
@@ -30,6 +30,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import com.twidere.twiderex.model.AccountDetails
+import com.twidere.twiderex.preferences.proto.DisplayPreferences
 import com.twidere.twiderex.viewmodel.ActiveAccountViewModel
 
 val AmbientWindow = staticAmbientOf<Window> { error("No Window") }
@@ -41,3 +42,5 @@ val AmbientViewModelFactoriesMap =
 val AmbientActiveAccountViewModel = ambientOf<ActiveAccountViewModel>()
 val AmbientApplication = staticAmbientOf<Application>()
 val AmbientActivity = staticAmbientOf<Activity>()
+val AmbientVideoPlayback = ambientOf { DisplayPreferences.AutoPlayback.Auto }
+val AmbientIsActiveNetworkMetered = ambientOf { false }

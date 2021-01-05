@@ -1,7 +1,7 @@
 /*
  *  Twidere X
  *
- *  Copyright (C) 2020 Tlaster <tlaster@outlook.com>
+ *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
  * 
  *  This file is part of Twidere X.
  * 
@@ -22,24 +22,13 @@ package com.twidere.twiderex.component
 
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import com.twidere.twiderex.extensions.humanizedTimestamp
-import kotlin.concurrent.timer
 
 @Composable
 fun HumanizedTime(time: Long) {
-    var text by remember(time) { mutableStateOf(time.humanizedTimestamp()) }
-    DisposableEffect(time) {
-        val timer = timer(period = 1000) {
-            text = time.humanizedTimestamp()
-        }
-        onDispose {
-            timer.cancel()
-        }
-    }
+    val text by remember(time) { mutableStateOf(time.humanizedTimestamp()) }
     Text(text = text)
 }

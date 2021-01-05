@@ -1,7 +1,7 @@
 /*
  *  Twidere X
  *
- *  Copyright (C) 2020 Tlaster <tlaster@outlook.com>
+ *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
  * 
  *  This file is part of Twidere X.
  * 
@@ -23,10 +23,8 @@ package com.twidere.services.twitter
 import com.twidere.services.http.authorization.OAuth1Authorization
 import com.twidere.services.http.retrofit
 import com.twidere.services.twitter.api.TwitterOAuthResources
-import com.twidere.services.twitter.api.UsersResources
 import com.twidere.services.twitter.model.AccessToken
 import com.twidere.services.twitter.model.OAuthToken
-import com.twidere.services.twitter.model.User
 import com.twidere.services.utils.queryString
 
 class TwitterOAuthService(
@@ -52,14 +50,6 @@ class TwitterOAuthService(
                 token.oauth_token
             ),
         ).accessToken(pinCode).queryString()
-    }
-
-    suspend fun verifyCredentials(accessToken: AccessToken): User? {
-        val usersResources = retrofit<UsersResources>(
-            TWITTER_BASE_URL,
-            OAuth1Authorization(consumerKey, consumerSecret, accessToken.oauth_token, accessToken.oauth_token_secret)
-        )
-        return usersResources.verifyCredentials()
     }
 
     fun getWebOAuthUrl(token: OAuthToken) =

@@ -1,7 +1,7 @@
 /*
  *  Twidere X
  *
- *  Copyright (C) 2020 Tlaster <tlaster@outlook.com>
+ *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
  * 
  *  This file is part of Twidere X.
  * 
@@ -113,21 +113,21 @@ fun ExpandedStatusComponent(
                     if (data.replyCount > 0) {
                         StatusStatistics(
                             count = data.replyCount,
-                            text = R.string.common_countable_reply_mutiple,
+                            text = R.string.scene_status_reply_mutiple,
                         )
                         Spacer(modifier = Modifier.width(standardPadding * 2))
                     }
                     if (data.retweetCount > 0) {
                         StatusStatistics(
                             count = data.retweetCount,
-                            text = R.string.common_countable_retweet_mutiple,
+                            text = R.string.scene_status_retweet_mutiple,
                         )
                         Spacer(modifier = Modifier.width(standardPadding * 2))
                     }
                     if (data.likeCount > 0) {
                         StatusStatistics(
                             count = data.likeCount,
-                            text = R.string.common_countable_like_multiple,
+                            text = R.string.scene_status_like_multiple,
                         )
                     }
                 }

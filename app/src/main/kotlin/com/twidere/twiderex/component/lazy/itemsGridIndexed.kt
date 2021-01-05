@@ -1,7 +1,7 @@
 /*
  *  Twidere X
  *
- *  Copyright (C) 2020 Tlaster <tlaster@outlook.com>
+ *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
  * 
  *  This file is part of Twidere X.
  * 
@@ -33,6 +33,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.paging.compose.LazyPagingItems
 import com.twidere.twiderex.annotations.IncomingComposeUpdate
 
 @IncomingComposeUpdate
@@ -63,5 +64,18 @@ fun <T> LazyListScope.itemsGridIndexed(
                 Spacer(modifier = Modifier.height(spacing))
             }
         }
+    }
+}
+
+@IncomingComposeUpdate
+fun <T : Any> LazyListScope.itemsPagingGridIndexed(
+    data: LazyPagingItems<T>,
+    rowSize: Int,
+    spacing: Dp = 0.dp,
+    padding: Dp = 0.dp,
+    itemContent: @Composable BoxScope.(Int, T?) -> Unit,
+) {
+    itemsGridIndexed((0 until data.itemCount).toList(), rowSize = rowSize, spacing = spacing, padding = padding) { _, index ->
+        itemContent.invoke(this, index, data[index])
     }
 }

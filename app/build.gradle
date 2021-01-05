@@ -54,6 +54,10 @@ android {
         }
     }
 
+    lintOptions{
+        disable 'MissingTranslation'
+    }
+
     flavorDimensions 'channel'
     productFlavors {
         if (enableGoogleVariant) {
@@ -165,6 +169,7 @@ dependencies {
     implementation "com.google.dagger:hilt-android:$versions.hilt"
     kapt "com.google.dagger:hilt-android-compiler:$versions.hilt"
     implementation "androidx.hilt:hilt-lifecycle-viewmodel:$versions.androidx_hilt"
+    implementation "androidx.hilt:hilt-work:$versions.androidx_hilt"
     kapt "androidx.hilt:hilt-compiler:$versions.androidx_hilt"
 
     compileOnly "com.squareup.inject:assisted-inject-annotations-dagger2:$versions.assisted_inject"
@@ -180,6 +185,8 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-viewmodel-savedstate:$versions.lifecycle"
     implementation "androidx.lifecycle:lifecycle-common-java8:$versions.lifecycle"
 
+    implementation "androidx.work:work-runtime-ktx:2.5.0-beta02"
+
     implementation "dev.chrisbanes.accompanist:accompanist-coil:0.4.0"
 
     implementation "com.twitter.twittertext:twitter-text:3.1.0"
@@ -188,6 +195,8 @@ dependencies {
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.5'
 
     implementation "com.google.protobuf:protobuf-javalite:$versions.protobuf"
+
+    implementation 'com.google.android.exoplayer:exoplayer:2.12.2'
 
     if (enableGoogleVariant) {
         // START Non-FOSS component

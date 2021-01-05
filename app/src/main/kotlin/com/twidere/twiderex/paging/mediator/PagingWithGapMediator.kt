@@ -1,7 +1,7 @@
 /*
  *  Twidere X
  *
- *  Copyright (C) 2020 Tlaster <tlaster@outlook.com>
+ *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
  * 
  *  This file is part of Twidere X.
  * 
@@ -34,16 +34,16 @@ import com.twidere.twiderex.db.model.DbPagingTimelineWithStatus
 import com.twidere.twiderex.db.model.TimelineType
 import com.twidere.twiderex.db.model.saveToDb
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.notification.InAppNotification
+import com.twidere.twiderex.utils.notify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import retrofit2.HttpException
-import java.io.IOException
-import java.net.SocketTimeoutException
 
 @OptIn(ExperimentalPagingApi::class)
 abstract class PagingWithGapMediator(
     accountKey: MicroBlogKey,
     database: AppDatabase,
+    private val inAppNotification: InAppNotification,
 ) : PagingMediator(accountKey = accountKey, database = database) {
     private var loadCount = 0
     protected open val skipInitialLoad = true
@@ -129,12 +129,10 @@ abstract class PagingWithGapMediator(
                 endOfPaginationReached = result.isEmpty()
             )
         } catch (e: MicroBlogException) {
+            e.notify(inAppNotification)
             return MediatorResult.Error(e)
-        } catch (e: IOException) {
-            return MediatorResult.Error(e)
-        } catch (e: HttpException) {
-            return MediatorResult.Error(e)
-        } catch (e: SocketTimeoutException) {
+        } catch (e: Throwable) {
+            e.notify(inAppNotification)
             return MediatorResult.Error(e)
         } finally {
             if (maxStatusKey != null && sinceStatueKey != null) {

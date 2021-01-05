@@ -1,7 +1,7 @@
 /*
  *  Twidere X
  *
- *  Copyright (C) 2020 Tlaster <tlaster@outlook.com>
+ *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
  * 
  *  This file is part of Twidere X.
  * 
@@ -38,6 +38,7 @@ import com.twidere.services.twitter.api.TwitterResources
 import com.twidere.services.twitter.api.UploadResources
 import com.twidere.services.twitter.model.StatusV2
 import com.twidere.services.twitter.model.TwitterSearchResponseV2
+import com.twidere.services.twitter.model.User
 import com.twidere.services.twitter.model.UserV2
 import com.twidere.services.twitter.model.fields.Expansions
 import com.twidere.services.twitter.model.fields.MediaFields
@@ -369,5 +370,25 @@ class TwitterService(
         }
 
         return uploadResources.finalizeUpload(mediaId).mediaIDString ?: throw Error()
+    }
+
+    suspend fun followers(id: String, cursor: String? = null) = resources.followers(
+        id,
+        pagination_token = cursor,
+        userFields = UserFields.values().joinToString(",") { it.value },
+        expansions = UserFields.pinned_tweet_id.name,
+        tweetFields = TweetFields.values().joinToString(",") { it.value },
+    )
+
+    suspend fun following(id: String, cursor: String? = null) = resources.following(
+        id,
+        pagination_token = cursor,
+        userFields = UserFields.values().joinToString(",") { it.value },
+        expansions = UserFields.pinned_tweet_id.name,
+        tweetFields = TweetFields.values().joinToString(",") { it.value },
+    )
+
+    suspend fun verifyCredentials(): User? {
+        return resources.verifyCredentials()
     }
 }

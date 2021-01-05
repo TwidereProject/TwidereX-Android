@@ -1,7 +1,7 @@
 /*
  *  Twidere X
  *
- *  Copyright (C) 2020 Tlaster <tlaster@outlook.com>
+ *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
  * 
  *  This file is part of Twidere X.
  * 
@@ -33,14 +33,14 @@ import com.twidere.twiderex.db.model.DbPagingTimelineWithStatus
 import com.twidere.twiderex.db.model.TimelineType
 import com.twidere.twiderex.db.model.saveToDb
 import com.twidere.twiderex.model.MicroBlogKey
-import retrofit2.HttpException
-import java.io.IOException
-import java.net.SocketTimeoutException
+import com.twidere.twiderex.notification.InAppNotification
+import com.twidere.twiderex.utils.notify
 
 @OptIn(ExperimentalPagingApi::class)
 abstract class PagingTimelineMediatorBase(
     accountKey: MicroBlogKey,
     database: AppDatabase,
+    private val inAppNotification: InAppNotification
 ) : PagingMediator(accountKey = accountKey, database = database) {
     override suspend fun load(
         loadType: LoadType,
@@ -67,6 +67,10 @@ abstract class PagingTimelineMediatorBase(
             val result = load(pageSize, key).map {
                 it.toDbTimeline(accountKey, TimelineType.Custom).toPagingDbTimeline(pagingKey)
             }.let {
+                it.filter {
+                    it.status.status.data.statusId != key
+                }
+            }.let {
                 transform(it)
             }
 
@@ -78,27 +82,25 @@ abstract class PagingTimelineMediatorBase(
             }
 
             return MediatorResult.Success(
-                endOfPaginationReached = hasMore(result, pageSize)
+                endOfPaginationReached = !hasMore(result, pageSize)
             )
         } catch (e: MicroBlogException) {
+            e.notify(inAppNotification)
             return MediatorResult.Error(e)
-        } catch (e: IOException) {
-            return MediatorResult.Error(e)
-        } catch (e: HttpException) {
-            return MediatorResult.Error(e)
-        } catch (e: SocketTimeoutException) {
+        } catch (e: Throwable) {
+            e.notify(inAppNotification)
             return MediatorResult.Error(e)
         }
     }
 
-    open fun transform(data: List<DbPagingTimelineWithStatus>): List<DbPagingTimelineWithStatus> {
+    protected open fun transform(data: List<DbPagingTimelineWithStatus>): List<DbPagingTimelineWithStatus> {
         return data
     }
 
     protected open fun hasMore(
         result: List<DbPagingTimelineWithStatus>,
         pageSize: Int
-    ) = result.size < pageSize
+    ) = result.isNotEmpty()
 
     protected open suspend fun clearData(database: AppDatabase) {
         database.pagingTimelineDao().clearAll(pagingKey, accountKey = accountKey)

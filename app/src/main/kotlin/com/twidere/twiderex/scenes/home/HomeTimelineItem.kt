@@ -1,7 +1,7 @@
 /*
  *  Twidere X
  *
- *  Copyright (C) 2020 Tlaster <tlaster@outlook.com>
+ *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
  * 
  *  This file is part of Twidere X.
  * 
@@ -22,7 +22,6 @@ package com.twidere.twiderex.scenes.home
 
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
-import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
@@ -30,6 +29,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.navigation.compose.navigate
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.TimelineComponent
+import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.scenes.ComposeType
@@ -56,7 +56,7 @@ class HomeTimelineItem : HomeNavigationItem() {
         ) {
             it.create(account)
         }
-        Scaffold(
+        InAppNotificationScaffold(
             floatingActionButton = {
                 val navController = AmbientNavController.current
                 FloatingActionButton(

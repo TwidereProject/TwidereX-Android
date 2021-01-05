@@ -44,7 +44,7 @@ jobs:
       run: |
         set -x
         assets=()
-        for asset in */*.apk; do
+        for asset in $(find -name *-release.apk); do
           assets+=("-a" "$asset")
         done
         tag_name="${GITHUB_REF##*/}"

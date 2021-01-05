@@ -1,7 +1,7 @@
 /*
  *  Twidere X
  *
- *  Copyright (C) 2020 Tlaster <tlaster@outlook.com>
+ *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
  * 
  *  This file is part of Twidere X.
  * 
@@ -26,6 +26,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.AmbientContentAlpha
@@ -35,7 +37,6 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.ListItem
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ProvideTextStyle
-import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -45,6 +46,7 @@ import androidx.compose.runtime.savedinstancestate.savedInstanceState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
@@ -58,21 +60,27 @@ import com.twidere.twiderex.R
 import com.twidere.twiderex.annotations.IncomingComposeUpdate
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
+import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
 import com.twidere.twiderex.component.foundation.TextTabsComponent
 import com.twidere.twiderex.component.foundation.TopAppBarElevation
+import com.twidere.twiderex.component.lazy.itemsPagingGridIndexed
 import com.twidere.twiderex.component.lazy.loadState
 import com.twidere.twiderex.component.navigation.AmbientNavigator
 import com.twidere.twiderex.component.status.StatusDivider
+import com.twidere.twiderex.component.status.StatusMediaPreviewItem
 import com.twidere.twiderex.component.status.TimelineStatusComponent
 import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.extensions.refreshOrRetry
 import com.twidere.twiderex.extensions.viewModel
 import com.twidere.twiderex.navigation.Route
+import com.twidere.twiderex.preferences.proto.DisplayPreferences
 import com.twidere.twiderex.ui.AmbientActiveAccount
 import com.twidere.twiderex.ui.AmbientNavController
+import com.twidere.twiderex.ui.AmbientVideoPlayback
 import com.twidere.twiderex.ui.TwidereXTheme
+import com.twidere.twiderex.ui.standardPadding
 import com.twidere.twiderex.viewmodel.twitter.search.TwitterSearchMediaViewModel
 import com.twidere.twiderex.viewmodel.twitter.search.TwitterSearchTweetsViewModel
 import com.twidere.twiderex.viewmodel.twitter.search.TwitterSearchUserViewModel
@@ -96,7 +104,7 @@ fun SearchScene(keyword: String) {
     val navigator = AmbientNavigator.current
 
     TwidereXTheme {
-        Scaffold {
+        InAppNotificationScaffold {
             Column {
                 Surface(
                     elevation = TopAppBarElevation,
@@ -193,24 +201,52 @@ private fun SearchTweetsContent(viewModel: TwitterSearchTweetsViewModel) {
 @Composable
 private fun SearchMediasContent(viewModel: TwitterSearchMediaViewModel) {
     val source = viewModel.source.collectAsLazyPagingItems()
-    SwipeToRefreshLayout(
-        refreshingState = source.loadState.refresh is LoadState.Loading,
-        onRefresh = {
-            source.refreshOrRetry()
-        }
+    Providers(
+        AmbientVideoPlayback provides DisplayPreferences.AutoPlayback.Off
     ) {
-        if (source.itemCount > 0) {
-            LazyColumn {
-                items(source) { item ->
-                    item?.let {
-                        TimelineStatusComponent(
-                            it,
-                        )
-                        StatusDivider()
+        SwipeToRefreshLayout(
+            refreshingState = source.loadState.refresh is LoadState.Loading,
+            onRefresh = {
+                source.refreshOrRetry()
+            }
+        ) {
+            if (source.itemCount > 0) {
+                LazyColumn {
+                    item {
+                        Box(modifier = Modifier.height(standardPadding))
                     }
-                }
-                loadState(source.loadState.append) {
-                    source.retry()
+                    itemsPagingGridIndexed(
+                        source,
+                        rowSize = 2,
+                        spacing = standardPadding,
+                        padding = standardPadding
+                    ) { index, pair ->
+                        pair?.let { item ->
+                            val navController = AmbientNavController.current
+                            StatusMediaPreviewItem(
+                                item.first,
+                                modifier = Modifier
+                                    .aspectRatio(1F)
+                                    .clip(
+                                        MaterialTheme.shapes.medium
+                                    ),
+                                onClick = {
+                                    navController.navigate(
+                                        Route.Media(
+                                            item.second.statusKey,
+                                            selectedIndex = index
+                                        )
+                                    )
+                                }
+                            )
+                        }
+                    }
+                    item {
+                        Box(modifier = Modifier.height(standardPadding))
+                    }
+                    loadState(source.loadState.append) {
+                        source.retry()
+                    }
                 }
             }
         }
@@ -221,7 +257,7 @@ private fun SearchMediasContent(viewModel: TwitterSearchMediaViewModel) {
 @Composable
 private fun SearchUsersContent(viewModel: TwitterSearchUserViewModel) {
     val source = viewModel.source.collectAsLazyPagingItems()
-    val navController = AmbientNavController.current
+    val navigator = AmbientNavigator.current
     SwipeToRefreshLayout(
         refreshingState = source.loadState.refresh is LoadState.Loading,
         onRefresh = {
@@ -235,7 +271,7 @@ private fun SearchUsersContent(viewModel: TwitterSearchUserViewModel) {
                         ListItem(
                             modifier = Modifier.clickable(
                                 onClick = {
-                                    navController.navigate(Route.User(item.userKey))
+                                    navigator.user(item)
                                 }
                             ),
                             icon = {

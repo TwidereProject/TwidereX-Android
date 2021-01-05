@@ -1,7 +1,7 @@
 /*
  *  Twidere X
  *
- *  Copyright (C) 2020 Tlaster <tlaster@outlook.com>
+ *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
  * 
  *  This file is part of Twidere X.
  * 
@@ -187,7 +187,10 @@ private fun StatusV2.toDbStatusWithMediaAndUser(
     )
     return DbStatusWithMediaAndUser(
         data = status,
-        media = (attachments?.media ?: emptyList()).mapIndexed { index, it ->
+        media = (attachments?.media ?: emptyList()).filter {
+            it.type == MediaType.photo.name // TODO: video and gif
+        }.mapIndexed { index, it ->
+            val type = it.type?.let { MediaType.valueOf(it) } ?: MediaType.photo
             DbMedia(
                 _id = UUID.randomUUID().toString(),
                 statusKey = status.statusKey,
@@ -198,7 +201,7 @@ private fun StatusV2.toDbStatusWithMediaAndUser(
                 pageUrl = null, // TODO: how to play media under twitter v2 api
                 altText = it.publicMetrics?.viewCount?.toString() ?: "",
                 url = it.url,
-                type = it.type?.let { MediaType.valueOf(it) } ?: MediaType.photo,
+                type = type,
                 order = index,
             )
         },
@@ -278,17 +281,23 @@ private fun Status.toDbStatusWithMediaAndUser(
             extendedEntities?.media ?: entities?.media
                 ?: emptyList()
             ).mapIndexed { index, it ->
+            val type = it.type?.let { MediaType.valueOf(it) } ?: MediaType.photo
             DbMedia(
                 _id = UUID.randomUUID().toString(),
                 statusKey = status.statusKey,
                 previewUrl = getImage(it.mediaURLHTTPS, "small"),
-                mediaUrl = getImage(it.mediaURLHTTPS, "orig"),
+                mediaUrl = when (type) {
+                    MediaType.photo -> getImage(it.mediaURLHTTPS, "orig")
+                    MediaType.animated_gif, MediaType.video -> it.videoInfo?.variants?.maxByOrNull {
+                        it.bitrate ?: 0L
+                    }?.url
+                },
                 width = it.sizes?.large?.w ?: 0,
                 height = it.sizes?.large?.h ?: 0,
                 pageUrl = it.expandedURL,
                 altText = it.displayURL ?: "",
                 url = it.url,
-                type = it.type?.let { MediaType.valueOf(it) } ?: MediaType.photo,
+                type = type,
                 order = index,
             )
         },

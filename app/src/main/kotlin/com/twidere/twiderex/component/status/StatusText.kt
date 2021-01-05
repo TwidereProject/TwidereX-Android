@@ -1,7 +1,7 @@
 /*
  *  Twidere X
  *
- *  Copyright (C) 2020 Tlaster <tlaster@outlook.com>
+ *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
  * 
  *  This file is part of Twidere X.
  * 
@@ -145,7 +145,9 @@ private fun AnnotatedString.Builder.RenderLink(element: Element, status: UiStatu
     ) {
         when {
             entity != null -> {
-                if (!entity.displayUrl.contains("pic.twitter.com")) {
+                if (!entity.displayUrl.contains("pic.twitter.com") && !
+                    (status.quote != null && !entity.displayUrl.endsWith(status.quote.statusId))
+                ) {
                     pushStringAnnotation(TAG_URL, entity.expandedUrl)
                     RenderText(entity.displayUrl)
                     pop()

@@ -1,7 +1,7 @@
 /*
  *  Twidere X
  *
- *  Copyright (C) 2020 Tlaster <tlaster@outlook.com>
+ *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
  * 
  *  This file is part of Twidere X.
  * 
@@ -27,12 +27,14 @@ import com.twidere.twiderex.db.AppDatabase
 import com.twidere.twiderex.di.assisted.IAssistedFactory
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.paging.mediator.PagingMediator
 import com.twidere.twiderex.paging.mediator.user.UserStatusMediator
 import com.twidere.twiderex.viewmodel.PagingViewModel
 
 class UserTimelineViewModel @AssistedInject constructor(
     database: AppDatabase,
+    inAppNotification: InAppNotification,
     @Assisted account: AccountDetails,
     @Assisted screenName: String,
     @Assisted userKey: MicroBlogKey,
@@ -53,6 +55,7 @@ class UserTimelineViewModel @AssistedInject constructor(
             userKey = userKey,
             database,
             account.accountKey,
-            account.service as TimelineService
+            account.service as TimelineService,
+            inAppNotification,
         )
 }

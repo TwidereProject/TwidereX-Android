@@ -1,7 +1,7 @@
 /*
  *  Twidere X
  *
- *  Copyright (C) 2020 Tlaster <tlaster@outlook.com>
+ *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
  * 
  *  This file is part of Twidere X.
  * 
@@ -23,7 +23,6 @@ package com.twidere.twiderex.scenes
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
@@ -32,7 +31,9 @@ import com.twidere.twiderex.annotations.IncomingComposeUpdate
 import com.twidere.twiderex.component.UserComponent
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
+import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.extensions.withElevation
+import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.ui.TwidereXTheme
 
 @OptIn(IncomingComposeUpdate::class)
@@ -40,9 +41,10 @@ import com.twidere.twiderex.ui.TwidereXTheme
 fun UserScene(
     screenName: String,
     host: String,
+    userKey: MicroBlogKey?,
 ) {
     TwidereXTheme {
-        Scaffold(
+        InAppNotificationScaffold(
             topBar = {
                 AppBar(
                     backgroundColor = MaterialTheme.colors.surface.withElevation(),
@@ -61,7 +63,7 @@ fun UserScene(
                 )
             }
         ) {
-            UserComponent(screenName, host)
+            UserComponent(screenName, host, userKey)
         }
     }
 }

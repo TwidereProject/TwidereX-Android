@@ -1,7 +1,7 @@
 /*
  *  Twidere X
  *
- *  Copyright (C) 2020 Tlaster <tlaster@outlook.com>
+ *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
  * 
  *  This file is part of Twidere X.
  * 
@@ -33,23 +33,26 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
 import androidx.lifecycle.map
 import androidx.lifecycle.switchMap
+import androidx.work.WorkManager
 import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
 import com.twidere.services.microblog.LookupService
 import com.twidere.services.microblog.RelationshipService
 import com.twidere.services.twitter.TwitterService
+import com.twidere.twiderex.action.ComposeAction
 import com.twidere.twiderex.db.model.DbDraft
 import com.twidere.twiderex.di.assisted.IAssistedFactory
 import com.twidere.twiderex.extensions.combineWith
 import com.twidere.twiderex.extensions.getCachedLocation
 import com.twidere.twiderex.model.AccountDetails
+import com.twidere.twiderex.model.ComposeData
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.repository.DraftRepository
 import com.twidere.twiderex.repository.UserRepository
 import com.twidere.twiderex.repository.twitter.TwitterTweetsRepository
 import com.twidere.twiderex.scenes.ComposeType
-import com.twidere.twiderex.utils.ComposeQueue
+import com.twidere.twiderex.worker.draft.SaveDraftWorker
 import com.twitter.twittertext.Extractor
 import java.util.UUID
 
@@ -75,17 +78,19 @@ class DraftItemViewModel @AssistedInject constructor(
 class DraftComposeViewModel @AssistedInject constructor(
     draftRepository: DraftRepository,
     locationManager: LocationManager,
-    composeQueue: ComposeQueue,
+    composeAction: ComposeAction,
     factory: TwitterTweetsRepository.AssistedFactory,
     userRepositoryFactory: UserRepository.AssistedFactory,
+    workManager: WorkManager,
     @Assisted account: AccountDetails,
     @Assisted private val draft: DbDraft,
 ) : ComposeViewModel(
     draftRepository,
     locationManager,
-    composeQueue,
+    composeAction,
     factory,
     userRepositoryFactory,
+    workManager,
     account,
     draft.statusKey,
     draft.composeType,
@@ -110,10 +115,11 @@ class DraftComposeViewModel @AssistedInject constructor(
 
 open class ComposeViewModel @AssistedInject constructor(
     protected val draftRepository: DraftRepository,
-    protected val locationManager: LocationManager,
-    protected val composeQueue: ComposeQueue,
+    private val locationManager: LocationManager,
+    protected val composeAction: ComposeAction,
     protected val factory: TwitterTweetsRepository.AssistedFactory,
-    protected val userRepositoryFactory: UserRepository.AssistedFactory,
+    private val userRepositoryFactory: UserRepository.AssistedFactory,
+    private val workManager: WorkManager,
     @Assisted protected val account: AccountDetails,
     @Assisted protected val statusKey: MicroBlogKey?,
     @Assisted val composeType: ComposeType,
@@ -197,30 +203,40 @@ open class ComposeViewModel @AssistedInject constructor(
 
     fun compose() {
         text.value?.let {
-            composeQueue.commit(
-                service,
-                it,
-                draftId = draftId,
-                images = images.value ?: emptyList(),
-                composeType = composeType,
-                statusKey = statusKey,
-                lat = location.value?.latitude,
-                long = location.value?.longitude,
-                excludedReplyUserIds = excludedReplyUserIds.value
+            composeAction.commit(
+                account.accountKey,
+                ComposeData(
+                    content = it,
+                    draftId = draftId,
+                    images = images.value?.map { it.toString() } ?: emptyList(),
+                    composeType = composeType,
+                    statusKey = statusKey,
+                    lat = location.value?.latitude,
+                    long = location.value?.longitude,
+                    excludedReplyUserIds = excludedReplyUserIds.value
+                )
             )
         }
     }
 
     fun saveDraft() {
         text.value?.let { text ->
-            draftRepository.addOrUpgrade(
-                text,
-                images.value?.map { it.toString() } ?: emptyList(),
-                composeType,
-                statusKey,
-                draftId = draftId,
-                excludedReplyUserIds = excludedReplyUserIds.value ?: emptyList()
-            )
+            workManager
+                .beginWith(
+                    SaveDraftWorker.create(
+                        ComposeData(
+                            content = text,
+                            draftId = draftId,
+                            images = images.value?.map { it.toString() } ?: emptyList(),
+                            composeType = composeType,
+                            statusKey = statusKey,
+                            lat = location.value?.latitude,
+                            long = location.value?.longitude,
+                            excludedReplyUserIds = excludedReplyUserIds.value
+                        )
+                    )
+                )
+                .enqueue()
         }
     }
 
