@@ -160,11 +160,31 @@ private fun StatusComponent(
 
             StatusText(status = status, onStatusTextClicked = onStatusTextClicked)
 
-            if (status.media.any() && isMediaPreviewEnabled) {
+            if (status.media.any()) {
                 Spacer(modifier = Modifier.height(standardPadding))
-                StatusMediaComponent(
-                    status = status,
-                )
+                if (isMediaPreviewEnabled) {
+                    StatusMediaComponent(
+                        status = status,
+                    )
+                } else {
+                    Providers(
+                        AmbientContentAlpha provides ContentAlpha.medium
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .clickable(
+                                    onClick = {
+                                        navigator.media(statusKey = status.statusKey)
+                                    }
+                                )
+                                .fillMaxWidth()
+                        ) {
+                            Icon(imageVector = vectorResource(id = R.drawable.ic_photo))
+                            Spacer(modifier = Modifier.width(standardPadding))
+                            Text(text = "Media")
+                        }
+                    }
+                }
             }
 
             if (!status.placeString.isNullOrEmpty()) {
