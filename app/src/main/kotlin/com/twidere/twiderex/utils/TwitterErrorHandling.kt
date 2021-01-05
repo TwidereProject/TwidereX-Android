@@ -28,6 +28,7 @@ import com.twidere.services.twitter.TwitterErrorCodes
 import com.twidere.twiderex.R
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.notification.StringResWithActionNotificationEvent
+import java.util.concurrent.CancellationException
 
 fun MicroBlogException.notify(notification: InAppNotification) {
     when (this.errors?.firstOrNull()?.code) {
@@ -54,5 +55,9 @@ fun MicroBlogException.notify(notification: InAppNotification) {
 }
 
 fun Throwable.notify(notification: InAppNotification) {
-    message?.let { notification.show(it) }
+    when (this) {
+        !is CancellationException -> {
+            message?.let { notification.show(it) }
+        }
+    }
 }
