@@ -38,7 +38,7 @@ import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.UserRepository
-import com.twidere.twiderex.utils.show
+import com.twidere.twiderex.utils.notify
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
@@ -90,7 +90,7 @@ class UserViewModel @AssistedInject constructor(
                 userKey.postValue(user.userKey)
             }
         } catch (e: MicroBlogException) {
-            e.show(inAppNotification)
+            e.notify(inAppNotification)
         } catch (e: IOException) {
             e.message?.let { inAppNotification.show(it) }
         } catch (e: HttpException) {

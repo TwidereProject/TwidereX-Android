@@ -20,18 +20,39 @@
  */
 package com.twidere.twiderex.utils
 
+import android.content.Intent
+import android.content.Intent.ACTION_VIEW
+import android.net.Uri
 import com.twidere.services.http.MicroBlogException
 import com.twidere.services.twitter.TwitterErrorCodes
 import com.twidere.twiderex.R
 import com.twidere.twiderex.notification.InAppNotification
+import com.twidere.twiderex.notification.StringResWithActionNotificationEvent
 
-fun MicroBlogException.show(notification: InAppNotification) {
+fun MicroBlogException.notify(notification: InAppNotification) {
     when (this.errors?.firstOrNull()?.code) {
         TwitterErrorCodes.TemporarilyLocked -> {
-            notification.show(R.string.common_alerts_account_temporarily_locked_title)
+            notification.show(
+                StringResWithActionNotificationEvent(
+                    R.string.common_alerts_account_temporarily_locked_title,
+                    R.string.common_alerts_account_temporarily_locked_message,
+                    actionId = R.string.common_controls_actions_ok
+                ) {
+                    context.startActivity(
+                        Intent(
+                            ACTION_VIEW,
+                            Uri.parse("https://twitter.com/login")
+                        )
+                    )
+                }
+            )
         }
         else -> {
             microBlogErrorMessage?.let { notification.show(it) }
         }
     }
+}
+
+fun Throwable.notify(notification: InAppNotification) {
+    message?.let { notification.show(it) }
 }

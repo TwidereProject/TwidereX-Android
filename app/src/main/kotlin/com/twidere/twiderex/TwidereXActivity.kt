@@ -81,6 +81,20 @@ class TwidereXActivity : FragmentActivity() {
 
     private lateinit var launcher: ActivityLauncher
     private val isActiveNetworkMetered = MutableLiveData(false)
+    private val networkCallback by lazy {
+        object : ConnectivityManager.NetworkCallback() {
+            override fun onCapabilitiesChanged(
+                network: Network,
+                networkCapabilities: NetworkCapabilities
+            ) {
+                isActiveNetworkMetered.postValue(
+                    ConnectivityManagerCompat.isActiveNetworkMetered(
+                        connectivityManager
+                    )
+                )
+            }
+        }
+    }
 
     @Inject
     lateinit var statusActions: StatusActions
@@ -105,21 +119,6 @@ class TwidereXActivity : FragmentActivity() {
             ConnectivityManagerCompat.isActiveNetworkMetered(
                 connectivityManager
             )
-        )
-        connectivityManager.registerNetworkCallback(
-            NetworkRequest.Builder().build(),
-            object : ConnectivityManager.NetworkCallback() {
-                override fun onCapabilitiesChanged(
-                    network: Network,
-                    networkCapabilities: NetworkCapabilities
-                ) {
-                    isActiveNetworkMetered.postValue(
-                        ConnectivityManagerCompat.isActiveNetworkMetered(
-                            connectivityManager
-                        )
-                    )
-                }
-            },
         )
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             window.setDecorFitsSystemWindows(false)
@@ -165,5 +164,18 @@ class TwidereXActivity : FragmentActivity() {
                 }
             }
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        connectivityManager.registerNetworkCallback(
+            NetworkRequest.Builder().build(),
+            networkCallback,
+        )
+    }
+
+    override fun onPause() {
+        super.onPause()
+        connectivityManager.unregisterNetworkCallback(networkCallback)
     }
 }

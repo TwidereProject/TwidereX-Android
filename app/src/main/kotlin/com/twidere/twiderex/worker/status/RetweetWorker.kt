@@ -30,6 +30,7 @@ import com.twidere.twiderex.db.model.TimelineType
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.model.ui.UiStatus.Companion.toUi
+import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.StatusRepository
 
@@ -37,8 +38,9 @@ class RetweetWorker @WorkerInject constructor(
     @Assisted appContext: Context,
     @Assisted params: WorkerParameters,
     accountRepository: AccountRepository,
-    statusRepository: StatusRepository
-) : StatusWorker(appContext, params, accountRepository, statusRepository) {
+    statusRepository: StatusRepository,
+    inAppNotification: InAppNotification,
+) : StatusWorker(appContext, params, accountRepository, statusRepository, inAppNotification) {
     override suspend fun doWork(
         accountKey: MicroBlogKey,
         service: StatusService,

@@ -33,15 +33,18 @@ import com.twidere.services.http.MicroBlogException
 import com.twidere.services.twitter.TwitterService
 import com.twidere.twiderex.model.ComposeData
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.DraftRepository
 import com.twidere.twiderex.scenes.ComposeType
+import com.twidere.twiderex.utils.notify
 
 class TwitterComposeWorker @WorkerInject constructor(
     @Assisted context: Context,
     @Assisted workerParams: WorkerParameters,
     private val draftRepository: DraftRepository,
     private val accountRepository: AccountRepository,
+    private val inAppNotification: InAppNotification,
 ) : CoroutineWorker(context, workerParams) {
 
     companion object {
@@ -104,11 +107,13 @@ class TwitterComposeWorker @WorkerInject constructor(
                 long = long,
                 exclude_reply_user_ids = draft.excludedReplyUserIds
             )
-            successResult()
+            Result.success()
         } catch (e: MicroBlogException) {
-            failureResult(e.errors?.firstOrNull()?.message ?: e.error ?: "")
+            e.notify(inAppNotification)
+            Result.failure()
         } catch (e: Throwable) {
-            failureResult(e.message ?: "")
+            e.notify(inAppNotification)
+            Result.failure()
         }
     }
 }

@@ -33,7 +33,6 @@ import com.twidere.twiderex.extensions.getNullableLong
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.repository.ReactionRepository
 import com.twidere.twiderex.repository.StatusRepository
-import com.twidere.twiderex.worker.successResult
 
 class UpdateStatusWorker @WorkerInject constructor(
     @Assisted appContext: Context,
@@ -79,6 +78,6 @@ class UpdateStatusWorker @WorkerInject constructor(
                 it.likeCount = likeCount
             }
         }
-        return successResult()
+        return Result.success()
     }
 }

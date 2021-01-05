@@ -29,12 +29,15 @@ import androidx.work.WorkerParameters
 import com.twidere.twiderex.model.ComposeData
 import com.twidere.twiderex.model.toComposeData
 import com.twidere.twiderex.model.toWorkData
+import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.DraftRepository
+import com.twidere.twiderex.utils.notify
 
 class SaveDraftWorker @WorkerInject constructor(
     @Assisted context: Context,
     @Assisted workerParams: WorkerParameters,
     private val repository: DraftRepository,
+    private val inAppNotification: InAppNotification,
 ) : CoroutineWorker(context, workerParams) {
 
     companion object {
@@ -57,6 +60,7 @@ class SaveDraftWorker @WorkerInject constructor(
                 )
                 Result.success()
             } catch (e: Throwable) {
+                e.notify(inAppNotification)
                 Result.failure()
             }
         }

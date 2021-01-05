@@ -37,7 +37,7 @@ import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.ACCOUNT_TYPE
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.utils.json
-import com.twidere.twiderex.utils.show
+import com.twidere.twiderex.utils.notify
 import retrofit2.HttpException
 import java.io.IOException
 
@@ -103,7 +103,7 @@ class TwitterSignInViewModel @ViewModelInject constructor(
                 }
             }
         } catch (e: MicroBlogException) {
-            e.show(inAppNotification)
+            e.notify(inAppNotification)
         } catch (e: IOException) {
             e.message?.let { inAppNotification.show(it) }
         } catch (e: HttpException) {

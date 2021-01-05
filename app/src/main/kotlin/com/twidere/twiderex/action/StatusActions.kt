@@ -24,7 +24,6 @@ import androidx.compose.runtime.ambientOf
 import androidx.work.WorkManager
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.ui.UiStatus
-import com.twidere.twiderex.worker.NotificationWorker
 import com.twidere.twiderex.worker.status.LikeWorker
 import com.twidere.twiderex.worker.status.RetweetWorker
 import com.twidere.twiderex.worker.status.StatusResult
@@ -66,7 +65,7 @@ class StatusActions @Inject constructor(
                     status = status
                 )
             }
-        ).then(listOf(UpdateStatusWorker.create(), NotificationWorker.create())).enqueue()
+        ).then(listOf(UpdateStatusWorker.create())).enqueue()
     }
 
     override fun retweet(status: UiStatus, account: AccountDetails) {
@@ -90,7 +89,7 @@ class StatusActions @Inject constructor(
                     status = status
                 )
             }
-        ).then(listOf(UpdateStatusWorker.create(), NotificationWorker.create())).enqueue()
+        ).then(listOf(UpdateStatusWorker.create())).enqueue()
     }
 }
 

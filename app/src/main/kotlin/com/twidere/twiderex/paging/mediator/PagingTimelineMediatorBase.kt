@@ -34,10 +34,7 @@ import com.twidere.twiderex.db.model.TimelineType
 import com.twidere.twiderex.db.model.saveToDb
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.notification.InAppNotification
-import com.twidere.twiderex.utils.show
-import retrofit2.HttpException
-import java.io.IOException
-import java.net.SocketTimeoutException
+import com.twidere.twiderex.utils.notify
 
 @OptIn(ExperimentalPagingApi::class)
 abstract class PagingTimelineMediatorBase(
@@ -88,13 +85,10 @@ abstract class PagingTimelineMediatorBase(
                 endOfPaginationReached = !hasMore(result, pageSize)
             )
         } catch (e: MicroBlogException) {
-            e.show(inAppNotification)
+            e.notify(inAppNotification)
             return MediatorResult.Error(e)
-        } catch (e: IOException) {
-            return MediatorResult.Error(e)
-        } catch (e: HttpException) {
-            return MediatorResult.Error(e)
-        } catch (e: SocketTimeoutException) {
+        } catch (e: Throwable) {
+            e.notify(inAppNotification)
             return MediatorResult.Error(e)
         }
     }

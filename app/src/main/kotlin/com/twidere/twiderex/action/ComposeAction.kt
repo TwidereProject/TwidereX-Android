@@ -23,7 +23,6 @@ package com.twidere.twiderex.action
 import androidx.work.WorkManager
 import com.twidere.twiderex.model.ComposeData
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.worker.NotificationWorker
 import com.twidere.twiderex.worker.TwitterComposeWorker
 import com.twidere.twiderex.worker.draft.RemoveDraftWorker
 import com.twidere.twiderex.worker.draft.SaveDraftWorker
@@ -38,7 +37,6 @@ class ComposeAction(
         workManager
             .beginWith(SaveDraftWorker.create(data = data))
             .then(TwitterComposeWorker.create(accountKey = accountKey, data = data))
-            .then(NotificationWorker.create())
             .then(RemoveDraftWorker.create(draftId = data.draftId))
             .enqueue()
     }

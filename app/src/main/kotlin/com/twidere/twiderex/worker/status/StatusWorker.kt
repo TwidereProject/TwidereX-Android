@@ -30,16 +30,17 @@ import com.twidere.services.microblog.StatusService
 import com.twidere.services.twitter.TwitterErrorCodes
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiStatus
+import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.StatusRepository
-import com.twidere.twiderex.worker.failureResult
-import com.twidere.twiderex.worker.successResult
+import com.twidere.twiderex.utils.notify
 
 abstract class StatusWorker(
     appContext: Context,
     params: WorkerParameters,
     private val accountRepository: AccountRepository,
     private val statusRepository: StatusRepository,
+    private val inAppNotification: InAppNotification,
 ) : CoroutineWorker(appContext, params) {
     companion object {
         inline fun <reified T : StatusWorker> create(
@@ -71,15 +72,14 @@ abstract class StatusWorker(
         } ?: return Result.failure()
         return try {
             val result = doWork(accountKey, service, status)
-            successResult(
+            Result.success(
                 result.toWorkData()
             )
         } catch (e: MicroBlogException) {
             e.errors?.firstOrNull()?.let {
                 when (it.code) {
                     TwitterErrorCodes.AlreadyRetweeted -> {
-                        failureResult(
-                            it.message ?: "",
+                        Result.success(
                             StatusResult(
                                 accountKey = accountKey,
                                 statusKey = status.statusKey,
@@ -88,8 +88,7 @@ abstract class StatusWorker(
                         )
                     }
                     TwitterErrorCodes.AlreadyFavorited -> {
-                        failureResult(
-                            it.message ?: "",
+                        Result.success(
                             StatusResult(
                                 accountKey = accountKey,
                                 statusKey = status.statusKey,
@@ -98,12 +97,17 @@ abstract class StatusWorker(
                         )
                     }
                     else -> {
-                        failureResult(it.message ?: "", fallback(accountKey, status).toWorkData())
+                        e.notify(inAppNotification)
+                        Result.success(fallback(accountKey, status).toWorkData())
                     }
                 }
-            } ?: failureResult(e.error ?: "", fallback(accountKey, status).toWorkData())
+            } ?: run {
+                e.notify(inAppNotification)
+                Result.success(fallback(accountKey, status).toWorkData())
+            }
         } catch (e: Throwable) {
-            failureResult(e.message ?: "", fallback(accountKey, status).toWorkData())
+            e.notify(inAppNotification)
+            Result.success(fallback(accountKey, status).toWorkData())
         }
     }
 
