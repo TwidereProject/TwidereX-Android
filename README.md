@@ -40,7 +40,7 @@ Twidere X is still in an early stage and will be periodically re-structuring/ref
 ```
                        Twidere X
 
-     Copyright (C) 2020 Tlaster <tlaster@outlook.com>
+     Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
 
 Twidere X is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
