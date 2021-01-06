@@ -187,7 +187,7 @@ dependencies {
 
     implementation "androidx.work:work-runtime-ktx:2.5.0-beta02"
 
-    implementation "dev.chrisbanes.accompanist:accompanist-coil:0.4.0"
+    implementation "dev.chrisbanes.accompanist:accompanist-coil:0.4.1"
 
     implementation "com.twitter.twittertext:twitter-text:3.1.0"
     implementation 'org.jsoup:jsoup:1.13.1'
