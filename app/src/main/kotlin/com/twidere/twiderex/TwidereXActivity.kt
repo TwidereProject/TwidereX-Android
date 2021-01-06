@@ -174,8 +174,8 @@ class TwidereXActivity : FragmentActivity() {
         )
     }
 
-    override fun onPause() {
-        super.onPause()
+    override fun onStop() {
+        super.onStop()
         connectivityManager.unregisterNetworkCallback(networkCallback)
     }
 }
