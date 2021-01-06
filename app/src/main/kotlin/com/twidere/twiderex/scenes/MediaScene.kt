@@ -42,7 +42,6 @@ import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
@@ -136,7 +135,7 @@ fun MediaScene(status: UiStatus, selectedIndex: Int) {
     var hideControls by remember { mutableStateOf(false) }
     val controlPanelColor = MaterialTheme.colors.surface.copy(alpha = 0.6f)
     val navController = AmbientNavController.current
-    Scaffold {
+    InAppNotificationScaffold {
         Box {
             val clock = AmbientAnimationClock.current
             val pagerState = remember(clock) {
