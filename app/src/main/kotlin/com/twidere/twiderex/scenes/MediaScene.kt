@@ -59,8 +59,8 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.DragObserver
 import androidx.compose.ui.gesture.rawDragGestureFilter
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.AmbientAnimationClock
 import androidx.compose.ui.platform.AmbientContext
 import androidx.compose.ui.res.vectorResource
@@ -95,7 +95,6 @@ import com.twidere.twiderex.ui.AmbientVideoPlayback
 import com.twidere.twiderex.ui.TwidereXTheme
 import com.twidere.twiderex.ui.standardPadding
 import com.twidere.twiderex.viewmodel.MediaViewModel
-import kotlin.math.max
 
 @Composable
 fun MediaScene(statusKey: MicroBlogKey, selectedIndex: Int) {
@@ -280,6 +279,16 @@ fun MediaItemView(
     var scale by remember { mutableStateOf(1f) }
     var translate by remember { mutableStateOf(Offset(0f, 0f)) }
     var looked by remember { mutableStateOf(false) }
+    val observer = remember {
+        object : DragObserver {
+            override fun onDrag(dragDistance: Offset): Offset {
+                if (looked) {
+                    translate = translate.plus(dragDistance)
+                }
+                return super.onDrag(dragDistance)
+            }
+        }
+    }
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -287,46 +296,64 @@ fun MediaItemView(
     ) {
         Box(
             modifier = Modifier
-                .zoomable(
-                    onZoomDelta = { scale = max(1f, scale * it) },
-                    onZoomStarted = {
-                        looked = true
-                        requestLock(looked)
-                    },
-                    onZoomStopped = {
-                        looked = scale != 1f
-                        requestLock(looked)
-                    },
-                )
-                .rawDragGestureFilter(
-                    object : DragObserver {
-                        override fun onDrag(dragDistance: Offset): Offset {
-                            if (looked) {
-                                translate = translate.plus(dragDistance)
-                            }
-                            return super.onDrag(dragDistance)
-                        }
-                    })
                 .fillMaxSize(),
             contentAlignment = Alignment.Center,
         ) {
             data.mediaUrl?.let {
                 when (data.type) {
                     MediaType.photo ->
-                        NetworkImage(
-                            url = it,
-                            contentScale = ContentScale.Fit,
+                        Box(
                             modifier = Modifier
-                                .graphicsLayer(
-                                    scaleX = scale,
-                                    scaleY = scale,
-                                    translationX = translate.x,
-                                    translationY = translate.y
-                                ),
-                            placeholder = {
-                                CircularProgressIndicator()
-                            }
-                        )
+                                .zoomable(
+                                    onZoomDelta = { scale = (scale * it).coerceAtLeast(1F) },
+                                    onZoomStarted = {
+                                        looked = true
+                                        requestLock(looked)
+                                    },
+                                    onZoomStopped = {
+                                        looked = scale != 1f
+                                        requestLock(looked)
+                                    },
+                                )
+                                .rawDragGestureFilter(observer)
+                                .layout { measurable, constraints ->
+                                    val placeable =
+                                        measurable.measure(constraints = constraints)
+                                    layout(
+                                        width = constraints.maxWidth,
+                                        height = constraints.maxHeight
+                                    ) {
+                                        placeable.placeRelativeWithLayer(
+                                            (constraints.maxWidth - placeable.width) / 2,
+                                            (constraints.maxHeight - placeable.height) / 2
+                                        ) {
+                                            scaleX = scale
+                                            scaleY = scale
+                                            val x = (placeable.width * scale - constraints.maxWidth)
+                                                .coerceAtLeast(0F) / 2F
+                                            val y =
+                                                (placeable.height * scale - constraints.maxHeight)
+                                                    .coerceAtLeast(0F) / 2F
+                                            translationX = translate.x.coerceIn(
+                                                -x,
+                                                x,
+                                            )
+                                            translationY = translate.y.coerceIn(
+                                                -y,
+                                                y,
+                                            )
+                                        }
+                                    }
+                                }
+                        ) {
+                            NetworkImage(
+                                url = it,
+                                contentScale = ContentScale.Fit,
+                                placeholder = {
+                                    CircularProgressIndicator()
+                                }
+                            )
+                        }
                     MediaType.video, MediaType.animated_gif ->
                         Box {
                             VideoPlayer(
