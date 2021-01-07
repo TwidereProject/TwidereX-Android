@@ -125,7 +125,6 @@ private fun StatusComponent(
                         text = status.user.name,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        color = MaterialTheme.colors.primary
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Providers(

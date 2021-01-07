@@ -174,7 +174,6 @@ private fun StatusComponent(
                         text = status.user.name,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        color = MaterialTheme.colors.primary,
                     )
                     Text(
                         text = "@${status.user.screenName}",
