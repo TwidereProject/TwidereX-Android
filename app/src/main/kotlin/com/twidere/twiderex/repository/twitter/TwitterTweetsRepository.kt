@@ -48,7 +48,7 @@ class TwitterTweetsRepository @AssistedInject constructor(
     }
 
     fun loadTweetFromCache(statusKey: MicroBlogKey): LiveData<UiStatus?> {
-        return database.statusDao().findWithStatusIdWithReferenceLiveData(statusKey).map {
+        return database.statusDao().findWithStatusKeyWithReferenceLiveData(statusKey).map {
             it?.toUi(accountKey)
         }
     }

@@ -89,11 +89,11 @@ class TwitterConversationRepository @AssistedInject constructor(
     }
 
     suspend fun loadTweetFromCache(statusKey: MicroBlogKey): UiStatus? {
-        return database.timelineDao().findWithStatusId(statusKey, accountKey)?.toUi(accountKey)
+        return database.timelineDao().findWithStatusKey(statusKey, accountKey)?.toUi(accountKey)
     }
 
     fun getStatusLiveData(statusKey: MicroBlogKey): LiveData<UiStatus?> {
-        return database.statusDao().findWithStatusIdWithReferenceLiveData(statusKey).map {
+        return database.statusDao().findWithStatusKeyWithReferenceLiveData(statusKey).map {
             it?.toUi(accountKey)
         }
     }

@@ -52,4 +52,7 @@ interface StatusResources {
         @Query("attachment_url") attachment_url: String? = null,
         @Query("possibly_sensitive") possibly_sensitive: Boolean? = null,
     ): Status
+
+    @POST("/1.1/statuses/destroy/{id}.json")
+    suspend fun destroy(@Path(value = "id") id: String): Status
 }

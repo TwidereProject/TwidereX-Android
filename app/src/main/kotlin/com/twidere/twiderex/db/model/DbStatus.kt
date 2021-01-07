@@ -54,9 +54,9 @@ data class DbStatusV2(
     val hasMedia: Boolean,
     val userKey: MicroBlogKey,
     val lang: String?,
-    val replyStatusId: String?,
-    val quoteStatusId: String?,
-    val retweetStatusId: String?,
+    val replyStatusKey: MicroBlogKey?,
+    val quoteStatusKey: MicroBlogKey?,
+    val retweetStatusKey: MicroBlogKey?,
     val is_possibly_sensitive: Boolean,
 )
 
@@ -76,11 +76,11 @@ data class DbStatusWithMediaAndUser(
 data class DbStatusWithReference(
     @Embedded
     val status: DbStatusWithMediaAndUser,
-    @Relation(parentColumn = "replyStatusId", entityColumn = "statusId", entity = DbStatusV2::class)
+    @Relation(parentColumn = "replyStatusKey", entityColumn = "statusKey", entity = DbStatusV2::class)
     val replyTo: DbStatusWithMediaAndUser?,
-    @Relation(parentColumn = "quoteStatusId", entityColumn = "statusId", entity = DbStatusV2::class)
+    @Relation(parentColumn = "quoteStatusKey", entityColumn = "statusKey", entity = DbStatusV2::class)
     val quote: DbStatusWithMediaAndUser?,
-    @Relation(parentColumn = "retweetStatusId", entityColumn = "statusId", entity = DbStatusV2::class)
+    @Relation(parentColumn = "retweetStatusKey", entityColumn = "statusKey", entity = DbStatusV2::class)
     val retweet: DbStatusWithMediaAndUser?,
 )
 

@@ -54,6 +54,7 @@ object AndroidModule {
     @Provides
     fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase =
         Room.databaseBuilder(context, AppDatabase::class.java, "twiderex-db")
+            .fallbackToDestructiveMigration()
             .build()
 
     @Provides

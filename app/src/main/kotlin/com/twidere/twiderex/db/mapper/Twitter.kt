@@ -131,11 +131,11 @@ private fun StatusV2.toDbStatusWithMediaAndUser(
 ): DbStatusWithMediaAndUser {
     val user = user?.toDbUser() ?: throw IllegalArgumentException("Status.user should not be null")
     val retweet = this.referencedTweets
-        ?.firstOrNull { it.type == ReferencedTweetType.retweeted }?.id
+        ?.firstOrNull { it.type == ReferencedTweetType.retweeted }?.status
     val replyTo = this.referencedTweets
-        ?.firstOrNull { it.type == ReferencedTweetType.replied_to }?.id
+        ?.firstOrNull { it.type == ReferencedTweetType.replied_to }?.status
     val quote = this.referencedTweets
-        ?.firstOrNull { it.type == ReferencedTweetType.quoted }?.id
+        ?.firstOrNull { it.type == ReferencedTweetType.quoted }?.status
     val status = DbStatusV2(
         _id = UUID.randomUUID().toString(),
         statusId = id ?: throw IllegalArgumentException("Status.idStr should not be null"),
@@ -178,9 +178,9 @@ private fun StatusV2.toDbStatusWithMediaAndUser(
         source = source ?: "",
         userKey = user.userKey,
         lang = lang,
-        replyStatusId = replyTo,
-        retweetStatusId = retweet,
-        quoteStatusId = quote,
+        replyStatusKey = replyTo?.toDbStatusWithMediaAndUser(accountKey = accountKey)?.data?.statusKey,
+        retweetStatusKey = retweet?.toDbStatusWithMediaAndUser(accountKey = accountKey)?.data?.statusKey,
+        quoteStatusKey = quote?.toDbStatusWithMediaAndUser(accountKey = accountKey)?.data?.statusKey,
         statusKey = MicroBlogKey.twitter(
             id ?: throw IllegalArgumentException("Status.idStr should not be null")
         )
@@ -268,9 +268,9 @@ private fun Status.toDbStatusWithMediaAndUser(
         source = source ?: "",
         userKey = user.userKey,
         lang = lang,
-        replyStatusId = null,
-        retweetStatusId = retweetedStatus?.idStr,
-        quoteStatusId = (retweetedStatus?.quotedStatus ?: quotedStatus)?.idStr,
+        replyStatusKey = null,
+        retweetStatusKey = retweetedStatus?.toDbStatusWithMediaAndUser(accountKey = accountKey)?.data?.statusKey,
+        quoteStatusKey = (retweetedStatus?.quotedStatus ?: quotedStatus)?.toDbStatusWithMediaAndUser(accountKey = accountKey)?.data?.statusKey,
         statusKey = MicroBlogKey.twitter(
             idStr ?: throw IllegalArgumentException("Status.idStr should not be null")
         )

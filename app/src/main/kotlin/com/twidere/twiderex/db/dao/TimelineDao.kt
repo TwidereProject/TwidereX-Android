@@ -22,6 +22,7 @@ package com.twidere.twiderex.db.dao
 
 import androidx.lifecycle.LiveData
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -46,8 +47,14 @@ interface TimelineDao {
 
     @Transaction
     @Query("SELECT * FROM timeline WHERE statusKey == :statusKey AND accountKey == :accountKey")
-    suspend fun findWithStatusId(statusKey: MicroBlogKey, accountKey: MicroBlogKey): DbTimelineWithStatus?
+    suspend fun findWithStatusKey(statusKey: MicroBlogKey, accountKey: MicroBlogKey): DbTimelineWithStatus?
+
+    @Query("SELECT * FROM timeline WHERE statusKey in (:statusKey)")
+    suspend fun findAllWithStatusKey(statusKey: List<MicroBlogKey>): List<DbTimeline>
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
     suspend fun update(timeline: List<DbTimeline>)
+
+    @Delete
+    suspend fun delete(timeline: List<DbTimeline>)
 }

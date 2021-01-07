@@ -82,9 +82,9 @@ private fun Status.toDbStatusWithMediaAndUser(
         source = application?.name ?: "",
         userKey = user.userKey,
         lang = null,
-        replyStatusId = null,
-        retweetStatusId = reblog?.id,
-        quoteStatusId = null,
+        replyStatusKey = null,
+        retweetStatusKey = reblog?.toDbStatusWithMediaAndUser(accountKey = accountKey)?.data?.statusKey,
+        quoteStatusKey = null,
         statusKey = MicroBlogKey(
             id ?: throw IllegalArgumentException("mastodon Status.idStr should not be null"),
             host = user.userKey.host,

@@ -183,6 +183,7 @@ fun ShareButton(
     compat: Boolean = false,
 ) {
     var expanded by remember { mutableStateOf(false) }
+    val actionsViewModel = AmbientStatusActions.current
     val account = AmbientActiveAccount.current
     val accountKey = account?.accountKey
     val context = AmbientContext.current
@@ -261,6 +262,7 @@ fun ShareButton(
             DropdownMenuItem(
                 onClick = {
                     expanded = false
+                    actionsViewModel.delete(status, account)
                 }
             ) {
                 Text(

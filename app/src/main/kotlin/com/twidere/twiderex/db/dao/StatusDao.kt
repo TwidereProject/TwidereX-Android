@@ -22,6 +22,7 @@ package com.twidere.twiderex.db.dao
 
 import androidx.lifecycle.LiveData
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -40,16 +41,22 @@ interface StatusDao {
     suspend fun getAll(): List<DbStatusV2>
 
     @Query("SELECT * FROM status WHERE statusKey == :key")
-    suspend fun findWithStatusId(key: MicroBlogKey): DbStatusV2?
+    suspend fun findWithStatusKey(key: MicroBlogKey): DbStatusV2?
+
+    @Query("SELECT * FROM status WHERE retweetStatusKey == :key")
+    suspend fun findWithReplyStatusKey(key: MicroBlogKey): DbStatusV2?
 
     @Transaction
     @Query("SELECT * FROM status WHERE statusKey == :key")
-    suspend fun findWithStatusIdWithReference(key: MicroBlogKey): DbStatusWithReference?
+    suspend fun findWithStatusKeyWithReference(key: MicroBlogKey): DbStatusWithReference?
 
     @Transaction
     @Query("SELECT * FROM status WHERE statusKey == :key")
-    fun findWithStatusIdWithReferenceLiveData(key: MicroBlogKey): LiveData<DbStatusWithReference?>
+    fun findWithStatusKeyWithReferenceLiveData(key: MicroBlogKey): LiveData<DbStatusWithReference?>
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
     suspend fun update(status: List<DbStatusV2>)
+
+    @Delete
+    suspend fun delete(status: List<DbStatusV2>)
 }
