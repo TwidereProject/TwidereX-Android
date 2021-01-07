@@ -59,6 +59,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.DragObserver
 import androidx.compose.ui.gesture.rawDragGestureFilter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.WithConstraints
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.AmbientAnimationClock
 import androidx.compose.ui.platform.AmbientContext
@@ -110,7 +111,9 @@ fun MediaScene(statusKey: MicroBlogKey, selectedIndex: Int) {
         if (loading) {
             InAppNotificationScaffold {
                 Column(
-                    modifier = Modifier.fillMaxWidth().fillMaxHeight(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight(),
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
@@ -275,19 +278,6 @@ fun MediaItemView(
     customControl: PlayerControlView? = null,
     requestLock: (Boolean) -> Unit,
 ) {
-    var scale by remember { mutableStateOf(1f) }
-    var translate by remember { mutableStateOf(Offset(0f, 0f)) }
-    var looked by remember { mutableStateOf(false) }
-    val observer = remember {
-        object : DragObserver {
-            override fun onDrag(dragDistance: Offset): Offset {
-                if (looked) {
-                    translate = translate.plus(dragDistance)
-                }
-                return super.onDrag(dragDistance)
-            }
-        }
-    }
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -301,57 +291,82 @@ fun MediaItemView(
             data.mediaUrl?.let {
                 when (data.type) {
                     MediaType.photo ->
-                        Box(
-                            modifier = Modifier
-                                .zoomable(
-                                    onZoomDelta = { scale = (scale * it).coerceAtLeast(1F) },
-                                    onZoomStarted = {
-                                        looked = true
-                                        requestLock(looked)
-                                    },
-                                    onZoomStopped = {
-                                        looked = scale != 1f
-                                        requestLock(looked)
-                                    },
-                                )
-                                .rawDragGestureFilter(observer)
-                                .layout { measurable, constraints ->
-                                    val placeable =
-                                        measurable.measure(constraints = constraints)
-                                    layout(
-                                        width = constraints.maxWidth,
-                                        height = constraints.maxHeight
-                                    ) {
-                                        placeable.placeRelativeWithLayer(
-                                            (constraints.maxWidth - placeable.width) / 2,
-                                            (constraints.maxHeight - placeable.height) / 2
-                                        ) {
-                                            scaleX = scale
-                                            scaleY = scale
-                                            val x = (placeable.width * scale - constraints.maxWidth)
-                                                .coerceAtLeast(0F) / 2F
-                                            val y =
-                                                (placeable.height * scale - constraints.maxHeight)
+                        WithConstraints {
+                            var looked by remember { mutableStateOf(false) }
+                            var scale by remember { mutableStateOf(1f) }
+                            var translate by remember { mutableStateOf(Offset(0f, 0f)) }
+                            var childWidth by remember { mutableStateOf(0) }
+                            var childHeight by remember { mutableStateOf(0) }
+                            val observer = remember {
+                                object : DragObserver {
+                                    override fun onDrag(dragDistance: Offset): Offset {
+                                        if (looked) {
+                                            val x =
+                                                (childWidth * scale - constraints.maxWidth)
                                                     .coerceAtLeast(0F) / 2F
-                                            translationX = translate.x.coerceIn(
-                                                -x,
-                                                x,
-                                            )
-                                            translationY = translate.y.coerceIn(
-                                                -y,
-                                                y,
-                                            )
+                                            val y =
+                                                (childHeight * scale - constraints.maxHeight)
+                                                    .coerceAtLeast(0F) / 2F
+                                            translate = translate.plus(dragDistance).let {
+                                                it.copy(
+                                                    it.x.coerceIn(
+                                                        -x,
+                                                        x,
+                                                    ),
+                                                    it.y.coerceIn(
+                                                        -y,
+                                                        y,
+                                                    )
+                                                )
+                                            }
                                         }
+                                        return super.onDrag(dragDistance)
                                     }
                                 }
-                        ) {
-                            NetworkImage(
-                                url = it,
-                                contentScale = ContentScale.Fit,
-                                placeholder = {
-                                    CircularProgressIndicator()
-                                }
-                            )
+                            }
+                            Box(
+                                modifier = Modifier
+                                    .zoomable(
+                                        onZoomDelta = { scale = (scale * it).coerceAtLeast(1F) },
+                                        onZoomStarted = {
+                                            looked = true
+                                            requestLock(looked)
+                                        },
+                                        onZoomStopped = {
+                                            looked = scale != 1f
+                                            requestLock(looked)
+                                        },
+                                    )
+                                    .rawDragGestureFilter(observer)
+                                    .layout { measurable, constraints ->
+                                        val placeable =
+                                            measurable.measure(constraints = constraints)
+                                        childHeight = placeable.height
+                                        childWidth = placeable.width
+                                        layout(
+                                            width = constraints.maxWidth,
+                                            height = constraints.maxHeight
+                                        ) {
+                                            placeable.placeRelativeWithLayer(
+                                                (constraints.maxWidth - placeable.width) / 2,
+                                                (constraints.maxHeight - placeable.height) / 2
+                                            ) {
+                                                scaleX = scale
+                                                scaleY = scale
+                                                translationX = translate.x
+                                                translationY = translate.y
+                                            }
+                                        }
+                                    }
+                            ) {
+                                NetworkImage(
+                                    url = it,
+                                    contentScale = ContentScale.Fit,
+                                    placeholder = {
+                                        CircularProgressIndicator()
+                                    }
+                                )
+                            }
                         }
                     MediaType.video, MediaType.animated_gif ->
                         Box {
