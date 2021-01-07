@@ -54,7 +54,6 @@ fun StatusText(
         AmbientTextStyle provides MaterialTheme.typography.body1.copy(color = textColor)
     ) {
         RenderContent(
-            html = status.htmlText,
             status = status,
             onLinkClicked = {
                 navigator.openLink(it)
@@ -68,17 +67,11 @@ fun StatusText(
 
 @Composable
 private fun RenderContent(
-    html: String,
     status: UiStatus,
     onLinkClicked: (String) -> Unit = {},
     onStatusTextClicked: () -> Unit = {},
 ) {
-    val document = Jsoup.parse(html.replace("\n", "<br>"))
-    val value = buildAnnotatedString {
-        document.body().childNodes().forEach {
-            RenderNode(it, status)
-        }
-    }
+    val value = status.contentAnnotatedString()
     if (value.text.isNotEmpty()) {
         ClickableText(
             onClick = {
@@ -94,6 +87,16 @@ private fun RenderContent(
             },
             text = value,
         )
+    }
+}
+
+@Composable
+public fun UiStatus.contentAnnotatedString(): AnnotatedString {
+    val document = Jsoup.parse(htmlText.replace("\n", "<br>"))
+    return buildAnnotatedString {
+        document.body().childNodes().forEach {
+            RenderNode(it, this@contentAnnotatedString)
+        }
     }
 }
 

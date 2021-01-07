@@ -37,8 +37,6 @@ import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
 import androidx.compose.ui.Alignment
@@ -84,7 +82,6 @@ fun TimelineStatusComponent(
             }
             StatusComponent(
                 status = status,
-                showActions = showActions,
                 onStatusTextClicked = {
                     navigator.status(data.statusKey)
                 }
@@ -112,7 +109,6 @@ fun TimelineStatusComponent(
 private fun StatusComponent(
     status: UiStatus,
     modifier: Modifier = Modifier,
-    showActions: Boolean = true,
     onStatusTextClicked: () -> Unit = {},
 ) {
     val navigator = AmbientNavigator.current
@@ -142,18 +138,7 @@ private fun StatusComponent(
                         )
                     }
                 }
-                Row {
-                    HumanizedTime(time = status.timestamp)
-                    if (showActions) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowDropDown,
-                            modifier = Modifier
-                                .clickable(
-                                    onClick = {},
-                                ),
-                        )
-                    }
-                }
+                HumanizedTime(time = status.timestamp)
             }
 
             Spacer(modifier = Modifier.height(4.dp))
@@ -218,7 +203,6 @@ private fun StatusComponent(
                 ) {
                     StatusComponent(
                         status = status.quote,
-                        showActions = false,
                         modifier = Modifier
                             .clickable(
                                 onClick = {

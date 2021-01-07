@@ -28,16 +28,27 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.AmbientContentColor
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.AmbientClipboardManager
 import androidx.compose.ui.platform.AmbientContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.R
 import com.twidere.twiderex.action.AmbientStatusActions
@@ -171,35 +182,92 @@ fun ShareButton(
     status: UiStatus,
     compat: Boolean = false,
 ) {
+    var expanded by remember { mutableStateOf(false) }
+    val account = AmbientActiveAccount.current
+    val accountKey = account?.accountKey
     val context = AmbientContext.current
-    val action = {
-        context.shareText(status.rawText)
+    val icon = Icons.Default.MoreHoriz
+    val text = status.contentAnnotatedString()
+    val clipboardManager = AmbientClipboardManager.current
+    val child = @Composable {
+        if (compat) {
+            TextButton(
+                onClick = {
+                    expanded = true
+                },
+                colors = ButtonDefaults.textButtonColors(
+                    contentColor = mediumEmphasisContentContentColor
+                )
+            ) {
+                Icon(
+                    modifier = Modifier.size(statusActionIconSize),
+                    imageVector = icon,
+                )
+            }
+        } else {
+            ActionIconButton(
+                onClick = {
+                    expanded = true
+                },
+            ) {
+                Icon(
+                    imageVector = icon,
+                    tint = mediumEmphasisContentContentColor,
+                )
+            }
+        }
     }
-    val icon = vectorResource(id = R.drawable.ic_share)
-    if (compat) {
-        TextButton(
+
+    DropdownMenu(
+        expanded = expanded,
+        onDismissRequest = { expanded = false },
+        toggle = child,
+    ) {
+        DropdownMenuItem(
             onClick = {
-                action.invoke()
-            },
-            colors = ButtonDefaults.textButtonColors(
-                contentColor = mediumEmphasisContentContentColor
-            )
+                expanded = false
+                clipboardManager.setText(text)
+            }
         ) {
-            Icon(
-                modifier = Modifier.size(statusActionIconSize),
-                imageVector = icon,
+            Text(
+                text = "Copy content",
             )
         }
-    } else {
-        ActionIconButton(
+        DropdownMenuItem(
             onClick = {
-                action.invoke()
-            },
+                expanded = false
+                clipboardManager.setText(
+                    buildAnnotatedString {
+                        append(status.generateShareLink())
+                    }
+                )
+            }
         ) {
-            Icon(
-                imageVector = icon,
-                tint = mediumEmphasisContentContentColor,
+            Text(
+                text = "Copy link",
             )
+        }
+        DropdownMenuItem(
+            onClick = {
+                expanded = false
+                context.shareText(status.generateShareLink())
+            }
+        ) {
+            Text(
+                text = "Share",
+            )
+        }
+        if (status.user.userKey == accountKey) {
+            DropdownMenuItem(
+                onClick = {
+                    expanded = false
+                }
+            ) {
+                Text(
+                    text = stringResource(id = R.string.common_controls_actions_remove),
+                    color = Color.Red,
+                )
+            }
         }
     }
 }

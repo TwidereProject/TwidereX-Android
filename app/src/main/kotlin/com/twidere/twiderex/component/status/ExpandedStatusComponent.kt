@@ -54,7 +54,7 @@ import com.twidere.twiderex.ui.standardPadding
 
 @Composable
 fun ExpandedStatusComponent(
-    status: UiStatus,
+    data: UiStatus,
     showInfo: Boolean = true,
     showActions: Boolean = true,
 ) {
@@ -68,20 +68,20 @@ fun ExpandedStatusComponent(
                 end = standardPadding * 2
             ),
     ) {
-        val data = (status.retweet ?: status)
-        if (status.retweet != null) {
-            RetweetHeader(data = status)
+        val status = (data.retweet ?: data)
+        if (data.retweet != null) {
+            RetweetHeader(data = data)
             Spacer(modifier = Modifier.height(standardPadding))
         }
         StatusComponent(
-            status = data,
+            status = status,
         )
 
         if (showInfo) {
-            if (!data.placeString.isNullOrEmpty()) {
+            if (!status.placeString.isNullOrEmpty()) {
                 Row {
                     Icon(imageVector = vectorResource(id = R.drawable.ic_map_pin))
-                    Text(text = data.placeString)
+                    Text(text = status.placeString)
                 }
             }
 
@@ -94,39 +94,39 @@ fun ExpandedStatusComponent(
                 Providers(
                     AmbientContentAlpha provides ContentAlpha.medium
                 ) {
-                    HumanizedTime(time = data.timestamp)
+                    HumanizedTime(time = status.timestamp)
                     Spacer(modifier = Modifier.width(standardPadding))
                     Text(
-                        text = data.source,
+                        text = status.source,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
                 }
             }
 
-            if (data.replyCount > 0 || data.retweetCount > 0 || data.likeCount > 0) {
+            if (status.replyCount > 0 || status.retweetCount > 0 || status.likeCount > 0) {
                 Spacer(modifier = Modifier.height(standardPadding))
                 Row(
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally)
                 ) {
-                    if (data.replyCount > 0) {
+                    if (status.replyCount > 0) {
                         StatusStatistics(
-                            count = data.replyCount,
+                            count = status.replyCount,
                             text = R.string.scene_status_reply_mutiple,
                         )
                         Spacer(modifier = Modifier.width(standardPadding * 2))
                     }
-                    if (data.retweetCount > 0) {
+                    if (status.retweetCount > 0) {
                         StatusStatistics(
-                            count = data.retweetCount,
+                            count = status.retweetCount,
                             text = R.string.scene_status_retweet_mutiple,
                         )
                         Spacer(modifier = Modifier.width(standardPadding * 2))
                     }
-                    if (data.likeCount > 0) {
+                    if (status.likeCount > 0) {
                         StatusStatistics(
-                            count = data.likeCount,
+                            count = status.likeCount,
                             text = R.string.scene_status_like_multiple,
                         )
                     }

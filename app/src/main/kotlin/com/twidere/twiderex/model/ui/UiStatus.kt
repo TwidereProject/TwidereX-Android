@@ -54,6 +54,11 @@ data class UiStatus(
     val url: List<UiUrlEntity>
 ) {
 
+    fun generateShareLink() = "https://${statusKey.host}" + when (statusKey.host) {
+        MicroBlogKey.TwitterHost -> "/${user.screenName}/status/$statusId"
+        else -> "/@${user.screenName}/$statusId"
+    }
+
     companion object {
         @Composable
         fun sample() = UiStatus(
@@ -95,7 +100,8 @@ data class UiStatus(
                 hasMedia = data.hasMedia,
                 user = user.toUi(),
                 media = media.toUi(),
-                retweet = status.retweet?.toUi(accountKey)?.copy(quote = status.quote?.toUi(accountKey)),
+                retweet = status.retweet?.toUi(accountKey)
+                    ?.copy(quote = status.quote?.toUi(accountKey)),
                 quote = status.quote?.toUi(accountKey),
                 isGap = timeline.isGap,
                 source = data.source,
@@ -176,7 +182,8 @@ data class UiStatus(
                 hasMedia = data.hasMedia,
                 user = user.toUi(),
                 media = media.toUi(),
-                retweet = status.retweet?.toUi(accountKey)?.copy(quote = status.quote?.toUi(accountKey)),
+                retweet = status.retweet?.toUi(accountKey)
+                    ?.copy(quote = status.quote?.toUi(accountKey)),
                 quote = status.quote?.toUi(accountKey),
                 isGap = timeline.isGap,
                 source = data.source,

@@ -81,7 +81,7 @@ fun StatusScene(statusKey: MicroBlogKey) {
                 Column {
                     status?.let {
                         ExpandedStatusComponent(
-                            status = it,
+                            data = it,
                         )
                     }
                     Divider(
@@ -109,7 +109,7 @@ fun StatusScene(statusKey: MicroBlogKey) {
                             ) {
                                 status?.let {
                                     ExpandedStatusComponent(
-                                        status = it,
+                                        data = it,
                                     )
                                 }
                             }
