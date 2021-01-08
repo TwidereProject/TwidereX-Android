@@ -31,10 +31,10 @@ import com.twidere.twiderex.db.model.DbTimeline
 import com.twidere.twiderex.db.model.DbTimelineWithStatus
 import com.twidere.twiderex.db.model.DbUrlEntity
 import com.twidere.twiderex.db.model.DbUser
-import com.twidere.twiderex.db.model.MicroBlogType
 import com.twidere.twiderex.db.model.TimelineType
 import com.twidere.twiderex.model.MediaType
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.PlatformType
 import java.util.UUID
 
 fun Status.toDbTimeline(
@@ -91,7 +91,7 @@ private fun Status.toDbStatusWithMediaAndUser(
             host = user.userKey.host,
         ),
         is_possibly_sensitive = sensitive ?: false,
-        statusType = MicroBlogType.Mastodon,
+        platformType = PlatformType.Mastodon,
     )
     return DbStatusWithMediaAndUser(
         data = status,

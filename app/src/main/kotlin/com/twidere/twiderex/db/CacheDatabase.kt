@@ -41,7 +41,6 @@ import com.twidere.twiderex.db.model.DbUrlEntity
 import com.twidere.twiderex.db.model.DbUser
 import com.twidere.twiderex.db.model.converter.MediaTypeConverter
 import com.twidere.twiderex.db.model.converter.MicroBlogKeyConverter
-import com.twidere.twiderex.db.model.converter.MicroBlogTypeConverter
 import com.twidere.twiderex.db.model.converter.PlatformTypeConverter
 import com.twidere.twiderex.db.model.converter.StringListConverter
 import com.twidere.twiderex.db.model.converter.TimelineTypeConverter
@@ -60,7 +59,7 @@ import javax.inject.Singleton
         DbUrlEntity::class,
         DbSearch::class,
     ],
-    version = 3,
+    version = 2,
 )
 @TypeConverters(
     MicroBlogKeyConverter::class,
@@ -69,7 +68,6 @@ import javax.inject.Singleton
     TimelineTypeConverter::class,
     UserTimelineTypeConverter::class,
     StringListConverter::class,
-    MicroBlogTypeConverter::class,
 )
 abstract class CacheDatabase : RoomDatabase() {
     abstract fun statusDao(): StatusDao

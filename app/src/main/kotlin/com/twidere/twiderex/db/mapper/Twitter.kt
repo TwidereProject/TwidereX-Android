@@ -34,10 +34,10 @@ import com.twidere.twiderex.db.model.DbTimeline
 import com.twidere.twiderex.db.model.DbTimelineWithStatus
 import com.twidere.twiderex.db.model.DbUrlEntity
 import com.twidere.twiderex.db.model.DbUser
-import com.twidere.twiderex.db.model.MicroBlogType
 import com.twidere.twiderex.db.model.TimelineType
 import com.twidere.twiderex.model.MediaType
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.navigation.DeepLinks
 import com.twitter.twittertext.Autolink
 import java.util.UUID
@@ -185,7 +185,7 @@ private fun StatusV2.toDbStatusWithMediaAndUser(
         statusKey = MicroBlogKey.twitter(
             id ?: throw IllegalArgumentException("Status.idStr should not be null")
         ),
-        statusType = MicroBlogType.Twitter,
+        platformType = PlatformType.Twitter,
     )
     return DbStatusWithMediaAndUser(
         data = status,
@@ -276,7 +276,7 @@ private fun Status.toDbStatusWithMediaAndUser(
         statusKey = MicroBlogKey.twitter(
             idStr ?: throw IllegalArgumentException("Status.idStr should not be null")
         ),
-        statusType = MicroBlogType.Twitter,
+        platformType = PlatformType.Twitter,
     )
     return DbStatusWithMediaAndUser(
         data = status,

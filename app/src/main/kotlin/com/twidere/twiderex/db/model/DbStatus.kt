@@ -27,6 +27,7 @@ import androidx.room.PrimaryKey
 import androidx.room.Relation
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.PlatformType
 
 @Entity(
     tableName = "status",
@@ -58,13 +59,8 @@ data class DbStatusV2(
     val quoteStatusKey: MicroBlogKey?,
     val retweetStatusKey: MicroBlogKey?,
     val is_possibly_sensitive: Boolean,
-    val statusType: MicroBlogType,
+    val platformType: PlatformType,
 )
-
-enum class MicroBlogType {
-    Twitter,
-    Mastodon,
-}
 
 data class DbStatusWithMediaAndUser(
     @Embedded
