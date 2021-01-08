@@ -20,7 +20,7 @@
  */
 package com.twidere.twiderex.repository
 
-import com.twidere.twiderex.db.AppDatabase
+import com.twidere.twiderex.db.DraftDatabase
 import com.twidere.twiderex.db.model.DbDraft
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.scenes.ComposeType
@@ -29,7 +29,7 @@ import javax.inject.Singleton
 
 @Singleton
 class DraftRepository(
-    private val database: AppDatabase
+    private val database: DraftDatabase
 ) {
     val source by lazy {
         database.draftDao().getAll()

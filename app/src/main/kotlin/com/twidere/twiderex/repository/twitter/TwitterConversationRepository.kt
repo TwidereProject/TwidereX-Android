@@ -30,7 +30,7 @@ import com.twidere.services.microblog.SearchService
 import com.twidere.services.twitter.model.ReferencedTweetType
 import com.twidere.services.twitter.model.StatusV2
 import com.twidere.services.twitter.model.TwitterSearchResponseV2
-import com.twidere.twiderex.db.AppDatabase
+import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.db.mapper.toDbTimeline
 import com.twidere.twiderex.db.model.TimelineType
 import com.twidere.twiderex.db.model.saveToDb
@@ -41,7 +41,7 @@ import com.twidere.twiderex.model.ui.UiStatus.Companion.toUi
 import com.twidere.twiderex.repository.twitter.model.SearchResult
 
 class TwitterConversationRepository @AssistedInject constructor(
-    private val database: AppDatabase,
+    private val database: CacheDatabase,
     @Assisted private val accountKey: MicroBlogKey,
     @Assisted private val searchService: SearchService,
     @Assisted private val lookupService: LookupService,

@@ -23,14 +23,14 @@ package com.twidere.twiderex.repository
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.map
 import androidx.room.withTransaction
-import com.twidere.twiderex.db.AppDatabase
+import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.db.model.DbStatusV2
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.model.ui.UiStatus.Companion.toUi
 
 class StatusRepository(
-    private val database: AppDatabase,
+    private val database: CacheDatabase,
 ) {
     fun loadLiveDataFromCache(
         statusKey: MicroBlogKey,

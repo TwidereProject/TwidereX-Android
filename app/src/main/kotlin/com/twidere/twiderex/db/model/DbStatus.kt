@@ -25,7 +25,7 @@ import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import androidx.room.Relation
-import com.twidere.twiderex.db.AppDatabase
+import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.model.MicroBlogKey
 
 @Entity(
@@ -58,7 +58,13 @@ data class DbStatusV2(
     val quoteStatusKey: MicroBlogKey?,
     val retweetStatusKey: MicroBlogKey?,
     val is_possibly_sensitive: Boolean,
+    val statusType: MicroBlogType,
 )
+
+enum class MicroBlogType {
+    Twitter,
+    Mastodon,
+}
 
 data class DbStatusWithMediaAndUser(
     @Embedded
@@ -104,7 +110,7 @@ data class DbStatusReaction(
 )
 
 suspend fun List<DbStatusWithMediaAndUser>.saveToDb(
-    database: AppDatabase
+    database: CacheDatabase
 ) {
     map { it.user }.let {
         database.userDao().insertAll(it)

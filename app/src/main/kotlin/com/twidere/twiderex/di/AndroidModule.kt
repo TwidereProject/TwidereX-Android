@@ -27,7 +27,8 @@ import android.location.LocationManager
 import android.net.ConnectivityManager
 import androidx.room.Room
 import androidx.work.WorkManager
-import com.twidere.twiderex.db.AppDatabase
+import com.twidere.twiderex.db.CacheDatabase
+import com.twidere.twiderex.db.DraftDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -52,8 +53,15 @@ object AndroidModule {
 
     @Singleton
     @Provides
-    fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase =
-        Room.databaseBuilder(context, AppDatabase::class.java, "twiderex-db")
+    fun provideCacheDatabase(@ApplicationContext context: Context): CacheDatabase =
+        Room.databaseBuilder(context, CacheDatabase::class.java, "twiderex-db")
+            .fallbackToDestructiveMigration()
+            .build()
+
+    @Singleton
+    @Provides
+    fun provideDraftDatabase(@ApplicationContext context: Context): DraftDatabase =
+        Room.databaseBuilder(context, DraftDatabase::class.java, "twiderex-draft-db")
             .fallbackToDestructiveMigration()
             .build()
 

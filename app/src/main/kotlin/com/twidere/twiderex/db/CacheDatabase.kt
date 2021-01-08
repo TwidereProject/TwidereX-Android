@@ -23,7 +23,6 @@ package com.twidere.twiderex.db
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import com.twidere.twiderex.db.dao.DraftDao
 import com.twidere.twiderex.db.dao.MediaDao
 import com.twidere.twiderex.db.dao.PagingTimelineDao
 import com.twidere.twiderex.db.dao.ReactionDao
@@ -32,7 +31,6 @@ import com.twidere.twiderex.db.dao.StatusDao
 import com.twidere.twiderex.db.dao.TimelineDao
 import com.twidere.twiderex.db.dao.UrlEntityDao
 import com.twidere.twiderex.db.dao.UserDao
-import com.twidere.twiderex.db.model.DbDraft
 import com.twidere.twiderex.db.model.DbMedia
 import com.twidere.twiderex.db.model.DbPagingTimeline
 import com.twidere.twiderex.db.model.DbSearch
@@ -41,9 +39,9 @@ import com.twidere.twiderex.db.model.DbStatusV2
 import com.twidere.twiderex.db.model.DbTimeline
 import com.twidere.twiderex.db.model.DbUrlEntity
 import com.twidere.twiderex.db.model.DbUser
-import com.twidere.twiderex.db.model.converter.ComposeTypeConverter
 import com.twidere.twiderex.db.model.converter.MediaTypeConverter
 import com.twidere.twiderex.db.model.converter.MicroBlogKeyConverter
+import com.twidere.twiderex.db.model.converter.MicroBlogTypeConverter
 import com.twidere.twiderex.db.model.converter.PlatformTypeConverter
 import com.twidere.twiderex.db.model.converter.StringListConverter
 import com.twidere.twiderex.db.model.converter.TimelineTypeConverter
@@ -60,10 +58,9 @@ import javax.inject.Singleton
         DbStatusReaction::class,
         DbPagingTimeline::class,
         DbUrlEntity::class,
-        DbDraft::class,
         DbSearch::class,
     ],
-    version = 2,
+    version = 3,
 )
 @TypeConverters(
     MicroBlogKeyConverter::class,
@@ -72,9 +69,9 @@ import javax.inject.Singleton
     TimelineTypeConverter::class,
     UserTimelineTypeConverter::class,
     StringListConverter::class,
-    ComposeTypeConverter::class,
+    MicroBlogTypeConverter::class,
 )
-abstract class AppDatabase : RoomDatabase() {
+abstract class CacheDatabase : RoomDatabase() {
     abstract fun statusDao(): StatusDao
     abstract fun timelineDao(): TimelineDao
     abstract fun mediaDao(): MediaDao
@@ -82,6 +79,5 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun reactionDao(): ReactionDao
     abstract fun pagingTimelineDao(): PagingTimelineDao
     abstract fun urlEntityDao(): UrlEntityDao
-    abstract fun draftDao(): DraftDao
     abstract fun searchDao(): SearchDao
 }

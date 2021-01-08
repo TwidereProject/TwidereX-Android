@@ -26,7 +26,7 @@ import androidx.paging.PagingState
 import androidx.room.withTransaction
 import com.twidere.services.http.MicroBlogException
 import com.twidere.services.microblog.model.IStatus
-import com.twidere.twiderex.db.AppDatabase
+import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.db.mapper.toDbTimeline
 import com.twidere.twiderex.db.model.DbPagingTimeline.Companion.toPagingDbTimeline
 import com.twidere.twiderex.db.model.DbPagingTimelineWithStatus
@@ -39,7 +39,7 @@ import com.twidere.twiderex.utils.notify
 @OptIn(ExperimentalPagingApi::class)
 abstract class PagingTimelineMediatorBase(
     accountKey: MicroBlogKey,
-    database: AppDatabase,
+    database: CacheDatabase,
     private val inAppNotification: InAppNotification
 ) : PagingMediator(accountKey = accountKey, database = database) {
     override suspend fun load(
@@ -102,7 +102,7 @@ abstract class PagingTimelineMediatorBase(
         pageSize: Int
     ) = result.isNotEmpty()
 
-    protected open suspend fun clearData(database: AppDatabase) {
+    protected open suspend fun clearData(database: CacheDatabase) {
         database.pagingTimelineDao().clearAll(pagingKey, accountKey = accountKey)
     }
 

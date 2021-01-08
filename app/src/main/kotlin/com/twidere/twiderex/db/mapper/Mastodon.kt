@@ -31,6 +31,7 @@ import com.twidere.twiderex.db.model.DbTimeline
 import com.twidere.twiderex.db.model.DbTimelineWithStatus
 import com.twidere.twiderex.db.model.DbUrlEntity
 import com.twidere.twiderex.db.model.DbUser
+import com.twidere.twiderex.db.model.MicroBlogType
 import com.twidere.twiderex.db.model.TimelineType
 import com.twidere.twiderex.model.MediaType
 import com.twidere.twiderex.model.MicroBlogKey
@@ -89,7 +90,8 @@ private fun Status.toDbStatusWithMediaAndUser(
             id ?: throw IllegalArgumentException("mastodon Status.idStr should not be null"),
             host = user.userKey.host,
         ),
-        is_possibly_sensitive = sensitive ?: false
+        is_possibly_sensitive = sensitive ?: false,
+        statusType = MicroBlogType.Mastodon,
     )
     return DbStatusWithMediaAndUser(
         data = status,

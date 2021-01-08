@@ -22,7 +22,8 @@ package com.twidere.twiderex.di
 
 import androidx.work.WorkManager
 import com.twidere.twiderex.action.ComposeAction
-import com.twidere.twiderex.db.AppDatabase
+import com.twidere.twiderex.db.CacheDatabase
+import com.twidere.twiderex.db.DraftDatabase
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.DraftRepository
 import com.twidere.twiderex.repository.ReactionRepository
@@ -45,19 +46,19 @@ object TwidereModule {
 
     @Singleton
     @Provides
-    fun provideDraftRepository(database: AppDatabase): DraftRepository =
+    fun provideDraftRepository(database: DraftDatabase): DraftRepository =
         DraftRepository(database = database)
 
     @Provides
-    fun provideSearchRepository(database: AppDatabase): SearchRepository =
+    fun provideSearchRepository(database: CacheDatabase): SearchRepository =
         SearchRepository(database = database)
 
     @Provides
-    fun provideStatusRepository(database: AppDatabase): StatusRepository =
+    fun provideStatusRepository(database: CacheDatabase): StatusRepository =
         StatusRepository(database = database)
 
     @Provides
-    fun provideReactionRepository(database: AppDatabase): ReactionRepository =
+    fun provideReactionRepository(database: CacheDatabase): ReactionRepository =
         ReactionRepository(database = database)
 
     @Singleton

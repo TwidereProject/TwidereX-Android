@@ -24,14 +24,14 @@ import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.RemoteMediator
-import com.twidere.twiderex.db.AppDatabase
+import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.db.model.DbPagingTimelineWithStatus
 import com.twidere.twiderex.defaultLoadCount
 import com.twidere.twiderex.model.MicroBlogKey
 
 @OptIn(ExperimentalPagingApi::class)
 abstract class PagingMediator(
-    val database: AppDatabase,
+    val database: CacheDatabase,
     val accountKey: MicroBlogKey,
 ) : RemoteMediator<Int, DbPagingTimelineWithStatus>() {
     abstract val pagingKey: String

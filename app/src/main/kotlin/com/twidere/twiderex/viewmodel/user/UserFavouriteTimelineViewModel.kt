@@ -23,7 +23,7 @@ package com.twidere.twiderex.viewmodel.user
 import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
 import com.twidere.services.microblog.TimelineService
-import com.twidere.twiderex.db.AppDatabase
+import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.di.assisted.IAssistedFactory
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
@@ -33,7 +33,7 @@ import com.twidere.twiderex.paging.mediator.user.UserFavouriteMediator
 import com.twidere.twiderex.viewmodel.PagingViewModel
 
 class UserFavouriteTimelineViewModel @AssistedInject constructor(
-    database: AppDatabase,
+    database: CacheDatabase,
     inAppNotification: InAppNotification,
     @Assisted account: AccountDetails,
     @Assisted screenName: String,

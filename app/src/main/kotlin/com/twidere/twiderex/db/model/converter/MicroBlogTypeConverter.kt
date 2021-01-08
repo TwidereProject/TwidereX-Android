@@ -18,24 +18,19 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.paging.mediator
+package com.twidere.twiderex.db.model.converter
 
-import com.twidere.services.microblog.TimelineService
-import com.twidere.twiderex.db.CacheDatabase
-import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.notification.InAppNotification
+import androidx.room.TypeConverter
+import com.twidere.twiderex.db.model.MicroBlogType
 
-class MentionTimelineMediator(
-    private val service: TimelineService,
-    accountKey: MicroBlogKey,
-    database: CacheDatabase,
-    inAppNotification: InAppNotification,
-) : PagingWithGapMediator(accountKey, database, inAppNotification) {
-    override suspend fun loadBetweenImpl(
-        pageSize: Int,
-        max_id: String?,
-        since_id: String?
-    ) = service.mentionsTimeline(pageSize, max_id = max_id, since_id = since_id)
+class MicroBlogTypeConverter {
+    @TypeConverter
+    fun fromString(value: String?): MicroBlogType? {
+        return value?.let { MicroBlogType.valueOf(it) }
+    }
 
-    override val pagingKey: String = "mentions:$accountKey"
+    @TypeConverter
+    fun fromComposeType(microBlogType: MicroBlogType?): String? {
+        return microBlogType?.name
+    }
 }
