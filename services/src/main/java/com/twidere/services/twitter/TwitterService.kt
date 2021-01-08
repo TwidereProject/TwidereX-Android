@@ -78,8 +78,14 @@ class TwitterService(
             { chain ->
                 val response = chain.proceed(chain.request())
                 if (response.code != 200) {
-                    response.body?.string()?.decodeJson<MicroBlogException>()?.let {
-                        throw it
+                    response.body?.string()?.takeIf {
+                        it.isNotEmpty()
+                    }?.let { content ->
+                        content.decodeJson<MicroBlogException>().let {
+                            throw it
+                        }
+                    } ?: run {
+                        throw MicroBlogException(httpCode = response.code)
                     }
                 }
                 response
@@ -322,6 +328,8 @@ class TwitterService(
     override suspend fun unRetweet(id: String) = resources.unretweet(id)
 
     override suspend fun compose(content: String) = update(content)
+
+    override suspend fun delete(id: String) = resources.destroy(id)
 
     private val BULK_SIZE: Long = 512 * 1024 // 512 Kib
 

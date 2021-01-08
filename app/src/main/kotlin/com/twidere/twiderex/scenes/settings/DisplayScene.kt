@@ -155,31 +155,33 @@ fun DisplayScene() {
                         Text(text = stringResource(id = R.string.scene_settings_display_media_media_previews))
                     }
                 )
-                radioItem(
-                    options = listOf(
-                        DisplayPreferences.AutoPlayback.Auto,
-                        DisplayPreferences.AutoPlayback.Always,
-                        DisplayPreferences.AutoPlayback.Off,
-                    ),
-                    value = display.autoPlayback,
-                    onChanged = {
-                        viewModel.setAutoPlayback(it)
-                    },
-                    title = {
-                        Text(text = stringResource(id = R.string.scene_settings_display_media_auto_playback))
-                    },
-                    itemContent = {
-                        Text(
-                            text = stringResource(
-                                arrayOf(
-                                    R.string.scene_settings_display_media_automatic,
-                                    R.string.scene_settings_display_media_always,
-                                    R.string.scene_settings_display_media_off,
-                                )[it.ordinal]
+                if (display.mediaPreview) {
+                    radioItem(
+                        options = listOf(
+                            DisplayPreferences.AutoPlayback.Auto,
+                            DisplayPreferences.AutoPlayback.Always,
+                            DisplayPreferences.AutoPlayback.Off,
+                        ),
+                        value = display.autoPlayback,
+                        onChanged = {
+                            viewModel.setAutoPlayback(it)
+                        },
+                        title = {
+                            Text(text = stringResource(id = R.string.scene_settings_display_media_auto_playback))
+                        },
+                        itemContent = {
+                            Text(
+                                text = stringResource(
+                                    arrayOf(
+                                        R.string.scene_settings_display_media_automatic,
+                                        R.string.scene_settings_display_media_always,
+                                        R.string.scene_settings_display_media_off,
+                                    )[it.ordinal]
+                                )
                             )
-                        )
-                    }
-                )
+                        }
+                    )
+                }
             }
         }
     }

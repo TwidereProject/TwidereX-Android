@@ -9,7 +9,7 @@ task generateTranslate {
         if (!jsonFile.exists()) {
             continue
         }
-        def text = jsonFile.getText()
+        def text = jsonFile.getText("UTF-8")
         def json = new JsonSlurper().parseText(text)
         def result = flattenMap(json).findAll {
             !it.value.isEmpty() && !it.value.isAllWhitespace()

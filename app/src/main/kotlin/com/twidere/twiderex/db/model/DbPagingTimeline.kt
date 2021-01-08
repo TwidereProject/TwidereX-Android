@@ -25,7 +25,7 @@ import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import androidx.room.Relation
-import com.twidere.twiderex.db.AppDatabase
+import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.model.MicroBlogKey
 import java.util.UUID
 
@@ -89,7 +89,7 @@ enum class UserTimelineType {
 fun UserTimelineType.pagingKey(accountKey: MicroBlogKey) = "user:$accountKey:$this"
 
 suspend fun List<DbPagingTimelineWithStatus>.saveToDb(
-    database: AppDatabase,
+    database: CacheDatabase,
 ) {
     val data = this
         .map { listOf(it.status.status, it.status.quote, it.status.retweet) }

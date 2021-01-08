@@ -3,8 +3,11 @@
     <string name="common_alerts_account_temporarily_locked_message">Open Twitter to unlock</string>
     <string name="common_alerts_rate_limit_exceeded_title">Rate Limit Exceeded</string>
     <string name="common_alerts_rate_limit_exceeded_message">Reached Twitter API usage limit</string>
-    <string name="common_alerts_permission_denied_title">Permission Denied</string>
-    <string name="common_alerts_permission_denied_message">Sorry, you are not authorized</string>
+    <string name="common_alerts_permission_denied_not_authorized_title">Permission Denied</string>
+    <string name="common_alerts_permission_denied_not_authorized_message">Sorry, you are not authorized</string>
+    <string name="common_alerts_permission_denied_friendship_blocked_title">Permission Denied</string>
+    <string name="common_alerts_permission_denied_friendship_blocked_message">You have been blocked from following this account at the request of the user</string>
+    <string name="common_alerts_no_tweets_found_title">No Tweets Found</string>
     <string name="common_alerts_unfollow_user_message">Unfollow user %s?</string>
     <string name="common_alerts_cancel_follow_request_message">Cancel follow request for %s?</string>
     <string name="common_alerts_tweet_sent_title">Tweet Sent</string>
@@ -22,6 +25,7 @@
     <string name="common_alerts_following_success_title">Following Succeeded</string>
     <string name="common_alerts_unfollowing_success_title">Unfollowing Succeeded</string>
     <string name="common_alerts_following_request_sent_title">Following Request Sent</string>
+    <string name="common_alerts_too_many_requests_title">Too many requests</string>
     <string name="common_controls_actions_add">Add</string>
     <string name="common_controls_actions_remove">Remove</string>
     <string name="common_controls_actions_edit">Edit</string>
@@ -34,6 +38,11 @@
     <string name="common_controls_actions_preview">Preview</string>
     <string name="common_controls_actions_open_in_safari">Open in Safari</string>
     <string name="common_controls_timeline_load_more">Load More</string>
+    <string name="common_controls_status_actions_copy_text">Copy text</string>
+    <string name="common_controls_status_actions_copy_link">Copy link</string>
+    <string name="common_controls_status_actions_share_link">Share link</string>
+    <string name="common_controls_status_actions_delete_tweet">Delete tweet</string>
+    <string name="common_controls_status_media">Media</string>
     <string name="common_controls_status_user_retweeted">%s retweeted</string>
     <string name="common_controls_friendship_actions_follow">Follow</string>
     <string name="common_controls_friendship_actions_unfollow">Unfollow</string>
@@ -93,8 +102,8 @@
     <string name="scene_search_tabs_users">Users</string>
     <string name="scene_profile_title">Me</string>
     <string name="scene_profile_hide_reply">Hide reply</string>
-    <string name="scene_profile_permission_denied_title">Permission Denied</string>
-    <string name="scene_profile_permission_denied_message">You have been blocked from viewing this user’s profile.</string>
+    <string name="scene_profile_permission_denied_profile_blocked_title">Permission Denied</string>
+    <string name="scene_profile_permission_denied_profile_blocked_message">You have been blocked from viewing this user’s profile.</string>
     <string name="scene_following_title">Following</string>
     <string name="scene_followers_title">Followers</string>
     <string name="scene_listed_title">Listed</string>

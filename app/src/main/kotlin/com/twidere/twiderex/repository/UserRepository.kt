@@ -26,7 +26,7 @@ import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
 import com.twidere.services.microblog.LookupService
 import com.twidere.services.microblog.RelationshipService
-import com.twidere.twiderex.db.AppDatabase
+import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.db.mapper.toDbUser
 import com.twidere.twiderex.db.model.DbUser
 import com.twidere.twiderex.model.MicroBlogKey
@@ -34,7 +34,7 @@ import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.model.ui.UiUser.Companion.toUi
 
 class UserRepository @AssistedInject constructor(
-    private val database: AppDatabase,
+    private val database: CacheDatabase,
     private val accountRepository: AccountRepository,
     @Assisted private val accountKey: MicroBlogKey,
     @Assisted private val lookupService: LookupService,

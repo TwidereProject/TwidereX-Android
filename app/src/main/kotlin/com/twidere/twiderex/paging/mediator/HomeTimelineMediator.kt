@@ -22,7 +22,7 @@ package com.twidere.twiderex.paging.mediator
 
 import androidx.paging.ExperimentalPagingApi
 import com.twidere.services.microblog.TimelineService
-import com.twidere.twiderex.db.AppDatabase
+import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.notification.InAppNotification
 
@@ -30,7 +30,7 @@ import com.twidere.twiderex.notification.InAppNotification
 class HomeTimelineMediator(
     private val service: TimelineService,
     accountKey: MicroBlogKey,
-    database: AppDatabase,
+    database: CacheDatabase,
     inAppNotification: InAppNotification,
 ) : PagingWithGapMediator(accountKey, database, inAppNotification) {
     override val pagingKey: String = "home:$accountKey"

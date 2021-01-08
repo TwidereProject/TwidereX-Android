@@ -37,13 +37,12 @@ import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -84,7 +83,6 @@ fun TimelineStatusComponent(
             }
             StatusComponent(
                 status = status,
-                showActions = showActions,
                 onStatusTextClicked = {
                     navigator.status(data.statusKey)
                 }
@@ -112,7 +110,6 @@ fun TimelineStatusComponent(
 private fun StatusComponent(
     status: UiStatus,
     modifier: Modifier = Modifier,
-    showActions: Boolean = true,
     onStatusTextClicked: () -> Unit = {},
 ) {
     val navigator = AmbientNavigator.current
@@ -129,7 +126,6 @@ private fun StatusComponent(
                         text = status.user.name,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        color = MaterialTheme.colors.primary
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Providers(
@@ -142,18 +138,7 @@ private fun StatusComponent(
                         )
                     }
                 }
-                Row {
-                    HumanizedTime(time = status.timestamp)
-                    if (showActions) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowDropDown,
-                            modifier = Modifier
-                                .clickable(
-                                    onClick = {},
-                                ),
-                        )
-                    }
-                }
+                HumanizedTime(time = status.timestamp)
             }
 
             Spacer(modifier = Modifier.height(4.dp))
@@ -181,7 +166,7 @@ private fun StatusComponent(
                         ) {
                             Icon(imageVector = vectorResource(id = R.drawable.ic_photo))
                             Spacer(modifier = Modifier.width(standardPadding))
-                            Text(text = "Media")
+                            Text(text = stringResource(id = R.string.common_controls_status_media))
                         }
                     }
                 }
@@ -218,7 +203,6 @@ private fun StatusComponent(
                 ) {
                     StatusComponent(
                         status = status.quote,
-                        showActions = false,
                         modifier = Modifier
                             .clickable(
                                 onClick = {

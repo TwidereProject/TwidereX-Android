@@ -34,6 +34,7 @@ import com.twidere.twiderex.db.model.DbUser
 import com.twidere.twiderex.db.model.TimelineType
 import com.twidere.twiderex.model.MediaType
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.PlatformType
 import java.util.UUID
 
 fun Status.toDbTimeline(
@@ -82,14 +83,15 @@ private fun Status.toDbStatusWithMediaAndUser(
         source = application?.name ?: "",
         userKey = user.userKey,
         lang = null,
-        replyStatusId = null,
-        retweetStatusId = reblog?.id,
-        quoteStatusId = null,
+        replyStatusKey = null,
+        retweetStatusKey = reblog?.toDbStatusWithMediaAndUser(accountKey = accountKey)?.data?.statusKey,
+        quoteStatusKey = null,
         statusKey = MicroBlogKey(
             id ?: throw IllegalArgumentException("mastodon Status.idStr should not be null"),
             host = user.userKey.host,
         ),
-        is_possibly_sensitive = sensitive ?: false
+        is_possibly_sensitive = sensitive ?: false,
+        platformType = PlatformType.Mastodon,
     )
     return DbStatusWithMediaAndUser(
         data = status,

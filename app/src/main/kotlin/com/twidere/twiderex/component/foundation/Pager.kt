@@ -155,6 +155,7 @@ fun Pager(
             }
         },
         modifier = modifier.draggable(
+            enabled = dragEnabled,
             orientation = Orientation.Horizontal,
             onDragStarted = {
                 state.selectionState = PagerState.SelectionState.Undecided
@@ -165,14 +166,12 @@ fun Pager(
                 state.fling(velocity / pageSize)
             }
         ) { dy ->
-            if (dragEnabled) {
-                with(state) {
-                    val pos = pageSize * currentPageOffset
-                    val max = if (currentPage == minPage) 0 else pageSize * offscreenLimit
-                    val min = if (currentPage == maxPage) 0 else -pageSize * offscreenLimit
-                    val newPos = (pos + dy).coerceIn(min.toFloat(), max.toFloat())
-                    currentPageOffset = newPos / pageSize
-                }
+            with(state) {
+                val pos = pageSize * currentPageOffset
+                val max = if (currentPage == minPage) 0 else pageSize * offscreenLimit
+                val min = if (currentPage == maxPage) 0 else -pageSize * offscreenLimit
+                val newPos = (pos + dy).coerceIn(min.toFloat(), max.toFloat())
+                currentPageOffset = newPos / pageSize
             }
         }
     ) { measurables, constraints ->

@@ -22,31 +22,51 @@ package com.twidere.twiderex.repository
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.map
-import com.twidere.twiderex.db.AppDatabase
+import androidx.room.withTransaction
+import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.db.model.DbStatusV2
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.model.ui.UiStatus.Companion.toUi
 
 class StatusRepository(
-    private val database: AppDatabase,
+    private val database: CacheDatabase,
 ) {
-    fun loadLiveDataFromCache(statusKey: MicroBlogKey, accountKey: MicroBlogKey): LiveData<UiStatus?> {
-        return database.statusDao().findWithStatusIdWithReferenceLiveData(statusKey).map {
+    fun loadLiveDataFromCache(
+        statusKey: MicroBlogKey,
+        accountKey: MicroBlogKey
+    ): LiveData<UiStatus?> {
+        return database.statusDao().findWithStatusKeyWithReferenceLiveData(statusKey).map {
             it?.toUi(accountKey)
         }
     }
 
     suspend fun loadFromCache(statusKey: MicroBlogKey, accountKey: MicroBlogKey): UiStatus? {
-        return database.statusDao().findWithStatusIdWithReference(statusKey).let {
+        return database.statusDao().findWithStatusKeyWithReference(statusKey).let {
             it?.toUi(accountKey)
         }
     }
 
     suspend fun updateStatus(statusKey: MicroBlogKey, action: (DbStatusV2) -> Unit) {
-        database.statusDao().findWithStatusId(statusKey)?.let {
+        database.statusDao().findWithStatusKey(statusKey)?.let {
             action.invoke(it)
             database.statusDao().insertAll(listOf(it))
+        }
+    }
+
+    suspend fun removeStatus(statusKey: MicroBlogKey) {
+        val statusToRemove = listOfNotNull(
+            database.statusDao().findWithStatusKey(statusKey),
+            database.statusDao().findWithReplyStatusKey(statusKey)
+        )
+        val timelineToRemove =
+            database.timelineDao().findAllWithStatusKey(statusToRemove.map { it.statusKey })
+        val pagingTimelineToRemove =
+            database.pagingTimelineDao().findAllWIthStatusKey(statusToRemove.map { it.statusKey })
+        database.withTransaction {
+            database.statusDao().delete(statusToRemove)
+            database.timelineDao().delete(timelineToRemove)
+            database.pagingTimelineDao().delete(pagingTimelineToRemove)
         }
     }
 }

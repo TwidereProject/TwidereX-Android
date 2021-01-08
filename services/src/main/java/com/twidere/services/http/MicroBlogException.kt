@@ -28,6 +28,7 @@ data class MicroBlogException(
     val error: String? = null,
     val request: String? = null,
     val errors: List<Errors>? = null,
+    val httpCode: Int? = null,
 ) : IOException() {
     val microBlogErrorMessage: String?
         get() = error ?: errors?.firstOrNull()?.let {

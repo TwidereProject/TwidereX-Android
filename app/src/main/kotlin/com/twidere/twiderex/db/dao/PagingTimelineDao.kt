@@ -22,6 +22,7 @@ package com.twidere.twiderex.db.dao
 
 import androidx.paging.PagingSource
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -39,6 +40,9 @@ interface PagingTimelineDao {
     @Query("SELECT * FROM paging_timeline WHERE statusKey == :statusKey AND accountKey == :accountKey")
     suspend fun findWithStatusKey(statusKey: MicroBlogKey, accountKey: MicroBlogKey): DbPagingTimeline?
 
+    @Query("SELECT * FROM paging_timeline WHERE statusKey in (:statusKey)")
+    suspend fun findAllWIthStatusKey(statusKey: List<MicroBlogKey>): List<DbPagingTimeline>
+
     @Transaction
     @Query("SELECT * FROM paging_timeline WHERE pagingKey == :pagingKey AND accountKey == :accountKey ORDER BY timestamp DESC")
     fun getPagingSource(
@@ -55,4 +59,7 @@ interface PagingTimelineDao {
         pagingKey: String,
         accountKey: MicroBlogKey,
     )
+
+    @Delete
+    suspend fun delete(timeline: List<DbPagingTimeline>)
 }

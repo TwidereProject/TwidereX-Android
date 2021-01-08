@@ -23,7 +23,7 @@ package com.twidere.twiderex.paging.mediator.user
 import androidx.paging.ExperimentalPagingApi
 import com.twidere.services.microblog.TimelineService
 import com.twidere.services.microblog.model.IStatus
-import com.twidere.twiderex.db.AppDatabase
+import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.db.model.UserTimelineType
 import com.twidere.twiderex.db.model.pagingKey
 import com.twidere.twiderex.model.MicroBlogKey
@@ -34,7 +34,7 @@ import com.twidere.twiderex.paging.mediator.PagingTimelineMediatorBase
 class UserStatusMediator(
     private val screenName: String,
     private val userKey: MicroBlogKey,
-    database: AppDatabase,
+    database: CacheDatabase,
     accountKey: MicroBlogKey,
     private val service: TimelineService,
     inAppNotification: InAppNotification,

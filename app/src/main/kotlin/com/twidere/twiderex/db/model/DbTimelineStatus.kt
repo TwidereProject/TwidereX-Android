@@ -25,7 +25,7 @@ import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import androidx.room.Relation
-import com.twidere.twiderex.db.AppDatabase
+import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.model.MicroBlogKey
 
 @Entity(
@@ -63,7 +63,7 @@ data class DbTimelineWithStatus(
 )
 
 suspend fun List<DbTimelineWithStatus>.saveToDb(
-    database: AppDatabase,
+    database: CacheDatabase,
 ) {
     val data = this
         .map { listOf(it.status.status, it.status.quote, it.status.retweet) }

@@ -22,14 +22,14 @@ package com.twidere.twiderex.paging.mediator.search
 
 import com.twidere.services.microblog.SearchService
 import com.twidere.services.microblog.model.IStatus
-import com.twidere.twiderex.db.AppDatabase
+import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.paging.mediator.PagingTimelineMediatorBase
 
 class SearchStatusMediator(
     private val query: String,
-    database: AppDatabase,
+    database: CacheDatabase,
     accountKey: MicroBlogKey,
     private val service: SearchService,
     inAppNotification: InAppNotification,

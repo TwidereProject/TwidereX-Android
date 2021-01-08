@@ -18,28 +18,8 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.services.utils
+package com.twidere.twiderex.utils
 
-import com.twidere.services.http.MicroBlogException
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.decodeFromJsonElement
-
-val JSON by lazy {
-    Json {
-        ignoreUnknownKeys = true
-        isLenient = true
-        coerceInputValues = true
-    }
-}
-
-inline fun <reified T> T.encodeJson(): String =
-    JSON.encodeToString<T>(this)
-
-inline fun <reified T> String.decodeJson(): T {
-    return runCatching {
-        JSON.parseToJsonElement(this)
-    }.getOrNull()?.let {
-        JSON.decodeFromJsonElement<T>(it)
-    } ?: throw MicroBlogException(error = this)
+object HttpErrorCodes {
+    const val TooManyRequests = 429
 }

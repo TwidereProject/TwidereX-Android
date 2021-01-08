@@ -5,6 +5,7 @@
     <string name="common_controls_actions_save">සුරකින්න</string>
     <string name="common_controls_actions_ok">හරි</string>
     <string name="common_controls_actions_cancel">අවලංගු කරන්න</string>
+    <string name="common_controls_status_media">මාධ්‍යය</string>
     <string name="common_countable_list_single">ලැයිස්තුව</string>
     <string name="common_countable_list_multiple">ලැයිස්තු</string>
     <string name="common_countable_tweet_single">ටුවිට්</string>

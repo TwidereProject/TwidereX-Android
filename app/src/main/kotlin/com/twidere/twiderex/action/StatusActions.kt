@@ -24,6 +24,8 @@ import androidx.compose.runtime.ambientOf
 import androidx.work.WorkManager
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.ui.UiStatus
+import com.twidere.twiderex.worker.database.DeleteDbStatusWorker
+import com.twidere.twiderex.worker.status.DeleteStatusWorker
 import com.twidere.twiderex.worker.status.LikeWorker
 import com.twidere.twiderex.worker.status.RetweetWorker
 import com.twidere.twiderex.worker.status.StatusResult
@@ -38,11 +40,21 @@ val AmbientStatusActions = ambientOf<IStatusActions>()
 interface IStatusActions {
     fun like(status: UiStatus, account: AccountDetails) {}
     fun retweet(status: UiStatus, account: AccountDetails) {}
+    fun delete(status: UiStatus, account: AccountDetails) {}
 }
 
 class StatusActions @Inject constructor(
     private val workManager: WorkManager,
 ) : IStatusActions {
+    override fun delete(status: UiStatus, account: AccountDetails) {
+        workManager.beginWith(
+            DeleteStatusWorker.create(
+                status = status,
+                accountKey = account.accountKey
+            )
+        ).then(DeleteDbStatusWorker.create())
+            .enqueue()
+    }
 
     override fun like(status: UiStatus, account: AccountDetails) {
         workManager.beginWith(

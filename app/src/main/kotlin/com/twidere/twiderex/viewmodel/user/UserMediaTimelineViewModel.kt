@@ -29,7 +29,7 @@ import androidx.paging.map
 import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
 import com.twidere.services.microblog.TimelineService
-import com.twidere.twiderex.db.AppDatabase
+import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.di.assisted.IAssistedFactory
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
@@ -44,7 +44,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 class UserMediaTimelineViewModel @AssistedInject constructor(
-    database: AppDatabase,
+    database: CacheDatabase,
     inAppNotification: InAppNotification,
     @Assisted account: AccountDetails,
     @Assisted screenName: String,

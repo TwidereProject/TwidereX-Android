@@ -24,7 +24,6 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.zoomable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -42,7 +41,6 @@ import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
@@ -56,10 +54,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.gesture.DragObserver
-import androidx.compose.ui.gesture.rawDragGestureFilter
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.AmbientAnimationClock
 import androidx.compose.ui.platform.AmbientContext
@@ -77,6 +71,7 @@ import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.foundation.Pager
 import com.twidere.twiderex.component.foundation.PagerState
 import com.twidere.twiderex.component.foundation.VideoPlayer
+import com.twidere.twiderex.component.foundation.Zoomable
 import com.twidere.twiderex.component.status.LikeButton
 import com.twidere.twiderex.component.status.ReplyButton
 import com.twidere.twiderex.component.status.RetweetButton
@@ -95,7 +90,6 @@ import com.twidere.twiderex.ui.AmbientVideoPlayback
 import com.twidere.twiderex.ui.TwidereXTheme
 import com.twidere.twiderex.ui.standardPadding
 import com.twidere.twiderex.viewmodel.MediaViewModel
-import kotlin.math.max
 
 @Composable
 fun MediaScene(statusKey: MicroBlogKey, selectedIndex: Int) {
@@ -112,7 +106,9 @@ fun MediaScene(statusKey: MicroBlogKey, selectedIndex: Int) {
         if (loading) {
             InAppNotificationScaffold {
                 Column(
-                    modifier = Modifier.fillMaxWidth().fillMaxHeight(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight(),
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
@@ -137,7 +133,7 @@ fun MediaScene(status: UiStatus, selectedIndex: Int) {
     var hideControls by remember { mutableStateOf(false) }
     val controlPanelColor = MaterialTheme.colors.surface.copy(alpha = 0.6f)
     val navController = AmbientNavController.current
-    Scaffold {
+    InAppNotificationScaffold {
         Box {
             val clock = AmbientAnimationClock.current
             val pagerState = remember(clock) {
@@ -277,9 +273,6 @@ fun MediaItemView(
     customControl: PlayerControlView? = null,
     requestLock: (Boolean) -> Unit,
 ) {
-    var scale by remember { mutableStateOf(1f) }
-    var translate by remember { mutableStateOf(Offset(0f, 0f)) }
-    var looked by remember { mutableStateOf(false) }
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -287,46 +280,28 @@ fun MediaItemView(
     ) {
         Box(
             modifier = Modifier
-                .zoomable(
-                    onZoomDelta = { scale = max(1f, scale * it) },
-                    onZoomStarted = {
-                        looked = true
-                        requestLock(looked)
-                    },
-                    onZoomStopped = {
-                        looked = scale != 1f
-                        requestLock(looked)
-                    },
-                )
-                .rawDragGestureFilter(
-                    object : DragObserver {
-                        override fun onDrag(dragDistance: Offset): Offset {
-                            if (looked) {
-                                translate = translate.plus(dragDistance)
-                            }
-                            return super.onDrag(dragDistance)
-                        }
-                    })
                 .fillMaxSize(),
             contentAlignment = Alignment.Center,
         ) {
             data.mediaUrl?.let {
                 when (data.type) {
                     MediaType.photo ->
-                        NetworkImage(
-                            url = it,
-                            contentScale = ContentScale.Fit,
-                            modifier = Modifier
-                                .graphicsLayer(
-                                    scaleX = scale,
-                                    scaleY = scale,
-                                    translationX = translate.x,
-                                    translationY = translate.y
-                                ),
-                            placeholder = {
-                                CircularProgressIndicator()
+                        Zoomable(
+                            onZoomStarted = {
+                                requestLock(true)
+                            },
+                            onZoomStopped = {
+                                requestLock(it != 1F)
                             }
-                        )
+                        ) {
+                            NetworkImage(
+                                url = it,
+                                contentScale = ContentScale.Fit,
+                                placeholder = {
+                                    CircularProgressIndicator()
+                                }
+                            )
+                        }
                     MediaType.video, MediaType.animated_gif ->
                         Box {
                             VideoPlayer(

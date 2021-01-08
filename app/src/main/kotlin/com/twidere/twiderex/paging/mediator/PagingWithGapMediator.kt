@@ -27,7 +27,7 @@ import androidx.paging.PagingState
 import androidx.room.withTransaction
 import com.twidere.services.http.MicroBlogException
 import com.twidere.services.microblog.model.IStatus
-import com.twidere.twiderex.db.AppDatabase
+import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.db.mapper.toDbTimeline
 import com.twidere.twiderex.db.model.DbPagingTimeline.Companion.toPagingDbTimeline
 import com.twidere.twiderex.db.model.DbPagingTimelineWithStatus
@@ -42,7 +42,7 @@ import kotlinx.coroutines.withContext
 @OptIn(ExperimentalPagingApi::class)
 abstract class PagingWithGapMediator(
     accountKey: MicroBlogKey,
-    database: AppDatabase,
+    database: CacheDatabase,
     private val inAppNotification: InAppNotification,
 ) : PagingMediator(accountKey = accountKey, database = database) {
     private var loadCount = 0
@@ -105,10 +105,10 @@ abstract class PagingWithGapMediator(
         }
         try {
             val max_id = withContext(Dispatchers.IO) {
-                maxStatusKey?.let { database.statusDao().findWithStatusId(it)?.statusId }
+                maxStatusKey?.let { database.statusDao().findWithStatusKey(it)?.statusId }
             }
             val since_id = withContext(Dispatchers.IO) {
-                sinceStatueKey?.let { database.statusDao().findWithStatusId(it)?.statusId }
+                sinceStatueKey?.let { database.statusDao().findWithStatusKey(it)?.statusId }
             }
             val result = loadBetweenImpl(pageSize, max_id = max_id, since_id = since_id).map {
                 it.toDbTimeline(accountKey, TimelineType.Custom).toPagingDbTimeline(pagingKey)

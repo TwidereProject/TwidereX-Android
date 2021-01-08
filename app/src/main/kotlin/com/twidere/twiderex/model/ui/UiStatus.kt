@@ -28,6 +28,7 @@ import com.twidere.twiderex.db.model.DbStatusWithMediaAndUser
 import com.twidere.twiderex.db.model.DbStatusWithReference
 import com.twidere.twiderex.db.model.DbTimelineWithStatus
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.ui.UiMedia.Companion.toUi
 import com.twidere.twiderex.model.ui.UiUrlEntity.Companion.toUi
 import com.twidere.twiderex.model.ui.UiUser.Companion.toUi
@@ -51,8 +52,16 @@ data class UiStatus(
     val source: String,
     val quote: UiStatus?,
     val isGap: Boolean,
-    val url: List<UiUrlEntity>
+    val url: List<UiUrlEntity>,
+    val platformType: PlatformType,
 ) {
+
+    fun generateShareLink() = "https://${statusKey.host}" + when (platformType) {
+        PlatformType.Twitter -> "/${user.screenName}/status/$statusId"
+        PlatformType.StatusNet -> TODO()
+        PlatformType.Fanfou -> TODO()
+        PlatformType.Mastodon -> "/@${user.screenName}/$statusId"
+    }
 
     companion object {
         @Composable
@@ -76,6 +85,7 @@ data class UiStatus(
             url = emptyList(),
             statusKey = MicroBlogKey.Empty,
             rawText = "",
+            platformType = PlatformType.Twitter,
         )
 
         fun DbTimelineWithStatus.toUi(
@@ -95,13 +105,15 @@ data class UiStatus(
                 hasMedia = data.hasMedia,
                 user = user.toUi(),
                 media = media.toUi(),
-                retweet = status.retweet?.toUi(accountKey)?.copy(quote = status.quote?.toUi(accountKey)),
+                retweet = status.retweet?.toUi(accountKey)
+                    ?.copy(quote = status.quote?.toUi(accountKey)),
                 quote = status.quote?.toUi(accountKey),
                 isGap = timeline.isGap,
                 source = data.source,
                 url = url.toUi(),
                 statusKey = data.statusKey,
                 rawText = data.rawText,
+                platformType = data.platformType,
             )
         }
 
@@ -129,6 +141,7 @@ data class UiStatus(
                 url = url.toUi(),
                 statusKey = data.statusKey,
                 rawText = data.rawText,
+                platformType = data.platformType,
             )
         }
 
@@ -156,6 +169,7 @@ data class UiStatus(
                 url = url.toUi(),
                 statusKey = data.statusKey,
                 rawText = data.rawText,
+                platformType = data.platformType,
             )
         }
 
@@ -176,13 +190,15 @@ data class UiStatus(
                 hasMedia = data.hasMedia,
                 user = user.toUi(),
                 media = media.toUi(),
-                retweet = status.retweet?.toUi(accountKey)?.copy(quote = status.quote?.toUi(accountKey)),
+                retweet = status.retweet?.toUi(accountKey)
+                    ?.copy(quote = status.quote?.toUi(accountKey)),
                 quote = status.quote?.toUi(accountKey),
                 isGap = timeline.isGap,
                 source = data.source,
                 url = url.toUi(),
                 statusKey = data.statusKey,
                 rawText = data.rawText,
+                platformType = data.platformType,
             )
         }
     }

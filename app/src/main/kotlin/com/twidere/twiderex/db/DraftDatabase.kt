@@ -18,28 +18,30 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.services.utils
+package com.twidere.twiderex.db
 
-import com.twidere.services.http.MicroBlogException
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.decodeFromJsonElement
+import androidx.room.Database
+import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
+import com.twidere.twiderex.db.dao.DraftDao
+import com.twidere.twiderex.db.model.DbDraft
+import com.twidere.twiderex.db.model.converter.ComposeTypeConverter
+import com.twidere.twiderex.db.model.converter.MicroBlogKeyConverter
+import com.twidere.twiderex.db.model.converter.StringListConverter
+import javax.inject.Singleton
 
-val JSON by lazy {
-    Json {
-        ignoreUnknownKeys = true
-        isLenient = true
-        coerceInputValues = true
-    }
-}
-
-inline fun <reified T> T.encodeJson(): String =
-    JSON.encodeToString<T>(this)
-
-inline fun <reified T> String.decodeJson(): T {
-    return runCatching {
-        JSON.parseToJsonElement(this)
-    }.getOrNull()?.let {
-        JSON.decodeFromJsonElement<T>(it)
-    } ?: throw MicroBlogException(error = this)
+@Singleton
+@Database(
+    entities = [
+        DbDraft::class,
+    ],
+    version = 1,
+)
+@TypeConverters(
+    MicroBlogKeyConverter::class,
+    ComposeTypeConverter::class,
+    StringListConverter::class,
+)
+abstract class DraftDatabase : RoomDatabase() {
+    abstract fun draftDao(): DraftDao
 }

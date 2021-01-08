@@ -86,9 +86,9 @@ private fun ApplyNotification(
                     message = it,
                     actionLabel = actionMessage,
                     duration = if (event is NotificationWithActionEvent) {
-                        SnackbarDuration.Short
-                    } else {
                         SnackbarDuration.Long
+                    } else {
+                        SnackbarDuration.Short
                     }
                 )
             ) {

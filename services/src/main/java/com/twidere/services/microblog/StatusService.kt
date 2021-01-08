@@ -28,4 +28,5 @@ interface StatusService {
     suspend fun retweet(id: String): IStatus
     suspend fun unRetweet(id: String): IStatus
     suspend fun compose(content: String): IStatus
+    suspend fun delete(id: String): IStatus
 }

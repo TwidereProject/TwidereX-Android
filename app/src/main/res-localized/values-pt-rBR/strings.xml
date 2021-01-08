@@ -3,7 +3,11 @@
     <string name="common_alerts_account_temporarily_locked_message">Abra o Twitter para desbloquear</string>
     <string name="common_alerts_rate_limit_exceeded_title">Limite de Taxa Excedido</string>
     <string name="common_alerts_rate_limit_exceeded_message">Atingiu o limite de uso da API do Twitter</string>
-    <string name="common_alerts_permission_denied_title">Permissão negada</string>
+    <string name="common_alerts_permission_denied_not_authorized_title">Permissão Negada</string>
+    <string name="common_alerts_permission_denied_not_authorized_message">Desculpe, você não está autorizado</string>
+    <string name="common_alerts_permission_denied_friendship_blocked_title">Permissão Negada</string>
+    <string name="common_alerts_permission_denied_friendship_blocked_message">Você foi impedido de seguir esta conta a pedido do usuário</string>
+    <string name="common_alerts_no_tweets_found_title">Nenhum Tweet Encontrado</string>
     <string name="common_alerts_unfollow_user_message">Deixar de seguir o usuário %s?</string>
     <string name="common_alerts_cancel_follow_request_message">Cancelar pedido para seguir %s?</string>
     <string name="common_alerts_tweet_sent_title">Tweet Enviado</string>
@@ -33,6 +37,7 @@
     <string name="common_controls_actions_preview">Pré-visualização</string>
     <string name="common_controls_actions_open_in_safari">Abrir no Safari</string>
     <string name="common_controls_timeline_load_more">Carregar Mais</string>
+    <string name="common_controls_status_media">Mídia</string>
     <string name="common_controls_status_user_retweeted">%s retuitado</string>
     <string name="common_controls_friendship_actions_follow">Seguir</string>
     <string name="common_controls_friendship_actions_unfollow">Deixar de seguir</string>
@@ -92,8 +97,8 @@
     <string name="scene_search_tabs_users">Usuários</string>
     <string name="scene_profile_title">Eu</string>
     <string name="scene_profile_hide_reply">Ocultar resposta</string>
-    <string name="scene_profile_permission_denied_title">Permissão negada</string>
-    <string name="scene_profile_permission_denied_message">Você foi impedido de visualizar o perfil deste usuário.</string>
+    <string name="scene_profile_permission_denied_profile_blocked_title">Permissão Negada</string>
+    <string name="scene_profile_permission_denied_profile_blocked_message">Você foi impedido de visualizar o perfil deste usuário.</string>
     <string name="scene_following_title">Seguindo</string>
     <string name="scene_followers_title">Seguidores</string>
     <string name="scene_listed_title">Listado</string>

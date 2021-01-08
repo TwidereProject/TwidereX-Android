@@ -28,7 +28,7 @@ import androidx.paging.map
 import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
 import com.twidere.services.microblog.SearchService
-import com.twidere.twiderex.db.AppDatabase
+import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.di.assisted.IAssistedFactory
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.ui.UiStatus.Companion.toUi
@@ -38,7 +38,7 @@ import com.twidere.twiderex.paging.mediator.search.SearchMediaMediator
 import kotlinx.coroutines.flow.map
 
 class TwitterSearchMediaViewModel @AssistedInject constructor(
-    val database: AppDatabase,
+    val database: CacheDatabase,
     inAppNotification: InAppNotification,
     @Assisted private val account: AccountDetails,
     @Assisted keyword: String,
