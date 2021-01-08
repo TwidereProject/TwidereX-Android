@@ -68,89 +68,95 @@ fun VideoPlayer(
     showControls: Boolean = customControl == null,
     thumb: @Composable (() -> Unit)? = null,
 ) {
+    var playing by remember { mutableStateOf(false) }
     val playBackMode = AmbientVideoPlayback.current
     val isActiveNetworkMetered = AmbientIsActiveNetworkMetered.current
     var shouldShowThumb by remember { mutableStateOf(false) }
-    var autoPlay by savedInstanceState(url) {
-        when (playBackMode) {
-            DisplayPreferences.AutoPlayback.Auto -> !isActiveNetworkMetered
-            DisplayPreferences.AutoPlayback.Always -> true
-            DisplayPreferences.AutoPlayback.Off -> false
-            DisplayPreferences.AutoPlayback.UNRECOGNIZED -> true
-        }
+    val playInitial = when (playBackMode) {
+        DisplayPreferences.AutoPlayback.Auto -> !isActiveNetworkMetered
+        DisplayPreferences.AutoPlayback.Always -> true
+        DisplayPreferences.AutoPlayback.Off -> false
+        DisplayPreferences.AutoPlayback.UNRECOGNIZED -> true
     }
+    var autoPlay by savedInstanceState(url) { playInitial }
     var window by savedInstanceState(url) { 0 }
     val context = AmbientContext.current
     val lifecycle = AmbientLifecycleOwner.current.lifecycle
-    val player = remember(url) {
-        SimpleExoPlayer.Builder(context).build().apply {
-            repeatMode = Player.REPEAT_MODE_ALL
-            playWhenReady = autoPlay
-            addListener(object : Player.EventListener {
-                override fun onPlaybackStateChanged(state: Int) {
-                    shouldShowThumb = state != Player.STATE_READY
-                }
-            })
-
-            setVolume(volume)
-            ProgressiveMediaSource.Factory(
-                CacheDataSourceFactory(
-                    context,
-                    5 * 1024 * 1024,
-                )
-            ).createMediaSource(MediaItem.fromUri(url)).also {
-                setMediaSource(it)
-            }
-            prepare()
-            seekTo(window, VideoPool.get(url))
-        }
-    }
-
-    fun updateState() {
-        autoPlay = player.playWhenReady
-        window = player.currentWindowIndex
-        VideoPool.set(url, 0L.coerceAtLeast(player.contentPosition))
-    }
-
-    val playerView = remember {
-        StyledPlayerView(context).also { playerView ->
-            playerView.useController = showControls
-            lifecycle.addObserver(object : LifecycleObserver {
-                @OnLifecycleEvent(Lifecycle.Event.ON_START)
-                fun onStart() {
-                    playerView.onResume()
-                    player.playWhenReady = autoPlay
-                }
-
-                @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
-                fun onStop() {
-                    updateState()
-                    playerView.onPause()
-                    player.playWhenReady = false
-                }
-            })
-        }
-    }
-
-    onActive {
-        if (customControl != null) {
-            customControl.player = player
-        }
-    }
-
-    onDispose {
-        updateState()
-        player.release()
-    }
 
     Box {
-        AndroidView(
-            modifier = modifier,
-            viewBlock = { playerView }
-        ) {
-            playerView.player = player
+        if (playInitial) {
+            val player = remember(url) {
+                SimpleExoPlayer.Builder(context).build().apply {
+                    repeatMode = Player.REPEAT_MODE_ALL
+                    playWhenReady = autoPlay
+                    addListener(object : Player.EventListener {
+                        override fun onPlaybackStateChanged(state: Int) {
+                            shouldShowThumb = state != Player.STATE_READY
+                        }
+
+                        override fun onIsPlayingChanged(isPlaying: Boolean) {
+                            playing = isPlaying
+                        }
+                    })
+
+                    setVolume(volume)
+                    ProgressiveMediaSource.Factory(
+                        CacheDataSourceFactory(
+                            context,
+                            5 * 1024 * 1024,
+                        )
+                    ).createMediaSource(MediaItem.fromUri(url)).also {
+                        setMediaSource(it)
+                    }
+                    prepare()
+                    seekTo(window, VideoPool.get(url))
+                }
+            }
+
+            fun updateState() {
+                autoPlay = player.playWhenReady
+                window = player.currentWindowIndex
+                VideoPool.set(url, 0L.coerceAtLeast(player.contentPosition))
+            }
+
+            val playerView = remember {
+                StyledPlayerView(context).also { playerView ->
+                    playerView.useController = showControls
+                    lifecycle.addObserver(object : LifecycleObserver {
+                        @OnLifecycleEvent(Lifecycle.Event.ON_START)
+                        fun onStart() {
+                            playerView.onResume()
+                            player.playWhenReady = autoPlay
+                        }
+
+                        @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
+                        fun onStop() {
+                            updateState()
+                            playerView.onPause()
+                            player.playWhenReady = false
+                        }
+                    })
+                }
+            }
+
+            onActive {
+                if (customControl != null) {
+                    customControl.player = player
+                }
+            }
+
+            onDispose {
+                updateState()
+                player.release()
+            }
+            AndroidView(
+                modifier = modifier,
+                viewBlock = { playerView }
+            ) {
+                playerView.player = player
+            }
         }
-        if ((shouldShowThumb || !player.isPlaying) && thumb != null) {
+        if ((shouldShowThumb || !playing) && thumb != null) {
             thumb()
             Icon(
                 imageVector = Icons.Default.PlayArrow,
