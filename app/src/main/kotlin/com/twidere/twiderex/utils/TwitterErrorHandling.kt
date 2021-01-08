@@ -48,6 +48,9 @@ fun MicroBlogException.notify(notification: InAppNotification) {
                 }
             )
         }
+        TwitterErrorCodes.RateLimitExceeded -> {
+            // ignore
+        }
         else -> {
             when (this.httpCode) {
                 HttpErrorCodes.TooManyRequests -> {
