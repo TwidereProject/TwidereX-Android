@@ -1,7 +1,7 @@
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="common_alerts_account_temporarily_locked_title">Account Temporaneamente Bloccato</string>
     <string name="common_alerts_account_temporarily_locked_message">Apri Twitter per sbloccare</string>
-    <string name="common_alerts_unfollow_user_message">Smettere di seguire l'utente %s?</string>
+    <string name="common_alerts_unfollow_user_message">Smettere di seguire l\'utente %s?</string>
     <string name="common_alerts_cancel_follow_request_message">Annullare la richiesta di seguire %s?</string>
     <string name="common_alerts_tweet_sent_title">Tweet Inviato</string>
     <string name="common_alerts_tweet_fail_title">Tweet non riuscito</string>

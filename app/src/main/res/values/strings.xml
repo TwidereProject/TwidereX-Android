@@ -1,4 +1,5 @@
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="app_name" translatable="false">Twidere X</string>
     <string name="common_alerts_account_temporarily_locked_title">Account Temporarily Locked</string>
     <string name="common_alerts_account_temporarily_locked_message">Open Twitter to unlock</string>
     <string name="common_alerts_rate_limit_exceeded_title">Rate Limit Exceeded</string>
