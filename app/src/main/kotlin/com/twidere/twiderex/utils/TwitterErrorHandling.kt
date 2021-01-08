@@ -49,7 +49,12 @@ fun MicroBlogException.notify(notification: InAppNotification) {
             )
         }
         else -> {
-            microBlogErrorMessage?.let { notification.show(it) }
+            when (this.httpCode) {
+                HttpErrorCodes.TooManyRequests -> {
+                    notification.show(R.string.common_alerts_too_many_requests_title)
+                }
+                else -> microBlogErrorMessage?.let { notification.show(it) }
+            }
         }
     }
 }

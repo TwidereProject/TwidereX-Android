@@ -3,8 +3,11 @@
     <string name="common_alerts_account_temporarily_locked_message">打开 Twitter 以解锁</string>
     <string name="common_alerts_rate_limit_exceeded_title">超出用量限制</string>
     <string name="common_alerts_rate_limit_exceeded_message">已超过 Twitter API 用量限制</string>
-    <string name="common_alerts_permission_denied_title">权限已被拒绝</string>
-    <string name="common_alerts_permission_denied_message">对不起，您没有被授权</string>
+    <string name="common_alerts_permission_denied_not_authorized_title">权限已被拒绝</string>
+    <string name="common_alerts_permission_denied_not_authorized_message">对不起，您没有被授权</string>
+    <string name="common_alerts_permission_denied_friendship_blocked_title">权限已被拒绝</string>
+    <string name="common_alerts_permission_denied_friendship_blocked_message">您已被阻止关注此帐户</string>
+    <string name="common_alerts_no_tweets_found_title">未找到推文</string>
     <string name="common_alerts_unfollow_user_message">是否取消关注用户 %s？</string>
     <string name="common_alerts_cancel_follow_request_message">取消关注 %s 的请求？</string>
     <string name="common_alerts_tweet_sent_title">推文已发送</string>
@@ -22,6 +25,7 @@
     <string name="common_alerts_following_success_title">关注成功</string>
     <string name="common_alerts_unfollowing_success_title">取消关注成功</string>
     <string name="common_alerts_following_request_sent_title">已发送关注请求</string>
+    <string name="common_alerts_too_many_requests_title">请求次数过多</string>
     <string name="common_controls_actions_add">添加</string>
     <string name="common_controls_actions_remove">删除</string>
     <string name="common_controls_actions_edit">编辑</string>
@@ -34,6 +38,9 @@
     <string name="common_controls_actions_preview">预览</string>
     <string name="common_controls_actions_open_in_safari">在 Safari 中打开</string>
     <string name="common_controls_timeline_load_more">加载更多</string>
+    <string name="common_controls_status_actions_copy_text">复制文本</string>
+    <string name="common_controls_status_actions_copy_link">复制链接</string>
+    <string name="common_controls_status_actions_share_link">分享链接</string>
     <string name="common_controls_status_user_retweeted">%s 转推了</string>
     <string name="common_controls_friendship_actions_follow">关注</string>
     <string name="common_controls_friendship_actions_unfollow">取消关注</string>
@@ -93,8 +100,8 @@
     <string name="scene_search_tabs_users">用户</string>
     <string name="scene_profile_title">我的</string>
     <string name="scene_profile_hide_reply">隐藏回复</string>
-    <string name="scene_profile_permission_denied_title">权限已被拒绝</string>
-    <string name="scene_profile_permission_denied_message">您已被阻止查看此用户的个人资料。</string>
+    <string name="scene_profile_permission_denied_profile_blocked_title">权限已被拒绝</string>
+    <string name="scene_profile_permission_denied_profile_blocked_message">您已被阻止查看此用户的个人资料。</string>
     <string name="scene_following_title">正在关注</string>
     <string name="scene_followers_title">关注者</string>
     <string name="scene_listed_title">列表中</string>

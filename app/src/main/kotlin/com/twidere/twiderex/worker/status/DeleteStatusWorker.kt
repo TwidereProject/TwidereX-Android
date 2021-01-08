@@ -24,10 +24,13 @@ import android.content.Context
 import androidx.hilt.Assisted
 import androidx.hilt.work.WorkerInject
 import androidx.work.CoroutineWorker
+import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkerParameters
+import androidx.work.workDataOf
 import com.twidere.services.http.MicroBlogException
 import com.twidere.services.microblog.StatusService
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.StatusRepository
@@ -40,6 +43,20 @@ class DeleteStatusWorker @WorkerInject constructor(
     private val statusRepository: StatusRepository,
     private val inAppNotification: InAppNotification,
 ) : CoroutineWorker(appContext, params) {
+    companion object {
+        fun create(
+            accountKey: MicroBlogKey,
+            status: UiStatus,
+        ) = OneTimeWorkRequestBuilder<DeleteStatusWorker>()
+            .setInputData(
+                workDataOf(
+                    "accountKey" to accountKey.toString(),
+                    "statusKey" to status.statusKey.toString(),
+                )
+            )
+            .build()
+    }
+
     override suspend fun doWork(): Result {
         val accountKey = inputData.getString("accountKey")?.let {
             MicroBlogKey.valueOf(it)

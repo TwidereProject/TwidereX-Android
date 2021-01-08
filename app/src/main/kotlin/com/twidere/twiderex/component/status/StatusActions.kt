@@ -231,7 +231,7 @@ fun ShareButton(
             }
         ) {
             Text(
-                text = "Copy content",
+                text = stringResource(id = R.string.common_controls_status_actions_copy_text),
             )
         }
         DropdownMenuItem(
@@ -245,7 +245,7 @@ fun ShareButton(
             }
         ) {
             Text(
-                text = "Copy link",
+                text = stringResource(id = R.string.common_controls_status_actions_copy_link),
             )
         }
         DropdownMenuItem(
@@ -255,7 +255,7 @@ fun ShareButton(
             }
         ) {
             Text(
-                text = "Share",
+                text = stringResource(id = R.string.common_controls_status_actions_share_link),
             )
         }
         if (status.user.userKey == accountKey) {

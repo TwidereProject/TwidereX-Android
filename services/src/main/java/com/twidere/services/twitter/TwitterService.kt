@@ -78,10 +78,14 @@ class TwitterService(
             { chain ->
                 val response = chain.proceed(chain.request())
                 if (response.code != 200) {
-                    response.body?.string()?.let { content ->
+                    response.body?.string()?.takeIf {
+                        it.isNotEmpty()
+                    }?.let { content ->
                         content.decodeJson<MicroBlogException>().let {
                             throw it
                         }
+                    } ?: run {
+                        throw MicroBlogException(httpCode = response.code)
                     }
                 }
                 response

@@ -1,8 +1,7 @@
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="common_alerts_account_temporarily_locked_title">Account Temporaneamente Bloccato</string>
     <string name="common_alerts_account_temporarily_locked_message">Apri Twitter per sbloccare</string>
-    <string name="common_alerts_permission_denied_title">Permesso Negato</string>
-    <string name="common_alerts_unfollow_user_message">Smettere di seguire l\'utente %s?</string>
+    <string name="common_alerts_unfollow_user_message">Smettere di seguire l'utente %s?</string>
     <string name="common_alerts_cancel_follow_request_message">Annullare la richiesta di seguire %s?</string>
     <string name="common_alerts_tweet_sent_title">Tweet Inviato</string>
     <string name="common_alerts_tweet_fail_title">Tweet non riuscito</string>
@@ -35,8 +34,6 @@
     <string name="scene_search_tabs_users">Utenti</string>
     <string name="scene_profile_title">Io</string>
     <string name="scene_profile_hide_reply">Nascondi risposta</string>
-    <string name="scene_profile_permission_denied_title">Permesso Negato</string>
-    <string name="scene_profile_permission_denied_message">Sei stato bloccato dalla visualizzazione del profilo di questo utente.</string>
     <string name="scene_compose_title_compose">Componi</string>
     <string name="scene_compose_title_reply">Rispondi</string>
     <string name="scene_compose_title_quote">Cita</string>

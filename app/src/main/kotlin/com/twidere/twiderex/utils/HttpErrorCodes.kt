@@ -18,20 +18,8 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.services.http
+package com.twidere.twiderex.utils
 
-import kotlinx.serialization.Serializable
-import java.io.IOException
-
-@Serializable
-data class MicroBlogException(
-    val error: String? = null,
-    val request: String? = null,
-    val errors: List<Errors>? = null,
-    val httpCode: Int? = null,
-) : IOException() {
-    val microBlogErrorMessage: String?
-        get() = error ?: errors?.firstOrNull()?.let {
-            it.detail ?: it.message
-        }
+object HttpErrorCodes {
+    const val TooManyRequests = 429
 }
