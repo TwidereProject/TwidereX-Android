@@ -37,6 +37,7 @@
     <string name="common_controls_actions_preview">Pré-visualização</string>
     <string name="common_controls_actions_open_in_safari">Abrir no Safari</string>
     <string name="common_controls_timeline_load_more">Carregar Mais</string>
+    <string name="common_controls_status_media">Mídia</string>
     <string name="common_controls_status_user_retweeted">%s retuitado</string>
     <string name="common_controls_friendship_actions_follow">Seguir</string>
     <string name="common_controls_friendship_actions_unfollow">Deixar de seguir</string>

@@ -24,6 +24,7 @@
     <string name="common_controls_actions_preview">Anteprima</string>
     <string name="common_controls_actions_open_in_safari">Apri in Safari</string>
     <string name="common_controls_timeline_load_more">Carica Altro</string>
+    <string name="common_controls_status_media">Contenuti</string>
     <string name="common_controls_friendship_actions_follow">Segui</string>
     <string name="common_controls_friendship_actions_unfollow">Smetti di seguire</string>
     <string name="scene_drawer_manage_accounts">Gestisci account</string>

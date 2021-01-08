@@ -39,8 +39,10 @@
     <string name="common_controls_actions_open_in_safari">Open in Safari</string>
     <string name="common_controls_timeline_load_more">Load More</string>
     <string name="common_controls_status_actions_copy_text">Copy text</string>
-    <string name="common_controls_status_actions_copy_link">Copy Link</string>
-    <string name="common_controls_status_actions_share_link">Share Link</string>
+    <string name="common_controls_status_actions_copy_link">Copy link</string>
+    <string name="common_controls_status_actions_share_link">Share link</string>
+    <string name="common_controls_status_actions_delete_tweet">Delete tweet</string>
+    <string name="common_controls_status_media">Media</string>
     <string name="common_controls_status_user_retweeted">%s retweeted</string>
     <string name="common_controls_friendship_actions_follow">Follow</string>
     <string name="common_controls_friendship_actions_unfollow">Unfollow</string>
