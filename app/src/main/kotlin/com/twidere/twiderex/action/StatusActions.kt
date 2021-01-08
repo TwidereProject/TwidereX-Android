@@ -48,7 +48,7 @@ class StatusActions @Inject constructor(
 ) : IStatusActions {
     override fun delete(status: UiStatus, account: AccountDetails) {
         workManager.beginWith(
-            StatusWorker.create<DeleteStatusWorker>(
+            DeleteStatusWorker.create(
                 status = status,
                 accountKey = account.accountKey
             )
