@@ -25,6 +25,7 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.squareup.moshi.JsonClass
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.PlatformType
 
 @Entity(
     tableName = "user",
@@ -51,4 +52,5 @@ data class DbUser(
     val location: String?,
     val verified: Boolean,
     val isProtected: Boolean,
+    val platformType: PlatformType,
 )

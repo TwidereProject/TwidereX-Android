@@ -26,6 +26,7 @@ import androidx.compose.ui.res.imageResource
 import com.twidere.twiderex.R
 import com.twidere.twiderex.db.model.DbUser
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.PlatformType
 
 data class UiUser(
     val id: String,
@@ -42,6 +43,7 @@ data class UiUser(
     val location: String?,
     val verified: Boolean,
     val protected: Boolean,
+    val platformType: PlatformType,
 ) {
     companion object {
         @Composable
@@ -60,6 +62,7 @@ data class UiUser(
             verified = false,
             protected = false,
             userKey = MicroBlogKey.Empty,
+            platformType = PlatformType.Twitter,
         )
 
         fun DbUser.toUi() = UiUser(
@@ -77,6 +80,7 @@ data class UiUser(
             verified = verified,
             protected = isProtected,
             userKey = userKey,
+            platformType = platformType,
         )
     }
 }

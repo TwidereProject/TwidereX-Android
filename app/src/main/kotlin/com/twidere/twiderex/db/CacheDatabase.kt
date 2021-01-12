@@ -59,7 +59,7 @@ import javax.inject.Singleton
         DbUrlEntity::class,
         DbSearch::class,
     ],
-    version = 2,
+    version = 3,
 )
 @TypeConverters(
     MicroBlogKeyConverter::class,

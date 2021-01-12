@@ -351,7 +351,8 @@ fun User.toDbUser() = DbUser(
     isProtected = this.protected ?: false,
     userKey = MicroBlogKey.twitter(
         idStr ?: throw IllegalArgumentException("user.idStr should not be null")
-    )
+    ),
+    platformType = PlatformType.Twitter,
 )
 
 fun UserV2.toDbUser() = DbUser(
@@ -373,7 +374,8 @@ fun UserV2.toDbUser() = DbUser(
     isProtected = this.protected ?: false,
     userKey = MicroBlogKey.twitter(
         id ?: throw IllegalArgumentException("user.idStr should not be null")
-    )
+    ),
+    platformType = PlatformType.Twitter,
 )
 
 private fun updateProfileImagePath(
