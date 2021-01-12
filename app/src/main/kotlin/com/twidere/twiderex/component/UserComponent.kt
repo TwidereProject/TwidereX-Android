@@ -45,6 +45,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.savedinstancestate.savedInstanceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -107,7 +108,12 @@ fun UserComponent(
         it.create(account, screenName, host, initialUserKey)
     }
     val user by viewModel.user.observeAsState(initial = initialData)
-
+    val userKey = remember(
+        screenName,
+        host,
+    ) {
+        MicroBlogKey(screenName, host)
+    }
     val lazyListState = rememberLazyListState()
     val timelineViewModel =
         assistedViewModel<UserTimelineViewModel.AssistedFactory, UserTimelineViewModel>(
@@ -115,7 +121,7 @@ fun UserComponent(
             screenName,
             host,
         ) {
-            it.create(account, screenName = screenName, MicroBlogKey(screenName, host))
+            it.create(account, screenName = screenName, userKey = userKey)
         }
     val mediaViewModel =
         assistedViewModel<UserMediaTimelineViewModel.AssistedFactory, UserMediaTimelineViewModel>(
@@ -123,7 +129,7 @@ fun UserComponent(
             screenName,
             host,
         ) {
-            it.create(account, screenName = screenName, MicroBlogKey(screenName, host))
+            it.create(account, screenName = screenName, userKey = userKey)
         }
     val favouriteViewModel =
         assistedViewModel<UserFavouriteTimelineViewModel.AssistedFactory, UserFavouriteTimelineViewModel>(
@@ -131,7 +137,7 @@ fun UserComponent(
             screenName,
             host,
         ) {
-            it.create(account, screenName = screenName, MicroBlogKey(screenName, host))
+            it.create(account, screenName = screenName, userKey = userKey)
         }
 
     val timelineSource = timelineViewModel.source.collectAsLazyPagingItems()
