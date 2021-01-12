@@ -57,6 +57,7 @@ import com.twidere.twiderex.component.lazy.itemsPaging
 import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.extensions.viewModel
 import com.twidere.twiderex.ui.AmbientActiveAccount
+import com.twidere.twiderex.ui.TwidereXTheme
 import com.twidere.twiderex.viewmodel.compose.ComposeSearchUserViewModel
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -69,79 +70,81 @@ fun ComposeSearchUserScene() {
     val text by viewModel.text.observeAsState(initial = "")
     val sourceState by viewModel.sourceFlow.collectAsState(initial = null)
     val source = sourceState?.collectAsLazyPagingItems()
-    InAppNotificationScaffold {
-        Column {
-            AppBar(
-                title = {
-                    Text(text = "@User")
-                },
-                navigationIcon = {
-                    AppBarNavigationButton()
-                },
-                elevation = 0.dp,
-            )
-            ListItem(
-                icon = {
-                    Icon(imageVector = vectorResource(id = R.drawable.ic_search))
-                },
-                text = {
-                    TextInput(
-                        value = text,
-                        onValueChange = {
-                            viewModel.text.postValue(it)
-                        },
-                        maxLines = 1,
-                        placeholder = {
-                            Text(text = stringResource(id = R.string.scene_search_search_bar_placeholder))
-                        },
-                        onImeActionPerformed = { _, _ ->
-                        },
-                        autoFocus = true,
-                        imeAction = ImeAction.Search,
-                        alignment = Alignment.CenterStart,
-                    )
-                }
-            )
-            Divider()
-            Box(
-                modifier = Modifier.weight(1F)
-            ) {
-                LazyColumn {
-                    source?.let {
-                        itemsPaging(source) {
-                            it?.let { item ->
-                                ListItem(
-                                    modifier = Modifier.clickable(
-                                        onClick = {
-                                        }
-                                    ),
-                                    icon = {
-                                        UserAvatar(user = item)
-                                    },
-                                    text = {
-                                        Row {
-                                            Text(
-                                                text = item.name,
-                                                maxLines = 1,
-                                                overflow = TextOverflow.Ellipsis,
-                                                color = MaterialTheme.colors.primary
-                                            )
-                                            Spacer(modifier = Modifier.width(4.dp))
-                                            Providers(
-                                                AmbientContentAlpha provides ContentAlpha.medium
-                                            ) {
+    TwidereXTheme {
+        InAppNotificationScaffold {
+            Column {
+                AppBar(
+                    title = {
+                        Text(text = "@User")
+                    },
+                    navigationIcon = {
+                        AppBarNavigationButton()
+                    },
+                    elevation = 0.dp,
+                )
+                ListItem(
+                    icon = {
+                        Icon(imageVector = vectorResource(id = R.drawable.ic_search))
+                    },
+                    text = {
+                        TextInput(
+                            value = text,
+                            onValueChange = {
+                                viewModel.text.postValue(it)
+                            },
+                            maxLines = 1,
+                            placeholder = {
+                                Text(text = stringResource(id = R.string.scene_search_search_bar_placeholder))
+                            },
+                            onImeActionPerformed = { _, _ ->
+                            },
+                            autoFocus = true,
+                            imeAction = ImeAction.Search,
+                            alignment = Alignment.CenterStart,
+                        )
+                    }
+                )
+                Divider()
+                Box(
+                    modifier = Modifier.weight(1F)
+                ) {
+                    LazyColumn {
+                        source?.let {
+                            itemsPaging(source) {
+                                it?.let { item ->
+                                    ListItem(
+                                        modifier = Modifier.clickable(
+                                            onClick = {
+                                            }
+                                        ),
+                                        icon = {
+                                            UserAvatar(user = item)
+                                        },
+                                        text = {
+                                            Row {
                                                 Text(
-                                                    text = "@${item.screenName}",
+                                                    text = item.name,
                                                     maxLines = 1,
                                                     overflow = TextOverflow.Ellipsis,
+                                                    color = MaterialTheme.colors.primary
                                                 )
+                                                Spacer(modifier = Modifier.width(4.dp))
+                                                Providers(
+                                                    AmbientContentAlpha provides ContentAlpha.medium
+                                                ) {
+                                                    Text(
+                                                        text = "@${item.screenName}",
+                                                        maxLines = 1,
+                                                        overflow = TextOverflow.Ellipsis,
+                                                    )
+                                                }
                                             }
-                                        }
-                                    },
-                                    secondaryText = {
-                                        Text(text = item.desc, maxLines = 1)
-                                    },
-                                )
+                                        },
+                                        secondaryText = {
+                                            Text(text = item.desc, maxLines = 1)
+                                        },
+                                    )
+                                }
                             }
                         }
                     }
