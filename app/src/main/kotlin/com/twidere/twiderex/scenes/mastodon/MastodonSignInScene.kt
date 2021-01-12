@@ -37,7 +37,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.AmbientLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.R
@@ -60,7 +59,6 @@ fun MastodonSignInScene() {
     val host by viewModel.host.observeAsState(initial = "")
     val loading by viewModel.loading.observeAsState(initial = false)
     val navController = AmbientNavController.current
-    val lifecycleOwner = AmbientLifecycleOwner.current
     val navigator = AmbientNavigator.current
     TwidereXTheme {
         InAppNotificationScaffold {
