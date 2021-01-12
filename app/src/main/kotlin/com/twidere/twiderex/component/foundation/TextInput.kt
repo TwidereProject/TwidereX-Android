@@ -24,7 +24,6 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.AmbientContentAlpha
@@ -129,7 +128,6 @@ fun TextInput(
     Box(
         modifier = modifier
             .focusRequester(focusRequester)
-            .fillMaxSize()
             .clickable(interactionState = interactionState, indication = null) {
                 onClicked?.invoke()
                 focusRequester.requestFocus()

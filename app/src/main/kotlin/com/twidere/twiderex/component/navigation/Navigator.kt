@@ -35,7 +35,7 @@ import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.navigation.twidereXSchema
-import com.twidere.twiderex.scenes.ComposeType
+import com.twidere.twiderex.viewmodel.compose.ComposeType
 
 val AmbientNavigator = staticAmbientOf<INavigator>()
 

@@ -32,9 +32,9 @@ import com.twidere.twiderex.component.TimelineComponent
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.navigation.Route
-import com.twidere.twiderex.scenes.ComposeType
 import com.twidere.twiderex.ui.AmbientActiveAccount
 import com.twidere.twiderex.ui.AmbientNavController
+import com.twidere.twiderex.viewmodel.compose.ComposeType
 import com.twidere.twiderex.viewmodel.timeline.HomeTimelineViewModel
 
 class HomeTimelineItem : HomeNavigationItem() {

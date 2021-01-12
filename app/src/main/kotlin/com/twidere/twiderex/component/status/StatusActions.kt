@@ -57,10 +57,10 @@ import com.twidere.twiderex.component.navigation.AmbientNavigator
 import com.twidere.twiderex.extensions.humanizedCount
 import com.twidere.twiderex.extensions.shareText
 import com.twidere.twiderex.model.ui.UiStatus
-import com.twidere.twiderex.scenes.ComposeType
 import com.twidere.twiderex.ui.AmbientActiveAccount
 import com.twidere.twiderex.ui.mediumEmphasisContentContentColor
 import com.twidere.twiderex.ui.statusActionIconSize
+import com.twidere.twiderex.viewmodel.compose.ComposeType
 
 @Composable
 fun ReplyButton(

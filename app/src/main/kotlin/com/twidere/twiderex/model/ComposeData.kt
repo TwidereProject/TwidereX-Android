@@ -23,7 +23,7 @@ package com.twidere.twiderex.model
 import androidx.work.Data
 import androidx.work.workDataOf
 import com.twidere.twiderex.extensions.getNullableDouble
-import com.twidere.twiderex.scenes.ComposeType
+import com.twidere.twiderex.viewmodel.compose.ComposeType
 import java.util.UUID
 
 data class ComposeData(

@@ -27,10 +27,10 @@ import androidx.compose.runtime.staticAmbientOf
 import androidx.compose.ui.viewinterop.viewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.twidere.twiderex.viewmodel.ComposeViewModel
-import com.twidere.twiderex.viewmodel.DraftComposeViewModel
-import com.twidere.twiderex.viewmodel.DraftItemViewModel
 import com.twidere.twiderex.viewmodel.MediaViewModel
+import com.twidere.twiderex.viewmodel.compose.ComposeViewModel
+import com.twidere.twiderex.viewmodel.compose.DraftComposeViewModel
+import com.twidere.twiderex.viewmodel.compose.DraftItemViewModel
 import com.twidere.twiderex.viewmodel.search.SearchInputViewModel
 import com.twidere.twiderex.viewmodel.timeline.HomeTimelineViewModel
 import com.twidere.twiderex.viewmodel.timeline.MentionsTimelineViewModel

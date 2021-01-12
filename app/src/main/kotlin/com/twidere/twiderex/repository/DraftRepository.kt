@@ -23,7 +23,7 @@ package com.twidere.twiderex.repository
 import com.twidere.twiderex.db.DraftDatabase
 import com.twidere.twiderex.db.model.DbDraft
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.scenes.ComposeType
+import com.twidere.twiderex.viewmodel.compose.ComposeType
 import java.util.UUID
 import javax.inject.Singleton
 
