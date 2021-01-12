@@ -45,6 +45,7 @@ import com.twidere.twiderex.component.LoginLogo
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.navigation.AmbientNavigator
 import com.twidere.twiderex.extensions.navViewModel
+import com.twidere.twiderex.extensions.navigateForResult
 import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.ui.TwidereXTheme
 import com.twidere.twiderex.viewmodel.mastodon.MastodonSignInViewModel
@@ -52,8 +53,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
 @Composable
 fun MastodonSignInScene() {
@@ -104,15 +103,7 @@ fun MastodonSignInScene() {
                                         viewModel.beginOAuth(
                                             host,
                                         ) { target ->
-                                            suspendCoroutine {
-                                                navController.currentBackStackEntry?.savedStateHandle?.getLiveData<String>(
-                                                    "code"
-                                                )?.observe(lifecycleOwner) { result ->
-                                                    it.resume(result)
-                                                    navController.currentBackStackEntry?.savedStateHandle?.remove<String>(
-                                                        "code"
-                                                    )
-                                                }
+                                            navController.navigateForResult("code") {
                                                 navigator.mastodonSignInWeb(target)
                                             }
                                         }.takeIf { it }?.let {
