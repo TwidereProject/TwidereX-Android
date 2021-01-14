@@ -20,4 +20,4 @@
  */
 package com.twidere.services.utils
 
-internal const val DEBUG = true
+internal const val DEBUG = false

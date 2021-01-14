@@ -78,6 +78,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.SoftwareKeyboardController
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.navigate
+import com.twidere.twiderex.BuildConfig
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.BackButtonHandler
 import com.twidere.twiderex.component.foundation.AppBar
@@ -634,12 +635,14 @@ private fun ComposeActions(viewModel: ComposeViewModel) {
 //            IconButton(onClick = {}) {
 //                Icon(imageVector = vectorResource(id = R.drawable.ic_gif))
 //            }
-            IconButton(
-                onClick = {
-                    navController.navigate(Route.Compose.Search.User)
+            if (BuildConfig.DEBUG) {
+                IconButton(
+                    onClick = {
+                        navController.navigate(Route.Compose.Search.User)
+                    }
+                ) {
+                    Icon(imageVector = vectorResource(id = R.drawable.ic_at_sign))
                 }
-            ) {
-                Icon(imageVector = vectorResource(id = R.drawable.ic_at_sign))
             }
 //            IconButton(onClick = {}) {
 //                Icon(imageVector = vectorResource(id = R.drawable.ic_hash))
