@@ -154,11 +154,11 @@ dependencies {
     androidTestImplementation "androidx.compose.ui:ui-test:$versions.compose"
 
     implementation "androidx.paging:paging-runtime-ktx:$versions.paging"
-    implementation "androidx.paging:paging-compose:1.0.0-alpha04"
-    implementation "androidx.navigation:navigation-compose:1.0.0-alpha04"
+    implementation "androidx.paging:paging-compose:$versions.androidx_compose"
+    implementation "androidx.navigation:navigation-compose:$versions.androidx_compose"
     implementation "androidx.navigation:navigation-fragment-ktx:2.3.2"
     implementation "androidx.activity:activity-ktx:1.2.0-rc01"
-    implementation "androidx.datastore:datastore:1.0.0-alpha05"
+    implementation "androidx.datastore:datastore:$versions.dataStore"
 
     // Use moshi for not since Kotlinx.Serialization not compatible with Jetpack Compose
     // https://github.com/Kotlin/kotlinx.serialization/issues/968
@@ -185,9 +185,9 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-viewmodel-savedstate:$versions.lifecycle"
     implementation "androidx.lifecycle:lifecycle-common-java8:$versions.lifecycle"
 
-    implementation "androidx.work:work-runtime-ktx:2.5.0-beta02"
+    implementation "androidx.work:work-runtime-ktx:$versions.work"
 
-    implementation "dev.chrisbanes.accompanist:accompanist-coil:0.4.1"
+    implementation "dev.chrisbanes.accompanist:accompanist-coil:$versions.accompanist"
 
     implementation "com.twitter.twittertext:twitter-text:3.1.0"
     implementation 'org.jsoup:jsoup:1.13.1'
@@ -196,7 +196,7 @@ dependencies {
 
     implementation "com.google.protobuf:protobuf-javalite:$versions.protobuf"
 
-    implementation 'com.google.android.exoplayer:exoplayer:2.12.2'
+    implementation "com.google.android.exoplayer:exoplayer:$versions.exoplayer"
 
     if (enableGoogleVariant) {
         // START Non-FOSS component

@@ -28,7 +28,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.useOrElse
+import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.buildAnnotatedString
 import com.twidere.twiderex.component.navigation.AmbientNavigator
@@ -47,7 +47,7 @@ fun StatusText(
     onStatusTextClicked: () -> Unit = {},
 ) {
     val navigator = AmbientNavigator.current
-    val textColor = color.useOrElse {
+    val textColor = color.takeOrElse {
         AmbientContentColor.current.copy(alpha = AmbientContentAlpha.current)
     }
     Providers(

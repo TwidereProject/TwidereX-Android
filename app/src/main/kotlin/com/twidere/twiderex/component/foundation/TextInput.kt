@@ -40,9 +40,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.useOrElse
+import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.node.Ref
 import androidx.compose.ui.text.SoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
@@ -116,7 +116,7 @@ fun TextInput(
     val focusRequester = FocusRequester()
     val keyboardController = remember { Ref<SoftwareKeyboardController>() }
     val interactionState = remember { InteractionState() }
-    val textColor = color.useOrElse {
+    val textColor = color.takeOrElse {
         AmbientContentColor.current.copy(alpha = AmbientContentAlpha.current)
     }
     if (autoFocus) {

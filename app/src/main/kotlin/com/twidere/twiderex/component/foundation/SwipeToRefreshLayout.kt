@@ -148,7 +148,7 @@ private val <T> SwipeableState<T>.PreUpPostDownNestedScrollConnection: NestedScr
             available: Velocity,
             onFinished: (Velocity) -> Unit
         ) {
-            performFling(velocity = available.pixelsPerSecond.toFloat()) {
+            performFling(velocity = Offset(available.x, available.y).toFloat()) {
                 // since we go to the anchor with tween settling, consume all for the best UX
                 onFinished.invoke(available)
             }
