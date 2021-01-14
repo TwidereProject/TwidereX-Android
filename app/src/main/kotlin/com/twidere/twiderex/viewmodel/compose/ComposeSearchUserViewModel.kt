@@ -41,13 +41,15 @@ class ComposeSearchUserViewModel(
     val text = MutableLiveData("")
 
     @OptIn(FlowPreview::class)
-    val sourceFlow = text.asFlow().debounce(500L).map {
-        Pager(config = PagingConfig(pageSize = defaultLoadCount)) {
-            SearchUserPagingSource(
-                accountKey = account.accountKey,
-                it,
-                account.service as SearchService
-            )
-        }.flow.cachedIn(viewModelScope)
+    val sourceFlow = text.asFlow().debounce(1000L).map {
+        it.takeIf { it.isNotEmpty() }?.let {
+            Pager(config = PagingConfig(pageSize = defaultLoadCount)) {
+                SearchUserPagingSource(
+                    accountKey = account.accountKey,
+                    it,
+                    account.service as SearchService
+                )
+            }.flow.cachedIn(viewModelScope)
+        }
     }
 }
