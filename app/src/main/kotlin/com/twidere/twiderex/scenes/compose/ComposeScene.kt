@@ -18,7 +18,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.scenes
+package com.twidere.twiderex.scenes.compose
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -31,6 +31,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -77,6 +78,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.SoftwareKeyboardController
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.navigate
+import com.twidere.twiderex.BuildConfig
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.BackButtonHandler
 import com.twidere.twiderex.component.foundation.AppBar
@@ -100,18 +102,13 @@ import com.twidere.twiderex.ui.TwidereXTheme
 import com.twidere.twiderex.ui.composeImageSize
 import com.twidere.twiderex.ui.profileImageSize
 import com.twidere.twiderex.ui.standardPadding
-import com.twidere.twiderex.viewmodel.ComposeViewModel
-import com.twidere.twiderex.viewmodel.DraftComposeViewModel
-import com.twidere.twiderex.viewmodel.DraftItemViewModel
+import com.twidere.twiderex.viewmodel.compose.ComposeType
+import com.twidere.twiderex.viewmodel.compose.ComposeViewModel
+import com.twidere.twiderex.viewmodel.compose.DraftComposeViewModel
+import com.twidere.twiderex.viewmodel.compose.DraftItemViewModel
 import com.twitter.twittertext.TwitterTextConfiguration
 import com.twitter.twittertext.TwitterTextParser
 import kotlinx.coroutines.launch
-
-enum class ComposeType {
-    New,
-    Reply,
-    Quote,
-}
 
 @Composable
 fun DraftComposeScene(
@@ -539,7 +536,9 @@ private fun ComposeInput(
                 modifier = Modifier.weight(1F)
             ) {
                 TextInput(
-                    modifier = Modifier.align(Alignment.TopCenter),
+                    modifier = Modifier
+                        .align(Alignment.TopCenter)
+                        .fillMaxSize(),
                     value = text,
                     onValueChange = { setText(it) },
                     autoFocus = autoFocus,
@@ -580,7 +579,8 @@ private fun ComposeReply(
                             scaffoldState.bottomSheetState.expand()
                         }
                     }
-                ).fillMaxWidth()
+                )
+                .fillMaxWidth()
                 .padding(top = 16.dp, start = 16.dp, end = 16.dp),
         ) {
             Box(
@@ -635,9 +635,15 @@ private fun ComposeActions(viewModel: ComposeViewModel) {
 //            IconButton(onClick = {}) {
 //                Icon(imageVector = vectorResource(id = R.drawable.ic_gif))
 //            }
-//            IconButton(onClick = {}) {
-//                Icon(imageVector = vectorResource(id = R.drawable.ic_at_sign))
-//            }
+            if (BuildConfig.DEBUG) {
+                IconButton(
+                    onClick = {
+                        navController.navigate(Route.Compose.Search.User)
+                    }
+                ) {
+                    Icon(imageVector = vectorResource(id = R.drawable.ic_at_sign))
+                }
+            }
 //            IconButton(onClick = {}) {
 //                Icon(imageVector = vectorResource(id = R.drawable.ic_hash))
 //            }

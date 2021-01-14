@@ -173,5 +173,6 @@ fun Account.toDbUser(
         location = null,
         verified = false,
         isProtected = false,
+        platformType = PlatformType.Mastodon,
     )
 }

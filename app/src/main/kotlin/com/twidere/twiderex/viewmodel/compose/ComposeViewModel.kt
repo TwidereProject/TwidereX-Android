@@ -18,7 +18,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.viewmodel
+package com.twidere.twiderex.viewmodel.compose
 
 import android.Manifest.permission
 import android.location.Criteria
@@ -51,10 +51,15 @@ import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.repository.DraftRepository
 import com.twidere.twiderex.repository.UserRepository
 import com.twidere.twiderex.repository.twitter.TwitterTweetsRepository
-import com.twidere.twiderex.scenes.ComposeType
 import com.twidere.twiderex.worker.draft.SaveDraftWorker
 import com.twitter.twittertext.Extractor
 import java.util.UUID
+
+enum class ComposeType {
+    New,
+    Reply,
+    Quote,
+}
 
 class DraftItemViewModel @AssistedInject constructor(
     private val repository: DraftRepository,
@@ -163,7 +168,7 @@ open class ComposeViewModel @AssistedInject constructor(
                     it?.let { status ->
                         Extractor().extractMentionedScreennames(
                             status.htmlText
-                        ).filter { it != account.user.screenName }
+                        ).filter { it != account.user.screenName && it != status.user.screenName }
                     } ?: run {
                         emptyList<String>()
                     }
@@ -187,7 +192,8 @@ open class ComposeViewModel @AssistedInject constructor(
     }
     val text = MutableLiveData("")
     val images = MutableLiveData<List<Uri>>(emptyList())
-    val canSaveDraft = text.combineWith(images) { text, imgs -> !text.isNullOrEmpty() || !imgs.isNullOrEmpty() }
+    val canSaveDraft =
+        text.combineWith(images) { text, imgs -> !text.isNullOrEmpty() || !imgs.isNullOrEmpty() }
     val locationEnabled = MutableLiveData(false)
     val status = liveData {
         statusKey?.let {

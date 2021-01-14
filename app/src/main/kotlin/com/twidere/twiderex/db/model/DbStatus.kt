@@ -86,25 +86,6 @@ data class DbStatusWithReference(
     val retweet: DbStatusWithMediaAndUser?,
 )
 
-@Entity(
-    tableName = "status_reactions",
-    indices = [Index(value = ["statusKey", "accountKey"], unique = true)],
-)
-data class DbStatusReaction(
-    /**
-     * Id that being used in the database
-     */
-    @PrimaryKey
-    val _id: String,
-    /**
-     * Actual tweet/toots id
-     */
-    val statusKey: MicroBlogKey,
-    val accountKey: MicroBlogKey,
-    var liked: Boolean,
-    var retweeted: Boolean,
-)
-
 suspend fun List<DbStatusWithMediaAndUser>.saveToDb(
     database: CacheDatabase
 ) {

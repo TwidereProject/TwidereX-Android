@@ -18,6 +18,23 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.services.utils
+package com.twidere.twiderex.extensions
 
-internal const val DEBUG = false
+import androidx.lifecycle.Observer
+import androidx.navigation.NavController
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
+
+suspend fun <T> NavController.navigateForResult(key: String, navAction: NavController.() -> Unit) = suspendCoroutine<T> { continuation ->
+    currentBackStackEntry?.savedStateHandle?.getLiveData<T>(key)?.let { liveData ->
+        val observer = object : Observer<T> {
+            override fun onChanged(result: T) {
+                continuation.resume(result)
+                currentBackStackEntry?.savedStateHandle?.remove<T>(key)
+                liveData.removeObserver(this)
+            }
+        }
+        liveData.observeForever(observer)
+    }
+    navAction.invoke(this)
+}

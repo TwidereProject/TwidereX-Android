@@ -37,7 +37,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.AmbientLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.R
@@ -45,6 +44,7 @@ import com.twidere.twiderex.component.LoginLogo
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.navigation.AmbientNavigator
 import com.twidere.twiderex.extensions.navViewModel
+import com.twidere.twiderex.extensions.navigateForResult
 import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.ui.TwidereXTheme
 import com.twidere.twiderex.viewmodel.mastodon.MastodonSignInViewModel
@@ -52,8 +52,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
 @Composable
 fun MastodonSignInScene() {
@@ -61,7 +59,6 @@ fun MastodonSignInScene() {
     val host by viewModel.host.observeAsState(initial = "")
     val loading by viewModel.loading.observeAsState(initial = false)
     val navController = AmbientNavController.current
-    val lifecycleOwner = AmbientLifecycleOwner.current
     val navigator = AmbientNavigator.current
     TwidereXTheme {
         InAppNotificationScaffold {
@@ -104,15 +101,7 @@ fun MastodonSignInScene() {
                                         viewModel.beginOAuth(
                                             host,
                                         ) { target ->
-                                            suspendCoroutine {
-                                                navController.currentBackStackEntry?.savedStateHandle?.getLiveData<String>(
-                                                    "code"
-                                                )?.observe(lifecycleOwner) { result ->
-                                                    it.resume(result)
-                                                    navController.currentBackStackEntry?.savedStateHandle?.remove<String>(
-                                                        "code"
-                                                    )
-                                                }
+                                            navController.navigateForResult("code") {
                                                 navigator.mastodonSignInWeb(target)
                                             }
                                         }.takeIf { it }?.let {

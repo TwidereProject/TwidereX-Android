@@ -36,8 +36,8 @@ import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.DraftRepository
-import com.twidere.twiderex.scenes.ComposeType
 import com.twidere.twiderex.utils.notify
+import com.twidere.twiderex.viewmodel.compose.ComposeType
 
 class TwitterComposeWorker @WorkerInject constructor(
     @Assisted context: Context,

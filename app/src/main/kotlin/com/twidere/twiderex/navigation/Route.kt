@@ -33,14 +33,14 @@ import androidx.navigation.navDeepLink
 import com.twidere.twiderex.component.requireAuthorization
 import com.twidere.twiderex.dialog.TwitterWebSignInDialog
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.scenes.ComposeScene
-import com.twidere.twiderex.scenes.ComposeType
-import com.twidere.twiderex.scenes.DraftComposeScene
 import com.twidere.twiderex.scenes.DraftListScene
 import com.twidere.twiderex.scenes.HomeScene
 import com.twidere.twiderex.scenes.MediaScene
 import com.twidere.twiderex.scenes.StatusScene
 import com.twidere.twiderex.scenes.UserScene
+import com.twidere.twiderex.scenes.compose.ComposeScene
+import com.twidere.twiderex.scenes.compose.ComposeSearchUserScene
+import com.twidere.twiderex.scenes.compose.DraftComposeScene
 import com.twidere.twiderex.scenes.mastodon.MastodonSignInScene
 import com.twidere.twiderex.scenes.mastodon.MastodonWebSignInScene
 import com.twidere.twiderex.scenes.search.SearchInputScene
@@ -55,6 +55,7 @@ import com.twidere.twiderex.scenes.twitter.TwitterWebSignInScene
 import com.twidere.twiderex.scenes.twitter.user.TwitterFollowersScene
 import com.twidere.twiderex.scenes.twitter.user.TwitterFollowingScene
 import com.twidere.twiderex.twitterHosts
+import com.twidere.twiderex.viewmodel.compose.ComposeType
 import java.net.URLDecoder
 import java.net.URLEncoder
 
@@ -122,7 +123,13 @@ object Route {
     }
 
     fun Compose(composeType: ComposeType, statusKey: MicroBlogKey? = null) =
-        "compose/${composeType.name}?statusId=${statusKey?.id}&host=${statusKey?.host}"
+        "compose?composeType=${composeType.name}&statusId=${statusKey?.id}&host=${statusKey?.host}"
+
+    object Compose {
+        object Search {
+            const val User = "compose/search/user"
+        }
+    }
 
     object Twitter {
         object User {
@@ -309,9 +316,9 @@ fun NavGraphBuilder.route() {
     }
 
     authorizedComposable(
-        "compose/{composeType}?statusId={statusId}&host={host}",
+        "compose?composeType={composeType}&statusId={statusId}&host={host}",
         arguments = listOf(
-            navArgument("composeType") { type = NavType.StringType },
+            navArgument("composeType") { type = NavType.StringType; nullable = true; },
             navArgument("statusId") { nullable = true },
             navArgument("host") { type = NavType.StringType; nullable = true; },
         )
@@ -389,5 +396,9 @@ fun NavGraphBuilder.route() {
         backStackEntry.arguments?.getString("draftId")?.let {
             DraftComposeScene(draftId = it)
         }
+    }
+
+    composable("compose/search/user") {
+        ComposeSearchUserScene()
     }
 }

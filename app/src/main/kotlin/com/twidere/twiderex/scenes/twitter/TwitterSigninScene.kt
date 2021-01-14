@@ -36,7 +36,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.AmbientLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.R
@@ -44,6 +43,7 @@ import com.twidere.twiderex.component.LoginLogo
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.navigation.AmbientNavigator
 import com.twidere.twiderex.extensions.navViewModel
+import com.twidere.twiderex.extensions.navigateForResult
 import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.ui.TwidereXTheme
 import com.twidere.twiderex.viewmodel.twitter.TwitterSignInViewModel
@@ -51,15 +51,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
 @Composable
 fun TwitterSignInScene() {
     val viewModel = navViewModel<TwitterSignInViewModel>()
     val loading by viewModel.loading.observeAsState(initial = false)
     val navController = AmbientNavController.current
-    val lifecycleOwner = AmbientLifecycleOwner.current
     val navigator = AmbientNavigator.current
     TwidereXTheme {
         InAppNotificationScaffold {
@@ -102,15 +99,9 @@ fun TwitterSignInScene() {
                                             "wmtrtTaVOjUnH5pWQp4LDI5Qs",
                                             "E9Q9u2yK0COJae2tLcNEdY75OPA3bxqJiGZQztraHaQUtoI2cu"
                                         ) { target ->
-                                            suspendCoroutine {
-                                                navController.currentBackStackEntry?.savedStateHandle?.getLiveData<String>(
-                                                    "pin_code"
-                                                )?.observe(lifecycleOwner) { result ->
-                                                    it.resume(result)
-                                                    navController.currentBackStackEntry?.savedStateHandle?.remove<String>(
-                                                        "pin_code"
-                                                    )
-                                                }
+                                            navController.navigateForResult(
+                                                "pin_code",
+                                            ) {
                                                 navigator.twitterSignInWeb(target)
                                             }
                                         }.takeIf { it }?.let {
