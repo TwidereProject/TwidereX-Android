@@ -28,7 +28,7 @@ import com.twidere.twiderex.model.MicroBlogKey
 
 @Entity(
     tableName = "media",
-    indices = [Index(value = ["statusKey", "mediaUrl"], unique = true)],
+    indices = [Index(value = ["statusKey", "order"], unique = true)],
 )
 data class DbMedia(
     /**
