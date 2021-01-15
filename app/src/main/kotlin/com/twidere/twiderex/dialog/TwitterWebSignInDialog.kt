@@ -51,7 +51,7 @@ class TwitterWebSignInDialog : DialogFragment() {
                 }.navController.let {
                     it.previousBackStackEntry?.savedStateHandle?.set(
                         "pin_code",
-                        "",
+                        null,
                     )
                     it.popBackStack()
                 }
@@ -63,7 +63,7 @@ class TwitterWebSignInDialog : DialogFragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         return LollipopFixWebView(requireContext()).also { webView ->
             webView.settings.apply {
                 javaScriptEnabled = true
