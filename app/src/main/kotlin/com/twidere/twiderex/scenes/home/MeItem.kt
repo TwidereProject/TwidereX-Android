@@ -48,7 +48,7 @@ class MeItem : HomeNavigationItem() {
     @Composable
     override fun onCompose() {
         val account = AmbientActiveAccount.current
-        account?.user?.toUi()?.let { user ->
+        account?.toUi()?.let { user ->
             InAppNotificationScaffold {
                 UserComponent(screenName = user.screenName, host = user.userKey.host, initialData = user)
             }

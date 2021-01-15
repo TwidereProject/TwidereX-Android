@@ -33,6 +33,7 @@ import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.cred.CredentialsType
 import com.twidere.twiderex.model.cred.OAuthCredentials
+import com.twidere.twiderex.model.toAmUser
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.ACCOUNT_TYPE
 import com.twidere.twiderex.repository.AccountRepository
@@ -93,7 +94,7 @@ class TwitterSignInViewModel @ViewModelInject constructor(
                                     credentials_type = CredentialsType.OAuth,
                                     credentials_json = credentials_json,
                                     extras_json = "",
-                                    user = user.toDbUser(),
+                                    user = user.toDbUser().toAmUser(),
                                     lastActive = System.currentTimeMillis()
                                 )
                             )

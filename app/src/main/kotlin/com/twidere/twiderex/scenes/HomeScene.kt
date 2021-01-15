@@ -72,7 +72,6 @@ import com.twidere.twiderex.component.lazy.itemDivider
 import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.model.ui.UiUser
-import com.twidere.twiderex.model.ui.UiUser.Companion.toUi
 import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.preferences.AmbientAppearancePreferences
 import com.twidere.twiderex.preferences.proto.AppearancePreferences
@@ -230,7 +229,7 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
         Spacer(modifier = Modifier.height(16.dp))
 
         val account = AmbientActiveAccount.current
-        val currentUser = account?.user?.toUi()
+        val currentUser = account?.toUi()
         val navController = AmbientNavController.current
         DrawerUserHeader(
             currentUser
@@ -277,7 +276,7 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
                 val allAccounts = accounts.filter { it.accountKey != account?.accountKey }
                 LazyColumn {
                     items(allAccounts) {
-                        val user = it.user.toUi()
+                        val user = it.toUi()
                         ListItem(
                             modifier = Modifier.clickable(
                                 onClick = {

@@ -31,6 +31,7 @@ import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.cred.CredentialsType
 import com.twidere.twiderex.model.cred.OAuth2Credentials
+import com.twidere.twiderex.model.toAmUser
 import com.twidere.twiderex.repository.ACCOUNT_TYPE
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.scenes.mastodon.MASTODON_CALLBACK_URL
@@ -87,7 +88,7 @@ class MastodonSignInViewModel @ViewModelInject constructor(
                             credentials_type = CredentialsType.OAuth2,
                             credentials_json = credentials_json,
                             extras_json = "",
-                            user = user.toDbUser(accountKey = internalKey),
+                            user = user.toDbUser(accountKey = internalKey).toAmUser(),
                             lastActive = System.currentTimeMillis()
                         )
                     )
