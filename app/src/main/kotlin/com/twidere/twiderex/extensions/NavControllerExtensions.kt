@@ -20,21 +20,38 @@
  */
 package com.twidere.twiderex.extensions
 
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.onDispose
 import androidx.lifecycle.Observer
 import androidx.navigation.NavController
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-suspend fun <T> NavController.navigateForResult(key: String, navAction: NavController.() -> Unit) = suspendCoroutine<T> { continuation ->
+suspend fun <T> NavController.navigateForResult(key: String, navAction: NavController.() -> Unit) = suspendCoroutine<T?> { continuation ->
+    currentBackStackEntry?.savedStateHandle?.remove<T>(key) // clear latest value in mRegular
     currentBackStackEntry?.savedStateHandle?.getLiveData<T>(key)?.let { liveData ->
-        val observer = object : Observer<T> {
-            override fun onChanged(result: T) {
+        val observer = object : Observer<T?> {
+            override fun onChanged(result: T?) {
                 continuation.resume(result)
-                currentBackStackEntry?.savedStateHandle?.remove<T>(key)
+                currentBackStackEntry?.savedStateHandle?.remove<T?>(key)
                 liveData.removeObserver(this)
             }
         }
         liveData.observeForever(observer)
     }
     navAction.invoke(this)
+}
+
+@Composable
+fun NavController.DisposeResult(key: String) {
+    onDispose {
+        currentBackStackEntry?.savedStateHandle?.set(key, null)
+    }
+}
+
+inline fun <reified T> NavController.setResult(key: String, value: T) {
+    previousBackStackEntry?.savedStateHandle?.set(
+        key,
+        value,
+    )
 }

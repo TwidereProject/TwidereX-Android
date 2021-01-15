@@ -28,6 +28,8 @@ import android.location.LocationManager
 import android.net.Uri
 import android.os.Bundle
 import androidx.annotation.RequiresPermission
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
@@ -44,6 +46,8 @@ import com.twidere.twiderex.db.model.DbDraft
 import com.twidere.twiderex.di.assisted.IAssistedFactory
 import com.twidere.twiderex.extensions.combineWith
 import com.twidere.twiderex.extensions.getCachedLocation
+import com.twidere.twiderex.extensions.getTextAfterSelection
+import com.twidere.twiderex.extensions.getTextBeforeSelection
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.ComposeData
 import com.twidere.twiderex.model.MicroBlogKey
@@ -104,7 +108,7 @@ class DraftComposeViewModel @AssistedInject constructor(
     override val draftId: String = draft._id
 
     init {
-        setText(draft.content)
+        setText(TextFieldValue(draft.content))
         putImages(draft.media.map { Uri.parse(it) })
         excludedReplyUserIds.postValue(draft.excludedReplyUserIds ?: emptyList())
     }
@@ -190,10 +194,10 @@ open class ComposeViewModel @AssistedInject constructor(
             },
         )
     }
-    val text = MutableLiveData("")
+    val textFieldValue = MutableLiveData(TextFieldValue())
     val images = MutableLiveData<List<Uri>>(emptyList())
     val canSaveDraft =
-        text.combineWith(images) { text, imgs -> !text.isNullOrEmpty() || !imgs.isNullOrEmpty() }
+        textFieldValue.combineWith(images) { text, imgs -> !text?.text.isNullOrEmpty() || !imgs.isNullOrEmpty() }
     val locationEnabled = MutableLiveData(false)
     val status = liveData {
         statusKey?.let {
@@ -203,12 +207,12 @@ open class ComposeViewModel @AssistedInject constructor(
         }
     }
 
-    fun setText(value: String) {
-        text.postValue(value)
+    fun setText(value: TextFieldValue) {
+        textFieldValue.postValue(value)
     }
 
     fun compose() {
-        text.value?.let {
+        textFieldValue.value?.text?.let {
             composeAction.commit(
                 account.accountKey,
                 ComposeData(
@@ -226,7 +230,7 @@ open class ComposeViewModel @AssistedInject constructor(
     }
 
     fun saveDraft() {
-        text.value?.let { text ->
+        textFieldValue.value?.text?.let { text ->
             workManager
                 .beginWith(
                     SaveDraftWorker.create(
@@ -305,6 +309,17 @@ open class ComposeViewModel @AssistedInject constructor(
     fun includeReplyUser(user: UiUser) {
         excludedReplyUserIds.value?.let {
             excludedReplyUserIds.postValue(it - user.id)
+        }
+    }
+
+    fun insertText(result: String) {
+        textFieldValue.value?.let {
+            setText(
+                it.copy(
+                    text = "${it.getTextBeforeSelection()}${result}${it.getTextAfterSelection()}",
+                    selection = TextRange(it.selection.min + result.length)
+                )
+            )
         }
     }
 }

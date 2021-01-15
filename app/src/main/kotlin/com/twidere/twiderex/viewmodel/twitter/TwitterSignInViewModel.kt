@@ -51,14 +51,14 @@ class TwitterSignInViewModel @ViewModelInject constructor(
     suspend fun beginOAuth(
         consumerKey: String,
         consumerSecret: String,
-        pinCodeProvider: suspend (url: String) -> String,
+        pinCodeProvider: suspend (url: String) -> String?,
     ): Boolean {
         loading.postValue(true)
         try {
             val service = TwitterOAuthService(consumerKey, consumerSecret)
             val token = service.getOAuthToken()
             val pinCode = pinCodeProvider.invoke(service.getWebOAuthUrl(token))
-            if (pinCode.isNotEmpty()) {
+            if (!pinCode.isNullOrBlank()) {
                 val accessToken = service.getAccessToken(pinCode, token)
                 val user = TwitterService(
                     consumer_key = consumerKey,

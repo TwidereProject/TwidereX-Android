@@ -22,6 +22,7 @@ package com.twidere.twiderex.utils
 
 import android.webkit.JavascriptInterface
 import androidx.navigation.NavController
+import com.twidere.twiderex.extensions.setResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -36,10 +37,7 @@ class TwitterWebJavascriptInterface(
             content.toIntOrNull()?.let {
                 GlobalScope.launch {
                     withContext(Dispatchers.Main) {
-                        navController.previousBackStackEntry?.savedStateHandle?.set(
-                            "pin_code",
-                            content
-                        )
+                        navController.setResult("pin_code", content)
                         navController.popBackStack()
                     }
                 }

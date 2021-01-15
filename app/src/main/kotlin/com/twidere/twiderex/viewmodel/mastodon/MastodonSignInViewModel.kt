@@ -48,7 +48,7 @@ class MastodonSignInViewModel @ViewModelInject constructor(
 
     suspend fun beginOAuth(
         host: String,
-        codeProvider: suspend (url: String) -> String,
+        codeProvider: suspend (url: String) -> String?,
     ): Boolean {
         loading.postValue(true)
         val service = MastodonOAuthService(
@@ -60,40 +60,42 @@ class MastodonSignInViewModel @ViewModelInject constructor(
         val application = service.createApplication()
         val target = service.getWebOAuthUrl(application)
         val code = codeProvider.invoke(target)
-        val accessTokenResponse = service.getAccessToken(code, application)
-        val accessToken = accessTokenResponse.accessToken
-        if (accessToken != null) {
-            val user = service.verifyCredentials(accessToken = accessToken)
-            val name = user.username
-            val id = user.id
-            if (name != null && id != null) {
-                val displayKey = MicroBlogKey(name, host = host)
-                val internalKey = MicroBlogKey(id, host = host)
-                val credentials_json = OAuth2Credentials(
-                    access_token = accessToken
-                ).json()
-                if (repository.containsAccount(internalKey)) {
-                    repository.findByAccountKey(internalKey)?.let {
-                        repository.getAccountDetails(it)
-                    }?.let {
-                        it.credentials_json = credentials_json
-                        repository.updateAccount(it)
-                    }
-                } else {
-                    repository.addAccount(
-                        AccountDetails(
-                            account = Account(displayKey.toString(), ACCOUNT_TYPE),
-                            type = PlatformType.Mastodon,
-                            accountKey = internalKey,
-                            credentials_type = CredentialsType.OAuth2,
-                            credentials_json = credentials_json,
-                            extras_json = "",
-                            user = user.toDbUser(accountKey = internalKey).toAmUser(),
-                            lastActive = System.currentTimeMillis()
+        if (!code.isNullOrBlank()) {
+            val accessTokenResponse = service.getAccessToken(code, application)
+            val accessToken = accessTokenResponse.accessToken
+            if (accessToken != null) {
+                val user = service.verifyCredentials(accessToken = accessToken)
+                val name = user.username
+                val id = user.id
+                if (name != null && id != null) {
+                    val displayKey = MicroBlogKey(name, host = host)
+                    val internalKey = MicroBlogKey(id, host = host)
+                    val credentials_json = OAuth2Credentials(
+                        access_token = accessToken
+                    ).json()
+                    if (repository.containsAccount(internalKey)) {
+                        repository.findByAccountKey(internalKey)?.let {
+                            repository.getAccountDetails(it)
+                        }?.let {
+                            it.credentials_json = credentials_json
+                            repository.updateAccount(it)
+                        }
+                    } else {
+                        repository.addAccount(
+                            AccountDetails(
+                                account = Account(displayKey.toString(), ACCOUNT_TYPE),
+                                type = PlatformType.Mastodon,
+                                accountKey = internalKey,
+                                credentials_type = CredentialsType.OAuth2,
+                                credentials_json = credentials_json,
+                                extras_json = "",
+                                user = user.toDbUser(accountKey = internalKey).toAmUser(),
+                                lastActive = System.currentTimeMillis()
+                            )
                         )
-                    )
+                    }
+                    return true
                 }
-                return true
             }
         }
         loading.postValue(false)

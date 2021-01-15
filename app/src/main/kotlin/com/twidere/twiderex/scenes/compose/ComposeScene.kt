@@ -76,9 +76,9 @@ import androidx.compose.ui.platform.AmbientContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.SoftwareKeyboardController
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.navigate
-import com.twidere.twiderex.BuildConfig
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.BackButtonHandler
 import com.twidere.twiderex.component.foundation.AppBar
@@ -90,6 +90,7 @@ import com.twidere.twiderex.component.status.TimelineStatusComponent
 import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.extensions.checkAllSelfPermissionsGranted
+import com.twidere.twiderex.extensions.navigateForResult
 import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.launcher.AmbientLauncher
 import com.twidere.twiderex.model.AccountDetails
@@ -156,7 +157,7 @@ private fun ComposeBody(
     val location by viewModel.location.observeAsState()
     val locationEnabled by viewModel.locationEnabled.observeAsState(initial = false)
     val navController = AmbientNavController.current
-    val text by viewModel.text.observeAsState(initial = "")
+    val textFieldValue by viewModel.textFieldValue.observeAsState(initial = TextFieldValue())
     val keyboardController = remember { Ref<SoftwareKeyboardController>() }
     val canSaveDraft by viewModel.canSaveDraft.observeAsState(initial = false)
     var showSaveDraftDialog by remember { mutableStateOf(false) }
@@ -222,7 +223,7 @@ private fun ComposeBody(
                     },
                     actions = {
                         IconButton(
-                            enabled = text.isNotEmpty(),
+                            enabled = textFieldValue.text.isNotEmpty(),
                             onClick = {
                                 viewModel.compose()
                                 navController.popBackStack()
@@ -243,8 +244,6 @@ private fun ComposeBody(
                             scaffoldState,
                             viewModel,
                             account,
-                            text,
-                            { viewModel.setText(it) },
                             keyboardController
                         )
                     } else {
@@ -288,8 +287,6 @@ private fun ComposeBody(
                                             scaffoldState,
                                             viewModel,
                                             account,
-                                            text,
-                                            { viewModel.setText(it) },
                                             keyboardController,
                                             autoFocus = if (composeType == ComposeType.Reply) {
                                                 listState.firstVisibleItemIndex == 1
@@ -327,8 +324,8 @@ private fun ComposeBody(
                     val maxLength = remember {
                         TwitterTextConfiguration.getDefaultConfig().maxWeightedTweetLength
                     }
-                    val textLength = remember(text) {
-                        TwitterTextParser.parseTweet(text).weightedLength
+                    val textLength = remember(textFieldValue) {
+                        TwitterTextParser.parseTweet(textFieldValue.text).weightedLength
                     }
                     val progress = remember(textLength) {
                         textLength.toFloat() / maxLength.toFloat()
@@ -508,11 +505,10 @@ private fun ComposeInput(
     scaffoldState: BottomSheetScaffoldState,
     composeViewModel: ComposeViewModel,
     account: AccountDetails?,
-    text: String,
-    setText: (String) -> Unit,
     keyboardController: Ref<SoftwareKeyboardController>,
     autoFocus: Boolean = true,
 ) {
+    val text by composeViewModel.textFieldValue.observeAsState(initial = TextFieldValue())
     Column {
         ComposeReply(composeViewModel = composeViewModel, scaffoldState = scaffoldState)
         if (composeViewModel.composeType != ComposeType.Reply) {
@@ -540,7 +536,7 @@ private fun ComposeInput(
                         .align(Alignment.TopCenter)
                         .fillMaxSize(),
                     value = text,
-                    onValueChange = { setText(it) },
+                    onValueChange = { composeViewModel.setText(it) },
                     autoFocus = autoFocus,
                     onTextInputStarted = {
                         keyboardController.value = it
@@ -635,14 +631,19 @@ private fun ComposeActions(viewModel: ComposeViewModel) {
 //            IconButton(onClick = {}) {
 //                Icon(imageVector = vectorResource(id = R.drawable.ic_gif))
 //            }
-            if (BuildConfig.DEBUG) {
-                IconButton(
-                    onClick = {
-                        navController.navigate(Route.Compose.Search.User)
+            IconButton(
+                onClick = {
+                    scope.launch {
+                        val result = navController.navigateForResult<String>("user_name") {
+                            navigate(Route.Compose.Search.User)
+                        }
+                        if (result != null) {
+                            viewModel.insertText("@$result ")
+                        }
                     }
-                ) {
-                    Icon(imageVector = vectorResource(id = R.drawable.ic_at_sign))
                 }
+            ) {
+                Icon(imageVector = vectorResource(id = R.drawable.ic_at_sign))
             }
 //            IconButton(onClick = {}) {
 //                Icon(imageVector = vectorResource(id = R.drawable.ic_hash))

@@ -41,7 +41,6 @@ import androidx.compose.runtime.Providers
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.onDispose
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -56,8 +55,11 @@ import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.TextInput
 import com.twidere.twiderex.component.lazy.itemsPaging
 import com.twidere.twiderex.component.status.UserAvatar
+import com.twidere.twiderex.extensions.DisposeResult
+import com.twidere.twiderex.extensions.setResult
 import com.twidere.twiderex.extensions.viewModel
 import com.twidere.twiderex.ui.AmbientActiveAccount
+import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.ui.TwidereXTheme
 import com.twidere.twiderex.viewmodel.compose.ComposeSearchUserViewModel
 
@@ -65,16 +67,15 @@ import com.twidere.twiderex.viewmodel.compose.ComposeSearchUserViewModel
 @Composable
 fun ComposeSearchUserScene() {
     val account = AmbientActiveAccount.current ?: return
+    val navController = AmbientNavController.current
     val viewModel = viewModel(account) {
         ComposeSearchUserViewModel(account = account)
     }
-    onDispose {
-    }
-
     val text by viewModel.text.observeAsState(initial = "")
     val sourceState by viewModel.sourceFlow.collectAsState(initial = null)
     val source = sourceState?.collectAsLazyPagingItems()
     TwidereXTheme {
+        navController.DisposeResult(key = "user_name")
         InAppNotificationScaffold(
             topBar = {
                 AppBar(
@@ -90,6 +91,8 @@ fun ComposeSearchUserScene() {
                                     Text(text = stringResource(id = R.string.scene_search_search_bar_placeholder))
                                 },
                                 onImeActionPerformed = { _, _ ->
+                                    navController.setResult("user_name", text)
+                                    navController.popBackStack()
                                 },
                                 autoFocus = true,
                                 imeAction = ImeAction.Done,
@@ -103,6 +106,8 @@ fun ComposeSearchUserScene() {
                     actions = {
                         IconButton(
                             onClick = {
+                                navController.setResult("user_name", text)
+                                navController.popBackStack()
                             }
                         ) {
                             Icon(imageVector = Icons.Default.Done)
@@ -118,6 +123,8 @@ fun ComposeSearchUserScene() {
                             ListItem(
                                 modifier = Modifier.clickable(
                                     onClick = {
+                                        navController.setResult("user_name", item.screenName)
+                                        navController.popBackStack()
                                     }
                                 ),
                                 icon = {

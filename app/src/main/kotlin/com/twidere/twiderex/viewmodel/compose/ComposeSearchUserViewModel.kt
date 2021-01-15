@@ -41,7 +41,7 @@ class ComposeSearchUserViewModel(
     val text = MutableLiveData("")
 
     @OptIn(FlowPreview::class)
-    val sourceFlow = text.asFlow().debounce(1000L).map {
+    val sourceFlow = text.asFlow().debounce(666L).map {
         it.takeIf { it.isNotEmpty() }?.let {
             Pager(config = PagingConfig(pageSize = defaultLoadCount)) {
                 SearchUserPagingSource(
