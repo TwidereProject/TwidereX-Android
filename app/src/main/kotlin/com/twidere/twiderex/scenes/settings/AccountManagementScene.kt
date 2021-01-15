@@ -45,7 +45,6 @@ import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.status.UserAvatar
-import com.twidere.twiderex.model.ui.UiUser.Companion.toUi
 import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.ui.AmbientActiveAccountViewModel
 import com.twidere.twiderex.ui.AmbientNavController
@@ -80,7 +79,7 @@ fun AccountManagementScene() {
             val accounts by activeAccountViewModel.allAccounts.observeAsState(initial = emptyList())
             LazyColumn {
                 items(items = accounts) { detail ->
-                    detail.user.toUi().let {
+                    detail.toUi().let {
                         ListItem(
                             icon = {
                                 UserAvatar(

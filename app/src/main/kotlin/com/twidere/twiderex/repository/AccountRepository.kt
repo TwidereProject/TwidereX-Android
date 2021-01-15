@@ -24,8 +24,8 @@ import android.accounts.Account
 import android.accounts.AccountManager
 import android.os.Build
 import androidx.lifecycle.MutableLiveData
-import com.twidere.twiderex.db.model.DbUser
 import com.twidere.twiderex.model.AccountDetails
+import com.twidere.twiderex.model.AmUser
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.cred.CredentialsType
@@ -115,7 +115,7 @@ class AccountRepository @Inject constructor(
             ),
             credentials_json = manager.peekAuthToken(account, ACCOUNT_AUTH_TOKEN_TYPE),
             extras_json = manager.getUserData(account, ACCOUNT_USER_DATA_EXTRAS),
-            user = manager.getUserData(account, ACCOUNT_USER_DATA_USER).fromJson<DbUser>()!!,
+            user = manager.getUserData(account, ACCOUNT_USER_DATA_USER).fromJson<AmUser>()!!,
             lastActive = manager.getUserData(account, ACCOUNT_USER_DATA_LAST_ACTIVE)?.toLongOrNull()
                 ?: 0
         )

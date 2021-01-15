@@ -26,13 +26,13 @@ import com.squareup.moshi.JsonClass
 import com.twidere.services.mastodon.MastodonService
 import com.twidere.services.microblog.MicroBlogService
 import com.twidere.services.twitter.TwitterService
-import com.twidere.twiderex.db.model.DbUser
 import com.twidere.twiderex.model.cred.BasicCredentials
 import com.twidere.twiderex.model.cred.Credentials
 import com.twidere.twiderex.model.cred.CredentialsType
 import com.twidere.twiderex.model.cred.EmptyCredentials
 import com.twidere.twiderex.model.cred.OAuth2Credentials
 import com.twidere.twiderex.model.cred.OAuthCredentials
+import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.utils.fromJson
 
 @JsonClass(generateAdapter = true)
@@ -46,10 +46,9 @@ data class AccountDetails(
     var credentials_json: String,
     @Json(name = "extras")
     val extras_json: String,
-    var user: DbUser,
+    var user: AmUser,
     var lastActive: Long,
 ) {
-
     val credentials: Credentials?
         get() = when (credentials_type) {
             CredentialsType.OAuth,
@@ -82,5 +81,25 @@ data class AccountDetails(
                     MastodonService(accountKey.host, it.access_token)
                 }
         }
+    }
+
+    fun toUi() = with(user) {
+        UiUser(
+            id = userId,
+            name = name,
+            screenName = screenName,
+            profileImage = profileImage,
+            profileBackgroundImage = profileBackgroundImage,
+            followersCount = followersCount,
+            friendsCount = friendsCount,
+            listedCount = listedCount,
+            desc = desc,
+            website = website,
+            location = location,
+            verified = verified,
+            protected = isProtected,
+            userKey = userKey,
+            platformType = type,
+        )
     }
 }
