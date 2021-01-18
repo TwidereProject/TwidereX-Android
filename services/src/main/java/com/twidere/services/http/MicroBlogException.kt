@@ -20,8 +20,8 @@
  */
 package com.twidere.services.http
 
-import java.io.IOException
 import kotlinx.serialization.Serializable
+import java.io.IOException
 
 @Serializable
 data class MicroBlogException(
