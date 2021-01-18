@@ -39,8 +39,6 @@ import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.twitter.TwitterConversationRepository
 import com.twidere.twiderex.utils.notify
 import kotlinx.coroutines.launch
-import retrofit2.HttpException
-import java.io.IOException
 
 class TwitterStatusViewModel @AssistedInject constructor(
     private val factory: TwitterConversationRepository.AssistedFactory,
@@ -103,22 +101,28 @@ class TwitterStatusViewModel @AssistedInject constructor(
                     tweet.referencedTweets?.firstOrNull { it.type == ReferencedTweetType.retweeted }?.status
                     ?: tweet
                 launch {
-                    val list = repository.loadPrevious(targetTweet)
-                    previous.addAll(list)
+                    runCatching {
+                        repository.loadPrevious(targetTweet)
+                    }.onSuccess {
+                        previous.addAll(it)
+                    }.onFailure {
+                        it.notify(inAppNotification)
+                    }
                     loadingPrevious.postValue(false)
                 }
                 launch {
-                    val result = repository.loadConversation(targetTweet)
-                    nextPage = result.nextPage
-                    conversations.addAll(result.result)
+                    runCatching {
+                        repository.loadConversation(targetTweet)
+                    }.onFailure {
+                        it.notify(inAppNotification)
+                    }.onSuccess { result ->
+                        nextPage = result.nextPage
+                        conversations.addAll(result.result)
+                    }
                     loadingMore.postValue(false)
                 }
-            } catch (e: MicroBlogException) {
+            } catch (e: Throwable) {
                 e.notify(inAppNotification)
-            } catch (e: IOException) {
-                e.message?.let { inAppNotification.show(it) }
-            } catch (e: HttpException) {
-                e.message?.let { inAppNotification.show(it) }
             }
         }
     }
@@ -128,9 +132,13 @@ class TwitterStatusViewModel @AssistedInject constructor(
             return
         }
         loadingMore.postValue(true)
-        val result = repository.loadConversation(targetTweet, nextPage = nextPage)
-        nextPage = result.nextPage
-        conversations.addAll(result.result)
+        try {
+            val result = repository.loadConversation(targetTweet, nextPage = nextPage)
+            nextPage = result.nextPage
+            conversations.addAll(result.result)
+        } catch (e: Throwable) {
+            e.notify(inAppNotification)
+        }
         loadingMore.postValue(false)
     }
 }
