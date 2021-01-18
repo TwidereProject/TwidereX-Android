@@ -67,5 +67,8 @@ fun Throwable.notify(notification: InAppNotification) {
         !is CancellationException -> {
             message?.let { notification.show(it) }
         }
+        is MicroBlogException -> {
+            notify(notification)
+        }
     }
 }
