@@ -27,13 +27,13 @@ import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
-import com.twidere.services.microblog.LookupService
-import com.twidere.services.microblog.SearchService
+import com.twidere.services.twitter.TwitterService
 import com.twidere.services.twitter.model.ReferencedTweetType
 import com.twidere.services.twitter.model.StatusV2
 import com.twidere.twiderex.di.assisted.IAssistedFactory
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.twitter.TwitterConversationRepository
 import com.twidere.twiderex.utils.notify
@@ -55,7 +55,7 @@ class TwitterStatusViewModel @AssistedInject constructor(
     private var nextPage: String? = null
     private val repository by lazy {
         account.service.let {
-            factory.create(account.accountKey, it as SearchService, it as LookupService)
+            factory.create(account.accountKey, it as TwitterService)
         }
     }
 
@@ -64,7 +64,7 @@ class TwitterStatusViewModel @AssistedInject constructor(
             emit(
                 conversations.mapNotNull { conversation ->
                     list.firstOrNull {
-                        it.statusId == conversation.id
+                        it.statusId == conversation.statusId
                     }
                 }
             )
@@ -86,7 +86,7 @@ class TwitterStatusViewModel @AssistedInject constructor(
     }
     val loadingPrevious = MutableLiveData(false)
     val loadingMore = MutableLiveData(false)
-    private val conversations = arrayListOf<StatusV2>()
+    private val conversations = arrayListOf<UiStatus>()
     private val previous = arrayListOf<StatusV2>()
 
     init {

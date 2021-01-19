@@ -20,8 +20,9 @@
  */
 package com.twidere.twiderex.paging.mediator.search
 
-import com.twidere.services.microblog.SearchService
 import com.twidere.services.microblog.model.IStatus
+import com.twidere.services.twitter.TwitterService
+import com.twidere.services.twitter.model.exceptions.TwitterApiExceptionV2
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.notification.InAppNotification
@@ -31,13 +32,17 @@ class SearchStatusMediator(
     private val query: String,
     database: CacheDatabase,
     accountKey: MicroBlogKey,
-    private val service: SearchService,
+    private val service: TwitterService,
     inAppNotification: InAppNotification,
 ) : PagingTimelineMediatorBase(accountKey, database, inAppNotification) {
     override val pagingKey = "search:$query:status"
     private var nextPage: String? = null
     override suspend fun load(pageSize: Int, max_id: String?): List<IStatus> {
-        val result = service.searchTweets("$query -is:retweet", count = pageSize, nextPage = nextPage)
+        val result = try {
+            service.searchTweets("$query -is:retweet", count = pageSize, nextPage = nextPage)
+        } catch (e: TwitterApiExceptionV2) {
+            service.searchTweetsV1("$query -filter:retweets", count = pageSize, max_id = nextPage)
+        }
         nextPage = result.nextPage
         return result.status
     }

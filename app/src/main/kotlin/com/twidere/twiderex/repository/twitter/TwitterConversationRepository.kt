@@ -25,13 +25,13 @@ import androidx.lifecycle.map
 import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
 import com.twidere.services.http.MicroBlogException
-import com.twidere.services.microblog.LookupService
-import com.twidere.services.microblog.SearchService
+import com.twidere.services.twitter.TwitterService
 import com.twidere.services.twitter.model.ReferencedTweetType
 import com.twidere.services.twitter.model.StatusV2
-import com.twidere.services.twitter.model.TwitterSearchResponseV2
+import com.twidere.services.twitter.model.exceptions.TwitterApiExceptionV2
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.db.mapper.toDbTimeline
+import com.twidere.twiderex.db.model.DbTimelineWithStatus
 import com.twidere.twiderex.db.model.TimelineType
 import com.twidere.twiderex.db.model.saveToDb
 import com.twidere.twiderex.defaultLoadCount
@@ -43,25 +43,24 @@ import com.twidere.twiderex.repository.twitter.model.SearchResult
 class TwitterConversationRepository @AssistedInject constructor(
     private val database: CacheDatabase,
     @Assisted private val accountKey: MicroBlogKey,
-    @Assisted private val searchService: SearchService,
-    @Assisted private val lookupService: LookupService,
+    @Assisted private val service: TwitterService,
 ) {
 
     @AssistedInject.Factory
     interface AssistedFactory {
         fun create(
             accountKey: MicroBlogKey,
-            searchService: SearchService,
-            lookupService: LookupService,
+            service: TwitterService,
         ): TwitterConversationRepository
     }
 
     val liveData by lazy {
-        database.timelineDao().getAllWithLiveData(accountKey, TimelineType.Conversation).map { list ->
-            list.map { status ->
-                status.toUi(accountKey)
+        database.timelineDao().getAllWithLiveData(accountKey, TimelineType.Conversation)
+            .map { list ->
+                list.map { status ->
+                    status.toUi(accountKey)
+                }
             }
-        }
     }
 
     suspend fun loadPrevious(statusV2: StatusV2): List<StatusV2> {
@@ -74,7 +73,7 @@ class TwitterConversationRepository @AssistedInject constructor(
                 break
             } else {
                 try {
-                    val result = lookupService.lookupStatus(referencedTweetId) as StatusV2
+                    val result = service.lookupStatus(referencedTweetId)
                     val db = result.toDbTimeline(accountKey, TimelineType.Conversation)
                     listOf(db).saveToDb(database)
                     list.add(result)
@@ -99,7 +98,7 @@ class TwitterConversationRepository @AssistedInject constructor(
     }
 
     suspend fun loadTweetFromNetwork(statusId: String): StatusV2 {
-        return lookupService.lookupStatus(statusId) as StatusV2
+        return service.lookupStatus(statusId)
     }
 
     suspend fun toUiStatus(status: StatusV2): UiStatus {
@@ -109,30 +108,49 @@ class TwitterConversationRepository @AssistedInject constructor(
     }
 
     private fun buildConversation(
-        status: StatusV2,
-        searchResponse: List<StatusV2>
-    ): List<List<StatusV2>> {
+        status: DbTimelineWithStatus,
+        searchResponse: List<DbTimelineWithStatus>
+    ): List<DbTimelineWithStatus> {
         return searchResponse.filter {
-            it.referencedTweets?.firstOrNull {
-                it.type == ReferencedTweetType.replied_to
-            }?.id == status.id
+            it.status.status.data.replyStatusKey?.id == status.status.status.data.statusId
         }
-            .map {
-                listOf(it) + buildConversation(it, searchResponse).flatten()
-            }
+//        return searchResponse.filter {
+//            it.status.replyTo?.data?.statusId == status.status.status.data.statusId
+//        }
+//            .map {
+//                listOf(it) + buildConversation(it, searchResponse).flatten()
+//            }
     }
 
     suspend fun loadConversation(tweet: StatusV2, nextPage: String? = null): SearchResult {
+        val dbTweet = tweet.toDbTimeline(
+            accountKey = accountKey,
+            TimelineType.Conversation
+        )
         val conversationId = tweet.conversationID ?: return SearchResult(emptyList(), null)
-        val searchResponse = searchService.searchTweets(
-            "conversation_id:$conversationId",
-            count = defaultLoadCount,
-            nextPage = nextPage
-        ) as TwitterSearchResponseV2
-        val status = searchResponse.data ?: emptyList()
-        val result = buildConversation(tweet, status)
-        val db = result.flatten().map { it.toDbTimeline(accountKey, TimelineType.Conversation) }
+        val searchResponse = try {
+            service.searchTweets(
+                "conversation_id:$conversationId",
+                count = defaultLoadCount,
+                nextPage = nextPage
+            )
+        } catch (e: TwitterApiExceptionV2) {
+            service.searchTweetsV1(
+                "to:${dbTweet.status.status.user.screenName} since_id:${dbTweet.status.status.data.statusId}",
+                count = defaultLoadCount,
+                max_id = nextPage
+            )
+        }
+        val status = searchResponse.status
+        val db = status.map { it.toDbTimeline(accountKey, TimelineType.Conversation) }
+        val result = buildConversation(
+            dbTweet,
+            db,
+        )
         db.saveToDb(database)
-        return SearchResult(result.flatten(), searchResponse.nextPage)
+        return SearchResult(
+            result.map { it.toUi(accountKey = accountKey) },
+            searchResponse.nextPage
+        )
     }
 }

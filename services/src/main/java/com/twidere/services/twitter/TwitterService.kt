@@ -37,6 +37,7 @@ import com.twidere.services.microblog.model.Relationship
 import com.twidere.services.twitter.api.TwitterResources
 import com.twidere.services.twitter.api.UploadResources
 import com.twidere.services.twitter.model.StatusV2
+import com.twidere.services.twitter.model.TwitterSearchResponseV1
 import com.twidere.services.twitter.model.TwitterSearchResponseV2
 import com.twidere.services.twitter.model.User
 import com.twidere.services.twitter.model.UserV2
@@ -306,6 +307,15 @@ class TwitterService(
             }
         }
         return result
+    }
+
+    suspend fun searchTweetsV1(
+        query: String,
+        count: Int,
+        since_id: String? = null,
+        max_id: String? = null,
+    ): TwitterSearchResponseV1 {
+        return resources.searchV1(query, count = count, max_id = max_id, since_id = since_id)
     }
 
     override suspend fun searchUsers(query: String, page: Int?, count: Int) =
