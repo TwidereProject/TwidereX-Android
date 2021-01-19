@@ -20,19 +20,8 @@
  */
 package com.twidere.services.http
 
-import kotlinx.serialization.Serializable
 import java.io.IOException
 
-@Serializable
-data class MicroBlogException(
-    val error: String? = null,
-    val request: String? = null,
-    val detail: String? = null,
-    val errors: List<Errors>? = null,
-    val httpCode: Int? = null,
-) : IOException() {
-    val microBlogErrorMessage: String?
-        get() = error ?: errors?.firstOrNull()?.let {
-            it.detail ?: it.message ?: it.detail
-        }
+abstract class MicroBlogException : IOException() {
+    abstract val microBlogErrorMessage: String?
 }

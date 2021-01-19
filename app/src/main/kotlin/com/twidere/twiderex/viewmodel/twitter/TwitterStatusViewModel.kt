@@ -93,12 +93,13 @@ class TwitterStatusViewModel @AssistedInject constructor(
         viewModelScope.launch {
             loadingPrevious.postValue(true)
             loadingMore.postValue(true)
-            try {
+            runCatching {
                 val tweet = repository.loadTweetFromNetwork(statusKey.id)
                 repository.toUiStatus(tweet)
                 targetTweet =
                     tweet.referencedTweets?.firstOrNull { it.type == ReferencedTweetType.retweeted }?.status
                     ?: tweet
+            }.onSuccess {
                 launch {
                     runCatching {
                         repository.loadPrevious(targetTweet)
@@ -120,8 +121,10 @@ class TwitterStatusViewModel @AssistedInject constructor(
                     }
                     loadingMore.postValue(false)
                 }
-            } catch (e: Throwable) {
-                e.notify(inAppNotification)
+            }.onFailure {
+                loadingPrevious.postValue(false)
+                loadingMore.postValue(false)
+                it.notify(inAppNotification)
             }
         }
     }

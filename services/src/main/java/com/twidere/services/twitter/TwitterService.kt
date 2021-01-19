@@ -21,7 +21,7 @@
 package com.twidere.services.twitter
 
 import com.twidere.services.http.Errors
-import com.twidere.services.http.MicroBlogException
+import com.twidere.services.http.MicroBlogHttpException
 import com.twidere.services.http.authorization.OAuth1Authorization
 import com.twidere.services.http.retrofit
 import com.twidere.services.microblog.LookupService
@@ -40,6 +40,8 @@ import com.twidere.services.twitter.model.StatusV2
 import com.twidere.services.twitter.model.TwitterSearchResponseV2
 import com.twidere.services.twitter.model.User
 import com.twidere.services.twitter.model.UserV2
+import com.twidere.services.twitter.model.exceptions.TwitterApiException
+import com.twidere.services.twitter.model.exceptions.TwitterApiExceptionV2
 import com.twidere.services.twitter.model.fields.Expansions
 import com.twidere.services.twitter.model.fields.MediaFields
 import com.twidere.services.twitter.model.fields.PlaceFields
@@ -81,11 +83,17 @@ class TwitterService(
                     response.body?.string()?.takeIf {
                         it.isNotEmpty()
                     }?.let { content ->
-                        content.decodeJson<MicroBlogException>().let {
+                        content.decodeJson<TwitterApiException>().takeIf {
+                            it.microBlogErrorMessage != null
+                        }.let {
+                            it ?: run {
+                                content.decodeJson<TwitterApiExceptionV2>()
+                            }
+                        }.let {
                             throw it
                         }
                     } ?: run {
-                        throw MicroBlogException(httpCode = response.code)
+                        throw MicroBlogHttpException(httpCode = response.code)
                     }
                 }
                 response
@@ -174,7 +182,7 @@ class TwitterService(
         )
         if (user.data == null) {
             if (user.errors != null && user.errors.any()) {
-                throw MicroBlogException(
+                throw TwitterApiException(
                     errors = user.errors.map {
                         Errors(
                             code = null,
@@ -223,7 +231,7 @@ class TwitterService(
         )
         if (user.data == null) {
             if (user.errors != null && user.errors.any()) {
-                throw MicroBlogException(
+                throw TwitterApiException(
                     errors = user.errors.map {
                         Errors(
                             code = null,
@@ -261,7 +269,7 @@ class TwitterService(
             expansions = Expansions.values().joinToString(",") { it.value },
             tweetFields = TweetFields.values().joinToString(",") { it.value },
         )
-        val data = response.data ?: throw MicroBlogException("Status not found")
+        val data = response.data ?: throw TwitterApiException("Status not found")
         response.includes?.let {
             data.setExtra(it)
         }

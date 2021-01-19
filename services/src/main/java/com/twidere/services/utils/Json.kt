@@ -33,6 +33,8 @@ val JSON by lazy {
     }
 }
 
+class MicroBlogJsonException(override val microBlogErrorMessage: String?) : MicroBlogException()
+
 inline fun <reified T> T.encodeJson(): String =
     JSON.encodeToString<T>(this)
 
@@ -41,5 +43,5 @@ inline fun <reified T> String.decodeJson(): T {
         JSON.parseToJsonElement(this)
     }.getOrNull()?.let {
         JSON.decodeFromJsonElement<T>(it)
-    } ?: throw MicroBlogException(error = this)
+    } ?: throw MicroBlogJsonException(this)
 }
