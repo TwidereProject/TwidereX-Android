@@ -18,6 +18,26 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.services.utils
+package com.twidere.services.twitter.model.exceptions
 
-internal const val DEBUG = true
+import com.twidere.services.http.MicroBlogException
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class TwitterApiExceptionV2(
+    @SerialName("account_id")
+    val accountID: Long? = null,
+
+    @SerialName("product_name")
+    val productName: String? = null,
+
+    val title: String? = null,
+    val period: String? = null,
+    val scope: String? = null,
+    val detail: String? = null,
+    val type: String? = null,
+) : MicroBlogException() {
+    override val microBlogErrorMessage: String?
+        get() = detail
+}

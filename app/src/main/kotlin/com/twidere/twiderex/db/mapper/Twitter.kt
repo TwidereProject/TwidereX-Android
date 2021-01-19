@@ -270,7 +270,7 @@ private fun Status.toDbStatusWithMediaAndUser(
         source = source ?: "",
         userKey = user.userKey,
         lang = lang,
-        replyStatusKey = null,
+        replyStatusKey = inReplyToStatusIDStr?.let { MicroBlogKey.twitter(it) },
         retweetStatusKey = retweetedStatus?.toDbStatusWithMediaAndUser(accountKey = accountKey)?.data?.statusKey,
         quoteStatusKey = (retweetedStatus?.quotedStatus ?: quotedStatus)?.toDbStatusWithMediaAndUser(accountKey = accountKey)?.data?.statusKey,
         statusKey = MicroBlogKey.twitter(

@@ -25,9 +25,9 @@ import androidx.work.CoroutineWorker
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
-import com.twidere.services.http.MicroBlogException
 import com.twidere.services.microblog.StatusService
 import com.twidere.services.twitter.TwitterErrorCodes
+import com.twidere.services.twitter.model.exceptions.TwitterApiException
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.notification.InAppNotification
@@ -75,7 +75,7 @@ abstract class StatusWorker(
             Result.success(
                 result.toWorkData()
             )
-        } catch (e: MicroBlogException) {
+        } catch (e: TwitterApiException) {
             e.errors?.firstOrNull()?.let {
                 when (it.code) {
                     TwitterErrorCodes.AlreadyRetweeted -> {

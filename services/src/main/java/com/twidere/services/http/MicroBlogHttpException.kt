@@ -18,6 +18,11 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.services.utils
+package com.twidere.services.http
 
-internal const val DEBUG = true
+class MicroBlogHttpException(
+    val httpCode: Int,
+) : MicroBlogException() {
+    override val microBlogErrorMessage: String?
+        get() = null
+}

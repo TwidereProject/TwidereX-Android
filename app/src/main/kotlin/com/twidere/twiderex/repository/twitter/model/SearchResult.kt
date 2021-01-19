@@ -20,9 +20,9 @@
  */
 package com.twidere.twiderex.repository.twitter.model
 
-import com.twidere.services.twitter.model.StatusV2
+import com.twidere.twiderex.model.ui.UiStatus
 
 data class SearchResult(
-    val result: List<StatusV2>,
+    val result: List<UiStatus>,
     val nextPage: String?,
 )

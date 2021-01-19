@@ -18,6 +18,35 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.services.utils
+package com.twidere.services.twitter.model
 
-internal const val DEBUG = true
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class SearchMetadataV1(
+    @SerialName("completed_in")
+    val completedIn: Double? = null,
+
+    @SerialName("max_id")
+    val maxID: Double? = null,
+
+    @SerialName("max_id_str")
+    val maxIDStr: String? = null,
+
+    @SerialName("next_results")
+    val nextResults: String? = null,
+
+    val query: String? = null,
+
+    @SerialName("refresh_url")
+    val refreshURL: String? = null,
+
+    val count: Long? = null,
+
+    @SerialName("since_id")
+    val sinceID: Long? = null,
+
+    @SerialName("since_id_str")
+    val sinceIDStr: String? = null
+)
