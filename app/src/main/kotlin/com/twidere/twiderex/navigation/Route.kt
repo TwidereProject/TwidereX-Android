@@ -36,6 +36,7 @@ import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.scenes.DraftListScene
 import com.twidere.twiderex.scenes.HomeScene
 import com.twidere.twiderex.scenes.MediaScene
+import com.twidere.twiderex.scenes.SignInScene
 import com.twidere.twiderex.scenes.StatusScene
 import com.twidere.twiderex.scenes.UserScene
 import com.twidere.twiderex.scenes.compose.ComposeScene
@@ -72,9 +73,12 @@ object Route {
 
     object SignIn {
         val Default by lazy {
-            Twitter
+            General
         }
-        val Twitter = "signin/twitter"
+        val General = "signin/general"
+        fun Twitter(consumerKey: String, consumerSecret: String) =
+            "signin/twitter?consumerKey=$consumerKey&consumerSecret=$consumerSecret"
+
         val Mastodon = "signin/mastodon"
 
         object Web {
@@ -173,14 +177,30 @@ fun NavGraphBuilder.route() {
     }
 
     composable(
-        Route.SignIn.Twitter,
+        Route.SignIn.General,
         deepLinks = listOf(
             navDeepLink {
                 uriPattern = DeepLinks.SignIn
             }
-        )
+        ),
     ) {
-        TwitterSignInScene()
+        SignInScene()
+    }
+
+    composable(
+        "signin/twitter?consumerKey={consumerKey}&consumerSecret={consumerSecret}",
+        arguments = listOf(
+            navArgument("consumerKey") { type = NavType.StringType },
+            navArgument("consumerSecret") { type = NavType.StringType },
+        )
+    ) { backStackEntry ->
+        backStackEntry.arguments?.let { arguments ->
+            val consumerKey = arguments.getString("consumerKey")
+            val consumerSecret = arguments.getString("consumerSecret")
+            if (consumerKey != null && consumerSecret != null) {
+                TwitterSignInScene(consumerKey = consumerKey, consumerSecret = consumerSecret)
+            }
+        }
     }
 
     composable(Route.SignIn.Mastodon) {

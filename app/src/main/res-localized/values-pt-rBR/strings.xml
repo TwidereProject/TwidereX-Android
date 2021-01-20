@@ -59,6 +59,7 @@
     <string name="common_controls_actions_cancel">Cancelar</string>
     <string name="common_controls_actions_take_photo">Tirar foto</string>
     <string name="common_controls_actions_save_photo">Salvar foto</string>
+    <string name="common_controls_actions_sign_in">Entrar</string>
     <string name="common_controls_actions_preview">Pré-visualização</string>
     <string name="common_controls_actions_open_in_safari">Abrir no Safari</string>
     <string name="common_controls_timeline_load_more">Carregar Mais</string>
@@ -109,7 +110,11 @@
     <string name="scene_drawer_manage_accounts">Gerenciar contas</string>
     <string name="scene_manage_accounts_title">Contas</string>
     <string name="scene_manage_accounts_delete_account">Excluir conta</string>
+    <string name="scene_sign_in_hello_sign_in_to_get_started">Olá!\nFaça Login para Começar.</string>
     <string name="scene_sign_in_sign_in_with_twitter">Entrar com o Twitter</string>
+    <string name="scene_sign_in_sign_in_with_mastodon">Fazer Login com Mastodon</string>
+    <string name="scene_sign_in_twitter_options_sign_in_with_custom_twitter_key">Fazer Login com uma Chave Personalizada do Twitter</string>
+    <string name="scene_sign_in_twitter_options_twitter_api_v2_access_is_required">O acesso à API v2 do Twitter é necessário.</string>
     <string name="scene_authentication_title">Autenticação</string>
     <string name="scene_timeline_title">Linha do Tempo</string>
     <string name="scene_mentions_title">Menções</string>

@@ -21,13 +21,16 @@
 package com.twidere.twiderex.viewmodel.twitter
 
 import android.accounts.Account
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.squareup.inject.assisted.Assisted
+import com.squareup.inject.assisted.AssistedInject
 import com.twidere.services.http.MicroBlogException
 import com.twidere.services.twitter.TwitterOAuthService
 import com.twidere.services.twitter.TwitterService
 import com.twidere.twiderex.db.mapper.toDbUser
+import com.twidere.twiderex.di.assisted.IAssistedFactory
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.PlatformType
@@ -39,20 +42,41 @@ import com.twidere.twiderex.repository.ACCOUNT_TYPE
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.utils.json
 import com.twidere.twiderex.utils.notify
+import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
 
-class TwitterSignInViewModel @ViewModelInject constructor(
+class TwitterSignInViewModel @AssistedInject constructor(
     private val repository: AccountRepository,
     private val inAppNotification: InAppNotification,
+    @Assisted private val consumerKey: String,
+    @Assisted private val consumerSecret: String,
+    @Assisted private val pinCodeProvider: suspend (url: String) -> String?,
+    @Assisted private val onResult: (success: Boolean) -> Unit,
 ) : ViewModel() {
+
+    @AssistedInject.Factory
+    interface AssistedFactory : IAssistedFactory {
+        fun create(
+            consumerKey: String,
+            consumerSecret: String,
+            pinCodeProvider: suspend (url: String) -> String?,
+            onResult: (success: Boolean) -> Unit,
+        ): TwitterSignInViewModel
+    }
+
+    val pinCode = MutableLiveData<String>()
+    val success = MutableLiveData(false)
     val loading = MutableLiveData(false)
 
-    suspend fun beginOAuth(
-        consumerKey: String,
-        consumerSecret: String,
-        pinCodeProvider: suspend (url: String) -> String?,
-    ): Boolean {
+    init {
+        viewModelScope.launch {
+            val result = beginOAuth()
+            onResult.invoke(result)
+        }
+    }
+
+    private suspend fun beginOAuth(): Boolean {
         loading.postValue(true)
         try {
             val service = TwitterOAuthService(consumerKey, consumerSecret)

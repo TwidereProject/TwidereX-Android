@@ -59,6 +59,7 @@
     <string name="common_controls_actions_cancel">Abbrechen</string>
     <string name="common_controls_actions_take_photo">Foto aufnehmen</string>
     <string name="common_controls_actions_save_photo">Foto speichern</string>
+    <string name="common_controls_actions_sign_in">Einloggen</string>
     <string name="common_controls_actions_preview">Vorschau</string>
     <string name="common_controls_actions_open_in_safari">In Safari öffnen</string>
     <string name="common_controls_timeline_load_more">Mehr laden</string>

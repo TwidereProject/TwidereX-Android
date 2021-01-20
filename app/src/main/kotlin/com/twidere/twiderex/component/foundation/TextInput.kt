@@ -113,7 +113,7 @@ fun TextInput(
     onTextInputStarted: ((SoftwareKeyboardController) -> Unit)? = null,
     onClicked: (() -> Unit)? = null,
 ) {
-    val focusRequester = FocusRequester()
+    val focusRequester = remember { FocusRequester() }
     val keyboardController = remember { Ref<SoftwareKeyboardController>() }
     val interactionState = remember { InteractionState() }
     val textColor = color.takeOrElse {
