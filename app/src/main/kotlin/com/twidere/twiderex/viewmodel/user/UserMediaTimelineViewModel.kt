@@ -26,8 +26,6 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.flatMap
 import androidx.paging.map
-import com.squareup.inject.assisted.Assisted
-import com.squareup.inject.assisted.AssistedInject
 import com.twidere.services.microblog.TimelineService
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.di.assisted.IAssistedFactory
@@ -40,6 +38,8 @@ import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.paging.mediator.PagingMediator
 import com.twidere.twiderex.paging.mediator.pager
 import com.twidere.twiderex.paging.mediator.user.UserMediaMediator
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -51,7 +51,7 @@ class UserMediaTimelineViewModel @AssistedInject constructor(
     @Assisted userKey: MicroBlogKey,
 ) : ViewModel() {
 
-    @AssistedInject.Factory
+    @dagger.assisted.AssistedFactory
     interface AssistedFactory : IAssistedFactory {
         fun create(
             account: AccountDetails,
