@@ -20,6 +20,8 @@
  */
 package com.twidere.twiderex.viewmodel.user
 
+import com.squareup.inject.assisted.Assisted
+import com.squareup.inject.assisted.AssistedInject
 import com.twidere.services.microblog.TimelineService
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.di.assisted.IAssistedFactory
@@ -29,8 +31,6 @@ import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.paging.mediator.PagingMediator
 import com.twidere.twiderex.paging.mediator.user.UserStatusMediator
 import com.twidere.twiderex.viewmodel.PagingViewModel
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedInject
 
 class UserTimelineViewModel @AssistedInject constructor(
     database: CacheDatabase,
@@ -40,7 +40,7 @@ class UserTimelineViewModel @AssistedInject constructor(
     @Assisted userKey: MicroBlogKey,
 ) : PagingViewModel() {
 
-    @dagger.assisted.AssistedFactory
+    @AssistedInject.Factory
     interface AssistedFactory : IAssistedFactory {
         fun create(
             account: AccountDetails,

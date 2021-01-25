@@ -181,6 +181,9 @@ dependencies {
     implementation "androidx.hilt:hilt-work:$versions.androidx_hilt"
     kapt "androidx.hilt:hilt-compiler:$versions.androidx_hilt"
 
+    compileOnly "com.squareup.inject:assisted-inject-annotations-dagger2:$versions.assisted_inject"
+    kapt "com.squareup.inject:assisted-inject-processor-dagger2:$versions.assisted_inject"
+
     implementation "androidx.room:room-runtime:$versions.room"
     kapt "androidx.room:room-compiler:$versions.room"
     implementation "androidx.room:room-ktx:$versions.room"

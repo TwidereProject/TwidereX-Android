@@ -22,19 +22,19 @@ package com.twidere.twiderex.viewmodel.search
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
+import com.squareup.inject.assisted.Assisted
+import com.squareup.inject.assisted.AssistedInject
 import com.twidere.twiderex.db.model.DbSearch
 import com.twidere.twiderex.di.assisted.IAssistedFactory
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.repository.SearchRepository
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedInject
 
 class SearchInputViewModel @AssistedInject constructor(
     private val repository: SearchRepository,
     @Assisted private val account: AccountDetails,
 ) : ViewModel() {
 
-    @dagger.assisted.AssistedFactory
+    @AssistedInject.Factory
     interface AssistedFactory : IAssistedFactory {
         fun create(account: AccountDetails): SearchInputViewModel
     }

@@ -25,6 +25,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
 import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
+import com.squareup.inject.assisted.Assisted
+import com.squareup.inject.assisted.AssistedInject
 import com.twidere.services.twitter.TwitterService
 import com.twidere.services.twitter.model.ReferencedTweetType
 import com.twidere.services.twitter.model.StatusV2
@@ -35,8 +37,6 @@ import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.twitter.TwitterConversationRepository
 import com.twidere.twiderex.utils.notify
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedInject
 import kotlinx.coroutines.launch
 
 class TwitterStatusViewModel @AssistedInject constructor(
@@ -46,7 +46,7 @@ class TwitterStatusViewModel @AssistedInject constructor(
     @Assisted private val statusKey: MicroBlogKey,
 ) : ViewModel() {
 
-    @dagger.assisted.AssistedFactory
+    @AssistedInject.Factory
     interface AssistedFactory : IAssistedFactory {
         fun create(account: AccountDetails, statusKey: MicroBlogKey): TwitterStatusViewModel
     }

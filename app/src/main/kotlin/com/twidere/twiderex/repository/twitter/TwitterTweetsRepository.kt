@@ -22,6 +22,8 @@ package com.twidere.twiderex.repository.twitter
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.map
+import com.squareup.inject.assisted.Assisted
+import com.squareup.inject.assisted.AssistedInject
 import com.twidere.services.microblog.LookupService
 import com.twidere.services.twitter.model.StatusV2
 import com.twidere.twiderex.db.CacheDatabase
@@ -31,15 +33,13 @@ import com.twidere.twiderex.db.model.saveToDb
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.model.ui.UiStatus.Companion.toUi
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedInject
 
 class TwitterTweetsRepository @AssistedInject constructor(
     private val database: CacheDatabase,
     @Assisted private val accountKey: MicroBlogKey,
     @Assisted private val lookupService: LookupService,
 ) {
-    @dagger.assisted.AssistedFactory
+    @AssistedInject.Factory
     interface AssistedFactory {
         fun create(
             accountKey: MicroBlogKey,
