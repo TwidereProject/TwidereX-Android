@@ -36,8 +36,6 @@ import androidx.lifecycle.liveData
 import androidx.lifecycle.map
 import androidx.lifecycle.switchMap
 import androidx.work.WorkManager
-import com.squareup.inject.assisted.Assisted
-import com.squareup.inject.assisted.AssistedInject
 import com.twidere.services.microblog.LookupService
 import com.twidere.services.microblog.RelationshipService
 import com.twidere.services.twitter.TwitterService
@@ -59,6 +57,8 @@ import com.twidere.twiderex.repository.twitter.TwitterTweetsRepository
 import com.twidere.twiderex.utils.notify
 import com.twidere.twiderex.worker.draft.SaveDraftWorker
 import com.twitter.twittertext.Extractor
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import java.util.UUID
 
 enum class ComposeType {
@@ -78,7 +78,7 @@ class DraftItemViewModel @AssistedInject constructor(
         }
     }
 
-    @AssistedInject.Factory
+    @dagger.assisted.AssistedFactory
     interface AssistedFactory : IAssistedFactory {
         fun create(
             draftId: String,
@@ -117,7 +117,7 @@ class DraftComposeViewModel @AssistedInject constructor(
         excludedReplyUserIds.postValue(draft.excludedReplyUserIds ?: emptyList())
     }
 
-    @AssistedInject.Factory
+    @dagger.assisted.AssistedFactory
     interface AssistedFactory : IAssistedFactory {
         fun create(
             account: AccountDetails,
@@ -140,7 +140,7 @@ open class ComposeViewModel @AssistedInject constructor(
 ) : ViewModel(), LocationListener {
     open val draftId: String = UUID.randomUUID().toString()
 
-    @AssistedInject.Factory
+    @dagger.assisted.AssistedFactory
     interface AssistedFactory : IAssistedFactory {
         fun create(
             account: AccountDetails,

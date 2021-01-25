@@ -26,8 +26,6 @@ import androidx.lifecycle.liveData
 import androidx.lifecycle.map
 import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
-import com.squareup.inject.assisted.Assisted
-import com.squareup.inject.assisted.AssistedInject
 import com.twidere.services.http.MicroBlogException
 import com.twidere.services.microblog.LookupService
 import com.twidere.services.microblog.RelationshipService
@@ -39,6 +37,8 @@ import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.UserRepository
 import com.twidere.twiderex.utils.notify
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
@@ -52,7 +52,7 @@ class UserViewModel @AssistedInject constructor(
     @Assisted private val initialUserKey: MicroBlogKey?,
 ) : ViewModel() {
 
-    @AssistedInject.Factory
+    @dagger.assisted.AssistedFactory
     interface AssistedFactory : IAssistedFactory {
         fun create(
             account: AccountDetails,
