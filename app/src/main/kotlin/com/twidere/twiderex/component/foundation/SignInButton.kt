@@ -51,6 +51,7 @@ fun SignInButton(
                 role = Role.Button,
                 onClick = onClick,
             ),
+        shape = MaterialTheme.shapes.small,
         border = border,
         contentColor = contentColor,
         color = color,
