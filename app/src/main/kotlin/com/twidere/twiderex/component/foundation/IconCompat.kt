@@ -30,7 +30,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.vectorResource
-import com.twidere.twiderex.BuildConfig
 
 @Composable
 fun IconCompat(
@@ -38,7 +37,7 @@ fun IconCompat(
     modifier: Modifier = Modifier,
     tint: Color = AmbientContentColor.current.copy(alpha = AmbientContentAlpha.current)
 ) {
-    if (BuildConfig.VERSION_CODE >= Build.VERSION_CODES.N) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
         Icon(
             imageVector = vectorResource(id = id),
             modifier = modifier,
