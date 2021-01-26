@@ -23,12 +23,7 @@ package com.twidere.twiderex.scenes.mastodon
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.ListItem
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.runtime.Composable
@@ -40,8 +35,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
 import com.twidere.twiderex.R
+import com.twidere.twiderex.component.foundation.IconCompat
 import com.twidere.twiderex.component.foundation.SignInButton
 import com.twidere.twiderex.component.foundation.SignInScaffold
 import com.twidere.twiderex.component.navigation.AmbientNavigator
@@ -102,7 +97,7 @@ fun MastodonSignInScene() {
             ) {
                 ListItem(
                     icon = {
-                        Icon(imageVector = vectorResource(id = R.drawable.ic_mastodon_logo_white))
+                        IconCompat(id = R.drawable.ic_mastodon_logo_white)
                     },
                     text = {
                         Text(text = stringResource(id = R.string.scene_sign_in_sign_in_with_mastodon))

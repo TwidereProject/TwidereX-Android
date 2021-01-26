@@ -50,6 +50,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.navigate
 import com.twidere.twiderex.BuildConfig
 import com.twidere.twiderex.R
+import com.twidere.twiderex.component.foundation.IconCompat
 import com.twidere.twiderex.component.foundation.SignInButton
 import com.twidere.twiderex.component.foundation.SignInScaffold
 import com.twidere.twiderex.navigation.Route
@@ -83,10 +84,11 @@ fun SignInScene() {
                 },
                 border = ButtonDefaults.outlinedBorder,
                 color = MaterialTheme.colors.surface,
+                contentColor = MaterialTheme.colors.primary,
             ) {
                 ListItem(
                     icon = {
-                        Icon(imageVector = vectorResource(id = R.drawable.ic_mastodon_logo_blue))
+                        IconCompat(id = R.drawable.ic_mastodon_logo_blue)
                     },
                     text = {
                         Text(

@@ -36,7 +36,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.AmbientContext
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.zIndex
 import com.twidere.twiderex.view.LollipopFixWebView
@@ -82,34 +81,38 @@ fun WebComponent(
     config: (WebView) -> Unit = {},
 ) {
     var progress by remember { mutableStateOf(0f) }
-    val context = AmbientContext.current
-    val webView = remember {
-        LollipopFixWebView(context).also {
-            it.settings.apply {
-                javaScriptEnabled = enableJavascript
-            }
-            it.webChromeClient = ComposeWebChromeClient(
-                onProgress = {
-                    progress = it
-                }
-            )
-            it.webViewClient = ComposeWebViewClient(onPageFinished, onPageStarted)
-            javascriptInterface.forEach { item ->
-                it.addJavascriptInterface(item.value, item.key)
-            }
-            it.setRef { view -> webContext.webView = view }
-            config.invoke(it)
-            it.setUrl(url)
-        }
-    }
     Box {
         if (progress != 1f) {
             LinearProgressIndicator(
-                modifier = Modifier.fillMaxWidth().align(Alignment.TopStart).zIndex(1f),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.TopStart)
+                    .zIndex(1f),
                 progress = progress
             )
         }
-        AndroidView({ webView }, modifier = Modifier.fillMaxSize())
+        AndroidView(
+            viewBlock = { context ->
+                LollipopFixWebView(context).also {
+                    it.settings.apply {
+                        javaScriptEnabled = enableJavascript
+                    }
+                    it.webChromeClient = ComposeWebChromeClient(
+                        onProgress = {
+                            progress = it
+                        }
+                    )
+                    it.webViewClient = ComposeWebViewClient(onPageFinished, onPageStarted)
+                    javascriptInterface.forEach { item ->
+                        it.addJavascriptInterface(item.value, item.key)
+                    }
+                    it.setRef { view -> webContext.webView = view }
+                    config.invoke(it)
+                    it.setUrl(url)
+                }
+            },
+            modifier = Modifier.fillMaxSize(),
+        )
     }
 }
 
