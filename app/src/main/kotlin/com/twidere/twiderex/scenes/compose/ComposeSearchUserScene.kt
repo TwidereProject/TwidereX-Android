@@ -84,7 +84,7 @@ fun ComposeSearchUserScene() {
                             TextInput(
                                 value = text,
                                 onValueChange = {
-                                    viewModel.text.postValue(it)
+                                    viewModel.text.value = it
                                 },
                                 maxLines = 1,
                                 placeholder = {

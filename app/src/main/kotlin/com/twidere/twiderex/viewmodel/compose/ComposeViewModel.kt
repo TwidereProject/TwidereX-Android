@@ -223,7 +223,7 @@ open class ComposeViewModel @AssistedInject constructor(
     }
 
     fun setText(value: TextFieldValue) {
-        textFieldValue.postValue(value)
+        textFieldValue.value = value
     }
 
     fun compose() {

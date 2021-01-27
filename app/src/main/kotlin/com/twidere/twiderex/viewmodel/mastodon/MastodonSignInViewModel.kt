@@ -43,7 +43,7 @@ class MastodonSignInViewModel @ViewModelInject constructor(
     val loading = MutableLiveData(false)
     val host = MutableLiveData("")
     fun setHost(value: String) {
-        host.postValue(value)
+        host.value = value
     }
 
     suspend fun beginOAuth(
