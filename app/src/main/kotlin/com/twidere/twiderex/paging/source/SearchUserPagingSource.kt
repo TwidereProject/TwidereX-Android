@@ -21,6 +21,7 @@
 package com.twidere.twiderex.paging.source
 
 import androidx.paging.PagingSource
+import androidx.paging.PagingState
 import com.twidere.services.microblog.SearchService
 import com.twidere.twiderex.db.mapper.toDbUser
 import com.twidere.twiderex.defaultLoadCount
@@ -47,5 +48,9 @@ class SearchUserPagingSource(
         } catch (e: Exception) {
             LoadResult.Error(e)
         }
+    }
+
+    override fun getRefreshKey(state: PagingState<Int, UiUser>): Int? {
+        return null
     }
 }
