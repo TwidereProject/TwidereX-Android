@@ -16,15 +16,17 @@ Next generation of Twidere for Android 5.0+. **Still in early stage.**
 
 
 ## What's Happening
-### November 2020 Update
-Initial release for Twidere X!
+### 1.0.3 - January 2021 Update
+You can now search and @ user while composing new tweet
+New design for login with custom API key support
+Stability improve
 
-### What is being planned for next release - November 2020
+### What is being planned for 1.1 - January 2021
 
+For 1.1, we are proactively working on:
+- **Mastodon Support!**
 - Stability
 - UI/UX tweaking
-- List timeline
-- Following/Follower list
 
 ## Contributing
 
