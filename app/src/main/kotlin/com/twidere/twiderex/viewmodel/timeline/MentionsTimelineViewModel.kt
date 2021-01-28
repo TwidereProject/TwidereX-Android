@@ -21,8 +21,6 @@
 package com.twidere.twiderex.viewmodel.timeline
 
 import android.content.SharedPreferences
-import com.squareup.inject.assisted.Assisted
-import com.squareup.inject.assisted.AssistedInject
 import com.twidere.services.microblog.TimelineService
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.di.assisted.IAssistedFactory
@@ -30,6 +28,8 @@ import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.paging.mediator.MentionTimelineMediator
 import com.twidere.twiderex.paging.mediator.PagingWithGapMediator
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 
 class MentionsTimelineViewModel @AssistedInject constructor(
     preferences: SharedPreferences,
@@ -37,7 +37,7 @@ class MentionsTimelineViewModel @AssistedInject constructor(
     inAppNotification: InAppNotification,
     @Assisted private val account: AccountDetails
 ) : TimelineViewModel(preferences) {
-    @AssistedInject.Factory
+    @dagger.assisted.AssistedFactory
     interface AssistedFactory : IAssistedFactory {
         fun create(account: AccountDetails): MentionsTimelineViewModel
     }

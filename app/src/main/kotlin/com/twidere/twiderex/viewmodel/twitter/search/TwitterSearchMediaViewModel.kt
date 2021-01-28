@@ -25,8 +25,6 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
 import androidx.paging.flatMap
 import androidx.paging.map
-import com.squareup.inject.assisted.Assisted
-import com.squareup.inject.assisted.AssistedInject
 import com.twidere.services.twitter.TwitterService
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.di.assisted.IAssistedFactory
@@ -35,6 +33,8 @@ import com.twidere.twiderex.model.ui.UiStatus.Companion.toUi
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.paging.mediator.pager
 import com.twidere.twiderex.paging.mediator.search.SearchMediaMediator
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.map
 
 class TwitterSearchMediaViewModel @AssistedInject constructor(
@@ -43,7 +43,7 @@ class TwitterSearchMediaViewModel @AssistedInject constructor(
     @Assisted private val account: AccountDetails,
     @Assisted keyword: String,
 ) : ViewModel() {
-    @AssistedInject.Factory
+    @dagger.assisted.AssistedFactory
     interface AssistedFactory : IAssistedFactory {
         fun create(account: AccountDetails, keyword: String): TwitterSearchMediaViewModel
     }
