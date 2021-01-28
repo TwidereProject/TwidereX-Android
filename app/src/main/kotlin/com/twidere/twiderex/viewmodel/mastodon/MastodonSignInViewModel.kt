@@ -21,7 +21,6 @@
 package com.twidere.twiderex.viewmodel.mastodon
 
 import android.accounts.Account
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.twidere.services.mastodon.MastodonOAuthService
@@ -36,8 +35,11 @@ import com.twidere.twiderex.repository.ACCOUNT_TYPE
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.scenes.mastodon.MASTODON_CALLBACK_URL
 import com.twidere.twiderex.utils.json
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
-class MastodonSignInViewModel @ViewModelInject constructor(
+@HiltViewModel
+class MastodonSignInViewModel @Inject constructor(
     private val repository: AccountRepository,
 ) : ViewModel() {
     val loading = MutableLiveData(false)

@@ -20,14 +20,16 @@
  */
 package com.twidere.twiderex.viewmodel
 
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.ViewModel
 import androidx.work.WorkManager
 import com.twidere.twiderex.db.model.DbDraft
 import com.twidere.twiderex.repository.DraftRepository
 import com.twidere.twiderex.worker.draft.RemoveDraftWorker
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
-class DraftViewModel @ViewModelInject constructor(
+@HiltViewModel
+class DraftViewModel @Inject constructor(
     private val repository: DraftRepository,
     private val workManager: WorkManager,
 ) : ViewModel() {
