@@ -21,13 +21,15 @@
 package com.twidere.twiderex.viewmodel.settings
 
 import androidx.datastore.core.DataStore
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.twidere.twiderex.preferences.proto.AppearancePreferences
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class AppearanceViewModel @ViewModelInject constructor(
+@HiltViewModel
+class AppearanceViewModel @Inject constructor(
     private val appearancePreferences: DataStore<AppearancePreferences>
 ) : ViewModel() {
     fun setPrimaryColorIndex(index: Int) = viewModelScope.launch {

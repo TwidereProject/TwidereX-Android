@@ -22,8 +22,7 @@ package com.twidere.twiderex.worker
 
 import android.content.Context
 import android.net.Uri
-import androidx.hilt.Assisted
-import androidx.hilt.work.WorkerInject
+import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkerParameters
@@ -38,8 +37,11 @@ import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.DraftRepository
 import com.twidere.twiderex.utils.notify
 import com.twidere.twiderex.viewmodel.compose.ComposeType
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 
-class TwitterComposeWorker @WorkerInject constructor(
+@HiltWorker
+class TwitterComposeWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted workerParams: WorkerParameters,
     private val draftRepository: DraftRepository,

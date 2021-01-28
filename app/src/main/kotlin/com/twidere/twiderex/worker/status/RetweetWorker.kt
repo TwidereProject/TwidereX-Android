@@ -21,8 +21,7 @@
 package com.twidere.twiderex.worker.status
 
 import android.content.Context
-import androidx.hilt.Assisted
-import androidx.hilt.work.WorkerInject
+import androidx.hilt.work.HiltWorker
 import androidx.work.WorkerParameters
 import com.twidere.services.microblog.StatusService
 import com.twidere.twiderex.db.mapper.toDbTimeline
@@ -33,8 +32,11 @@ import com.twidere.twiderex.model.ui.UiStatus.Companion.toUi
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.StatusRepository
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 
-class RetweetWorker @WorkerInject constructor(
+@HiltWorker
+class RetweetWorker @AssistedInject constructor(
     @Assisted appContext: Context,
     @Assisted params: WorkerParameters,
     accountRepository: AccountRepository,

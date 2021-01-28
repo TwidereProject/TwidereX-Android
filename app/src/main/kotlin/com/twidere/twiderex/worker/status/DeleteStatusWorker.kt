@@ -21,8 +21,7 @@
 package com.twidere.twiderex.worker.status
 
 import android.content.Context
-import androidx.hilt.Assisted
-import androidx.hilt.work.WorkerInject
+import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkerParameters
@@ -35,8 +34,11 @@ import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.StatusRepository
 import com.twidere.twiderex.utils.notify
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 
-class DeleteStatusWorker @WorkerInject constructor(
+@HiltWorker
+class DeleteStatusWorker @AssistedInject constructor(
     @Assisted appContext: Context,
     @Assisted params: WorkerParameters,
     private val accountRepository: AccountRepository,

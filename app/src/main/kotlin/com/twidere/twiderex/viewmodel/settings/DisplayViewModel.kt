@@ -21,13 +21,15 @@
 package com.twidere.twiderex.viewmodel.settings
 
 import androidx.datastore.core.DataStore
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.twidere.twiderex.preferences.proto.DisplayPreferences
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class DisplayViewModel @ViewModelInject constructor(
+@HiltViewModel
+class DisplayViewModel @Inject constructor(
     private val displayPreferences: DataStore<DisplayPreferences>
 ) : ViewModel() {
     fun setUseSystemFontSize(value: Boolean) = viewModelScope.launch {

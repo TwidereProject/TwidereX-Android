@@ -22,40 +22,25 @@ package com.twidere.twiderex.extensions
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
+import androidx.compose.ui.platform.AmbientContext
 import androidx.compose.ui.viewinterop.viewModel
-import androidx.hilt.lifecycle.HiltViewModelFactory
-import androidx.hilt.lifecycle.ViewModelAssistedFactory
-import androidx.lifecycle.SavedStateViewModelFactory
+import androidx.hilt.navigation.HiltViewModelFactory
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.twidere.twiderex.preferences.AmbientAppearancePreferences
 import com.twidere.twiderex.preferences.proto.AppearancePreferences
-import com.twidere.twiderex.ui.AmbientApplication
 import com.twidere.twiderex.ui.AmbientNavController
-import com.twidere.twiderex.ui.AmbientViewModelFactoriesMap
-import com.twidere.twiderex.ui.AmbientViewModelProviderFactory
 
 @Composable
 inline fun <reified VM : ViewModel> navViewModel(
     key: String? = null,
-    factory: ViewModelProvider.Factory? = AmbientViewModelProviderFactory.current,
+    factory: ViewModelProvider.Factory? = null,
 ): VM {
     val navController = AmbientNavController.current
     val backStackEntry = navController.currentBackStackEntryAsState().value
     return if (backStackEntry != null) {
-        // Hack for navigation viewModel
-        val application = AmbientApplication.current
-        val viewModelFactories = AmbientViewModelFactoriesMap.current
-        val delegate = SavedStateViewModelFactory(application, backStackEntry, null)
-        // https://github.com/google/dagger/issues/2166
-        // idk why people in google like factory pattern,
-        // they might need to take a look at https://github.com/EnterpriseQualityCoding/FizzBuzzEnterpriseEdition
-        val hiltViewModelFactory = HiltViewModelFactory::class.java.declaredConstructors.first()?.also {
-            it.isAccessible = true
-        }?.newInstance(backStackEntry, null, delegate, viewModelFactories) as HiltViewModelFactory
-        viewModel(key, hiltViewModelFactory)
+        viewModel(key, HiltViewModelFactory(AmbientContext.current, backStackEntry))
     } else {
         viewModel(key, factory)
     }
@@ -79,26 +64,6 @@ inline fun <reified VM : ViewModel> viewModel(
             }
         }
     )
-}
-
-@Composable
-fun ProvideNavigationViewModelFactoryMap(
-    factory: HiltViewModelFactory,
-    content: @Composable () -> Unit
-) {
-    // Hack for navigationViewModel
-    val factories =
-        HiltViewModelFactory::class.java.getDeclaredField("mViewModelFactories")
-            .also { it.isAccessible = true }
-            .get(factory).let {
-                @Suppress("UNCHECKED_CAST")
-                it as Map<String, ViewModelAssistedFactory<out ViewModel>>
-            }
-    Providers(
-        AmbientViewModelFactoriesMap provides factories
-    ) {
-        content.invoke()
-    }
 }
 
 @Composable
