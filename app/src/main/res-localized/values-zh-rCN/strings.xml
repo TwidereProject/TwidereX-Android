@@ -59,6 +59,7 @@
     <string name="common_controls_actions_cancel">取消</string>
     <string name="common_controls_actions_take_photo">拍摄照片</string>
     <string name="common_controls_actions_save_photo">保存照片</string>
+    <string name="common_controls_actions_sign_in">登录</string>
     <string name="common_controls_actions_preview">预览</string>
     <string name="common_controls_actions_open_in_safari">在 Safari 中打开</string>
     <string name="common_controls_timeline_load_more">加载更多</string>
@@ -109,7 +110,11 @@
     <string name="scene_drawer_manage_accounts">管理帐号</string>
     <string name="scene_manage_accounts_title">帐号</string>
     <string name="scene_manage_accounts_delete_account">删除帐号</string>
+    <string name="scene_sign_in_hello_sign_in_to_get_started">你好！\n登录后即可开始使用。</string>
     <string name="scene_sign_in_sign_in_with_twitter">使用 Twitter 登录</string>
+    <string name="scene_sign_in_sign_in_with_mastodon">使用 Mastodon 登录</string>
+    <string name="scene_sign_in_twitter_options_sign_in_with_custom_twitter_key">使用自定义 Twitter 口令登录</string>
+    <string name="scene_sign_in_twitter_options_twitter_api_v2_access_is_required">需要开启 Twitter API v2 访问权限。</string>
     <string name="scene_authentication_title">身份认证</string>
     <string name="scene_timeline_title">时间线</string>
     <string name="scene_mentions_title">提及</string>

@@ -47,6 +47,7 @@
     <string name="common_controls_actions_cancel">キャンセル</string>
     <string name="common_controls_actions_take_photo">写真を撮影</string>
     <string name="common_controls_actions_save_photo">写真を保存</string>
+    <string name="common_controls_actions_sign_in">サインイン</string>
     <string name="common_controls_actions_preview">プレビュー</string>
     <string name="common_controls_actions_open_in_safari">Safari で開く</string>
     <string name="common_controls_timeline_load_more">さらに読み込む</string>

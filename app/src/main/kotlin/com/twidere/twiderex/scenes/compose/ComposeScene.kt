@@ -563,8 +563,8 @@ private fun ComposeReply(
     val viewModelStatus by composeViewModel.status.observeAsState(initial = null)
     viewModelStatus?.let { status ->
         val replyToUser by composeViewModel.replyToUser.observeAsState(initial = emptyList())
-        val replyToUserName by composeViewModel.replyToUserName.observeAsState(initial = emptyList())
         val excludedUserIds by composeViewModel.excludedReplyUserIds.observeAsState(initial = emptyList())
+        val loadingReplyUser by composeViewModel.loadingReplyUser.observeAsState(initial = false)
         Row(
             modifier = Modifier
                 .clickable(
@@ -588,7 +588,7 @@ private fun ComposeReply(
             Box(
                 modifier = Modifier.weight(1F)
             ) {
-                if (replyToUser.isEmpty() && replyToUserName.isNotEmpty()) {
+                if (loadingReplyUser) {
                     LinearProgressIndicator()
                 } else {
                     Text(

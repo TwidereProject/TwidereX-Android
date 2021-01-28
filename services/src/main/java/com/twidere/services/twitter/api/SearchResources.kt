@@ -20,6 +20,7 @@
  */
 package com.twidere.services.twitter.api
 
+import com.twidere.services.twitter.model.TwitterSearchResponseV1
 import com.twidere.services.twitter.model.TwitterSearchResponseV2
 import com.twidere.services.twitter.model.User
 import retrofit2.http.GET
@@ -43,6 +44,17 @@ interface SearchResources {
         @Query("poll.fields", encoded = true) pollFields: String? = null,
         @Query("user.fields", encoded = true) userFields: String? = null,
     ): TwitterSearchResponseV2
+
+    @GET("/1.1/search/tweets.json")
+    suspend fun searchV1(
+        @Query("q") q: String,
+        @Query("include_entities") include_entities: Boolean = true,
+        @Query("tweet_mode") tweet_mode: String = "extended",
+        @Query("include_ext_alt_text") include_ext_alt_text: Boolean = true,
+        @Query("count") count: Int = 20,
+        @Query("since_id") since_id: String? = null,
+        @Query("max_id") max_id: String? = null,
+    ): TwitterSearchResponseV1
 
     @GET("/1.1/users/search.json")
     suspend fun searchUser(

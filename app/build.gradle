@@ -52,6 +52,15 @@ android {
                 arguments += ["room.schemaLocation": "$buildDir/schemas".toString()]
             }
         }
+        def apiKeyProperties = rootProject.file('apiKey.properties')
+        def hasApiKeyProps = apiKeyProperties.exists()
+        if (hasApiKeyProps) {
+            Properties apiKeyProp = new Properties()
+            apiKeyProp.load(apiKeyProperties.newInputStream())
+            buildConfigField "String", "CONSUMERKEY", apiKeyProp.get("ConsumerKey")
+            buildConfigField "String", "CONSUMERSECRET", apiKeyProp.get("ConsumerSecret")
+        }
+
     }
 
     lintOptions{

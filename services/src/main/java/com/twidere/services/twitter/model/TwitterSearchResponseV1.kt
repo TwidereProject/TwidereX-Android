@@ -18,11 +18,24 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.repository.twitter.model
+package com.twidere.services.twitter.model
 
-import com.twidere.twiderex.model.ui.UiStatus
+import com.twidere.services.microblog.model.ISearchResponse
+import com.twidere.services.microblog.model.IStatus
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-data class SearchResult(
-    val result: List<UiStatus>,
-    val nextPage: String?,
-)
+@Serializable
+data class TwitterSearchResponseV1(
+    val statuses: List<Status>? = null,
+
+    @SerialName("search_metadata")
+    val searchMetadata: SearchMetadataV1? = null
+) : ISearchResponse {
+    override val nextPage: String?
+        get() = searchMetadata?.nextResults?.split("&")?.firstOrNull { it.contains("max_id=") }?.let {
+            it.substring(it.indexOf("max_id=") + "max_id=".length)
+        }
+    override val status: List<IStatus>
+        get() = statuses ?: emptyList()
+}

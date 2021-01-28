@@ -60,6 +60,7 @@
     <string name="common_controls_actions_cancel">Cancel</string>
     <string name="common_controls_actions_take_photo">Take photo</string>
     <string name="common_controls_actions_save_photo">Save photo</string>
+    <string name="common_controls_actions_sign_in">Sign in</string>
     <string name="common_controls_actions_preview">Preview</string>
     <string name="common_controls_actions_open_in_safari">Open in Safari</string>
     <string name="common_controls_timeline_load_more">Load More</string>
@@ -110,7 +111,11 @@
     <string name="scene_drawer_manage_accounts">Manage accounts</string>
     <string name="scene_manage_accounts_title">Accounts</string>
     <string name="scene_manage_accounts_delete_account">Delete account</string>
+    <string name="scene_sign_in_hello_sign_in_to_get_started">Hello!\nSign in to Get Started.</string>
     <string name="scene_sign_in_sign_in_with_twitter">Sign in with Twitter</string>
+    <string name="scene_sign_in_sign_in_with_mastodon">Sign in with Mastodon</string>
+    <string name="scene_sign_in_twitter_options_sign_in_with_custom_twitter_key">Sign in with Custom Twitter Key</string>
+    <string name="scene_sign_in_twitter_options_twitter_api_v2_access_is_required">Twitter API v2 access is required.</string>
     <string name="scene_authentication_title">Authentication</string>
     <string name="scene_timeline_title">Timeline</string>
     <string name="scene_mentions_title">Mentions</string>

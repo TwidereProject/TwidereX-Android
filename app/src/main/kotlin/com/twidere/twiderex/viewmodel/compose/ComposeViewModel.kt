@@ -52,9 +52,11 @@ import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.ComposeData
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiUser
+import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.DraftRepository
 import com.twidere.twiderex.repository.UserRepository
 import com.twidere.twiderex.repository.twitter.TwitterTweetsRepository
+import com.twidere.twiderex.utils.notify
 import com.twidere.twiderex.worker.draft.SaveDraftWorker
 import com.twitter.twittertext.Extractor
 import java.util.UUID
@@ -91,6 +93,7 @@ class DraftComposeViewModel @AssistedInject constructor(
     factory: TwitterTweetsRepository.AssistedFactory,
     userRepositoryFactory: UserRepository.AssistedFactory,
     workManager: WorkManager,
+    inAppNotification: InAppNotification,
     @Assisted account: AccountDetails,
     @Assisted private val draft: DbDraft,
 ) : ComposeViewModel(
@@ -100,6 +103,7 @@ class DraftComposeViewModel @AssistedInject constructor(
     factory,
     userRepositoryFactory,
     workManager,
+    inAppNotification,
     account,
     draft.statusKey,
     draft.composeType,
@@ -129,6 +133,7 @@ open class ComposeViewModel @AssistedInject constructor(
     protected val factory: TwitterTweetsRepository.AssistedFactory,
     private val userRepositoryFactory: UserRepository.AssistedFactory,
     private val workManager: WorkManager,
+    private val inAppNotification: InAppNotification,
     @Assisted protected val account: AccountDetails,
     @Assisted protected val statusKey: MicroBlogKey?,
     @Assisted val composeType: ComposeType,
@@ -183,12 +188,22 @@ open class ComposeViewModel @AssistedInject constructor(
         }
     }
 
+    val loadingReplyUser = MutableLiveData(false)
+
     val replyToUser = liveData {
         emitSource(
             replyToUserName.switchMap {
                 liveData {
                     if (it.isNotEmpty()) {
-                        emit(userRepository.lookupUsersByName(it))
+                        loadingReplyUser.postValue(true)
+                        runCatching {
+                            userRepository.lookupUsersByName(it)
+                        }.onFailure {
+                            it.notify(inAppNotification)
+                        }.onSuccess {
+                            emit(it)
+                        }
+                        loadingReplyUser.postValue(false)
                     }
                 }
             },
@@ -208,7 +223,7 @@ open class ComposeViewModel @AssistedInject constructor(
     }
 
     fun setText(value: TextFieldValue) {
-        textFieldValue.postValue(value)
+        textFieldValue.value = value
     }
 
     fun compose() {

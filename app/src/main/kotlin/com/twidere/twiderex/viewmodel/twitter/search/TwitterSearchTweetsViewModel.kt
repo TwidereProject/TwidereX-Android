@@ -26,7 +26,7 @@ import androidx.paging.cachedIn
 import androidx.paging.map
 import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
-import com.twidere.services.microblog.SearchService
+import com.twidere.services.twitter.TwitterService
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.di.assisted.IAssistedFactory
 import com.twidere.twiderex.model.AccountDetails
@@ -48,7 +48,7 @@ class TwitterSearchTweetsViewModel @AssistedInject constructor(
     }
 
     private val service by lazy {
-        account.service as SearchService
+        account.service as TwitterService
     }
     val source by lazy {
         SearchStatusMediator(keyword, database, account.accountKey, service, inAppNotification).pager()
