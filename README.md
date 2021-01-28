@@ -17,9 +17,9 @@ Next generation of Twidere for Android 5.0+. **Still in early stage.**
 
 ## What's Happening
 ### 1.0.3 - January 2021 Update
-You can now search and @ user while composing new tweet
-New design for login with custom API key support
-Stability improve
+ - You can now search and @ user while composing new tweet  
+ - New design for login with custom API key support  
+ - Stability improve  
 
 ### What is being planned for 1.1 - January 2021
 
