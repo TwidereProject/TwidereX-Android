@@ -314,7 +314,8 @@ fun MediaItemView(
                         Box {
                             VideoPlayer(
                                 url = it,
-                                customControl = customControl
+                                customControl = customControl,
+                                showControls = false
                             )
                         }
                 }
