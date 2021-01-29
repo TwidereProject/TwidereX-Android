@@ -31,10 +31,10 @@ import androidx.compose.material.AmbientContentColor
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.onActive
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -61,7 +61,7 @@ fun TextInput(
     keyboardType: KeyboardType = KeyboardType.Text,
     maxLines: Int = Int.MAX_VALUE,
     alignment: Alignment = Alignment.TopStart,
-    imeAction: ImeAction = ImeAction.Unspecified,
+    imeAction: ImeAction = ImeAction.Default,
     onImeActionPerformed: (ImeAction, SoftwareKeyboardController?) -> Unit = { _, _ -> },
     value: String,
     onValueChange: (String) -> Unit,
@@ -106,7 +106,7 @@ fun TextInput(
     keyboardType: KeyboardType = KeyboardType.Text,
     maxLines: Int = Int.MAX_VALUE,
     alignment: Alignment = Alignment.TopStart,
-    imeAction: ImeAction = ImeAction.Unspecified,
+    imeAction: ImeAction = ImeAction.Default,
     onImeActionPerformed: (ImeAction, SoftwareKeyboardController?) -> Unit = { _, _ -> },
     value: TextFieldValue,
     onValueChange: (TextFieldValue) -> Unit,
@@ -119,11 +119,12 @@ fun TextInput(
     val textColor = color.takeOrElse {
         AmbientContentColor.current.copy(alpha = AmbientContentAlpha.current)
     }
-    if (autoFocus) {
-        onActive {
+    DisposableEffect(autoFocus) {
+        if (autoFocus) {
             focusRequester.requestFocus()
             keyboardController.value?.showSoftwareKeyboard()
         }
+        onDispose { }
     }
     Box(
         modifier = modifier

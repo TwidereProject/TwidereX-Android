@@ -24,11 +24,11 @@ import android.os.Build
 import android.view.WindowInsets
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.ambientOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.onCommit
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.AmbientDensity
@@ -60,9 +60,10 @@ fun ProvideWindowPadding(
                 }
             }
         }
-        onCommit(view) {
+        DisposableEffect(view) {
             view.setWindowInsetsAnimationCallback(deferringInsetsListener)
             view.setOnApplyWindowInsetsListener(deferringInsetsListener)
+            onDispose { }
         }
     }
     Providers(

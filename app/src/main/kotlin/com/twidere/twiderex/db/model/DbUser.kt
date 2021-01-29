@@ -23,7 +23,6 @@ package com.twidere.twiderex.db.model
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.squareup.moshi.JsonClass
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.PlatformType
 
@@ -31,7 +30,6 @@ import com.twidere.twiderex.model.PlatformType
     tableName = "user",
     indices = [Index(value = ["userKey"], unique = true)],
 )
-@JsonClass(generateAdapter = true)
 data class DbUser(
     /**
      * Id that being used in the database

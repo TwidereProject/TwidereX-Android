@@ -24,6 +24,7 @@ plugins {
     id 'org.jetbrains.kotlin.android'
     id "org.jetbrains.kotlin.kapt"
     id "com.google.protobuf" version "0.8.14"
+    id "org.jetbrains.kotlin.plugin.serialization" version "1.4.21-2"
 }
 
 if (enableGoogleVariant) {
@@ -150,12 +151,14 @@ protobuf {
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$versions.kotlin"
     implementation "org.jetbrains.kotlin:kotlin-reflect:$versions.kotlin"
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:$versions.kotlinx_serialization"
 
     implementation project(":services")
 
     implementation "androidx.compose.ui:ui:$versions.compose"
     implementation "androidx.compose.ui:ui-tooling:$versions.compose"
     implementation "androidx.compose.foundation:foundation:$versions.compose"
+    implementation "androidx.compose.animation:animation:$versions.compose"
     implementation "androidx.compose.material:material:$versions.compose"
     implementation "androidx.compose.material:material-icons-core:$versions.compose"
     implementation "androidx.compose.material:material-icons-extended:$versions.compose"
@@ -168,12 +171,6 @@ dependencies {
     implementation "androidx.navigation:navigation-fragment-ktx:2.3.2"
     implementation "androidx.activity:activity-ktx:1.2.0-rc01"
     implementation "androidx.datastore:datastore:$versions.dataStore"
-
-    // Use moshi for not since Kotlinx.Serialization not compatible with Jetpack Compose
-    // https://github.com/Kotlin/kotlinx.serialization/issues/968
-    implementation "com.squareup.moshi:moshi:$versions.moshi"
-    implementation "com.squareup.moshi:moshi-kotlin:$versions.moshi"
-    kapt "com.squareup.moshi:moshi-kotlin-codegen:$versions.moshi"
 
     implementation "com.google.dagger:hilt-android:$versions.hilt"
     kapt "com.google.dagger:hilt-android-compiler:$versions.hilt"

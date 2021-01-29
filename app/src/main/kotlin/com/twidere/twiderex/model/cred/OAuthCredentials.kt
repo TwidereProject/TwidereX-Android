@@ -20,9 +20,9 @@
  */
 package com.twidere.twiderex.model.cred
 
-import com.squareup.moshi.JsonClass
+import kotlinx.serialization.Serializable
 
-@JsonClass(generateAdapter = true)
+@Serializable
 data class OAuthCredentials(
     val consumer_key: String,
     val consumer_secret: String,

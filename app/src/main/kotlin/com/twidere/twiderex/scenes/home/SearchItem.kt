@@ -21,9 +21,11 @@
 package com.twidere.twiderex.scenes.home
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.AmbientContentAlpha
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Icon
@@ -38,6 +40,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -87,13 +90,15 @@ class SearchItem : HomeNavigationItem() {
                                         navigator.searchInput()
                                     },
                                     indication = null,
+                                    interactionState = remember { InteractionState() }
                                 )
                             ) {
                                 Providers(
                                     AmbientContentAlpha provides ContentAlpha.medium
                                 ) {
                                     Text(
-                                        modifier = Modifier.weight(1F)
+                                        modifier = Modifier
+                                            .weight(1F)
                                             .align(Alignment.CenterVertically),
                                         text = stringResource(id = R.string.scene_search_search_bar_placeholder),
                                     )
@@ -103,7 +108,12 @@ class SearchItem : HomeNavigationItem() {
                                         navigator.searchInput()
                                     }
                                 ) {
-                                    Icon(imageVector = vectorResource(id = R.drawable.ic_search))
+                                    Icon(
+                                        imageVector = vectorResource(id = R.drawable.ic_search),
+                                        contentDescription = stringResource(
+                                            id = R.string.scene_search_title
+                                        )
+                                    )
                                 }
                             }
                         }
@@ -121,7 +131,12 @@ class SearchItem : HomeNavigationItem() {
                             }
                         ),
                         icon = {
-                            Icon(imageVector = Icons.Default.History)
+                            Icon(
+                                imageVector = Icons.Default.History,
+                                contentDescription = stringResource(
+                                    id = R.string.accessibility_scene_search_history
+                                )
+                            )
                         },
                         trailing = {
                             IconButton(
@@ -129,7 +144,12 @@ class SearchItem : HomeNavigationItem() {
                                     viewModel.remove(it)
                                 }
                             ) {
-                                Icon(imageVector = vectorResource(id = R.drawable.ic_x))
+                                Icon(
+                                    imageVector = vectorResource(id = R.drawable.ic_x),
+                                    contentDescription = stringResource(
+                                        id = R.string.common_controls_actions_remove
+                                    )
+                                )
                             }
                         },
                         text = {

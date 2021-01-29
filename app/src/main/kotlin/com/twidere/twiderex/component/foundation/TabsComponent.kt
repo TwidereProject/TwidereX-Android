@@ -38,7 +38,7 @@ import com.twidere.twiderex.ui.mediumEmphasisContentContentColor
 
 @Composable
 fun IconTabsComponent(
-    items: List<ImageVector>,
+    items: List<Pair<ImageVector, String>>,
     selectedItem: Int,
     onItemSelected: (Int) -> Unit,
 ) {
@@ -50,7 +50,7 @@ fun IconTabsComponent(
         Box(
             modifier = Modifier.padding(16.dp)
         ) {
-            Icon(imageVector = items[it])
+            Icon(imageVector = items[it].first, contentDescription = items[it].second)
         }
     }
 }

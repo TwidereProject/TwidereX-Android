@@ -20,4 +20,7 @@
  */
 package com.twidere.twiderex.model.cred
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 class EmptyCredentials : Credentials

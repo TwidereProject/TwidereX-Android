@@ -102,6 +102,7 @@ fun DisplayScene() {
                                 Icon(
                                     modifier = Modifier.size(12.dp),
                                     imageVector = Icons.Default.TextFields,
+                                    contentDescription = stringResource(id = R.string.accessibility_scene_settings_display_font_size)
                                 )
                             },
                             text = {
@@ -113,7 +114,10 @@ fun DisplayScene() {
                                 )
                             },
                             trailing = {
-                                Icon(imageVector = Icons.Default.TextFields)
+                                Icon(
+                                    imageVector = Icons.Default.TextFields,
+                                    contentDescription = stringResource(id = R.string.accessibility_scene_settings_display_font_size)
+                                )
                             }
                         )
                     }

@@ -130,6 +130,7 @@ private fun AboutContent() {
                     Icon(
                         imageVector = vectorResource(id = R.drawable.ic_twitter),
                         tint = MaterialTheme.colors.onBackground,
+                        contentDescription = stringResource(id = R.string.accessibility_common_logo_twitter)
                     )
                 }
                 Box(modifier = Modifier.width(32.dp))
@@ -141,6 +142,7 @@ private fun AboutContent() {
                     Icon(
                         imageVector = vectorResource(id = R.drawable.ic_github),
                         tint = MaterialTheme.colors.onBackground,
+                        contentDescription = stringResource(id = R.string.accessibility_common_logo_github)
                     )
                 }
             }

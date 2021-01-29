@@ -23,6 +23,7 @@ package com.twidere.twiderex.scenes.search
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.ListItem
@@ -115,7 +116,12 @@ fun SearchInputScene(initial: String? = null) {
                                 }
                             }
                         ) {
-                            Icon(imageVector = vectorResource(id = R.drawable.ic_search))
+                            Icon(
+                                imageVector = vectorResource(id = R.drawable.ic_search),
+                                contentDescription = stringResource(
+                                    id = R.string.scene_search_title
+                                )
+                            )
                         }
                     }
                 )
@@ -131,7 +137,12 @@ fun SearchInputScene(initial: String? = null) {
                             }
                         ),
                         icon = {
-                            Icon(imageVector = Icons.Default.History)
+                            Icon(
+                                imageVector = Icons.Default.History,
+                                contentDescription = stringResource(
+                                    id = R.string.accessibility_scene_search_history
+                                )
+                            )
                         },
                         trailing = {
                             IconButton(
@@ -139,7 +150,12 @@ fun SearchInputScene(initial: String? = null) {
                                     viewModel.remove(it)
                                 }
                             ) {
-                                Icon(imageVector = vectorResource(id = R.drawable.ic_x))
+                                Icon(
+                                    imageVector = vectorResource(id = R.drawable.ic_x),
+                                    contentDescription = stringResource(
+                                        id = R.string.common_controls_actions_remove
+                                    )
+                                )
                             }
                         },
                         text = {

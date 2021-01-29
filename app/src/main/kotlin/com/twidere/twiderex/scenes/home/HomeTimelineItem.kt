@@ -64,7 +64,12 @@ class HomeTimelineItem : HomeNavigationItem() {
                         navController.navigate(Route.Compose(ComposeType.New))
                     }
                 ) {
-                    Icon(imageVector = vectorResource(id = R.drawable.ic_feather))
+                    Icon(
+                        imageVector = vectorResource(id = R.drawable.ic_feather),
+                        contentDescription = stringResource(
+                            id = R.string.accessibility_scene_home_compose
+                        )
+                    )
                 }
             }
         ) {

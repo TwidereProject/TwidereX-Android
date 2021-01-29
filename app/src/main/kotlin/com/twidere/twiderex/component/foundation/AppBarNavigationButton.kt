@@ -26,6 +26,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
+import com.twidere.twiderex.R
 import com.twidere.twiderex.ui.AmbientNavController
 
 @Composable
@@ -38,6 +40,9 @@ fun AppBarNavigationButton(
             navController.popBackStack()
         }
     ) {
-        Icon(imageVector = icon)
+        Icon(
+            imageVector = icon,
+            contentDescription = stringResource(id = R.string.accessibility_common_back)
+        )
     }
 }

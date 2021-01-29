@@ -30,10 +30,9 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.onActive
-import androidx.compose.runtime.onDispose
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.savedinstancestate.savedInstanceState
 import androidx.compose.runtime.setValue
@@ -42,6 +41,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.AmbientContext
 import androidx.compose.ui.platform.AmbientLifecycleOwner
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
@@ -52,6 +52,7 @@ import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.ui.PlayerControlView
 import com.google.android.exoplayer2.ui.StyledPlayerView
+import com.twidere.twiderex.R
 import com.twidere.twiderex.preferences.proto.DisplayPreferences
 import com.twidere.twiderex.ui.AmbientIsActiveNetworkMetered
 import com.twidere.twiderex.ui.AmbientVideoPlayback
@@ -139,16 +140,17 @@ fun VideoPlayer(
                 }
             }
 
-            onActive {
+            DisposableEffect(customControl) {
                 if (customControl != null) {
                     customControl.player = player
                 }
+                onDispose {
+                    updateState()
+                    player.release()
+                    customControl?.player = null
+                }
             }
 
-            onDispose {
-                updateState()
-                player.release()
-            }
             AndroidView(
                 modifier = modifier,
                 viewBlock = { playerView }
@@ -161,9 +163,11 @@ fun VideoPlayer(
             Icon(
                 imageVector = Icons.Default.PlayArrow,
                 tint = Color.White.copy(alpha = AmbientContentAlpha.current),
-                modifier = Modifier.align(Alignment.Center)
+                modifier = Modifier
+                    .align(Alignment.Center)
                     .preferredSize(profileImageSize)
                     .background(MaterialTheme.colors.primary, CircleShape),
+                contentDescription = stringResource(id = R.string.accessibility_common_video_play)
             )
         }
     }

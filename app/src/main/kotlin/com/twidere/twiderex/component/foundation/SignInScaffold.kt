@@ -20,6 +20,7 @@
  */
 package com.twidere.twiderex.component.foundation
 
+import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -82,11 +83,12 @@ fun SignInScaffold(
                         modifier = Modifier
                             .size(with(AmbientDensity.current) { MaterialTheme.typography.h4.fontSize.toDp() })
                             .clickable(
+                                indication = null,
+                                interactionState = remember { InteractionState() },
                                 onClick = {
                                     count++
                                     countAction.invoke(count)
                                 },
-                                indication = null,
                             )
                     )
                     Spacer(modifier = Modifier.width(standardPadding * 2))

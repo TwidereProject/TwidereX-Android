@@ -21,6 +21,7 @@
 package com.twidere.twiderex.extensions
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.onDispose
 import androidx.lifecycle.Observer
 import androidx.navigation.NavController
@@ -44,8 +45,10 @@ suspend fun <T> NavController.navigateForResult(key: String, navAction: NavContr
 
 @Composable
 fun NavController.DisposeResult(key: String) {
-    onDispose {
-        currentBackStackEntry?.savedStateHandle?.set(key, null)
+    DisposableEffect(key) {
+        onDispose {
+            currentBackStackEntry?.savedStateHandle?.set(key, null)
+        }
     }
 }
 

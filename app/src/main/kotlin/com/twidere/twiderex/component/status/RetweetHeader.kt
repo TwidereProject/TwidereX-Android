@@ -56,12 +56,16 @@ fun RetweetHeader(
                 modifier = Modifier.size(12.dp),
                 imageVector = vectorResource(id = R.drawable.ic_repeat),
                 tint = mediumEmphasisContentContentColor,
+                contentDescription = stringResource(id = R.string.accessibility_common_status_retweeted)
             )
         }
         Spacer(modifier = Modifier.width(standardPadding))
         Text(
             style = MaterialTheme.typography.caption,
-            text = stringResource(id = R.string.common_controls_status_user_retweeted, data.user.name),
+            text = stringResource(
+                id = R.string.common_controls_status_user_retweeted,
+                data.user.name
+            ),
         )
     }
 }

@@ -80,7 +80,12 @@ fun ExpandedStatusComponent(
         if (showInfo) {
             if (!status.placeString.isNullOrEmpty()) {
                 Row {
-                    Icon(imageVector = vectorResource(id = R.drawable.ic_map_pin))
+                    Icon(
+                        imageVector = vectorResource(id = R.drawable.ic_map_pin),
+                        contentDescription = stringResource(
+                            id = R.string.accessibility_common_status_location
+                        )
+                    )
                     Text(text = status.placeString)
                 }
             }

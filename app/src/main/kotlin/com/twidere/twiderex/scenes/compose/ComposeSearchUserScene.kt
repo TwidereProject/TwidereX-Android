@@ -110,7 +110,12 @@ fun ComposeSearchUserScene() {
                                 navController.popBackStack()
                             }
                         ) {
-                            Icon(imageVector = Icons.Default.Done)
+                            Icon(
+                                imageVector = Icons.Default.Done,
+                                contentDescription = stringResource(
+                                    id = R.string.accessibility_common_done
+                                )
+                            )
                         }
                     },
                 )

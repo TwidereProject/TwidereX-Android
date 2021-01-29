@@ -164,7 +164,12 @@ private fun StatusComponent(
                                 )
                                 .fillMaxWidth()
                         ) {
-                            Icon(imageVector = vectorResource(id = R.drawable.ic_photo))
+                            Icon(
+                                imageVector = vectorResource(id = R.drawable.ic_photo),
+                                contentDescription = stringResource(
+                                    id = R.string.accessibility_common_status_media
+                                )
+                            )
                             Spacer(modifier = Modifier.width(standardPadding))
                             Text(text = stringResource(id = R.string.common_controls_status_media))
                         }
@@ -182,7 +187,8 @@ private fun StatusComponent(
                     ) {
                         Icon(
                             modifier = Modifier.size(statusActionIconSize),
-                            imageVector = vectorResource(id = R.drawable.ic_map_pin)
+                            imageVector = vectorResource(id = R.drawable.ic_map_pin),
+                            contentDescription = stringResource(id = R.string.accessibility_common_status_location)
                         )
                         Box(modifier = Modifier.width(standardPadding))
                         Text(text = status.placeString)

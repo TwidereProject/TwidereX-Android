@@ -23,6 +23,7 @@ package com.twidere.twiderex.component.foundation
 import androidx.compose.foundation.gestures.zoomable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -32,7 +33,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.DragObserver
 import androidx.compose.ui.gesture.rawDragGestureFilter
-import androidx.compose.ui.layout.WithConstraints
 import androidx.compose.ui.layout.layout
 
 @Composable
@@ -42,7 +42,7 @@ fun Zoomable(
     onZoomStopped: ((scale: Float) -> Unit)? = null,
     content: @Composable BoxScope.() -> Unit,
 ) {
-    WithConstraints {
+    BoxWithConstraints {
         var looked by remember { mutableStateOf(false) }
         var scale by remember { mutableStateOf(1f) }
         var translate by remember { mutableStateOf(Offset(0f, 0f)) }
