@@ -129,7 +129,6 @@ android {
     }
     composeOptions {
         kotlinCompilerExtensionVersion versions.compose
-        kotlinCompilerVersion versions.kotlin
     }
 }
 
