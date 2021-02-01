@@ -144,10 +144,13 @@ fun VideoPlayer(
                 if (customControl != null) {
                     customControl.player = player
                 }
+                onDispose { }
+            }
+
+            DisposableEffect(Unit) {
                 onDispose {
                     updateState()
                     player.release()
-                    customControl?.player = null
                 }
             }
 
