@@ -28,7 +28,7 @@ subprojects {
             targetExclude("$buildDir/**/*.kt")
             targetExclude('bin/**/*.kt')
 
-            ktlint(versions.ktlint)
+            ktlint(versions.ktlint).userData([android: "true"])
             licenseHeaderFile rootProject.file('spotless/license.kt')
         }
         java {
