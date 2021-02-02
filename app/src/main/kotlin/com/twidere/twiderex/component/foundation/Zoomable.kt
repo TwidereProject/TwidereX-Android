@@ -37,6 +37,7 @@ import androidx.compose.ui.layout.layout
 
 @Composable
 fun Zoomable(
+    modifier: Modifier = Modifier,
     minScale: Float = 1F,
     onZoomStarted: ((scale: Float) -> Unit)? = null,
     onZoomStopped: ((scale: Float) -> Unit)? = null,
@@ -76,7 +77,7 @@ fun Zoomable(
             }
         }
         Box(
-            modifier = Modifier
+            modifier = modifier
                 .zoomable(
                     onZoomDelta = { scale = (scale * it).coerceAtLeast(minScale) },
                     onZoomStarted = {

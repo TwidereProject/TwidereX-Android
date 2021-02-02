@@ -56,9 +56,7 @@ fun SignInScaffold(
     content: @Composable ColumnScope.() -> Unit,
 ) {
     var count by remember { mutableStateOf(0) }
-    TwidereXTheme(
-        pureStatusBarColor = true,
-    ) {
+    TwidereXTheme {
         InAppNotificationScaffold(
             topBar = {
                 AppBar(

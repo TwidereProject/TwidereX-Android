@@ -92,6 +92,8 @@ import com.twidere.twiderex.ui.AmbientVideoPlayback
 import com.twidere.twiderex.ui.TwidereXTheme
 import com.twidere.twiderex.ui.standardPadding
 import com.twidere.twiderex.viewmodel.MediaViewModel
+import dev.chrisbanes.accompanist.insets.navigationBarsPadding
+import dev.chrisbanes.accompanist.insets.statusBarsPadding
 
 @Composable
 fun MediaScene(statusKey: MicroBlogKey, selectedIndex: Int) {
@@ -103,7 +105,7 @@ fun MediaScene(statusKey: MicroBlogKey, selectedIndex: Int) {
     val status by viewModel.status.observeAsState()
     TwidereXTheme(
         requireDarkTheme = true,
-        pureStatusBarColor = true,
+        withSystemBarPadding = false
     ) {
         if (loading) {
             InAppNotificationScaffold {
@@ -179,6 +181,7 @@ fun MediaScene(status: UiStatus, selectedIndex: Int) {
             if (alpha != 0f) {
                 Box(
                     modifier = Modifier
+                        .navigationBarsPadding()
                         .fillMaxSize()
                         .alpha(alpha),
                 ) {
@@ -243,6 +246,7 @@ fun MediaScene(status: UiStatus, selectedIndex: Int) {
 
                     Box(
                         modifier = Modifier
+                            .statusBarsPadding()
                             .padding(16.dp)
                     ) {
                         Box(

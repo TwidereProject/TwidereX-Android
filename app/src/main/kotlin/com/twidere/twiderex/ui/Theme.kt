@@ -24,25 +24,39 @@ import android.os.Build
 import android.view.View
 import android.view.Window
 import android.view.WindowInsetsController
+import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Typography
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.preferences.AmbientAppearancePreferences
 import com.twidere.twiderex.preferences.AmbientDisplayPreferences
 import com.twidere.twiderex.preferences.proto.AppearancePreferences
+import dev.chrisbanes.accompanist.insets.HorizontalSide
+import dev.chrisbanes.accompanist.insets.navigationBarsHeight
+import dev.chrisbanes.accompanist.insets.navigationBarsWidth
+import dev.chrisbanes.accompanist.insets.navigationBarsWithImePadding
+import dev.chrisbanes.accompanist.insets.statusBarsHeight
+import dev.chrisbanes.accompanist.insets.statusBarsPadding
 
 @Composable
 fun TwidereXTheme(
     requireDarkTheme: Boolean = false,
-    pureStatusBarColor: Boolean = false,
+    withSystemBarPadding: Boolean = true,
     content: @Composable () -> Unit
 ) {
     val appearance = AmbientAppearancePreferences.current
@@ -155,13 +169,71 @@ fun TwidereXTheme(
         shapes = shapes,
         content = {
             val window = AmbientWindow.current
-            val statusBarColor = if (pureStatusBarColor) {
-                MaterialTheme.colors.surface
-            } else {
-                MaterialTheme.colors.surface.withElevation()
+            updateStatusBar(window, darkTheme)
+            val navigationBarColor = Color.Black
+            val statusBarColor = MaterialTheme.colors.surface.withElevation()
+            Box {
+                Spacer(
+                    modifier = if (withSystemBarPadding) {
+                        Modifier
+                            .navigationBarsWidth(HorizontalSide.Left)
+                            .zIndex(999F)
+                            .fillMaxHeight()
+                            .align(Alignment.CenterStart)
+                            .background(navigationBarColor)
+                    } else {
+                        Modifier
+                    }
+                )
+                Spacer(
+                    modifier = if (withSystemBarPadding) {
+                        Modifier
+                            .statusBarsHeight()
+                            .align(Alignment.TopCenter)
+                            .zIndex(999F)
+                            .fillMaxWidth()
+                            .background(statusBarColor)
+                    } else {
+                        Modifier
+                    }
+                )
+                Box(
+                    modifier = if (withSystemBarPadding) {
+                        Modifier
+                            .statusBarsPadding()
+                            .navigationBarsWithImePadding()
+                            .align(Alignment.Center)
+                    } else {
+                        Modifier
+                    }
+                ) {
+                    content()
+                }
+                Spacer(
+                    modifier = if (withSystemBarPadding) {
+                        Modifier
+                            .navigationBarsHeight()
+                            .align(Alignment.BottomCenter)
+                            .zIndex(999F)
+                            .fillMaxWidth()
+                            .background(navigationBarColor)
+                    } else {
+                        Modifier
+                    }
+                )
+                Spacer(
+                    modifier = if (withSystemBarPadding) {
+                        Modifier
+                            .navigationBarsWidth(HorizontalSide.Right)
+                            .fillMaxHeight()
+                            .align(Alignment.CenterEnd)
+                            .zIndex(999F)
+                            .background(navigationBarColor)
+                    } else {
+                        Modifier
+                    }
+                )
             }
-            updateStatusBar(window, darkTheme, statusBarColor)
-            content()
         }
     )
 }
@@ -169,24 +241,20 @@ fun TwidereXTheme(
 fun updateStatusBar(
     window: Window,
     darkTheme: Boolean,
-    statusBarColor: androidx.compose.ui.graphics.Color,
 ) {
-    if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1) {
-        window.statusBarColor = statusBarColor.toArgb()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                window.insetsController?.setSystemBarsAppearance(
-                    if (darkTheme) 0 else WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS,
-                    WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
-                )
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            window.insetsController?.setSystemBarsAppearance(
+                if (darkTheme) 0 else WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS,
+                WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
+            )
+        } else {
+            val decor = window.decorView
+            @Suppress("DEPRECATION")
+            decor.systemUiVisibility = if (darkTheme) {
+                decor.systemUiVisibility and View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR.inv()
             } else {
-                val decor = window.decorView
-                @Suppress("DEPRECATION")
-                decor.systemUiVisibility = if (darkTheme) {
-                    0
-                } else {
-                    View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
-                }
+                decor.systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
             }
         }
     }
