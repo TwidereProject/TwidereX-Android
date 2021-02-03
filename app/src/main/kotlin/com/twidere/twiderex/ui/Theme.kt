@@ -30,6 +30,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Typography
 import androidx.compose.material.darkColors
@@ -46,12 +47,13 @@ import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.preferences.AmbientAppearancePreferences
 import com.twidere.twiderex.preferences.AmbientDisplayPreferences
 import com.twidere.twiderex.preferences.proto.AppearancePreferences
+import dev.chrisbanes.accompanist.insets.AmbientWindowInsets
 import dev.chrisbanes.accompanist.insets.HorizontalSide
 import dev.chrisbanes.accompanist.insets.navigationBarsHeight
+import dev.chrisbanes.accompanist.insets.navigationBarsPadding
 import dev.chrisbanes.accompanist.insets.navigationBarsWidth
-import dev.chrisbanes.accompanist.insets.navigationBarsWithImePadding
 import dev.chrisbanes.accompanist.insets.statusBarsHeight
-import dev.chrisbanes.accompanist.insets.statusBarsPadding
+import dev.chrisbanes.accompanist.insets.toPaddingValues
 
 @Composable
 fun TwidereXTheme(
@@ -173,65 +175,68 @@ fun TwidereXTheme(
             val navigationBarColor = Color.Black
             val statusBarColor = MaterialTheme.colors.surface.withElevation()
             Box {
-                Spacer(
-                    modifier = if (withSystemBarPadding) {
-                        Modifier
-                            .navigationBarsWidth(HorizontalSide.Left)
-                            .zIndex(999F)
-                            .fillMaxHeight()
-                            .align(Alignment.CenterStart)
-                            .background(navigationBarColor)
-                    } else {
-                        Modifier
-                    }
-                )
-                Spacer(
-                    modifier = if (withSystemBarPadding) {
-                        Modifier
-                            .statusBarsHeight()
-                            .align(Alignment.TopCenter)
-                            .zIndex(999F)
-                            .fillMaxWidth()
-                            .background(statusBarColor)
-                    } else {
-                        Modifier
-                    }
-                )
                 Box(
                     modifier = if (withSystemBarPadding) {
-                        Modifier
-                            .statusBarsPadding()
-                            .navigationBarsWithImePadding()
-                            .align(Alignment.Center)
+                        val ime = AmbientWindowInsets.current.ime
+                        val navigation = AmbientWindowInsets.current.navigationBars
+                        val status = AmbientWindowInsets.current.statusBars
+                        val actual = ime.copy(
+                            left = ime.left.coerceAtLeast(navigation.left),
+                            right = ime.right.coerceAtLeast(navigation.right),
+                            bottom = ime.bottom.coerceAtLeast(navigation.bottom),
+                            top = ime.top.coerceAtLeast(navigation.top) + status.top,
+                        )
+                        Modifier.padding(actual.toPaddingValues())
                     } else {
                         Modifier
-                    }
+                    }.align(Alignment.Center)
                 ) {
                     content()
                 }
                 Spacer(
                     modifier = if (withSystemBarPadding) {
                         Modifier
-                            .navigationBarsHeight()
-                            .align(Alignment.BottomCenter)
+                            .statusBarsHeight()
+                            .navigationBarsPadding(bottom = false)
                             .zIndex(999F)
                             .fillMaxWidth()
+                            .background(statusBarColor)
+                    } else {
+                        Modifier
+                    }.align(Alignment.TopCenter)
+                )
+                Spacer(
+                    modifier = if (withSystemBarPadding) {
+                        Modifier
+                            .navigationBarsWidth(HorizontalSide.Left)
+                            .zIndex(999F)
+                            .fillMaxHeight()
                             .background(navigationBarColor)
                     } else {
                         Modifier
-                    }
+                    }.align(Alignment.CenterStart)
                 )
                 Spacer(
                     modifier = if (withSystemBarPadding) {
                         Modifier
                             .navigationBarsWidth(HorizontalSide.Right)
                             .fillMaxHeight()
-                            .align(Alignment.CenterEnd)
                             .zIndex(999F)
                             .background(navigationBarColor)
                     } else {
                         Modifier
-                    }
+                    }.align(Alignment.CenterEnd)
+                )
+                Spacer(
+                    modifier = if (withSystemBarPadding) {
+                        Modifier
+                            .navigationBarsHeight()
+                            .zIndex(999F)
+                            .fillMaxWidth()
+                            .background(navigationBarColor)
+                    } else {
+                        Modifier
+                    }.align(Alignment.BottomCenter)
                 )
             }
         }
