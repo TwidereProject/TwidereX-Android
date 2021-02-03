@@ -22,6 +22,7 @@ package com.twidere.twiderex.scenes
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.ButtonDefaults
@@ -185,6 +186,7 @@ private fun TwitterCustomKeySignIn(
             Column {
                 Text(text = stringResource(id = R.string.scene_sign_in_twitter_options_twitter_api_v2_access_is_required))
                 OutlinedTextField(
+                    modifier = Modifier.fillMaxWidth(),
                     value = apiKey,
                     onValueChange = { apiKey = it },
                     placeholder = {
@@ -192,6 +194,7 @@ private fun TwitterCustomKeySignIn(
                     }
                 )
                 OutlinedTextField(
+                    modifier = Modifier.fillMaxWidth(),
                     value = apiSecret,
                     onValueChange = { apiSecret = it },
                     placeholder = {
