@@ -167,7 +167,7 @@ dependencies {
     implementation "androidx.paging:paging-runtime-ktx:$versions.paging"
     implementation "androidx.paging:paging-compose:$versions.androidx_compose"
     implementation "androidx.navigation:navigation-compose:$versions.androidx_compose"
-    implementation "androidx.navigation:navigation-fragment-ktx:2.3.2"
+    implementation "androidx.navigation:navigation-fragment-ktx:$versions.navigation"
     implementation "androidx.activity:activity-ktx:1.2.0-rc01"
     implementation "androidx.datastore:datastore:$versions.dataStore"
 
