@@ -105,7 +105,8 @@ fun MediaScene(statusKey: MicroBlogKey, selectedIndex: Int) {
     val status by viewModel.status.observeAsState()
     TwidereXTheme(
         requireDarkTheme = true,
-        withSystemBarPadding = false
+        extendViewIntoStatusBar = true,
+        extendViewIntoNavigationBar = true,
     ) {
         if (loading) {
             InAppNotificationScaffold {

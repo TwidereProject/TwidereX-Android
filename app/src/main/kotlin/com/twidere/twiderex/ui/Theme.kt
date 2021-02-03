@@ -58,7 +58,8 @@ import dev.chrisbanes.accompanist.insets.toPaddingValues
 @Composable
 fun TwidereXTheme(
     requireDarkTheme: Boolean = false,
-    withSystemBarPadding: Boolean = true,
+    extendViewIntoStatusBar: Boolean = false,
+    extendViewIntoNavigationBar: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val appearance = AmbientAppearancePreferences.current
@@ -176,25 +177,43 @@ fun TwidereXTheme(
             val statusBarColor = MaterialTheme.colors.surface.withElevation()
             Box {
                 Box(
-                    modifier = if (withSystemBarPadding) {
+                    modifier = run {
                         val ime = AmbientWindowInsets.current.ime
                         val navigation = AmbientWindowInsets.current.navigationBars
                         val status = AmbientWindowInsets.current.statusBars
                         val actual = ime.copy(
-                            left = ime.left.coerceAtLeast(navigation.left),
-                            right = ime.right.coerceAtLeast(navigation.right),
-                            bottom = ime.bottom.coerceAtLeast(navigation.bottom),
-                            top = ime.top.coerceAtLeast(navigation.top) + status.top,
+                            left = if (extendViewIntoNavigationBar) {
+                                0
+                            } else {
+                                ime.left.coerceAtLeast(navigation.left)
+                            },
+                            right = if (extendViewIntoNavigationBar) {
+                                0
+                            } else {
+                                ime.right.coerceAtLeast(navigation.right)
+                            },
+                            bottom = if (extendViewIntoNavigationBar) {
+                                0
+                            } else {
+                                ime.bottom.coerceAtLeast(navigation.bottom)
+                            },
+                            top = if (extendViewIntoNavigationBar) {
+                                0
+                            } else {
+                                ime.top.coerceAtLeast(navigation.top)
+                            } + if (extendViewIntoStatusBar) {
+                                0
+                            } else {
+                                status.top
+                            },
                         )
                         Modifier.padding(actual.toPaddingValues())
-                    } else {
-                        Modifier
                     }.align(Alignment.Center)
                 ) {
                     content()
                 }
                 Spacer(
-                    modifier = if (withSystemBarPadding) {
+                    modifier = if (!extendViewIntoStatusBar) {
                         Modifier
                             .statusBarsHeight()
                             .navigationBarsPadding(bottom = false)
@@ -206,7 +225,7 @@ fun TwidereXTheme(
                     }.align(Alignment.TopCenter)
                 )
                 Spacer(
-                    modifier = if (withSystemBarPadding) {
+                    modifier = if (!extendViewIntoNavigationBar) {
                         Modifier
                             .navigationBarsWidth(HorizontalSide.Left)
                             .zIndex(999F)
@@ -217,7 +236,7 @@ fun TwidereXTheme(
                     }.align(Alignment.CenterStart)
                 )
                 Spacer(
-                    modifier = if (withSystemBarPadding) {
+                    modifier = if (!extendViewIntoNavigationBar) {
                         Modifier
                             .navigationBarsWidth(HorizontalSide.Right)
                             .fillMaxHeight()
@@ -228,7 +247,7 @@ fun TwidereXTheme(
                     }.align(Alignment.CenterEnd)
                 )
                 Spacer(
-                    modifier = if (withSystemBarPadding) {
+                    modifier = if (!extendViewIntoNavigationBar) {
                         Modifier
                             .navigationBarsHeight()
                             .zIndex(999F)
