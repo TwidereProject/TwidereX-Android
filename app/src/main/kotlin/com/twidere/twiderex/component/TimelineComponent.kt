@@ -34,9 +34,9 @@ import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.onCommit
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -84,7 +84,7 @@ fun TimelineComponent(viewModel: TimelineViewModel) {
                     listState.snapToItemIndex(0)
                 }
             }
-            onCommit(listState.isAnimationRunning) {
+            DisposableEffect(listState.isAnimationRunning) {
                 if (!listState.isAnimationRunning) {
                     viewModel.saveScrollState(
                         TimelineScrollState(
@@ -93,6 +93,7 @@ fun TimelineComponent(viewModel: TimelineViewModel) {
                         )
                     )
                 }
+                onDispose { }
             }
             LazyColumn(
                 state = listState
@@ -127,7 +128,12 @@ fun TimelineComponent(viewModel: TimelineViewModel) {
                                             }
                                         },
                                     ) {
-                                        Icon(imageVector = vectorResource(id = R.drawable.ic_refresh))
+                                        Icon(
+                                            imageVector = vectorResource(id = R.drawable.ic_refresh),
+                                            contentDescription = stringResource(
+                                                id = R.string.accessibility_scene_timeline_load_gap
+                                            )
+                                        )
                                         Box(modifier = Modifier.width(standardPadding))
                                         Text(text = stringResource(id = R.string.common_controls_timeline_load_more))
                                     }

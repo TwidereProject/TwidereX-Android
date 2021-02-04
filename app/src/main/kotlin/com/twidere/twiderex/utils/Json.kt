@@ -20,18 +20,20 @@
  */
 package com.twidere.twiderex.utils
 
-import com.squareup.moshi.Moshi
-import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import com.twidere.twiderex.model.adapter.AndroidAccountAdapter
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
-inline fun <reified T> T.json(): String =
-    Moshi.Builder()
-        .add(AndroidAccountAdapter())
-        .add(KotlinJsonAdapterFactory())
-        .build().adapter<T>(T::class.java).toJson(this)
+private val JSON by lazy {
+    Json {
+        ignoreUnknownKeys = true
+        isLenient = true
+        coerceInputValues = true
+    }
+}
 
-inline fun <reified T> String.fromJson() =
-    Moshi.Builder()
-        .add(AndroidAccountAdapter())
-        .add(KotlinJsonAdapterFactory())
-        .build().adapter<T>(T::class.java).fromJson(this)
+internal inline fun <reified T> T.json(): String =
+    JSON.encodeToString<T>(this)
+
+internal inline fun <reified T> String.fromJson() =
+    JSON.decodeFromString<T>(this)

@@ -25,7 +25,7 @@ import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.decodeFromJsonElement
 import java.net.URLDecoder
 
-inline fun <reified T> String.queryString(): T {
+internal inline fun <reified T> String.queryString(): T {
     val map = split("&")
         .map {
             it.split("=")

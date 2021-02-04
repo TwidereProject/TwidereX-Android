@@ -23,6 +23,7 @@ package com.twidere.twiderex.component
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -51,7 +52,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
-import androidx.compose.ui.layout.WithConstraints
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -146,9 +146,9 @@ fun UserComponent(
 
     Box {
         val tabs = listOf(
-            vectorResource(id = R.drawable.ic_float_left),
-            vectorResource(id = R.drawable.ic_photo),
-            vectorResource(id = R.drawable.ic_heart),
+            vectorResource(id = R.drawable.ic_float_left) to stringResource(id = R.string.accessibility_scene_user_tab_status),
+            vectorResource(id = R.drawable.ic_photo) to stringResource(id = R.string.accessibility_scene_user_tab_media),
+            vectorResource(id = R.drawable.ic_heart) to stringResource(id = R.string.accessibility_scene_user_tab_favourite),
         )
         val (selectedItem, setSelectedItem) = savedInstanceState { 0 }
         val shouldStickyHeaderShown = lazyListState.firstVisibleItemIndex >= 1
@@ -308,7 +308,7 @@ private fun UserInfo(user: UiUser, viewModel: UserViewModel) {
             }
         }
         Column {
-            WithConstraints {
+            BoxWithConstraints {
                 Spacer(
                     modifier = Modifier.height(
                         min(
@@ -416,7 +416,12 @@ private fun UserInfo(user: UiUser, viewModel: UserViewModel) {
                 ) {
                     Spacer(modifier = Modifier.height(standardPadding))
                     Row {
-                        Icon(imageVector = vectorResource(id = R.drawable.ic_globe))
+                        Icon(
+                            imageVector = vectorResource(id = R.drawable.ic_globe),
+                            contentDescription = stringResource(
+                                id = R.string.accessibility_scene_user_website
+                            )
+                        )
                         Spacer(modifier = Modifier.width(standardPadding))
                         Text(
                             text = it,
@@ -434,7 +439,12 @@ private fun UserInfo(user: UiUser, viewModel: UserViewModel) {
                     modifier = Modifier
                         .padding(horizontal = standardPadding * 2),
                 ) {
-                    Icon(imageVector = vectorResource(id = R.drawable.ic_map_pin))
+                    Icon(
+                        imageVector = vectorResource(id = R.drawable.ic_map_pin),
+                        contentDescription = stringResource(
+                            id = R.string.accessibility_scene_user_location
+                        )
+                    )
                     Spacer(modifier = Modifier.width(standardPadding))
                     Text(
                         text = it,
@@ -447,7 +457,8 @@ private fun UserInfo(user: UiUser, viewModel: UserViewModel) {
             Spacer(modifier = Modifier.height(standardPadding))
             Row {
                 Column(
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier
+                        .weight(1f)
                         .clickable {
                             if (user.userKey.host == MicroBlogKey.TwitterHost) {
                                 navController.navigate(Route.Twitter.User.Following(user.userKey))
@@ -459,7 +470,8 @@ private fun UserInfo(user: UiUser, viewModel: UserViewModel) {
                     Text(text = stringResource(id = R.string.common_controls_profile_dashboard_following))
                 }
                 Column(
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier
+                        .weight(1f)
                         .clickable {
                             if (user.userKey.host == MicroBlogKey.TwitterHost) {
                                 navController.navigate(Route.Twitter.User.Followers(user.userKey))

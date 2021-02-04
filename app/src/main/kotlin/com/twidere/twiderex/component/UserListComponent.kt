@@ -88,7 +88,7 @@ fun UserListComponent(
                                 Text(
                                     text = stringResource(
                                         id = R.string.common_controls_profile_dashboard_followers,
-                                    ) + it.followersCount.toString()
+                                    ) + " " + it.followersCount.toString()
                                 )
                             }
                         )

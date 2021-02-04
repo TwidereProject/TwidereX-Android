@@ -39,6 +39,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.AlertDialog
@@ -218,7 +219,12 @@ private fun ComposeBody(
                                 }
                             }
                         ) {
-                            Icon(imageVector = vectorResource(id = R.drawable.ic_x))
+                            Icon(
+                                imageVector = vectorResource(id = R.drawable.ic_x),
+                                contentDescription = stringResource(
+                                    id = R.string.accessibility_common_close
+                                )
+                            )
                         }
                     },
                     actions = {
@@ -229,7 +235,12 @@ private fun ComposeBody(
                                 navController.popBackStack()
                             }
                         ) {
-                            Icon(imageVector = vectorResource(id = R.drawable.ic_send))
+                            Icon(
+                                imageVector = vectorResource(id = R.drawable.ic_send),
+                                contentDescription = stringResource(
+                                    id = R.string.accessibility_scene_compose_send
+                                )
+                            )
                         }
                     }
                 )
@@ -359,7 +370,12 @@ private fun ComposeBody(
                                 AmbientContentAlpha provides ContentAlpha.medium
                             ) {
                                 Row {
-                                    Icon(imageVector = vectorResource(id = R.drawable.ic_map_pin))
+                                    Icon(
+                                        imageVector = vectorResource(id = R.drawable.ic_map_pin),
+                                        contentDescription = stringResource(
+                                            id = R.string.accessibility_common_status_location
+                                        )
+                                    )
                                     Text(text = "${it.latitude}, ${it.longitude}")
                                 }
                             }
@@ -393,7 +409,12 @@ private fun ReplySheetContent(
                     scaffoldState.bottomSheetState.collapse()
                 }
             ) {
-                Icon(imageVector = vectorResource(id = R.drawable.ic_x))
+                Icon(
+                    imageVector = vectorResource(id = R.drawable.ic_x),
+                    contentDescription = stringResource(
+                        id = R.string.accessibility_common_close
+                    )
+                )
             }
         },
         text = {
@@ -625,7 +646,12 @@ private fun ComposeActions(viewModel: ComposeViewModel) {
                     }
                 }
             ) {
-                Icon(imageVector = vectorResource(id = R.drawable.ic_camera))
+                Icon(
+                    imageVector = vectorResource(id = R.drawable.ic_camera),
+                    contentDescription = stringResource(
+                        id = R.string.accessibility_scene_compose_image
+                    )
+                )
             }
             // TODO:
 //            IconButton(onClick = {}) {
@@ -643,7 +669,12 @@ private fun ComposeActions(viewModel: ComposeViewModel) {
                     }
                 }
             ) {
-                Icon(imageVector = vectorResource(id = R.drawable.ic_at_sign))
+                Icon(
+                    imageVector = vectorResource(id = R.drawable.ic_at_sign),
+                    contentDescription = stringResource(
+                        id = R.string.accessibility_scene_compose_at
+                    )
+                )
             }
 //            IconButton(onClick = {}) {
 //                Icon(imageVector = vectorResource(id = R.drawable.ic_hash))
@@ -672,7 +703,16 @@ private fun ComposeActions(viewModel: ComposeViewModel) {
                     }
                 },
             ) {
-                Icon(imageVector = vectorResource(id = R.drawable.ic_map_pin))
+                Icon(
+                    imageVector = vectorResource(id = R.drawable.ic_map_pin),
+                    contentDescription = stringResource(
+                        id = if (locationEnabled) {
+                            R.string.accessibility_scene_compose_location_disable
+                        } else {
+                            R.string.accessibility_scene_compose_location_enable
+                        }
+                    )
+                )
             }
             Spacer(modifier = Modifier.weight(1f))
             IconButton(
@@ -680,7 +720,12 @@ private fun ComposeActions(viewModel: ComposeViewModel) {
                     navController.navigate(Route.Draft.List)
                 }
             ) {
-                Icon(imageVector = vectorResource(id = R.drawable.ic_note))
+                Icon(
+                    imageVector = vectorResource(id = R.drawable.ic_note),
+                    contentDescription = stringResource(
+                        id = R.string.accessibility_scene_compose_draft
+                    )
+                )
             }
         }
     }

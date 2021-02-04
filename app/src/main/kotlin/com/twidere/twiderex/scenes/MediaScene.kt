@@ -22,6 +22,7 @@ package com.twidere.twiderex.scenes
 
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.updateTransition
+import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -57,6 +58,7 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.AmbientAnimationClock
 import androidx.compose.ui.platform.AmbientContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -160,6 +162,7 @@ fun MediaScene(status: UiStatus, selectedIndex: Int) {
                             hideControls = !hideControls
                         },
                         indication = null,
+                        interactionState = remember { InteractionState() }
                     ),
                 state = pagerState,
                 dragEnabled = !lockPager,
@@ -257,7 +260,12 @@ fun MediaScene(status: UiStatus, selectedIndex: Int) {
                                     navController.popBackStack()
                                 }
                             ) {
-                                Icon(imageVector = vectorResource(id = R.drawable.ic_x))
+                                Icon(
+                                    imageVector = vectorResource(id = R.drawable.ic_x),
+                                    contentDescription = stringResource(
+                                        id = R.string.accessibility_common_close
+                                    )
+                                )
                             }
                         }
                     }

@@ -1,6 +1,6 @@
 plugins {
     id 'org.jetbrains.kotlin.jvm'
-    id "org.jetbrains.kotlin.plugin.serialization" version '1.4.21'
+    id "org.jetbrains.kotlin.plugin.serialization" version "1.4.21-2"
 }
 
 java {
@@ -21,7 +21,7 @@ test {
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$versions.kotlin"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.2"
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$versions.kotlinx_serialization")
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:$versions.kotlinx_serialization"
     
     api "com.squareup.retrofit2:retrofit:$versions.retrofit2"
     implementation "com.squareup.retrofit2:converter-scalars:$versions.retrofit2"

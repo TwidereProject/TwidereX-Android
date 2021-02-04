@@ -21,6 +21,7 @@
 package com.twidere.twiderex.paging.source.twitter
 
 import androidx.paging.PagingSource
+import androidx.paging.PagingState
 import com.twidere.services.twitter.TwitterService
 import com.twidere.twiderex.db.mapper.toDbUser
 import com.twidere.twiderex.model.MicroBlogKey
@@ -42,5 +43,9 @@ class TwitterFollowingPagingSource(
         } catch (e: Exception) {
             LoadResult.Error(e)
         }
+    }
+
+    override fun getRefreshKey(state: PagingState<String, UiUser>): String? {
+        return null
     }
 }

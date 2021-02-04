@@ -37,7 +37,6 @@ import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.viewinterop.viewModel
 import androidx.core.net.ConnectivityManagerCompat
 import androidx.fragment.app.FragmentActivity
-import androidx.hilt.lifecycle.HiltViewModelFactory
 import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.ComposeNavigator
@@ -47,7 +46,6 @@ import com.twidere.twiderex.action.StatusActions
 import com.twidere.twiderex.component.foundation.AmbientInAppNotification
 import com.twidere.twiderex.di.assisted.AssistedViewModelFactoryHolder
 import com.twidere.twiderex.di.assisted.ProvideAssistedFactory
-import com.twidere.twiderex.extensions.ProvideNavigationViewModelFactoryMap
 import com.twidere.twiderex.launcher.ActivityLauncher
 import com.twidere.twiderex.launcher.AmbientLauncher
 import com.twidere.twiderex.navigation.Router
@@ -59,7 +57,6 @@ import com.twidere.twiderex.ui.AmbientActiveAccountViewModel
 import com.twidere.twiderex.ui.AmbientActivity
 import com.twidere.twiderex.ui.AmbientApplication
 import com.twidere.twiderex.ui.AmbientIsActiveNetworkMetered
-import com.twidere.twiderex.ui.AmbientViewModelProviderFactory
 import com.twidere.twiderex.ui.AmbientWindow
 import com.twidere.twiderex.ui.AmbientWindowPadding
 import com.twidere.twiderex.ui.ProvideWindowPadding
@@ -134,7 +131,6 @@ class TwidereXActivity : FragmentActivity() {
                 AmbientInAppNotification provides inAppNotification,
                 AmbientLauncher provides launcher,
                 AmbientWindow provides window,
-                AmbientViewModelProviderFactory provides defaultViewModelProviderFactory,
                 AmbientActiveAccount provides account,
                 AmbientApplication provides application,
                 AmbientStatusActions provides statusActions,
@@ -148,16 +144,14 @@ class TwidereXActivity : FragmentActivity() {
                     ProvideAssistedFactory(
                         assistedViewModelFactoryHolder
                     ) {
-                        ProvideNavigationViewModelFactoryMap(factory = defaultViewModelProviderFactory as HiltViewModelFactory) {
-                            ProvideWindowPadding {
-                                val windowPadding = AmbientWindowPadding.current
-                                Box(
-                                    modifier = Modifier.padding(windowPadding)
-                                ) {
-                                    Router(
-                                        navController = navController
-                                    )
-                                }
+                        ProvideWindowPadding {
+                            val windowPadding = AmbientWindowPadding.current
+                            Box(
+                                modifier = Modifier.padding(windowPadding)
+                            ) {
+                                Router(
+                                    navController = navController
+                                )
                             }
                         }
                     }

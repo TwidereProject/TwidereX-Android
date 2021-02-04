@@ -22,6 +22,7 @@ package com.twidere.twiderex.component.settings
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.ListItem
 import androidx.compose.material.RadioButton
 import androidx.compose.runtime.Composable

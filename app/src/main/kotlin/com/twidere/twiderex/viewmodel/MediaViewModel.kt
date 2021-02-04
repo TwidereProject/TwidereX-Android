@@ -24,8 +24,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
-import com.squareup.inject.assisted.Assisted
-import com.squareup.inject.assisted.AssistedInject
 import com.twidere.services.http.MicroBlogException
 import com.twidere.services.microblog.LookupService
 import com.twidere.twiderex.di.assisted.IAssistedFactory
@@ -34,6 +32,8 @@ import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.twitter.TwitterTweetsRepository
 import com.twidere.twiderex.utils.notify
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
@@ -45,7 +45,7 @@ class MediaViewModel @AssistedInject constructor(
     @Assisted private val statusKey: MicroBlogKey,
 ) : ViewModel() {
 
-    @AssistedInject.Factory
+    @dagger.assisted.AssistedFactory
     interface AssistedFactory : IAssistedFactory {
         fun create(account: AccountDetails, statusKey: MicroBlogKey): MediaViewModel
     }

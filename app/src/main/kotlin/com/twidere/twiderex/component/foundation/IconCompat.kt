@@ -35,19 +35,22 @@ import androidx.compose.ui.res.vectorResource
 fun IconCompat(
     @DrawableRes id: Int,
     modifier: Modifier = Modifier,
+    contentDescription: String?,
     tint: Color = AmbientContentColor.current.copy(alpha = AmbientContentAlpha.current)
 ) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
         Icon(
             imageVector = vectorResource(id = id),
             modifier = modifier,
-            tint = tint
+            tint = tint,
+            contentDescription = contentDescription,
         )
     } else {
         Icon(
             bitmap = imageResource(id = id),
             modifier = modifier,
-            tint = tint
+            tint = tint,
+            contentDescription = contentDescription,
         )
     }
 }

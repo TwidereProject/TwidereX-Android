@@ -16,6 +16,7 @@ jobs:
         java-version: 15
 
     - name: Apply Signing
+      if: ${{ github.event_name != 'pull_request' }}
       env:
         ALIAS: ${{ secrets.ALIAS }}
         KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}

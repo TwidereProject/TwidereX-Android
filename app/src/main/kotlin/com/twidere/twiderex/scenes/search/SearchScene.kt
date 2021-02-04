@@ -21,6 +21,7 @@
 package com.twidere.twiderex.scenes.search
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -42,6 +43,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.savedinstancestate.savedInstanceState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -125,6 +127,7 @@ fun SearchScene(keyword: String) {
                                                         navigator.searchInput(keyword)
                                                     },
                                                     indication = null,
+                                                    interactionState = remember { InteractionState() }
                                                 )
                                                 .align(Alignment.CenterVertically)
                                                 .weight(1F),
@@ -136,7 +139,12 @@ fun SearchScene(keyword: String) {
                                             onClick = {
                                             }
                                         ) {
-                                            Icon(imageVector = vectorResource(id = R.drawable.ic_device_floppy))
+                                            Icon(
+                                                imageVector = vectorResource(id = R.drawable.ic_device_floppy),
+                                                contentDescription = stringResource(
+                                                    id = R.string.accessibility_scene_search_save
+                                                )
+                                            )
                                         }
                                     }
                                 }

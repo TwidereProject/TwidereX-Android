@@ -25,7 +25,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromJsonElement
 
-val JSON by lazy {
+internal val JSON by lazy {
     Json {
         ignoreUnknownKeys = true
         isLenient = true
@@ -35,10 +35,10 @@ val JSON by lazy {
 
 class MicroBlogJsonException(override val microBlogErrorMessage: String?) : MicroBlogException()
 
-inline fun <reified T> T.encodeJson(): String =
+internal inline fun <reified T> T.encodeJson(): String =
     JSON.encodeToString<T>(this)
 
-inline fun <reified T> String.decodeJson(): T {
+internal inline fun <reified T> String.decodeJson(): T {
     return runCatching {
         JSON.parseToJsonElement(this)
     }.getOrNull()?.let {

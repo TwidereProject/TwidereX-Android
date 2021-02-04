@@ -28,6 +28,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Divider
@@ -44,11 +45,11 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.onActive
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.savedinstancestate.savedInstanceState
 import androidx.compose.runtime.setValue
@@ -89,8 +90,9 @@ import com.twidere.twiderex.ui.mediumEmphasisContentContentColor
 @Composable
 fun HomeScene() {
     val navController = rememberNavController()
-    onActive {
+    DisposableEffect(navController) {
         navController.enableOnBackPressed(false)
+        onDispose { }
     }
     var selectedItem by savedInstanceState { 0 }
     val timelineController = remember {
@@ -125,7 +127,12 @@ fun HomeScene() {
                                         }
                                     }
                                 ) {
-                                    Icon(imageVector = Icons.Default.Menu)
+                                    Icon(
+                                        imageVector = Icons.Default.Menu,
+                                        contentDescription = stringResource(
+                                            id = R.string.accessibility_scene_home_menu
+                                        )
+                                    )
                                 }
                             },
                             elevation = if (menus[selectedItem].withAppBar) {
@@ -144,7 +151,7 @@ fun HomeScene() {
                         }
                     ) {
                         IconTabsComponent(
-                            items = menus.map { it.icon },
+                            items = menus.map { it.icon to it.name },
                             selectedItem = selectedItem,
                             onItemSelected = {
                                 if (selectedItem == it) {
@@ -213,7 +220,7 @@ fun HomeBottomNavigation(
             BottomNavigationItem(
                 selectedContentColor = MaterialTheme.colors.primary,
                 unselectedContentColor = mediumEmphasisContentContentColor,
-                icon = { Icon(imageVector = item.icon) },
+                icon = { Icon(imageVector = item.icon, contentDescription = item.name) },
                 selected = selectedItem == index,
                 onClick = { onItemSelected.invoke(index) }
             )
@@ -346,7 +353,12 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
                                 Text(text = stringResource(id = R.string.scene_drafts_title))
                             },
                             icon = {
-                                Icon(imageVector = vectorResource(id = R.drawable.ic_note))
+                                Icon(
+                                    imageVector = vectorResource(id = R.drawable.ic_note),
+                                    contentDescription = stringResource(
+                                        id = R.string.scene_drafts_title
+                                    )
+                                )
                             },
                         )
                     }
@@ -364,7 +376,12 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
                 }
             ),
             icon = {
-                Icon(imageVector = vectorResource(id = R.drawable.ic_adjustments_horizontal))
+                Icon(
+                    imageVector = vectorResource(id = R.drawable.ic_adjustments_horizontal),
+                    contentDescription = stringResource(
+                        id = R.string.scene_settings_title
+                    )
+                )
             },
             text = {
                 Text(text = stringResource(id = R.string.scene_settings_title))
@@ -406,7 +423,12 @@ private fun DrawerUserHeader(
                     onTrailingClicked.invoke()
                 }
             ) {
-                Icon(imageVector = Icons.Default.ArrowDropDown)
+                Icon(
+                    imageVector = Icons.Default.ArrowDropDown,
+                    contentDescription = stringResource(
+                        id = R.string.accessibility_scene_home_drawer_account_dropdown
+                    )
+                )
             }
         }
     )

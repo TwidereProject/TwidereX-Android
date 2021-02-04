@@ -22,8 +22,6 @@ package com.twidere.twiderex.repository
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.map
-import com.squareup.inject.assisted.Assisted
-import com.squareup.inject.assisted.AssistedInject
 import com.twidere.services.microblog.LookupService
 import com.twidere.services.microblog.RelationshipService
 import com.twidere.twiderex.db.CacheDatabase
@@ -33,6 +31,8 @@ import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.toAmUser
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.model.ui.UiUser.Companion.toUi
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 
 class UserRepository @AssistedInject constructor(
     private val database: CacheDatabase,
@@ -42,7 +42,7 @@ class UserRepository @AssistedInject constructor(
     @Assisted private val relationshipService: RelationshipService,
 ) {
 
-    @AssistedInject.Factory
+    @dagger.assisted.AssistedFactory
     interface AssistedFactory {
         fun create(
             accountKey: MicroBlogKey,

@@ -36,10 +36,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.onCommit
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -64,10 +64,11 @@ fun SignInScene() {
     val success by state?.savedStateHandle?.getLiveData<Boolean>("success").let {
         it ?: liveData { emit(false) }
     }.observeAsState(initial = false)
-    onCommit(success) {
+    DisposableEffect(success) {
         if (success) {
             navController.popBackStack()
         }
+        onDispose { }
     }
     var showMastodon by remember { mutableStateOf(false) }
     SignInScaffold(
@@ -88,7 +89,12 @@ fun SignInScene() {
             ) {
                 ListItem(
                     icon = {
-                        IconCompat(id = R.drawable.ic_mastodon_logo_blue)
+                        IconCompat(
+                            id = R.drawable.ic_mastodon_logo_blue,
+                            contentDescription = stringResource(
+                                id = R.string.accessibility_common_logo_mastodon
+                            )
+                        )
                     },
                     text = {
                         Text(
@@ -100,7 +106,12 @@ fun SignInScene() {
                             enabled = false,
                             onClick = {},
                         ) {
-                            Icon(imageVector = Icons.Default.KeyboardArrowRight)
+                            Icon(
+                                imageVector = Icons.Default.KeyboardArrowRight,
+                                contentDescription = stringResource(
+                                    id = R.string.scene_sign_in_sign_in_with_mastodon
+                                )
+                            )
                         }
                     }
                 )
@@ -132,7 +143,12 @@ private fun TwitterSignIn() {
     ) {
         ListItem(
             icon = {
-                Icon(imageVector = vectorResource(id = R.drawable.ic_twitter_logo_white))
+                Icon(
+                    imageVector = vectorResource(id = R.drawable.ic_twitter_logo_white),
+                    contentDescription = stringResource(
+                        id = R.string.accessibility_common_logo_twitter
+                    )
+                )
             },
             text = {
                 Text(
@@ -143,6 +159,7 @@ private fun TwitterSignIn() {
                 IconButton(onClick = { showKeyConfiguration = true }) {
                     Icon(
                         imageVector = Icons.Default.MoreHoriz,
+                        contentDescription = stringResource(id = R.string.accessibility_common_more)
                     )
                 }
             }

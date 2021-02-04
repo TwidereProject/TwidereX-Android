@@ -32,9 +32,9 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.onActive
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -69,8 +69,9 @@ fun MastodonSignInScene() {
             CircularProgressIndicator()
         } else {
             val focusRequester = remember { FocusRequester() }
-            onActive {
+            DisposableEffect(focusRequester) {
                 focusRequester.requestFocus()
+                onDispose { }
             }
             OutlinedTextField(
                 modifier = Modifier
@@ -102,7 +103,12 @@ fun MastodonSignInScene() {
             ) {
                 ListItem(
                     icon = {
-                        IconCompat(id = R.drawable.ic_mastodon_logo_white)
+                        IconCompat(
+                            id = R.drawable.ic_mastodon_logo_white,
+                            contentDescription = stringResource(
+                                id = R.string.accessibility_common_logo_mastodon
+                            )
+                        )
                     },
                     text = {
                         Text(text = stringResource(id = R.string.scene_sign_in_sign_in_with_mastodon))
@@ -112,7 +118,12 @@ fun MastodonSignInScene() {
                             enabled = false,
                             onClick = {},
                         ) {
-                            Icon(imageVector = Icons.Default.KeyboardArrowRight)
+                            Icon(
+                                imageVector = Icons.Default.KeyboardArrowRight,
+                                contentDescription = stringResource(
+                                    id = R.string.scene_sign_in_sign_in_with_mastodon
+                                )
+                            )
                         }
                     }
                 )

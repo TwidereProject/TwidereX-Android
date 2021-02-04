@@ -21,20 +21,22 @@
 package com.twidere.twiderex.model
 
 import com.twidere.twiderex.db.model.DbUser
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class AmUser(
     val userId: String,
     val name: String,
     val userKey: MicroBlogKey,
     val screenName: String,
     val profileImage: String,
-    val profileBackgroundImage: String?,
+    val profileBackgroundImage: String? = null,
     val followersCount: Long,
     val friendsCount: Long,
     val listedCount: Long,
     val desc: String,
-    val website: String?,
-    val location: String?,
+    val website: String? = null,
+    val location: String? = null,
     val verified: Boolean,
     val isProtected: Boolean,
 )

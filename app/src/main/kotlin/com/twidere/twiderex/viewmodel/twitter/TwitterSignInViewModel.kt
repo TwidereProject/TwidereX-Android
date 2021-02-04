@@ -24,8 +24,6 @@ import android.accounts.Account
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.squareup.inject.assisted.Assisted
-import com.squareup.inject.assisted.AssistedInject
 import com.twidere.services.http.MicroBlogException
 import com.twidere.services.twitter.TwitterOAuthService
 import com.twidere.services.twitter.TwitterService
@@ -42,6 +40,8 @@ import com.twidere.twiderex.repository.ACCOUNT_TYPE
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.utils.json
 import com.twidere.twiderex.utils.notify
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
@@ -55,7 +55,7 @@ class TwitterSignInViewModel @AssistedInject constructor(
     @Assisted private val onResult: (success: Boolean) -> Unit,
 ) : ViewModel() {
 
-    @AssistedInject.Factory
+    @dagger.assisted.AssistedFactory
     interface AssistedFactory : IAssistedFactory {
         fun create(
             consumerKey: String,

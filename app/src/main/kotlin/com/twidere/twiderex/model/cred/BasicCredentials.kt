@@ -20,9 +20,9 @@
  */
 package com.twidere.twiderex.model.cred
 
-import com.squareup.moshi.JsonClass
+import kotlinx.serialization.Serializable
 
-@JsonClass(generateAdapter = true)
+@Serializable
 data class BasicCredentials(
     val username: String,
     val password: String,

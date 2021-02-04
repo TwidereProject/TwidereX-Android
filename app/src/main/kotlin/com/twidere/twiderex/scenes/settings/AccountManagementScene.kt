@@ -21,6 +21,7 @@
 package com.twidere.twiderex.scenes.settings
 
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
@@ -69,7 +70,12 @@ fun AccountManagementScene() {
                                 navController.navigate(Route.SignIn.Default)
                             }
                         ) {
-                            Icon(imageVector = Icons.Default.Add)
+                            Icon(
+                                imageVector = Icons.Default.Add,
+                                contentDescription = stringResource(
+                                    id = R.string.accessibility_scene_manage_accounts_add
+                                )
+                            )
                         }
                     }
                 )
@@ -111,7 +117,12 @@ fun AccountManagementScene() {
                                                 expanded = true
                                             },
                                         ) {
-                                            Icon(imageVector = Icons.Default.MoreVert)
+                                            Icon(
+                                                imageVector = Icons.Default.MoreVert,
+                                                contentDescription = stringResource(
+                                                    id = R.string.accessibility_common_more
+                                                )
+                                            )
                                         }
                                     },
                                 ) {
