@@ -20,15 +20,45 @@
  */
 package com.twidere.twiderex.extensions
 
-import android.graphics.Rect
+import android.os.Build
+import android.view.View
 import android.view.Window
+import android.view.WindowInsets
 
-val Window.displayFrame: Rect
-    get() {
-        val rectangle = Rect()
-        decorView.getWindowVisibleDisplayFrame(rectangle)
-        return rectangle
+fun Window.showControls() {
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+        decorView.removeSystemUiVisibility(FLAG_SYSTEM_UI_HIDE_BARS)
+    } else {
+        insetsController?.show(WindowInsets.Type.systemBars())
     }
+}
 
-val Window.statusBarHeight: Int
-    get() = displayFrame.top
+fun Window.hideControls() {
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+        decorView.addSystemUiVisibility(FLAG_SYSTEM_UI_HIDE_BARS)
+    } else {
+        insetsController?.hide(WindowInsets.Type.systemBars())
+    }
+}
+
+fun Window.setOnSystemBarsVisibilityChangeListener(callback: (visibility: Boolean) -> Unit) {
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+        @Suppress("DEPRECATION")
+        decorView.setOnSystemUiVisibilityChangeListener {
+            callback.invoke(View.SYSTEM_UI_FLAG_FULLSCREEN !in it)
+        }
+    } else {
+        decorView.setOnApplyWindowInsetsListener { _, insets ->
+            callback.invoke(
+                insets.isVisible(WindowInsets.Type.navigationBars()) ||
+                    insets.isVisible(WindowInsets.Type.captionBar()) ||
+                    insets.isVisible(WindowInsets.Type.statusBars())
+            )
+            insets
+        }
+    }
+}
+
+@Suppress("DEPRECATION")
+const val FLAG_SYSTEM_UI_HIDE_BARS = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or
+    View.SYSTEM_UI_FLAG_FULLSCREEN

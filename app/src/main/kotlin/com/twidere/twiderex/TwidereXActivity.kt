@@ -30,10 +30,12 @@ import android.view.WindowManager
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.viewinterop.viewModel
 import androidx.core.net.ConnectivityManagerCompat
 import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavHostController
@@ -56,6 +58,7 @@ import com.twidere.twiderex.ui.AmbientActivity
 import com.twidere.twiderex.ui.AmbientApplication
 import com.twidere.twiderex.ui.AmbientIsActiveNetworkMetered
 import com.twidere.twiderex.ui.AmbientWindow
+import com.twidere.twiderex.ui.AmbientWindowInsetsController
 import com.twidere.twiderex.viewmodel.ActiveAccountViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import dev.chrisbanes.accompanist.insets.ExperimentalAnimatedInsets
@@ -121,6 +124,8 @@ class TwidereXActivity : FragmentActivity() {
         window.navigationBarColor = Color.TRANSPARENT
         window.statusBarColor = Color.TRANSPARENT
         setContent {
+            val windowInsetsControllerCompat =
+                remember { WindowInsetsControllerCompat(window, window.decorView) }
             val accountViewModel = viewModel<ActiveAccountViewModel>()
             val account by accountViewModel.account.observeAsState()
             val isActiveNetworkMetered by isActiveNetworkMetered.observeAsState(initial = false)
@@ -128,12 +133,13 @@ class TwidereXActivity : FragmentActivity() {
                 AmbientInAppNotification provides inAppNotification,
                 AmbientLauncher provides launcher,
                 AmbientWindow provides window,
+                AmbientWindowInsetsController provides windowInsetsControllerCompat,
                 AmbientActiveAccount provides account,
                 AmbientApplication provides application,
                 AmbientStatusActions provides statusActions,
                 AmbientActivity provides this,
                 AmbientActiveAccountViewModel provides accountViewModel,
-                AmbientIsActiveNetworkMetered provides isActiveNetworkMetered
+                AmbientIsActiveNetworkMetered provides isActiveNetworkMetered,
             ) {
                 ProvidePreferences(
                     preferencesHolder,

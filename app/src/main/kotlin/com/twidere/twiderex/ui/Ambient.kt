@@ -25,18 +25,16 @@ import android.app.Application
 import android.view.Window
 import androidx.compose.runtime.ambientOf
 import androidx.compose.runtime.staticAmbientOf
-import androidx.hilt.lifecycle.ViewModelAssistedFactory
-import androidx.lifecycle.ViewModel
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.navigation.NavController
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.preferences.proto.DisplayPreferences
 import com.twidere.twiderex.viewmodel.ActiveAccountViewModel
 
+val AmbientWindowInsetsController = staticAmbientOf<WindowInsetsControllerCompat>()
 val AmbientWindow = staticAmbientOf<Window> { error("No Window") }
 val AmbientNavController = staticAmbientOf<NavController> { error("No NavController") }
 val AmbientActiveAccount = ambientOf<AccountDetails?>()
-val AmbientViewModelFactoriesMap =
-    staticAmbientOf<Map<String, ViewModelAssistedFactory<out ViewModel>>>()
 val AmbientActiveAccountViewModel = ambientOf<ActiveAccountViewModel>()
 val AmbientApplication = staticAmbientOf<Application>()
 val AmbientActivity = staticAmbientOf<Activity>()

@@ -30,7 +30,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -42,8 +41,10 @@ import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -55,6 +56,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.AmbientAnimationClock
 import androidx.compose.ui.platform.AmbientContext
@@ -80,6 +82,9 @@ import com.twidere.twiderex.component.status.RetweetButton
 import com.twidere.twiderex.component.status.ShareButton
 import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.extensions.hideControls
+import com.twidere.twiderex.extensions.setOnSystemBarsVisibilityChangeListener
+import com.twidere.twiderex.extensions.showControls
 import com.twidere.twiderex.model.MediaType
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiMedia
@@ -89,6 +94,7 @@ import com.twidere.twiderex.preferences.proto.DisplayPreferences
 import com.twidere.twiderex.ui.AmbientActiveAccount
 import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.ui.AmbientVideoPlayback
+import com.twidere.twiderex.ui.AmbientWindow
 import com.twidere.twiderex.ui.TwidereXTheme
 import com.twidere.twiderex.ui.standardPadding
 import com.twidere.twiderex.viewmodel.MediaViewModel
@@ -109,11 +115,10 @@ fun MediaScene(statusKey: MicroBlogKey, selectedIndex: Int) {
         extendViewIntoNavigationBar = true,
     ) {
         if (loading) {
-            InAppNotificationScaffold {
+            Scaffold {
                 Column(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .fillMaxHeight(),
+                        .fillMaxSize(),
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
@@ -135,10 +140,10 @@ fun MediaScene(statusKey: MicroBlogKey, selectedIndex: Int) {
 @Composable
 fun MediaScene(status: UiStatus, selectedIndex: Int) {
     var lockPager by remember { mutableStateOf(false) }
-    var hideControls by remember { mutableStateOf(false) }
+    var controlVisibility by remember { mutableStateOf(true) }
     val controlPanelColor = MaterialTheme.colors.surface.copy(alpha = 0.6f)
     val navController = AmbientNavController.current
-    InAppNotificationScaffold {
+    Scaffold {
         Box {
             val clock = AmbientAnimationClock.current
             val pagerState = remember(clock) {
@@ -158,11 +163,16 @@ fun MediaScene(status: UiStatus, selectedIndex: Int) {
                     null
                 }
             }
+            val window = AmbientWindow.current
             Pager(
                 modifier = Modifier
                     .clickable(
                         onClick = {
-                            hideControls = !hideControls
+                            if (controlVisibility) {
+                                window.hideControls()
+                            } else {
+                                window.showControls()
+                            }
                         },
                         indication = null,
                         interactionState = remember { InteractionState() }
@@ -175,106 +185,123 @@ fun MediaScene(status: UiStatus, selectedIndex: Int) {
                     lockPager = it
                 }
             }
-            val transition = updateTransition(targetState = !hideControls)
+            DisposableEffect(Unit) {
+                window.setOnSystemBarsVisibilityChangeListener { visibility ->
+                    controlVisibility = visibility
+                }
+                onDispose {
+                    window.showControls()
+                }
+            }
+            val transition = updateTransition(targetState = controlVisibility)
             val alpha by transition.animateFloat {
                 if (it) 1f else 0f
             }
-            if (alpha != 0f) {
-                Box(
-                    modifier = Modifier
-                        .navigationBarsPadding()
-                        .fillMaxSize()
-                        .alpha(alpha),
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .align(Alignment.BottomCenter)
-                            .background(color = controlPanelColor),
-                    ) {
-                        Column(
+            InAppNotificationScaffold(
+                backgroundColor = Color.Transparent,
+                topBar = {
+                    if (alpha != 0f) {
+                        Box(
                             modifier = Modifier
-                                .padding(standardPadding),
+                                .statusBarsPadding()
+                                .padding(16.dp)
+                                .alpha(alpha),
                         ) {
-                            if (videoControl != null) {
-                                AndroidView(viewBlock = { videoControl })
-                            }
-                            Text(
+                            Box(
                                 modifier = Modifier
-                                    .clickable(
-                                        onClick = {
-                                            navController.navigate(Route.Status(status.statusKey))
-                                        }
-                                    ),
-                                text = status.rawText,
-                                maxLines = 2,
-                                overflow = TextOverflow.Ellipsis,
-                            )
-                            Spacer(modifier = Modifier.height(standardPadding))
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                            ) {
-                                Row(
-                                    modifier = Modifier
-                                        .weight(1f),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                ) {
-                                    UserAvatar(user = status.user)
-                                    Spacer(modifier = Modifier.width(standardPadding))
-                                    Text(
-                                        text = status.user.name,
-                                        maxLines = 1,
-                                        overflow = TextOverflow.Ellipsis,
+                                    .align(Alignment.TopStart)
+                                    .clip(MaterialTheme.shapes.small)
+                                    .background(
+                                        color = controlPanelColor,
+                                        shape = MaterialTheme.shapes.small
                                     )
-                                    Spacer(modifier = Modifier.width(standardPadding))
-                                    Providers(
-                                        AmbientContentAlpha provides ContentAlpha.medium
-                                    ) {
-                                        Text(
-                                            text = "@${status.user.screenName}",
-                                            maxLines = 1,
-                                            overflow = TextOverflow.Ellipsis,
-                                        )
+                                    .clipToBounds()
+                            ) {
+                                IconButton(
+                                    onClick = {
+                                        navController.popBackStack()
                                     }
+                                ) {
+                                    Icon(
+                                        imageVector = vectorResource(id = R.drawable.ic_x),
+                                        contentDescription = stringResource(
+                                            id = R.string.accessibility_common_close
+                                        )
+                                    )
                                 }
-                                ReplyButton(status = status, withNumber = false)
-                                RetweetButton(status = status, withNumber = false)
-                                LikeButton(status = status, withNumber = false)
-                                ShareButton(status = status)
                             }
                         }
                     }
-
+                },
+                bottomBar = {
                     Box(
                         modifier = Modifier
-                            .statusBarsPadding()
-                            .padding(16.dp)
+                            .navigationBarsPadding(),
                     ) {
-                        Box(
-                            modifier = Modifier
-                                .align(Alignment.TopStart)
-                                .clip(MaterialTheme.shapes.small)
-                                .background(
-                                    color = controlPanelColor,
-                                    shape = MaterialTheme.shapes.small
-                                )
-                                .clipToBounds()
-                        ) {
-                            IconButton(
-                                onClick = {
-                                    navController.popBackStack()
-                                }
+                        if (alpha != 0f) {
+                            Box(
+                                modifier = Modifier
+                                    .alpha(alpha)
+                                    .fillMaxWidth()
+                                    .align(Alignment.BottomCenter)
+                                    .background(color = controlPanelColor),
                             ) {
-                                Icon(
-                                    imageVector = vectorResource(id = R.drawable.ic_x),
-                                    contentDescription = stringResource(
-                                        id = R.string.accessibility_common_close
+                                Column(
+                                    modifier = Modifier
+                                        .padding(standardPadding),
+                                ) {
+                                    if (videoControl != null) {
+                                        AndroidView(viewBlock = { videoControl })
+                                    }
+                                    Text(
+                                        modifier = Modifier
+                                            .clickable(
+                                                onClick = {
+                                                    navController.navigate(Route.Status(status.statusKey))
+                                                }
+                                            ),
+                                        text = status.rawText,
+                                        maxLines = 2,
+                                        overflow = TextOverflow.Ellipsis,
                                     )
-                                )
+                                    Spacer(modifier = Modifier.height(standardPadding))
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                    ) {
+                                        Row(
+                                            modifier = Modifier
+                                                .weight(1f),
+                                            verticalAlignment = Alignment.CenterVertically,
+                                        ) {
+                                            UserAvatar(user = status.user)
+                                            Spacer(modifier = Modifier.width(standardPadding))
+                                            Text(
+                                                text = status.user.name,
+                                                maxLines = 1,
+                                                overflow = TextOverflow.Ellipsis,
+                                            )
+                                            Spacer(modifier = Modifier.width(standardPadding))
+                                            Providers(
+                                                AmbientContentAlpha provides ContentAlpha.medium
+                                            ) {
+                                                Text(
+                                                    text = "@${status.user.screenName}",
+                                                    maxLines = 1,
+                                                    overflow = TextOverflow.Ellipsis,
+                                                )
+                                            }
+                                        }
+                                        ReplyButton(status = status, withNumber = false)
+                                        RetweetButton(status = status, withNumber = false)
+                                        LikeButton(status = status, withNumber = false)
+                                        ShareButton(status = status)
+                                    }
+                                }
                             }
                         }
                     }
                 }
+            ) {
             }
         }
     }
