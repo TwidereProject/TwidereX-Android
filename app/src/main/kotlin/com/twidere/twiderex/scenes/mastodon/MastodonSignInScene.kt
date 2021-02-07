@@ -94,8 +94,10 @@ fun MastodonSignInScene() {
                                     navigator.mastodonSignInWeb(target)
                                 }
                             }.let { success ->
-                                navController.setResult("success", success)
-                                navController.popBackStack()
+                                if (success) {
+                                    navController.setResult("success", success)
+                                    navController.popBackStack()
+                                }
                             }
                         }
                     }

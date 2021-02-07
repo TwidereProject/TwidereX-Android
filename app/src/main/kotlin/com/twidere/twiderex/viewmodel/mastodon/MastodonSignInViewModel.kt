@@ -31,6 +31,7 @@ import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.cred.CredentialsType
 import com.twidere.twiderex.model.cred.OAuth2Credentials
 import com.twidere.twiderex.model.toAmUser
+import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.ACCOUNT_TYPE
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.scenes.mastodon.MASTODON_CALLBACK_URL
@@ -41,6 +42,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MastodonSignInViewModel @Inject constructor(
     private val repository: AccountRepository,
+    private val inAppNotification: InAppNotification,
 ) : ViewModel() {
     val loading = MutableLiveData(false)
     val host = MutableLiveData("")
@@ -53,52 +55,56 @@ class MastodonSignInViewModel @Inject constructor(
         codeProvider: suspend (url: String) -> String?,
     ): Boolean {
         loading.postValue(true)
-        val service = MastodonOAuthService(
-            host = "https://$host",
-            client_name = "Twidere X",
-            website = "https://github.com/TwidereProject/TwidereX-Android",
-            redirect_uri = MASTODON_CALLBACK_URL,
-        )
-        val application = service.createApplication()
-        val target = service.getWebOAuthUrl(application)
-        val code = codeProvider.invoke(target)
-        if (!code.isNullOrBlank()) {
-            val accessTokenResponse = service.getAccessToken(code, application)
-            val accessToken = accessTokenResponse.accessToken
-            if (accessToken != null) {
-                val user = service.verifyCredentials(accessToken = accessToken)
-                val name = user.username
-                val id = user.id
-                if (name != null && id != null) {
-                    val displayKey = MicroBlogKey(name, host = host)
-                    val internalKey = MicroBlogKey(id, host = host)
-                    val credentials_json = OAuth2Credentials(
-                        access_token = accessToken
-                    ).json()
-                    if (repository.containsAccount(internalKey)) {
-                        repository.findByAccountKey(internalKey)?.let {
-                            repository.getAccountDetails(it)
-                        }?.let {
-                            it.credentials_json = credentials_json
-                            repository.updateAccount(it)
-                        }
-                    } else {
-                        repository.addAccount(
-                            AccountDetails(
-                                account = Account(displayKey.toString(), ACCOUNT_TYPE),
-                                type = PlatformType.Mastodon,
-                                accountKey = internalKey,
-                                credentials_type = CredentialsType.OAuth2,
-                                credentials_json = credentials_json,
-                                extras_json = "",
-                                user = user.toDbUser(accountKey = internalKey).toAmUser(),
-                                lastActive = System.currentTimeMillis()
+        runCatching {
+            val service = MastodonOAuthService(
+                host = "https://$host",
+                client_name = "Twidere X",
+                website = "https://github.com/TwidereProject/TwidereX-Android",
+                redirect_uri = MASTODON_CALLBACK_URL,
+            )
+            val application = service.createApplication()
+            val target = service.getWebOAuthUrl(application)
+            val code = codeProvider.invoke(target)
+            if (!code.isNullOrBlank()) {
+                val accessTokenResponse = service.getAccessToken(code, application)
+                val accessToken = accessTokenResponse.accessToken
+                if (accessToken != null) {
+                    val user = service.verifyCredentials(accessToken = accessToken)
+                    val name = user.username
+                    val id = user.id
+                    if (name != null && id != null) {
+                        val displayKey = MicroBlogKey(name, host = host)
+                        val internalKey = MicroBlogKey(id, host = host)
+                        val credentials_json = OAuth2Credentials(
+                            access_token = accessToken
+                        ).json()
+                        if (repository.containsAccount(internalKey)) {
+                            repository.findByAccountKey(internalKey)?.let {
+                                repository.getAccountDetails(it)
+                            }?.let {
+                                it.credentials_json = credentials_json
+                                repository.updateAccount(it)
+                            }
+                        } else {
+                            repository.addAccount(
+                                AccountDetails(
+                                    account = Account(displayKey.toString(), ACCOUNT_TYPE),
+                                    type = PlatformType.Mastodon,
+                                    accountKey = internalKey,
+                                    credentials_type = CredentialsType.OAuth2,
+                                    credentials_json = credentials_json,
+                                    extras_json = "",
+                                    user = user.toDbUser(accountKey = internalKey).toAmUser(),
+                                    lastActive = System.currentTimeMillis()
+                                )
                             )
-                        )
+                        }
+                        return true
                     }
-                    return true
                 }
             }
+        }.onFailure {
+            inAppNotification.show(it.message.toString())
         }
         loading.postValue(false)
         return false
