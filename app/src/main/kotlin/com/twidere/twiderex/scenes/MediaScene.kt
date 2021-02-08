@@ -74,6 +74,7 @@ import com.twidere.twiderex.component.foundation.LoadingProgress
 import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.foundation.Pager
 import com.twidere.twiderex.component.foundation.PagerState
+import com.twidere.twiderex.component.foundation.Swiper
 import com.twidere.twiderex.component.foundation.VideoPlayer
 import com.twidere.twiderex.component.foundation.Zoomable
 import com.twidere.twiderex.component.status.LikeButton
@@ -164,25 +165,38 @@ fun MediaScene(status: UiStatus, selectedIndex: Int) {
                 }
             }
             val window = AmbientWindow.current
-            Pager(
-                modifier = Modifier
-                    .clickable(
-                        onClick = {
-                            if (controlVisibility) {
-                                window.hideControls()
-                            } else {
-                                window.showControls()
-                            }
-                        },
-                        indication = null,
-                        interactionState = remember { InteractionState() }
-                    ),
-                state = pagerState,
-                dragEnabled = !lockPager,
+            Swiper(
+                enabled = !lockPager,
+                onDismiss = {
+                    navController.popBackStack()
+                },
+                onStart = {
+                    controlVisibility = false
+                },
+                onEnd = {
+                    controlVisibility = true
+                }
             ) {
-                val data = status.media[this.page]
-                MediaItemView(data, customControl = videoControl) {
-                    lockPager = it
+                Pager(
+                    modifier = Modifier
+                        .clickable(
+                            onClick = {
+                                if (controlVisibility) {
+                                    window.hideControls()
+                                } else {
+                                    window.showControls()
+                                }
+                            },
+                            indication = null,
+                            interactionState = remember { InteractionState() }
+                        ),
+                    state = pagerState,
+                    dragEnabled = !lockPager,
+                ) {
+                    val data = status.media[this.page]
+                    MediaItemView(data, customControl = videoControl) {
+                        lockPager = it
+                    }
                 }
             }
             DisposableEffect(Unit) {
