@@ -212,7 +212,7 @@ fun UserComponent(
                                 padding = standardPadding
                             ) { index, pair ->
                                 pair?.let { item ->
-                                    val navController = AmbientNavController.current
+                                    val navigator = AmbientNavigator.current
                                     Providers(
                                         AmbientVideoPlayback provides DisplayPreferences.AutoPlayback.Off,
                                     ) {
@@ -224,12 +224,7 @@ fun UserComponent(
                                                     MaterialTheme.shapes.medium
                                                 ),
                                             onClick = {
-                                                navController.navigate(
-                                                    Route.Media(
-                                                        item.second.statusKey,
-                                                        selectedIndex = index
-                                                    )
-                                                )
+                                                navigator.media(item.second.statusKey, index)
                                             }
                                         )
                                     }
