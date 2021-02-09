@@ -39,11 +39,9 @@ import androidx.compose.ui.gesture.DragObserver
 import androidx.compose.ui.gesture.rawDragGestureFilter
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.AmbientAnimationClock
-import androidx.compose.ui.unit.Constraints
 
 class ZoomableState(
     clock: AnimationClockObservable,
-    private val constraints: Constraints,
 ) {
     var translateY: Float
         get() = _translateY.value
@@ -95,7 +93,6 @@ fun Zoomable(
         val state = remember {
             ZoomableState(
                 clock = clock,
-                constraints = constraints,
             )
         }
         var locked by remember { mutableStateOf(false) }
