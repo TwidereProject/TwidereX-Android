@@ -22,8 +22,6 @@ package com.twidere.twiderex.component.foundation
 
 import androidx.compose.animation.AnimatedFloatModel
 import androidx.compose.animation.core.AnimationClockObservable
-import androidx.compose.animation.core.AnimationEndReason
-import androidx.compose.animation.core.fling
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
@@ -41,7 +39,10 @@ import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.ParentDataModifier
 import androidx.compose.ui.unit.Density
+import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
+import kotlin.math.sign
+import kotlin.math.withSign
 
 /**
  * This is a modified version of:
@@ -108,10 +109,19 @@ class PagerState(
     fun fling(velocity: Float) {
         if (velocity < 0 && currentPage == maxPage) return
         if (velocity > 0 && currentPage == minPage) return
-
-        _currentPageOffset.fling(velocity) { reason, _, _ ->
-            if (reason != AnimationEndReason.Interrupted) {
-                _currentPageOffset.animateTo(currentPageOffset.roundToInt().toFloat()) { _, _ ->
+        val currentOffset = _currentPageOffset.value
+        when {
+            currentOffset.sign == velocity.sign &&
+                (
+                    velocity.absoluteValue > 1.5f ||
+                        currentOffset.absoluteValue > 0.5 && currentOffset.absoluteValue < 1f
+                    ) -> {
+                _currentPageOffset.animateTo(1f.withSign(velocity)) { _, _ ->
+                    selectPage()
+                }
+            }
+            else -> {
+                _currentPageOffset.animateTo(0f) { _, _ ->
                     selectPage()
                 }
             }
