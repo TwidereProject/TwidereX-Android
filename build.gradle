@@ -42,7 +42,7 @@ subprojects {
 
     tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
         kotlinOptions {
-            allWarningsAsErrors = false
+            allWarningsAsErrors = true
             freeCompilerArgs += '-Xopt-in=kotlin.RequiresOptIn'
             jvmTarget = "1.8"
         }
