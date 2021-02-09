@@ -20,6 +20,10 @@
  */
 package com.twidere.twiderex.component.foundation
 
+import androidx.compose.animation.AnimatedFloatModel
+import androidx.compose.animation.core.AnimationClockObservable
+import androidx.compose.animation.core.TargetAnimation
+import androidx.compose.animation.core.fling
 import androidx.compose.foundation.gestures.zoomable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -34,57 +38,101 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.DragObserver
 import androidx.compose.ui.gesture.rawDragGestureFilter
 import androidx.compose.ui.layout.layout
+import androidx.compose.ui.platform.AmbientAnimationClock
+
+class ZoomableState(
+    clock: AnimationClockObservable,
+) {
+    var translateY: Float
+        get() = _translateY.value
+        set(value) {
+            _translateY.snapTo(value)
+        }
+
+    private var _translateY = AnimatedFloatModel(0f, clock = clock)
+
+    var translateX: Float
+        get() = _translateX.value
+        set(value) {
+            _translateX.snapTo(value)
+        }
+
+    private var _translateX = AnimatedFloatModel(0f, clock = clock)
+
+    fun fling(velocity: Offset, maxX: Float, maxY: Float) {
+        _translateY.fling(
+            velocity.y / 2f,
+            adjustTarget = {
+                TargetAnimation(it.coerceIn(-maxY, maxY))
+            }
+        )
+        _translateX.fling(
+            velocity.x / 2f,
+            adjustTarget = {
+                TargetAnimation(it.coerceIn(-maxX, maxX))
+            }
+        )
+    }
+
+    fun drag(dragDistance: Offset, x: Float, y: Float) {
+        translateY = (translateY + dragDistance.y).coerceIn(-y, y)
+        translateX = (translateX + dragDistance.x).coerceIn(-x, x)
+    }
+}
 
 @Composable
 fun Zoomable(
+    modifier: Modifier = Modifier,
     minScale: Float = 1F,
     onZoomStarted: ((scale: Float) -> Unit)? = null,
     onZoomStopped: ((scale: Float) -> Unit)? = null,
     content: @Composable BoxScope.() -> Unit,
 ) {
     BoxWithConstraints {
-        var looked by remember { mutableStateOf(false) }
+        val clock = AmbientAnimationClock.current
+        val state = remember {
+            ZoomableState(
+                clock = clock,
+            )
+        }
+        var locked by remember { mutableStateOf(false) }
         var scale by remember { mutableStateOf(1f) }
-        var translate by remember { mutableStateOf(Offset(0f, 0f)) }
         var childWidth by remember { mutableStateOf(0) }
         var childHeight by remember { mutableStateOf(0) }
         val observer = remember {
             object : DragObserver {
+                override fun onStop(velocity: Offset) {
+                    if (locked) {
+                        val maxX = (childWidth * scale - constraints.maxWidth)
+                            .coerceAtLeast(0F) / 2F
+                        val maxY = (childHeight * scale - constraints.maxHeight)
+                            .coerceAtLeast(0F) / 2F
+                        state.fling(velocity, maxX, maxY)
+                    }
+                }
+
                 override fun onDrag(dragDistance: Offset): Offset {
-                    if (looked) {
-                        val x =
-                            (childWidth * scale - constraints.maxWidth)
-                                .coerceAtLeast(0F) / 2F
-                        val y =
-                            (childHeight * scale - constraints.maxHeight)
-                                .coerceAtLeast(0F) / 2F
-                        translate = translate.plus(dragDistance).let {
-                            it.copy(
-                                it.x.coerceIn(
-                                    -x,
-                                    x,
-                                ),
-                                it.y.coerceIn(
-                                    -y,
-                                    y,
-                                )
-                            )
-                        }
+                    if (locked) {
+                        val maxX = (childWidth * scale - constraints.maxWidth)
+                            .coerceAtLeast(0F) / 2F
+                        val maxY = (childHeight * scale - constraints.maxHeight)
+                            .coerceAtLeast(0F) / 2F
+                        state.drag(dragDistance, maxX, maxY)
                     }
                     return super.onDrag(dragDistance)
                 }
             }
         }
         Box(
-            modifier = Modifier
+            modifier = modifier
                 .zoomable(
                     onZoomDelta = { scale = (scale * it).coerceAtLeast(minScale) },
                     onZoomStarted = {
-                        looked = true
+                        locked = true
                         onZoomStarted?.invoke(scale)
                     },
                     onZoomStopped = {
-                        looked = scale != minScale
+                        locked = scale != minScale
                         onZoomStopped?.invoke(scale)
                     },
                 )
@@ -104,8 +152,8 @@ fun Zoomable(
                         ) {
                             scaleX = scale
                             scaleY = scale
-                            translationX = translate.x
-                            translationY = translate.y
+                            translationX = state.translateX
+                            translationY = state.translateY
                         }
                     }
                 }

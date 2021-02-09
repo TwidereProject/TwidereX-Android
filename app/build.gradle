@@ -129,7 +129,6 @@ android {
     }
     composeOptions {
         kotlinCompilerExtensionVersion versions.compose
-        kotlinCompilerVersion versions.kotlin
     }
 }
 
@@ -149,8 +148,6 @@ protobuf {
 }
 
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$versions.kotlin"
-    implementation "org.jetbrains.kotlin:kotlin-reflect:$versions.kotlin"
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:$versions.kotlinx_serialization"
 
     implementation project(":services")
@@ -168,7 +165,7 @@ dependencies {
     implementation "androidx.paging:paging-runtime-ktx:$versions.paging"
     implementation "androidx.paging:paging-compose:$versions.androidx_compose"
     implementation "androidx.navigation:navigation-compose:$versions.androidx_compose"
-    implementation "androidx.navigation:navigation-fragment-ktx:2.3.2"
+    implementation "androidx.navigation:navigation-fragment-ktx:$versions.navigation"
     implementation "androidx.activity:activity-ktx:1.2.0-rc01"
     implementation "androidx.datastore:datastore:$versions.dataStore"
 
@@ -192,6 +189,7 @@ dependencies {
     implementation "androidx.work:work-runtime-ktx:$versions.work"
 
     implementation "dev.chrisbanes.accompanist:accompanist-coil:$versions.accompanist"
+    implementation "dev.chrisbanes.accompanist:accompanist-insets:$versions.accompanist"
 
     implementation "com.twitter.twittertext:twitter-text:3.1.0"
     implementation 'org.jsoup:jsoup:1.13.1'

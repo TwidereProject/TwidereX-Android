@@ -6,7 +6,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.0.0-alpha04'
+        classpath 'com.android.tools.build:gradle:7.0.0-alpha05'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$versions.kotlin"
     }
 }
@@ -28,7 +28,7 @@ subprojects {
             targetExclude("$buildDir/**/*.kt")
             targetExclude('bin/**/*.kt')
 
-            ktlint(versions.ktlint)
+            ktlint(versions.ktlint)//.userData([android: "true"])
             licenseHeaderFile rootProject.file('spotless/license.kt')
         }
         java {
@@ -42,7 +42,7 @@ subprojects {
 
     tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
         kotlinOptions {
-            allWarningsAsErrors = true
+            allWarningsAsErrors = false
             freeCompilerArgs += '-Xopt-in=kotlin.RequiresOptIn'
             jvmTarget = "1.8"
         }

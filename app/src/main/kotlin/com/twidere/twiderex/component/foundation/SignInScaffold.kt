@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -56,9 +57,7 @@ fun SignInScaffold(
     content: @Composable ColumnScope.() -> Unit,
 ) {
     var count by remember { mutableStateOf(0) }
-    TwidereXTheme(
-        pureStatusBarColor = true,
-    ) {
+    TwidereXTheme {
         InAppNotificationScaffold(
             topBar = {
                 AppBar(
@@ -72,7 +71,7 @@ fun SignInScaffold(
             }
         ) {
             Column(
-                modifier = Modifier.padding(horizontal = 20.dp),
+                modifier = Modifier.padding(horizontal = 20.dp).fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Row(

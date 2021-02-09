@@ -20,6 +20,7 @@
  */
 package com.twidere.twiderex.component
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -39,7 +40,6 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
@@ -57,7 +57,6 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
-import androidx.compose.ui.zIndex
 import androidx.navigation.compose.navigate
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -66,7 +65,6 @@ import com.twidere.twiderex.annotations.IncomingComposeUpdate
 import com.twidere.twiderex.component.foundation.IconTabsComponent
 import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
-import com.twidere.twiderex.component.foundation.TopAppBarElevation
 import com.twidere.twiderex.component.lazy.itemsPaging
 import com.twidere.twiderex.component.lazy.itemsPagingGridIndexed
 import com.twidere.twiderex.component.navigation.AmbientNavigator
@@ -91,6 +89,7 @@ import com.twidere.twiderex.viewmodel.user.UserMediaTimelineViewModel
 import com.twidere.twiderex.viewmodel.user.UserTimelineViewModel
 import com.twidere.twiderex.viewmodel.user.UserViewModel
 
+@OptIn(ExperimentalFoundationApi::class)
 @IncomingComposeUpdate
 @Composable
 fun UserComponent(
@@ -151,21 +150,6 @@ fun UserComponent(
             vectorResource(id = R.drawable.ic_heart) to stringResource(id = R.string.accessibility_scene_user_tab_favourite),
         )
         val (selectedItem, setSelectedItem) = savedInstanceState { 0 }
-        val shouldStickyHeaderShown = lazyListState.firstVisibleItemIndex >= 1
-        Surface(
-            modifier = Modifier.zIndex(1f),
-            elevation = if (shouldStickyHeaderShown) TopAppBarElevation else 0.dp
-        ) {
-            if (shouldStickyHeaderShown) {
-                IconTabsComponent(
-                    items = tabs,
-                    selectedItem = selectedItem,
-                    onItemSelected = {
-                        setSelectedItem(it)
-                    },
-                )
-            }
-        }
 
         val refreshing by viewModel.refreshing.observeAsState(initial = false)
         SwipeToRefreshLayout(
@@ -191,12 +175,12 @@ fun UserComponent(
                     state = lazyListState,
                 ) {
                     user?.let {
-                        item {
+                        stickyHeader {
                             UserInfo(user = it, viewModel = viewModel)
                         }
                     }
 
-                    item {
+                    stickyHeader {
                         IconTabsComponent(
                             items = tabs,
                             selectedItem = selectedItem,
@@ -228,7 +212,7 @@ fun UserComponent(
                                 padding = standardPadding
                             ) { index, pair ->
                                 pair?.let { item ->
-                                    val navController = AmbientNavController.current
+                                    val navigator = AmbientNavigator.current
                                     Providers(
                                         AmbientVideoPlayback provides DisplayPreferences.AutoPlayback.Off,
                                     ) {
@@ -240,12 +224,7 @@ fun UserComponent(
                                                     MaterialTheme.shapes.medium
                                                 ),
                                             onClick = {
-                                                navController.navigate(
-                                                    Route.Media(
-                                                        item.second.statusKey,
-                                                        selectedIndex = index
-                                                    )
-                                                )
+                                                navigator.media(item.second.statusKey, index)
                                             }
                                         )
                                     }

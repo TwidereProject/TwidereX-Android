@@ -20,22 +20,22 @@
  */
 package com.twidere.twiderex
 
+import android.graphics.Color
 import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
-import android.os.Build
 import android.os.Bundle
 import android.view.WindowManager
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.ui.Modifier
+import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.viewinterop.viewModel
 import androidx.core.net.ConnectivityManagerCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavHostController
@@ -58,10 +58,11 @@ import com.twidere.twiderex.ui.AmbientActivity
 import com.twidere.twiderex.ui.AmbientApplication
 import com.twidere.twiderex.ui.AmbientIsActiveNetworkMetered
 import com.twidere.twiderex.ui.AmbientWindow
-import com.twidere.twiderex.ui.AmbientWindowPadding
-import com.twidere.twiderex.ui.ProvideWindowPadding
+import com.twidere.twiderex.ui.AmbientWindowInsetsController
 import com.twidere.twiderex.viewmodel.ActiveAccountViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import dev.chrisbanes.accompanist.insets.ExperimentalAnimatedInsets
+import dev.chrisbanes.accompanist.insets.ProvideWindowInsets
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -108,6 +109,7 @@ class TwidereXActivity : FragmentActivity() {
     @Inject
     lateinit var connectivityManager: ConnectivityManager
 
+    @OptIn(ExperimentalAnimatedInsets::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         launcher = ActivityLauncher(activityResultRegistry)
@@ -117,13 +119,13 @@ class TwidereXActivity : FragmentActivity() {
                 connectivityManager
             )
         )
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            window.setDecorFitsSystemWindows(false)
-        } else {
-            @Suppress("DEPRECATION")
-            window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
-        }
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+        window.navigationBarColor = Color.TRANSPARENT
+        window.statusBarColor = Color.TRANSPARENT
         setContent {
+            val windowInsetsControllerCompat =
+                remember { WindowInsetsControllerCompat(window, window.decorView) }
             val accountViewModel = viewModel<ActiveAccountViewModel>()
             val account by accountViewModel.account.observeAsState()
             val isActiveNetworkMetered by isActiveNetworkMetered.observeAsState(initial = false)
@@ -131,12 +133,13 @@ class TwidereXActivity : FragmentActivity() {
                 AmbientInAppNotification provides inAppNotification,
                 AmbientLauncher provides launcher,
                 AmbientWindow provides window,
+                AmbientWindowInsetsController provides windowInsetsControllerCompat,
                 AmbientActiveAccount provides account,
                 AmbientApplication provides application,
                 AmbientStatusActions provides statusActions,
                 AmbientActivity provides this,
                 AmbientActiveAccountViewModel provides accountViewModel,
-                AmbientIsActiveNetworkMetered provides isActiveNetworkMetered
+                AmbientIsActiveNetworkMetered provides isActiveNetworkMetered,
             ) {
                 ProvidePreferences(
                     preferencesHolder,
@@ -144,15 +147,12 @@ class TwidereXActivity : FragmentActivity() {
                     ProvideAssistedFactory(
                         assistedViewModelFactoryHolder
                     ) {
-                        ProvideWindowPadding {
-                            val windowPadding = AmbientWindowPadding.current
-                            Box(
-                                modifier = Modifier.padding(windowPadding)
-                            ) {
-                                Router(
-                                    navController = navController
-                                )
-                            }
+                        ProvideWindowInsets(
+                            windowInsetsAnimationsEnabled = true
+                        ) {
+                            Router(
+                                navController = navController
+                            )
                         }
                     }
                 }

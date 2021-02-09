@@ -20,29 +20,43 @@
  */
 package com.twidere.twiderex.ui
 
-import android.os.Build
-import android.view.View
-import android.view.Window
-import android.view.WindowInsetsController
+import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Typography
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.toArgb
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.preferences.AmbientAppearancePreferences
 import com.twidere.twiderex.preferences.AmbientDisplayPreferences
 import com.twidere.twiderex.preferences.proto.AppearancePreferences
+import dev.chrisbanes.accompanist.insets.AmbientWindowInsets
+import dev.chrisbanes.accompanist.insets.HorizontalSide
+import dev.chrisbanes.accompanist.insets.navigationBarsHeight
+import dev.chrisbanes.accompanist.insets.navigationBarsPadding
+import dev.chrisbanes.accompanist.insets.navigationBarsWidth
+import dev.chrisbanes.accompanist.insets.statusBarsHeight
+import dev.chrisbanes.accompanist.insets.toPaddingValues
 
 @Composable
 fun TwidereXTheme(
     requireDarkTheme: Boolean = false,
-    pureStatusBarColor: Boolean = false,
+    extendViewIntoStatusBar: Boolean = false,
+    extendViewIntoNavigationBar: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val appearance = AmbientAppearancePreferences.current
@@ -154,40 +168,96 @@ fun TwidereXTheme(
         typography = typography,
         shapes = shapes,
         content = {
-            val window = AmbientWindow.current
-            val statusBarColor = if (pureStatusBarColor) {
-                MaterialTheme.colors.surface
-            } else {
-                MaterialTheme.colors.surface.withElevation()
+            val windowInsetsController = AmbientWindowInsetsController.current
+            DisposableEffect(darkTheme) {
+                windowInsetsController.isAppearanceLightStatusBars = !darkTheme
+                onDispose { }
             }
-            updateStatusBar(window, darkTheme, statusBarColor)
-            content()
+            val navigationBarColor = Color.Black
+            val statusBarColor = MaterialTheme.colors.surface.withElevation()
+            Box {
+                Box(
+                    modifier = run {
+                        val ime = AmbientWindowInsets.current.ime
+                        val navigation = AmbientWindowInsets.current.navigationBars
+                        val status = AmbientWindowInsets.current.statusBars
+                        val actual = ime.copy(
+                            left = if (extendViewIntoNavigationBar) {
+                                0
+                            } else {
+                                ime.left.coerceAtLeast(navigation.left)
+                            },
+                            right = if (extendViewIntoNavigationBar) {
+                                0
+                            } else {
+                                ime.right.coerceAtLeast(navigation.right)
+                            },
+                            bottom = if (extendViewIntoNavigationBar) {
+                                0
+                            } else {
+                                ime.bottom.coerceAtLeast(navigation.bottom)
+                            },
+                            top = if (extendViewIntoNavigationBar) {
+                                0
+                            } else {
+                                ime.top.coerceAtLeast(navigation.top)
+                            } + if (extendViewIntoStatusBar) {
+                                0
+                            } else {
+                                status.top
+                            },
+                        )
+                        Modifier.padding(actual.toPaddingValues())
+                    }.align(Alignment.Center)
+                ) {
+                    content()
+                }
+                Spacer(
+                    modifier = if (!extendViewIntoStatusBar) {
+                        Modifier
+                            .statusBarsHeight()
+                            .navigationBarsPadding(bottom = false)
+                            .zIndex(999F)
+                            .fillMaxWidth()
+                            .background(statusBarColor)
+                    } else {
+                        Modifier
+                    }.align(Alignment.TopCenter)
+                )
+                Spacer(
+                    modifier = if (!extendViewIntoNavigationBar) {
+                        Modifier
+                            .navigationBarsWidth(HorizontalSide.Left)
+                            .zIndex(999F)
+                            .fillMaxHeight()
+                            .background(navigationBarColor)
+                    } else {
+                        Modifier
+                    }.align(Alignment.CenterStart)
+                )
+                Spacer(
+                    modifier = if (!extendViewIntoNavigationBar) {
+                        Modifier
+                            .navigationBarsWidth(HorizontalSide.Right)
+                            .fillMaxHeight()
+                            .zIndex(999F)
+                            .background(navigationBarColor)
+                    } else {
+                        Modifier
+                    }.align(Alignment.CenterEnd)
+                )
+                Spacer(
+                    modifier = if (!extendViewIntoNavigationBar) {
+                        Modifier
+                            .navigationBarsHeight()
+                            .zIndex(999F)
+                            .fillMaxWidth()
+                            .background(navigationBarColor)
+                    } else {
+                        Modifier
+                    }.align(Alignment.BottomCenter)
+                )
+            }
         }
     )
-}
-
-fun updateStatusBar(
-    window: Window,
-    darkTheme: Boolean,
-    statusBarColor: androidx.compose.ui.graphics.Color,
-) {
-    if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1) {
-        window.statusBarColor = statusBarColor.toArgb()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                window.insetsController?.setSystemBarsAppearance(
-                    if (darkTheme) 0 else WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS,
-                    WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
-                )
-            } else {
-                val decor = window.decorView
-                @Suppress("DEPRECATION")
-                decor.systemUiVisibility = if (darkTheme) {
-                    0
-                } else {
-                    View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
-                }
-            }
-        }
-    }
 }

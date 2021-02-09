@@ -20,18 +20,19 @@
  */
 package com.twidere.twiderex.extensions
 
-import android.graphics.Insets
 import android.os.Build
-import android.view.ViewGroup
-import androidx.annotation.RequiresApi
-import androidx.core.view.updateMargins
+import android.view.View
 
-@RequiresApi(Build.VERSION_CODES.Q)
-fun ViewGroup.MarginLayoutParams.updateMargins(insets: Insets) {
-    updateMargins(
-        left = insets.left,
-        top = insets.top,
-        bottom = insets.bottom,
-        right = insets.right
-    )
+@Suppress("DEPRECATION")
+fun View.addSystemUiVisibility(systemUiVisibility: Int) {
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+        this.systemUiVisibility = this.systemUiVisibility or systemUiVisibility
+    }
+}
+
+@Suppress("DEPRECATION")
+fun View.removeSystemUiVisibility(systemUiVisibility: Int) {
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+        this.systemUiVisibility = this.systemUiVisibility and systemUiVisibility.inv()
+    }
 }

@@ -54,7 +54,6 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.navigation.compose.navigate
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.items
@@ -76,10 +75,8 @@ import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.extensions.refreshOrRetry
 import com.twidere.twiderex.extensions.viewModel
-import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.preferences.proto.DisplayPreferences
 import com.twidere.twiderex.ui.AmbientActiveAccount
-import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.ui.AmbientVideoPlayback
 import com.twidere.twiderex.ui.TwidereXTheme
 import com.twidere.twiderex.ui.standardPadding
@@ -230,7 +227,7 @@ private fun SearchMediasContent(viewModel: TwitterSearchMediaViewModel) {
                         padding = standardPadding
                     ) { index, pair ->
                         pair?.let { item ->
-                            val navController = AmbientNavController.current
+                            val navigator = AmbientNavigator.current
                             StatusMediaPreviewItem(
                                 item.first,
                                 modifier = Modifier
@@ -239,12 +236,7 @@ private fun SearchMediasContent(viewModel: TwitterSearchMediaViewModel) {
                                         MaterialTheme.shapes.medium
                                     ),
                                 onClick = {
-                                    navController.navigate(
-                                        Route.Media(
-                                            item.second.statusKey,
-                                            selectedIndex = index
-                                        )
-                                    )
+                                    navigator.media(item.second.statusKey, index)
                                 }
                             )
                         }

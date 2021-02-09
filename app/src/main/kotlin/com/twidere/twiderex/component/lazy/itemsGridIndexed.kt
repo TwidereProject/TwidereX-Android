@@ -76,7 +76,13 @@ fun <T : Any> LazyListScope.itemsPagingGridIndexed(
     padding: Dp = 0.dp,
     itemContent: @Composable BoxScope.(Int, T?) -> Unit,
 ) {
+    loadState(data.loadState.refresh) {
+        data.retry()
+    }
     itemsGridIndexed((0 until data.itemCount).toList(), rowSize = rowSize, spacing = spacing, padding = padding) { _, index ->
         itemContent.invoke(this, index, data[index])
+    }
+    loadState(data.loadState.append) {
+        data.retry()
     }
 }
