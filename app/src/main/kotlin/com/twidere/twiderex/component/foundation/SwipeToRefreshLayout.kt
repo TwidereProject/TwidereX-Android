@@ -150,7 +150,7 @@ class SwipeToRefreshState(
         return if (toFling < 0) {
             Velocity.Zero
         } else {
-            fling(velocity = toFling)
+            fling()
             Velocity.Zero
         }
     }
@@ -160,13 +160,13 @@ class SwipeToRefreshState(
         available: Velocity,
         onFinished: (Velocity) -> Unit
     ) {
-        fling(velocity = Offset(available.x, available.y).toFloat()) {
+        fling() {
             // since we go to the anchor with tween settling, consume all for the best UX
             onFinished.invoke(available)
         }
     }
 
-    fun fling(velocity: Float, onFinished: () -> Unit = {}) {
+    fun fling(onFinished: () -> Unit = {}) {
         val offsetValue = _offset.value
         when {
             offsetValue >= 0 -> {
@@ -248,7 +248,7 @@ fun SwipeToRefreshLayout(
                     state.drag(dy)
                 },
                 onDragStopped = {
-                    state.fling(it)
+                    state.fling()
                 },
             )
     ) {
