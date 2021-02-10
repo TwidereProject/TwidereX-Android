@@ -64,6 +64,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigate
 import androidx.navigation.compose.rememberNavController
 import com.twidere.twiderex.R
+import com.twidere.twiderex.component.BackButtonHandler
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.IconTabsComponent
 import com.twidere.twiderex.component.foundation.TopAppBarElevation
@@ -106,6 +107,11 @@ fun HomeScene() {
         MeItem(),
     )
     val scaffoldState = rememberScaffoldState()
+    if (scaffoldState.drawerState.isOpen) {
+        BackButtonHandler {
+            scaffoldState.drawerState.close()
+        }
+    }
     TwidereXTheme {
         Scaffold(
             scaffoldState = scaffoldState,
