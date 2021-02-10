@@ -22,6 +22,7 @@ package com.twidere.twiderex.component.foundation
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.AmbientContentAlpha
@@ -163,15 +164,20 @@ fun VideoPlayer(
         }
         if ((shouldShowThumb || !playing) && thumb != null) {
             thumb()
-            Icon(
-                imageVector = Icons.Default.PlayArrow,
-                tint = Color.White.copy(alpha = AmbientContentAlpha.current),
+            Box(
                 modifier = Modifier
-                    .align(Alignment.Center)
-                    .preferredSize(profileImageSize)
-                    .background(MaterialTheme.colors.primary, CircleShape),
-                contentDescription = stringResource(id = R.string.accessibility_common_video_play)
-            )
+                    .fillMaxSize()
+            ) {
+                Icon(
+                    imageVector = Icons.Default.PlayArrow,
+                    tint = Color.White.copy(alpha = AmbientContentAlpha.current),
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .preferredSize(profileImageSize)
+                        .background(MaterialTheme.colors.primary, CircleShape),
+                    contentDescription = stringResource(id = R.string.accessibility_common_video_play)
+                )
+            }
         }
     }
 }
