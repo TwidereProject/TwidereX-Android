@@ -38,7 +38,7 @@ interface NotificationWithActionEvent : NotificationEvent {
     val action: EventActionContext.() -> Unit
 }
 
-data class StringNotificationEvent(
+class StringNotificationEvent(
     private val message: String,
 ) : NotificationEvent {
     @Composable
