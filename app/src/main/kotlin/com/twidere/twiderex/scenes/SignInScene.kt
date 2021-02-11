@@ -52,7 +52,6 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.navigate
 import com.twidere.twiderex.BuildConfig
 import com.twidere.twiderex.R
-import com.twidere.twiderex.component.foundation.IconCompat
 import com.twidere.twiderex.component.foundation.SignInButton
 import com.twidere.twiderex.component.foundation.SignInScaffold
 import com.twidere.twiderex.navigation.Route
@@ -92,8 +91,8 @@ fun SignInScene() {
             ) {
                 ListItem(
                     icon = {
-                        IconCompat(
-                            id = R.drawable.ic_mastodon_logo_blue,
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_mastodon_logo_blue),
                             contentDescription = stringResource(
                                 id = R.string.accessibility_common_logo_mastodon
                             )

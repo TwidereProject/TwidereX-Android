@@ -58,7 +58,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalAnimationClock
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -146,10 +145,8 @@ fun MediaScene(status: UiStatus, selectedIndex: Int) {
     val navController = LocalNavController.current
     Scaffold {
         Box {
-            val clock = LocalAnimationClock.current
-            val pagerState = remember(clock) {
+            val pagerState = remember {
                 PagerState(
-                    clock,
                     currentPage = selectedIndex,
                     maxPage = status.media.lastIndex,
                 )
@@ -349,7 +346,7 @@ fun MediaItemView(
                             }
                         ) {
                             NetworkImage(
-                                url = it,
+                                data = it,
                                 contentScale = ContentScale.Fit,
                                 placeholder = {
                                     CircularProgressIndicator()

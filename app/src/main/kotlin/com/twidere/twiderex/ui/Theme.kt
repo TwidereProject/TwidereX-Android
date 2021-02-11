@@ -20,6 +20,7 @@
  */
 package com.twidere.twiderex.ui
 
+import android.os.Build
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
@@ -174,7 +175,11 @@ fun TwidereXTheme(
                 onDispose { }
             }
             val navigationBarColor = Color.Black
-            val statusBarColor = MaterialTheme.colors.surface.withElevation()
+            val statusBarColor = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+                Color.Black
+            } else {
+                MaterialTheme.colors.surface.withElevation()
+            }
             Box {
                 Box(
                     modifier = run {

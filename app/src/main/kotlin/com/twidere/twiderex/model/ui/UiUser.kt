@@ -21,8 +21,7 @@
 package com.twidere.twiderex.model.ui
 
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.asAndroidBitmap
-import androidx.compose.ui.res.imageResource
+import androidx.compose.ui.res.painterResource
 import com.twidere.twiderex.R
 import com.twidere.twiderex.db.model.DbUser
 import com.twidere.twiderex.model.MicroBlogKey
@@ -51,7 +50,7 @@ data class UiUser(
             id = "",
             name = "Twidere",
             screenName = "TwidereProject",
-            profileImage = imageResource(id = R.drawable.ic_profile_image_twidere).asAndroidBitmap(),
+            profileImage = painterResource(id = R.drawable.ic_profile_image_twidere),
             profileBackgroundImage = null,
             followersCount = 0,
             friendsCount = 0,

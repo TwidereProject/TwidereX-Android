@@ -4,7 +4,7 @@ ext {
             compose              : '1.0.0-alpha12',
             androidx_compose     : '1.0.0-alpha07',
             androidx             : '1.3.0-alpha02',
-            accompanist          : "0.5.1-SNAPSHOT",
+            accompanist          : "0.5.1",
             retrofit2            : '2.9.0',
             hilt                 : '2.31.2-alpha',
             androidx_hilt        : '1.0.0-alpha03',

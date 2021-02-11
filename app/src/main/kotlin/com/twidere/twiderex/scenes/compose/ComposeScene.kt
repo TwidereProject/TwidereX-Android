@@ -541,7 +541,7 @@ private fun ComposeInput(
         ) {
             account?.let {
                 NetworkImage(
-                    url = it.user.profileImage,
+                    data = it.user.profileImage,
                     modifier = Modifier
                         .clip(CircleShape)
                         .width(profileImageSize)
@@ -746,7 +746,7 @@ private fun ComposeImage(item: Uri, viewModel: ComposeViewModel) {
                 )
                 .clip(MaterialTheme.shapes.small),
         ) {
-            NetworkImage(url = item)
+            NetworkImage(data = item)
         }
         DropdownMenu(
             expanded = expanded,

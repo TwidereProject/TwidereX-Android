@@ -127,7 +127,7 @@ fun StatusMediaPreviewItem(
             MediaType.photo ->
                 media.previewUrl?.let {
                     NetworkImage(
-                        url = it,
+                        data = it,
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable(
@@ -152,7 +152,7 @@ fun StatusMediaPreviewItem(
                 ) {
                     media.previewUrl?.let {
                         NetworkImage(
-                            url = it,
+                            data = it,
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable(

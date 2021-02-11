@@ -41,7 +41,7 @@ fun LoginLogo(
     Image(
         modifier = modifier,
         contentScale = ContentScale.FillWidth,
-        imageVector = resource,
+        painter = resource,
         contentDescription = stringResource(id = R.string.accessibility_common_logo_twidere)
     )
 }

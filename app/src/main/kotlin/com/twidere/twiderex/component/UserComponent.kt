@@ -283,7 +283,7 @@ private fun UserInfo(user: UiUser, viewModel: UserViewModel) {
                     .heightIn(max = maxBannerSize)
             ) {
                 NetworkImage(
-                    url = it,
+                    data = it,
                 )
             }
         }

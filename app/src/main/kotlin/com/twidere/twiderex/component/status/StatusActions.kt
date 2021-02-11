@@ -43,7 +43,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -90,7 +90,7 @@ fun ReplyButton(
             },
         ) {
             Icon(
-                imageVector = icon,
+                painter = icon,
                 tint = mediumEmphasisContentContentColor,
                 contentDescription = contentDescription,
             )
@@ -134,7 +134,7 @@ fun LikeButton(
             },
         ) {
             Icon(
-                imageVector = icon,
+                painter = icon,
                 tint = color,
                 contentDescription = contentDescription,
             )
@@ -178,7 +178,7 @@ fun RetweetButton(
             },
         ) {
             Icon(
-                imageVector = icon,
+                painter = icon,
                 tint = color,
                 contentDescription = contentDescription,
             )
@@ -288,7 +288,7 @@ fun ShareButton(
 @Composable
 private fun StatusActionButtonWithNumbers(
     modifier: Modifier = Modifier,
-    icon: ImageVector,
+    icon: Painter,
     contentDescription: String,
     count: Long,
     color: Color = LocalContentColor.current,
@@ -306,7 +306,7 @@ private fun StatusActionButtonWithNumbers(
         ) {
             Icon(
                 modifier = Modifier.size(statusActionIconSize),
-                imageVector = icon,
+                painter = icon,
                 tint = color,
                 contentDescription = contentDescription
             )

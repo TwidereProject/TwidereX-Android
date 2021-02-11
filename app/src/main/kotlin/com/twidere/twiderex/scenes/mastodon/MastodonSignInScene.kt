@@ -40,9 +40,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.twidere.twiderex.R
-import com.twidere.twiderex.component.foundation.IconCompat
 import com.twidere.twiderex.component.foundation.SignInButton
 import com.twidere.twiderex.component.foundation.SignInScaffold
 import com.twidere.twiderex.component.navigation.LocalNavigator
@@ -107,8 +107,8 @@ fun MastodonSignInScene() {
             ) {
                 ListItem(
                     icon = {
-                        IconCompat(
-                            id = R.drawable.ic_mastodon_logo_white,
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_mastodon_logo_white),
                             contentDescription = stringResource(
                                 id = R.string.accessibility_common_logo_mastodon
                             )

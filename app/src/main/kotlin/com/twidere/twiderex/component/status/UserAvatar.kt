@@ -53,7 +53,7 @@ fun UserAvatar(
             .clipToBounds()
     ) {
         NetworkImage(
-            url = user.profileImage,
+            data = user.profileImage,
             modifier = Modifier
                 .clickable(
                     onClick = {

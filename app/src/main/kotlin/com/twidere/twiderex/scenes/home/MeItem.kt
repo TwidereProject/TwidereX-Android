@@ -21,7 +21,7 @@
 package com.twidere.twiderex.scenes.home
 
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.twidere.twiderex.R
@@ -38,7 +38,7 @@ class MeItem : HomeNavigationItem() {
     override val route: String
         get() = "me"
 
-    override val icon: ImageVector
+    override val icon: Painter
         @Composable
         get() = painterResource(id = R.drawable.ic_user)
     override val withAppBar: Boolean

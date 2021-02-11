@@ -96,7 +96,7 @@ fun HomeScene() {
         navController.enableOnBackPressed(false)
         onDispose { }
     }
-    var selectedItem by rememberSaveable { /*TODO*/ } { mutableStateOf(0) }
+    var selectedItem by rememberSaveable { mutableStateOf(0) }
     val timelineController = remember {
         LazyListController()
     }
@@ -222,7 +222,7 @@ fun HomeBottomNavigation(
             BottomNavigationItem(
                 selectedContentColor = MaterialTheme.colors.primary,
                 unselectedContentColor = mediumEmphasisContentContentColor,
-                icon = { Icon(imageVector = item.icon, contentDescription = item.name) },
+                icon = { Icon(painter = item.icon, contentDescription = item.name) },
                 selected = selectedItem == index,
                 onClick = { onItemSelected.invoke(index) }
             )

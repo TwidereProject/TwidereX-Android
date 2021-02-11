@@ -44,7 +44,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.twidere.twiderex.R
@@ -62,7 +62,7 @@ class SearchItem : HomeNavigationItem() {
     override val route: String
         get() = "search"
 
-    override val icon: ImageVector
+    override val icon: Painter
         @Composable
         get() = painterResource(id = R.drawable.ic_search)
     override val withAppBar: Boolean

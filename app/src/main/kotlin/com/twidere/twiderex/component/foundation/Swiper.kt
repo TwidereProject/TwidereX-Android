@@ -20,36 +20,36 @@
  */
 package com.twidere.twiderex.component.foundation
 
-import androidx.compose.animation.AnimatedFloatModel
-import androidx.compose.animation.core.AnimationClockObservable
+import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.platform.LocalAnimationClock
 import androidx.compose.ui.unit.Constraints
+import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 import kotlin.math.withSign
 
 class SwiperState(
-    clock: AnimationClockObservable,
     private val constraints: Constraints,
     private val onDismiss: () -> Unit,
     private val onEnd: () -> Unit = {},
 ) {
-    var offset: Float
+    val offset: Float
         get() = _offset.value
-        set(value) {
-            _offset.snapTo(value)
-        }
 
-    private var _offset = AnimatedFloatModel(0f, clock = clock)
+    private var _offset = Animatable(0f)
 
-    fun fling(velocity: Float) {
+    suspend fun snap(value: Float) {
+        _offset.snapTo(value)
+    }
+
+    suspend fun fling(velocity: Float) {
         val value = _offset.value
         when {
             velocity.absoluteValue > 4000f -> {
@@ -64,15 +64,14 @@ class SwiperState(
         }
     }
 
-    private fun dismiss() {
-        _offset.animateTo(constraints.maxHeight.toFloat().withSign(_offset.value)) { _, _ ->
-            onDismiss.invoke()
-        }
+    private suspend fun dismiss() {
+        _offset.animateTo(constraints.maxHeight.toFloat().withSign(_offset.value))
+        onDismiss.invoke()
     }
 
-    private fun restore() {
-        _offset.animateTo(0f)
+    private suspend fun restore() {
         onEnd.invoke()
+        _offset.animateTo(0f)
     }
 }
 
@@ -86,11 +85,10 @@ fun Swiper(
     onDismiss: () -> Unit = {},
     content: @Composable () -> Unit,
 ) {
+    val scope = rememberCoroutineScope()
     BoxWithConstraints {
-        val clock = LocalAnimationClock.current
         val state = remember {
             SwiperState(
-                clock = clock,
                 constraints = constraints,
                 onDismiss = onDismiss,
                 onEnd = onEnd,
@@ -102,14 +100,18 @@ fun Swiper(
                 enabled = enabled,
                 reverseDirection = reverseDirection,
                 onDragStopped = { velocity ->
-                    state.fling(velocity)
+                    scope.launch {
+                        state.fling(velocity)
+                    }
                 },
                 onDragStarted = {
                     onStart.invoke()
                 },
             ) { dy ->
-                with(state) {
-                    offset += dy
+                scope.launch {
+                    with(state) {
+                        snap(offset + dy)
+                    }
                 }
             },
             content = content,
