@@ -29,7 +29,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.platform.AmbientAnimationClock
+import androidx.compose.ui.platform.LocalAnimationClock
 import androidx.compose.ui.unit.Constraints
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
@@ -87,7 +87,7 @@ fun Swiper(
     content: @Composable () -> Unit,
 ) {
     BoxWithConstraints {
-        val clock = AmbientAnimationClock.current
+        val clock = LocalAnimationClock.current
         val state = remember {
             SwiperState(
                 clock = clock,

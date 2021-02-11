@@ -23,6 +23,7 @@ package com.twidere.twiderex.component.lazy
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ListItem
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -44,6 +45,7 @@ fun <T : Any> LazyListScope.itemsPaging(
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 fun LazyListScope.loadState(
     state: LoadState,
     onReloadRequested: () -> Unit = {},

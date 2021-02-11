@@ -41,24 +41,24 @@ import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.ComposeNavigator
 import androidx.navigation.fragment.DialogFragmentNavigator
-import com.twidere.twiderex.action.AmbientStatusActions
+import com.twidere.twiderex.action.LocalStatusActions
 import com.twidere.twiderex.action.StatusActions
-import com.twidere.twiderex.component.foundation.AmbientInAppNotification
+import com.twidere.twiderex.component.foundation.LocalInAppNotification
 import com.twidere.twiderex.di.assisted.AssistedViewModelFactoryHolder
 import com.twidere.twiderex.di.assisted.ProvideAssistedFactory
 import com.twidere.twiderex.launcher.ActivityLauncher
-import com.twidere.twiderex.launcher.AmbientLauncher
+import com.twidere.twiderex.launcher.LocalLauncher
 import com.twidere.twiderex.navigation.Router
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.preferences.PreferencesHolder
 import com.twidere.twiderex.preferences.ProvidePreferences
-import com.twidere.twiderex.ui.AmbientActiveAccount
-import com.twidere.twiderex.ui.AmbientActiveAccountViewModel
-import com.twidere.twiderex.ui.AmbientActivity
-import com.twidere.twiderex.ui.AmbientApplication
-import com.twidere.twiderex.ui.AmbientIsActiveNetworkMetered
-import com.twidere.twiderex.ui.AmbientWindow
-import com.twidere.twiderex.ui.AmbientWindowInsetsController
+import com.twidere.twiderex.ui.LocalActiveAccount
+import com.twidere.twiderex.ui.LocalActiveAccountViewModel
+import com.twidere.twiderex.ui.LocalActivity
+import com.twidere.twiderex.ui.LocalApplication
+import com.twidere.twiderex.ui.LocalIsActiveNetworkMetered
+import com.twidere.twiderex.ui.LocalWindow
+import com.twidere.twiderex.ui.LocalWindowInsetsController
 import com.twidere.twiderex.viewmodel.ActiveAccountViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import dev.chrisbanes.accompanist.insets.ExperimentalAnimatedInsets
@@ -130,16 +130,16 @@ class TwidereXActivity : FragmentActivity() {
             val account by accountViewModel.account.observeAsState()
             val isActiveNetworkMetered by isActiveNetworkMetered.observeAsState(initial = false)
             Providers(
-                AmbientInAppNotification provides inAppNotification,
-                AmbientLauncher provides launcher,
-                AmbientWindow provides window,
-                AmbientWindowInsetsController provides windowInsetsControllerCompat,
-                AmbientActiveAccount provides account,
-                AmbientApplication provides application,
-                AmbientStatusActions provides statusActions,
-                AmbientActivity provides this,
-                AmbientActiveAccountViewModel provides accountViewModel,
-                AmbientIsActiveNetworkMetered provides isActiveNetworkMetered,
+                LocalInAppNotification provides inAppNotification,
+                LocalLauncher provides launcher,
+                LocalWindow provides window,
+                LocalWindowInsetsController provides windowInsetsControllerCompat,
+                LocalActiveAccount provides account,
+                LocalApplication provides application,
+                LocalStatusActions provides statusActions,
+                LocalActivity provides this,
+                LocalActiveAccountViewModel provides accountViewModel,
+                LocalIsActiveNetworkMetered provides isActiveNetworkMetered,
             ) {
                 ProvidePreferences(
                     preferencesHolder,

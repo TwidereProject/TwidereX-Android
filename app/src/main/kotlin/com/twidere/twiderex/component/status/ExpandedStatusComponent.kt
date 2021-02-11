@@ -30,10 +30,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.AmbientContentAlpha
-import androidx.compose.material.AmbientContentColor
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Icon
+import androidx.compose.material.LocalContentAlpha
+import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -41,13 +41,13 @@ import androidx.compose.runtime.Providers
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.HumanizedTime
-import com.twidere.twiderex.component.navigation.AmbientNavigator
+import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.ui.mediumEmphasisContentContentColor
 import com.twidere.twiderex.ui.standardPadding
@@ -81,7 +81,7 @@ fun ExpandedStatusComponent(
             if (!status.placeString.isNullOrEmpty()) {
                 Row {
                     Icon(
-                        imageVector = vectorResource(id = R.drawable.ic_map_pin),
+                        painter = painterResource(id = R.drawable.ic_map_pin),
                         contentDescription = stringResource(
                             id = R.string.accessibility_common_status_location
                         )
@@ -97,7 +97,7 @@ fun ExpandedStatusComponent(
                     .align(Alignment.CenterHorizontally)
             ) {
                 Providers(
-                    AmbientContentAlpha provides ContentAlpha.medium
+                    LocalContentAlpha provides ContentAlpha.medium
                 ) {
                     HumanizedTime(time = status.timestamp)
                     Spacer(modifier = Modifier.width(standardPadding))
@@ -141,7 +141,7 @@ fun ExpandedStatusComponent(
 
         if (showActions) {
             Providers(
-                AmbientContentAlpha provides ContentAlpha.medium
+                LocalContentAlpha provides ContentAlpha.medium
             ) {
                 Row {
                     Spacer(modifier = Modifier.weight(1f))
@@ -162,7 +162,7 @@ private fun StatusComponent(
     modifier: Modifier = Modifier,
     onStatusTextClicked: () -> Unit = {},
 ) {
-    val navigator = AmbientNavigator.current
+    val navigator = LocalNavigator.current
     Box(modifier = modifier) {
         Column {
             Row(
@@ -206,7 +206,7 @@ private fun StatusComponent(
                     modifier = Modifier
                         .border(
                             1.dp,
-                            AmbientContentColor.current.copy(alpha = 0.12f),
+                            LocalContentColor.current.copy(alpha = 0.12f),
                             MaterialTheme.shapes.medium,
                         )
                         .clip(MaterialTheme.shapes.medium)

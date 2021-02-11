@@ -22,14 +22,14 @@ package com.twidere.twiderex.scenes.home
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
 import com.twidere.twiderex.R
 import com.twidere.twiderex.annotations.IncomingComposeUpdate
 import com.twidere.twiderex.component.UserComponent
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.model.ui.UiUser.Companion.toUi
-import com.twidere.twiderex.ui.AmbientActiveAccount
+import com.twidere.twiderex.ui.LocalActiveAccount
 
 class MeItem : HomeNavigationItem() {
     override val name: String
@@ -40,14 +40,14 @@ class MeItem : HomeNavigationItem() {
 
     override val icon: ImageVector
         @Composable
-        get() = vectorResource(id = R.drawable.ic_user)
+        get() = painterResource(id = R.drawable.ic_user)
     override val withAppBar: Boolean
         get() = false
 
     @OptIn(IncomingComposeUpdate::class)
     @Composable
     override fun onCompose() {
-        val account = AmbientActiveAccount.current
+        val account = LocalActiveAccount.current
         account?.toUi()?.let { user ->
             InAppNotificationScaffold {
                 UserComponent(screenName = user.screenName, host = user.userKey.host, initialData = user)

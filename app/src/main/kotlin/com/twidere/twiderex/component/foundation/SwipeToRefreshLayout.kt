@@ -37,8 +37,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.savedinstancestate.mapSaver
-import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
+import androidx.compose.runtime.saveable.mapSaver
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,8 +47,8 @@ import androidx.compose.ui.gesture.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.gesture.nestedscroll.NestedScrollSource
 import androidx.compose.ui.gesture.nestedscroll.nestedScroll
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
-import androidx.compose.ui.platform.AmbientAnimationClock
-import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.LocalAnimationClock
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
@@ -66,8 +66,8 @@ fun rememberSwipeToRefreshState(
     minOffset: Float,
     onRefresh: () -> Unit,
 ): SwipeToRefreshState {
-    val clock = AmbientAnimationClock.current.asDisposableClock()
-    return rememberSavedInstanceState(
+    val clock = LocalAnimationClock.current.asDisposableClock()
+    return rememberSaveable(
         clock,
         saver = mapSaver(
             save = {
@@ -229,8 +229,8 @@ fun SwipeToRefreshLayout(
     },
     content: @Composable () -> Unit
 ) {
-    val refreshDistance = with(AmbientDensity.current) { RefreshDistance.toPx() }
-    val minRefreshDistance = with(AmbientDensity.current) { MinRefreshDistance.toPx() }
+    val refreshDistance = with(LocalDensity.current) { RefreshDistance.toPx() }
+    val minRefreshDistance = with(LocalDensity.current) { MinRefreshDistance.toPx() }
     val state = rememberSwipeToRefreshState(
         initialValue = refreshingState,
         initialOffset = -refreshDistance,

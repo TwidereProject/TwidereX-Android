@@ -31,10 +31,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.AmbientContentAlpha
-import androidx.compose.material.AmbientContentColor
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Icon
+import androidx.compose.material.LocalContentAlpha
+import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -42,15 +42,15 @@ import androidx.compose.runtime.Providers
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.HumanizedTime
-import com.twidere.twiderex.component.navigation.AmbientNavigator
+import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.model.ui.UiStatus
-import com.twidere.twiderex.preferences.AmbientDisplayPreferences
+import com.twidere.twiderex.preferences.LocalDisplayPreferences
 import com.twidere.twiderex.ui.profileImageSize
 import com.twidere.twiderex.ui.standardPadding
 import com.twidere.twiderex.ui.statusActionIconSize
@@ -60,7 +60,7 @@ fun TimelineStatusComponent(
     data: UiStatus,
     showActions: Boolean = true,
 ) {
-    val navigator = AmbientNavigator.current
+    val navigator = LocalNavigator.current
     Column {
         val status = (data.retweet ?: data)
         Column(
@@ -89,7 +89,7 @@ fun TimelineStatusComponent(
             )
             if (showActions) {
                 Providers(
-                    AmbientContentAlpha provides ContentAlpha.medium
+                    LocalContentAlpha provides ContentAlpha.medium
                 ) {
                     Spacer(modifier = Modifier.height(standardPadding))
                     Row {
@@ -112,8 +112,8 @@ private fun StatusComponent(
     modifier: Modifier = Modifier,
     onStatusTextClicked: () -> Unit = {},
 ) {
-    val navigator = AmbientNavigator.current
-    val isMediaPreviewEnabled = AmbientDisplayPreferences.current.mediaPreview
+    val navigator = LocalNavigator.current
+    val isMediaPreviewEnabled = LocalDisplayPreferences.current.mediaPreview
     Row(modifier = modifier) {
         UserAvatar(user = status.user)
         Spacer(modifier = Modifier.width(standardPadding))
@@ -129,7 +129,7 @@ private fun StatusComponent(
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Providers(
-                        AmbientContentAlpha provides ContentAlpha.medium
+                        LocalContentAlpha provides ContentAlpha.medium
                     ) {
                         Text(
                             text = "@${status.user.screenName}",
@@ -153,7 +153,7 @@ private fun StatusComponent(
                     )
                 } else {
                     Providers(
-                        AmbientContentAlpha provides ContentAlpha.medium
+                        LocalContentAlpha provides ContentAlpha.medium
                     ) {
                         Row(
                             modifier = Modifier
@@ -165,7 +165,7 @@ private fun StatusComponent(
                                 .fillMaxWidth()
                         ) {
                             Icon(
-                                imageVector = vectorResource(id = R.drawable.ic_photo),
+                                painter = painterResource(id = R.drawable.ic_photo),
                                 contentDescription = stringResource(
                                     id = R.string.accessibility_common_status_media
                                 )
@@ -180,14 +180,14 @@ private fun StatusComponent(
             if (!status.placeString.isNullOrEmpty()) {
                 Spacer(modifier = Modifier.height(standardPadding))
                 Providers(
-                    AmbientContentAlpha provides ContentAlpha.medium
+                    LocalContentAlpha provides ContentAlpha.medium
                 ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Icon(
                             modifier = Modifier.size(statusActionIconSize),
-                            imageVector = vectorResource(id = R.drawable.ic_map_pin),
+                            painter = painterResource(id = R.drawable.ic_map_pin),
                             contentDescription = stringResource(id = R.string.accessibility_common_status_location)
                         )
                         Box(modifier = Modifier.width(standardPadding))
@@ -202,7 +202,7 @@ private fun StatusComponent(
                     modifier = Modifier
                         .border(
                             1.dp,
-                            AmbientContentColor.current.copy(alpha = 0.12f),
+                            LocalContentColor.current.copy(alpha = 0.12f),
                             MaterialTheme.shapes.medium
                         )
                         .clip(MaterialTheme.shapes.medium)

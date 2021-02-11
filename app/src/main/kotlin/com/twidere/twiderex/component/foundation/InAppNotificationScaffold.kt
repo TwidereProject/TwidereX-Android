@@ -41,7 +41,7 @@ import androidx.compose.material.rememberBottomSheetScaffoldState
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.ambientOf
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -49,21 +49,21 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.platform.AmbientContext
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.Dp
-import com.twidere.twiderex.component.navigation.AmbientNavigator
+import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.notification.EventActionContext
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.notification.NotificationWithActionEvent
 
-val AmbientInAppNotification = ambientOf { InAppNotification() }
+val LocalInAppNotification = compositionLocalOf { InAppNotification() }
 
 @ExperimentalMaterialApi
 @Composable
 private fun ApplyNotification(
     snackbarHostState: SnackbarHostState
 ) {
-    val inAppNotification = AmbientInAppNotification.current
+    val inAppNotification = LocalInAppNotification.current
     val notification by inAppNotification.observeAsState()
     val event = notification?.getContentIfNotHandled()
     val message = event?.getMessage()
@@ -74,8 +74,8 @@ private fun ApplyNotification(
             null
         }
     }
-    val context = AmbientContext.current
-    val navigator = AmbientNavigator.current
+    val context = LocalContext.current
+    val navigator = LocalNavigator.current
     val actionContext = remember {
         EventActionContext(context = context, navigator = navigator)
     }

@@ -26,11 +26,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.AmbientContentAlpha
 import androidx.compose.material.ContentAlpha
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.ListItem
+import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
@@ -58,16 +59,16 @@ import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.extensions.DisposeResult
 import com.twidere.twiderex.extensions.setResult
 import com.twidere.twiderex.extensions.viewModel
-import com.twidere.twiderex.ui.AmbientActiveAccount
-import com.twidere.twiderex.ui.AmbientNavController
+import com.twidere.twiderex.ui.LocalActiveAccount
+import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereXTheme
 import com.twidere.twiderex.viewmodel.compose.ComposeSearchUserViewModel
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun ComposeSearchUserScene() {
-    val account = AmbientActiveAccount.current ?: return
-    val navController = AmbientNavController.current
+    val account = LocalActiveAccount.current ?: return
+    val navController = LocalNavController.current
     val viewModel = viewModel(account) {
         ComposeSearchUserViewModel(account = account)
     }
@@ -145,7 +146,7 @@ fun ComposeSearchUserScene() {
                                         )
                                         Spacer(modifier = Modifier.width(4.dp))
                                         Providers(
-                                            AmbientContentAlpha provides ContentAlpha.medium
+                                            LocalContentAlpha provides ContentAlpha.medium
                                         ) {
                                             Text(
                                                 text = "@${item.screenName}",

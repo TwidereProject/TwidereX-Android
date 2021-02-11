@@ -24,7 +24,7 @@ plugins {
     id 'org.jetbrains.kotlin.android'
     id "org.jetbrains.kotlin.kapt"
     id "com.google.protobuf" version "0.8.14"
-    id "org.jetbrains.kotlin.plugin.serialization" version "1.4.21-2"
+    id "org.jetbrains.kotlin.plugin.serialization" version "1.4.30"
 }
 
 if (enableGoogleVariant) {
@@ -166,7 +166,8 @@ dependencies {
     implementation "androidx.paging:paging-compose:$versions.androidx_compose"
     implementation "androidx.navigation:navigation-compose:$versions.androidx_compose"
     implementation "androidx.navigation:navigation-fragment-ktx:$versions.navigation"
-    implementation "androidx.activity:activity-ktx:1.2.0-rc01"
+    implementation "androidx.activity:activity-ktx:$versions.androidx"
+    implementation "androidx.activity:activity-compose:$versions.androidx"
     implementation "androidx.datastore:datastore:$versions.dataStore"
 
     implementation "com.google.dagger:hilt-android:$versions.hilt"
@@ -185,6 +186,7 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:$versions.lifecycle"
     implementation "androidx.lifecycle:lifecycle-viewmodel-savedstate:$versions.lifecycle"
     implementation "androidx.lifecycle:lifecycle-common-java8:$versions.lifecycle"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-compose:$versions.lifecycle_compose"
 
     implementation "androidx.work:work-runtime-ktx:$versions.work"
 

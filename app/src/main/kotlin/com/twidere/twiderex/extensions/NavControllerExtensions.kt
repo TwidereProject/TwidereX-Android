@@ -22,7 +22,6 @@ package com.twidere.twiderex.extensions
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.onDispose
 import androidx.lifecycle.Observer
 import androidx.navigation.NavController
 import kotlin.coroutines.resume

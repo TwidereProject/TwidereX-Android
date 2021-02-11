@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.ListItem
@@ -44,11 +45,11 @@ import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.IconCompat
 import com.twidere.twiderex.component.foundation.SignInButton
 import com.twidere.twiderex.component.foundation.SignInScaffold
-import com.twidere.twiderex.component.navigation.AmbientNavigator
+import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.extensions.navViewModel
 import com.twidere.twiderex.extensions.navigateForResult
 import com.twidere.twiderex.extensions.setResult
-import com.twidere.twiderex.ui.AmbientNavController
+import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.standardPadding
 import com.twidere.twiderex.viewmodel.mastodon.MastodonSignInViewModel
 import kotlinx.coroutines.Dispatchers
@@ -56,13 +57,14 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun MastodonSignInScene() {
     val viewModel = navViewModel<MastodonSignInViewModel>()
     val host by viewModel.host.observeAsState(initial = "")
     val loading by viewModel.loading.observeAsState(initial = false)
-    val navController = AmbientNavController.current
-    val navigator = AmbientNavigator.current
+    val navController = LocalNavController.current
+    val navigator = LocalNavigator.current
 
     SignInScaffold {
         if (loading == true) {

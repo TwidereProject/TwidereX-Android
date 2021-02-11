@@ -35,11 +35,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.AmbientContentAlpha
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
@@ -58,10 +58,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.AmbientAnimationClock
-import androidx.compose.ui.platform.AmbientContext
+import androidx.compose.ui.platform.LocalAnimationClock
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -92,10 +92,10 @@ import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.preferences.proto.DisplayPreferences
-import com.twidere.twiderex.ui.AmbientActiveAccount
-import com.twidere.twiderex.ui.AmbientNavController
-import com.twidere.twiderex.ui.AmbientVideoPlayback
-import com.twidere.twiderex.ui.AmbientWindow
+import com.twidere.twiderex.ui.LocalActiveAccount
+import com.twidere.twiderex.ui.LocalNavController
+import com.twidere.twiderex.ui.LocalVideoPlayback
+import com.twidere.twiderex.ui.LocalWindow
 import com.twidere.twiderex.ui.TwidereXTheme
 import com.twidere.twiderex.ui.standardPadding
 import com.twidere.twiderex.viewmodel.MediaViewModel
@@ -104,7 +104,7 @@ import dev.chrisbanes.accompanist.insets.statusBarsPadding
 
 @Composable
 fun MediaScene(statusKey: MicroBlogKey, selectedIndex: Int) {
-    val account = AmbientActiveAccount.current ?: return
+    val account = LocalActiveAccount.current ?: return
     val viewModel = assistedViewModel<MediaViewModel.AssistedFactory, MediaViewModel> {
         it.create(account, statusKey)
     }
@@ -129,7 +129,7 @@ fun MediaScene(statusKey: MicroBlogKey, selectedIndex: Int) {
         }
         status?.let {
             Providers(
-                AmbientVideoPlayback provides DisplayPreferences.AutoPlayback.Always
+                LocalVideoPlayback provides DisplayPreferences.AutoPlayback.Always
             ) {
                 MediaScene(status = it, selectedIndex = selectedIndex)
             }
@@ -143,10 +143,10 @@ fun MediaScene(status: UiStatus, selectedIndex: Int) {
     var lockPager by remember { mutableStateOf(false) }
     var controlVisibility by remember { mutableStateOf(true) }
     val controlPanelColor = MaterialTheme.colors.surface.copy(alpha = 0.6f)
-    val navController = AmbientNavController.current
+    val navController = LocalNavController.current
     Scaffold {
         Box {
-            val clock = AmbientAnimationClock.current
+            val clock = LocalAnimationClock.current
             val pagerState = remember(clock) {
                 PagerState(
                     clock,
@@ -154,7 +154,7 @@ fun MediaScene(status: UiStatus, selectedIndex: Int) {
                     maxPage = status.media.lastIndex,
                 )
             }
-            val context = AmbientContext.current
+            val context = LocalContext.current
             val videoControl = remember(pagerState.currentPage) {
                 if (status.media[pagerState.currentPage].type == MediaType.video) {
                     PlayerControlView(context).apply {
@@ -164,7 +164,7 @@ fun MediaScene(status: UiStatus, selectedIndex: Int) {
                     null
                 }
             }
-            val window = AmbientWindow.current
+            val window = LocalWindow.current
             Swiper(
                 enabled = !lockPager,
                 onDismiss = {
@@ -237,7 +237,7 @@ fun MediaScene(status: UiStatus, selectedIndex: Int) {
                                     }
                                 ) {
                                     Icon(
-                                        imageVector = vectorResource(id = R.drawable.ic_x),
+                                        painter = painterResource(id = R.drawable.ic_x),
                                         contentDescription = stringResource(
                                             id = R.string.accessibility_common_close
                                         )
@@ -296,7 +296,7 @@ fun MediaScene(status: UiStatus, selectedIndex: Int) {
                                             )
                                             Spacer(modifier = Modifier.width(standardPadding))
                                             Providers(
-                                                AmbientContentAlpha provides ContentAlpha.medium
+                                                LocalContentAlpha provides ContentAlpha.medium
                                             ) {
                                                 Text(
                                                     text = "@${status.user.screenName}",

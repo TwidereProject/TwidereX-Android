@@ -23,20 +23,20 @@ package com.twidere.twiderex.ui
 import android.app.Activity
 import android.app.Application
 import android.view.Window
-import androidx.compose.runtime.ambientOf
-import androidx.compose.runtime.staticAmbientOf
+import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.navigation.NavController
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.preferences.proto.DisplayPreferences
 import com.twidere.twiderex.viewmodel.ActiveAccountViewModel
 
-val AmbientWindowInsetsController = staticAmbientOf<WindowInsetsControllerCompat>()
-val AmbientWindow = staticAmbientOf<Window> { error("No Window") }
-val AmbientNavController = staticAmbientOf<NavController> { error("No NavController") }
-val AmbientActiveAccount = ambientOf<AccountDetails?>()
-val AmbientActiveAccountViewModel = ambientOf<ActiveAccountViewModel>()
-val AmbientApplication = staticAmbientOf<Application>()
-val AmbientActivity = staticAmbientOf<Activity>()
-val AmbientVideoPlayback = ambientOf { DisplayPreferences.AutoPlayback.Auto }
-val AmbientIsActiveNetworkMetered = ambientOf { false }
+val LocalWindowInsetsController = staticCompositionLocalOf<WindowInsetsControllerCompat>()
+val LocalWindow = staticCompositionLocalOf<Window> { error("No Window") }
+val LocalNavController = staticCompositionLocalOf<NavController> { error("No NavController") }
+val LocalActiveAccount = compositionLocalOf<AccountDetails?>()
+val LocalActiveAccountViewModel = compositionLocalOf<ActiveAccountViewModel>()
+val LocalApplication = staticCompositionLocalOf<Application>()
+val LocalActivity = staticCompositionLocalOf<Activity>()
+val LocalVideoPlayback = compositionLocalOf { DisplayPreferences.AutoPlayback.Auto }
+val LocalIsActiveNetworkMetered = compositionLocalOf { false }

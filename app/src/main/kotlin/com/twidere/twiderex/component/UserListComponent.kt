@@ -23,6 +23,7 @@ package com.twidere.twiderex.component
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ListItem
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -36,19 +37,19 @@ import com.twidere.twiderex.R
 import com.twidere.twiderex.annotations.IncomingComposeUpdate
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
 import com.twidere.twiderex.component.lazy.itemsPaging
-import com.twidere.twiderex.component.navigation.AmbientNavigator
+import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.extensions.refreshOrRetry
 import com.twidere.twiderex.ui.mediumEmphasisContentContentColor
 import com.twidere.twiderex.viewmodel.UserListViewModel
 
-@OptIn(IncomingComposeUpdate::class)
+@OptIn(IncomingComposeUpdate::class, ExperimentalMaterialApi::class)
 @Composable
 fun UserListComponent(
     viewModel: UserListViewModel,
 ) {
     val source = viewModel.source.collectAsLazyPagingItems()
-    val navigator = AmbientNavigator.current
+    val navigator = LocalNavigator.current
     SwipeToRefreshLayout(
         refreshingState = source.loadState.refresh is LoadState.Loading,
         onRefresh = {

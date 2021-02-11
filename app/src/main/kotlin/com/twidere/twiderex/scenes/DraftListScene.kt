@@ -20,10 +20,12 @@
  */
 package com.twidere.twiderex.scenes
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.ListItem
@@ -45,15 +47,16 @@ import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.extensions.navViewModel
 import com.twidere.twiderex.navigation.Route
-import com.twidere.twiderex.ui.AmbientNavController
+import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereXTheme
 import com.twidere.twiderex.viewmodel.DraftViewModel
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun DraftListScene() {
     val viewModel = navViewModel<DraftViewModel>()
     val source by viewModel.source.observeAsState(initial = emptyList())
-    val navController = AmbientNavController.current
+    val navController = LocalNavController.current
     TwidereXTheme {
         InAppNotificationScaffold(
             topBar = {
@@ -75,36 +78,36 @@ fun DraftListScene() {
                         },
                         trailing = {
                             var expanded by remember { mutableStateOf(false) }
-                            DropdownMenu(
-                                toggle = {
-                                    IconButton(onClick = { expanded = true }) {
-                                        Icon(
-                                            imageVector = Icons.Default.MoreVert,
-                                            contentDescription = stringResource(
-                                                id = R.string.accessibility_common_more
-                                            )
+                            Box {
+                                IconButton(onClick = { expanded = true }) {
+                                    Icon(
+                                        imageVector = Icons.Default.MoreVert,
+                                        contentDescription = stringResource(
+                                            id = R.string.accessibility_common_more
+                                        )
+                                    )
+                                }
+                                DropdownMenu(
+                                    expanded = expanded,
+                                    onDismissRequest = { expanded = false },
+                                ) {
+                                    DropdownMenuItem(
+                                        onClick = {
+                                            navController.navigate(Route.Draft.Compose(it._id))
+                                        }
+                                    ) {
+                                        Text(text = stringResource(id = R.string.scene_drafts_actions_edit_draft))
+                                    }
+                                    DropdownMenuItem(
+                                        onClick = {
+                                            viewModel.delete(it)
+                                        }
+                                    ) {
+                                        Text(
+                                            text = stringResource(id = R.string.common_controls_actions_remove),
+                                            color = Color.Red,
                                         )
                                     }
-                                },
-                                expanded = expanded,
-                                onDismissRequest = { expanded = false },
-                            ) {
-                                DropdownMenuItem(
-                                    onClick = {
-                                        navController.navigate(Route.Draft.Compose(it._id))
-                                    }
-                                ) {
-                                    Text(text = stringResource(id = R.string.scene_drafts_actions_edit_draft))
-                                }
-                                DropdownMenuItem(
-                                    onClick = {
-                                        viewModel.delete(it)
-                                    }
-                                ) {
-                                    Text(
-                                        text = stringResource(id = R.string.common_controls_actions_remove),
-                                        color = Color.Red,
-                                    )
                                 }
                             }
                         }

@@ -21,9 +21,9 @@
 package com.twidere.twiderex.component.status
 
 import androidx.compose.foundation.ClickableText
-import androidx.compose.material.AmbientContentAlpha
-import androidx.compose.material.AmbientContentColor
-import androidx.compose.material.AmbientTextStyle
+import androidx.compose.material.LocalContentAlpha
+import androidx.compose.material.LocalContentColor
+import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
@@ -31,7 +31,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.buildAnnotatedString
-import com.twidere.twiderex.component.navigation.AmbientNavigator
+import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.model.ui.UiStatus
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
@@ -46,12 +46,12 @@ fun StatusText(
     color: Color = Color.Unspecified,
     onStatusTextClicked: () -> Unit = {},
 ) {
-    val navigator = AmbientNavigator.current
+    val navigator = LocalNavigator.current
     val textColor = color.takeOrElse {
-        AmbientContentColor.current.copy(alpha = AmbientContentAlpha.current)
+        LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
     }
     Providers(
-        AmbientTextStyle provides MaterialTheme.typography.body1.copy(color = textColor)
+        LocalTextStyle provides MaterialTheme.typography.body1.copy(color = textColor)
     ) {
         RenderContent(
             status = status,
@@ -115,7 +115,7 @@ private fun AnnotatedString.Builder.RenderNode(node: Node, status: UiStatus) {
 @Composable
 private fun AnnotatedString.Builder.RenderText(text: String) {
     pushStyle(
-        AmbientTextStyle.current.toSpanStyle()
+        LocalTextStyle.current.toSpanStyle()
     )
     append(text)
     pop()
@@ -144,7 +144,7 @@ private fun AnnotatedString.Builder.RenderLink(element: Element, status: UiStatu
     val entity = status.url.firstOrNull { it.url == href }
     val media = status.media.firstOrNull { it.url == href }
     Providers(
-        AmbientTextStyle provides AmbientTextStyle.current.copy(color = MaterialTheme.colors.primary)
+        LocalTextStyle provides LocalTextStyle.current.copy(color = MaterialTheme.colors.primary)
     ) {
         when {
             entity != null -> {

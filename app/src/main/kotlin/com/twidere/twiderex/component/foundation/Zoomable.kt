@@ -38,7 +38,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.DragObserver
 import androidx.compose.ui.gesture.rawDragGestureFilter
 import androidx.compose.ui.layout.layout
-import androidx.compose.ui.platform.AmbientAnimationClock
+import androidx.compose.ui.platform.LocalAnimationClock
 
 class ZoomableState(
     clock: AnimationClockObservable,
@@ -89,7 +89,7 @@ fun Zoomable(
     content: @Composable BoxScope.() -> Unit,
 ) {
     BoxWithConstraints {
-        val clock = AmbientAnimationClock.current
+        val clock = LocalAnimationClock.current
         val state = remember {
             ZoomableState(
                 clock = clock,

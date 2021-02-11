@@ -35,7 +35,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.foundation.VideoPlayer
-import com.twidere.twiderex.component.navigation.AmbientNavigator
+import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.model.MediaType
 import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.model.ui.UiStatus
@@ -44,7 +44,7 @@ import com.twidere.twiderex.model.ui.UiStatus
 fun StatusMediaComponent(
     status: UiStatus,
 ) {
-    val navigator = AmbientNavigator.current
+    val navigator = LocalNavigator.current
     val media = status.media
     val onItemClick = { it: UiMedia ->
         val index = media.indexOf(it)

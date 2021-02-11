@@ -46,14 +46,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.savedinstancestate.savedInstanceState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
@@ -67,7 +68,7 @@ import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
 import com.twidere.twiderex.component.lazy.itemsPaging
 import com.twidere.twiderex.component.lazy.itemsPagingGridIndexed
-import com.twidere.twiderex.component.navigation.AmbientNavigator
+import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.component.status.StatusDivider
 import com.twidere.twiderex.component.status.StatusMediaPreviewItem
 import com.twidere.twiderex.component.status.TimelineStatusComponent
@@ -80,9 +81,9 @@ import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.preferences.proto.DisplayPreferences
-import com.twidere.twiderex.ui.AmbientActiveAccount
-import com.twidere.twiderex.ui.AmbientNavController
-import com.twidere.twiderex.ui.AmbientVideoPlayback
+import com.twidere.twiderex.ui.LocalActiveAccount
+import com.twidere.twiderex.ui.LocalNavController
+import com.twidere.twiderex.ui.LocalVideoPlayback
 import com.twidere.twiderex.ui.standardPadding
 import com.twidere.twiderex.viewmodel.user.UserFavouriteTimelineViewModel
 import com.twidere.twiderex.viewmodel.user.UserMediaTimelineViewModel
@@ -98,7 +99,7 @@ fun UserComponent(
     initialUserKey: MicroBlogKey? = null,
     initialData: UiUser? = null,
 ) {
-    val account = AmbientActiveAccount.current ?: return
+    val account = LocalActiveAccount.current ?: return
     val viewModel = assistedViewModel<UserViewModel.AssistedFactory, UserViewModel>(
         account,
         screenName,
@@ -145,11 +146,11 @@ fun UserComponent(
 
     Box {
         val tabs = listOf(
-            vectorResource(id = R.drawable.ic_float_left) to stringResource(id = R.string.accessibility_scene_user_tab_status),
-            vectorResource(id = R.drawable.ic_photo) to stringResource(id = R.string.accessibility_scene_user_tab_media),
-            vectorResource(id = R.drawable.ic_heart) to stringResource(id = R.string.accessibility_scene_user_tab_favourite),
+            painterResource(id = R.drawable.ic_float_left) to stringResource(id = R.string.accessibility_scene_user_tab_status),
+            painterResource(id = R.drawable.ic_photo) to stringResource(id = R.string.accessibility_scene_user_tab_media),
+            painterResource(id = R.drawable.ic_heart) to stringResource(id = R.string.accessibility_scene_user_tab_favourite),
         )
-        val (selectedItem, setSelectedItem) = savedInstanceState { 0 }
+        val (selectedItem, setSelectedItem) = rememberSaveable { mutableStateOf(0) }
 
         val refreshing by viewModel.refreshing.observeAsState(initial = false)
         SwipeToRefreshLayout(
@@ -212,9 +213,9 @@ fun UserComponent(
                                 padding = standardPadding
                             ) { index, pair ->
                                 pair?.let { item ->
-                                    val navigator = AmbientNavigator.current
+                                    val navigator = LocalNavigator.current
                                     Providers(
-                                        AmbientVideoPlayback provides DisplayPreferences.AutoPlayback.Off,
+                                        LocalVideoPlayback provides DisplayPreferences.AutoPlayback.Off,
                                     ) {
                                         StatusMediaPreviewItem(
                                             item.first,
@@ -270,7 +271,7 @@ private fun UserInfo(user: UiUser, viewModel: UserViewModel) {
     val relationship by viewModel.relationship.observeAsState(initial = null)
     val loadingRelationship by viewModel.loadingRelationship.observeAsState(initial = false)
     val maxBannerSize = 200.dp
-    val navController = AmbientNavController.current
+    val navController = LocalNavController.current
     Box(
         modifier = Modifier
             .background(MaterialTheme.colors.surface.withElevation())
@@ -382,7 +383,7 @@ private fun UserInfo(user: UiUser, viewModel: UserViewModel) {
                 text = user.desc,
             )
             user.website?.let {
-                val navigator = AmbientNavigator.current
+                val navigator = LocalNavigator.current
                 Column(
                     modifier = Modifier
                         .clickable(
@@ -396,7 +397,7 @@ private fun UserInfo(user: UiUser, viewModel: UserViewModel) {
                     Spacer(modifier = Modifier.height(standardPadding))
                     Row {
                         Icon(
-                            imageVector = vectorResource(id = R.drawable.ic_globe),
+                            painter = painterResource(id = R.drawable.ic_globe),
                             contentDescription = stringResource(
                                 id = R.string.accessibility_scene_user_website
                             )
@@ -419,7 +420,7 @@ private fun UserInfo(user: UiUser, viewModel: UserViewModel) {
                         .padding(horizontal = standardPadding * 2),
                 ) {
                     Icon(
-                        imageVector = vectorResource(id = R.drawable.ic_map_pin),
+                        painter = painterResource(id = R.drawable.ic_map_pin),
                         contentDescription = stringResource(
                             id = R.string.accessibility_scene_user_location
                         )

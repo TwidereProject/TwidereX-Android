@@ -22,25 +22,25 @@ package com.twidere.twiderex.component.foundation
 
 import android.os.Build
 import androidx.annotation.DrawableRes
-import androidx.compose.material.AmbientContentAlpha
-import androidx.compose.material.AmbientContentColor
 import androidx.compose.material.Icon
+import androidx.compose.material.LocalContentAlpha
+import androidx.compose.material.LocalContentColor
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.imageResource
-import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.res.painterResource
 
 @Composable
 fun IconCompat(
     @DrawableRes id: Int,
     modifier: Modifier = Modifier,
     contentDescription: String?,
-    tint: Color = AmbientContentColor.current.copy(alpha = AmbientContentAlpha.current)
+    tint: Color = LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
 ) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
         Icon(
-            imageVector = vectorResource(id = id),
+            painter = painterResource(id = id),
             modifier = modifier,
             tint = tint,
             contentDescription = contentDescription,

@@ -22,7 +22,7 @@ package com.twidere.twiderex.launcher
 
 import android.net.Uri
 import androidx.activity.result.ActivityResultRegistry
-import androidx.compose.runtime.ambientOf
+import androidx.compose.runtime.compositionLocalOf
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 
@@ -46,4 +46,4 @@ class ActivityLauncher(registry: ActivityResultRegistry) : DefaultLifecycleObser
     }
 }
 
-val AmbientLauncher = ambientOf<ActivityLauncher>()
+val LocalLauncher = compositionLocalOf<ActivityLauncher>()

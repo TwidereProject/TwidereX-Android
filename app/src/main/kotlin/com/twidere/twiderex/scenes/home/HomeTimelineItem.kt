@@ -24,16 +24,16 @@ import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
 import androidx.navigation.compose.navigate
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.TimelineComponent
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.navigation.Route
-import com.twidere.twiderex.ui.AmbientActiveAccount
-import com.twidere.twiderex.ui.AmbientNavController
+import com.twidere.twiderex.ui.LocalActiveAccount
+import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.viewmodel.compose.ComposeType
 import com.twidere.twiderex.viewmodel.timeline.HomeTimelineViewModel
 
@@ -46,11 +46,11 @@ class HomeTimelineItem : HomeNavigationItem() {
 
     override val icon: ImageVector
         @Composable
-        get() = vectorResource(id = R.drawable.ic_home)
+        get() = painterResource(id = R.drawable.ic_home)
 
     @Composable
     override fun onCompose() {
-        val account = AmbientActiveAccount.current ?: return
+        val account = LocalActiveAccount.current ?: return
         val viewModel = assistedViewModel<HomeTimelineViewModel.AssistedFactory, HomeTimelineViewModel>(
             account
         ) {
@@ -58,14 +58,14 @@ class HomeTimelineItem : HomeNavigationItem() {
         }
         InAppNotificationScaffold(
             floatingActionButton = {
-                val navController = AmbientNavController.current
+                val navController = LocalNavController.current
                 FloatingActionButton(
                     onClick = {
                         navController.navigate(Route.Compose(ComposeType.New))
                     }
                 ) {
                     Icon(
-                        imageVector = vectorResource(id = R.drawable.ic_feather),
+                        painter = painterResource(id = R.drawable.ic_feather),
                         contentDescription = stringResource(
                             id = R.string.accessibility_scene_home_compose
                         )

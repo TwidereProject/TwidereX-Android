@@ -39,8 +39,8 @@ import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.navigate
 import com.twidere.twiderex.BuildConfig
@@ -49,10 +49,10 @@ import com.twidere.twiderex.component.LoginLogo
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
-import com.twidere.twiderex.component.navigation.AmbientNavigator
+import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.navigation.Route
-import com.twidere.twiderex.ui.AmbientNavController
+import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereXTheme
 
 @Composable
@@ -77,8 +77,8 @@ fun AboutScene() {
 
 @Composable
 private fun AboutContent() {
-    val navigator = AmbientNavigator.current
-    val navController = AmbientNavController.current
+    val navigator = LocalNavigator.current
+    val navController = LocalNavController.current
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -128,7 +128,7 @@ private fun AboutContent() {
                     }
                 ) {
                     Icon(
-                        imageVector = vectorResource(id = R.drawable.ic_twitter),
+                        painter = painterResource(id = R.drawable.ic_twitter),
                         tint = MaterialTheme.colors.onBackground,
                         contentDescription = stringResource(id = R.string.accessibility_common_logo_twitter)
                     )
@@ -140,7 +140,7 @@ private fun AboutContent() {
                     }
                 ) {
                     Icon(
-                        imageVector = vectorResource(id = R.drawable.ic_github),
+                        painter = painterResource(id = R.drawable.ic_github),
                         tint = MaterialTheme.colors.onBackground,
                         contentDescription = stringResource(id = R.string.accessibility_common_logo_github)
                     )

@@ -20,10 +20,12 @@
  */
 package com.twidere.twiderex.scenes.settings
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.ListItem
@@ -47,10 +49,11 @@ import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.navigation.Route
-import com.twidere.twiderex.ui.AmbientActiveAccountViewModel
-import com.twidere.twiderex.ui.AmbientNavController
+import com.twidere.twiderex.ui.LocalActiveAccountViewModel
+import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereXTheme
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun AccountManagementScene() {
     TwidereXTheme {
@@ -64,7 +67,7 @@ fun AccountManagementScene() {
                         Text(text = stringResource(id = R.string.scene_manage_accounts_title))
                     },
                     actions = {
-                        val navController = AmbientNavController.current
+                        val navController = LocalNavController.current
                         IconButton(
                             onClick = {
                                 navController.navigate(Route.SignIn.Default)
@@ -81,7 +84,7 @@ fun AccountManagementScene() {
                 )
             }
         ) {
-            val activeAccountViewModel = AmbientActiveAccountViewModel.current
+            val activeAccountViewModel = LocalActiveAccountViewModel.current
             val accounts by activeAccountViewModel.allAccounts.observeAsState(initial = emptyList())
             LazyColumn {
                 items(items = accounts) { detail ->
@@ -108,33 +111,33 @@ fun AccountManagementScene() {
                             },
                             trailing = {
                                 var expanded by remember { mutableStateOf(false) }
-                                DropdownMenu(
-                                    expanded = expanded,
-                                    onDismissRequest = { expanded = false },
-                                    toggle = {
-                                        IconButton(
-                                            onClick = {
-                                                expanded = true
-                                            },
-                                        ) {
-                                            Icon(
-                                                imageVector = Icons.Default.MoreVert,
-                                                contentDescription = stringResource(
-                                                    id = R.string.accessibility_common_more
-                                                )
-                                            )
-                                        }
-                                    },
-                                ) {
-                                    DropdownMenuItem(
+                                Box {
+                                    IconButton(
                                         onClick = {
-                                            activeAccountViewModel.deleteAccount(detail)
+                                            expanded = true
                                         },
                                     ) {
-                                        Text(
-                                            text = stringResource(id = R.string.common_controls_actions_remove),
-                                            color = Color.Red,
+                                        Icon(
+                                            imageVector = Icons.Default.MoreVert,
+                                            contentDescription = stringResource(
+                                                id = R.string.accessibility_common_more
+                                            )
                                         )
+                                    }
+                                    DropdownMenu(
+                                        expanded = expanded,
+                                        onDismissRequest = { expanded = false },
+                                    ) {
+                                        DropdownMenuItem(
+                                            onClick = {
+                                                activeAccountViewModel.deleteAccount(detail)
+                                            },
+                                        ) {
+                                            Text(
+                                                text = stringResource(id = R.string.common_controls_actions_remove),
+                                                color = Color.Red,
+                                            )
+                                        }
                                     }
                                 }
                             }

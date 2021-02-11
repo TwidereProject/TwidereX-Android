@@ -42,7 +42,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -80,7 +80,7 @@ fun SignInScaffold(
                 ) {
                     LoginLogo(
                         modifier = Modifier
-                            .size(with(AmbientDensity.current) { MaterialTheme.typography.h4.fontSize.toDp() })
+                            .size(with(LocalDensity.current) { MaterialTheme.typography.h4.fontSize.toDp() })
                             .clickable(
                                 indication = null,
                                 interactionState = remember { InteractionState() },

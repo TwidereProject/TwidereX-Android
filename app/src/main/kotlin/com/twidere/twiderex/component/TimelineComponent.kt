@@ -40,8 +40,8 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemsIndexed
@@ -49,7 +49,7 @@ import com.twidere.twiderex.R
 import com.twidere.twiderex.annotations.IncomingComposeUpdate
 import com.twidere.twiderex.component.foundation.LoadingProgress
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
-import com.twidere.twiderex.component.lazy.AmbientLazyListController
+import com.twidere.twiderex.component.lazy.LocalLazyListController
 import com.twidere.twiderex.component.lazy.loadState
 import com.twidere.twiderex.component.status.StatusDivider
 import com.twidere.twiderex.component.status.TimelineStatusComponent
@@ -79,7 +79,7 @@ fun TimelineComponent(viewModel: TimelineViewModel) {
                 initialFirstVisibleItemScrollOffset = lastScrollState.firstVisibleItemScrollOffset,
             )
             val scope = rememberCoroutineScope()
-            AmbientLazyListController.current.requestScrollTop = {
+            LocalLazyListController.current.requestScrollTop = {
                 scope.launch {
                     listState.snapToItemIndex(0)
                 }
@@ -129,7 +129,7 @@ fun TimelineComponent(viewModel: TimelineViewModel) {
                                         },
                                     ) {
                                         Icon(
-                                            imageVector = vectorResource(id = R.drawable.ic_refresh),
+                                            painter = painterResource(id = R.drawable.ic_refresh),
                                             contentDescription = stringResource(
                                                 id = R.string.accessibility_scene_timeline_load_gap
                                             )

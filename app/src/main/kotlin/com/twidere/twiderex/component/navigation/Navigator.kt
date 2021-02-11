@@ -26,7 +26,7 @@ import android.content.Intent.ACTION_VIEW
 import android.net.Uri
 import android.os.Build
 import android.webkit.CookieManager
-import androidx.compose.runtime.staticAmbientOf
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.core.os.bundleOf
 import androidx.navigation.NavController
 import androidx.navigation.compose.navigate
@@ -37,7 +37,7 @@ import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.navigation.twidereXSchema
 import com.twidere.twiderex.viewmodel.compose.ComposeType
 
-val AmbientNavigator = staticAmbientOf<INavigator>()
+val LocalNavigator = staticCompositionLocalOf<INavigator>()
 
 interface INavigator {
     fun user(user: UiUser) {}
