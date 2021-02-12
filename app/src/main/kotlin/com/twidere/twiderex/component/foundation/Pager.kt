@@ -91,6 +91,7 @@ class PagerState(
 
     suspend fun selectPage() {
         currentPage -= currentPageOffset.roundToInt()
+        snapToOffset(0f)
         selectionState = SelectionState.Selected
     }
 
