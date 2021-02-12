@@ -43,7 +43,6 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.AlertDialog
-import androidx.compose.material.AmbientContentAlpha
 import androidx.compose.material.BottomSheetScaffoldState
 import androidx.compose.material.Checkbox
 import androidx.compose.material.CircularProgressIndicator
@@ -56,6 +55,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.ListItem
+import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
@@ -73,9 +73,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.node.Ref
-import androidx.compose.ui.platform.AmbientContext
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.SoftwareKeyboardController
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
@@ -93,12 +93,12 @@ import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.extensions.checkAllSelfPermissionsGranted
 import com.twidere.twiderex.extensions.navigateForResult
 import com.twidere.twiderex.extensions.withElevation
-import com.twidere.twiderex.launcher.AmbientLauncher
+import com.twidere.twiderex.launcher.LocalLauncher
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.navigation.Route
-import com.twidere.twiderex.ui.AmbientActiveAccount
-import com.twidere.twiderex.ui.AmbientNavController
+import com.twidere.twiderex.ui.LocalActiveAccount
+import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.Orange
 import com.twidere.twiderex.ui.TwidereXTheme
 import com.twidere.twiderex.ui.composeImageSize
@@ -116,7 +116,7 @@ import kotlinx.coroutines.launch
 fun DraftComposeScene(
     draftId: String,
 ) {
-    val account = AmbientActiveAccount.current ?: return
+    val account = LocalActiveAccount.current ?: return
     val draftItemViewModel =
         assistedViewModel<DraftItemViewModel.AssistedFactory, DraftItemViewModel> {
             it.create(draftId = draftId)
@@ -139,7 +139,7 @@ fun ComposeScene(
     statusKey: MicroBlogKey? = null,
     composeType: ComposeType = ComposeType.New,
 ) {
-    val account = AmbientActiveAccount.current ?: return
+    val account = LocalActiveAccount.current ?: return
     val viewModel = assistedViewModel<ComposeViewModel.AssistedFactory, ComposeViewModel> {
         it.create(account, statusKey, composeType)
     }
@@ -157,7 +157,7 @@ private fun ComposeBody(
     val images by viewModel.images.observeAsState(initial = emptyList())
     val location by viewModel.location.observeAsState()
     val locationEnabled by viewModel.locationEnabled.observeAsState(initial = false)
-    val navController = AmbientNavController.current
+    val navController = LocalNavController.current
     val textFieldValue by viewModel.textFieldValue.observeAsState(initial = TextFieldValue())
     val keyboardController = remember { Ref<SoftwareKeyboardController>() }
     val canSaveDraft by viewModel.canSaveDraft.observeAsState(initial = false)
@@ -220,7 +220,7 @@ private fun ComposeBody(
                             }
                         ) {
                             Icon(
-                                imageVector = vectorResource(id = R.drawable.ic_x),
+                                painter = painterResource(id = R.drawable.ic_x),
                                 contentDescription = stringResource(
                                     id = R.string.accessibility_common_close
                                 )
@@ -236,7 +236,7 @@ private fun ComposeBody(
                             }
                         ) {
                             Icon(
-                                imageVector = vectorResource(id = R.drawable.ic_send),
+                                painter = painterResource(id = R.drawable.ic_send),
                                 contentDescription = stringResource(
                                     id = R.string.accessibility_scene_compose_send
                                 )
@@ -367,11 +367,11 @@ private fun ComposeBody(
                     if (locationEnabled) {
                         location?.let {
                             Providers(
-                                AmbientContentAlpha provides ContentAlpha.medium
+                                LocalContentAlpha provides ContentAlpha.medium
                             ) {
                                 Row {
                                     Icon(
-                                        imageVector = vectorResource(id = R.drawable.ic_map_pin),
+                                        painter = painterResource(id = R.drawable.ic_map_pin),
                                         contentDescription = stringResource(
                                             id = R.string.accessibility_common_status_location
                                         )
@@ -410,7 +410,7 @@ private fun ReplySheetContent(
                 }
             ) {
                 Icon(
-                    imageVector = vectorResource(id = R.drawable.ic_x),
+                    painter = painterResource(id = R.drawable.ic_x),
                     contentDescription = stringResource(
                         id = R.string.accessibility_common_close
                     )
@@ -541,7 +541,7 @@ private fun ComposeInput(
         ) {
             account?.let {
                 NetworkImage(
-                    url = it.user.profileImage,
+                    data = it.user.profileImage,
                     modifier = Modifier
                         .clip(CircleShape)
                         .width(profileImageSize)
@@ -631,10 +631,10 @@ private fun ComposeReply(
 @Composable
 private fun ComposeActions(viewModel: ComposeViewModel) {
     val locationEnabled by viewModel.locationEnabled.observeAsState(initial = false)
-    val launcher = AmbientLauncher.current
+    val launcher = LocalLauncher.current
     val scope = rememberCoroutineScope()
-    val context = AmbientContext.current
-    val navController = AmbientNavController.current
+    val context = LocalContext.current
+    val navController = LocalNavController.current
     Box {
         Row {
             IconButton(
@@ -647,7 +647,7 @@ private fun ComposeActions(viewModel: ComposeViewModel) {
                 }
             ) {
                 Icon(
-                    imageVector = vectorResource(id = R.drawable.ic_camera),
+                    painter = painterResource(id = R.drawable.ic_camera),
                     contentDescription = stringResource(
                         id = R.string.accessibility_scene_compose_image
                     )
@@ -655,7 +655,7 @@ private fun ComposeActions(viewModel: ComposeViewModel) {
             }
             // TODO:
 //            IconButton(onClick = {}) {
-//                Icon(imageVector = vectorResource(id = R.drawable.ic_gif))
+//                Icon(painter = painterResource(id = R.drawable.ic_gif))
 //            }
             IconButton(
                 onClick = {
@@ -670,14 +670,14 @@ private fun ComposeActions(viewModel: ComposeViewModel) {
                 }
             ) {
                 Icon(
-                    imageVector = vectorResource(id = R.drawable.ic_at_sign),
+                    painter = painterResource(id = R.drawable.ic_at_sign),
                     contentDescription = stringResource(
                         id = R.string.accessibility_scene_compose_at
                     )
                 )
             }
 //            IconButton(onClick = {}) {
-//                Icon(imageVector = vectorResource(id = R.drawable.ic_hash))
+//                Icon(painter = painterResource(id = R.drawable.ic_hash))
 //            }
             IconButton(
                 onClick = {
@@ -704,7 +704,7 @@ private fun ComposeActions(viewModel: ComposeViewModel) {
                 },
             ) {
                 Icon(
-                    imageVector = vectorResource(id = R.drawable.ic_map_pin),
+                    painter = painterResource(id = R.drawable.ic_map_pin),
                     contentDescription = stringResource(
                         id = if (locationEnabled) {
                             R.string.accessibility_scene_compose_location_disable
@@ -721,7 +721,7 @@ private fun ComposeActions(viewModel: ComposeViewModel) {
                 }
             ) {
                 Icon(
-                    imageVector = vectorResource(id = R.drawable.ic_note),
+                    painter = painterResource(id = R.drawable.ic_note),
                     contentDescription = stringResource(
                         id = R.string.accessibility_scene_compose_draft
                     )
@@ -734,7 +734,7 @@ private fun ComposeActions(viewModel: ComposeViewModel) {
 @Composable
 private fun ComposeImage(item: Uri, viewModel: ComposeViewModel) {
     var expanded by remember { mutableStateOf(false) }
-    val image = @Composable {
+    Box {
         Box(
             modifier = Modifier
                 .heightIn(max = composeImageSize)
@@ -746,24 +746,23 @@ private fun ComposeImage(item: Uri, viewModel: ComposeViewModel) {
                 )
                 .clip(MaterialTheme.shapes.small),
         ) {
-            NetworkImage(url = item)
+            NetworkImage(data = item)
         }
-    }
-    DropdownMenu(
-        expanded = expanded,
-        onDismissRequest = { expanded = false },
-        toggle = image,
-    ) {
-        DropdownMenuItem(
-            onClick = {
-                expanded = false
-                viewModel.removeImage(item)
-            }
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
         ) {
-            Text(
-                text = stringResource(id = R.string.common_controls_actions_remove),
-                color = Color.Red,
-            )
+            DropdownMenuItem(
+                onClick = {
+                    expanded = false
+                    viewModel.removeImage(item)
+                }
+            ) {
+                Text(
+                    text = stringResource(id = R.string.common_controls_actions_remove),
+                    color = Color.Red,
+                )
+            }
         }
     }
 }

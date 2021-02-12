@@ -36,7 +36,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.AmbientContext
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.zIndex
 import com.twidere.twiderex.view.LollipopFixWebView
@@ -82,7 +82,7 @@ fun WebComponent(
     config: (WebView) -> Unit = {},
 ) {
     var progress by remember { mutableStateOf(0f) }
-    val context = AmbientContext.current
+    val context = LocalContext.current
     val webView = remember {
         LollipopFixWebView(context).also {
             it.settings.apply {

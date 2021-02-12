@@ -45,10 +45,10 @@ fun UserScene(
 //                    },
 //                    actions = {
 //                        IconButton(onClick = {}) {
-//                            Icon(imageVector = vectorResource(id = R.drawable.ic_mail))
+//                            Icon(painter = painterResource(id = R.drawable.ic_mail))
 //                        }
 //                        IconButton(onClick = {}) {
-//                            Icon(imageVector = vectorResource(id = R.drawable.ic_dots_vertical))
+//                            Icon(painter = painterResource(id = R.drawable.ic_dots_vertical))
 //                        }
 //                    },
 //                    elevation = 0.dp,

@@ -23,6 +23,7 @@ package com.twidere.twiderex.scenes.settings
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.ListItem
 import androidx.compose.material.MaterialTheme
@@ -30,24 +31,25 @@ import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
 import androidx.navigation.compose.navigate
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.navigation.Route
-import com.twidere.twiderex.ui.AmbientNavController
+import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereXTheme
 
 data class SettingItem(
     val name: String,
-    val icon: ImageVector,
+    val icon: Painter,
     val route: String,
 )
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun SettingsScene() {
     val settings =
@@ -55,30 +57,30 @@ fun SettingsScene() {
             stringResource(id = R.string.scene_settings_section_header_general) to listOf(
                 SettingItem(
                     stringResource(id = R.string.scene_settings_appearance_title),
-                    vectorResource(id = R.drawable.ic_shirt),
+                    painterResource(id = R.drawable.ic_shirt),
                     route = Route.Settings.Appearance,
                 ),
                 SettingItem(
                     stringResource(id = R.string.scene_settings_display_title),
-                    vectorResource(id = R.drawable.ic_template),
+                    painterResource(id = R.drawable.ic_template),
                     route = Route.Settings.Display,
                 ),
                 // TODO
 //                SettingItem(
 //                    "Layout",
-//                    vectorResource(id = R.drawable.ic_layout_sidebar),
+//                    painterResource(id = R.drawable.ic_layout_sidebar),
 //                    route = "",
 //                ),
 //                SettingItem(
 //                    "Web Browser",
-//                    vectorResource(id = R.drawable.ic_browser),
+//                    painterResource(id = R.drawable.ic_browser),
 //                    route = "",
 //                ),
             ),
             stringResource(id = R.string.scene_settings_section_header_about) to listOf(
                 SettingItem(
                     stringResource(id = R.string.scene_settings_about_title),
-                    vectorResource(id = R.drawable.ic_info_circle),
+                    painterResource(id = R.drawable.ic_info_circle),
                     route = Route.Settings.About,
                 ),
             )
@@ -111,7 +113,7 @@ fun SettingsScene() {
                         )
                     }
                     items(it.value) {
-                        val navController = AmbientNavController.current
+                        val navController = LocalNavController.current
                         ListItem(
                             modifier = Modifier.clickable(
                                 onClick = {
@@ -121,7 +123,7 @@ fun SettingsScene() {
                                 }
                             ),
                             icon = {
-                                Icon(imageVector = it.icon, contentDescription = it.name)
+                                Icon(painter = it.icon, contentDescription = it.name)
                             },
                             text = {
                                 Text(text = it.name)

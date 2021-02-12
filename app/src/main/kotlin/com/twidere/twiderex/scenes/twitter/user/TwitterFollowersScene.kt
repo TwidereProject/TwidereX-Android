@@ -30,7 +30,7 @@ import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.extensions.viewModel
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.ui.AmbientActiveAccount
+import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.TwidereXTheme
 import com.twidere.twiderex.viewmodel.twitter.user.FollowersViewModel
 
@@ -38,7 +38,7 @@ import com.twidere.twiderex.viewmodel.twitter.user.FollowersViewModel
 fun TwitterFollowersScene(
     userKey: MicroBlogKey,
 ) {
-    val account = AmbientActiveAccount.current ?: return
+    val account = LocalActiveAccount.current ?: return
     val viewModel = viewModel(
         account,
         userKey,

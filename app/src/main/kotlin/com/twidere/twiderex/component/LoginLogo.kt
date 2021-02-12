@@ -24,8 +24,8 @@ import androidx.compose.foundation.Image
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
 import com.twidere.twiderex.R
 import com.twidere.twiderex.extensions.isDarkTheme
 
@@ -34,14 +34,14 @@ fun LoginLogo(
     modifier: Modifier = Modifier,
 ) {
     val resource = if (isDarkTheme()) {
-        vectorResource(id = R.drawable.ic_login_logo_dark)
+        painterResource(id = R.drawable.ic_login_logo_dark)
     } else {
-        vectorResource(id = R.drawable.ic_login_logo)
+        painterResource(id = R.drawable.ic_login_logo)
     }
     Image(
         modifier = modifier,
         contentScale = ContentScale.FillWidth,
-        imageVector = resource,
+        painter = resource,
         contentDescription = stringResource(id = R.string.accessibility_common_logo_twidere)
     )
 }

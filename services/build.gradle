@@ -1,6 +1,6 @@
 plugins {
     id 'org.jetbrains.kotlin.jvm'
-    id "org.jetbrains.kotlin.plugin.serialization" version "1.4.21-2"
+    id "org.jetbrains.kotlin.plugin.serialization" version "1.4.30"
 }
 
 java {

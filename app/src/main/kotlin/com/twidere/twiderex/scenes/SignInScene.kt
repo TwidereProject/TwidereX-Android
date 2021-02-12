@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.ListItem
@@ -44,23 +45,23 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
 import androidx.lifecycle.liveData
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.navigate
 import com.twidere.twiderex.BuildConfig
 import com.twidere.twiderex.R
-import com.twidere.twiderex.component.foundation.IconCompat
 import com.twidere.twiderex.component.foundation.SignInButton
 import com.twidere.twiderex.component.foundation.SignInScaffold
 import com.twidere.twiderex.navigation.Route
-import com.twidere.twiderex.ui.AmbientNavController
+import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.standardPadding
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun SignInScene() {
-    val navController = AmbientNavController.current
+    val navController = LocalNavController.current
     val state by navController.currentBackStackEntryAsState()
     val success by state?.savedStateHandle?.getLiveData<Boolean>("success").let {
         it ?: liveData { emit(false) }
@@ -90,8 +91,8 @@ fun SignInScene() {
             ) {
                 ListItem(
                     icon = {
-                        IconCompat(
-                            id = R.drawable.ic_mastodon_logo_blue,
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_mastodon_logo_blue),
                             contentDescription = stringResource(
                                 id = R.string.accessibility_common_logo_mastodon
                             )
@@ -121,9 +122,10 @@ fun SignInScene() {
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun TwitterSignIn() {
-    val navController = AmbientNavController.current
+    val navController = LocalNavController.current
     var showKeyConfiguration by remember { mutableStateOf(false) }
     if (showKeyConfiguration) {
         TwitterCustomKeySignIn(
@@ -145,7 +147,7 @@ private fun TwitterSignIn() {
         ListItem(
             icon = {
                 Icon(
-                    imageVector = vectorResource(id = R.drawable.ic_twitter_logo_white),
+                    painter = painterResource(id = R.drawable.ic_twitter_logo_white),
                     contentDescription = stringResource(
                         id = R.string.accessibility_common_logo_twitter
                     )
@@ -172,7 +174,7 @@ private fun TwitterSignIn() {
 private fun TwitterCustomKeySignIn(
     onDismissRequest: () -> Unit,
 ) {
-    val navController = AmbientNavController.current
+    val navController = LocalNavController.current
     var apiKey by remember { mutableStateOf("") }
     var apiSecret by remember { mutableStateOf("") }
     AlertDialog(

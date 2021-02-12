@@ -21,12 +21,13 @@
 package com.twidere.twiderex.component
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.savedinstancestate.savedInstanceState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.navigation.compose.navigate
 import com.twidere.twiderex.navigation.Route
-import com.twidere.twiderex.ui.AmbientActiveAccount
-import com.twidere.twiderex.ui.AmbientActivity
-import com.twidere.twiderex.ui.AmbientNavController
+import com.twidere.twiderex.ui.LocalActiveAccount
+import com.twidere.twiderex.ui.LocalActivity
+import com.twidere.twiderex.ui.LocalNavController
 import java.util.UUID
 
 private val key = UUID.randomUUID().toString()
@@ -35,11 +36,11 @@ private val key = UUID.randomUUID().toString()
 fun requireAuthorization(
     content: @Composable () -> Unit,
 ) {
-    val account = AmbientActiveAccount.current
+    val account = LocalActiveAccount.current
     if (account == null) {
-        val navController = AmbientNavController.current
-        val activity = AmbientActivity.current
-        val (isSignInShown, setIsSignInShown) = savedInstanceState(key = key) { false }
+        val navController = LocalNavController.current
+        val activity = LocalActivity.current
+        val (isSignInShown, setIsSignInShown) = rememberSaveable(key = key) { mutableStateOf(false) }
         if (!isSignInShown) {
             setIsSignInShown(true)
             navController.navigate(Route.SignIn.Default)

@@ -32,6 +32,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Divider
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.ListItem
@@ -51,12 +52,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.savedinstancestate.savedInstanceState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
@@ -68,23 +69,23 @@ import com.twidere.twiderex.component.BackButtonHandler
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.IconTabsComponent
 import com.twidere.twiderex.component.foundation.TopAppBarElevation
-import com.twidere.twiderex.component.lazy.AmbientLazyListController
 import com.twidere.twiderex.component.lazy.LazyListController
+import com.twidere.twiderex.component.lazy.LocalLazyListController
 import com.twidere.twiderex.component.lazy.itemDivider
 import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.navigation.Route
-import com.twidere.twiderex.preferences.AmbientAppearancePreferences
+import com.twidere.twiderex.preferences.LocalAppearancePreferences
 import com.twidere.twiderex.preferences.proto.AppearancePreferences
 import com.twidere.twiderex.scenes.home.HomeNavigationItem
 import com.twidere.twiderex.scenes.home.HomeTimelineItem
 import com.twidere.twiderex.scenes.home.MeItem
 import com.twidere.twiderex.scenes.home.MentionItem
 import com.twidere.twiderex.scenes.home.SearchItem
-import com.twidere.twiderex.ui.AmbientActiveAccount
-import com.twidere.twiderex.ui.AmbientActiveAccountViewModel
-import com.twidere.twiderex.ui.AmbientNavController
+import com.twidere.twiderex.ui.LocalActiveAccount
+import com.twidere.twiderex.ui.LocalActiveAccountViewModel
+import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereXTheme
 import com.twidere.twiderex.ui.mediumEmphasisContentContentColor
 
@@ -95,11 +96,11 @@ fun HomeScene() {
         navController.enableOnBackPressed(false)
         onDispose { }
     }
-    var selectedItem by savedInstanceState { 0 }
+    var selectedItem by rememberSaveable { mutableStateOf(0) }
     val timelineController = remember {
         LazyListController()
     }
-    val tabPosition = AmbientAppearancePreferences.current.tapPosition
+    val tabPosition = LocalAppearancePreferences.current.tapPosition
     val menus = listOf(
         HomeTimelineItem(),
         MentionItem(),
@@ -190,15 +191,10 @@ fun HomeScene() {
             }
         ) {
             Box(
-                modifier = Modifier.padding(
-                    start = it.start,
-                    bottom = it.bottom,
-                    end = it.end,
-                    top = it.top,
-                )
+                modifier = Modifier.padding(it)
             ) {
                 Providers(
-                    AmbientLazyListController provides timelineController
+                    LocalLazyListController provides timelineController
                 ) {
                     NavHost(navController = navController, startDestination = menus.first().route) {
                         menus.forEach { item ->
@@ -226,7 +222,7 @@ fun HomeBottomNavigation(
             BottomNavigationItem(
                 selectedContentColor = MaterialTheme.colors.primary,
                 unselectedContentColor = mediumEmphasisContentContentColor,
-                icon = { Icon(imageVector = item.icon, contentDescription = item.name) },
+                icon = { Icon(painter = item.icon, contentDescription = item.name) },
                 selected = selectedItem == index,
                 onClick = { onItemSelected.invoke(index) }
             )
@@ -234,6 +230,7 @@ fun HomeBottomNavigation(
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun HomeDrawer(scaffoldState: ScaffoldState) {
     var showAccounts by remember { mutableStateOf(false) }
@@ -241,9 +238,9 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
     Column {
         Spacer(modifier = Modifier.height(16.dp))
 
-        val account = AmbientActiveAccount.current
+        val account = LocalActiveAccount.current
         val currentUser = account?.toUi()
-        val navController = AmbientNavController.current
+        val navController = LocalNavController.current
         DrawerUserHeader(
             currentUser
         ) {
@@ -284,7 +281,7 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
                 .weight(1f)
         ) {
             if (showAccounts) {
-                val activeAccountViewModel = AmbientActiveAccountViewModel.current
+                val activeAccountViewModel = LocalActiveAccountViewModel.current
                 val accounts by activeAccountViewModel.allAccounts.observeAsState(initial = emptyList())
                 val allAccounts = accounts.filter { it.accountKey != account?.accountKey }
                 LazyColumn {
@@ -360,7 +357,7 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
                             },
                             icon = {
                                 Icon(
-                                    imageVector = vectorResource(id = R.drawable.ic_note),
+                                    painter = painterResource(id = R.drawable.ic_note),
                                     contentDescription = stringResource(
                                         id = R.string.scene_drafts_title
                                     )
@@ -383,7 +380,7 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
             ),
             icon = {
                 Icon(
-                    imageVector = vectorResource(id = R.drawable.ic_adjustments_horizontal),
+                    painter = painterResource(id = R.drawable.ic_adjustments_horizontal),
                     contentDescription = stringResource(
                         id = R.string.scene_settings_title
                     )
@@ -396,6 +393,7 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun DrawerUserHeader(
     user: UiUser?,

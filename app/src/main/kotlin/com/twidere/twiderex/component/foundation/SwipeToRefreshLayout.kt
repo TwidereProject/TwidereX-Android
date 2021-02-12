@@ -20,9 +20,7 @@
  */
 package com.twidere.twiderex.component.foundation
 
-import androidx.compose.animation.AnimatedFloatModel
-import androidx.compose.animation.asDisposableClock
-import androidx.compose.animation.core.AnimationClockObservable
+import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -33,12 +31,14 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Surface
+import androidx.compose.material.SwipeableState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.savedinstancestate.mapSaver
-import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.mapSaver
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,12 +47,13 @@ import androidx.compose.ui.gesture.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.gesture.nestedscroll.NestedScrollSource
 import androidx.compose.ui.gesture.nestedscroll.nestedScroll
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
-import androidx.compose.ui.platform.AmbientAnimationClock
-import androidx.compose.ui.platform.AmbientDensity
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.annotations.IncomingComposeUpdate
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
 private val RefreshDistance = 80.dp
@@ -60,15 +61,14 @@ private val MinRefreshDistance = 32.dp
 
 @Composable
 fun rememberSwipeToRefreshState(
+    scope: CoroutineScope,
     initialValue: Boolean,
     initialOffset: Float,
     maxOffset: Float,
     minOffset: Float,
     onRefresh: () -> Unit,
 ): SwipeToRefreshState {
-    val clock = AmbientAnimationClock.current.asDisposableClock()
-    return rememberSavedInstanceState(
-        clock,
+    return rememberSaveable(
         saver = mapSaver(
             save = {
                 mapOf(
@@ -77,8 +77,8 @@ fun rememberSwipeToRefreshState(
             },
             restore = {
                 SwipeToRefreshState(
-                    clock,
                     it["value"] as Boolean,
+                    scope = scope,
                     initialOffset = initialOffset,
                     maxOffset = maxOffset,
                     minOffset = minOffset,
@@ -88,7 +88,7 @@ fun rememberSwipeToRefreshState(
         )
     ) {
         SwipeToRefreshState(
-            clock = clock,
+            scope = scope,
             initialValue = initialValue,
             initialOffset = initialOffset,
             maxOffset = maxOffset,
@@ -99,8 +99,8 @@ fun rememberSwipeToRefreshState(
 }
 
 class SwipeToRefreshState(
-    clock: AnimationClockObservable,
     initialValue: Boolean,
+    private val scope: CoroutineScope,
     private val initialOffset: Float,
     private val minOffset: Float,
     private val maxOffset: Float,
@@ -109,19 +109,15 @@ class SwipeToRefreshState(
 
     var value: Boolean by mutableStateOf(initialValue)
 
-    var offset: Float
+    val offset: Float
         get() = _offset.value
-        set(value) {
-            _offset.snapTo(value)
-        }
 
-    private var _offset = AnimatedFloatModel(
+    private var _offset = Animatable(
         if (initialValue) {
             minOffset
         } else {
             initialOffset
         },
-        clock = clock
     )
 
     override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
@@ -150,7 +146,9 @@ class SwipeToRefreshState(
         return if (toFling < 0) {
             Velocity.Zero
         } else {
-            fling()
+            scope.launch {
+                fling()
+            }
             Velocity.Zero
         }
     }
@@ -160,13 +158,19 @@ class SwipeToRefreshState(
         available: Velocity,
         onFinished: (Velocity) -> Unit
     ) {
-        fling() {
-            // since we go to the anchor with tween settling, consume all for the best UX
-            onFinished.invoke(available)
+        scope.launch {
+            fling {
+                // since we go to the anchor with tween settling, consume all for the best UX
+                onFinished.invoke(available)
+            }
         }
     }
 
-    fun fling(onFinished: () -> Unit = {}) {
+    suspend fun snapTo(value: Float) {
+        _offset.snapTo(value)
+    }
+
+    suspend fun fling(onFinished: () -> Unit = {}) {
         val offsetValue = _offset.value
         when {
             offsetValue >= 0 -> {
@@ -174,28 +178,28 @@ class SwipeToRefreshState(
                     value = true
                     onRefresh.invoke()
                 }
-                _offset.animateTo(minOffset) { _, _ ->
-                    onFinished.invoke()
-                }
+                _offset.animateTo(minOffset)
+                onFinished.invoke()
             }
             else -> {
-                _offset.animateTo(initialOffset) { _, _ ->
-                    onFinished.invoke()
-                }
+                _offset.animateTo(initialOffset)
+                onFinished.invoke()
             }
         }
     }
 
     fun drag(delta: Float): Float {
-        return if (!value) {
-            offset = (offset + delta).coerceAtMost(maxOffset)
+        return if (!value && delta > 0) {
+            scope.launch {
+                snapTo((offset + delta).coerceAtMost(maxOffset))
+            }
             delta
         } else {
-            minOffset
+            0f
         }
     }
 
-    fun animateTo(refreshingState: Boolean) {
+    suspend fun animateTo(refreshingState: Boolean) {
         value = refreshingState
         when {
             refreshingState -> {
@@ -229,9 +233,11 @@ fun SwipeToRefreshLayout(
     },
     content: @Composable () -> Unit
 ) {
-    val refreshDistance = with(AmbientDensity.current) { RefreshDistance.toPx() }
-    val minRefreshDistance = with(AmbientDensity.current) { MinRefreshDistance.toPx() }
+    val scope = rememberCoroutineScope()
+    val refreshDistance = with(LocalDensity.current) { RefreshDistance.toPx() }
+    val minRefreshDistance = with(LocalDensity.current) { MinRefreshDistance.toPx() }
     val state = rememberSwipeToRefreshState(
+        scope = scope,
         initialValue = refreshingState,
         initialOffset = -refreshDistance,
         maxOffset = refreshDistance,
@@ -245,10 +251,14 @@ fun SwipeToRefreshLayout(
             .draggable(
                 orientation = Orientation.Vertical,
                 onDrag = { dy ->
-                    state.drag(dy)
+                    scope.launch {
+                        state.drag(dy)
+                    }
                 },
                 onDragStopped = {
-                    state.fling()
+                    scope.launch {
+                        state.fling()
+                    }
                 },
             )
     ) {
@@ -266,8 +276,65 @@ fun SwipeToRefreshLayout(
         }
 
         DisposableEffect(refreshingState) {
-            state.animateTo(refreshingState)
+            scope.launch {
+                state.animateTo(refreshingState)
+            }
             onDispose { }
         }
     }
 }
+
+/**
+ * Temporary workaround for nested scrolling behavior. There is no default implementation for
+ * pull to refresh yet, this nested scroll connection mimics the behavior.
+ */
+@ExperimentalMaterialApi
+private val <T> SwipeableState<T>.PreUpPostDownNestedScrollConnection: NestedScrollConnection
+    get() = object : NestedScrollConnection {
+        override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+            val delta = available.toFloat()
+            return if (delta < 0 && source == NestedScrollSource.Drag) {
+                performDrag(delta).toOffset()
+            } else {
+                Offset.Zero
+            }
+        }
+
+        override fun onPostScroll(
+            consumed: Offset,
+            available: Offset,
+            source: NestedScrollSource
+        ): Offset {
+            return if (source == NestedScrollSource.Drag) {
+                performDrag(available.toFloat()).toOffset()
+            } else {
+                Offset.Zero
+            }
+        }
+
+        override fun onPreFling(available: Velocity): Velocity {
+            val toFling = Offset(available.x, available.y).toFloat()
+            return if (toFling < 0) {
+                performFling(velocity = toFling) {}
+                // since we go to the anchor with tween settling, consume all for the best UX
+                available
+            } else {
+                Velocity.Zero
+            }
+        }
+
+        override fun onPostFling(
+            consumed: Velocity,
+            available: Velocity,
+            onFinished: (Velocity) -> Unit
+        ) {
+            performFling(velocity = Offset(available.x, available.y).toFloat()) {
+                // since we go to the anchor with tween settling, consume all for the best UX
+                onFinished.invoke(available)
+            }
+        }
+
+        private fun Float.toOffset(): Offset = Offset(0f, this)
+
+        private fun Offset.toFloat(): Float = this.y
+    }

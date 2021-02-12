@@ -20,9 +20,11 @@
  */
 package com.twidere.twiderex.component.foundation
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import com.twidere.twiderex.R
@@ -30,17 +32,26 @@ import dev.chrisbanes.accompanist.coil.CoilImage
 
 @Composable
 fun NetworkImage(
-    url: Any,
+    data: Any,
     modifier: Modifier = Modifier,
     contentScale: ContentScale = ContentScale.Crop,
     placeholder: @Composable (BoxScope.() -> Unit)? = null,
 ) {
-    CoilImage(
-        data = url,
-        fadeIn = true,
-        modifier = modifier,
-        contentScale = contentScale,
-        loading = placeholder,
-        contentDescription = stringResource(id = R.string.accessibility_common_network_image)
-    )
+    if (data is Painter) {
+        Image(
+            painter = data,
+            modifier = modifier,
+            contentScale = contentScale,
+            contentDescription = stringResource(id = R.string.accessibility_common_network_image)
+        )
+    } else {
+        CoilImage(
+            data = data,
+            fadeIn = true,
+            modifier = modifier,
+            contentScale = contentScale,
+            loading = placeholder,
+            contentDescription = stringResource(id = R.string.accessibility_common_network_image)
+        )
+    }
 }

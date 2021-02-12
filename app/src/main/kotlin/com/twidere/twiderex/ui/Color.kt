@@ -20,16 +20,16 @@
  */
 package com.twidere.twiderex.ui
 
-import androidx.compose.material.AmbientContentColor
 import androidx.compose.material.ContentAlpha
+import androidx.compose.material.LocalContentColor
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import com.twidere.twiderex.extensions.isDarkTheme
-import com.twidere.twiderex.preferences.AmbientAppearancePreferences
+import com.twidere.twiderex.preferences.LocalAppearancePreferences
 
 val mediumEmphasisContentContentColor: Color
     @Composable
-    get() = AmbientContentColor.current.copy(alpha = ContentAlpha.medium)
+    get() = LocalContentColor.current.copy(alpha = ContentAlpha.medium)
 
 val Orange: Color
     get() = Color(0XFFFF9500)
@@ -47,7 +47,7 @@ val primaryColors = listOf(
 
 @Composable
 fun currentPrimaryColor(): Color {
-    val appearance = AmbientAppearancePreferences.current
+    val appearance = LocalAppearancePreferences.current
     val colorIndex = appearance.primaryColorIndex
     return if (isDarkTheme()) {
         primaryColors[colorIndex].second

@@ -34,7 +34,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.paging.compose.LazyPagingItems
 import com.twidere.twiderex.annotations.IncomingComposeUpdate
 
 @IncomingComposeUpdate

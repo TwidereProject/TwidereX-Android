@@ -34,6 +34,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Checkbox
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ListItem
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -56,7 +57,7 @@ import com.twidere.twiderex.component.lazy.itemDivider
 import com.twidere.twiderex.component.settings.radioItem
 import com.twidere.twiderex.extensions.isDarkTheme
 import com.twidere.twiderex.extensions.navViewModel
-import com.twidere.twiderex.preferences.AmbientAppearancePreferences
+import com.twidere.twiderex.preferences.LocalAppearancePreferences
 import com.twidere.twiderex.preferences.proto.AppearancePreferences
 import com.twidere.twiderex.ui.TwidereXTheme
 import com.twidere.twiderex.ui.primaryColors
@@ -64,10 +65,11 @@ import com.twidere.twiderex.ui.profileImageSize
 import com.twidere.twiderex.ui.standardPadding
 import com.twidere.twiderex.viewmodel.settings.AppearanceViewModel
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun AppearanceScene() {
     var showPrimaryColorDialog by remember { mutableStateOf(false) }
-    val appearance = AmbientAppearancePreferences.current
+    val appearance = LocalAppearancePreferences.current
     val viewModel = navViewModel<AppearanceViewModel>()
     TwidereXTheme {
         InAppNotificationScaffold(
@@ -174,7 +176,7 @@ fun primaryColorDialog(
     viewModel: AppearanceViewModel,
     onDismiss: () -> Unit,
 ) {
-    val appearance = AmbientAppearancePreferences.current
+    val appearance = LocalAppearancePreferences.current
     val colorIndex = appearance.primaryColorIndex
     val colors = if (isDarkTheme()) {
         primaryColors.map { it.second }

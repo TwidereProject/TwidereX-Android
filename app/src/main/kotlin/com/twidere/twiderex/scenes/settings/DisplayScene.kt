@@ -22,6 +22,7 @@ package com.twidere.twiderex.scenes.settings
 
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.ListItem
 import androidx.compose.material.Slider
@@ -34,29 +35,30 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.R
-import com.twidere.twiderex.action.AmbientStatusActions
 import com.twidere.twiderex.action.FakeStatusActions
+import com.twidere.twiderex.action.LocalStatusActions
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.lazy.itemDivider
 import com.twidere.twiderex.component.lazy.itemHeader
-import com.twidere.twiderex.component.navigation.AmbientNavigator
 import com.twidere.twiderex.component.navigation.FakeNavigator
+import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.component.settings.radioItem
 import com.twidere.twiderex.component.settings.switchItem
 import com.twidere.twiderex.component.status.TimelineStatusComponent
 import com.twidere.twiderex.extensions.navViewModel
 import com.twidere.twiderex.model.ui.UiStatus
-import com.twidere.twiderex.preferences.AmbientDisplayPreferences
+import com.twidere.twiderex.preferences.LocalDisplayPreferences
 import com.twidere.twiderex.preferences.proto.DisplayPreferences
 import com.twidere.twiderex.ui.TwidereXTheme
 import com.twidere.twiderex.viewmodel.settings.DisplayViewModel
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun DisplayScene() {
     val viewModel = navViewModel<DisplayViewModel>()
-    val display = AmbientDisplayPreferences.current
+    val display = LocalDisplayPreferences.current
     TwidereXTheme {
         InAppNotificationScaffold(
             topBar = {
@@ -76,8 +78,8 @@ fun DisplayScene() {
                 }
                 item {
                     Providers(
-                        AmbientNavigator provides FakeNavigator,
-                        AmbientStatusActions provides FakeStatusActions,
+                        LocalNavigator provides FakeNavigator,
+                        LocalStatusActions provides FakeStatusActions,
                     ) {
                         TimelineStatusComponent(data = UiStatus.sample())
                     }

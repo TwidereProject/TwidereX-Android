@@ -24,6 +24,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.ListItem
@@ -40,8 +41,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
@@ -50,16 +51,16 @@ import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.TextInput
-import com.twidere.twiderex.component.navigation.AmbientNavigator
+import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.di.assisted.assistedViewModel
-import com.twidere.twiderex.ui.AmbientActiveAccount
+import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.TwidereXTheme
 import com.twidere.twiderex.viewmodel.search.SearchInputViewModel
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun SearchInputScene(initial: String? = null) {
-    val account = AmbientActiveAccount.current ?: return
+    val account = LocalActiveAccount.current ?: return
     val viewModel =
         assistedViewModel<SearchInputViewModel.AssistedFactory, SearchInputViewModel>(
             account
@@ -76,7 +77,7 @@ fun SearchInputScene(initial: String? = null) {
             )
         )
     }
-    val navigator = AmbientNavigator.current
+    val navigator = LocalNavigator.current
     TwidereXTheme {
         InAppNotificationScaffold(
             topBar = {
@@ -117,7 +118,7 @@ fun SearchInputScene(initial: String? = null) {
                             }
                         ) {
                             Icon(
-                                imageVector = vectorResource(id = R.drawable.ic_search),
+                                painter = painterResource(id = R.drawable.ic_search),
                                 contentDescription = stringResource(
                                     id = R.string.scene_search_title
                                 )
@@ -151,7 +152,7 @@ fun SearchInputScene(initial: String? = null) {
                                 }
                             ) {
                                 Icon(
-                                    imageVector = vectorResource(id = R.drawable.ic_x),
+                                    painter = painterResource(id = R.drawable.ic_x),
                                     contentDescription = stringResource(
                                         id = R.string.common_controls_actions_remove
                                     )

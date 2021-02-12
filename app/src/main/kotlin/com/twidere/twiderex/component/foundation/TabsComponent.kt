@@ -25,20 +25,20 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Tab
-import androidx.compose.material.TabDefaults
-import androidx.compose.material.TabDefaults.tabIndicatorOffset
 import androidx.compose.material.TabRow
+import androidx.compose.material.TabRowDefaults
+import androidx.compose.material.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.ui.mediumEmphasisContentContentColor
 
 @Composable
 fun IconTabsComponent(
-    items: List<Pair<ImageVector, String>>,
+    items: List<Pair<Painter, String>>,
     selectedItem: Int,
     onItemSelected: (Int) -> Unit,
 ) {
@@ -50,7 +50,7 @@ fun IconTabsComponent(
         Box(
             modifier = Modifier.padding(16.dp)
         ) {
-            Icon(imageVector = items[it].first, contentDescription = items[it].second)
+            Icon(painter = items[it].first, contentDescription = items[it].second)
         }
     }
 }
@@ -85,7 +85,7 @@ fun TabsComponent(
         selectedTabIndex = selectedItem,
         backgroundColor = MaterialTheme.colors.surface.withElevation(),
         indicator = { tabPositions ->
-            TabDefaults.Indicator(
+            TabRowDefaults.Indicator(
                 modifier = Modifier.tabIndicatorOffset(tabPositions[selectedItem]),
                 color = MaterialTheme.colors.primary,
             )

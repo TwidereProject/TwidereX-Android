@@ -20,6 +20,7 @@
  */
 package com.twidere.twiderex.ui
 
+import android.os.Build
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
@@ -41,11 +42,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import com.twidere.twiderex.extensions.withElevation
-import com.twidere.twiderex.preferences.AmbientAppearancePreferences
-import com.twidere.twiderex.preferences.AmbientDisplayPreferences
+import com.twidere.twiderex.preferences.LocalAppearancePreferences
+import com.twidere.twiderex.preferences.LocalDisplayPreferences
 import com.twidere.twiderex.preferences.proto.AppearancePreferences
-import dev.chrisbanes.accompanist.insets.AmbientWindowInsets
 import dev.chrisbanes.accompanist.insets.HorizontalSide
+import dev.chrisbanes.accompanist.insets.LocalWindowInsets
 import dev.chrisbanes.accompanist.insets.navigationBarsHeight
 import dev.chrisbanes.accompanist.insets.navigationBarsPadding
 import dev.chrisbanes.accompanist.insets.navigationBarsWidth
@@ -59,8 +60,8 @@ fun TwidereXTheme(
     extendViewIntoNavigationBar: Boolean = false,
     content: @Composable () -> Unit
 ) {
-    val appearance = AmbientAppearancePreferences.current
-    val display = AmbientDisplayPreferences.current
+    val appearance = LocalAppearancePreferences.current
+    val display = LocalDisplayPreferences.current
     val theme = appearance.theme
     val primaryColor = currentPrimaryColor()
     val useSystemFontSize = display.useSystemFontSize
@@ -168,19 +169,23 @@ fun TwidereXTheme(
         typography = typography,
         shapes = shapes,
         content = {
-            val windowInsetsController = AmbientWindowInsetsController.current
+            val windowInsetsController = LocalWindowInsetsController.current
             DisposableEffect(darkTheme) {
                 windowInsetsController.isAppearanceLightStatusBars = !darkTheme
                 onDispose { }
             }
             val navigationBarColor = Color.Black
-            val statusBarColor = MaterialTheme.colors.surface.withElevation()
+            val statusBarColor = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+                Color.Black
+            } else {
+                MaterialTheme.colors.surface.withElevation()
+            }
             Box {
                 Box(
                     modifier = run {
-                        val ime = AmbientWindowInsets.current.ime
-                        val navigation = AmbientWindowInsets.current.navigationBars
-                        val status = AmbientWindowInsets.current.statusBars
+                        val ime = LocalWindowInsets.current.ime
+                        val navigation = LocalWindowInsets.current.navigationBars
+                        val status = LocalWindowInsets.current.statusBars
                         val actual = ime.copy(
                             left = if (extendViewIntoNavigationBar) {
                                 0

@@ -25,10 +25,11 @@ import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.AmbientContentAlpha
-import androidx.compose.material.AmbientContentColor
 import androidx.compose.material.ContentAlpha
+import androidx.compose.material.LocalContentAlpha
+import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -117,7 +118,7 @@ fun TextInput(
     val keyboardController = remember { Ref<SoftwareKeyboardController>() }
     val interactionState = remember { InteractionState() }
     val textColor = color.takeOrElse {
-        AmbientContentColor.current.copy(alpha = AmbientContentAlpha.current)
+        LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
     }
     DisposableEffect(autoFocus) {
         if (autoFocus) {
@@ -147,11 +148,17 @@ fun TextInput(
                 keyboardType = keyboardType,
                 imeAction = imeAction,
             ),
+            keyboardActions =
+                KeyboardActions(
+                    onDone = { onImeActionPerformed.invoke(ImeAction.Done, keyboardController.value) },
+                    onGo = { onImeActionPerformed.invoke(ImeAction.Go, keyboardController.value) },
+                    onNext = { onImeActionPerformed.invoke(ImeAction.Next, keyboardController.value) },
+                    onPrevious = { onImeActionPerformed.invoke(ImeAction.Previous, keyboardController.value) },
+                    onSearch = { onImeActionPerformed.invoke(ImeAction.Search, keyboardController.value) },
+                    onSend = { onImeActionPerformed.invoke(ImeAction.Send, keyboardController.value) }
+                ),
             cursorColor = textColor,
             textStyle = textStyle.copy(color = textColor),
-            onImeActionPerformed = {
-                onImeActionPerformed(it, keyboardController.value)
-            },
             onTextInputStarted = {
                 keyboardController.value = it
                 onTextInputStarted?.invoke(it)
@@ -163,7 +170,7 @@ fun TextInput(
         )
         if (value.text.isEmpty()) {
             Providers(
-                AmbientContentAlpha provides ContentAlpha.medium
+                LocalContentAlpha provides ContentAlpha.medium
             ) {
                 placeholder?.invoke()
             }

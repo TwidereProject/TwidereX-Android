@@ -22,17 +22,17 @@ package com.twidere.twiderex.preferences
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
-import androidx.compose.runtime.ambientOf
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.datastore.core.DataStore
 import com.twidere.twiderex.preferences.proto.AppearancePreferences
 import com.twidere.twiderex.preferences.proto.DisplayPreferences
-import com.twidere.twiderex.ui.AmbientVideoPlayback
+import com.twidere.twiderex.ui.LocalVideoPlayback
 import javax.inject.Inject
 
-val AmbientAppearancePreferences = ambientOf<AppearancePreferences>()
-val AmbientDisplayPreferences = ambientOf<DisplayPreferences>()
+val LocalAppearancePreferences = compositionLocalOf<AppearancePreferences>()
+val LocalDisplayPreferences = compositionLocalOf<DisplayPreferences>()
 
 data class PreferencesHolder @Inject constructor(
     val appearancePreferences: DataStore<AppearancePreferences>,
@@ -52,9 +52,9 @@ fun ProvidePreferences(
         .collectAsState(initial = DisplayPreferences.getDefaultInstance())
 
     Providers(
-        AmbientAppearancePreferences provides appearances,
-        AmbientDisplayPreferences provides display,
-        AmbientVideoPlayback provides display.autoPlayback,
+        LocalAppearancePreferences provides appearances,
+        LocalDisplayPreferences provides display,
+        LocalVideoPlayback provides display.autoPlayback,
     ) {
         content.invoke()
     }
