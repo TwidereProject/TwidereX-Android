@@ -49,8 +49,8 @@ import com.twidere.twiderex.component.foundation.LoadingProgress
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
 import com.twidere.twiderex.component.lazy.LocalLazyListController
 import com.twidere.twiderex.component.lazy.collectAsLazyPagingItems
-import com.twidere.twiderex.component.lazy.itemsIndexed
 import com.twidere.twiderex.component.lazy.loadState
+import com.twidere.twiderex.component.lazy.statusesIndexed
 import com.twidere.twiderex.component.status.StatusDivider
 import com.twidere.twiderex.component.status.TimelineStatusComponent
 import com.twidere.twiderex.extensions.refreshOrRetry
@@ -98,7 +98,7 @@ fun TimelineComponent(viewModel: TimelineViewModel) {
             LazyColumn(
                 state = listState
             ) {
-                itemsIndexed(items) { index, it ->
+                statusesIndexed(items) { index, it ->
                     it?.let { item ->
                         Column {
                             TimelineStatusComponent(

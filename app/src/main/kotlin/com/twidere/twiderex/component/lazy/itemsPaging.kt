@@ -32,12 +32,13 @@ import com.twidere.twiderex.component.foundation.loading
 
 fun <T : Any> LazyListScope.itemsPaging(
     lazyPagingItems: LazyPagingItems<T>,
+    key: ((index: Int) -> Any) = { lazyPagingItems[it]!!.hashCode() },
     itemContent: @Composable LazyItemScope.(value: T?) -> Unit
 ) {
     loadState(lazyPagingItems.loadState.refresh) {
         lazyPagingItems.retry()
     }
-    items(lazyPagingItems, itemContent = itemContent)
+    items(lazyPagingItems = lazyPagingItems, key = key, itemContent = itemContent)
     loadState(lazyPagingItems.loadState.append) {
         lazyPagingItems.retry()
     }

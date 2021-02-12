@@ -193,7 +193,10 @@ fun UserComponent(
 
                     when (selectedItem) {
                         0 -> {
-                            itemsPaging(timelineSource) { item ->
+                            itemsPaging(
+                                timelineSource,
+                                key = { timelineSource[it]!!.statusKey.hashCode() },
+                            ) { item ->
                                 item?.let {
                                     Column {
                                         TimelineStatusComponent(it)
@@ -236,7 +239,10 @@ fun UserComponent(
                             }
                         }
                         2 -> {
-                            itemsPaging(favouriteSource) { item ->
+                            itemsPaging(
+                                favouriteSource,
+                                key = { timelineSource[it]!!.statusKey.hashCode() },
+                            ) { item ->
                                 item?.let {
                                     Column {
                                         TimelineStatusComponent(it)

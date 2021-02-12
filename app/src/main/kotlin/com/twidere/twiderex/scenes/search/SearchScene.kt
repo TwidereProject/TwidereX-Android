@@ -69,6 +69,7 @@ import com.twidere.twiderex.component.lazy.collectAsLazyPagingItems
 import com.twidere.twiderex.component.lazy.items
 import com.twidere.twiderex.component.lazy.itemsPagingGridIndexed
 import com.twidere.twiderex.component.lazy.loadState
+import com.twidere.twiderex.component.lazy.statuses
 import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.component.status.StatusDivider
 import com.twidere.twiderex.component.status.StatusMediaPreviewItem
@@ -188,7 +189,7 @@ private fun SearchTweetsContent(viewModel: TwitterSearchTweetsViewModel) {
     ) {
         if (source.itemCount > 0) {
             LazyColumn {
-                items(source) { item ->
+                statuses(source) { item ->
                     item?.let {
                         TimelineStatusComponent(
                             it,
