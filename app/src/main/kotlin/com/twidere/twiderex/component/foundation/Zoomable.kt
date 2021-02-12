@@ -28,7 +28,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -40,8 +40,10 @@ import androidx.compose.ui.gesture.util.VelocityTracker
 import androidx.compose.ui.input.pointer.consumePositionChange
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.layout
+import com.twidere.twiderex.extensions.isInRange
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import kotlin.math.withSign
 
 class ZoomableState {
     val velocityTracker = VelocityTracker()
@@ -65,9 +67,13 @@ class ZoomableState {
         }
     }
 
-    suspend fun drag(dragDistance: Offset) {
-        translateY.snapTo((translateY.value + dragDistance.y))
-        translateX.snapTo((translateX.value + dragDistance.x))
+    suspend fun drag(dragDistance: Offset) = coroutineScope {
+        launch {
+            translateY.snapTo((translateY.value + dragDistance.y))
+        }
+        launch {
+            translateX.snapTo((translateX.value + dragDistance.x))
+        }
     }
 
     suspend fun dragEnd() {
@@ -75,9 +81,20 @@ class ZoomableState {
         fling(Offset(velocity.x, velocity.y))
     }
 
-    fun updateBounds(maxX: Float, maxY: Float) {
+    suspend fun updateBounds(maxX: Float, maxY: Float) = coroutineScope {
         translateY.updateBounds(-maxY, maxY)
         translateX.updateBounds(-maxX, maxX)
+        // Workaround for https://issuetracker.google.com/issues/180031493
+        if (!translateX.value.isInRange(-maxX, maxX)) {
+            launch {
+                translateX.snapTo(maxX.withSign(translateX.value))
+            }
+        }
+        if (!translateY.value.isInRange(-maxY, maxY)) {
+            launch {
+                translateY.snapTo(maxY.withSign(translateY.value))
+            }
+        }
     }
 }
 
@@ -100,7 +117,7 @@ fun Zoomable(
         var scale by remember { mutableStateOf(1f) }
         var childWidth by remember { mutableStateOf(0) }
         var childHeight by remember { mutableStateOf(0) }
-        DisposableEffect(
+        LaunchedEffect(
             childHeight,
             childWidth,
             scale,
@@ -110,7 +127,6 @@ fun Zoomable(
             val maxY = (childHeight * scale - constraints.maxHeight)
                 .coerceAtLeast(0F) / 2F
             state.updateBounds(maxX, maxY)
-            onDispose { }
         }
         Box(
             modifier = modifier
