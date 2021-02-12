@@ -71,7 +71,7 @@ fun DraftListScene() {
             }
         ) {
             LazyColumn {
-                items(items = source) {
+                items(items = source, key = { it._id.hashCode() }) {
                     ListItem(
                         text = {
                             Text(text = it.content)
