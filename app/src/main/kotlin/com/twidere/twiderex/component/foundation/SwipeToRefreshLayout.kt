@@ -189,13 +189,13 @@ class SwipeToRefreshState(
     }
 
     fun drag(delta: Float): Float {
-        return if (!value) {
+        return if (!value && delta > 0) {
             scope.launch {
                 snapTo((offset + delta).coerceAtMost(maxOffset))
             }
             delta
         } else {
-            minOffset
+            0f
         }
     }
 
