@@ -31,7 +31,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Surface
-import androidx.compose.material.SwipeableState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
@@ -283,58 +282,3 @@ fun SwipeToRefreshLayout(
         }
     }
 }
-
-/**
- * Temporary workaround for nested scrolling behavior. There is no default implementation for
- * pull to refresh yet, this nested scroll connection mimics the behavior.
- */
-@ExperimentalMaterialApi
-private val <T> SwipeableState<T>.PreUpPostDownNestedScrollConnection: NestedScrollConnection
-    get() = object : NestedScrollConnection {
-        override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
-            val delta = available.toFloat()
-            return if (delta < 0 && source == NestedScrollSource.Drag) {
-                performDrag(delta).toOffset()
-            } else {
-                Offset.Zero
-            }
-        }
-
-        override fun onPostScroll(
-            consumed: Offset,
-            available: Offset,
-            source: NestedScrollSource
-        ): Offset {
-            return if (source == NestedScrollSource.Drag) {
-                performDrag(available.toFloat()).toOffset()
-            } else {
-                Offset.Zero
-            }
-        }
-
-        override fun onPreFling(available: Velocity): Velocity {
-            val toFling = Offset(available.x, available.y).toFloat()
-            return if (toFling < 0) {
-                performFling(velocity = toFling) {}
-                // since we go to the anchor with tween settling, consume all for the best UX
-                available
-            } else {
-                Velocity.Zero
-            }
-        }
-
-        override fun onPostFling(
-            consumed: Velocity,
-            available: Velocity,
-            onFinished: (Velocity) -> Unit
-        ) {
-            performFling(velocity = Offset(available.x, available.y).toFloat()) {
-                // since we go to the anchor with tween settling, consume all for the best UX
-                onFinished.invoke(available)
-            }
-        }
-
-        private fun Float.toOffset(): Offset = Offset(0f, this)
-
-        private fun Offset.toFloat(): Float = this.y
-    }
