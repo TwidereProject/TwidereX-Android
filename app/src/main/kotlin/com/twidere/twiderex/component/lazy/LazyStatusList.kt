@@ -27,7 +27,7 @@ import com.twidere.twiderex.model.ui.UiStatus
 
 fun LazyListScope.statuses(
     lazyPagingItems: LazyPagingItems<UiStatus>,
-    key: ((index: Int) -> Any) = { lazyPagingItems[it]!!.statusKey.hashCode() },
+    key: ((index: Int) -> Any) = { lazyPagingItems[it]?.statusKey.hashCode() },
     itemContent: @Composable LazyItemScope.(value: UiStatus?) -> Unit
 ) {
     // this state recomposes every time the LazyPagingItems receives an update and changes the
@@ -43,7 +43,7 @@ fun LazyListScope.statuses(
 
 fun LazyListScope.statusesIndexed(
     lazyPagingItems: LazyPagingItems<UiStatus>,
-    key: ((index: Int) -> Any) = { lazyPagingItems[it]!!.statusKey.hashCode() },
+    key: ((index: Int) -> Any) = { lazyPagingItems[it]?.statusKey.hashCode() },
     itemContent: @Composable LazyItemScope.(index: Int, value: UiStatus?) -> Unit
 ) {
     // this state recomposes every time the LazyPagingItems receives an update and changes the
