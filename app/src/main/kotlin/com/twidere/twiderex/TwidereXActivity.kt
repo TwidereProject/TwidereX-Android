@@ -32,6 +32,7 @@ import androidx.compose.runtime.Providers
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalView
 import androidx.core.net.ConnectivityManagerCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -41,6 +42,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.ComposeNavigator
 import androidx.navigation.fragment.DialogFragmentNavigator
+import com.bumptech.glide.Glide
 import com.twidere.twiderex.action.LocalStatusActions
 import com.twidere.twiderex.action.StatusActions
 import com.twidere.twiderex.component.foundation.LocalInAppNotification
@@ -61,6 +63,7 @@ import com.twidere.twiderex.ui.LocalWindow
 import com.twidere.twiderex.ui.LocalWindowInsetsController
 import com.twidere.twiderex.viewmodel.ActiveAccountViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import dev.chrisbanes.accompanist.glide.LocalRequestManager
 import dev.chrisbanes.accompanist.insets.ExperimentalAnimatedInsets
 import dev.chrisbanes.accompanist.insets.ProvideWindowInsets
 import javax.inject.Inject
@@ -140,6 +143,7 @@ class TwidereXActivity : FragmentActivity() {
                 LocalActivity provides this,
                 LocalActiveAccountViewModel provides accountViewModel,
                 LocalIsActiveNetworkMetered provides isActiveNetworkMetered,
+                LocalRequestManager provides Glide.with(LocalView.current),
             ) {
                 ProvidePreferences(
                     preferencesHolder,

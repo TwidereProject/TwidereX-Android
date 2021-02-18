@@ -36,7 +36,6 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
@@ -68,6 +67,7 @@ import com.twidere.twiderex.annotations.IncomingComposeUpdate
 import com.twidere.twiderex.component.foundation.IconTabsComponent
 import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
+import com.twidere.twiderex.component.lazy.LazyColumn2
 import com.twidere.twiderex.component.lazy.collectAsLazyPagingItems
 import com.twidere.twiderex.component.lazy.itemsPaging
 import com.twidere.twiderex.component.lazy.itemsPagingGridIndexed
@@ -185,7 +185,7 @@ fun UserComponent(
                 selectedItem == 1 && mediaSource.itemCount > 0 ||
                 selectedItem == 2 && favouriteSource.itemCount > 0
             ) {
-                LazyColumn(
+                LazyColumn2(
                     state = lazyListState,
                 ) {
                     user?.let {
