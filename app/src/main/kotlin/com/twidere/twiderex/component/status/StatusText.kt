@@ -72,7 +72,7 @@ private fun RenderContent(
     onStatusTextClicked: () -> Unit = {},
 ) {
     val value = status.contentAnnotatedString()
-    if (value.text.isNotEmpty()) {
+    if (value.text.isNotEmpty() && value.text.isNotBlank()) {
         ClickableText(
             onClick = {
                 value.getStringAnnotations(start = it, end = it)
