@@ -77,6 +77,7 @@ class SwiperState(
 
 @Composable
 fun Swiper(
+    modifier: Modifier = Modifier,
     orientation: Orientation = Orientation.Vertical,
     enabled: Boolean = true,
     reverseDirection: Boolean = false,
@@ -86,7 +87,9 @@ fun Swiper(
     content: @Composable () -> Unit,
 ) {
     val scope = rememberCoroutineScope()
-    BoxWithConstraints {
+    BoxWithConstraints(
+        modifier = modifier,
+    ) {
         val state = remember {
             SwiperState(
                 constraints = constraints,

@@ -21,6 +21,7 @@
 package com.twidere.twiderex.component
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -299,6 +300,13 @@ private fun UserInfo(user: UiUser, viewModel: UserViewModel) {
             Box(
                 modifier = Modifier
                     .heightIn(max = maxBannerSize)
+                    .clickable(
+                        onClick = {
+                            navController.navigate(Route.Media.Raw(it))
+                        },
+                        indication = null,
+                        interactionState = remember { InteractionState() }
+                    )
             ) {
                 NetworkImage(
                     data = it,
@@ -331,8 +339,12 @@ private fun UserInfo(user: UiUser, viewModel: UserViewModel) {
                 )
                 UserAvatar(
                     user = user,
-                    size = 72.dp,
-                )
+                    size = 72.dp
+                ) {
+                    if (user.profileImage is String) {
+                        navController.navigate(Route.Media.Raw(user.profileImage))
+                    }
+                }
             }
             Spacer(modifier = Modifier.height(standardPadding))
             Row(

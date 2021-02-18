@@ -87,7 +87,6 @@ import com.twidere.twiderex.extensions.setOnSystemBarsVisibilityChangeListener
 import com.twidere.twiderex.extensions.showControls
 import com.twidere.twiderex.model.MediaType
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.preferences.proto.DisplayPreferences
@@ -102,7 +101,7 @@ import dev.chrisbanes.accompanist.insets.navigationBarsPadding
 import dev.chrisbanes.accompanist.insets.statusBarsPadding
 
 @Composable
-fun MediaScene(statusKey: MicroBlogKey, selectedIndex: Int) {
+fun StatusMediaScene(statusKey: MicroBlogKey, selectedIndex: Int) {
     val account = LocalActiveAccount.current ?: return
     val viewModel = assistedViewModel<MediaViewModel.AssistedFactory, MediaViewModel> {
         it.create(account, statusKey)
@@ -130,7 +129,7 @@ fun MediaScene(statusKey: MicroBlogKey, selectedIndex: Int) {
             Providers(
                 LocalVideoPlayback provides DisplayPreferences.AutoPlayback.Always
             ) {
-                MediaScene(status = it, selectedIndex = selectedIndex)
+                StatusMediaScene(status = it, selectedIndex = selectedIndex)
             }
         }
     }
@@ -138,8 +137,7 @@ fun MediaScene(statusKey: MicroBlogKey, selectedIndex: Int) {
 
 @OptIn(IncomingComposeUpdate::class)
 @Composable
-fun MediaScene(status: UiStatus, selectedIndex: Int) {
-    var lockPager by remember { mutableStateOf(false) }
+fun StatusMediaScene(status: UiStatus, selectedIndex: Int) {
     var controlVisibility by remember { mutableStateOf(true) }
     val controlPanelColor = MaterialTheme.colors.surface.copy(alpha = 0.6f)
     val navController = LocalNavController.current
@@ -162,40 +160,34 @@ fun MediaScene(status: UiStatus, selectedIndex: Int) {
                 }
             }
             val window = LocalWindow.current
-            Swiper(
-                enabled = !lockPager,
-                onDismiss = {
-                    navController.popBackStack()
-                },
-                onStart = {
-                    controlVisibility = false
-                },
-                onEnd = {
-                    controlVisibility = true
-                }
-            ) {
-                Pager(
-                    modifier = Modifier
-                        .clickable(
-                            onClick = {
-                                if (controlVisibility) {
-                                    window.hideControls()
-                                } else {
-                                    window.showControls()
-                                }
-                            },
-                            indication = null,
-                            interactionState = remember { InteractionState() }
-                        ),
-                    state = pagerState,
-                    dragEnabled = !lockPager,
-                ) {
-                    val data = status.media[this.page]
-                    MediaItemView(data, customControl = videoControl) {
-                        lockPager = it
+            MediaView(
+                modifier = Modifier
+                    .clickable(
+                        onClick = {
+                            if (controlVisibility) {
+                                window.hideControls()
+                            } else {
+                                window.showControls()
+                            }
+                        },
+                        indication = null,
+                        interactionState = remember { InteractionState() }
+                    ),
+                media = status.media.mapNotNull {
+                    it.mediaUrl?.let { it1 ->
+                        MediaData(
+                            it1,
+                            it.type
+                        )
                     }
+                },
+                onSwipeEnd = {
+                    controlVisibility = true
+                },
+                onSwipeStart = {
+                    controlVisibility = false
                 }
-            }
+            )
             DisposableEffect(Unit) {
                 window.setOnSystemBarsVisibilityChangeListener { visibility ->
                     controlVisibility = visibility
@@ -319,49 +311,84 @@ fun MediaScene(status: UiStatus, selectedIndex: Int) {
 }
 
 @Composable
-fun MediaItemView(
-    data: UiMedia,
-    customControl: PlayerControlView? = null,
-    requestLock: (Boolean) -> Unit,
-) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .clipToBounds()
+fun RawMediaScene(url: String) {
+    TwidereXTheme(
+        requireDarkTheme = true,
+        extendViewIntoStatusBar = true,
+        extendViewIntoNavigationBar = true,
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize(),
-            contentAlignment = Alignment.Center,
+        Scaffold {
+            MediaView(media = listOf(MediaData(url, MediaType.photo)))
+        }
+    }
+}
+
+data class MediaData(
+    val url: String,
+    val type: MediaType,
+)
+
+@Composable
+fun MediaView(
+    modifier: Modifier = Modifier,
+    media: List<MediaData>,
+    selectedIndex: Int = 0,
+    customControl: PlayerControlView? = null,
+    onSwipeStart: () -> Unit = {},
+    onSwipeEnd: () -> Unit = {},
+) {
+    var lockPager by remember { mutableStateOf(false) }
+    val navController = LocalNavController.current
+    Swiper(
+        modifier = modifier,
+        enabled = !lockPager,
+        onDismiss = {
+            navController.popBackStack()
+        },
+        onStart = {
+            onSwipeStart.invoke()
+        },
+        onEnd = {
+            onSwipeEnd.invoke()
+        }
+    ) {
+        val pagerState = remember {
+            PagerState(
+                currentPage = selectedIndex,
+                maxPage = media.lastIndex,
+            )
+        }
+        Pager(
+            state = pagerState,
+            dragEnabled = !lockPager,
         ) {
-            data.mediaUrl?.let {
-                when (data.type) {
-                    MediaType.photo ->
-                        Zoomable(
-                            onZoomStarted = {
-                                requestLock(true)
-                            },
-                            onZoomStopped = {
-                                requestLock(it != 1F)
+            val data = media[this.page]
+            when (data.type) {
+                MediaType.photo ->
+                    Zoomable(
+                        onZoomStarted = {
+                            lockPager = true
+                        },
+                        onZoomStopped = {
+                            lockPager = it != 1F
+                        }
+                    ) {
+                        NetworkImage(
+                            data = data.url,
+                            contentScale = ContentScale.Fit,
+                            placeholder = {
+                                CircularProgressIndicator()
                             }
-                        ) {
-                            NetworkImage(
-                                data = it,
-                                contentScale = ContentScale.Fit,
-                                placeholder = {
-                                    CircularProgressIndicator()
-                                }
-                            )
-                        }
-                    MediaType.video, MediaType.animated_gif ->
-                        Box {
-                            VideoPlayer(
-                                url = it,
-                                customControl = customControl,
-                                showControls = false
-                            )
-                        }
-                }
+                        )
+                    }
+                MediaType.video, MediaType.animated_gif ->
+                    Box {
+                        VideoPlayer(
+                            url = data.url,
+                            customControl = customControl,
+                            showControls = false
+                        )
+                    }
             }
         }
     }

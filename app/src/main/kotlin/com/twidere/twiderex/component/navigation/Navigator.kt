@@ -64,7 +64,7 @@ class Navigator(
     }
 
     override fun media(statusKey: MicroBlogKey, selectedIndex: Int) {
-        navController.navigate(Route.Media(statusKey, selectedIndex))
+        navController.navigate(Route.Media.Status(statusKey, selectedIndex))
     }
 
     override fun search(keyword: String) {

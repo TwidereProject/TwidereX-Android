@@ -35,8 +35,9 @@ import com.twidere.twiderex.dialog.TwitterWebSignInDialog
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.scenes.DraftListScene
 import com.twidere.twiderex.scenes.HomeScene
-import com.twidere.twiderex.scenes.MediaScene
+import com.twidere.twiderex.scenes.RawMediaScene
 import com.twidere.twiderex.scenes.SignInScene
+import com.twidere.twiderex.scenes.StatusMediaScene
 import com.twidere.twiderex.scenes.StatusScene
 import com.twidere.twiderex.scenes.UserScene
 import com.twidere.twiderex.scenes.compose.ComposeScene
@@ -104,8 +105,14 @@ object Route {
         "user/$name?host=$host&userKey=$userKey"
 
     fun Status(statusKey: MicroBlogKey) = "status/${statusKey.id}?host=${statusKey.host}"
-    fun Media(statusKey: MicroBlogKey, selectedIndex: Int = 0) =
-        "media/${statusKey.id}?selectedIndex=$selectedIndex&host=${statusKey.host}"
+
+    object Media {
+        fun Status(statusKey: MicroBlogKey, selectedIndex: Int = 0) =
+            "media/status/${statusKey.id}?selectedIndex=$selectedIndex&host=${statusKey.host}"
+
+        fun Raw(url: String) =
+            "media/raw/${URLEncoder.encode(url, "UTF-8")}"
+    }
 
     fun Search(keyword: String) = "search/result/${
     URLEncoder.encode(
@@ -284,7 +291,7 @@ fun NavGraphBuilder.route() {
     }
 
     authorizedComposable(
-        "media/{statusId}?selectedIndex={selectedIndex}&host={host}",
+        "media/status/{statusId}?selectedIndex={selectedIndex}&host={host}",
         arguments = listOf(
             navArgument("statusId") { type = NavType.StringType },
             navArgument("selectedIndex") { type = NavType.IntType; defaultValue = 0; },
@@ -301,8 +308,24 @@ fun NavGraphBuilder.route() {
             val selectedIndex = argument.getInt("selectedIndex", 0)
             val host = argument.getString("host") ?: MicroBlogKey.TwitterHost
             if (statusId != null) {
-                MediaScene(statusKey = MicroBlogKey(statusId, host), selectedIndex = selectedIndex)
+                StatusMediaScene(
+                    statusKey = MicroBlogKey(statusId, host),
+                    selectedIndex = selectedIndex
+                )
             }
+        }
+    }
+
+    authorizedComposable(
+        "media/raw/{url}",
+        arguments = listOf(
+            navArgument("url") { type = NavType.StringType },
+        )
+    ) { backStackEntry ->
+        backStackEntry.arguments?.getString("url")?.let {
+            URLDecoder.decode(it, "UTF-8")
+        }?.let {
+            RawMediaScene(url = it)
         }
     }
 

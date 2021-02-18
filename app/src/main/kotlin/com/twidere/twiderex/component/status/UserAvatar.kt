@@ -44,7 +44,8 @@ import com.twidere.twiderex.ui.profileImageSize
 @Composable
 fun UserAvatar(
     user: UiUser,
-    size: Dp = profileImageSize
+    size: Dp = profileImageSize,
+    onClick: (() -> Unit)? = null,
 ) {
     val navigator = LocalNavigator.current
     Box(
@@ -57,7 +58,9 @@ fun UserAvatar(
             modifier = Modifier
                 .clickable(
                     onClick = {
-                        navigator.user(user)
+                        onClick?.invoke() ?: run {
+                            navigator.user(user)
+                        }
                     }
                 )
                 .width(size)
