@@ -53,6 +53,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -96,7 +97,17 @@ fun HomeScene() {
         navController.enableOnBackPressed(false)
         onDispose { }
     }
-    var selectedItem by rememberSaveable { mutableStateOf(0) }
+    var selectedItem by rememberSaveable(
+        // FIXME: 2021/2/18 Workaround for https://issuetracker.google.com/issues/180513115
+        saver = Saver(
+            save = {
+                it.value
+            },
+            restore = {
+                mutableStateOf(it)
+            },
+        )
+    ) { mutableStateOf(0) }
     val timelineController = remember {
         LazyListController()
     }

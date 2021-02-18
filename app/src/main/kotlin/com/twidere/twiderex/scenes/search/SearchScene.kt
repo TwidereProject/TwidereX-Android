@@ -46,6 +46,7 @@ import androidx.compose.runtime.Providers
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -102,7 +103,17 @@ fun SearchScene(keyword: String) {
     val usersViewModel = viewModel {
         TwitterSearchUserViewModel(account, keyword)
     }
-    var selectedTab by rememberSaveable { mutableStateOf(0) }
+    var selectedTab by rememberSaveable(
+        // FIXME: 2021/2/18 Workaround for https://issuetracker.google.com/issues/180513115
+        saver = Saver(
+            save = {
+                it.value
+            },
+            restore = {
+                mutableStateOf(it)
+            },
+        )
+    ) { mutableStateOf(0) }
     val navigator = LocalNavigator.current
 
     TwidereXTheme {

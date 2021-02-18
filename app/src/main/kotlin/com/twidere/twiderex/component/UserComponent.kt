@@ -48,7 +48,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -150,7 +152,17 @@ fun UserComponent(
             painterResource(id = R.drawable.ic_photo) to stringResource(id = R.string.accessibility_scene_user_tab_media),
             painterResource(id = R.drawable.ic_heart) to stringResource(id = R.string.accessibility_scene_user_tab_favourite),
         )
-        val (selectedItem, setSelectedItem) = rememberSaveable { mutableStateOf(0) }
+        var selectedItem by rememberSaveable(
+            // FIXME: 2021/2/18 Workaround for https://issuetracker.google.com/issues/180513115
+            saver = Saver(
+                save = {
+                    it.value
+                },
+                restore = {
+                    mutableStateOf(it)
+                },
+            )
+        ) { mutableStateOf(0) }
 
         val refreshing by viewModel.refreshing.observeAsState(initial = false)
         SwipeToRefreshLayout(
@@ -186,7 +198,7 @@ fun UserComponent(
                             items = tabs,
                             selectedItem = selectedItem,
                             onItemSelected = {
-                                setSelectedItem(it)
+                                selectedItem = it
                             },
                         )
                     }
@@ -261,7 +273,7 @@ fun UserComponent(
                             items = tabs,
                             selectedItem = selectedItem,
                             onItemSelected = {
-                                setSelectedItem(it)
+                                selectedItem = it
                             },
                         )
                     }
