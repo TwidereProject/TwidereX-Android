@@ -35,7 +35,6 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -80,8 +79,7 @@ fun VideoPlayer(
         DisplayPreferences.AutoPlayback.Off -> false
         DisplayPreferences.AutoPlayback.UNRECOGNIZED -> true
     }
-    var autoPlay by rememberSaveable(url) { mutableStateOf(playInitial) }
-    var window by rememberSaveable(url) { mutableStateOf(0) }
+    var autoPlay by remember(url) { mutableStateOf(playInitial) }
     val context = LocalContext.current
     val lifecycle = LocalLifecycleOwner.current.lifecycle
 
@@ -111,13 +109,12 @@ fun VideoPlayer(
                         setMediaSource(it)
                     }
                     prepare()
-                    seekTo(window, VideoPool.get(url))
+                    seekTo(VideoPool.get(url))
                 }
             }
 
             fun updateState() {
                 autoPlay = player.playWhenReady
-                window = player.currentWindowIndex
                 VideoPool.set(url, 0L.coerceAtLeast(player.contentPosition))
             }
 
