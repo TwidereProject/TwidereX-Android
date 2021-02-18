@@ -36,7 +36,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.mapSaver
+import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -59,7 +59,7 @@ private val RefreshDistance = 80.dp
 private val MinRefreshDistance = 32.dp
 
 @Composable
-fun rememberSwipeToRefreshState(
+private fun rememberSwipeToRefreshState(
     scope: CoroutineScope,
     initialValue: Boolean,
     initialOffset: Float,
@@ -68,15 +68,13 @@ fun rememberSwipeToRefreshState(
     onRefresh: () -> Unit,
 ): SwipeToRefreshState {
     return rememberSaveable(
-        saver = mapSaver(
+        saver = Saver(
             save = {
-                mapOf(
-                    "value" to it.value,
-                )
+                it.value
             },
             restore = {
                 SwipeToRefreshState(
-                    it["value"] as Boolean,
+                    it,
                     scope = scope,
                     initialOffset = initialOffset,
                     maxOffset = maxOffset,
