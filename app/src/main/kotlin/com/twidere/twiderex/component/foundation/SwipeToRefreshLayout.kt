@@ -35,6 +35,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -67,8 +68,16 @@ private fun rememberSwipeToRefreshState(
     minOffset: Float,
     onRefresh: () -> Unit,
 ): SwipeToRefreshState {
-    return rememberSaveable(
-        saver = Saver(
+    // Avoid creating a new instance every invocation
+    val saver = remember(
+        scope,
+        initialValue,
+        initialOffset,
+        maxOffset,
+        minOffset,
+        onRefresh,
+    ) {
+        Saver<SwipeToRefreshState, Boolean>(
             save = {
                 it.value
             },
@@ -83,6 +92,9 @@ private fun rememberSwipeToRefreshState(
                 )
             }
         )
+    }
+    return rememberSaveable(
+        saver = saver,
     ) {
         SwipeToRefreshState(
             scope = scope,
