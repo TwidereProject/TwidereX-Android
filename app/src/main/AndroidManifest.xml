@@ -27,6 +27,7 @@
             android:authorities="${applicationId}.workmanager-init"
             tools:node="remove" />
         <activity
+            android:exported="true"
             android:launchMode="singleTop"
             android:hardwareAccelerated="true"
             android:name=".TwidereXActivity"
