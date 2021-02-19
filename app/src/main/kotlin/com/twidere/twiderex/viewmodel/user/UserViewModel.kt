@@ -47,8 +47,8 @@ class UserViewModel @AssistedInject constructor(
     private val factory: UserRepository.AssistedFactory,
     private val inAppNotification: InAppNotification,
     @Assisted private val account: AccountDetails,
-    @Assisted private val screenName: String,
-    @Assisted private val host: String,
+    @Assisted("screenName") private val screenName: String,
+    @Assisted("host") private val host: String,
     @Assisted private val initialUserKey: MicroBlogKey?,
 ) : ViewModel() {
 
@@ -56,8 +56,8 @@ class UserViewModel @AssistedInject constructor(
     interface AssistedFactory : IAssistedFactory {
         fun create(
             account: AccountDetails,
-            screenName: String,
-            host: String,
+            @Assisted("screenName") screenName: String,
+            @Assisted("host") host: String,
             initialUserKey: MicroBlogKey?,
         ): UserViewModel
     }
