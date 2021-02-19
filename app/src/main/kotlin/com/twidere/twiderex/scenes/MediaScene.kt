@@ -72,10 +72,10 @@ import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.LoadingProgress
 import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.foundation.Pager
-import com.twidere.twiderex.component.foundation.PagerState
 import com.twidere.twiderex.component.foundation.Swiper
 import com.twidere.twiderex.component.foundation.VideoPlayer
 import com.twidere.twiderex.component.foundation.Zoomable
+import com.twidere.twiderex.component.foundation.rememberPagerState
 import com.twidere.twiderex.component.status.LikeButton
 import com.twidere.twiderex.component.status.ReplyButton
 import com.twidere.twiderex.component.status.RetweetButton
@@ -143,12 +143,10 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int) {
     val navController = LocalNavController.current
     Scaffold {
         Box {
-            val pagerState = remember {
-                PagerState(
-                    currentPage = selectedIndex,
-                    maxPage = status.media.lastIndex,
-                )
-            }
+            val pagerState = rememberPagerState(
+                currentPage = selectedIndex,
+                maxPage = status.media.lastIndex,
+            )
             val context = LocalContext.current
             val videoControl = remember(pagerState.currentPage) {
                 if (status.media[pagerState.currentPage].type == MediaType.video) {
@@ -352,12 +350,10 @@ fun MediaView(
             onSwipeEnd.invoke()
         }
     ) {
-        val pagerState = remember {
-            PagerState(
-                currentPage = selectedIndex,
-                maxPage = media.lastIndex,
-            )
-        }
+        val pagerState = rememberPagerState(
+            currentPage = selectedIndex,
+            maxPage = media.lastIndex,
+        )
         Pager(
             state = pagerState,
             dragEnabled = !lockPager,

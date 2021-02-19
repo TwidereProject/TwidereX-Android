@@ -107,7 +107,7 @@ private fun rememberSwipeToRefreshState(
     }
 }
 
-class SwipeToRefreshState(
+private class SwipeToRefreshState(
     initialValue: Boolean,
     private val scope: CoroutineScope,
     private val initialOffset: Float,
