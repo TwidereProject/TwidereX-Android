@@ -184,7 +184,8 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int) {
                 },
                 onSwipeStart = {
                     controlVisibility = false
-                }
+                },
+                customControl = videoControl,
             )
             DisposableEffect(Unit) {
                 window.setOnSystemBarsVisibilityChangeListener { visibility ->
