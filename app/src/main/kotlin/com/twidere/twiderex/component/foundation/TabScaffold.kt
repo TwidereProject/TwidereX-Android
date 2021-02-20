@@ -30,6 +30,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.listSaver
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -41,21 +44,56 @@ import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.unit.Velocity
+import com.twidere.twiderex.extensions.isInRange
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 
+@Composable
+private fun rememberTabScaffoldState(): TabScaffoldState {
+    val scope = rememberCoroutineScope()
+    val saver = remember {
+        TabScaffoldState.Saver(scope = scope)
+    }
+    return rememberSaveable(
+        saver = saver
+    ) {
+        TabScaffoldState(scope = scope)
+    }
+}
+
 private class TabScaffoldState(
     private val scope: CoroutineScope,
+    initialOffset: Float = 0f,
+    initialMaxOffset: Float = 0f,
 ) : NestedScrollConnection {
 
-    val offset: Float
+    companion object {
+        fun Saver(
+            scope: CoroutineScope,
+        ): Saver<TabScaffoldState, *> = listSaver(
+            save = {
+                listOf(it.offset, it.maxOffset)
+            },
+            restore = {
+                TabScaffoldState(
+                    scope = scope,
+                    initialOffset = it[0],
+                    initialMaxOffset = it[1],
+                )
+            }
+        )
+    }
+
+    fun offsetState() = _offset.asState()
+
+    private val offset: Float
         get() = _offset.value
 
-    private var _offset = Animatable(0f)
+    private var _offset = Animatable(initialOffset)
 
-    var maxOffset by mutableStateOf(0)
+    var maxOffset by mutableStateOf(initialMaxOffset)
 
     override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
         val delta = available.y
@@ -78,14 +116,27 @@ private class TabScaffoldState(
         }
     }
 
+    override fun onPreFling(available: Velocity): Velocity {
+        return if (offset == 0f || offset.isInRange(maxOffset, 0f)) {
+            scope.launch {
+                fling(-available.y)
+            }
+            available
+        } else {
+            Velocity.Zero
+        }
+    }
+
     override fun onPostFling(
         consumed: Velocity,
         available: Velocity,
         onFinished: (Velocity) -> Unit
     ) {
-        scope.launch {
-            fling(available.y) {
-                onFinished.invoke(available)
+        available.y.takeIf { it != 0f }?.let { velocity ->
+            scope.launch {
+                fling(velocity) {
+                    onFinished.invoke(available)
+                }
             }
         }
     }
@@ -105,7 +156,7 @@ private class TabScaffoldState(
     fun drag(delta: Float): Float {
         return if (delta < 0 && offset > maxOffset || delta > 0 && offset < 0f) {
             scope.launch {
-                snapTo((offset + delta).coerceIn(maxOffset.toFloat(), 0f))
+                snapTo((offset + delta).coerceIn(maxOffset, 0f))
             }
             delta
         } else {
@@ -114,12 +165,12 @@ private class TabScaffoldState(
     }
 
     fun updateBounds(maxOffset: Float) {
-        this.maxOffset = maxOffset.toInt()
+        this.maxOffset = maxOffset
         _offset.updateBounds(maxOffset, 0f)
     }
 }
 
-class TabScaffoldHeaderState {
+private class TabScaffoldHeaderState {
     private val velocityTracker = VelocityTracker()
 
     fun dragEnd(): Velocity {
@@ -137,49 +188,49 @@ class TabScaffoldHeaderState {
 
 @Composable
 fun TabScaffold(
+    modifier: Modifier = Modifier,
     onScroll: (percent: Float) -> Unit = {},
     header: @Composable () -> Unit,
     content: @Composable () -> Unit,
 ) {
     val scope = rememberCoroutineScope()
-    val state = remember {
-        TabScaffoldState(scope = scope)
-    }
+    val state = rememberTabScaffoldState()
     val headerState = remember {
         TabScaffoldHeaderState()
     }
-    DisposableEffect(state.maxOffset, state.offset) {
-        if (state.maxOffset != 0) {
-            onScroll.invoke(state.offset.absoluteValue / state.maxOffset.absoluteValue.toFloat())
+    val offset by state.offsetState()
+    DisposableEffect(state.maxOffset, offset) {
+        if (state.maxOffset != 0f) {
+            onScroll.invoke(offset.absoluteValue / state.maxOffset.absoluteValue)
         }
         onDispose { }
     }
     Layout(
-        modifier = Modifier
-            .nestedScroll(state),
-        content = {
-            Box(
-                modifier = Modifier.pointerInput(Unit) {
-                    detectVerticalDragGestures(
-                        onVerticalDrag = { change, dragAmount ->
+        modifier = modifier
+            .nestedScroll(state)
+            .pointerInput(Unit) {
+                detectVerticalDragGestures(
+                    onVerticalDrag = { change, dragAmount ->
+                        if (state.drag(dragAmount) != 0f) {
                             change.consumeAllChanges()
-                            state.drag(dragAmount)
                             headerState.addPosition(
                                 change.uptimeMillis,
                                 change.position,
                             )
-                        },
-                        onDragEnd = {
-                            scope.launch {
-                                state.fling(-headerState.dragEnd().y)
-                            }
-                        },
-                        onDragCancel = {
-                            headerState.resetTracking()
                         }
-                    )
-                }
-            ) {
+                    },
+                    onDragEnd = {
+                        scope.launch {
+                            state.fling(headerState.dragEnd().y)
+                        }
+                    },
+                    onDragCancel = {
+                        headerState.resetTracking()
+                    }
+                )
+            },
+        content = {
+            Box {
                 header.invoke()
             }
             Box {
@@ -190,9 +241,9 @@ fun TabScaffold(
         layout(constraints.maxWidth, constraints.maxHeight) {
             val headerPlaceable = measurables[0].measure(constraints)
             state.updateBounds(-headerPlaceable.height.toFloat())
-            headerPlaceable.place(0, state.offset.roundToInt())
+            headerPlaceable.place(0, offset.roundToInt())
             val contentPlaceable = measurables[1].measure(constraints)
-            contentPlaceable.place(0, state.offset.roundToInt() + headerPlaceable.height)
+            contentPlaceable.place(0, offset.roundToInt() + headerPlaceable.height)
         }
     }
 }
