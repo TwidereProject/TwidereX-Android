@@ -33,6 +33,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.listSaver
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -45,12 +48,46 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlin.math.withSign
 
-class ZoomableState {
+@Composable
+private fun rememberZoomableState(): ZoomableState {
+    val saver = remember {
+        ZoomableState.Saver()
+    }
+
+    return rememberSaveable(
+        saver = saver
+    ) {
+        ZoomableState()
+    }
+}
+
+private class ZoomableState(
+    initialTranslateX: Float = 0f,
+    initialTranslateY: Float = 0f,
+    initialScale: Float = 1f,
+) {
+    companion object {
+        fun Saver(): Saver<ZoomableState, *> = listSaver(
+            save = {
+                listOf(it.translateX.value, it.translateY.value, it.scale)
+            },
+            restore = {
+                ZoomableState(
+                    initialTranslateX = it[0],
+                    initialTranslateY = it[1],
+                    initialScale = it[2],
+                )
+            }
+        )
+    }
+
     val velocityTracker = VelocityTracker()
 
-    var translateY = Animatable(0f)
+    var translateY = Animatable(initialTranslateY)
 
-    var translateX = Animatable(0f)
+    var translateX = Animatable(initialTranslateX)
+
+    var scale by mutableStateOf(initialScale)
 
     private suspend fun fling(velocity: Offset) = coroutineScope {
         launch {
@@ -108,23 +145,20 @@ fun Zoomable(
 ) {
     val scope = rememberCoroutineScope()
     BoxWithConstraints {
-        val state = remember {
-            ZoomableState()
-        }
+        val state = rememberZoomableState()
         val translateY by remember { state.translateY.asState() }
         val translateX by remember { state.translateX.asState() }
         var locked by remember { mutableStateOf(false) }
-        var scale by remember { mutableStateOf(1f) }
         var childWidth by remember { mutableStateOf(0) }
         var childHeight by remember { mutableStateOf(0) }
         LaunchedEffect(
             childHeight,
             childWidth,
-            scale,
+            state.scale,
         ) {
-            val maxX = (childWidth * scale - constraints.maxWidth)
+            val maxX = (childWidth * state.scale - constraints.maxWidth)
                 .coerceAtLeast(0F) / 2F
-            val maxY = (childHeight * scale - constraints.maxHeight)
+            val maxY = (childHeight * state.scale - constraints.maxHeight)
                 .coerceAtLeast(0F) / 2F
             state.updateBounds(maxX, maxY)
         }
@@ -158,15 +192,15 @@ fun Zoomable(
                 }
                 .zoomable(
                     onZoomDelta = {
-                        scale = (scale * it).coerceAtLeast(minScale)
+                        state.scale = (state.scale * it).coerceAtLeast(minScale)
                     },
                     onZoomStarted = {
                         locked = true
-                        onZoomStarted?.invoke(scale)
+                        onZoomStarted?.invoke(state.scale)
                     },
                     onZoomStopped = {
-                        locked = scale != minScale
-                        onZoomStopped?.invoke(scale)
+                        locked = state.scale != minScale
+                        onZoomStopped?.invoke(state.scale)
                     },
                 )
                 .layout { measurable, constraints ->
@@ -182,8 +216,8 @@ fun Zoomable(
                             (constraints.maxWidth - placeable.width) / 2,
                             (constraints.maxHeight - placeable.height) / 2
                         ) {
-                            scaleX = scale
-                            scaleY = scale
+                            scaleX = state.scale
+                            scaleY = state.scale
                             translationX = translateX
                             translationY = translateY
                         }
