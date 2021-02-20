@@ -76,12 +76,14 @@ fun TextTabsComponent(
 
 @Composable
 fun TabsComponent(
+    modifier: Modifier = Modifier,
     count: Int,
     selectedItem: Int,
     onItemSelected: (Int) -> Unit,
     tabContent: @Composable (Int) -> Unit,
 ) {
     TabRow(
+        modifier = modifier,
         selectedTabIndex = selectedItem,
         backgroundColor = MaterialTheme.colors.surface.withElevation(),
         indicator = { tabPositions ->

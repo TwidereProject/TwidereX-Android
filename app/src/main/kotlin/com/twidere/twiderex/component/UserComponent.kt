@@ -20,7 +20,6 @@
  */
 package com.twidere.twiderex.component
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -36,7 +35,6 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
@@ -46,27 +44,27 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.Saver
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
 import androidx.navigation.compose.navigate
-import androidx.paging.LoadState
 import com.twidere.twiderex.R
 import com.twidere.twiderex.annotations.IncomingComposeUpdate
 import com.twidere.twiderex.component.foundation.IconTabsComponent
 import com.twidere.twiderex.component.foundation.NetworkImage
+import com.twidere.twiderex.component.foundation.Pager
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
+import com.twidere.twiderex.component.foundation.TabScaffold
+import com.twidere.twiderex.component.foundation.rememberPagerState
 import com.twidere.twiderex.component.lazy.LazyColumn2
 import com.twidere.twiderex.component.lazy.collectAsLazyPagingItems
 import com.twidere.twiderex.component.lazy.itemsPaging
@@ -78,7 +76,6 @@ import com.twidere.twiderex.component.status.TimelineStatusComponent
 import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.component.status.withAvatarClip
 import com.twidere.twiderex.di.assisted.assistedViewModel
-import com.twidere.twiderex.extensions.refreshOrRetry
 import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiUser
@@ -92,9 +89,9 @@ import com.twidere.twiderex.viewmodel.user.UserFavouriteTimelineViewModel
 import com.twidere.twiderex.viewmodel.user.UserMediaTimelineViewModel
 import com.twidere.twiderex.viewmodel.user.UserTimelineViewModel
 import com.twidere.twiderex.viewmodel.user.UserViewModel
+import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalFoundationApi::class)
-@IncomingComposeUpdate
+@OptIn(IncomingComposeUpdate::class)
 @Composable
 fun UserComponent(
     screenName: String,
@@ -117,166 +114,187 @@ fun UserComponent(
     ) {
         MicroBlogKey(screenName, host)
     }
-    val lazyListState = rememberLazyListState()
+    val tabs = listOf(
+        UserTabComponent(
+            painterResource(id = R.drawable.ic_float_left),
+            stringResource(id = R.string.accessibility_scene_user_tab_status)
+        ) {
+            UserStatusTimeline(screenName = screenName, userKey = userKey)
+        },
+        UserTabComponent(
+            painterResource(id = R.drawable.ic_photo),
+            stringResource(id = R.string.accessibility_scene_user_tab_media)
+        ) {
+            UserMediaTimeline(screenName = screenName, userKey = userKey)
+        },
+        UserTabComponent(
+            painterResource(id = R.drawable.ic_heart),
+            stringResource(id = R.string.accessibility_scene_user_tab_favourite)
+        ) {
+            UserFavouriteTimeline(screenName = screenName, userKey = userKey)
+        },
+    )
+    val refreshing by viewModel.refreshing.observeAsState(initial = false)
+    SwipeToRefreshLayout(
+        refreshingState = refreshing,
+        onRefresh = {
+            viewModel.refresh()
+        },
+    ) {
+        TabScaffold(
+            header = {
+                user?.let {
+                    UserInfo(user = it, viewModel = viewModel)
+                }
+            },
+            content = {
+                val state = rememberPagerState(maxPage = tabs.lastIndex)
+                Column {
+                    val scope = rememberCoroutineScope()
+                    IconTabsComponent(
+                        items = tabs.map { it.icon to it.title },
+                        selectedItem = state.currentPage,
+                        onItemSelected = {
+                            scope.launch {
+                                state.selectPage { state.currentPage = it }
+                            }
+                        },
+                    )
+                    Pager(
+                        modifier = Modifier.weight(1f),
+                        state = state,
+                    ) {
+                        tabs[page].compose.invoke()
+                    }
+                }
+            }
+        )
+    }
+}
+
+data class UserTabComponent(
+    val icon: Painter,
+    val title: String,
+    val compose: @Composable () -> Unit,
+)
+
+@OptIn(IncomingComposeUpdate::class)
+@Composable
+fun UserStatusTimeline(
+    screenName: String,
+    userKey: MicroBlogKey,
+) {
+    val account = LocalActiveAccount.current ?: return
     val timelineViewModel =
         assistedViewModel<UserTimelineViewModel.AssistedFactory, UserTimelineViewModel>(
             account,
             screenName,
-            host,
         ) {
             it.create(account, screenName = screenName, userKey = userKey)
         }
+    val timelineSource = timelineViewModel.source.collectAsLazyPagingItems()
+    // FIXME: 2021/2/20 Recover the scroll position require visiting the loadState once, have no idea why
+    @Suppress("UNUSED_VARIABLE")
+    timelineSource.loadState
+    if (timelineSource.itemCount > 0) {
+        LazyColumn2 {
+            itemsPaging(
+                timelineSource,
+                key = { timelineSource[it]!!.statusKey.hashCode() },
+            ) { item ->
+                item?.let {
+                    Column {
+                        TimelineStatusComponent(it)
+                        StatusDivider()
+                    }
+                }
+            }
+        }
+    }
+}
+
+@OptIn(IncomingComposeUpdate::class)
+@Composable
+fun UserMediaTimeline(
+    screenName: String,
+    userKey: MicroBlogKey,
+) {
+    val account = LocalActiveAccount.current ?: return
     val mediaViewModel =
         assistedViewModel<UserMediaTimelineViewModel.AssistedFactory, UserMediaTimelineViewModel>(
             account,
             screenName,
-            host,
         ) {
             it.create(account, screenName = screenName, userKey = userKey)
         }
-    val favouriteViewModel =
+    val mediaSource = mediaViewModel.source.collectAsLazyPagingItems()
+    // FIXME: 2021/2/20 Recover the scroll position require visiting the loadState once, have no idea why
+    @Suppress("UNUSED_VARIABLE")
+    mediaSource.loadState
+    if (mediaSource.itemCount > 0) {
+        LazyColumn2 {
+            item {
+                Box(modifier = Modifier.height(standardPadding))
+            }
+            itemsPagingGridIndexed(
+                mediaSource,
+                rowSize = 2,
+                spacing = standardPadding,
+                padding = standardPadding
+            ) { index, pair ->
+                pair?.let { item ->
+                    val navigator = LocalNavigator.current
+                    Providers(
+                        LocalVideoPlayback provides DisplayPreferences.AutoPlayback.Off,
+                    ) {
+                        StatusMediaPreviewItem(
+                            item.first,
+                            modifier = Modifier
+                                .aspectRatio(1F)
+                                .clip(
+                                    MaterialTheme.shapes.medium
+                                ),
+                            onClick = {
+                                navigator.media(item.second.statusKey, index)
+                            }
+                        )
+                    }
+                }
+            }
+            item {
+                Box(modifier = Modifier.height(standardPadding))
+            }
+        }
+    }
+}
+
+@Composable
+fun UserFavouriteTimeline(
+    screenName: String,
+    userKey: MicroBlogKey,
+) {
+    val account = LocalActiveAccount.current ?: return
+    val timelineViewModel =
         assistedViewModel<UserFavouriteTimelineViewModel.AssistedFactory, UserFavouriteTimelineViewModel>(
             account,
             screenName,
-            host,
         ) {
             it.create(account, screenName = screenName, userKey = userKey)
         }
-
     val timelineSource = timelineViewModel.source.collectAsLazyPagingItems()
-    val mediaSource = mediaViewModel.source.collectAsLazyPagingItems()
-    val favouriteSource = favouriteViewModel.source.collectAsLazyPagingItems()
-
-    Box {
-        val tabs = listOf(
-            painterResource(id = R.drawable.ic_float_left) to stringResource(id = R.string.accessibility_scene_user_tab_status),
-            painterResource(id = R.drawable.ic_photo) to stringResource(id = R.string.accessibility_scene_user_tab_media),
-            painterResource(id = R.drawable.ic_heart) to stringResource(id = R.string.accessibility_scene_user_tab_favourite),
-        )
-        var selectedItem by rememberSaveable(
-            // FIXME: 2021/2/18 Workaround for https://issuetracker.google.com/issues/180513115
-            saver = Saver(
-                save = {
-                    it.value
-                },
-                restore = {
-                    mutableStateOf(it)
-                },
-            )
-        ) { mutableStateOf(0) }
-
-        val refreshing by viewModel.refreshing.observeAsState(initial = false)
-        SwipeToRefreshLayout(
-            refreshingState = refreshing ||
-                selectedItem == 0 && timelineSource.loadState.refresh is LoadState.Loading ||
-                selectedItem == 1 && mediaSource.loadState.refresh is LoadState.Loading ||
-                selectedItem == 2 && favouriteSource.loadState.refresh is LoadState.Loading,
-            onRefresh = {
-                viewModel.refresh()
-                when (selectedItem) {
-                    0 -> timelineSource.refreshOrRetry()
-                    1 -> mediaSource.refreshOrRetry()
-                    2 -> favouriteSource.refreshOrRetry()
-                }
-            },
-        ) {
-            if (
-                selectedItem == 0 && timelineSource.itemCount > 0 ||
-                selectedItem == 1 && mediaSource.itemCount > 0 ||
-                selectedItem == 2 && favouriteSource.itemCount > 0
-            ) {
-                LazyColumn2(
-                    state = lazyListState,
-                ) {
-                    user?.let {
-                        stickyHeader {
-                            UserInfo(user = it, viewModel = viewModel)
-                        }
-                    }
-
-                    stickyHeader {
-                        IconTabsComponent(
-                            items = tabs,
-                            selectedItem = selectedItem,
-                            onItemSelected = {
-                                selectedItem = it
-                            },
-                        )
-                    }
-
-                    when (selectedItem) {
-                        0 -> {
-                            itemsPaging(
-                                timelineSource,
-                                key = { timelineSource[it]!!.statusKey.hashCode() },
-                            ) { item ->
-                                item?.let {
-                                    Column {
-                                        TimelineStatusComponent(it)
-                                        StatusDivider()
-                                    }
-                                }
-                            }
-                        }
-                        1 -> {
-                            item {
-                                Box(modifier = Modifier.height(standardPadding))
-                            }
-                            itemsPagingGridIndexed(
-                                mediaSource,
-                                rowSize = 2,
-                                spacing = standardPadding,
-                                padding = standardPadding
-                            ) { index, pair ->
-                                pair?.let { item ->
-                                    val navigator = LocalNavigator.current
-                                    Providers(
-                                        LocalVideoPlayback provides DisplayPreferences.AutoPlayback.Off,
-                                    ) {
-                                        StatusMediaPreviewItem(
-                                            item.first,
-                                            modifier = Modifier
-                                                .aspectRatio(1F)
-                                                .clip(
-                                                    MaterialTheme.shapes.medium
-                                                ),
-                                            onClick = {
-                                                navigator.media(item.second.statusKey, index)
-                                            }
-                                        )
-                                    }
-                                }
-                            }
-                            item {
-                                Box(modifier = Modifier.height(standardPadding))
-                            }
-                        }
-                        2 -> {
-                            itemsPaging(
-                                favouriteSource,
-                                key = { timelineSource[it]!!.statusKey.hashCode() },
-                            ) { item ->
-                                item?.let {
-                                    Column {
-                                        TimelineStatusComponent(it)
-                                        StatusDivider()
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            } else {
-                user?.let {
+    // FIXME: 2021/2/20 Recover the scroll position require visiting the loadState once, have no idea why
+    @Suppress("UNUSED_VARIABLE")
+    timelineSource.loadState
+    if (timelineSource.itemCount > 0) {
+        LazyColumn2 {
+            itemsPaging(
+                timelineSource,
+                key = { timelineSource[it]!!.statusKey.hashCode() },
+            ) { item ->
+                item?.let {
                     Column {
-                        UserInfo(user = it, viewModel = viewModel)
-                        IconTabsComponent(
-                            items = tabs,
-                            selectedItem = selectedItem,
-                            onItemSelected = {
-                                selectedItem = it
-                            },
-                        )
+                        TimelineStatusComponent(it)
+                        StatusDivider()
                     }
                 }
             }

@@ -30,6 +30,9 @@ import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.listSaver
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.structuralEqualityPolicy
 import androidx.compose.ui.Alignment
@@ -50,11 +53,37 @@ import kotlin.math.withSign
  * https://gist.github.com/adamp/07d468f4bcfe632670f305ce3734f511
  */
 
+@Composable
+fun rememberPagerState(
+    currentPage: Int = 0,
+    minPage: Int = 0,
+    maxPage: Int = 0,
+): PagerState {
+    return rememberSaveable(
+        saver = PagerState.Saver(),
+    ) {
+        PagerState(currentPage, minPage, maxPage)
+    }
+}
+
 class PagerState(
     currentPage: Int = 0,
     minPage: Int = 0,
-    maxPage: Int = 0
+    maxPage: Int = 0,
 ) {
+    companion object {
+        fun Saver(): Saver<PagerState, *> = listSaver(
+            save = { listOf(it.currentPage, it.minPage, it.maxPage) },
+            restore = {
+                PagerState(
+                    currentPage = it[0],
+                    minPage = it[1],
+                    maxPage = it[2],
+                )
+            }
+        )
+    }
+
     private var _minPage by mutableStateOf(minPage)
     var minPage: Int
         get() = _minPage
@@ -84,7 +113,7 @@ class PagerState(
 
     suspend inline fun <R> selectPage(block: PagerState.() -> R): R = try {
         selectionState = SelectionState.Undecided
-        block()
+        block.invoke(this)
     } finally {
         selectPage()
     }

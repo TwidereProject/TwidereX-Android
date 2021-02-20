@@ -21,7 +21,7 @@
 package com.twidere.twiderex.component.foundation
 
 import androidx.compose.animation.core.Animatable
-import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
@@ -46,7 +46,8 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.gesture.nestedscroll.NestedScrollSource
 import androidx.compose.ui.gesture.nestedscroll.nestedScroll
-import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
+import androidx.compose.ui.input.pointer.consumeAllChanges
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.Velocity
@@ -107,7 +108,7 @@ private fun rememberSwipeToRefreshState(
     }
 }
 
-class SwipeToRefreshState(
+private class SwipeToRefreshState(
     initialValue: Boolean,
     private val scope: CoroutineScope,
     private val initialOffset: Float,
@@ -257,19 +258,20 @@ fun SwipeToRefreshLayout(
         modifier = Modifier
             .fillMaxWidth()
             .nestedScroll(state)
-            .draggable(
-                orientation = Orientation.Vertical,
-                onDrag = { dy ->
-                    scope.launch {
-                        state.drag(dy)
+            .pointerInput(Unit) {
+                detectVerticalDragGestures(
+                    onVerticalDrag = { change, dragAmount ->
+                        if (state.drag(dragAmount) != 0f) {
+                            change.consumeAllChanges()
+                        }
+                    },
+                    onDragEnd = {
+                        scope.launch {
+                            state.fling()
+                        }
                     }
-                },
-                onDragStopped = {
-                    scope.launch {
-                        state.fling()
-                    }
-                },
-            )
+                )
+            }
     ) {
         content()
         Box(
