@@ -62,6 +62,7 @@ import com.twidere.twiderex.annotations.IncomingComposeUpdate
 import com.twidere.twiderex.component.foundation.IconTabsComponent
 import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.foundation.Pager
+import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
 import com.twidere.twiderex.component.foundation.TabScaffold
 import com.twidere.twiderex.component.foundation.rememberPagerState
 import com.twidere.twiderex.component.lazy.LazyColumn2
@@ -90,6 +91,7 @@ import com.twidere.twiderex.viewmodel.user.UserTimelineViewModel
 import com.twidere.twiderex.viewmodel.user.UserViewModel
 import kotlinx.coroutines.launch
 
+@OptIn(IncomingComposeUpdate::class)
 @Composable
 fun UserComponent(
     screenName: String,
@@ -112,54 +114,62 @@ fun UserComponent(
     ) {
         MicroBlogKey(screenName, host)
     }
-    TabScaffold(
-        header = {
-            user?.let {
-                UserInfo(user = it, viewModel = viewModel)
-            }
+    val tabs = listOf(
+        UserTabComponent(
+            painterResource(id = R.drawable.ic_float_left),
+            stringResource(id = R.string.accessibility_scene_user_tab_status)
+        ) {
+            UserStatusTimeline(screenName = screenName, userKey = userKey)
         },
-        content = {
-            val tabs = listOf(
-                UserTabComponent(
-                    painterResource(id = R.drawable.ic_float_left),
-                    stringResource(id = R.string.accessibility_scene_user_tab_status)
-                ) {
-                    UserStatusTimeline(screenName = screenName, userKey = userKey)
-                },
-                UserTabComponent(
-                    painterResource(id = R.drawable.ic_photo),
-                    stringResource(id = R.string.accessibility_scene_user_tab_media)
-                ) {
-                    UserMediaTimeline(screenName = screenName, userKey = userKey)
-                },
-                UserTabComponent(
-                    painterResource(id = R.drawable.ic_heart),
-                    stringResource(id = R.string.accessibility_scene_user_tab_favourite)
-                ) {
-                    UserFavouriteTimeline(screenName = screenName, userKey = userKey)
-                },
-            )
-            val state = rememberPagerState(maxPage = tabs.lastIndex)
-            Column {
-                val scope = rememberCoroutineScope()
-                IconTabsComponent(
-                    items = tabs.map { it.icon to it.title },
-                    selectedItem = state.currentPage,
-                    onItemSelected = {
-                        scope.launch {
-                            state.selectPage { state.currentPage = it }
-                        }
-                    },
-                )
-                Pager(
-                    modifier = Modifier.weight(1f),
-                    state = state,
-                ) {
-                    tabs[page].compose.invoke()
+        UserTabComponent(
+            painterResource(id = R.drawable.ic_photo),
+            stringResource(id = R.string.accessibility_scene_user_tab_media)
+        ) {
+            UserMediaTimeline(screenName = screenName, userKey = userKey)
+        },
+        UserTabComponent(
+            painterResource(id = R.drawable.ic_heart),
+            stringResource(id = R.string.accessibility_scene_user_tab_favourite)
+        ) {
+            UserFavouriteTimeline(screenName = screenName, userKey = userKey)
+        },
+    )
+    val refreshing by viewModel.refreshing.observeAsState(initial = false)
+    SwipeToRefreshLayout(
+        refreshingState = refreshing,
+        onRefresh = {
+            viewModel.refresh()
+        },
+    ) {
+        TabScaffold(
+            header = {
+                user?.let {
+                    UserInfo(user = it, viewModel = viewModel)
+                }
+            },
+            content = {
+                val state = rememberPagerState(maxPage = tabs.lastIndex)
+                Column {
+                    val scope = rememberCoroutineScope()
+                    IconTabsComponent(
+                        items = tabs.map { it.icon to it.title },
+                        selectedItem = state.currentPage,
+                        onItemSelected = {
+                            scope.launch {
+                                state.selectPage { state.currentPage = it }
+                            }
+                        },
+                    )
+                    Pager(
+                        modifier = Modifier.weight(1f),
+                        state = state,
+                    ) {
+                        tabs[page].compose.invoke()
+                    }
                 }
             }
-        }
-    )
+        )
+    }
 }
 
 data class UserTabComponent(
@@ -168,6 +178,7 @@ data class UserTabComponent(
     val compose: @Composable () -> Unit,
 )
 
+@OptIn(IncomingComposeUpdate::class)
 @Composable
 fun UserStatusTimeline(
     screenName: String,
@@ -182,15 +193,20 @@ fun UserStatusTimeline(
             it.create(account, screenName = screenName, userKey = userKey)
         }
     val timelineSource = timelineViewModel.source.collectAsLazyPagingItems()
-    LazyColumn2 {
-        itemsPaging(
-            timelineSource,
-            key = { timelineSource[it]!!.statusKey.hashCode() },
-        ) { item ->
-            item?.let {
-                Column {
-                    TimelineStatusComponent(it)
-                    StatusDivider()
+    // FIXME: 2021/2/20 Recover the scroll position require visiting the loadState once, have no idea why
+    @Suppress("UNUSED_VARIABLE")
+    timelineSource.loadState
+    if (timelineSource.itemCount > 0) {
+        LazyColumn2 {
+            itemsPaging(
+                timelineSource,
+                key = { timelineSource[it]!!.statusKey.hashCode() },
+            ) { item ->
+                item?.let {
+                    Column {
+                        TimelineStatusComponent(it)
+                        StatusDivider()
+                    }
                 }
             }
         }
@@ -212,37 +228,42 @@ fun UserMediaTimeline(
             it.create(account, screenName = screenName, userKey = userKey)
         }
     val mediaSource = mediaViewModel.source.collectAsLazyPagingItems()
-    LazyColumn2 {
-        item {
-            Box(modifier = Modifier.height(standardPadding))
-        }
-        itemsPagingGridIndexed(
-            mediaSource,
-            rowSize = 2,
-            spacing = standardPadding,
-            padding = standardPadding
-        ) { index, pair ->
-            pair?.let { item ->
-                val navigator = LocalNavigator.current
-                Providers(
-                    LocalVideoPlayback provides DisplayPreferences.AutoPlayback.Off,
-                ) {
-                    StatusMediaPreviewItem(
-                        item.first,
-                        modifier = Modifier
-                            .aspectRatio(1F)
-                            .clip(
-                                MaterialTheme.shapes.medium
-                            ),
-                        onClick = {
-                            navigator.media(item.second.statusKey, index)
-                        }
-                    )
+    // FIXME: 2021/2/20 Recover the scroll position require visiting the loadState once, have no idea why
+    @Suppress("UNUSED_VARIABLE")
+    mediaSource.loadState
+    if (mediaSource.itemCount > 0) {
+        LazyColumn2 {
+            item {
+                Box(modifier = Modifier.height(standardPadding))
+            }
+            itemsPagingGridIndexed(
+                mediaSource,
+                rowSize = 2,
+                spacing = standardPadding,
+                padding = standardPadding
+            ) { index, pair ->
+                pair?.let { item ->
+                    val navigator = LocalNavigator.current
+                    Providers(
+                        LocalVideoPlayback provides DisplayPreferences.AutoPlayback.Off,
+                    ) {
+                        StatusMediaPreviewItem(
+                            item.first,
+                            modifier = Modifier
+                                .aspectRatio(1F)
+                                .clip(
+                                    MaterialTheme.shapes.medium
+                                ),
+                            onClick = {
+                                navigator.media(item.second.statusKey, index)
+                            }
+                        )
+                    }
                 }
             }
-        }
-        item {
-            Box(modifier = Modifier.height(standardPadding))
+            item {
+                Box(modifier = Modifier.height(standardPadding))
+            }
         }
     }
 }
@@ -261,15 +282,20 @@ fun UserFavouriteTimeline(
             it.create(account, screenName = screenName, userKey = userKey)
         }
     val timelineSource = timelineViewModel.source.collectAsLazyPagingItems()
-    LazyColumn2 {
-        itemsPaging(
-            timelineSource,
-            key = { timelineSource[it]!!.statusKey.hashCode() },
-        ) { item ->
-            item?.let {
-                Column {
-                    TimelineStatusComponent(it)
-                    StatusDivider()
+    // FIXME: 2021/2/20 Recover the scroll position require visiting the loadState once, have no idea why
+    @Suppress("UNUSED_VARIABLE")
+    timelineSource.loadState
+    if (timelineSource.itemCount > 0) {
+        LazyColumn2 {
+            itemsPaging(
+                timelineSource,
+                key = { timelineSource[it]!!.statusKey.hashCode() },
+            ) { item ->
+                item?.let {
+                    Column {
+                        TimelineStatusComponent(it)
+                        StatusDivider()
+                    }
                 }
             }
         }
