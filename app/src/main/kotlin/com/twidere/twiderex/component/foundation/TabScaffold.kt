@@ -40,7 +40,7 @@ import androidx.compose.ui.gesture.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.gesture.nestedscroll.NestedScrollSource
 import androidx.compose.ui.gesture.nestedscroll.nestedScroll
 import androidx.compose.ui.gesture.util.VelocityTracker
-import androidx.compose.ui.input.pointer.consumeAllChanges
+import androidx.compose.ui.input.pointer.consumePositionChange
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.unit.Velocity
@@ -212,7 +212,7 @@ fun TabScaffold(
                 detectVerticalDragGestures(
                     onVerticalDrag = { change, dragAmount ->
                         if (state.drag(dragAmount) != 0f) {
-                            change.consumeAllChanges()
+                            change.consumePositionChange(0f, dragAmount)
                             headerState.addPosition(
                                 change.uptimeMillis,
                                 change.position,
