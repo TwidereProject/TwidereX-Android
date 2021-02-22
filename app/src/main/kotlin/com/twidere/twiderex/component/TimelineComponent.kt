@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.defaultMinSizeConstraints
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Divider
@@ -45,7 +46,6 @@ import androidx.paging.LoadState
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.LoadingProgress
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
-import com.twidere.twiderex.component.lazy.LazyColumn2
 import com.twidere.twiderex.component.lazy.LocalLazyListController
 import com.twidere.twiderex.component.lazy.collectAsLazyPagingItems
 import com.twidere.twiderex.component.lazy.loadState
@@ -93,7 +93,7 @@ fun TimelineComponent(viewModel: TimelineViewModel) {
                 }
                 onDispose { }
             }
-            LazyColumn2(
+            LazyColumn(
                 state = listState
             ) {
                 statusesIndexed(items) { index, it ->

@@ -28,7 +28,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import com.twidere.twiderex.R
-import dev.chrisbanes.accompanist.glide.GlideImage
+import dev.chrisbanes.accompanist.coil.CoilImage
 
 @Composable
 fun NetworkImage(
@@ -45,7 +45,7 @@ fun NetworkImage(
             contentDescription = stringResource(id = R.string.accessibility_common_network_image)
         )
     } else {
-        GlideImage(
+        CoilImage(
             data = data,
             fadeIn = true,
             modifier = modifier,
