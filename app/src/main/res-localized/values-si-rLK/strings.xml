@@ -17,4 +17,8 @@
     <string name="scene_compose_and">, </string>
     <string name="scene_settings_title">සැකසුම්</string>
     <string name="scene_settings_display_section_header_media">මාධ්‍යය</string>
+    <string name="accessibility_common_status_media">මාධ්‍යය</string>
+    <string name="accessibility_scene_search_save">සුරකින්න</string>
+    <string name="accessibility_scene_user_tab_media">මාධ්‍යය</string>
+    <string name="accessibility_scene_manage_accounts_add">එකතු කරන්න</string>
 </resources>

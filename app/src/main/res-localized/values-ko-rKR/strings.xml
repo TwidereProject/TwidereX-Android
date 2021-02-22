@@ -64,6 +64,7 @@
     <string name="common_controls_actions_open_in_safari">사파리에서 보기</string>
     <string name="common_controls_timeline_load_more">더 불러오기</string>
     <string name="common_controls_status_actions_copy_text">글 복사하기</string>
+    <string name="common_controls_status_actions_quote">인용</string>
     <string name="common_controls_status_actions_copy_link">링크 복사하기</string>
     <string name="common_controls_status_actions_share_link">링크 공유하기</string>
     <string name="common_controls_status_actions_delete_tweet">트윗 지우기</string>
@@ -110,8 +111,7 @@
     <string name="scene_drawer_manage_accounts">계정 관리</string>
     <string name="scene_manage_accounts_title">계정</string>
     <string name="scene_manage_accounts_delete_account">계정 지우기</string>
-    <string name="scene_sign_in_hello_sign_in_to_get_started">안녕하세요!
-로그인해서 시작하세요.</string>
+    <string name="scene_sign_in_hello_sign_in_to_get_started">안녕하세요!\n로그인해서 시작하세요.</string>
     <string name="scene_sign_in_sign_in_with_twitter">트위터로 로그인하기</string>
     <string name="scene_sign_in_sign_in_with_mastodon">Mastodon으로 로그인하기</string>
     <string name="scene_sign_in_twitter_options_sign_in_with_custom_twitter_key">트위터 커스텀 키로 로그인하기</string>
@@ -184,14 +184,12 @@
     <string name="scene_settings_appearance_tab_position_top">위</string>
     <string name="scene_settings_appearance_tab_position_bottom">맨 아래</string>
     <string name="scene_settings_appearance_theme_auto">자동</string>
-    <string name="scene_settings_appearance_theme_light">밝게</string>
-    <string name="scene_settings_appearance_theme_dark">어둡게</string>
     <string name="scene_settings_display_title">디스플레이</string>
     <string name="scene_settings_display_section_header_preview">미리보기</string>
     <string name="scene_settings_display_section_header_text">글자</string>
     <string name="scene_settings_display_section_header_date_format">날짜 형식</string>
     <string name="scene_settings_display_section_header_media">미디어</string>
-    <string name="scene_settings_display_preview_thank_for_using_twidere_x">@TwidereProject를 써주셔서 고맙습니다!</string>
+    <string name="scene_settings_display_preview_thank_for_using_twidere_x">\@TwidereProject를 써주셔서 고맙습니다!</string>
     <string name="scene_settings_display_text_use_the_system_font_size">시스템 글꼴 크기 적용</string>
     <string name="scene_settings_display_text_avatar_style">아이콘 형식</string>
     <string name="scene_settings_display_text_circle">둥글게</string>
@@ -205,4 +203,10 @@
     <string name="scene_settings_display_media_off">끄기</string>
     <string name="scene_settings_about_title">정보</string>
     <string name="scene_settings_about_license">라이선스</string>
+    <string name="accessibility_common_status_media">미디어</string>
+    <string name="accessibility_common_status_actions_reply">답글</string>
+    <string name="accessibility_scene_home_compose">쓰기</string>
+    <string name="accessibility_scene_search_save">저장</string>
+    <string name="accessibility_scene_user_tab_media">미디어</string>
+    <string name="accessibility_scene_manage_accounts_add">새로 만들기</string>
 </resources>

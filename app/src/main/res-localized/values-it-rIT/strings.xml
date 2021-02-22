@@ -31,6 +31,7 @@
     <string name="common_controls_actions_preview">Anteprima</string>
     <string name="common_controls_actions_open_in_safari">Apri in Safari</string>
     <string name="common_controls_timeline_load_more">Carica Altro</string>
+    <string name="common_controls_status_actions_quote">Cita</string>
     <string name="common_controls_status_media">Contenuti</string>
     <string name="common_controls_friendship_actions_follow">Segui</string>
     <string name="common_controls_friendship_actions_unfollow">Smetti di seguire</string>
@@ -45,11 +46,15 @@
     <string name="scene_compose_title_compose">Componi</string>
     <string name="scene_compose_title_reply">Rispondi</string>
     <string name="scene_compose_title_quote">Cita</string>
-    <string name="scene_settings_appearance_theme_light">chiaro</string>
-    <string name="scene_settings_appearance_theme_dark">scuro</string>
     <string name="scene_settings_display_section_header_preview">Anteprima</string>
     <string name="scene_settings_display_section_header_media">Contenuti</string>
     <string name="scene_settings_display_media_always">Sempre</string>
     <string name="scene_settings_display_media_off">Off</string>
     <string name="scene_settings_about_license">Licenza</string>
+    <string name="accessibility_common_status_media">Contenuti</string>
+    <string name="accessibility_common_status_actions_reply">Rispondi</string>
+    <string name="accessibility_scene_home_compose">Componi</string>
+    <string name="accessibility_scene_search_save">Salva</string>
+    <string name="accessibility_scene_user_tab_media">Contenuti</string>
+    <string name="accessibility_scene_manage_accounts_add">Aggiungi</string>
 </resources>
