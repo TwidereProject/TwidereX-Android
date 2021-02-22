@@ -71,6 +71,7 @@ import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.LoadingProgress
 import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.foundation.Pager
+import com.twidere.twiderex.component.foundation.PagerState
 import com.twidere.twiderex.component.foundation.Swiper
 import com.twidere.twiderex.component.foundation.VideoPlayer
 import com.twidere.twiderex.component.foundation.Zoomable
@@ -184,6 +185,7 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int) {
                     controlVisibility = false
                 },
                 customControl = videoControl,
+                pagerState = pagerState,
             )
             DisposableEffect(Unit) {
                 window.setOnSystemBarsVisibilityChangeListener { visibility ->
@@ -329,7 +331,10 @@ data class MediaData(
 fun MediaView(
     modifier: Modifier = Modifier,
     media: List<MediaData>,
-    selectedIndex: Int = 0,
+    pagerState: PagerState = rememberPagerState(
+        currentPage = 0,
+        maxPage = media.lastIndex,
+    ),
     customControl: PlayerControlView? = null,
     onSwipeStart: () -> Unit = {},
     onSwipeEnd: () -> Unit = {},
@@ -349,10 +354,6 @@ fun MediaView(
             onSwipeEnd.invoke()
         }
     ) {
-        val pagerState = rememberPagerState(
-            currentPage = selectedIndex,
-            maxPage = media.lastIndex,
-        )
         Pager(
             state = pagerState,
             dragEnabled = !lockPager,
