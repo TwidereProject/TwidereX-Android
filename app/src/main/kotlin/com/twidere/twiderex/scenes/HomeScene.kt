@@ -133,7 +133,7 @@ fun HomeScene() {
                         AppBar(
                             backgroundColor = MaterialTheme.colors.surface.withElevation(),
                             title = {
-                                Text(text = menus[selectedItem].name)
+                                Text(text = menus[selectedItem].name())
                             },
                             navigationIcon = {
                                 IconButton(
@@ -169,7 +169,7 @@ fun HomeScene() {
                         }
                     ) {
                         IconTabsComponent(
-                            items = menus.map { it.icon to it.name },
+                            items = menus.map { it.icon() to it.name() },
                             selectedItem = selectedItem,
                             onItemSelected = {
                                 if (selectedItem == it) {
@@ -210,7 +210,7 @@ fun HomeScene() {
                     NavHost(navController = navController, startDestination = menus.first().route) {
                         menus.forEach { item ->
                             composable(item.route) {
-                                item.onCompose()
+                                item.content()
                             }
                         }
                     }
@@ -233,7 +233,7 @@ fun HomeBottomNavigation(
             BottomNavigationItem(
                 selectedContentColor = MaterialTheme.colors.primary,
                 unselectedContentColor = mediumEmphasisContentContentColor,
-                icon = { Icon(painter = item.icon, contentDescription = item.name) },
+                icon = { Icon(painter = item.icon(), contentDescription = item.name()) },
                 selected = selectedItem == index,
                 onClick = { onItemSelected.invoke(index) }
             )

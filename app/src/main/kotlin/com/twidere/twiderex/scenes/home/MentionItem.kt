@@ -32,18 +32,17 @@ import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.viewmodel.timeline.MentionsTimelineViewModel
 
 class MentionItem : HomeNavigationItem() {
-    override val name: String
-        @Composable
-        get() = stringResource(R.string.scene_mentions_title)
+    @Composable
+    override fun name(): String = stringResource(R.string.scene_mentions_title)
+
     override val route: String
         get() = "mentions"
 
-    override val icon: Painter
-        @Composable
-        get() = painterResource(id = R.drawable.ic_message_circle)
+    @Composable
+    override fun icon(): Painter = painterResource(id = R.drawable.ic_message_circle)
 
     @Composable
-    override fun onCompose() {
+    override fun content() {
         val account = LocalActiveAccount.current ?: return
         val viewModel =
             assistedViewModel<MentionsTimelineViewModel.AssistedFactory, MentionsTimelineViewModel>(

@@ -38,18 +38,18 @@ import com.twidere.twiderex.viewmodel.compose.ComposeType
 import com.twidere.twiderex.viewmodel.timeline.HomeTimelineViewModel
 
 class HomeTimelineItem : HomeNavigationItem() {
-    override val name: String
-        @Composable
-        get() = stringResource(R.string.scene_timeline_title)
+
+    @Composable
+    override fun name(): String = stringResource(R.string.scene_timeline_title)
+
     override val route: String
         get() = "home"
 
-    override val icon: Painter
-        @Composable
-        get() = painterResource(id = R.drawable.ic_home)
+    @Composable
+    override fun icon(): Painter = painterResource(id = R.drawable.ic_home)
 
     @Composable
-    override fun onCompose() {
+    override fun content() {
         val account = LocalActiveAccount.current ?: return
         val viewModel = assistedViewModel<HomeTimelineViewModel.AssistedFactory, HomeTimelineViewModel>(
             account

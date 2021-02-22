@@ -25,13 +25,14 @@ import androidx.compose.ui.graphics.painter.Painter
 
 abstract class HomeNavigationItem {
 
-    abstract val name: String
-        @Composable get
+    @Composable
+    abstract fun name(): String
+
     abstract val route: String
-    abstract val icon: Painter
-        @Composable get
+    @Composable
+    abstract fun icon(): Painter
     open val withAppBar = true
 
     @Composable
-    abstract fun onCompose()
+    abstract fun content()
 }

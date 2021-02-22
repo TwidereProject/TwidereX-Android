@@ -56,21 +56,22 @@ import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.viewmodel.search.SearchInputViewModel
 
 class SearchItem : HomeNavigationItem() {
-    override val name: String
-        @Composable
-        get() = stringResource(R.string.scene_search_title)
+
+    @Composable
+    override fun name(): String = stringResource(R.string.scene_search_title)
+
     override val route: String
         get() = "search"
 
-    override val icon: Painter
-        @Composable
-        get() = painterResource(id = R.drawable.ic_search)
+    @Composable
+    override fun icon(): Painter = painterResource(id = R.drawable.ic_search)
+
     override val withAppBar: Boolean
         get() = false
 
     @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
     @Composable
-    override fun onCompose() {
+    override fun content() {
         val account = LocalActiveAccount.current ?: return
         val viewModel =
             assistedViewModel<SearchInputViewModel.AssistedFactory, SearchInputViewModel>(

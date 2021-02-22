@@ -27,24 +27,24 @@ import androidx.compose.ui.res.stringResource
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.UserComponent
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
-import com.twidere.twiderex.model.ui.UiUser.Companion.toUi
 import com.twidere.twiderex.ui.LocalActiveAccount
 
 class MeItem : HomeNavigationItem() {
-    override val name: String
-        @Composable
-        get() = stringResource(R.string.scene_profile_title)
+
+    @Composable
+    override fun name(): String = stringResource(R.string.scene_profile_title)
+
     override val route: String
         get() = "me"
 
-    override val icon: Painter
-        @Composable
-        get() = painterResource(id = R.drawable.ic_user)
+    @Composable
+    override fun icon(): Painter = painterResource(id = R.drawable.ic_user)
+
     override val withAppBar: Boolean
         get() = false
 
     @Composable
-    override fun onCompose() {
+    override fun content() {
         val account = LocalActiveAccount.current
         account?.toUi()?.let { user ->
             InAppNotificationScaffold {
