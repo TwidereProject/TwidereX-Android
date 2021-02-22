@@ -38,6 +38,7 @@ import com.twidere.twiderex.viewmodel.twitter.TwitterSignInViewModel
 import com.twidere.twiderex.viewmodel.twitter.TwitterStatusViewModel
 import com.twidere.twiderex.viewmodel.twitter.search.TwitterSearchMediaViewModel
 import com.twidere.twiderex.viewmodel.twitter.search.TwitterSearchTweetsViewModel
+import com.twidere.twiderex.viewmodel.twitter.user.TwitterUserViewModel
 import com.twidere.twiderex.viewmodel.user.UserFavouriteTimelineViewModel
 import com.twidere.twiderex.viewmodel.user.UserMediaTimelineViewModel
 import com.twidere.twiderex.viewmodel.user.UserTimelineViewModel
@@ -84,6 +85,7 @@ data class AssistedViewModelFactoryHolder @Inject constructor(
     val draftItemViewModelFactory: DraftItemViewModel.AssistedFactory,
     val draftComposeViewModelFactory: DraftComposeViewModel.AssistedFactory,
     val twitterSignInViewModelViewModelFactory: TwitterSignInViewModel.AssistedFactory,
+    val twitterUserViewModelFactory: TwitterUserViewModel.AssistedFactory,
 )
 
 @Composable
@@ -108,6 +110,7 @@ fun ProvideAssistedFactory(
             factoryHolder.draftItemViewModelFactory,
             factoryHolder.draftComposeViewModelFactory,
             factoryHolder.twitterSignInViewModelViewModelFactory,
+            factoryHolder.twitterUserViewModelFactory,
         )
     }
     Providers(

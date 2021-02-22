@@ -53,7 +53,7 @@ class MastodonService(
     }
 
     override suspend fun userTimeline(
-        screen_name: String,
+        user_id: String,
         count: Int,
         since_id: String?,
         max_id: String?,
@@ -63,7 +63,7 @@ class MastodonService(
     }
 
     override suspend fun favorites(
-        screen_name: String,
+        user_id: String,
         count: Int,
         since_id: String?,
         max_id: String?

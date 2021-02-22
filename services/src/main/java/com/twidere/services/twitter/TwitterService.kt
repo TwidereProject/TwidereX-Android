@@ -140,32 +140,32 @@ class TwitterService(
     )
 
     override suspend fun userTimeline(
-        screen_name: String,
+        user_id: String,
         count: Int,
         since_id: String?,
         max_id: String?,
         exclude_replies: Boolean,
     ) = resources.userTimeline(
-        screen_name,
-        count,
-        since_id,
-        max_id,
+        user_id = user_id,
+        count = count,
+        since_id = since_id,
+        max_id = max_id,
         trim_user = false,
         exclude_replies = exclude_replies,
         include_entities = true,
     )
 
     override suspend fun favorites(
-        screen_name: String,
+        user_id: String,
         count: Int,
         since_id: String?,
         max_id: String?
     ) =
         resources.favoritesList(
-            screen_name,
-            count,
-            since_id,
-            max_id,
+            user_id = user_id,
+            count = count,
+            since_id = since_id,
+            max_id = max_id,
             include_entities = true,
         )
 
@@ -321,20 +321,20 @@ class TwitterService(
     override suspend fun searchUsers(query: String, page: Int?, count: Int) =
         resources.searchUser(query, page, count)
 
-    override suspend fun showRelationship(target_screen_name: String): IRelationship {
-        val response = resources.showFriendships(target_screen_name)
+    override suspend fun showRelationship(target_id: String): IRelationship {
+        val response = resources.showFriendships(target_id)
         return Relationship(
             followedBy = response.relationship?.target?.followedBy ?: false,
             following = response.relationship?.target?.following ?: false,
         )
     }
 
-    override suspend fun follow(screenName: String) {
-        resources.follow(screenName)
+    override suspend fun follow(user_id: String) {
+        resources.follow(user_id)
     }
 
-    override suspend fun unfollow(screenName: String) {
-        resources.unfollow(screenName)
+    override suspend fun unfollow(user_id: String) {
+        resources.unfollow(user_id)
     }
 
     override suspend fun like(id: String) = resources.like(id)

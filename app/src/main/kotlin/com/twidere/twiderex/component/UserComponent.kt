@@ -92,44 +92,35 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun UserComponent(
-    screenName: String,
-    host: String,
-    initialUserKey: MicroBlogKey? = null,
+    userKey: MicroBlogKey,
     initialData: UiUser? = null,
 ) {
     val account = LocalActiveAccount.current ?: return
     val viewModel = assistedViewModel<UserViewModel.AssistedFactory, UserViewModel>(
         account,
-        screenName,
-        host,
+        userKey,
     ) {
-        it.create(account, screenName, host, initialUserKey)
+        it.create(account, userKey)
     }
     val user by viewModel.user.observeAsState(initial = initialData)
-    val userKey = remember(
-        screenName,
-        host,
-    ) {
-        MicroBlogKey(screenName, host)
-    }
     val tabs = listOf(
         UserTabComponent(
             painterResource(id = R.drawable.ic_float_left),
             stringResource(id = R.string.accessibility_scene_user_tab_status)
         ) {
-            UserStatusTimeline(screenName = screenName, userKey = userKey)
+            UserStatusTimeline(userKey = userKey)
         },
         UserTabComponent(
             painterResource(id = R.drawable.ic_photo),
             stringResource(id = R.string.accessibility_scene_user_tab_media)
         ) {
-            UserMediaTimeline(screenName = screenName, userKey = userKey)
+            UserMediaTimeline(userKey = userKey)
         },
         UserTabComponent(
             painterResource(id = R.drawable.ic_heart),
             stringResource(id = R.string.accessibility_scene_user_tab_favourite)
         ) {
-            UserFavouriteTimeline(screenName = screenName, userKey = userKey)
+            UserFavouriteTimeline(userKey = userKey)
         },
     )
     val refreshing by viewModel.refreshing.observeAsState(initial = false)
@@ -178,16 +169,15 @@ data class UserTabComponent(
 
 @Composable
 fun UserStatusTimeline(
-    screenName: String,
     userKey: MicroBlogKey,
 ) {
     val account = LocalActiveAccount.current ?: return
     val timelineViewModel =
         assistedViewModel<UserTimelineViewModel.AssistedFactory, UserTimelineViewModel>(
             account,
-            screenName,
+            userKey,
         ) {
-            it.create(account, screenName = screenName, userKey = userKey)
+            it.create(account, userKey = userKey)
         }
     val timelineSource = timelineViewModel.source.collectAsLazyPagingItems()
     // FIXME: 2021/2/20 Recover the scroll position require visiting the loadState once, have no idea why
@@ -212,16 +202,15 @@ fun UserStatusTimeline(
 
 @Composable
 fun UserMediaTimeline(
-    screenName: String,
     userKey: MicroBlogKey,
 ) {
     val account = LocalActiveAccount.current ?: return
     val mediaViewModel =
         assistedViewModel<UserMediaTimelineViewModel.AssistedFactory, UserMediaTimelineViewModel>(
             account,
-            screenName,
+            userKey,
         ) {
-            it.create(account, screenName = screenName, userKey = userKey)
+            it.create(account, userKey = userKey)
         }
     val mediaSource = mediaViewModel.source.collectAsLazyPagingItems()
     // FIXME: 2021/2/20 Recover the scroll position require visiting the loadState once, have no idea why
@@ -266,16 +255,15 @@ fun UserMediaTimeline(
 
 @Composable
 fun UserFavouriteTimeline(
-    screenName: String,
     userKey: MicroBlogKey,
 ) {
     val account = LocalActiveAccount.current ?: return
     val timelineViewModel =
         assistedViewModel<UserFavouriteTimelineViewModel.AssistedFactory, UserFavouriteTimelineViewModel>(
             account,
-            screenName,
+            userKey,
         ) {
-            it.create(account, screenName = screenName, userKey = userKey)
+            it.create(account, userKey = userKey)
         }
     val timelineSource = timelineViewModel.source.collectAsLazyPagingItems()
     // FIXME: 2021/2/20 Recover the scroll position require visiting the loadState once, have no idea why
@@ -300,7 +288,6 @@ fun UserFavouriteTimeline(
 
 @Composable
 private fun UserInfo(user: UiUser, viewModel: UserViewModel) {
-    val isMe by viewModel.isMe.observeAsState(initial = false)
     val relationship by viewModel.relationship.observeAsState(initial = null)
     val loadingRelationship by viewModel.loadingRelationship.observeAsState(initial = false)
     val maxBannerSize = 200.dp
@@ -378,7 +365,7 @@ private fun UserInfo(user: UiUser, viewModel: UserViewModel) {
                         text = "@${user.screenName}",
                     )
                 }
-                if (isMe) {
+                if (viewModel.isMe) {
                     // TODO: edit button
 //                    Text(
 //                        style = MaterialTheme.typography.h6,

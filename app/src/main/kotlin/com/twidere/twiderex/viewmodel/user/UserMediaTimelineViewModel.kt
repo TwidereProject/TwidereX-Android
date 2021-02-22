@@ -47,7 +47,6 @@ class UserMediaTimelineViewModel @AssistedInject constructor(
     database: CacheDatabase,
     inAppNotification: InAppNotification,
     @Assisted account: AccountDetails,
-    @Assisted screenName: String,
     @Assisted userKey: MicroBlogKey,
 ) : ViewModel() {
 
@@ -55,7 +54,6 @@ class UserMediaTimelineViewModel @AssistedInject constructor(
     interface AssistedFactory : IAssistedFactory {
         fun create(
             account: AccountDetails,
-            screenName: String,
             userKey: MicroBlogKey,
         ): UserMediaTimelineViewModel
     }
@@ -74,7 +72,6 @@ class UserMediaTimelineViewModel @AssistedInject constructor(
 
     val pagingMediator: PagingMediator =
         UserMediaMediator(
-            screenName = screenName,
             userKey = userKey,
             database,
             account.accountKey,

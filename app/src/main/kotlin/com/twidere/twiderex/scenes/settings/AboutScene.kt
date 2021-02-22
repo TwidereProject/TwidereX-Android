@@ -120,8 +120,6 @@ private fun AboutContent() {
                     onClick = {
                         navController.navigate(
                             Route.User(
-                                "TwidereProject",
-                                MicroBlogKey.TwitterHost,
                                 MicroBlogKey.twitter("TwidereProject")
                             )
                         )

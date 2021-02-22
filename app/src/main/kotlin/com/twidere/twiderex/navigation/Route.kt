@@ -56,6 +56,7 @@ import com.twidere.twiderex.scenes.twitter.TwitterSignInScene
 import com.twidere.twiderex.scenes.twitter.TwitterWebSignInScene
 import com.twidere.twiderex.scenes.twitter.user.TwitterFollowersScene
 import com.twidere.twiderex.scenes.twitter.user.TwitterFollowingScene
+import com.twidere.twiderex.scenes.twitter.user.TwitterUserScene
 import com.twidere.twiderex.twitterHosts
 import com.twidere.twiderex.viewmodel.compose.ComposeType
 import java.net.URLDecoder
@@ -101,8 +102,8 @@ object Route {
         val TwitterWebSignInDialog = 1
     }
 
-    fun User(name: String, host: String, userKey: MicroBlogKey) =
-        "user/$name?host=$host&userKey=$userKey"
+    fun User(userKey: MicroBlogKey) =
+        "user/$userKey"
 
     fun Status(statusKey: MicroBlogKey) = "status/${statusKey.id}?host=${statusKey.host}"
 
@@ -245,11 +246,9 @@ fun NavGraphBuilder.route() {
     }
 
     authorizedComposable(
-        "user/{screenName}?host={host}&userKey={userKey}",
+        "twitter/{screenName}",
         arguments = listOf(
             navArgument("screenName") { type = NavType.StringType },
-            navArgument("host") { type = NavType.StringType; nullable = true; },
-            navArgument("userKey") { type = NavType.StringType; nullable = true; },
         ),
         deepLinks = twitterHosts.map {
             navDeepLink {
@@ -261,11 +260,22 @@ fun NavGraphBuilder.route() {
     ) { backStackEntry ->
         backStackEntry.arguments?.let { arguments ->
             arguments.getString("screenName")?.let {
-                val host = arguments.getString("host") ?: MicroBlogKey.TwitterHost
-                val userKey = arguments.getString("userKey")?.let {
-                    MicroBlogKey.valueOf(it)
-                }
-                UserScene(it, host = host, userKey = userKey)
+                TwitterUserScene(screenName = it)
+            }
+        }
+    }
+
+    authorizedComposable(
+        "user/{userKey}",
+        arguments = listOf(
+            navArgument("userKey") { type = NavType.StringType },
+        ),
+    ) { backStackEntry ->
+        backStackEntry.arguments?.let { arguments ->
+            arguments.getString("userKey")?.let {
+                MicroBlogKey.valueOf(it)
+            }?.let {
+                UserScene(it)
             }
         }
     }

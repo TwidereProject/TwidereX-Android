@@ -33,7 +33,6 @@ import com.twidere.twiderex.paging.mediator.PagingTimelineMediatorBase
 
 @OptIn(ExperimentalPagingApi::class)
 class UserMediaMediator(
-    private val screenName: String,
     private val userKey: MicroBlogKey,
     database: CacheDatabase,
     accountKey: MicroBlogKey,
@@ -45,7 +44,7 @@ class UserMediaMediator(
 
     override suspend fun load(pageSize: Int, max_id: String?): List<IStatus> {
         return service.userTimeline(
-            screen_name = screenName,
+            user_id = userKey.id,
             count = pageSize,
             max_id = max_id,
             exclude_replies = false
@@ -55,7 +54,7 @@ class UserMediaMediator(
     override fun transform(data: List<DbPagingTimelineWithStatus>): List<DbPagingTimelineWithStatus> {
         return data.filter {
             val content = it.status.status
-            it.status.retweet == null && content.data.hasMedia && content.user.screenName == screenName
+            it.status.retweet == null && content.data.hasMedia && content.user.userKey == userKey
         }
     }
 

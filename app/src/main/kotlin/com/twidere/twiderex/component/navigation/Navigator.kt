@@ -29,6 +29,7 @@ import android.webkit.CookieManager
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.core.os.bundleOf
 import androidx.navigation.NavController
+import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.compose.navigate
 import androidx.navigation.compose.popUpTo
 import com.twidere.twiderex.model.MicroBlogKey
@@ -40,11 +41,23 @@ import com.twidere.twiderex.viewmodel.compose.ComposeType
 val LocalNavigator = staticCompositionLocalOf<INavigator>()
 
 interface INavigator {
-    fun user(user: UiUser) {}
-    fun status(statusKey: MicroBlogKey) {}
-    fun media(statusKey: MicroBlogKey, selectedIndex: Int = 0) {}
+    fun user(user: UiUser, builder: NavOptionsBuilder.() -> Unit = {}) {}
+    fun status(statusKey: MicroBlogKey, builder: NavOptionsBuilder.() -> Unit = {}) {}
+    fun media(
+        statusKey: MicroBlogKey,
+        selectedIndex: Int = 0,
+        builder: NavOptionsBuilder.() -> Unit = {}
+    ) {
+    }
+
     fun search(keyword: String) {}
-    fun compose(composeType: ComposeType, statusKey: MicroBlogKey? = null) {}
+    fun compose(
+        composeType: ComposeType,
+        statusKey: MicroBlogKey? = null,
+        builder: NavOptionsBuilder.() -> Unit = {}
+    ) {
+    }
+
     fun openLink(it: String) {}
     fun twitterSignInWeb(target: String) {}
     fun mastodonSignInWeb(target: String) {}
@@ -55,16 +68,20 @@ class Navigator(
     private val navController: NavController,
     private val context: Context,
 ) : INavigator {
-    override fun user(user: UiUser) {
-        navController.navigate(Route.User(user.screenName, user.userKey.host, user.userKey))
+    override fun user(user: UiUser, builder: NavOptionsBuilder.() -> Unit) {
+        navController.navigate(Route.User(user.userKey), builder)
     }
 
-    override fun status(statusKey: MicroBlogKey) {
-        navController.navigate(Route.Status(statusKey))
+    override fun status(statusKey: MicroBlogKey, builder: NavOptionsBuilder.() -> Unit) {
+        navController.navigate(Route.Status(statusKey), builder)
     }
 
-    override fun media(statusKey: MicroBlogKey, selectedIndex: Int) {
-        navController.navigate(Route.Media.Status(statusKey, selectedIndex))
+    override fun media(
+        statusKey: MicroBlogKey,
+        selectedIndex: Int,
+        builder: NavOptionsBuilder.() -> Unit
+    ) {
+        navController.navigate(Route.Media.Status(statusKey, selectedIndex), builder)
     }
 
     override fun search(keyword: String) {
@@ -83,8 +100,12 @@ class Navigator(
         }
     }
 
-    override fun compose(composeType: ComposeType, statusKey: MicroBlogKey?) {
-        navController.navigate(Route.Compose(composeType, statusKey))
+    override fun compose(
+        composeType: ComposeType,
+        statusKey: MicroBlogKey?,
+        builder: NavOptionsBuilder.() -> Unit
+    ) {
+        navController.navigate(Route.Compose(composeType, statusKey), builder)
     }
 
     override fun openLink(it: String) {

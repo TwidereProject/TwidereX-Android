@@ -28,9 +28,7 @@ import com.twidere.twiderex.ui.TwidereXTheme
 
 @Composable
 fun UserScene(
-    screenName: String,
-    host: String,
-    userKey: MicroBlogKey?,
+    userKey: MicroBlogKey,
 ) {
     TwidereXTheme {
         InAppNotificationScaffold(
@@ -53,7 +51,7 @@ fun UserScene(
 //                )
 //            }
         ) {
-            UserComponent(screenName, host, userKey)
+            UserComponent(userKey)
         }
     }
 }

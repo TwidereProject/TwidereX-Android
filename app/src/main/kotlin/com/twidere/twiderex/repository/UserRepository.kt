@@ -57,6 +57,12 @@ class UserRepository @AssistedInject constructor(
         return user.toUi()
     }
 
+    suspend fun lookupUserById(id: String): UiUser {
+        val user = lookupService.lookupUser(id).toDbUser(accountKey)
+        saveUser(user)
+        return user.toUi()
+    }
+
     suspend fun lookupUsersByName(name: List<String>): List<UiUser> {
         return lookupService.lookupUsersByName(name = name).map { it.toDbUser(accountKey).toUi() }
     }
@@ -79,7 +85,7 @@ class UserRepository @AssistedInject constructor(
         }
     }
 
-    suspend fun showRelationship(target_screen_name: String) = relationshipService.showRelationship(target_screen_name)
+    suspend fun showRelationship(target_id: String) = relationshipService.showRelationship(target_id)
 
 //    suspend fun getPinnedStatus(user: UiUser): UiStatus? {
 //        val result = lookupService.userPinnedStatus(user.id) ?: return null
@@ -88,11 +94,11 @@ class UserRepository @AssistedInject constructor(
 //        return timeline.toUi(userKey)
 //    }
 
-    suspend fun unfollow(screenName: String) {
-        relationshipService.unfollow(screenName)
+    suspend fun unfollow(user_id: String) {
+        relationshipService.unfollow(user_id)
     }
 
-    suspend fun follow(screenName: String) {
-        relationshipService.follow(screenName)
+    suspend fun follow(user_id: String) {
+        relationshipService.follow(user_id)
     }
 }
