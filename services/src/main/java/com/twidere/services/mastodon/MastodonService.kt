@@ -23,14 +23,20 @@ package com.twidere.services.mastodon
 import com.twidere.services.http.authorization.BearerAuthorization
 import com.twidere.services.http.retrofit
 import com.twidere.services.mastodon.api.MastodonResources
+import com.twidere.services.mastodon.model.exceptions.MastodonException
+import com.twidere.services.microblog.LookupService
 import com.twidere.services.microblog.MicroBlogService
+import com.twidere.services.microblog.RelationshipService
 import com.twidere.services.microblog.TimelineService
+import com.twidere.services.microblog.model.IRelationship
 import com.twidere.services.microblog.model.IStatus
+import com.twidere.services.microblog.model.IUser
+import com.twidere.services.microblog.model.Relationship
 
 class MastodonService(
     private val host: String,
     private val accessToken: String,
-) : MicroBlogService, TimelineService {
+) : MicroBlogService, TimelineService, LookupService, RelationshipService {
     private val resources by lazy {
         retrofit<MastodonResources>(
             "https://$host",
@@ -58,9 +64,13 @@ class MastodonService(
         since_id: String?,
         max_id: String?,
         exclude_replies: Boolean
-    ): List<IStatus> {
-        TODO("Not yet implemented")
-    }
+    ): List<IStatus> = resources.userTimeline(
+        user_id = user_id,
+        max_id = max_id,
+        since_id = since_id,
+        limit = count,
+        exclude_replies = exclude_replies,
+    )
 
     override suspend fun favorites(
         user_id: String,
@@ -68,6 +78,47 @@ class MastodonService(
         since_id: String?,
         max_id: String?
     ): List<IStatus> {
+        return resources.favoritesList(
+            max_id = max_id,
+            since_id = since_id,
+            limit = count,
+        )
+    }
+
+    override suspend fun lookupUserByName(name: String): IUser {
         TODO("Not yet implemented")
+    }
+
+    override suspend fun lookupUsersByName(name: List<String>): List<IUser> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun lookupUser(id: String): IUser {
+        return resources.lookupUser(id)
+    }
+
+    override suspend fun lookupStatus(id: String): IStatus {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun userPinnedStatus(userId: String): IStatus? {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun showRelationship(target_id: String): IRelationship {
+        val response = resources.showFriendships(target_id).firstOrNull()
+            ?: throw MastodonException("can not fetch relationship")
+        return Relationship(
+            followedBy = response.following ?: false,
+            following = response.followedBy ?: false,
+        )
+    }
+
+    override suspend fun follow(user_id: String) {
+        resources.follow(user_id)
+    }
+
+    override suspend fun unfollow(user_id: String) {
+        resources.unfollow(user_id)
     }
 }

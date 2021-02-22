@@ -63,9 +63,7 @@ class UserViewModel @AssistedInject constructor(
     val loadingRelationship = MutableLiveData(false)
     val user = repository.getUserLiveData(userKey)
     val relationship = MutableLiveData<IRelationship>()
-    val isMe = userKey.let {
-        it == account.accountKey
-    }
+    val isMe = userKey == account.accountKey
 
     fun refresh() = viewModelScope.launch {
         refreshing.postValue(true)

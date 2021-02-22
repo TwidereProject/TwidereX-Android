@@ -29,6 +29,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -116,13 +117,18 @@ fun UserComponent(
         ) {
             UserMediaTimeline(userKey = userKey)
         },
-        UserTabComponent(
-            painterResource(id = R.drawable.ic_heart),
-            stringResource(id = R.string.accessibility_scene_user_tab_favourite)
-        ) {
-            UserFavouriteTimeline(userKey = userKey)
-        },
-    )
+    ).let {
+        if (viewModel.isMe || userKey.host == MicroBlogKey.TwitterHost) {
+            it + UserTabComponent(
+                painterResource(id = R.drawable.ic_heart),
+                stringResource(id = R.string.accessibility_scene_user_tab_favourite)
+            ) {
+                UserFavouriteTimeline(userKey = userKey)
+            }
+        } else {
+            it
+        }
+    }
     val refreshing by viewModel.refreshing.observeAsState(initial = false)
     SwipeToRefreshLayout(
         refreshingState = refreshing,
@@ -153,7 +159,12 @@ fun UserComponent(
                         modifier = Modifier.weight(1f),
                         state = state,
                     ) {
-                        tabs[page].compose.invoke()
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.TopCenter,
+                        ) {
+                            tabs[page].compose.invoke()
+                        }
                     }
                 }
             }

@@ -161,7 +161,8 @@ fun Account.toDbUser(
             ?: throw IllegalArgumentException("mastodon user.username should not be null"),
         userKey = MicroBlogKey(
             id ?: throw IllegalArgumentException("mastodon user.id should not be null"),
-            acct?.let { MicroBlogKey.valueOf(it) }?.host ?: accountKey.host,
+            acct?.let { MicroBlogKey.valueOf(it) }?.host?.takeIf { it.isNotEmpty() }
+                ?: accountKey.host,
         ),
         profileImage = avatar ?: avatarStatic ?: "",
         profileBackgroundImage = header ?: headerStatic ?: "",

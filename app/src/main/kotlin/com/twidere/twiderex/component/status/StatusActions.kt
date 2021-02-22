@@ -56,6 +56,7 @@ import com.twidere.twiderex.component.foundation.ActionIconButton
 import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.extensions.humanizedCount
 import com.twidere.twiderex.extensions.shareText
+import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.mediumEmphasisContentContentColor
@@ -157,22 +158,28 @@ fun RetweetButton(
     val icon = painterResource(id = R.drawable.ic_repeat)
     val contentDescription =
         stringResource(id = R.string.accessibility_common_status_actions_retweet)
+    var expanded by remember { mutableStateOf(false) }
     val retweetAction = {
-        if (account != null) {
-            actionsViewModel.retweet(status, account)
+        if (status.platformType == PlatformType.Twitter) {
+            expanded = true
+        } else {
+            if (account != null) {
+                actionsViewModel.retweet(status = status, account = account)
+            }
         }
     }
     Box(
         modifier = Modifier.weight(1f),
     ) {
-        var expanded by remember { mutableStateOf(false) }
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
         ) {
             DropdownMenuItem(
                 onClick = {
-                    retweetAction.invoke()
+                    if (account != null) {
+                        actionsViewModel.retweet(status, account)
+                    }
                     expanded = false
                 }
             ) {
@@ -196,13 +203,13 @@ fun RetweetButton(
                 color = color,
                 contentDescription = contentDescription,
                 onClick = {
-                    expanded = true
+                    retweetAction.invoke()
                 },
             )
         } else {
             ActionIconButton(
                 onClick = {
-                    expanded = true
+                    retweetAction.invoke()
                 },
             ) {
                 Icon(

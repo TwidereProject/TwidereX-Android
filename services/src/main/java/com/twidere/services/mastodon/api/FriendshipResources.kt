@@ -20,4 +20,24 @@
  */
 package com.twidere.services.mastodon.api
 
-interface MastodonResources : TimelineResources, LookupResources, FriendshipResources
+import com.twidere.services.mastodon.model.Account
+import com.twidere.services.mastodon.model.RelationshipResponse
+import retrofit2.http.GET
+import retrofit2.http.POST
+import retrofit2.http.Path
+import retrofit2.http.Query
+
+interface FriendshipResources {
+    @POST("/api/v1/accounts/{id}/follow")
+    suspend fun follow(
+        @Path(value = "id") id: String,
+    ): Account
+
+    @POST("/api/v1/accounts/{id}/unfollow")
+    suspend fun unfollow(
+        @Path(value = "id") id: String,
+    ): Account
+
+    @GET("/api/v1/accounts/relationships")
+    suspend fun showFriendships(@Query("id[]") id: String): List<RelationshipResponse>
+}

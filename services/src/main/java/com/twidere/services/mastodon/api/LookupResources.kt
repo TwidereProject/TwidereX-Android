@@ -20,4 +20,13 @@
  */
 package com.twidere.services.mastodon.api
 
-interface MastodonResources : TimelineResources, LookupResources, FriendshipResources
+import com.twidere.services.mastodon.model.Account
+import retrofit2.http.GET
+import retrofit2.http.Path
+
+interface LookupResources {
+    @GET("/api/v1/accounts/{id}")
+    suspend fun lookupUser(
+        @Path(value = "id") id: String,
+    ): Account
+}
