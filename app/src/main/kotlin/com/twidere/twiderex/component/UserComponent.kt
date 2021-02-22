@@ -58,7 +58,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
 import androidx.navigation.compose.navigate
 import com.twidere.twiderex.R
-import com.twidere.twiderex.annotations.IncomingComposeUpdate
 import com.twidere.twiderex.component.foundation.IconTabsComponent
 import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.foundation.Pager
@@ -91,7 +90,6 @@ import com.twidere.twiderex.viewmodel.user.UserTimelineViewModel
 import com.twidere.twiderex.viewmodel.user.UserViewModel
 import kotlinx.coroutines.launch
 
-@OptIn(IncomingComposeUpdate::class)
 @Composable
 fun UserComponent(
     screenName: String,
@@ -178,7 +176,6 @@ data class UserTabComponent(
     val compose: @Composable () -> Unit,
 )
 
-@OptIn(IncomingComposeUpdate::class)
 @Composable
 fun UserStatusTimeline(
     screenName: String,
@@ -213,7 +210,6 @@ fun UserStatusTimeline(
     }
 }
 
-@OptIn(IncomingComposeUpdate::class)
 @Composable
 fun UserMediaTimeline(
     screenName: String,

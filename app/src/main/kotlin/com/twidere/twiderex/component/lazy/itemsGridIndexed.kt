@@ -34,9 +34,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.twidere.twiderex.annotations.IncomingComposeUpdate
 
-@IncomingComposeUpdate
 fun <T> LazyListScope.itemsGridIndexed(
     data: List<T>,
     rowSize: Int,
@@ -67,7 +65,6 @@ fun <T> LazyListScope.itemsGridIndexed(
     }
 }
 
-@IncomingComposeUpdate
 fun <T : Any> LazyListScope.itemsPagingGridIndexed(
     data: LazyPagingItems<T>,
     rowSize: Int,

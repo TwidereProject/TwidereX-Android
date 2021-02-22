@@ -59,7 +59,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import com.twidere.twiderex.R
-import com.twidere.twiderex.annotations.IncomingComposeUpdate
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
@@ -188,7 +187,6 @@ fun SearchScene(keyword: String) {
     }
 }
 
-@OptIn(IncomingComposeUpdate::class)
 @Composable
 private fun SearchTweetsContent(viewModel: TwitterSearchTweetsViewModel) {
     val source = viewModel.source.collectAsLazyPagingItems()
@@ -216,7 +214,6 @@ private fun SearchTweetsContent(viewModel: TwitterSearchTweetsViewModel) {
     }
 }
 
-@OptIn(IncomingComposeUpdate::class)
 @Composable
 private fun SearchMediasContent(viewModel: TwitterSearchMediaViewModel) {
     val source = viewModel.source.collectAsLazyPagingItems()
@@ -267,7 +264,7 @@ private fun SearchMediasContent(viewModel: TwitterSearchMediaViewModel) {
     }
 }
 
-@OptIn(IncomingComposeUpdate::class, ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun SearchUsersContent(viewModel: TwitterSearchUserViewModel) {
     val source = viewModel.source.collectAsLazyPagingItems()

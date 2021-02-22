@@ -25,7 +25,6 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.twidere.twiderex.R
-import com.twidere.twiderex.annotations.IncomingComposeUpdate
 import com.twidere.twiderex.component.UserComponent
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.model.ui.UiUser.Companion.toUi
@@ -44,7 +43,6 @@ class MeItem : HomeNavigationItem() {
     override val withAppBar: Boolean
         get() = false
 
-    @OptIn(IncomingComposeUpdate::class)
     @Composable
     override fun onCompose() {
         val account = LocalActiveAccount.current

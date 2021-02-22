@@ -21,13 +21,11 @@
 package com.twidere.twiderex.scenes
 
 import androidx.compose.runtime.Composable
-import com.twidere.twiderex.annotations.IncomingComposeUpdate
 import com.twidere.twiderex.component.UserComponent
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.ui.TwidereXTheme
 
-@OptIn(IncomingComposeUpdate::class)
 @Composable
 fun UserScene(
     screenName: String,

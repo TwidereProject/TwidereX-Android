@@ -67,7 +67,6 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.compose.navigate
 import com.google.android.exoplayer2.ui.PlayerControlView
 import com.twidere.twiderex.R
-import com.twidere.twiderex.annotations.IncomingComposeUpdate
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.LoadingProgress
 import com.twidere.twiderex.component.foundation.NetworkImage
@@ -135,7 +134,6 @@ fun StatusMediaScene(statusKey: MicroBlogKey, selectedIndex: Int) {
     }
 }
 
-@OptIn(IncomingComposeUpdate::class)
 @Composable
 fun StatusMediaScene(status: UiStatus, selectedIndex: Int) {
     var controlVisibility by remember { mutableStateOf(true) }
