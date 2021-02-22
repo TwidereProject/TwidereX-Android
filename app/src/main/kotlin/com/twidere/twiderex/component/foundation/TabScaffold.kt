@@ -119,7 +119,7 @@ private class TabScaffoldState(
     override fun onPreFling(available: Velocity): Velocity {
         return if (offset == 0f || offset.isInRange(maxOffset, 0f)) {
             scope.launch {
-                fling(-available.y)
+                fling(-available.y * 2f)
             }
             available
         } else {
