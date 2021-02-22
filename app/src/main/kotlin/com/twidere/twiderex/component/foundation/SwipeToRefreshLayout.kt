@@ -262,7 +262,7 @@ fun SwipeToRefreshLayout(
                 detectVerticalDragGestures(
                     onVerticalDrag = { change, dragAmount ->
                         if (state.drag(dragAmount) != 0f) {
-                            change.consumeAllChanges()
+                            change.consumePositionChange(0f, dragAmount)
                         }
                     },
                     onDragEnd = {
