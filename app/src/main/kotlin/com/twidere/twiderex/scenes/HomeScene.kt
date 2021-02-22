@@ -41,10 +41,10 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.ScaffoldState
 import androidx.compose.material.Surface
+import androidx.compose.material.TabRowDefaults
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
@@ -86,6 +86,7 @@ import com.twidere.twiderex.ui.LocalActiveAccountViewModel
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereXTheme
 import com.twidere.twiderex.ui.mediumEmphasisContentContentColor
+import com.twidere.twiderex.ui.standardPadding
 import kotlinx.coroutines.launch
 
 @Composable
@@ -122,22 +123,7 @@ fun HomeScene() {
                                 Text(text = menus[pagerState.currentPage].name())
                             },
                             navigationIcon = {
-                                IconButton(
-                                    onClick = {
-                                        if (scaffoldState.drawerState.isOpen) {
-                                            scaffoldState.drawerState.close()
-                                        } else {
-                                            scaffoldState.drawerState.open()
-                                        }
-                                    }
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.Menu,
-                                        contentDescription = stringResource(
-                                            id = R.string.accessibility_scene_home_menu
-                                        )
-                                    )
-                                }
+                                MenuAvatar(scaffoldState)
                             },
                             elevation = if (menus[pagerState.currentPage].withAppBar) {
                                 TopAppBarElevation
@@ -154,20 +140,29 @@ fun HomeScene() {
                             0.dp
                         }
                     ) {
-                        IconTabsComponent(
-                            items = menus.map { it.icon() to it.name() },
-                            selectedItem = pagerState.currentPage,
-                            onItemSelected = {
-                                if (pagerState.currentPage == it) {
-                                    timelineController.scrollToTop()
-                                }
-                                scope.launch {
-                                    pagerState.selectPage {
-                                        pagerState.currentPage = it
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            MenuAvatar(scaffoldState)
+                            IconTabsComponent(
+                                modifier = Modifier.weight(1f),
+                                items = menus.map { it.icon() to it.name() },
+                                selectedItem = pagerState.currentPage,
+                                divider = {
+                                    TabRowDefaults.Divider(thickness = 0.dp)
+                                },
+                                onItemSelected = {
+                                    if (pagerState.currentPage == it) {
+                                        timelineController.scrollToTop()
                                     }
-                                }
-                            },
-                        )
+                                    scope.launch {
+                                        pagerState.selectPage {
+                                            pagerState.currentPage = it
+                                        }
+                                    }
+                                },
+                            )
+                        }
                     }
                 }
             },
@@ -201,6 +196,27 @@ fun HomeScene() {
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun MenuAvatar(scaffoldState: ScaffoldState) {
+    LocalActiveAccount.current?.let { account ->
+        val user = remember(account) {
+            account.toUi()
+        }
+        UserAvatar(
+            modifier = Modifier.padding(horizontal = standardPadding * 2),
+            size = 32.dp,
+            user = user,
+            onClick = {
+                if (scaffoldState.drawerState.isOpen) {
+                    scaffoldState.drawerState.close()
+                } else {
+                    scaffoldState.drawerState.open()
+                }
+            }
+        )
     }
 }
 

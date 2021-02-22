@@ -38,14 +38,20 @@ import com.twidere.twiderex.ui.mediumEmphasisContentContentColor
 
 @Composable
 fun IconTabsComponent(
+    modifier: Modifier = Modifier,
+    divider: @Composable () -> Unit = @Composable {
+        TabRowDefaults.Divider()
+    },
     items: List<Pair<Painter, String>>,
     selectedItem: Int,
     onItemSelected: (Int) -> Unit,
 ) {
     TabsComponent(
+        modifier = modifier,
         count = items.count(),
         selectedItem = selectedItem,
-        onItemSelected = onItemSelected
+        divider = divider,
+        onItemSelected = onItemSelected,
     ) {
         Box(
             modifier = Modifier.padding(16.dp)
@@ -79,6 +85,9 @@ fun TabsComponent(
     modifier: Modifier = Modifier,
     count: Int,
     selectedItem: Int,
+    divider: @Composable () -> Unit = @Composable {
+        TabRowDefaults.Divider()
+    },
     onItemSelected: (Int) -> Unit,
     tabContent: @Composable (Int) -> Unit,
 ) {
@@ -91,10 +100,10 @@ fun TabsComponent(
                 modifier = Modifier.tabIndicatorOffset(tabPositions[selectedItem]),
                 color = MaterialTheme.colors.primary,
             )
-        }
+        },
+        divider = divider
     ) {
         for (i in 0 until count) {
-
             Tab(
                 selected = selectedItem == i,
                 onClick = {

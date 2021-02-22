@@ -43,13 +43,14 @@ import com.twidere.twiderex.ui.profileImageSize
 
 @Composable
 fun UserAvatar(
+    modifier: Modifier = Modifier,
     user: UiUser,
     size: Dp = profileImageSize,
     onClick: (() -> Unit)? = null,
 ) {
     val navigator = LocalNavigator.current
     Box(
-        modifier = Modifier
+        modifier = modifier
             .withAvatarClip()
             .clipToBounds()
     ) {
