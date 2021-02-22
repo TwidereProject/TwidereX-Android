@@ -47,14 +47,12 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.Saver
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -62,14 +60,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigate
-import androidx.navigation.compose.rememberNavController
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.IconTabsComponent
+import com.twidere.twiderex.component.foundation.Pager
 import com.twidere.twiderex.component.foundation.TopAppBarElevation
+import com.twidere.twiderex.component.foundation.rememberPagerState
 import com.twidere.twiderex.component.lazy.LazyListController
 import com.twidere.twiderex.component.lazy.LocalLazyListController
 import com.twidere.twiderex.component.lazy.itemDivider
@@ -89,25 +86,11 @@ import com.twidere.twiderex.ui.LocalActiveAccountViewModel
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereXTheme
 import com.twidere.twiderex.ui.mediumEmphasisContentContentColor
+import kotlinx.coroutines.launch
 
 @Composable
 fun HomeScene() {
-    val navController = rememberNavController()
-    DisposableEffect(navController) {
-        navController.enableOnBackPressed(false)
-        onDispose { }
-    }
-    var selectedItem by rememberSaveable(
-        // FIXME: 2021/2/18 Workaround for https://issuetracker.google.com/issues/180513115
-        saver = Saver(
-            save = {
-                it.value
-            },
-            restore = {
-                mutableStateOf(it)
-            },
-        )
-    ) { mutableStateOf(0) }
+    val scope = rememberCoroutineScope()
     val timelineController = remember {
         LazyListController()
     }
@@ -117,6 +100,9 @@ fun HomeScene() {
         MentionItem(),
         SearchItem(),
         MeItem(),
+    )
+    val pagerState = rememberPagerState(
+        maxPage = menus.lastIndex
     )
     val scaffoldState = rememberScaffoldState()
     if (scaffoldState.drawerState.isOpen) {
@@ -129,11 +115,11 @@ fun HomeScene() {
             scaffoldState = scaffoldState,
             topBar = {
                 if (tabPosition == AppearancePreferences.TabPosition.Bottom) {
-                    if (menus[selectedItem].withAppBar) {
+                    if (menus[pagerState.currentPage].withAppBar) {
                         AppBar(
                             backgroundColor = MaterialTheme.colors.surface.withElevation(),
                             title = {
-                                Text(text = menus[selectedItem].name())
+                                Text(text = menus[pagerState.currentPage].name())
                             },
                             navigationIcon = {
                                 IconButton(
@@ -153,7 +139,7 @@ fun HomeScene() {
                                     )
                                 }
                             },
-                            elevation = if (menus[selectedItem].withAppBar) {
+                            elevation = if (menus[pagerState.currentPage].withAppBar) {
                                 TopAppBarElevation
                             } else {
                                 0.dp
@@ -162,7 +148,7 @@ fun HomeScene() {
                     }
                 } else {
                     Surface(
-                        elevation = if (menus[selectedItem].withAppBar) {
+                        elevation = if (menus[pagerState.currentPage].withAppBar) {
                             TopAppBarElevation
                         } else {
                             0.dp
@@ -170,14 +156,15 @@ fun HomeScene() {
                     ) {
                         IconTabsComponent(
                             items = menus.map { it.icon() to it.name() },
-                            selectedItem = selectedItem,
+                            selectedItem = pagerState.currentPage,
                             onItemSelected = {
-                                if (selectedItem == it) {
+                                if (pagerState.currentPage == it) {
                                     timelineController.scrollToTop()
                                 }
-                                selectedItem = it
-                                navController.navigate(menus[selectedItem].route) {
-                                    launchSingleTop = true
+                                scope.launch {
+                                    pagerState.selectPage {
+                                        pagerState.currentPage = it
+                                    }
                                 }
                             },
                         )
@@ -186,13 +173,14 @@ fun HomeScene() {
             },
             bottomBar = {
                 if (tabPosition == AppearancePreferences.TabPosition.Bottom) {
-                    HomeBottomNavigation(menus, selectedItem) {
-                        if (selectedItem == it) {
+                    HomeBottomNavigation(menus, pagerState.currentPage) {
+                        if (pagerState.currentPage == it) {
                             timelineController.scrollToTop()
                         }
-                        selectedItem = it
-                        navController.navigate(menus[selectedItem].route) {
-                            launchSingleTop = true
+                        scope.launch {
+                            pagerState.selectPage {
+                                pagerState.currentPage = it
+                            }
                         }
                     }
                 }
@@ -207,12 +195,8 @@ fun HomeScene() {
                 Providers(
                     LocalLazyListController provides timelineController
                 ) {
-                    NavHost(navController = navController, startDestination = menus.first().route) {
-                        menus.forEach { item ->
-                            composable(item.route) {
-                                item.content()
-                            }
-                        }
+                    Pager(state = pagerState) {
+                        menus[page].content()
                     }
                 }
             }
