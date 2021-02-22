@@ -35,6 +35,7 @@ import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.DraftRepository
+import com.twidere.twiderex.repository.StatusRepository
 import com.twidere.twiderex.utils.notify
 import com.twidere.twiderex.viewmodel.compose.ComposeType
 import dagger.assisted.Assisted
@@ -47,6 +48,7 @@ class TwitterComposeWorker @AssistedInject constructor(
     private val draftRepository: DraftRepository,
     private val accountRepository: AccountRepository,
     private val inAppNotification: InAppNotification,
+    private val statusRepository: StatusRepository,
 ) : CoroutineWorker(context, workerParams) {
 
     companion object {
@@ -100,8 +102,19 @@ class TwitterComposeWorker @AssistedInject constructor(
                 } ?: throw Error()
                 mediaIds.add(id)
             }
+            val content = draft.content.let {
+                if (draft.composeType == ComposeType.Quote && draft.statusKey != null) {
+                    val status = statusRepository.loadFromCache(
+                        draft.statusKey,
+                        accountKey = accountDetails.accountKey
+                    )
+                    it + " ${status?.generateShareLink()}"
+                } else {
+                    it
+                }
+            }
             service.update(
-                draft.content,
+                content,
                 media_ids = mediaIds,
                 in_reply_to_status_id = if (draft.composeType == ComposeType.Reply) draft.statusKey?.id else null,
                 repost_status_id = if (draft.composeType == ComposeType.Quote) draft.statusKey?.id else null,

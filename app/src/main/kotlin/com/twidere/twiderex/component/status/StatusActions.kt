@@ -155,33 +155,62 @@ fun RetweetButton(
         mediumEmphasisContentContentColor
     }
     val icon = painterResource(id = R.drawable.ic_repeat)
-    val contentDescription = stringResource(id = R.string.accessibility_common_status_actions_retweet)
-    val action = {
+    val contentDescription =
+        stringResource(id = R.string.accessibility_common_status_actions_retweet)
+    val retweetAction = {
         if (account != null) {
             actionsViewModel.retweet(status, account)
         }
     }
-    if (withNumber) {
-        StatusActionButtonWithNumbers(
-            icon = icon,
-            count = status.retweetCount,
-            color = color,
-            contentDescription = contentDescription,
-            onClick = {
-                action.invoke()
-            },
-        )
-    } else {
-        ActionIconButton(
-            onClick = {
-                action.invoke()
-            },
+    Box(
+        modifier = Modifier.weight(1f),
+    ) {
+        var expanded by remember { mutableStateOf(false) }
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
         ) {
-            Icon(
-                painter = icon,
-                tint = color,
+            DropdownMenuItem(
+                onClick = {
+                    retweetAction.invoke()
+                    expanded = false
+                }
+            ) {
+                Text(text = stringResource(id = R.string.common_controls_status_actions_retweet))
+            }
+            val navigator = LocalNavigator.current
+            DropdownMenuItem(
+                onClick = {
+                    navigator.compose(ComposeType.Quote, statusKey = status.statusKey)
+                }
+            ) {
+                Text(
+                    text = stringResource(id = R.string.common_controls_status_actions_quote),
+                )
+            }
+        }
+        if (withNumber) {
+            StatusActionButtonWithNumbers(
+                icon = icon,
+                count = status.retweetCount,
+                color = color,
                 contentDescription = contentDescription,
+                onClick = {
+                    expanded = true
+                },
             )
+        } else {
+            ActionIconButton(
+                onClick = {
+                    expanded = true
+                },
+            ) {
+                Icon(
+                    painter = icon,
+                    tint = color,
+                    contentDescription = contentDescription,
+                )
+            }
         }
     }
 }

@@ -250,37 +250,83 @@ private fun ComposeBody(
                 Box(
                     modifier = Modifier.weight(1f)
                 ) {
-                    if (composeType == ComposeType.New) {
-                        ComposeInput(
-                            scaffoldState,
-                            viewModel,
-                            account,
-                            keyboardController
-                        )
-                    } else {
-                        status?.let { status ->
-                            val listState = rememberLazyListState(
-                                initialFirstVisibleItemIndex = if (composeType == ComposeType.Reply) {
-                                    1
-                                } else {
-                                    0
-                                }
+                    when (composeType) {
+                        ComposeType.New -> {
+                            ComposeInput(
+                                scaffoldState,
+                                viewModel,
+                                account,
+                                keyboardController
                             )
-                            if (listState.firstVisibleItemIndex == 0) {
-                                keyboardController.value?.hideSoftwareKeyboard()
-                            } else if (listState.firstVisibleItemIndex == 1) {
-                                keyboardController.value?.showSoftwareKeyboard()
-                            }
-                            LazyColumn(
-                                state = listState,
-                            ) {
+                        }
+                        ComposeType.Quote,
+                        ComposeType.Reply -> {
+                            status?.let { status ->
+                                val listState = rememberLazyListState(
+                                    initialFirstVisibleItemIndex = if (composeType == ComposeType.Reply) {
+                                        1
+                                    } else {
+                                        0
+                                    }
+                                )
                                 if (composeType == ComposeType.Reply) {
+                                    if (listState.firstVisibleItemIndex == 0) {
+                                        keyboardController.value?.hideSoftwareKeyboard()
+                                    } else if (listState.firstVisibleItemIndex == 1) {
+                                        keyboardController.value?.showSoftwareKeyboard()
+                                    }
+                                }
+                                LazyColumn(
+                                    state = listState,
+                                ) {
+                                    if (composeType == ComposeType.Reply) {
+                                        item {
+                                            Box(
+                                                modifier = Modifier
+                                                    .background(MaterialTheme.colors.surface.withElevation())
+                                            ) {
+                                                StatusLineComponent(lineDown = true) {
+                                                    TimelineStatusComponent(
+                                                        data = status,
+                                                        showActions = false,
+                                                    )
+                                                }
+                                            }
+                                        }
+                                    }
                                     item {
-                                        Box(
-                                            modifier = Modifier
-                                                .background(MaterialTheme.colors.surface.withElevation())
+                                        StatusLineComponent(
+                                            modifier = Modifier.let {
+                                                if (composeType == ComposeType.Reply) {
+                                                    it.fillParentMaxSize()
+                                                } else {
+                                                    it
+                                                }
+                                            },
+                                            lineUp = composeType == ComposeType.Reply,
                                         ) {
-                                            StatusLineComponent(lineDown = true) {
+                                            ComposeInput(
+                                                scaffoldState,
+                                                viewModel,
+                                                account,
+                                                keyboardController,
+                                                autoFocus = if (composeType == ComposeType.Reply) {
+                                                    listState.firstVisibleItemIndex == 1
+                                                } else {
+                                                    true
+                                                }
+                                            )
+                                        }
+                                    }
+                                    if (composeType == ComposeType.Quote) {
+                                        item {
+                                            Box(
+                                                modifier = Modifier.background(
+                                                    MaterialTheme.colors.onBackground.copy(
+                                                        alpha = 0.04f
+                                                    )
+                                                ),
+                                            ) {
                                                 TimelineStatusComponent(
                                                     data = status,
                                                     showActions = false,
@@ -289,30 +335,13 @@ private fun ComposeBody(
                                         }
                                     }
                                 }
-                                item {
-                                    StatusLineComponent(
-                                        modifier = Modifier.fillParentMaxSize(),
-                                        lineUp = composeType == ComposeType.Reply,
-                                    ) {
-                                        ComposeInput(
-                                            scaffoldState,
-                                            viewModel,
-                                            account,
-                                            keyboardController,
-                                            autoFocus = if (composeType == ComposeType.Reply) {
-                                                listState.firstVisibleItemIndex == 1
-                                            } else {
-                                                true
-                                            }
-                                        )
-                                    }
-                                }
                             }
                         }
                     }
                 }
 
                 if (images.any()) {
+                    Spacer(modifier = Modifier.height(standardPadding * 2))
                     LazyRow(
                         modifier = Modifier.padding(horizontal = standardPadding * 2),
                     ) {
@@ -325,9 +354,9 @@ private fun ComposeBody(
                             }
                         }
                     }
-                    Spacer(modifier = Modifier.height(standardPadding * 2))
                 }
 
+                Spacer(modifier = Modifier.height(standardPadding * 2))
                 Row(
                     modifier = Modifier
                         .padding(horizontal = standardPadding * 2)
