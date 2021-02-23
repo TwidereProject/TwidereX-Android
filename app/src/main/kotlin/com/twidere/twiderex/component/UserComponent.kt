@@ -198,7 +198,7 @@ fun UserStatusTimeline(
         LazyColumn {
             itemsPaging(
                 timelineSource,
-                key = { timelineSource[it]!!.statusKey.hashCode() },
+                key = { timelineSource[it]?.statusKey.hashCode() },
             ) { item ->
                 item?.let {
                     Column {
@@ -284,7 +284,7 @@ fun UserFavouriteTimeline(
         LazyColumn {
             itemsPaging(
                 timelineSource,
-                key = { timelineSource[it]!!.statusKey.hashCode() },
+                key = { timelineSource[it]?.statusKey.hashCode() },
             ) { item ->
                 item?.let {
                     Column {
