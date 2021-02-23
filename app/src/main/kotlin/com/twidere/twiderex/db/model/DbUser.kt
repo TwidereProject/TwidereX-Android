@@ -20,9 +20,11 @@
  */
 package com.twidere.twiderex.db.model
 
+import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import androidx.room.Relation
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.PlatformType
 
@@ -45,10 +47,24 @@ data class DbUser(
     val followersCount: Long,
     val friendsCount: Long,
     val listedCount: Long,
-    val desc: String,
+    val htmlDesc: String,
+    val rawDesc: String,
     val website: String?,
     val location: String?,
     val verified: Boolean,
     val isProtected: Boolean,
     val platformType: PlatformType,
+    @Embedded
+    val twitterExtra: DbTwitterUserExtra? = null
+)
+
+data class DbTwitterUserExtra(
+    var pinned_tweet_id: String?
+)
+
+data class DbUserWithEntity(
+    @Embedded
+    val user: DbUser,
+    @Relation(parentColumn = "userKey", entityColumn = "userKey")
+    val url: List<DbUrlEntity>,
 )

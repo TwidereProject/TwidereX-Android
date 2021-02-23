@@ -45,6 +45,7 @@ import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -70,6 +71,8 @@ import com.twidere.twiderex.component.lazy.collectAsLazyPagingItems
 import com.twidere.twiderex.component.lazy.itemsPaging
 import com.twidere.twiderex.component.lazy.itemsPagingGridIndexed
 import com.twidere.twiderex.component.navigation.LocalNavigator
+import com.twidere.twiderex.component.status.HtmlText
+import com.twidere.twiderex.component.status.ResolvedLink
 import com.twidere.twiderex.component.status.StatusDivider
 import com.twidere.twiderex.component.status.StatusMediaPreviewItem
 import com.twidere.twiderex.component.status.TimelineStatusComponent
@@ -80,6 +83,7 @@ import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.navigation.Route
+import com.twidere.twiderex.navigation.twidereXSchema
 import com.twidere.twiderex.preferences.proto.DisplayPreferences
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalNavController
@@ -420,9 +424,9 @@ private fun UserInfo(user: UiUser, viewModel: UserViewModel) {
                 }
             }
             Spacer(modifier = Modifier.height(standardPadding))
-            Text(
+            UserDescText(
                 modifier = Modifier.padding(horizontal = standardPadding * 2),
-                text = user.desc,
+                user = user,
             )
             user.website?.let {
                 val navigator = LocalNavigator.current
@@ -514,5 +518,31 @@ private fun UserInfo(user: UiUser, viewModel: UserViewModel) {
             }
             Spacer(modifier = Modifier.height(standardPadding))
         }
+    }
+}
+
+@Composable
+fun UserDescText(
+    modifier: Modifier = Modifier,
+    user: UiUser,
+) {
+    key(user) {
+        HtmlText(
+            modifier = modifier,
+            htmlText = user.htmlDesc,
+            linkResolver = { href ->
+                val entity = user.url.firstOrNull { it.url == href }
+                if (entity != null) {
+                    ResolvedLink(
+                        expanded = entity.expandedUrl,
+                        display = entity.displayUrl,
+                    )
+                } else if (!href.startsWith(twidereXSchema)) {
+                    ResolvedLink(expanded = href)
+                } else {
+                    ResolvedLink(expanded = null)
+                }
+            }
+        )
     }
 }

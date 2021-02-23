@@ -136,7 +136,7 @@ class TwitterConversationRepository @AssistedInject constructor(
             )
         } catch (e: TwitterApiExceptionV2) {
             service.searchTweetsV1(
-                "to:${dbTweet.status.status.user.screenName} since_id:${dbTweet.status.status.data.statusId}",
+                "to:${dbTweet.status.status.user.user.screenName} since_id:${dbTweet.status.status.data.statusId}",
                 count = defaultLoadCount,
                 max_id = nextPage
             )

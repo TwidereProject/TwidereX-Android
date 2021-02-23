@@ -160,7 +160,6 @@ fun ExpandedStatusComponent(
 private fun StatusComponent(
     status: UiStatus,
     modifier: Modifier = Modifier,
-    onStatusTextClicked: () -> Unit = {},
 ) {
     val navigator = LocalNavigator.current
     Box(modifier = modifier) {
@@ -191,7 +190,7 @@ private fun StatusComponent(
 
             Spacer(modifier = Modifier.height(standardPadding))
 
-            StatusText(status = status, onStatusTextClicked = onStatusTextClicked)
+            StatusText(status = status)
 
             if (status.media.any()) {
                 Spacer(modifier = Modifier.height(standardPadding))
@@ -220,9 +219,6 @@ private fun StatusComponent(
                                 }
                             )
                             .padding(standardPadding),
-                        onStatusTextClicked = {
-                            navigator.status(status.quote.statusKey)
-                        }
                     )
                 }
             }

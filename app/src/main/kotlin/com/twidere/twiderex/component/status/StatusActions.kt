@@ -233,7 +233,10 @@ fun ShareButton(
     val accountKey = account?.accountKey
     val context = LocalContext.current
     val icon = Icons.Default.MoreHoriz
-    val text = status.contentAnnotatedString()
+    val text = renderContentAnnotatedString(
+        htmlText = status.htmlText,
+        linkResolver = { status.resolveLink(it) },
+    )
     val clipboardManager = LocalClipboardManager.current
     val contentDescription = stringResource(id = R.string.accessibility_common_more)
     Box {

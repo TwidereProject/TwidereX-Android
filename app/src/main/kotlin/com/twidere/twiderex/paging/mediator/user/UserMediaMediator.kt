@@ -73,7 +73,7 @@ class UserMediaMediator(
         return PagingList(
             data.filter {
                 val content = it.status.status
-                it.status.retweet == null && content.data.hasMedia && content.user.userKey == userKey
+                it.status.retweet == null && content.data.hasMedia && content.user.user.userKey == userKey
             },
             MaxIdPagination(data.lastOrNull()?.status?.status?.data?.statusId)
         )

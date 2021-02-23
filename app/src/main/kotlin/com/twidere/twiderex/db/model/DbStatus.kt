@@ -67,8 +67,8 @@ data class DbStatusWithMediaAndUser(
     val data: DbStatusV2,
     @Relation(parentColumn = "statusKey", entityColumn = "statusKey")
     val media: List<DbMedia>,
-    @Relation(parentColumn = "userKey", entityColumn = "userKey")
-    val user: DbUser,
+    @Relation(parentColumn = "userKey", entityColumn = "userKey", entity = DbUser::class)
+    val user: DbUserWithEntity,
     @Relation(parentColumn = "statusKey", entityColumn = "statusKey")
     val reactions: List<DbStatusReaction>,
     @Relation(parentColumn = "statusKey", entityColumn = "statusKey")
@@ -78,25 +78,39 @@ data class DbStatusWithMediaAndUser(
 data class DbStatusWithReference(
     @Embedded
     val status: DbStatusWithMediaAndUser,
-    @Relation(parentColumn = "replyStatusKey", entityColumn = "statusKey", entity = DbStatusV2::class)
+    @Relation(
+        parentColumn = "replyStatusKey",
+        entityColumn = "statusKey",
+        entity = DbStatusV2::class
+    )
     val replyTo: DbStatusWithMediaAndUser?,
-    @Relation(parentColumn = "quoteStatusKey", entityColumn = "statusKey", entity = DbStatusV2::class)
+    @Relation(
+        parentColumn = "quoteStatusKey",
+        entityColumn = "statusKey",
+        entity = DbStatusV2::class
+    )
     val quote: DbStatusWithMediaAndUser?,
-    @Relation(parentColumn = "retweetStatusKey", entityColumn = "statusKey", entity = DbStatusV2::class)
+    @Relation(
+        parentColumn = "retweetStatusKey",
+        entityColumn = "statusKey",
+        entity = DbStatusV2::class
+    )
     val retweet: DbStatusWithMediaAndUser?,
 )
 
 suspend fun List<DbStatusWithMediaAndUser>.saveToDb(
     database: CacheDatabase
 ) {
-    map { it.user }.let {
+    map { it.user.user }.let {
         database.userDao().insertAll(it)
     }
     database.mediaDao().insertAll(map { it.media }.flatten())
     map { it.data }.let {
         database.statusDao().insertAll(it)
     }
-    map { it.url }.flatten().let {
+    map { it.url }.let {
+        it + map { it.user.url }
+    }.flatten().let {
         database.urlEntityDao().insertAll(it)
     }
     map { it.reactions }.flatten().let {

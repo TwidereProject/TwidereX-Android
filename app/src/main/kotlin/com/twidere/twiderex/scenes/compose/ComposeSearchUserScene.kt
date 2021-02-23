@@ -157,7 +157,7 @@ fun ComposeSearchUserScene() {
                                     }
                                 },
                                 secondaryText = {
-                                    Text(text = item.desc, maxLines = 1)
+                                    Text(text = item.rawDesc, maxLines = 1)
                                 },
                             )
                         }

@@ -31,7 +31,7 @@ import com.twidere.twiderex.ui.LocalActivity
 import com.twidere.twiderex.ui.LocalNavController
 import java.util.UUID
 
-private val key = UUID.randomUUID().toString()
+private val authorizationKey = UUID.randomUUID().toString()
 
 @Composable
 fun requireAuthorization(
@@ -42,7 +42,7 @@ fun requireAuthorization(
         val navController = LocalNavController.current
         val activity = LocalActivity.current
         val (isSignInShown, setIsSignInShown) = rememberSaveable(
-            key = key,
+            key = authorizationKey,
             // FIXME: 2021/2/18 Workaround for https://issuetracker.google.com/issues/180513115
             saver = Saver(
                 save = {

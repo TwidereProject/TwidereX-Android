@@ -83,9 +83,6 @@ fun TimelineStatusComponent(
             }
             StatusComponent(
                 status = status,
-                onStatusTextClicked = {
-                    navigator.status(data.statusKey)
-                }
             )
             if (showActions) {
                 Providers(
@@ -110,7 +107,6 @@ fun TimelineStatusComponent(
 private fun StatusComponent(
     status: UiStatus,
     modifier: Modifier = Modifier,
-    onStatusTextClicked: () -> Unit = {},
 ) {
     val navigator = LocalNavigator.current
     val isMediaPreviewEnabled = LocalDisplayPreferences.current.mediaPreview
@@ -143,7 +139,7 @@ private fun StatusComponent(
 
             Spacer(modifier = Modifier.height(4.dp))
 
-            StatusText(status = status, onStatusTextClicked = onStatusTextClicked)
+            StatusText(status)
 
             if (status.media.any()) {
                 Spacer(modifier = Modifier.height(standardPadding))
@@ -216,9 +212,6 @@ private fun StatusComponent(
                                 }
                             )
                             .padding(standardPadding),
-                        onStatusTextClicked = {
-                            navigator.status(statusKey = status.quote.statusKey)
-                        }
                     )
                 }
             }
