@@ -8,7 +8,7 @@ ext {
             retrofit2            : '2.9.0',
             hilt                 : '2.32-alpha',
             androidx_hilt        : '1.0.0-alpha03',
-            room                 : '2.3.0-beta01',
+            room                 : '2.3.0-beta02',
             lifecycle            : '2.3.0',
             lifecycle_compose    : '1.0.0-alpha01',
             okhttp               : '4.9.0',
@@ -18,7 +18,7 @@ ext {
             ktlint               : '0.39.0',
             assisted_inject      : '0.6.0',
             protobuf             : '3.14.0',
-            work                 : '2.5.0',
+            work                 : '2.7.0-alpha01',
             dataStore            : "1.0.0-alpha06",
             exoplayer            : '2.12.3',
     ]
