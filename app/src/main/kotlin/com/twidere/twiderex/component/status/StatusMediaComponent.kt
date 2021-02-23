@@ -52,10 +52,18 @@ fun StatusMediaComponent(
     }
     if (media.size == 1) {
         val first = media.first()
+        val aspectRatio = (first.width.toFloat() / first.height.toFloat()).let {
+            if (it.isNaN()) {
+                270f / 162f
+            } else {
+                it
+            }
+        }
+
         Box(
             modifier = Modifier
                 .heightIn(max = 400.dp)
-                .aspectRatio(first.width.toFloat() / first.height.toFloat())
+                .aspectRatio(aspectRatio)
                 .clip(MaterialTheme.shapes.medium)
         ) {
             StatusMediaPreviewItem(
