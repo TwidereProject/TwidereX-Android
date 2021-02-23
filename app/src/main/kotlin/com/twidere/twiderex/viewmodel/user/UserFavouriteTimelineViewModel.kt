@@ -20,17 +20,23 @@
  */
 package com.twidere.twiderex.viewmodel.user
 
+import androidx.lifecycle.viewModelScope
+import androidx.paging.cachedIn
+import androidx.paging.map
 import com.twidere.services.microblog.TimelineService
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.di.assisted.IAssistedFactory
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.ui.UiStatus.Companion.toUi
 import com.twidere.twiderex.notification.InAppNotification
-import com.twidere.twiderex.paging.mediator.PagingMediator
+import com.twidere.twiderex.paging.mediator.paging.PagingMediator
+import com.twidere.twiderex.paging.mediator.paging.pager
 import com.twidere.twiderex.paging.mediator.user.UserFavouriteMediator
 import com.twidere.twiderex.viewmodel.PagingViewModel
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.flow.map
 
 class UserFavouriteTimelineViewModel @AssistedInject constructor(
     database: CacheDatabase,
@@ -47,9 +53,25 @@ class UserFavouriteTimelineViewModel @AssistedInject constructor(
         ): UserFavouriteTimelineViewModel
     }
 
+    override val source by lazy {
+        pagingMediator.pager(
+            pagingSourceFactory = {
+                database.pagingTimelineDao().getPagingSourceAsc(
+                    pagingKey = pagingMediator.pagingKey,
+                    accountKey = pagingMediator.accountKey,
+                )
+            }
+        ).flow.map { pagingData ->
+            pagingData.map {
+                it.toUi(pagingMediator.accountKey)
+            }
+        }.cachedIn(viewModelScope)
+    }
+
     override val pagingMediator: PagingMediator =
         UserFavouriteMediator(
             userKey = userKey,
+            platformType = account.type,
             database,
             account.accountKey,
             account.service as TimelineService,

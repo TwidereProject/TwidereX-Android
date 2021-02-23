@@ -21,6 +21,8 @@
 package com.twidere.twiderex.paging.mediator.user
 
 import androidx.paging.ExperimentalPagingApi
+import androidx.paging.LoadType
+import androidx.paging.PagingState
 import com.twidere.services.microblog.TimelineService
 import com.twidere.services.microblog.model.IStatus
 import com.twidere.twiderex.db.CacheDatabase
@@ -29,7 +31,9 @@ import com.twidere.twiderex.db.model.UserTimelineType
 import com.twidere.twiderex.db.model.pagingKey
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.notification.InAppNotification
-import com.twidere.twiderex.paging.mediator.PagingTimelineMediatorBase
+import com.twidere.twiderex.paging.MaxIdPagination
+import com.twidere.twiderex.paging.PagingList
+import com.twidere.twiderex.paging.mediator.paging.MaxIdPagingMediator
 
 @OptIn(ExperimentalPagingApi::class)
 class UserMediaMediator(
@@ -38,27 +42,40 @@ class UserMediaMediator(
     accountKey: MicroBlogKey,
     private val service: TimelineService,
     inAppNotification: InAppNotification,
-) : PagingTimelineMediatorBase(accountKey, database, inAppNotification) {
+) : MaxIdPagingMediator(accountKey, database, inAppNotification) {
     override val pagingKey: String
         get() = UserTimelineType.Media.pagingKey(userKey)
 
-    override suspend fun load(pageSize: Int, max_id: String?): List<IStatus> {
+    override suspend fun load(pageSize: Int, paging: MaxIdPagination?): List<IStatus> {
         return service.userTimeline(
             user_id = userKey.id,
             count = pageSize,
-            max_id = max_id,
+            max_id = paging?.maxId,
             exclude_replies = false
         )
     }
 
-    override fun transform(data: List<DbPagingTimelineWithStatus>): List<DbPagingTimelineWithStatus> {
-        return data.filter {
-            val content = it.status.status
-            it.status.retweet == null && content.data.hasMedia && content.user.userKey == userKey
+    override fun provideNextPage(
+        raw: List<IStatus>,
+        result: List<DbPagingTimelineWithStatus>
+    ): MaxIdPagination {
+        if (result is PagingList<*, *>) {
+            return result.nextPage as MaxIdPagination
         }
+        return super.provideNextPage(raw, result)
     }
 
-    override fun hasMore(result: List<DbPagingTimelineWithStatus>, pageSize: Int): Boolean {
-        return result.isNotEmpty()
+    override fun transform(
+        type: LoadType,
+        state: PagingState<Int, DbPagingTimelineWithStatus>,
+        data: List<DbPagingTimelineWithStatus>
+    ): List<DbPagingTimelineWithStatus> {
+        return PagingList(
+            data.filter {
+                val content = it.status.status
+                it.status.retweet == null && content.data.hasMedia && content.user.userKey == userKey
+            },
+            MaxIdPagination(data.lastOrNull()?.status?.status?.data?.statusId)
+        )
     }
 }

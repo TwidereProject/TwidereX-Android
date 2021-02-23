@@ -23,6 +23,7 @@ package com.twidere.services.mastodon
 import com.twidere.services.http.authorization.BearerAuthorization
 import com.twidere.services.http.retrofit
 import com.twidere.services.mastodon.api.MastodonResources
+import com.twidere.services.mastodon.model.MastodonFavouriteResponse
 import com.twidere.services.mastodon.model.exceptions.MastodonException
 import com.twidere.services.microblog.LookupService
 import com.twidere.services.microblog.MicroBlogService
@@ -78,11 +79,20 @@ class MastodonService(
         since_id: String?,
         max_id: String?
     ): List<IStatus> {
-        return resources.favoritesList(
+        val response = resources.favoritesList(
             max_id = max_id,
             since_id = since_id,
             limit = count,
         )
+        val link = response.headers().get("link")
+        val next = link?.let { "max_id=(\\d+)".toRegex().find(it) }?.groupValues?.getOrNull(1)
+        val prev = link?.let { "min_id=(\\d+)".toRegex().find(it) }?.groupValues?.getOrNull(1)
+        return MastodonFavouriteResponse(
+            next = next,
+            prev = prev,
+        ).apply {
+            addAll(response.body() ?: emptyList())
+        }
     }
 
     override suspend fun lookupUserByName(name: String): IUser {

@@ -18,25 +18,23 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.viewmodel
+package com.twidere.twiderex.paging
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import androidx.paging.cachedIn
-import androidx.paging.map
-import com.twidere.twiderex.model.ui.UiStatus.Companion.toUi
-import com.twidere.twiderex.paging.mediator.paging.PagingMediator
-import com.twidere.twiderex.paging.mediator.paging.pager
-import kotlinx.coroutines.flow.map
-
-abstract class PagingViewModel : ViewModel() {
-    abstract val pagingMediator: PagingMediator
-
-    open val source by lazy {
-        pagingMediator.pager().flow.map { pagingData ->
-            pagingData.map {
-                it.toUi(pagingMediator.accountKey)
-            }
-        }.cachedIn(viewModelScope)
-    }
+interface IPagingList<T, P : IPagination> : List<T> {
+    val nextPage: P?
 }
+
+interface IPagination
+
+data class MaxIdPagination(
+    val maxId: String?,
+) : IPagination
+
+data class CursorPagination(
+    val cursor: String?,
+) : IPagination
+
+class PagingList<T, P : IPagination>(
+    data: List<T>,
+    override val nextPage: P? = null,
+) : ArrayList<T>(data), IPagingList<T, P>

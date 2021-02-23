@@ -18,23 +18,24 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.paging.mediator
+package com.twidere.twiderex.paging.mediator.paging
 
-import androidx.paging.ExperimentalPagingApi
-import com.twidere.services.microblog.TimelineService
+import com.twidere.services.microblog.model.IStatus
 import com.twidere.twiderex.db.CacheDatabase
+import com.twidere.twiderex.db.model.DbPagingTimelineWithStatus
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.notification.InAppNotification
-import com.twidere.twiderex.paging.mediator.paging.PagingWithGapMediator
+import com.twidere.twiderex.paging.MaxIdPagination
 
-@OptIn(ExperimentalPagingApi::class)
-class HomeTimelineMediator(
-    private val service: TimelineService,
+abstract class MaxIdPagingMediator(
     accountKey: MicroBlogKey,
     database: CacheDatabase,
-    inAppNotification: InAppNotification,
-) : PagingWithGapMediator(accountKey, database, inAppNotification) {
-    override val pagingKey: String = "home:$accountKey"
-    override suspend fun loadBetweenImpl(pageSize: Int, max_id: String?, since_id: String?) =
-        service.homeTimeline(pageSize, max_id = max_id, since_id = since_id)
+    inAppNotification: InAppNotification
+) : PagingTimelineMediatorBase<MaxIdPagination>(accountKey, database, inAppNotification) {
+    override fun provideNextPage(
+        raw: List<IStatus>,
+        result: List<DbPagingTimelineWithStatus>
+    ): MaxIdPagination {
+        return MaxIdPagination(maxId = result.lastOrNull()?.status?.status?.data?.statusId)
+    }
 }

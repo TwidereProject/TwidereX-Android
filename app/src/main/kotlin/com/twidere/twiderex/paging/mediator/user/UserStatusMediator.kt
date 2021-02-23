@@ -28,7 +28,8 @@ import com.twidere.twiderex.db.model.UserTimelineType
 import com.twidere.twiderex.db.model.pagingKey
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.notification.InAppNotification
-import com.twidere.twiderex.paging.mediator.PagingTimelineMediatorBase
+import com.twidere.twiderex.paging.MaxIdPagination
+import com.twidere.twiderex.paging.mediator.paging.MaxIdPagingMediator
 
 @OptIn(ExperimentalPagingApi::class)
 class UserStatusMediator(
@@ -37,15 +38,15 @@ class UserStatusMediator(
     accountKey: MicroBlogKey,
     private val service: TimelineService,
     inAppNotification: InAppNotification,
-) : PagingTimelineMediatorBase(accountKey, database, inAppNotification) {
+) : MaxIdPagingMediator(accountKey, database, inAppNotification) {
     override val pagingKey: String
         get() = UserTimelineType.Status.pagingKey(userKey)
 
-    override suspend fun load(pageSize: Int, max_id: String?): List<IStatus> {
+    override suspend fun load(pageSize: Int, paging: MaxIdPagination?): List<IStatus> {
         return service.userTimeline(
             user_id = userKey.id,
             count = pageSize,
-            max_id = max_id,
+            max_id = paging?.maxId,
         )
     }
 }

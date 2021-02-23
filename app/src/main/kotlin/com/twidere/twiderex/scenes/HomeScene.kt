@@ -21,6 +21,8 @@
 package com.twidere.twiderex.scenes
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.core.animateDp
+import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -133,12 +135,18 @@ fun HomeScene() {
                         )
                     }
                 } else {
-                    Surface(
-                        elevation = if (menus[pagerState.currentPage].withAppBar) {
+                    val transition = updateTransition(
+                        targetState = menus[pagerState.currentPage].withAppBar,
+                    )
+                    val elevation by transition.animateDp {
+                        if (it) {
                             TopAppBarElevation
                         } else {
                             0.dp
                         }
+                    }
+                    Surface(
+                        elevation = elevation
                     ) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically

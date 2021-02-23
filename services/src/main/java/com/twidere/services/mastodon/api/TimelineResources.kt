@@ -21,6 +21,7 @@
 package com.twidere.services.mastodon.api
 
 import com.twidere.services.mastodon.model.Status
+import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -52,5 +53,5 @@ interface TimelineResources {
         @Query("min_id") min_id: String? = null,
         @Query("exclude_replies") exclude_replies: Boolean? = null,
         @Query("limit") limit: Int? = null,
-    ): List<Status>
+    ): Response<List<Status>>
 }

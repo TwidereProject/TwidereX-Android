@@ -31,7 +31,7 @@ import com.twidere.twiderex.di.assisted.IAssistedFactory
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.ui.UiStatus.Companion.toUi
 import com.twidere.twiderex.notification.InAppNotification
-import com.twidere.twiderex.paging.mediator.pager
+import com.twidere.twiderex.paging.mediator.paging.pager
 import com.twidere.twiderex.paging.mediator.search.SearchMediaMediator
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject

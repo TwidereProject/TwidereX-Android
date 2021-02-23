@@ -18,25 +18,11 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.viewmodel
+package com.twidere.services.mastodon.model
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import androidx.paging.cachedIn
-import androidx.paging.map
-import com.twidere.twiderex.model.ui.UiStatus.Companion.toUi
-import com.twidere.twiderex.paging.mediator.paging.PagingMediator
-import com.twidere.twiderex.paging.mediator.paging.pager
-import kotlinx.coroutines.flow.map
+import com.twidere.services.microblog.model.IStatus
 
-abstract class PagingViewModel : ViewModel() {
-    abstract val pagingMediator: PagingMediator
-
-    open val source by lazy {
-        pagingMediator.pager().flow.map { pagingData ->
-            pagingData.map {
-                it.toUi(pagingMediator.accountKey)
-            }
-        }.cachedIn(viewModelScope)
-    }
-}
+class MastodonFavouriteResponse(
+    val next: String? = null,
+    val prev: String? = null,
+) : ArrayList<IStatus>()

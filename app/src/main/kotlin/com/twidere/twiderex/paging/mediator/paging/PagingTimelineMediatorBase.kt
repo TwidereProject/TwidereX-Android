@@ -18,7 +18,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.paging.mediator
+package com.twidere.twiderex.paging.mediator.paging
 
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
@@ -34,14 +34,18 @@ import com.twidere.twiderex.db.model.TimelineType
 import com.twidere.twiderex.db.model.saveToDb
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.notification.InAppNotification
+import com.twidere.twiderex.paging.IPagination
+import com.twidere.twiderex.paging.IPagingList
 import com.twidere.twiderex.utils.notify
 
 @OptIn(ExperimentalPagingApi::class)
-abstract class PagingTimelineMediatorBase(
+abstract class PagingTimelineMediatorBase<T : IPagination>(
     accountKey: MicroBlogKey,
     database: CacheDatabase,
     private val inAppNotification: InAppNotification
 ) : PagingMediator(accountKey = accountKey, database = database) {
+    private var nextPage: T? = null
+
     override suspend fun load(
         loadType: LoadType,
         state: PagingState<Int, DbPagingTimelineWithStatus>
@@ -49,31 +53,35 @@ abstract class PagingTimelineMediatorBase(
         try {
             val key = when (loadType) {
                 LoadType.APPEND -> {
-                    val lastItem = state.lastItemOrNull()
-                        ?: return MediatorResult.Success(
-                            endOfPaginationReached = true
-                        )
-                    lastItem.status.status.data.statusId
+                    nextPage
                 }
                 LoadType.PREPEND -> {
                     return MediatorResult.Success(endOfPaginationReached = true)
                 }
                 LoadType.REFRESH -> {
+                    nextPage = null
                     null
                 }
             }
             val pageSize = state.config.pageSize
-
-            val result = load(pageSize, key).map {
-                it.toDbTimeline(accountKey, TimelineType.Custom).toPagingDbTimeline(pagingKey)
-            }.let {
-                it.filter {
-                    it.status.status.data.statusId != key
+            val last = state.lastItemOrNull()
+            val result = load(pageSize, key).let { list ->
+                list.map { status ->
+                    status.toDbTimeline(accountKey, TimelineType.Custom)
+                        .toPagingDbTimeline(pagingKey)
+                }.filter {
+                    last?.status?.status?.data?.statusKey != it.status.status.data.statusKey
+                }.let {
+                    transform(loadType, state, it)
+                }.also {
+                    nextPage = if (list is IPagingList<*, *>) {
+                        @Suppress("UNCHECKED_CAST")
+                        list.nextPage as T
+                    } else {
+                        provideNextPage(list, it)
+                    }
                 }
-            }.let {
-                transform(it)
             }
-
             database.withTransaction {
                 if (loadType == LoadType.REFRESH) {
                     clearData(database)
@@ -93,7 +101,16 @@ abstract class PagingTimelineMediatorBase(
         }
     }
 
-    protected open fun transform(data: List<DbPagingTimelineWithStatus>): List<DbPagingTimelineWithStatus> {
+    protected abstract fun provideNextPage(
+        raw: List<IStatus>,
+        result: List<DbPagingTimelineWithStatus>
+    ): T
+
+    protected open fun transform(
+        type: LoadType,
+        state: PagingState<Int, DbPagingTimelineWithStatus>,
+        data: List<DbPagingTimelineWithStatus>
+    ): List<DbPagingTimelineWithStatus> {
         return data
     }
 
@@ -108,6 +125,6 @@ abstract class PagingTimelineMediatorBase(
 
     protected abstract suspend fun load(
         pageSize: Int,
-        max_id: String?
+        paging: T?
     ): List<IStatus>
 }

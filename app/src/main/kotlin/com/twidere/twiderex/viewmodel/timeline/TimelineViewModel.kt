@@ -26,7 +26,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.twidere.twiderex.defaultLoadCount
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.paging.mediator.PagingWithGapMediator
+import com.twidere.twiderex.paging.mediator.paging.PagingWithGapMediator
 import com.twidere.twiderex.viewmodel.PagingViewModel
 import kotlinx.coroutines.launch
 
