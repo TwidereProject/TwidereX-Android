@@ -246,7 +246,7 @@ fun NavGraphBuilder.route() {
     }
 
     authorizedComposable(
-        "twitter/{screenName}",
+        "deeplink/twitter/{screenName}",
         arguments = listOf(
             navArgument("screenName") { type = NavType.StringType },
         ),

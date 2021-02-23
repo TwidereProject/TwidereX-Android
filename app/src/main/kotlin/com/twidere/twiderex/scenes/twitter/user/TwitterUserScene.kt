@@ -51,7 +51,7 @@ fun TwitterUserScene(screenName: String) {
     DisposableEffect(user) {
         user?.let {
             navigator.user(user = it) {
-                popUpTo("twitter/{screenName}") {
+                popUpTo("deeplink/twitter/{screenName}") {
                     inclusive = true
                 }
             }
