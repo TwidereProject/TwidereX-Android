@@ -23,7 +23,7 @@ package com.twidere.twiderex.paging.mediator.user
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
 import androidx.paging.PagingState
-import com.twidere.services.mastodon.model.MastodonFavouriteResponse
+import com.twidere.services.mastodon.model.MastodonPaging
 import com.twidere.services.microblog.TimelineService
 import com.twidere.services.microblog.model.IStatus
 import com.twidere.twiderex.db.CacheDatabase
@@ -70,7 +70,7 @@ class UserFavouriteMediator(
             count = pageSize,
             max_id = paging?.maxId,
         )
-        return if (platformType == PlatformType.Mastodon && result is MastodonFavouriteResponse) {
+        return if (platformType == PlatformType.Mastodon && result is MastodonPaging<*>) {
             PagingList(result, nextPage = MaxIdPagination(maxId = result.next))
         } else {
             result

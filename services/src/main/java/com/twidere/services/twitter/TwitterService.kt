@@ -37,6 +37,7 @@ import com.twidere.services.microblog.model.Relationship
 import com.twidere.services.twitter.api.TwitterResources
 import com.twidere.services.twitter.api.UploadResources
 import com.twidere.services.twitter.model.StatusV2
+import com.twidere.services.twitter.model.TwitterPaging
 import com.twidere.services.twitter.model.TwitterSearchResponseV1
 import com.twidere.services.twitter.model.TwitterSearchResponseV2
 import com.twidere.services.twitter.model.User
@@ -398,21 +399,25 @@ class TwitterService(
         return uploadResources.finalizeUpload(mediaId).mediaIDString ?: throw Error()
     }
 
-    suspend fun followers(id: String, cursor: String? = null) = resources.followers(
-        id,
-        pagination_token = cursor,
+    override suspend fun followers(user_id: String, nextPage: String?) = resources.followers(
+        user_id,
+        pagination_token = nextPage,
         userFields = UserFields.values().joinToString(",") { it.value },
         expansions = UserFields.pinned_tweet_id.name,
         tweetFields = TweetFields.values().joinToString(",") { it.value },
-    )
+    ).let {
+        TwitterPaging(it.data ?: emptyList(), it.meta?.nextToken)
+    }
 
-    suspend fun following(id: String, cursor: String? = null) = resources.following(
-        id,
-        pagination_token = cursor,
+    override suspend fun following(user_id: String, nextPage: String?) = resources.following(
+        user_id,
+        pagination_token = nextPage,
         userFields = UserFields.values().joinToString(",") { it.value },
         expansions = UserFields.pinned_tweet_id.name,
         tweetFields = TweetFields.values().joinToString(",") { it.value },
-    )
+    ).let {
+        TwitterPaging(it.data ?: emptyList(), it.meta?.nextToken)
+    }
 
     suspend fun verifyCredentials(): User? {
         return resources.verifyCredentials()

@@ -18,7 +18,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.scenes.twitter.user
+package com.twidere.twiderex.scenes.user
 
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -32,10 +32,10 @@ import com.twidere.twiderex.extensions.viewModel
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.TwidereXTheme
-import com.twidere.twiderex.viewmodel.twitter.user.FollowingViewModel
+import com.twidere.twiderex.viewmodel.twitter.FollowersViewModel
 
 @Composable
-fun TwitterFollowingScene(
+fun FollowersScene(
     userKey: MicroBlogKey,
 ) {
     val account = LocalActiveAccount.current ?: return
@@ -43,7 +43,7 @@ fun TwitterFollowingScene(
         account,
         userKey,
     ) {
-        FollowingViewModel(account, userKey)
+        FollowersViewModel(account, userKey)
     }
     TwidereXTheme {
         InAppNotificationScaffold(
@@ -53,7 +53,7 @@ fun TwitterFollowingScene(
                         AppBarNavigationButton()
                     },
                     title = {
-                        Text(stringResource(id = R.string.scene_following_title))
+                        Text(stringResource(id = R.string.scene_followers_title))
                     }
                 )
             },

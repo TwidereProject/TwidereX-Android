@@ -64,6 +64,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.navigate
 import com.twidere.twiderex.R
+import com.twidere.twiderex.component.UserMetrics
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.IconTabsComponent
 import com.twidere.twiderex.component.foundation.Pager
@@ -268,28 +269,8 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Row {
-            Column(
-                modifier = Modifier.weight(1f),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                Text(text = currentUser?.friendsCount.toString())
-                Text(text = stringResource(id = R.string.common_controls_profile_dashboard_following))
-            }
-            Column(
-                modifier = Modifier.weight(1f),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                Text(text = currentUser?.followersCount.toString())
-                Text(text = stringResource(id = R.string.common_controls_profile_dashboard_followers))
-            }
-            Column(
-                modifier = Modifier.weight(1f),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                Text(text = currentUser?.listedCount.toString())
-                Text(text = stringResource(id = R.string.common_controls_profile_dashboard_listed))
-            }
+        if (currentUser != null) {
+            UserMetrics(user = currentUser)
         }
 
         Spacer(modifier = Modifier.height(24.dp))

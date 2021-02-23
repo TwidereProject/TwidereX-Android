@@ -23,7 +23,7 @@ package com.twidere.services.twitter.model
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class TwitterResponseV2<T> (
+data class TwitterResponseV2<T>(
     val meta: Meta? = null,
     val data: T? = null,
     val errors: List<TwitterErrorV2>? = null,

@@ -39,7 +39,6 @@ import com.twidere.twiderex.scenes.RawMediaScene
 import com.twidere.twiderex.scenes.SignInScene
 import com.twidere.twiderex.scenes.StatusMediaScene
 import com.twidere.twiderex.scenes.StatusScene
-import com.twidere.twiderex.scenes.UserScene
 import com.twidere.twiderex.scenes.compose.ComposeScene
 import com.twidere.twiderex.scenes.compose.ComposeSearchUserScene
 import com.twidere.twiderex.scenes.compose.DraftComposeScene
@@ -54,9 +53,10 @@ import com.twidere.twiderex.scenes.settings.DisplayScene
 import com.twidere.twiderex.scenes.settings.SettingsScene
 import com.twidere.twiderex.scenes.twitter.TwitterSignInScene
 import com.twidere.twiderex.scenes.twitter.TwitterWebSignInScene
-import com.twidere.twiderex.scenes.twitter.user.TwitterFollowersScene
-import com.twidere.twiderex.scenes.twitter.user.TwitterFollowingScene
 import com.twidere.twiderex.scenes.twitter.user.TwitterUserScene
+import com.twidere.twiderex.scenes.user.FollowersScene
+import com.twidere.twiderex.scenes.user.FollowingScene
+import com.twidere.twiderex.scenes.user.UserScene
 import com.twidere.twiderex.twitterHosts
 import com.twidere.twiderex.viewmodel.compose.ComposeType
 import java.net.URLDecoder
@@ -143,12 +143,8 @@ object Route {
         }
     }
 
-    object Twitter {
-        object User {
-            fun Following(userKey: MicroBlogKey) = "twitter/$userKey/following"
-            fun Followers(userKey: MicroBlogKey) = "twitter/$userKey/followers"
-        }
-    }
+    fun Following(userKey: MicroBlogKey) = "following/$userKey"
+    fun Followers(userKey: MicroBlogKey) = "followers/$userKey"
 
     object Settings {
         val Home = "settings"
@@ -387,7 +383,7 @@ fun NavGraphBuilder.route() {
     }
 
     authorizedComposable(
-        "twitter/{userKey}/followers",
+        "followers/{userKey}",
         arguments = listOf(
             navArgument("userKey") { type = NavType.StringType }
         )
@@ -396,13 +392,13 @@ fun NavGraphBuilder.route() {
             args.getString("userKey")?.let {
                 MicroBlogKey.valueOf(it)
             }?.let {
-                TwitterFollowersScene(it)
+                FollowersScene(it)
             }
         }
     }
 
     authorizedComposable(
-        "twitter/{userKey}/following",
+        "following/{userKey}",
         arguments = listOf(
             navArgument("userKey") { type = NavType.StringType }
         )
@@ -411,7 +407,7 @@ fun NavGraphBuilder.route() {
             args.getString("userKey")?.let {
                 MicroBlogKey.valueOf(it)
             }?.let {
-                TwitterFollowingScene(it)
+                FollowingScene(it)
             }
         }
     }

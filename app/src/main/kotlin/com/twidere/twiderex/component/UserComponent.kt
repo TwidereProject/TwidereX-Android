@@ -81,6 +81,7 @@ import com.twidere.twiderex.component.status.withAvatarClip
 import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.navigation.twidereXSchema
@@ -481,42 +482,48 @@ private fun UserInfo(user: UiUser, viewModel: UserViewModel) {
                 Spacer(modifier = Modifier.height(standardPadding))
             }
             Spacer(modifier = Modifier.height(standardPadding))
-            Row {
-                Column(
-                    modifier = Modifier
-                        .weight(1f)
-                        .clickable {
-                            if (user.userKey.host == MicroBlogKey.TwitterHost) {
-                                navController.navigate(Route.Twitter.User.Following(user.userKey))
-                            }
-                        },
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Text(text = user.friendsCount.toString())
-                    Text(text = stringResource(id = R.string.common_controls_profile_dashboard_following))
-                }
-                Column(
-                    modifier = Modifier
-                        .weight(1f)
-                        .clickable {
-                            if (user.userKey.host == MicroBlogKey.TwitterHost) {
-                                navController.navigate(Route.Twitter.User.Followers(user.userKey))
-                            }
-                        },
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Text(text = user.followersCount.toString())
-                    Text(text = stringResource(id = R.string.common_controls_profile_dashboard_followers))
-                }
-                Column(
-                    modifier = Modifier.weight(1f),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Text(text = user.listedCount.toString())
-                    Text(text = stringResource(id = R.string.common_controls_profile_dashboard_listed))
-                }
-            }
+            UserMetrics(user)
             Spacer(modifier = Modifier.height(standardPadding))
+        }
+    }
+}
+
+@Composable
+fun UserMetrics(
+    user: UiUser,
+) {
+    val navController = LocalNavController.current
+    Row {
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .clickable {
+                    navController.navigate(Route.Following(user.userKey))
+                },
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Text(text = user.friendsCount.toString())
+            Text(text = stringResource(id = R.string.common_controls_profile_dashboard_following))
+        }
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .clickable {
+                    navController.navigate(Route.Followers(user.userKey))
+                },
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Text(text = user.followersCount.toString())
+            Text(text = stringResource(id = R.string.common_controls_profile_dashboard_followers))
+        }
+        if (user.platformType == PlatformType.Twitter) {
+            Column(
+                modifier = Modifier.weight(1f),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Text(text = user.listedCount.toString())
+                Text(text = stringResource(id = R.string.common_controls_profile_dashboard_listed))
+            }
         }
     }
 }

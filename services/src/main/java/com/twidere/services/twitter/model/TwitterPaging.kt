@@ -18,11 +18,11 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.services.mastodon.model
+package com.twidere.services.twitter.model
 
-import com.twidere.services.microblog.model.IStatus
+import com.twidere.services.microblog.model.IPaging
 
-class MastodonFavouriteResponse(
-    val next: String? = null,
-    val prev: String? = null,
-) : ArrayList<IStatus>()
+class TwitterPaging<T>(
+    data: List<T>,
+    override val nextPage: String? = null
+) : ArrayList<T>(data), IPaging
