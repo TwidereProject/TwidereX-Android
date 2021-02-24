@@ -18,24 +18,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.paging
+package com.twidere.services.microblog.model
 
-interface IPagingList<T, P : IPagination> : List<T> {
-    val nextPage: P?
-}
-
-interface IPagination
-
-data class SinceMaxPagination(
-    val maxId: String? = null,
-    val sinceId: String? = null,
-) : IPagination
-
-data class CursorPagination(
-    val cursor: String?,
-) : IPagination
-
-class PagingList<T, P : IPagination>(
-    data: List<T>,
-    override val nextPage: P? = null,
-) : ArrayList<T>(data), IPagingList<T, P>
+interface INotification
