@@ -35,7 +35,7 @@ import com.twidere.twiderex.worker.status.UnRetweetWorker
 import com.twidere.twiderex.worker.status.UpdateStatusWorker
 import javax.inject.Inject
 
-val LocalStatusActions = compositionLocalOf<IStatusActions>()
+val LocalStatusActions = compositionLocalOf<IStatusActions> { error("No LocalStatusActions") }
 
 interface IStatusActions {
     fun like(status: UiStatus, account: AccountDetails) {}

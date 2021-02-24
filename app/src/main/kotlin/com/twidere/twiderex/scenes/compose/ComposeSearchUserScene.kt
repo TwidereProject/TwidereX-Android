@@ -38,7 +38,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -145,7 +145,7 @@ fun ComposeSearchUserScene() {
                                             color = MaterialTheme.colors.primary
                                         )
                                         Spacer(modifier = Modifier.width(4.dp))
-                                        Providers(
+                                        CompositionLocalProvider(
                                             LocalContentAlpha provides ContentAlpha.medium
                                         ) {
                                             Text(

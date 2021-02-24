@@ -28,7 +28,7 @@ import android.net.NetworkRequest
 import android.os.Bundle
 import android.view.WindowManager
 import androidx.activity.compose.setContent
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.remember
@@ -129,7 +129,7 @@ class TwidereXActivity : FragmentActivity() {
             val accountViewModel = viewModel<ActiveAccountViewModel>()
             val account by accountViewModel.account.observeAsState()
             val isActiveNetworkMetered by isActiveNetworkMetered.observeAsState(initial = false)
-            Providers(
+            CompositionLocalProvider(
                 LocalInAppNotification provides inAppNotification,
                 LocalLauncher provides launcher,
                 LocalWindow provides window,

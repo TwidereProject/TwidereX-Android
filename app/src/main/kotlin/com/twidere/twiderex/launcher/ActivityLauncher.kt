@@ -46,4 +46,4 @@ class ActivityLauncher(registry: ActivityResultRegistry) : DefaultLifecycleObser
     }
 }
 
-val LocalLauncher = compositionLocalOf<ActivityLauncher>()
+val LocalLauncher = compositionLocalOf<ActivityLauncher> { error("No ActivityLauncher") }

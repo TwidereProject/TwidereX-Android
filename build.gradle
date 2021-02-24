@@ -6,7 +6,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.0.0-alpha05'
+        classpath 'com.android.tools.build:gradle:7.0.0-alpha06'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$versions.kotlin"
     }
 }
@@ -19,6 +19,8 @@ subprojects {
     repositories {
         google()
         jcenter()
+        maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
+        maven { url "https://androidx.dev/snapshots/builds/$versions.snapshot/artifacts/repository/" }
     }
 
     apply plugin: 'com.diffplug.spotless'
@@ -44,6 +46,7 @@ subprojects {
         kotlinOptions {
             allWarningsAsErrors = true
             freeCompilerArgs += '-Xopt-in=kotlin.RequiresOptIn'
+            freeCompilerArgs += '-Xallow-unstable-dependencies'
             jvmTarget = "1.8"
         }
     }

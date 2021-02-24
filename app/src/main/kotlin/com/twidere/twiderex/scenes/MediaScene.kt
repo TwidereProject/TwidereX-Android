@@ -22,9 +22,9 @@ package com.twidere.twiderex.scenes
 
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.updateTransition
-import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -44,8 +44,8 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.Providers
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -126,7 +126,7 @@ fun StatusMediaScene(statusKey: MicroBlogKey, selectedIndex: Int) {
             }
         }
         status?.let {
-            Providers(
+            CompositionLocalProvider(
                 LocalVideoPlayback provides DisplayPreferences.AutoPlayback.Always
             ) {
                 StatusMediaScene(status = it, selectedIndex = selectedIndex)
@@ -168,7 +168,7 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int) {
                             }
                         },
                         indication = null,
-                        interactionState = remember { InteractionState() }
+                        interactionSource = remember { MutableInteractionSource() }
                     ),
                 media = status.media.mapNotNull {
                     it.mediaUrl?.let { it1 ->
@@ -253,7 +253,7 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int) {
                                         .padding(standardPadding),
                                 ) {
                                     if (videoControl != null) {
-                                        AndroidView(viewBlock = { videoControl })
+                                        AndroidView(factory = { videoControl })
                                     }
                                     Text(
                                         modifier = Modifier
@@ -283,7 +283,7 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int) {
                                                 overflow = TextOverflow.Ellipsis,
                                             )
                                             Spacer(modifier = Modifier.width(standardPadding))
-                                            Providers(
+                                            CompositionLocalProvider(
                                                 LocalContentAlpha provides ContentAlpha.medium
                                             ) {
                                                 Text(
@@ -362,10 +362,7 @@ fun MediaView(
             when (data.type) {
                 MediaType.photo ->
                     Zoomable(
-                        onZoomStarted = {
-                            lockPager = true
-                        },
-                        onZoomStopped = {
+                        onZooming = {
                             lockPager = it != 1F
                         }
                     ) {

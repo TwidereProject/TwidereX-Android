@@ -23,7 +23,7 @@ package com.twidere.twiderex.component.foundation
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Icon
 import androidx.compose.material.LocalContentAlpha
@@ -118,26 +118,6 @@ fun VideoPlayer(
                 VideoPool.set(url, 0L.coerceAtLeast(player.contentPosition))
             }
 
-            val playerView = remember {
-                StyledPlayerView(context).also { playerView ->
-                    playerView.useController = showControls
-                    lifecycle.addObserver(object : LifecycleObserver {
-                        @OnLifecycleEvent(Lifecycle.Event.ON_START)
-                        fun onStart() {
-                            playerView.onResume()
-                            player.playWhenReady = autoPlay
-                        }
-
-                        @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
-                        fun onStop() {
-                            updateState()
-                            playerView.onPause()
-                            player.playWhenReady = false
-                        }
-                    })
-                }
-            }
-
             DisposableEffect(customControl) {
                 if (customControl != null) {
                     customControl.player = player
@@ -154,9 +134,27 @@ fun VideoPlayer(
 
             AndroidView(
                 modifier = modifier,
-                viewBlock = { playerView }
+                factory = { context ->
+                    StyledPlayerView(context).also { playerView ->
+                        playerView.useController = showControls
+                        lifecycle.addObserver(object : LifecycleObserver {
+                            @OnLifecycleEvent(Lifecycle.Event.ON_START)
+                            fun onStart() {
+                                playerView.onResume()
+                                player.playWhenReady = autoPlay
+                            }
+
+                            @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
+                            fun onStop() {
+                                updateState()
+                                playerView.onPause()
+                                player.playWhenReady = false
+                            }
+                        })
+                    }
+                }
             ) {
-                playerView.player = player
+                it.player = player
             }
         }
         if ((shouldShowThumb || !playing) && thumb != null) {
@@ -170,7 +168,7 @@ fun VideoPlayer(
                     tint = Color.White.copy(alpha = LocalContentAlpha.current),
                     modifier = Modifier
                         .align(Alignment.Center)
-                        .preferredSize(profileImageSize)
+                        .size(profileImageSize)
                         .background(MaterialTheme.colors.primary, CircleShape),
                     contentDescription = stringResource(id = R.string.accessibility_common_video_play)
                 )

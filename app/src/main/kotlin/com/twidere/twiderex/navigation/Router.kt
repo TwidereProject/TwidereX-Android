@@ -21,7 +21,7 @@
 package com.twidere.twiderex.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -35,7 +35,7 @@ fun Router(
     navController: NavHostController = rememberNavController()
 ) {
     val context = LocalContext.current
-    Providers(
+    CompositionLocalProvider(
         LocalNavController provides navController,
         LocalNavigator provides Navigator(navController, context),
     ) {

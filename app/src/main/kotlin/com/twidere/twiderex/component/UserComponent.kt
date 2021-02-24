@@ -20,9 +20,9 @@
  */
 package com.twidere.twiderex.component
 
-import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -43,7 +43,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.livedata.observeAsState
@@ -245,7 +245,7 @@ fun UserMediaTimeline(
             ) { index, pair ->
                 pair?.let { item ->
                     val navigator = LocalNavigator.current
-                    Providers(
+                    CompositionLocalProvider(
                         LocalVideoPlayback provides DisplayPreferences.AutoPlayback.Off,
                     ) {
                         StatusMediaPreviewItem(
@@ -322,7 +322,7 @@ private fun UserInfo(user: UiUser, viewModel: UserViewModel) {
                             navController.navigate(Route.Media.Raw(it))
                         },
                         indication = null,
-                        interactionState = remember { InteractionState() }
+                        interactionSource = remember { MutableInteractionSource() },
                     )
             ) {
                 NetworkImage(

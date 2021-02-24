@@ -22,7 +22,7 @@ package com.twidere.twiderex.component.foundation
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.ColumnScope.Companion.align
-import androidx.compose.foundation.layout.defaultMinSizeConstraints
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListScope
@@ -36,7 +36,7 @@ import androidx.compose.ui.Modifier
 fun LoadingProgress() {
     CircularProgressIndicator(
         modifier = Modifier
-            .defaultMinSizeConstraints(
+            .defaultMinSize(
                 minHeight = ButtonDefaults.MinHeight,
             )
             .padding(ButtonDefaults.ContentPadding)

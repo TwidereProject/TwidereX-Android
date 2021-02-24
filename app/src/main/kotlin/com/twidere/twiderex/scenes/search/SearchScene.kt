@@ -21,8 +21,8 @@
 package com.twidere.twiderex.scenes.search
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -42,7 +42,7 @@ import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -137,7 +137,7 @@ fun SearchScene(keyword: String) {
                                                         navigator.searchInput(keyword)
                                                     },
                                                     indication = null,
-                                                    interactionState = remember { InteractionState() }
+                                                    interactionSource = remember { MutableInteractionSource() }
                                                 )
                                                 .align(Alignment.CenterVertically)
                                                 .weight(1F),
@@ -217,7 +217,7 @@ private fun SearchTweetsContent(viewModel: TwitterSearchTweetsViewModel) {
 @Composable
 private fun SearchMediasContent(viewModel: TwitterSearchMediaViewModel) {
     val source = viewModel.source.collectAsLazyPagingItems()
-    Providers(
+    CompositionLocalProvider(
         LocalVideoPlayback provides DisplayPreferences.AutoPlayback.Off
     ) {
         SwipeToRefreshLayout(
@@ -297,7 +297,7 @@ private fun SearchUsersContent(viewModel: TwitterSearchUserViewModel) {
                                         color = MaterialTheme.colors.primary
                                     )
                                     Spacer(modifier = Modifier.width(4.dp))
-                                    Providers(
+                                    CompositionLocalProvider(
                                         LocalContentAlpha provides ContentAlpha.medium
                                     ) {
                                         Text(

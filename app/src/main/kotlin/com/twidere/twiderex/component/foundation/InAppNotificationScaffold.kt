@@ -129,7 +129,7 @@ fun InAppNotificationBottomSheetScaffold(
     drawerScrimColor: Color = DrawerDefaults.scrimColor,
     backgroundColor: Color = MaterialTheme.colors.background,
     contentColor: Color = contentColorFor(backgroundColor),
-    bodyContent: @Composable (PaddingValues) -> Unit,
+    content: @Composable (PaddingValues) -> Unit,
 ) {
     ApplyNotification(scaffoldState.snackbarHostState)
 
@@ -156,7 +156,7 @@ fun InAppNotificationBottomSheetScaffold(
         drawerScrimColor = drawerScrimColor,
         backgroundColor = backgroundColor,
         contentColor = contentColor,
-        bodyContent = bodyContent,
+        content = content,
     )
 }
 
@@ -180,7 +180,7 @@ fun InAppNotificationScaffold(
     drawerScrimColor: Color = DrawerDefaults.scrimColor,
     backgroundColor: Color = MaterialTheme.colors.background,
     contentColor: Color = contentColorFor(backgroundColor),
-    bodyContent: @Composable (PaddingValues) -> Unit
+    content: @Composable (PaddingValues) -> Unit
 ) {
     ApplyNotification(scaffoldState.snackbarHostState)
     Scaffold(
@@ -201,6 +201,6 @@ fun InAppNotificationScaffold(
         drawerScrimColor = drawerScrimColor,
         backgroundColor = backgroundColor,
         contentColor = contentColor,
-        bodyContent = bodyContent,
+        content = content,
     )
 }

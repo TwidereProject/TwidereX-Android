@@ -21,13 +21,14 @@
 package com.twidere.twiderex.component.foundation
 
 import androidx.compose.animation.core.Animatable
+import androidx.compose.foundation.gestures.DraggableState
+import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.unit.Constraints
 import kotlinx.coroutines.launch
@@ -110,13 +111,14 @@ fun Swiper(
                 onDragStarted = {
                     onStart.invoke()
                 },
-            ) { dy ->
-                scope.launch {
-                    with(state) {
-                        snap(offset + dy)
+                state = DraggableState { dy ->
+                    scope.launch {
+                        with(state) {
+                            snap(offset + dy)
+                        }
                     }
-                }
-            },
+                },
+            ),
             content = content,
         ) { measurables, constraints ->
             layout(constraints.maxWidth, constraints.maxHeight) {

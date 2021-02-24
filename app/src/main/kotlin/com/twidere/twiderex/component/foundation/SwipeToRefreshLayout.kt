@@ -26,7 +26,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ExperimentalMaterialApi
@@ -43,9 +43,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.gesture.nestedscroll.NestedScrollConnection
-import androidx.compose.ui.gesture.nestedscroll.NestedScrollSource
-import androidx.compose.ui.gesture.nestedscroll.nestedScroll
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.input.pointer.consumePositionChange
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
@@ -150,36 +150,29 @@ private class SwipeToRefreshState(
         }
     }
 
-    override fun onPreFling(available: Velocity): Velocity {
+    override suspend fun onPreFling(available: Velocity): Velocity {
         val toFling = Offset(available.x, available.y).toFloat()
         return if (toFling < 0) {
             Velocity.Zero
         } else {
-            scope.launch {
-                fling()
-            }
+            fling()
             Velocity.Zero
         }
     }
 
-    override fun onPostFling(
+    override suspend fun onPostFling(
         consumed: Velocity,
         available: Velocity,
-        onFinished: (Velocity) -> Unit
-    ) {
-        scope.launch {
-            fling {
-                // since we go to the anchor with tween settling, consume all for the best UX
-                onFinished.invoke(available)
-            }
-        }
+    ): Velocity {
+        fling()
+        return available
     }
 
     suspend fun snapTo(value: Float) {
         _offset.snapTo(value)
     }
 
-    suspend fun fling(onFinished: () -> Unit = {}) {
+    suspend fun fling() {
         val offsetValue = _offset.value
         when {
             offsetValue >= 0 -> {
@@ -188,11 +181,9 @@ private class SwipeToRefreshState(
                     onRefresh.invoke()
                 }
                 _offset.animateTo(minOffset)
-                onFinished.invoke()
             }
             else -> {
                 _offset.animateTo(initialOffset)
-                onFinished.invoke()
             }
         }
     }
@@ -234,7 +225,7 @@ fun SwipeToRefreshLayout(
         Surface(elevation = 10.dp, shape = CircleShape) {
             CircularProgressIndicator(
                 modifier = Modifier
-                    .preferredSize(36.dp)
+                    .size(36.dp)
                     .padding(4.dp)
             )
         }
@@ -260,7 +251,7 @@ fun SwipeToRefreshLayout(
                 detectVerticalDragGestures(
                     onVerticalDrag = { change, dragAmount ->
                         if (state.drag(dragAmount) != 0f) {
-                            change.consumePositionChange(0f, dragAmount)
+                            change.consumePositionChange()
                         }
                     },
                     onDragEnd = {

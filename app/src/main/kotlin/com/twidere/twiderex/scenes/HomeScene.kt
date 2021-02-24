@@ -49,7 +49,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -111,7 +111,9 @@ fun HomeScene() {
     val scaffoldState = rememberScaffoldState()
     if (scaffoldState.drawerState.isOpen) {
         BackHandler {
-            scaffoldState.drawerState.close()
+            scope.launch {
+                scaffoldState.drawerState.close()
+            }
         }
     }
     TwidereXTheme {
@@ -196,7 +198,7 @@ fun HomeScene() {
             Box(
                 modifier = Modifier.padding(it)
             ) {
-                Providers(
+                CompositionLocalProvider(
                     LocalLazyListController provides timelineController
                 ) {
                     Pager(state = pagerState) {
@@ -210,6 +212,7 @@ fun HomeScene() {
 
 @Composable
 private fun MenuAvatar(scaffoldState: ScaffoldState) {
+    val scope = rememberCoroutineScope()
     LocalActiveAccount.current?.let { account ->
         val user = remember(account) {
             account.toUi()
@@ -219,10 +222,12 @@ private fun MenuAvatar(scaffoldState: ScaffoldState) {
             size = 32.dp,
             user = user,
             onClick = {
-                if (scaffoldState.drawerState.isOpen) {
-                    scaffoldState.drawerState.close()
-                } else {
-                    scaffoldState.drawerState.open()
+                scope.launch {
+                    if (scaffoldState.drawerState.isOpen) {
+                        scaffoldState.drawerState.close()
+                    } else {
+                        scaffoldState.drawerState.open()
+                    }
                 }
             }
         )
@@ -370,10 +375,12 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
         }
 
         Divider()
+        val scope = rememberCoroutineScope()
         ListItem(
             modifier = Modifier.clickable(
                 onClick = {
-                    scaffoldState.drawerState.close {
+                    scope.launch {
+                        scaffoldState.drawerState.close()
                         navController.navigate(Route.Settings.Home)
                     }
                 }

@@ -24,10 +24,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.preferredHeight
-import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -106,8 +106,8 @@ fun AppearanceScene() {
                         trailing = {
                             Box(
                                 modifier = Modifier
-                                    .preferredHeight(24.dp)
-                                    .preferredWidth(32.dp)
+                                    .height(24.dp)
+                                    .width(32.dp)
                                     .clip(MaterialTheme.shapes.small)
                                     .aspectRatio(1F)
                                     .background(MaterialTheme.colors.primary),

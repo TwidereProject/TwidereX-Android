@@ -21,7 +21,7 @@
 package com.twidere.twiderex.di.assisted
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.lifecycle.ViewModel
@@ -113,11 +113,11 @@ fun ProvideAssistedFactory(
             factoryHolder.twitterUserViewModelFactory,
         )
     }
-    Providers(
+    CompositionLocalProvider(
         LocalAssistedFactories provides factory
     ) {
         content.invoke()
     }
 }
 
-val LocalAssistedFactories = staticCompositionLocalOf<List<IAssistedFactory>>()
+val LocalAssistedFactories = staticCompositionLocalOf<List<IAssistedFactory>> { emptyList() }

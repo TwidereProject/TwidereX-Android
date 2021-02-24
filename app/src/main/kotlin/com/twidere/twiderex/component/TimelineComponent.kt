@@ -22,7 +22,7 @@ package com.twidere.twiderex.component
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.defaultMinSizeConstraints
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -77,13 +77,15 @@ fun TimelineComponent(viewModel: TimelineViewModel) {
                 initialFirstVisibleItemScrollOffset = lastScrollState.firstVisibleItemScrollOffset,
             )
             val scope = rememberCoroutineScope()
-            LocalLazyListController.current.requestScrollTop = {
-                scope.launch {
-                    listState.snapToItemIndex(0)
+            LocalLazyListController.current.requestScrollTop = remember {
+                {
+                    scope.launch {
+                        listState.scrollToItem(0)
+                    }
                 }
             }
-            DisposableEffect(listState.isAnimationRunning) {
-                if (!listState.isAnimationRunning) {
+            DisposableEffect(listState.isScrollInProgress) {
+                if (!listState.isScrollInProgress) {
                     viewModel.saveScrollState(
                         TimelineScrollState(
                             firstVisibleItemIndex = listState.firstVisibleItemIndex,
@@ -112,7 +114,7 @@ fun TimelineComponent(viewModel: TimelineViewModel) {
                                     Divider()
                                     TextButton(
                                         modifier = Modifier
-                                            .defaultMinSizeConstraints(
+                                            .defaultMinSize(
                                                 minHeight = ButtonDefaults.MinHeight,
                                             )
                                             .padding(ButtonDefaults.ContentPadding)
