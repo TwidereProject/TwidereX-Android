@@ -44,7 +44,7 @@ abstract class PagingTimelineMediatorBase<T : IPagination>(
     database: CacheDatabase,
     private val inAppNotification: InAppNotification
 ) : PagingMediator(accountKey = accountKey, database = database) {
-    private var nextPage: T? = null
+    private var paging: T? = null
 
     override suspend fun load(
         loadType: LoadType,
@@ -53,13 +53,13 @@ abstract class PagingTimelineMediatorBase<T : IPagination>(
         try {
             val key = when (loadType) {
                 LoadType.APPEND -> {
-                    nextPage
+                    paging
                 }
                 LoadType.PREPEND -> {
                     return MediatorResult.Success(endOfPaginationReached = true)
                 }
                 LoadType.REFRESH -> {
-                    nextPage = null
+                    paging = null
                     null
                 }
             }
@@ -74,7 +74,7 @@ abstract class PagingTimelineMediatorBase<T : IPagination>(
                 }.let {
                     transform(loadType, state, it)
                 }.also {
-                    nextPage = if (list is IPagingList<*, *>) {
+                    paging = if (list is IPagingList<*, *>) {
                         @Suppress("UNCHECKED_CAST")
                         list.nextPage as T
                     } else {
