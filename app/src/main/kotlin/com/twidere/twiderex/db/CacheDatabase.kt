@@ -24,6 +24,7 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.twidere.twiderex.db.dao.MediaDao
+import com.twidere.twiderex.db.dao.NotificationDao
 import com.twidere.twiderex.db.dao.PagingTimelineDao
 import com.twidere.twiderex.db.dao.ReactionDao
 import com.twidere.twiderex.db.dao.SearchDao
@@ -32,6 +33,7 @@ import com.twidere.twiderex.db.dao.TimelineDao
 import com.twidere.twiderex.db.dao.UrlEntityDao
 import com.twidere.twiderex.db.dao.UserDao
 import com.twidere.twiderex.db.model.DbMedia
+import com.twidere.twiderex.db.model.DbNotification
 import com.twidere.twiderex.db.model.DbPagingTimeline
 import com.twidere.twiderex.db.model.DbSearch
 import com.twidere.twiderex.db.model.DbStatusReaction
@@ -41,6 +43,7 @@ import com.twidere.twiderex.db.model.DbUrlEntity
 import com.twidere.twiderex.db.model.DbUser
 import com.twidere.twiderex.db.model.converter.MediaTypeConverter
 import com.twidere.twiderex.db.model.converter.MicroBlogKeyConverter
+import com.twidere.twiderex.db.model.converter.NotificationTypeConverter
 import com.twidere.twiderex.db.model.converter.PlatformTypeConverter
 import com.twidere.twiderex.db.model.converter.StringListConverter
 import com.twidere.twiderex.db.model.converter.TimelineTypeConverter
@@ -58,8 +61,9 @@ import javax.inject.Singleton
         DbPagingTimeline::class,
         DbUrlEntity::class,
         DbSearch::class,
+        DbNotification::class,
     ],
-    version = 4,
+    version = 5,
 )
 @TypeConverters(
     MicroBlogKeyConverter::class,
@@ -68,6 +72,7 @@ import javax.inject.Singleton
     TimelineTypeConverter::class,
     UserTimelineTypeConverter::class,
     StringListConverter::class,
+    NotificationTypeConverter::class,
 )
 abstract class CacheDatabase : RoomDatabase() {
     abstract fun statusDao(): StatusDao
@@ -78,4 +83,5 @@ abstract class CacheDatabase : RoomDatabase() {
     abstract fun pagingTimelineDao(): PagingTimelineDao
     abstract fun urlEntityDao(): UrlEntityDao
     abstract fun searchDao(): SearchDao
+    abstract fun notificationDao(): NotificationDao
 }

@@ -31,8 +31,8 @@ import com.twidere.twiderex.db.model.UserTimelineType
 import com.twidere.twiderex.db.model.pagingKey
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.notification.InAppNotification
-import com.twidere.twiderex.paging.MaxIdPagination
 import com.twidere.twiderex.paging.PagingList
+import com.twidere.twiderex.paging.SinceMaxPagination
 import com.twidere.twiderex.paging.mediator.paging.MaxIdPagingMediator
 
 @OptIn(ExperimentalPagingApi::class)
@@ -46,7 +46,7 @@ class UserMediaMediator(
     override val pagingKey: String
         get() = UserTimelineType.Media.pagingKey(userKey)
 
-    override suspend fun load(pageSize: Int, paging: MaxIdPagination?): List<IStatus> {
+    override suspend fun load(pageSize: Int, paging: SinceMaxPagination?): List<IStatus> {
         return service.userTimeline(
             user_id = userKey.id,
             count = pageSize,
@@ -58,9 +58,9 @@ class UserMediaMediator(
     override fun provideNextPage(
         raw: List<IStatus>,
         result: List<DbPagingTimelineWithStatus>
-    ): MaxIdPagination {
+    ): SinceMaxPagination {
         if (result is PagingList<*, *>) {
-            return result.nextPage as MaxIdPagination
+            return result.nextPage as SinceMaxPagination
         }
         return super.provideNextPage(raw, result)
     }
@@ -75,7 +75,7 @@ class UserMediaMediator(
                 val content = it.status.status
                 it.status.retweet == null && content.data.hasMedia && content.user.user.userKey == userKey
             },
-            MaxIdPagination(data.lastOrNull()?.status?.status?.data?.statusId)
+            SinceMaxPagination(maxId = data.lastOrNull()?.status?.status?.data?.statusId)
         )
     }
 }
