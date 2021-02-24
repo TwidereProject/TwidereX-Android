@@ -20,6 +20,8 @@
  */
 package com.twidere.services.mastodon.api
 
+import com.twidere.services.mastodon.model.Notification
+import com.twidere.services.mastodon.model.NotificationTypes
 import com.twidere.services.mastodon.model.Status
 import retrofit2.Response
 import retrofit2.http.GET
@@ -54,4 +56,14 @@ interface TimelineResources {
         @Query("exclude_replies") exclude_replies: Boolean? = null,
         @Query("limit") limit: Int? = null,
     ): Response<List<Status>>
+
+    @GET("/api/v1/notifications")
+    suspend fun notification(
+        @Query("max_id") max_id: String? = null,
+        @Query("since_id") since_id: String? = null,
+        @Query("min_id") min_id: String? = null,
+        @Query("limit") limit: Int? = null,
+        @Query("exclude_types[]") exclude_types: List<NotificationTypes>? = null,
+        @Query("account_id") account_id: String? = null,
+    ): List<Notification>
 }

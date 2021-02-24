@@ -18,24 +18,27 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.paging
+package com.twidere.services.mastodon.model
 
-interface IPagingList<T, P : IPagination> : List<T> {
-    val nextPage: P?
+import com.twidere.services.microblog.model.INotification
+import com.twidere.services.serializer.DateSerializerV2
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import java.util.Date
+
+@Serializable
+data class Notification(
+    val id: String? = null,
+    val type: String? = null,
+
+    @SerialName("created_at")
+    @Serializable(with = DateSerializerV2::class)
+    val createdAt: Date? = null,
+
+    val account: Account? = null,
+    val status: Status? = null
+) : INotification
+
+enum class NotificationTypes {
+    follow, favourite, reblog, mention, poll, follow_request
 }
-
-interface IPagination
-
-data class SinceMaxPagination(
-    val maxId: String? = null,
-    val sinceId: String? = null,
-) : IPagination
-
-data class CursorPagination(
-    val cursor: String?,
-) : IPagination
-
-class PagingList<T, P : IPagination>(
-    data: List<T>,
-    override val nextPage: P? = null,
-) : ArrayList<T>(data), IPagingList<T, P>

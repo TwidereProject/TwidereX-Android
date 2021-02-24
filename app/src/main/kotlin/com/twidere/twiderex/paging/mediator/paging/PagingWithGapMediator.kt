@@ -45,9 +45,11 @@ abstract class PagingWithGapMediator(
     database: CacheDatabase,
     private val inAppNotification: InAppNotification,
 ) : PagingMediator(accountKey = accountKey, database = database) {
-    private var loadCount = 0
-    protected open val skipInitialLoad = true
     val loadingBetween = MutableLiveData(listOf<MicroBlogKey>())
+
+    override suspend fun initialize(): InitializeAction {
+        return InitializeAction.SKIP_INITIAL_REFRESH
+    }
 
     override suspend fun load(
         loadType: LoadType,
@@ -81,12 +83,6 @@ abstract class PagingWithGapMediator(
                         .getLatest(pagingKey, accountKey)?.status?.status?.data?.statusKey
                 }
             }
-        }
-        if (skipInitialLoad && loadCount == 0 && loadType == LoadType.REFRESH && sinceStatueKey != null) {
-            loadCount++
-            return MediatorResult.Success(
-                endOfPaginationReached = false
-            )
         }
         return loadBetween(
             pageSize = state.config.pageSize,
