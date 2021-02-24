@@ -36,7 +36,6 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
@@ -67,6 +66,7 @@ import com.twidere.twiderex.component.foundation.Pager
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
 import com.twidere.twiderex.component.foundation.TabScaffold
 import com.twidere.twiderex.component.foundation.rememberPagerState
+import com.twidere.twiderex.component.lazy.LazyColumn2
 import com.twidere.twiderex.component.lazy.collectAsLazyPagingItems
 import com.twidere.twiderex.component.lazy.itemsPaging
 import com.twidere.twiderex.component.lazy.itemsPagingGridIndexed
@@ -200,7 +200,7 @@ fun UserStatusTimeline(
     @Suppress("UNUSED_VARIABLE")
     timelineSource.loadState
     if (timelineSource.itemCount > 0) {
-        LazyColumn {
+        LazyColumn2 {
             itemsPaging(
                 timelineSource,
                 key = { timelineSource[it]?.statusKey.hashCode() },
@@ -233,7 +233,7 @@ fun UserMediaTimeline(
     @Suppress("UNUSED_VARIABLE")
     mediaSource.loadState
     if (mediaSource.itemCount > 0) {
-        LazyColumn {
+        LazyColumn2 {
             item {
                 Box(modifier = Modifier.height(standardPadding))
             }
@@ -286,7 +286,7 @@ fun UserFavouriteTimeline(
     @Suppress("UNUSED_VARIABLE")
     timelineSource.loadState
     if (timelineSource.itemCount > 0) {
-        LazyColumn {
+        LazyColumn2 {
             itemsPaging(
                 timelineSource,
                 key = { timelineSource[it]?.statusKey.hashCode() },

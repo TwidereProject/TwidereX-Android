@@ -190,7 +190,7 @@ dependencies {
 
     implementation "androidx.work:work-runtime-ktx:$versions.work"
 
-    implementation "dev.chrisbanes.accompanist:accompanist-coil:$versions.accompanist"
+    implementation "dev.chrisbanes.accompanist:accompanist-glide:$versions.accompanist"
     implementation "dev.chrisbanes.accompanist:accompanist-insets:$versions.accompanist"
 
     implementation "com.twitter.twittertext:twitter-text:3.1.0"

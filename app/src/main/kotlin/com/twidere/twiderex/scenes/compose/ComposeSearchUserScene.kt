@@ -25,7 +25,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
@@ -53,6 +52,7 @@ import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.TextInput
+import com.twidere.twiderex.component.lazy.LazyColumn2
 import com.twidere.twiderex.component.lazy.collectAsLazyPagingItems
 import com.twidere.twiderex.component.lazy.itemsPaging
 import com.twidere.twiderex.component.status.UserAvatar
@@ -122,7 +122,7 @@ fun ComposeSearchUserScene() {
                 )
             }
         ) {
-            LazyColumn {
+            LazyColumn2 {
                 source?.let {
                     itemsPaging(source) {
                         it?.let { item ->

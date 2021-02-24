@@ -30,7 +30,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
@@ -65,6 +64,7 @@ import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
 import com.twidere.twiderex.component.foundation.TextTabsComponent
 import com.twidere.twiderex.component.foundation.TopAppBarElevation
+import com.twidere.twiderex.component.lazy.LazyColumn2
 import com.twidere.twiderex.component.lazy.collectAsLazyPagingItems
 import com.twidere.twiderex.component.lazy.items
 import com.twidere.twiderex.component.lazy.itemsPagingGridIndexed
@@ -197,7 +197,7 @@ private fun SearchTweetsContent(viewModel: TwitterSearchTweetsViewModel) {
         }
     ) {
         if (source.itemCount > 0) {
-            LazyColumn {
+            LazyColumn2 {
                 statuses(source) { item ->
                     item?.let {
                         TimelineStatusComponent(
@@ -227,7 +227,7 @@ private fun SearchMediasContent(viewModel: TwitterSearchMediaViewModel) {
             }
         ) {
             if (source.itemCount > 0) {
-                LazyColumn {
+                LazyColumn2 {
                     item {
                         Box(modifier = Modifier.height(standardPadding))
                     }
@@ -276,7 +276,7 @@ private fun SearchUsersContent(viewModel: TwitterSearchUserViewModel) {
         }
     ) {
         if (source.itemCount > 0) {
-            LazyColumn {
+            LazyColumn2 {
                 items(source) { item ->
                     item?.let {
                         ListItem(
