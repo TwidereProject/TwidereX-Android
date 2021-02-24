@@ -18,24 +18,19 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.paging
+package com.twidere.services.mastodon.model
 
-interface IPagingList<T, P : IPagination> : List<T> {
-    val nextPage: P?
-}
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-interface IPagination
+@Serializable
+data class Emoji(
+    val shortcode: String? = null,
+    val url: String? = null,
 
-data class SinceMaxPagination(
-    val maxId: String? = null,
-    val sinceId: String? = null,
-) : IPagination
+    @SerialName("static_url")
+    val staticURL: String? = null,
 
-data class CursorPagination(
-    val cursor: String?,
-) : IPagination
-
-class PagingList<T, P : IPagination>(
-    data: List<T>,
-    override val nextPage: P? = null,
-) : ArrayList<T>(data), IPagingList<T, P>
+    @SerialName("visible_in_picker")
+    val visibleInPicker: Boolean? = null
+)

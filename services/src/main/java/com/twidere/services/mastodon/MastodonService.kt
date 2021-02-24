@@ -27,8 +27,10 @@ import com.twidere.services.mastodon.model.MastodonPaging
 import com.twidere.services.mastodon.model.exceptions.MastodonException
 import com.twidere.services.microblog.LookupService
 import com.twidere.services.microblog.MicroBlogService
+import com.twidere.services.microblog.NotificationService
 import com.twidere.services.microblog.RelationshipService
 import com.twidere.services.microblog.TimelineService
+import com.twidere.services.microblog.model.INotification
 import com.twidere.services.microblog.model.IRelationship
 import com.twidere.services.microblog.model.IStatus
 import com.twidere.services.microblog.model.IUser
@@ -37,7 +39,7 @@ import com.twidere.services.microblog.model.Relationship
 class MastodonService(
     private val host: String,
     private val accessToken: String,
-) : MicroBlogService, TimelineService, LookupService, RelationshipService {
+) : MicroBlogService, TimelineService, LookupService, RelationshipService, NotificationService {
     private val resources by lazy {
         retrofit<MastodonResources>(
             "https://$host",
@@ -108,7 +110,7 @@ class MastodonService(
     }
 
     override suspend fun showRelationship(target_id: String): IRelationship {
-        val response = resources.showFriendships(target_id).firstOrNull()
+        val response = resources.showFriendships(listOf(target_id)).firstOrNull()
             ?: throw MastodonException("can not fetch relationship")
         return Relationship(
             followedBy = response.following ?: false,
@@ -136,5 +138,17 @@ class MastodonService(
 
     override suspend fun unfollow(user_id: String) {
         resources.unfollow(user_id)
+    }
+
+    override suspend fun notificationTimeline(
+        count: Int,
+        since_id: String?,
+        max_id: String?
+    ): List<INotification> {
+        return resources.notification(
+            max_id = max_id,
+            since_id = since_id,
+            limit = count,
+        )
     }
 }

@@ -18,24 +18,25 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.paging.mediator.paging
+package com.twidere.twiderex.paging.mediator
 
-import com.twidere.services.microblog.model.IStatus
+import com.twidere.services.microblog.NotificationService
 import com.twidere.twiderex.db.CacheDatabase
-import com.twidere.twiderex.db.model.DbPagingTimelineWithStatus
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.notification.InAppNotification
-import com.twidere.twiderex.paging.SinceMaxPagination
+import com.twidere.twiderex.paging.mediator.paging.PagingWithGapMediator
 
-abstract class MaxIdPagingMediator(
+class NotificationTimelineMediator(
+    private val service: NotificationService,
     accountKey: MicroBlogKey,
     database: CacheDatabase,
-    inAppNotification: InAppNotification
-) : PagingTimelineMediatorBase<SinceMaxPagination>(accountKey, database, inAppNotification) {
-    override fun provideNextPage(
-        raw: List<IStatus>,
-        result: List<DbPagingTimelineWithStatus>
-    ): SinceMaxPagination {
-        return SinceMaxPagination(maxId = result.lastOrNull()?.status?.status?.data?.statusId)
-    }
+    inAppNotification: InAppNotification,
+) : PagingWithGapMediator(accountKey, database, inAppNotification) {
+    override suspend fun loadBetweenImpl(
+        pageSize: Int,
+        max_id: String?,
+        since_id: String?
+    ) = service.notificationTimeline(count = pageSize, max_id = max_id, since_id = since_id)
+
+    override val pagingKey: String = "notification:$accountKey"
 }
