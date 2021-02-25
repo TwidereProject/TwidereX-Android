@@ -58,7 +58,6 @@ fun NetworkImage(
             contentDescription = stringResource(id = R.string.accessibility_common_network_image)
         )
     } else {
-
         GlideImage(
             data = data,
             modifier = modifier,
@@ -71,7 +70,7 @@ fun NetworkImage(
                         contentScale = contentScale,
                     )
                 }
-                is ImageLoadState.Error -> Unit
+                is ImageLoadState.Error -> if (placeholder != null) placeholder()
                 ImageLoadState.Loading -> if (placeholder != null) placeholder()
                 ImageLoadState.Empty -> if (placeholder != null) placeholder()
             }
