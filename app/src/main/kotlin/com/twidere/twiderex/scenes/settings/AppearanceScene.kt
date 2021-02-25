@@ -34,6 +34,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Checkbox
+import androidx.compose.material.CheckboxDefaults
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ListItem
 import androidx.compose.material.MaterialTheme
@@ -47,6 +48,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.R
@@ -208,7 +210,11 @@ fun primaryColorDialog(
                             contentAlignment = Alignment.Center,
                         ) {
                             if (colorIndex == index) {
-                                Checkbox(checked = true, onCheckedChange = {})
+                                Checkbox(
+                                    checked = true,
+                                    onCheckedChange = {},
+                                    colors = CheckboxDefaults.colors(checkedColor = Color.Transparent)
+                                )
                             }
                         }
                     }
