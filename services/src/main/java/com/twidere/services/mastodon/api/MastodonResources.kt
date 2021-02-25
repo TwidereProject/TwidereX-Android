@@ -20,4 +20,8 @@
  */
 package com.twidere.services.mastodon.api
 
-interface MastodonResources : TimelineResources
+interface MastodonResources :
+    TimelineResources,
+    LookupResources,
+    FriendshipResources,
+    AccountResources

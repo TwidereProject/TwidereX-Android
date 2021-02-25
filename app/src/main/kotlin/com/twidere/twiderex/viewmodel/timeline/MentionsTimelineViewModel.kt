@@ -27,7 +27,7 @@ import com.twidere.twiderex.di.assisted.IAssistedFactory
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.paging.mediator.MentionTimelineMediator
-import com.twidere.twiderex.paging.mediator.PagingWithGapMediator
+import com.twidere.twiderex.paging.mediator.paging.PagingWithGapMediator
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 

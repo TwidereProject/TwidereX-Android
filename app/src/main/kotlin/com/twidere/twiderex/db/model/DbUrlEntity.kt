@@ -27,12 +27,13 @@ import com.twidere.twiderex.model.MicroBlogKey
 
 @Entity(
     tableName = "url_entity",
-    indices = [Index(value = ["statusKey", "url"], unique = true)],
+    indices = [Index(value = ["statusKey", "userKey", "url"], unique = true)],
 )
 data class DbUrlEntity(
     @PrimaryKey
     val _id: String,
-    val statusKey: MicroBlogKey,
+    val statusKey: MicroBlogKey?,
+    val userKey: MicroBlogKey?,
     val url: String,
     val expandedUrl: String,
     val displayUrl: String,

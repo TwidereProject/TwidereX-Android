@@ -25,6 +25,7 @@ import com.twidere.services.microblog.TimelineService
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.notification.InAppNotification
+import com.twidere.twiderex.paging.mediator.paging.PagingWithGapMediator
 
 @OptIn(ExperimentalPagingApi::class)
 class HomeTimelineMediator(

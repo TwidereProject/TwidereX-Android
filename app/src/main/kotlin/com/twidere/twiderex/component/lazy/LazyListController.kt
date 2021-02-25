@@ -20,7 +20,7 @@
  */
 package com.twidere.twiderex.component.lazy
 
-import androidx.compose.runtime.ambientOf
+import androidx.compose.runtime.compositionLocalOf
 
 class LazyListController {
     internal var requestScrollTop: () -> Unit = {}
@@ -30,4 +30,4 @@ class LazyListController {
     }
 }
 
-val AmbientLazyListController = ambientOf { LazyListController() }
+val LocalLazyListController = compositionLocalOf { LazyListController() }

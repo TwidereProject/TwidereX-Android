@@ -45,11 +45,13 @@ data class DbPagingTimeline(
     val pagingKey: String,
     val statusKey: MicroBlogKey,
     val timestamp: Long,
+    val sortId: Long,
     var isGap: Boolean,
 ) {
     companion object {
         fun DbTimelineWithStatus.toPagingDbTimeline(
-            pagingKey: String
+            pagingKey: String,
+            sortId: Long? = null,
         ): DbPagingTimelineWithStatus {
             return DbPagingTimelineWithStatus(
                 timeline = with(timeline) {
@@ -59,6 +61,7 @@ data class DbPagingTimeline(
                         pagingKey = pagingKey,
                         timestamp = timestamp,
                         statusKey = statusKey,
+                        sortId = sortId ?: timestamp,
                         isGap = isGap,
                     )
                 },

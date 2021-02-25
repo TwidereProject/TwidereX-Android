@@ -18,7 +18,11 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.annotations
+package com.twidere.services.twitter.model
 
-@RequiresOptIn("This component/layout will be upgraded/rewrite once google release new component/layout for Jetpack Compose")
-annotation class IncomingComposeUpdate
+import com.twidere.services.microblog.model.IPaging
+
+class TwitterPaging<T>(
+    data: List<T>,
+    override val nextPage: String? = null
+) : ArrayList<T>(data), IPaging

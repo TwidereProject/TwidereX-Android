@@ -20,6 +20,16 @@
  */
 package com.twidere.twiderex.scenes
 
+import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.animateDp
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.updateTransition
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -32,6 +42,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Divider
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.ListItem
@@ -39,103 +50,100 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.ScaffoldState
 import androidx.compose.material.Surface
+import androidx.compose.material.TabRowDefaults
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.savedinstancestate.savedInstanceState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigate
-import androidx.navigation.compose.rememberNavController
 import com.twidere.twiderex.R
+import com.twidere.twiderex.component.UserMetrics
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.IconTabsComponent
+import com.twidere.twiderex.component.foundation.Pager
 import com.twidere.twiderex.component.foundation.TopAppBarElevation
-import com.twidere.twiderex.component.lazy.AmbientLazyListController
+import com.twidere.twiderex.component.foundation.rememberPagerState
 import com.twidere.twiderex.component.lazy.LazyListController
+import com.twidere.twiderex.component.lazy.LocalLazyListController
 import com.twidere.twiderex.component.lazy.itemDivider
 import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.navigation.Route
-import com.twidere.twiderex.preferences.AmbientAppearancePreferences
+import com.twidere.twiderex.preferences.LocalAppearancePreferences
 import com.twidere.twiderex.preferences.proto.AppearancePreferences
 import com.twidere.twiderex.scenes.home.HomeNavigationItem
 import com.twidere.twiderex.scenes.home.HomeTimelineItem
 import com.twidere.twiderex.scenes.home.MeItem
 import com.twidere.twiderex.scenes.home.MentionItem
 import com.twidere.twiderex.scenes.home.SearchItem
-import com.twidere.twiderex.ui.AmbientActiveAccount
-import com.twidere.twiderex.ui.AmbientActiveAccountViewModel
-import com.twidere.twiderex.ui.AmbientNavController
+import com.twidere.twiderex.ui.LocalActiveAccount
+import com.twidere.twiderex.ui.LocalActiveAccountViewModel
+import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereXTheme
 import com.twidere.twiderex.ui.mediumEmphasisContentContentColor
+import com.twidere.twiderex.ui.standardPadding
+import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun HomeScene() {
-    val navController = rememberNavController()
-    DisposableEffect(navController) {
-        navController.enableOnBackPressed(false)
-        onDispose { }
-    }
-    var selectedItem by savedInstanceState { 0 }
+    val scope = rememberCoroutineScope()
     val timelineController = remember {
         LazyListController()
     }
-    val tabPosition = AmbientAppearancePreferences.current.tapPosition
+    val tabPosition = LocalAppearancePreferences.current.tapPosition
     val menus = listOf(
         HomeTimelineItem(),
         MentionItem(),
         SearchItem(),
         MeItem(),
     )
+    val pagerState = rememberPagerState(
+        maxPage = menus.lastIndex
+    )
     val scaffoldState = rememberScaffoldState()
+    if (scaffoldState.drawerState.isOpen) {
+        BackHandler {
+            scope.launch {
+                scaffoldState.drawerState.close()
+            }
+        }
+    }
     TwidereXTheme {
         Scaffold(
             scaffoldState = scaffoldState,
             topBar = {
                 if (tabPosition == AppearancePreferences.TabPosition.Bottom) {
-                    if (menus[selectedItem].withAppBar) {
+                    AnimatedVisibility(
+                        visible = menus[pagerState.currentPage].withAppBar,
+                        enter = expandVertically(clip = false),
+                        exit = shrinkVertically(clip = false),
+                    ) {
                         AppBar(
                             backgroundColor = MaterialTheme.colors.surface.withElevation(),
                             title = {
-                                Text(text = menus[selectedItem].name)
+                                Text(text = menus[pagerState.currentPage].name())
                             },
                             navigationIcon = {
-                                IconButton(
-                                    onClick = {
-                                        if (scaffoldState.drawerState.isOpen) {
-                                            scaffoldState.drawerState.close()
-                                        } else {
-                                            scaffoldState.drawerState.open()
-                                        }
-                                    }
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.Menu,
-                                        contentDescription = stringResource(
-                                            id = R.string.accessibility_scene_home_menu
-                                        )
-                                    )
-                                }
+                                MenuAvatar(scaffoldState)
                             },
-                            elevation = if (menus[selectedItem].withAppBar) {
+                            elevation = if (menus[pagerState.currentPage].withAppBar) {
                                 TopAppBarElevation
                             } else {
                                 0.dp
@@ -143,38 +151,55 @@ fun HomeScene() {
                         )
                     }
                 } else {
-                    Surface(
-                        elevation = if (menus[selectedItem].withAppBar) {
+                    val transition = updateTransition(
+                        targetState = menus[pagerState.currentPage].withAppBar,
+                    )
+                    val elevation by transition.animateDp {
+                        if (it) {
                             TopAppBarElevation
                         } else {
                             0.dp
                         }
+                    }
+                    Surface(
+                        elevation = elevation
                     ) {
-                        IconTabsComponent(
-                            items = menus.map { it.icon to it.name },
-                            selectedItem = selectedItem,
-                            onItemSelected = {
-                                if (selectedItem == it) {
-                                    timelineController.scrollToTop()
-                                }
-                                selectedItem = it
-                                navController.navigate(menus[selectedItem].route) {
-                                    launchSingleTop = true
-                                }
-                            },
-                        )
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            MenuAvatar(scaffoldState)
+                            IconTabsComponent(
+                                modifier = Modifier.weight(1f),
+                                items = menus.map { it.icon() to it.name() },
+                                selectedItem = pagerState.currentPage,
+                                divider = {
+                                    TabRowDefaults.Divider(thickness = 0.dp)
+                                },
+                                onItemSelected = {
+                                    if (pagerState.currentPage == it) {
+                                        timelineController.scrollToTop()
+                                    }
+                                    scope.launch {
+                                        pagerState.selectPage {
+                                            pagerState.currentPage = it
+                                        }
+                                    }
+                                },
+                            )
+                        }
                     }
                 }
             },
             bottomBar = {
                 if (tabPosition == AppearancePreferences.TabPosition.Bottom) {
-                    HomeBottomNavigation(menus, selectedItem) {
-                        if (selectedItem == it) {
+                    HomeBottomNavigation(menus, pagerState.currentPage) {
+                        if (pagerState.currentPage == it) {
                             timelineController.scrollToTop()
                         }
-                        selectedItem = it
-                        navController.navigate(menus[selectedItem].route) {
-                            launchSingleTop = true
+                        scope.launch {
+                            pagerState.selectPage {
+                                pagerState.currentPage = it
+                            }
                         }
                     }
                 }
@@ -184,26 +209,41 @@ fun HomeScene() {
             }
         ) {
             Box(
-                modifier = Modifier.padding(
-                    start = it.start,
-                    bottom = it.bottom,
-                    end = it.end,
-                    top = it.top,
-                )
+                modifier = Modifier.padding(it)
             ) {
-                Providers(
-                    AmbientLazyListController provides timelineController
+                CompositionLocalProvider(
+                    LocalLazyListController provides timelineController
                 ) {
-                    NavHost(navController = navController, startDestination = menus.first().route) {
-                        menus.forEach { item ->
-                            composable(item.route) {
-                                item.onCompose()
-                            }
-                        }
+                    Pager(state = pagerState) {
+                        menus[page].content()
                     }
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun MenuAvatar(scaffoldState: ScaffoldState) {
+    val scope = rememberCoroutineScope()
+    LocalActiveAccount.current?.let { account ->
+        val user = remember(account) {
+            account.toUi()
+        }
+        UserAvatar(
+            modifier = Modifier.padding(horizontal = standardPadding * 2),
+            size = 32.dp,
+            user = user,
+            onClick = {
+                scope.launch {
+                    if (scaffoldState.drawerState.isOpen) {
+                        scaffoldState.drawerState.close()
+                    } else {
+                        scaffoldState.drawerState.open()
+                    }
+                }
+            }
+        )
     }
 }
 
@@ -220,7 +260,7 @@ fun HomeBottomNavigation(
             BottomNavigationItem(
                 selectedContentColor = MaterialTheme.colors.primary,
                 unselectedContentColor = mediumEmphasisContentContentColor,
-                icon = { Icon(imageVector = item.icon, contentDescription = item.name) },
+                icon = { Icon(painter = item.icon(), contentDescription = item.name()) },
                 selected = selectedItem == index,
                 onClick = { onItemSelected.invoke(index) }
             )
@@ -228,6 +268,7 @@ fun HomeBottomNavigation(
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class, ExperimentalAnimationApi::class)
 @Composable
 private fun HomeDrawer(scaffoldState: ScaffoldState) {
     var showAccounts by remember { mutableStateOf(false) }
@@ -235,39 +276,20 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
     Column {
         Spacer(modifier = Modifier.height(16.dp))
 
-        val account = AmbientActiveAccount.current
+        val account = LocalActiveAccount.current
         val currentUser = account?.toUi()
-        val navController = AmbientNavController.current
+        val navController = LocalNavController.current
         DrawerUserHeader(
-            currentUser
+            currentUser,
+            showAccounts,
         ) {
             showAccounts = !showAccounts
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Row {
-            Column(
-                modifier = Modifier.weight(1f),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                Text(text = currentUser?.friendsCount.toString())
-                Text(text = stringResource(id = R.string.common_controls_profile_dashboard_following))
-            }
-            Column(
-                modifier = Modifier.weight(1f),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                Text(text = currentUser?.followersCount.toString())
-                Text(text = stringResource(id = R.string.common_controls_profile_dashboard_followers))
-            }
-            Column(
-                modifier = Modifier.weight(1f),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                Text(text = currentUser?.listedCount.toString())
-                Text(text = stringResource(id = R.string.common_controls_profile_dashboard_listed))
-            }
+        if (currentUser != null) {
+            UserMetrics(user = currentUser)
         }
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -277,10 +299,14 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
             modifier = Modifier
                 .weight(1f)
         ) {
-            if (showAccounts) {
-                val activeAccountViewModel = AmbientActiveAccountViewModel.current
-                val accounts by activeAccountViewModel.allAccounts.observeAsState(initial = emptyList())
-                val allAccounts = accounts.filter { it.accountKey != account?.accountKey }
+            val activeAccountViewModel = LocalActiveAccountViewModel.current
+            val accounts by activeAccountViewModel.allAccounts.observeAsState(initial = emptyList())
+            val allAccounts = accounts.filter { it.accountKey != account?.accountKey }
+            androidx.compose.animation.AnimatedVisibility(
+                visible = showAccounts,
+                enter = fadeIn() + expandVertically(),
+                exit = shrinkVertically() + fadeOut(),
+            ) {
                 LazyColumn {
                     items(allAccounts) {
                         val user = it.toUi()
@@ -340,7 +366,12 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
                         )
                     }
                 }
-            } else {
+            }
+            androidx.compose.animation.AnimatedVisibility(
+                visible = !showAccounts,
+                enter = fadeIn() + expandVertically(),
+                exit = shrinkVertically() + fadeOut(),
+            ) {
                 LazyColumn {
                     item {
                         ListItem(
@@ -354,7 +385,7 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
                             },
                             icon = {
                                 Icon(
-                                    imageVector = vectorResource(id = R.drawable.ic_note),
+                                    painter = painterResource(id = R.drawable.ic_note),
                                     contentDescription = stringResource(
                                         id = R.string.scene_drafts_title
                                     )
@@ -367,17 +398,19 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
         }
 
         Divider()
+        val scope = rememberCoroutineScope()
         ListItem(
             modifier = Modifier.clickable(
                 onClick = {
-                    scaffoldState.drawerState.close {
+                    scope.launch {
+                        scaffoldState.drawerState.close()
                         navController.navigate(Route.Settings.Home)
                     }
                 }
             ),
             icon = {
                 Icon(
-                    imageVector = vectorResource(id = R.drawable.ic_adjustments_horizontal),
+                    painter = painterResource(id = R.drawable.ic_adjustments_horizontal),
                     contentDescription = stringResource(
                         id = R.string.scene_settings_title
                     )
@@ -390,9 +423,11 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun DrawerUserHeader(
     user: UiUser?,
+    showAccounts: Boolean,
     onTrailingClicked: () -> Unit = {},
 ) {
     ListItem(
@@ -418,12 +453,21 @@ private fun DrawerUserHeader(
             )
         },
         trailing = {
+            val transition = updateTransition(targetState = showAccounts)
+            val rotate by transition.animateFloat {
+                if (it) {
+                    180f
+                } else {
+                    0f
+                }
+            }
             IconButton(
                 onClick = {
                     onTrailingClicked.invoke()
                 }
             ) {
                 Icon(
+                    modifier = Modifier.rotate(rotate),
                     imageVector = Icons.Default.ArrowDropDown,
                     contentDescription = stringResource(
                         id = R.string.accessibility_scene_home_drawer_account_dropdown

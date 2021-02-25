@@ -21,12 +21,12 @@
 package com.twidere.twiderex.di.assisted
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.staticAmbientOf
-import androidx.compose.ui.viewinterop.viewModel
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.twidere.twiderex.viewmodel.MediaViewModel
 import com.twidere.twiderex.viewmodel.compose.ComposeViewModel
 import com.twidere.twiderex.viewmodel.compose.DraftComposeViewModel
@@ -38,6 +38,7 @@ import com.twidere.twiderex.viewmodel.twitter.TwitterSignInViewModel
 import com.twidere.twiderex.viewmodel.twitter.TwitterStatusViewModel
 import com.twidere.twiderex.viewmodel.twitter.search.TwitterSearchMediaViewModel
 import com.twidere.twiderex.viewmodel.twitter.search.TwitterSearchTweetsViewModel
+import com.twidere.twiderex.viewmodel.twitter.user.TwitterUserViewModel
 import com.twidere.twiderex.viewmodel.user.UserFavouriteTimelineViewModel
 import com.twidere.twiderex.viewmodel.user.UserMediaTimelineViewModel
 import com.twidere.twiderex.viewmodel.user.UserTimelineViewModel
@@ -49,7 +50,7 @@ inline fun <reified AF : IAssistedFactory, reified VM : ViewModel> assistedViewM
     vararg dependsOn: Any,
     noinline creator: ((AF) -> VM)? = null,
 ): VM {
-    val factories = AmbientAssistedFactories.current
+    val factories = LocalAssistedFactories.current
     val factory = factories.firstOrNull { AF::class.java.isInstance(it) } as? AF
     return viewModel(
         if (dependsOn.any()) {
@@ -84,6 +85,7 @@ data class AssistedViewModelFactoryHolder @Inject constructor(
     val draftItemViewModelFactory: DraftItemViewModel.AssistedFactory,
     val draftComposeViewModelFactory: DraftComposeViewModel.AssistedFactory,
     val twitterSignInViewModelViewModelFactory: TwitterSignInViewModel.AssistedFactory,
+    val twitterUserViewModelFactory: TwitterUserViewModel.AssistedFactory,
 )
 
 @Composable
@@ -108,13 +110,14 @@ fun ProvideAssistedFactory(
             factoryHolder.draftItemViewModelFactory,
             factoryHolder.draftComposeViewModelFactory,
             factoryHolder.twitterSignInViewModelViewModelFactory,
+            factoryHolder.twitterUserViewModelFactory,
         )
     }
-    Providers(
-        AmbientAssistedFactories provides factory
+    CompositionLocalProvider(
+        LocalAssistedFactories provides factory
     ) {
         content.invoke()
     }
 }
 
-val AmbientAssistedFactories = staticAmbientOf<List<IAssistedFactory>>()
+val LocalAssistedFactories = staticCompositionLocalOf<List<IAssistedFactory>> { emptyList() }

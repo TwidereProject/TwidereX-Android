@@ -18,17 +18,17 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.viewmodel.twitter.user
+package com.twidere.twiderex.viewmodel.twitter
 
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
-import com.twidere.services.twitter.TwitterService
+import com.twidere.services.microblog.RelationshipService
 import com.twidere.twiderex.defaultLoadCount
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.paging.source.twitter.TwitterFollowersPagingSource
+import com.twidere.twiderex.paging.source.FollowersPagingSource
 import com.twidere.twiderex.viewmodel.UserListViewModel
 
 class FollowersViewModel(
@@ -37,9 +37,9 @@ class FollowersViewModel(
 ) : UserListViewModel() {
     override val source by lazy {
         Pager(config = PagingConfig(pageSize = defaultLoadCount)) {
-            TwitterFollowersPagingSource(
+            FollowersPagingSource(
                 userKey = userKey,
-                account.service as TwitterService
+                account.service as RelationshipService
             )
         }.flow.cachedIn(viewModelScope)
     }

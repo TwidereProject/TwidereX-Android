@@ -22,10 +22,11 @@ package com.twidere.twiderex.component.foundation
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.AmbientContentAlpha
 import androidx.compose.material.Icon
+import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
@@ -34,13 +35,12 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.savedinstancestate.savedInstanceState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.AmbientContext
-import androidx.compose.ui.platform.AmbientLifecycleOwner
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
@@ -54,8 +54,8 @@ import com.google.android.exoplayer2.ui.PlayerControlView
 import com.google.android.exoplayer2.ui.StyledPlayerView
 import com.twidere.twiderex.R
 import com.twidere.twiderex.preferences.proto.DisplayPreferences
-import com.twidere.twiderex.ui.AmbientIsActiveNetworkMetered
-import com.twidere.twiderex.ui.AmbientVideoPlayback
+import com.twidere.twiderex.ui.LocalIsActiveNetworkMetered
+import com.twidere.twiderex.ui.LocalVideoPlayback
 import com.twidere.twiderex.ui.profileImageSize
 import com.twidere.twiderex.utils.video.CacheDataSourceFactory
 import com.twidere.twiderex.utils.video.VideoPool
@@ -70,8 +70,8 @@ fun VideoPlayer(
     thumb: @Composable (() -> Unit)? = null,
 ) {
     var playing by remember { mutableStateOf(false) }
-    val playBackMode = AmbientVideoPlayback.current
-    val isActiveNetworkMetered = AmbientIsActiveNetworkMetered.current
+    val playBackMode = LocalVideoPlayback.current
+    val isActiveNetworkMetered = LocalIsActiveNetworkMetered.current
     var shouldShowThumb by remember { mutableStateOf(false) }
     val playInitial = when (playBackMode) {
         DisplayPreferences.AutoPlayback.Auto -> !isActiveNetworkMetered
@@ -79,10 +79,9 @@ fun VideoPlayer(
         DisplayPreferences.AutoPlayback.Off -> false
         DisplayPreferences.AutoPlayback.UNRECOGNIZED -> true
     }
-    var autoPlay by savedInstanceState(url) { playInitial }
-    var window by savedInstanceState(url) { 0 }
-    val context = AmbientContext.current
-    val lifecycle = AmbientLifecycleOwner.current.lifecycle
+    var autoPlay by remember(url) { mutableStateOf(playInitial) }
+    val context = LocalContext.current
+    val lifecycle = LocalLifecycleOwner.current.lifecycle
 
     Box {
         if (playInitial) {
@@ -110,34 +109,13 @@ fun VideoPlayer(
                         setMediaSource(it)
                     }
                     prepare()
-                    seekTo(window, VideoPool.get(url))
+                    seekTo(VideoPool.get(url))
                 }
             }
 
             fun updateState() {
                 autoPlay = player.playWhenReady
-                window = player.currentWindowIndex
                 VideoPool.set(url, 0L.coerceAtLeast(player.contentPosition))
-            }
-
-            val playerView = remember {
-                StyledPlayerView(context).also { playerView ->
-                    playerView.useController = showControls
-                    lifecycle.addObserver(object : LifecycleObserver {
-                        @OnLifecycleEvent(Lifecycle.Event.ON_START)
-                        fun onStart() {
-                            playerView.onResume()
-                            player.playWhenReady = autoPlay
-                        }
-
-                        @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
-                        fun onStop() {
-                            updateState()
-                            playerView.onPause()
-                            player.playWhenReady = false
-                        }
-                    })
-                }
             }
 
             DisposableEffect(customControl) {
@@ -156,22 +134,45 @@ fun VideoPlayer(
 
             AndroidView(
                 modifier = modifier,
-                viewBlock = { playerView }
+                factory = { context ->
+                    StyledPlayerView(context).also { playerView ->
+                        playerView.useController = showControls
+                        lifecycle.addObserver(object : LifecycleObserver {
+                            @OnLifecycleEvent(Lifecycle.Event.ON_START)
+                            fun onStart() {
+                                playerView.onResume()
+                                player.playWhenReady = autoPlay
+                            }
+
+                            @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
+                            fun onStop() {
+                                updateState()
+                                playerView.onPause()
+                                player.playWhenReady = false
+                            }
+                        })
+                    }
+                }
             ) {
-                playerView.player = player
+                it.player = player
             }
         }
         if ((shouldShowThumb || !playing) && thumb != null) {
             thumb()
-            Icon(
-                imageVector = Icons.Default.PlayArrow,
-                tint = Color.White.copy(alpha = AmbientContentAlpha.current),
+            Box(
                 modifier = Modifier
-                    .align(Alignment.Center)
-                    .preferredSize(profileImageSize)
-                    .background(MaterialTheme.colors.primary, CircleShape),
-                contentDescription = stringResource(id = R.string.accessibility_common_video_play)
-            )
+                    .fillMaxSize()
+            ) {
+                Icon(
+                    imageVector = Icons.Default.PlayArrow,
+                    tint = Color.White.copy(alpha = LocalContentAlpha.current),
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .size(profileImageSize)
+                        .background(MaterialTheme.colors.primary, CircleShape),
+                    contentDescription = stringResource(id = R.string.accessibility_common_video_play)
+                )
+            }
         }
     }
 }

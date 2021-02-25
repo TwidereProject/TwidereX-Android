@@ -20,151 +20,41 @@
  */
 package com.twidere.twiderex.component.status
 
-import androidx.compose.foundation.ClickableText
-import androidx.compose.material.AmbientContentAlpha
-import androidx.compose.material.AmbientContentColor
-import androidx.compose.material.AmbientTextStyle
-import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.takeOrElse
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.buildAnnotatedString
-import com.twidere.twiderex.component.navigation.AmbientNavigator
 import com.twidere.twiderex.model.ui.UiStatus
-import org.jsoup.Jsoup
-import org.jsoup.nodes.Element
-import org.jsoup.nodes.Node
-import org.jsoup.nodes.TextNode
-
-private const val TAG_URL = "url"
 
 @Composable
 fun StatusText(
     status: UiStatus,
-    color: Color = Color.Unspecified,
-    onStatusTextClicked: () -> Unit = {},
 ) {
-    val navigator = AmbientNavigator.current
-    val textColor = color.takeOrElse {
-        AmbientContentColor.current.copy(alpha = AmbientContentAlpha.current)
-    }
-    Providers(
-        AmbientTextStyle provides MaterialTheme.typography.body1.copy(color = textColor)
-    ) {
-        RenderContent(
-            status = status,
-            onLinkClicked = {
-                navigator.openLink(it)
-            },
-            onStatusTextClicked = {
-                onStatusTextClicked.invoke()
-            },
-        )
+    HtmlText(
+        htmlText = status.htmlText,
+    ) { href ->
+        status.resolveLink(href)
     }
 }
 
-@Composable
-private fun RenderContent(
-    status: UiStatus,
-    onLinkClicked: (String) -> Unit = {},
-    onStatusTextClicked: () -> Unit = {},
-) {
-    val value = status.contentAnnotatedString()
-    if (value.text.isNotEmpty()) {
-        ClickableText(
-            onClick = {
-                value.getStringAnnotations(start = it, end = it)
-                    .firstOrNull()
-                    ?.let { annotation ->
-                        when (annotation.tag) {
-                            TAG_URL -> onLinkClicked.invoke(annotation.item)
-                        }
-                    } ?: run {
-                    onStatusTextClicked.invoke()
-                }
-            },
-            text = value,
-        )
-    }
-}
-
-@Composable
-public fun UiStatus.contentAnnotatedString(): AnnotatedString {
-    val document = Jsoup.parse(htmlText.replace("\n", "<br>"))
-    return buildAnnotatedString {
-        document.body().childNodes().forEach {
-            RenderNode(it, this@contentAnnotatedString)
-        }
-    }
-}
-
-@Composable
-private fun AnnotatedString.Builder.RenderNode(node: Node, status: UiStatus) {
-    when (node) {
-        is Element -> {
-            this.RenderElement(node, status = status)
-        }
-        is TextNode -> {
-            RenderText(node.text())
-        }
-    }
-}
-
-@Composable
-private fun AnnotatedString.Builder.RenderText(text: String) {
-    pushStyle(
-        AmbientTextStyle.current.toSpanStyle()
-    )
-    append(text)
-    pop()
-}
-
-@Composable
-private fun AnnotatedString.Builder.RenderElement(element: Element, status: UiStatus) {
-    when (element.normalName()) {
-        "a" -> {
-            RenderLink(element, status)
-        }
-        "br" -> {
-            RenderText("\n")
-        }
-        "span", "p" -> {
-            element.childNodes().forEach {
-                RenderNode(node = it, status = status)
+fun UiStatus.resolveLink(href: String): ResolvedLink {
+    val entity = url.firstOrNull { it.url == href }
+    val media = media.firstOrNull { it.url == href }
+    return when {
+        entity != null -> {
+            if (!entity.displayUrl.contains("pic.twitter.com") &&
+                !(quote != null && entity.expandedUrl.endsWith(quote.statusId))
+            ) {
+                ResolvedLink(
+                    expanded = entity.expandedUrl,
+                    display = entity.displayUrl,
+                )
+            } else {
+                ResolvedLink(expanded = null, skip = true)
             }
         }
-    }
-}
-
-@Composable
-private fun AnnotatedString.Builder.RenderLink(element: Element, status: UiStatus) {
-    val href = element.attr("href")
-    val entity = status.url.firstOrNull { it.url == href }
-    val media = status.media.firstOrNull { it.url == href }
-    Providers(
-        AmbientTextStyle provides AmbientTextStyle.current.copy(color = MaterialTheme.colors.primary)
-    ) {
-        when {
-            entity != null -> {
-                if (!entity.displayUrl.contains("pic.twitter.com") && !
-                    (status.quote != null && !entity.displayUrl.endsWith(status.quote.statusId))
-                ) {
-                    pushStringAnnotation(TAG_URL, entity.expandedUrl)
-                    RenderText(entity.displayUrl)
-                    pop()
-                }
-            }
-            media != null -> {
-            }
-            else -> {
-                pushStringAnnotation(TAG_URL, href)
-                element.childNodes().forEach {
-                    RenderNode(node = it, status = status)
-                }
-                pop()
-            }
+        media != null -> {
+            ResolvedLink(expanded = null, skip = true)
+        }
+        else -> {
+            ResolvedLink(expanded = null)
         }
     }
 }

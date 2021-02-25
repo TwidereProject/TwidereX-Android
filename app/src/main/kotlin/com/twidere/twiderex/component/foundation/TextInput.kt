@@ -20,37 +20,38 @@
  */
 package com.twidere.twiderex.component.foundation
 
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.AmbientContentAlpha
-import androidx.compose.material.AmbientContentColor
 import androidx.compose.material.ContentAlpha
+import androidx.compose.material.LocalContentAlpha
+import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.Providers
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.takeOrElse
-import androidx.compose.ui.node.Ref
-import androidx.compose.ui.text.SoftwareKeyboardController
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.SoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 
-@ExperimentalFoundationApi
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun TextInput(
     modifier: Modifier = Modifier,
@@ -65,7 +66,6 @@ fun TextInput(
     onImeActionPerformed: (ImeAction, SoftwareKeyboardController?) -> Unit = { _, _ -> },
     value: String,
     onValueChange: (String) -> Unit,
-    onTextInputStarted: ((SoftwareKeyboardController) -> Unit)? = null,
     onClicked: (() -> Unit)? = null,
 ) {
 
@@ -90,12 +90,11 @@ fun TextInput(
                 onValueChange(it.text)
             }
         },
-        onTextInputStarted = onTextInputStarted,
         onClicked = onClicked,
     )
 }
 
-@ExperimentalFoundationApi
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun TextInput(
     modifier: Modifier = Modifier,
@@ -110,26 +109,25 @@ fun TextInput(
     onImeActionPerformed: (ImeAction, SoftwareKeyboardController?) -> Unit = { _, _ -> },
     value: TextFieldValue,
     onValueChange: (TextFieldValue) -> Unit,
-    onTextInputStarted: ((SoftwareKeyboardController) -> Unit)? = null,
     onClicked: (() -> Unit)? = null,
 ) {
     val focusRequester = remember { FocusRequester() }
-    val keyboardController = remember { Ref<SoftwareKeyboardController>() }
-    val interactionState = remember { InteractionState() }
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val interactionSource = remember { MutableInteractionSource() }
     val textColor = color.takeOrElse {
-        AmbientContentColor.current.copy(alpha = AmbientContentAlpha.current)
+        LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
     }
     DisposableEffect(autoFocus) {
         if (autoFocus) {
             focusRequester.requestFocus()
-            keyboardController.value?.showSoftwareKeyboard()
+            keyboardController?.showSoftwareKeyboard()
         }
         onDispose { }
     }
     Box(
         modifier = modifier
             .focusRequester(focusRequester)
-            .clickable(interactionState = interactionState, indication = null) {
+            .clickable(interactionSource = interactionSource, indication = null) {
                 onClicked?.invoke()
                 focusRequester.requestFocus()
                 // TODO(b/163109449): Showing and hiding keyboard should be handled by BaseTextField.
@@ -137,7 +135,7 @@ fun TextInput(
                 //  Investiate why this is needed here. If it is really needed, instead of doing
                 //  this in the onClick callback, we should move this logic to the focusObserver
                 //  so that it can show or hide the keyboard based on the focus state.
-                keyboardController.value?.showSoftwareKeyboard()
+                keyboardController?.showSoftwareKeyboard()
             },
         contentAlignment = alignment,
     ) {
@@ -147,23 +145,30 @@ fun TextInput(
                 keyboardType = keyboardType,
                 imeAction = imeAction,
             ),
-            cursorColor = textColor,
+            keyboardActions =
+                KeyboardActions(
+                    onDone = { onImeActionPerformed.invoke(ImeAction.Done, keyboardController) },
+                    onGo = { onImeActionPerformed.invoke(ImeAction.Go, keyboardController) },
+                    onNext = { onImeActionPerformed.invoke(ImeAction.Next, keyboardController) },
+                    onPrevious = { onImeActionPerformed.invoke(ImeAction.Previous, keyboardController) },
+                    onSearch = { onImeActionPerformed.invoke(ImeAction.Search, keyboardController) },
+                    onSend = { onImeActionPerformed.invoke(ImeAction.Send, keyboardController) }
+                ),
+            // cursorColor = textColor,
             textStyle = textStyle.copy(color = textColor),
-            onImeActionPerformed = {
-                onImeActionPerformed(it, keyboardController.value)
-            },
-            onTextInputStarted = {
-                keyboardController.value = it
-                onTextInputStarted?.invoke(it)
-            },
+            // onTextInputStarted = {
+            //     keyboardController.value = it
+            //     onTextInputStarted?.invoke(it)
+            // },
             value = value,
             onValueChange = {
                 onValueChange(it)
             },
+
         )
         if (value.text.isEmpty()) {
-            Providers(
-                AmbientContentAlpha provides ContentAlpha.medium
+            CompositionLocalProvider(
+                LocalContentAlpha provides ContentAlpha.medium
             ) {
                 placeholder?.invoke()
             }

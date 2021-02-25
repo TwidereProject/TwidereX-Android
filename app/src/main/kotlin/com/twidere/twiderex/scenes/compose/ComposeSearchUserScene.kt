@@ -25,19 +25,19 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.AmbientContentAlpha
 import androidx.compose.material.ContentAlpha
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.ListItem
+import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -47,27 +47,28 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.paging.compose.collectAsLazyPagingItems
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.TextInput
+import com.twidere.twiderex.component.lazy.LazyColumn2
+import com.twidere.twiderex.component.lazy.collectAsLazyPagingItems
 import com.twidere.twiderex.component.lazy.itemsPaging
 import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.extensions.DisposeResult
 import com.twidere.twiderex.extensions.setResult
 import com.twidere.twiderex.extensions.viewModel
-import com.twidere.twiderex.ui.AmbientActiveAccount
-import com.twidere.twiderex.ui.AmbientNavController
+import com.twidere.twiderex.ui.LocalActiveAccount
+import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereXTheme
 import com.twidere.twiderex.viewmodel.compose.ComposeSearchUserViewModel
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun ComposeSearchUserScene() {
-    val account = AmbientActiveAccount.current ?: return
-    val navController = AmbientNavController.current
+    val account = LocalActiveAccount.current ?: return
+    val navController = LocalNavController.current
     val viewModel = viewModel(account) {
         ComposeSearchUserViewModel(account = account)
     }
@@ -121,7 +122,7 @@ fun ComposeSearchUserScene() {
                 )
             }
         ) {
-            LazyColumn {
+            LazyColumn2 {
                 source?.let {
                     itemsPaging(source) {
                         it?.let { item ->
@@ -144,8 +145,8 @@ fun ComposeSearchUserScene() {
                                             color = MaterialTheme.colors.primary
                                         )
                                         Spacer(modifier = Modifier.width(4.dp))
-                                        Providers(
-                                            AmbientContentAlpha provides ContentAlpha.medium
+                                        CompositionLocalProvider(
+                                            LocalContentAlpha provides ContentAlpha.medium
                                         ) {
                                             Text(
                                                 text = "@${item.screenName}",
@@ -156,7 +157,7 @@ fun ComposeSearchUserScene() {
                                     }
                                 },
                                 secondaryText = {
-                                    Text(text = item.desc, maxLines = 1)
+                                    Text(text = item.rawDesc, maxLines = 1)
                                 },
                             )
                         }

@@ -35,29 +35,33 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.unit.Dp
 import com.twidere.twiderex.component.foundation.NetworkImage
-import com.twidere.twiderex.component.navigation.AmbientNavigator
+import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.model.ui.UiUser
-import com.twidere.twiderex.preferences.AmbientDisplayPreferences
+import com.twidere.twiderex.preferences.LocalDisplayPreferences
 import com.twidere.twiderex.preferences.proto.DisplayPreferences
 import com.twidere.twiderex.ui.profileImageSize
 
 @Composable
 fun UserAvatar(
+    modifier: Modifier = Modifier,
     user: UiUser,
-    size: Dp = profileImageSize
+    size: Dp = profileImageSize,
+    onClick: (() -> Unit)? = null,
 ) {
-    val navigator = AmbientNavigator.current
+    val navigator = LocalNavigator.current
     Box(
-        modifier = Modifier
+        modifier = modifier
             .withAvatarClip()
             .clipToBounds()
     ) {
         NetworkImage(
-            url = user.profileImage,
+            data = user.profileImage,
             modifier = Modifier
                 .clickable(
                     onClick = {
-                        navigator.user(user)
+                        onClick?.invoke() ?: run {
+                            navigator.user(user)
+                        }
                     }
                 )
                 .width(size)
@@ -69,7 +73,7 @@ fun UserAvatar(
 fun Modifier.withAvatarClip(): Modifier {
     return composed {
         val transition =
-            updateTransition(targetState = AmbientDisplayPreferences.current.avatarStyle)
+            updateTransition(targetState = LocalDisplayPreferences.current.avatarStyle)
         val percent by transition.animateInt {
             when (it) {
                 DisplayPreferences.AvatarStyle.Round -> 50

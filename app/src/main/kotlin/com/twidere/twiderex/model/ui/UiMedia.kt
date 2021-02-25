@@ -21,8 +21,7 @@
 package com.twidere.twiderex.model.ui
 
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.asAndroidBitmap
-import androidx.compose.ui.res.imageResource
+import androidx.compose.ui.res.painterResource
 import com.twidere.twiderex.R
 import com.twidere.twiderex.db.model.DbMedia
 import com.twidere.twiderex.model.MediaType
@@ -43,10 +42,10 @@ data class UiMedia(
             UiMedia(
                 url = null,
                 mediaUrl = null,
-                previewUrl = imageResource(id = R.drawable.featured_graphics).asAndroidBitmap(),
+                previewUrl = painterResource(id = R.drawable.featured_graphics),
                 type = MediaType.photo,
-                width = imageResource(id = R.drawable.featured_graphics).width.toLong(),
-                height = imageResource(id = R.drawable.featured_graphics).height.toLong(),
+                width = painterResource(id = R.drawable.featured_graphics).intrinsicSize.width.toLong(),
+                height = painterResource(id = R.drawable.featured_graphics).intrinsicSize.height.toLong(),
                 pageUrl = null,
                 altText = "",
             ),

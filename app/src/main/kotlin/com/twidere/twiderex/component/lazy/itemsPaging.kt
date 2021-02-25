@@ -23,27 +23,28 @@ package com.twidere.twiderex.component.lazy
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ListItem
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.paging.LoadState
-import androidx.paging.compose.LazyPagingItems
-import androidx.paging.compose.items
 import com.twidere.twiderex.component.foundation.loading
 
 fun <T : Any> LazyListScope.itemsPaging(
     lazyPagingItems: LazyPagingItems<T>,
+    key: ((index: Int) -> Any) = { lazyPagingItems[it]?.hashCode() ?: 0 },
     itemContent: @Composable LazyItemScope.(value: T?) -> Unit
 ) {
     loadState(lazyPagingItems.loadState.refresh) {
         lazyPagingItems.retry()
     }
-    items(lazyPagingItems, itemContent)
+    items(lazyPagingItems = lazyPagingItems, key = key, itemContent = itemContent)
     loadState(lazyPagingItems.loadState.append) {
         lazyPagingItems.retry()
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 fun LazyListScope.loadState(
     state: LoadState,
     onReloadRequested: () -> Unit = {},
@@ -51,14 +52,12 @@ fun LazyListScope.loadState(
     when (state) {
         is LoadState.Loading -> loading()
         is LoadState.Error -> item {
-            item {
-                ListItem(
-                    modifier = Modifier.clickable(onClick = { onReloadRequested.invoke() }),
-                    text = {
+            ListItem(
+                modifier = Modifier.clickable(onClick = { onReloadRequested.invoke() }),
+                text = {
 //                        Text(text = stringResource(id = R.string.list_load_state_error))
-                    }
-                )
-            }
+                }
+            )
         }
         else -> {
         }

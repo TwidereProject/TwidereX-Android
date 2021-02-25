@@ -18,28 +18,34 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.paging.source.twitter
+package com.twidere.twiderex.paging.source
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.twidere.services.twitter.TwitterService
+import com.twidere.services.microblog.RelationshipService
+import com.twidere.services.microblog.model.IPaging
 import com.twidere.twiderex.db.mapper.toDbUser
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.model.ui.UiUser.Companion.toUi
 
-class TwitterFollowingPagingSource(
+class FollowingPagingSource(
     private val userKey: MicroBlogKey,
-    private val service: TwitterService
+    private val service: RelationshipService
 ) : PagingSource<String, UiUser>() {
     override suspend fun load(params: LoadParams<String>): LoadResult<String, UiUser> {
         return try {
             val page = params.key
-            val result = service.following(userKey.id, cursor = page)
-            val users = result.data?.map {
+            val result = service.following(userKey.id, nextPage = page)
+            val users = result.map {
                 it.toDbUser(userKey).toUi()
-            } ?: emptyList()
-            LoadResult.Page(data = users, prevKey = null, nextKey = result.meta?.nextToken)
+            }
+            val nextPage = if (result is IPaging) {
+                result.nextPage
+            } else {
+                null
+            }
+            LoadResult.Page(data = users, prevKey = null, nextKey = nextPage)
         } catch (e: Exception) {
             LoadResult.Error(e)
         }

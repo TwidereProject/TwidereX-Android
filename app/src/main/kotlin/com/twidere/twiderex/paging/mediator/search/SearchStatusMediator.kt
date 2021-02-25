@@ -26,7 +26,9 @@ import com.twidere.services.twitter.model.exceptions.TwitterApiExceptionV2
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.notification.InAppNotification
-import com.twidere.twiderex.paging.mediator.PagingTimelineMediatorBase
+import com.twidere.twiderex.paging.CursorPagination
+import com.twidere.twiderex.paging.mediator.paging.CursorPagingMediator
+import com.twidere.twiderex.paging.mediator.paging.CursorPagingResult
 
 class SearchStatusMediator(
     private val query: String,
@@ -34,16 +36,14 @@ class SearchStatusMediator(
     accountKey: MicroBlogKey,
     private val service: TwitterService,
     inAppNotification: InAppNotification,
-) : PagingTimelineMediatorBase(accountKey, database, inAppNotification) {
+) : CursorPagingMediator(accountKey, database, inAppNotification) {
     override val pagingKey = "search:$query:status"
-    private var nextPage: String? = null
-    override suspend fun load(pageSize: Int, max_id: String?): List<IStatus> {
+    override suspend fun load(pageSize: Int, paging: CursorPagination?): List<IStatus> {
         val result = try {
-            service.searchTweets("$query -is:retweet", count = pageSize, nextPage = nextPage)
+            service.searchTweets("$query -is:retweet", count = pageSize, nextPage = paging?.cursor)
         } catch (e: TwitterApiExceptionV2) {
-            service.searchTweetsV1("$query -filter:retweets", count = pageSize, max_id = nextPage)
+            service.searchTweetsV1("$query -filter:retweets", count = pageSize, max_id = paging?.cursor)
         }
-        nextPage = result.nextPage
-        return result.status
+        return CursorPagingResult(result.status, result.nextPage)
     }
 }

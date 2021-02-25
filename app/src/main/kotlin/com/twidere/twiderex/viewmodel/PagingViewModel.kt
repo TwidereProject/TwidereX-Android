@@ -25,8 +25,8 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
 import androidx.paging.map
 import com.twidere.twiderex.model.ui.UiStatus.Companion.toUi
-import com.twidere.twiderex.paging.mediator.PagingMediator
-import com.twidere.twiderex.paging.mediator.pager
+import com.twidere.twiderex.paging.mediator.paging.PagingMediator
+import com.twidere.twiderex.paging.mediator.paging.pager
 import kotlinx.coroutines.flow.map
 
 abstract class PagingViewModel : ViewModel() {

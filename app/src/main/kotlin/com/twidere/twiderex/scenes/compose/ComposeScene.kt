@@ -23,6 +23,9 @@ package com.twidere.twiderex.scenes.compose
 import android.Manifest
 import android.annotation.SuppressLint
 import android.net.Uri
+import androidx.activity.compose.BackHandler
+import androidx.activity.compose.registerForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -43,7 +46,6 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.AlertDialog
-import androidx.compose.material.AmbientContentAlpha
 import androidx.compose.material.BottomSheetScaffoldState
 import androidx.compose.material.Checkbox
 import androidx.compose.material.CircularProgressIndicator
@@ -56,12 +58,13 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.ListItem
+import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.material.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -69,19 +72,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.node.Ref
-import androidx.compose.ui.platform.AmbientContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.SoftwareKeyboardController
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.navigate
 import com.twidere.twiderex.R
-import com.twidere.twiderex.component.BackButtonHandler
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.InAppNotificationBottomSheetScaffold
 import com.twidere.twiderex.component.foundation.NetworkImage
@@ -90,15 +91,13 @@ import com.twidere.twiderex.component.status.StatusLineComponent
 import com.twidere.twiderex.component.status.TimelineStatusComponent
 import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.di.assisted.assistedViewModel
-import com.twidere.twiderex.extensions.checkAllSelfPermissionsGranted
 import com.twidere.twiderex.extensions.navigateForResult
 import com.twidere.twiderex.extensions.withElevation
-import com.twidere.twiderex.launcher.AmbientLauncher
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.navigation.Route
-import com.twidere.twiderex.ui.AmbientActiveAccount
-import com.twidere.twiderex.ui.AmbientNavController
+import com.twidere.twiderex.ui.LocalActiveAccount
+import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.Orange
 import com.twidere.twiderex.ui.TwidereXTheme
 import com.twidere.twiderex.ui.composeImageSize
@@ -116,7 +115,7 @@ import kotlinx.coroutines.launch
 fun DraftComposeScene(
     draftId: String,
 ) {
-    val account = AmbientActiveAccount.current ?: return
+    val account = LocalActiveAccount.current ?: return
     val draftItemViewModel =
         assistedViewModel<DraftItemViewModel.AssistedFactory, DraftItemViewModel> {
             it.create(draftId = draftId)
@@ -139,14 +138,18 @@ fun ComposeScene(
     statusKey: MicroBlogKey? = null,
     composeType: ComposeType = ComposeType.New,
 ) {
-    val account = AmbientActiveAccount.current ?: return
+    val account = LocalActiveAccount.current ?: return
     val viewModel = assistedViewModel<ComposeViewModel.AssistedFactory, ComposeViewModel> {
         it.create(account, statusKey, composeType)
     }
     ComposeBody(viewModel = viewModel, account = account)
 }
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
+@OptIn(
+    ExperimentalFoundationApi::class,
+    ExperimentalMaterialApi::class,
+    ExperimentalComposeUiApi::class,
+)
 @Composable
 private fun ComposeBody(
     viewModel: ComposeViewModel,
@@ -157,13 +160,13 @@ private fun ComposeBody(
     val images by viewModel.images.observeAsState(initial = emptyList())
     val location by viewModel.location.observeAsState()
     val locationEnabled by viewModel.locationEnabled.observeAsState(initial = false)
-    val navController = AmbientNavController.current
+    val navController = LocalNavController.current
     val textFieldValue by viewModel.textFieldValue.observeAsState(initial = TextFieldValue())
-    val keyboardController = remember { Ref<SoftwareKeyboardController>() }
+    val keyboardController = LocalSoftwareKeyboardController.current
     val canSaveDraft by viewModel.canSaveDraft.observeAsState(initial = false)
     var showSaveDraftDialog by remember { mutableStateOf(false) }
     val scaffoldState = rememberBottomSheetScaffoldState()
-    BackButtonHandler {
+    BackHandler {
         when {
             showSaveDraftDialog -> {
                 showSaveDraftDialog = false
@@ -220,7 +223,7 @@ private fun ComposeBody(
                             }
                         ) {
                             Icon(
-                                imageVector = vectorResource(id = R.drawable.ic_x),
+                                painter = painterResource(id = R.drawable.ic_x),
                                 contentDescription = stringResource(
                                     id = R.string.accessibility_common_close
                                 )
@@ -236,7 +239,7 @@ private fun ComposeBody(
                             }
                         ) {
                             Icon(
-                                imageVector = vectorResource(id = R.drawable.ic_send),
+                                painter = painterResource(id = R.drawable.ic_send),
                                 contentDescription = stringResource(
                                     id = R.string.accessibility_scene_compose_send
                                 )
@@ -250,37 +253,81 @@ private fun ComposeBody(
                 Box(
                     modifier = Modifier.weight(1f)
                 ) {
-                    if (composeType == ComposeType.New) {
-                        ComposeInput(
-                            scaffoldState,
-                            viewModel,
-                            account,
-                            keyboardController
-                        )
-                    } else {
-                        status?.let { status ->
-                            val listState = rememberLazyListState(
-                                initialFirstVisibleItemIndex = if (composeType == ComposeType.Reply) {
-                                    1
-                                } else {
-                                    0
-                                }
+                    when (composeType) {
+                        ComposeType.New -> {
+                            ComposeInput(
+                                scaffoldState,
+                                viewModel,
+                                account,
                             )
-                            if (listState.firstVisibleItemIndex == 0) {
-                                keyboardController.value?.hideSoftwareKeyboard()
-                            } else if (listState.firstVisibleItemIndex == 1) {
-                                keyboardController.value?.showSoftwareKeyboard()
-                            }
-                            LazyColumn(
-                                state = listState,
-                            ) {
+                        }
+                        ComposeType.Quote,
+                        ComposeType.Reply -> {
+                            status?.let { status ->
+                                val listState = rememberLazyListState(
+                                    initialFirstVisibleItemIndex = if (composeType == ComposeType.Reply) {
+                                        1
+                                    } else {
+                                        0
+                                    }
+                                )
                                 if (composeType == ComposeType.Reply) {
+                                    if (listState.firstVisibleItemIndex == 0) {
+                                        keyboardController?.hideSoftwareKeyboard()
+                                    } else if (listState.firstVisibleItemIndex == 1) {
+                                        keyboardController?.showSoftwareKeyboard()
+                                    }
+                                }
+                                LazyColumn(
+                                    state = listState,
+                                ) {
+                                    if (composeType == ComposeType.Reply) {
+                                        item {
+                                            Box(
+                                                modifier = Modifier
+                                                    .background(MaterialTheme.colors.surface.withElevation())
+                                            ) {
+                                                StatusLineComponent(lineDown = true) {
+                                                    TimelineStatusComponent(
+                                                        data = status,
+                                                        showActions = false,
+                                                    )
+                                                }
+                                            }
+                                        }
+                                    }
                                     item {
-                                        Box(
-                                            modifier = Modifier
-                                                .background(MaterialTheme.colors.surface.withElevation())
+                                        StatusLineComponent(
+                                            modifier = Modifier.let {
+                                                if (composeType == ComposeType.Reply) {
+                                                    it.fillParentMaxSize()
+                                                } else {
+                                                    it
+                                                }
+                                            },
+                                            lineUp = composeType == ComposeType.Reply,
                                         ) {
-                                            StatusLineComponent(lineDown = true) {
+                                            ComposeInput(
+                                                scaffoldState,
+                                                viewModel,
+                                                account,
+                                                autoFocus = if (composeType == ComposeType.Reply) {
+                                                    listState.firstVisibleItemIndex == 1
+                                                } else {
+                                                    true
+                                                }
+                                            )
+                                        }
+                                    }
+                                    if (composeType == ComposeType.Quote) {
+                                        item {
+                                            Box(
+                                                modifier = Modifier.background(
+                                                    MaterialTheme.colors.onBackground.copy(
+                                                        alpha = 0.04f
+                                                    )
+                                                ),
+                                            ) {
                                                 TimelineStatusComponent(
                                                     data = status,
                                                     showActions = false,
@@ -289,30 +336,13 @@ private fun ComposeBody(
                                         }
                                     }
                                 }
-                                item {
-                                    StatusLineComponent(
-                                        modifier = Modifier.fillParentMaxSize(),
-                                        lineUp = composeType == ComposeType.Reply,
-                                    ) {
-                                        ComposeInput(
-                                            scaffoldState,
-                                            viewModel,
-                                            account,
-                                            keyboardController,
-                                            autoFocus = if (composeType == ComposeType.Reply) {
-                                                listState.firstVisibleItemIndex == 1
-                                            } else {
-                                                true
-                                            }
-                                        )
-                                    }
-                                }
                             }
                         }
                     }
                 }
 
                 if (images.any()) {
+                    Spacer(modifier = Modifier.height(standardPadding * 2))
                     LazyRow(
                         modifier = Modifier.padding(horizontal = standardPadding * 2),
                     ) {
@@ -325,9 +355,9 @@ private fun ComposeBody(
                             }
                         }
                     }
-                    Spacer(modifier = Modifier.height(standardPadding * 2))
                 }
 
+                Spacer(modifier = Modifier.height(standardPadding * 2))
                 Row(
                     modifier = Modifier
                         .padding(horizontal = standardPadding * 2)
@@ -366,12 +396,12 @@ private fun ComposeBody(
                     Spacer(modifier = Modifier.weight(1F))
                     if (locationEnabled) {
                         location?.let {
-                            Providers(
-                                AmbientContentAlpha provides ContentAlpha.medium
+                            CompositionLocalProvider(
+                                LocalContentAlpha provides ContentAlpha.medium
                             ) {
                                 Row {
                                     Icon(
-                                        imageVector = vectorResource(id = R.drawable.ic_map_pin),
+                                        painter = painterResource(id = R.drawable.ic_map_pin),
                                         contentDescription = stringResource(
                                             id = R.string.accessibility_common_status_location
                                         )
@@ -402,15 +432,18 @@ private fun ReplySheetContent(
     val replyToUser by viewModel.replyToUser.observeAsState(initial = emptyList())
     val excludedUserIds by viewModel.excludedReplyUserIds.observeAsState(initial = emptyList())
     val status by viewModel.status.observeAsState(initial = null)
+    val scope = rememberCoroutineScope()
     ListItem(
         icon = {
             IconButton(
                 onClick = {
-                    scaffoldState.bottomSheetState.collapse()
+                    scope.launch {
+                        scaffoldState.bottomSheetState.collapse()
+                    }
                 }
             ) {
                 Icon(
-                    imageVector = vectorResource(id = R.drawable.ic_x),
+                    painter = painterResource(id = R.drawable.ic_x),
                     contentDescription = stringResource(
                         id = R.string.accessibility_common_close
                     )
@@ -519,6 +552,7 @@ private fun ConfirmDraftDialog(
     )
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @ExperimentalMaterialApi
 @ExperimentalFoundationApi
 @Composable
@@ -526,7 +560,6 @@ private fun ComposeInput(
     scaffoldState: BottomSheetScaffoldState,
     composeViewModel: ComposeViewModel,
     account: AccountDetails?,
-    keyboardController: Ref<SoftwareKeyboardController>,
     autoFocus: Boolean = true,
 ) {
     val text by composeViewModel.textFieldValue.observeAsState(initial = TextFieldValue())
@@ -541,7 +574,7 @@ private fun ComposeInput(
         ) {
             account?.let {
                 NetworkImage(
-                    url = it.user.profileImage,
+                    data = it.user.profileImage,
                     modifier = Modifier
                         .clip(CircleShape)
                         .width(profileImageSize)
@@ -559,9 +592,6 @@ private fun ComposeInput(
                     value = text,
                     onValueChange = { composeViewModel.setText(it) },
                     autoFocus = autoFocus,
-                    onTextInputStarted = {
-                        keyboardController.value = it
-                    },
                     onClicked = {
                         // TODO: scroll lazyColumn
                     }
@@ -586,14 +616,17 @@ private fun ComposeReply(
         val replyToUser by composeViewModel.replyToUser.observeAsState(initial = emptyList())
         val excludedUserIds by composeViewModel.excludedReplyUserIds.observeAsState(initial = emptyList())
         val loadingReplyUser by composeViewModel.loadingReplyUser.observeAsState(initial = false)
+        val scope = rememberCoroutineScope()
         Row(
             modifier = Modifier
                 .clickable(
                     onClick = {
-                        if (scaffoldState.bottomSheetState.isExpanded) {
-                            scaffoldState.bottomSheetState.collapse()
-                        } else {
-                            scaffoldState.bottomSheetState.expand()
+                        scope.launch {
+                            if (scaffoldState.bottomSheetState.isExpanded) {
+                                scaffoldState.bottomSheetState.collapse()
+                            } else {
+                                scaffoldState.bottomSheetState.expand()
+                            }
                         }
                     }
                 )
@@ -631,23 +664,35 @@ private fun ComposeReply(
 @Composable
 private fun ComposeActions(viewModel: ComposeViewModel) {
     val locationEnabled by viewModel.locationEnabled.observeAsState(initial = false)
-    val launcher = AmbientLauncher.current
+    // val launcher = LocalLauncher.current
     val scope = rememberCoroutineScope()
-    val context = AmbientContext.current
-    val navController = AmbientNavController.current
+    // val context = LocalContext.current
+    val navController = LocalNavController.current
+    val filePickerLauncher = registerForActivityResult(
+        contract = ActivityResultContracts.GetMultipleContents(),
+        onResult = {
+            viewModel.putImages(it)
+        },
+    )
+    val permissionLauncher = registerForActivityResult(
+        contract = ActivityResultContracts.RequestMultiplePermissions(),
+        onResult = {
+            if (it.all { it.value }) {
+                viewModel.trackingLocation()
+            }
+        },
+    )
     Box {
         Row {
             IconButton(
                 onClick = {
                     scope.launch {
-                        val item =
-                            launcher.launchMultipleFilePicker("image/*")
-                        viewModel.putImages(item)
+                        filePickerLauncher.launch("image/*")
                     }
                 }
             ) {
                 Icon(
-                    imageVector = vectorResource(id = R.drawable.ic_camera),
+                    painter = painterResource(id = R.drawable.ic_camera),
                     contentDescription = stringResource(
                         id = R.string.accessibility_scene_compose_image
                     )
@@ -655,7 +700,7 @@ private fun ComposeActions(viewModel: ComposeViewModel) {
             }
             // TODO:
 //            IconButton(onClick = {}) {
-//                Icon(imageVector = vectorResource(id = R.drawable.ic_gif))
+//                Icon(painter = painterResource(id = R.drawable.ic_gif))
 //            }
             IconButton(
                 onClick = {
@@ -670,41 +715,30 @@ private fun ComposeActions(viewModel: ComposeViewModel) {
                 }
             ) {
                 Icon(
-                    imageVector = vectorResource(id = R.drawable.ic_at_sign),
+                    painter = painterResource(id = R.drawable.ic_at_sign),
                     contentDescription = stringResource(
                         id = R.string.accessibility_scene_compose_at
                     )
                 )
             }
 //            IconButton(onClick = {}) {
-//                Icon(imageVector = vectorResource(id = R.drawable.ic_hash))
+//                Icon(painter = painterResource(id = R.drawable.ic_hash))
 //            }
             IconButton(
                 onClick = {
                     if (locationEnabled) {
                         viewModel.disableLocation()
                     } else {
-                        scope.launch {
-                            val permissions = arrayOf(
-                                Manifest.permission.ACCESS_COARSE_LOCATION,
-                                Manifest.permission.ACCESS_FINE_LOCATION
-                            )
-                            val hasPermissions =
-                                if (!context.checkAllSelfPermissionsGranted(*permissions)) {
-                                    launcher.requestMultiplePermissions(permissions)
-                                        .all { it.value }
-                                } else {
-                                    true
-                                }
-                            if (hasPermissions) {
-                                viewModel.trackingLocation()
-                            }
-                        }
+                        val permissions = arrayOf(
+                            Manifest.permission.ACCESS_COARSE_LOCATION,
+                            Manifest.permission.ACCESS_FINE_LOCATION
+                        )
+                        permissionLauncher.launch(permissions)
                     }
                 },
             ) {
                 Icon(
-                    imageVector = vectorResource(id = R.drawable.ic_map_pin),
+                    painter = painterResource(id = R.drawable.ic_map_pin),
                     contentDescription = stringResource(
                         id = if (locationEnabled) {
                             R.string.accessibility_scene_compose_location_disable
@@ -721,7 +755,7 @@ private fun ComposeActions(viewModel: ComposeViewModel) {
                 }
             ) {
                 Icon(
-                    imageVector = vectorResource(id = R.drawable.ic_note),
+                    painter = painterResource(id = R.drawable.ic_note),
                     contentDescription = stringResource(
                         id = R.string.accessibility_scene_compose_draft
                     )
@@ -734,7 +768,7 @@ private fun ComposeActions(viewModel: ComposeViewModel) {
 @Composable
 private fun ComposeImage(item: Uri, viewModel: ComposeViewModel) {
     var expanded by remember { mutableStateOf(false) }
-    val image = @Composable {
+    Box {
         Box(
             modifier = Modifier
                 .heightIn(max = composeImageSize)
@@ -746,24 +780,23 @@ private fun ComposeImage(item: Uri, viewModel: ComposeViewModel) {
                 )
                 .clip(MaterialTheme.shapes.small),
         ) {
-            NetworkImage(url = item)
+            NetworkImage(data = item)
         }
-    }
-    DropdownMenu(
-        expanded = expanded,
-        onDismissRequest = { expanded = false },
-        toggle = image,
-    ) {
-        DropdownMenuItem(
-            onClick = {
-                expanded = false
-                viewModel.removeImage(item)
-            }
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
         ) {
-            Text(
-                text = stringResource(id = R.string.common_controls_actions_remove),
-                color = Color.Red,
-            )
+            DropdownMenuItem(
+                onClick = {
+                    expanded = false
+                    viewModel.removeImage(item)
+                }
+            ) {
+                Text(
+                    text = stringResource(id = R.string.common_controls_actions_remove),
+                    color = Color.Red,
+                )
+            }
         }
     }
 }

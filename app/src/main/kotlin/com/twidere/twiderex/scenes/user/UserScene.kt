@@ -18,21 +18,17 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.scenes
+package com.twidere.twiderex.scenes.user
 
 import androidx.compose.runtime.Composable
-import com.twidere.twiderex.annotations.IncomingComposeUpdate
 import com.twidere.twiderex.component.UserComponent
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.ui.TwidereXTheme
 
-@OptIn(IncomingComposeUpdate::class)
 @Composable
 fun UserScene(
-    screenName: String,
-    host: String,
-    userKey: MicroBlogKey?,
+    userKey: MicroBlogKey,
 ) {
     TwidereXTheme {
         InAppNotificationScaffold(
@@ -45,17 +41,17 @@ fun UserScene(
 //                    },
 //                    actions = {
 //                        IconButton(onClick = {}) {
-//                            Icon(imageVector = vectorResource(id = R.drawable.ic_mail))
+//                            Icon(painter = painterResource(id = R.drawable.ic_mail))
 //                        }
 //                        IconButton(onClick = {}) {
-//                            Icon(imageVector = vectorResource(id = R.drawable.ic_dots_vertical))
+//                            Icon(painter = painterResource(id = R.drawable.ic_dots_vertical))
 //                        }
 //                    },
 //                    elevation = 0.dp,
 //                )
 //            }
         ) {
-            UserComponent(screenName, host, userKey)
+            UserComponent(userKey)
         }
     }
 }

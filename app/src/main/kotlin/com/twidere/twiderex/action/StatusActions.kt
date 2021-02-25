@@ -20,7 +20,7 @@
  */
 package com.twidere.twiderex.action
 
-import androidx.compose.runtime.ambientOf
+import androidx.compose.runtime.compositionLocalOf
 import androidx.work.WorkManager
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.ui.UiStatus
@@ -35,7 +35,7 @@ import com.twidere.twiderex.worker.status.UnRetweetWorker
 import com.twidere.twiderex.worker.status.UpdateStatusWorker
 import javax.inject.Inject
 
-val AmbientStatusActions = ambientOf<IStatusActions>()
+val LocalStatusActions = compositionLocalOf<IStatusActions> { error("No LocalStatusActions") }
 
 interface IStatusActions {
     fun like(status: UiStatus, account: AccountDetails) {}

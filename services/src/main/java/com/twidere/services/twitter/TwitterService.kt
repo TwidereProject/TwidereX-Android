@@ -37,6 +37,7 @@ import com.twidere.services.microblog.model.Relationship
 import com.twidere.services.twitter.api.TwitterResources
 import com.twidere.services.twitter.api.UploadResources
 import com.twidere.services.twitter.model.StatusV2
+import com.twidere.services.twitter.model.TwitterPaging
 import com.twidere.services.twitter.model.TwitterSearchResponseV1
 import com.twidere.services.twitter.model.TwitterSearchResponseV2
 import com.twidere.services.twitter.model.User
@@ -140,32 +141,32 @@ class TwitterService(
     )
 
     override suspend fun userTimeline(
-        screen_name: String,
+        user_id: String,
         count: Int,
         since_id: String?,
         max_id: String?,
         exclude_replies: Boolean,
     ) = resources.userTimeline(
-        screen_name,
-        count,
-        since_id,
-        max_id,
+        user_id = user_id,
+        count = count,
+        since_id = since_id,
+        max_id = max_id,
         trim_user = false,
         exclude_replies = exclude_replies,
         include_entities = true,
     )
 
     override suspend fun favorites(
-        screen_name: String,
+        user_id: String,
         count: Int,
         since_id: String?,
         max_id: String?
     ) =
         resources.favoritesList(
-            screen_name,
-            count,
-            since_id,
-            max_id,
+            user_id = user_id,
+            count = count,
+            since_id = since_id,
+            max_id = max_id,
             include_entities = true,
         )
 
@@ -321,20 +322,20 @@ class TwitterService(
     override suspend fun searchUsers(query: String, page: Int?, count: Int) =
         resources.searchUser(query, page, count)
 
-    override suspend fun showRelationship(target_screen_name: String): IRelationship {
-        val response = resources.showFriendships(target_screen_name)
+    override suspend fun showRelationship(target_id: String): IRelationship {
+        val response = resources.showFriendships(target_id)
         return Relationship(
             followedBy = response.relationship?.target?.followedBy ?: false,
             following = response.relationship?.target?.following ?: false,
         )
     }
 
-    override suspend fun follow(screenName: String) {
-        resources.follow(screenName)
+    override suspend fun follow(user_id: String) {
+        resources.follow(user_id)
     }
 
-    override suspend fun unfollow(screenName: String) {
-        resources.unfollow(screenName)
+    override suspend fun unfollow(user_id: String) {
+        resources.unfollow(user_id)
     }
 
     override suspend fun like(id: String) = resources.like(id)
@@ -398,21 +399,25 @@ class TwitterService(
         return uploadResources.finalizeUpload(mediaId).mediaIDString ?: throw Error()
     }
 
-    suspend fun followers(id: String, cursor: String? = null) = resources.followers(
-        id,
-        pagination_token = cursor,
+    override suspend fun followers(user_id: String, nextPage: String?) = resources.followers(
+        user_id,
+        pagination_token = nextPage,
         userFields = UserFields.values().joinToString(",") { it.value },
         expansions = UserFields.pinned_tweet_id.name,
         tweetFields = TweetFields.values().joinToString(",") { it.value },
-    )
+    ).let {
+        TwitterPaging(it.data ?: emptyList(), it.meta?.nextToken)
+    }
 
-    suspend fun following(id: String, cursor: String? = null) = resources.following(
-        id,
-        pagination_token = cursor,
+    override suspend fun following(user_id: String, nextPage: String?) = resources.following(
+        user_id,
+        pagination_token = nextPage,
         userFields = UserFields.values().joinToString(",") { it.value },
         expansions = UserFields.pinned_tweet_id.name,
         tweetFields = TweetFields.values().joinToString(",") { it.value },
-    )
+    ).let {
+        TwitterPaging(it.data ?: emptyList(), it.meta?.nextToken)
+    }
 
     suspend fun verifyCredentials(): User? {
         return resources.verifyCredentials()

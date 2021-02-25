@@ -21,12 +21,12 @@
 package com.twidere.twiderex.model.ui
 
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.asAndroidBitmap
-import androidx.compose.ui.res.imageResource
+import androidx.compose.ui.res.painterResource
 import com.twidere.twiderex.R
-import com.twidere.twiderex.db.model.DbUser
+import com.twidere.twiderex.db.model.DbUserWithEntity
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.PlatformType
+import com.twidere.twiderex.model.ui.UiUrlEntity.Companion.toUi
 
 data class UiUser(
     val id: String,
@@ -38,12 +38,14 @@ data class UiUser(
     val followersCount: Long,
     val friendsCount: Long,
     val listedCount: Long,
-    val desc: String,
+    val rawDesc: String,
+    val htmlDesc: String,
     val website: String?,
     val location: String?,
     val verified: Boolean,
     val protected: Boolean,
     val platformType: PlatformType,
+    val url: List<UiUrlEntity>,
 ) {
     companion object {
         @Composable
@@ -51,36 +53,42 @@ data class UiUser(
             id = "",
             name = "Twidere",
             screenName = "TwidereProject",
-            profileImage = imageResource(id = R.drawable.ic_profile_image_twidere).asAndroidBitmap(),
+            profileImage = painterResource(id = R.drawable.ic_profile_image_twidere),
             profileBackgroundImage = null,
             followersCount = 0,
             friendsCount = 0,
             listedCount = 0,
-            desc = "",
+            rawDesc = "",
+            htmlDesc = "",
             website = null,
             location = null,
             verified = false,
             protected = false,
             userKey = MicroBlogKey.Empty,
             platformType = PlatformType.Twitter,
+            url = emptyList(),
         )
 
-        fun DbUser.toUi() = UiUser(
-            id = userId,
-            name = name,
-            screenName = screenName,
-            profileImage = profileImage,
-            profileBackgroundImage = profileBackgroundImage,
-            followersCount = followersCount,
-            friendsCount = friendsCount,
-            listedCount = listedCount,
-            desc = desc,
-            website = website,
-            location = location,
-            verified = verified,
-            protected = isProtected,
-            userKey = userKey,
-            platformType = platformType,
-        )
+        fun DbUserWithEntity.toUi() = with(user) {
+            UiUser(
+                id = userId,
+                name = name,
+                screenName = screenName,
+                profileImage = profileImage,
+                profileBackgroundImage = profileBackgroundImage,
+                followersCount = followersCount,
+                friendsCount = friendsCount,
+                listedCount = listedCount,
+                rawDesc = rawDesc,
+                htmlDesc = htmlDesc,
+                website = website,
+                location = location,
+                verified = verified,
+                protected = isProtected,
+                userKey = userKey,
+                platformType = platformType,
+                url = url.map { it.toUi() }
+            )
+        }
     }
 }

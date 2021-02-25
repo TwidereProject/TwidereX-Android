@@ -25,11 +25,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import com.twidere.twiderex.component.foundation.SignInScaffold
-import com.twidere.twiderex.component.navigation.AmbientNavigator
+import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.extensions.navigateForResult
 import com.twidere.twiderex.extensions.setResult
-import com.twidere.twiderex.ui.AmbientNavController
+import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.viewmodel.twitter.TwitterSignInViewModel
 
 @Composable
@@ -37,8 +37,8 @@ fun TwitterSignInScene(
     consumerKey: String,
     consumerSecret: String,
 ) {
-    val navController = AmbientNavController.current
-    val navigator = AmbientNavigator.current
+    val navController = LocalNavController.current
+    val navigator = LocalNavigator.current
     val viewModel =
         assistedViewModel<TwitterSignInViewModel.AssistedFactory, TwitterSignInViewModel> {
             it.create(

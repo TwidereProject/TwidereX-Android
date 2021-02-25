@@ -49,7 +49,7 @@ interface TimelineResources {
 
     @GET("/1.1/statuses/user_timeline.json")
     suspend fun userTimeline(
-        @Query("screen_name") screen_name: String,
+        @Query("user_id") user_id: String,
         @Query("count") count: Int = 20,
         @Query("since_id") since_id: String? = null,
         @Query("max_id") max_id: String? = null,
@@ -63,7 +63,7 @@ interface TimelineResources {
 
     @GET("/1.1/favorites/list.json")
     suspend fun favoritesList(
-        @Query("screen_name") screen_name: String,
+        @Query("user_id") user_id: String,
         @Query("count") count: Int = 20,
         @Query("since_id") since_id: String? = null,
         @Query("max_id") max_id: String? = null,

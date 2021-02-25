@@ -22,9 +22,6 @@ package com.twidere.twiderex.viewmodel.user
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.liveData
-import androidx.lifecycle.map
-import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import com.twidere.services.http.MicroBlogException
 import com.twidere.services.microblog.LookupService
@@ -33,7 +30,6 @@ import com.twidere.services.microblog.model.IRelationship
 import com.twidere.twiderex.di.assisted.IAssistedFactory
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.UserRepository
 import com.twidere.twiderex.utils.notify
@@ -47,17 +43,13 @@ class UserViewModel @AssistedInject constructor(
     private val factory: UserRepository.AssistedFactory,
     private val inAppNotification: InAppNotification,
     @Assisted private val account: AccountDetails,
-    @Assisted private val screenName: String,
-    @Assisted private val host: String,
-    @Assisted private val initialUserKey: MicroBlogKey?,
+    @Assisted private val userKey: MicroBlogKey,
 ) : ViewModel() {
 
     @dagger.assisted.AssistedFactory
     interface AssistedFactory : IAssistedFactory {
         fun create(
             account: AccountDetails,
-            screenName: String,
-            host: String,
             initialUserKey: MicroBlogKey?,
         ): UserViewModel
     }
@@ -67,28 +59,16 @@ class UserViewModel @AssistedInject constructor(
             factory.create(account.accountKey, it as LookupService, it as RelationshipService)
         }
     }
-    val userKey = MutableLiveData(initialUserKey)
     val refreshing = MutableLiveData(false)
     val loadingRelationship = MutableLiveData(false)
-    val user = userKey.switchMap {
-        if (it != null) {
-            repository.getUserLiveData(it)
-        } else {
-            liveData<UiUser?> { emit(null) }
-        }
-    }
+    val user = repository.getUserLiveData(userKey)
     val relationship = MutableLiveData<IRelationship>()
-    val isMe = userKey.map {
-        it == account.accountKey
-    }
+    val isMe = userKey == account.accountKey
 
     fun refresh() = viewModelScope.launch {
         refreshing.postValue(true)
         try {
-            val user = repository.lookupUserByName(screenName)
-            if (initialUserKey != user.userKey) {
-                userKey.postValue(user.userKey)
-            }
+            repository.lookupUserById(userKey.id)
         } catch (e: MicroBlogException) {
             e.notify(inAppNotification)
         } catch (e: IOException) {
@@ -101,20 +81,20 @@ class UserViewModel @AssistedInject constructor(
 
     fun follow() = viewModelScope.launch {
         loadingRelationship.postValue(true)
-        repository.follow(screenName)
+        repository.follow(userKey.id)
         loadRelationShip()
     }
 
     fun unfollow() = viewModelScope.launch {
         loadingRelationship.postValue(true)
-        repository.unfollow(screenName)
+        repository.unfollow(userKey.id)
         loadRelationShip()
     }
 
     private fun loadRelationShip() = viewModelScope.launch {
         loadingRelationship.postValue(true)
         try {
-            repository.showRelationship(screenName).let {
+            repository.showRelationship(userKey.id).let {
                 relationship.postValue(it)
             }
         } catch (e: MicroBlogException) {

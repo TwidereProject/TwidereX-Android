@@ -26,14 +26,14 @@ import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.WebComponent
 import com.twidere.twiderex.extensions.DisposeResult
 import com.twidere.twiderex.extensions.setResult
-import com.twidere.twiderex.ui.AmbientNavController
+import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereXTheme
 
 val MASTODON_CALLBACK_URL = "https://org.mariotaku.twidere/auth/callback/mastodon"
 
 @Composable
 fun MastodonWebSignInScene(target: String) {
-    val navController = AmbientNavController.current
+    val navController = LocalNavController.current
     TwidereXTheme {
         navController.DisposeResult(key = "code")
         InAppNotificationScaffold {

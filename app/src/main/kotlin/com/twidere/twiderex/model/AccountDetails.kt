@@ -95,13 +95,15 @@ data class AccountDetails(
             followersCount = followersCount,
             friendsCount = friendsCount,
             listedCount = listedCount,
-            desc = desc,
+            rawDesc = desc,
+            htmlDesc = desc,
             website = website,
             location = location,
             verified = verified,
             protected = isProtected,
             userKey = userKey,
             platformType = type,
+            url = emptyList()
         )
     }
 }

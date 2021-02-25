@@ -18,35 +18,30 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.paging.mediator
+package com.twidere.twiderex.paging.mediator.paging
 
-import androidx.paging.ExperimentalPagingApi
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import androidx.paging.RemoteMediator
+import com.twidere.services.microblog.model.IStatus
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.db.model.DbPagingTimelineWithStatus
-import com.twidere.twiderex.defaultLoadCount
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.notification.InAppNotification
+import com.twidere.twiderex.paging.CursorPagination
 
-@OptIn(ExperimentalPagingApi::class)
-abstract class PagingMediator(
-    val database: CacheDatabase,
-    val accountKey: MicroBlogKey,
-) : RemoteMediator<Int, DbPagingTimelineWithStatus>() {
-    abstract val pagingKey: String
-}
+class CursorPagingResult<T>(data: List<T>, val cursor: String? = null) : ArrayList<T>(data)
 
-@OptIn(ExperimentalPagingApi::class)
-fun PagingMediator.pager(
-    pageSize: Int = defaultLoadCount,
-): Pager<Int, DbPagingTimelineWithStatus> {
-    return Pager(
-        config = PagingConfig(
-            pageSize = pageSize,
-        ),
-        remoteMediator = this,
-    ) {
-        database.pagingTimelineDao().getPagingSource(pagingKey = pagingKey, accountKey = accountKey)
+abstract class CursorPagingMediator(
+    accountKey: MicroBlogKey,
+    database: CacheDatabase,
+    inAppNotification: InAppNotification
+) : PagingTimelineMediatorBase<CursorPagination>(accountKey, database, inAppNotification) {
+    override fun provideNextPage(
+        raw: List<IStatus>,
+        result: List<DbPagingTimelineWithStatus>
+    ): CursorPagination {
+        return if (raw is CursorPagingResult<*>) {
+            CursorPagination(cursor = raw.cursor)
+        } else {
+            CursorPagination(cursor = null)
+        }
     }
 }

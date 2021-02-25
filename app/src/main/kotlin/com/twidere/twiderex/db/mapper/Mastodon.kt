@@ -31,6 +31,7 @@ import com.twidere.twiderex.db.model.DbTimeline
 import com.twidere.twiderex.db.model.DbTimelineWithStatus
 import com.twidere.twiderex.db.model.DbUrlEntity
 import com.twidere.twiderex.db.model.DbUser
+import com.twidere.twiderex.db.model.DbUserWithEntity
 import com.twidere.twiderex.db.model.TimelineType
 import com.twidere.twiderex.model.MediaType
 import com.twidere.twiderex.model.MicroBlogKey
@@ -81,14 +82,14 @@ private fun Status.toDbStatusWithMediaAndUser(
         placeString = "",
         hasMedia = !mediaAttachments.isNullOrEmpty(),
         source = application?.name ?: "",
-        userKey = user.userKey,
+        userKey = user.user.userKey,
         lang = null,
         replyStatusKey = null,
         retweetStatusKey = reblog?.toDbStatusWithMediaAndUser(accountKey = accountKey)?.data?.statusKey,
         quoteStatusKey = null,
         statusKey = MicroBlogKey(
             id ?: throw IllegalArgumentException("mastodon Status.idStr should not be null"),
-            host = user.userKey.host,
+            host = user.user.userKey.host,
         ),
         is_possibly_sensitive = sensitive ?: false,
         platformType = PlatformType.Mastodon,
@@ -137,6 +138,7 @@ private fun Status.toDbStatusWithMediaAndUser(
                 DbUrlEntity(
                     _id = UUID.randomUUID().toString(),
                     statusKey = status.statusKey,
+                    userKey = null,
                     url = it.url ?: "",
                     expandedUrl = it.url ?: "",
                     displayUrl = it.url ?: "",
@@ -151,8 +153,8 @@ private fun Status.toDbStatusWithMediaAndUser(
 
 fun Account.toDbUser(
     accountKey: MicroBlogKey
-): DbUser {
-    return DbUser(
+): DbUserWithEntity {
+    val user = DbUser(
         _id = UUID.randomUUID().toString(),
         userId = this.id ?: throw IllegalArgumentException("mastodon user.id should not be null"),
         name = displayName
@@ -161,18 +163,24 @@ fun Account.toDbUser(
             ?: throw IllegalArgumentException("mastodon user.username should not be null"),
         userKey = MicroBlogKey(
             id ?: throw IllegalArgumentException("mastodon user.id should not be null"),
-            acct?.let { MicroBlogKey.valueOf(it) }?.host ?: accountKey.host,
+            acct?.let { MicroBlogKey.valueOf(it) }?.host?.takeIf { it.isNotEmpty() }
+                ?: accountKey.host,
         ),
         profileImage = avatar ?: avatarStatic ?: "",
         profileBackgroundImage = header ?: headerStatic ?: "",
         followersCount = followersCount ?: 0,
         friendsCount = followingCount ?: 0,
         listedCount = 0,
-        desc = note ?: "",
+        rawDesc = note ?: "",
+        htmlDesc = note ?: "",
         website = null,
         location = null,
         verified = false,
         isProtected = false,
         platformType = PlatformType.Mastodon,
+    )
+    return DbUserWithEntity(
+        user = user,
+        url = emptyList()
     )
 }

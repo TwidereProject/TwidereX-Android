@@ -20,11 +20,15 @@
  */
 package com.twidere.twiderex.scenes
 
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.updateTransition
-import androidx.compose.foundation.InteractionState
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -35,17 +39,17 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.AmbientContentAlpha
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.Providers
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -53,22 +57,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.AmbientAnimationClock
-import androidx.compose.ui.platform.AmbientContext
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.compose.navigate
 import com.google.android.exoplayer2.ui.PlayerControlView
 import com.twidere.twiderex.R
-import com.twidere.twiderex.annotations.IncomingComposeUpdate
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.LoadingProgress
 import com.twidere.twiderex.component.foundation.NetworkImage
@@ -77,6 +78,7 @@ import com.twidere.twiderex.component.foundation.PagerState
 import com.twidere.twiderex.component.foundation.Swiper
 import com.twidere.twiderex.component.foundation.VideoPlayer
 import com.twidere.twiderex.component.foundation.Zoomable
+import com.twidere.twiderex.component.foundation.rememberPagerState
 import com.twidere.twiderex.component.status.LikeButton
 import com.twidere.twiderex.component.status.ReplyButton
 import com.twidere.twiderex.component.status.RetweetButton
@@ -88,23 +90,23 @@ import com.twidere.twiderex.extensions.setOnSystemBarsVisibilityChangeListener
 import com.twidere.twiderex.extensions.showControls
 import com.twidere.twiderex.model.MediaType
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.preferences.proto.DisplayPreferences
-import com.twidere.twiderex.ui.AmbientActiveAccount
-import com.twidere.twiderex.ui.AmbientNavController
-import com.twidere.twiderex.ui.AmbientVideoPlayback
-import com.twidere.twiderex.ui.AmbientWindow
+import com.twidere.twiderex.ui.LocalActiveAccount
+import com.twidere.twiderex.ui.LocalNavController
+import com.twidere.twiderex.ui.LocalVideoPlayback
+import com.twidere.twiderex.ui.LocalWindow
 import com.twidere.twiderex.ui.TwidereXTheme
 import com.twidere.twiderex.ui.standardPadding
 import com.twidere.twiderex.viewmodel.MediaViewModel
+import dev.chrisbanes.accompanist.glide.LocalRequestManager
 import dev.chrisbanes.accompanist.insets.navigationBarsPadding
 import dev.chrisbanes.accompanist.insets.statusBarsPadding
 
 @Composable
-fun MediaScene(statusKey: MicroBlogKey, selectedIndex: Int) {
-    val account = AmbientActiveAccount.current ?: return
+fun StatusMediaScene(statusKey: MicroBlogKey, selectedIndex: Int) {
+    val account = LocalActiveAccount.current ?: return
     val viewModel = assistedViewModel<MediaViewModel.AssistedFactory, MediaViewModel> {
         it.create(account, statusKey)
     }
@@ -128,33 +130,28 @@ fun MediaScene(statusKey: MicroBlogKey, selectedIndex: Int) {
             }
         }
         status?.let {
-            Providers(
-                AmbientVideoPlayback provides DisplayPreferences.AutoPlayback.Always
+            CompositionLocalProvider(
+                LocalVideoPlayback provides DisplayPreferences.AutoPlayback.Always
             ) {
-                MediaScene(status = it, selectedIndex = selectedIndex)
+                StatusMediaScene(status = it, selectedIndex = selectedIndex)
             }
         }
     }
 }
 
-@OptIn(IncomingComposeUpdate::class)
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun MediaScene(status: UiStatus, selectedIndex: Int) {
-    var lockPager by remember { mutableStateOf(false) }
+fun StatusMediaScene(status: UiStatus, selectedIndex: Int) {
     var controlVisibility by remember { mutableStateOf(true) }
     val controlPanelColor = MaterialTheme.colors.surface.copy(alpha = 0.6f)
-    val navController = AmbientNavController.current
+    val navController = LocalNavController.current
     Scaffold {
         Box {
-            val clock = AmbientAnimationClock.current
-            val pagerState = remember(clock) {
-                PagerState(
-                    clock,
-                    currentPage = selectedIndex,
-                    maxPage = status.media.lastIndex,
-                )
-            }
-            val context = AmbientContext.current
+            val pagerState = rememberPagerState(
+                currentPage = selectedIndex,
+                maxPage = status.media.lastIndex,
+            )
+            val context = LocalContext.current
             val videoControl = remember(pagerState.currentPage) {
                 if (status.media[pagerState.currentPage].type == MediaType.video) {
                     PlayerControlView(context).apply {
@@ -164,41 +161,37 @@ fun MediaScene(status: UiStatus, selectedIndex: Int) {
                     null
                 }
             }
-            val window = AmbientWindow.current
-            Swiper(
-                enabled = !lockPager,
-                onDismiss = {
-                    navController.popBackStack()
+            val window = LocalWindow.current
+            MediaView(
+                modifier = Modifier
+                    .clickable(
+                        onClick = {
+                            if (controlVisibility) {
+                                window.hideControls()
+                            } else {
+                                window.showControls()
+                            }
+                        },
+                        indication = null,
+                        interactionSource = remember { MutableInteractionSource() }
+                    ),
+                media = status.media.mapNotNull {
+                    it.mediaUrl?.let { it1 ->
+                        MediaData(
+                            it1,
+                            it.type
+                        )
+                    }
                 },
-                onStart = {
+                onSwipeEnd = {
+                    controlVisibility = true
+                },
+                onSwipeStart = {
                     controlVisibility = false
                 },
-                onEnd = {
-                    controlVisibility = true
-                }
-            ) {
-                Pager(
-                    modifier = Modifier
-                        .clickable(
-                            onClick = {
-                                if (controlVisibility) {
-                                    window.hideControls()
-                                } else {
-                                    window.showControls()
-                                }
-                            },
-                            indication = null,
-                            interactionState = remember { InteractionState() }
-                        ),
-                    state = pagerState,
-                    dragEnabled = !lockPager,
-                ) {
-                    val data = status.media[this.page]
-                    MediaItemView(data, customControl = videoControl) {
-                        lockPager = it
-                    }
-                }
-            }
+                customControl = videoControl,
+                pagerState = pagerState,
+            )
             DisposableEffect(Unit) {
                 window.setOnSystemBarsVisibilityChangeListener { visibility ->
                     controlVisibility = visibility
@@ -207,19 +200,22 @@ fun MediaScene(status: UiStatus, selectedIndex: Int) {
                     window.showControls()
                 }
             }
-            val transition = updateTransition(targetState = controlVisibility)
-            val alpha by transition.animateFloat {
-                if (it) 1f else 0f
-            }
+            // val transition = updateTransition(targetState = controlVisibility)
+            // val alpha by transition.animateFloat {
+            //     if (it) 1f else 0f
+            // }
             InAppNotificationScaffold(
                 backgroundColor = Color.Transparent,
                 topBar = {
-                    if (alpha != 0f) {
+                    AnimatedVisibility(
+                        visible = controlVisibility,
+                        enter = fadeIn() + expandVertically(),
+                        exit = shrinkVertically() + fadeOut()
+                    ) {
                         Box(
                             modifier = Modifier
                                 .statusBarsPadding()
-                                .padding(16.dp)
-                                .alpha(alpha),
+                                .padding(16.dp),
                         ) {
                             Box(
                                 modifier = Modifier
@@ -237,7 +233,7 @@ fun MediaScene(status: UiStatus, selectedIndex: Int) {
                                     }
                                 ) {
                                     Icon(
-                                        imageVector = vectorResource(id = R.drawable.ic_x),
+                                        painter = painterResource(id = R.drawable.ic_x),
                                         contentDescription = stringResource(
                                             id = R.string.accessibility_common_close
                                         )
@@ -252,10 +248,13 @@ fun MediaScene(status: UiStatus, selectedIndex: Int) {
                         modifier = Modifier
                             .navigationBarsPadding(),
                     ) {
-                        if (alpha != 0f) {
+                        AnimatedVisibility(
+                            visible = controlVisibility,
+                            enter = fadeIn() + expandVertically(),
+                            exit = shrinkVertically() + fadeOut()
+                        ) {
                             Box(
                                 modifier = Modifier
-                                    .alpha(alpha)
                                     .fillMaxWidth()
                                     .align(Alignment.BottomCenter)
                                     .background(color = controlPanelColor),
@@ -265,7 +264,7 @@ fun MediaScene(status: UiStatus, selectedIndex: Int) {
                                         .padding(standardPadding),
                                 ) {
                                     if (videoControl != null) {
-                                        AndroidView(viewBlock = { videoControl })
+                                        AndroidView(factory = { videoControl })
                                     }
                                     Text(
                                         modifier = Modifier
@@ -295,8 +294,8 @@ fun MediaScene(status: UiStatus, selectedIndex: Int) {
                                                 overflow = TextOverflow.Ellipsis,
                                             )
                                             Spacer(modifier = Modifier.width(standardPadding))
-                                            Providers(
-                                                AmbientContentAlpha provides ContentAlpha.medium
+                                            CompositionLocalProvider(
+                                                LocalContentAlpha provides ContentAlpha.medium
                                             ) {
                                                 Text(
                                                     text = "@${status.user.screenName}",
@@ -322,49 +321,87 @@ fun MediaScene(status: UiStatus, selectedIndex: Int) {
 }
 
 @Composable
-fun MediaItemView(
-    data: UiMedia,
-    customControl: PlayerControlView? = null,
-    requestLock: (Boolean) -> Unit,
-) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .clipToBounds()
+fun RawMediaScene(url: String) {
+    TwidereXTheme(
+        requireDarkTheme = true,
+        extendViewIntoStatusBar = true,
+        extendViewIntoNavigationBar = true,
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize(),
-            contentAlignment = Alignment.Center,
+        Scaffold {
+            MediaView(media = listOf(MediaData(url, MediaType.photo)))
+        }
+    }
+}
+
+data class MediaData(
+    val url: String,
+    val type: MediaType,
+)
+
+@Composable
+fun MediaView(
+    modifier: Modifier = Modifier,
+    media: List<MediaData>,
+    pagerState: PagerState = rememberPagerState(
+        currentPage = 0,
+        maxPage = media.lastIndex,
+    ),
+    customControl: PlayerControlView? = null,
+    onSwipeStart: () -> Unit = {},
+    onSwipeEnd: () -> Unit = {},
+) {
+    var lockPager by remember { mutableStateOf(false) }
+    val navController = LocalNavController.current
+    val requestManager = LocalRequestManager.current
+    DisposableEffect(Unit) {
+        requestManager?.let {
+            if (requestManager.isPaused) {
+                requestManager.resumeRequests()
+            }
+        }
+        onDispose { }
+    }
+    Swiper(
+        modifier = modifier,
+        enabled = !lockPager,
+        onDismiss = {
+            navController.popBackStack()
+        },
+        onStart = {
+            onSwipeStart.invoke()
+        },
+        onEnd = {
+            onSwipeEnd.invoke()
+        }
+    ) {
+        Pager(
+            state = pagerState,
+            dragEnabled = !lockPager,
         ) {
-            data.mediaUrl?.let {
-                when (data.type) {
-                    MediaType.photo ->
-                        Zoomable(
-                            onZoomStarted = {
-                                requestLock(true)
-                            },
-                            onZoomStopped = {
-                                requestLock(it != 1F)
+            val data = media[this.page]
+            when (data.type) {
+                MediaType.photo ->
+                    Zoomable(
+                        onZooming = {
+                            lockPager = it != 1F
+                        }
+                    ) {
+                        NetworkImage(
+                            data = data.url,
+                            contentScale = ContentScale.Fit,
+                            placeholder = {
+                                CircularProgressIndicator()
                             }
-                        ) {
-                            NetworkImage(
-                                url = it,
-                                contentScale = ContentScale.Fit,
-                                placeholder = {
-                                    CircularProgressIndicator()
-                                }
-                            )
-                        }
-                    MediaType.video, MediaType.animated_gif ->
-                        Box {
-                            VideoPlayer(
-                                url = it,
-                                customControl = customControl,
-                                showControls = false
-                            )
-                        }
-                }
+                        )
+                    }
+                MediaType.video, MediaType.animated_gif ->
+                    Box {
+                        VideoPlayer(
+                            url = data.url,
+                            customControl = customControl,
+                            showControls = false
+                        )
+                    }
             }
         }
     }

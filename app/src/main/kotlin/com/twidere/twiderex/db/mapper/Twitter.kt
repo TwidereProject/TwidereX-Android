@@ -32,8 +32,10 @@ import com.twidere.twiderex.db.model.DbStatusWithMediaAndUser
 import com.twidere.twiderex.db.model.DbStatusWithReference
 import com.twidere.twiderex.db.model.DbTimeline
 import com.twidere.twiderex.db.model.DbTimelineWithStatus
+import com.twidere.twiderex.db.model.DbTwitterUserExtra
 import com.twidere.twiderex.db.model.DbUrlEntity
 import com.twidere.twiderex.db.model.DbUser
+import com.twidere.twiderex.db.model.DbUserWithEntity
 import com.twidere.twiderex.db.model.TimelineType
 import com.twidere.twiderex.model.MediaType
 import com.twidere.twiderex.model.MicroBlogKey
@@ -177,7 +179,7 @@ private fun StatusV2.toDbStatusWithMediaAndUser(
         placeString = place?.fullName,
         hasMedia = !attachments?.media.isNullOrEmpty(),
         source = source ?: "",
-        userKey = user.userKey,
+        userKey = user.user.userKey,
         lang = lang,
         replyStatusKey = replyTo?.toDbStatusWithMediaAndUser(accountKey = accountKey)?.data?.statusKey,
         retweetStatusKey = retweet?.toDbStatusWithMediaAndUser(accountKey = accountKey)?.data?.statusKey,
@@ -213,6 +215,7 @@ private fun StatusV2.toDbStatusWithMediaAndUser(
             DbUrlEntity(
                 _id = UUID.randomUUID().toString(),
                 statusKey = status.statusKey,
+                userKey = null,
                 url = it.url ?: "",
                 expandedUrl = it.expandedURL ?: "",
                 displayUrl = it.displayURL ?: "",
@@ -268,7 +271,7 @@ private fun Status.toDbStatusWithMediaAndUser(
         placeString = place?.fullName,
         hasMedia = extendedEntities?.media != null || entities?.media != null,
         source = source ?: "",
-        userKey = user.userKey,
+        userKey = user.user.userKey,
         lang = lang,
         replyStatusKey = inReplyToStatusIDStr?.let { MicroBlogKey.twitter(it) },
         retweetStatusKey = retweetedStatus?.toDbStatusWithMediaAndUser(accountKey = accountKey)?.data?.statusKey,
@@ -322,6 +325,7 @@ private fun Status.toDbStatusWithMediaAndUser(
             DbUrlEntity(
                 _id = UUID.randomUUID().toString(),
                 statusKey = status.statusKey,
+                userKey = null,
                 url = it.url ?: "",
                 expandedUrl = it.expandedURL ?: "",
                 displayUrl = it.displayURL ?: "",
@@ -333,50 +337,91 @@ private fun Status.toDbStatusWithMediaAndUser(
     )
 }
 
-fun User.toDbUser() = DbUser(
-    _id = UUID.randomUUID().toString(),
-    userId = this.idStr ?: throw IllegalArgumentException("user.idStr should not be null"),
-    name = this.name ?: "",
-    screenName = this.screenName ?: "",
-    profileImage = (profileImageURLHTTPS ?: profileImageURL)?.let { updateProfileImagePath(it) }
-        ?: "",
-    profileBackgroundImage = profileBannerURL,
-    followersCount = this.followersCount ?: 0,
-    friendsCount = this.friendsCount ?: 0,
-    listedCount = this.listedCount ?: 0,
-    desc = this.description ?: "",
-    location = this.location,
-    website = this.entities?.url?.urls?.firstOrNull { it.url == this.url }?.expandedURL,
-    verified = this.verified ?: false,
-    isProtected = this.protected ?: false,
-    userKey = MicroBlogKey.twitter(
-        idStr ?: throw IllegalArgumentException("user.idStr should not be null")
-    ),
-    platformType = PlatformType.Twitter,
-)
+fun User.toDbUser(): DbUserWithEntity {
+    val user = DbUser(
+        _id = UUID.randomUUID().toString(),
+        userId = this.idStr ?: throw IllegalArgumentException("user.idStr should not be null"),
+        name = this.name ?: "",
+        screenName = this.screenName ?: "",
+        profileImage = (profileImageURLHTTPS ?: profileImageURL)?.let { updateProfileImagePath(it) }
+            ?: "",
+        profileBackgroundImage = profileBannerURL,
+        followersCount = this.followersCount ?: 0,
+        friendsCount = this.friendsCount ?: 0,
+        listedCount = this.listedCount ?: 0,
+        rawDesc = this.description ?: "",
+        htmlDesc = autolink.autoLink(this.description ?: ""),
+        location = this.location,
+        website = this.entities?.url?.urls?.firstOrNull { it.url == this.url }?.expandedURL,
+        verified = this.verified ?: false,
+        isProtected = this.protected ?: false,
+        userKey = MicroBlogKey.twitter(
+            idStr ?: throw IllegalArgumentException("user.idStr should not be null")
+        ),
+        platformType = PlatformType.Twitter,
+    )
+    return DbUserWithEntity(
+        user = user,
+        url = entities?.url?.urls?.map {
+            DbUrlEntity(
+                _id = UUID.randomUUID().toString(),
+                statusKey = null,
+                userKey = user.userKey,
+                url = it.url ?: "",
+                expandedUrl = it.expandedURL ?: "",
+                displayUrl = it.displayURL ?: "",
+                title = null,
+                description = null,
+                image = null,
+            )
+        } ?: emptyList()
+    )
+}
 
-fun UserV2.toDbUser() = DbUser(
-    _id = UUID.randomUUID().toString(),
-    userId = this.id ?: throw IllegalArgumentException("user.idStr should not be null"),
-    name = this.name ?: "",
-    screenName = this.username ?: "",
-    profileImage = profileImageURL?.let { updateProfileImagePath(it) } ?: "",
-    profileBackgroundImage = this.profileBanner?.sizes?.let {
-        it.getOrElse("mobile_retina", { null }) ?: it.values.firstOrNull()
-    }?.url,
-    followersCount = this.publicMetrics?.followersCount ?: 0,
-    friendsCount = this.publicMetrics?.followingCount ?: 0,
-    listedCount = this.publicMetrics?.listedCount ?: 0,
-    desc = this.description ?: "",
-    location = this.location,
-    website = this.entities?.url?.urls?.firstOrNull { it.url == this.url }?.expandedURL,
-    verified = this.verified ?: false,
-    isProtected = this.protected ?: false,
-    userKey = MicroBlogKey.twitter(
-        id ?: throw IllegalArgumentException("user.idStr should not be null")
-    ),
-    platformType = PlatformType.Twitter,
-)
+fun UserV2.toDbUser(): DbUserWithEntity {
+    val user = DbUser(
+        _id = UUID.randomUUID().toString(),
+        userId = this.id ?: throw IllegalArgumentException("user.idStr should not be null"),
+        name = this.name ?: "",
+        screenName = this.username ?: "",
+        profileImage = profileImageURL?.let { updateProfileImagePath(it) } ?: "",
+        profileBackgroundImage = this.profileBanner?.sizes?.let {
+            it.getOrElse("mobile_retina", { null }) ?: it.values.firstOrNull()
+        }?.url,
+        followersCount = this.publicMetrics?.followersCount ?: 0,
+        friendsCount = this.publicMetrics?.followingCount ?: 0,
+        listedCount = this.publicMetrics?.listedCount ?: 0,
+        rawDesc = this.description ?: "",
+        htmlDesc = autolink.autoLink(this.description ?: ""),
+        location = this.location,
+        website = this.entities?.url?.urls?.firstOrNull { it.url == this.url }?.expandedURL,
+        verified = this.verified ?: false,
+        isProtected = this.protected ?: false,
+        userKey = MicroBlogKey.twitter(
+            id ?: throw IllegalArgumentException("user.idStr should not be null")
+        ),
+        platformType = PlatformType.Twitter,
+        twitterExtra = DbTwitterUserExtra(
+            pinned_tweet_id = pinnedTweetID
+        )
+    )
+    return DbUserWithEntity(
+        user = user,
+        url = entities?.description?.urls?.map {
+            DbUrlEntity(
+                _id = UUID.randomUUID().toString(),
+                statusKey = null,
+                userKey = user.userKey,
+                url = it.url ?: "",
+                expandedUrl = it.expandedURL ?: "",
+                displayUrl = it.displayURL ?: "",
+                title = null,
+                description = null,
+                image = null,
+            )
+        } ?: emptyList()
+    )
+}
 
 private fun updateProfileImagePath(
     value: String,

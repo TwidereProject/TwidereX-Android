@@ -22,11 +22,10 @@ package com.twidere.twiderex.component
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.defaultMinSizeConstraints
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Divider
@@ -40,17 +39,17 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
 import androidx.paging.LoadState
-import androidx.paging.compose.collectAsLazyPagingItems
-import androidx.paging.compose.itemsIndexed
 import com.twidere.twiderex.R
-import com.twidere.twiderex.annotations.IncomingComposeUpdate
 import com.twidere.twiderex.component.foundation.LoadingProgress
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
-import com.twidere.twiderex.component.lazy.AmbientLazyListController
+import com.twidere.twiderex.component.lazy.LazyColumn2
+import com.twidere.twiderex.component.lazy.LocalLazyListController
+import com.twidere.twiderex.component.lazy.collectAsLazyPagingItems
 import com.twidere.twiderex.component.lazy.loadState
+import com.twidere.twiderex.component.lazy.statusesIndexed
 import com.twidere.twiderex.component.status.StatusDivider
 import com.twidere.twiderex.component.status.TimelineStatusComponent
 import com.twidere.twiderex.extensions.refreshOrRetry
@@ -59,7 +58,6 @@ import com.twidere.twiderex.viewmodel.timeline.TimelineScrollState
 import com.twidere.twiderex.viewmodel.timeline.TimelineViewModel
 import kotlinx.coroutines.launch
 
-@OptIn(IncomingComposeUpdate::class)
 @Composable
 fun TimelineComponent(viewModel: TimelineViewModel) {
     val items = viewModel.source.collectAsLazyPagingItems()
@@ -79,13 +77,15 @@ fun TimelineComponent(viewModel: TimelineViewModel) {
                 initialFirstVisibleItemScrollOffset = lastScrollState.firstVisibleItemScrollOffset,
             )
             val scope = rememberCoroutineScope()
-            AmbientLazyListController.current.requestScrollTop = {
-                scope.launch {
-                    listState.snapToItemIndex(0)
+            LocalLazyListController.current.requestScrollTop = remember {
+                {
+                    scope.launch {
+                        listState.scrollToItem(0)
+                    }
                 }
             }
-            DisposableEffect(listState.isAnimationRunning) {
-                if (!listState.isAnimationRunning) {
+            DisposableEffect(listState.isScrollInProgress) {
+                if (!listState.isScrollInProgress) {
                     viewModel.saveScrollState(
                         TimelineScrollState(
                             firstVisibleItemIndex = listState.firstVisibleItemIndex,
@@ -95,10 +95,10 @@ fun TimelineComponent(viewModel: TimelineViewModel) {
                 }
                 onDispose { }
             }
-            LazyColumn(
+            LazyColumn2(
                 state = listState
             ) {
-                itemsIndexed(items) { index, it ->
+                statusesIndexed(items) { index, it ->
                     it?.let { item ->
                         Column {
                             TimelineStatusComponent(
@@ -114,7 +114,7 @@ fun TimelineComponent(viewModel: TimelineViewModel) {
                                     Divider()
                                     TextButton(
                                         modifier = Modifier
-                                            .defaultMinSizeConstraints(
+                                            .defaultMinSize(
                                                 minHeight = ButtonDefaults.MinHeight,
                                             )
                                             .padding(ButtonDefaults.ContentPadding)
@@ -129,7 +129,7 @@ fun TimelineComponent(viewModel: TimelineViewModel) {
                                         },
                                     ) {
                                         Icon(
-                                            imageVector = vectorResource(id = R.drawable.ic_refresh),
+                                            painter = painterResource(id = R.drawable.ic_refresh),
                                             contentDescription = stringResource(
                                                 id = R.string.accessibility_scene_timeline_load_gap
                                             )

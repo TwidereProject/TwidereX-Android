@@ -49,8 +49,8 @@ import java.io.IOException
 class TwitterSignInViewModel @AssistedInject constructor(
     private val repository: AccountRepository,
     private val inAppNotification: InAppNotification,
-    @Assisted private val consumerKey: String,
-    @Assisted private val consumerSecret: String,
+    @Assisted("consumerKey") private val consumerKey: String,
+    @Assisted("consumerSecret") private val consumerSecret: String,
     @Assisted private val pinCodeProvider: suspend (url: String) -> String?,
     @Assisted private val onResult: (success: Boolean) -> Unit,
 ) : ViewModel() {
@@ -58,10 +58,10 @@ class TwitterSignInViewModel @AssistedInject constructor(
     @dagger.assisted.AssistedFactory
     interface AssistedFactory : IAssistedFactory {
         fun create(
-            consumerKey: String,
-            consumerSecret: String,
-            pinCodeProvider: suspend (url: String) -> String?,
-            onResult: (success: Boolean) -> Unit,
+            @Assisted("consumerKey") consumerKey: String,
+            @Assisted("consumerSecret") consumerSecret: String,
+            @Assisted pinCodeProvider: suspend (url: String) -> String?,
+            @Assisted onResult: (success: Boolean) -> Unit,
         ): TwitterSignInViewModel
     }
 

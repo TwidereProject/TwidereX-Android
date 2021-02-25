@@ -30,12 +30,18 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.foundation.VideoPlayer
-import com.twidere.twiderex.component.navigation.AmbientNavigator
+import com.twidere.twiderex.component.lazy.LocalIsScrollInProgress
+import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.model.MediaType
 import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.model.ui.UiStatus
@@ -44,7 +50,7 @@ import com.twidere.twiderex.model.ui.UiStatus
 fun StatusMediaComponent(
     status: UiStatus,
 ) {
-    val navigator = AmbientNavigator.current
+    val navigator = LocalNavigator.current
     val media = status.media
     val onItemClick = { it: UiMedia ->
         val index = media.indexOf(it)
@@ -52,10 +58,18 @@ fun StatusMediaComponent(
     }
     if (media.size == 1) {
         val first = media.first()
+        val aspectRatio = (first.width.toFloat() / first.height.toFloat()).let {
+            if (it.isNaN()) {
+                270f / 162f
+            } else {
+                it
+            }
+        }
+
         Box(
             modifier = Modifier
                 .heightIn(max = 400.dp)
-                .aspectRatio(first.width.toFloat() / first.height.toFloat())
+                .aspectRatio(aspectRatio)
                 .clip(MaterialTheme.shapes.medium)
         ) {
             StatusMediaPreviewItem(
@@ -127,7 +141,7 @@ fun StatusMediaPreviewItem(
             MediaType.photo ->
                 media.previewUrl?.let {
                     NetworkImage(
-                        url = it,
+                        data = it,
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable(
@@ -138,29 +152,36 @@ fun StatusMediaPreviewItem(
                     )
                 }
             MediaType.video, MediaType.animated_gif -> media.mediaUrl?.let {
-                VideoPlayer(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .clickable(
-                            onClick = {
-                                onClick(media)
-                            }
-                        ),
-                    url = it,
-                    showControls = false,
-                    volume = 0F
-                ) {
-                    media.previewUrl?.let {
-                        NetworkImage(
-                            url = it,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable(
-                                    onClick = {
-                                        onClick(media)
-                                    }
-                                ),
-                        )
+                var loaded by remember { mutableStateOf(false) }
+                if (!LocalIsScrollInProgress.current || loaded) {
+                    DisposableEffect(Unit) {
+                        loaded = true
+                        onDispose { }
+                    }
+                    VideoPlayer(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .clickable(
+                                onClick = {
+                                    onClick(media)
+                                }
+                            ),
+                        url = it,
+                        showControls = false,
+                        volume = 0F
+                    ) {
+                        media.previewUrl?.let {
+                            NetworkImage(
+                                data = it,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable(
+                                        onClick = {
+                                            onClick(media)
+                                        }
+                                    ),
+                            )
+                        }
                     }
                 }
             }

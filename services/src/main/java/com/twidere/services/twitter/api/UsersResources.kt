@@ -34,5 +34,5 @@ interface UsersResources {
     suspend fun profileBanners(@Query("screen_name") screenName: String): ProfileBanner
 
     @GET("/1.1/friendships/show.json")
-    suspend fun showFriendships(@Query("target_screen_name") target_screen_name: String): RelationshipResponse
+    suspend fun showFriendships(@Query("target_id") target_id: String): RelationshipResponse
 }

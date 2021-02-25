@@ -20,7 +20,7 @@
  */
 package com.twidere.twiderex.extensions
 
-import androidx.compose.material.AmbientElevationOverlay
+import androidx.compose.material.LocalElevationOverlay
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
@@ -28,7 +28,7 @@ import com.twidere.twiderex.component.foundation.TopAppBarElevation
 
 @Composable
 fun Color.withElevation(elevation: Dp = TopAppBarElevation): Color {
-    return AmbientElevationOverlay.current?.apply(
+    return LocalElevationOverlay.current?.apply(
         color = this,
         elevation = elevation
     ) ?: this

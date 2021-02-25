@@ -20,243 +20,281 @@
  */
 package com.twidere.twiderex.component
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.savedinstancestate.savedInstanceState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
 import androidx.navigation.compose.navigate
-import androidx.paging.LoadState
-import androidx.paging.compose.collectAsLazyPagingItems
 import com.twidere.twiderex.R
-import com.twidere.twiderex.annotations.IncomingComposeUpdate
 import com.twidere.twiderex.component.foundation.IconTabsComponent
 import com.twidere.twiderex.component.foundation.NetworkImage
+import com.twidere.twiderex.component.foundation.Pager
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
+import com.twidere.twiderex.component.foundation.TabScaffold
+import com.twidere.twiderex.component.foundation.rememberPagerState
+import com.twidere.twiderex.component.lazy.LazyColumn2
+import com.twidere.twiderex.component.lazy.collectAsLazyPagingItems
 import com.twidere.twiderex.component.lazy.itemsPaging
 import com.twidere.twiderex.component.lazy.itemsPagingGridIndexed
-import com.twidere.twiderex.component.navigation.AmbientNavigator
+import com.twidere.twiderex.component.navigation.LocalNavigator
+import com.twidere.twiderex.component.status.HtmlText
+import com.twidere.twiderex.component.status.ResolvedLink
 import com.twidere.twiderex.component.status.StatusDivider
 import com.twidere.twiderex.component.status.StatusMediaPreviewItem
 import com.twidere.twiderex.component.status.TimelineStatusComponent
 import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.component.status.withAvatarClip
 import com.twidere.twiderex.di.assisted.assistedViewModel
-import com.twidere.twiderex.extensions.refreshOrRetry
 import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.navigation.Route
+import com.twidere.twiderex.navigation.twidereXSchema
 import com.twidere.twiderex.preferences.proto.DisplayPreferences
-import com.twidere.twiderex.ui.AmbientActiveAccount
-import com.twidere.twiderex.ui.AmbientNavController
-import com.twidere.twiderex.ui.AmbientVideoPlayback
+import com.twidere.twiderex.ui.LocalActiveAccount
+import com.twidere.twiderex.ui.LocalNavController
+import com.twidere.twiderex.ui.LocalVideoPlayback
 import com.twidere.twiderex.ui.standardPadding
 import com.twidere.twiderex.viewmodel.user.UserFavouriteTimelineViewModel
 import com.twidere.twiderex.viewmodel.user.UserMediaTimelineViewModel
 import com.twidere.twiderex.viewmodel.user.UserTimelineViewModel
 import com.twidere.twiderex.viewmodel.user.UserViewModel
+import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalFoundationApi::class)
-@IncomingComposeUpdate
 @Composable
 fun UserComponent(
-    screenName: String,
-    host: String,
-    initialUserKey: MicroBlogKey? = null,
+    userKey: MicroBlogKey,
     initialData: UiUser? = null,
 ) {
-    val account = AmbientActiveAccount.current ?: return
+    val account = LocalActiveAccount.current ?: return
     val viewModel = assistedViewModel<UserViewModel.AssistedFactory, UserViewModel>(
         account,
-        screenName,
-        host,
+        userKey,
     ) {
-        it.create(account, screenName, host, initialUserKey)
+        it.create(account, userKey)
     }
     val user by viewModel.user.observeAsState(initial = initialData)
-    val userKey = remember(
-        screenName,
-        host,
-    ) {
-        MicroBlogKey(screenName, host)
+    val tabs = listOf(
+        UserTabComponent(
+            painterResource(id = R.drawable.ic_float_left),
+            stringResource(id = R.string.accessibility_scene_user_tab_status)
+        ) {
+            UserStatusTimeline(userKey = userKey)
+        },
+        UserTabComponent(
+            painterResource(id = R.drawable.ic_photo),
+            stringResource(id = R.string.accessibility_scene_user_tab_media)
+        ) {
+            UserMediaTimeline(userKey = userKey)
+        },
+    ).let {
+        if (viewModel.isMe || userKey.host == MicroBlogKey.TwitterHost) {
+            it + UserTabComponent(
+                painterResource(id = R.drawable.ic_heart),
+                stringResource(id = R.string.accessibility_scene_user_tab_favourite)
+            ) {
+                UserFavouriteTimeline(userKey = userKey)
+            }
+        } else {
+            it
+        }
     }
-    val lazyListState = rememberLazyListState()
+    val refreshing by viewModel.refreshing.observeAsState(initial = false)
+    SwipeToRefreshLayout(
+        refreshingState = refreshing,
+        onRefresh = {
+            viewModel.refresh()
+        },
+    ) {
+        TabScaffold(
+            header = {
+                user?.let {
+                    UserInfo(user = it, viewModel = viewModel)
+                }
+            },
+            content = {
+                val state = rememberPagerState(maxPage = tabs.lastIndex)
+                Column {
+                    val scope = rememberCoroutineScope()
+                    IconTabsComponent(
+                        items = tabs.map { it.icon to it.title },
+                        selectedItem = state.currentPage,
+                        onItemSelected = {
+                            scope.launch {
+                                state.selectPage { state.currentPage = it }
+                            }
+                        },
+                    )
+                    Pager(
+                        modifier = Modifier.weight(1f),
+                        state = state,
+                    ) {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.TopCenter,
+                        ) {
+                            tabs[page].compose.invoke()
+                        }
+                    }
+                }
+            }
+        )
+    }
+}
+
+data class UserTabComponent(
+    val icon: Painter,
+    val title: String,
+    val compose: @Composable () -> Unit,
+)
+
+@Composable
+fun UserStatusTimeline(
+    userKey: MicroBlogKey,
+) {
+    val account = LocalActiveAccount.current ?: return
     val timelineViewModel =
         assistedViewModel<UserTimelineViewModel.AssistedFactory, UserTimelineViewModel>(
             account,
-            screenName,
-            host,
+            userKey,
         ) {
-            it.create(account, screenName = screenName, userKey = userKey)
+            it.create(account, userKey = userKey)
         }
+    val timelineSource = timelineViewModel.source.collectAsLazyPagingItems()
+    // FIXME: 2021/2/20 Recover the scroll position require visiting the loadState once, have no idea why
+    @Suppress("UNUSED_VARIABLE")
+    timelineSource.loadState
+    if (timelineSource.itemCount > 0) {
+        LazyColumn2 {
+            itemsPaging(
+                timelineSource,
+                key = { timelineSource[it]?.statusKey.hashCode() },
+            ) { item ->
+                item?.let {
+                    Column {
+                        TimelineStatusComponent(it)
+                        StatusDivider()
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun UserMediaTimeline(
+    userKey: MicroBlogKey,
+) {
+    val account = LocalActiveAccount.current ?: return
     val mediaViewModel =
         assistedViewModel<UserMediaTimelineViewModel.AssistedFactory, UserMediaTimelineViewModel>(
             account,
-            screenName,
-            host,
+            userKey,
         ) {
-            it.create(account, screenName = screenName, userKey = userKey)
+            it.create(account, userKey = userKey)
         }
-    val favouriteViewModel =
+    val mediaSource = mediaViewModel.source.collectAsLazyPagingItems()
+    // FIXME: 2021/2/20 Recover the scroll position require visiting the loadState once, have no idea why
+    @Suppress("UNUSED_VARIABLE")
+    mediaSource.loadState
+    if (mediaSource.itemCount > 0) {
+        LazyColumn2 {
+            item {
+                Box(modifier = Modifier.height(standardPadding))
+            }
+            itemsPagingGridIndexed(
+                mediaSource,
+                rowSize = 2,
+                spacing = standardPadding,
+                padding = standardPadding
+            ) { index, pair ->
+                pair?.let { item ->
+                    val navigator = LocalNavigator.current
+                    CompositionLocalProvider(
+                        LocalVideoPlayback provides DisplayPreferences.AutoPlayback.Off,
+                    ) {
+                        StatusMediaPreviewItem(
+                            item.first,
+                            modifier = Modifier
+                                .aspectRatio(1F)
+                                .clip(
+                                    MaterialTheme.shapes.medium
+                                ),
+                            onClick = {
+                                navigator.media(item.second.statusKey, index)
+                            }
+                        )
+                    }
+                }
+            }
+            item {
+                Box(modifier = Modifier.height(standardPadding))
+            }
+        }
+    }
+}
+
+@Composable
+fun UserFavouriteTimeline(
+    userKey: MicroBlogKey,
+) {
+    val account = LocalActiveAccount.current ?: return
+    val timelineViewModel =
         assistedViewModel<UserFavouriteTimelineViewModel.AssistedFactory, UserFavouriteTimelineViewModel>(
             account,
-            screenName,
-            host,
+            userKey,
         ) {
-            it.create(account, screenName = screenName, userKey = userKey)
+            it.create(account, userKey = userKey)
         }
-
     val timelineSource = timelineViewModel.source.collectAsLazyPagingItems()
-    val mediaSource = mediaViewModel.source.collectAsLazyPagingItems()
-    val favouriteSource = favouriteViewModel.source.collectAsLazyPagingItems()
-
-    Box {
-        val tabs = listOf(
-            vectorResource(id = R.drawable.ic_float_left) to stringResource(id = R.string.accessibility_scene_user_tab_status),
-            vectorResource(id = R.drawable.ic_photo) to stringResource(id = R.string.accessibility_scene_user_tab_media),
-            vectorResource(id = R.drawable.ic_heart) to stringResource(id = R.string.accessibility_scene_user_tab_favourite),
-        )
-        val (selectedItem, setSelectedItem) = savedInstanceState { 0 }
-
-        val refreshing by viewModel.refreshing.observeAsState(initial = false)
-        SwipeToRefreshLayout(
-            refreshingState = refreshing ||
-                selectedItem == 0 && timelineSource.loadState.refresh is LoadState.Loading ||
-                selectedItem == 1 && mediaSource.loadState.refresh is LoadState.Loading ||
-                selectedItem == 2 && favouriteSource.loadState.refresh is LoadState.Loading,
-            onRefresh = {
-                viewModel.refresh()
-                when (selectedItem) {
-                    0 -> timelineSource.refreshOrRetry()
-                    1 -> mediaSource.refreshOrRetry()
-                    2 -> favouriteSource.refreshOrRetry()
-                }
-            },
-        ) {
-            if (
-                selectedItem == 0 && timelineSource.itemCount > 0 ||
-                selectedItem == 1 && mediaSource.itemCount > 0 ||
-                selectedItem == 2 && favouriteSource.itemCount > 0
-            ) {
-                LazyColumn(
-                    state = lazyListState,
-                ) {
-                    user?.let {
-                        stickyHeader {
-                            UserInfo(user = it, viewModel = viewModel)
-                        }
-                    }
-
-                    stickyHeader {
-                        IconTabsComponent(
-                            items = tabs,
-                            selectedItem = selectedItem,
-                            onItemSelected = {
-                                setSelectedItem(it)
-                            },
-                        )
-                    }
-
-                    when (selectedItem) {
-                        0 -> {
-                            itemsPaging(timelineSource) { item ->
-                                item?.let {
-                                    Column {
-                                        TimelineStatusComponent(it)
-                                        StatusDivider()
-                                    }
-                                }
-                            }
-                        }
-                        1 -> {
-                            item {
-                                Box(modifier = Modifier.height(standardPadding))
-                            }
-                            itemsPagingGridIndexed(
-                                mediaSource,
-                                rowSize = 2,
-                                spacing = standardPadding,
-                                padding = standardPadding
-                            ) { index, pair ->
-                                pair?.let { item ->
-                                    val navigator = AmbientNavigator.current
-                                    Providers(
-                                        AmbientVideoPlayback provides DisplayPreferences.AutoPlayback.Off,
-                                    ) {
-                                        StatusMediaPreviewItem(
-                                            item.first,
-                                            modifier = Modifier
-                                                .aspectRatio(1F)
-                                                .clip(
-                                                    MaterialTheme.shapes.medium
-                                                ),
-                                            onClick = {
-                                                navigator.media(item.second.statusKey, index)
-                                            }
-                                        )
-                                    }
-                                }
-                            }
-                            item {
-                                Box(modifier = Modifier.height(standardPadding))
-                            }
-                        }
-                        2 -> {
-                            itemsPaging(favouriteSource) { item ->
-                                item?.let {
-                                    Column {
-                                        TimelineStatusComponent(it)
-                                        StatusDivider()
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            } else {
-                user?.let {
+    // FIXME: 2021/2/20 Recover the scroll position require visiting the loadState once, have no idea why
+    @Suppress("UNUSED_VARIABLE")
+    timelineSource.loadState
+    if (timelineSource.itemCount > 0) {
+        LazyColumn2 {
+            itemsPaging(
+                timelineSource,
+                key = { timelineSource[it]?.statusKey.hashCode() },
+            ) { item ->
+                item?.let {
                     Column {
-                        UserInfo(user = it, viewModel = viewModel)
-                        IconTabsComponent(
-                            items = tabs,
-                            selectedItem = selectedItem,
-                            onItemSelected = {
-                                setSelectedItem(it)
-                            },
-                        )
+                        TimelineStatusComponent(it)
+                        StatusDivider()
                     }
                 }
             }
@@ -266,11 +304,10 @@ fun UserComponent(
 
 @Composable
 private fun UserInfo(user: UiUser, viewModel: UserViewModel) {
-    val isMe by viewModel.isMe.observeAsState(initial = false)
     val relationship by viewModel.relationship.observeAsState(initial = null)
     val loadingRelationship by viewModel.loadingRelationship.observeAsState(initial = false)
     val maxBannerSize = 200.dp
-    val navController = AmbientNavController.current
+    val navController = LocalNavController.current
     Box(
         modifier = Modifier
             .background(MaterialTheme.colors.surface.withElevation())
@@ -280,9 +317,16 @@ private fun UserInfo(user: UiUser, viewModel: UserViewModel) {
             Box(
                 modifier = Modifier
                     .heightIn(max = maxBannerSize)
+                    .clickable(
+                        onClick = {
+                            navController.navigate(Route.Media.Raw(it))
+                        },
+                        indication = null,
+                        interactionSource = remember { MutableInteractionSource() },
+                    )
             ) {
                 NetworkImage(
-                    url = it,
+                    data = it,
                 )
             }
         }
@@ -312,8 +356,12 @@ private fun UserInfo(user: UiUser, viewModel: UserViewModel) {
                 )
                 UserAvatar(
                     user = user,
-                    size = 72.dp,
-                )
+                    size = 72.dp
+                ) {
+                    if (user.profileImage is String) {
+                        navController.navigate(Route.Media.Raw(user.profileImage))
+                    }
+                }
             }
             Spacer(modifier = Modifier.height(standardPadding))
             Row(
@@ -333,7 +381,7 @@ private fun UserInfo(user: UiUser, viewModel: UserViewModel) {
                         text = "@${user.screenName}",
                     )
                 }
-                if (isMe) {
+                if (viewModel.isMe) {
                     // TODO: edit button
 //                    Text(
 //                        style = MaterialTheme.typography.h6,
@@ -377,12 +425,12 @@ private fun UserInfo(user: UiUser, viewModel: UserViewModel) {
                 }
             }
             Spacer(modifier = Modifier.height(standardPadding))
-            Text(
+            UserDescText(
                 modifier = Modifier.padding(horizontal = standardPadding * 2),
-                text = user.desc,
+                user = user,
             )
             user.website?.let {
-                val navigator = AmbientNavigator.current
+                val navigator = LocalNavigator.current
                 Column(
                     modifier = Modifier
                         .clickable(
@@ -396,7 +444,7 @@ private fun UserInfo(user: UiUser, viewModel: UserViewModel) {
                     Spacer(modifier = Modifier.height(standardPadding))
                     Row {
                         Icon(
-                            imageVector = vectorResource(id = R.drawable.ic_globe),
+                            painter = painterResource(id = R.drawable.ic_globe),
                             contentDescription = stringResource(
                                 id = R.string.accessibility_scene_user_website
                             )
@@ -419,7 +467,7 @@ private fun UserInfo(user: UiUser, viewModel: UserViewModel) {
                         .padding(horizontal = standardPadding * 2),
                 ) {
                     Icon(
-                        imageVector = vectorResource(id = R.drawable.ic_map_pin),
+                        painter = painterResource(id = R.drawable.ic_map_pin),
                         contentDescription = stringResource(
                             id = R.string.accessibility_scene_user_location
                         )
@@ -434,42 +482,74 @@ private fun UserInfo(user: UiUser, viewModel: UserViewModel) {
                 Spacer(modifier = Modifier.height(standardPadding))
             }
             Spacer(modifier = Modifier.height(standardPadding))
-            Row {
-                Column(
-                    modifier = Modifier
-                        .weight(1f)
-                        .clickable {
-                            if (user.userKey.host == MicroBlogKey.TwitterHost) {
-                                navController.navigate(Route.Twitter.User.Following(user.userKey))
-                            }
-                        },
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Text(text = user.friendsCount.toString())
-                    Text(text = stringResource(id = R.string.common_controls_profile_dashboard_following))
-                }
-                Column(
-                    modifier = Modifier
-                        .weight(1f)
-                        .clickable {
-                            if (user.userKey.host == MicroBlogKey.TwitterHost) {
-                                navController.navigate(Route.Twitter.User.Followers(user.userKey))
-                            }
-                        },
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Text(text = user.followersCount.toString())
-                    Text(text = stringResource(id = R.string.common_controls_profile_dashboard_followers))
-                }
-                Column(
-                    modifier = Modifier.weight(1f),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Text(text = user.listedCount.toString())
-                    Text(text = stringResource(id = R.string.common_controls_profile_dashboard_listed))
-                }
-            }
+            UserMetrics(user)
             Spacer(modifier = Modifier.height(standardPadding))
         }
+    }
+}
+
+@Composable
+fun UserMetrics(
+    user: UiUser,
+) {
+    val navController = LocalNavController.current
+    Row {
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .clickable {
+                    navController.navigate(Route.Following(user.userKey))
+                },
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Text(text = user.friendsCount.toString())
+            Text(text = stringResource(id = R.string.common_controls_profile_dashboard_following))
+        }
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .clickable {
+                    navController.navigate(Route.Followers(user.userKey))
+                },
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Text(text = user.followersCount.toString())
+            Text(text = stringResource(id = R.string.common_controls_profile_dashboard_followers))
+        }
+        if (user.platformType == PlatformType.Twitter) {
+            Column(
+                modifier = Modifier.weight(1f),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Text(text = user.listedCount.toString())
+                Text(text = stringResource(id = R.string.common_controls_profile_dashboard_listed))
+            }
+        }
+    }
+}
+
+@Composable
+fun UserDescText(
+    modifier: Modifier = Modifier,
+    user: UiUser,
+) {
+    key(user) {
+        HtmlText(
+            modifier = modifier,
+            htmlText = user.htmlDesc,
+            linkResolver = { href ->
+                val entity = user.url.firstOrNull { it.url == href }
+                if (entity != null) {
+                    ResolvedLink(
+                        expanded = entity.expandedUrl,
+                        display = entity.displayUrl,
+                    )
+                } else if (!href.startsWith(twidereXSchema)) {
+                    ResolvedLink(expanded = href)
+                } else {
+                    ResolvedLink(expanded = null)
+                }
+            }
+        )
     }
 }

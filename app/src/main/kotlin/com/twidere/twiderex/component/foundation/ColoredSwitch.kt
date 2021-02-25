@@ -20,7 +20,7 @@
  */
 package com.twidere.twiderex.component.foundation
 
-import androidx.compose.foundation.InteractionState
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Switch
@@ -37,7 +37,7 @@ fun ColoredSwitch(
     onCheckedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    interactionState: InteractionState = remember { InteractionState() },
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     colors: SwitchColors = SwitchDefaults.colors(
         checkedThumbColor = MaterialTheme.colors.primaryVariant,
     )
@@ -47,7 +47,7 @@ fun ColoredSwitch(
         onCheckedChange = onCheckedChange,
         modifier = modifier,
         enabled = enabled,
-        interactionState = interactionState,
+        interactionSource = interactionSource,
         colors = colors,
     )
 }
