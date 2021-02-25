@@ -100,6 +100,7 @@ import com.twidere.twiderex.ui.LocalWindow
 import com.twidere.twiderex.ui.TwidereXTheme
 import com.twidere.twiderex.ui.standardPadding
 import com.twidere.twiderex.viewmodel.MediaViewModel
+import dev.chrisbanes.accompanist.glide.LocalRequestManager
 import dev.chrisbanes.accompanist.insets.navigationBarsPadding
 import dev.chrisbanes.accompanist.insets.statusBarsPadding
 
@@ -351,6 +352,15 @@ fun MediaView(
 ) {
     var lockPager by remember { mutableStateOf(false) }
     val navController = LocalNavController.current
+    val requestManager = LocalRequestManager.current
+    DisposableEffect(Unit) {
+        requestManager?.let {
+            if (requestManager.isPaused) {
+                requestManager.resumeRequests()
+            }
+        }
+        onDispose { }
+    }
     Swiper(
         modifier = modifier,
         enabled = !lockPager,
