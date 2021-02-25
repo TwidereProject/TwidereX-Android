@@ -38,7 +38,7 @@ import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.navigation.twidereXSchema
 import com.twidere.twiderex.viewmodel.compose.ComposeType
 
-val LocalNavigator = staticCompositionLocalOf<INavigator>()
+val LocalNavigator = staticCompositionLocalOf<INavigator> { error("No Navigator") }
 
 interface INavigator {
     fun user(user: UiUser, builder: NavOptionsBuilder.() -> Unit = {}) {}
@@ -124,7 +124,7 @@ class Navigator(
     override fun twitterSignInWeb(target: String) {
         CookieManager.getInstance().removeAllCookies {
         }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        if (true) {
             navController.navigate(
                 Route.SignIn.Web.Twitter(target)
             )

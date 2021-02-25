@@ -20,8 +20,8 @@
  */
 package com.twidere.twiderex.component.foundation
 
-import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
@@ -83,7 +83,7 @@ fun SignInScaffold(
                             .size(with(LocalDensity.current) { MaterialTheme.typography.h4.fontSize.toDp() })
                             .clickable(
                                 indication = null,
-                                interactionState = remember { InteractionState() },
+                                interactionSource = remember { MutableInteractionSource() },
                                 onClick = {
                                     count++
                                     countAction.invoke(count)

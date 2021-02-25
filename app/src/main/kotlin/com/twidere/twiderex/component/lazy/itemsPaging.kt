@@ -52,14 +52,12 @@ fun LazyListScope.loadState(
     when (state) {
         is LoadState.Loading -> loading()
         is LoadState.Error -> item {
-            item {
-                ListItem(
-                    modifier = Modifier.clickable(onClick = { onReloadRequested.invoke() }),
-                    text = {
+            ListItem(
+                modifier = Modifier.clickable(onClick = { onReloadRequested.invoke() }),
+                text = {
 //                        Text(text = stringResource(id = R.string.list_load_state_error))
-                    }
-                )
-            }
+                }
+            )
         }
         else -> {
         }

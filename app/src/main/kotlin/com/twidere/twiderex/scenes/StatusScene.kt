@@ -23,7 +23,6 @@ package com.twidere.twiderex.scenes
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Divider
@@ -40,6 +39,7 @@ import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.LoadingProgress
 import com.twidere.twiderex.component.foundation.loading
+import com.twidere.twiderex.component.lazy.LazyColumn2
 import com.twidere.twiderex.component.status.ExpandedStatusComponent
 import com.twidere.twiderex.component.status.StatusDivider
 import com.twidere.twiderex.component.status.StatusLineComponent
@@ -91,7 +91,7 @@ fun StatusScene(statusKey: MicroBlogKey) {
                     LoadingProgress()
                 }
             } else {
-                LazyColumn(
+                LazyColumn2(
                     state = rememberLazyListState(initialFirstVisibleItemIndex = previousConversations.size)
                 ) {
                     itemsIndexed(previousConversations) { index, item ->

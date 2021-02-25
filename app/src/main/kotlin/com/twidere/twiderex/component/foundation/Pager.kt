@@ -38,9 +38,9 @@ import androidx.compose.runtime.structuralEqualityPolicy
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.gesture.util.VelocityTracker
 import androidx.compose.ui.input.pointer.consumePositionChange
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.pointer.util.VelocityTracker
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.ParentDataModifier
@@ -221,10 +221,12 @@ fun Pager(
                                     if (currentPage == maxPage) 0 else -pageSize * offscreenLimit
                                 val newPos =
                                     (pos + dragAmount).coerceIn(min.toFloat(), max.toFloat())
-                                change.consumePositionChange(newPos, 0f)
-                                addPosition(change.uptimeMillis, change.position)
-                                coroutineScope.launch {
-                                    snapToOffset(newPos / pageSize)
+                                if (newPos != 0f) {
+                                    change.consumePositionChange()
+                                    addPosition(change.uptimeMillis, change.position)
+                                    coroutineScope.launch {
+                                        snapToOffset(newPos / pageSize)
+                                    }
                                 }
                             }
                         },

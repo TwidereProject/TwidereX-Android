@@ -22,7 +22,8 @@ package com.twidere.twiderex.di
 
 import android.content.Context
 import androidx.datastore.core.DataStore
-import androidx.datastore.createDataStore
+import androidx.datastore.core.DataStoreFactory
+import androidx.datastore.core.Serializer
 import com.twidere.twiderex.preferences.proto.AppearancePreferences
 import com.twidere.twiderex.preferences.proto.DisplayPreferences
 import com.twidere.twiderex.preferences.serializer.AppearancePreferencesSerializer
@@ -32,6 +33,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import java.io.File
 import javax.inject.Singleton
 
 @Module
@@ -46,3 +48,16 @@ object PreferenceModule {
     fun provideDisplay(@ApplicationContext context: Context): DataStore<DisplayPreferences> =
         context.createDataStore("display.pb", DisplayPreferencesSerializer)
 }
+
+inline fun <reified T> Context.createDataStore(
+    name: String,
+    serializer: Serializer<T>,
+) = DataStoreFactory.create(
+    serializer,
+    produceFile = {
+        File(
+            applicationContext.filesDir,
+            "datastore/$name"
+        )
+    },
+)

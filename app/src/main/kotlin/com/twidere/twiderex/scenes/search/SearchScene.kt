@@ -21,8 +21,8 @@
 package com.twidere.twiderex.scenes.search
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -30,7 +30,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
@@ -42,7 +41,7 @@ import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -65,6 +64,7 @@ import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
 import com.twidere.twiderex.component.foundation.TextTabsComponent
 import com.twidere.twiderex.component.foundation.TopAppBarElevation
+import com.twidere.twiderex.component.lazy.LazyColumn2
 import com.twidere.twiderex.component.lazy.collectAsLazyPagingItems
 import com.twidere.twiderex.component.lazy.items
 import com.twidere.twiderex.component.lazy.itemsPagingGridIndexed
@@ -137,7 +137,7 @@ fun SearchScene(keyword: String) {
                                                         navigator.searchInput(keyword)
                                                     },
                                                     indication = null,
-                                                    interactionState = remember { InteractionState() }
+                                                    interactionSource = remember { MutableInteractionSource() }
                                                 )
                                                 .align(Alignment.CenterVertically)
                                                 .weight(1F),
@@ -197,7 +197,7 @@ private fun SearchTweetsContent(viewModel: TwitterSearchTweetsViewModel) {
         }
     ) {
         if (source.itemCount > 0) {
-            LazyColumn {
+            LazyColumn2 {
                 statuses(source) { item ->
                     item?.let {
                         TimelineStatusComponent(
@@ -217,7 +217,7 @@ private fun SearchTweetsContent(viewModel: TwitterSearchTweetsViewModel) {
 @Composable
 private fun SearchMediasContent(viewModel: TwitterSearchMediaViewModel) {
     val source = viewModel.source.collectAsLazyPagingItems()
-    Providers(
+    CompositionLocalProvider(
         LocalVideoPlayback provides DisplayPreferences.AutoPlayback.Off
     ) {
         SwipeToRefreshLayout(
@@ -227,7 +227,7 @@ private fun SearchMediasContent(viewModel: TwitterSearchMediaViewModel) {
             }
         ) {
             if (source.itemCount > 0) {
-                LazyColumn {
+                LazyColumn2 {
                     item {
                         Box(modifier = Modifier.height(standardPadding))
                     }
@@ -276,7 +276,7 @@ private fun SearchUsersContent(viewModel: TwitterSearchUserViewModel) {
         }
     ) {
         if (source.itemCount > 0) {
-            LazyColumn {
+            LazyColumn2 {
                 items(source) { item ->
                     item?.let {
                         ListItem(
@@ -297,7 +297,7 @@ private fun SearchUsersContent(viewModel: TwitterSearchUserViewModel) {
                                         color = MaterialTheme.colors.primary
                                     )
                                     Spacer(modifier = Modifier.width(4.dp))
-                                    Providers(
+                                    CompositionLocalProvider(
                                         LocalContentAlpha provides ContentAlpha.medium
                                     ) {
                                         Text(

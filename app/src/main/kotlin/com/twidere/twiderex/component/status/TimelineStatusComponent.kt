@@ -20,6 +20,8 @@
  */
 package com.twidere.twiderex.component.status
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -38,7 +40,7 @@ import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -85,7 +87,7 @@ fun TimelineStatusComponent(
                 status = status,
             )
             if (showActions) {
-                Providers(
+                CompositionLocalProvider(
                     LocalContentAlpha provides ContentAlpha.medium
                 ) {
                     Spacer(modifier = Modifier.height(standardPadding))
@@ -103,13 +105,13 @@ fun TimelineStatusComponent(
     }
 }
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 private fun StatusComponent(
     status: UiStatus,
     modifier: Modifier = Modifier,
 ) {
     val navigator = LocalNavigator.current
-    val isMediaPreviewEnabled = LocalDisplayPreferences.current.mediaPreview
     Row(modifier = modifier) {
         UserAvatar(user = status.user)
         Spacer(modifier = Modifier.width(standardPadding))
@@ -124,7 +126,7 @@ private fun StatusComponent(
                         overflow = TextOverflow.Ellipsis,
                     )
                     Spacer(modifier = Modifier.width(4.dp))
-                    Providers(
+                    CompositionLocalProvider(
                         LocalContentAlpha provides ContentAlpha.medium
                     ) {
                         Text(
@@ -143,12 +145,13 @@ private fun StatusComponent(
 
             if (status.media.any()) {
                 Spacer(modifier = Modifier.height(standardPadding))
-                if (isMediaPreviewEnabled) {
+                AnimatedVisibility(visible = LocalDisplayPreferences.current.mediaPreview) {
                     StatusMediaComponent(
                         status = status,
                     )
-                } else {
-                    Providers(
+                }
+                AnimatedVisibility(visible = !LocalDisplayPreferences.current.mediaPreview) {
+                    CompositionLocalProvider(
                         LocalContentAlpha provides ContentAlpha.medium
                     ) {
                         Row(
@@ -175,7 +178,7 @@ private fun StatusComponent(
 
             if (!status.placeString.isNullOrEmpty()) {
                 Spacer(modifier = Modifier.height(standardPadding))
-                Providers(
+                CompositionLocalProvider(
                     LocalContentAlpha provides ContentAlpha.medium
                 ) {
                     Row(

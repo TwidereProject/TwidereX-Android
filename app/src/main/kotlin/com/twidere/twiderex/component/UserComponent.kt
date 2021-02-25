@@ -20,9 +20,9 @@
  */
 package com.twidere.twiderex.component
 
-import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -36,14 +36,13 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.livedata.observeAsState
@@ -67,6 +66,7 @@ import com.twidere.twiderex.component.foundation.Pager
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
 import com.twidere.twiderex.component.foundation.TabScaffold
 import com.twidere.twiderex.component.foundation.rememberPagerState
+import com.twidere.twiderex.component.lazy.LazyColumn2
 import com.twidere.twiderex.component.lazy.collectAsLazyPagingItems
 import com.twidere.twiderex.component.lazy.itemsPaging
 import com.twidere.twiderex.component.lazy.itemsPagingGridIndexed
@@ -200,7 +200,7 @@ fun UserStatusTimeline(
     @Suppress("UNUSED_VARIABLE")
     timelineSource.loadState
     if (timelineSource.itemCount > 0) {
-        LazyColumn {
+        LazyColumn2 {
             itemsPaging(
                 timelineSource,
                 key = { timelineSource[it]?.statusKey.hashCode() },
@@ -233,7 +233,7 @@ fun UserMediaTimeline(
     @Suppress("UNUSED_VARIABLE")
     mediaSource.loadState
     if (mediaSource.itemCount > 0) {
-        LazyColumn {
+        LazyColumn2 {
             item {
                 Box(modifier = Modifier.height(standardPadding))
             }
@@ -245,7 +245,7 @@ fun UserMediaTimeline(
             ) { index, pair ->
                 pair?.let { item ->
                     val navigator = LocalNavigator.current
-                    Providers(
+                    CompositionLocalProvider(
                         LocalVideoPlayback provides DisplayPreferences.AutoPlayback.Off,
                     ) {
                         StatusMediaPreviewItem(
@@ -286,7 +286,7 @@ fun UserFavouriteTimeline(
     @Suppress("UNUSED_VARIABLE")
     timelineSource.loadState
     if (timelineSource.itemCount > 0) {
-        LazyColumn {
+        LazyColumn2 {
             itemsPaging(
                 timelineSource,
                 key = { timelineSource[it]?.statusKey.hashCode() },
@@ -322,7 +322,7 @@ private fun UserInfo(user: UiUser, viewModel: UserViewModel) {
                             navController.navigate(Route.Media.Raw(it))
                         },
                         indication = null,
-                        interactionState = remember { InteractionState() }
+                        interactionSource = remember { MutableInteractionSource() },
                     )
             ) {
                 NetworkImage(

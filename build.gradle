@@ -3,10 +3,9 @@ buildscript {
     apply from: 'versions.gradle'
     repositories {
         google()
-        jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.0.0-alpha05'
+        classpath 'com.android.tools.build:gradle:7.0.0-alpha08'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$versions.kotlin"
     }
 }
@@ -18,7 +17,8 @@ plugins {
 subprojects {
     repositories {
         google()
-        jcenter()
+        mavenCentral()
+        jcenter()// exoplayer still in jcenter
     }
 
     apply plugin: 'com.diffplug.spotless'
@@ -44,6 +44,7 @@ subprojects {
         kotlinOptions {
             allWarningsAsErrors = true
             freeCompilerArgs += '-Xopt-in=kotlin.RequiresOptIn'
+            freeCompilerArgs += '-Xallow-unstable-dependencies'
             jvmTarget = "1.8"
         }
     }

@@ -31,12 +31,14 @@ import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.preferences.proto.DisplayPreferences
 import com.twidere.twiderex.viewmodel.ActiveAccountViewModel
 
-val LocalWindowInsetsController = staticCompositionLocalOf<WindowInsetsControllerCompat>()
+val LocalWindowInsetsController =
+    staticCompositionLocalOf<WindowInsetsControllerCompat> { error("No WindowInsetsControllerCompat") }
 val LocalWindow = staticCompositionLocalOf<Window> { error("No Window") }
 val LocalNavController = staticCompositionLocalOf<NavController> { error("No NavController") }
-val LocalActiveAccount = compositionLocalOf<AccountDetails?>()
-val LocalActiveAccountViewModel = compositionLocalOf<ActiveAccountViewModel>()
-val LocalApplication = staticCompositionLocalOf<Application>()
-val LocalActivity = staticCompositionLocalOf<Activity>()
+val LocalActiveAccount = compositionLocalOf<AccountDetails?> { null }
+val LocalActiveAccountViewModel =
+    compositionLocalOf<ActiveAccountViewModel> { error("No ActiveAccountViewModel") }
+val LocalApplication = staticCompositionLocalOf<Application> { error("No Application") }
+val LocalActivity = staticCompositionLocalOf<Activity> { error("NoActivity") }
 val LocalVideoPlayback = compositionLocalOf { DisplayPreferences.AutoPlayback.Auto }
 val LocalIsActiveNetworkMetered = compositionLocalOf { false }

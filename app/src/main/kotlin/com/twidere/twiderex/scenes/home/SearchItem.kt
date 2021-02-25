@@ -21,8 +21,8 @@
 package com.twidere.twiderex.scenes.home
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -38,7 +38,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.History
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.remember
@@ -92,10 +92,10 @@ class SearchItem : HomeNavigationItem() {
                                         navigator.searchInput()
                                     },
                                     indication = null,
-                                    interactionState = remember { InteractionState() }
+                                    interactionSource = remember { MutableInteractionSource() }
                                 )
                             ) {
-                                Providers(
+                                CompositionLocalProvider(
                                     LocalContentAlpha provides ContentAlpha.medium
                                 ) {
                                     Text(

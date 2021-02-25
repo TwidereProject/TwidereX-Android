@@ -21,8 +21,14 @@
 package com.twidere.twiderex.scenes
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.animateDp
+import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.updateTransition
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -49,7 +55,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -58,6 +64,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -111,7 +118,9 @@ fun HomeScene() {
     val scaffoldState = rememberScaffoldState()
     if (scaffoldState.drawerState.isOpen) {
         BackHandler {
-            scaffoldState.drawerState.close()
+            scope.launch {
+                scaffoldState.drawerState.close()
+            }
         }
     }
     TwidereXTheme {
@@ -196,7 +205,7 @@ fun HomeScene() {
             Box(
                 modifier = Modifier.padding(it)
             ) {
-                Providers(
+                CompositionLocalProvider(
                     LocalLazyListController provides timelineController
                 ) {
                     Pager(state = pagerState) {
@@ -210,6 +219,7 @@ fun HomeScene() {
 
 @Composable
 private fun MenuAvatar(scaffoldState: ScaffoldState) {
+    val scope = rememberCoroutineScope()
     LocalActiveAccount.current?.let { account ->
         val user = remember(account) {
             account.toUi()
@@ -219,10 +229,12 @@ private fun MenuAvatar(scaffoldState: ScaffoldState) {
             size = 32.dp,
             user = user,
             onClick = {
-                if (scaffoldState.drawerState.isOpen) {
-                    scaffoldState.drawerState.close()
-                } else {
-                    scaffoldState.drawerState.open()
+                scope.launch {
+                    if (scaffoldState.drawerState.isOpen) {
+                        scaffoldState.drawerState.close()
+                    } else {
+                        scaffoldState.drawerState.open()
+                    }
                 }
             }
         )
@@ -250,7 +262,7 @@ fun HomeBottomNavigation(
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalAnimationApi::class)
 @Composable
 private fun HomeDrawer(scaffoldState: ScaffoldState) {
     var showAccounts by remember { mutableStateOf(false) }
@@ -262,7 +274,8 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
         val currentUser = account?.toUi()
         val navController = LocalNavController.current
         DrawerUserHeader(
-            currentUser
+            currentUser,
+            showAccounts,
         ) {
             showAccounts = !showAccounts
         }
@@ -280,10 +293,14 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
             modifier = Modifier
                 .weight(1f)
         ) {
-            if (showAccounts) {
-                val activeAccountViewModel = LocalActiveAccountViewModel.current
-                val accounts by activeAccountViewModel.allAccounts.observeAsState(initial = emptyList())
-                val allAccounts = accounts.filter { it.accountKey != account?.accountKey }
+            val activeAccountViewModel = LocalActiveAccountViewModel.current
+            val accounts by activeAccountViewModel.allAccounts.observeAsState(initial = emptyList())
+            val allAccounts = accounts.filter { it.accountKey != account?.accountKey }
+            androidx.compose.animation.AnimatedVisibility(
+                visible = showAccounts,
+                enter = fadeIn() + expandVertically(),
+                exit = shrinkVertically() + fadeOut(),
+            ) {
                 LazyColumn {
                     items(allAccounts) {
                         val user = it.toUi()
@@ -343,7 +360,12 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
                         )
                     }
                 }
-            } else {
+            }
+            androidx.compose.animation.AnimatedVisibility(
+                visible = !showAccounts,
+                enter = fadeIn() + expandVertically(),
+                exit = shrinkVertically() + fadeOut(),
+            ) {
                 LazyColumn {
                     item {
                         ListItem(
@@ -370,10 +392,12 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
         }
 
         Divider()
+        val scope = rememberCoroutineScope()
         ListItem(
             modifier = Modifier.clickable(
                 onClick = {
-                    scaffoldState.drawerState.close {
+                    scope.launch {
+                        scaffoldState.drawerState.close()
                         navController.navigate(Route.Settings.Home)
                     }
                 }
@@ -397,6 +421,7 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
 @Composable
 private fun DrawerUserHeader(
     user: UiUser?,
+    showAccounts: Boolean,
     onTrailingClicked: () -> Unit = {},
 ) {
     ListItem(
@@ -422,12 +447,21 @@ private fun DrawerUserHeader(
             )
         },
         trailing = {
+            val transition = updateTransition(targetState = showAccounts)
+            val rotate by transition.animateFloat {
+                if (it) {
+                    180f
+                } else {
+                    0f
+                }
+            }
             IconButton(
                 onClick = {
                     onTrailingClicked.invoke()
                 }
             ) {
                 Icon(
+                    modifier = Modifier.rotate(rotate),
                     imageVector = Icons.Default.ArrowDropDown,
                     contentDescription = stringResource(
                         id = R.string.accessibility_scene_home_drawer_account_dropdown

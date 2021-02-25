@@ -28,7 +28,6 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
@@ -50,8 +49,6 @@ import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.navigation.LocalNavigator
-import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereXTheme
 
@@ -92,7 +89,7 @@ private fun AboutContent() {
             verticalArrangement = Arrangement.Bottom,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            LoginLogo(modifier = Modifier.preferredWidth(150.dp))
+            LoginLogo(modifier = Modifier.width(150.dp))
             Box(modifier = Modifier.height(32.dp))
             Text(
                 text = stringResource(id = R.string.app_name),
@@ -118,11 +115,7 @@ private fun AboutContent() {
             Row {
                 IconButton(
                     onClick = {
-                        navController.navigate(
-                            Route.User(
-                                MicroBlogKey.twitter("TwidereProject")
-                            )
-                        )
+                        navController.navigate("deeplink/twitter/TwidereProject")
                     }
                 ) {
                     Icon(

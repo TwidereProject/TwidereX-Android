@@ -21,6 +21,7 @@
 package com.twidere.twiderex.ui
 
 import android.os.Build
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
@@ -28,12 +29,14 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Colors
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Typography
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -46,6 +49,7 @@ import com.twidere.twiderex.preferences.LocalAppearancePreferences
 import com.twidere.twiderex.preferences.LocalDisplayPreferences
 import com.twidere.twiderex.preferences.proto.AppearancePreferences
 import dev.chrisbanes.accompanist.insets.HorizontalSide
+import dev.chrisbanes.accompanist.insets.Insets
 import dev.chrisbanes.accompanist.insets.LocalWindowInsets
 import dev.chrisbanes.accompanist.insets.navigationBarsHeight
 import dev.chrisbanes.accompanist.insets.navigationBarsPadding
@@ -60,14 +64,129 @@ fun TwidereXTheme(
     extendViewIntoNavigationBar: Boolean = false,
     content: @Composable () -> Unit
 ) {
-    val appearance = LocalAppearancePreferences.current
-    val display = LocalDisplayPreferences.current
-    val theme = appearance.theme
-    val primaryColor = currentPrimaryColor()
-    val useSystemFontSize = display.useSystemFontSize
-    val fontScale = display.fontScale
+    val darkTheme = isDarkTheme(requireDarkTheme)
+    val colors = provideThemeColors(darkTheme)
+    val typography = provideTypography()
 
-    val darkTheme = if (requireDarkTheme) {
+    MaterialTheme(
+        colors = colors,
+        typography = typography,
+        shapes = shapes,
+        content = {
+            val windowInsetsController = LocalWindowInsetsController.current
+            DisposableEffect(darkTheme) {
+                windowInsetsController.isAppearanceLightStatusBars = !darkTheme
+                onDispose { }
+            }
+            val navigationBarColor = Color.Black
+            val statusBarColor = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+                Color.Black
+            } else {
+                MaterialTheme.colors.surface.withElevation()
+            }
+            Box {
+                Box(
+                    modifier = run {
+                        val actual = provideSystemInsets(
+                            extendViewIntoNavigationBar,
+                            extendViewIntoStatusBar
+                        )
+                        Modifier.padding(actual.toPaddingValues())
+                    }.align(Alignment.Center)
+                ) {
+                    content()
+                }
+                Spacer(
+                    modifier = if (!extendViewIntoStatusBar) {
+                        Modifier
+                            .statusBarsHeight()
+                            .navigationBarsPadding(bottom = false)
+                            .zIndex(999F)
+                            .fillMaxWidth()
+                            .background(statusBarColor)
+                    } else {
+                        Modifier
+                    }.align(Alignment.TopCenter)
+                )
+                Spacer(
+                    modifier = if (!extendViewIntoNavigationBar) {
+                        Modifier
+                            .navigationBarsWidth(HorizontalSide.Left)
+                            .zIndex(999F)
+                            .fillMaxHeight()
+                            .background(navigationBarColor)
+                    } else {
+                        Modifier
+                    }.align(Alignment.CenterStart)
+                )
+                Spacer(
+                    modifier = if (!extendViewIntoNavigationBar) {
+                        Modifier
+                            .navigationBarsWidth(HorizontalSide.Right)
+                            .fillMaxHeight()
+                            .zIndex(999F)
+                            .background(navigationBarColor)
+                    } else {
+                        Modifier
+                    }.align(Alignment.CenterEnd)
+                )
+                Spacer(
+                    modifier = if (!extendViewIntoNavigationBar) {
+                        Modifier
+                            .navigationBarsHeight()
+                            .zIndex(999F)
+                            .fillMaxWidth()
+                            .background(navigationBarColor)
+                    } else {
+                        Modifier
+                    }.align(Alignment.BottomCenter)
+                )
+            }
+        }
+    )
+}
+
+@Composable
+private fun provideSystemInsets(
+    extendViewIntoNavigationBar: Boolean,
+    extendViewIntoStatusBar: Boolean
+): Insets {
+    val ime = LocalWindowInsets.current.ime
+    val navigation = LocalWindowInsets.current.navigationBars
+    val status = LocalWindowInsets.current.statusBars
+    return ime.copy(
+        left = if (extendViewIntoNavigationBar) {
+            0
+        } else {
+            ime.left.coerceAtLeast(navigation.left)
+        },
+        right = if (extendViewIntoNavigationBar) {
+            0
+        } else {
+            ime.right.coerceAtLeast(navigation.right)
+        },
+        bottom = if (extendViewIntoNavigationBar) {
+            0
+        } else {
+            ime.bottom.coerceAtLeast(navigation.bottom)
+        },
+        top = if (extendViewIntoNavigationBar) {
+            0
+        } else {
+            ime.top.coerceAtLeast(navigation.top)
+        } + if (extendViewIntoStatusBar) {
+            0
+        } else {
+            status.top
+        },
+    )
+}
+
+@Composable
+private fun isDarkTheme(requireDarkTheme: Boolean): Boolean {
+    val appearance = LocalAppearancePreferences.current
+    val theme = appearance.theme
+    return if (requireDarkTheme) {
         true
     } else {
         when (theme) {
@@ -77,22 +196,14 @@ fun TwidereXTheme(
             else -> false
         }
     }
-    val colors = if (darkTheme) {
-        darkColors(
-            primary = primaryColor,
-            primaryVariant = primaryColor,
-            secondary = primaryColor,
+}
 
-        )
-    } else {
-        lightColors(
-            primary = primaryColor,
-            primaryVariant = primaryColor,
-            secondary = primaryColor
-        )
-    }
-
-    val typography = if (useSystemFontSize) {
+@Composable
+private fun provideTypography(): Typography {
+    val display = LocalDisplayPreferences.current
+    val useSystemFontSize = display.useSystemFontSize
+    val fontScale = display.fontScale
+    return if (useSystemFontSize) {
         Typography()
     } else {
         Typography(
@@ -163,106 +274,43 @@ fun TwidereXTheme(
             )
         )
     }
+}
 
-    MaterialTheme(
-        colors = colors,
-        typography = typography,
-        shapes = shapes,
-        content = {
-            val windowInsetsController = LocalWindowInsetsController.current
-            DisposableEffect(darkTheme) {
-                windowInsetsController.isAppearanceLightStatusBars = !darkTheme
-                onDispose { }
-            }
-            val navigationBarColor = Color.Black
-            val statusBarColor = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-                Color.Black
-            } else {
-                MaterialTheme.colors.surface.withElevation()
-            }
-            Box {
-                Box(
-                    modifier = run {
-                        val ime = LocalWindowInsets.current.ime
-                        val navigation = LocalWindowInsets.current.navigationBars
-                        val status = LocalWindowInsets.current.statusBars
-                        val actual = ime.copy(
-                            left = if (extendViewIntoNavigationBar) {
-                                0
-                            } else {
-                                ime.left.coerceAtLeast(navigation.left)
-                            },
-                            right = if (extendViewIntoNavigationBar) {
-                                0
-                            } else {
-                                ime.right.coerceAtLeast(navigation.right)
-                            },
-                            bottom = if (extendViewIntoNavigationBar) {
-                                0
-                            } else {
-                                ime.bottom.coerceAtLeast(navigation.bottom)
-                            },
-                            top = if (extendViewIntoNavigationBar) {
-                                0
-                            } else {
-                                ime.top.coerceAtLeast(navigation.top)
-                            } + if (extendViewIntoStatusBar) {
-                                0
-                            } else {
-                                status.top
-                            },
-                        )
-                        Modifier.padding(actual.toPaddingValues())
-                    }.align(Alignment.Center)
-                ) {
-                    content()
-                }
-                Spacer(
-                    modifier = if (!extendViewIntoStatusBar) {
-                        Modifier
-                            .statusBarsHeight()
-                            .navigationBarsPadding(bottom = false)
-                            .zIndex(999F)
-                            .fillMaxWidth()
-                            .background(statusBarColor)
-                    } else {
-                        Modifier
-                    }.align(Alignment.TopCenter)
-                )
-                Spacer(
-                    modifier = if (!extendViewIntoNavigationBar) {
-                        Modifier
-                            .navigationBarsWidth(HorizontalSide.Left)
-                            .zIndex(999F)
-                            .fillMaxHeight()
-                            .background(navigationBarColor)
-                    } else {
-                        Modifier
-                    }.align(Alignment.CenterStart)
-                )
-                Spacer(
-                    modifier = if (!extendViewIntoNavigationBar) {
-                        Modifier
-                            .navigationBarsWidth(HorizontalSide.Right)
-                            .fillMaxHeight()
-                            .zIndex(999F)
-                            .background(navigationBarColor)
-                    } else {
-                        Modifier
-                    }.align(Alignment.CenterEnd)
-                )
-                Spacer(
-                    modifier = if (!extendViewIntoNavigationBar) {
-                        Modifier
-                            .navigationBarsHeight()
-                            .zIndex(999F)
-                            .fillMaxWidth()
-                            .background(navigationBarColor)
-                    } else {
-                        Modifier
-                    }.align(Alignment.BottomCenter)
-                )
-            }
-        }
+@Composable
+private fun provideThemeColors(darkTheme: Boolean): Colors {
+    val primaryColor by animateColorAsState(targetValue = currentPrimaryColor())
+    val target = if (darkTheme) {
+        darkColors(
+            primary = primaryColor,
+            primaryVariant = primaryColor,
+            secondary = primaryColor,
+        )
+    } else {
+        lightColors(
+            primary = primaryColor,
+            primaryVariant = primaryColor,
+            secondary = primaryColor
+        )
+    }
+    val background by animateColorAsState(targetValue = target.background)
+    val surface by animateColorAsState(targetValue = target.surface)
+    val error by animateColorAsState(targetValue = target.error)
+    val onPrimary by animateColorAsState(targetValue = target.onPrimary)
+    val onSecondary by animateColorAsState(targetValue = target.onSecondary)
+    val onBackground by animateColorAsState(targetValue = target.onBackground)
+    val onSurface by animateColorAsState(targetValue = target.onSurface)
+    val onError by animateColorAsState(targetValue = target.onError)
+    return target.copy(
+        primary = primaryColor,
+        primaryVariant = primaryColor,
+        secondary = primaryColor,
+        background = background,
+        surface = surface,
+        error = error,
+        onPrimary = onPrimary,
+        onSecondary = onSecondary,
+        onBackground = onBackground,
+        onSurface = onSurface,
+        onError = onError,
     )
 }

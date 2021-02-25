@@ -20,11 +20,15 @@
  */
 package com.twidere.twiderex.scenes
 
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.updateTransition
-import androidx.compose.foundation.InteractionState
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -44,8 +48,8 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.Providers
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -53,7 +57,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
@@ -126,7 +129,7 @@ fun StatusMediaScene(statusKey: MicroBlogKey, selectedIndex: Int) {
             }
         }
         status?.let {
-            Providers(
+            CompositionLocalProvider(
                 LocalVideoPlayback provides DisplayPreferences.AutoPlayback.Always
             ) {
                 StatusMediaScene(status = it, selectedIndex = selectedIndex)
@@ -135,6 +138,7 @@ fun StatusMediaScene(statusKey: MicroBlogKey, selectedIndex: Int) {
     }
 }
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun StatusMediaScene(status: UiStatus, selectedIndex: Int) {
     var controlVisibility by remember { mutableStateOf(true) }
@@ -168,7 +172,7 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int) {
                             }
                         },
                         indication = null,
-                        interactionState = remember { InteractionState() }
+                        interactionSource = remember { MutableInteractionSource() }
                     ),
                 media = status.media.mapNotNull {
                     it.mediaUrl?.let { it1 ->
@@ -195,19 +199,22 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int) {
                     window.showControls()
                 }
             }
-            val transition = updateTransition(targetState = controlVisibility)
-            val alpha by transition.animateFloat {
-                if (it) 1f else 0f
-            }
+            // val transition = updateTransition(targetState = controlVisibility)
+            // val alpha by transition.animateFloat {
+            //     if (it) 1f else 0f
+            // }
             InAppNotificationScaffold(
                 backgroundColor = Color.Transparent,
                 topBar = {
-                    if (alpha != 0f) {
+                    AnimatedVisibility(
+                        visible = controlVisibility,
+                        enter = fadeIn() + expandVertically(),
+                        exit = shrinkVertically() + fadeOut()
+                    ) {
                         Box(
                             modifier = Modifier
                                 .statusBarsPadding()
-                                .padding(16.dp)
-                                .alpha(alpha),
+                                .padding(16.dp),
                         ) {
                             Box(
                                 modifier = Modifier
@@ -240,10 +247,13 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int) {
                         modifier = Modifier
                             .navigationBarsPadding(),
                     ) {
-                        if (alpha != 0f) {
+                        AnimatedVisibility(
+                            visible = controlVisibility,
+                            enter = fadeIn() + expandVertically(),
+                            exit = shrinkVertically() + fadeOut()
+                        ) {
                             Box(
                                 modifier = Modifier
-                                    .alpha(alpha)
                                     .fillMaxWidth()
                                     .align(Alignment.BottomCenter)
                                     .background(color = controlPanelColor),
@@ -253,7 +263,7 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int) {
                                         .padding(standardPadding),
                                 ) {
                                     if (videoControl != null) {
-                                        AndroidView(viewBlock = { videoControl })
+                                        AndroidView(factory = { videoControl })
                                     }
                                     Text(
                                         modifier = Modifier
@@ -283,7 +293,7 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int) {
                                                 overflow = TextOverflow.Ellipsis,
                                             )
                                             Spacer(modifier = Modifier.width(standardPadding))
-                                            Providers(
+                                            CompositionLocalProvider(
                                                 LocalContentAlpha provides ContentAlpha.medium
                                             ) {
                                                 Text(
@@ -362,10 +372,7 @@ fun MediaView(
             when (data.type) {
                 MediaType.photo ->
                     Zoomable(
-                        onZoomStarted = {
-                            lockPager = true
-                        },
-                        onZoomStopped = {
+                        onZooming = {
                             lockPager = it != 1F
                         }
                     ) {

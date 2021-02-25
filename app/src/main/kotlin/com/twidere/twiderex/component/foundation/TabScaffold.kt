@@ -36,12 +36,12 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.gesture.nestedscroll.NestedScrollConnection
-import androidx.compose.ui.gesture.nestedscroll.NestedScrollSource
-import androidx.compose.ui.gesture.nestedscroll.nestedScroll
-import androidx.compose.ui.gesture.util.VelocityTracker
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.input.pointer.consumePositionChange
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.pointer.util.VelocityTracker
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.unit.Velocity
 import com.twidere.twiderex.extensions.isInRange
@@ -116,41 +116,34 @@ private class TabScaffoldState(
         }
     }
 
-    override fun onPreFling(available: Velocity): Velocity {
+    override suspend fun onPreFling(available: Velocity): Velocity {
         return if (offset == 0f || offset.isInRange(maxOffset, 0f)) {
-            scope.launch {
-                fling(-available.y * 2f)
-            }
+            fling(-available.y * 2f)
             available
         } else {
             Velocity.Zero
         }
     }
 
-    override fun onPostFling(
+    override suspend fun onPostFling(
         consumed: Velocity,
         available: Velocity,
-        onFinished: (Velocity) -> Unit
-    ) {
+    ): Velocity {
         available.y.takeIf { it != 0f }?.let { velocity ->
-            scope.launch {
-                fling(velocity) {
-                    onFinished.invoke(available)
-                }
-            }
+            fling(velocity)
         }
+        return available
     }
 
     suspend fun snapTo(value: Float) {
         _offset.snapTo(value)
     }
 
-    suspend fun fling(velocity: Float, onFinished: () -> Unit = {}) {
+    suspend fun fling(velocity: Float) {
         _offset.animateDecay(
             velocity,
             exponentialDecay()
         )
-        onFinished.invoke()
     }
 
     fun drag(delta: Float): Float {
@@ -212,7 +205,7 @@ fun TabScaffold(
                 detectVerticalDragGestures(
                     onVerticalDrag = { change, dragAmount ->
                         if (state.drag(dragAmount) != 0f) {
-                            change.consumePositionChange(0f, dragAmount)
+                            change.consumePositionChange()
                             headerState.addPosition(
                                 change.uptimeMillis,
                                 change.position,

@@ -23,11 +23,13 @@ package com.twidere.twiderex.component.foundation
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.exponentialDecay
 import androidx.compose.foundation.gestures.detectDragGestures
-import androidx.compose.foundation.gestures.zoomable
+import androidx.compose.foundation.gestures.rememberTransformableState
+import androidx.compose.foundation.gestures.transformable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -39,9 +41,9 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.gesture.util.VelocityTracker
 import androidx.compose.ui.input.pointer.consumePositionChange
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.pointer.util.VelocityTracker
 import androidx.compose.ui.layout.layout
 import com.twidere.twiderex.extensions.isInRange
 import kotlinx.coroutines.coroutineScope
@@ -139,8 +141,7 @@ private class ZoomableState(
 fun Zoomable(
     modifier: Modifier = Modifier,
     minScale: Float = 1F,
-    onZoomStarted: ((scale: Float) -> Unit)? = null,
-    onZoomStopped: ((scale: Float) -> Unit)? = null,
+    onZooming: (scale: Float) -> Unit = {},
     content: @Composable BoxScope.() -> Unit,
 ) {
     val scope = rememberCoroutineScope()
@@ -162,13 +163,22 @@ fun Zoomable(
                 .coerceAtLeast(0F) / 2F
             state.updateBounds(maxX, maxY)
         }
+        DisposableEffect(state.scale) {
+            onZooming.invoke(state.scale)
+            locked = state.scale != minScale
+            onDispose { }
+        }
+        val transformableState =
+            rememberTransformableState { zoomChange, _, _ ->
+                state.scale = (state.scale * zoomChange).coerceAtLeast(minScale)
+            }
         Box(
             modifier = modifier
                 .pointerInput(Unit) {
                     detectDragGestures(
                         onDrag = { change, dragAmount ->
                             if (locked) {
-                                change.consumePositionChange(change.position.x, change.position.y)
+                                change.consumePositionChange()
                                 scope.launch {
                                     state.drag(dragAmount)
                                     state.velocityTracker.addPosition(
@@ -187,22 +197,10 @@ fun Zoomable(
                                     state.dragEnd()
                                 }
                             }
-                        }
+                        },
                     )
                 }
-                .zoomable(
-                    onZoomDelta = {
-                        state.scale = (state.scale * it).coerceAtLeast(minScale)
-                    },
-                    onZoomStarted = {
-                        locked = true
-                        onZoomStarted?.invoke(state.scale)
-                    },
-                    onZoomStopped = {
-                        locked = state.scale != minScale
-                        onZoomStopped?.invoke(state.scale)
-                    },
-                )
+                .transformable(state = transformableState)
                 .layout { measurable, constraints ->
                     val placeable =
                         measurable.measure(constraints = constraints)

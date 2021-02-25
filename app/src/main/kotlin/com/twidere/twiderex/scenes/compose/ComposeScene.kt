@@ -24,6 +24,8 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.net.Uri
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.registerForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -62,7 +64,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.material.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -70,14 +72,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.node.Ref
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.SoftwareKeyboardController
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.navigate
@@ -90,10 +91,8 @@ import com.twidere.twiderex.component.status.StatusLineComponent
 import com.twidere.twiderex.component.status.TimelineStatusComponent
 import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.di.assisted.assistedViewModel
-import com.twidere.twiderex.extensions.checkAllSelfPermissionsGranted
 import com.twidere.twiderex.extensions.navigateForResult
 import com.twidere.twiderex.extensions.withElevation
-import com.twidere.twiderex.launcher.LocalLauncher
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.navigation.Route
@@ -146,7 +145,11 @@ fun ComposeScene(
     ComposeBody(viewModel = viewModel, account = account)
 }
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
+@OptIn(
+    ExperimentalFoundationApi::class,
+    ExperimentalMaterialApi::class,
+    ExperimentalComposeUiApi::class,
+)
 @Composable
 private fun ComposeBody(
     viewModel: ComposeViewModel,
@@ -159,7 +162,7 @@ private fun ComposeBody(
     val locationEnabled by viewModel.locationEnabled.observeAsState(initial = false)
     val navController = LocalNavController.current
     val textFieldValue by viewModel.textFieldValue.observeAsState(initial = TextFieldValue())
-    val keyboardController = remember { Ref<SoftwareKeyboardController>() }
+    val keyboardController = LocalSoftwareKeyboardController.current
     val canSaveDraft by viewModel.canSaveDraft.observeAsState(initial = false)
     var showSaveDraftDialog by remember { mutableStateOf(false) }
     val scaffoldState = rememberBottomSheetScaffoldState()
@@ -256,7 +259,6 @@ private fun ComposeBody(
                                 scaffoldState,
                                 viewModel,
                                 account,
-                                keyboardController
                             )
                         }
                         ComposeType.Quote,
@@ -271,9 +273,9 @@ private fun ComposeBody(
                                 )
                                 if (composeType == ComposeType.Reply) {
                                     if (listState.firstVisibleItemIndex == 0) {
-                                        keyboardController.value?.hideSoftwareKeyboard()
+                                        keyboardController?.hideSoftwareKeyboard()
                                     } else if (listState.firstVisibleItemIndex == 1) {
-                                        keyboardController.value?.showSoftwareKeyboard()
+                                        keyboardController?.showSoftwareKeyboard()
                                     }
                                 }
                                 LazyColumn(
@@ -309,7 +311,6 @@ private fun ComposeBody(
                                                 scaffoldState,
                                                 viewModel,
                                                 account,
-                                                keyboardController,
                                                 autoFocus = if (composeType == ComposeType.Reply) {
                                                     listState.firstVisibleItemIndex == 1
                                                 } else {
@@ -395,7 +396,7 @@ private fun ComposeBody(
                     Spacer(modifier = Modifier.weight(1F))
                     if (locationEnabled) {
                         location?.let {
-                            Providers(
+                            CompositionLocalProvider(
                                 LocalContentAlpha provides ContentAlpha.medium
                             ) {
                                 Row {
@@ -431,11 +432,14 @@ private fun ReplySheetContent(
     val replyToUser by viewModel.replyToUser.observeAsState(initial = emptyList())
     val excludedUserIds by viewModel.excludedReplyUserIds.observeAsState(initial = emptyList())
     val status by viewModel.status.observeAsState(initial = null)
+    val scope = rememberCoroutineScope()
     ListItem(
         icon = {
             IconButton(
                 onClick = {
-                    scaffoldState.bottomSheetState.collapse()
+                    scope.launch {
+                        scaffoldState.bottomSheetState.collapse()
+                    }
                 }
             ) {
                 Icon(
@@ -548,6 +552,7 @@ private fun ConfirmDraftDialog(
     )
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @ExperimentalMaterialApi
 @ExperimentalFoundationApi
 @Composable
@@ -555,7 +560,6 @@ private fun ComposeInput(
     scaffoldState: BottomSheetScaffoldState,
     composeViewModel: ComposeViewModel,
     account: AccountDetails?,
-    keyboardController: Ref<SoftwareKeyboardController>,
     autoFocus: Boolean = true,
 ) {
     val text by composeViewModel.textFieldValue.observeAsState(initial = TextFieldValue())
@@ -588,9 +592,6 @@ private fun ComposeInput(
                     value = text,
                     onValueChange = { composeViewModel.setText(it) },
                     autoFocus = autoFocus,
-                    onTextInputStarted = {
-                        keyboardController.value = it
-                    },
                     onClicked = {
                         // TODO: scroll lazyColumn
                     }
@@ -615,14 +616,17 @@ private fun ComposeReply(
         val replyToUser by composeViewModel.replyToUser.observeAsState(initial = emptyList())
         val excludedUserIds by composeViewModel.excludedReplyUserIds.observeAsState(initial = emptyList())
         val loadingReplyUser by composeViewModel.loadingReplyUser.observeAsState(initial = false)
+        val scope = rememberCoroutineScope()
         Row(
             modifier = Modifier
                 .clickable(
                     onClick = {
-                        if (scaffoldState.bottomSheetState.isExpanded) {
-                            scaffoldState.bottomSheetState.collapse()
-                        } else {
-                            scaffoldState.bottomSheetState.expand()
+                        scope.launch {
+                            if (scaffoldState.bottomSheetState.isExpanded) {
+                                scaffoldState.bottomSheetState.collapse()
+                            } else {
+                                scaffoldState.bottomSheetState.expand()
+                            }
                         }
                     }
                 )
@@ -660,18 +664,30 @@ private fun ComposeReply(
 @Composable
 private fun ComposeActions(viewModel: ComposeViewModel) {
     val locationEnabled by viewModel.locationEnabled.observeAsState(initial = false)
-    val launcher = LocalLauncher.current
+    // val launcher = LocalLauncher.current
     val scope = rememberCoroutineScope()
-    val context = LocalContext.current
+    // val context = LocalContext.current
     val navController = LocalNavController.current
+    val filePickerLauncher = registerForActivityResult(
+        contract = ActivityResultContracts.GetMultipleContents(),
+        onResult = {
+            viewModel.putImages(it)
+        },
+    )
+    val permissionLauncher = registerForActivityResult(
+        contract = ActivityResultContracts.RequestMultiplePermissions(),
+        onResult = {
+            if (it.all { it.value }) {
+                viewModel.trackingLocation()
+            }
+        },
+    )
     Box {
         Row {
             IconButton(
                 onClick = {
                     scope.launch {
-                        val item =
-                            launcher.launchMultipleFilePicker("image/*")
-                        viewModel.putImages(item)
+                        filePickerLauncher.launch("image/*")
                     }
                 }
             ) {
@@ -713,22 +729,11 @@ private fun ComposeActions(viewModel: ComposeViewModel) {
                     if (locationEnabled) {
                         viewModel.disableLocation()
                     } else {
-                        scope.launch {
-                            val permissions = arrayOf(
-                                Manifest.permission.ACCESS_COARSE_LOCATION,
-                                Manifest.permission.ACCESS_FINE_LOCATION
-                            )
-                            val hasPermissions =
-                                if (!context.checkAllSelfPermissionsGranted(*permissions)) {
-                                    launcher.requestMultiplePermissions(permissions)
-                                        .all { it.value }
-                                } else {
-                                    true
-                                }
-                            if (hasPermissions) {
-                                viewModel.trackingLocation()
-                            }
-                        }
+                        val permissions = arrayOf(
+                            Manifest.permission.ACCESS_COARSE_LOCATION,
+                            Manifest.permission.ACCESS_FINE_LOCATION
+                        )
+                        permissionLauncher.launch(permissions)
                     }
                 },
             ) {

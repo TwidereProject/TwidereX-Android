@@ -24,16 +24,17 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.preferredHeight
-import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Checkbox
+import androidx.compose.material.CheckboxDefaults
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ListItem
 import androidx.compose.material.MaterialTheme
@@ -47,6 +48,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.R
@@ -106,8 +108,8 @@ fun AppearanceScene() {
                         trailing = {
                             Box(
                                 modifier = Modifier
-                                    .preferredHeight(24.dp)
-                                    .preferredWidth(32.dp)
+                                    .height(24.dp)
+                                    .width(32.dp)
                                     .clip(MaterialTheme.shapes.small)
                                     .aspectRatio(1F)
                                     .background(MaterialTheme.colors.primary),
@@ -208,7 +210,11 @@ fun primaryColorDialog(
                             contentAlignment = Alignment.Center,
                         ) {
                             if (colorIndex == index) {
-                                Checkbox(checked = true, onCheckedChange = {})
+                                Checkbox(
+                                    checked = true,
+                                    onCheckedChange = {},
+                                    colors = CheckboxDefaults.colors(checkedColor = Color.Transparent)
+                                )
                             }
                         }
                     }
