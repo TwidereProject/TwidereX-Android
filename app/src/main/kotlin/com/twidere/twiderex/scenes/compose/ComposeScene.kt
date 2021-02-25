@@ -24,6 +24,8 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.net.Uri
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.registerForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -74,7 +76,6 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -90,10 +91,8 @@ import com.twidere.twiderex.component.status.StatusLineComponent
 import com.twidere.twiderex.component.status.TimelineStatusComponent
 import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.di.assisted.assistedViewModel
-import com.twidere.twiderex.extensions.checkAllSelfPermissionsGranted
 import com.twidere.twiderex.extensions.navigateForResult
 import com.twidere.twiderex.extensions.withElevation
-import com.twidere.twiderex.launcher.LocalLauncher
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.navigation.Route
@@ -665,18 +664,30 @@ private fun ComposeReply(
 @Composable
 private fun ComposeActions(viewModel: ComposeViewModel) {
     val locationEnabled by viewModel.locationEnabled.observeAsState(initial = false)
-    val launcher = LocalLauncher.current
+    // val launcher = LocalLauncher.current
     val scope = rememberCoroutineScope()
-    val context = LocalContext.current
+    // val context = LocalContext.current
     val navController = LocalNavController.current
+    val filePickerLauncher = registerForActivityResult(
+        contract = ActivityResultContracts.GetMultipleContents(),
+        onResult = {
+            viewModel.putImages(it)
+        },
+    )
+    val permissionLauncher = registerForActivityResult(
+        contract = ActivityResultContracts.RequestMultiplePermissions(),
+        onResult = {
+            if (it.all { it.value }) {
+                viewModel.trackingLocation()
+            }
+        },
+    )
     Box {
         Row {
             IconButton(
                 onClick = {
                     scope.launch {
-                        val item =
-                            launcher.launchMultipleFilePicker("image/*")
-                        viewModel.putImages(item)
+                        filePickerLauncher.launch("image/*")
                     }
                 }
             ) {
@@ -718,22 +729,11 @@ private fun ComposeActions(viewModel: ComposeViewModel) {
                     if (locationEnabled) {
                         viewModel.disableLocation()
                     } else {
-                        scope.launch {
-                            val permissions = arrayOf(
-                                Manifest.permission.ACCESS_COARSE_LOCATION,
-                                Manifest.permission.ACCESS_FINE_LOCATION
-                            )
-                            val hasPermissions =
-                                if (!context.checkAllSelfPermissionsGranted(*permissions)) {
-                                    launcher.requestMultiplePermissions(permissions)
-                                        .all { it.value }
-                                } else {
-                                    true
-                                }
-                            if (hasPermissions) {
-                                viewModel.trackingLocation()
-                            }
-                        }
+                        val permissions = arrayOf(
+                            Manifest.permission.ACCESS_COARSE_LOCATION,
+                            Manifest.permission.ACCESS_FINE_LOCATION
+                        )
+                        permissionLauncher.launch(permissions)
                     }
                 },
             ) {

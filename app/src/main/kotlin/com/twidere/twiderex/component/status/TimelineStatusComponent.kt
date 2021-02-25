@@ -20,6 +20,8 @@
  */
 package com.twidere.twiderex.component.status
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -103,13 +105,13 @@ fun TimelineStatusComponent(
     }
 }
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 private fun StatusComponent(
     status: UiStatus,
     modifier: Modifier = Modifier,
 ) {
     val navigator = LocalNavigator.current
-    val isMediaPreviewEnabled = LocalDisplayPreferences.current.mediaPreview
     Row(modifier = modifier) {
         UserAvatar(user = status.user)
         Spacer(modifier = Modifier.width(standardPadding))
@@ -143,11 +145,12 @@ private fun StatusComponent(
 
             if (status.media.any()) {
                 Spacer(modifier = Modifier.height(standardPadding))
-                if (isMediaPreviewEnabled) {
+                AnimatedVisibility(visible = LocalDisplayPreferences.current.mediaPreview) {
                     StatusMediaComponent(
                         status = status,
                     )
-                } else {
+                }
+                AnimatedVisibility(visible = !LocalDisplayPreferences.current.mediaPreview) {
                     CompositionLocalProvider(
                         LocalContentAlpha provides ContentAlpha.medium
                     ) {

@@ -197,7 +197,7 @@ fun Zoomable(
                                     state.dragEnd()
                                 }
                             }
-                        }
+                        },
                     )
                 }
                 .transformable(state = transformableState)

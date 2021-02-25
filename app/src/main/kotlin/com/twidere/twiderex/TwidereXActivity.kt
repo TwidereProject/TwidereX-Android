@@ -47,8 +47,6 @@ import com.twidere.twiderex.action.StatusActions
 import com.twidere.twiderex.component.foundation.LocalInAppNotification
 import com.twidere.twiderex.di.assisted.AssistedViewModelFactoryHolder
 import com.twidere.twiderex.di.assisted.ProvideAssistedFactory
-import com.twidere.twiderex.launcher.ActivityLauncher
-import com.twidere.twiderex.launcher.LocalLauncher
 import com.twidere.twiderex.navigation.Router
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.preferences.PreferencesHolder
@@ -79,7 +77,6 @@ class TwidereXActivity : FragmentActivity() {
         }
     }
 
-    private lateinit var launcher: ActivityLauncher
     private val isActiveNetworkMetered = MutableLiveData(false)
     private val networkCallback by lazy {
         object : ConnectivityManager.NetworkCallback() {
@@ -114,8 +111,6 @@ class TwidereXActivity : FragmentActivity() {
     @OptIn(ExperimentalAnimatedInsets::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        launcher = ActivityLauncher(activityResultRegistry)
-        lifecycle.addObserver(launcher)
         isActiveNetworkMetered.postValue(
             ConnectivityManagerCompat.isActiveNetworkMetered(
                 connectivityManager
@@ -133,7 +128,6 @@ class TwidereXActivity : FragmentActivity() {
             val isActiveNetworkMetered by isActiveNetworkMetered.observeAsState(initial = false)
             CompositionLocalProvider(
                 LocalInAppNotification provides inAppNotification,
-                LocalLauncher provides launcher,
                 LocalWindow provides window,
                 LocalWindowInsetsController provides windowInsetsControllerCompat,
                 LocalActiveAccount provides account,

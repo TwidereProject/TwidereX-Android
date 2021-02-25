@@ -21,8 +21,14 @@
 package com.twidere.twiderex.scenes
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.animateDp
+import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.updateTransition
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -58,6 +64,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -255,7 +262,7 @@ fun HomeBottomNavigation(
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalAnimationApi::class)
 @Composable
 private fun HomeDrawer(scaffoldState: ScaffoldState) {
     var showAccounts by remember { mutableStateOf(false) }
@@ -267,7 +274,8 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
         val currentUser = account?.toUi()
         val navController = LocalNavController.current
         DrawerUserHeader(
-            currentUser
+            currentUser,
+            showAccounts,
         ) {
             showAccounts = !showAccounts
         }
@@ -285,10 +293,14 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
             modifier = Modifier
                 .weight(1f)
         ) {
-            if (showAccounts) {
-                val activeAccountViewModel = LocalActiveAccountViewModel.current
-                val accounts by activeAccountViewModel.allAccounts.observeAsState(initial = emptyList())
-                val allAccounts = accounts.filter { it.accountKey != account?.accountKey }
+            val activeAccountViewModel = LocalActiveAccountViewModel.current
+            val accounts by activeAccountViewModel.allAccounts.observeAsState(initial = emptyList())
+            val allAccounts = accounts.filter { it.accountKey != account?.accountKey }
+            androidx.compose.animation.AnimatedVisibility(
+                visible = showAccounts,
+                enter = fadeIn() + expandVertically(),
+                exit = shrinkVertically() + fadeOut(),
+            ) {
                 LazyColumn {
                     items(allAccounts) {
                         val user = it.toUi()
@@ -348,7 +360,12 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
                         )
                     }
                 }
-            } else {
+            }
+            androidx.compose.animation.AnimatedVisibility(
+                visible = !showAccounts,
+                enter = fadeIn() + expandVertically(),
+                exit = shrinkVertically() + fadeOut(),
+            ) {
                 LazyColumn {
                     item {
                         ListItem(
@@ -404,6 +421,7 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
 @Composable
 private fun DrawerUserHeader(
     user: UiUser?,
+    showAccounts: Boolean,
     onTrailingClicked: () -> Unit = {},
 ) {
     ListItem(
@@ -429,12 +447,21 @@ private fun DrawerUserHeader(
             )
         },
         trailing = {
+            val transition = updateTransition(targetState = showAccounts)
+            val rotate by transition.animateFloat {
+                if (it) {
+                    180f
+                } else {
+                    0f
+                }
+            }
             IconButton(
                 onClick = {
                     onTrailingClicked.invoke()
                 }
             ) {
                 Icon(
+                    modifier = Modifier.rotate(rotate),
                     imageVector = Icons.Default.ArrowDropDown,
                     contentDescription = stringResource(
                         id = R.string.accessibility_scene_home_drawer_account_dropdown
