@@ -49,8 +49,6 @@ import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.navigation.LocalNavigator
-import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereXTheme
 
@@ -117,11 +115,7 @@ private fun AboutContent() {
             Row {
                 IconButton(
                     onClick = {
-                        navController.navigate(
-                            Route.User(
-                                MicroBlogKey.twitter("TwidereProject")
-                            )
-                        )
+                        navController.navigate("deeplink/twitter/TwidereProject")
                     }
                 ) {
                     Icon(
