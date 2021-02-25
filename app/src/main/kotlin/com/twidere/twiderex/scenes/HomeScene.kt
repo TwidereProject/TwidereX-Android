@@ -21,6 +21,7 @@
 package com.twidere.twiderex.scenes
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.animateFloat
@@ -99,6 +100,7 @@ import com.twidere.twiderex.ui.mediumEmphasisContentContentColor
 import com.twidere.twiderex.ui.standardPadding
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun HomeScene() {
     val scope = rememberCoroutineScope()
@@ -128,7 +130,11 @@ fun HomeScene() {
             scaffoldState = scaffoldState,
             topBar = {
                 if (tabPosition == AppearancePreferences.TabPosition.Bottom) {
-                    if (menus[pagerState.currentPage].withAppBar) {
+                    AnimatedVisibility(
+                        visible = menus[pagerState.currentPage].withAppBar,
+                        enter = expandVertically(clip = false),
+                        exit = shrinkVertically(clip = false),
+                    ) {
                         AppBar(
                             backgroundColor = MaterialTheme.colors.surface.withElevation(),
                             title = {
