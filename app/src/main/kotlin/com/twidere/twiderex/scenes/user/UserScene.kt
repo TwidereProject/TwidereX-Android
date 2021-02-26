@@ -30,7 +30,9 @@ import com.twidere.twiderex.ui.TwidereXTheme
 fun UserScene(
     userKey: MicroBlogKey,
 ) {
-    TwidereXTheme {
+    TwidereXTheme(
+        extendViewIntoStatusBar = true,
+    ) {
         InAppNotificationScaffold(
             // TODO: Show top bar with actions
 //            topBar = {
@@ -51,7 +53,7 @@ fun UserScene(
 //                )
 //            }
         ) {
-            UserComponent(userKey)
+            UserComponent(userKey, extendViewIntoStatusBar = true)
         }
     }
 }

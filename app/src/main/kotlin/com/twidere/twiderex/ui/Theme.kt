@@ -78,11 +78,7 @@ fun TwidereXTheme(
                 windowInsetsController.isAppearanceLightStatusBars = !darkTheme
             }
             val navigationBarColor = Color.Black
-            val statusBarColor = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-                Color.Black
-            } else {
-                MaterialTheme.colors.surface.withElevation()
-            }
+            val statusBarColor = statusBarColor()
             Box {
                 Box(
                     modifier = run {
@@ -143,6 +139,15 @@ fun TwidereXTheme(
             }
         }
     )
+}
+
+@Composable
+fun statusBarColor(): Color {
+    return if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+        Color.Black
+    } else {
+        MaterialTheme.colors.surface.withElevation()
+    }
 }
 
 @Composable

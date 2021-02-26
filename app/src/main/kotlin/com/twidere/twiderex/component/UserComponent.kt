@@ -47,10 +47,13 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
@@ -92,15 +95,18 @@ import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.LocalVideoPlayback
 import com.twidere.twiderex.ui.standardPadding
+import com.twidere.twiderex.ui.statusBarColor
 import com.twidere.twiderex.viewmodel.user.UserFavouriteTimelineViewModel
 import com.twidere.twiderex.viewmodel.user.UserMediaTimelineViewModel
 import com.twidere.twiderex.viewmodel.user.UserTimelineViewModel
 import com.twidere.twiderex.viewmodel.user.UserViewModel
+import dev.chrisbanes.accompanist.insets.statusBarsHeight
 import kotlinx.coroutines.launch
 
 @Composable
 fun UserComponent(
     userKey: MicroBlogKey,
+    extendViewIntoStatusBar: Boolean = false,
 ) {
     val account = LocalActiveAccount.current ?: return
     val viewModel = assistedViewModel<UserViewModel.AssistedFactory, UserViewModel>(
@@ -141,7 +147,24 @@ fun UserComponent(
             viewModel.refresh()
         },
     ) {
+        var alpha by remember {
+            mutableStateOf(0f)
+        }
         TabScaffold(
+            onScroll = {
+                alpha = it
+            },
+            appbar = {
+                if (extendViewIntoStatusBar) {
+                    Spacer(
+                        modifier = Modifier
+                            .statusBarsHeight()
+                            .alpha(alpha)
+                            .background(statusBarColor())
+                            .fillMaxWidth()
+                    )
+                }
+            },
             header = {
                 UserInfo(viewModel = viewModel)
             },

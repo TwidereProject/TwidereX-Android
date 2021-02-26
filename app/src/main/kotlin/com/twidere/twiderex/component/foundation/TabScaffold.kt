@@ -34,6 +34,7 @@ import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
@@ -46,8 +47,11 @@ import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.unit.Velocity
 import com.twidere.twiderex.extensions.isInRange
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
+import kotlin.math.max
 import kotlin.math.roundToInt
 
 @Composable
@@ -183,6 +187,7 @@ private class TabScaffoldHeaderState {
 fun TabScaffold(
     modifier: Modifier = Modifier,
     onScroll: (percent: Float) -> Unit = {},
+    appbar: @Composable () -> Unit = {},
     header: @Composable () -> Unit,
     content: @Composable () -> Unit,
 ) {
@@ -193,9 +198,17 @@ fun TabScaffold(
     }
     val offset by state.offsetState()
     LaunchedEffect(state.maxOffset, offset) {
-        if (state.maxOffset != 0f) {
-            onScroll.invoke(offset.absoluteValue / state.maxOffset.absoluteValue)
+        snapshotFlow {
+            if (state.maxOffset != 0f) {
+                offset.absoluteValue / state.maxOffset.absoluteValue
+            } else {
+                0f
+            }
         }
+            .distinctUntilChanged()
+            .collect {
+                onScroll.invoke(it)
+            }
     }
     Layout(
         modifier = modifier
@@ -228,14 +241,23 @@ fun TabScaffold(
             Box {
                 content.invoke()
             }
+            Box {
+                appbar.invoke()
+            }
         },
     ) { measurables, constraints ->
         layout(constraints.maxWidth, constraints.maxHeight) {
             val headerPlaceable = measurables[0].measure(constraints)
-            state.updateBounds(-headerPlaceable.height.toFloat())
             headerPlaceable.place(0, offset.roundToInt())
-            val contentPlaceable = measurables[1].measure(constraints)
-            contentPlaceable.place(0, offset.roundToInt() + headerPlaceable.height)
+            val appbarPlaceable = measurables[2].measure(constraints = constraints)
+            appbarPlaceable.place(0, 0)
+            state.updateBounds(-(headerPlaceable.height.toFloat() - appbarPlaceable.height))
+            val contentPlaceable =
+                measurables[1].measure(constraints.copy(maxHeight = constraints.maxHeight - appbarPlaceable.height))
+            contentPlaceable.place(
+                0,
+                max(offset.roundToInt() + headerPlaceable.height, appbarPlaceable.height)
+            )
         }
     }
 }
