@@ -81,6 +81,7 @@ fun TimelineComponent(viewModel: TimelineViewModel) {
                     }
             }
             LazyUiStatusList(
+                state = listState,
                 items = items,
                 loadingBetween = loadingBetween,
                 onLoadBetweenClicked = { current, next ->
