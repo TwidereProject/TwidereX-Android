@@ -29,7 +29,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -163,10 +162,9 @@ fun Zoomable(
                 .coerceAtLeast(0F) / 2F
             state.updateBounds(maxX, maxY)
         }
-        DisposableEffect(state.scale) {
+        LaunchedEffect(state.scale) {
             onZooming.invoke(state.scale)
             locked = state.scale != minScale
-            onDispose { }
         }
         val transformableState =
             rememberTransformableState { zoomChange, _, _ ->

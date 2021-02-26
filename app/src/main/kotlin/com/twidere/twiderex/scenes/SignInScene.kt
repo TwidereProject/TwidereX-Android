@@ -38,7 +38,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -66,11 +66,10 @@ fun SignInScene() {
     val success by state?.savedStateHandle?.getLiveData<Boolean>("success").let {
         it ?: liveData { emit(false) }
     }.observeAsState(initial = false)
-    DisposableEffect(success) {
+    LaunchedEffect(success) {
         if (success) {
             navController.popBackStack()
         }
-        onDispose { }
     }
     var showMastodon by remember { mutableStateOf(false) }
     SignInScaffold(

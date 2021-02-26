@@ -25,7 +25,7 @@ import androidx.compose.animation.core.exponentialDecay
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -192,11 +192,10 @@ fun TabScaffold(
         TabScaffoldHeaderState()
     }
     val offset by state.offsetState()
-    DisposableEffect(state.maxOffset, offset) {
+    LaunchedEffect(state.maxOffset, offset) {
         if (state.maxOffset != 0f) {
             onScroll.invoke(offset.absoluteValue / state.maxOffset.absoluteValue)
         }
-        onDispose { }
     }
     Layout(
         modifier = modifier

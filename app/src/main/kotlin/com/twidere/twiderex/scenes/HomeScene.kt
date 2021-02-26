@@ -211,10 +211,10 @@ fun HomeScene() {
             Box(
                 modifier = Modifier.padding(it)
             ) {
-                CompositionLocalProvider(
-                    LocalLazyListController provides timelineController
-                ) {
-                    Pager(state = pagerState) {
+                Pager(state = pagerState) {
+                    CompositionLocalProvider(
+                        LocalLazyListController provides timelineController
+                    ) {
                         menus[page].content()
                     }
                 }

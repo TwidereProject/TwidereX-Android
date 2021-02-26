@@ -32,7 +32,7 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -275,11 +275,10 @@ fun SwipeToRefreshLayout(
             }
         }
 
-        DisposableEffect(refreshingState) {
+        LaunchedEffect(refreshingState) {
             scope.launch {
                 state.animateTo(refreshingState)
             }
-            onDispose { }
         }
     }
 }

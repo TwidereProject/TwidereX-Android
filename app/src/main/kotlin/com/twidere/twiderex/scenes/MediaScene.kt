@@ -50,6 +50,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -353,13 +354,12 @@ fun MediaView(
     var lockPager by remember { mutableStateOf(false) }
     val navController = LocalNavController.current
     val requestManager = LocalRequestManager.current
-    DisposableEffect(Unit) {
+    LaunchedEffect(Unit) {
         requestManager?.let {
             if (requestManager.isPaused) {
                 requestManager.resumeRequests()
             }
         }
-        onDispose { }
     }
     Swiper(
         modifier = modifier,

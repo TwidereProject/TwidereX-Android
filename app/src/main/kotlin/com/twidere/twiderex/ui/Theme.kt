@@ -35,7 +35,7 @@ import androidx.compose.material.Typography
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -74,9 +74,8 @@ fun TwidereXTheme(
         shapes = shapes,
         content = {
             val windowInsetsController = LocalWindowInsetsController.current
-            DisposableEffect(darkTheme) {
+            LaunchedEffect(darkTheme) {
                 windowInsetsController.isAppearanceLightStatusBars = !darkTheme
-                onDispose { }
             }
             val navigationBarColor = Color.Black
             val statusBarColor = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {

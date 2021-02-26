@@ -24,7 +24,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -48,7 +48,7 @@ fun TwitterUserScene(screenName: String) {
     }
     val user by viewModel.user.observeAsState(initial = null)
     val navigator = LocalNavigator.current
-    DisposableEffect(user) {
+    LaunchedEffect(user) {
         user?.let {
             navigator.user(user = it) {
                 popUpTo("deeplink/twitter/{screenName}") {
@@ -56,8 +56,6 @@ fun TwitterUserScene(screenName: String) {
                 }
             }
         }
-
-        onDispose { }
     }
 
     TwidereXTheme {

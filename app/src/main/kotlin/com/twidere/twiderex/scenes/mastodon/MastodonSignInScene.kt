@@ -33,7 +33,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.remember
@@ -71,9 +71,8 @@ fun MastodonSignInScene() {
             CircularProgressIndicator()
         } else {
             val focusRequester = remember { FocusRequester() }
-            DisposableEffect(focusRequester) {
+            LaunchedEffect(focusRequester) {
                 focusRequester.requestFocus()
-                onDispose { }
             }
             OutlinedTextField(
                 modifier = Modifier

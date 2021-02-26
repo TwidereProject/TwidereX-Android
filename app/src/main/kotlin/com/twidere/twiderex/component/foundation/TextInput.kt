@@ -32,7 +32,7 @@ import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -117,12 +117,11 @@ fun TextInput(
     val textColor = color.takeOrElse {
         LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
     }
-    DisposableEffect(autoFocus) {
+    LaunchedEffect(autoFocus) {
         if (autoFocus) {
             focusRequester.requestFocus()
             keyboardController?.showSoftwareKeyboard()
         }
-        onDispose { }
     }
     Box(
         modifier = modifier
