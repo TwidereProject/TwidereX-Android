@@ -20,26 +20,14 @@
  */
 package com.twidere.twiderex.component
 
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Row
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.ListItem
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.paging.LoadState
-import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
-import com.twidere.twiderex.component.lazy.LazyColumn2
 import com.twidere.twiderex.component.lazy.collectAsLazyPagingItems
-import com.twidere.twiderex.component.lazy.itemsPaging
+import com.twidere.twiderex.component.lazy.ui.LazyUiUserList
 import com.twidere.twiderex.component.navigation.LocalNavigator
-import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.extensions.refreshOrRetry
-import com.twidere.twiderex.ui.mediumEmphasisContentContentColor
 import com.twidere.twiderex.viewmodel.UserListViewModel
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -56,45 +44,7 @@ fun UserListComponent(
         }
     ) {
         if (source.itemCount > 0) {
-            LazyColumn2 {
-                itemsPaging(source) {
-                    it?.let {
-                        ListItem(
-                            modifier = Modifier.clickable {
-                                navigator.user(it)
-                            },
-                            icon = {
-                                UserAvatar(
-                                    user = it,
-                                )
-                            },
-                            text = {
-                                Row {
-                                    Text(
-                                        text = it.name,
-                                        maxLines = 1,
-                                        overflow = TextOverflow.Ellipsis,
-                                        color = MaterialTheme.colors.primary,
-                                    )
-                                    Text(
-                                        text = "@${it.screenName}",
-                                        maxLines = 1,
-                                        overflow = TextOverflow.Ellipsis,
-                                        color = mediumEmphasisContentContentColor,
-                                    )
-                                }
-                            },
-                            secondaryText = {
-                                Text(
-                                    text = stringResource(
-                                        id = R.string.common_controls_profile_dashboard_followers,
-                                    ) + " " + it.followersCount.toString()
-                                )
-                            }
-                        )
-                    }
-                }
-            }
+            LazyUiUserList(items = source, onItemClicked = { navigator.user(it) })
         }
     }
 }

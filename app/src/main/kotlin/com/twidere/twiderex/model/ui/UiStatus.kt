@@ -88,6 +88,30 @@ data class UiStatus(
             platformType = PlatformType.Twitter,
         )
 
+        @Composable
+        fun placeHolder() = UiStatus(
+            statusId = "",
+            htmlText = "",
+            timestamp = System.currentTimeMillis(),
+            retweetCount = 0,
+            likeCount = 0,
+            replyCount = 0,
+            retweeted = false,
+            liked = false,
+            placeString = null,
+            hasMedia = true,
+            user = UiUser.placeHolder(),
+            media = emptyList(),
+            retweet = null,
+            source = "",
+            quote = null,
+            isGap = false,
+            url = emptyList(),
+            statusKey = MicroBlogKey.Empty,
+            rawText = "",
+            platformType = PlatformType.Twitter,
+        )
+
         fun DbTimelineWithStatus.toUi(
             accountKey: MicroBlogKey,
         ) = with(status.status) {

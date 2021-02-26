@@ -30,7 +30,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navArgument
 import androidx.navigation.fragment.dialog
 import androidx.navigation.navDeepLink
-import com.twidere.twiderex.component.requireAuthorization
+import com.twidere.twiderex.component.RequireAuthorization
 import com.twidere.twiderex.dialog.TwitterWebSignInDialog
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.scenes.DraftListScene
@@ -168,7 +168,7 @@ fun NavGraphBuilder.authorizedComposable(
     content: @Composable (NavBackStackEntry) -> Unit,
 ) {
     composable(route, arguments, deepLinks) {
-        requireAuthorization {
+        RequireAuthorization {
             content.invoke(it)
         }
     }

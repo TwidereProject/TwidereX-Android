@@ -48,7 +48,7 @@ class MeItem : HomeNavigationItem() {
         val account = LocalActiveAccount.current
         account?.toUi()?.let { user ->
             InAppNotificationScaffold {
-                UserComponent(userKey = user.userKey, initialData = user)
+                UserComponent(userKey = user.userKey)
             }
         }
     }

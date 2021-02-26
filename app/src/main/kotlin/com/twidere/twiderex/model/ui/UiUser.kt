@@ -69,6 +69,27 @@ data class UiUser(
             url = emptyList(),
         )
 
+        @Composable
+        fun placeHolder() = UiUser(
+            id = "",
+            name = "",
+            screenName = "",
+            profileImage = painterResource(id = R.drawable.ic_profile_image_twidere),
+            profileBackgroundImage = null,
+            followersCount = 0,
+            friendsCount = 0,
+            listedCount = 0,
+            rawDesc = "",
+            htmlDesc = "",
+            website = null,
+            location = null,
+            verified = false,
+            protected = false,
+            userKey = MicroBlogKey.Empty,
+            platformType = PlatformType.Twitter,
+            url = emptyList(),
+        )
+
         fun DbUserWithEntity.toUi() = with(user) {
             UiUser(
                 id = userId,

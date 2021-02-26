@@ -34,7 +34,7 @@ import java.util.UUID
 private val authorizationKey = UUID.randomUUID().toString()
 
 @Composable
-fun requireAuthorization(
+fun RequireAuthorization(
     content: @Composable () -> Unit,
 ) {
     val account = LocalActiveAccount.current

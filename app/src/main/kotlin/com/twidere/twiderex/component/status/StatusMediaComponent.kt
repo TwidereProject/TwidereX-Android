@@ -30,17 +30,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.foundation.VideoPlayer
-import com.twidere.twiderex.component.lazy.LocalIsScrollInProgress
 import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.model.MediaType
 import com.twidere.twiderex.model.ui.UiMedia
@@ -152,36 +146,29 @@ fun StatusMediaPreviewItem(
                     )
                 }
             MediaType.video, MediaType.animated_gif -> media.mediaUrl?.let {
-                var loaded by remember { mutableStateOf(false) }
-                if (!LocalIsScrollInProgress.current || loaded) {
-                    DisposableEffect(Unit) {
-                        loaded = true
-                        onDispose { }
-                    }
-                    VideoPlayer(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .clickable(
-                                onClick = {
-                                    onClick(media)
-                                }
-                            ),
-                        url = it,
-                        showControls = false,
-                        volume = 0F
-                    ) {
-                        media.previewUrl?.let {
-                            NetworkImage(
-                                data = it,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clickable(
-                                        onClick = {
-                                            onClick(media)
-                                        }
-                                    ),
-                            )
-                        }
+                VideoPlayer(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clickable(
+                            onClick = {
+                                onClick(media)
+                            }
+                        ),
+                    url = it,
+                    showControls = false,
+                    volume = 0F
+                ) {
+                    media.previewUrl?.let {
+                        NetworkImage(
+                            data = it,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable(
+                                    onClick = {
+                                        onClick(media)
+                                    }
+                                ),
+                        )
                     }
                 }
             }

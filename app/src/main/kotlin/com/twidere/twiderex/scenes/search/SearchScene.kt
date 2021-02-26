@@ -26,16 +26,11 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.width
-import androidx.compose.material.ContentAlpha
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
-import androidx.compose.material.ListItem
-import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Surface
@@ -54,7 +49,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import com.twidere.twiderex.R
@@ -66,15 +60,12 @@ import com.twidere.twiderex.component.foundation.TextTabsComponent
 import com.twidere.twiderex.component.foundation.TopAppBarElevation
 import com.twidere.twiderex.component.lazy.LazyColumn2
 import com.twidere.twiderex.component.lazy.collectAsLazyPagingItems
-import com.twidere.twiderex.component.lazy.items
 import com.twidere.twiderex.component.lazy.itemsPagingGridIndexed
 import com.twidere.twiderex.component.lazy.loadState
-import com.twidere.twiderex.component.lazy.statuses
+import com.twidere.twiderex.component.lazy.ui.LazyUiStatusList
+import com.twidere.twiderex.component.lazy.ui.LazyUiUserList
 import com.twidere.twiderex.component.navigation.LocalNavigator
-import com.twidere.twiderex.component.status.StatusDivider
 import com.twidere.twiderex.component.status.StatusMediaPreviewItem
-import com.twidere.twiderex.component.status.TimelineStatusComponent
-import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.extensions.refreshOrRetry
 import com.twidere.twiderex.extensions.viewModel
@@ -197,19 +188,9 @@ private fun SearchTweetsContent(viewModel: TwitterSearchTweetsViewModel) {
         }
     ) {
         if (source.itemCount > 0) {
-            LazyColumn2 {
-                statuses(source) { item ->
-                    item?.let {
-                        TimelineStatusComponent(
-                            it,
-                        )
-                        StatusDivider()
-                    }
-                }
-                loadState(source.loadState.append) {
-                    source.retry()
-                }
-            }
+            LazyUiStatusList(
+                items = source,
+            )
         }
     }
 }
@@ -276,48 +257,10 @@ private fun SearchUsersContent(viewModel: TwitterSearchUserViewModel) {
         }
     ) {
         if (source.itemCount > 0) {
-            LazyColumn2 {
-                items(source) { item ->
-                    item?.let {
-                        ListItem(
-                            modifier = Modifier.clickable(
-                                onClick = {
-                                    navigator.user(item)
-                                }
-                            ),
-                            icon = {
-                                UserAvatar(user = item)
-                            },
-                            text = {
-                                Row {
-                                    Text(
-                                        text = item.name,
-                                        maxLines = 1,
-                                        overflow = TextOverflow.Ellipsis,
-                                        color = MaterialTheme.colors.primary
-                                    )
-                                    Spacer(modifier = Modifier.width(4.dp))
-                                    CompositionLocalProvider(
-                                        LocalContentAlpha provides ContentAlpha.medium
-                                    ) {
-                                        Text(
-                                            text = "@${item.screenName}",
-                                            maxLines = 1,
-                                            overflow = TextOverflow.Ellipsis,
-                                        )
-                                    }
-                                }
-                            },
-                            secondaryText = {
-                                Text(text = item.rawDesc, maxLines = 1)
-                            },
-                        )
-                    }
-                }
-                loadState(source.loadState.append) {
-                    source.retry()
-                }
-            }
+            LazyUiUserList(
+                items = source,
+                onItemClicked = { navigator.user(it) },
+            )
         }
     }
 }

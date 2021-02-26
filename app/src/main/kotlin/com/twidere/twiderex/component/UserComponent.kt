@@ -27,6 +27,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
@@ -52,12 +53,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
+import androidx.navigation.NavController
 import androidx.navigation.compose.navigate
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.IconTabsComponent
@@ -68,20 +71,19 @@ import com.twidere.twiderex.component.foundation.TabScaffold
 import com.twidere.twiderex.component.foundation.rememberPagerState
 import com.twidere.twiderex.component.lazy.LazyColumn2
 import com.twidere.twiderex.component.lazy.collectAsLazyPagingItems
-import com.twidere.twiderex.component.lazy.itemsPaging
 import com.twidere.twiderex.component.lazy.itemsPagingGridIndexed
+import com.twidere.twiderex.component.lazy.ui.LazyUiStatusList
 import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.component.status.HtmlText
 import com.twidere.twiderex.component.status.ResolvedLink
-import com.twidere.twiderex.component.status.StatusDivider
 import com.twidere.twiderex.component.status.StatusMediaPreviewItem
-import com.twidere.twiderex.component.status.TimelineStatusComponent
 import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.component.status.withAvatarClip
 import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.PlatformType
+import com.twidere.twiderex.model.ui.UiUrlEntity
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.navigation.twidereXSchema
@@ -99,7 +101,6 @@ import kotlinx.coroutines.launch
 @Composable
 fun UserComponent(
     userKey: MicroBlogKey,
-    initialData: UiUser? = null,
 ) {
     val account = LocalActiveAccount.current ?: return
     val viewModel = assistedViewModel<UserViewModel.AssistedFactory, UserViewModel>(
@@ -108,7 +109,6 @@ fun UserComponent(
     ) {
         it.create(account, userKey)
     }
-    val user by viewModel.user.observeAsState(initial = initialData)
     val tabs = listOf(
         UserTabComponent(
             painterResource(id = R.drawable.ic_float_left),
@@ -143,9 +143,7 @@ fun UserComponent(
     ) {
         TabScaffold(
             header = {
-                user?.let {
-                    UserInfo(user = it, viewModel = viewModel)
-                }
+                UserInfo(viewModel = viewModel)
             },
             content = {
                 val state = rememberPagerState(maxPage = tabs.lastIndex)
@@ -200,19 +198,9 @@ fun UserStatusTimeline(
     @Suppress("UNUSED_VARIABLE")
     timelineSource.loadState
     if (timelineSource.itemCount > 0) {
-        LazyColumn2 {
-            itemsPaging(
-                timelineSource,
-                key = { timelineSource[it]?.statusKey.hashCode() },
-            ) { item ->
-                item?.let {
-                    Column {
-                        TimelineStatusComponent(it)
-                        StatusDivider()
-                    }
-                }
-            }
-        }
+        LazyUiStatusList(
+            items = timelineSource,
+        )
     }
 }
 
@@ -286,49 +274,27 @@ fun UserFavouriteTimeline(
     @Suppress("UNUSED_VARIABLE")
     timelineSource.loadState
     if (timelineSource.itemCount > 0) {
-        LazyColumn2 {
-            itemsPaging(
-                timelineSource,
-                key = { timelineSource[it]?.statusKey.hashCode() },
-            ) { item ->
-                item?.let {
-                    Column {
-                        TimelineStatusComponent(it)
-                        StatusDivider()
-                    }
-                }
-            }
-        }
+        LazyUiStatusList(
+            items = timelineSource,
+        )
     }
 }
 
+val maxBannerSize = 200.dp
+
 @Composable
-private fun UserInfo(user: UiUser, viewModel: UserViewModel) {
-    val relationship by viewModel.relationship.observeAsState(initial = null)
-    val loadingRelationship by viewModel.loadingRelationship.observeAsState(initial = false)
-    val maxBannerSize = 200.dp
+private fun UserInfo(
+    viewModel: UserViewModel,
+) {
+    val user by viewModel.user.observeAsState()
     val navController = LocalNavController.current
     Box(
         modifier = Modifier
             .background(MaterialTheme.colors.surface.withElevation())
     ) {
         // TODO: parallax effect
-        user.profileBackgroundImage?.let {
-            Box(
-                modifier = Modifier
-                    .heightIn(max = maxBannerSize)
-                    .clickable(
-                        onClick = {
-                            navController.navigate(Route.Media.Raw(it))
-                        },
-                        indication = null,
-                        interactionSource = remember { MutableInteractionSource() },
-                    )
-            ) {
-                NetworkImage(
-                    data = it,
-                )
-            }
+        user?.profileBackgroundImage?.let {
+            UserBanner(navController, it)
         }
         Column {
             BoxWithConstraints {
@@ -341,7 +307,6 @@ private fun UserInfo(user: UiUser, viewModel: UserViewModel) {
                     )
                 )
             }
-
             Box(
                 modifier = Modifier
                     .fillMaxWidth(),
@@ -354,12 +319,14 @@ private fun UserInfo(user: UiUser, viewModel: UserViewModel) {
                         .clipToBounds()
                         .background(MaterialTheme.colors.surface.withElevation())
                 )
-                UserAvatar(
-                    user = user,
-                    size = 72.dp
-                ) {
-                    if (user.profileImage is String) {
-                        navController.navigate(Route.Media.Raw(user.profileImage))
+                user?.let { user ->
+                    UserAvatar(
+                        user = user,
+                        size = 72.dp
+                    ) {
+                        if (user.profileImage is String) {
+                            navController.navigate(Route.Media.Raw(user.profileImage))
+                        }
                     }
                 }
             }
@@ -371,15 +338,17 @@ private fun UserInfo(user: UiUser, viewModel: UserViewModel) {
                 Column(
                     modifier = Modifier.weight(1f),
                 ) {
-                    Text(
-                        text = user.name,
-                        style = MaterialTheme.typography.h6,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                    Text(
-                        text = "@${user.screenName}",
-                    )
+                    user?.let { user ->
+                        Text(
+                            text = user.name,
+                            style = MaterialTheme.typography.h6,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                        Text(
+                            text = "@${user.screenName}",
+                        )
+                    }
                 }
                 if (viewModel.isMe) {
                     // TODO: edit button
@@ -389,102 +358,144 @@ private fun UserInfo(user: UiUser, viewModel: UserViewModel) {
 //                        text = "Edit",
 //                    )
                 } else {
-                    relationship?.takeIf { !loadingRelationship }?.let {
-                        Column(
-                            horizontalAlignment = Alignment.End
-                        ) {
-                            TextButton(
-                                onClick = {
-                                    if (it.followedBy) {
-                                        viewModel.unfollow()
-                                    } else {
-                                        viewModel.follow()
-                                    }
-                                }
-                            ) {
-                                Text(
-                                    text = if (it.followedBy) {
-                                        stringResource(id = R.string.common_controls_friendship_actions_unfollow)
-                                    } else {
-                                        stringResource(id = R.string.common_controls_friendship_actions_follow)
-                                    },
-                                    style = MaterialTheme.typography.h6,
-                                    color = MaterialTheme.colors.primary,
-                                )
-                            }
-                            if (it.following) {
-                                Text(
-                                    text = stringResource(id = R.string.common_controls_friendship_follows_you),
-                                    style = MaterialTheme.typography.caption,
-                                )
-                            }
-                        }
-                    } ?: run {
-                        CircularProgressIndicator()
-                    }
+                    UserRelationship(viewModel)
                 }
             }
             Spacer(modifier = Modifier.height(standardPadding))
-            UserDescText(
-                modifier = Modifier.padding(horizontal = standardPadding * 2),
-                user = user,
-            )
-            user.website?.let {
+            user?.let { user ->
+                UserDescText(
+                    modifier = Modifier.padding(horizontal = standardPadding * 2),
+                    htmlDesc = user.htmlDesc,
+                    url = user.url,
+                )
+            }
+            Spacer(modifier = Modifier.height(standardPadding))
+            user?.website?.let {
                 val navigator = LocalNavigator.current
-                Column(
+                ProfileItem(
                     modifier = Modifier
                         .clickable(
                             onClick = {
                                 navigator.openLink(it)
                             }
                         )
-                        .padding(horizontal = standardPadding * 2)
+                        .padding(vertical = standardPadding)
                         .fillMaxWidth(),
-                ) {
-                    Spacer(modifier = Modifier.height(standardPadding))
-                    Row {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_globe),
-                            contentDescription = stringResource(
-                                id = R.string.accessibility_scene_user_website
-                            )
-                        )
-                        Spacer(modifier = Modifier.width(standardPadding))
-                        Text(
-                            text = it,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            color = MaterialTheme.colors.primary
-                        )
-                    }
-                    Spacer(modifier = Modifier.height(standardPadding))
-                }
-            }
-            user.location?.takeIf { it.isNotEmpty() }?.let {
-                Spacer(modifier = Modifier.height(standardPadding))
-                Row(
-                    modifier = Modifier
-                        .padding(horizontal = standardPadding * 2),
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_map_pin),
-                        contentDescription = stringResource(
-                            id = R.string.accessibility_scene_user_location
-                        )
-                    )
-                    Spacer(modifier = Modifier.width(standardPadding))
-                    Text(
-                        text = it,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                }
-                Spacer(modifier = Modifier.height(standardPadding))
+                    painter = painterResource(id = R.drawable.ic_globe),
+                    contentDescription = stringResource(
+                        id = R.string.accessibility_scene_user_website
+                    ),
+                    text = it,
+                    textColor = MaterialTheme.colors.primary,
+                )
             }
             Spacer(modifier = Modifier.height(standardPadding))
-            UserMetrics(user)
+            user?.location?.takeIf { it.isNotEmpty() }?.let {
+                ProfileItem(
+                    painter = painterResource(id = R.drawable.ic_map_pin),
+                    contentDescription = stringResource(
+                        id = R.string.accessibility_scene_user_location
+                    ),
+                    text = it
+                )
+            }
+            Spacer(modifier = Modifier.height(standardPadding))
+            user?.let { UserMetrics(it) }
             Spacer(modifier = Modifier.height(standardPadding))
         }
+    }
+}
+
+@Composable
+private fun ProfileItem(
+    modifier: Modifier = Modifier,
+    painter: Painter,
+    contentDescription: String?,
+    text: String,
+    textColor: Color = Color.Unspecified,
+) {
+    Box(
+        modifier = modifier,
+    ) {
+        Spacer(modifier = Modifier.height(standardPadding))
+        Row(
+            modifier = Modifier
+                .padding(horizontal = standardPadding * 2),
+        ) {
+            Icon(
+                painter = painter,
+                contentDescription = contentDescription
+            )
+            Spacer(modifier = Modifier.width(standardPadding))
+            Text(
+                text = text,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                color = textColor,
+            )
+        }
+        Spacer(modifier = Modifier.height(standardPadding))
+    }
+}
+
+@Composable
+private fun RowScope.UserRelationship(viewModel: UserViewModel) {
+    val relationship by viewModel.relationship.observeAsState(initial = null)
+    val loadingRelationship by viewModel.loadingRelationship.observeAsState(initial = false)
+    relationship?.takeIf { !loadingRelationship }?.let {
+        Column(
+            horizontalAlignment = Alignment.End
+        ) {
+            TextButton(
+                onClick = {
+                    if (it.followedBy) {
+                        viewModel.unfollow()
+                    } else {
+                        viewModel.follow()
+                    }
+                }
+            ) {
+                Text(
+                    text = if (it.followedBy) {
+                        stringResource(id = R.string.common_controls_friendship_actions_unfollow)
+                    } else {
+                        stringResource(id = R.string.common_controls_friendship_actions_follow)
+                    },
+                    style = MaterialTheme.typography.h6,
+                    color = MaterialTheme.colors.primary,
+                )
+            }
+            if (it.following) {
+                Text(
+                    text = stringResource(id = R.string.common_controls_friendship_follows_you),
+                    style = MaterialTheme.typography.caption,
+                )
+            }
+        }
+    } ?: run {
+        CircularProgressIndicator()
+    }
+}
+
+@Composable
+private fun UserBanner(
+    navController: NavController,
+    bannerUrl: String
+) {
+    Box(
+        modifier = Modifier
+            .heightIn(max = maxBannerSize)
+            .clickable(
+                onClick = {
+                    navController.navigate(Route.Media.Raw(bannerUrl))
+                },
+                indication = null,
+                interactionSource = remember { MutableInteractionSource() },
+            )
+    ) {
+        NetworkImage(
+            data = bannerUrl,
+        )
     }
 }
 
@@ -494,51 +505,66 @@ fun UserMetrics(
 ) {
     val navController = LocalNavController.current
     Row {
-        Column(
+        MetricsItem(
             modifier = Modifier
                 .weight(1f)
                 .clickable {
                     navController.navigate(Route.Following(user.userKey))
                 },
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Text(text = user.friendsCount.toString())
-            Text(text = stringResource(id = R.string.common_controls_profile_dashboard_following))
-        }
-        Column(
+            primaryText = user.friendsCount.toString(),
+            secondaryText = stringResource(id = R.string.common_controls_profile_dashboard_following),
+        )
+
+        MetricsItem(
             modifier = Modifier
                 .weight(1f)
                 .clickable {
                     navController.navigate(Route.Followers(user.userKey))
                 },
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Text(text = user.followersCount.toString())
-            Text(text = stringResource(id = R.string.common_controls_profile_dashboard_followers))
-        }
+            primaryText = user.followersCount.toString(),
+            secondaryText = stringResource(id = R.string.common_controls_profile_dashboard_followers),
+        )
         if (user.platformType == PlatformType.Twitter) {
-            Column(
-                modifier = Modifier.weight(1f),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                Text(text = user.listedCount.toString())
-                Text(text = stringResource(id = R.string.common_controls_profile_dashboard_listed))
-            }
+            MetricsItem(
+                modifier = Modifier
+                    .weight(1f),
+                primaryText = user.listedCount.toString(),
+                secondaryText = stringResource(id = R.string.common_controls_profile_dashboard_listed),
+            )
         }
+    }
+}
+
+@Composable
+fun MetricsItem(
+    modifier: Modifier = Modifier,
+    primaryText: String,
+    secondaryText: String,
+) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text(text = primaryText)
+        Text(text = secondaryText)
     }
 }
 
 @Composable
 fun UserDescText(
     modifier: Modifier = Modifier,
-    user: UiUser,
+    htmlDesc: String,
+    url: List<UiUrlEntity>,
 ) {
-    key(user) {
+    key(
+        htmlDesc,
+        url,
+    ) {
         HtmlText(
             modifier = modifier,
-            htmlText = user.htmlDesc,
+            htmlText = htmlDesc,
             linkResolver = { href ->
-                val entity = user.url.firstOrNull { it.url == href }
+                val entity = url.firstOrNull { it.url == href }
                 if (entity != null) {
                     ResolvedLink(
                         expanded = entity.expandedUrl,
