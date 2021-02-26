@@ -22,6 +22,7 @@ package com.twidere.twiderex.viewmodel.user
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.flatMap
@@ -59,7 +60,12 @@ class UserMediaTimelineViewModel @AssistedInject constructor(
     }
 
     val source: Flow<PagingData<Pair<UiMedia, UiStatus>>> by lazy {
-        pagingMediator.pager(pageSize = 200).flow.map { pagingData ->
+        pagingMediator.pager(
+            config = PagingConfig(
+                pageSize = 200,
+                prefetchDistance = 4
+            )
+        ).flow.map { pagingData ->
             pagingData.map {
                 it.toUi(pagingMediator.accountKey)
             }
