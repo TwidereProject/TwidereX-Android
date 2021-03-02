@@ -141,7 +141,9 @@ private fun StatusComponent(
 
             Spacer(modifier = Modifier.height(4.dp))
 
-            StatusText(status)
+            StatusText(
+                status = status,
+            )
 
             if (status.media.any()) {
                 Spacer(modifier = Modifier.height(standardPadding))
@@ -195,7 +197,7 @@ private fun StatusComponent(
                 }
             }
 
-            if (status.quote != null) {
+            status.quote?.let { quote ->
                 Spacer(modifier = Modifier.height(standardPadding))
                 Box(
                     modifier = Modifier
@@ -207,11 +209,11 @@ private fun StatusComponent(
                         .clip(MaterialTheme.shapes.medium)
                 ) {
                     StatusComponent(
-                        status = status.quote,
+                        status = quote,
                         modifier = Modifier
                             .clickable(
                                 onClick = {
-                                    navigator.status(statusKey = status.quote.statusKey)
+                                    navigator.status(statusKey = quote.statusKey)
                                 }
                             )
                             .padding(standardPadding),

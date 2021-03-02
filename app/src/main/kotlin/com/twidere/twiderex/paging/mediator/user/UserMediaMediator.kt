@@ -27,6 +27,7 @@ import com.twidere.services.microblog.TimelineService
 import com.twidere.services.microblog.model.IStatus
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.db.model.DbPagingTimelineWithStatus
+import com.twidere.twiderex.db.model.ReferenceType
 import com.twidere.twiderex.db.model.UserTimelineType
 import com.twidere.twiderex.db.model.pagingKey
 import com.twidere.twiderex.model.MicroBlogKey
@@ -73,7 +74,8 @@ class UserMediaMediator(
         return PagingList(
             data.filter {
                 val content = it.status.status
-                it.status.retweet == null && content.data.hasMedia && content.user.user.userKey == userKey
+                !it.status.references.any { it.reference.referenceType == ReferenceType.Retweet } &&
+                    content.data.hasMedia && content.user.userKey == userKey
             },
             SinceMaxPagination(maxId = data.lastOrNull()?.status?.status?.data?.statusId)
         )

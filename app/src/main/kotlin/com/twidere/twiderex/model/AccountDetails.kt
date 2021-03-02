@@ -103,7 +103,6 @@ data class AccountDetails(
             protected = isProtected,
             userKey = userKey,
             platformType = type,
-            url = emptyList()
         )
     }
 }

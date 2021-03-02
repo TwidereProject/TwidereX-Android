@@ -24,9 +24,9 @@ import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import androidx.room.Relation
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.PlatformType
+import kotlinx.serialization.Serializable
 
 @Entity(
     tableName = "user",
@@ -55,16 +55,25 @@ data class DbUser(
     val isProtected: Boolean,
     val platformType: PlatformType,
     @Embedded
-    val twitterExtra: DbTwitterUserExtra? = null
+    val twitterExtra: DbTwitterUserExtra? = null,
+    @Embedded
+    val mastodonExtra: DbMastodonUserExtra? = null,
 )
 
 data class DbTwitterUserExtra(
-    var pinned_tweet_id: String?
+    val pinned_tweet_id: String?,
+    val url: List<TwitterUrlEntity>,
 )
 
-data class DbUserWithEntity(
-    @Embedded
-    val user: DbUser,
-    @Relation(parentColumn = "userKey", entityColumn = "userKey")
-    val url: List<DbUrlEntity>,
+@Serializable
+data class TwitterUrlEntity(
+    val url: String,
+    val expandedUrl: String,
+    val displayUrl: String,
+)
+
+data class DbMastodonUserExtra(
+    val fields: List<com.twidere.services.mastodon.model.Field>,
+    val bot: Boolean,
+    val locked: Boolean,
 )

@@ -20,11 +20,25 @@
  */
 package com.twidere.twiderex.db.dao
 
+import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
-import com.twidere.twiderex.db.model.DbNotification
+import androidx.room.Query
+import androidx.room.Transaction
+import com.twidere.twiderex.db.model.DbStatusReference
+import com.twidere.twiderex.db.model.DbStatusReferenceWithStatus
+import com.twidere.twiderex.db.model.ReferenceType
+import com.twidere.twiderex.model.MicroBlogKey
 
-interface NotificationDao {
+@Dao
+interface StatusReferenceDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAll(items: List<DbNotification>)
+    suspend fun insertAll(items: List<DbStatusReference>)
+
+    @Transaction
+    @Query("SELECT * FROM status_reference WHERE referenceStatusKey == :key AND referenceType == :referenceType")
+    suspend fun find(key: MicroBlogKey, referenceType: ReferenceType): List<DbStatusReferenceWithStatus>
+
+    @Query("DELETE FROM status_reference WHERE statusKey in (:key)")
+    suspend fun remove(key: List<MicroBlogKey>)
 }

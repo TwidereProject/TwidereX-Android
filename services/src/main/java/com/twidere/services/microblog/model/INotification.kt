@@ -20,4 +20,4 @@
  */
 package com.twidere.services.microblog.model
 
-interface INotification
+interface INotification : IStatus

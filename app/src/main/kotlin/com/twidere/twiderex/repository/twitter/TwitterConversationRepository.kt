@@ -30,6 +30,7 @@ import com.twidere.services.twitter.model.exceptions.TwitterApiExceptionV2
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.db.mapper.toDbTimeline
 import com.twidere.twiderex.db.model.DbTimelineWithStatus
+import com.twidere.twiderex.db.model.ReferenceType
 import com.twidere.twiderex.db.model.TimelineType
 import com.twidere.twiderex.db.model.saveToDb
 import com.twidere.twiderex.defaultLoadCount
@@ -112,7 +113,9 @@ class TwitterConversationRepository @AssistedInject constructor(
         searchResponse: List<DbTimelineWithStatus>
     ): List<DbTimelineWithStatus> {
         return searchResponse.filter {
-            it.status.status.data.replyStatusKey?.id == status.status.status.data.statusId
+            it.status.references
+                .firstOrNull { it.reference.referenceType == ReferenceType.Reply }
+                ?.status?.data?.statusId == status.status.status.data.statusId
         }
 //        return searchResponse.filter {
 //            it.status.replyTo?.data?.statusId == status.status.status.data.statusId
@@ -136,7 +139,7 @@ class TwitterConversationRepository @AssistedInject constructor(
             )
         } catch (e: TwitterApiExceptionV2) {
             service.searchTweetsV1(
-                "to:${dbTweet.status.status.user.user.screenName} since_id:${dbTweet.status.status.data.statusId}",
+                "to:${dbTweet.status.status.user.screenName} since_id:${dbTweet.status.status.data.statusId}",
                 count = defaultLoadCount,
                 max_id = nextPage
             )

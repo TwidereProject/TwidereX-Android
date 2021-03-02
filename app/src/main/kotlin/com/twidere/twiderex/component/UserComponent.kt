@@ -82,11 +82,11 @@ import com.twidere.twiderex.component.status.ResolvedLink
 import com.twidere.twiderex.component.status.StatusMediaPreviewItem
 import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.component.status.withAvatarClip
+import com.twidere.twiderex.db.model.TwitterUrlEntity
 import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.PlatformType
-import com.twidere.twiderex.model.ui.UiUrlEntity
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.navigation.twidereXSchema
@@ -389,7 +389,7 @@ private fun UserInfo(
                 UserDescText(
                     modifier = Modifier.padding(horizontal = standardPadding * 2),
                     htmlDesc = user.htmlDesc,
-                    url = user.url,
+                    url = user.twitterExtra?.url ?: emptyList(),
                 )
             }
             Spacer(modifier = Modifier.height(standardPadding))
@@ -577,7 +577,7 @@ fun MetricsItem(
 fun UserDescText(
     modifier: Modifier = Modifier,
     htmlDesc: String,
-    url: List<UiUrlEntity>,
+    url: List<TwitterUrlEntity>,
 ) {
     key(
         htmlDesc,

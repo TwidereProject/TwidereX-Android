@@ -20,12 +20,12 @@
  */
 package com.twidere.twiderex.model
 
-enum class NotificationType {
-    Follow,
-    FollowRequest,
-    Mention,
-    Reblog,
-    Favourite,
-    Poll,
+enum class MastodonStatusType {
     Status,
+    NotificationFollow,
+    NotificationFollowRequest,
+    NotificationMention,
+    NotificationReblog,
+    NotificationFavourite,
+    NotificationPoll,
 }

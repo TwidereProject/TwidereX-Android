@@ -29,7 +29,7 @@ import java.util.Date
 @Serializable
 data class Notification(
     val id: String? = null,
-    val type: String? = null,
+    val type: NotificationTypes? = null,
 
     @SerialName("created_at")
     @Serializable(with = DateSerializerV2::class)
@@ -39,6 +39,18 @@ data class Notification(
     val status: Status? = null
 ) : INotification
 
+@Serializable
 enum class NotificationTypes {
-    follow, favourite, reblog, mention, poll, follow_request
+    @SerialName("follow")
+    follow,
+    @SerialName("favourite")
+    favourite,
+    @SerialName("reblog")
+    reblog,
+    @SerialName("mention")
+    mention,
+    @SerialName("poll")
+    poll,
+    @SerialName("follow_request")
+    follow_request
 }

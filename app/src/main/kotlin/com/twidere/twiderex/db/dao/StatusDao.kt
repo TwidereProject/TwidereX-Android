@@ -43,9 +43,6 @@ interface StatusDao {
     @Query("SELECT * FROM status WHERE statusKey == :key")
     suspend fun findWithStatusKey(key: MicroBlogKey): DbStatusV2?
 
-    @Query("SELECT * FROM status WHERE retweetStatusKey == :key")
-    suspend fun findWithReplyStatusKey(key: MicroBlogKey): DbStatusV2?
-
     @Transaction
     @Query("SELECT * FROM status WHERE statusKey == :key")
     suspend fun findWithStatusKeyWithReference(key: MicroBlogKey): DbStatusWithReference?

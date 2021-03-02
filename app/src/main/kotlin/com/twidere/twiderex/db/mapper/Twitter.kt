@@ -35,8 +35,10 @@ import com.twidere.twiderex.db.model.DbTimelineWithStatus
 import com.twidere.twiderex.db.model.DbTwitterUserExtra
 import com.twidere.twiderex.db.model.DbUrlEntity
 import com.twidere.twiderex.db.model.DbUser
-import com.twidere.twiderex.db.model.DbUserWithEntity
+import com.twidere.twiderex.db.model.ReferenceType
 import com.twidere.twiderex.db.model.TimelineType
+import com.twidere.twiderex.db.model.TwitterUrlEntity
+import com.twidere.twiderex.db.model.toDbStatusReference
 import com.twidere.twiderex.model.MediaType
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.PlatformType
@@ -62,11 +64,17 @@ fun StatusV2.toDbTimeline(
         ?.firstOrNull { it.type == ReferencedTweetType.retweeted }?.status?.toDbStatusWithMediaAndUser(
             accountKey
         )
-    val replyTo = this.referencedTweets
+    val replyTo = this.let {
+        it.referencedTweets
+            ?.firstOrNull { it.type == ReferencedTweetType.retweeted }?.status ?: it
+    }.referencedTweets
         ?.firstOrNull { it.type == ReferencedTweetType.replied_to }?.status?.toDbStatusWithMediaAndUser(
             accountKey
         )
-    val quote = this.referencedTweets
+    val quote = this.let {
+        it.referencedTweets
+            ?.firstOrNull { it.type == ReferencedTweetType.retweeted }?.status ?: it
+    }.referencedTweets
         ?.firstOrNull { it.type == ReferencedTweetType.quoted }?.status?.toDbStatusWithMediaAndUser(
             accountKey
         )
@@ -81,10 +89,12 @@ fun StatusV2.toDbTimeline(
             type = timelineType,
         ),
         status = DbStatusWithReference(
-            replyTo = replyTo,
-            quote = quote,
-            retweet = retweet,
-            status = status
+            status = status,
+            references = listOfNotNull(
+                replyTo.toDbStatusReference(status.data.statusKey, ReferenceType.Reply),
+                quote.toDbStatusReference(status.data.statusKey, ReferenceType.Quote),
+                retweet.toDbStatusReference(status.data.statusKey, ReferenceType.Retweet),
+            ),
         ),
     )
 }
@@ -109,9 +119,10 @@ fun Status.toDbTimeline(
         ),
         status = DbStatusWithReference(
             status = status,
-            quote = quote,
-            retweet = retweet,
-            replyTo = null,
+            references = listOfNotNull(
+                quote.toDbStatusReference(status.data.statusKey, ReferenceType.Quote),
+                retweet.toDbStatusReference(status.data.statusKey, ReferenceType.Retweet),
+            ),
         ),
     )
 }
@@ -133,12 +144,6 @@ private fun StatusV2.toDbStatusWithMediaAndUser(
     accountKey: MicroBlogKey
 ): DbStatusWithMediaAndUser {
     val user = user?.toDbUser() ?: throw IllegalArgumentException("Status.user should not be null")
-    val retweet = this.referencedTweets
-        ?.firstOrNull { it.type == ReferencedTweetType.retweeted }?.status
-    val replyTo = this.referencedTweets
-        ?.firstOrNull { it.type == ReferencedTweetType.replied_to }?.status
-    val quote = this.referencedTweets
-        ?.firstOrNull { it.type == ReferencedTweetType.quoted }?.status
     val status = DbStatusV2(
         _id = UUID.randomUUID().toString(),
         statusId = id ?: throw IllegalArgumentException("Status.idStr should not be null"),
@@ -179,15 +184,13 @@ private fun StatusV2.toDbStatusWithMediaAndUser(
         placeString = place?.fullName,
         hasMedia = !attachments?.media.isNullOrEmpty(),
         source = source ?: "",
-        userKey = user.user.userKey,
+        userKey = user.userKey,
         lang = lang,
-        replyStatusKey = replyTo?.toDbStatusWithMediaAndUser(accountKey = accountKey)?.data?.statusKey,
-        retweetStatusKey = retweet?.toDbStatusWithMediaAndUser(accountKey = accountKey)?.data?.statusKey,
-        quoteStatusKey = quote?.toDbStatusWithMediaAndUser(accountKey = accountKey)?.data?.statusKey,
         statusKey = MicroBlogKey.twitter(
             id ?: throw IllegalArgumentException("Status.idStr should not be null")
         ),
         platformType = PlatformType.Twitter,
+        mastodonExtra = null,
     )
     return DbStatusWithMediaAndUser(
         data = status,
@@ -215,7 +218,6 @@ private fun StatusV2.toDbStatusWithMediaAndUser(
             DbUrlEntity(
                 _id = UUID.randomUUID().toString(),
                 statusKey = status.statusKey,
-                userKey = null,
                 url = it.url ?: "",
                 expandedUrl = it.expandedURL ?: "",
                 displayUrl = it.displayURL ?: "",
@@ -271,15 +273,13 @@ private fun Status.toDbStatusWithMediaAndUser(
         placeString = place?.fullName,
         hasMedia = extendedEntities?.media != null || entities?.media != null,
         source = source ?: "",
-        userKey = user.user.userKey,
+        userKey = user.userKey,
         lang = lang,
-        replyStatusKey = inReplyToStatusIDStr?.let { MicroBlogKey.twitter(it) },
-        retweetStatusKey = retweetedStatus?.toDbStatusWithMediaAndUser(accountKey = accountKey)?.data?.statusKey,
-        quoteStatusKey = (retweetedStatus?.quotedStatus ?: quotedStatus)?.toDbStatusWithMediaAndUser(accountKey = accountKey)?.data?.statusKey,
         statusKey = MicroBlogKey.twitter(
             idStr ?: throw IllegalArgumentException("Status.idStr should not be null")
         ),
         platformType = PlatformType.Twitter,
+        mastodonExtra = null,
     )
     return DbStatusWithMediaAndUser(
         data = status,
@@ -325,7 +325,6 @@ private fun Status.toDbStatusWithMediaAndUser(
             DbUrlEntity(
                 _id = UUID.randomUUID().toString(),
                 statusKey = status.statusKey,
-                userKey = null,
                 url = it.url ?: "",
                 expandedUrl = it.expandedURL ?: "",
                 displayUrl = it.displayURL ?: "",
@@ -337,8 +336,8 @@ private fun Status.toDbStatusWithMediaAndUser(
     )
 }
 
-fun User.toDbUser(): DbUserWithEntity {
-    val user = DbUser(
+fun User.toDbUser(): DbUser {
+    return DbUser(
         _id = UUID.randomUUID().toString(),
         userId = this.idStr ?: throw IllegalArgumentException("user.idStr should not be null"),
         name = this.name ?: "",
@@ -360,66 +359,57 @@ fun User.toDbUser(): DbUserWithEntity {
         ),
         platformType = PlatformType.Twitter,
     )
-    return DbUserWithEntity(
-        user = user,
-        url = entities?.url?.urls?.map {
-            DbUrlEntity(
-                _id = UUID.randomUUID().toString(),
-                statusKey = null,
-                userKey = user.userKey,
-                url = it.url ?: "",
-                expandedUrl = it.expandedURL ?: "",
-                displayUrl = it.displayURL ?: "",
-                title = null,
-                description = null,
-                image = null,
-            )
-        } ?: emptyList()
-    )
+    // return DbUserWithEntity(
+    //     user = user,
+    //     url = entities?.url?.urls?.map {
+    //         DbUrlEntity(
+    //             _id = UUID.randomUUID().toString(),
+    //             statusKey = null,
+    //             userKey = user.userKey,
+    //             url = it.url ?: "",
+    //             expandedUrl = it.expandedURL ?: "",
+    //             displayUrl = it.displayURL ?: "",
+    //             title = null,
+    //             description = null,
+    //             image = null,
+    //         )
+    //     } ?: emptyList()
+    // )
 }
 
-fun UserV2.toDbUser(): DbUserWithEntity {
-    val user = DbUser(
+fun UserV2.toDbUser(): DbUser {
+    return DbUser(
         _id = UUID.randomUUID().toString(),
-        userId = this.id ?: throw IllegalArgumentException("user.idStr should not be null"),
-        name = this.name ?: "",
-        screenName = this.username ?: "",
+        userId = id ?: throw IllegalArgumentException("user.idStr should not be null"),
+        name = name ?: "",
+        screenName = username ?: "",
         profileImage = profileImageURL?.let { updateProfileImagePath(it) } ?: "",
-        profileBackgroundImage = this.profileBanner?.sizes?.let {
+        profileBackgroundImage = profileBanner?.sizes?.let {
             it.getOrElse("mobile_retina", { null }) ?: it.values.firstOrNull()
         }?.url,
-        followersCount = this.publicMetrics?.followersCount ?: 0,
-        friendsCount = this.publicMetrics?.followingCount ?: 0,
-        listedCount = this.publicMetrics?.listedCount ?: 0,
-        rawDesc = this.description ?: "",
-        htmlDesc = autolink.autoLink(this.description ?: ""),
-        location = this.location,
-        website = this.entities?.url?.urls?.firstOrNull { it.url == this.url }?.expandedURL,
-        verified = this.verified ?: false,
-        isProtected = this.protected ?: false,
+        followersCount = publicMetrics?.followersCount ?: 0,
+        friendsCount = publicMetrics?.followingCount ?: 0,
+        listedCount = publicMetrics?.listedCount ?: 0,
+        rawDesc = description ?: "",
+        htmlDesc = autolink.autoLink(description ?: ""),
+        location = location,
+        website = entities?.url?.urls?.firstOrNull { it.url == url }?.expandedURL,
+        verified = verified ?: false,
+        isProtected = protected ?: false,
         userKey = MicroBlogKey.twitter(
             id ?: throw IllegalArgumentException("user.idStr should not be null")
         ),
         platformType = PlatformType.Twitter,
         twitterExtra = DbTwitterUserExtra(
-            pinned_tweet_id = pinnedTweetID
+            pinned_tweet_id = pinnedTweetID,
+            url = entities?.description?.urls?.map {
+                TwitterUrlEntity(
+                    url = it.url ?: "",
+                    expandedUrl = it.expandedURL ?: "",
+                    displayUrl = it.displayURL ?: "",
+                )
+            } ?: emptyList()
         )
-    )
-    return DbUserWithEntity(
-        user = user,
-        url = entities?.description?.urls?.map {
-            DbUrlEntity(
-                _id = UUID.randomUUID().toString(),
-                statusKey = null,
-                userKey = user.userKey,
-                url = it.url ?: "",
-                expandedUrl = it.expandedURL ?: "",
-                displayUrl = it.displayURL ?: "",
-                title = null,
-                description = null,
-                image = null,
-            )
-        } ?: emptyList()
     )
 }
 

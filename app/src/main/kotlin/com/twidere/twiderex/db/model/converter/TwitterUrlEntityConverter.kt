@@ -18,24 +18,23 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.model.ui
+package com.twidere.twiderex.db.model.converter
 
-import androidx.compose.runtime.Stable
-import com.twidere.twiderex.db.model.DbUrlEntity
+import androidx.room.TypeConverter
+import com.twidere.twiderex.db.model.TwitterUrlEntity
+import com.twidere.twiderex.utils.fromJson
+import com.twidere.twiderex.utils.json
 
-@Stable
-data class UiUrlEntity(
-    val url: String,
-    val expandedUrl: String,
-    val displayUrl: String,
-    val title: String?,
-    val description: String?,
-    val image: String?,
-) {
-    companion object {
-        fun DbUrlEntity.toUi() = UiUrlEntity(
-            url, expandedUrl, displayUrl, title, description, image
-        )
-        fun List<DbUrlEntity>.toUi() = map { it.toUi() }
+class TwitterUrlEntityConverter {
+    @TypeConverter
+    fun fromString(value: String?): List<TwitterUrlEntity>? {
+        return value?.let {
+            value.fromJson<List<TwitterUrlEntity>>()
+        }
+    }
+
+    @TypeConverter
+    fun fromList(list: List<TwitterUrlEntity>?): String? {
+        return list?.json()
     }
 }

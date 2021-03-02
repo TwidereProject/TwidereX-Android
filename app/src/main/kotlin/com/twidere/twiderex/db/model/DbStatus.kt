@@ -26,6 +26,7 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import androidx.room.Relation
 import com.twidere.twiderex.db.CacheDatabase
+import com.twidere.twiderex.model.MastodonStatusType
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.PlatformType
 
@@ -55,11 +56,14 @@ data class DbStatusV2(
     val hasMedia: Boolean,
     val userKey: MicroBlogKey,
     val lang: String?,
-    val replyStatusKey: MicroBlogKey?,
-    val quoteStatusKey: MicroBlogKey?,
-    val retweetStatusKey: MicroBlogKey?,
     val is_possibly_sensitive: Boolean,
     val platformType: PlatformType,
+    @Embedded
+    val mastodonExtra: DbStatusMastodonExtra?,
+)
+
+data class DbStatusMastodonExtra(
+    val type: MastodonStatusType,
 )
 
 data class DbStatusWithMediaAndUser(
@@ -67,53 +71,28 @@ data class DbStatusWithMediaAndUser(
     val data: DbStatusV2,
     @Relation(parentColumn = "statusKey", entityColumn = "statusKey")
     val media: List<DbMedia>,
-    @Relation(parentColumn = "userKey", entityColumn = "userKey", entity = DbUser::class)
-    val user: DbUserWithEntity,
+    @Relation(parentColumn = "userKey", entityColumn = "userKey")
+    val user: DbUser,
     @Relation(parentColumn = "statusKey", entityColumn = "statusKey")
     val reactions: List<DbStatusReaction>,
     @Relation(parentColumn = "statusKey", entityColumn = "statusKey")
     val url: List<DbUrlEntity>,
 )
 
-data class DbStatusWithReference(
-    @Embedded
-    val status: DbStatusWithMediaAndUser,
-    @Relation(
-        parentColumn = "replyStatusKey",
-        entityColumn = "statusKey",
-        entity = DbStatusV2::class
-    )
-    val replyTo: DbStatusWithMediaAndUser?,
-    @Relation(
-        parentColumn = "quoteStatusKey",
-        entityColumn = "statusKey",
-        entity = DbStatusV2::class
-    )
-    val quote: DbStatusWithMediaAndUser?,
-    @Relation(
-        parentColumn = "retweetStatusKey",
-        entityColumn = "statusKey",
-        entity = DbStatusV2::class
-    )
-    val retweet: DbStatusWithMediaAndUser?,
-)
-
 suspend fun List<DbStatusWithMediaAndUser>.saveToDb(
     database: CacheDatabase
 ) {
-    map { it.user.user }.let {
+    map { it.user }.let {
         database.userDao().insertAll(it)
     }
-    database.mediaDao().insertAll(map { it.media }.flatten())
+    database.mediaDao().insertAll(flatMap { it.media })
     map { it.data }.let {
         database.statusDao().insertAll(it)
     }
-    map { it.url }.let {
-        it + map { it.user.url }
-    }.flatten().let {
+    flatMap { it.url }.let {
         database.urlEntityDao().insertAll(it)
     }
-    map { it.reactions }.flatten().let {
+    flatMap { it.reactions }.let {
         database.reactionDao().insertAll(it)
     }
 }

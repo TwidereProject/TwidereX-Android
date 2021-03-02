@@ -34,13 +34,15 @@ fun StatusText(
     }
 }
 
-fun UiStatus.resolveLink(href: String): ResolvedLink {
+fun UiStatus.resolveLink(
+    href: String,
+): ResolvedLink {
     val entity = url.firstOrNull { it.url == href }
     val media = media.firstOrNull { it.url == href }
     return when {
         entity != null -> {
             if (!entity.displayUrl.contains("pic.twitter.com") &&
-                !(quote != null && entity.expandedUrl.endsWith(quote.statusId))
+                quote?.let { entity.expandedUrl.endsWith(it.statusId) } != true
             ) {
                 ResolvedLink(
                     expanded = entity.expandedUrl,

@@ -21,16 +21,16 @@
 package com.twidere.twiderex.db.model.converter
 
 import androidx.room.TypeConverter
-import com.twidere.twiderex.model.NotificationType
+import com.twidere.twiderex.model.MastodonStatusType
 
 class NotificationTypeConverter {
     @TypeConverter
-    fun fromString(value: String?): NotificationType? {
-        return value?.let { NotificationType.valueOf(it) }
+    fun fromString(value: String?): MastodonStatusType? {
+        return value?.let { MastodonStatusType.valueOf(it) }
     }
 
     @TypeConverter
-    fun fromNotificationType(type: NotificationType?): String? {
+    fun fromNotificationType(type: MastodonStatusType?): String? {
         return type?.name
     }
 }
