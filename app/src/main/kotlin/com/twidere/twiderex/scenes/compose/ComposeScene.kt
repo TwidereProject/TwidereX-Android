@@ -90,6 +90,8 @@ import com.twidere.twiderex.component.foundation.TextInput
 import com.twidere.twiderex.component.status.StatusLineComponent
 import com.twidere.twiderex.component.status.TimelineStatusComponent
 import com.twidere.twiderex.component.status.UserAvatar
+import com.twidere.twiderex.component.status.UserName
+import com.twidere.twiderex.component.status.UserScreenName
 import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.extensions.navigateForResult
 import com.twidere.twiderex.extensions.withElevation
@@ -462,10 +464,10 @@ private fun ReplySheetContent(
                 )
             },
             text = {
-                Text(text = it.user.name)
+                UserName(user = it.user)
             },
             secondaryText = {
-                Text(text = it.user.screenName)
+                UserScreenName(user = it.user)
             },
             trailing = {
                 IconButton(onClick = {}) {
@@ -501,10 +503,10 @@ private fun ReplySheetContent(
                     )
                 },
                 text = {
-                    Text(text = user.name)
+                    UserName(user = user)
                 },
                 secondaryText = {
-                    Text(text = user.screenName)
+                    UserScreenName(user = user)
                 },
                 trailing = {
                     IconButton(onClick = {}) {

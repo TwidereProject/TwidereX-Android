@@ -18,19 +18,21 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.services.mastodon.model
+package com.twidere.twiderex.db.model.converter
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import androidx.room.TypeConverter
+import com.twidere.services.twitter.model.ReplySettings
 
-@Serializable
-enum class Visibility {
-    @SerialName("public")
-    Public,
-    @SerialName("unlisted")
-    Unlisted,
-    @SerialName("private")
-    Private,
-    @SerialName("direct")
-    Direct;
+class ReplySettingsConverter {
+    @TypeConverter
+    fun fromString(value: String?): ReplySettings? {
+        return value?.let {
+            ReplySettings.valueOf(it)
+        }
+    }
+
+    @TypeConverter
+    fun fromTarget(target: ReplySettings?): String? {
+        return target?.name
+    }
 }

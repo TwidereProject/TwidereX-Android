@@ -63,7 +63,8 @@ class UserMediaTimelineViewModel @AssistedInject constructor(
         pagingMediator.pager(
             config = PagingConfig(
                 pageSize = 200,
-                prefetchDistance = 4
+                prefetchDistance = 4,
+                enablePlaceholders = false,
             )
         ).flow.map { pagingData ->
             pagingData.map {

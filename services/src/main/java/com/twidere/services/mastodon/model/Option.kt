@@ -24,13 +24,9 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-enum class Visibility {
-    @SerialName("public")
-    Public,
-    @SerialName("unlisted")
-    Unlisted,
-    @SerialName("private")
-    Private,
-    @SerialName("direct")
-    Direct;
-}
+data class Option(
+    val title: String? = null,
+
+    @SerialName("votes_count")
+    val votesCount: Long? = null
+)

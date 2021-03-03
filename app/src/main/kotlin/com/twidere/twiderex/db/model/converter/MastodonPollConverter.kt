@@ -18,19 +18,21 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.services.mastodon.model
+package com.twidere.twiderex.db.model.converter
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import androidx.room.TypeConverter
+import com.twidere.services.mastodon.model.Poll
+import com.twidere.twiderex.utils.fromJson
+import com.twidere.twiderex.utils.json
 
-@Serializable
-enum class Visibility {
-    @SerialName("public")
-    Public,
-    @SerialName("unlisted")
-    Unlisted,
-    @SerialName("private")
-    Private,
-    @SerialName("direct")
-    Direct;
+class MastodonPollConverter {
+    @TypeConverter
+    fun fromString(value: String?): Poll? {
+        return value?.fromJson()
+    }
+
+    @TypeConverter
+    fun fromTarget(target: Poll?): String? {
+        return target?.json()
+    }
 }

@@ -21,12 +21,14 @@
 package com.twidere.twiderex.db.mapper
 
 import com.twidere.services.twitter.model.ReferencedTweetType
+import com.twidere.services.twitter.model.ReplySettings
 import com.twidere.services.twitter.model.Status
 import com.twidere.services.twitter.model.StatusV2
 import com.twidere.services.twitter.model.User
 import com.twidere.services.twitter.model.UserV2
 import com.twidere.twiderex.db.model.DbMedia
 import com.twidere.twiderex.db.model.DbStatusReaction
+import com.twidere.twiderex.db.model.DbStatusTwitterExtra
 import com.twidere.twiderex.db.model.DbStatusV2
 import com.twidere.twiderex.db.model.DbStatusWithMediaAndUser
 import com.twidere.twiderex.db.model.DbStatusWithReference
@@ -191,6 +193,9 @@ private fun StatusV2.toDbStatusWithMediaAndUser(
         ),
         platformType = PlatformType.Twitter,
         mastodonExtra = null,
+        twitterExtra = DbStatusTwitterExtra(
+            reply_settings = replySettings ?: ReplySettings.Everyone,
+        )
     )
     return DbStatusWithMediaAndUser(
         data = status,
@@ -206,7 +211,7 @@ private fun StatusV2.toDbStatusWithMediaAndUser(
                 width = it.width ?: 0,
                 height = it.height ?: 0,
                 pageUrl = null, // TODO: how to play media under twitter v2 api
-                altText = it.publicMetrics?.viewCount?.toString() ?: "",
+                altText = "",
                 url = it.url,
                 type = type,
                 order = index,
@@ -280,6 +285,9 @@ private fun Status.toDbStatusWithMediaAndUser(
         ),
         platformType = PlatformType.Twitter,
         mastodonExtra = null,
+        twitterExtra = DbStatusTwitterExtra(
+            reply_settings = ReplySettings.Everyone,
+        )
     )
     return DbStatusWithMediaAndUser(
         data = status,
@@ -359,22 +367,6 @@ fun User.toDbUser(): DbUser {
         ),
         platformType = PlatformType.Twitter,
     )
-    // return DbUserWithEntity(
-    //     user = user,
-    //     url = entities?.url?.urls?.map {
-    //         DbUrlEntity(
-    //             _id = UUID.randomUUID().toString(),
-    //             statusKey = null,
-    //             userKey = user.userKey,
-    //             url = it.url ?: "",
-    //             expandedUrl = it.expandedURL ?: "",
-    //             displayUrl = it.displayURL ?: "",
-    //             title = null,
-    //             description = null,
-    //             image = null,
-    //         )
-    //     } ?: emptyList()
-    // )
 }
 
 fun UserV2.toDbUser(): DbUser {

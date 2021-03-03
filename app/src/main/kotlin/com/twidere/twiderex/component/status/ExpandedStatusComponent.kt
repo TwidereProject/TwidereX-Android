@@ -20,9 +20,7 @@
  */
 package com.twidere.twiderex.component.status
 
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -33,21 +31,16 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Icon
 import androidx.compose.material.LocalContentAlpha
-import androidx.compose.material.LocalContentColor
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.HumanizedTime
-import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.ui.mediumEmphasisContentContentColor
 import com.twidere.twiderex.ui.standardPadding
@@ -68,16 +61,13 @@ fun ExpandedStatusComponent(
                 end = standardPadding * 2
             ),
     ) {
-        val status = (data.retweet ?: data)
-        if (data.retweet != null) {
-            RetweetHeader(data = data)
-            Spacer(modifier = Modifier.height(standardPadding))
-        }
-        StatusComponent(
+        StatusContent(
             modifier = Modifier.fillMaxWidth(),
-            status = status,
+            data = data,
+            type = StatusContentType.Extend,
         )
 
+        val status = (data.retweet ?: data)
         if (showInfo) {
             if (!status.placeString.isNullOrEmpty()) {
                 Row {
@@ -151,77 +141,6 @@ fun ExpandedStatusComponent(
                     LikeButton(status = status, withNumber = false)
                     ShareButton(status = status)
                     Spacer(modifier = Modifier.weight(1f))
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun StatusComponent(
-    status: UiStatus,
-    modifier: Modifier = Modifier,
-) {
-    val navigator = LocalNavigator.current
-    Box(modifier = modifier) {
-        Column {
-            Row(
-                modifier = Modifier.clickable(
-                    onClick = {
-                        navigator.user(status.user)
-                    }
-                )
-            ) {
-                UserAvatar(user = status.user)
-                Spacer(modifier = Modifier.width(standardPadding))
-                Column {
-                    Text(
-                        text = status.user.name,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                    Text(
-                        text = "@${status.user.screenName}",
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        color = mediumEmphasisContentContentColor,
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(standardPadding))
-
-            StatusText(status = status)
-
-            if (status.media.any()) {
-                Spacer(modifier = Modifier.height(standardPadding))
-                StatusMediaComponent(
-                    status = status,
-                )
-            }
-
-            status.quote?.let { quote ->
-                Spacer(modifier = Modifier.height(standardPadding))
-                Box(
-                    modifier = Modifier
-                        .border(
-                            1.dp,
-                            LocalContentColor.current.copy(alpha = 0.12f),
-                            MaterialTheme.shapes.medium,
-                        )
-                        .clip(MaterialTheme.shapes.medium)
-                ) {
-                    StatusComponent(
-                        status = quote,
-                        modifier = Modifier
-                            .clickable(
-                                onClick = {
-                                    navigator.status(quote.statusKey)
-                                }
-                            )
-                            .fillMaxWidth()
-                            .padding(standardPadding),
-                    )
                 }
             }
         }

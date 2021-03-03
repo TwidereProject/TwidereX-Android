@@ -21,9 +21,11 @@
 package com.twidere.twiderex.db.mapper
 
 import com.twidere.services.mastodon.model.Account
+import com.twidere.services.mastodon.model.Emoji
 import com.twidere.services.mastodon.model.Notification
 import com.twidere.services.mastodon.model.NotificationTypes
 import com.twidere.services.mastodon.model.Status
+import com.twidere.services.mastodon.model.Visibility
 import com.twidere.twiderex.db.model.DbMastodonUserExtra
 import com.twidere.twiderex.db.model.DbMedia
 import com.twidere.twiderex.db.model.DbStatusMastodonExtra
@@ -43,6 +45,7 @@ import com.twidere.twiderex.model.MediaType
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.PlatformType
 import java.util.UUID
+import java.util.regex.Pattern
 
 fun Notification.toDbTimeline(
     accountKey: MicroBlogKey,
@@ -74,6 +77,11 @@ fun Notification.toDbTimeline(
         platformType = PlatformType.Mastodon,
         mastodonExtra = DbStatusMastodonExtra(
             type = this.type.toDbType(),
+            emoji = emptyList(),
+            visibility = Visibility.Public,
+            sensitive = false,
+            spoilerText = null,
+            poll = null,
         )
     )
     return DbTimelineWithStatus(
@@ -151,7 +159,12 @@ private fun Status.toDbStatusWithMediaAndUser(
         _id = UUID.randomUUID().toString(),
         statusId = id ?: throw IllegalArgumentException("mastodon Status.idStr should not be null"),
         rawText = content ?: "",
-        htmlText = content ?: "",
+        htmlText = content?.let {
+            generateHtmlContentWithEmoji(
+                content = it,
+                emojis = emojis ?: emptyList()
+            )
+        } ?: "",
         timestamp = createdAt?.time ?: 0,
         retweetCount = reblogsCount ?: 0,
         likeCount = favouritesCount ?: 0,
@@ -169,6 +182,11 @@ private fun Status.toDbStatusWithMediaAndUser(
         platformType = PlatformType.Mastodon,
         mastodonExtra = DbStatusMastodonExtra(
             type = MastodonStatusType.Status,
+            emoji = emojis ?: emptyList(),
+            visibility = visibility ?: Visibility.Public,
+            sensitive = sensitive ?: false,
+            spoilerText = spoilerText?.takeIf { it.isNotEmpty() },
+            poll = poll,
         )
     )
     return DbStatusWithMediaAndUser(
@@ -248,7 +266,12 @@ fun Account.toDbUser(
         friendsCount = followingCount ?: 0,
         listedCount = 0,
         rawDesc = note ?: "",
-        htmlDesc = note ?: "",
+        htmlDesc = note?.let {
+            generateHtmlContentWithEmoji(
+                content = it,
+                emojis = emojis ?: emptyList()
+            )
+        } ?: "",
         website = null,
         location = null,
         verified = false,
@@ -258,6 +281,21 @@ fun Account.toDbUser(
             fields = fields ?: emptyList(),
             bot = bot ?: false,
             locked = locked ?: false,
+            emoji = emojis ?: emptyList(),
         )
     )
+}
+
+private fun generateHtmlContentWithEmoji(
+    content: String,
+    emojis: List<Emoji>,
+): String {
+    var result = content
+    emojis.forEach { (shortcode, url) ->
+        val regex = Pattern.compile(":$shortcode:", Pattern.LITERAL).toRegex()
+        result = result.replace(regex = regex) {
+            "<emoji target=\"$url\">:$shortcode:</emoji>"
+        }
+    }
+    return result
 }

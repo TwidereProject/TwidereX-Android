@@ -18,19 +18,22 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.services.mastodon.model
+package com.twidere.twiderex.db.model.converter
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import androidx.room.TypeConverter
+import com.twidere.twiderex.utils.fromJson
+import com.twidere.twiderex.utils.json
 
-@Serializable
-enum class Visibility {
-    @SerialName("public")
-    Public,
-    @SerialName("unlisted")
-    Unlisted,
-    @SerialName("private")
-    Private,
-    @SerialName("direct")
-    Direct;
+class MastodonEmojiConverter {
+    @TypeConverter
+    fun fromString(value: String?): List<com.twidere.services.mastodon.model.Emoji>? {
+        return value?.let {
+            value.fromJson<List<com.twidere.services.mastodon.model.Emoji>>()
+        }
+    }
+
+    @TypeConverter
+    fun fromList(list: List<com.twidere.services.mastodon.model.Emoji>?): String? {
+        return list?.json()
+    }
 }

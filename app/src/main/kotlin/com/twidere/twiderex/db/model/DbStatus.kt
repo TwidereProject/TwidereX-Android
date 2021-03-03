@@ -20,11 +20,13 @@
  */
 package com.twidere.twiderex.db.model
 
+import androidx.compose.runtime.Stable
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import androidx.room.Relation
+import com.twidere.services.twitter.model.ReplySettings
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.model.MastodonStatusType
 import com.twidere.twiderex.model.MicroBlogKey
@@ -59,11 +61,24 @@ data class DbStatusV2(
     val is_possibly_sensitive: Boolean,
     val platformType: PlatformType,
     @Embedded
-    val mastodonExtra: DbStatusMastodonExtra?,
+    val mastodonExtra: DbStatusMastodonExtra? = null,
+    @Embedded
+    val twitterExtra: DbStatusTwitterExtra? = null,
 )
 
+@Stable
+data class DbStatusTwitterExtra(
+    val reply_settings: ReplySettings,
+)
+
+@Stable
 data class DbStatusMastodonExtra(
     val type: MastodonStatusType,
+    val emoji: List<com.twidere.services.mastodon.model.Emoji>,
+    val visibility: com.twidere.services.mastodon.model.Visibility,
+    val sensitive: Boolean,
+    val spoilerText: String?,
+    val poll: com.twidere.services.mastodon.model.Poll?,
 )
 
 data class DbStatusWithMediaAndUser(

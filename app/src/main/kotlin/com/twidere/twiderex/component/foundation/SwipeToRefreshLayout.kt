@@ -23,6 +23,7 @@ package com.twidere.twiderex.component.foundation
 import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -219,6 +220,7 @@ private class SwipeToRefreshState(
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun SwipeToRefreshLayout(
+    modifier: Modifier = Modifier,
     refreshingState: Boolean,
     onRefresh: () -> Unit,
     refreshIndicator: @Composable () -> Unit = {
@@ -244,8 +246,8 @@ fun SwipeToRefreshLayout(
         onRefresh = onRefresh,
     )
     Box(
-        modifier = Modifier
-            .fillMaxWidth()
+        modifier = modifier
+            .fillMaxSize()
             .nestedScroll(state)
             .pointerInput(Unit) {
                 detectVerticalDragGestures(

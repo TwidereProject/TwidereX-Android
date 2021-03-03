@@ -75,6 +75,6 @@ data class Status(
     val tags: List<Tag>? = null,
     val emojis: List<Emoji>? = null,
     val card: Card? = null,
-//    val poll: Any? = null,
+    val poll: Poll? = null,
     val pinned: Boolean? = null,
 ) : IStatus

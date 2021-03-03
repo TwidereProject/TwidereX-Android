@@ -23,7 +23,6 @@ package com.twidere.twiderex.viewmodel.user
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.twidere.services.http.MicroBlogException
 import com.twidere.services.microblog.LookupService
 import com.twidere.services.microblog.RelationshipService
 import com.twidere.services.microblog.model.IRelationship
@@ -36,8 +35,6 @@ import com.twidere.twiderex.utils.notify
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.launch
-import retrofit2.HttpException
-import java.io.IOException
 
 class UserViewModel @AssistedInject constructor(
     private val factory: UserRepository.AssistedFactory,
@@ -67,28 +64,36 @@ class UserViewModel @AssistedInject constructor(
 
     fun refresh() = viewModelScope.launch {
         refreshing.postValue(true)
-        try {
+        runCatching {
             repository.lookupUserById(userKey.id)
-        } catch (e: MicroBlogException) {
-            e.notify(inAppNotification)
-        } catch (e: IOException) {
-            e.message?.let { inAppNotification.show(it) }
-        } catch (e: HttpException) {
-            e.message?.let { inAppNotification.show(it) }
+        }.onFailure {
+            it.notify(inAppNotification)
         }
         refreshing.postValue(false)
     }
 
     fun follow() = viewModelScope.launch {
         loadingRelationship.postValue(true)
-        repository.follow(userKey.id)
-        loadRelationShip()
+        runCatching {
+            repository.follow(userKey.id)
+        }.onSuccess {
+            loadRelationShip()
+        }.onFailure {
+            loadingRelationship.postValue(false)
+            it.notify(inAppNotification)
+        }
     }
 
     fun unfollow() = viewModelScope.launch {
         loadingRelationship.postValue(true)
-        repository.unfollow(userKey.id)
-        loadRelationShip()
+        runCatching {
+            repository.unfollow(userKey.id)
+        }.onSuccess {
+            loadRelationShip()
+        }.onFailure {
+            loadingRelationship.postValue(false)
+            it.notify(inAppNotification)
+        }
     }
 
     private fun loadRelationShip() = viewModelScope.launch {
@@ -97,9 +102,7 @@ class UserViewModel @AssistedInject constructor(
             repository.showRelationship(userKey.id).let {
                 relationship.postValue(it)
             }
-        } catch (e: MicroBlogException) {
-        } catch (e: IOException) {
-        } catch (e: HttpException) {
+        } catch (e: Exception) {
         }
         loadingRelationship.postValue(false)
     }

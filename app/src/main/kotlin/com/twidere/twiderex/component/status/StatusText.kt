@@ -20,17 +20,56 @@
  */
 package com.twidere.twiderex.component.status
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.material.Button
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.ui.UiStatus
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun StatusText(
+fun ColumnScope.StatusText(
     status: UiStatus,
 ) {
-    HtmlText(
-        htmlText = status.htmlText,
-    ) { href ->
-        status.resolveLink(href)
+    val expandable = status.platformType == PlatformType.Mastodon &&
+        status.mastodonExtra?.spoilerText != null
+
+    var expanded by rememberSaveable(
+        saver = Saver(
+            save = {
+                it.value
+            },
+            restore = {
+                mutableStateOf(it)
+            },
+        )
+    ) { mutableStateOf(!expandable) }
+
+    if (expandable && status.mastodonExtra?.spoilerText != null) {
+        Text(text = status.mastodonExtra.spoilerText)
+        Button(
+            onClick = {
+                expanded = !expanded
+            }
+        ) {
+            Text(text = "expand")
+        }
+    }
+    AnimatedVisibility(visible = expanded) {
+        HtmlText(
+            htmlText = status.htmlText,
+            linkResolver = { href ->
+                status.resolveLink(href)
+            },
+        )
     }
 }
 

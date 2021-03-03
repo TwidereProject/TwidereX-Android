@@ -20,17 +20,33 @@
  */
 package com.twidere.services.mastodon.model
 
+import com.twidere.services.serializer.DateSerializerV2
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import java.util.Date
 
 @Serializable
-enum class Visibility {
-    @SerialName("public")
-    Public,
-    @SerialName("unlisted")
-    Unlisted,
-    @SerialName("private")
-    Private,
-    @SerialName("direct")
-    Direct;
-}
+data class Poll(
+    val id: String? = null,
+
+    @SerialName("expires_at")
+    @Serializable(with = DateSerializerV2::class)
+    val expiresAt: Date? = null,
+
+    val expired: Boolean? = null,
+    val multiple: Boolean? = null,
+
+    @SerialName("votes_count")
+    val votesCount: Long? = null,
+
+    @SerialName("voters_count")
+    val votersCount: Long? = null,
+
+    val voted: Boolean? = null,
+
+    @SerialName("own_votes")
+    val ownVotes: List<Int>? = null,
+
+    val options: List<Option>? = null,
+    val emojis: List<Emoji>? = null
+)

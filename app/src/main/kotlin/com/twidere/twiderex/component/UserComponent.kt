@@ -40,6 +40,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
@@ -81,6 +82,8 @@ import com.twidere.twiderex.component.status.HtmlText
 import com.twidere.twiderex.component.status.ResolvedLink
 import com.twidere.twiderex.component.status.StatusMediaPreviewItem
 import com.twidere.twiderex.component.status.UserAvatar
+import com.twidere.twiderex.component.status.UserName
+import com.twidere.twiderex.component.status.UserScreenName
 import com.twidere.twiderex.component.status.withAvatarClip
 import com.twidere.twiderex.db.model.TwitterUrlEntity
 import com.twidere.twiderex.di.assisted.assistedViewModel
@@ -362,15 +365,10 @@ private fun UserInfo(
                     modifier = Modifier.weight(1f),
                 ) {
                     user?.let { user ->
-                        Text(
-                            text = user.name,
-                            style = MaterialTheme.typography.h6,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                        )
-                        Text(
-                            text = "@${user.screenName}",
-                        )
+                        ProvideTextStyle(value = MaterialTheme.typography.h6) {
+                            UserName(user = user)
+                        }
+                        UserScreenName(user = user)
                     }
                 }
                 if (viewModel.isMe) {

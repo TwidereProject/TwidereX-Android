@@ -24,7 +24,7 @@ import android.content.Context
 import com.google.android.exoplayer2.upstream.DataSource
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
-import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory
+import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
 import com.google.android.exoplayer2.upstream.FileDataSource
 import com.google.android.exoplayer2.upstream.cache.CacheDataSink
 import com.google.android.exoplayer2.upstream.cache.CacheDataSource
@@ -55,7 +55,9 @@ class CacheDataSourceFactory(
         defaultDatasourceFactory = DefaultDataSourceFactory(
             this.context,
             bandwidthMeter,
-            DefaultHttpDataSourceFactory(userAgent, bandwidthMeter)
+            DefaultHttpDataSource.Factory()
+                .setUserAgent(userAgent)
+                .setTransferListener(bandwidthMeter)
         )
     }
 }

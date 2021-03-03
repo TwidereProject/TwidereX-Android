@@ -26,7 +26,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.Icon
+import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -44,28 +46,46 @@ import com.twidere.twiderex.ui.standardPadding
 fun RetweetHeader(
     data: UiStatus,
 ) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Box(
-            modifier = Modifier
-                .width(profileImageSize),
-            contentAlignment = Alignment.CenterEnd,
-        ) {
+    TweetHeader(
+        icon = {
             Icon(
-                modifier = Modifier.size(12.dp),
                 painter = painterResource(id = R.drawable.ic_repeat),
                 tint = mediumEmphasisContentContentColor,
                 contentDescription = stringResource(id = R.string.accessibility_common_status_retweeted)
             )
+        },
+        text = {
+            Text(
+                style = MaterialTheme.typography.caption,
+                text = stringResource(
+                    id = R.string.common_controls_status_user_retweeted,
+                    data.user.name
+                ),
+            )
+        },
+    )
+}
+
+@Composable
+fun TweetHeader(
+    icon: @Composable () -> Unit,
+    text: @Composable () -> Unit,
+) {
+    ProvideTextStyle(value = MaterialTheme.typography.caption) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Box(
+                modifier = Modifier
+                    .width(profileImageSize),
+                contentAlignment = Alignment.CenterEnd,
+            ) {
+                Box(modifier = Modifier.size(LocalTextStyle.current.fontSize.value.dp)) {
+                    icon.invoke()
+                }
+            }
+            Spacer(modifier = Modifier.width(standardPadding))
+            text.invoke()
         }
-        Spacer(modifier = Modifier.width(standardPadding))
-        Text(
-            style = MaterialTheme.typography.caption,
-            text = stringResource(
-                id = R.string.common_controls_status_user_retweeted,
-                data.user.name
-            ),
-        )
     }
 }
