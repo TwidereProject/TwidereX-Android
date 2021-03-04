@@ -20,6 +20,9 @@
  */
 package com.twidere.twiderex.model
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 enum class MastodonStatusType {
     Status,
     NotificationFollow,
@@ -28,4 +31,5 @@ enum class MastodonStatusType {
     NotificationReblog,
     NotificationFavourite,
     NotificationPoll,
+    NotificationStatus,
 }

@@ -41,18 +41,13 @@ import com.twidere.twiderex.db.model.DbStatusV2
 import com.twidere.twiderex.db.model.DbTimeline
 import com.twidere.twiderex.db.model.DbUrlEntity
 import com.twidere.twiderex.db.model.DbUser
-import com.twidere.twiderex.db.model.converter.MastodonEmojiConverter
-import com.twidere.twiderex.db.model.converter.MastodonFieldConverter
-import com.twidere.twiderex.db.model.converter.MastodonPollConverter
-import com.twidere.twiderex.db.model.converter.MastodonVisibilityConverter
+import com.twidere.twiderex.db.model.converter.ExtraConverter
 import com.twidere.twiderex.db.model.converter.MediaTypeConverter
 import com.twidere.twiderex.db.model.converter.MicroBlogKeyConverter
 import com.twidere.twiderex.db.model.converter.NotificationTypeConverter
 import com.twidere.twiderex.db.model.converter.PlatformTypeConverter
-import com.twidere.twiderex.db.model.converter.ReplySettingsConverter
 import com.twidere.twiderex.db.model.converter.StringListConverter
 import com.twidere.twiderex.db.model.converter.TimelineTypeConverter
-import com.twidere.twiderex.db.model.converter.TwitterUrlEntityConverter
 import com.twidere.twiderex.db.model.converter.UserTimelineTypeConverter
 import javax.inject.Singleton
 
@@ -79,12 +74,7 @@ import javax.inject.Singleton
     UserTimelineTypeConverter::class,
     StringListConverter::class,
     NotificationTypeConverter::class,
-    MastodonFieldConverter::class,
-    TwitterUrlEntityConverter::class,
-    MastodonEmojiConverter::class,
-    MastodonVisibilityConverter::class,
-    ReplySettingsConverter::class,
-    MastodonPollConverter::class,
+    ExtraConverter::class,
 )
 abstract class CacheDatabase : RoomDatabase() {
     abstract fun statusDao(): StatusDao

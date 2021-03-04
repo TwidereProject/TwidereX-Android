@@ -24,12 +24,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.res.stringResource
 import com.twidere.twiderex.R
+import com.twidere.twiderex.db.model.DbMastodonStatusExtra
 import com.twidere.twiderex.db.model.DbPagingTimelineWithStatus
-import com.twidere.twiderex.db.model.DbStatusMastodonExtra
 import com.twidere.twiderex.db.model.DbStatusWithMediaAndUser
 import com.twidere.twiderex.db.model.DbStatusWithReference
 import com.twidere.twiderex.db.model.DbTimelineWithStatus
 import com.twidere.twiderex.db.model.ReferenceType
+import com.twidere.twiderex.model.MastodonStatusType
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.ui.UiMedia.Companion.toUi
@@ -56,13 +57,17 @@ data class UiStatus(
     val isGap: Boolean,
     val url: List<UiUrlEntity>,
     val platformType: PlatformType,
-    val mastodonExtra: DbStatusMastodonExtra? = null,
+    val mastodonExtra: DbMastodonStatusExtra? = null,
     val referenceStatus: Map<ReferenceType, UiStatus> = emptyMap(),
 ) {
     val retweet: UiStatus? by lazy {
-        referenceStatus[ReferenceType.Retweet]?.copy(
-            referenceStatus = referenceStatus.filterNot { it.key == ReferenceType.Retweet }
-        )
+        if (platformType == PlatformType.Mastodon && mastodonExtra != null && mastodonExtra.type != MastodonStatusType.Status) {
+            referenceStatus[ReferenceType.MastodonNotification]
+        } else {
+            referenceStatus[ReferenceType.Retweet]?.copy(
+                referenceStatus = referenceStatus.filterNot { it.key == ReferenceType.Retweet }
+            )
+        }
     }
 
     val quote: UiStatus? by lazy {

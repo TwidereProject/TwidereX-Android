@@ -52,5 +52,7 @@ enum class NotificationTypes {
     @SerialName("poll")
     poll,
     @SerialName("follow_request")
-    follow_request
+    follow_request,
+    @SerialName("status")
+    status,
 }

@@ -34,9 +34,6 @@ class MeItem : HomeNavigationItem() {
     @Composable
     override fun name(): String = stringResource(R.string.scene_profile_title)
 
-    override val route: String
-        get() = "me"
-
     @Composable
     override fun icon(): Painter = painterResource(id = R.drawable.ic_user)
 

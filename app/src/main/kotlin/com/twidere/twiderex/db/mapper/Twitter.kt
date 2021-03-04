@@ -28,12 +28,12 @@ import com.twidere.services.twitter.model.User
 import com.twidere.services.twitter.model.UserV2
 import com.twidere.twiderex.db.model.DbMedia
 import com.twidere.twiderex.db.model.DbStatusReaction
-import com.twidere.twiderex.db.model.DbStatusTwitterExtra
 import com.twidere.twiderex.db.model.DbStatusV2
 import com.twidere.twiderex.db.model.DbStatusWithMediaAndUser
 import com.twidere.twiderex.db.model.DbStatusWithReference
 import com.twidere.twiderex.db.model.DbTimeline
 import com.twidere.twiderex.db.model.DbTimelineWithStatus
+import com.twidere.twiderex.db.model.DbTwitterStatusExtra
 import com.twidere.twiderex.db.model.DbTwitterUserExtra
 import com.twidere.twiderex.db.model.DbUrlEntity
 import com.twidere.twiderex.db.model.DbUser
@@ -193,7 +193,7 @@ private fun StatusV2.toDbStatusWithMediaAndUser(
         ),
         platformType = PlatformType.Twitter,
         mastodonExtra = null,
-        twitterExtra = DbStatusTwitterExtra(
+        twitterExtra = DbTwitterStatusExtra(
             reply_settings = replySettings ?: ReplySettings.Everyone,
         )
     )
@@ -285,7 +285,7 @@ private fun Status.toDbStatusWithMediaAndUser(
         ),
         platformType = PlatformType.Twitter,
         mastodonExtra = null,
-        twitterExtra = DbStatusTwitterExtra(
+        twitterExtra = DbTwitterStatusExtra(
             reply_settings = ReplySettings.Everyone,
         )
     )

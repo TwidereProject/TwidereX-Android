@@ -57,6 +57,7 @@ interface TimelineResources {
         @Query("limit") limit: Int? = null,
     ): Response<List<Status>>
 
+    @JvmSuppressWildcards
     @GET("/api/v1/notifications")
     suspend fun notification(
         @Query("max_id") max_id: String? = null,

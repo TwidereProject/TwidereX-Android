@@ -84,12 +84,14 @@ import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.component.status.UserName
 import com.twidere.twiderex.component.status.UserScreenName
 import com.twidere.twiderex.extensions.withElevation
+import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.preferences.LocalAppearancePreferences
 import com.twidere.twiderex.preferences.proto.AppearancePreferences
 import com.twidere.twiderex.scenes.home.HomeNavigationItem
 import com.twidere.twiderex.scenes.home.HomeTimelineItem
+import com.twidere.twiderex.scenes.home.MastodonNotificationItem
 import com.twidere.twiderex.scenes.home.MeItem
 import com.twidere.twiderex.scenes.home.MentionItem
 import com.twidere.twiderex.scenes.home.SearchItem
@@ -104,17 +106,29 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun HomeScene() {
+    val account = LocalActiveAccount.current ?: return
     val scope = rememberCoroutineScope()
     val timelineController = remember {
         LazyListController()
     }
     val tabPosition = LocalAppearancePreferences.current.tapPosition
-    val menus = listOf(
-        HomeTimelineItem(),
-        MentionItem(),
-        SearchItem(),
-        MeItem(),
-    )
+    val menus = remember {
+        listOf(
+            HomeTimelineItem(),
+        ).let {
+            it + when (account.type) {
+                PlatformType.Twitter -> MentionItem()
+                PlatformType.StatusNet -> TODO()
+                PlatformType.Fanfou -> TODO()
+                PlatformType.Mastodon -> MastodonNotificationItem()
+            }
+        }.let {
+            it + listOf(
+                SearchItem(),
+                MeItem(),
+            )
+        }
+    }
     val pagerState = rememberPagerState(
         maxPage = menus.lastIndex
     )

@@ -29,6 +29,7 @@ import com.twidere.twiderex.db.model.DbTwitterUserExtra
 import com.twidere.twiderex.db.model.DbUser
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.PlatformType
+import com.twidere.twiderex.ui.LocalActiveAccount
 
 @Stable
 data class UiUser(
@@ -51,6 +52,18 @@ data class UiUser(
     val twitterExtra: DbTwitterUserExtra? = null,
     val mastodonExtra: DbMastodonUserExtra? = null,
 ) {
+    val displayName
+        get() = name.takeUnless { it.isEmpty() } ?: screenName
+    val displayScreenName: String
+        @Composable
+        get() {
+            return if (LocalActiveAccount.current?.accountKey?.host?.let { it != userKey.host } != false) {
+                "@$screenName@${userKey.host}}"
+            } else {
+                screenName
+            }
+        }
+
     companion object {
         @Composable
         fun sample() = UiUser(

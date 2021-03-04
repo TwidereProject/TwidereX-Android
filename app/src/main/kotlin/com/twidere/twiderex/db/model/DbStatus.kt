@@ -31,6 +31,7 @@ import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.model.MastodonStatusType
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.PlatformType
+import kotlinx.serialization.Serializable
 
 @Entity(
     tableName = "status",
@@ -60,19 +61,19 @@ data class DbStatusV2(
     val lang: String?,
     val is_possibly_sensitive: Boolean,
     val platformType: PlatformType,
-    @Embedded
-    val mastodonExtra: DbStatusMastodonExtra? = null,
-    @Embedded
-    val twitterExtra: DbStatusTwitterExtra? = null,
+    val mastodonExtra: DbMastodonStatusExtra? = null,
+    val twitterExtra: DbTwitterStatusExtra? = null,
 )
 
 @Stable
-data class DbStatusTwitterExtra(
+@Serializable
+data class DbTwitterStatusExtra(
     val reply_settings: ReplySettings,
 )
 
 @Stable
-data class DbStatusMastodonExtra(
+@Serializable
+data class DbMastodonStatusExtra(
     val type: MastodonStatusType,
     val emoji: List<com.twidere.services.mastodon.model.Emoji>,
     val visibility: com.twidere.services.mastodon.model.Visibility,

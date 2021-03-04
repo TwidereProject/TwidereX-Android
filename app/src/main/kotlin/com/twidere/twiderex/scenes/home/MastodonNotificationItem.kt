@@ -21,23 +21,30 @@
 package com.twidere.twiderex.scenes.home
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.twidere.services.microblog.NotificationService
 import com.twidere.twiderex.R
-import com.twidere.twiderex.component.TimelineComponent
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
-import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.component.foundation.Pager
+import com.twidere.twiderex.component.foundation.TextTabsComponent
+import com.twidere.twiderex.component.foundation.rememberPagerState
 import com.twidere.twiderex.ui.LocalActiveAccount
-import com.twidere.twiderex.viewmodel.timeline.NotificationTimelineViewModel
+import kotlinx.coroutines.launch
 
-class NotificationItem : HomeNavigationItem() {
+class MastodonNotificationItem : HomeNavigationItem() {
     @Composable
-    override fun name(): String = stringResource(R.string.scene_mentions_title)
+    override fun name(): String {
+        return stringResource(id = R.string.scene_notification_title)
+    }
 
     @Composable
-    override fun icon(): Painter = painterResource(id = R.drawable.ic_message_circle)
+    override fun icon(): Painter {
+        return painterResource(id = R.drawable.ic_bell)
+    }
 
     @Composable
     override fun content() {
@@ -45,14 +52,32 @@ class NotificationItem : HomeNavigationItem() {
         if (account.service !is NotificationService) {
             return
         }
-        val viewModel =
-            assistedViewModel<NotificationTimelineViewModel.AssistedFactory, NotificationTimelineViewModel>(
-                account
-            ) {
-                it.create(account)
+        val tabs = remember {
+            listOf(
+                AllNotificationItem(),
+                MentionItem(),
+            )
+        }
+        val pagerState = rememberPagerState(maxPage = tabs.lastIndex)
+        val scope = rememberCoroutineScope()
+        InAppNotificationScaffold(
+            topBar = {
+                TextTabsComponent(
+                    items = tabs.map { it.name() },
+                    selectedItem = pagerState.currentPage,
+                    onItemSelected = {
+                        scope.launch {
+                            pagerState.selectPage {
+                                pagerState.currentPage = it
+                            }
+                        }
+                    },
+                )
             }
-        InAppNotificationScaffold {
-            TimelineComponent(viewModel = viewModel)
+        ) {
+            Pager(state = pagerState) {
+                tabs[page].content()
+            }
         }
     }
 }

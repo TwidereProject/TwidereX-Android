@@ -24,6 +24,7 @@ import com.twidere.services.http.authorization.BearerAuthorization
 import com.twidere.services.http.retrofit
 import com.twidere.services.mastodon.api.MastodonResources
 import com.twidere.services.mastodon.model.MastodonPaging
+import com.twidere.services.mastodon.model.NotificationTypes
 import com.twidere.services.mastodon.model.exceptions.MastodonException
 import com.twidere.services.microblog.LookupService
 import com.twidere.services.microblog.MicroBlogService
@@ -58,7 +59,12 @@ class MastodonService(
         since_id: String?,
         max_id: String?
     ): List<IStatus> {
-        TODO("Not yet implemented")
+        return resources.notification(
+            max_id = max_id,
+            since_id = since_id,
+            limit = count,
+            exclude_types = NotificationTypes.values().filter { it != NotificationTypes.mention }
+        )
     }
 
     override suspend fun userTimeline(

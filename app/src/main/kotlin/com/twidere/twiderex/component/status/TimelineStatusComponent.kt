@@ -22,13 +22,6 @@ package com.twidere.twiderex.component.status
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.updateTransition
-import androidx.compose.animation.expandIn
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkOut
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -41,8 +34,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
@@ -52,13 +43,11 @@ import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Message
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -66,21 +55,19 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.twidere.services.mastodon.model.Option
-import com.twidere.services.mastodon.model.Poll
 import com.twidere.services.mastodon.model.Visibility
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.HumanizedTime
 import com.twidere.twiderex.component.navigation.LocalNavigator
-import com.twidere.twiderex.extensions.humanizedTimestamp
+import com.twidere.twiderex.db.model.DbMastodonStatusExtra
 import com.twidere.twiderex.model.MastodonStatusType
 import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.preferences.LocalDisplayPreferences
+import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.profileImageSize
 import com.twidere.twiderex.ui.standardPadding
 import com.twidere.twiderex.ui.statusActionIconSize
-import kotlin.math.max
 
 @Composable
 fun TimelineStatusComponent(
@@ -94,8 +81,38 @@ fun TimelineStatusComponent(
                 data.mastodonExtra.type == MastodonStatusType.NotificationFollowRequest ||
                     data.mastodonExtra.type == MastodonStatusType.NotificationFollow
                 ) -> {
+            MastodonFollowStatus(data, data.mastodonExtra)
         }
         else -> NormalStatus(data, showActions)
+    }
+}
+
+@Composable
+fun MastodonFollowStatus(data: UiStatus, mastodonExtra: DbMastodonStatusExtra) {
+    val navigator = LocalNavigator.current
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable {
+                navigator.user(data.user)
+            }
+            .padding(
+                horizontal = standardPadding * 2,
+            ),
+    ) {
+        Spacer(modifier = Modifier.height(standardPadding))
+        StatusHeader(data = data)
+        Row {
+            UserAvatar(user = data.user)
+            Spacer(modifier = Modifier.width(standardPadding))
+            Column {
+                UserName(data.user)
+                Spacer(modifier = Modifier.width(standardPadding / 2))
+                UserScreenName(data.user)
+            }
+            Spacer(modifier = Modifier.width(standardPadding))
+        }
+        Spacer(modifier = Modifier.height(standardPadding))
     }
 }
 
@@ -134,9 +151,126 @@ private fun NormalStatus(
 
 @Composable
 private fun StatusHeader(data: UiStatus) {
-    if (data.retweet != null) {
-        RetweetHeader(data = data)
-        Spacer(modifier = Modifier.height(standardPadding))
+    when {
+        data.platformType == PlatformType.Mastodon && data.mastodonExtra != null -> {
+            MastodonStatusHeader(data.mastodonExtra, data)
+            Spacer(modifier = Modifier.height(standardPadding))
+        }
+        data.retweet != null -> {
+            RetweetHeader(data = data)
+            Spacer(modifier = Modifier.height(standardPadding))
+        }
+    }
+}
+
+@Composable
+private fun MastodonStatusHeader(
+    mastodonExtra: DbMastodonStatusExtra,
+    data: UiStatus
+) {
+    when (mastodonExtra.type) {
+        MastodonStatusType.Status -> Unit
+        MastodonStatusType.NotificationFollow -> {
+            TweetHeader(
+                icon = {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_user_plus),
+                        contentDescription = null
+                    )
+                },
+                text = {
+                    Text(
+                        text = stringResource(
+                            id = R.string.common_notification_follow,
+                            data.user.displayName
+                        )
+                    )
+                }
+            )
+        }
+        MastodonStatusType.NotificationFollowRequest -> {
+            TweetHeader(
+                icon = {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_user_exclamation),
+                        contentDescription = null
+                    )
+                },
+                text = {
+                    Text(
+                        text = stringResource(
+                            id = R.string.common_notification_follow_request,
+                            data.user.displayName
+                        )
+                    )
+                }
+            )
+        }
+        MastodonStatusType.NotificationMention -> Unit
+        MastodonStatusType.NotificationReblog -> {
+            RetweetHeader(data = data)
+        }
+        MastodonStatusType.NotificationFavourite -> {
+            TweetHeader(
+                icon = {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_heart),
+                        contentDescription = null
+                    )
+                },
+                text = {
+                    Text(
+                        text = stringResource(
+                            id = R.string.common_notification_favourite,
+                            data.user.displayName
+                        )
+                    )
+                }
+            )
+        }
+        MastodonStatusType.NotificationPoll -> {
+            TweetHeader(
+                icon = {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_poll),
+                        contentDescription = null
+                    )
+                },
+                text = {
+                    val text = if (LocalActiveAccount.current?.let { it.accountKey == data.user.userKey } == true) {
+                        stringResource(
+                            id = R.string.common_notification_own_poll,
+                        )
+                    } else {
+                        stringResource(
+                            id = R.string.common_notification_poll,
+                        )
+                    }
+
+                    Text(
+                        text = text
+                    )
+                }
+            )
+        }
+        MastodonStatusType.NotificationStatus -> {
+            TweetHeader(
+                icon = {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_bell_ringing),
+                        contentDescription = null
+                    )
+                },
+                text = {
+                    Text(
+                        text = stringResource(
+                            id = R.string.common_notification_status,
+                            data.user.displayName
+                        )
+                    )
+                }
+            )
+        }
     }
 }
 
@@ -313,132 +447,6 @@ fun ColumnScope.StatusBody(
                     .padding(standardPadding),
                 type = type,
             )
-        }
-    }
-}
-
-@Composable
-fun MastodonPoll(status: UiStatus) {
-    if (status.platformType != PlatformType.Mastodon || status.mastodonExtra?.poll == null) {
-        return
-    }
-
-    status.mastodonExtra.poll.options?.forEachIndexed { index, option ->
-        MastodonPollOption(option, index, status.mastodonExtra.poll)
-        if (index != status.mastodonExtra.poll.options?.lastIndex) {
-            Spacer(modifier = Modifier.height(standardPadding))
-        }
-    }
-
-    Spacer(modifier = Modifier.height(standardPadding))
-    Row {
-        if (status.mastodonExtra.poll.votersCount != null) {
-            Text(text = "${status.mastodonExtra.poll.votersCount} people")
-        } else if (status.mastodonExtra.poll.votesCount != null) {
-            Text(text = "${status.mastodonExtra.poll.votesCount} votes")
-        }
-        Spacer(modifier = Modifier.width(standardPadding))
-        if (status.mastodonExtra.poll.expired == true) {
-            Text(text = "Closed")
-        } else {
-            Text(text = status.mastodonExtra.poll.expiresAt?.time?.humanizedTimestamp() ?: "")
-        }
-    }
-}
-
-@OptIn(ExperimentalAnimationApi::class)
-@Composable
-fun MastodonPollOption(
-    option: Option,
-    index: Int,
-    poll: Poll,
-) {
-    val size = LocalTextStyle.current.fontSize.value.dp + standardPadding * 3
-    val transition = updateTransition(targetState = option.votesCount)
-    val progress by transition.animateFloat {
-        (option.votesCount ?: 0).toFloat() / max((poll.votesCount ?: 0), 1).toFloat()
-    }
-    val color = MaterialTheme.colors.onBackground
-    Box(
-        modifier = Modifier
-            .clip(
-                if (poll.multiple == true) {
-                    RoundedCornerShape(4.dp)
-                } else {
-                    RoundedCornerShape(percent = 50)
-                }
-            ).let {
-                if (poll.voted == true) {
-                    it
-                } else {
-                    it.clickable {
-                    }
-                }
-            }
-    ) {
-        Box(
-            modifier = Modifier
-                .height(size)
-                .fillMaxWidth()
-                .background(color.copy(alpha = 0.08f)),
-        )
-        Box(
-            modifier = Modifier
-                .height(size)
-                .fillMaxWidth(progress)
-                .clip(
-                    if (poll.multiple == true) {
-                        RoundedCornerShape(4.dp)
-                    } else {
-                        RoundedCornerShape(percent = 50)
-                    }
-                )
-                .background(
-                    color.let {
-                        if (poll.ownVotes?.contains(index) == true) {
-                            it.copy(alpha = 0.38f)
-                        } else {
-                            it.copy(alpha = 0.2f)
-                        }
-                    }
-                ),
-        )
-        Row(
-            modifier = Modifier
-                .height(size),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Spacer(modifier = Modifier.width(standardPadding))
-            Box(
-                modifier = Modifier.width(LocalTextStyle.current.fontSize.value.dp + standardPadding)
-            ) {
-                androidx.compose.animation.AnimatedVisibility(
-                    visible = poll.ownVotes?.contains(
-                        index
-                    ) == true,
-                    enter = fadeIn() + expandIn(expandFrom = Alignment.Center),
-                    exit = shrinkOut(shrinkTowards = Alignment.Center) + fadeOut(),
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .background(MaterialTheme.colors.surface, shape = CircleShape),
-                    ) {
-                        Icon(
-                            modifier = Modifier
-                                .padding(4.dp),
-                            imageVector = Icons.Default.Check,
-                            contentDescription = null,
-                        )
-                    }
-                }
-            }
-            Spacer(modifier = Modifier.width(standardPadding))
-            Text(
-                modifier = Modifier.weight(1f),
-                text = option.title ?: "",
-            )
-            Text(text = String.format("%.0f%%", progress * 100))
-            Spacer(modifier = Modifier.width(standardPadding))
         }
     }
 }

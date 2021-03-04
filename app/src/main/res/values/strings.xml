@@ -51,6 +51,13 @@
     <string name="common_alerts_report_and_block_user_success_title">%s has been reported for spam and blocked</string>
     <string name="common_alerts_failed_to_report_and_block_user_title">Failed to report and block %s</string>
     <string name="common_alerts_failed_to_report_and_block_user_message">Please try again</string>
+    <string name="common_notification_own_poll">Your poll has ended</string>
+    <string name="common_notification_poll">A poll you have voted in has ended</string>
+    <string name="common_notification_reblog">%s boosted your toot</string>
+    <string name="common_notification_status">%s just posted</string>
+    <string name="common_notification_follow_request">%s has requested to follow you</string>
+    <string name="common_notification_favourite">%s favourited your toot</string>
+    <string name="common_notification_follow">%s followed you</string>
     <string name="common_controls_actions_add">Add</string>
     <string name="common_controls_actions_remove">Remove</string>
     <string name="common_controls_actions_edit">Edit</string>
@@ -70,8 +77,14 @@
     <string name="common_controls_status_actions_copy_link">Copy link</string>
     <string name="common_controls_status_actions_share_link">Share link</string>
     <string name="common_controls_status_actions_delete_tweet">Delete tweet</string>
+    <string name="common_controls_status_actions_vote">Vote</string>
     <string name="common_controls_status_media">Media</string>
     <string name="common_controls_status_user_retweeted">%s retweeted</string>
+    <string name="common_controls_status_poll_expired">Closed</string>
+    <string name="common_controls_status_poll_total_person">%s person</string>
+    <string name="common_controls_status_poll_total_vote">%s vote</string>
+    <string name="common_controls_status_poll_total_people">%s people</string>
+    <string name="common_controls_status_poll_total_votes">%s votes</string>
     <string name="common_controls_friendship_actions_follow">Follow</string>
     <string name="common_controls_friendship_actions_unfollow">Unfollow</string>
     <string name="common_controls_friendship_actions_following">Following</string>
@@ -121,6 +134,8 @@
     <string name="scene_authentication_title">Authentication</string>
     <string name="scene_timeline_title">Timeline</string>
     <string name="scene_mentions_title">Mentions</string>
+    <string name="scene_notification_title">Notification</string>
+    <string name="scene_notification_tabs_all">All</string>
     <string name="scene_messages_title">Messages</string>
     <string name="scene_likes_title">Likes</string>
     <string name="scene_bookmark_title">Bookmark</string>

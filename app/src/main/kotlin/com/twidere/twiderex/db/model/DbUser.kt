@@ -21,7 +21,6 @@
 package com.twidere.twiderex.db.model
 
 import androidx.compose.runtime.Stable
-import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
@@ -55,13 +54,12 @@ data class DbUser(
     val verified: Boolean,
     val isProtected: Boolean,
     val platformType: PlatformType,
-    @Embedded
     val twitterExtra: DbTwitterUserExtra? = null,
-    @Embedded
     val mastodonExtra: DbMastodonUserExtra? = null,
 )
 
 @Stable
+@Serializable
 data class DbTwitterUserExtra(
     val pinned_tweet_id: String?,
     val url: List<TwitterUrlEntity>,
@@ -76,6 +74,7 @@ data class TwitterUrlEntity(
 )
 
 @Stable
+@Serializable
 data class DbMastodonUserExtra(
     val fields: List<com.twidere.services.mastodon.model.Field>,
     val emoji: List<com.twidere.services.mastodon.model.Emoji>,

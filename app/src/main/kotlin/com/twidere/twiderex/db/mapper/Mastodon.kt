@@ -26,9 +26,9 @@ import com.twidere.services.mastodon.model.Notification
 import com.twidere.services.mastodon.model.NotificationTypes
 import com.twidere.services.mastodon.model.Status
 import com.twidere.services.mastodon.model.Visibility
+import com.twidere.twiderex.db.model.DbMastodonStatusExtra
 import com.twidere.twiderex.db.model.DbMastodonUserExtra
 import com.twidere.twiderex.db.model.DbMedia
-import com.twidere.twiderex.db.model.DbStatusMastodonExtra
 import com.twidere.twiderex.db.model.DbStatusReaction
 import com.twidere.twiderex.db.model.DbStatusV2
 import com.twidere.twiderex.db.model.DbStatusWithMediaAndUser
@@ -75,7 +75,7 @@ fun Notification.toDbTimeline(
         lang = null,
         is_possibly_sensitive = false,
         platformType = PlatformType.Mastodon,
-        mastodonExtra = DbStatusMastodonExtra(
+        mastodonExtra = DbMastodonStatusExtra(
             type = this.type.toDbType(),
             emoji = emptyList(),
             visibility = Visibility.Public,
@@ -119,6 +119,7 @@ private fun NotificationTypes?.toDbType(): MastodonStatusType {
         NotificationTypes.mention -> MastodonStatusType.NotificationMention
         NotificationTypes.poll -> MastodonStatusType.NotificationPoll
         NotificationTypes.follow_request -> MastodonStatusType.NotificationFollowRequest
+        NotificationTypes.status -> MastodonStatusType.NotificationStatus
         null -> throw IllegalArgumentException("mastodon Notification.type should not be null")
     }
 }
@@ -180,7 +181,7 @@ private fun Status.toDbStatusWithMediaAndUser(
         ),
         is_possibly_sensitive = sensitive ?: false,
         platformType = PlatformType.Mastodon,
-        mastodonExtra = DbStatusMastodonExtra(
+        mastodonExtra = DbMastodonStatusExtra(
             type = MastodonStatusType.Status,
             emoji = emojis ?: emptyList(),
             visibility = visibility ?: Visibility.Public,
