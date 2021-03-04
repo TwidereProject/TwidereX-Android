@@ -40,6 +40,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
@@ -81,12 +82,14 @@ import com.twidere.twiderex.component.status.HtmlText
 import com.twidere.twiderex.component.status.ResolvedLink
 import com.twidere.twiderex.component.status.StatusMediaPreviewItem
 import com.twidere.twiderex.component.status.UserAvatar
+import com.twidere.twiderex.component.status.UserName
+import com.twidere.twiderex.component.status.UserScreenName
 import com.twidere.twiderex.component.status.withAvatarClip
+import com.twidere.twiderex.db.model.TwitterUrlEntity
 import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.PlatformType
-import com.twidere.twiderex.model.ui.UiUrlEntity
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.navigation.twidereXSchema
@@ -362,15 +365,10 @@ private fun UserInfo(
                     modifier = Modifier.weight(1f),
                 ) {
                     user?.let { user ->
-                        Text(
-                            text = user.name,
-                            style = MaterialTheme.typography.h6,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                        )
-                        Text(
-                            text = "@${user.screenName}",
-                        )
+                        ProvideTextStyle(value = MaterialTheme.typography.h6) {
+                            UserName(user = user)
+                        }
+                        UserScreenName(user = user)
                     }
                 }
                 if (viewModel.isMe) {
@@ -389,7 +387,7 @@ private fun UserInfo(
                 UserDescText(
                     modifier = Modifier.padding(horizontal = standardPadding * 2),
                     htmlDesc = user.htmlDesc,
-                    url = user.url,
+                    url = user.twitterExtra?.url ?: emptyList(),
                 )
             }
             Spacer(modifier = Modifier.height(standardPadding))
@@ -577,7 +575,7 @@ fun MetricsItem(
 fun UserDescText(
     modifier: Modifier = Modifier,
     htmlDesc: String,
-    url: List<UiUrlEntity>,
+    url: List<TwitterUrlEntity>,
 ) {
     key(
         htmlDesc,

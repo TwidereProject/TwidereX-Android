@@ -44,6 +44,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import java.util.UUID
 
 /**
  * The class responsible for accessing the data from a [Flow] of [PagingData].
@@ -234,7 +235,7 @@ public fun <T : Any> Flow<PagingData<T>>.collectAsLazyPagingItems(): LazyPagingI
  */
 public fun <T : Any> LazyListScope.items(
     lazyPagingItems: LazyPagingItems<T>,
-    key: ((index: Int) -> Any) = { lazyPagingItems[it]?.hashCode() ?: 0 },
+    key: ((index: Int) -> Any) = { lazyPagingItems[it]?.hashCode() ?: UUID.randomUUID() },
     itemContent: @Composable LazyItemScope.(value: T?) -> Unit
 ) {
     // this state recomposes every time the LazyPagingItems receives an update and changes the
@@ -263,7 +264,7 @@ public fun <T : Any> LazyListScope.items(
  */
 public fun <T : Any> LazyListScope.itemsIndexed(
     lazyPagingItems: LazyPagingItems<T>,
-    key: ((index: Int) -> Any) = { lazyPagingItems[it]?.hashCode() ?: 0 },
+    key: ((index: Int) -> Any) = { lazyPagingItems[it]?.hashCode() ?: UUID.randomUUID() },
     itemContent: @Composable LazyItemScope.(index: Int, value: T?) -> Unit
 ) {
     // this state recomposes every time the LazyPagingItems receives an update and changes the

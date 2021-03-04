@@ -26,20 +26,20 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ListItem
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.lazy.LazyColumn2
 import com.twidere.twiderex.component.lazy.LazyPagingItems
 import com.twidere.twiderex.component.lazy.items
 import com.twidere.twiderex.component.lazy.loadState
 import com.twidere.twiderex.component.status.UserAvatar
+import com.twidere.twiderex.component.status.UserName
+import com.twidere.twiderex.component.status.UserScreenName
 import com.twidere.twiderex.model.ui.UiUser
-import com.twidere.twiderex.ui.mediumEmphasisContentContentColor
+import java.util.UUID
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -47,7 +47,7 @@ fun LazyUiUserList(
     modifier: Modifier = Modifier,
     items: LazyPagingItems<UiUser>,
     state: LazyListState = rememberLazyListState(),
-    key: ((index: Int) -> Any) = { items[it]?.userKey.hashCode() },
+    key: ((index: Int) -> Any) = { items[it]?.userKey?.hashCode() ?: UUID.randomUUID() },
     onItemClicked: (UiUser) -> Unit = {},
 ) {
     LazyColumn2(
@@ -67,18 +67,8 @@ fun LazyUiUserList(
                     },
                     text = {
                         Row {
-                            Text(
-                                text = it.name,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                                color = MaterialTheme.colors.primary,
-                            )
-                            Text(
-                                text = "@${it.screenName}",
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                                color = mediumEmphasisContentContentColor,
-                            )
+                            UserName(user = it)
+                            UserScreenName(user = it)
                         }
                     },
                     secondaryText = {

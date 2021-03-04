@@ -27,7 +27,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.snapshotFlow
 import androidx.paging.LoadState
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
@@ -53,7 +52,9 @@ fun TimelineComponent(viewModel: TimelineViewModel) {
         },
     ) {
         if (items.itemCount > 0) {
-            val lastScrollState by rememberUpdatedState(newValue = viewModel.restoreScrollState())
+            val lastScrollState = remember {
+                viewModel.restoreScrollState()
+            }
             val listState = rememberLazyListState(
                 initialFirstVisibleItemIndex = lastScrollState.firstVisibleItemIndex,
                 initialFirstVisibleItemScrollOffset = lastScrollState.firstVisibleItemScrollOffset,
@@ -66,7 +67,6 @@ fun TimelineComponent(viewModel: TimelineViewModel) {
                     }
                 }
             }
-
             LaunchedEffect(listState) {
                 snapshotFlow { listState.isScrollInProgress }
                     .distinctUntilChanged()

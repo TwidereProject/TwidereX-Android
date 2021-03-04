@@ -23,6 +23,8 @@ package com.twidere.twiderex.component.status
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.forEachGesture
 import androidx.compose.foundation.gestures.waitForUpOrCancellation
+import androidx.compose.foundation.text.InlineTextContent
+import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.LocalTextStyle
@@ -36,9 +38,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.consumeDownChange
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.Placeholder
+import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.navigation.LocalNavigator
 import kotlinx.coroutines.coroutineScope
 import org.jsoup.Jsoup
@@ -47,6 +52,8 @@ import org.jsoup.nodes.Node
 import org.jsoup.nodes.TextNode
 
 private const val TAG_URL = "url"
+
+private const val ID_IMAGE = "image"
 
 data class ResolvedLink(
     val expanded: String?,
@@ -96,10 +103,11 @@ private fun RenderContent(
                         val change = awaitPointerEventScope {
                             awaitFirstDown()
                         }
-                        val annotation = layoutResult.value?.getOffsetForPosition(change.position)?.let {
-                            value.getStringAnnotations(start = it, end = it)
-                                .firstOrNull()
-                        }
+                        val annotation =
+                            layoutResult.value?.getOffsetForPosition(change.position)?.let {
+                                value.getStringAnnotations(start = it, end = it)
+                                    .firstOrNull()
+                            }
                         if (annotation != null) {
                             change.consumeDownChange()
                             val up = awaitPointerEventScope {
@@ -115,7 +123,20 @@ private fun RenderContent(
             text = value,
             onTextLayout = {
                 layoutResult.value = it
-            }
+            },
+            inlineContent = mapOf(
+                ID_IMAGE to InlineTextContent(
+                    Placeholder(
+                        width = LocalTextStyle.current.fontSize,
+                        height = LocalTextStyle.current.fontSize,
+                        placeholderVerticalAlign = PlaceholderVerticalAlign.TextCenter
+                    )
+                ) { target ->
+                    NetworkImage(
+                        data = target,
+                    )
+                }
+            )
         )
     }
 }
@@ -200,8 +221,18 @@ private fun AnnotatedString.Builder.RenderElement(
                     RenderNode(node = it, context = context, styleData = styleData)
                 }
             }
+            "emoji" -> {
+                RenderEmoji(element)
+            }
         }
     }
+}
+
+private fun AnnotatedString.Builder.RenderEmoji(
+    element: Element,
+) {
+    val target = element.attr("target")
+    appendInlineContent(ID_IMAGE, target)
 }
 
 private fun AnnotatedString.Builder.RenderLink(

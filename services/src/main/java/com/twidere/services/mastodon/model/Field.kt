@@ -20,12 +20,16 @@
  */
 package com.twidere.services.mastodon.model
 
+import com.twidere.services.serializer.DateSerializerV2WithOffset
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import java.util.Date
 
 @Serializable
 data class Field(
     val name: String? = null,
     val value: String? = null,
-//    @SerialName("verified_at")
-//    val verifiedAt: Date? = null,
+    @SerialName("verified_at")
+    @Serializable(with = DateSerializerV2WithOffset::class)
+    val verifiedAt: Date? = null,
 )

@@ -21,7 +21,13 @@
 package com.twidere.twiderex.db.mapper
 
 import com.twidere.services.mastodon.model.Account
+import com.twidere.services.mastodon.model.Emoji
+import com.twidere.services.mastodon.model.Notification
+import com.twidere.services.mastodon.model.NotificationTypes
 import com.twidere.services.mastodon.model.Status
+import com.twidere.services.mastodon.model.Visibility
+import com.twidere.twiderex.db.model.DbMastodonStatusExtra
+import com.twidere.twiderex.db.model.DbMastodonUserExtra
 import com.twidere.twiderex.db.model.DbMedia
 import com.twidere.twiderex.db.model.DbStatusReaction
 import com.twidere.twiderex.db.model.DbStatusV2
@@ -31,12 +37,92 @@ import com.twidere.twiderex.db.model.DbTimeline
 import com.twidere.twiderex.db.model.DbTimelineWithStatus
 import com.twidere.twiderex.db.model.DbUrlEntity
 import com.twidere.twiderex.db.model.DbUser
-import com.twidere.twiderex.db.model.DbUserWithEntity
+import com.twidere.twiderex.db.model.ReferenceType
 import com.twidere.twiderex.db.model.TimelineType
+import com.twidere.twiderex.db.model.toDbStatusReference
+import com.twidere.twiderex.model.MastodonStatusType
 import com.twidere.twiderex.model.MediaType
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.PlatformType
 import java.util.UUID
+import java.util.regex.Pattern
+
+fun Notification.toDbTimeline(
+    accountKey: MicroBlogKey,
+    timelineType: TimelineType,
+): DbTimelineWithStatus {
+    val user = this.account?.toDbUser(accountKey = accountKey)
+        ?: throw IllegalArgumentException("mastodon Notification.user should not be null")
+    val relatedStatus = this.status?.toDbStatusWithMediaAndUser(accountKey = accountKey)
+    val status = DbStatusV2(
+        _id = UUID.randomUUID().toString(),
+        statusId = id
+            ?: throw IllegalArgumentException("mastodon Notification.id should not be null"),
+        statusKey = accountKey.copy(
+            id = id
+                ?: throw IllegalArgumentException("mastodon Notification.id should not be null"),
+        ),
+        htmlText = "",
+        rawText = "",
+        timestamp = this.createdAt?.time ?: 0,
+        retweetCount = 0,
+        likeCount = 0,
+        replyCount = 0,
+        placeString = null,
+        source = "",
+        hasMedia = false,
+        userKey = user.userKey,
+        lang = null,
+        is_possibly_sensitive = false,
+        platformType = PlatformType.Mastodon,
+        mastodonExtra = DbMastodonStatusExtra(
+            type = this.type.toDbType(),
+            emoji = emptyList(),
+            visibility = Visibility.Public,
+            sensitive = false,
+            spoilerText = null,
+            poll = null,
+        )
+    )
+    return DbTimelineWithStatus(
+        timeline = DbTimeline(
+            _id = UUID.randomUUID().toString(),
+            accountKey = accountKey,
+            timestamp = createdAt?.time ?: 0,
+            isGap = false,
+            statusKey = status.statusKey,
+            type = timelineType,
+        ),
+        status = DbStatusWithReference(
+            status = DbStatusWithMediaAndUser(
+                data = status,
+                media = emptyList(),
+                user = user,
+                reactions = emptyList(),
+                url = emptyList(),
+            ),
+            references = listOfNotNull(
+                relatedStatus.toDbStatusReference(
+                    status.statusKey,
+                    ReferenceType.MastodonNotification
+                ),
+            ),
+        ),
+    )
+}
+
+private fun NotificationTypes?.toDbType(): MastodonStatusType {
+    return when (this) {
+        NotificationTypes.follow -> MastodonStatusType.NotificationFollow
+        NotificationTypes.favourite -> MastodonStatusType.NotificationFavourite
+        NotificationTypes.reblog -> MastodonStatusType.NotificationReblog
+        NotificationTypes.mention -> MastodonStatusType.NotificationMention
+        NotificationTypes.poll -> MastodonStatusType.NotificationPoll
+        NotificationTypes.follow_request -> MastodonStatusType.NotificationFollowRequest
+        NotificationTypes.status -> MastodonStatusType.NotificationStatus
+        null -> throw IllegalArgumentException("mastodon Notification.type should not be null")
+    }
+}
 
 fun Status.toDbTimeline(
     accountKey: MicroBlogKey,
@@ -57,10 +143,10 @@ fun Status.toDbTimeline(
             type = timelineType,
         ),
         status = DbStatusWithReference(
-            replyTo = null,
-            quote = null,
-            retweet = retweet,
-            status = status
+            status = status,
+            references = listOfNotNull(
+                retweet.toDbStatusReference(status.data.statusKey, ReferenceType.Retweet),
+            ),
         ),
     )
 }
@@ -74,7 +160,12 @@ private fun Status.toDbStatusWithMediaAndUser(
         _id = UUID.randomUUID().toString(),
         statusId = id ?: throw IllegalArgumentException("mastodon Status.idStr should not be null"),
         rawText = content ?: "",
-        htmlText = content ?: "",
+        htmlText = content?.let {
+            generateHtmlContentWithEmoji(
+                content = it,
+                emojis = emojis ?: emptyList()
+            )
+        } ?: "",
         timestamp = createdAt?.time ?: 0,
         retweetCount = reblogsCount ?: 0,
         likeCount = favouritesCount ?: 0,
@@ -82,17 +173,22 @@ private fun Status.toDbStatusWithMediaAndUser(
         placeString = "",
         hasMedia = !mediaAttachments.isNullOrEmpty(),
         source = application?.name ?: "",
-        userKey = user.user.userKey,
+        userKey = user.userKey,
         lang = null,
-        replyStatusKey = null,
-        retweetStatusKey = reblog?.toDbStatusWithMediaAndUser(accountKey = accountKey)?.data?.statusKey,
-        quoteStatusKey = null,
         statusKey = MicroBlogKey(
             id ?: throw IllegalArgumentException("mastodon Status.idStr should not be null"),
-            host = user.user.userKey.host,
+            host = user.userKey.host,
         ),
         is_possibly_sensitive = sensitive ?: false,
         platformType = PlatformType.Mastodon,
+        mastodonExtra = DbMastodonStatusExtra(
+            type = MastodonStatusType.Status,
+            emoji = emojis ?: emptyList(),
+            visibility = visibility ?: Visibility.Public,
+            sensitive = sensitive ?: false,
+            spoilerText = spoilerText?.takeIf { it.isNotEmpty() },
+            poll = poll,
+        )
     )
     return DbStatusWithMediaAndUser(
         data = status,
@@ -138,7 +234,6 @@ private fun Status.toDbStatusWithMediaAndUser(
                 DbUrlEntity(
                     _id = UUID.randomUUID().toString(),
                     statusKey = status.statusKey,
-                    userKey = null,
                     url = it.url ?: "",
                     expandedUrl = it.url ?: "",
                     displayUrl = it.url ?: "",
@@ -153,8 +248,8 @@ private fun Status.toDbStatusWithMediaAndUser(
 
 fun Account.toDbUser(
     accountKey: MicroBlogKey
-): DbUserWithEntity {
-    val user = DbUser(
+): DbUser {
+    return DbUser(
         _id = UUID.randomUUID().toString(),
         userId = this.id ?: throw IllegalArgumentException("mastodon user.id should not be null"),
         name = displayName
@@ -172,15 +267,36 @@ fun Account.toDbUser(
         friendsCount = followingCount ?: 0,
         listedCount = 0,
         rawDesc = note ?: "",
-        htmlDesc = note ?: "",
+        htmlDesc = note?.let {
+            generateHtmlContentWithEmoji(
+                content = it,
+                emojis = emojis ?: emptyList()
+            )
+        } ?: "",
         website = null,
         location = null,
         verified = false,
         isProtected = false,
         platformType = PlatformType.Mastodon,
+        mastodonExtra = DbMastodonUserExtra(
+            fields = fields ?: emptyList(),
+            bot = bot ?: false,
+            locked = locked ?: false,
+            emoji = emojis ?: emptyList(),
+        )
     )
-    return DbUserWithEntity(
-        user = user,
-        url = emptyList()
-    )
+}
+
+private fun generateHtmlContentWithEmoji(
+    content: String,
+    emojis: List<Emoji>,
+): String {
+    var result = content
+    emojis.forEach { (shortcode, url) ->
+        val regex = Pattern.compile(":$shortcode:", Pattern.LITERAL).toRegex()
+        result = result.replace(regex = regex) {
+            "<emoji target=\"$url\">:$shortcode:</emoji>"
+        }
+    }
+    return result
 }

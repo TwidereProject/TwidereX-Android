@@ -42,9 +42,6 @@ class HomeTimelineItem : HomeNavigationItem() {
     @Composable
     override fun name(): String = stringResource(R.string.scene_timeline_title)
 
-    override val route: String
-        get() = "home"
-
     @Composable
     override fun icon(): Painter = painterResource(id = R.drawable.ic_home)
 

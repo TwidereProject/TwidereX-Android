@@ -40,10 +40,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
-import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
@@ -85,6 +83,8 @@ import com.twidere.twiderex.component.status.ReplyButton
 import com.twidere.twiderex.component.status.RetweetButton
 import com.twidere.twiderex.component.status.ShareButton
 import com.twidere.twiderex.component.status.UserAvatar
+import com.twidere.twiderex.component.status.UserName
+import com.twidere.twiderex.component.status.UserScreenName
 import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.extensions.hideControls
 import com.twidere.twiderex.extensions.setOnSystemBarsVisibilityChangeListener
@@ -289,21 +289,9 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int) {
                                         ) {
                                             UserAvatar(user = status.user)
                                             Spacer(modifier = Modifier.width(standardPadding))
-                                            Text(
-                                                text = status.user.name,
-                                                maxLines = 1,
-                                                overflow = TextOverflow.Ellipsis,
-                                            )
+                                            UserName(user = status.user)
                                             Spacer(modifier = Modifier.width(standardPadding))
-                                            CompositionLocalProvider(
-                                                LocalContentAlpha provides ContentAlpha.medium
-                                            ) {
-                                                Text(
-                                                    text = "@${status.user.screenName}",
-                                                    maxLines = 1,
-                                                    overflow = TextOverflow.Ellipsis,
-                                                )
-                                            }
+                                            UserScreenName(user = status.user)
                                         }
                                         ReplyButton(status = status, withNumber = false)
                                         RetweetButton(status = status, withNumber = false)

@@ -33,8 +33,8 @@ import com.twidere.twiderex.db.model.pagingKey
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.notification.InAppNotification
-import com.twidere.twiderex.paging.MaxIdPagination
 import com.twidere.twiderex.paging.PagingList
+import com.twidere.twiderex.paging.SinceMaxPagination
 import com.twidere.twiderex.paging.mediator.paging.MaxIdPagingMediator
 
 @OptIn(ExperimentalPagingApi::class)
@@ -64,14 +64,14 @@ class UserFavouriteMediator(
         }
     }
 
-    override suspend fun load(pageSize: Int, paging: MaxIdPagination?): List<IStatus> {
+    override suspend fun load(pageSize: Int, paging: SinceMaxPagination?): List<IStatus> {
         val result = service.favorites(
             user_id = userKey.id,
             count = pageSize,
             max_id = paging?.maxId,
         )
         return if (platformType == PlatformType.Mastodon && result is MastodonPaging<*>) {
-            PagingList(result, nextPage = MaxIdPagination(maxId = result.next))
+            PagingList(result, nextPage = SinceMaxPagination(maxId = result.next))
         } else {
             result
         }

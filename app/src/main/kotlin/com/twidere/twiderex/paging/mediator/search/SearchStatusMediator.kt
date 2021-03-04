@@ -24,6 +24,7 @@ import com.twidere.services.microblog.model.IStatus
 import com.twidere.services.twitter.TwitterService
 import com.twidere.services.twitter.model.exceptions.TwitterApiExceptionV2
 import com.twidere.twiderex.db.CacheDatabase
+import com.twidere.twiderex.db.model.DbPagingTimelineWithStatus
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.paging.CursorPagination
@@ -45,5 +46,9 @@ class SearchStatusMediator(
             service.searchTweetsV1("$query -filter:retweets", count = pageSize, max_id = paging?.cursor)
         }
         return CursorPagingResult(result.status, result.nextPage)
+    }
+
+    override fun hasMore(result: List<DbPagingTimelineWithStatus>, pageSize: Int): Boolean {
+        return result.size == pageSize
     }
 }

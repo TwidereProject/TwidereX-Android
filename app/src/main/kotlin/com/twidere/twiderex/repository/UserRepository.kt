@@ -26,7 +26,7 @@ import com.twidere.services.microblog.LookupService
 import com.twidere.services.microblog.RelationshipService
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.db.mapper.toDbUser
-import com.twidere.twiderex.db.model.DbUserWithEntity
+import com.twidere.twiderex.db.model.DbUser
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.toAmUser
 import com.twidere.twiderex.model.ui.UiUser
@@ -73,10 +73,9 @@ class UserRepository @AssistedInject constructor(
         }
     }
 
-    private suspend fun saveUser(user: DbUserWithEntity) {
-        database.userDao().insertAll(listOf(user.user))
-        database.urlEntityDao().insertAll(user.url)
-        accountRepository.findByAccountKey(user.user.userKey)?.let {
+    private suspend fun saveUser(user: DbUser) {
+        database.userDao().insertAll(listOf(user))
+        accountRepository.findByAccountKey(user.userKey)?.let {
             accountRepository.getAccountDetails(it)
         }?.let { details ->
             user.let {

@@ -30,6 +30,7 @@ private typealias TwitterUserV2 = com.twidere.services.twitter.model.UserV2
 private typealias TwitterStatus = com.twidere.services.twitter.model.Status
 private typealias TwitterStatusV2 = com.twidere.services.twitter.model.StatusV2
 private typealias MastodonStatus = com.twidere.services.mastodon.model.Status
+private typealias MastodonNotification = com.twidere.services.mastodon.model.Notification
 private typealias MastodonUser = com.twidere.services.mastodon.model.Account
 
 fun IStatus.toDbTimeline(
@@ -47,6 +48,10 @@ fun IStatus.toDbTimeline(
     is MastodonStatus -> this.toDbTimeline(
         accountKey = accountKey,
         timelineType = timelineType
+    )
+    is MastodonNotification -> this.toDbTimeline(
+        accountKey = accountKey,
+        timelineType = timelineType,
     )
     else -> throw NotImplementedError()
 }

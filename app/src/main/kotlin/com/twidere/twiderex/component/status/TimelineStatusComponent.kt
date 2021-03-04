@@ -26,6 +26,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -34,25 +35,36 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.ContentAlpha
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.LocalContentColor
+import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Message
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.twidere.services.mastodon.model.Visibility
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.HumanizedTime
 import com.twidere.twiderex.component.navigation.LocalNavigator
+import com.twidere.twiderex.db.model.DbMastodonStatusExtra
+import com.twidere.twiderex.model.MastodonStatusType
+import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.preferences.LocalDisplayPreferences
+import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.profileImageSize
 import com.twidere.twiderex.ui.standardPadding
 import com.twidere.twiderex.ui.statusActionIconSize
@@ -62,162 +74,379 @@ fun TimelineStatusComponent(
     data: UiStatus,
     showActions: Boolean = true,
 ) {
+    when {
+        data.platformType == PlatformType.Mastodon &&
+            data.mastodonExtra != null
+            && (
+                data.mastodonExtra.type == MastodonStatusType.NotificationFollowRequest ||
+                    data.mastodonExtra.type == MastodonStatusType.NotificationFollow
+                ) -> {
+            MastodonFollowStatus(data, data.mastodonExtra)
+        }
+        else -> NormalStatus(data, showActions)
+    }
+}
+
+@Composable
+fun MastodonFollowStatus(data: UiStatus, mastodonExtra: DbMastodonStatusExtra) {
     val navigator = LocalNavigator.current
-    Column {
-        val status = (data.retweet ?: data)
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable(
-                    onClick = {
-                        navigator.status(data.statusKey)
-                    }
-                )
-                .padding(
-                    start = standardPadding * 2,
-                    top = standardPadding * 2,
-                    end = standardPadding * 2
-                ),
-        ) {
-            if (data.retweet != null) {
-                RetweetHeader(data = data)
-                Spacer(modifier = Modifier.height(standardPadding))
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable {
+                navigator.user(data.user)
             }
-            StatusComponent(
-                status = status,
+            .padding(
+                horizontal = standardPadding * 2,
+            ),
+    ) {
+        Spacer(modifier = Modifier.height(standardPadding))
+        StatusHeader(data = data)
+        Row {
+            UserAvatar(user = data.user)
+            Spacer(modifier = Modifier.width(standardPadding))
+            Column {
+                UserName(data.user)
+                Spacer(modifier = Modifier.width(standardPadding / 2))
+                UserScreenName(data.user)
+            }
+            Spacer(modifier = Modifier.width(standardPadding))
+        }
+        Spacer(modifier = Modifier.height(standardPadding))
+    }
+}
+
+@Composable
+private fun NormalStatus(
+    data: UiStatus,
+    showActions: Boolean
+) {
+    val navigator = LocalNavigator.current
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(
+                onClick = {
+                    navigator.status(data.statusKey)
+                }
             )
-            if (showActions) {
-                CompositionLocalProvider(
-                    LocalContentAlpha provides ContentAlpha.medium
+            .padding(
+                start = standardPadding * 2,
+                end = standardPadding * 2
+            ),
+    ) {
+        Spacer(modifier = Modifier.height(standardPadding))
+        StatusContent(
+            data = data,
+        )
+        if (showActions) {
+            Row {
+                Spacer(modifier = Modifier.width(profileImageSize + standardPadding))
+                val status = (data.retweet ?: data)
+                StatusActions(status)
+            }
+        }
+    }
+}
+
+@Composable
+private fun StatusHeader(data: UiStatus) {
+    when {
+        data.platformType == PlatformType.Mastodon && data.mastodonExtra != null -> {
+            MastodonStatusHeader(data.mastodonExtra, data)
+            Spacer(modifier = Modifier.height(standardPadding))
+        }
+        data.retweet != null -> {
+            RetweetHeader(data = data)
+            Spacer(modifier = Modifier.height(standardPadding))
+        }
+    }
+}
+
+@Composable
+private fun MastodonStatusHeader(
+    mastodonExtra: DbMastodonStatusExtra,
+    data: UiStatus
+) {
+    when (mastodonExtra.type) {
+        MastodonStatusType.Status -> Unit
+        MastodonStatusType.NotificationFollow -> {
+            TweetHeader(
+                icon = {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_user_plus),
+                        contentDescription = null
+                    )
+                },
+                text = {
+                    Text(
+                        text = stringResource(
+                            id = R.string.common_notification_follow,
+                            data.user.displayName
+                        )
+                    )
+                }
+            )
+        }
+        MastodonStatusType.NotificationFollowRequest -> {
+            TweetHeader(
+                icon = {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_user_exclamation),
+                        contentDescription = null
+                    )
+                },
+                text = {
+                    Text(
+                        text = stringResource(
+                            id = R.string.common_notification_follow_request,
+                            data.user.displayName
+                        )
+                    )
+                }
+            )
+        }
+        MastodonStatusType.NotificationMention -> Unit
+        MastodonStatusType.NotificationReblog -> {
+            RetweetHeader(data = data)
+        }
+        MastodonStatusType.NotificationFavourite -> {
+            TweetHeader(
+                icon = {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_heart),
+                        contentDescription = null
+                    )
+                },
+                text = {
+                    Text(
+                        text = stringResource(
+                            id = R.string.common_notification_favourite,
+                            data.user.displayName
+                        )
+                    )
+                }
+            )
+        }
+        MastodonStatusType.NotificationPoll -> {
+            TweetHeader(
+                icon = {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_poll),
+                        contentDescription = null
+                    )
+                },
+                text = {
+                    val text = if (LocalActiveAccount.current?.let { it.accountKey == data.user.userKey } == true) {
+                        stringResource(
+                            id = R.string.common_notification_own_poll,
+                        )
+                    } else {
+                        stringResource(
+                            id = R.string.common_notification_poll,
+                        )
+                    }
+
+                    Text(
+                        text = text
+                    )
+                }
+            )
+        }
+        MastodonStatusType.NotificationStatus -> {
+            TweetHeader(
+                icon = {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_bell_ringing),
+                        contentDescription = null
+                    )
+                },
+                text = {
+                    Text(
+                        text = stringResource(
+                            id = R.string.common_notification_status,
+                            data.user.displayName
+                        )
+                    )
+                }
+            )
+        }
+    }
+}
+
+@Composable
+private fun StatusActions(status: UiStatus) {
+    CompositionLocalProvider(
+        LocalContentAlpha provides ContentAlpha.medium
+    ) {
+        Row {
+            ReplyButton(status = status)
+            RetweetButton(status = status)
+            LikeButton(status = status)
+            ShareButton(status = status, compat = true)
+        }
+    }
+}
+
+enum class StatusContentType {
+    Normal,
+    Extend,
+}
+
+@OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialApi::class)
+@Composable
+fun StatusContent(
+    modifier: Modifier = Modifier,
+    data: UiStatus,
+    type: StatusContentType = StatusContentType.Normal,
+) {
+    Column(modifier = modifier) {
+        StatusHeader(data)
+        val status = data.retweet ?: data
+        Row {
+            UserAvatar(user = status.user)
+            Spacer(modifier = Modifier.width(standardPadding))
+            Column {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Spacer(modifier = Modifier.height(standardPadding))
-                    Row {
-                        Spacer(modifier = Modifier.width(profileImageSize))
-                        ReplyButton(status = status)
-                        RetweetButton(status = status)
-                        LikeButton(status = status)
-                        ShareButton(status = status, compat = true)
+                    Row(
+                        modifier = Modifier.weight(1f),
+                    ) {
+                        UserName(status.user)
+                        if (type == StatusContentType.Normal) {
+                            Spacer(modifier = Modifier.width(standardPadding / 2))
+                            UserScreenName(status.user)
+                        }
+                    }
+                    CompositionLocalProvider(
+                        LocalContentAlpha provides ContentAlpha.medium
+                    ) {
+                        if (status.platformType == PlatformType.Mastodon && status.mastodonExtra != null) {
+                            Icon(
+                                modifier = Modifier.size(LocalTextStyle.current.fontSize.value.dp),
+                                painter = when (status.mastodonExtra.visibility) {
+                                    Visibility.Public -> painterResource(id = R.drawable.ic_globe)
+                                    Visibility.Unlisted -> rememberVectorPainter(image = Icons.Default.List)
+                                    Visibility.Private -> rememberVectorPainter(image = Icons.Default.Lock)
+                                    Visibility.Direct -> rememberVectorPainter(image = Icons.Default.Message)
+                                },
+                                contentDescription = status.mastodonExtra.visibility.name
+                            )
+                            Spacer(modifier = Modifier.width(standardPadding / 2))
+                        }
+                        if (type == StatusContentType.Normal) {
+                            HumanizedTime(time = status.timestamp)
+                        }
                     }
                 }
+                when (type) {
+                    StatusContentType.Normal -> {
+                        Spacer(modifier = Modifier.height(standardPadding / 2))
+                        StatusBody(status, type)
+                    }
+                    StatusContentType.Extend -> UserScreenName(status.user)
+                }
             }
+        }
+        if (type == StatusContentType.Extend) {
             Spacer(modifier = Modifier.height(standardPadding))
+            StatusBody(status = status, type = type)
         }
     }
 }
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-private fun StatusComponent(
+fun ColumnScope.StatusBody(
     status: UiStatus,
-    modifier: Modifier = Modifier,
+    type: StatusContentType = StatusContentType.Normal,
 ) {
     val navigator = LocalNavigator.current
-    Row(modifier = modifier) {
-        UserAvatar(user = status.user)
-        Spacer(modifier = Modifier.width(standardPadding))
-        Column {
-            Row {
+
+    StatusText(
+        status = status,
+    )
+
+    if (status.media.any()) {
+        Spacer(modifier = Modifier.height(standardPadding))
+        AnimatedVisibility(visible = LocalDisplayPreferences.current.mediaPreview) {
+            StatusMediaComponent(
+                status = status,
+            )
+        }
+        AnimatedVisibility(visible = !LocalDisplayPreferences.current.mediaPreview) {
+            CompositionLocalProvider(
+                LocalContentAlpha provides ContentAlpha.medium
+            ) {
                 Row(
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text(
-                        text = status.user.name,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    CompositionLocalProvider(
-                        LocalContentAlpha provides ContentAlpha.medium
-                    ) {
-                        Text(
-                            text = "@${status.user.screenName}",
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                        )
-                    }
-                }
-                HumanizedTime(time = status.timestamp)
-            }
-
-            Spacer(modifier = Modifier.height(4.dp))
-
-            StatusText(status)
-
-            if (status.media.any()) {
-                Spacer(modifier = Modifier.height(standardPadding))
-                AnimatedVisibility(visible = LocalDisplayPreferences.current.mediaPreview) {
-                    StatusMediaComponent(
-                        status = status,
-                    )
-                }
-                AnimatedVisibility(visible = !LocalDisplayPreferences.current.mediaPreview) {
-                    CompositionLocalProvider(
-                        LocalContentAlpha provides ContentAlpha.medium
-                    ) {
-                        Row(
-                            modifier = Modifier
-                                .clickable(
-                                    onClick = {
-                                        navigator.media(statusKey = status.statusKey)
-                                    }
-                                )
-                                .fillMaxWidth()
-                        ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_photo),
-                                contentDescription = stringResource(
-                                    id = R.string.accessibility_common_status_media
-                                )
-                            )
-                            Spacer(modifier = Modifier.width(standardPadding))
-                            Text(text = stringResource(id = R.string.common_controls_status_media))
-                        }
-                    }
-                }
-            }
-
-            if (!status.placeString.isNullOrEmpty()) {
-                Spacer(modifier = Modifier.height(standardPadding))
-                CompositionLocalProvider(
-                    LocalContentAlpha provides ContentAlpha.medium
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Icon(
-                            modifier = Modifier.size(statusActionIconSize),
-                            painter = painterResource(id = R.drawable.ic_map_pin),
-                            contentDescription = stringResource(id = R.string.accessibility_common_status_location)
-                        )
-                        Box(modifier = Modifier.width(standardPadding))
-                        Text(text = status.placeString)
-                    }
-                }
-            }
-
-            if (status.quote != null) {
-                Spacer(modifier = Modifier.height(standardPadding))
-                Box(
                     modifier = Modifier
-                        .border(
-                            1.dp,
-                            LocalContentColor.current.copy(alpha = 0.12f),
-                            MaterialTheme.shapes.medium
+                        .clickable(
+                            onClick = {
+                                navigator.media(statusKey = status.statusKey)
+                            }
                         )
-                        .clip(MaterialTheme.shapes.medium)
+                        .fillMaxWidth()
                 ) {
-                    StatusComponent(
-                        status = status.quote,
-                        modifier = Modifier
-                            .clickable(
-                                onClick = {
-                                    navigator.status(statusKey = status.quote.statusKey)
-                                }
-                            )
-                            .padding(standardPadding),
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_photo),
+                        contentDescription = stringResource(
+                            id = R.string.accessibility_common_status_media
+                        )
                     )
+                    Spacer(modifier = Modifier.width(standardPadding))
+                    Text(text = stringResource(id = R.string.common_controls_status_media))
                 }
             }
+        }
+    }
+
+    if (status.platformType == PlatformType.Mastodon && status.mastodonExtra?.poll != null) {
+        Spacer(modifier = Modifier.height(standardPadding))
+        MastodonPoll(status)
+    }
+
+    if (!status.placeString.isNullOrEmpty()) {
+        Spacer(modifier = Modifier.height(standardPadding))
+        CompositionLocalProvider(
+            LocalContentAlpha provides ContentAlpha.medium
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Icon(
+                    modifier = Modifier.size(statusActionIconSize),
+                    painter = painterResource(id = R.drawable.ic_map_pin),
+                    contentDescription = stringResource(id = R.string.accessibility_common_status_location)
+                )
+                Box(modifier = Modifier.width(standardPadding))
+                Text(text = status.placeString)
+            }
+        }
+    }
+
+    status.quote?.let { quote ->
+        Spacer(modifier = Modifier.height(standardPadding))
+        Box(
+            modifier = Modifier
+                .border(
+                    1.dp,
+                    LocalContentColor.current.copy(alpha = 0.12f),
+                    MaterialTheme.shapes.medium
+                )
+                .clip(MaterialTheme.shapes.medium)
+        ) {
+            StatusContent(
+                data = quote,
+                modifier = Modifier
+                    .clickable(
+                        onClick = {
+                            navigator.status(statusKey = quote.statusKey)
+                        }
+                    )
+                    .padding(standardPadding),
+                type = type,
+            )
         }
     }
 }

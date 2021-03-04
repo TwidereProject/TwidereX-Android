@@ -41,7 +41,6 @@ import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.LoadingProgress
 import com.twidere.twiderex.component.lazy.LazyColumn2
 import com.twidere.twiderex.component.lazy.LazyPagingItems
-import com.twidere.twiderex.component.lazy.items
 import com.twidere.twiderex.component.lazy.loadState
 import com.twidere.twiderex.component.lazy.statusesIndexed
 import com.twidere.twiderex.component.status.StatusDivider
@@ -49,6 +48,7 @@ import com.twidere.twiderex.component.status.TimelineStatusComponent
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.ui.standardPadding
+import java.util.UUID
 
 @Composable
 fun LazyUiStatusList(
@@ -57,7 +57,7 @@ fun LazyUiStatusList(
     state: LazyListState = rememberLazyListState(),
     loadingBetween: List<MicroBlogKey> = emptyList(),
     onLoadBetweenClicked: (current: MicroBlogKey, next: MicroBlogKey) -> Unit = { _, _ -> },
-    key: ((index: Int) -> Any) = { items[it]?.statusKey.hashCode() },
+    key: ((index: Int) -> Any) = { items[it]?.statusKey?.hashCode() ?: UUID.randomUUID() },
 ) {
     LazyColumn2(
         modifier = modifier,

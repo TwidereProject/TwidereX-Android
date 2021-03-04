@@ -20,35 +20,17 @@
  */
 package com.twidere.services.mastodon.model
 
-import kotlinx.serialization.KSerializer
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.descriptors.PrimitiveKind
-import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
-import kotlinx.serialization.descriptors.SerialDescriptor
-import kotlinx.serialization.encoding.Decoder
-import kotlinx.serialization.encoding.Encoder
 
-@Serializable(with = Visibility.Companion::class)
-enum class Visibility(val value: String) {
-    Public("public"),
-    Unlisted("unlisted"),
-    Private("private"),
-    Direct("direct");
-
-    companion object : KSerializer<Visibility> {
-        override val descriptor: SerialDescriptor
-            get() {
-                return PrimitiveSerialDescriptor("quicktype.Visibility", PrimitiveKind.STRING)
-            }
-        override fun deserialize(decoder: Decoder): Visibility = when (val value = decoder.decodeString()) {
-            "public" -> Public
-            "unlisted" -> Unlisted
-            "private" -> Private
-            "direct" -> Direct
-            else -> throw IllegalArgumentException("Visibility could not parse: $value")
-        }
-        override fun serialize(encoder: Encoder, value: Visibility) {
-            return encoder.encodeString(value.value)
-        }
-    }
+@Serializable
+enum class Visibility {
+    @SerialName("public")
+    Public,
+    @SerialName("unlisted")
+    Unlisted,
+    @SerialName("private")
+    Private,
+    @SerialName("direct")
+    Direct;
 }

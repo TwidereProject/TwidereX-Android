@@ -25,6 +25,7 @@ import androidx.lifecycle.map
 import androidx.room.withTransaction
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.db.model.DbStatusV2
+import com.twidere.twiderex.db.model.ReferenceType
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.model.ui.UiStatus.Companion.toUi
@@ -55,18 +56,20 @@ class StatusRepository(
     }
 
     suspend fun removeStatus(statusKey: MicroBlogKey) {
-        val statusToRemove = listOfNotNull(
-            database.statusDao().findWithStatusKey(statusKey),
-            database.statusDao().findWithReplyStatusKey(statusKey)
-        )
-        val timelineToRemove =
-            database.timelineDao().findAllWithStatusKey(statusToRemove.map { it.statusKey })
-        val pagingTimelineToRemove =
-            database.pagingTimelineDao().findAllWIthStatusKey(statusToRemove.map { it.statusKey })
         database.withTransaction {
+            val statusToRemove = listOfNotNull(
+                database.statusDao().findWithStatusKey(statusKey),
+            ) + database.statusReferenceDao().find(statusKey, ReferenceType.Reply)
+                .map { it.status.data }
+            val timelineToRemove =
+                database.timelineDao().findAllWithStatusKey(statusToRemove.map { it.statusKey })
+            val pagingTimelineToRemove =
+                database.pagingTimelineDao()
+                    .findAllWIthStatusKey(statusToRemove.map { it.statusKey })
             database.statusDao().delete(statusToRemove)
             database.timelineDao().delete(timelineToRemove)
             database.pagingTimelineDao().delete(pagingTimelineToRemove)
+            database.statusReferenceDao().remove(statusToRemove.map { it.statusKey })
         }
     }
 }

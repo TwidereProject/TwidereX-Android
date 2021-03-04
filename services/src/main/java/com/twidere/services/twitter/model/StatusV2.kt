@@ -57,6 +57,9 @@ data class StatusV2(
     @SerialName("public_metrics")
     val publicMetrics: StatusV2PublicMetrics? = null,
 
+    @SerialName("reply_settings")
+    val replySettings: ReplySettings? = null,
+
     val attachments: AttachmentsV2? = null
 ) : IStatus {
     internal fun setExtra(includesV2: IncludesV2) {
@@ -80,4 +83,14 @@ data class StatusV2(
 
     @Transient
     var place: PlaceV2? = null
+}
+
+@Serializable
+enum class ReplySettings {
+    @SerialName("everyone")
+    Everyone,
+    @SerialName("mentioned_users")
+    MentionedUsers,
+    @SerialName("followers")
+    Followers,
 }

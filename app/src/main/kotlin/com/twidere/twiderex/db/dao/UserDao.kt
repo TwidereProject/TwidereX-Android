@@ -28,7 +28,6 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
 import com.twidere.twiderex.db.model.DbUser
-import com.twidere.twiderex.db.model.DbUserWithEntity
 import com.twidere.twiderex.model.MicroBlogKey
 
 @Dao
@@ -38,7 +37,7 @@ interface UserDao {
 
     @Transaction
     @Query("SELECT * FROM user WHERE userKey == :userKey")
-    fun findWithUserKeyLiveData(userKey: MicroBlogKey): LiveData<DbUserWithEntity?>
+    fun findWithUserKeyLiveData(userKey: MicroBlogKey): LiveData<DbUser?>
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
     suspend fun update(user: List<DbUser>)

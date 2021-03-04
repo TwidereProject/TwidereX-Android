@@ -25,17 +25,17 @@ import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.db.model.DbPagingTimelineWithStatus
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.notification.InAppNotification
-import com.twidere.twiderex.paging.MaxIdPagination
+import com.twidere.twiderex.paging.SinceMaxPagination
 
 abstract class MaxIdPagingMediator(
     accountKey: MicroBlogKey,
     database: CacheDatabase,
     inAppNotification: InAppNotification
-) : PagingTimelineMediatorBase<MaxIdPagination>(accountKey, database, inAppNotification) {
+) : PagingTimelineMediatorBase<SinceMaxPagination>(accountKey, database, inAppNotification) {
     override fun provideNextPage(
         raw: List<IStatus>,
         result: List<DbPagingTimelineWithStatus>
-    ): MaxIdPagination {
-        return MaxIdPagination(maxId = result.lastOrNull()?.status?.status?.data?.statusId)
+    ): SinceMaxPagination {
+        return SinceMaxPagination(maxId = result.lastOrNull()?.status?.status?.data?.statusId)
     }
 }

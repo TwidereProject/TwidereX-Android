@@ -39,5 +39,5 @@ interface FriendshipResources {
     ): Account
 
     @GET("/api/v1/accounts/relationships")
-    suspend fun showFriendships(@Query("id[]") id: String): List<RelationshipResponse>
+    suspend fun showFriendships(@Query("id[]") id: List<String>): List<RelationshipResponse>
 }

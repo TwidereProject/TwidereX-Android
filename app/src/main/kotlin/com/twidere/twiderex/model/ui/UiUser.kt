@@ -21,13 +21,17 @@
 package com.twidere.twiderex.model.ui
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.res.painterResource
 import com.twidere.twiderex.R
-import com.twidere.twiderex.db.model.DbUserWithEntity
+import com.twidere.twiderex.db.model.DbMastodonUserExtra
+import com.twidere.twiderex.db.model.DbTwitterUserExtra
+import com.twidere.twiderex.db.model.DbUser
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.PlatformType
-import com.twidere.twiderex.model.ui.UiUrlEntity.Companion.toUi
+import com.twidere.twiderex.ui.LocalActiveAccount
 
+@Stable
 data class UiUser(
     val id: String,
     val userKey: MicroBlogKey,
@@ -45,8 +49,21 @@ data class UiUser(
     val verified: Boolean,
     val protected: Boolean,
     val platformType: PlatformType,
-    val url: List<UiUrlEntity>,
+    val twitterExtra: DbTwitterUserExtra? = null,
+    val mastodonExtra: DbMastodonUserExtra? = null,
 ) {
+    val displayName
+        get() = name.takeUnless { it.isEmpty() } ?: screenName
+    val displayScreenName: String
+        @Composable
+        get() {
+            return if (LocalActiveAccount.current?.accountKey?.host?.let { it != userKey.host } != false) {
+                "@$screenName@${userKey.host}}"
+            } else {
+                screenName
+            }
+        }
+
     companion object {
         @Composable
         fun sample() = UiUser(
@@ -66,7 +83,6 @@ data class UiUser(
             protected = false,
             userKey = MicroBlogKey.Empty,
             platformType = PlatformType.Twitter,
-            url = emptyList(),
         )
 
         @Composable
@@ -87,10 +103,9 @@ data class UiUser(
             protected = false,
             userKey = MicroBlogKey.Empty,
             platformType = PlatformType.Twitter,
-            url = emptyList(),
         )
 
-        fun DbUserWithEntity.toUi() = with(user) {
+        fun DbUser.toUi() =
             UiUser(
                 id = userId,
                 name = name,
@@ -108,8 +123,8 @@ data class UiUser(
                 protected = isProtected,
                 userKey = userKey,
                 platformType = platformType,
-                url = url.map { it.toUi() }
+                twitterExtra = twitterExtra,
+                mastodonExtra = mastodonExtra,
             )
-        }
     }
 }

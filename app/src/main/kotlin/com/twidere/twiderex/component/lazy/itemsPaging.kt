@@ -29,10 +29,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.paging.LoadState
 import com.twidere.twiderex.component.foundation.loading
+import java.util.UUID
 
 fun <T : Any> LazyListScope.itemsPaging(
     lazyPagingItems: LazyPagingItems<T>,
-    key: ((index: Int) -> Any) = { lazyPagingItems[it]?.hashCode() ?: 0 },
+    key: ((index: Int) -> Any) = { lazyPagingItems[it]?.hashCode() ?: UUID.randomUUID() },
     itemContent: @Composable LazyItemScope.(value: T?) -> Unit
 ) {
     loadState(lazyPagingItems.loadState.refresh) {

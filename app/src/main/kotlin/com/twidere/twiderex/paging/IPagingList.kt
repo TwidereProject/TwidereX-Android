@@ -26,8 +26,9 @@ interface IPagingList<T, P : IPagination> : List<T> {
 
 interface IPagination
 
-data class MaxIdPagination(
-    val maxId: String?,
+data class SinceMaxPagination(
+    val maxId: String? = null,
+    val sinceId: String? = null,
 ) : IPagination
 
 data class CursorPagination(

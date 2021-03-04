@@ -19,7 +19,7 @@ ext {
             protobuf             : '3.14.0',
             work                 : '2.7.0-alpha01',
             dataStore            : "1.0.0-alpha07",
-            exoplayer            : '2.12.3',
+            exoplayer            : '2.13.2',
     ]
     global = [
             compileSdkVersion: 30,
