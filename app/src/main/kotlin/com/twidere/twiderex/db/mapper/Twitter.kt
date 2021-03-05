@@ -366,6 +366,16 @@ fun User.toDbUser(): DbUser {
             idStr ?: throw IllegalArgumentException("user.idStr should not be null")
         ),
         platformType = PlatformType.Twitter,
+        twitterExtra = DbTwitterUserExtra(
+            pinned_tweet_id = null,
+            url = entities?.description?.urls?.map {
+                TwitterUrlEntity(
+                    url = it.url ?: "",
+                    expandedUrl = it.expandedURL ?: "",
+                    displayUrl = it.displayURL ?: "",
+                )
+            } ?: emptyList()
+        )
     )
 }
 
