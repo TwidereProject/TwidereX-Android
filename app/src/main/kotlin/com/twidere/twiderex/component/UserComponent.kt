@@ -21,13 +21,13 @@
 package com.twidere.twiderex.component
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
@@ -37,12 +37,17 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Icon
+import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ProvideTextStyle
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
-import androidx.compose.material.TextButton
+import androidx.compose.material.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -322,7 +327,9 @@ private fun UserInfo(
         user?.profileBackgroundImage?.let {
             UserBanner(navController, it)
         }
-        Column {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
             BoxWithConstraints {
                 Spacer(
                     modifier = Modifier.height(
@@ -357,30 +364,28 @@ private fun UserInfo(
                 }
             }
             Spacer(modifier = Modifier.height(standardPadding))
-            Row(
-                modifier = Modifier
-                    .padding(horizontal = standardPadding * 2)
-            ) {
-                Column(
-                    modifier = Modifier.weight(1f),
-                ) {
-                    user?.let { user ->
-                        ProvideTextStyle(value = MaterialTheme.typography.h6) {
-                            UserName(user = user)
+            user?.let { user ->
+                Row {
+                    if (user.platformType == PlatformType.Mastodon && user.mastodonExtra?.locked == true) {
+                        CompositionLocalProvider(
+                            LocalContentAlpha provides ContentAlpha.medium,
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_lock),
+                                contentDescription = null
+                            )
                         }
-                        UserScreenName(user = user)
+                        Spacer(modifier = Modifier.width(standardPadding / 2))
+                    }
+                    ProvideTextStyle(value = MaterialTheme.typography.h6) {
+                        UserName(user = user)
                     }
                 }
-                if (viewModel.isMe) {
-                    // TODO: edit button
-//                    Text(
-//                        style = MaterialTheme.typography.h6,
-//                        color = MaterialTheme.colors.primary,
-//                        text = "Edit",
-//                    )
-                } else {
-                    UserRelationship(viewModel)
-                }
+                UserScreenName(user = user)
+            }
+            if (!viewModel.isMe) {
+                Spacer(modifier = Modifier.height(standardPadding))
+                UserRelationship(viewModel)
             }
             Spacer(modifier = Modifier.height(standardPadding))
             user?.let { user ->
@@ -389,8 +394,8 @@ private fun UserInfo(
                     htmlDesc = user.htmlDesc,
                     url = user.twitterExtra?.url ?: emptyList(),
                 )
+                Spacer(modifier = Modifier.height(standardPadding))
             }
-            Spacer(modifier = Modifier.height(standardPadding))
             user?.website?.let {
                 val navigator = LocalNavigator.current
                 ProfileItem(
@@ -409,8 +414,8 @@ private fun UserInfo(
                     text = it,
                     textColor = MaterialTheme.colors.primary,
                 )
+                Spacer(modifier = Modifier.height(standardPadding))
             }
-            Spacer(modifier = Modifier.height(standardPadding))
             user?.location?.takeIf { it.isNotEmpty() }?.let {
                 ProfileItem(
                     painter = painterResource(id = R.drawable.ic_map_pin),
@@ -419,9 +424,42 @@ private fun UserInfo(
                     ),
                     text = it
                 )
+                Spacer(modifier = Modifier.height(standardPadding))
+            }
+            user?.let {
+                MastodonUserField(it)
             }
             Spacer(modifier = Modifier.height(standardPadding))
             user?.let { UserMetrics(it) }
+            Spacer(modifier = Modifier.height(standardPadding))
+        }
+    }
+}
+
+@Composable
+fun MastodonUserField(user: UiUser) {
+    if (user.platformType != PlatformType.Mastodon || user.mastodonExtra == null) {
+        return
+    }
+    user.mastodonExtra.fields.forEachIndexed { index, field ->
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = standardPadding * 2)
+        ) {
+            CompositionLocalProvider(
+                LocalContentAlpha provides ContentAlpha.medium
+            ) {
+                field.name?.let { Text(text = it) }
+            }
+            Spacer(modifier = Modifier.width(standardPadding))
+            field.value?.let {
+                HtmlText(
+                    htmlText = it,
+                )
+            }
+        }
+        if (index != user.mastodonExtra.fields.lastIndex) {
             Spacer(modifier = Modifier.height(standardPadding))
         }
     }
@@ -436,7 +474,8 @@ private fun ProfileItem(
     textColor: Color = Color.Unspecified,
 ) {
     Box(
-        modifier = modifier,
+        modifier = modifier
+            .fillMaxWidth(),
     ) {
         Spacer(modifier = Modifier.height(standardPadding))
         Row(
@@ -460,38 +499,60 @@ private fun ProfileItem(
 }
 
 @Composable
-private fun RowScope.UserRelationship(viewModel: UserViewModel) {
+private fun UserRelationship(viewModel: UserViewModel) {
     val relationship by viewModel.relationship.observeAsState(initial = null)
     val loadingRelationship by viewModel.loadingRelationship.observeAsState(initial = false)
-    relationship?.takeIf { !loadingRelationship }?.let {
-        Column(
-            horizontalAlignment = Alignment.End
-        ) {
-            TextButton(
-                onClick = {
-                    if (it.followedBy) {
+    val shape = RoundedCornerShape(percent = 50)
+    relationship?.takeIf { !loadingRelationship }?.let { relationshipResult ->
+        Surface(
+            modifier = Modifier
+                .clip(RoundedCornerShape(percent = 50))
+                .let {
+                    if (relationshipResult.followedBy) {
+                        it
+                    } else {
+                        it.border(
+                            1.dp,
+                            MaterialTheme.colors.primary,
+                            shape = shape,
+                        )
+                    }
+                }
+                .clip(shape)
+                .clickable {
+                    if (relationshipResult.followedBy) {
                         viewModel.unfollow()
                     } else {
                         viewModel.follow()
                     }
-                }
-            ) {
-                Text(
-                    text = if (it.followedBy) {
-                        stringResource(id = R.string.common_controls_friendship_actions_unfollow)
-                    } else {
-                        stringResource(id = R.string.common_controls_friendship_actions_follow)
-                    },
-                    style = MaterialTheme.typography.h6,
-                    color = MaterialTheme.colors.primary,
-                )
+                },
+            contentColor = if (relationshipResult.followedBy) {
+                contentColorFor(backgroundColor = MaterialTheme.colors.primary)
+            } else {
+                MaterialTheme.colors.primary
+            },
+            color = if (relationshipResult.followedBy) {
+                MaterialTheme.colors.primary
+            } else {
+                MaterialTheme.colors.background
             }
-            if (it.following) {
-                Text(
-                    text = stringResource(id = R.string.common_controls_friendship_follows_you),
-                    style = MaterialTheme.typography.caption,
-                )
-            }
+        ) {
+            Text(
+                modifier = Modifier
+                    .padding(ButtonDefaults.ContentPadding),
+                text = if (relationshipResult.followedBy) {
+                    stringResource(id = R.string.common_controls_friendship_actions_unfollow)
+                } else {
+                    stringResource(id = R.string.common_controls_friendship_actions_follow)
+                },
+            )
+        }
+        Spacer(modifier = Modifier.height(standardPadding / 2))
+        if (relationshipResult.following) {
+            Text(
+                text = stringResource(id = R.string.common_controls_friendship_follows_you),
+                style = MaterialTheme.typography.caption,
+            )
         }
     } ?: run {
         CircularProgressIndicator()
