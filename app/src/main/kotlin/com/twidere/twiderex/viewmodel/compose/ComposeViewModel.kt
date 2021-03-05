@@ -37,7 +37,6 @@ import androidx.lifecycle.map
 import androidx.lifecycle.switchMap
 import androidx.work.WorkManager
 import com.twidere.services.microblog.LookupService
-import com.twidere.services.microblog.RelationshipService
 import com.twidere.services.twitter.TwitterService
 import com.twidere.twiderex.action.ComposeAction
 import com.twidere.twiderex.db.model.DbDraft
@@ -163,7 +162,6 @@ open class ComposeViewModel @AssistedInject constructor(
         userRepositoryFactory.create(
             accountKey = account.accountKey,
             account.service as LookupService,
-            account.service as RelationshipService,
         )
     }
 

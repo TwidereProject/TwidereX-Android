@@ -53,9 +53,14 @@ class UserViewModel @AssistedInject constructor(
 
     private val repository by lazy {
         account.service.let {
-            factory.create(account.accountKey, it as LookupService, it as RelationshipService)
+            factory.create(account.accountKey, it as LookupService)
         }
     }
+
+    private val relationshipService by lazy {
+        account.service as RelationshipService
+    }
+
     val refreshing = MutableLiveData(false)
     val loadingRelationship = MutableLiveData(false)
     val user = repository.getUserLiveData(userKey)
@@ -75,7 +80,7 @@ class UserViewModel @AssistedInject constructor(
     fun follow() = viewModelScope.launch {
         loadingRelationship.postValue(true)
         runCatching {
-            repository.follow(userKey.id)
+            relationshipService.follow(userKey.id)
         }.onSuccess {
             loadRelationShip()
         }.onFailure {
@@ -87,7 +92,7 @@ class UserViewModel @AssistedInject constructor(
     fun unfollow() = viewModelScope.launch {
         loadingRelationship.postValue(true)
         runCatching {
-            repository.unfollow(userKey.id)
+            relationshipService.unfollow(userKey.id)
         }.onSuccess {
             loadRelationShip()
         }.onFailure {
@@ -99,7 +104,7 @@ class UserViewModel @AssistedInject constructor(
     private fun loadRelationShip() = viewModelScope.launch {
         loadingRelationship.postValue(true)
         try {
-            repository.showRelationship(userKey.id).let {
+            relationshipService.showRelationship(userKey.id).let {
                 relationship.postValue(it)
             }
         } catch (e: Exception) {
