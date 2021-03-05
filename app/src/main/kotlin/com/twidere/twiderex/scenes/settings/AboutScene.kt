@@ -115,7 +115,7 @@ private fun AboutContent() {
             Row {
                 IconButton(
                     onClick = {
-                        navController.navigate("deeplink/twitter/TwidereProject")
+                        navController.navigate("deeplink/twitter/user/TwidereProject")
                     }
                 ) {
                     Icon(

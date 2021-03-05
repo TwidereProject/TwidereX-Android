@@ -58,6 +58,8 @@ import com.twidere.twiderex.ui.LocalApplication
 import com.twidere.twiderex.ui.LocalIsActiveNetworkMetered
 import com.twidere.twiderex.ui.LocalWindow
 import com.twidere.twiderex.ui.LocalWindowInsetsController
+import com.twidere.twiderex.utils.LocalPlatformResolver
+import com.twidere.twiderex.utils.PlatformResolver
 import com.twidere.twiderex.viewmodel.ActiveAccountViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import dev.chrisbanes.accompanist.glide.LocalRequestManager
@@ -108,6 +110,9 @@ class TwidereXActivity : FragmentActivity() {
     @Inject
     lateinit var connectivityManager: ConnectivityManager
 
+    @Inject
+    lateinit var platformResolver: PlatformResolver
+
     @OptIn(ExperimentalAnimatedInsets::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -137,6 +142,7 @@ class TwidereXActivity : FragmentActivity() {
                 LocalActiveAccountViewModel provides accountViewModel,
                 LocalIsActiveNetworkMetered provides isActiveNetworkMetered,
                 LocalRequestManager provides Glide.with(this),
+                LocalPlatformResolver provides platformResolver,
             ) {
                 ProvidePreferences(
                     preferencesHolder,

@@ -23,6 +23,7 @@ package com.twidere.twiderex.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
 import com.twidere.twiderex.model.AccountDetails
+import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.repository.AccountRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -37,6 +38,12 @@ class ActiveAccountViewModel @Inject constructor(
 
     fun deleteAccount(detail: AccountDetails) {
         repository.delete(detail)
+    }
+
+    fun getTargetPlatformDefault(type: PlatformType): AccountDetails? {
+        return repository.accounts.value?.let {
+            it.sortedByDescending { it.lastActive }.firstOrNull { it.type == type }
+        }
     }
 
     val account = liveData {

@@ -25,7 +25,6 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import androidx.room.Transaction
 import androidx.room.Update
 import com.twidere.twiderex.db.model.DbUser
 import com.twidere.twiderex.model.MicroBlogKey
@@ -35,9 +34,11 @@ interface UserDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(user: List<DbUser>)
 
-    @Transaction
     @Query("SELECT * FROM user WHERE userKey == :userKey")
     fun findWithUserKeyLiveData(userKey: MicroBlogKey): LiveData<DbUser?>
+
+    @Query("SELECT * FROM user WHERE userKey == :userKey")
+    suspend fun findWithUserKey(userKey: MicroBlogKey): DbUser?
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
     suspend fun update(user: List<DbUser>)

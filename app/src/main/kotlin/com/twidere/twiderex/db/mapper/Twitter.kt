@@ -51,9 +51,9 @@ import java.util.UUID
 private val autolink by lazy {
     Autolink().apply {
         setUsernameIncludeSymbol(true)
-        hashtagUrlBase = "${DeepLinks.Search}%23"
-        cashtagUrlBase = "${DeepLinks.Search}%24"
-        usernameUrlBase = DeepLinks.User
+        hashtagUrlBase = "${DeepLinks.Search}/%23"
+        cashtagUrlBase = "${DeepLinks.Search}/%24"
+        usernameUrlBase = "${DeepLinks.Twitter.User}/"
     }
 }
 
