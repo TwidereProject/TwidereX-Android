@@ -65,7 +65,7 @@ data class ResolvedLink(
 fun HtmlText(
     modifier: Modifier = Modifier,
     htmlText: String,
-    linkResolver: (href: String) -> ResolvedLink,
+    linkResolver: (href: String) -> ResolvedLink = { ResolvedLink(it) },
 ) {
     val navigator = LocalNavigator.current
     val textColor = LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
@@ -87,7 +87,7 @@ fun HtmlText(
 private fun RenderContent(
     modifier: Modifier = Modifier,
     htmlText: String,
-    linkResolver: (href: String) -> ResolvedLink,
+    linkResolver: (href: String) -> ResolvedLink = { ResolvedLink(it) },
     onLinkClicked: (String) -> Unit = {},
 ) {
     val value = renderContentAnnotatedString(
