@@ -20,10 +20,10 @@
  */
 package com.twidere.twiderex.viewmodel.twitter.user
 
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
 import com.twidere.services.microblog.LookupService
-import com.twidere.services.microblog.RelationshipService
 import com.twidere.twiderex.di.assisted.IAssistedFactory
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.notification.InAppNotification
@@ -41,7 +41,7 @@ class TwitterUserViewModel @AssistedInject constructor(
 
     private val repository by lazy {
         account.service.let {
-            factory.create(account.accountKey, it as LookupService, it as RelationshipService)
+            factory.create(account.accountKey, it as LookupService)
         }
     }
 
@@ -53,14 +53,17 @@ class TwitterUserViewModel @AssistedInject constructor(
         ): TwitterUserViewModel
     }
 
+    val error = MutableLiveData<Throwable>(null)
+
     val user = liveData {
         runCatching {
             repository.lookupUserByName(screenName)
         }.onSuccess {
             emit(it)
         }.onFailure {
-            emit(null)
             it.notify(inAppNotification)
+            emit(null)
+            error.postValue(it)
         }
     }
 }
