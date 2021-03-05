@@ -44,6 +44,7 @@ import androidx.compose.ui.input.pointer.consumePositionChange
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.util.VelocityTracker
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Velocity
 import com.twidere.twiderex.extensions.isInRange
 import kotlinx.coroutines.CoroutineScope
@@ -247,9 +248,11 @@ fun TabScaffold(
         },
     ) { measurables, constraints ->
         layout(constraints.maxWidth, constraints.maxHeight) {
-            val headerPlaceable = measurables[0].measure(constraints)
+            val headerPlaceable =
+                measurables[0].measure(constraints.copy(maxHeight = Constraints.Infinity))
             headerPlaceable.place(0, offset.roundToInt())
-            val appbarPlaceable = measurables[2].measure(constraints = constraints)
+            val appbarPlaceable =
+                measurables[2].measure(constraints = constraints.copy(maxHeight = Constraints.Infinity))
             appbarPlaceable.place(0, 0)
             state.updateBounds(-(headerPlaceable.height.toFloat() - appbarPlaceable.height))
             val contentPlaceable =
