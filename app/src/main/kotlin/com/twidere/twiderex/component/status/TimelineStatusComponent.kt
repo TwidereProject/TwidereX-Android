@@ -81,14 +81,14 @@ fun TimelineStatusComponent(
                 data.mastodonExtra.type == MastodonStatusType.NotificationFollowRequest ||
                     data.mastodonExtra.type == MastodonStatusType.NotificationFollow
                 ) -> {
-            MastodonFollowStatus(data, data.mastodonExtra)
+            MastodonFollowStatus(data)
         }
         else -> NormalStatus(data, showActions)
     }
 }
 
 @Composable
-fun MastodonFollowStatus(data: UiStatus, mastodonExtra: DbMastodonStatusExtra) {
+fun MastodonFollowStatus(data: UiStatus) {
     val navigator = LocalNavigator.current
     Column(
         modifier = Modifier
