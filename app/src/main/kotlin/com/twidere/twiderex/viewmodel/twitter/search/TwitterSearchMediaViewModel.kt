@@ -27,7 +27,6 @@ import androidx.paging.flatMap
 import androidx.paging.map
 import com.twidere.services.twitter.TwitterService
 import com.twidere.twiderex.db.CacheDatabase
-import com.twidere.twiderex.di.assisted.IAssistedFactory
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.ui.UiStatus.Companion.toUi
 import com.twidere.twiderex.notification.InAppNotification
@@ -44,7 +43,7 @@ class TwitterSearchMediaViewModel @AssistedInject constructor(
     @Assisted keyword: String,
 ) : ViewModel() {
     @dagger.assisted.AssistedFactory
-    interface AssistedFactory : IAssistedFactory {
+    interface AssistedFactory {
         fun create(account: AccountDetails, keyword: String): TwitterSearchMediaViewModel
     }
 

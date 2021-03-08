@@ -28,7 +28,6 @@ import androidx.lifecycle.viewModelScope
 import com.twidere.services.twitter.TwitterService
 import com.twidere.services.twitter.model.ReferencedTweetType
 import com.twidere.services.twitter.model.StatusV2
-import com.twidere.twiderex.di.assisted.IAssistedFactory
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiStatus
@@ -47,7 +46,7 @@ class TwitterStatusViewModel @AssistedInject constructor(
 ) : ViewModel() {
 
     @dagger.assisted.AssistedFactory
-    interface AssistedFactory : IAssistedFactory {
+    interface AssistedFactory {
         fun create(account: AccountDetails, statusKey: MicroBlogKey): TwitterStatusViewModel
     }
 

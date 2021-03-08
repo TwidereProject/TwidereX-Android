@@ -23,7 +23,6 @@ package com.twidere.twiderex.viewmodel.search
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
 import com.twidere.twiderex.db.model.DbSearch
-import com.twidere.twiderex.di.assisted.IAssistedFactory
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.repository.SearchRepository
 import dagger.assisted.Assisted
@@ -35,7 +34,7 @@ class SearchInputViewModel @AssistedInject constructor(
 ) : ViewModel() {
 
     @dagger.assisted.AssistedFactory
-    interface AssistedFactory : IAssistedFactory {
+    interface AssistedFactory {
         fun create(account: AccountDetails): SearchInputViewModel
     }
 

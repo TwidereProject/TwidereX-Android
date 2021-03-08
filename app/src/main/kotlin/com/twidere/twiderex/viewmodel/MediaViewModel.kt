@@ -26,7 +26,6 @@ import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import com.twidere.services.http.MicroBlogException
 import com.twidere.services.microblog.LookupService
-import com.twidere.twiderex.di.assisted.IAssistedFactory
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.notification.InAppNotification
@@ -46,7 +45,7 @@ class MediaViewModel @AssistedInject constructor(
 ) : ViewModel() {
 
     @dagger.assisted.AssistedFactory
-    interface AssistedFactory : IAssistedFactory {
+    interface AssistedFactory {
         fun create(account: AccountDetails, statusKey: MicroBlogKey): MediaViewModel
     }
 

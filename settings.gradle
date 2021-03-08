@@ -1,3 +1,11 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        google()
+    }
+}
+
 rootProject.name = "TwidereX"
 include ':app'
 include ':services'
+include ':assisted-processor'

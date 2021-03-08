@@ -24,6 +24,7 @@ plugins {
     id "org.jetbrains.kotlin.kapt"
     id "com.google.protobuf" version "0.8.14"
     id "org.jetbrains.kotlin.plugin.serialization" version "1.4.30"
+    id "com.google.devtools.ksp" version "1.4.30-1.0.0-alpha04"
 }
 
 if (enableGoogleVariant) {
@@ -32,6 +33,7 @@ if (enableGoogleVariant) {
     apply plugin: 'com.google.firebase.crashlytics'
     // END Non-FOSS component
 }
+
 apply plugin: 'dagger.hilt.android.plugin'
 
 android {
@@ -150,6 +152,7 @@ dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:$versions.kotlinx_serialization"
 
     implementation project(":services")
+    ksp project(":assisted-processor")
 
     implementation "androidx.compose.ui:ui:$versions.compose"
     implementation "androidx.compose.ui:ui-tooling:$versions.compose"

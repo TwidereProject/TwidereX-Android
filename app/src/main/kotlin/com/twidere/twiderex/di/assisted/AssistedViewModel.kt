@@ -22,32 +22,13 @@ package com.twidere.twiderex.di.assisted
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.twidere.twiderex.viewmodel.MediaViewModel
-import com.twidere.twiderex.viewmodel.compose.ComposeViewModel
-import com.twidere.twiderex.viewmodel.compose.DraftComposeViewModel
-import com.twidere.twiderex.viewmodel.compose.DraftItemViewModel
-import com.twidere.twiderex.viewmodel.search.SearchInputViewModel
-import com.twidere.twiderex.viewmodel.timeline.HomeTimelineViewModel
-import com.twidere.twiderex.viewmodel.timeline.MentionsTimelineViewModel
-import com.twidere.twiderex.viewmodel.timeline.NotificationTimelineViewModel
-import com.twidere.twiderex.viewmodel.twitter.TwitterSignInViewModel
-import com.twidere.twiderex.viewmodel.twitter.TwitterStatusViewModel
-import com.twidere.twiderex.viewmodel.twitter.search.TwitterSearchMediaViewModel
-import com.twidere.twiderex.viewmodel.twitter.search.TwitterSearchTweetsViewModel
-import com.twidere.twiderex.viewmodel.twitter.user.TwitterUserViewModel
-import com.twidere.twiderex.viewmodel.user.UserFavouriteTimelineViewModel
-import com.twidere.twiderex.viewmodel.user.UserMediaTimelineViewModel
-import com.twidere.twiderex.viewmodel.user.UserTimelineViewModel
-import com.twidere.twiderex.viewmodel.user.UserViewModel
-import javax.inject.Inject
 
 @Composable
-inline fun <reified AF : IAssistedFactory, reified VM : ViewModel> assistedViewModel(
+inline fun <reified AF, reified VM : ViewModel> assistedViewModel(
     vararg dependsOn: Any,
     noinline creator: ((AF) -> VM)? = null,
 ): VM {
@@ -68,54 +49,11 @@ inline fun <reified AF : IAssistedFactory, reified VM : ViewModel> assistedViewM
     )
 }
 
-interface IAssistedFactory
-
-data class AssistedViewModelFactoryHolder @Inject constructor(
-    val homeTimelineViewModelFactory: HomeTimelineViewModel.AssistedFactory,
-    val twitterStatusViewModelFactory: TwitterStatusViewModel.AssistedFactory,
-    val mentionsTimelineViewModelFactory: MentionsTimelineViewModel.AssistedFactory,
-    val twitterSearchMediaViewModelFactory: TwitterSearchMediaViewModel.AssistedFactory,
-    val twitterSearchTweetsViewModelFactory: TwitterSearchTweetsViewModel.AssistedFactory,
-    val userFavouriteTimelineViewModelFactory: UserFavouriteTimelineViewModel.AssistedFactory,
-    val userTimelineViewModelFactory: UserTimelineViewModel.AssistedFactory,
-    val userMediaTimelineViewModelFactory: UserMediaTimelineViewModel.AssistedFactory,
-    val userViewModelFactory: UserViewModel.AssistedFactory,
-    val composeViewModelFactory: ComposeViewModel.AssistedFactory,
-    val mediaViewModelFactory: MediaViewModel.AssistedFactory,
-    val searchInputViewModelFactory: SearchInputViewModel.AssistedFactory,
-    val draftItemViewModelFactory: DraftItemViewModel.AssistedFactory,
-    val draftComposeViewModelFactory: DraftComposeViewModel.AssistedFactory,
-    val twitterSignInViewModelViewModelFactory: TwitterSignInViewModel.AssistedFactory,
-    val twitterUserViewModelFactory: TwitterUserViewModel.AssistedFactory,
-    val notificationTimelineViewModelFactory: NotificationTimelineViewModel.AssistedFactory
-)
-
 @Composable
 fun ProvideAssistedFactory(
-    factoryHolder: AssistedViewModelFactoryHolder,
+    factory: List<Any>,
     content: @Composable () -> Unit,
 ) {
-    val factory = remember {
-        listOf(
-            factoryHolder.homeTimelineViewModelFactory,
-            factoryHolder.twitterStatusViewModelFactory,
-            factoryHolder.mentionsTimelineViewModelFactory,
-            factoryHolder.twitterSearchMediaViewModelFactory,
-            factoryHolder.twitterSearchTweetsViewModelFactory,
-            factoryHolder.userFavouriteTimelineViewModelFactory,
-            factoryHolder.userTimelineViewModelFactory,
-            factoryHolder.userMediaTimelineViewModelFactory,
-            factoryHolder.userViewModelFactory,
-            factoryHolder.composeViewModelFactory,
-            factoryHolder.mediaViewModelFactory,
-            factoryHolder.searchInputViewModelFactory,
-            factoryHolder.draftItemViewModelFactory,
-            factoryHolder.draftComposeViewModelFactory,
-            factoryHolder.twitterSignInViewModelViewModelFactory,
-            factoryHolder.twitterUserViewModelFactory,
-            factoryHolder.notificationTimelineViewModelFactory,
-        )
-    }
     CompositionLocalProvider(
         LocalAssistedFactories provides factory
     ) {
@@ -123,4 +61,4 @@ fun ProvideAssistedFactory(
     }
 }
 
-val LocalAssistedFactories = staticCompositionLocalOf<List<IAssistedFactory>> { emptyList() }
+val LocalAssistedFactories = staticCompositionLocalOf<List<Any>> { emptyList() }

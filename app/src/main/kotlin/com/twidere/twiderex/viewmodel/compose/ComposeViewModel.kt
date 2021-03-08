@@ -40,7 +40,6 @@ import com.twidere.services.microblog.LookupService
 import com.twidere.services.twitter.TwitterService
 import com.twidere.twiderex.action.ComposeAction
 import com.twidere.twiderex.db.model.DbDraft
-import com.twidere.twiderex.di.assisted.IAssistedFactory
 import com.twidere.twiderex.extensions.combineWith
 import com.twidere.twiderex.extensions.getCachedLocation
 import com.twidere.twiderex.extensions.getTextAfterSelection
@@ -78,7 +77,7 @@ class DraftItemViewModel @AssistedInject constructor(
     }
 
     @dagger.assisted.AssistedFactory
-    interface AssistedFactory : IAssistedFactory {
+    interface AssistedFactory {
         fun create(
             draftId: String,
         ): DraftItemViewModel
@@ -117,7 +116,7 @@ class DraftComposeViewModel @AssistedInject constructor(
     }
 
     @dagger.assisted.AssistedFactory
-    interface AssistedFactory : IAssistedFactory {
+    interface AssistedFactory {
         fun create(
             account: AccountDetails,
             draft: DbDraft,
@@ -140,7 +139,7 @@ open class ComposeViewModel @AssistedInject constructor(
     open val draftId: String = UUID.randomUUID().toString()
 
     @dagger.assisted.AssistedFactory
-    interface AssistedFactory : IAssistedFactory {
+    interface AssistedFactory {
         fun create(
             account: AccountDetails,
             statusKey: MicroBlogKey?,

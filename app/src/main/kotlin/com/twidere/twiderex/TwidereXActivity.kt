@@ -45,7 +45,6 @@ import com.bumptech.glide.Glide
 import com.twidere.twiderex.action.LocalStatusActions
 import com.twidere.twiderex.action.StatusActions
 import com.twidere.twiderex.component.foundation.LocalInAppNotification
-import com.twidere.twiderex.di.assisted.AssistedViewModelFactoryHolder
 import com.twidere.twiderex.di.assisted.ProvideAssistedFactory
 import com.twidere.twiderex.navigation.Router
 import com.twidere.twiderex.notification.InAppNotification
@@ -96,13 +95,13 @@ class TwidereXActivity : FragmentActivity() {
     }
 
     @Inject
+    lateinit var viewModelHolder: TwidereXActivityAssistedViewModelHolder
+
+    @Inject
     lateinit var statusActions: StatusActions
 
     @Inject
     lateinit var preferencesHolder: PreferencesHolder
-
-    @Inject
-    lateinit var assistedViewModelFactoryHolder: AssistedViewModelFactoryHolder
 
     @Inject
     lateinit var inAppNotification: InAppNotification
@@ -148,7 +147,7 @@ class TwidereXActivity : FragmentActivity() {
                     preferencesHolder,
                 ) {
                     ProvideAssistedFactory(
-                        assistedViewModelFactoryHolder
+                        viewModelHolder.factory,
                     ) {
                         ProvideWindowInsets(
                             windowInsetsAnimationsEnabled = true

@@ -42,7 +42,7 @@ subprojects {
 
     tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
         kotlinOptions {
-//            allWarningsAsErrors = true
+            allWarningsAsErrors = true
             freeCompilerArgs = [
                     '-Xallow-unstable-dependencies',
                     '-Xopt-in=kotlin.RequiresOptIn',
