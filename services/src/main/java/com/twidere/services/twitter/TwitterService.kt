@@ -31,6 +31,7 @@ import com.twidere.services.microblog.SearchService
 import com.twidere.services.microblog.StatusService
 import com.twidere.services.microblog.TimelineService
 import com.twidere.services.microblog.model.IRelationship
+import com.twidere.services.microblog.model.ISearchResponse
 import com.twidere.services.microblog.model.IStatus
 import com.twidere.services.microblog.model.IUser
 import com.twidere.services.microblog.model.Relationship
@@ -278,22 +279,32 @@ class TwitterService(
         return data
     }
 
-    override suspend fun userPinnedStatus(userId: String): IStatus? {
+    override suspend fun userPinnedStatus(userId: String): List<IStatus> {
         val user = lookupUser(userId)
-        return user.pinnedTweetID?.let { lookupStatus(it) }
+        return listOfNotNull(user.pinnedTweetID?.let { lookupStatus(it) })
     }
 
     override suspend fun searchTweets(
         query: String,
         count: Int,
-        since_id: String?,
+        nextPage: String?,
+    ): ISearchResponse {
+        return try {
+            searchV2("$query -is:retweet", count = count, nextPage = nextPage)
+        } catch (e: TwitterApiExceptionV2) {
+            searchV1("$query -filter:retweets", count = count, max_id = nextPage)
+        }
+    }
+
+    suspend fun searchV2(
+        query: String,
+        count: Int,
         nextPage: String?,
     ): TwitterSearchResponseV2 {
         val result = resources.search(
             query,
             next_token = nextPage,
             max_results = count,
-            since_id = since_id,
             userFields = UserFields.values().joinToString(",") { it.value },
             pollFields = PollFields.values().joinToString(",") { it.name },
             placeFields = PlaceFields.values().joinToString(",") { it.value },
@@ -310,7 +321,7 @@ class TwitterService(
         return result
     }
 
-    suspend fun searchTweetsV1(
+    suspend fun searchV1(
         query: String,
         count: Int,
         since_id: String? = null,

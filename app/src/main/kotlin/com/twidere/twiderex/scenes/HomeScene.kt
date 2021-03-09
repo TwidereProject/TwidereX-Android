@@ -228,7 +228,11 @@ fun HomeScene() {
             ) {
                 Pager(state = pagerState) {
                     CompositionLocalProvider(
-                        LocalLazyListController provides timelineController
+                        *if (page == currentPage) {
+                            arrayOf(LocalLazyListController provides timelineController)
+                        } else {
+                            emptyArray()
+                        }
                     ) {
                         menus[page].content()
                     }

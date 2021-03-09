@@ -41,7 +41,12 @@ class MastodonStatusContextMediator(
     override suspend fun load(pageSize: Int, paging: CursorPagination?): List<IStatus> {
         val result = service.context(statusKey.id)
         val status = service.lookupStatus(statusKey.id)
-        return (result.ancestors + status + result.descendants).reversed()
+        return (
+            (result.ancestors ?: emptyList()) + status + (
+                result.descendants
+                    ?: emptyList()
+                )
+            ).reversed()
     }
 
     override fun transform(

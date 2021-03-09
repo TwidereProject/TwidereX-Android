@@ -40,9 +40,17 @@ class SearchMediaMediator(
     override val pagingKey = "search:$query:media"
     override suspend fun load(pageSize: Int, paging: CursorPagination?): List<IStatus> {
         val result = try {
-            service.searchTweets("$query has:media -is:retweet", count = pageSize, nextPage = paging?.cursor)
+            service.searchV2(
+                "$query has:media -is:retweet",
+                count = pageSize,
+                nextPage = paging?.cursor,
+            )
         } catch (e: TwitterApiExceptionV2) {
-            service.searchTweetsV1("$query filter:media -filter:retweets", count = pageSize, max_id = paging?.cursor)
+            service.searchV1(
+                "$query filter:media -filter:retweets",
+                count = pageSize,
+                max_id = paging?.cursor
+            )
         }
         return CursorPagingResult(result.status, result.nextPage)
     }

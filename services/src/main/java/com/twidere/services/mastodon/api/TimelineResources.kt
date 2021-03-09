@@ -47,6 +47,7 @@ interface TimelineResources {
         @Query("min_id") min_id: String? = null,
         @Query("exclude_replies") exclude_replies: Boolean? = null,
         @Query("limit") limit: Int? = null,
+        @Query("pinned") pinned: Boolean? = null,
     ): List<Status>
 
     @GET("/api/v1/favourites")
@@ -71,4 +72,15 @@ interface TimelineResources {
 
     @GET("/api/v1/statuses/{id}/context")
     suspend fun context(@Path("id") id: String): Context
+
+    @GET("/api/v1/timelines/tag/{hashtag}")
+    suspend fun hashtagTimeline(
+        @Path("hashtag") hashtag: String,
+        @Query("max_id") max_id: String? = null,
+        @Query("since_id") since_id: String? = null,
+        @Query("min_id") min_id: String? = null,
+        @Query("limit") limit: Int? = null,
+        @Query("local") local: Boolean? = null,
+        @Query("only_media") only_media: Boolean? = null,
+    ): List<Status>
 }

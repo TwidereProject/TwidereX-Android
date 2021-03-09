@@ -26,6 +26,10 @@ import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import androidx.room.Relation
+import com.twidere.services.mastodon.model.Card
+import com.twidere.services.mastodon.model.Emoji
+import com.twidere.services.mastodon.model.Poll
+import com.twidere.services.mastodon.model.Visibility
 import com.twidere.services.twitter.model.ReplySettings
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.model.MastodonStatusType
@@ -75,11 +79,12 @@ data class DbTwitterStatusExtra(
 @Serializable
 data class DbMastodonStatusExtra(
     val type: MastodonStatusType,
-    val emoji: List<com.twidere.services.mastodon.model.Emoji>,
-    val visibility: com.twidere.services.mastodon.model.Visibility,
+    val emoji: List<Emoji>,
+    val visibility: Visibility,
     val sensitive: Boolean,
     val spoilerText: String?,
-    val poll: com.twidere.services.mastodon.model.Poll?,
+    val poll: Poll?,
+    val card: Card?,
 )
 
 data class DbStatusWithMediaAndUser(

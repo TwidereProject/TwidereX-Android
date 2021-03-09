@@ -63,11 +63,13 @@ fun IconTabsComponent(
 
 @Composable
 fun TextTabsComponent(
+    modifier: Modifier = Modifier,
     items: List<String>,
     selectedItem: Int,
     onItemSelected: (Int) -> Unit,
 ) {
     TabsComponent(
+        modifier = modifier,
         count = items.count(),
         selectedItem = selectedItem,
         onItemSelected = onItemSelected

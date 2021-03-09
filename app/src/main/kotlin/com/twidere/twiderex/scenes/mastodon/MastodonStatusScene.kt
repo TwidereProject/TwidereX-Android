@@ -78,7 +78,7 @@ fun MastodonStatusScene(
             ) {
                 if (source.loadState.refresh == LoadState.Loading) {
                     status?.let {
-                        item(key = it.statusKey.hashCode()) {
+                        item(key = it.hashCode()) {
                             ExpandedStatusComponent(data = it)
                         }
                     }

@@ -18,11 +18,20 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.services.mastodon.api
+package com.twidere.services.mastodon.model
 
-interface MastodonResources :
-    TimelineResources,
-    LookupResources,
-    FriendshipResources,
-    AccountResources,
-    SearchResources
+import com.twidere.services.microblog.model.ISearchResponse
+import com.twidere.services.microblog.model.IStatus
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class SearchResult(
+    val accounts: List<Account>? = null,
+    val statuses: List<Status>? = null,
+    val hashtags: List<Hashtag>? = null
+)
+
+data class MastodonSearchResponse(
+    override val nextPage: String?,
+    override val status: List<IStatus>
+) : ISearchResponse

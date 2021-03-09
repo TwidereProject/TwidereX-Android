@@ -18,34 +18,14 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.component.status
+package com.twidere.twiderex.scenes.search.tabs
 
-import androidx.compose.material.ContentAlpha
-import androidx.compose.material.LocalContentAlpha
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.ui.text.style.TextOverflow
-import com.twidere.twiderex.model.ui.UiUser
 
-@Composable
-fun UserScreenName(user: UiUser) {
-    CompositionLocalProvider(
-        LocalContentAlpha provides ContentAlpha.medium
-    ) {
-        Text(
-            text = user.displayScreenName,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-        )
-    }
-}
+interface SearchSceneItem {
+    @Composable
+    fun name(): String
 
-@Composable
-fun UserName(user: UiUser) {
-    Text(
-        text = user.name.takeIf { it.isNotEmpty() } ?: user.screenName,
-        maxLines = 1,
-        overflow = TextOverflow.Ellipsis,
-    )
+    @Composable
+    fun Content(keyword: String)
 }

@@ -35,6 +35,7 @@ import com.twidere.twiderex.ui.LocalActiveAccount
 data class UiUser(
     val id: String,
     val userKey: MicroBlogKey,
+    val acct: MicroBlogKey,
     val name: String,
     val screenName: String,
     val profileImage: Any,
@@ -57,10 +58,10 @@ data class UiUser(
     val displayScreenName: String
         @Composable
         get() {
-            return if (LocalActiveAccount.current?.accountKey?.host?.let { it != userKey.host } != false) {
-                "@$screenName@${userKey.host}}"
+            return if (LocalActiveAccount.current?.accountKey?.host?.let { it != acct.host } != false) {
+                "@$screenName@${acct.host}"
             } else {
-                screenName
+                "@$screenName"
             }
         }
 
@@ -83,6 +84,7 @@ data class UiUser(
             protected = false,
             userKey = MicroBlogKey.Empty,
             platformType = PlatformType.Twitter,
+            acct = MicroBlogKey.twitter("TwidereProject")
         )
 
         @Composable
@@ -103,6 +105,7 @@ data class UiUser(
             protected = false,
             userKey = MicroBlogKey.Empty,
             platformType = PlatformType.Twitter,
+            acct = MicroBlogKey.Empty
         )
 
         fun DbUser.toUi() =
@@ -125,6 +128,7 @@ data class UiUser(
                 platformType = platformType,
                 twitterExtra = twitterExtra,
                 mastodonExtra = mastodonExtra,
+                acct = acct,
             )
     }
 }

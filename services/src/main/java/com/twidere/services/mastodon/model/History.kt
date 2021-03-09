@@ -18,11 +18,13 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.services.mastodon.api
+package com.twidere.services.mastodon.model
 
-interface MastodonResources :
-    TimelineResources,
-    LookupResources,
-    FriendshipResources,
-    AccountResources,
-    SearchResources
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class History(
+    val day: String? = null,
+    val uses: String? = null,
+    val accounts: String? = null
+)

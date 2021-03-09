@@ -50,6 +50,7 @@ import com.twidere.twiderex.scenes.StatusMediaScene
 import com.twidere.twiderex.scenes.compose.ComposeScene
 import com.twidere.twiderex.scenes.compose.ComposeSearchUserScene
 import com.twidere.twiderex.scenes.compose.DraftComposeScene
+import com.twidere.twiderex.scenes.mastodon.MastodonHashtagScene
 import com.twidere.twiderex.scenes.mastodon.MastodonSignInScene
 import com.twidere.twiderex.scenes.mastodon.MastodonStatusScene
 import com.twidere.twiderex.scenes.mastodon.MastodonWebSignInScene
@@ -180,8 +181,12 @@ object Route {
     }
 
     object Status {
-        fun Twitter(statusKey: MicroBlogKey) = "deeplink/twitter/status/$statusKey"
+        fun Twitter(statusKey: MicroBlogKey) = "deeplink/twitter/status/${statusKey.id}"
         fun Mastodon(statusKey: MicroBlogKey) = "mastodon/status/$statusKey"
+    }
+
+    object Mastodon {
+        fun Hashtag(keyword: String) = "mastodon/hashtag/$keyword"
     }
 }
 
@@ -208,11 +213,11 @@ fun NavGraphBuilder.authorizedComposable(
 }
 
 @Composable
-fun ProvideStatusPlatform(
-    statusKey: MicroBlogKey,
+fun ProvidePlatformType(
+    key: MicroBlogKey,
+    provider: suspend () -> PlatformType?,
     content: @Composable (platformType: PlatformType) -> Unit,
 ) {
-    val platformResolver = LocalPlatformResolver.current
     var platformType by rememberSaveable(
         saver = Saver(
             save = {
@@ -225,8 +230,9 @@ fun ProvideStatusPlatform(
     ) {
         mutableStateOf<PlatformType?>(null)
     }
-    LaunchedEffect(statusKey) {
-        platformType = platformResolver.resolveStatus(statusKey = statusKey)
+    val account = LocalActiveAccount.current
+    LaunchedEffect(key) {
+        platformType = provider.invoke() ?: account?.type
     }
     platformType?.let {
         content.invoke(it)
@@ -239,34 +245,33 @@ fun ProvideStatusPlatform(
 }
 
 @Composable
+fun ProvideStatusPlatform(
+    statusKey: MicroBlogKey,
+    content: @Composable (platformType: PlatformType) -> Unit,
+) {
+    val platformResolver = LocalPlatformResolver.current
+    ProvidePlatformType(
+        key = statusKey,
+        provider = {
+            platformResolver.resolveStatus(statusKey = statusKey)
+        },
+        content = content
+    )
+}
+
+@Composable
 fun ProvideUserPlatform(
     userKey: MicroBlogKey,
     content: @Composable (platformType: PlatformType) -> Unit,
 ) {
     val platformResolver = LocalPlatformResolver.current
-    var platformType by rememberSaveable(
-        saver = Saver(
-            save = {
-                it.value?.toString()
-            },
-            restore = {
-                mutableStateOf(PlatformType.valueOf(it))
-            }
-        ),
-    ) {
-        mutableStateOf<PlatformType?>(null)
-    }
-    LaunchedEffect(userKey) {
-        platformType = platformResolver.resolveUser(userKey = userKey)
-    }
-    platformType?.let {
-        content.invoke(it)
-    } ?: run {
-        TwidereXTheme {
-            Scaffold {
-            }
-        }
-    }
+    ProvidePlatformType(
+        key = userKey,
+        provider = {
+            platformResolver.resolveUser(userKey = userKey)
+        },
+        content = content
+    )
 }
 
 @Composable
@@ -390,6 +395,15 @@ fun NavGraphBuilder.route() {
                     }
                 }
             }
+        }
+    }
+
+    authorizedComposable(
+        "mastodon/hashtag/{keyword}",
+        arguments = listOf(navArgument("keyword") { type = NavType.StringType })
+    ) { backStackEntry ->
+        backStackEntry.arguments?.getString("keyword")?.let {
+            MastodonHashtagScene(keyword = it)
         }
     }
 

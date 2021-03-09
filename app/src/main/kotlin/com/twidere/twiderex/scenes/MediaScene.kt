@@ -44,7 +44,6 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
@@ -63,7 +62,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.google.android.exoplayer2.ui.PlayerControlView
@@ -77,11 +75,11 @@ import com.twidere.twiderex.component.foundation.Swiper
 import com.twidere.twiderex.component.foundation.VideoPlayer
 import com.twidere.twiderex.component.foundation.Zoomable
 import com.twidere.twiderex.component.foundation.rememberPagerState
-import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.component.status.LikeButton
 import com.twidere.twiderex.component.status.ReplyButton
 import com.twidere.twiderex.component.status.RetweetButton
 import com.twidere.twiderex.component.status.ShareButton
+import com.twidere.twiderex.component.status.StatusText
 import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.component.status.UserName
 import com.twidere.twiderex.component.status.UserScreenName
@@ -145,7 +143,6 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int) {
     var controlVisibility by remember { mutableStateOf(true) }
     val controlPanelColor = MaterialTheme.colors.surface.copy(alpha = 0.6f)
     val navController = LocalNavController.current
-    val navigator = LocalNavigator.current
     Scaffold {
         Box {
             val pagerState = rememberPagerState(
@@ -267,17 +264,7 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int) {
                                     if (videoControl != null) {
                                         AndroidView(factory = { videoControl })
                                     }
-                                    Text(
-                                        modifier = Modifier
-                                            .clickable(
-                                                onClick = {
-                                                    navigator.status(status)
-                                                }
-                                            ),
-                                        text = status.rawText,
-                                        maxLines = 2,
-                                        overflow = TextOverflow.Ellipsis,
-                                    )
+                                    StatusText(status = status)
                                     Spacer(modifier = Modifier.height(standardPadding))
                                     Row(
                                         verticalAlignment = Alignment.CenterVertically,

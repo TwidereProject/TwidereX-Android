@@ -228,11 +228,9 @@ fun UserStatusTimeline(
     // FIXME: 2021/2/20 Recover the scroll position require visiting the loadState once, have no idea why
     @Suppress("UNUSED_VARIABLE")
     timelineSource.loadState
-    if (timelineSource.itemCount > 0) {
-        LazyUiStatusList(
-            items = timelineSource,
-        )
-    }
+    LazyUiStatusList(
+        items = timelineSource,
+    )
 }
 
 @Composable
@@ -304,11 +302,9 @@ fun UserFavouriteTimeline(
     // FIXME: 2021/2/20 Recover the scroll position require visiting the loadState once, have no idea why
     @Suppress("UNUSED_VARIABLE")
     timelineSource.loadState
-    if (timelineSource.itemCount > 0) {
-        LazyUiStatusList(
-            items = timelineSource,
-        )
-    }
+    LazyUiStatusList(
+        items = timelineSource,
+    )
 }
 
 val maxBannerSize = 200.dp

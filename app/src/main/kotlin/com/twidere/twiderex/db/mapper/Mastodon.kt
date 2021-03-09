@@ -35,7 +35,6 @@ import com.twidere.twiderex.db.model.DbStatusWithMediaAndUser
 import com.twidere.twiderex.db.model.DbStatusWithReference
 import com.twidere.twiderex.db.model.DbTimeline
 import com.twidere.twiderex.db.model.DbTimelineWithStatus
-import com.twidere.twiderex.db.model.DbUrlEntity
 import com.twidere.twiderex.db.model.DbUser
 import com.twidere.twiderex.db.model.ReferenceType
 import com.twidere.twiderex.db.model.TimelineType
@@ -82,6 +81,7 @@ fun Notification.toDbTimeline(
             sensitive = false,
             spoilerText = null,
             poll = null,
+            card = null,
         )
     )
     return DbTimelineWithStatus(
@@ -188,6 +188,7 @@ private fun Status.toDbStatusWithMediaAndUser(
             sensitive = sensitive ?: false,
             spoilerText = spoilerText?.takeIf { it.isNotEmpty() },
             poll = poll,
+            card = card,
         )
     )
     return DbStatusWithMediaAndUser(
@@ -229,20 +230,7 @@ private fun Status.toDbStatusWithMediaAndUser(
         } else {
             emptyList()
         },
-        url = card?.let {
-            listOf(
-                DbUrlEntity(
-                    _id = UUID.randomUUID().toString(),
-                    statusKey = status.statusKey,
-                    url = it.url ?: "",
-                    expandedUrl = it.url ?: "",
-                    displayUrl = it.url ?: "",
-                    title = it.title,
-                    description = it.description,
-                    image = it.image
-                )
-            )
-        } ?: emptyList()
+        url = emptyList(),
     )
 }
 
@@ -258,8 +246,7 @@ fun Account.toDbUser(
             ?: throw IllegalArgumentException("mastodon user.username should not be null"),
         userKey = MicroBlogKey(
             id ?: throw IllegalArgumentException("mastodon user.id should not be null"),
-            acct?.let { MicroBlogKey.valueOf(it) }?.host?.takeIf { it.isNotEmpty() }
-                ?: accountKey.host,
+            accountKey.host,
         ),
         profileImage = avatar ?: avatarStatic ?: "",
         profileBackgroundImage = header ?: headerStatic ?: "",
@@ -277,6 +264,13 @@ fun Account.toDbUser(
         location = null,
         verified = false,
         isProtected = false,
+        acct = acct?.let { MicroBlogKey.valueOf(it) }?.let {
+            if (it.host.isEmpty()) {
+                it.copy(host = accountKey.host)
+            } else {
+                it
+            }
+        } ?: throw IllegalArgumentException("mastodon user.acct should not be null"),
         platformType = PlatformType.Mastodon,
         mastodonExtra = DbMastodonUserExtra(
             fields = fields ?: emptyList(),

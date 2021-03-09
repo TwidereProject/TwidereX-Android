@@ -23,7 +23,7 @@ package com.twidere.twiderex.repository.twitter
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.map
 import com.twidere.services.microblog.LookupService
-import com.twidere.services.twitter.model.StatusV2
+import com.twidere.services.microblog.model.IStatus
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.db.mapper.toDbTimeline
 import com.twidere.twiderex.db.model.TimelineType
@@ -54,10 +54,10 @@ class TwitterTweetsRepository @AssistedInject constructor(
     }
 
     suspend fun loadTweetFromNetwork(statusId: String): UiStatus {
-        return toUiStatus(lookupService.lookupStatus(statusId) as StatusV2)
+        return toUiStatus(lookupService.lookupStatus(statusId))
     }
 
-    private suspend fun toUiStatus(status: StatusV2): UiStatus {
+    private suspend fun toUiStatus(status: IStatus): UiStatus {
         val db = status.toDbTimeline(accountKey, TimelineType.Conversation)
         listOf(db).saveToDb(database)
         return db.toUi(accountKey)

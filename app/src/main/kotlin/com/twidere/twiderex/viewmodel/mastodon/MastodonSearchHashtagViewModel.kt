@@ -18,23 +18,22 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.viewmodel.twitter.search
+package com.twidere.twiderex.viewmodel.mastodon
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
-import com.twidere.services.microblog.SearchService
+import com.twidere.services.mastodon.MastodonService
 import com.twidere.twiderex.defaultLoadCount
 import com.twidere.twiderex.model.AccountDetails
-import com.twidere.twiderex.paging.source.SearchUserPagingSource
+import com.twidere.twiderex.paging.source.MastodonSearchHashtagPagingSource
 
-class TwitterSearchUserViewModel(
+class MastodonSearchHashtagViewModel(
     private val account: AccountDetails,
     keyword: String,
 ) : ViewModel() {
-
     val source by lazy {
         Pager(
             config = PagingConfig(
@@ -42,10 +41,9 @@ class TwitterSearchUserViewModel(
                 enablePlaceholders = false,
             )
         ) {
-            SearchUserPagingSource(
-                accountKey = account.accountKey,
+            MastodonSearchHashtagPagingSource(
                 keyword,
-                account.service as SearchService
+                account.service as MastodonService
             )
         }.flow.cachedIn(viewModelScope)
     }

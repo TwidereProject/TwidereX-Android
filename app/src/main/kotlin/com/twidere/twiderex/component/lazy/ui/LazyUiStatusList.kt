@@ -56,40 +56,42 @@ fun LazyUiStatusList(
     state: LazyListState = rememberLazyListState(),
     loadingBetween: List<MicroBlogKey> = emptyList(),
     onLoadBetweenClicked: (current: MicroBlogKey, next: MicroBlogKey) -> Unit = { _, _ -> },
-    key: ((index: Int) -> Any) = { items[it]?.statusKey?.hashCode() ?: it },
+    key: ((index: Int) -> Any) = { items[it]?.hashCode() ?: it },
 ) {
-    LazyColumn2(
-        modifier = modifier,
-        state = state
-    ) {
-        statusesIndexed(items, key = key) { index, item ->
-            if (item == null) {
-                TimelineStatusComponent(data = UiStatus.placeHolder())
-            } else {
-                Column {
-                    TimelineStatusComponent(
-                        item,
-                    )
-                    when {
-                        loadingBetween.contains(item.statusKey) -> {
-                            Divider()
-                            LoadingProgress()
-                            Divider()
-                        }
-                        item.isGap -> {
-                            Divider()
-                            LoadMoreButton(items, index, onLoadBetweenClicked, item)
-                            Divider()
-                        }
-                        else -> {
-                            StatusDivider()
+    if (items.itemCount > 0) {
+        LazyColumn2(
+            modifier = modifier,
+            state = state
+        ) {
+            statusesIndexed(items, key = key) { index, item ->
+                if (item == null) {
+                    TimelineStatusComponent(data = UiStatus.placeHolder())
+                } else {
+                    Column {
+                        TimelineStatusComponent(
+                            item,
+                        )
+                        when {
+                            loadingBetween.contains(item.statusKey) -> {
+                                Divider()
+                                LoadingProgress()
+                                Divider()
+                            }
+                            item.isGap -> {
+                                Divider()
+                                LoadMoreButton(items, index, onLoadBetweenClicked, item)
+                                Divider()
+                            }
+                            else -> {
+                                StatusDivider()
+                            }
                         }
                     }
                 }
             }
-        }
-        loadState(items.loadState.append) {
-            items.retry()
+            loadState(items.loadState.append) {
+                items.retry()
+            }
         }
     }
 }

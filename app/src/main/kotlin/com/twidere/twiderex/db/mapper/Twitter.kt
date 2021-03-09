@@ -366,6 +366,7 @@ fun User.toDbUser(): DbUser {
             idStr ?: throw IllegalArgumentException("user.idStr should not be null")
         ),
         platformType = PlatformType.Twitter,
+        acct = MicroBlogKey.twitter(screenName ?: ""),
         twitterExtra = DbTwitterUserExtra(
             pinned_tweet_id = null,
             url = entities?.description?.urls?.map {
@@ -401,6 +402,7 @@ fun UserV2.toDbUser(): DbUser {
         userKey = MicroBlogKey.twitter(
             id ?: throw IllegalArgumentException("user.idStr should not be null")
         ),
+        acct = MicroBlogKey.twitter(username ?: ""),
         platformType = PlatformType.Twitter,
         twitterExtra = DbTwitterUserExtra(
             pinned_tweet_id = pinnedTweetID,

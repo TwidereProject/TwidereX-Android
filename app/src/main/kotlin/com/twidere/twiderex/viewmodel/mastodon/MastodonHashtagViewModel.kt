@@ -18,39 +18,37 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.viewmodel.twitter.search
+package com.twidere.twiderex.viewmodel.mastodon
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import androidx.paging.cachedIn
-import androidx.paging.map
-import com.twidere.services.twitter.TwitterService
+import com.twidere.services.mastodon.MastodonService
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.model.AccountDetails
-import com.twidere.twiderex.model.ui.UiStatus.Companion.toUi
 import com.twidere.twiderex.notification.InAppNotification
-import com.twidere.twiderex.paging.mediator.paging.pager
-import com.twidere.twiderex.paging.mediator.search.SearchStatusMediator
+import com.twidere.twiderex.paging.mediator.MastodonHashtagTimelineMediator
+import com.twidere.twiderex.paging.mediator.paging.PagingMediator
+import com.twidere.twiderex.viewmodel.PagingViewModel
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import kotlinx.coroutines.flow.map
 
-class TwitterSearchTweetsViewModel @AssistedInject constructor(
-    val database: CacheDatabase,
+class MastodonHashtagViewModel @AssistedInject constructor(
+    database: CacheDatabase,
     inAppNotification: InAppNotification,
-    @Assisted private val account: AccountDetails,
     @Assisted keyword: String,
-) : ViewModel() {
+    @Assisted account: AccountDetails,
+) : PagingViewModel() {
+
     @dagger.assisted.AssistedFactory
     interface AssistedFactory {
-        fun create(account: AccountDetails, keyword: String): TwitterSearchTweetsViewModel
+        fun create(
+            keyword: String,
+            account: AccountDetails,
+        ): MastodonHashtagViewModel
     }
-
-    private val service by lazy {
-        account.service as TwitterService
-    }
-    val source by lazy {
-        SearchStatusMediator(keyword, database, account.accountKey, service, inAppNotification).pager()
-            .flow.map { it.map { it.status.toUi(account.accountKey) } }.cachedIn(viewModelScope)
-    }
+    override val pagingMediator: PagingMediator = MastodonHashtagTimelineMediator(
+        keyword = keyword,
+        service = account.service as MastodonService,
+        accountKey = account.accountKey,
+        database = database,
+        inAppNotification = inAppNotification
+    )
 }

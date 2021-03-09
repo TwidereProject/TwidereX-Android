@@ -27,20 +27,6 @@ data class MicroBlogKey(
     val id: String,
     val host: String,
 ) {
-
-    override fun hashCode(): Int {
-        var result = id.hashCode()
-        result = 31 * result + host.hashCode()
-        return result
-    }
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other == null || javaClass != other.javaClass) return false
-        val (id1, host1) = other as MicroBlogKey
-        return if (id != id1) false else !if (host.isNotEmpty()) host != host1 else host1.isNotEmpty()
-    }
-
     override fun toString(): String {
         return if (host.isNotEmpty()) escapeText(id).toString() + "@" + escapeText(host) else id
     }
@@ -65,7 +51,7 @@ data class MicroBlogKey(
     }
 
     companion object {
-        val TwitterHost = "twitter.com"
+        const val TwitterHost = "twitter.com"
         val Empty: MicroBlogKey = MicroBlogKey("", "")
         fun twitter(id: String) = MicroBlogKey(id, TwitterHost)
 

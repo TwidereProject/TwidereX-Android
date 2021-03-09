@@ -169,7 +169,13 @@ fun RetweetButton(
         }
     }
     Box(
-        modifier = Modifier.weight(1f),
+        modifier = Modifier.let {
+            if (withNumber) {
+                it.weight(1f)
+            } else {
+                it
+            }
+        }
     ) {
         DropdownMenu(
             expanded = expanded,
@@ -240,7 +246,6 @@ fun ShareButton(
     val clipboardManager = LocalClipboardManager.current
     val contentDescription = stringResource(id = R.string.accessibility_common_more)
     Box {
-
         if (compat) {
             TextButton(
                 onClick = {

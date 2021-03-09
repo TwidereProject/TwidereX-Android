@@ -24,16 +24,21 @@ import com.twidere.services.http.authorization.BearerAuthorization
 import com.twidere.services.http.retrofit
 import com.twidere.services.mastodon.api.MastodonResources
 import com.twidere.services.mastodon.model.Context
+import com.twidere.services.mastodon.model.Hashtag
 import com.twidere.services.mastodon.model.MastodonPaging
+import com.twidere.services.mastodon.model.MastodonSearchResponse
 import com.twidere.services.mastodon.model.NotificationTypes
+import com.twidere.services.mastodon.model.SearchType
 import com.twidere.services.mastodon.model.exceptions.MastodonException
 import com.twidere.services.microblog.LookupService
 import com.twidere.services.microblog.MicroBlogService
 import com.twidere.services.microblog.NotificationService
 import com.twidere.services.microblog.RelationshipService
+import com.twidere.services.microblog.SearchService
 import com.twidere.services.microblog.TimelineService
 import com.twidere.services.microblog.model.INotification
 import com.twidere.services.microblog.model.IRelationship
+import com.twidere.services.microblog.model.ISearchResponse
 import com.twidere.services.microblog.model.IStatus
 import com.twidere.services.microblog.model.IUser
 import com.twidere.services.microblog.model.Relationship
@@ -41,7 +46,12 @@ import com.twidere.services.microblog.model.Relationship
 class MastodonService(
     private val host: String,
     private val accessToken: String,
-) : MicroBlogService, TimelineService, LookupService, RelationshipService, NotificationService {
+) : MicroBlogService,
+    TimelineService,
+    LookupService,
+    RelationshipService,
+    NotificationService,
+    SearchService {
     private val resources by lazy {
         retrofit<MastodonResources>(
             "https://$host",
@@ -112,8 +122,8 @@ class MastodonService(
         return resources.lookupStatus(id)
     }
 
-    override suspend fun userPinnedStatus(userId: String): IStatus? {
-        TODO("Not yet implemented")
+    override suspend fun userPinnedStatus(userId: String): List<IStatus> {
+        return resources.userTimeline(user_id = userId, pinned = true)
     }
 
     override suspend fun showRelationship(target_id: String): IRelationship {
@@ -162,4 +172,55 @@ class MastodonService(
     suspend fun context(id: String): Context {
         return resources.context(id)
     }
+
+    suspend fun searchHashTag(
+        query: String,
+        offset: Int,
+        count: Int,
+    ): List<Hashtag> {
+        return resources.searchV2(
+            query = query,
+            type = SearchType.hashtags,
+            offset = offset,
+            limit = count,
+        ).hashtags ?: emptyList()
+    }
+
+    override suspend fun searchTweets(
+        query: String,
+        count: Int,
+        nextPage: String?
+    ): ISearchResponse {
+        val result = resources.searchV2(
+            query = query,
+            type = SearchType.statuses,
+            max_id = nextPage,
+            limit = count
+        )
+        return MastodonSearchResponse(
+            nextPage = result.statuses?.lastOrNull()?.id,
+            status = result.statuses ?: emptyList()
+        )
+    }
+
+    override suspend fun searchUsers(query: String, page: Int?, count: Int): List<IUser> {
+        return resources.searchV2(
+            query = query,
+            type = SearchType.accounts,
+            limit = count,
+            offset = (page ?: 0) * count
+        ).accounts ?: emptyList()
+    }
+
+    suspend fun hashtagTimeline(
+        query: String,
+        count: Int? = null,
+        since_id: String? = null,
+        max_id: String? = null,
+    ): List<IStatus> = resources.hashtagTimeline(
+        hashtag = query,
+        limit = count,
+        since_id = since_id,
+        max_id = max_id,
+    )
 }

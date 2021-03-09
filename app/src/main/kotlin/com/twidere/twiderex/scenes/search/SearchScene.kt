@@ -26,9 +26,6 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.height
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
@@ -36,76 +33,54 @@ import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.Saver
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.paging.LoadState
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
-import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
+import com.twidere.twiderex.component.foundation.Pager
 import com.twidere.twiderex.component.foundation.TextTabsComponent
 import com.twidere.twiderex.component.foundation.TopAppBarElevation
-import com.twidere.twiderex.component.lazy.LazyColumn2
-import com.twidere.twiderex.component.lazy.collectAsLazyPagingItems
-import com.twidere.twiderex.component.lazy.itemsPagingGridIndexed
-import com.twidere.twiderex.component.lazy.loadState
-import com.twidere.twiderex.component.lazy.ui.LazyUiStatusList
-import com.twidere.twiderex.component.lazy.ui.LazyUiUserList
+import com.twidere.twiderex.component.foundation.rememberPagerState
 import com.twidere.twiderex.component.navigation.LocalNavigator
-import com.twidere.twiderex.component.status.StatusMediaPreviewItem
-import com.twidere.twiderex.di.assisted.assistedViewModel
-import com.twidere.twiderex.extensions.refreshOrRetry
-import com.twidere.twiderex.extensions.viewModel
-import com.twidere.twiderex.preferences.proto.DisplayPreferences
+import com.twidere.twiderex.model.PlatformType
+import com.twidere.twiderex.scenes.search.tabs.MastodonSearchHashtagItem
+import com.twidere.twiderex.scenes.search.tabs.SearchTweetsItem
+import com.twidere.twiderex.scenes.search.tabs.SearchUserItem
+import com.twidere.twiderex.scenes.search.tabs.TwitterSearchMediaItem
 import com.twidere.twiderex.ui.LocalActiveAccount
-import com.twidere.twiderex.ui.LocalVideoPlayback
 import com.twidere.twiderex.ui.TwidereXTheme
-import com.twidere.twiderex.ui.standardPadding
-import com.twidere.twiderex.viewmodel.twitter.search.TwitterSearchMediaViewModel
-import com.twidere.twiderex.viewmodel.twitter.search.TwitterSearchTweetsViewModel
-import com.twidere.twiderex.viewmodel.twitter.search.TwitterSearchUserViewModel
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SearchScene(keyword: String) {
     val account = LocalActiveAccount.current ?: return
-    val tweetsViewModel =
-        assistedViewModel<TwitterSearchTweetsViewModel.AssistedFactory, TwitterSearchTweetsViewModel> {
-            it.create(account, keyword)
-        }
-    val mediaViewModel =
-        assistedViewModel<TwitterSearchMediaViewModel.AssistedFactory, TwitterSearchMediaViewModel> {
-            it.create(account, keyword)
-        }
-    val usersViewModel = viewModel {
-        TwitterSearchUserViewModel(account, keyword)
-    }
-    var selectedTab by rememberSaveable(
-        // FIXME: 2021/2/18 Workaround for https://issuetracker.google.com/issues/180513115
-        saver = Saver(
-            save = {
-                it.value
-            },
-            restore = {
-                mutableStateOf(it)
-            },
-        )
-    ) { mutableStateOf(0) }
     val navigator = LocalNavigator.current
 
+    val tabs = remember {
+        when (account.type) {
+            PlatformType.Twitter -> listOf(
+                SearchTweetsItem(),
+                TwitterSearchMediaItem(),
+                SearchUserItem()
+            )
+            else -> listOf(
+                SearchTweetsItem(),
+                SearchUserItem(),
+                MastodonSearchHashtagItem(),
+            )
+        }
+    }
+    val pagerState = rememberPagerState(maxPage = tabs.lastIndex)
+    val scope = rememberCoroutineScope()
     TwidereXTheme {
         InAppNotificationScaffold {
             Column {
@@ -152,14 +127,14 @@ fun SearchScene(keyword: String) {
                             }
                         )
                         TextTabsComponent(
-                            items = listOf(
-                                stringResource(id = R.string.scene_search_tabs_tweets),
-                                stringResource(id = R.string.scene_search_tabs_media),
-                                stringResource(id = R.string.scene_search_tabs_users),
-                            ),
-                            selectedItem = selectedTab,
+                            items = tabs.map { it.name() },
+                            selectedItem = pagerState.currentPage,
                             onItemSelected = {
-                                selectedTab = it
+                                scope.launch {
+                                    pagerState.selectPage {
+                                        pagerState.currentPage = it
+                                    }
+                                }
                             },
                         )
                     }
@@ -167,100 +142,11 @@ fun SearchScene(keyword: String) {
                 Box(
                     modifier = Modifier.weight(1F),
                 ) {
-                    when (selectedTab) {
-                        0 -> SearchTweetsContent(tweetsViewModel)
-                        1 -> SearchMediasContent(mediaViewModel)
-                        2 -> SearchUsersContent(usersViewModel)
+                    Pager(state = pagerState) {
+                        tabs[page].Content(keyword = keyword)
                     }
                 }
             }
-        }
-    }
-}
-
-@Composable
-private fun SearchTweetsContent(viewModel: TwitterSearchTweetsViewModel) {
-    val source = viewModel.source.collectAsLazyPagingItems()
-    SwipeToRefreshLayout(
-        refreshingState = source.loadState.refresh is LoadState.Loading,
-        onRefresh = {
-            source.refreshOrRetry()
-        }
-    ) {
-        if (source.itemCount > 0) {
-            LazyUiStatusList(
-                items = source,
-            )
-        }
-    }
-}
-
-@Composable
-private fun SearchMediasContent(viewModel: TwitterSearchMediaViewModel) {
-    val source = viewModel.source.collectAsLazyPagingItems()
-    CompositionLocalProvider(
-        LocalVideoPlayback provides DisplayPreferences.AutoPlayback.Off
-    ) {
-        SwipeToRefreshLayout(
-            refreshingState = source.loadState.refresh is LoadState.Loading,
-            onRefresh = {
-                source.refreshOrRetry()
-            }
-        ) {
-            if (source.itemCount > 0) {
-                LazyColumn2 {
-                    item {
-                        Box(modifier = Modifier.height(standardPadding))
-                    }
-                    itemsPagingGridIndexed(
-                        source,
-                        rowSize = 2,
-                        spacing = standardPadding,
-                        padding = standardPadding
-                    ) { index, pair ->
-                        pair?.let { item ->
-                            val navigator = LocalNavigator.current
-                            StatusMediaPreviewItem(
-                                item.first,
-                                modifier = Modifier
-                                    .aspectRatio(1F)
-                                    .clip(
-                                        MaterialTheme.shapes.medium
-                                    ),
-                                onClick = {
-                                    navigator.media(item.second.statusKey, index)
-                                }
-                            )
-                        }
-                    }
-                    item {
-                        Box(modifier = Modifier.height(standardPadding))
-                    }
-                    loadState(source.loadState.append) {
-                        source.retry()
-                    }
-                }
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterialApi::class)
-@Composable
-private fun SearchUsersContent(viewModel: TwitterSearchUserViewModel) {
-    val source = viewModel.source.collectAsLazyPagingItems()
-    val navigator = LocalNavigator.current
-    SwipeToRefreshLayout(
-        refreshingState = source.loadState.refresh is LoadState.Loading,
-        onRefresh = {
-            source.refreshOrRetry()
-        }
-    ) {
-        if (source.itemCount > 0) {
-            LazyUiUserList(
-                items = source,
-                onItemClicked = { navigator.user(it) },
-            )
         }
     }
 }

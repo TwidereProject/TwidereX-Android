@@ -66,6 +66,7 @@ interface INavigator {
     fun twitterSignInWeb(target: String) {}
     fun mastodonSignInWeb(target: String) {}
     fun searchInput(initial: String? = null) {}
+    fun hashtag(name: String) {}
 }
 
 class Navigator(
@@ -173,6 +174,10 @@ class Navigator(
             )
         } else {
         }
+    }
+
+    override fun hashtag(name: String) {
+        navController.navigate(Route.Mastodon.Hashtag(name))
     }
 }
 

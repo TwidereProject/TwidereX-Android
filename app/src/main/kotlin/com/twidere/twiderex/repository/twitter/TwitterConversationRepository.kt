@@ -132,13 +132,13 @@ class TwitterConversationRepository @AssistedInject constructor(
         )
         val conversationId = tweet.conversationID ?: return SearchResult(emptyList(), null)
         val searchResponse = try {
-            service.searchTweets(
+            service.searchV2(
                 "conversation_id:$conversationId",
                 count = defaultLoadCount,
                 nextPage = nextPage
             )
         } catch (e: TwitterApiExceptionV2) {
-            service.searchTweetsV1(
+            service.searchV1(
                 "to:${dbTweet.status.status.user.screenName} since_id:${dbTweet.status.status.data.statusId}",
                 count = defaultLoadCount,
                 max_id = nextPage

@@ -41,6 +41,7 @@ data class DbUser(
     val userId: String,
     val name: String,
     val userKey: MicroBlogKey,
+    val acct: MicroBlogKey,
     val screenName: String,
     val profileImage: String,
     val profileBackgroundImage: String?,
