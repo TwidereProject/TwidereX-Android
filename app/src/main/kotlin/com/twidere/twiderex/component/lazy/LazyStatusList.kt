@@ -24,11 +24,10 @@ import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.runtime.Composable
 import com.twidere.twiderex.model.ui.UiStatus
-import java.util.UUID
 
 fun LazyListScope.statuses(
     lazyPagingItems: LazyPagingItems<UiStatus>,
-    key: ((index: Int) -> Any) = { lazyPagingItems[it]?.statusKey?.hashCode() ?: UUID.randomUUID() },
+    key: ((index: Int) -> Any) = { lazyPagingItems[it]?.statusKey?.hashCode() ?: it },
     itemContent: @Composable LazyItemScope.(value: UiStatus?) -> Unit
 ) {
     // this state recomposes every time the LazyPagingItems receives an update and changes the
@@ -44,7 +43,7 @@ fun LazyListScope.statuses(
 
 fun LazyListScope.statusesIndexed(
     lazyPagingItems: LazyPagingItems<UiStatus>,
-    key: ((index: Int) -> Any) = { lazyPagingItems[it]?.statusKey?.hashCode() ?: UUID.randomUUID() },
+    key: ((index: Int) -> Any) = { lazyPagingItems[it]?.statusKey?.hashCode() ?: it },
     itemContent: @Composable LazyItemScope.(index: Int, value: UiStatus?) -> Unit
 ) {
     // this state recomposes every time the LazyPagingItems receives an update and changes the

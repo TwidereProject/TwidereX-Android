@@ -39,7 +39,6 @@ import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.component.status.UserName
 import com.twidere.twiderex.component.status.UserScreenName
 import com.twidere.twiderex.model.ui.UiUser
-import java.util.UUID
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -47,7 +46,7 @@ fun LazyUiUserList(
     modifier: Modifier = Modifier,
     items: LazyPagingItems<UiUser>,
     state: LazyListState = rememberLazyListState(),
-    key: ((index: Int) -> Any) = { items[it]?.userKey?.hashCode() ?: UUID.randomUUID() },
+    key: ((index: Int) -> Any) = { items[it]?.userKey?.hashCode() ?: it },
     onItemClicked: (UiUser) -> Unit = {},
 ) {
     LazyColumn2(
