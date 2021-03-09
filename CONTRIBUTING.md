@@ -20,7 +20,7 @@ For those able & willing to help fix issues and/or implement features ...
 
 Make sure you have
  - The latest Android Studio Canary
- - JDK 14+
+ - JDK 11
 
 ### Working Branch
 
