@@ -32,6 +32,8 @@ import androidx.navigation.NavController
 import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.compose.navigate
 import androidx.navigation.compose.popUpTo
+import com.twidere.twiderex.db.model.ReferenceType
+import com.twidere.twiderex.model.MastodonStatusType
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.ui.UiStatus
@@ -82,10 +84,23 @@ class Navigator(
             )
             PlatformType.StatusNet -> TODO()
             PlatformType.Fanfou -> TODO()
-            PlatformType.Mastodon -> navController.navigate(
-                Route.Status.Mastodon(status.statusKey),
-                builder,
-            )
+            PlatformType.Mastodon -> {
+                val statusKey = if (status.mastodonExtra != null) {
+                    when (status.mastodonExtra.type) {
+                        MastodonStatusType.Status -> status.statusKey
+                        MastodonStatusType.NotificationFollow, MastodonStatusType.NotificationFollowRequest -> null
+                        else -> status.referenceStatus[ReferenceType.MastodonNotification]?.statusKey
+                    }
+                } else {
+                    status.statusKey
+                }
+                statusKey?.let {
+                    navController.navigate(
+                        Route.Status.Mastodon(statusKey),
+                        builder,
+                    )
+                }
+            }
         }
     }
 
