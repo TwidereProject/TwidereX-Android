@@ -33,6 +33,8 @@ import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.compose.navigate
 import androidx.navigation.compose.popUpTo
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.PlatformType
+import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.navigation.twidereXSchema
@@ -42,7 +44,7 @@ val LocalNavigator = staticCompositionLocalOf<INavigator> { error("No Navigator"
 
 interface INavigator {
     fun user(user: UiUser, builder: NavOptionsBuilder.() -> Unit = {}) {}
-    fun status(statusKey: MicroBlogKey, builder: NavOptionsBuilder.() -> Unit = {}) {}
+    fun status(status: UiStatus, builder: NavOptionsBuilder.() -> Unit = {}) {}
     fun media(
         statusKey: MicroBlogKey,
         selectedIndex: Int = 0,
@@ -72,8 +74,19 @@ class Navigator(
         navController.navigate(Route.User(user.userKey), builder)
     }
 
-    override fun status(statusKey: MicroBlogKey, builder: NavOptionsBuilder.() -> Unit) {
-        navController.navigate(Route.Status(statusKey), builder)
+    override fun status(status: UiStatus, builder: NavOptionsBuilder.() -> Unit) {
+        when (status.platformType) {
+            PlatformType.Twitter -> navController.navigate(
+                Route.Status.Twitter(status.statusKey),
+                builder,
+            )
+            PlatformType.StatusNet -> TODO()
+            PlatformType.Fanfou -> TODO()
+            PlatformType.Mastodon -> navController.navigate(
+                Route.Status.Mastodon(status.statusKey),
+                builder,
+            )
+        }
     }
 
     override fun media(

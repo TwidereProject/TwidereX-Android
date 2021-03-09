@@ -127,7 +127,7 @@ private fun NormalStatus(
             .fillMaxWidth()
             .clickable(
                 onClick = {
-                    navigator.status(data.statusKey)
+                    navigator.status(data)
                 }
             )
             .padding(
@@ -441,7 +441,7 @@ fun ColumnScope.StatusBody(
                 modifier = Modifier
                     .clickable(
                         onClick = {
-                            navigator.status(statusKey = quote.statusKey)
+                            navigator.status(quote)
                         }
                     )
                     .padding(standardPadding),

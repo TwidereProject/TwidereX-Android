@@ -20,6 +20,7 @@
  */
 package com.twidere.services.mastodon.api
 
+import com.twidere.services.mastodon.model.Context
 import com.twidere.services.mastodon.model.Notification
 import com.twidere.services.mastodon.model.NotificationTypes
 import com.twidere.services.mastodon.model.Status
@@ -67,4 +68,7 @@ interface TimelineResources {
         @Query("exclude_types[]") exclude_types: List<NotificationTypes>? = null,
         @Query("account_id") account_id: String? = null,
     ): List<Notification>
+
+    @GET("/api/v1/statuses/{id}/context")
+    suspend fun context(@Path("id") id: String): Context
 }

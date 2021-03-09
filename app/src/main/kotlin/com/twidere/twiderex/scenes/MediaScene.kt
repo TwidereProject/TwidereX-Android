@@ -66,7 +66,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.navigation.compose.navigate
 import com.google.android.exoplayer2.ui.PlayerControlView
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
@@ -78,6 +77,7 @@ import com.twidere.twiderex.component.foundation.Swiper
 import com.twidere.twiderex.component.foundation.VideoPlayer
 import com.twidere.twiderex.component.foundation.Zoomable
 import com.twidere.twiderex.component.foundation.rememberPagerState
+import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.component.status.LikeButton
 import com.twidere.twiderex.component.status.ReplyButton
 import com.twidere.twiderex.component.status.RetweetButton
@@ -92,7 +92,6 @@ import com.twidere.twiderex.extensions.showControls
 import com.twidere.twiderex.model.MediaType
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiStatus
-import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.preferences.proto.DisplayPreferences
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalNavController
@@ -146,6 +145,7 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int) {
     var controlVisibility by remember { mutableStateOf(true) }
     val controlPanelColor = MaterialTheme.colors.surface.copy(alpha = 0.6f)
     val navController = LocalNavController.current
+    val navigator = LocalNavigator.current
     Scaffold {
         Box {
             val pagerState = rememberPagerState(
@@ -271,7 +271,7 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int) {
                                         modifier = Modifier
                                             .clickable(
                                                 onClick = {
-                                                    navController.navigate(Route.Status(status.statusKey))
+                                                    navigator.status(status)
                                                 }
                                             ),
                                         text = status.rawText,

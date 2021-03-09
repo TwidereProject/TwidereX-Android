@@ -18,7 +18,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.scenes
+package com.twidere.twiderex.scenes.twitter
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -53,7 +53,7 @@ import com.twidere.twiderex.viewmodel.twitter.TwitterStatusViewModel
 import kotlinx.coroutines.launch
 
 @Composable
-fun StatusScene(statusKey: MicroBlogKey) {
+fun TwitterStatusScene(statusKey: MicroBlogKey) {
     val account = LocalActiveAccount.current ?: return
     val viewModel =
         assistedViewModel<TwitterStatusViewModel.AssistedFactory, TwitterStatusViewModel> {

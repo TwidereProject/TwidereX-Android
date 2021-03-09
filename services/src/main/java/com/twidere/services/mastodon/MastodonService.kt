@@ -23,6 +23,7 @@ package com.twidere.services.mastodon
 import com.twidere.services.http.authorization.BearerAuthorization
 import com.twidere.services.http.retrofit
 import com.twidere.services.mastodon.api.MastodonResources
+import com.twidere.services.mastodon.model.Context
 import com.twidere.services.mastodon.model.MastodonPaging
 import com.twidere.services.mastodon.model.NotificationTypes
 import com.twidere.services.mastodon.model.exceptions.MastodonException
@@ -108,7 +109,7 @@ class MastodonService(
     }
 
     override suspend fun lookupStatus(id: String): IStatus {
-        TODO("Not yet implemented")
+        return resources.lookupStatus(id)
     }
 
     override suspend fun userPinnedStatus(userId: String): IStatus? {
@@ -156,5 +157,9 @@ class MastodonService(
             since_id = since_id,
             limit = count,
         )
+    }
+
+    suspend fun context(id: String): Context {
+        return resources.context(id)
     }
 }

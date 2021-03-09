@@ -18,21 +18,12 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.services.mastodon.api
+package com.twidere.services.mastodon.model
 
-import com.twidere.services.mastodon.model.Account
-import com.twidere.services.mastodon.model.Status
-import retrofit2.http.GET
-import retrofit2.http.Path
+import kotlinx.serialization.Serializable
 
-interface LookupResources {
-    @GET("/api/v1/accounts/{id}")
-    suspend fun lookupUser(
-        @Path(value = "id") id: String,
-    ): Account
-
-    @GET("/api/v1/statuses/{id}")
-    suspend fun lookupStatus(
-        @Path("id") id: String,
-    ): Status
-}
+@Serializable
+data class Context(
+    val ancestors: List<Status>,
+    val descendants: List<Status>,
+)
