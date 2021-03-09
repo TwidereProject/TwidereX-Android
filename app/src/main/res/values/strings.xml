@@ -155,6 +155,7 @@
     <string name="scene_search_tabs_tweets">Tweets</string>
     <string name="scene_search_tabs_media">Media</string>
     <string name="scene_search_tabs_users">Users</string>
+    <string name="scene_search_tabs_hashtag">Hashtag</string>
     <string name="scene_profile_title">Me</string>
     <string name="scene_profile_hide_reply">Hide reply</string>
     <string name="scene_profile_permission_denied_profile_blocked_title">Permission Denied</string>

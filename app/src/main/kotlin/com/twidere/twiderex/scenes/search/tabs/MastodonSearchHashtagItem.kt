@@ -26,7 +26,9 @@ import androidx.compose.material.ListItem
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.paging.LoadState
+import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
 import com.twidere.twiderex.component.lazy.LazyColumn2
 import com.twidere.twiderex.component.lazy.collectAsLazyPagingItems
@@ -40,7 +42,7 @@ import com.twidere.twiderex.viewmodel.mastodon.MastodonSearchHashtagViewModel
 class MastodonSearchHashtagItem : SearchSceneItem {
     @Composable
     override fun name(): String {
-        return "Hashtag"
+        return stringResource(id = R.string.scene_search_tabs_hashtag)
     }
 
     @OptIn(ExperimentalMaterialApi::class)
