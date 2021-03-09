@@ -42,16 +42,11 @@ import androidx.compose.material.LocalContentColor
 import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.List
-import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Message
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -327,9 +322,9 @@ fun StatusContent(
                                 modifier = Modifier.size(LocalTextStyle.current.fontSize.value.dp),
                                 painter = when (status.mastodonExtra.visibility) {
                                     Visibility.Public -> painterResource(id = R.drawable.ic_globe)
-                                    Visibility.Unlisted -> rememberVectorPainter(image = Icons.Default.List)
-                                    Visibility.Private -> rememberVectorPainter(image = Icons.Default.Lock)
-                                    Visibility.Direct -> rememberVectorPainter(image = Icons.Default.Message)
+                                    Visibility.Unlisted -> painterResource(id = R.drawable.ic_lock_open)
+                                    Visibility.Private -> painterResource(id = R.drawable.ic_lock)
+                                    Visibility.Direct -> painterResource(id = R.drawable.ic_mail)
                                 },
                                 contentDescription = status.mastodonExtra.visibility.name
                             )
