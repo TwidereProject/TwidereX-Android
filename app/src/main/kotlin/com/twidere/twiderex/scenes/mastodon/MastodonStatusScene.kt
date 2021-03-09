@@ -73,17 +73,19 @@ fun MastodonStatusScene(
                 )
             }
         ) {
-            if (source.loadState.refresh == LoadState.Loading) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
+            LazyColumn2(
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                if (source.loadState.refresh == LoadState.Loading) {
                     status?.let {
-                        ExpandedStatusComponent(data = it)
+                        item(key = it.statusKey.hashCode()) {
+                            ExpandedStatusComponent(data = it)
+                        }
                     }
-                    CircularProgressIndicator()
-                }
-            } else {
-                LazyColumn2 {
+                    item {
+                        CircularProgressIndicator()
+                    }
+                } else {
                     statusesIndexed(source) { index, it ->
                         it?.let { status ->
                             Column {
