@@ -112,7 +112,7 @@ fun HomeScene() {
         LazyListController()
     }
     val tabPosition = LocalAppearancePreferences.current.tapPosition
-    val menus = remember {
+    val menus = remember(account.type) {
         listOf(
             HomeTimelineItem(),
         ).let {
