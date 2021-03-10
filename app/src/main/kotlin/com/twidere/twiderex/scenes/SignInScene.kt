@@ -71,53 +71,53 @@ fun SignInScene() {
             navController.popBackStack()
         }
     }
-    var showMastodon by remember { mutableStateOf(false) }
-    SignInScaffold(
-        countAction = {
-            showMastodon = it > 9
-        }
-    ) {
+    SignInScaffold {
         TwitterSignIn()
-        if (showMastodon) {
-            Spacer(modifier = Modifier.height(standardPadding * 2))
-            SignInButton(
-                onClick = {
-                    navController.navigate(Route.SignIn.Mastodon)
-                },
-                border = ButtonDefaults.outlinedBorder,
-                color = MaterialTheme.colors.surface,
-                contentColor = MaterialTheme.colors.primary,
-            ) {
-                ListItem(
-                    icon = {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_mastodon_logo_blue),
-                            contentDescription = stringResource(
-                                id = R.string.accessibility_common_logo_mastodon
-                            )
-                        )
-                    },
-                    text = {
-                        Text(
-                            text = stringResource(id = R.string.scene_sign_in_sign_in_with_mastodon)
-                        )
-                    },
-                    trailing = {
-                        IconButton(
-                            enabled = false,
-                            onClick = {},
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.KeyboardArrowRight,
-                                contentDescription = stringResource(
-                                    id = R.string.scene_sign_in_sign_in_with_mastodon
-                                )
-                            )
-                        }
-                    }
+        Spacer(modifier = Modifier.height(standardPadding * 2))
+        MastodonSignIn()
+    }
+}
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+private fun MastodonSignIn() {
+    val navController = LocalNavController.current
+    SignInButton(
+        onClick = {
+            navController.navigate(Route.SignIn.Mastodon)
+        },
+        border = ButtonDefaults.outlinedBorder,
+        color = MaterialTheme.colors.surface,
+        contentColor = MaterialTheme.colors.primary,
+    ) {
+        ListItem(
+            icon = {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_mastodon_logo_blue),
+                    contentDescription = stringResource(
+                        id = R.string.accessibility_common_logo_mastodon
+                    )
                 )
+            },
+            text = {
+                Text(
+                    text = stringResource(id = R.string.scene_sign_in_sign_in_with_mastodon)
+                )
+            },
+            trailing = {
+                IconButton(
+                    enabled = false,
+                    onClick = {},
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.KeyboardArrowRight,
+                        contentDescription = stringResource(
+                            id = R.string.scene_sign_in_sign_in_with_mastodon
+                        )
+                    )
+                }
             }
-        }
+        )
     }
 }
 
