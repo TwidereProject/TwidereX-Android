@@ -25,4 +25,5 @@ interface MastodonResources :
     LookupResources,
     FriendshipResources,
     AccountResources,
-    SearchResources
+    SearchResources,
+    StatusResources

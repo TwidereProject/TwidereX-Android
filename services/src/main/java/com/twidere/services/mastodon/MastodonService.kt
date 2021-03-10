@@ -35,6 +35,7 @@ import com.twidere.services.microblog.MicroBlogService
 import com.twidere.services.microblog.NotificationService
 import com.twidere.services.microblog.RelationshipService
 import com.twidere.services.microblog.SearchService
+import com.twidere.services.microblog.StatusService
 import com.twidere.services.microblog.TimelineService
 import com.twidere.services.microblog.model.INotification
 import com.twidere.services.microblog.model.IRelationship
@@ -51,7 +52,8 @@ class MastodonService(
     LookupService,
     RelationshipService,
     NotificationService,
-    SearchService {
+    SearchService,
+    StatusService {
     private val resources by lazy {
         retrofit<MastodonResources>(
             "https://$host",
@@ -223,4 +225,28 @@ class MastodonService(
         since_id = since_id,
         max_id = max_id,
     )
+
+    override suspend fun like(id: String): IStatus {
+        return resources.favourite(id)
+    }
+
+    override suspend fun unlike(id: String): IStatus {
+        return resources.unfavourite(id).let {
+            it.copy(favouritesCount = it.favouritesCount?.let { it - 1 })
+        }
+    }
+
+    override suspend fun retweet(id: String): IStatus {
+        return resources.reblog(id)
+    }
+
+    override suspend fun unRetweet(id: String): IStatus {
+        return resources.unreblog(id).let {
+            it.copy(favouritesCount = it.reblogsCount?.let { it - 1 })
+        }
+    }
+
+    override suspend fun delete(id: String): IStatus {
+        return resources.delete(id)
+    }
 }
