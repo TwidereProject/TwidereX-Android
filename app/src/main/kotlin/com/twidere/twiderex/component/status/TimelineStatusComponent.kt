@@ -393,11 +393,6 @@ fun ColumnScope.StatusBody(
         }
     }
 
-    if (status.platformType == PlatformType.Mastodon && status.mastodonExtra?.poll != null) {
-        Spacer(modifier = Modifier.height(standardPadding))
-        MastodonPoll(status)
-    }
-
     if (!status.placeString.isNullOrEmpty()) {
         Spacer(modifier = Modifier.height(standardPadding))
         CompositionLocalProvider(
