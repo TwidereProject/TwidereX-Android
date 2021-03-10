@@ -44,7 +44,6 @@ import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Icon
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.contentColorFor
@@ -66,6 +65,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
@@ -361,7 +361,9 @@ private fun UserInfo(
             }
             Spacer(modifier = Modifier.height(standardPadding))
             user?.let { user ->
-                Row {
+                Row(
+                    modifier = Modifier.padding(horizontal = standardPadding * 2)
+                ) {
                     if (user.platformType == PlatformType.Mastodon && user.mastodonExtra?.locked == true) {
                         CompositionLocalProvider(
                             LocalContentAlpha provides ContentAlpha.medium,
@@ -373,9 +375,12 @@ private fun UserInfo(
                         }
                         Spacer(modifier = Modifier.width(standardPadding / 2))
                     }
-                    ProvideTextStyle(value = MaterialTheme.typography.h6) {
-                        UserName(user = user)
-                    }
+                    UserName(
+                        user = user,
+                        style = MaterialTheme.typography.h6,
+                        maxLines = Int.MAX_VALUE,
+                        textAlign = TextAlign.Center
+                    )
                 }
                 UserScreenName(user = user)
             }
