@@ -24,10 +24,8 @@ import android.content.Context
 import android.content.Intent
 import android.content.Intent.ACTION_VIEW
 import android.net.Uri
-import android.os.Build
 import android.webkit.CookieManager
 import androidx.compose.runtime.staticCompositionLocalOf
-import androidx.core.os.bundleOf
 import androidx.navigation.NavController
 import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.compose.navigate
@@ -153,27 +151,17 @@ class Navigator(
     override fun twitterSignInWeb(target: String) {
         CookieManager.getInstance().removeAllCookies {
         }
-        if (true) {
-            navController.navigate(
-                Route.SignIn.Web.Twitter(target)
-            )
-        } else {
-            navController.navigate(
-                Route.SignIn.TwitterWebSignInDialog,
-                bundleOf("target" to target)
-            )
-        }
+        navController.navigate(
+            Route.SignIn.Web.Twitter(target)
+        )
     }
 
     override fun mastodonSignInWeb(target: String) {
         CookieManager.getInstance().removeAllCookies {
         }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            navController.navigate(
-                Route.SignIn.Web.Mastodon(target)
-            )
-        } else {
-        }
+        navController.navigate(
+            Route.SignIn.Web.Mastodon(target)
+        )
     }
 
     override fun hashtag(name: String) {

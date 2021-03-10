@@ -36,10 +36,8 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NamedNavArgument
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navArgument
-import androidx.navigation.fragment.dialog
 import androidx.navigation.navDeepLink
 import com.twidere.twiderex.component.RequireAuthorization
-import com.twidere.twiderex.dialog.TwitterWebSignInDialog
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.scenes.DraftListScene
@@ -113,8 +111,6 @@ object Route {
             )
             }"
         }
-
-        val TwitterWebSignInDialog = 1
     }
 
     fun User(userKey: MicroBlogKey) =
@@ -347,13 +343,6 @@ fun NavGraphBuilder.route() {
     ) { backStackEntry ->
         backStackEntry.arguments?.getString("target")?.let {
             MastodonWebSignInScene(target = URLDecoder.decode(it, "UTF-8"))
-        }
-    }
-
-    dialog<TwitterWebSignInDialog>(Route.SignIn.TwitterWebSignInDialog) {
-        argument("target") {
-            nullable = false
-            type = NavType.StringType
         }
     }
 

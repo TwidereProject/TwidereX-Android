@@ -23,7 +23,7 @@ plugins {
     id 'org.jetbrains.kotlin.android'
     id "org.jetbrains.kotlin.kapt"
     id "com.google.protobuf" version "0.8.14"
-    id "org.jetbrains.kotlin.plugin.serialization" version "1.4.30"
+    id "org.jetbrains.kotlin.plugin.serialization" version "1.4.31"
     id "com.google.devtools.ksp" version "1.4.30-1.0.0-alpha04"
 }
 
@@ -165,18 +165,16 @@ dependencies {
     androidTestImplementation "androidx.compose.ui:ui-test:$versions.compose"
 
     implementation "androidx.paging:paging-runtime-ktx:$versions.paging"
-    implementation "androidx.paging:paging-compose:$versions.androidx_compose"
-    implementation "androidx.navigation:navigation-compose:$versions.androidx_compose"
-    implementation "androidx.navigation:navigation-fragment-ktx:$versions.navigation"
+    implementation "androidx.paging:paging-compose:$versions.paging_compose"
+    implementation "androidx.navigation:navigation-compose:$versions.navigation_compose"
     implementation "androidx.activity:activity-ktx:$versions.androidx"
     implementation "androidx.activity:activity-compose:$versions.androidx"
     implementation "androidx.datastore:datastore:$versions.dataStore"
 
     implementation "com.google.dagger:hilt-android:$versions.hilt"
     kapt "com.google.dagger:hilt-android-compiler:$versions.hilt"
-    implementation "androidx.hilt:hilt-lifecycle-viewmodel:$versions.androidx_hilt"
-    implementation "androidx.hilt:hilt-navigation:$versions.androidx_hilt"
     implementation "androidx.hilt:hilt-work:$versions.androidx_hilt"
+    implementation "androidx.hilt:hilt-navigation-compose:$versions.hilt_compose"
     kapt "androidx.hilt:hilt-compiler:$versions.androidx_hilt"
 
     implementation "androidx.room:room-runtime:$versions.room"
