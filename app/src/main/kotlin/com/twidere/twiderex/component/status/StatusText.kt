@@ -56,7 +56,16 @@ fun ColumnScope.StatusText(
     val expandable = status.platformType == PlatformType.Mastodon &&
         status.mastodonExtra?.spoilerText != null
 
-    var expanded by rememberSaveable(key = status.statusKey.toString()) { mutableStateOf(!expandable) }
+    var expanded by rememberSaveable(
+        saver = Saver(
+            save = {
+                it.value
+            },
+            restore = {
+                mutableStateOf(it)
+            },
+        )
+    ) { mutableStateOf(!expandable) }
 
     if (expandable && status.mastodonExtra?.spoilerText != null) {
         Text(text = status.mastodonExtra.spoilerText)

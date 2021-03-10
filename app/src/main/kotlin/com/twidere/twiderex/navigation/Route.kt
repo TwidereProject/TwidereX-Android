@@ -26,6 +26,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.navigation.NavBackStackEntry
@@ -213,7 +214,16 @@ fun ProvidePlatformType(
     provider: suspend () -> PlatformType?,
     content: @Composable (platformType: PlatformType) -> Unit,
 ) {
-    var platformType by rememberSaveable {
+    var platformType by rememberSaveable(
+        saver = Saver(
+            save = {
+                it.value?.toString()
+            },
+            restore = {
+                mutableStateOf(PlatformType.valueOf(it))
+            }
+        ),
+    ) {
         mutableStateOf<PlatformType?>(null)
     }
     val account = LocalActiveAccount.current
