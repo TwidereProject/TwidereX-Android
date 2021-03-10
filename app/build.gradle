@@ -167,7 +167,6 @@ dependencies {
     implementation "androidx.paging:paging-runtime-ktx:$versions.paging"
     implementation "androidx.paging:paging-compose:$versions.paging_compose"
     implementation "androidx.navigation:navigation-compose:$versions.navigation_compose"
-    implementation "androidx.navigation:navigation-fragment-ktx:$versions.navigation"
     implementation "androidx.activity:activity-ktx:$versions.androidx"
     implementation "androidx.activity:activity-compose:$versions.androidx"
     implementation "androidx.datastore:datastore:$versions.dataStore"
@@ -177,7 +176,6 @@ dependencies {
     implementation "androidx.hilt:hilt-work:$versions.androidx_hilt"
     implementation "androidx.hilt:hilt-navigation-compose:$versions.hilt_compose"
     kapt "androidx.hilt:hilt-compiler:$versions.androidx_hilt"
-
 
     implementation "androidx.room:room-runtime:$versions.room"
     kapt "androidx.room:room-compiler:$versions.room"

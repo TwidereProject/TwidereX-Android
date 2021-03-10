@@ -27,6 +27,7 @@ import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import android.os.Bundle
 import android.view.WindowManager
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -35,12 +36,8 @@ import androidx.compose.runtime.remember
 import androidx.core.net.ConnectivityManagerCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.ComposeNavigator
-import androidx.navigation.fragment.DialogFragmentNavigator
 import com.bumptech.glide.Glide
 import com.twidere.twiderex.action.LocalStatusActions
 import com.twidere.twiderex.action.StatusActions
@@ -67,16 +64,7 @@ import dev.chrisbanes.accompanist.insets.ProvideWindowInsets
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class TwidereXActivity : FragmentActivity() {
-
-    val navController by lazy {
-        NavHostController(this).apply {
-            navigatorProvider.apply {
-                addNavigator(ComposeNavigator())
-                addNavigator(DialogFragmentNavigator(this@TwidereXActivity, supportFragmentManager))
-            }
-        }
-    }
+class TwidereXActivity : ComponentActivity() {
 
     private val isActiveNetworkMetered = MutableLiveData(false)
     private val networkCallback by lazy {
@@ -152,9 +140,7 @@ class TwidereXActivity : FragmentActivity() {
                         ProvideWindowInsets(
                             windowInsetsAnimationsEnabled = true
                         ) {
-                            Router(
-                                navController = navController
-                            )
+                            Router()
                         }
                     }
                 }

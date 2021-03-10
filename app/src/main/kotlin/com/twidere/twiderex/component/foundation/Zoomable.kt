@@ -44,10 +44,8 @@ import androidx.compose.ui.input.pointer.consumePositionChange
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.util.VelocityTracker
 import androidx.compose.ui.layout.layout
-import com.twidere.twiderex.extensions.isInRange
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import kotlin.math.withSign
 
 @Composable
 private fun rememberZoomableState(): ZoomableState {
@@ -122,17 +120,6 @@ private class ZoomableState(
     suspend fun updateBounds(maxX: Float, maxY: Float) = coroutineScope {
         translateY.updateBounds(-maxY, maxY)
         translateX.updateBounds(-maxX, maxX)
-        // Workaround for https://issuetracker.google.com/issues/180031493
-        if (!translateX.value.isInRange(-maxX, maxX)) {
-            launch {
-                translateX.snapTo(maxX.withSign(translateX.value))
-            }
-        }
-        if (!translateY.value.isInRange(-maxY, maxY)) {
-            launch {
-                translateY.snapTo(maxY.withSign(translateY.value))
-            }
-        }
     }
 }
 
