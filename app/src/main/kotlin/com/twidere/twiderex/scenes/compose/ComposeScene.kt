@@ -305,7 +305,7 @@ private fun ComposeBody(
                         }
                         StatusLineComponent(
                             modifier = Modifier.let {
-                                if (composeType == ComposeType.Reply) {
+                                if (composeType != ComposeType.Quote) {
                                     it.height(height)
                                 } else {
                                     it
