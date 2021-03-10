@@ -24,15 +24,24 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Original(
-    val width: Long? = null,
-    val height: Long? = null,
+data class UploadResponse(
+    val id: String? = null,
+    val type: String? = null,
+    val url: String? = null,
 
-    @SerialName("frame_rate")
-    val frameRate: String? = null,
+    @SerialName("preview_url")
+    val previewURL: String? = null,
 
-    val duration: Double? = null,
-    val bitrate: Long? = null,
-    val size: String? = null,
-    val aspect: Double? = null
+    @SerialName("remote_url")
+    val remoteURL: String? = null,
+
+    @SerialName("preview_remote_url")
+    val previewRemoteURL: String? = null,
+
+    @SerialName("text_url")
+    val textURL: String? = null,
+
+    val meta: Meta? = null,
+    val description: String? = null,
+    val blurhash: String? = null
 )

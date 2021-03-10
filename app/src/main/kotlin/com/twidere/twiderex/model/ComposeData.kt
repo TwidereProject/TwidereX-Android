@@ -22,8 +22,11 @@ package com.twidere.twiderex.model
 
 import androidx.work.Data
 import androidx.work.workDataOf
+import com.twidere.services.mastodon.model.Visibility
+import com.twidere.twiderex.extensions.getNullableBoolean
 import com.twidere.twiderex.extensions.getNullableDouble
 import com.twidere.twiderex.viewmodel.compose.ComposeType
+import com.twidere.twiderex.viewmodel.compose.VoteExpired
 import java.util.UUID
 
 data class ComposeData(
@@ -35,6 +38,12 @@ data class ComposeData(
     val long: Double? = null,
     val draftId: String = UUID.randomUUID().toString(),
     val excludedReplyUserIds: List<String>? = null,
+    val voteOptions: List<String>? = null,
+    val voteExpired: VoteExpired? = null,
+    val voteMultiple: Boolean? = null,
+    val visibility: Visibility? = null,
+    val isSensitive: Boolean? = null,
+    val contentWarningText: String? = null,
 )
 
 fun ComposeData.toWorkData() = workDataOf(
@@ -45,7 +54,13 @@ fun ComposeData.toWorkData() = workDataOf(
     "lat" to lat,
     "long" to long,
     "draftId" to draftId,
-    "excludedReplyUserIds" to excludedReplyUserIds?.toTypedArray()
+    "excludedReplyUserIds" to excludedReplyUserIds?.toTypedArray(),
+    "voteOptions" to voteOptions?.toTypedArray(),
+    "voteExpired" to voteExpired?.name,
+    "voteMultiple" to voteMultiple,
+    "visibility" to visibility?.name,
+    "isSensitive" to isSensitive,
+    "contentWarningText" to contentWarningText,
 )
 
 fun Data.toComposeData() = ComposeData(
@@ -56,5 +71,11 @@ fun Data.toComposeData() = ComposeData(
     lat = getNullableDouble("lat"),
     long = getNullableDouble("long"),
     draftId = getString("draftId") ?: "",
-    excludedReplyUserIds = getStringArray("excludedReplyUserIds")?.toList()
+    excludedReplyUserIds = getStringArray("excludedReplyUserIds")?.toList(),
+    voteOptions = getStringArray("voteOptions")?.toList(),
+    voteExpired = getString("voteExpired")?.let { VoteExpired.valueOf(it) },
+    voteMultiple = getNullableBoolean("voteMultiple"),
+    visibility = getString("visibility")?.let { Visibility.valueOf(it) },
+    isSensitive = getNullableBoolean("isSensitive"),
+    contentWarningText = getString("contentWarningText"),
 )

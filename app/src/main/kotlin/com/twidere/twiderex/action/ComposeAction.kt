@@ -23,6 +23,8 @@ package com.twidere.twiderex.action
 import androidx.work.WorkManager
 import com.twidere.twiderex.model.ComposeData
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.PlatformType
+import com.twidere.twiderex.worker.MastodonComposeWorker
 import com.twidere.twiderex.worker.TwitterComposeWorker
 import com.twidere.twiderex.worker.draft.RemoveDraftWorker
 import com.twidere.twiderex.worker.draft.SaveDraftWorker
@@ -32,11 +34,24 @@ class ComposeAction(
 ) {
     fun commit(
         accountKey: MicroBlogKey,
+        platformType: PlatformType,
         data: ComposeData,
     ) {
+        val worker = when (platformType) {
+            PlatformType.Twitter -> TwitterComposeWorker.create(
+                accountKey = accountKey,
+                data = data,
+            )
+            PlatformType.StatusNet -> TODO()
+            PlatformType.Fanfou -> TODO()
+            PlatformType.Mastodon -> MastodonComposeWorker.create(
+                accountKey = accountKey,
+                data = data,
+            )
+        }
         workManager
             .beginWith(SaveDraftWorker.create(data = data))
-            .then(TwitterComposeWorker.create(accountKey = accountKey, data = data))
+            .then(worker)
             .then(RemoveDraftWorker.create(draftId = data.draftId))
             .enqueue()
     }

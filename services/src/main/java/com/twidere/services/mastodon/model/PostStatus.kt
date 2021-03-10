@@ -24,15 +24,20 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Original(
-    val width: Long? = null,
-    val height: Long? = null,
+data class PostStatus(
+    val status: String? = null,
 
-    @SerialName("frame_rate")
-    val frameRate: String? = null,
+    @SerialName("in_reply_to_id")
+    val inReplyToID: String? = null,
 
-    val duration: Double? = null,
-    val bitrate: Long? = null,
-    val size: String? = null,
-    val aspect: Double? = null
+    @SerialName("media_ids")
+    val mediaIDS: List<String>? = null,
+
+    val sensitive: Boolean? = null,
+
+    @SerialName("spoiler_text")
+    val spoilerText: String? = null,
+
+    val visibility: Visibility? = null,
+    val poll: PostPoll? = null
 )

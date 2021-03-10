@@ -28,7 +28,9 @@ import com.twidere.services.mastodon.model.Hashtag
 import com.twidere.services.mastodon.model.MastodonPaging
 import com.twidere.services.mastodon.model.MastodonSearchResponse
 import com.twidere.services.mastodon.model.NotificationTypes
+import com.twidere.services.mastodon.model.PostStatus
 import com.twidere.services.mastodon.model.SearchType
+import com.twidere.services.mastodon.model.UploadResponse
 import com.twidere.services.mastodon.model.exceptions.MastodonException
 import com.twidere.services.microblog.LookupService
 import com.twidere.services.microblog.MicroBlogService
@@ -43,6 +45,9 @@ import com.twidere.services.microblog.model.ISearchResponse
 import com.twidere.services.microblog.model.IStatus
 import com.twidere.services.microblog.model.IUser
 import com.twidere.services.microblog.model.Relationship
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.toRequestBody
+import java.io.InputStream
 
 class MastodonService(
     private val host: String,
@@ -248,5 +253,15 @@ class MastodonService(
 
     override suspend fun delete(id: String): IStatus {
         return resources.delete(id)
+    }
+
+    suspend fun upload(stream: InputStream, name: String): UploadResponse {
+        val body = MultipartBody.Part
+            .createFormData("file", name, stream.readBytes().toRequestBody())
+        return resources.upload(body)
+    }
+
+    suspend fun compose(data: PostStatus): IStatus {
+        return resources.post(data)
     }
 }

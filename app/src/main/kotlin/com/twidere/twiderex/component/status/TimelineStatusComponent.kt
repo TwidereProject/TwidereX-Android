@@ -50,11 +50,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.twidere.services.mastodon.model.Visibility
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.HumanizedTime
 import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.db.model.DbMastodonStatusExtra
+import com.twidere.twiderex.extensions.icon
 import com.twidere.twiderex.model.MastodonStatusType
 import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.ui.UiStatus
@@ -322,12 +322,7 @@ fun StatusContent(
                         if (status.platformType == PlatformType.Mastodon && status.mastodonExtra != null) {
                             Icon(
                                 modifier = Modifier.size(LocalTextStyle.current.fontSize.value.dp),
-                                painter = when (status.mastodonExtra.visibility) {
-                                    Visibility.Public -> painterResource(id = R.drawable.ic_globe)
-                                    Visibility.Unlisted -> painterResource(id = R.drawable.ic_lock_open)
-                                    Visibility.Private -> painterResource(id = R.drawable.ic_lock)
-                                    Visibility.Direct -> painterResource(id = R.drawable.ic_mail)
-                                },
+                                painter = status.mastodonExtra.visibility.icon(),
                                 contentDescription = status.mastodonExtra.visibility.name
                             )
                             Spacer(modifier = Modifier.width(standardPadding / 2))

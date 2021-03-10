@@ -24,15 +24,11 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Original(
-    val width: Long? = null,
-    val height: Long? = null,
+data class PostPoll(
+    val options: List<String>? = null,
 
-    @SerialName("frame_rate")
-    val frameRate: String? = null,
+    @SerialName("expires_in")
+    val expiresIn: Long? = null,
 
-    val duration: Double? = null,
-    val bitrate: Long? = null,
-    val size: String? = null,
-    val aspect: Double? = null
+    val multiple: Boolean? = null
 )

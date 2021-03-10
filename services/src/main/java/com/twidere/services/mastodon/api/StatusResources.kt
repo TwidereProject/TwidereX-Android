@@ -20,9 +20,15 @@
  */
 package com.twidere.services.mastodon.api
 
+import com.twidere.services.mastodon.model.PostStatus
 import com.twidere.services.mastodon.model.Status
+import com.twidere.services.mastodon.model.UploadResponse
+import okhttp3.MultipartBody
+import retrofit2.http.Body
 import retrofit2.http.DELETE
+import retrofit2.http.Multipart
 import retrofit2.http.POST
+import retrofit2.http.Part
 import retrofit2.http.Path
 
 interface StatusResources {
@@ -58,4 +64,11 @@ interface StatusResources {
 
     @DELETE("/api/v1/statuses/{id}")
     suspend fun delete(@Path("id") id: String): Status
+
+    @POST("/api/v1/statuses")
+    suspend fun post(@Body data: PostStatus): Status
+
+    @Multipart
+    @POST("/api/v1/media")
+    suspend fun upload(@Part file: MultipartBody.Part): UploadResponse
 }

@@ -36,6 +36,7 @@ import androidx.lifecycle.liveData
 import androidx.lifecycle.map
 import androidx.lifecycle.switchMap
 import androidx.work.WorkManager
+import com.twidere.services.mastodon.model.Visibility
 import com.twidere.services.microblog.LookupService
 import com.twidere.services.twitter.TwitterService
 import com.twidere.twiderex.action.ComposeAction
@@ -47,6 +48,7 @@ import com.twidere.twiderex.extensions.getTextBeforeSelection
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.ComposeData
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.DraftRepository
@@ -124,6 +126,49 @@ class DraftComposeViewModel @AssistedInject constructor(
     }
 }
 
+class VoteOption {
+    val text = MutableLiveData("")
+    fun setText(value: String) {
+        text.value = value
+    }
+}
+
+enum class VoteExpired(val value: Long) {
+    Min_5(300),
+    Min_30(1800),
+    Hour_1(3600),
+    Hour_6(21600),
+    Day_1(86400),
+    Day_3(259200),
+    Day_7(604800),
+}
+
+class VoteState {
+    val options = MutableLiveData(arrayListOf(VoteOption(), VoteOption()))
+    val expired = MutableLiveData(VoteExpired.Day_1)
+    val multiple = MutableLiveData(false)
+
+    fun setMultiple(value: Boolean) {
+        multiple.value = value
+    }
+
+    fun setExpired(value: VoteExpired) {
+        expired.value = value
+    }
+
+    fun setOption(value: String, index: Int) {
+        options.value?.let {
+            it[index].setText(value)
+            if (index == it.lastIndex && it.size < 4 && value.isNotEmpty()) {
+                it.add(VoteOption())
+            } else if (value.isEmpty() && it.size > 2) {
+                it.removeAt(index)
+            }
+            options.value = it
+        }
+    }
+}
+
 open class ComposeViewModel @AssistedInject constructor(
     protected val draftRepository: DraftRepository,
     private val locationManager: LocationManager,
@@ -150,6 +195,7 @@ open class ComposeViewModel @AssistedInject constructor(
     protected val service by lazy {
         account.service as TwitterService
     }
+
     protected val repository by lazy {
         factory.create(
             account.accountKey,
@@ -168,7 +214,7 @@ open class ComposeViewModel @AssistedInject constructor(
     val excludedReplyUserIds = MutableLiveData<List<String>>(emptyList())
 
     val replyToUserName = liveData {
-        if (composeType == ComposeType.Reply && statusKey != null) {
+        if (account.type == PlatformType.Twitter && composeType == ComposeType.Reply && statusKey != null) {
             emitSource(
                 status.map {
                     it?.let { status ->
@@ -206,6 +252,13 @@ open class ComposeViewModel @AssistedInject constructor(
             },
         )
     }
+
+    val voteState = MutableLiveData<VoteState?>(null)
+    val isInVoteMode = MutableLiveData(false)
+    val visibility = MutableLiveData(Visibility.Public)
+    val isImageSensitive = MutableLiveData(false)
+    val isContentWarningEnabled = MutableLiveData(false)
+    val contentWarningTextFieldValue = MutableLiveData(TextFieldValue())
     val textFieldValue = MutableLiveData(TextFieldValue())
     val images = MutableLiveData<List<Uri>>(emptyList())
     val canSaveDraft =
@@ -223,20 +276,37 @@ open class ComposeViewModel @AssistedInject constructor(
         textFieldValue.value = value
     }
 
+    fun setContentWarningText(value: TextFieldValue) {
+        contentWarningTextFieldValue.value = value
+    }
+
+    fun setContentWarningEnabled(value: Boolean) {
+        isContentWarningEnabled.value = value
+    }
+
+    fun setImageSensitive(value: Boolean) {
+        isImageSensitive.value = value
+    }
+
+    fun setVisibility(value: Visibility) {
+        visibility.value = value
+    }
+
+    fun setInVoteMode(value: Boolean) {
+        if (value) {
+            voteState.value = VoteState()
+        } else {
+            voteState.value = null
+        }
+        isInVoteMode.value = value
+    }
+
     fun compose() {
         textFieldValue.value?.text?.let {
             composeAction.commit(
                 account.accountKey,
-                ComposeData(
-                    content = it,
-                    draftId = draftId,
-                    images = images.value?.map { it.toString() } ?: emptyList(),
-                    composeType = composeType,
-                    statusKey = statusKey,
-                    lat = location.value?.latitude,
-                    long = location.value?.longitude,
-                    excludedReplyUserIds = excludedReplyUserIds.value
-                )
+                account.type,
+                BuildComposeData(it)
             )
         }
     }
@@ -246,21 +316,29 @@ open class ComposeViewModel @AssistedInject constructor(
             workManager
                 .beginWith(
                     SaveDraftWorker.create(
-                        ComposeData(
-                            content = text,
-                            draftId = draftId,
-                            images = images.value?.map { it.toString() } ?: emptyList(),
-                            composeType = composeType,
-                            statusKey = statusKey,
-                            lat = location.value?.latitude,
-                            long = location.value?.longitude,
-                            excludedReplyUserIds = excludedReplyUserIds.value
-                        )
+                        BuildComposeData(text)
                     )
                 )
                 .enqueue()
         }
     }
+
+    private fun BuildComposeData(text: String) = ComposeData(
+        content = text,
+        draftId = draftId,
+        images = images.value?.map { it.toString() } ?: emptyList(),
+        composeType = composeType,
+        statusKey = statusKey,
+        lat = location.value?.latitude,
+        long = location.value?.longitude,
+        excludedReplyUserIds = excludedReplyUserIds.value,
+        voteOptions = voteState.value?.options?.value?.map { it.text.value.toString() },
+        voteExpired = voteState.value?.expired?.value,
+        voteMultiple = voteState.value?.multiple?.value,
+        visibility = visibility.value,
+        isSensitive = isImageSensitive.value,
+        contentWarningText = contentWarningTextFieldValue.value?.text,
+    )
 
     fun putImages(value: List<Uri>) {
         images.value?.let {
