@@ -140,6 +140,8 @@ private fun NormalStatus(
                 val status = (data.retweet ?: data)
                 StatusActions(status)
             }
+        } else {
+            Spacer(modifier = Modifier.height(standardPadding))
         }
     }
 }
