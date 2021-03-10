@@ -67,7 +67,10 @@ class AssistedViewModelProcessor : SymbolProcessor {
             val packageName = node.packageName.asString()
             val className = "${node.qualifiedName?.getShortName()}AssistedViewModelHolder"
             codeGenerator.createNewFile(
-                Dependencies(true, *data.mapNotNull { it.containingFile }.toTypedArray()),
+                Dependencies(
+                    true,
+                    *(data.mapNotNull { it.containingFile } + listOfNotNull(node.containingFile)).toTypedArray()
+                ),
                 packageName,
                 className
             ).use { outputStream ->
@@ -77,7 +80,14 @@ class AssistedViewModelProcessor : SymbolProcessor {
 
                 data.forEach {
                     val name = it.qualifiedName?.asString() ?: "<ERROR>"
-                    outputStream.appendText("    ${name.replace(".", "_")}: $name,${System.lineSeparator()}")
+                    outputStream.appendText(
+                        "    ${
+                        name.replace(
+                            ".",
+                            "_"
+                        )
+                        }: $name,${System.lineSeparator()}"
+                    )
                 }
 
                 outputStream.appendText(") {${System.lineSeparator()}")
@@ -85,7 +95,14 @@ class AssistedViewModelProcessor : SymbolProcessor {
                 outputStream.appendText("    val factory = listOf(${System.lineSeparator()}")
                 data.forEach {
                     val name = it.qualifiedName?.asString() ?: "<ERROR>"
-                    outputStream.appendText("        ${name.replace(".", "_")},${System.lineSeparator()}")
+                    outputStream.appendText(
+                        "        ${
+                        name.replace(
+                            ".",
+                            "_"
+                        )
+                        },${System.lineSeparator()}"
+                    )
                 }
                 outputStream.appendText("    )${System.lineSeparator()}")
 
