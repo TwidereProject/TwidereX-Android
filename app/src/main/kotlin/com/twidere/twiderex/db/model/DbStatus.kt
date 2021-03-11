@@ -65,7 +65,7 @@ data class DbStatusV2(
     val lang: String?,
     val is_possibly_sensitive: Boolean,
     val platformType: PlatformType,
-    val mastodonExtra: DbMastodonStatusExtra? = null,
+    var mastodonExtra: DbMastodonStatusExtra? = null,
     val twitterExtra: DbTwitterStatusExtra? = null,
 )
 

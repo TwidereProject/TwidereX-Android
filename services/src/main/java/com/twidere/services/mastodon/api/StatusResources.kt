@@ -20,7 +20,9 @@
  */
 package com.twidere.services.mastodon.api
 
+import com.twidere.services.mastodon.model.Poll
 import com.twidere.services.mastodon.model.PostStatus
+import com.twidere.services.mastodon.model.PostVote
 import com.twidere.services.mastodon.model.Status
 import com.twidere.services.mastodon.model.UploadResponse
 import okhttp3.MultipartBody
@@ -71,4 +73,7 @@ interface StatusResources {
     @Multipart
     @POST("/api/v1/media")
     suspend fun upload(@Part file: MultipartBody.Part): UploadResponse
+
+    @POST("/api/v1/polls/{id}/votes")
+    suspend fun vote(@Path("id") id: String, @Body data: PostVote): Poll
 }

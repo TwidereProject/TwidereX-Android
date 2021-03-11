@@ -49,6 +49,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -57,9 +59,11 @@ import androidx.compose.ui.unit.dp
 import com.twidere.services.mastodon.model.Option
 import com.twidere.services.mastodon.model.Poll
 import com.twidere.twiderex.R
+import com.twidere.twiderex.action.LocalStatusActions
 import com.twidere.twiderex.extensions.humanizedTimestamp
 import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.ui.UiStatus
+import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.standardPadding
 import kotlin.math.max
 
@@ -68,12 +72,37 @@ private val Poll.canVote: Boolean
 
 @Composable
 fun MastodonPoll(status: UiStatus) {
+    val account = LocalActiveAccount.current ?: return
     if (status.platformType != PlatformType.Mastodon || status.mastodonExtra?.poll == null) {
         return
     }
+    val voteState = remember {
+        mutableStateListOf<Int>()
+    }
 
     status.mastodonExtra.poll.options?.forEachIndexed { index, option ->
-        MastodonPollOption(option, index, status.mastodonExtra.poll)
+        MastodonPollOption(
+            option,
+            index,
+            status.mastodonExtra.poll,
+            voted = voteState.contains(index),
+            onVote = {
+                if (status.mastodonExtra.poll.multiple == true) {
+                    if (voteState.contains(index)) {
+                        voteState.remove(index)
+                    } else {
+                        voteState.add(index)
+                    }
+                } else {
+                    if (voteState.isEmpty()) {
+                        voteState.add(index)
+                    } else {
+                        voteState.clear()
+                        voteState.add(index)
+                    }
+                }
+            }
+        )
         if (index != status.mastodonExtra.poll.options?.lastIndex) {
             Spacer(modifier = Modifier.height(standardPadding))
         }
@@ -81,7 +110,12 @@ fun MastodonPoll(status: UiStatus) {
 
     if (status.mastodonExtra.poll.canVote) {
         Spacer(modifier = Modifier.height(standardPadding))
-        TextButton(onClick = { }) {
+        val statusActions = LocalStatusActions.current
+        TextButton(
+            onClick = {
+                statusActions.vote(status = status, account = account, votes = voteState)
+            }
+        ) {
             Text(text = stringResource(id = R.string.common_controls_status_actions_vote))
         }
     }
@@ -131,6 +165,8 @@ fun MastodonPollOption(
     option: Option,
     index: Int,
     poll: Poll,
+    voted: Boolean,
+    onVote: (voted: Boolean) -> Unit = {},
 ) {
     val size = LocalTextStyle.current.fontSize.value.dp + standardPadding * 3
     val transition = updateTransition(targetState = option.votesCount)
@@ -155,6 +191,7 @@ fun MastodonPollOption(
                     it
                 } else {
                     it.clickable {
+                        onVote.invoke(!voted)
                     }
                 }
             }
@@ -197,9 +234,9 @@ fun MastodonPollOption(
             ) {
                 if (poll.canVote) {
                     if (poll.multiple == true) {
-                        Checkbox(checked = false, onCheckedChange = { /*TODO*/ })
+                        Checkbox(checked = voted, onCheckedChange = { onVote.invoke(it) })
                     } else {
-                        RadioButton(selected = false, onClick = { /*TODO*/ })
+                        RadioButton(selected = voted, onClick = { onVote.invoke(!voted) })
                     }
                 } else {
                     androidx.compose.animation.AnimatedVisibility(
