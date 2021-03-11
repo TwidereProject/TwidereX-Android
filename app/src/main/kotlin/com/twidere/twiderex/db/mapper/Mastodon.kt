@@ -272,6 +272,7 @@ fun Account.toDbUser(
             }
         } ?: throw IllegalArgumentException("mastodon user.acct should not be null"),
         platformType = PlatformType.Mastodon,
+        statusesCount = statusesCount ?: 0L,
         mastodonExtra = DbMastodonUserExtra(
             fields = fields ?: emptyList(),
             bot = bot ?: false,

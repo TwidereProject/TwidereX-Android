@@ -369,6 +369,7 @@ fun User.toDbUser(): DbUser {
         ),
         platformType = PlatformType.Twitter,
         acct = MicroBlogKey.twitter(screenName ?: ""),
+        statusesCount = statusesCount ?: 0,
         twitterExtra = DbTwitterUserExtra(
             pinned_tweet_id = null,
             url = entities?.description?.urls?.map {
@@ -406,6 +407,7 @@ fun UserV2.toDbUser(): DbUser {
         ),
         acct = MicroBlogKey.twitter(username ?: ""),
         platformType = PlatformType.Twitter,
+        statusesCount = publicMetrics?.tweetCount ?: 0,
         twitterExtra = DbTwitterUserExtra(
             pinned_tweet_id = pinnedTweetID,
             url = entities?.description?.urls?.map {

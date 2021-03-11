@@ -29,11 +29,13 @@ import androidx.compose.ui.Modifier
 @Composable
 fun ActionIconButton(
     onClick: () -> Unit,
+    enabled: Boolean = true,
     content: @Composable () -> Unit,
 ) {
     IconButton(
         onClick = onClick,
         modifier = Modifier.size(ButtonDefaults.MinWidth),
+        enabled = enabled,
         content = content,
     )
 }

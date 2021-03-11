@@ -335,6 +335,7 @@ private fun StatusActionButtonWithNumbers(
     icon: Painter,
     contentDescription: String,
     count: Long,
+    enabled: Boolean = true,
     color: Color = LocalContentColor.current,
     onClick: () -> Unit,
 ) {
@@ -346,7 +347,8 @@ private fun StatusActionButtonWithNumbers(
             onClick = onClick,
             colors = ButtonDefaults.textButtonColors(
                 contentColor = color
-            )
+            ),
+            enabled = enabled,
         ) {
             Icon(
                 modifier = Modifier.size(statusActionIconSize),

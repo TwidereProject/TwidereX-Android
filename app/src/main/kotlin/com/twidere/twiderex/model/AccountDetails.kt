@@ -104,6 +104,7 @@ data class AccountDetails(
             userKey = userKey,
             platformType = type,
             acct = userKey.copy(id = screenName),
+            statusesCount = 0
         )
     }
 }

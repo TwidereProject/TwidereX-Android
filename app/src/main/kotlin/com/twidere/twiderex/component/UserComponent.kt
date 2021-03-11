@@ -41,9 +41,15 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ContentAlpha
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.ListItem
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.RadioButton
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.contentColorFor
@@ -55,6 +61,8 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -128,7 +136,7 @@ fun UserComponent(
             painterResource(id = R.drawable.ic_float_left),
             stringResource(id = R.string.accessibility_scene_user_tab_status)
         ) {
-            UserStatusTimeline(userKey = userKey)
+            UserStatusTimeline(userKey = userKey, viewModel = viewModel)
         },
         UserTabComponent(
             painterResource(id = R.drawable.ic_photo),
@@ -212,17 +220,31 @@ data class UserTabComponent(
     val compose: @Composable () -> Unit,
 )
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun UserStatusTimeline(
     userKey: MicroBlogKey,
+    viewModel: UserViewModel,
 ) {
+    val user by viewModel.user.observeAsState(initial = null)
     val account = LocalActiveAccount.current ?: return
+    var excludeReplies by rememberSaveable(
+        saver = Saver(
+            save = {
+                it.value
+            },
+            restore = {
+                mutableStateOf(it)
+            },
+        )
+    ) { mutableStateOf(false) }
     val timelineViewModel =
         assistedViewModel<UserTimelineViewModel.AssistedFactory, UserTimelineViewModel>(
             account,
             userKey,
+            excludeReplies,
         ) {
-            it.create(account, userKey = userKey)
+            it.create(account, userKey = userKey, excludeReplies)
         }
     val timelineSource = timelineViewModel.source.collectAsLazyPagingItems()
     // FIXME: 2021/2/20 Recover the scroll position require visiting the loadState once, have no idea why
@@ -230,6 +252,86 @@ fun UserStatusTimeline(
     timelineSource.loadState
     LazyUiStatusList(
         items = timelineSource,
+        header = {
+            user?.let { user ->
+                item {
+                    Row(
+                        modifier = Modifier.background(
+                            color = MaterialTheme.colors.onBackground.copy(
+                                alpha = 0.01f
+                            )
+                        ),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Spacer(modifier = Modifier.width(standardPadding * 2))
+                        Text(
+                            modifier = Modifier.weight(1f),
+                            text = "${user.statusesCount} Tweets"
+                        )
+                        Box {
+                            var showDropdown by remember {
+                                mutableStateOf(false)
+                            }
+                            DropdownMenu(
+                                expanded = showDropdown,
+                                onDismissRequest = { showDropdown = false }
+                            ) {
+                                DropdownMenuItem(
+                                    onClick = {
+                                        excludeReplies = false
+                                        showDropdown = false
+                                    }
+                                ) {
+                                    ListItem(
+                                        icon = {
+                                            RadioButton(
+                                                selected = !excludeReplies,
+                                                onClick = {
+                                                    excludeReplies = false
+                                                    showDropdown = false
+                                                },
+                                            )
+                                        }
+                                    ) {
+                                        Text(text = "All tweets")
+                                    }
+                                }
+                                DropdownMenuItem(
+                                    onClick = {
+                                        excludeReplies = true
+                                        showDropdown = false
+                                    }
+                                ) {
+                                    ListItem(
+                                        icon = {
+                                            RadioButton(
+                                                selected = excludeReplies,
+                                                onClick = {
+                                                    excludeReplies = true
+                                                    showDropdown = false
+                                                },
+                                            )
+                                        }
+                                    ) {
+                                        Text(text = "Exclude replies")
+                                    }
+                                }
+                            }
+                            IconButton(
+                                onClick = {
+                                    showDropdown = !showDropdown
+                                }
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.ic_filter),
+                                    contentDescription = null,
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        },
     )
 }
 

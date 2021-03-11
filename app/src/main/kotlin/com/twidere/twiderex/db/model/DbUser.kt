@@ -55,6 +55,7 @@ data class DbUser(
     val verified: Boolean,
     val isProtected: Boolean,
     val platformType: PlatformType,
+    val statusesCount: Long,
     val twitterExtra: DbTwitterUserExtra? = null,
     val mastodonExtra: DbMastodonUserExtra? = null,
 )

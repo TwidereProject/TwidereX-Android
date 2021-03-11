@@ -36,6 +36,7 @@ class UserTimelineViewModel @AssistedInject constructor(
     inAppNotification: InAppNotification,
     @Assisted account: AccountDetails,
     @Assisted userKey: MicroBlogKey,
+    @Assisted exclude_replies: Boolean,
 ) : PagingViewModel() {
 
     @dagger.assisted.AssistedFactory
@@ -43,6 +44,7 @@ class UserTimelineViewModel @AssistedInject constructor(
         fun create(
             account: AccountDetails,
             userKey: MicroBlogKey,
+            exclude_replies: Boolean
         ): UserTimelineViewModel
     }
 
@@ -53,5 +55,6 @@ class UserTimelineViewModel @AssistedInject constructor(
             account.accountKey,
             account.service as TimelineService,
             inAppNotification,
+            exclude_replies,
         )
 }

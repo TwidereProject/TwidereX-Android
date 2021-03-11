@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.ButtonDefaults
@@ -57,12 +58,14 @@ fun LazyUiStatusList(
     loadingBetween: List<MicroBlogKey> = emptyList(),
     onLoadBetweenClicked: (current: MicroBlogKey, next: MicroBlogKey) -> Unit = { _, _ -> },
     key: ((index: Int) -> Any) = { items[it]?.hashCode() ?: it },
+    header: LazyListScope.() -> Unit = {},
 ) {
     if (items.itemCount > 0) {
         LazyColumn2(
             modifier = modifier,
             state = state
         ) {
+            header.invoke(this)
             statusesIndexed(items, key = key) { index, item ->
                 if (item == null) {
                     TimelineStatusComponent(data = UiStatus.placeHolder())

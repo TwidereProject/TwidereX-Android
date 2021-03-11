@@ -38,15 +38,17 @@ class UserStatusMediator(
     accountKey: MicroBlogKey,
     private val service: TimelineService,
     inAppNotification: InAppNotification,
+    private val exclude_replies: Boolean = false,
 ) : MaxIdPagingMediator(accountKey, database, inAppNotification) {
     override val pagingKey: String
-        get() = UserTimelineType.Status.pagingKey(userKey)
+        get() = UserTimelineType.Status.pagingKey(userKey) + ":exclude_replies=$exclude_replies"
 
     override suspend fun load(pageSize: Int, paging: SinceMaxPagination?): List<IStatus> {
         return service.userTimeline(
             user_id = userKey.id,
             count = pageSize,
             max_id = paging?.maxId,
+            exclude_replies = exclude_replies,
         )
     }
 }
