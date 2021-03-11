@@ -109,6 +109,7 @@ import com.twidere.twiderex.component.status.UserScreenName
 import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.extensions.icon
 import com.twidere.twiderex.extensions.navigateForResult
+import com.twidere.twiderex.extensions.stringName
 import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
@@ -532,10 +533,10 @@ fun ComposeMastodonVisibility(
                 ) {
                     ListItem(
                         text = {
-                            Text(text = it.name)
+                            Text(text = it.stringName())
                         },
                         icon = {
-                            Icon(painter = it.icon(), contentDescription = it.name)
+                            Icon(painter = it.icon(), contentDescription = it.stringName())
                         }
                     )
                 }
@@ -554,9 +555,9 @@ fun ComposeMastodonVisibility(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Spacer(modifier = Modifier.width(standardPadding))
-                Icon(painter = visibility.icon(), contentDescription = visibility.name)
+                Icon(painter = visibility.icon(), contentDescription = visibility.stringName())
                 Spacer(modifier = Modifier.width(standardPadding))
-                Text(text = visibility.name)
+                Text(text = visibility.stringName())
                 Spacer(modifier = Modifier.width(standardPadding))
             }
         }
@@ -734,7 +735,7 @@ private fun ComposeInput(
                                 value = cwText,
                                 onValueChange = { viewModel.setContentWarningText(it) },
                                 placeholder = {
-                                    Text(text = "Write your warning here..")
+                                    Text(text = stringResource(id = R.string.scene_compose_cw_placeholder))
                                 }
                             )
                             Spacer(modifier = Modifier.height(standardPadding))
@@ -752,7 +753,7 @@ private fun ComposeInput(
                         // TODO: scroll lazyColumn
                     },
                     placeholder = {
-                        Text(text = "Write something...")
+                        Text(text = stringResource(id = R.string.scene_compose_placeholder))
                     }
                 )
 
@@ -859,7 +860,7 @@ private fun ComposeVote(voteState: VoteState) {
                             showDropdown = false
                         }
                     ) {
-                        Text(text = it.name)
+                        Text(text = it.stringName())
                     }
                 }
             }
@@ -873,7 +874,7 @@ private fun ComposeVote(voteState: VoteState) {
                 Text(
                     modifier = Modifier
                         .weight(1f),
-                    text = expired.name,
+                    text = expired.stringName(),
                 )
                 Icon(imageVector = Icons.Default.ArrowDropDown, contentDescription = null)
             }
@@ -888,7 +889,7 @@ private fun ComposeVote(voteState: VoteState) {
         ) {
             Checkbox(checked = multiple, onCheckedChange = { voteState.setMultiple(!multiple) })
             Spacer(modifier = Modifier.width(standardPadding))
-            Text(text = "multiple")
+            Text(text = stringResource(id = R.string.scene_compose_vote_multiple))
         }
     }
 }

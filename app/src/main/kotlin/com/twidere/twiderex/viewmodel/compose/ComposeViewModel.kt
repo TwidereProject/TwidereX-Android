@@ -28,6 +28,8 @@ import android.location.LocationManager
 import android.net.Uri
 import android.os.Bundle
 import androidx.annotation.RequiresPermission
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.MutableLiveData
@@ -39,6 +41,7 @@ import androidx.work.WorkManager
 import com.twidere.services.mastodon.model.Visibility
 import com.twidere.services.microblog.LookupService
 import com.twidere.services.twitter.TwitterService
+import com.twidere.twiderex.R
 import com.twidere.twiderex.action.ComposeAction
 import com.twidere.twiderex.db.model.DbDraft
 import com.twidere.twiderex.extensions.combineWith
@@ -140,7 +143,20 @@ enum class VoteExpired(val value: Long) {
     Hour_6(21600),
     Day_1(86400),
     Day_3(259200),
-    Day_7(604800),
+    Day_7(604800);
+
+    @Composable
+    fun stringName(): String {
+        return when (this) {
+            Min_5 -> stringResource(id = R.string.scene_compose_vote_expiration_5_Min)
+            Min_30 -> stringResource(id = R.string.scene_compose_vote_expiration_30_Min)
+            Hour_1 -> stringResource(id = R.string.scene_compose_vote_expiration_1_Hour)
+            Hour_6 -> stringResource(id = R.string.scene_compose_vote_expiration_6_Hour)
+            Day_1 -> stringResource(id = R.string.scene_compose_vote_expiration_1_Day)
+            Day_3 -> stringResource(id = R.string.scene_compose_vote_expiration_3_Day)
+            Day_7 -> stringResource(id = R.string.scene_compose_vote_expiration_7_Day)
+        }
+    }
 }
 
 class VoteState {

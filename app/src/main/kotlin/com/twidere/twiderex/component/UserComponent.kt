@@ -266,7 +266,17 @@ fun UserStatusTimeline(
                         Spacer(modifier = Modifier.width(standardPadding * 2))
                         Text(
                             modifier = Modifier.weight(1f),
-                            text = "${user.statusesCount} Tweets"
+                            text = if (user.statusesCount > 1) {
+                                stringResource(
+                                    id = R.string.common_countable_tweet_single,
+                                    user.statusesCount
+                                )
+                            } else {
+                                stringResource(
+                                    id = R.string.common_countable_tweet_multiple,
+                                    user.statusesCount
+                                )
+                            }
                         )
                         Box {
                             var showDropdown by remember {
@@ -293,7 +303,7 @@ fun UserStatusTimeline(
                                             )
                                         }
                                     ) {
-                                        Text(text = "All tweets")
+                                        Text(text = stringResource(id = R.string.scene_profile_filter_all))
                                     }
                                 }
                                 DropdownMenuItem(
@@ -313,7 +323,7 @@ fun UserStatusTimeline(
                                             )
                                         }
                                     ) {
-                                        Text(text = "Exclude replies")
+                                        Text(text = stringResource(id = R.string.scene_profile_filter_exclude_replies))
                                     }
                                 }
                             }
