@@ -25,7 +25,7 @@ import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.WebComponent
 import com.twidere.twiderex.extensions.DisposeResult
 import com.twidere.twiderex.ui.LocalNavController
-import com.twidere.twiderex.ui.TwidereXTheme
+import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.utils.TwitterWebJavascriptInterface
 
 const val INJECT_CONTENT =
@@ -34,7 +34,7 @@ const val INJECT_CONTENT =
 @Composable
 fun TwitterWebSignInScene(target: String) {
     val navController = LocalNavController.current
-    TwidereXTheme {
+    TwidereScene {
         navController.DisposeResult(key = "pin_code")
         InAppNotificationScaffold {
             WebComponent(

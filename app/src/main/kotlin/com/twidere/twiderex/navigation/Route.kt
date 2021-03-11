@@ -69,7 +69,7 @@ import com.twidere.twiderex.scenes.user.UserScene
 import com.twidere.twiderex.twitterHosts
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalActiveAccountViewModel
-import com.twidere.twiderex.ui.TwidereXTheme
+import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.utils.LocalPlatformResolver
 import com.twidere.twiderex.viewmodel.compose.ComposeType
 import java.net.URLDecoder
@@ -233,7 +233,7 @@ fun ProvidePlatformType(
     platformType?.let {
         content.invoke(it)
     } ?: run {
-        TwidereXTheme {
+        TwidereScene {
             Scaffold {
             }
         }

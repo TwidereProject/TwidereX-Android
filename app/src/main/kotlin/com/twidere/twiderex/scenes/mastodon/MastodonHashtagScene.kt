@@ -32,7 +32,7 @@ import com.twidere.twiderex.component.lazy.ui.LazyUiStatusList
 import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.extensions.refreshOrRetry
 import com.twidere.twiderex.ui.LocalActiveAccount
-import com.twidere.twiderex.ui.TwidereXTheme
+import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.mastodon.MastodonHashtagViewModel
 
 @Composable
@@ -46,7 +46,7 @@ fun MastodonHashtagScene(keyword: String) {
             it.create(keyword = keyword, account = account)
         }
     val source = viewModel.source.collectAsLazyPagingItems()
-    TwidereXTheme {
+    TwidereScene {
         InAppNotificationScaffold(
             topBar = {
                 AppBar(

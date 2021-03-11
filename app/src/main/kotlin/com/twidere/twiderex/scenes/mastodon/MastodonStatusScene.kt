@@ -42,7 +42,7 @@ import com.twidere.twiderex.component.status.TimelineStatusComponent
 import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.ui.LocalActiveAccount
-import com.twidere.twiderex.ui.TwidereXTheme
+import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.mastodon.MastodonStatusViewModel
 
 @Composable
@@ -60,7 +60,7 @@ fun MastodonStatusScene(
     val source = viewModel.source.collectAsLazyPagingItems()
     val status by viewModel.status.observeAsState(initial = null)
 
-    TwidereXTheme {
+    TwidereScene {
         InAppNotificationScaffold(
             topBar = {
                 AppBar(

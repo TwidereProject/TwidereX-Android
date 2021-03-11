@@ -117,7 +117,7 @@ import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.Orange
-import com.twidere.twiderex.ui.TwidereXTheme
+import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.ui.composeImageSize
 import com.twidere.twiderex.ui.profileImageSize
 import com.twidere.twiderex.ui.standardPadding
@@ -202,7 +202,7 @@ private fun ComposeBody(
             }
         }
     }
-    TwidereXTheme {
+    TwidereScene {
         if (showSaveDraftDialog) {
             ConfirmDraftDialog(
                 onDismiss = {

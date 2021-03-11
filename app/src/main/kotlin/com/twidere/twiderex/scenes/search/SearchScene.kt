@@ -56,7 +56,7 @@ import com.twidere.twiderex.scenes.search.tabs.SearchTweetsItem
 import com.twidere.twiderex.scenes.search.tabs.SearchUserItem
 import com.twidere.twiderex.scenes.search.tabs.TwitterSearchMediaItem
 import com.twidere.twiderex.ui.LocalActiveAccount
-import com.twidere.twiderex.ui.TwidereXTheme
+import com.twidere.twiderex.ui.TwidereScene
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -81,7 +81,7 @@ fun SearchScene(keyword: String) {
     }
     val pagerState = rememberPagerState(maxPage = tabs.lastIndex)
     val scope = rememberCoroutineScope()
-    TwidereXTheme {
+    TwidereScene {
         InAppNotificationScaffold {
             Column {
                 Surface(

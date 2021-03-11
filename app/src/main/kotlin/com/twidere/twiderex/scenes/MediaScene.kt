@@ -95,7 +95,7 @@ import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.LocalVideoPlayback
 import com.twidere.twiderex.ui.LocalWindow
-import com.twidere.twiderex.ui.TwidereXTheme
+import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.ui.standardPadding
 import com.twidere.twiderex.viewmodel.MediaViewModel
 import dev.chrisbanes.accompanist.glide.LocalRequestManager
@@ -110,7 +110,7 @@ fun StatusMediaScene(statusKey: MicroBlogKey, selectedIndex: Int) {
     }
     val loading by viewModel.loading.observeAsState(initial = false)
     val status by viewModel.status.observeAsState()
-    TwidereXTheme(
+    TwidereScene(
         requireDarkTheme = true,
         extendViewIntoStatusBar = true,
         extendViewIntoNavigationBar = true,
@@ -298,7 +298,7 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int) {
 
 @Composable
 fun RawMediaScene(url: String) {
-    TwidereXTheme(
+    TwidereScene(
         requireDarkTheme = true,
         extendViewIntoStatusBar = true,
         extendViewIntoNavigationBar = true,
@@ -369,7 +369,7 @@ fun MediaView(
                             }
                         )
                     }
-                MediaType.video, MediaType.animated_gif ->
+                MediaType.video, MediaType.animated_gif, MediaType.audio ->
                     Box {
                         VideoPlayer(
                             url = data.url,
@@ -377,6 +377,7 @@ fun MediaView(
                             showControls = false
                         )
                     }
+                MediaType.other -> Unit
             }
         }
     }

@@ -98,7 +98,7 @@ import com.twidere.twiderex.scenes.home.SearchItem
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalActiveAccountViewModel
 import com.twidere.twiderex.ui.LocalNavController
-import com.twidere.twiderex.ui.TwidereXTheme
+import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.ui.mediumEmphasisContentContentColor
 import com.twidere.twiderex.ui.standardPadding
 import kotlinx.coroutines.launch
@@ -140,7 +140,7 @@ fun HomeScene() {
             }
         }
     }
-    TwidereXTheme {
+    TwidereScene {
         Scaffold(
             scaffoldState = scaffoldState,
             topBar = {

@@ -58,87 +58,94 @@ import dev.chrisbanes.accompanist.insets.statusBarsHeight
 import dev.chrisbanes.accompanist.insets.toPaddingValues
 
 @Composable
-fun TwidereXTheme(
-    requireDarkTheme: Boolean = false,
-    extendViewIntoStatusBar: Boolean = false,
-    extendViewIntoNavigationBar: Boolean = false,
-    content: @Composable () -> Unit
+fun TwidereTheme(
+    darkTheme: Boolean = false,
+    content: @Composable () -> Unit,
 ) {
-    val darkTheme = isDarkTheme(requireDarkTheme)
     val colors = provideThemeColors(darkTheme)
     val typography = provideTypography()
-
     MaterialTheme(
         colors = colors,
         typography = typography,
         shapes = shapes,
-        content = {
-            val windowInsetsController = LocalWindowInsetsController.current
-            LaunchedEffect(darkTheme) {
-                windowInsetsController.isAppearanceLightStatusBars = !darkTheme
-            }
-            val navigationBarColor = Color.Black
-            val statusBarColor = statusBarColor()
-            Box {
-                Box(
-                    modifier = run {
-                        val actual = provideSystemInsets(
-                            extendViewIntoNavigationBar,
-                            extendViewIntoStatusBar
-                        )
-                        Modifier.padding(actual.toPaddingValues())
-                    }.align(Alignment.Center)
-                ) {
-                    content()
-                }
-                Spacer(
-                    modifier = if (!extendViewIntoStatusBar) {
-                        Modifier
-                            .statusBarsHeight()
-                            .navigationBarsPadding(bottom = false)
-                            .zIndex(999F)
-                            .fillMaxWidth()
-                            .background(statusBarColor)
-                    } else {
-                        Modifier
-                    }.align(Alignment.TopCenter)
-                )
-                Spacer(
-                    modifier = if (!extendViewIntoNavigationBar) {
-                        Modifier
-                            .navigationBarsWidth(HorizontalSide.Left)
-                            .zIndex(999F)
-                            .fillMaxHeight()
-                            .background(navigationBarColor)
-                    } else {
-                        Modifier
-                    }.align(Alignment.CenterStart)
-                )
-                Spacer(
-                    modifier = if (!extendViewIntoNavigationBar) {
-                        Modifier
-                            .navigationBarsWidth(HorizontalSide.Right)
-                            .fillMaxHeight()
-                            .zIndex(999F)
-                            .background(navigationBarColor)
-                    } else {
-                        Modifier
-                    }.align(Alignment.CenterEnd)
-                )
-                Spacer(
-                    modifier = if (!extendViewIntoNavigationBar) {
-                        Modifier
-                            .navigationBarsHeight()
-                            .zIndex(999F)
-                            .fillMaxWidth()
-                            .background(navigationBarColor)
-                    } else {
-                        Modifier
-                    }.align(Alignment.BottomCenter)
-                )
-            }
-        }
+        content = content,
     )
+}
+
+@Composable
+fun TwidereScene(
+    requireDarkTheme: Boolean = false,
+    extendViewIntoStatusBar: Boolean = false,
+    extendViewIntoNavigationBar: Boolean = false,
+    content: @Composable () -> Unit,
+) {
+    val darkTheme = isDarkTheme(requireDarkTheme)
+    TwidereTheme(darkTheme = darkTheme) {
+        val windowInsetsController = LocalWindowInsetsController.current
+        LaunchedEffect(darkTheme) {
+            windowInsetsController.isAppearanceLightStatusBars = !darkTheme
+        }
+        val navigationBarColor = Color.Black
+        val statusBarColor = statusBarColor()
+        Box {
+            Box(
+                modifier = run {
+                    val actual = provideSystemInsets(
+                        extendViewIntoNavigationBar,
+                        extendViewIntoStatusBar
+                    )
+                    Modifier.padding(actual.toPaddingValues())
+                }.align(Alignment.Center)
+            ) {
+                content()
+            }
+            Spacer(
+                modifier = if (!extendViewIntoStatusBar) {
+                    Modifier
+                        .statusBarsHeight()
+                        .navigationBarsPadding(bottom = false)
+                        .zIndex(999F)
+                        .fillMaxWidth()
+                        .background(statusBarColor)
+                } else {
+                    Modifier
+                }.align(Alignment.TopCenter)
+            )
+            Spacer(
+                modifier = if (!extendViewIntoNavigationBar) {
+                    Modifier
+                        .navigationBarsWidth(HorizontalSide.Left)
+                        .zIndex(999F)
+                        .fillMaxHeight()
+                        .background(navigationBarColor)
+                } else {
+                    Modifier
+                }.align(Alignment.CenterStart)
+            )
+            Spacer(
+                modifier = if (!extendViewIntoNavigationBar) {
+                    Modifier
+                        .navigationBarsWidth(HorizontalSide.Right)
+                        .fillMaxHeight()
+                        .zIndex(999F)
+                        .background(navigationBarColor)
+                } else {
+                    Modifier
+                }.align(Alignment.CenterEnd)
+            )
+            Spacer(
+                modifier = if (!extendViewIntoNavigationBar) {
+                    Modifier
+                        .navigationBarsHeight()
+                        .zIndex(999F)
+                        .fillMaxWidth()
+                        .background(navigationBarColor)
+                } else {
+                    Modifier
+                }.align(Alignment.BottomCenter)
+            )
+        }
+    }
 }
 
 @Composable

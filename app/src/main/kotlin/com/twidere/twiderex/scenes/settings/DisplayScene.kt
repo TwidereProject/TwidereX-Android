@@ -51,7 +51,7 @@ import com.twidere.twiderex.extensions.navViewModel
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.preferences.LocalDisplayPreferences
 import com.twidere.twiderex.preferences.proto.DisplayPreferences
-import com.twidere.twiderex.ui.TwidereXTheme
+import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.settings.DisplayViewModel
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -59,7 +59,7 @@ import com.twidere.twiderex.viewmodel.settings.DisplayViewModel
 fun DisplayScene() {
     val viewModel = navViewModel<DisplayViewModel>()
     val display = LocalDisplayPreferences.current
-    TwidereXTheme {
+    TwidereScene {
         InAppNotificationScaffold(
             topBar = {
                 AppBar(

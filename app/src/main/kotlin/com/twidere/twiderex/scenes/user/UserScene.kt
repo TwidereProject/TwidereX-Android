@@ -34,7 +34,7 @@ import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.ui.LocalActiveAccount
-import com.twidere.twiderex.ui.TwidereXTheme
+import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.user.UserViewModel
 
 @Composable
@@ -49,7 +49,7 @@ fun UserScene(
         it.create(account, userKey)
     }
     val user by viewModel.user.observeAsState(initial = null)
-    TwidereXTheme {
+    TwidereScene {
         InAppNotificationScaffold(
             // TODO: Show top bar with actions
             topBar = {

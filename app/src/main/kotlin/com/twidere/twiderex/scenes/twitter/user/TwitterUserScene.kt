@@ -40,7 +40,7 @@ import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.ui.LocalActiveAccount
-import com.twidere.twiderex.ui.TwidereXTheme
+import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.twitter.user.TwitterUserViewModel
 
 @Composable
@@ -66,7 +66,7 @@ fun TwitterUserScene(screenName: String) {
         }
     }
 
-    TwidereXTheme {
+    TwidereScene {
         InAppNotificationScaffold {
             Box(
                 modifier = Modifier.fillMaxSize(),

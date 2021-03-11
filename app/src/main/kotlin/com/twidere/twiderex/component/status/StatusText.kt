@@ -30,7 +30,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -75,9 +74,9 @@ fun ColumnScope.StatusText(
             modifier = Modifier
                 .background(
                     MaterialTheme.colors.onBackground.copy(alpha = 0.04f),
-                    shape = RoundedCornerShape(4.dp),
+                    shape = MaterialTheme.shapes.medium,
                 )
-                .clip(RoundedCornerShape(4.dp))
+                .clip(MaterialTheme.shapes.medium)
                 .clickable {
                     expanded = !expanded
                 },

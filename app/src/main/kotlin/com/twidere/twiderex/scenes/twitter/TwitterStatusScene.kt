@@ -47,7 +47,7 @@ import com.twidere.twiderex.component.status.TimelineStatusComponent
 import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.ui.LocalActiveAccount
-import com.twidere.twiderex.ui.TwidereXTheme
+import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.ui.standardPadding
 import com.twidere.twiderex.viewmodel.twitter.TwitterStatusViewModel
 import kotlinx.coroutines.launch
@@ -65,7 +65,7 @@ fun TwitterStatusScene(statusKey: MicroBlogKey) {
     val moreConversations by viewModel.moreConversations.observeAsState(initial = emptyList())
     val previousConversations by viewModel.previousConversations.observeAsState(initial = emptyList())
     val scope = rememberCoroutineScope()
-    TwidereXTheme {
+    TwidereScene {
         InAppNotificationScaffold(
             topBar = {
                 AppBar(

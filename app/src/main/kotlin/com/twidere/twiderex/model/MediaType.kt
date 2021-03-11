@@ -24,4 +24,6 @@ enum class MediaType {
     photo,
     video,
     animated_gif,
+    audio,
+    other,
 }

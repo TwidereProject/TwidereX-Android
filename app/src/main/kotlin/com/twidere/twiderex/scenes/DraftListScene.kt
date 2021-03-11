@@ -48,7 +48,7 @@ import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.extensions.navViewModel
 import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.ui.LocalNavController
-import com.twidere.twiderex.ui.TwidereXTheme
+import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.DraftViewModel
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -57,7 +57,7 @@ fun DraftListScene() {
     val viewModel = navViewModel<DraftViewModel>()
     val source by viewModel.source.observeAsState(initial = emptyList())
     val navController = LocalNavController.current
-    TwidereXTheme {
+    TwidereScene {
         InAppNotificationScaffold(
             topBar = {
                 AppBar(

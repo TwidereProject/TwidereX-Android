@@ -52,12 +52,12 @@ import com.twidere.twiderex.component.status.UserScreenName
 import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.ui.LocalActiveAccountViewModel
 import com.twidere.twiderex.ui.LocalNavController
-import com.twidere.twiderex.ui.TwidereXTheme
+import com.twidere.twiderex.ui.TwidereScene
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun AccountManagementScene() {
-    TwidereXTheme {
+    TwidereScene {
         InAppNotificationScaffold(
             topBar = {
                 AppBar(

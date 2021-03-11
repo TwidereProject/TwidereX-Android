@@ -207,10 +207,10 @@ private fun Status.toDbStatusWithMediaAndUser(
                 type = it.type?.let {
                     when (it) {
                         com.twidere.services.mastodon.model.MediaType.image -> MediaType.photo
-                        com.twidere.services.mastodon.model.MediaType.unknown -> MediaType.photo
+                        com.twidere.services.mastodon.model.MediaType.unknown -> MediaType.other
                         com.twidere.services.mastodon.model.MediaType.gifv -> MediaType.video
                         com.twidere.services.mastodon.model.MediaType.video -> MediaType.video
-                        com.twidere.services.mastodon.model.MediaType.audio -> MediaType.photo
+                        com.twidere.services.mastodon.model.MediaType.audio -> MediaType.audio
                     }
                 } ?: MediaType.photo,
                 order = index,

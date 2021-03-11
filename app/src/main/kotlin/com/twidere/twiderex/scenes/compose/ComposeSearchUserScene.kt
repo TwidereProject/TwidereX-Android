@@ -48,7 +48,7 @@ import com.twidere.twiderex.extensions.setResult
 import com.twidere.twiderex.extensions.viewModel
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalNavController
-import com.twidere.twiderex.ui.TwidereXTheme
+import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.compose.ComposeSearchUserViewModel
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
@@ -62,7 +62,7 @@ fun ComposeSearchUserScene() {
     val text by viewModel.text.observeAsState(initial = "")
     val sourceState by viewModel.sourceFlow.collectAsState(initial = null)
     val source = sourceState?.collectAsLazyPagingItems()
-    TwidereXTheme {
+    TwidereScene {
         navController.DisposeResult(key = "user_name")
         InAppNotificationScaffold(
             topBar = {

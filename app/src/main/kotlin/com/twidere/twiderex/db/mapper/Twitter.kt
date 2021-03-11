@@ -305,6 +305,8 @@ private fun Status.toDbStatusWithMediaAndUser(
                     MediaType.animated_gif, MediaType.video -> it.videoInfo?.variants?.maxByOrNull {
                         it.bitrate ?: 0L
                     }?.url
+                    MediaType.audio -> it.mediaURLHTTPS
+                    MediaType.other -> it.mediaURLHTTPS
                 },
                 width = it.sizes?.large?.w ?: 0,
                 height = it.sizes?.large?.h ?: 0,
