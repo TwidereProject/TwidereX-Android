@@ -76,15 +76,12 @@ class Navigator(
     }
 
     override fun status(status: UiStatus, builder: NavOptionsBuilder.() -> Unit) {
-        when (status.platformType) {
-            PlatformType.Twitter -> navController.navigate(
-                Route.Status.Twitter(status.statusKey),
-                builder,
-            )
+        val statusKey = when (status.platformType) {
+            PlatformType.Twitter -> status.statusKey
             PlatformType.StatusNet -> TODO()
             PlatformType.Fanfou -> TODO()
             PlatformType.Mastodon -> {
-                val statusKey = if (status.mastodonExtra != null) {
+                if (status.mastodonExtra != null) {
                     when (status.mastodonExtra.type) {
                         MastodonStatusType.Status -> status.statusKey
                         MastodonStatusType.NotificationFollow, MastodonStatusType.NotificationFollowRequest -> null
@@ -93,13 +90,13 @@ class Navigator(
                 } else {
                     status.statusKey
                 }
-                statusKey?.let {
-                    navController.navigate(
-                        Route.Status.Mastodon(statusKey),
-                        builder,
-                    )
-                }
             }
+        }
+        if (statusKey != null) {
+            navController.navigate(
+                Route.Status(statusKey),
+                builder,
+            )
         }
     }
 

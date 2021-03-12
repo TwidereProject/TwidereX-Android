@@ -21,7 +21,6 @@
 package com.twidere.twiderex.paging.mediator.user
 
 import androidx.paging.ExperimentalPagingApi
-import androidx.paging.LoadType
 import androidx.paging.PagingState
 import com.twidere.services.microblog.TimelineService
 import com.twidere.services.microblog.model.IStatus
@@ -67,9 +66,9 @@ class UserMediaMediator(
     }
 
     override fun transform(
-        type: LoadType,
         state: PagingState<Int, DbPagingTimelineWithStatus>,
-        data: List<DbPagingTimelineWithStatus>
+        data: List<DbPagingTimelineWithStatus>,
+        list: List<IStatus>,
     ): List<DbPagingTimelineWithStatus> {
         return PagingList(
             data.filter {

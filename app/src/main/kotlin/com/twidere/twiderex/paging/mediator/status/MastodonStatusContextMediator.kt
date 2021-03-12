@@ -20,16 +20,15 @@
  */
 package com.twidere.twiderex.paging.mediator.status
 
-import androidx.paging.LoadType
-import androidx.paging.PagingState
 import com.twidere.services.mastodon.MastodonService
 import com.twidere.services.microblog.model.IStatus
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.db.model.DbPagingTimelineWithStatus
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.notification.InAppNotification
-import com.twidere.twiderex.paging.CursorPagination
-import com.twidere.twiderex.paging.mediator.paging.CursorPagingMediator
+import com.twidere.twiderex.paging.mediator.paging.CursorWithCustomOrderPagination
+import com.twidere.twiderex.paging.mediator.paging.CursorWithCustomOrderPagingMediator
+import com.twidere.twiderex.paging.mediator.paging.CursorWithCustomOrderPagingResult
 
 class MastodonStatusContextMediator(
     private val service: MastodonService,
@@ -37,31 +36,18 @@ class MastodonStatusContextMediator(
     accountKey: MicroBlogKey,
     database: CacheDatabase,
     inAppNotification: InAppNotification
-) : CursorPagingMediator(accountKey, database, inAppNotification) {
-    override suspend fun load(pageSize: Int, paging: CursorPagination?): List<IStatus> {
+) : CursorWithCustomOrderPagingMediator(accountKey, database, inAppNotification) {
+    override suspend fun load(
+        pageSize: Int,
+        paging: CursorWithCustomOrderPagination?
+    ): List<IStatus> {
         val result = service.context(statusKey.id)
         val status = service.lookupStatus(statusKey.id)
-        return (
-            (result.ancestors ?: emptyList()) + status + (
-                result.descendants
-                    ?: emptyList()
-                )
-            ).reversed()
-    }
-
-    override fun transform(
-        type: LoadType,
-        state: PagingState<Int, DbPagingTimelineWithStatus>,
-        data: List<DbPagingTimelineWithStatus>
-    ): List<DbPagingTimelineWithStatus> {
-        val lastId = state.lastItemOrNull()?.timeline?.sortId ?: 0
-        return data.mapIndexed { index, dbPagingTimelineWithStatus ->
-            dbPagingTimelineWithStatus.copy(
-                timeline = dbPagingTimelineWithStatus.timeline.copy(
-                    sortId = lastId + index
-                )
-            )
-        }
+        return CursorWithCustomOrderPagingResult(
+            (result.ancestors ?: emptyList()) + status + (result.descendants ?: emptyList()),
+            cursor = null,
+            nextOrder = 0,
+        )
     }
 
     override val pagingKey: String = "status:$statusKey"

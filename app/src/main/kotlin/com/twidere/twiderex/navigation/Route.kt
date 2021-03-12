@@ -45,12 +45,12 @@ import com.twidere.twiderex.scenes.HomeScene
 import com.twidere.twiderex.scenes.RawMediaScene
 import com.twidere.twiderex.scenes.SignInScene
 import com.twidere.twiderex.scenes.StatusMediaScene
+import com.twidere.twiderex.scenes.StatusScene
 import com.twidere.twiderex.scenes.compose.ComposeScene
 import com.twidere.twiderex.scenes.compose.ComposeSearchUserScene
 import com.twidere.twiderex.scenes.compose.DraftComposeScene
 import com.twidere.twiderex.scenes.mastodon.MastodonHashtagScene
 import com.twidere.twiderex.scenes.mastodon.MastodonSignInScene
-import com.twidere.twiderex.scenes.mastodon.MastodonStatusScene
 import com.twidere.twiderex.scenes.mastodon.MastodonWebSignInScene
 import com.twidere.twiderex.scenes.search.SearchInputScene
 import com.twidere.twiderex.scenes.search.SearchScene
@@ -60,7 +60,6 @@ import com.twidere.twiderex.scenes.settings.AppearanceScene
 import com.twidere.twiderex.scenes.settings.DisplayScene
 import com.twidere.twiderex.scenes.settings.SettingsScene
 import com.twidere.twiderex.scenes.twitter.TwitterSignInScene
-import com.twidere.twiderex.scenes.twitter.TwitterStatusScene
 import com.twidere.twiderex.scenes.twitter.TwitterWebSignInScene
 import com.twidere.twiderex.scenes.twitter.user.TwitterUserScene
 import com.twidere.twiderex.scenes.user.FollowersScene
@@ -176,10 +175,7 @@ object Route {
         }
     }
 
-    object Status {
-        fun Twitter(statusKey: MicroBlogKey) = "deeplink/twitter/status/${statusKey.id}"
-        fun Mastodon(statusKey: MicroBlogKey) = "mastodon/status/$statusKey"
-    }
+    fun Status(statusKey: MicroBlogKey) = "status/$statusKey"
 
     object Mastodon {
         fun Hashtag(keyword: String) = "mastodon/hashtag/$keyword"
@@ -412,7 +408,7 @@ fun NavGraphBuilder.route() {
     }
 
     authorizedComposable(
-        "mastodon/status/{statusKey}",
+        "status/{statusKey}",
         arguments = listOf(
             navArgument("statusKey") { type = NavType.StringType },
         ),
@@ -421,8 +417,10 @@ fun NavGraphBuilder.route() {
             argument.getString("statusKey")?.let {
                 MicroBlogKey.valueOf(it)
             }?.let { statusKey ->
-                RequirePlatformAccount(platformType = PlatformType.Mastodon) {
-                    MastodonStatusScene(statusKey = statusKey)
+                ProvideStatusPlatform(statusKey = statusKey) { platform ->
+                    RequirePlatformAccount(platformType = platform) {
+                        StatusScene(statusKey = statusKey)
+                    }
                 }
             }
         }
@@ -442,7 +440,7 @@ fun NavGraphBuilder.route() {
         backStackEntry.arguments?.let { argument ->
             argument.getString("statusId")?.let {
                 RequirePlatformAccount(platformType = PlatformType.Twitter) {
-                    TwitterStatusScene(statusKey = MicroBlogKey.twitter(it))
+                    StatusScene(statusKey = MicroBlogKey.twitter(it))
                 }
             }
         }

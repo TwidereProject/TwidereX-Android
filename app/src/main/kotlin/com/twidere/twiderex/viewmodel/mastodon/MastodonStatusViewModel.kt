@@ -28,24 +28,17 @@ import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.paging.mediator.paging.PagingMediator
 import com.twidere.twiderex.paging.mediator.status.MastodonStatusContextMediator
 import com.twidere.twiderex.repository.StatusRepository
-import com.twidere.twiderex.viewmodel.PagingViewModel
+import com.twidere.twiderex.viewmodel.StatusPagingViewModel
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 
 class MastodonStatusViewModel @AssistedInject constructor(
-    private val statusRepository: StatusRepository,
+    statusRepository: StatusRepository,
     inAppNotification: InAppNotification,
     database: CacheDatabase,
     @Assisted private val account: AccountDetails,
     @Assisted private val statusKey: MicroBlogKey,
-) : PagingViewModel() {
-
-    val status by lazy {
-        statusRepository.loadLiveDataFromCache(
-            statusKey = statusKey,
-            accountKey = account.accountKey,
-        )
-    }
+) : StatusPagingViewModel(statusRepository, account, statusKey) {
 
     @dagger.assisted.AssistedFactory
     interface AssistedFactory {

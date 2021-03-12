@@ -53,14 +53,7 @@ class UserFavouriteTimelineViewModel @AssistedInject constructor(
     }
 
     override val source by lazy {
-        pagingMediator.pager(
-            pagingSourceFactory = {
-                database.pagingTimelineDao().getPagingSourceAsc(
-                    pagingKey = pagingMediator.pagingKey,
-                    accountKey = pagingMediator.accountKey,
-                )
-            }
-        ).flow.map { pagingData ->
+        pagingMediator.pager().flow.map { pagingData ->
             pagingData.map {
                 it.toUi(pagingMediator.accountKey)
             }

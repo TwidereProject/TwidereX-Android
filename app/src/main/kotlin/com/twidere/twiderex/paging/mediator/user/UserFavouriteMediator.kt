@@ -21,8 +21,6 @@
 package com.twidere.twiderex.paging.mediator.user
 
 import androidx.paging.ExperimentalPagingApi
-import androidx.paging.LoadType
-import androidx.paging.PagingState
 import com.twidere.services.mastodon.model.MastodonPaging
 import com.twidere.services.microblog.TimelineService
 import com.twidere.services.microblog.model.IStatus
@@ -33,9 +31,9 @@ import com.twidere.twiderex.db.model.pagingKey
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.notification.InAppNotification
-import com.twidere.twiderex.paging.PagingList
-import com.twidere.twiderex.paging.SinceMaxPagination
-import com.twidere.twiderex.paging.mediator.paging.MaxIdPagingMediator
+import com.twidere.twiderex.paging.mediator.paging.CursorWithCustomOrderPagination
+import com.twidere.twiderex.paging.mediator.paging.CursorWithCustomOrderPagingMediator
+import com.twidere.twiderex.paging.mediator.paging.CursorWithCustomOrderPagingResult
 
 @OptIn(ExperimentalPagingApi::class)
 class UserFavouriteMediator(
@@ -45,33 +43,25 @@ class UserFavouriteMediator(
     accountKey: MicroBlogKey,
     private val service: TimelineService,
     inAppNotification: InAppNotification,
-) : MaxIdPagingMediator(accountKey, database, inAppNotification) {
+) : CursorWithCustomOrderPagingMediator(accountKey, database, inAppNotification) {
     override val pagingKey: String
         get() = UserTimelineType.Favourite.pagingKey(userKey)
 
-    override fun transform(
-        type: LoadType,
-        state: PagingState<Int, DbPagingTimelineWithStatus>,
-        data: List<DbPagingTimelineWithStatus>
-    ): List<DbPagingTimelineWithStatus> {
-        val lastId = state.lastItemOrNull()?.timeline?.sortId ?: 0
-        return data.mapIndexed { index, dbPagingTimelineWithStatus ->
-            dbPagingTimelineWithStatus.copy(
-                timeline = dbPagingTimelineWithStatus.timeline.copy(
-                    sortId = lastId + index
-                )
-            )
-        }
-    }
-
-    override suspend fun load(pageSize: Int, paging: SinceMaxPagination?): List<IStatus> {
+    override suspend fun load(
+        pageSize: Int,
+        paging: CursorWithCustomOrderPagination?
+    ): List<IStatus> {
         val result = service.favorites(
             user_id = userKey.id,
             count = pageSize,
-            max_id = paging?.maxId,
+            max_id = paging?.cursor,
         )
         return if (platformType == PlatformType.Mastodon && result is MastodonPaging<*>) {
-            PagingList(result, nextPage = SinceMaxPagination(maxId = result.next))
+            CursorWithCustomOrderPagingResult(
+                result,
+                cursor = result.next,
+                nextOrder = paging?.nextOrder ?: 0
+            )
         } else {
             result
         }

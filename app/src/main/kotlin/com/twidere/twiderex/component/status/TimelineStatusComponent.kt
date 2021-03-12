@@ -126,8 +126,7 @@ private fun NormalStatus(
                 }
             )
             .padding(
-                start = standardPadding * 2,
-                end = standardPadding * 2
+                horizontal = standardPadding * 2,
             ),
     ) {
         Spacer(modifier = Modifier.height(standardPadding))

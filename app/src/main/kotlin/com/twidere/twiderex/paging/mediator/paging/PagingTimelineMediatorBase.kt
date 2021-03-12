@@ -72,7 +72,7 @@ abstract class PagingTimelineMediatorBase<T : IPagination>(
                 }.filter {
                     last?.status?.status?.data?.statusKey != it.status.status.data.statusKey
                 }.let {
-                    transform(loadType, state, it)
+                    transform(state, it, list)
                 }.also {
                     paging = if (list is IPagingList<*, *>) {
                         @Suppress("UNCHECKED_CAST")
@@ -107,9 +107,9 @@ abstract class PagingTimelineMediatorBase<T : IPagination>(
     ): T
 
     protected open fun transform(
-        type: LoadType,
         state: PagingState<Int, DbPagingTimelineWithStatus>,
-        data: List<DbPagingTimelineWithStatus>
+        data: List<DbPagingTimelineWithStatus>,
+        list: List<IStatus>
     ): List<DbPagingTimelineWithStatus> {
         return data
     }
