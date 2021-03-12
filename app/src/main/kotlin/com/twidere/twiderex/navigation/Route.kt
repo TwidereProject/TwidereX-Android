@@ -191,6 +191,11 @@ object DeepLinks {
         const val User = "$twidereXSchema://twitter/user"
     }
 
+    object Mastodon {
+        const val Hashtag = "$twidereXSchema://mastodon/hashtag"
+    }
+
+    const val User = "$twidereXSchema://user"
     const val Search = "$twidereXSchema://search"
     const val SignIn = "$twidereXSchema://signin"
 }
@@ -373,6 +378,11 @@ fun NavGraphBuilder.route() {
         arguments = listOf(
             navArgument("userKey") { type = NavType.StringType },
         ),
+        deepLinks = listOf(
+            navDeepLink {
+                uriPattern = "${DeepLinks.User}/{userKey}"
+            }
+        )
     ) { backStackEntry ->
         backStackEntry.arguments?.let { arguments ->
             arguments.getString("userKey")?.let {
@@ -389,7 +399,12 @@ fun NavGraphBuilder.route() {
 
     authorizedComposable(
         "mastodon/hashtag/{keyword}",
-        arguments = listOf(navArgument("keyword") { type = NavType.StringType })
+        arguments = listOf(navArgument("keyword") { type = NavType.StringType }),
+        deepLinks = listOf(
+            navDeepLink {
+                uriPattern = "${DeepLinks.Mastodon.Hashtag}/{keyword}"
+            }
+        )
     ) { backStackEntry ->
         backStackEntry.arguments?.getString("keyword")?.let {
             MastodonHashtagScene(keyword = it)

@@ -22,6 +22,7 @@ package com.twidere.twiderex.db.mapper
 
 import com.twidere.services.mastodon.model.Account
 import com.twidere.services.mastodon.model.Emoji
+import com.twidere.services.mastodon.model.Mention
 import com.twidere.services.mastodon.model.Notification
 import com.twidere.services.mastodon.model.NotificationTypes
 import com.twidere.services.mastodon.model.Status
@@ -43,6 +44,10 @@ import com.twidere.twiderex.model.MastodonStatusType
 import com.twidere.twiderex.model.MediaType
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.PlatformType
+import com.twidere.twiderex.navigation.DeepLinks
+import org.jsoup.Jsoup
+import org.jsoup.nodes.Element
+import org.jsoup.nodes.Node
 import java.util.UUID
 import java.util.regex.Pattern
 
@@ -165,6 +170,14 @@ private fun Status.toDbStatusWithMediaAndUser(
                 content = it,
                 emojis = emojis ?: emptyList()
             )
+        }?.let {
+            generateWithMentionLink(
+                content = it,
+                mentions = mentions ?: emptyList(),
+                accountKey = accountKey,
+            )
+        }?.let {
+            generateWithHashtag(content = it)
         } ?: "",
         timestamp = createdAt?.time ?: 0,
         retweetCount = reblogsCount ?: 0,
@@ -259,6 +272,8 @@ fun Account.toDbUser(
                 content = it,
                 emojis = emojis ?: emptyList()
             )
+        }?.let {
+            generateWithHashtag(content = it)
         } ?: "",
         website = null,
         location = null,
@@ -294,4 +309,50 @@ private fun generateHtmlContentWithEmoji(
         }
     }
     return result
+}
+
+private fun generateWithMentionLink(
+    content: String,
+    mentions: List<Mention>,
+    accountKey: MicroBlogKey,
+): String {
+    if (mentions.isEmpty()) {
+        return content
+    }
+    val body = Jsoup.parse(content).body()
+    body.childNodes().forEach { replaceMention(mentions, it, accountKey) }
+    return body.html()
+}
+
+private fun replaceMention(mentions: List<Mention>, node: Node, accountKey: MicroBlogKey) {
+    if (mentions.any { it.url == node.attr("href") }) {
+        val id = mentions.firstOrNull { it.url == node.attr("href") }?.id
+        if (id != null) {
+            node.attr(
+                "href",
+                DeepLinks.User + "/" + MicroBlogKey(id, accountKey.host)
+            )
+        }
+    } else {
+        node.childNodes().forEach { replaceMention(mentions, it, accountKey) }
+    }
+}
+
+private fun generateWithHashtag(content: String): String {
+    val body = Jsoup.parse(content).body()
+    body.childNodes().forEach { replaceHashTag(it) }
+    return body.html()
+}
+
+private fun replaceHashTag(node: Node) {
+    if (node is Element && node.normalName() == "a" && node.hasText() && node.text()
+        .startsWith('#')
+    ) {
+        node.attr(
+            "href",
+            DeepLinks.Mastodon.Hashtag + "/" + node.text().trimStart('#')
+        )
+    } else {
+        node.childNodes().forEach { replaceHashTag(it) }
+    }
 }
