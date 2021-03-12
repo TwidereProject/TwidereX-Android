@@ -123,7 +123,10 @@ public class LazyPagingItems<T : Any> internal constructor(
      * @param index Index of the presented item to return, including placeholders.
      * @return The presented item at position [index], `null` if it is a placeholder
      */
-    fun peek(index: Int): T? {
+    fun peekOrNull(index: Int): T? {
+        if (index < 0 || index >= pagingDataDiffer.size) {
+            return null
+        }
         return pagingDataDiffer.peek(index)
     }
 
@@ -234,7 +237,7 @@ public fun <T : Any> Flow<PagingData<T>>.collectAsLazyPagingItems(): LazyPagingI
  */
 public fun <T : Any> LazyListScope.items(
     lazyPagingItems: LazyPagingItems<T>,
-    key: ((index: Int) -> Any) = { lazyPagingItems[it]?.hashCode() ?: it },
+    key: ((index: Int) -> Any) = { lazyPagingItems.peekOrNull(it)?.hashCode() ?: it },
     itemContent: @Composable LazyItemScope.(value: T?) -> Unit
 ) {
     // this state recomposes every time the LazyPagingItems receives an update and changes the
@@ -263,7 +266,7 @@ public fun <T : Any> LazyListScope.items(
  */
 public fun <T : Any> LazyListScope.itemsIndexed(
     lazyPagingItems: LazyPagingItems<T>,
-    key: ((index: Int) -> Any) = { lazyPagingItems[it]?.hashCode() ?: it },
+    key: ((index: Int) -> Any) = { lazyPagingItems.peekOrNull(it)?.hashCode() ?: it },
     itemContent: @Composable LazyItemScope.(index: Int, value: T?) -> Unit
 ) {
     // this state recomposes every time the LazyPagingItems receives an update and changes the

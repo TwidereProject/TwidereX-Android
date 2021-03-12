@@ -46,7 +46,7 @@ fun LazyUiUserList(
     modifier: Modifier = Modifier,
     items: LazyPagingItems<UiUser>,
     state: LazyListState = rememberLazyListState(),
-    key: ((index: Int) -> Any) = { items[it]?.userKey?.hashCode() ?: it },
+    key: ((index: Int) -> Any) = { items.peekOrNull(it)?.userKey?.hashCode() ?: it },
     onItemClicked: (UiUser) -> Unit = {},
 ) {
     LazyColumn2(

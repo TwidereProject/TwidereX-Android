@@ -57,7 +57,7 @@ fun LazyUiStatusList(
     state: LazyListState = rememberLazyListState(),
     loadingBetween: List<MicroBlogKey> = emptyList(),
     onLoadBetweenClicked: (current: MicroBlogKey, next: MicroBlogKey) -> Unit = { _, _ -> },
-    key: ((index: Int) -> Any) = { items[it]?.hashCode() ?: it },
+    key: ((index: Int) -> Any) = { items.peekOrNull(it)?.hashCode() ?: it },
     header: LazyListScope.() -> Unit = {},
 ) {
     if (items.itemCount > 0) {
