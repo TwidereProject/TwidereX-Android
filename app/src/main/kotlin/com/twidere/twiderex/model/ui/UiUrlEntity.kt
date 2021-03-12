@@ -20,10 +20,10 @@
  */
 package com.twidere.twiderex.model.ui
 
-import androidx.compose.runtime.Stable
+import androidx.compose.runtime.Immutable
 import com.twidere.twiderex.db.model.DbUrlEntity
 
-@Stable
+@Immutable
 data class UiUrlEntity(
     val url: String,
     val expandedUrl: String,

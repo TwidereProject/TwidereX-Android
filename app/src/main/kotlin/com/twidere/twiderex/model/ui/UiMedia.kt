@@ -21,13 +21,13 @@
 package com.twidere.twiderex.model.ui
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Stable
+import androidx.compose.runtime.Immutable
 import androidx.compose.ui.res.painterResource
 import com.twidere.twiderex.R
 import com.twidere.twiderex.db.model.DbMedia
 import com.twidere.twiderex.model.MediaType
 
-@Stable
+@Immutable
 data class UiMedia(
     val url: String?,
     val mediaUrl: String?,

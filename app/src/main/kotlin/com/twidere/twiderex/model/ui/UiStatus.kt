@@ -21,7 +21,7 @@
 package com.twidere.twiderex.model.ui
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Stable
+import androidx.compose.runtime.Immutable
 import androidx.compose.ui.res.stringResource
 import com.twidere.twiderex.R
 import com.twidere.twiderex.db.model.DbMastodonStatusExtra
@@ -37,7 +37,7 @@ import com.twidere.twiderex.model.ui.UiMedia.Companion.toUi
 import com.twidere.twiderex.model.ui.UiUrlEntity.Companion.toUi
 import com.twidere.twiderex.model.ui.UiUser.Companion.toUi
 
-@Stable
+@Immutable
 data class UiStatus(
     val statusId: String,
     val statusKey: MicroBlogKey,

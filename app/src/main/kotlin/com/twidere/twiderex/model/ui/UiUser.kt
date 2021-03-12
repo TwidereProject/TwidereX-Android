@@ -21,6 +21,7 @@
 package com.twidere.twiderex.model.ui
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.res.painterResource
 import com.twidere.twiderex.R
@@ -31,7 +32,7 @@ import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.ui.LocalActiveAccount
 
-@Stable
+@Immutable
 data class UiUser(
     val id: String,
     val userKey: MicroBlogKey,
