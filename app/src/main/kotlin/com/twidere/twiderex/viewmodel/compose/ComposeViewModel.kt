@@ -281,8 +281,24 @@ open class ComposeViewModel @AssistedInject constructor(
         textFieldValue.combineWith(images) { text, imgs -> !text?.text.isNullOrEmpty() || !imgs.isNullOrEmpty() }
     val locationEnabled = MutableLiveData(false)
     val status = liveData {
-        statusKey?.let {
-            emitSource(repository.loadTweetFromCache(it))
+        statusKey?.let { statusKey ->
+            emitSource(
+                repository.loadTweetFromCache(statusKey).map { status ->
+                    if (status != null &&
+                        textFieldValue.value?.text.isNullOrEmpty() &&
+                        status.platformType == PlatformType.Mastodon &&
+                        status.mastodonExtra?.mentions != null &&
+                        composeType == ComposeType.Reply
+                    ) {
+                        val mentions =
+                            status.mastodonExtra.mentions.mapNotNull { it.acct }.map { "@$it" }.let {
+                                listOf(status.user.getDisplayScreenName(account)) + it
+                            }.distinctBy { it }.joinToString(" ", postfix = " ") { it }
+                        setText(TextFieldValue(mentions, selection = TextRange(mentions.length)))
+                    }
+                    status
+                }
+            )
         } ?: run {
             emit(null)
         }

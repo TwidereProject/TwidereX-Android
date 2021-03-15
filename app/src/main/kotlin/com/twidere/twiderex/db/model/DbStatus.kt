@@ -28,6 +28,7 @@ import androidx.room.PrimaryKey
 import androidx.room.Relation
 import com.twidere.services.mastodon.model.Card
 import com.twidere.services.mastodon.model.Emoji
+import com.twidere.services.mastodon.model.Mention
 import com.twidere.services.mastodon.model.Poll
 import com.twidere.services.mastodon.model.Visibility
 import com.twidere.services.twitter.model.ReplySettings
@@ -85,6 +86,7 @@ data class DbMastodonStatusExtra(
     val spoilerText: String?,
     val poll: Poll?,
     val card: Card?,
+    val mentions: List<Mention>?,
 )
 
 data class DbStatusWithMediaAndUser(

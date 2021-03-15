@@ -87,6 +87,7 @@ fun Notification.toDbTimeline(
             spoilerText = null,
             poll = null,
             card = null,
+            mentions = null,
         )
     )
     return DbTimelineWithStatus(
@@ -202,6 +203,7 @@ private fun Status.toDbStatusWithMediaAndUser(
             spoilerText = spoilerText?.takeIf { it.isNotEmpty() },
             poll = poll,
             card = card,
+            mentions = mentions,
         )
     )
     return DbStatusWithMediaAndUser(
