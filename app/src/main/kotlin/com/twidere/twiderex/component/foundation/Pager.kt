@@ -25,6 +25,7 @@ import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
@@ -69,6 +70,7 @@ fun rememberPagerState(
     }
 }
 
+@Stable
 class PagerState(
     currentPage: Int = 0,
     minPage: Int = 0,

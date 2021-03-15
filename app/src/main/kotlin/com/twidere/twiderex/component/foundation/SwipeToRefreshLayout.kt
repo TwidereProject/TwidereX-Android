@@ -34,6 +34,7 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -108,6 +109,7 @@ private fun rememberSwipeToRefreshState(
     }
 }
 
+@Stable
 private class SwipeToRefreshState(
     initialValue: Boolean,
     private val scope: CoroutineScope,

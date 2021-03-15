@@ -26,6 +26,7 @@ import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -36,6 +37,7 @@ import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 import kotlin.math.withSign
 
+@Stable
 class SwiperState(
     private val constraints: Constraints,
     private val onDismiss: () -> Unit,

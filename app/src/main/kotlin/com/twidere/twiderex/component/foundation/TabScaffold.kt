@@ -26,6 +26,7 @@ import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -68,6 +69,7 @@ private fun rememberTabScaffoldState(): TabScaffoldState {
     }
 }
 
+@Stable
 private class TabScaffoldState(
     private val scope: CoroutineScope,
     initialOffset: Float = 0f,
