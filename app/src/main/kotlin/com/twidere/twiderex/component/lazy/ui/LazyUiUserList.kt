@@ -22,6 +22,7 @@ package com.twidere.twiderex.component.lazy.ui
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.ExperimentalMaterialApi
@@ -48,11 +49,13 @@ fun LazyUiUserList(
     state: LazyListState = rememberLazyListState(),
     key: ((index: Int) -> Any) = { items.peekOrNull(it)?.userKey?.hashCode() ?: it },
     onItemClicked: (UiUser) -> Unit = {},
+    header: LazyListScope.() -> Unit = {},
 ) {
     LazyColumn2(
         modifier = modifier,
         state = state,
     ) {
+        header.invoke(this)
         items(items, key = key) {
             (it ?: UiUser.placeHolder()).let {
                 ListItem(

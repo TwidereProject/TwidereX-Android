@@ -27,6 +27,7 @@ import com.twidere.twiderex.R
 import com.twidere.twiderex.db.model.DbMastodonUserExtra
 import com.twidere.twiderex.db.model.DbTwitterUserExtra
 import com.twidere.twiderex.db.model.DbUser
+import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.ui.LocalActiveAccount
@@ -59,12 +60,16 @@ data class UiUser(
     val displayScreenName: String
         @Composable
         get() {
-            return if (LocalActiveAccount.current?.accountKey?.host?.let { it != acct.host } != false) {
-                "@$screenName@${acct.host}"
-            } else {
-                "@$screenName"
-            }
+            return LocalActiveAccount.current?.let { getDisplayScreenName(it) } ?: "@$screenName"
         }
+
+    fun getDisplayScreenName(accountDetails: AccountDetails): String {
+        return if (accountDetails.accountKey.host.let { it != acct.host }) {
+            "@$screenName@${acct.host}"
+        } else {
+            "@$screenName"
+        }
+    }
 
     companion object {
         @Composable

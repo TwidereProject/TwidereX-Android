@@ -974,7 +974,7 @@ private fun ComposeActions(viewModel: ComposeViewModel) {
                             navigate(Route.Compose.Search.User)
                         }
                         if (result != null) {
-                            viewModel.insertText("@$result ")
+                            viewModel.insertText("$result ")
                         }
                     }
                 }

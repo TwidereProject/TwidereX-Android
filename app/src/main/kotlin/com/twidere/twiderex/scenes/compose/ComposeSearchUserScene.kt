@@ -42,6 +42,7 @@ import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.TextInput
 import com.twidere.twiderex.component.lazy.collectAsLazyPagingItems
+import com.twidere.twiderex.component.lazy.loadState
 import com.twidere.twiderex.component.lazy.ui.LazyUiUserList
 import com.twidere.twiderex.extensions.DisposeResult
 import com.twidere.twiderex.extensions.setResult
@@ -113,9 +114,13 @@ fun ComposeSearchUserScene() {
                 LazyUiUserList(
                     items = source,
                     onItemClicked = {
-                        navController.setResult("user_name", it.screenName)
+                        val displayName = it.getDisplayScreenName(accountDetails = account)
+                        navController.setResult("user_name", displayName)
                         navController.popBackStack()
                     },
+                    header = {
+                        loadState(source.loadState.refresh)
+                    }
                 )
             }
         }
