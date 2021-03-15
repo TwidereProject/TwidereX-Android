@@ -68,7 +68,7 @@ import com.twidere.twiderex.ui.standardPadding
 import kotlin.math.max
 
 private val Poll.canVote: Boolean
-    get() = voted != true && expired != true
+    get() = voted != true && expiresAt?.time?.let { it > System.currentTimeMillis() } == true
 
 @Composable
 fun MastodonPoll(status: UiStatus) {
