@@ -48,6 +48,7 @@ import com.twidere.twiderex.scenes.SignInScene
 import com.twidere.twiderex.scenes.StatusMediaScene
 import com.twidere.twiderex.scenes.StatusScene
 import com.twidere.twiderex.scenes.compose.ComposeScene
+import com.twidere.twiderex.scenes.compose.ComposeSearchHashtagScene
 import com.twidere.twiderex.scenes.compose.ComposeSearchUserScene
 import com.twidere.twiderex.scenes.compose.DraftComposeScene
 import com.twidere.twiderex.scenes.mastodon.MastodonHashtagScene
@@ -180,6 +181,9 @@ object Route {
 
     object Mastodon {
         fun Hashtag(keyword: String) = "mastodon/hashtag/$keyword"
+        object Compose {
+            const val Hashtag = "mastodon/compose/hashtag"
+        }
     }
 }
 
@@ -628,7 +632,11 @@ fun NavGraphBuilder.route() {
         }
     }
 
-    composable("compose/search/user") {
+    authorizedComposable(Route.Compose.Search.User) {
         ComposeSearchUserScene()
+    }
+
+    authorizedComposable(Route.Mastodon.Compose.Hashtag) {
+        ComposeSearchHashtagScene()
     }
 }

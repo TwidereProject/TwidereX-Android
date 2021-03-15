@@ -20,10 +20,11 @@
  */
 package com.twidere.twiderex.scenes.compose
 
-import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.clickable
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.ListItem
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
@@ -34,6 +35,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import com.twidere.twiderex.R
@@ -41,30 +43,32 @@ import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.TextInput
+import com.twidere.twiderex.component.lazy.LazyColumn2
 import com.twidere.twiderex.component.lazy.collectAsLazyPagingItems
+import com.twidere.twiderex.component.lazy.items
 import com.twidere.twiderex.component.lazy.loadState
-import com.twidere.twiderex.component.lazy.ui.LazyUiUserList
 import com.twidere.twiderex.extensions.DisposeResult
 import com.twidere.twiderex.extensions.setResult
 import com.twidere.twiderex.extensions.viewModel
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
-import com.twidere.twiderex.viewmodel.compose.ComposeSearchUserViewModel
+import com.twidere.twiderex.viewmodel.compose.MastodonComposeSearchHashtagViewModel
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun ComposeSearchUserScene() {
+fun ComposeSearchHashtagScene() {
     val account = LocalActiveAccount.current ?: return
     val navController = LocalNavController.current
     val viewModel = viewModel(account) {
-        ComposeSearchUserViewModel(account = account)
+        MastodonComposeSearchHashtagViewModel(account = account)
     }
+
     val text by viewModel.text.observeAsState(initial = "")
     val sourceState by viewModel.sourceFlow.collectAsState(initial = null)
     val source = sourceState?.collectAsLazyPagingItems()
     TwidereScene {
-        navController.DisposeResult(key = "user_name")
+        navController.DisposeResult(key = "hashtag")
         InAppNotificationScaffold(
             topBar = {
                 AppBar(
@@ -77,10 +81,10 @@ fun ComposeSearchUserScene() {
                                 },
                                 maxLines = 1,
                                 placeholder = {
-                                    Text(text = stringResource(id = R.string.scene_compose_user_search_search_placeholder))
+                                    Text(text = stringResource(id = R.string.scene_compose_hashtag_search_search_placeholder))
                                 },
                                 onImeActionPerformed = { _, _ ->
-                                    navController.setResult("user_name", "@$text")
+                                    navController.setResult("hashtag", "#$text")
                                     navController.popBackStack()
                                 },
                                 autoFocus = true,
@@ -95,7 +99,7 @@ fun ComposeSearchUserScene() {
                     actions = {
                         IconButton(
                             onClick = {
-                                navController.setResult("user_name", "@$text")
+                                navController.setResult("hashtag", "#$text")
                                 navController.popBackStack()
                             }
                         ) {
@@ -111,17 +115,22 @@ fun ComposeSearchUserScene() {
             }
         ) {
             source?.let { source ->
-                LazyUiUserList(
-                    items = source,
-                    onItemClicked = {
-                        val displayName = it.getDisplayScreenName(accountDetails = account)
-                        navController.setResult("user_name", displayName)
-                        navController.popBackStack()
-                    },
-                    header = {
-                        loadState(source.loadState.refresh)
+                LazyColumn2 {
+                    loadState(source.loadState.refresh)
+                    items(source) {
+                        it?.name?.let { name ->
+                            ListItem(
+                                modifier = Modifier
+                                    .clickable {
+                                        navController.setResult("hashtag", "#$name")
+                                        navController.popBackStack()
+                                    }
+                            ) {
+                                Text(text = name)
+                            }
+                        }
                     }
-                )
+                }
             }
         }
     }

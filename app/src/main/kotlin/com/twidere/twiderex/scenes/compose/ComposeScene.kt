@@ -967,28 +967,41 @@ private fun ComposeActions(viewModel: ComposeViewModel) {
 //            IconButton(onClick = {}) {
 //                Icon(painter = painterResource(id = R.drawable.ic_gif))
 //            }
+            if (account.type == PlatformType.Mastodon) {
+                IconButton(
+                    onClick = {
+                        scope.launch {
+                            val result = navController.navigateForResult<String>("user_name") {
+                                navigate(Route.Compose.Search.User)
+                            }
+                            if (!result.isNullOrEmpty()) {
+                                viewModel.insertText("$result ")
+                            }
+                        }
+                    }
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_at_sign),
+                        contentDescription = stringResource(
+                            id = R.string.accessibility_scene_compose_at
+                        )
+                    )
+                }
+            }
             IconButton(
                 onClick = {
                     scope.launch {
-                        val result = navController.navigateForResult<String>("user_name") {
-                            navigate(Route.Compose.Search.User)
+                        val result = navController.navigateForResult<String>("hashtag") {
+                            navigate(Route.Mastodon.Compose.Hashtag)
                         }
-                        if (result != null) {
+                        if (!result.isNullOrEmpty()) {
                             viewModel.insertText("$result ")
                         }
                     }
                 }
             ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_at_sign),
-                    contentDescription = stringResource(
-                        id = R.string.accessibility_scene_compose_at
-                    )
-                )
+                Icon(painter = painterResource(id = R.drawable.ic_hash), contentDescription = null)
             }
-//            IconButton(onClick = {}) {
-//                Icon(painter = painterResource(id = R.drawable.ic_hash))
-//            }
             if (allowLocation) {
                 IconButton(
                     onClick = {

@@ -189,6 +189,8 @@
     <string name="scene_compose_visibility_unlisted">Unlisted</string>
     <string name="scene_compose_visibility_private">Private</string>
     <string name="scene_compose_visibility_direct">Direct</string>
+    <string name="scene_compose_user_search_search_placeholder">Search users</string>
+    <string name="scene_compose_hashtag_search_search_placeholder">Search hashtag</string>
     <string name="scene_drafts_title">Drafts</string>
     <string name="scene_drafts_actions_delete_draft">Delete draft</string>
     <string name="scene_drafts_actions_edit_draft">Edit draft</string>
