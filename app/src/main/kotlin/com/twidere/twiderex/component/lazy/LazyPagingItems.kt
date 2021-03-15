@@ -113,6 +113,9 @@ public class LazyPagingItems<T : Any> internal constructor(
      * bounds or the item is a placeholder.
      */
     public operator fun get(index: Int): T? {
+        if (index < 0 || index >= pagingDataDiffer.size) {
+            return null
+        }
         return pagingDataDiffer[index]
     }
 
