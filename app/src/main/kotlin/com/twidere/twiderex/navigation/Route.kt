@@ -38,6 +38,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navArgument
 import androidx.navigation.navDeepLink
 import com.twidere.twiderex.component.RequireAuthorization
+import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.scenes.DraftListScene
@@ -274,12 +275,19 @@ fun ProvideUserPlatform(
 @Composable
 fun RequirePlatformAccount(
     platformType: PlatformType,
+    fallback: () -> Unit = {},
     content: @Composable () -> Unit,
 ) {
-    var account = LocalActiveAccount.current ?: return
+    var account = LocalActiveAccount.current ?: run {
+        fallback.invoke()
+        return
+    }
     if (account.type != platformType) {
         account = LocalActiveAccountViewModel.current.getTargetPlatformDefault(platformType)
-            ?: return
+            ?: run {
+                fallback.invoke()
+                return
+            }
     }
     CompositionLocalProvider(
         LocalActiveAccount provides account
@@ -361,9 +369,16 @@ fun NavGraphBuilder.route() {
         }
     ) { backStackEntry ->
         backStackEntry.arguments?.let { arguments ->
-            arguments.getString("screenName")?.let {
-                RequirePlatformAccount(platformType = PlatformType.Twitter) {
-                    TwitterUserScene(screenName = it)
+            arguments.getString("screenName")?.let { screenName ->
+                val navigator = LocalNavigator.current
+                RequirePlatformAccount(
+                    platformType = PlatformType.Twitter,
+                    fallback = {
+                        navigator.openLink("https://twitter.com/$screenName", deepLink = false)
+                        navigator.goBack()
+                    }
+                ) {
+                    TwitterUserScene(screenName = screenName)
                 }
             }
         }
@@ -438,9 +453,19 @@ fun NavGraphBuilder.route() {
         }
     ) { backStackEntry ->
         backStackEntry.arguments?.let { argument ->
-            argument.getString("statusId")?.let {
-                RequirePlatformAccount(platformType = PlatformType.Twitter) {
-                    StatusScene(statusKey = MicroBlogKey.twitter(it))
+            argument.getString("statusId")?.let { statusId ->
+                val navigator = LocalNavigator.current
+                RequirePlatformAccount(
+                    platformType = PlatformType.Twitter,
+                    fallback = {
+                        navigator.openLink(
+                            "https://twitter.com/${argument.getString("screenName")}/status/$statusId",
+                            deepLink = false
+                        )
+                        navigator.goBack()
+                    }
+                ) {
+                    StatusScene(statusKey = MicroBlogKey.twitter(statusId))
                 }
             }
         }

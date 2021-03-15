@@ -60,11 +60,12 @@ interface INavigator {
     ) {
     }
 
-    fun openLink(it: String) {}
+    fun openLink(it: String, deepLink: Boolean = true) {}
     fun twitterSignInWeb(target: String) {}
     fun mastodonSignInWeb(target: String) {}
     fun searchInput(initial: String? = null) {}
     fun hashtag(name: String) {}
+    fun goBack() {}
 }
 
 class Navigator(
@@ -132,12 +133,15 @@ class Navigator(
         navController.navigate(Route.Compose(composeType, statusKey), builder)
     }
 
-    override fun openLink(it: String) {
+    override fun openLink(it: String, deepLink: Boolean) {
         val uri = Uri.parse(it)
-        if (uri.scheme == twidereXSchema || uri.host?.contains(
-                "twitter.com",
-                ignoreCase = true
-            ) == true
+        if ((
+            uri.scheme == twidereXSchema || uri.host?.contains(
+                    "twitter.com",
+                    ignoreCase = true
+                ) == true
+            ) &&
+            deepLink
         ) {
             navController.navigate(uri)
         } else {
@@ -163,6 +167,10 @@ class Navigator(
 
     override fun hashtag(name: String) {
         navController.navigate(Route.Mastodon.Hashtag(name))
+    }
+
+    override fun goBack() {
+        navController.navigateUp()
     }
 }
 
