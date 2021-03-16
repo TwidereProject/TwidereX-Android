@@ -38,9 +38,9 @@ import androidx.lifecycle.liveData
 import androidx.lifecycle.map
 import androidx.lifecycle.switchMap
 import androidx.work.WorkManager
+import com.twidere.services.mastodon.model.Emoji
 import com.twidere.services.mastodon.model.Visibility
 import com.twidere.services.microblog.LookupService
-import com.twidere.services.twitter.TwitterService
 import com.twidere.twiderex.R
 import com.twidere.twiderex.action.ComposeAction
 import com.twidere.twiderex.db.model.DbDraft
@@ -57,6 +57,7 @@ import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.DraftRepository
 import com.twidere.twiderex.repository.UserRepository
 import com.twidere.twiderex.repository.twitter.TwitterTweetsRepository
+import com.twidere.twiderex.utils.MastodonEmojiCache
 import com.twidere.twiderex.utils.notify
 import com.twidere.twiderex.worker.draft.SaveDraftWorker
 import com.twitter.twittertext.Extractor
@@ -208,8 +209,12 @@ open class ComposeViewModel @AssistedInject constructor(
         ): ComposeViewModel
     }
 
-    protected val service by lazy {
-        account.service as TwitterService
+    val emojis by lazy {
+        if (account.type == PlatformType.Mastodon) {
+            MastodonEmojiCache.get(account)
+        } else {
+            null
+        }
     }
 
     protected val repository by lazy {
@@ -447,6 +452,12 @@ open class ComposeViewModel @AssistedInject constructor(
                     selection = TextRange(it.selection.min + result.length)
                 )
             )
+        }
+    }
+
+    fun insertEmoji(emoji: Emoji) {
+        textFieldValue.value?.let { textFieldValue ->
+            insertText("${if (textFieldValue.selection.start != 0) " " else ""}:${emoji.shortcode}: ")
         }
     }
 }

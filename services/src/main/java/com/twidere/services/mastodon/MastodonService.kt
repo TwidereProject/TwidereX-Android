@@ -24,6 +24,7 @@ import com.twidere.services.http.authorization.BearerAuthorization
 import com.twidere.services.http.retrofit
 import com.twidere.services.mastodon.api.MastodonResources
 import com.twidere.services.mastodon.model.Context
+import com.twidere.services.mastodon.model.Emoji
 import com.twidere.services.mastodon.model.Hashtag
 import com.twidere.services.mastodon.model.MastodonPaging
 import com.twidere.services.mastodon.model.MastodonSearchResponse
@@ -270,4 +271,6 @@ class MastodonService(
     suspend fun vote(id: String, choice: List<Int>): Poll {
         return resources.vote(id, PostVote(choices = choice.map { it.toString() }))
     }
+
+    suspend fun emojis(): List<Emoji> = resources.emojis()
 }

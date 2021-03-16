@@ -36,6 +36,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -45,7 +46,10 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.GridCells
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.LazyVerticalGrid
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -88,11 +92,13 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.unit.coerceAtLeast
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.navigate
 import com.twidere.services.mastodon.model.Visibility
@@ -130,10 +136,13 @@ import com.twidere.twiderex.viewmodel.compose.VoteExpired
 import com.twidere.twiderex.viewmodel.compose.VoteState
 import com.twitter.twittertext.TwitterTextConfiguration
 import com.twitter.twittertext.TwitterTextParser
+import dev.chrisbanes.accompanist.insets.LocalWindowInsets
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlin.math.max
 
 @Composable
 fun DraftComposeScene(
@@ -395,7 +404,91 @@ private fun ComposeBody(
                     }
                 }
                 Divider()
-                ComposeActions(viewModel)
+                var showEmoji by remember { mutableStateOf(false) }
+                val ime = LocalWindowInsets.current.ime
+                LaunchedEffect(ime) {
+                    snapshotFlow { ime.isVisible }
+                        .distinctUntilChanged()
+                        .filter { it && showEmoji }
+                        .collect { showEmoji = false }
+                }
+                LaunchedEffect(showEmoji) {
+                    if (showEmoji) {
+                        keyboardController?.hideSoftwareKeyboard()
+                    } else {
+                        keyboardController?.showSoftwareKeyboard()
+                    }
+                }
+                ComposeActions(
+                    viewModel,
+                    emojiButtonClicked = {
+                        showEmoji = !showEmoji
+                    },
+                )
+                EmojiPanel(viewModel = viewModel, showEmoji = showEmoji)
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun EmojiPanel(
+    viewModel: ComposeViewModel,
+    showEmoji: Boolean,
+) {
+    viewModel.emojis?.let { emojis ->
+        val items by emojis.observeAsState(initial = null)
+        val ime = LocalWindowInsets.current.ime
+        val navigation = LocalWindowInsets.current.navigationBars
+        var height by remember { mutableStateOf(0) }
+        LaunchedEffect(ime) {
+            snapshotFlow { ime.bottom }
+                .distinctUntilChanged()
+                .filter { it > 0 }
+                .collect { height = max(height, it) }
+        }
+        val targetHeight = with(LocalDensity.current) {
+            height.toDp()
+        }
+        val bottom = with(LocalDensity.current) {
+            ime.bottom.coerceAtLeast(navigation.bottom).toDp()
+        }.let {
+            if (!showEmoji && it.value != 0f) {
+                targetHeight
+            } else {
+                it
+            }
+        }
+        Box(
+            modifier = Modifier.height(
+                height = (targetHeight - bottom).coerceAtLeast(0.dp)
+            ),
+            contentAlignment = Alignment.Center,
+        ) {
+            items?.let { items ->
+                LazyVerticalGrid(
+                    cells = GridCells.Adaptive(48.dp),
+                    contentPadding = PaddingValues(horizontal = standardPadding, vertical = 0.dp),
+                    content = {
+                        items(items) { it ->
+                            it.url?.let { it1 ->
+                                NetworkImage(
+                                    modifier = Modifier
+                                        .size(48.dp)
+                                        .padding(4.dp)
+                                        .clickable {
+                                            viewModel.insertEmoji(it)
+                                        },
+                                    data = it1,
+                                    contentScale = ContentScale.Fit,
+                                )
+                            }
+                        }
+                    },
+                )
+            } ?: run {
+                CircularProgressIndicator()
             }
         }
     }
@@ -897,7 +990,10 @@ private fun ComposeVote(voteState: VoteState) {
 @OptIn(ExperimentalAnimationApi::class)
 @SuppressLint("MissingPermission")
 @Composable
-private fun ComposeActions(viewModel: ComposeViewModel) {
+private fun ComposeActions(
+    viewModel: ComposeViewModel,
+    emojiButtonClicked: () -> Unit = {},
+) {
     val account = LocalActiveAccount.current ?: return
     val images by viewModel.images.observeAsState(initial = emptyList())
     val isInVoteState by viewModel.isInVoteMode.observeAsState(initial = false)
@@ -943,6 +1039,18 @@ private fun ComposeActions(viewModel: ComposeViewModel) {
                         contentDescription = stringResource(
                             id = R.string.accessibility_scene_compose_image
                         )
+                    )
+                }
+            }
+            if (account.type == PlatformType.Mastodon) {
+                IconButton(
+                    onClick = {
+                        emojiButtonClicked.invoke()
+                    }
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_mood_smile),
+                        contentDescription = null,
                     )
                 }
             }

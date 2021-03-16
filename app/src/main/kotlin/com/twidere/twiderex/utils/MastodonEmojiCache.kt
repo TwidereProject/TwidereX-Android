@@ -18,19 +18,31 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.services.mastodon.api
+package com.twidere.twiderex.utils
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.liveData
+import com.twidere.services.mastodon.MastodonService
 import com.twidere.services.mastodon.model.Emoji
-import retrofit2.http.GET
+import com.twidere.twiderex.model.AccountDetails
 
-interface MastodonResources :
-    TimelineResources,
-    LookupResources,
-    FriendshipResources,
-    AccountResources,
-    SearchResources,
-    StatusResources {
-
-    @GET("/api/v1/custom_emojis")
-    suspend fun emojis(): List<Emoji>
+object MastodonEmojiCache {
+    private val items = hashMapOf<String, LiveData<List<Emoji>>>()
+    fun get(account: AccountDetails): LiveData<List<Emoji>> {
+        return items.getOrPut(account.accountKey.host) {
+            liveData {
+                account.service.let {
+                    it as MastodonService
+                }.let {
+                    try {
+                        it.emojis()
+                    } catch (e: Throwable) {
+                        emptyList()
+                    }
+                }.let {
+                    emit(it)
+                }
+            }
+        }
+    }
 }
