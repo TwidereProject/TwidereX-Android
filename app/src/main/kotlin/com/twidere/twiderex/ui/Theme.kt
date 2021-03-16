@@ -37,6 +37,7 @@ import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -88,14 +89,14 @@ fun TwidereScene(
         val navigationBarColor = Color.Black
         val statusBarColor = statusBarColor()
         Box {
+            val actual = provideSystemInsets(
+                extendViewIntoNavigationBar,
+                extendViewIntoStatusBar
+            )
             Box(
-                modifier = run {
-                    val actual = provideSystemInsets(
-                        extendViewIntoNavigationBar,
-                        extendViewIntoStatusBar
-                    )
-                    Modifier.padding(actual.toPaddingValues())
-                }.align(Alignment.Center)
+                modifier = Modifier
+                    .padding(actual.toPaddingValues())
+                    .align(Alignment.Center)
             ) {
                 content()
             }
@@ -165,32 +166,39 @@ private fun provideSystemInsets(
     val ime = LocalWindowInsets.current.ime
     val navigation = LocalWindowInsets.current.navigationBars
     val status = LocalWindowInsets.current.statusBars
-    return ime.copy(
-        left = if (extendViewIntoNavigationBar) {
-            0
-        } else {
-            ime.left.coerceAtLeast(navigation.left)
-        },
-        right = if (extendViewIntoNavigationBar) {
-            0
-        } else {
-            ime.right.coerceAtLeast(navigation.right)
-        },
-        bottom = if (extendViewIntoNavigationBar) {
-            0
-        } else {
-            ime.bottom.coerceAtLeast(navigation.bottom)
-        },
-        top = if (extendViewIntoNavigationBar) {
-            0
-        } else {
-            ime.top.coerceAtLeast(navigation.top)
-        } + if (extendViewIntoStatusBar) {
-            0
-        } else {
-            status.top
-        },
-    )
+    return key(
+        ime,
+        ime.isVisible,
+        navigation,
+        status
+    ) {
+        ime.copy(
+            left = if (extendViewIntoNavigationBar) {
+                0
+            } else {
+                ime.left.coerceAtLeast(navigation.left)
+            },
+            right = if (extendViewIntoNavigationBar) {
+                0
+            } else {
+                ime.right.coerceAtLeast(navigation.right)
+            },
+            bottom = if (extendViewIntoNavigationBar) {
+                0
+            } else {
+                ime.bottom.coerceAtLeast(navigation.bottom)
+            },
+            top = if (extendViewIntoNavigationBar) {
+                0
+            } else {
+                ime.top.coerceAtLeast(navigation.top)
+            } + if (extendViewIntoStatusBar) {
+                0
+            } else {
+                status.top
+            },
+        )
+    }
 }
 
 @Composable
