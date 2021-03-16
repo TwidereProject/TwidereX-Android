@@ -165,7 +165,7 @@ fun renderContentAnnotatedString(
         val document = Jsoup.parse(htmlText.replace("\n", "<br>"))
         buildAnnotatedString {
             document.body().childNodes().forEach {
-                RenderNode(it, renderContext, styleData)
+                renderNode(it, renderContext, styleData)
             }
         }
     }
@@ -180,22 +180,22 @@ data class StyleData(
     val linkStyle: TextStyle,
 )
 
-private fun AnnotatedString.Builder.RenderNode(
+private fun AnnotatedString.Builder.renderNode(
     node: Node,
     context: RenderContext,
     styleData: StyleData
 ) {
     when (node) {
         is Element -> {
-            this.RenderElement(node, context = context, styleData = styleData)
+            this.renderElement(node, context = context, styleData = styleData)
         }
         is TextNode -> {
-            RenderText(node.text(), styleData.textStyle)
+            renderText(node.text(), styleData.textStyle)
         }
     }
 }
 
-private fun AnnotatedString.Builder.RenderText(text: String, textStyle: TextStyle) {
+private fun AnnotatedString.Builder.renderText(text: String, textStyle: TextStyle) {
     pushStyle(
         textStyle.toSpanStyle()
     )
@@ -203,7 +203,7 @@ private fun AnnotatedString.Builder.RenderText(text: String, textStyle: TextStyl
     pop()
 }
 
-private fun AnnotatedString.Builder.RenderElement(
+private fun AnnotatedString.Builder.renderElement(
     element: Element,
     context: RenderContext,
     styleData: StyleData
@@ -211,31 +211,31 @@ private fun AnnotatedString.Builder.RenderElement(
     if (!element.hasClass("invisible")) {
         when (element.normalName()) {
             "a" -> {
-                RenderLink(element, context, styleData)
+                renderLink(element, context, styleData)
             }
             "br" -> {
-                RenderText("\n", styleData.textStyle)
+                renderText("\n", styleData.textStyle)
             }
             "span", "p" -> {
                 element.childNodes().forEach {
-                    RenderNode(node = it, context = context, styleData = styleData)
+                    renderNode(node = it, context = context, styleData = styleData)
                 }
             }
             "emoji" -> {
-                RenderEmoji(element)
+                renderEmoji(element)
             }
         }
     }
 }
 
-private fun AnnotatedString.Builder.RenderEmoji(
+private fun AnnotatedString.Builder.renderEmoji(
     element: Element,
 ) {
     val target = element.attr("target")
     appendInlineContent(ID_IMAGE, target)
 }
 
-private fun AnnotatedString.Builder.RenderLink(
+private fun AnnotatedString.Builder.renderLink(
     element: Element,
     context: RenderContext,
     styleData: StyleData
@@ -245,7 +245,7 @@ private fun AnnotatedString.Builder.RenderLink(
     when {
         resolvedLink.expanded != null -> {
             pushStringAnnotation(TAG_URL, resolvedLink.expanded)
-            RenderText(resolvedLink.display ?: resolvedLink.expanded, styleData.linkStyle)
+            renderText(resolvedLink.display ?: resolvedLink.expanded, styleData.linkStyle)
             pop()
         }
         resolvedLink.skip -> {
@@ -253,7 +253,7 @@ private fun AnnotatedString.Builder.RenderLink(
         else -> {
             pushStringAnnotation(TAG_URL, href)
             element.childNodes().forEach {
-                RenderNode(
+                renderNode(
                     node = it,
                     context = context,
                     styleData = styleData.copy(textStyle = styleData.linkStyle)

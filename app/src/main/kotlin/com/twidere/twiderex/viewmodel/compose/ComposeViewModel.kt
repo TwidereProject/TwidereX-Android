@@ -343,7 +343,7 @@ open class ComposeViewModel @AssistedInject constructor(
             composeAction.commit(
                 account.accountKey,
                 account.type,
-                BuildComposeData(it)
+                buildComposeData(it)
             )
         }
     }
@@ -353,14 +353,14 @@ open class ComposeViewModel @AssistedInject constructor(
             workManager
                 .beginWith(
                     SaveDraftWorker.create(
-                        BuildComposeData(text)
+                        buildComposeData(text)
                     )
                 )
                 .enqueue()
         }
     }
 
-    private fun BuildComposeData(text: String) = ComposeData(
+    private fun buildComposeData(text: String) = ComposeData(
         content = text,
         draftId = draftId,
         images = images.value?.map { it.toString() } ?: emptyList(),
