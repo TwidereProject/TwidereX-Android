@@ -208,24 +208,29 @@ private fun AnnotatedString.Builder.renderElement(
     context: RenderContext,
     styleData: StyleData
 ) {
-    if (!element.hasClass("invisible")) {
-        when (element.normalName()) {
-            "a" -> {
-                renderLink(element, context, styleData)
-            }
-            "br" -> {
-                renderText("\n", styleData.textStyle)
-            }
-            "span", "p" -> {
-                element.childNodes().forEach {
-                    renderNode(node = it, context = context, styleData = styleData)
-                }
-            }
-            "emoji" -> {
-                renderEmoji(element)
+    if (skipElement(element = element)) {
+        return
+    }
+    when (element.normalName()) {
+        "a" -> {
+            renderLink(element, context, styleData)
+        }
+        "br" -> {
+            renderText("\n", styleData.textStyle)
+        }
+        "span", "p" -> {
+            element.childNodes().forEach {
+                renderNode(node = it, context = context, styleData = styleData)
             }
         }
+        "emoji" -> {
+            renderEmoji(element)
+        }
     }
+}
+
+private fun skipElement(element: Element): Boolean {
+    return element.hasClass("invisible")
 }
 
 private fun AnnotatedString.Builder.renderEmoji(
