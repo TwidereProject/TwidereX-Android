@@ -453,17 +453,23 @@ fun EmojiPanel(
         }
         val bottom = with(LocalDensity.current) {
             ime.bottom.coerceAtLeast(navigation.bottom).toDp()
-        }.let {
-            if (!showEmoji && it.value != 0f) {
-                targetHeight
-            } else {
-                it
+        }
+        var visibility by remember { mutableStateOf(false) }
+        LaunchedEffect(showEmoji, bottom) {
+            if (bottom == targetHeight || showEmoji) {
+                visibility = showEmoji
             }
         }
         Box(
-            modifier = Modifier.height(
-                height = (targetHeight - bottom).coerceAtLeast(0.dp)
-            ),
+            modifier = Modifier
+                .height(
+                    height = if (visibility) {
+                        (targetHeight - bottom).coerceAtLeast(0.dp)
+                    } else {
+                        0.dp
+                    }
+                )
+                .fillMaxWidth(),
             contentAlignment = Alignment.Center,
         ) {
             items?.let { items ->
@@ -1096,19 +1102,24 @@ private fun ComposeActions(
                     )
                 }
             }
-            IconButton(
-                onClick = {
-                    scope.launch {
-                        val result = navController.navigateForResult<String>("hashtag") {
-                            navigate(Route.Mastodon.Compose.Hashtag)
-                        }
-                        if (!result.isNullOrEmpty()) {
-                            viewModel.insertText("$result ")
+            if (account.type == PlatformType.Mastodon) {
+                IconButton(
+                    onClick = {
+                        scope.launch {
+                            val result = navController.navigateForResult<String>("hashtag") {
+                                navigate(Route.Mastodon.Compose.Hashtag)
+                            }
+                            if (!result.isNullOrEmpty()) {
+                                viewModel.insertText("$result ")
+                            }
                         }
                     }
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_hash),
+                        contentDescription = null
+                    )
                 }
-            ) {
-                Icon(painter = painterResource(id = R.drawable.ic_hash), contentDescription = null)
             }
             if (allowLocation) {
                 IconButton(
