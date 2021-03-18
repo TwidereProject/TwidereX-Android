@@ -47,6 +47,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -175,7 +176,8 @@ private fun MastodonStatusHeader(
                 icon = {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_user_plus),
-                        contentDescription = null
+                        contentDescription = null,
+                        tint = Color(0xFF4C9EEB),
                     )
                 },
                 text = {
@@ -193,7 +195,8 @@ private fun MastodonStatusHeader(
                 icon = {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_user_exclamation),
-                        contentDescription = null
+                        contentDescription = null,
+                        tint = Color(0xFFFF9500),
                     )
                 },
                 text = {
@@ -215,7 +218,8 @@ private fun MastodonStatusHeader(
                 icon = {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_heart),
-                        contentDescription = null
+                        contentDescription = null,
+                        tint = Color(0xFFFF2D55),
                     )
                 },
                 text = {
@@ -233,7 +237,8 @@ private fun MastodonStatusHeader(
                 icon = {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_poll),
-                        contentDescription = null
+                        contentDescription = null,
+                        tint = Color(0xFF4C9EEB),
                     )
                 },
                 text = {
@@ -258,7 +263,8 @@ private fun MastodonStatusHeader(
                 icon = {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_bell_ringing),
-                        contentDescription = null
+                        contentDescription = null,
+                        tint = Color(0xFFFF9500),
                     )
                 },
                 text = {

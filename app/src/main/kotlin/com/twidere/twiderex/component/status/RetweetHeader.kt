@@ -35,6 +35,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -51,7 +52,8 @@ fun RetweetHeader(
         icon = {
             Icon(
                 painter = painterResource(id = R.drawable.ic_repeat),
-                contentDescription = stringResource(id = R.string.accessibility_common_status_retweeted)
+                contentDescription = stringResource(id = R.string.accessibility_common_status_retweeted),
+                tint = Color(0xFF4C9EEB)
             )
         },
         text = {
