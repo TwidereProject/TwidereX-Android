@@ -21,6 +21,7 @@
 package com.twidere.twiderex.viewmodel.mastodon
 
 import android.accounts.Account
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.twidere.services.mastodon.MastodonOAuthService
@@ -45,8 +46,8 @@ class MastodonSignInViewModel @Inject constructor(
     private val inAppNotification: InAppNotification,
 ) : ViewModel() {
     val loading = MutableLiveData(false)
-    val host = MutableLiveData("")
-    fun setHost(value: String) {
+    val host = MutableLiveData(TextFieldValue())
+    fun setHost(value: TextFieldValue) {
         host.value = value
     }
 

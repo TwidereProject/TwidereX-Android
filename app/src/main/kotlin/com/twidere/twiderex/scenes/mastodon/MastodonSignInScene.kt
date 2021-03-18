@@ -23,6 +23,8 @@ package com.twidere.twiderex.scenes.mastodon
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
@@ -42,9 +44,14 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
+import androidx.navigation.NavController
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.SignInButton
 import com.twidere.twiderex.component.foundation.SignInScaffold
+import com.twidere.twiderex.component.navigation.INavigator
 import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.extensions.navViewModel
 import com.twidere.twiderex.extensions.navigateForResult
@@ -61,11 +68,10 @@ import kotlinx.coroutines.withContext
 @Composable
 fun MastodonSignInScene() {
     val viewModel = navViewModel<MastodonSignInViewModel>()
-    val host by viewModel.host.observeAsState(initial = "")
+    val host by viewModel.host.observeAsState(initial = TextFieldValue())
     val loading by viewModel.loading.observeAsState(initial = false)
     val navController = LocalNavController.current
     val navigator = LocalNavigator.current
-
     SignInScaffold {
         if (loading == true) {
             CircularProgressIndicator()
@@ -80,28 +86,21 @@ fun MastodonSignInScene() {
                     .fillMaxWidth(),
                 value = host,
                 onValueChange = { viewModel.setHost(it) },
-
+                keyboardOptions = KeyboardOptions(
+                    autoCorrect = false,
+                    keyboardType = KeyboardType.Uri,
+                    imeAction = ImeAction.Go,
+                ),
+                keyboardActions = KeyboardActions(
+                    onGo = {
+                        signin(viewModel, host, navController, navigator)
+                    }
+                )
             )
             Spacer(modifier = Modifier.height(standardPadding * 2))
             SignInButton(
                 onClick = {
-                    GlobalScope.launch {
-                        withContext(Dispatchers.Main) {
-                            // TODO: dynamic key && secret
-                            viewModel.beginOAuth(
-                                host,
-                            ) { target ->
-                                navController.navigateForResult("code") {
-                                    navigator.mastodonSignInWeb(target)
-                                }
-                            }.let { success ->
-                                if (success) {
-                                    navController.setResult("success", success)
-                                    navController.popBackStack()
-                                }
-                            }
-                        }
-                    }
+                    signin(viewModel, host, navController, navigator)
                 }
             ) {
                 ListItem(
@@ -130,6 +129,30 @@ fun MastodonSignInScene() {
                         }
                     }
                 )
+            }
+        }
+    }
+}
+
+private fun signin(
+    viewModel: MastodonSignInViewModel,
+    host: TextFieldValue,
+    navController: NavController,
+    navigator: INavigator
+) {
+    GlobalScope.launch {
+        withContext(Dispatchers.Main) {
+            viewModel.beginOAuth(
+                host.text,
+            ) { target ->
+                navController.navigateForResult("code") {
+                    navigator.mastodonSignInWeb(target)
+                }
+            }.let { success ->
+                if (success) {
+                    navController.setResult("success", success)
+                    navController.popBackStack()
+                }
             }
         }
     }
