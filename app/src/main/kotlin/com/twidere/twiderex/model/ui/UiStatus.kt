@@ -78,7 +78,7 @@ data class UiStatus(
         PlatformType.Twitter -> "/${user.screenName}/status/$statusId"
         PlatformType.StatusNet -> TODO()
         PlatformType.Fanfou -> TODO()
-        PlatformType.Mastodon -> "/@${user.screenName}/$statusId"
+        PlatformType.Mastodon -> "/web/statuses/$statusId"
     }
 
     companion object {
