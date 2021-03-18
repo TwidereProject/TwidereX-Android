@@ -20,27 +20,33 @@
  */
 package com.twidere.twiderex.component.status
 
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.indication
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope.Companion.weight
+import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
+import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreHoriz
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
@@ -49,6 +55,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.R
 import com.twidere.twiderex.action.LocalStatusActions
@@ -59,9 +66,11 @@ import com.twidere.twiderex.extensions.shareText
 import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.ui.LocalActiveAccount
-import com.twidere.twiderex.ui.mediumEmphasisContentContentColor
+import com.twidere.twiderex.ui.standardPadding
 import com.twidere.twiderex.ui.statusActionIconSize
 import com.twidere.twiderex.viewmodel.compose.ComposeType
+
+private val rippleSize = 24.dp
 
 @Composable
 fun ReplyButton(
@@ -77,7 +86,7 @@ fun ReplyButton(
     if (withNumber) {
         StatusActionButtonWithNumbers(
             icon = icon,
-            color = mediumEmphasisContentContentColor,
+            color = LocalContentColor.current,
             count = status.replyCount,
             contentDescription = contentDescription,
             onClick = {
@@ -92,7 +101,7 @@ fun ReplyButton(
         ) {
             Icon(
                 painter = icon,
-                tint = mediumEmphasisContentContentColor,
+                tint = LocalContentColor.current,
                 contentDescription = contentDescription,
             )
         }
@@ -109,7 +118,7 @@ fun LikeButton(
     val color = if (status.liked) {
         Color.Red
     } else {
-        mediumEmphasisContentContentColor
+        LocalContentColor.current
     }
     val contentDescription = stringResource(id = R.string.accessibility_common_status_actions_like)
     val icon = painterResource(id = R.drawable.ic_heart)
@@ -153,7 +162,7 @@ fun RetweetButton(
     val color = if (status.retweeted) {
         MaterialTheme.colors.primary
     } else {
-        mediumEmphasisContentContentColor
+        LocalContentColor.current
     }
     val icon = painterResource(id = R.drawable.ic_repeat)
     val contentDescription =
@@ -247,18 +256,34 @@ fun ShareButton(
     val contentDescription = stringResource(id = R.string.accessibility_common_more)
     Box {
         if (compat) {
-            TextButton(
-                onClick = {
-                    expanded = true
-                },
-                colors = ButtonDefaults.textButtonColors(
-                    contentColor = mediumEmphasisContentContentColor
-                )
+            Box(
+                modifier = Modifier
+                    .defaultMinSize(
+                        minHeight = ButtonDefaults.MinHeight
+                    )
+                    .clickable(
+                        indication = rememberRipple(
+                            bounded = false,
+                            radius = rippleSize
+                        ),
+                        interactionSource = remember { MutableInteractionSource() },
+                        onClick = {
+                            expanded = true
+                        },
+                    )
+                    .padding(
+                        top = ButtonDefaults.ContentPadding.calculateTopPadding(),
+                        bottom = ButtonDefaults.ContentPadding.calculateBottomPadding(),
+                        start = standardPadding,
+                        end = standardPadding,
+                    ),
+                contentAlignment = Alignment.Center,
             ) {
                 Icon(
                     modifier = Modifier.size(statusActionIconSize),
                     imageVector = icon,
                     contentDescription = contentDescription,
+                    tint = LocalContentColor.current.copy(LocalContentAlpha.current)
                 )
             }
         } else {
@@ -269,7 +294,7 @@ fun ShareButton(
             ) {
                 Icon(
                     imageVector = icon,
-                    tint = mediumEmphasisContentContentColor,
+                    tint = LocalContentColor.current,
                     contentDescription = contentDescription,
                 )
             }
@@ -339,26 +364,61 @@ private fun StatusActionButtonWithNumbers(
     color: Color = LocalContentColor.current,
     onClick: () -> Unit,
 ) {
-    Row(
-        modifier = modifier.weight(1f),
-        horizontalArrangement = Arrangement.Start,
+    val contentColor = color.copy(LocalContentAlpha.current)
+    Box(
+        modifier = modifier
+            .weight(1f),
     ) {
-        TextButton(
-            onClick = onClick,
-            colors = ButtonDefaults.textButtonColors(
-                contentColor = color
-            ),
-            enabled = enabled,
+        val source = remember {
+            MutableInteractionSource()
+        }
+        Row(
+            modifier = Modifier
+                .defaultMinSize(
+                    minHeight = ButtonDefaults.MinHeight
+                )
+                .clickable(
+                    onClick = onClick,
+                    enabled = enabled,
+                    interactionSource = source,
+                    indication = null,
+                )
+                .padding(
+                    top = ButtonDefaults.ContentPadding.calculateTopPadding(),
+                    bottom = ButtonDefaults.ContentPadding.calculateBottomPadding(),
+                    start = standardPadding,
+                    end = standardPadding,
+                ),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(
-                modifier = Modifier.size(statusActionIconSize),
+                modifier = Modifier
+                    .size(MaterialTheme.typography.body1.fontSize.value.dp)
+                    .indication(
+                        source,
+                        rememberRipple(
+                            bounded = false,
+                            radius = rippleSize
+                        )
+                    ),
+                tint = contentColor,
                 painter = icon,
-                tint = color,
-                contentDescription = contentDescription
+                contentDescription = contentDescription,
             )
-            if (count > 0) {
-                Box(modifier = Modifier.width(4.dp))
-                Text(text = count.humanizedCount(), maxLines = 1)
+            Row(
+                modifier = modifier
+                    .weight(1f),
+            ) {
+                if (count > 0) {
+                    Box(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = count.humanizedCount(),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        style = MaterialTheme.typography.body2,
+                        color = contentColor,
+                    )
+                }
             }
         }
     }

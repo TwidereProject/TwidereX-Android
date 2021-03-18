@@ -31,7 +31,6 @@ import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -68,19 +67,14 @@ fun HtmlText(
     linkResolver: (href: String) -> ResolvedLink = { ResolvedLink(it) },
 ) {
     val navigator = LocalNavigator.current
-    val textColor = LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
-    CompositionLocalProvider(
-        LocalTextStyle provides MaterialTheme.typography.body1.copy(color = textColor)
-    ) {
-        RenderContent(
-            modifier = modifier,
-            htmlText = htmlText,
-            linkResolver = linkResolver,
-            onLinkClicked = {
-                navigator.openLink(it)
-            },
-        )
-    }
+    RenderContent(
+        modifier = modifier,
+        htmlText = htmlText,
+        linkResolver = linkResolver,
+        onLinkClicked = {
+            navigator.openLink(it)
+        },
+    )
 }
 
 @Composable

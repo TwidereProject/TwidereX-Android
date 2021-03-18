@@ -123,7 +123,7 @@ private fun NormalStatus(
             .clickable(
                 onClick = {
                     navigator.status(data)
-                }
+                },
             )
             .padding(
                 horizontal = standardPadding * 2,
@@ -131,11 +131,15 @@ private fun NormalStatus(
     ) {
         Spacer(modifier = Modifier.height(standardPadding))
         StatusContent(
+            modifier = Modifier
+                .padding(
+                    end = standardPadding
+                ),
             data = data,
         )
         if (showActions) {
             Row {
-                Spacer(modifier = Modifier.width(profileImageSize + standardPadding))
+                Spacer(modifier = Modifier.width(profileImageSize))
                 val status = (data.retweet ?: data)
                 StatusActions(status)
             }
@@ -273,7 +277,7 @@ private fun MastodonStatusHeader(
 @Composable
 private fun StatusActions(status: UiStatus) {
     CompositionLocalProvider(
-        LocalContentAlpha provides ContentAlpha.medium
+        LocalContentAlpha provides ContentAlpha.medium,
     ) {
         Row {
             ReplyButton(status = status)

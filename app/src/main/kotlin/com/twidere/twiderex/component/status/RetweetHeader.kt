@@ -28,7 +28,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Icon
 import androidx.compose.material.LocalContentAlpha
-import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
@@ -84,7 +83,7 @@ fun TweetHeader(
                         .width(profileImageSize),
                     contentAlignment = Alignment.CenterEnd,
                 ) {
-                    Box(modifier = Modifier.size(LocalTextStyle.current.fontSize.value.dp)) {
+                    Box(modifier = Modifier.size(MaterialTheme.typography.body1.fontSize.value.dp)) {
                         icon.invoke()
                     }
                 }
