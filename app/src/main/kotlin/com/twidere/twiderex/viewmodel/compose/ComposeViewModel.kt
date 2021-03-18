@@ -385,12 +385,18 @@ open class ComposeViewModel @AssistedInject constructor(
     fun putImages(value: List<Uri>) {
         images.value?.let {
             value + it
-        }?.let {
-            it.take(4)
-        }?.let {
+        }?.take(imageLimit)?.let {
             images.postValue(it)
         }
     }
+
+    private val imageLimit: Int
+        get() = when (account.type) {
+            PlatformType.Twitter -> 4
+            PlatformType.StatusNet -> TODO()
+            PlatformType.Fanfou -> TODO()
+            PlatformType.Mastodon -> 4
+        }
 
     @RequiresPermission(anyOf = [permission.ACCESS_COARSE_LOCATION, permission.ACCESS_FINE_LOCATION])
     fun trackingLocation() {
