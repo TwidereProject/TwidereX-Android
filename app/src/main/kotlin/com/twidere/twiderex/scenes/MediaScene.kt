@@ -73,7 +73,6 @@ import com.twidere.twiderex.component.foundation.Pager
 import com.twidere.twiderex.component.foundation.PagerState
 import com.twidere.twiderex.component.foundation.Swiper
 import com.twidere.twiderex.component.foundation.VideoPlayer
-import com.twidere.twiderex.component.foundation.Zoomable
 import com.twidere.twiderex.component.foundation.rememberPagerState
 import com.twidere.twiderex.component.status.LikeButton
 import com.twidere.twiderex.component.status.ReplyButton
@@ -101,6 +100,8 @@ import com.twidere.twiderex.viewmodel.MediaViewModel
 import dev.chrisbanes.accompanist.glide.LocalRequestManager
 import dev.chrisbanes.accompanist.insets.navigationBarsPadding
 import dev.chrisbanes.accompanist.insets.statusBarsPadding
+import moe.tlaster.zoomable.Zoomable
+import moe.tlaster.zoomable.rememberZoomableState
 
 @Composable
 fun StatusMediaScene(statusKey: MicroBlogKey, selectedIndex: Int) {
@@ -326,7 +327,6 @@ fun MediaView(
     onSwipeStart: () -> Unit = {},
     onSwipeEnd: () -> Unit = {},
 ) {
-    var lockPager by remember { mutableStateOf(false) }
     val navController = LocalNavController.current
     val requestManager = LocalRequestManager.current
     LaunchedEffect(Unit) {
@@ -338,7 +338,6 @@ fun MediaView(
     }
     Swiper(
         modifier = modifier,
-        enabled = !lockPager,
         onDismiss = {
             navController.popBackStack()
         },
@@ -351,15 +350,12 @@ fun MediaView(
     ) {
         Pager(
             state = pagerState,
-            dragEnabled = !lockPager,
         ) {
             val data = media[this.page]
             when (data.type) {
                 MediaType.photo ->
                     Zoomable(
-                        onZooming = {
-                            lockPager = it != 1F
-                        }
+                        state = rememberZoomableState()
                     ) {
                         NetworkImage(
                             data = data.url,

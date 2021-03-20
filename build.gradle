@@ -18,6 +18,7 @@ subprojects {
     repositories {
         google()
         mavenCentral()
+        maven { url 'https://jitpack.io' }
         jcenter()// exoplayer still in jcenter
     }
 
