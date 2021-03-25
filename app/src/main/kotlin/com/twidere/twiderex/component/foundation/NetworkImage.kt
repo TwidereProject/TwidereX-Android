@@ -38,10 +38,10 @@ import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
+import com.google.accompanist.glide.GlideImage
+import com.google.accompanist.imageloading.DataSource
+import com.google.accompanist.imageloading.ImageLoadState
 import com.twidere.twiderex.R
-import dev.chrisbanes.accompanist.glide.GlideImage
-import dev.chrisbanes.accompanist.imageloading.DataSource
-import dev.chrisbanes.accompanist.imageloading.ImageLoadState
 
 @Composable
 fun NetworkImage(

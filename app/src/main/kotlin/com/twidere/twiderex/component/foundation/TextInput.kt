@@ -145,14 +145,14 @@ fun TextInput(
                 imeAction = imeAction,
             ),
             keyboardActions =
-                KeyboardActions(
-                    onDone = { onImeActionPerformed.invoke(ImeAction.Done, keyboardController) },
-                    onGo = { onImeActionPerformed.invoke(ImeAction.Go, keyboardController) },
-                    onNext = { onImeActionPerformed.invoke(ImeAction.Next, keyboardController) },
-                    onPrevious = { onImeActionPerformed.invoke(ImeAction.Previous, keyboardController) },
-                    onSearch = { onImeActionPerformed.invoke(ImeAction.Search, keyboardController) },
-                    onSend = { onImeActionPerformed.invoke(ImeAction.Send, keyboardController) }
-                ),
+            KeyboardActions(
+                onDone = { onImeActionPerformed.invoke(ImeAction.Done, keyboardController) },
+                onGo = { onImeActionPerformed.invoke(ImeAction.Go, keyboardController) },
+                onNext = { onImeActionPerformed.invoke(ImeAction.Next, keyboardController) },
+                onPrevious = { onImeActionPerformed.invoke(ImeAction.Previous, keyboardController) },
+                onSearch = { onImeActionPerformed.invoke(ImeAction.Search, keyboardController) },
+                onSend = { onImeActionPerformed.invoke(ImeAction.Send, keyboardController) }
+            ),
             // cursorColor = textColor,
             textStyle = textStyle.copy(color = textColor),
             // onTextInputStarted = {

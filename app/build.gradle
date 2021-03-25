@@ -190,8 +190,8 @@ dependencies {
 
     implementation "androidx.work:work-runtime-ktx:$versions.work"
 
-    implementation "dev.chrisbanes.accompanist:accompanist-glide:$versions.accompanist"
-    implementation "dev.chrisbanes.accompanist:accompanist-insets:$versions.accompanist"
+    implementation "com.google.accompanist:accompanist-glide:$versions.accompanist"
+    implementation "com.google.accompanist:accompanist-insets:$versions.accompanist"
 
     implementation 'com.github.Tlaster:Zoomable:0.1.0'
 
