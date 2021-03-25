@@ -22,7 +22,6 @@ package com.twidere.twiderex.component
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.navigation.compose.navigate
 import com.twidere.twiderex.navigation.Route
@@ -42,16 +41,7 @@ fun RequireAuthorization(
         val navController = LocalNavController.current
         val activity = LocalActivity.current
         val (isSignInShown, setIsSignInShown) = rememberSaveable(
-            key = authorizationKey,
-            // FIXME: 2021/2/18 Workaround for https://issuetracker.google.com/issues/180513115
-            saver = Saver(
-                save = {
-                    it.value
-                },
-                restore = {
-                    mutableStateOf(it)
-                },
-            )
+            key = authorizationKey
         ) { mutableStateOf(false) }
         if (!isSignInShown) {
             setIsSignInShown(true)

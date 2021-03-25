@@ -61,7 +61,6 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -228,16 +227,7 @@ fun UserStatusTimeline(
 ) {
     val user by viewModel.user.observeAsState(initial = null)
     val account = LocalActiveAccount.current ?: return
-    var excludeReplies by rememberSaveable(
-        saver = Saver(
-            save = {
-                it.value
-            },
-            restore = {
-                mutableStateOf(it)
-            },
-        )
-    ) { mutableStateOf(false) }
+    var excludeReplies by rememberSaveable { mutableStateOf(false) }
     val timelineViewModel =
         assistedViewModel<UserTimelineViewModel.AssistedFactory, UserTimelineViewModel>(
             account,
