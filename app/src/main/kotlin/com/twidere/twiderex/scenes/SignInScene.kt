@@ -78,7 +78,7 @@ private fun MastodonSignIn() {
                         it as Boolean
                     }?.let {
                         if (it) {
-                            navController.goBack()
+                            navController.goBackWith(true)
                         }
                     }
             }
@@ -121,6 +121,7 @@ private fun MastodonSignIn() {
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun TwitterSignIn() {
+    val scope = rememberCoroutineScope()
     val navController = LocalNavController.current
     var showKeyConfiguration by remember { mutableStateOf(false) }
     if (showKeyConfiguration) {
@@ -132,12 +133,20 @@ private fun TwitterSignIn() {
     }
     SignInButton(
         onClick = {
-            navController.navigate(
-                Route.SignIn.Twitter(
-                    BuildConfig.CONSUMERKEY,
-                    BuildConfig.CONSUMERSECRET,
-                )
-            )
+            scope.launch {
+                navController.navigateForResult(
+                    Route.SignIn.Twitter(
+                        BuildConfig.CONSUMERKEY,
+                        BuildConfig.CONSUMERSECRET,
+                    )
+                )?.let {
+                    it as Boolean
+                }?.let {
+                    if (it) {
+                        navController.goBackWith(true)
+                    }
+                }
+            }
         },
     ) {
         ListItem(
@@ -224,7 +233,7 @@ private fun TwitterCustomKeySignIn(
                             it as Boolean
                         }?.let {
                             if (it) {
-                                navController.goBack()
+                                navController.goBackWith(true)
                             }
                         }
                     }

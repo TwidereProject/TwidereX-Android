@@ -27,7 +27,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.twidere.twiderex.preferences.LocalAppearancePreferences
 import com.twidere.twiderex.preferences.proto.AppearancePreferences
-import dagger.hilt.android.internal.lifecycle.HiltViewModelFactory
 
 @Composable
 inline fun <reified VM : ViewModel> navViewModel(
@@ -37,9 +36,9 @@ inline fun <reified VM : ViewModel> navViewModel(
     // val navController = LocalNavController.current
     // val backStackEntry = navController.currentBackStackEntryAsState().value
     // return if (backStackEntry != null) {
-        // viewModel(key, HiltViewModelFactory(LocalContext.current, backStackEntry))
+    // viewModel(key, HiltViewModelFactory(LocalContext.current, backStackEntry))
     // } else {
-        // viewModel(key, factory)
+    // viewModel(key, factory)
     // }
     return viewModel(key, factory)
 }

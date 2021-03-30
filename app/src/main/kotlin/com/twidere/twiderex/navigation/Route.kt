@@ -94,17 +94,17 @@ object Route {
 
         object Web {
             fun Twitter(target: String) = "signin/twitter/web/${
-                URLEncoder.encode(
-                    target,
-                    "UTF-8"
-                )
+            URLEncoder.encode(
+                target,
+                "UTF-8"
+            )
             }"
 
             fun Mastodon(target: String) = "signin/mastodon/web/${
-                URLEncoder.encode(
-                    target,
-                    "UTF-8"
-                )
+            URLEncoder.encode(
+                target,
+                "UTF-8"
+            )
             }"
         }
     }
@@ -121,10 +121,10 @@ object Route {
     }
 
     fun Search(keyword: String) = "search/result/${
-        URLEncoder.encode(
-            keyword,
-            "UTF-8"
-        )
+    URLEncoder.encode(
+        keyword,
+        "UTF-8"
+    )
     }"
 
     fun SearchInput(keyword: String? = null): String {
@@ -132,20 +132,20 @@ object Route {
             return "search/input"
         }
         return "search/input?keyword=${
-            URLEncoder.encode(
-                keyword,
-                "UTF-8"
-            )
+        URLEncoder.encode(
+            keyword,
+            "UTF-8"
+        )
         }"
     }
 
     fun Compose(composeType: ComposeType, statusKey: MicroBlogKey? = null) =
         "compose?composeType=${composeType.name}${
-            if (statusKey != null) {
-                "&statusKey=$statusKey"
-            } else {
-                ""
-            }
+        if (statusKey != null) {
+            "&statusKey=$statusKey"
+        } else {
+            ""
+        }
         }"
 
     object Compose {

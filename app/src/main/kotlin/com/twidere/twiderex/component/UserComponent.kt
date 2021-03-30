@@ -76,7 +76,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
-import moe.tlaster.precompose.navigation.NavController
 import com.google.accompanist.insets.statusBarsHeight
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.IconTabsComponent
@@ -116,6 +115,7 @@ import com.twidere.twiderex.viewmodel.user.UserMediaTimelineViewModel
 import com.twidere.twiderex.viewmodel.user.UserTimelineViewModel
 import com.twidere.twiderex.viewmodel.user.UserViewModel
 import kotlinx.coroutines.launch
+import moe.tlaster.precompose.navigation.NavController
 
 @Composable
 fun UserComponent(

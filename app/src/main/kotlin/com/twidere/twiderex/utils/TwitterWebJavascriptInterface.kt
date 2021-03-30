@@ -21,11 +21,11 @@
 package com.twidere.twiderex.utils
 
 import android.webkit.JavascriptInterface
-import moe.tlaster.precompose.navigation.NavController
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import moe.tlaster.precompose.navigation.NavController
 
 class TwitterWebJavascriptInterface(
     val navController: NavController,
