@@ -25,14 +25,18 @@ import androidx.work.WorkManager
 import com.twidere.twiderex.db.model.DbDraft
 import com.twidere.twiderex.repository.DraftRepository
 import com.twidere.twiderex.worker.draft.RemoveDraftWorker
-import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
+import dagger.assisted.AssistedInject
 
-@HiltViewModel
-class DraftViewModel @Inject constructor(
+class DraftViewModel @AssistedInject constructor(
     private val repository: DraftRepository,
     private val workManager: WorkManager,
 ) : ViewModel() {
+
+    @dagger.assisted.AssistedFactory
+    interface AssistedFactory {
+        fun create(): DraftViewModel
+    }
+
     fun delete(it: DbDraft) {
         workManager.beginWith(RemoveDraftWorker.create(it._id)).enqueue()
     }

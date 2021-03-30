@@ -52,7 +52,7 @@ import com.twidere.twiderex.component.foundation.SignInButton
 import com.twidere.twiderex.component.foundation.SignInScaffold
 import com.twidere.twiderex.component.navigation.INavigator
 import com.twidere.twiderex.component.navigation.LocalNavigator
-import com.twidere.twiderex.extensions.navViewModel
+import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.standardPadding
 import com.twidere.twiderex.viewmodel.mastodon.MastodonSignInViewModel
@@ -65,7 +65,9 @@ import moe.tlaster.precompose.navigation.NavController
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun MastodonSignInScene() {
-    val viewModel = navViewModel<MastodonSignInViewModel>()
+    val viewModel = assistedViewModel<MastodonSignInViewModel.AssistedFactory, MastodonSignInViewModel> {
+        it.create()
+    }
     val host by viewModel.host.observeAsState(initial = TextFieldValue())
     val loading by viewModel.loading.observeAsState(initial = false)
     val navController = LocalNavController.current

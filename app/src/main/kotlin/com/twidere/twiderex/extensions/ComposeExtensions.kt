@@ -29,21 +29,6 @@ import com.twidere.twiderex.preferences.LocalAppearancePreferences
 import com.twidere.twiderex.preferences.proto.AppearancePreferences
 
 @Composable
-inline fun <reified VM : ViewModel> navViewModel(
-    key: String? = null,
-    factory: ViewModelProvider.Factory? = null,
-): VM {
-    // val navController = LocalNavController.current
-    // val backStackEntry = navController.currentBackStackEntryAsState().value
-    // return if (backStackEntry != null) {
-    // viewModel(key, HiltViewModelFactory(LocalContext.current, backStackEntry))
-    // } else {
-    // viewModel(key, factory)
-    // }
-    return viewModel(key, factory)
-}
-
-@Composable
 inline fun <reified VM : ViewModel> viewModel(
     vararg dependsOn: Any,
     noinline creator: (() -> VM)? = null,
