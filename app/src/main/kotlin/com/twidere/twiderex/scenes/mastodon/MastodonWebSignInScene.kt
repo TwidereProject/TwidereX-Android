@@ -24,8 +24,6 @@ import android.net.Uri
 import androidx.compose.runtime.Composable
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.WebComponent
-import com.twidere.twiderex.extensions.DisposeResult
-import com.twidere.twiderex.extensions.setResult
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
 
@@ -35,7 +33,6 @@ val MASTODON_CALLBACK_URL = "https://org.mariotaku.twidere/auth/callback/mastodo
 fun MastodonWebSignInScene(target: String) {
     val navController = LocalNavController.current
     TwidereScene {
-        navController.DisposeResult(key = "code")
         InAppNotificationScaffold {
             WebComponent(
                 url = target,
@@ -45,8 +42,7 @@ fun MastodonWebSignInScene(target: String) {
                         uri.getQueryParameter("code")?.takeIf {
                             it.isNotEmpty()
                         }?.let {
-                            navController.setResult("code", it)
-                            navController.popBackStack()
+                            navController.goBackWith(it)
                         }
                     }
                 },

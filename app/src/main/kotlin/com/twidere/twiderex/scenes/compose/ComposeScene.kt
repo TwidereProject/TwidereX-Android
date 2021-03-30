@@ -100,7 +100,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.coerceAtLeast
 import androidx.compose.ui.unit.dp
-import androidx.navigation.compose.navigate
 import com.google.accompanist.insets.LocalWindowInsets
 import com.twidere.services.mastodon.model.Visibility
 import com.twidere.twiderex.R
@@ -115,7 +114,6 @@ import com.twidere.twiderex.component.status.UserName
 import com.twidere.twiderex.component.status.UserScreenName
 import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.extensions.icon
-import com.twidere.twiderex.extensions.navigateForResult
 import com.twidere.twiderex.extensions.stringName
 import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.model.AccountDetails
@@ -1085,10 +1083,9 @@ private fun ComposeActions(
                 IconButton(
                     onClick = {
                         scope.launch {
-                            val result = navController.navigateForResult<String>("user_name") {
-                                navigate(Route.Compose.Search.User)
-                            }
-                            if (!result.isNullOrEmpty()) {
+                            val result = navController.navigateForResult(Route.Compose.Search.User)
+                                .toString()
+                            if (result.isNotEmpty()) {
                                 viewModel.insertText("$result ")
                             }
                         }
@@ -1106,10 +1103,10 @@ private fun ComposeActions(
                 IconButton(
                     onClick = {
                         scope.launch {
-                            val result = navController.navigateForResult<String>("hashtag") {
-                                navigate(Route.Mastodon.Compose.Hashtag)
-                            }
-                            if (!result.isNullOrEmpty()) {
+                            val result =
+                                navController.navigateForResult(Route.Mastodon.Compose.Hashtag)
+                                    .toString()
+                            if (result.isNotEmpty()) {
                                 viewModel.insertText("$result ")
                             }
                         }

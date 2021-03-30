@@ -76,8 +76,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
-import androidx.navigation.NavController
-import androidx.navigation.compose.navigate
+import moe.tlaster.precompose.navigation.NavController
 import com.google.accompanist.insets.statusBarsHeight
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.IconTabsComponent

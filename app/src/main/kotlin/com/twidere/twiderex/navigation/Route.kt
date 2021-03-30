@@ -28,14 +28,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.navigation.NavBackStackEntry
-import androidx.navigation.NavDeepLink
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavType
-import androidx.navigation.compose.NamedNavArgument
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.navArgument
-import androidx.navigation.navDeepLink
 import com.twidere.twiderex.component.RequireAuthorization
 import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.model.MicroBlogKey
@@ -72,6 +64,10 @@ import com.twidere.twiderex.ui.LocalActiveAccountViewModel
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.utils.LocalPlatformResolver
 import com.twidere.twiderex.viewmodel.compose.ComposeType
+import moe.tlaster.precompose.navigation.BackStackEntry
+import moe.tlaster.precompose.navigation.RouteBuilder
+import moe.tlaster.precompose.navigation.path
+import moe.tlaster.precompose.navigation.query
 import java.net.URLDecoder
 import java.net.URLEncoder
 
@@ -98,17 +94,17 @@ object Route {
 
         object Web {
             fun Twitter(target: String) = "signin/twitter/web/${
-            URLEncoder.encode(
-                target,
-                "UTF-8"
-            )
+                URLEncoder.encode(
+                    target,
+                    "UTF-8"
+                )
             }"
 
             fun Mastodon(target: String) = "signin/mastodon/web/${
-            URLEncoder.encode(
-                target,
-                "UTF-8"
-            )
+                URLEncoder.encode(
+                    target,
+                    "UTF-8"
+                )
             }"
         }
     }
@@ -125,10 +121,10 @@ object Route {
     }
 
     fun Search(keyword: String) = "search/result/${
-    URLEncoder.encode(
-        keyword,
-        "UTF-8"
-    )
+        URLEncoder.encode(
+            keyword,
+            "UTF-8"
+        )
     }"
 
     fun SearchInput(keyword: String? = null): String {
@@ -136,20 +132,20 @@ object Route {
             return "search/input"
         }
         return "search/input?keyword=${
-        URLEncoder.encode(
-            keyword,
-            "UTF-8"
-        )
+            URLEncoder.encode(
+                keyword,
+                "UTF-8"
+            )
         }"
     }
 
     fun Compose(composeType: ComposeType, statusKey: MicroBlogKey? = null) =
         "compose?composeType=${composeType.name}${
-        if (statusKey != null) {
-            "&statusKey=$statusKey"
-        } else {
-            ""
-        }
+            if (statusKey != null) {
+                "&statusKey=$statusKey"
+            } else {
+                ""
+            }
         }"
 
     object Compose {
@@ -180,6 +176,7 @@ object Route {
 
     object Mastodon {
         fun Hashtag(keyword: String) = "mastodon/hashtag/$keyword"
+
         object Compose {
             const val Hashtag = "mastodon/compose/hashtag"
         }
@@ -200,13 +197,12 @@ object DeepLinks {
     const val SignIn = "$twidereXSchema://signin"
 }
 
-fun NavGraphBuilder.authorizedComposable(
+fun RouteBuilder.authorizedScene(
     route: String,
-    arguments: List<NamedNavArgument> = emptyList(),
-    deepLinks: List<NavDeepLink> = emptyList(),
-    content: @Composable (NavBackStackEntry) -> Unit,
+    deepLinks: List<String> = emptyList(),
+    content: @Composable (BackStackEntry) -> Unit,
 ) {
-    composable(route, arguments, deepLinks) {
+    scene(route, deepLinks) {
         RequireAuthorization {
             content.invoke(it)
         }
@@ -290,343 +286,259 @@ fun RequirePlatformAccount(
     }
 }
 
-fun NavGraphBuilder.route() {
-    authorizedComposable(Route.Home) {
+fun RouteBuilder.route() {
+    authorizedScene(Route.Home) {
         HomeScene()
     }
 
-    composable(
+    scene(
         Route.SignIn.General,
         deepLinks = listOf(
-            navDeepLink {
-                uriPattern = DeepLinks.SignIn
-            }
+            DeepLinks.SignIn
         ),
     ) {
         SignInScene()
     }
 
-    composable(
-        "signin/twitter?consumerKey={consumerKey}&consumerSecret={consumerSecret}",
-        arguments = listOf(
-            navArgument("consumerKey") { type = NavType.StringType },
-            navArgument("consumerSecret") { type = NavType.StringType },
-        )
+    scene(
+        "signin/twitter",
     ) { backStackEntry ->
-        backStackEntry.arguments?.let { arguments ->
-            val consumerKey = arguments.getString("consumerKey")
-            val consumerSecret = arguments.getString("consumerSecret")
-            if (consumerKey != null && consumerSecret != null) {
-                TwitterSignInScene(consumerKey = consumerKey, consumerSecret = consumerSecret)
-            }
+        val consumerKey = backStackEntry.query<String>("consumerKey")
+        val consumerSecret = backStackEntry.query<String>("consumerSecret")
+        if (consumerKey != null && consumerSecret != null) {
+            TwitterSignInScene(consumerKey = consumerKey, consumerSecret = consumerSecret)
         }
     }
 
-    composable(Route.SignIn.Mastodon) {
+    scene(Route.SignIn.Mastodon) {
         MastodonSignInScene()
     }
 
-    composable(
+    scene(
         "signin/twitter/web/{target}",
-        arguments = listOf(navArgument("target") { type = NavType.StringType }),
     ) { backStackEntry ->
-        backStackEntry.arguments?.getString("target")?.let {
+        backStackEntry.path<String>("target")?.let {
             TwitterWebSignInScene(target = URLDecoder.decode(it, "UTF-8"))
         }
     }
 
-    composable(
+    scene(
         "signin/mastodon/web/{target}",
-        arguments = listOf(
-            navArgument("target") {
-                type =
-                    NavType.StringType
-            },
-        ),
     ) { backStackEntry ->
-        backStackEntry.arguments?.getString("target")?.let {
+        backStackEntry.path<String>("target")?.let {
             MastodonWebSignInScene(target = URLDecoder.decode(it, "UTF-8"))
         }
     }
 
-    authorizedComposable(
+    authorizedScene(
         Route.DeepLink.Twitter.User,
-        arguments = listOf(
-            navArgument("screenName") { type = NavType.StringType },
-        ),
         deepLinks = twitterHosts.map {
-            navDeepLink {
-                uriPattern = "$it/{screenName}"
-            }
-        } + navDeepLink {
-            uriPattern = "${DeepLinks.Twitter.User}/{screenName}"
-        }
+            "$it/{screenName}"
+        } + "${DeepLinks.Twitter.User}/{screenName}"
     ) { backStackEntry ->
-        backStackEntry.arguments?.let { arguments ->
-            arguments.getString("screenName")?.let { screenName ->
-                val navigator = LocalNavigator.current
-                RequirePlatformAccount(
-                    platformType = PlatformType.Twitter,
-                    fallback = {
-                        navigator.openLink("https://twitter.com/$screenName", deepLink = false)
-                        navigator.goBack()
-                    }
-                ) {
-                    TwitterUserScene(screenName = screenName)
+        backStackEntry.path<String>("screenName")?.let { screenName ->
+            val navigator = LocalNavigator.current
+            RequirePlatformAccount(
+                platformType = PlatformType.Twitter,
+                fallback = {
+                    navigator.openLink("https://twitter.com/$screenName", deepLink = false)
+                    navigator.goBack()
                 }
+            ) {
+                TwitterUserScene(screenName = screenName)
             }
         }
     }
 
-    authorizedComposable(
+    authorizedScene(
         "user/{userKey}",
-        arguments = listOf(
-            navArgument("userKey") { type = NavType.StringType },
-        ),
         deepLinks = listOf(
-            navDeepLink {
-                uriPattern = "${DeepLinks.User}/{userKey}"
-            }
+            "${DeepLinks.User}/{userKey}"
         )
     ) { backStackEntry ->
-        backStackEntry.arguments?.let { arguments ->
-            arguments.getString("userKey")?.let {
-                MicroBlogKey.valueOf(it)
-            }?.let { userKey ->
-                ProvideUserPlatform(userKey = userKey) { platformType ->
-                    RequirePlatformAccount(platformType = platformType) {
-                        UserScene(userKey)
-                    }
+        backStackEntry.path<String>("userKey")?.let {
+            MicroBlogKey.valueOf(it)
+        }?.let { userKey ->
+            ProvideUserPlatform(userKey = userKey) { platformType ->
+                RequirePlatformAccount(platformType = platformType) {
+                    UserScene(userKey)
                 }
             }
         }
     }
 
-    authorizedComposable(
+    authorizedScene(
         "mastodon/hashtag/{keyword}",
-        arguments = listOf(navArgument("keyword") { type = NavType.StringType }),
         deepLinks = listOf(
-            navDeepLink {
-                uriPattern = "${DeepLinks.Mastodon.Hashtag}/{keyword}"
-            }
+            "${DeepLinks.Mastodon.Hashtag}/{keyword}"
         )
     ) { backStackEntry ->
-        backStackEntry.arguments?.getString("keyword")?.let {
+        backStackEntry.path<String>("keyword")?.let {
             MastodonHashtagScene(keyword = it)
         }
     }
 
-    authorizedComposable(
+    authorizedScene(
         "status/{statusKey}",
-        arguments = listOf(
-            navArgument("statusKey") { type = NavType.StringType },
-        ),
     ) { backStackEntry ->
-        backStackEntry.arguments?.let { argument ->
-            argument.getString("statusKey")?.let {
-                MicroBlogKey.valueOf(it)
-            }?.let { statusKey ->
-                ProvideStatusPlatform(statusKey = statusKey) { platform ->
-                    RequirePlatformAccount(platformType = platform) {
-                        StatusScene(statusKey = statusKey)
-                    }
+        backStackEntry.path<String>("statusKey")?.let {
+            MicroBlogKey.valueOf(it)
+        }?.let { statusKey ->
+            ProvideStatusPlatform(statusKey = statusKey) { platform ->
+                RequirePlatformAccount(platformType = platform) {
+                    StatusScene(statusKey = statusKey)
                 }
             }
         }
     }
 
-    authorizedComposable(
+    authorizedScene(
         Route.DeepLink.Twitter.Status,
-        arguments = listOf(
-            navArgument("statusId") { type = NavType.StringType },
-        ),
         deepLinks = twitterHosts.map {
-            navDeepLink {
-                uriPattern = "$it/{screenName}/status/{statusId}"
-            }
+            "$it/{screenName}/status/{statusId}"
         }
     ) { backStackEntry ->
-        backStackEntry.arguments?.let { argument ->
-            argument.getString("statusId")?.let { statusId ->
-                val navigator = LocalNavigator.current
-                RequirePlatformAccount(
-                    platformType = PlatformType.Twitter,
-                    fallback = {
-                        navigator.openLink(
-                            "https://twitter.com/${argument.getString("screenName")}/status/$statusId",
-                            deepLink = false
-                        )
-                        navigator.goBack()
-                    }
-                ) {
-                    StatusScene(statusKey = MicroBlogKey.twitter(statusId))
+        backStackEntry.path<String>("statusId")?.let { statusId ->
+            val navigator = LocalNavigator.current
+            RequirePlatformAccount(
+                platformType = PlatformType.Twitter,
+                fallback = {
+                    navigator.openLink(
+                        "https://twitter.com/${backStackEntry.path<String>("screenName")}/status/$statusId",
+                        deepLink = false
+                    )
+                    navigator.goBack()
+                }
+            ) {
+                StatusScene(statusKey = MicroBlogKey.twitter(statusId))
+            }
+        }
+    }
+
+    authorizedScene(
+        "media/status/{statusKey}",
+    ) { backStackEntry ->
+        backStackEntry.path<String>("statusKey")?.let {
+            MicroBlogKey.valueOf(it)
+        }?.let { statusKey ->
+            ProvideStatusPlatform(statusKey = statusKey) { platformType ->
+                RequirePlatformAccount(platformType = platformType) {
+                    val selectedIndex = backStackEntry.query("selectedIndex", 0) ?: 0
+                    StatusMediaScene(
+                        statusKey = statusKey,
+                        selectedIndex = selectedIndex
+                    )
                 }
             }
         }
     }
 
-    authorizedComposable(
-        "media/status/{statusKey}?selectedIndex={selectedIndex}",
-        arguments = listOf(
-            navArgument("statusKey") { type = NavType.StringType },
-            navArgument("selectedIndex") { type = NavType.IntType; defaultValue = 0; },
-        ),
-    ) { backStackEntry ->
-        backStackEntry.arguments?.let { argument ->
-            argument.getString("statusKey")?.let {
-                MicroBlogKey.valueOf(it)
-            }?.let { statusKey ->
-                ProvideStatusPlatform(statusKey = statusKey) { platformType ->
-                    RequirePlatformAccount(platformType = platformType) {
-                        val selectedIndex = argument.getInt("selectedIndex", 0)
-                        StatusMediaScene(
-                            statusKey = statusKey,
-                            selectedIndex = selectedIndex
-                        )
-                    }
-                }
-            }
-        }
-    }
-
-    authorizedComposable(
+    authorizedScene(
         "media/raw/{url}",
-        arguments = listOf(
-            navArgument("url") { type = NavType.StringType },
-        )
     ) { backStackEntry ->
-        backStackEntry.arguments?.getString("url")?.let {
+        backStackEntry.path<String>("url")?.let {
             URLDecoder.decode(it, "UTF-8")
         }?.let {
             RawMediaScene(url = it)
         }
     }
 
-    authorizedComposable(
-        "search/input?keyword={keyword}",
-        arguments = listOf(
-            navArgument("keyword") { type = NavType.StringType; nullable = true; }
-        )
+    authorizedScene(
+        "search/input",
     ) { backStackEntry ->
         SearchInputScene(
-            backStackEntry.arguments?.getString("keyword")?.let { URLDecoder.decode(it, "UTF-8") }
+            backStackEntry.query<String>("keyword")?.let { URLDecoder.decode(it, "UTF-8") }
         )
     }
 
-    authorizedComposable(
+    authorizedScene(
         "search/result/{keyword}",
-        arguments = listOf(
-            navArgument("keyword") { type = NavType.StringType }
-        ),
         deepLinks = twitterHosts.map {
-            navDeepLink {
-                uriPattern = "$it/search?q={keyword}"
-            }
-        } + navDeepLink {
-            uriPattern = "${DeepLinks.Search}/{keyword}"
-        }
+            "$it/search?q={keyword}"
+        } + "${DeepLinks.Search}/{keyword}"
     ) { backStackEntry ->
-        backStackEntry.arguments?.getString("keyword")?.takeIf { it.isNotEmpty() }?.let {
+        backStackEntry.path<String>("keyword")?.takeIf { it.isNotEmpty() }?.let {
             SearchScene(keyword = URLDecoder.decode(it, "UTF-8"))
         }
     }
 
-    authorizedComposable(
-        "compose?composeType={composeType}&statusKey={statusKey}",
-        arguments = listOf(
-            navArgument("composeType") { type = NavType.StringType; nullable = true; },
-            navArgument("statusKey") { type = NavType.StringType; nullable = true; },
-        )
+    authorizedScene(
+        "compose",
     ) { backStackEntry ->
-        backStackEntry.arguments?.let { args ->
-            val type = args.getString("composeType")?.let {
-                enumValueOf(it)
-            } ?: ComposeType.New
-            val statusKey = args.getString("statusKey")
-                ?.takeIf { it.isNotEmpty() }
-                ?.let { MicroBlogKey.valueOf(it) }
-            if (statusKey != null) {
-                ProvideStatusPlatform(statusKey = statusKey) { platformType ->
-                    RequirePlatformAccount(platformType = platformType) {
-                        ComposeScene(statusKey, type)
-                    }
+        val type = backStackEntry.query<String>("composeType")?.let {
+            enumValueOf(it)
+        } ?: ComposeType.New
+        val statusKey = backStackEntry.query<String>("statusKey")
+            ?.takeIf { it.isNotEmpty() }
+            ?.let { MicroBlogKey.valueOf(it) }
+        if (statusKey != null) {
+            ProvideStatusPlatform(statusKey = statusKey) { platformType ->
+                RequirePlatformAccount(platformType = platformType) {
+                    ComposeScene(statusKey, type)
                 }
-            } else {
-                ComposeScene(statusKey, type)
             }
+        } else {
+            ComposeScene(statusKey, type)
         }
     }
 
-    authorizedComposable(
+    authorizedScene(
         "followers/{userKey}",
-        arguments = listOf(
-            navArgument("userKey") { type = NavType.StringType }
-        )
     ) { backStackEntry ->
-        backStackEntry.arguments?.let { args ->
-            args.getString("userKey")?.let {
-                MicroBlogKey.valueOf(it)
-            }?.let {
-                FollowersScene(it)
-            }
+        backStackEntry.path<String>("userKey")?.let {
+            MicroBlogKey.valueOf(it)
+        }?.let {
+            FollowersScene(it)
         }
     }
 
-    authorizedComposable(
+    authorizedScene(
         "following/{userKey}",
-        arguments = listOf(
-            navArgument("userKey") { type = NavType.StringType }
-        )
     ) { backStackEntry ->
-        backStackEntry.arguments?.let { args ->
-            args.getString("userKey")?.let {
-                MicroBlogKey.valueOf(it)
-            }?.let {
-                FollowingScene(it)
-            }
+        backStackEntry.path<String>("userKey")?.let {
+            MicroBlogKey.valueOf(it)
+        }?.let {
+            FollowingScene(it)
         }
     }
 
-    composable(Route.Settings.Home) {
+    scene(Route.Settings.Home) {
         SettingsScene()
     }
 
-    composable(Route.Settings.Appearance) {
+    scene(Route.Settings.Appearance) {
         AppearanceScene()
     }
 
-    composable(Route.Settings.Display) {
+    scene(Route.Settings.Display) {
         DisplayScene()
     }
 
-    composable(Route.Settings.AccountManagement) {
+    scene(Route.Settings.AccountManagement) {
         AccountManagementScene()
     }
 
-    composable(Route.Settings.About) {
+    scene(Route.Settings.About) {
         AboutScene()
     }
 
-    composable(Route.Draft.List) {
+    scene(Route.Draft.List) {
         DraftListScene()
     }
 
-    composable(
+    scene(
         "draft/compose/{draftId}",
-        arguments = listOf(
-            navArgument("draftId") { type = NavType.StringType }
-        )
     ) { backStackEntry ->
-        backStackEntry.arguments?.getString("draftId")?.let {
+        backStackEntry.path<String>("draftId")?.let {
             DraftComposeScene(draftId = it)
         }
     }
 
-    authorizedComposable(Route.Compose.Search.User) {
+    authorizedScene(Route.Compose.Search.User) {
         ComposeSearchUserScene()
     }
 
-    authorizedComposable(Route.Mastodon.Compose.Hashtag) {
+    authorizedScene(Route.Mastodon.Compose.Hashtag) {
         ComposeSearchHashtagScene()
     }
 }

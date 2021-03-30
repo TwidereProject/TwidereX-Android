@@ -44,8 +44,6 @@ import com.twidere.twiderex.component.foundation.TextInput
 import com.twidere.twiderex.component.lazy.collectAsLazyPagingItems
 import com.twidere.twiderex.component.lazy.loadState
 import com.twidere.twiderex.component.lazy.ui.LazyUiUserList
-import com.twidere.twiderex.extensions.DisposeResult
-import com.twidere.twiderex.extensions.setResult
 import com.twidere.twiderex.extensions.viewModel
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalNavController
@@ -64,7 +62,6 @@ fun ComposeSearchUserScene() {
     val sourceState by viewModel.sourceFlow.collectAsState(initial = null)
     val source = sourceState?.collectAsLazyPagingItems()
     TwidereScene {
-        navController.DisposeResult(key = "user_name")
         InAppNotificationScaffold(
             topBar = {
                 AppBar(
@@ -80,8 +77,7 @@ fun ComposeSearchUserScene() {
                                     Text(text = stringResource(id = R.string.scene_compose_user_search_search_placeholder))
                                 },
                                 onImeActionPerformed = { _, _ ->
-                                    navController.setResult("user_name", "@$text")
-                                    navController.popBackStack()
+                                    navController.goBackWith("@$text")
                                 },
                                 autoFocus = true,
                                 imeAction = ImeAction.Done,
@@ -95,8 +91,7 @@ fun ComposeSearchUserScene() {
                     actions = {
                         IconButton(
                             onClick = {
-                                navController.setResult("user_name", "@$text")
-                                navController.popBackStack()
+                                navController.goBackWith("@$text")
                             }
                         ) {
                             Icon(
@@ -115,8 +110,7 @@ fun ComposeSearchUserScene() {
                     items = source,
                     onItemClicked = {
                         val displayName = it.getDisplayScreenName(accountDetails = account)
-                        navController.setResult("user_name", displayName)
-                        navController.popBackStack()
+                        navController.goBackWith(displayName)
                     },
                     header = {
                         loadState(source.loadState.refresh)

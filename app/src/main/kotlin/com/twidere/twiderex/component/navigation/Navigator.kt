@@ -26,10 +26,6 @@ import android.content.Intent.ACTION_VIEW
 import android.net.Uri
 import android.webkit.CookieManager
 import androidx.compose.runtime.staticCompositionLocalOf
-import androidx.navigation.NavController
-import androidx.navigation.NavOptionsBuilder
-import androidx.navigation.compose.navigate
-import androidx.navigation.compose.popUpTo
 import com.twidere.twiderex.db.model.ReferenceType
 import com.twidere.twiderex.model.MastodonStatusType
 import com.twidere.twiderex.model.MicroBlogKey
@@ -39,16 +35,19 @@ import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.navigation.twidereXSchema
 import com.twidere.twiderex.viewmodel.compose.ComposeType
+import moe.tlaster.precompose.navigation.NavController
+import moe.tlaster.precompose.navigation.NavOptions
+import moe.tlaster.precompose.navigation.PopUpTo
 
 val LocalNavigator = staticCompositionLocalOf<INavigator> { error("No Navigator") }
 
 interface INavigator {
-    fun user(user: UiUser, builder: NavOptionsBuilder.() -> Unit = {}) {}
-    fun status(status: UiStatus, builder: NavOptionsBuilder.() -> Unit = {}) {}
+    fun user(user: UiUser, navOptions: NavOptions? = null) {}
+    fun status(status: UiStatus, navOptions: NavOptions? = null) {}
     fun media(
         statusKey: MicroBlogKey,
         selectedIndex: Int = 0,
-        builder: NavOptionsBuilder.() -> Unit = {}
+        navOptions: NavOptions? = null
     ) {
     }
 
@@ -56,13 +55,13 @@ interface INavigator {
     fun compose(
         composeType: ComposeType,
         statusKey: MicroBlogKey? = null,
-        builder: NavOptionsBuilder.() -> Unit = {}
+        navOptions: NavOptions? = null
     ) {
     }
 
     fun openLink(it: String, deepLink: Boolean = true) {}
-    fun twitterSignInWeb(target: String) {}
-    fun mastodonSignInWeb(target: String) {}
+    suspend fun twitterSignInWeb(target: String): String = ""
+    suspend fun mastodonSignInWeb(target: String): String = ""
     fun searchInput(initial: String? = null) {}
     fun hashtag(name: String) {}
     fun goBack() {}
@@ -72,11 +71,11 @@ class Navigator(
     private val navController: NavController,
     private val context: Context,
 ) : INavigator {
-    override fun user(user: UiUser, builder: NavOptionsBuilder.() -> Unit) {
-        navController.navigate(Route.User(user.userKey), builder)
+    override fun user(user: UiUser, navOptions: NavOptions?) {
+        navController.navigate(Route.User(user.userKey), navOptions)
     }
 
-    override fun status(status: UiStatus, builder: NavOptionsBuilder.() -> Unit) {
+    override fun status(status: UiStatus, navOptions: NavOptions?) {
         val statusKey = when (status.platformType) {
             PlatformType.Twitter -> status.statusKey
             PlatformType.StatusNet -> TODO()
@@ -96,7 +95,7 @@ class Navigator(
         if (statusKey != null) {
             navController.navigate(
                 Route.Status(statusKey),
-                builder,
+                navOptions
             )
         }
     }
@@ -104,65 +103,60 @@ class Navigator(
     override fun media(
         statusKey: MicroBlogKey,
         selectedIndex: Int,
-        builder: NavOptionsBuilder.() -> Unit
+        navOptions: NavOptions?
     ) {
-        navController.navigate(Route.Media.Status(statusKey, selectedIndex), builder)
+        navController.navigate(Route.Media.Status(statusKey, selectedIndex), navOptions)
     }
 
     override fun search(keyword: String) {
-        navController.navigate(Route.Search(keyword)) {
-            popUpTo(Route.Home) {
-                inclusive = false
-            }
-        }
+        navController.navigate(Route.Search(keyword), NavOptions(popUpTo = PopUpTo(Route.Home)))
     }
 
     override fun searchInput(initial: String?) {
-        navController.navigate(Route.SearchInput(initial)) {
-            popUpTo(Route.Home) {
-                inclusive = false
-            }
-        }
+        navController.navigate(
+            Route.SearchInput(initial),
+            NavOptions(popUpTo = PopUpTo(Route.Home))
+        )
     }
 
     override fun compose(
         composeType: ComposeType,
         statusKey: MicroBlogKey?,
-        builder: NavOptionsBuilder.() -> Unit
+        navOptions: NavOptions?
     ) {
-        navController.navigate(Route.Compose(composeType, statusKey), builder)
+        navController.navigate(Route.Compose(composeType, statusKey))
     }
 
     override fun openLink(it: String, deepLink: Boolean) {
         val uri = Uri.parse(it)
         if ((
-            uri.scheme == twidereXSchema || uri.host?.contains(
+                uri.scheme == twidereXSchema || uri.host?.contains(
                     "twitter.com",
                     ignoreCase = true
                 ) == true
-            ) &&
+                ) &&
             deepLink
         ) {
-            navController.navigate(uri)
+            navController.navigate(it)
         } else {
             context.startActivity(Intent(ACTION_VIEW, uri))
         }
     }
 
-    override fun twitterSignInWeb(target: String) {
+    override suspend fun twitterSignInWeb(target: String): String {
         CookieManager.getInstance().removeAllCookies {
         }
-        navController.navigate(
+        return navController.navigateForResult(
             Route.SignIn.Web.Twitter(target)
-        )
+        ).toString()
     }
 
-    override fun mastodonSignInWeb(target: String) {
+    override suspend fun mastodonSignInWeb(target: String): String {
         CookieManager.getInstance().removeAllCookies {
         }
-        navController.navigate(
+        return navController.navigateForResult(
             Route.SignIn.Web.Mastodon(target)
-        )
+        ).toString()
     }
 
     override fun hashtag(name: String) {
@@ -170,7 +164,7 @@ class Navigator(
     }
 
     override fun goBack() {
-        navController.navigateUp()
+        navController.goBack()
     }
 }
 
