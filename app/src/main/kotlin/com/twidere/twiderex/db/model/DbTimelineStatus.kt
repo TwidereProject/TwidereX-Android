@@ -20,20 +20,9 @@
  */
 package com.twidere.twiderex.db.model
 
-import androidx.room.Embedded
-import androidx.room.Entity
-import androidx.room.Index
-import androidx.room.PrimaryKey
-import androidx.room.Relation
-import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.model.MicroBlogKey
 
-@Entity(
-    tableName = "timeline",
-    indices = [Index(value = ["statusKey", "accountKey", "type"], unique = true)],
-)
 data class DbTimeline(
-    @PrimaryKey
     val _id: String,
     val accountKey: MicroBlogKey,
     val timestamp: Long,
@@ -51,22 +40,6 @@ enum class TimelineType {
 }
 
 data class DbTimelineWithStatus(
-    @Embedded
     val timeline: DbTimeline,
-
-    @Relation(
-        parentColumn = "statusKey",
-        entityColumn = "statusKey",
-        entity = DbStatusV2::class,
-    )
     val status: DbStatusWithReference,
 )
-
-suspend fun List<DbTimelineWithStatus>.saveToDb(
-    database: CacheDatabase,
-) {
-    this.map { it.status }.saveToDb(database)
-    this.map { it.timeline }.let {
-        database.timelineDao().insertAll(it)
-    }
-}

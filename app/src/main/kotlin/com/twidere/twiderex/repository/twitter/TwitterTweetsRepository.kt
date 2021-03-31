@@ -58,7 +58,7 @@ class TwitterTweetsRepository @AssistedInject constructor(
     }
 
     private suspend fun toUiStatus(status: IStatus): UiStatus {
-        val db = status.toDbTimeline(accountKey, TimelineType.Conversation)
+        val db = status.toDbTimeline(accountKey, TimelineType.Custom).status
         listOf(db).saveToDb(database)
         return db.toUi(accountKey)
     }

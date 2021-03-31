@@ -29,9 +29,6 @@ import com.twidere.services.twitter.model.Status
 import com.twidere.services.twitter.model.StatusV2
 import com.twidere.services.twitter.model.exceptions.TwitterApiExceptionV2
 import com.twidere.twiderex.db.CacheDatabase
-import com.twidere.twiderex.db.mapper.toDbTimeline
-import com.twidere.twiderex.db.model.TimelineType
-import com.twidere.twiderex.db.model.saveToDb
 import com.twidere.twiderex.defaultLoadCount
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.notification.InAppNotification
@@ -62,8 +59,6 @@ class TwitterConversationMediator(
             } else {
                 try {
                     val result = service.lookupStatus(referencedTweetId)
-                    val db = result.toDbTimeline(accountKey, TimelineType.Conversation)
-                    listOf(db).saveToDb(database)
                     list.add(result)
                     current = result
                 } catch (e: MicroBlogException) {

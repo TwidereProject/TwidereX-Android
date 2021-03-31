@@ -41,7 +41,7 @@ interface PagingTimelineDao {
     suspend fun findWithStatusKey(statusKey: MicroBlogKey, accountKey: MicroBlogKey): DbPagingTimeline?
 
     @Query("SELECT * FROM paging_timeline WHERE statusKey in (:statusKey)")
-    suspend fun findAllWIthStatusKey(statusKey: List<MicroBlogKey>): List<DbPagingTimeline>
+    suspend fun findAllWithStatusKey(statusKey: List<MicroBlogKey>): List<DbPagingTimeline>
 
     @Transaction
     @Query("SELECT * FROM paging_timeline WHERE pagingKey == :pagingKey AND accountKey == :accountKey ORDER BY sortId DESC")
