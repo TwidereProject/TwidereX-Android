@@ -38,18 +38,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.lifecycle.liveData
-import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.navigate
 import com.twidere.twiderex.BuildConfig
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.SignInButton
@@ -57,20 +53,11 @@ import com.twidere.twiderex.component.foundation.SignInScaffold
 import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.standardPadding
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun SignInScene() {
-    val navController = LocalNavController.current
-    val state by navController.currentBackStackEntryAsState()
-    val success by state?.savedStateHandle?.getLiveData<Boolean>("success").let {
-        it ?: liveData { emit(false) }
-    }.observeAsState(initial = false)
-    LaunchedEffect(success) {
-        if (success) {
-            navController.popBackStack()
-        }
-    }
     SignInScaffold {
         TwitterSignIn()
         Spacer(modifier = Modifier.height(standardPadding * 2))
@@ -81,10 +68,20 @@ fun SignInScene() {
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun MastodonSignIn() {
+    val scope = rememberCoroutineScope()
     val navController = LocalNavController.current
     SignInButton(
         onClick = {
-            navController.navigate(Route.SignIn.Mastodon)
+            scope.launch {
+                navController.navigateForResult(Route.SignIn.Mastodon)
+                    ?.let {
+                        it as Boolean
+                    }?.let {
+                        if (it) {
+                            navController.goBackWith(true)
+                        }
+                    }
+            }
         },
         border = ButtonDefaults.outlinedBorder,
         color = MaterialTheme.colors.surface,
@@ -124,6 +121,7 @@ private fun MastodonSignIn() {
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun TwitterSignIn() {
+    val scope = rememberCoroutineScope()
     val navController = LocalNavController.current
     var showKeyConfiguration by remember { mutableStateOf(false) }
     if (showKeyConfiguration) {
@@ -135,12 +133,20 @@ private fun TwitterSignIn() {
     }
     SignInButton(
         onClick = {
-            navController.navigate(
-                Route.SignIn.Twitter(
-                    BuildConfig.CONSUMERKEY,
-                    BuildConfig.CONSUMERSECRET,
-                )
-            )
+            scope.launch {
+                navController.navigateForResult(
+                    Route.SignIn.Twitter(
+                        BuildConfig.CONSUMERKEY,
+                        BuildConfig.CONSUMERSECRET,
+                    )
+                )?.let {
+                    it as Boolean
+                }?.let {
+                    if (it) {
+                        navController.goBackWith(true)
+                    }
+                }
+            }
         },
     ) {
         ListItem(
@@ -173,6 +179,7 @@ private fun TwitterSignIn() {
 private fun TwitterCustomKeySignIn(
     onDismissRequest: () -> Unit,
 ) {
+    val scope = rememberCoroutineScope()
     val navController = LocalNavController.current
     var apiKey by remember { mutableStateOf("") }
     var apiSecret by remember { mutableStateOf("") }
@@ -216,12 +223,20 @@ private fun TwitterCustomKeySignIn(
         confirmButton = {
             TextButton(
                 onClick = {
-                    navController.navigate(
-                        Route.SignIn.Twitter(
-                            apiKey,
-                            apiSecret,
-                        )
-                    )
+                    scope.launch {
+                        navController.navigateForResult(
+                            Route.SignIn.Twitter(
+                                apiKey,
+                                apiSecret,
+                            )
+                        )?.let {
+                            it as Boolean
+                        }?.let {
+                            if (it) {
+                                navController.goBackWith(true)
+                            }
+                        }
+                    }
                 }
             ) {
                 Text(text = stringResource(id = R.string.scene_drawer_sign_in))

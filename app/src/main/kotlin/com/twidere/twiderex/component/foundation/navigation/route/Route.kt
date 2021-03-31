@@ -18,28 +18,9 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.utils
+package moe.tlaster.precompose.navigation.route
 
-import android.webkit.JavascriptInterface
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import moe.tlaster.precompose.navigation.NavController
-
-class TwitterWebJavascriptInterface(
-    val navController: NavController,
-) {
-    @JavascriptInterface
-    fun tryPinCode(content: String?) {
-        if (!content.isNullOrEmpty()) {
-            content.toIntOrNull()?.let {
-                GlobalScope.launch {
-                    withContext(Dispatchers.Main) {
-                        navController.goBackWith(content)
-                    }
-                }
-            }
-        }
-    }
+internal interface Route {
+    val route: String
+    val pathKeys: List<String>
 }

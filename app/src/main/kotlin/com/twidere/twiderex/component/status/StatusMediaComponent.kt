@@ -38,7 +38,6 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -144,17 +143,7 @@ fun StatusMediaComponent(
         }
 
         if (status.platformType == PlatformType.Mastodon && status.mastodonExtra != null) {
-            var sensitive by rememberSaveable(
-                status.statusKey.toString(),
-                saver = Saver(
-                    save = {
-                        it.value
-                    },
-                    restore = {
-                        mutableStateOf(it)
-                    },
-                )
-            ) {
+            var sensitive by rememberSaveable(status.statusKey.toString()) {
                 mutableStateOf(status.mastodonExtra.sensitive)
             }
             TwidereTheme(darkTheme = true) {

@@ -25,6 +25,7 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -41,22 +42,24 @@ import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import com.google.accompanist.insets.HorizontalSide
+import com.google.accompanist.insets.Insets
+import com.google.accompanist.insets.LocalWindowInsets
+import com.google.accompanist.insets.navigationBarsHeight
+import com.google.accompanist.insets.navigationBarsPadding
+import com.google.accompanist.insets.navigationBarsWidth
+import com.google.accompanist.insets.statusBarsHeight
 import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.preferences.LocalAppearancePreferences
 import com.twidere.twiderex.preferences.LocalDisplayPreferences
 import com.twidere.twiderex.preferences.proto.AppearancePreferences
-import dev.chrisbanes.accompanist.insets.HorizontalSide
-import dev.chrisbanes.accompanist.insets.Insets
-import dev.chrisbanes.accompanist.insets.LocalWindowInsets
-import dev.chrisbanes.accompanist.insets.navigationBarsHeight
-import dev.chrisbanes.accompanist.insets.navigationBarsPadding
-import dev.chrisbanes.accompanist.insets.navigationBarsWidth
-import dev.chrisbanes.accompanist.insets.statusBarsHeight
-import dev.chrisbanes.accompanist.insets.toPaddingValues
 
 @Composable
 fun TwidereTheme(
@@ -95,7 +98,26 @@ fun TwidereScene(
             )
             Box(
                 modifier = Modifier
-                    .padding(actual.toPaddingValues())
+                    .padding(
+                        actual.let {
+                            with(LocalDensity.current) {
+                                val layoutDirection = LocalLayoutDirection.current
+                                PaddingValues(
+                                    top = it.top.toDp(),
+                                    bottom = it.bottom.toDp(),
+                                    start = when (layoutDirection) {
+                                        LayoutDirection.Ltr -> it.left.toDp()
+                                        LayoutDirection.Rtl -> it.right.toDp()
+                                    },
+                                    end = when (layoutDirection) {
+                                        LayoutDirection.Ltr -> it.right.toDp()
+                                        LayoutDirection.Rtl -> it.left.toDp()
+                                    },
+
+                                )
+                            }
+                        }
+                    )
                     .align(Alignment.Center)
             ) {
                 content()

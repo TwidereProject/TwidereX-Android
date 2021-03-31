@@ -57,8 +57,8 @@ import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.lazy.itemDivider
 import com.twidere.twiderex.component.settings.radioItem
+import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.extensions.isDarkTheme
-import com.twidere.twiderex.extensions.navViewModel
 import com.twidere.twiderex.preferences.LocalAppearancePreferences
 import com.twidere.twiderex.preferences.proto.AppearancePreferences
 import com.twidere.twiderex.ui.TwidereScene
@@ -72,7 +72,9 @@ import com.twidere.twiderex.viewmodel.settings.AppearanceViewModel
 fun AppearanceScene() {
     var showPrimaryColorDialog by remember { mutableStateOf(false) }
     val appearance = LocalAppearancePreferences.current
-    val viewModel = navViewModel<AppearanceViewModel>()
+    val viewModel = assistedViewModel<AppearanceViewModel.AssistedFactory, AppearanceViewModel> {
+        it.create()
+    }
     TwidereScene {
         InAppNotificationScaffold(
             topBar = {

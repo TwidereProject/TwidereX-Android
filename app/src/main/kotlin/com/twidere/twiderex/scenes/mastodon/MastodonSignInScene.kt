@@ -47,15 +47,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.navigation.NavController
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.SignInButton
 import com.twidere.twiderex.component.foundation.SignInScaffold
 import com.twidere.twiderex.component.navigation.INavigator
 import com.twidere.twiderex.component.navigation.LocalNavigator
-import com.twidere.twiderex.extensions.navViewModel
-import com.twidere.twiderex.extensions.navigateForResult
-import com.twidere.twiderex.extensions.setResult
+import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.standardPadding
 import com.twidere.twiderex.viewmodel.mastodon.MastodonSignInViewModel
@@ -63,11 +60,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import moe.tlaster.precompose.navigation.NavController
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun MastodonSignInScene() {
-    val viewModel = navViewModel<MastodonSignInViewModel>()
+    val viewModel = assistedViewModel<MastodonSignInViewModel.AssistedFactory, MastodonSignInViewModel> {
+        it.create()
+    }
     val host by viewModel.host.observeAsState(initial = TextFieldValue())
     val loading by viewModel.loading.observeAsState(initial = false)
     val navController = LocalNavController.current
@@ -145,13 +145,10 @@ private fun signin(
             viewModel.beginOAuth(
                 host.text,
             ) { target ->
-                navController.navigateForResult("code") {
-                    navigator.mastodonSignInWeb(target)
-                }
+                navigator.mastodonSignInWeb(target)
             }.let { success ->
                 if (success) {
-                    navController.setResult("success", success)
-                    navController.popBackStack()
+                    navController.goBackWith(success)
                 }
             }
         }

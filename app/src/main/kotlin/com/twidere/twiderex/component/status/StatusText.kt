@@ -38,7 +38,6 @@ import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -56,16 +55,7 @@ fun ColumnScope.StatusText(
     val expandable = status.platformType == PlatformType.Mastodon &&
         status.mastodonExtra?.spoilerText != null
 
-    var expanded by rememberSaveable(
-        saver = Saver(
-            save = {
-                it.value
-            },
-            restore = {
-                mutableStateOf(it)
-            },
-        )
-    ) { mutableStateOf(!expandable) }
+    var expanded by rememberSaveable { mutableStateOf(!expandable) }
 
     if (expandable && status.mastodonExtra?.spoilerText != null) {
         Text(text = status.mastodonExtra.spoilerText)

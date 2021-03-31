@@ -61,7 +61,6 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -77,8 +76,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
-import androidx.navigation.NavController
-import androidx.navigation.compose.navigate
+import com.google.accompanist.insets.statusBarsHeight
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.IconTabsComponent
 import com.twidere.twiderex.component.foundation.NetworkImage
@@ -116,8 +114,8 @@ import com.twidere.twiderex.viewmodel.user.UserFavouriteTimelineViewModel
 import com.twidere.twiderex.viewmodel.user.UserMediaTimelineViewModel
 import com.twidere.twiderex.viewmodel.user.UserTimelineViewModel
 import com.twidere.twiderex.viewmodel.user.UserViewModel
-import dev.chrisbanes.accompanist.insets.statusBarsHeight
 import kotlinx.coroutines.launch
+import moe.tlaster.precompose.navigation.NavController
 
 @Composable
 fun UserComponent(
@@ -228,16 +226,7 @@ fun UserStatusTimeline(
 ) {
     val user by viewModel.user.observeAsState(initial = null)
     val account = LocalActiveAccount.current ?: return
-    var excludeReplies by rememberSaveable(
-        saver = Saver(
-            save = {
-                it.value
-            },
-            restore = {
-                mutableStateOf(it)
-            },
-        )
-    ) { mutableStateOf(false) }
+    var excludeReplies by rememberSaveable { mutableStateOf(false) }
     val timelineViewModel =
         assistedViewModel<UserTimelineViewModel.AssistedFactory, UserTimelineViewModel>(
             account,

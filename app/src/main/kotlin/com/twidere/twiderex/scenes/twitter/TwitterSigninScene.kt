@@ -27,8 +27,6 @@ import androidx.compose.runtime.livedata.observeAsState
 import com.twidere.twiderex.component.foundation.SignInScaffold
 import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.di.assisted.assistedViewModel
-import com.twidere.twiderex.extensions.navigateForResult
-import com.twidere.twiderex.extensions.setResult
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.viewmodel.twitter.TwitterSignInViewModel
 
@@ -45,15 +43,10 @@ fun TwitterSignInScene(
                 consumerKey,
                 consumerSecret,
                 { target ->
-                    navController.navigateForResult(
-                        "pin_code",
-                    ) {
-                        navigator.twitterSignInWeb(target)
-                    }
+                    navigator.twitterSignInWeb(target)
                 },
                 { success ->
-                    navController.setResult("success", success)
-                    navController.popBackStack()
+                    navController.goBackWith(success)
                 }
             )
         }

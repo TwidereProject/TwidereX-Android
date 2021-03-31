@@ -18,30 +18,15 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.component
+package moe.tlaster.precompose.navigation.route
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import com.twidere.twiderex.navigation.Route
-import com.twidere.twiderex.ui.LocalActiveAccount
-import com.twidere.twiderex.ui.LocalActivity
-import com.twidere.twiderex.ui.LocalNavController
+import moe.tlaster.precompose.navigation.BackStackEntry
+import moe.tlaster.precompose.navigation.transition.NavTransition
 
-@Composable
-fun RequireAuthorization(
-    content: @Composable () -> Unit,
-) {
-    val account = LocalActiveAccount.current
-    if (account == null) {
-        val navController = LocalNavController.current
-        val activity = LocalActivity.current
-        LaunchedEffect(Unit) {
-            val result = navController.navigateForResult(Route.SignIn.Default)
-            if (result == null) {
-                activity.finish()
-            }
-        }
-    } else {
-        content.invoke()
-    }
-}
+internal class SceneRoute(
+    route: String,
+    val navTransition: NavTransition?,
+    val deepLinks: List<String>,
+    content: @Composable (BackStackEntry) -> Unit,
+) : ComposeRoute(route, content)

@@ -47,8 +47,6 @@ import com.twidere.twiderex.component.lazy.LazyColumn2
 import com.twidere.twiderex.component.lazy.collectAsLazyPagingItems
 import com.twidere.twiderex.component.lazy.items
 import com.twidere.twiderex.component.lazy.loadState
-import com.twidere.twiderex.extensions.DisposeResult
-import com.twidere.twiderex.extensions.setResult
 import com.twidere.twiderex.extensions.viewModel
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalNavController
@@ -68,7 +66,6 @@ fun ComposeSearchHashtagScene() {
     val sourceState by viewModel.sourceFlow.collectAsState(initial = null)
     val source = sourceState?.collectAsLazyPagingItems()
     TwidereScene {
-        navController.DisposeResult(key = "hashtag")
         InAppNotificationScaffold(
             topBar = {
                 AppBar(
@@ -84,8 +81,7 @@ fun ComposeSearchHashtagScene() {
                                     Text(text = stringResource(id = R.string.scene_compose_hashtag_search_search_placeholder))
                                 },
                                 onImeActionPerformed = { _, _ ->
-                                    navController.setResult("hashtag", "#$text")
-                                    navController.popBackStack()
+                                    navController.goBackWith("#$text")
                                 },
                                 autoFocus = true,
                                 imeAction = ImeAction.Done,
@@ -99,8 +95,7 @@ fun ComposeSearchHashtagScene() {
                     actions = {
                         IconButton(
                             onClick = {
-                                navController.setResult("hashtag", "#$text")
-                                navController.popBackStack()
+                                navController.goBackWith("#$text")
                             }
                         ) {
                             Icon(
@@ -122,8 +117,7 @@ fun ComposeSearchHashtagScene() {
                             ListItem(
                                 modifier = Modifier
                                     .clickable {
-                                        navController.setResult("hashtag", "#$name")
-                                        navController.popBackStack()
+                                        navController.goBackWith("#$name")
                                     }
                             ) {
                                 Text(text = name)

@@ -40,12 +40,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.navigation.compose.navigate
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
-import com.twidere.twiderex.extensions.navViewModel
+import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
@@ -54,7 +53,9 @@ import com.twidere.twiderex.viewmodel.DraftViewModel
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun DraftListScene() {
-    val viewModel = navViewModel<DraftViewModel>()
+    val viewModel = assistedViewModel<DraftViewModel.AssistedFactory, DraftViewModel> {
+        it.create()
+    }
     val source by viewModel.source.observeAsState(initial = emptyList())
     val navController = LocalNavController.current
     TwidereScene {

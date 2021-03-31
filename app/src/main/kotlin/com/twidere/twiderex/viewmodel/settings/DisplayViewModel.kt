@@ -24,14 +24,18 @@ import androidx.datastore.core.DataStore
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.twidere.twiderex.preferences.proto.DisplayPreferences
-import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class DisplayViewModel @Inject constructor(
+class DisplayViewModel @AssistedInject constructor(
     private val displayPreferences: DataStore<DisplayPreferences>
 ) : ViewModel() {
+
+    @dagger.assisted.AssistedFactory
+    interface AssistedFactory {
+        fun create(): DisplayViewModel
+    }
+
     fun setUseSystemFontSize(value: Boolean) = viewModelScope.launch {
         displayPreferences.updateData {
             it.toBuilder().setUseSystemFontSize(value).build()

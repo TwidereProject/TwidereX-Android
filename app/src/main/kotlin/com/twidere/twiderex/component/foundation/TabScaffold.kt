@@ -124,12 +124,12 @@ private class TabScaffoldState(
     }
 
     override suspend fun onPreFling(available: Velocity): Velocity {
-        return if (offset == 0f || offset.isInRange(maxOffset, 0f)) {
+        return takeIf {
+            (offset == 0f || offset.isInRange(maxOffset, 0f)) && available.y != 0f
+        }?.let {
             fling(-available.y * 2f)
             available
-        } else {
-            Velocity.Zero
-        }
+        } ?: Velocity.Zero
     }
 
     override suspend fun onPostFling(
@@ -137,7 +137,7 @@ private class TabScaffoldState(
         available: Velocity,
     ): Velocity {
         available.y.takeIf { it != 0f }?.let { velocity ->
-            fling(velocity)
+            fling(-velocity)
         }
         return available
     }

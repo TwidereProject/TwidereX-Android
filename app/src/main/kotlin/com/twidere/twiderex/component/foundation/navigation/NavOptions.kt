@@ -18,28 +18,21 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.utils
+package moe.tlaster.precompose.navigation
 
-import android.webkit.JavascriptInterface
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import moe.tlaster.precompose.navigation.NavController
-
-class TwitterWebJavascriptInterface(
-    val navController: NavController,
-) {
-    @JavascriptInterface
-    fun tryPinCode(content: String?) {
-        if (!content.isNullOrEmpty()) {
-            content.toIntOrNull()?.let {
-                GlobalScope.launch {
-                    withContext(Dispatchers.Main) {
-                        navController.goBackWith(content)
-                    }
-                }
-            }
-        }
-    }
-}
+/**
+ * [NavOptions] stores special options for navigate actions
+ */
+data class NavOptions(
+    /**
+     * Whether this navigation action should launch as single-top (i.e., there will be at most
+     * one copy of a given destination on the top of the back stack).
+     */
+    val launchSingleTop: Boolean = false,
+    /**
+     * The destination to pop up to before navigating. When set, all non-matching destinations
+     * should be popped from the back stack.
+     * @see [PopUpTo]
+     */
+    val popUpTo: PopUpTo? = null,
+)
