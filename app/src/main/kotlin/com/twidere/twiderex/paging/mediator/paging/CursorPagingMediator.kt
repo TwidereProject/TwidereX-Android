@@ -25,9 +25,10 @@ import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.db.model.DbPagingTimelineWithStatus
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.notification.InAppNotification
+import com.twidere.twiderex.paging.ArrayListCompat
 import com.twidere.twiderex.paging.CursorPagination
 
-class CursorPagingResult<T>(data: List<T>, val cursor: String? = null) : ArrayList<T>(data)
+class CursorPagingResult<T>(data: List<T>, val cursor: String? = null) : ArrayListCompat<T>(data)
 
 abstract class CursorPagingMediator(
     accountKey: MicroBlogKey,
