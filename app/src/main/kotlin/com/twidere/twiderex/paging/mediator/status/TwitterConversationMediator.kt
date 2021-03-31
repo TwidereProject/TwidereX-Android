@@ -95,6 +95,9 @@ class TwitterConversationMediator(
         pageSize: Int,
         paging: CursorWithCustomOrderPagination?
     ): List<IStatus> {
+        if (paging != null && paging.cursor == null) {
+            return emptyList()
+        }
         val ancestors = if (paging == null) {
             val tweet = service.lookupStatus(statusKey.id)
             _targetTweet =

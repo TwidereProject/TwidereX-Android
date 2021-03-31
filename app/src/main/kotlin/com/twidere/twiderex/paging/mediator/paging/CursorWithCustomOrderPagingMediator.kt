@@ -55,10 +55,13 @@ abstract class CursorWithCustomOrderPagingMediator(
         return if (raw is CursorWithCustomOrderPagingResult<*>) {
             CursorWithCustomOrderPagination(
                 cursor = raw.cursor,
-                nextOrder = raw.nextOrder + result.size
+                nextOrder = raw.nextOrder - result.size
             )
         } else {
-            CursorWithCustomOrderPagination(cursor = null, nextOrder = 0)
+            CursorWithCustomOrderPagination(
+                cursor = result.lastOrNull()?.status?.status?.data?.statusId,
+                nextOrder = (result.lastOrNull()?.timeline?.sortId ?: 0) - result.size
+            )
         }
     }
 
@@ -75,7 +78,7 @@ abstract class CursorWithCustomOrderPagingMediator(
         return data.mapIndexed { index, dbPagingTimelineWithStatus ->
             dbPagingTimelineWithStatus.copy(
                 timeline = dbPagingTimelineWithStatus.timeline.copy(
-                    sortId = -(lastId + index)
+                    sortId = lastId - index
                 )
             )
         }

@@ -20,14 +20,22 @@
  */
 package com.twidere.twiderex.scenes
 
+import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.AppBar
@@ -46,6 +54,9 @@ import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.mastodon.MastodonStatusViewModel
 import com.twidere.twiderex.viewmodel.twitter.TwitterStatusViewModel
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterNot
 
 @Composable
 fun StatusScene(
@@ -72,6 +83,19 @@ fun StatusScene(
     }
     val source = viewModel.source.collectAsLazyPagingItems()
     val status by viewModel.status.observeAsState(initial = null)
+    val state = rememberLazyListState()
+    val distance = with(LocalDensity.current) {
+        -50.dp.toPx()
+    }
+    LaunchedEffect(source.loadState) {
+        snapshotFlow { source.loadState.refresh }
+            .filter { it is LoadState.NotLoading }
+            .filterNot { source.snapshot().indexOf(status) == -1 }
+            .collect {
+                state.scrollToItem(source.snapshot().indexOf(status))
+                state.animateScrollBy(distance)
+            }
+    }
 
     TwidereScene {
         InAppNotificationScaffold(
@@ -87,16 +111,19 @@ fun StatusScene(
             }
         ) {
             LazyColumn2(
+                state = state,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                if (source.loadState.refresh == LoadState.Loading) {
+                if (source.loadState.refresh is LoadState.Loading || source.loadState.refresh is LoadState.Error) {
                     status?.let {
                         item(key = it.hashCode()) {
                             ExpandedStatusComponent(data = it)
                         }
                     }
-                    item {
-                        CircularProgressIndicator()
+                    if (source.loadState.refresh is LoadState.Loading) {
+                        item {
+                            CircularProgressIndicator()
+                        }
                     }
                 } else {
                     statusesIndexed(source) { index, it ->
@@ -109,6 +136,8 @@ fun StatusScene(
                                 }
                                 if (index != source.itemCount - 1) {
                                     StatusDivider()
+                                } else {
+                                    Spacer(modifier = Modifier.fillParentMaxHeight())
                                 }
                             }
                         }
