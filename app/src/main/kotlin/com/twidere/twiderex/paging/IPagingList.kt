@@ -38,4 +38,14 @@ data class CursorPagination(
 class PagingList<T, P : IPagination>(
     data: List<T>,
     override val nextPage: P? = null,
-) : ArrayList<T>(data), IPagingList<T, P>
+) : ArrayListCompat<T>(data), IPagingList<T, P>
+
+// FIXME: 2021/3/31 workaround for java.lang.NoSuchMethodError: No virtual method getSize()I
+open class ArrayListCompat<T>(
+    private val data: List<T>
+) : AbstractList<T>() {
+    override val size: Int
+        get() = data.size
+
+    override fun get(index: Int): T = data[index]
+}

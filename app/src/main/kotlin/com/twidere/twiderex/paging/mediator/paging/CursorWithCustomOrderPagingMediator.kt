@@ -26,13 +26,14 @@ import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.db.model.DbPagingTimelineWithStatus
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.notification.InAppNotification
+import com.twidere.twiderex.paging.ArrayListCompat
 import com.twidere.twiderex.paging.IPagination
 
 class CursorWithCustomOrderPagingResult<T>(
     data: List<T>,
     val cursor: String? = null,
     val nextOrder: Long = 0,
-) : ArrayList<T>(data)
+) : ArrayListCompat<T>(data)
 
 data class CursorWithCustomOrderPagination(
     val cursor: String?,
