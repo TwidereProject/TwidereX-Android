@@ -28,7 +28,6 @@ import com.twidere.twiderex.db.model.DbMastodonStatusExtra
 import com.twidere.twiderex.db.model.DbPagingTimelineWithStatus
 import com.twidere.twiderex.db.model.DbStatusWithMediaAndUser
 import com.twidere.twiderex.db.model.DbStatusWithReference
-import com.twidere.twiderex.db.model.DbTimelineWithStatus
 import com.twidere.twiderex.db.model.ReferenceType
 import com.twidere.twiderex.model.MastodonStatusType
 import com.twidere.twiderex.model.MicroBlogKey
@@ -125,38 +124,6 @@ data class UiStatus(
             rawText = "",
             platformType = PlatformType.Twitter,
         )
-
-        fun DbTimelineWithStatus.toUi(
-            accountKey: MicroBlogKey,
-        ) = with(status.status) {
-            val reaction = reactions.firstOrNull { it.accountKey == accountKey }
-            UiStatus(
-                statusId = data.statusId,
-                htmlText = data.htmlText,
-                timestamp = data.timestamp,
-                retweetCount = data.retweetCount,
-                likeCount = data.likeCount,
-                replyCount = data.replyCount,
-                retweeted = reaction?.retweeted ?: false,
-                liked = reaction?.liked ?: false,
-                placeString = data.placeString,
-                hasMedia = data.hasMedia,
-                user = user.toUi(),
-                media = media.toUi(),
-                isGap = timeline.isGap,
-                source = data.source,
-                url = url.toUi(),
-                statusKey = data.statusKey,
-                rawText = data.rawText,
-                platformType = data.platformType,
-                mastodonExtra = data.mastodonExtra,
-                referenceStatus = status.references.map {
-                    it.reference.referenceType to it.status.toUi(
-                        accountKey = accountKey
-                    )
-                }.toMap()
-            )
-        }
 
         fun DbStatusWithMediaAndUser.toUi(
             accountKey: MicroBlogKey,

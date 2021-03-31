@@ -25,8 +25,7 @@ import androidx.lifecycle.map
 import com.twidere.services.microblog.LookupService
 import com.twidere.services.microblog.model.IStatus
 import com.twidere.twiderex.db.CacheDatabase
-import com.twidere.twiderex.db.mapper.toDbTimeline
-import com.twidere.twiderex.db.model.TimelineType
+import com.twidere.twiderex.db.mapper.toDbStatusWithReference
 import com.twidere.twiderex.db.model.saveToDb
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiStatus
@@ -58,7 +57,7 @@ class TwitterTweetsRepository @AssistedInject constructor(
     }
 
     private suspend fun toUiStatus(status: IStatus): UiStatus {
-        val db = status.toDbTimeline(accountKey, TimelineType.Conversation)
+        val db = status.toDbStatusWithReference(accountKey)
         listOf(db).saveToDb(database)
         return db.toUi(accountKey)
     }

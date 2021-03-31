@@ -29,7 +29,6 @@ import com.twidere.twiderex.db.dao.ReactionDao
 import com.twidere.twiderex.db.dao.SearchDao
 import com.twidere.twiderex.db.dao.StatusDao
 import com.twidere.twiderex.db.dao.StatusReferenceDao
-import com.twidere.twiderex.db.dao.TimelineDao
 import com.twidere.twiderex.db.dao.UrlEntityDao
 import com.twidere.twiderex.db.dao.UserDao
 import com.twidere.twiderex.db.model.DbMedia
@@ -38,7 +37,6 @@ import com.twidere.twiderex.db.model.DbSearch
 import com.twidere.twiderex.db.model.DbStatusReaction
 import com.twidere.twiderex.db.model.DbStatusReference
 import com.twidere.twiderex.db.model.DbStatusV2
-import com.twidere.twiderex.db.model.DbTimeline
 import com.twidere.twiderex.db.model.DbUrlEntity
 import com.twidere.twiderex.db.model.DbUser
 import com.twidere.twiderex.db.model.converter.ExtraConverter
@@ -47,7 +45,6 @@ import com.twidere.twiderex.db.model.converter.MicroBlogKeyConverter
 import com.twidere.twiderex.db.model.converter.NotificationTypeConverter
 import com.twidere.twiderex.db.model.converter.PlatformTypeConverter
 import com.twidere.twiderex.db.model.converter.StringListConverter
-import com.twidere.twiderex.db.model.converter.TimelineTypeConverter
 import com.twidere.twiderex.db.model.converter.UserTimelineTypeConverter
 import javax.inject.Singleton
 
@@ -55,7 +52,6 @@ import javax.inject.Singleton
 @Database(
     entities = [
         DbStatusV2::class,
-        DbTimeline::class,
         DbMedia::class,
         DbUser::class,
         DbStatusReaction::class,
@@ -64,13 +60,12 @@ import javax.inject.Singleton
         DbSearch::class,
         DbStatusReference::class,
     ],
-    version = 8,
+    version = 9,
 )
 @TypeConverters(
     MicroBlogKeyConverter::class,
     PlatformTypeConverter::class,
     MediaTypeConverter::class,
-    TimelineTypeConverter::class,
     UserTimelineTypeConverter::class,
     StringListConverter::class,
     NotificationTypeConverter::class,
@@ -78,7 +73,6 @@ import javax.inject.Singleton
 )
 abstract class CacheDatabase : RoomDatabase() {
     abstract fun statusDao(): StatusDao
-    abstract fun timelineDao(): TimelineDao
     abstract fun mediaDao(): MediaDao
     abstract fun userDao(): UserDao
     abstract fun reactionDao(): ReactionDao

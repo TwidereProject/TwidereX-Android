@@ -27,7 +27,6 @@ import androidx.room.PrimaryKey
 import androidx.room.Relation
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.model.MicroBlogKey
-import java.util.UUID
 
 @Entity(
     tableName = "paging_timeline",
@@ -47,29 +46,7 @@ data class DbPagingTimeline(
     val timestamp: Long,
     val sortId: Long,
     var isGap: Boolean,
-) {
-    companion object {
-        fun DbTimelineWithStatus.toPagingDbTimeline(
-            pagingKey: String,
-            sortId: Long? = null,
-        ): DbPagingTimelineWithStatus {
-            return DbPagingTimelineWithStatus(
-                timeline = with(timeline) {
-                    DbPagingTimeline(
-                        _id = UUID.randomUUID().toString(),
-                        accountKey = accountKey,
-                        pagingKey = pagingKey,
-                        timestamp = timestamp,
-                        statusKey = statusKey,
-                        sortId = sortId ?: timestamp,
-                        isGap = isGap,
-                    )
-                },
-                status = status,
-            )
-        }
-    }
-}
+)
 
 data class DbPagingTimelineWithStatus(
     @Embedded

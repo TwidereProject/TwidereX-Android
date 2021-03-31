@@ -27,18 +27,17 @@ import com.twidere.services.twitter.model.StatusV2
 import com.twidere.services.twitter.model.User
 import com.twidere.services.twitter.model.UserV2
 import com.twidere.twiderex.db.model.DbMedia
+import com.twidere.twiderex.db.model.DbPagingTimeline
+import com.twidere.twiderex.db.model.DbPagingTimelineWithStatus
 import com.twidere.twiderex.db.model.DbStatusReaction
 import com.twidere.twiderex.db.model.DbStatusV2
 import com.twidere.twiderex.db.model.DbStatusWithMediaAndUser
 import com.twidere.twiderex.db.model.DbStatusWithReference
-import com.twidere.twiderex.db.model.DbTimeline
-import com.twidere.twiderex.db.model.DbTimelineWithStatus
 import com.twidere.twiderex.db.model.DbTwitterStatusExtra
 import com.twidere.twiderex.db.model.DbTwitterUserExtra
 import com.twidere.twiderex.db.model.DbUrlEntity
 import com.twidere.twiderex.db.model.DbUser
 import com.twidere.twiderex.db.model.ReferenceType
-import com.twidere.twiderex.db.model.TimelineType
 import com.twidere.twiderex.db.model.TwitterUrlEntity
 import com.twidere.twiderex.db.model.toDbStatusReference
 import com.twidere.twiderex.model.MediaType
@@ -57,10 +56,28 @@ private val autolink by lazy {
     }
 }
 
-fun StatusV2.toDbTimeline(
+fun StatusV2.toDbPagingTimeline(
     accountKey: MicroBlogKey,
-    timelineType: TimelineType,
-): DbTimelineWithStatus {
+    pagingKey: String,
+): DbPagingTimelineWithStatus {
+    val status = toDbStatusWithReference(accountKey = accountKey)
+    return DbPagingTimelineWithStatus(
+        timeline = DbPagingTimeline(
+            _id = UUID.randomUUID().toString(),
+            accountKey = accountKey,
+            timestamp = status.status.data.timestamp,
+            isGap = false,
+            statusKey = status.status.data.statusKey,
+            pagingKey = pagingKey,
+            sortId = status.status.data.timestamp
+        ),
+        status = status,
+    )
+}
+
+fun StatusV2.toDbStatusWithReference(
+    accountKey: MicroBlogKey,
+): DbStatusWithReference {
     val status = this.toDbStatusWithMediaAndUser(accountKey)
     val retweet = this.referencedTweets
         ?.firstOrNull { it.type == ReferencedTweetType.retweeted }?.status?.toDbStatusWithMediaAndUser(
@@ -81,50 +98,49 @@ fun StatusV2.toDbTimeline(
             accountKey
         )
 
-    return DbTimelineWithStatus(
-        timeline = DbTimeline(
-            _id = UUID.randomUUID().toString(),
-            accountKey = accountKey,
-            timestamp = status.data.timestamp,
-            isGap = false,
-            statusKey = status.data.statusKey,
-            type = timelineType,
-        ),
-        status = DbStatusWithReference(
-            status = status,
-            references = listOfNotNull(
-                replyTo.toDbStatusReference(status.data.statusKey, ReferenceType.Reply),
-                quote.toDbStatusReference(status.data.statusKey, ReferenceType.Quote),
-                retweet.toDbStatusReference(status.data.statusKey, ReferenceType.Retweet),
-            ),
+    return DbStatusWithReference(
+        status = status,
+        references = listOfNotNull(
+            replyTo.toDbStatusReference(status.data.statusKey, ReferenceType.Reply),
+            quote.toDbStatusReference(status.data.statusKey, ReferenceType.Quote),
+            retweet.toDbStatusReference(status.data.statusKey, ReferenceType.Retweet),
         ),
     )
 }
 
-fun Status.toDbTimeline(
+fun Status.toDbPagingTimeline(
     accountKey: MicroBlogKey,
-    timelineType: TimelineType,
-): DbTimelineWithStatus {
+    pagingKey: String,
+): DbPagingTimelineWithStatus {
+    val status = toDbStatusWithReference(accountKey = accountKey)
+
+    return DbPagingTimelineWithStatus(
+        timeline = DbPagingTimeline(
+            _id = UUID.randomUUID().toString(),
+            accountKey = accountKey,
+            timestamp = status.status.data.timestamp,
+            isGap = false,
+            statusKey = status.status.data.statusKey,
+            pagingKey = pagingKey,
+            sortId = status.status.data.timestamp
+        ),
+        status = status,
+    )
+}
+
+fun Status.toDbStatusWithReference(
+    accountKey: MicroBlogKey,
+): DbStatusWithReference {
     val status = this.toDbStatusWithMediaAndUser(accountKey)
     val retweet = retweetedStatus?.toDbStatusWithMediaAndUser(accountKey)
     val quote =
         (retweetedStatus?.quotedStatus ?: quotedStatus)?.toDbStatusWithMediaAndUser(accountKey)
 
-    return DbTimelineWithStatus(
-        timeline = DbTimeline(
-            _id = UUID.randomUUID().toString(),
-            accountKey = accountKey,
-            timestamp = status.data.timestamp,
-            isGap = false,
-            statusKey = status.data.statusKey,
-            type = timelineType,
-        ),
-        status = DbStatusWithReference(
-            status = status,
-            references = listOfNotNull(
-                quote.toDbStatusReference(status.data.statusKey, ReferenceType.Quote),
-                retweet.toDbStatusReference(status.data.statusKey, ReferenceType.Retweet),
-            ),
+    return DbStatusWithReference(
+        status = status,
+        references = listOfNotNull(
+            quote.toDbStatusReference(status.data.statusKey, ReferenceType.Quote),
+            retweet.toDbStatusReference(status.data.statusKey, ReferenceType.Retweet),
         ),
     )
 }

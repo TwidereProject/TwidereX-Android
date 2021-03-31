@@ -30,15 +30,14 @@ import com.twidere.services.mastodon.model.Visibility
 import com.twidere.twiderex.db.model.DbMastodonStatusExtra
 import com.twidere.twiderex.db.model.DbMastodonUserExtra
 import com.twidere.twiderex.db.model.DbMedia
+import com.twidere.twiderex.db.model.DbPagingTimeline
+import com.twidere.twiderex.db.model.DbPagingTimelineWithStatus
 import com.twidere.twiderex.db.model.DbStatusReaction
 import com.twidere.twiderex.db.model.DbStatusV2
 import com.twidere.twiderex.db.model.DbStatusWithMediaAndUser
 import com.twidere.twiderex.db.model.DbStatusWithReference
-import com.twidere.twiderex.db.model.DbTimeline
-import com.twidere.twiderex.db.model.DbTimelineWithStatus
 import com.twidere.twiderex.db.model.DbUser
 import com.twidere.twiderex.db.model.ReferenceType
-import com.twidere.twiderex.db.model.TimelineType
 import com.twidere.twiderex.db.model.toDbStatusReference
 import com.twidere.twiderex.model.MastodonStatusType
 import com.twidere.twiderex.model.MediaType
@@ -51,10 +50,28 @@ import org.jsoup.nodes.Node
 import java.util.UUID
 import java.util.regex.Pattern
 
-fun Notification.toDbTimeline(
+fun Notification.toDbPagingTimeline(
     accountKey: MicroBlogKey,
-    timelineType: TimelineType,
-): DbTimelineWithStatus {
+    pagingKey: String,
+): DbPagingTimelineWithStatus {
+    val status = this.toDbStatusWithReference(accountKey = accountKey)
+    return DbPagingTimelineWithStatus(
+        timeline = DbPagingTimeline(
+            _id = UUID.randomUUID().toString(),
+            accountKey = accountKey,
+            timestamp = createdAt?.time ?: 0,
+            isGap = false,
+            statusKey = status.status.data.statusKey,
+            pagingKey = pagingKey,
+            sortId = status.status.data.timestamp
+        ),
+        status = status,
+    )
+}
+
+fun Notification.toDbStatusWithReference(
+    accountKey: MicroBlogKey,
+): DbStatusWithReference {
     val user = this.account?.toDbUser(accountKey = accountKey)
         ?: throw IllegalArgumentException("mastodon Notification.user should not be null")
     val relatedStatus = this.status?.toDbStatusWithMediaAndUser(accountKey = accountKey)
@@ -90,28 +107,18 @@ fun Notification.toDbTimeline(
             mentions = null,
         )
     )
-    return DbTimelineWithStatus(
-        timeline = DbTimeline(
-            _id = UUID.randomUUID().toString(),
-            accountKey = accountKey,
-            timestamp = createdAt?.time ?: 0,
-            isGap = false,
-            statusKey = status.statusKey,
-            type = timelineType,
+    return DbStatusWithReference(
+        status = DbStatusWithMediaAndUser(
+            data = status,
+            media = emptyList(),
+            user = user,
+            reactions = emptyList(),
+            url = emptyList(),
         ),
-        status = DbStatusWithReference(
-            status = DbStatusWithMediaAndUser(
-                data = status,
-                media = emptyList(),
-                user = user,
-                reactions = emptyList(),
-                url = emptyList(),
-            ),
-            references = listOfNotNull(
-                relatedStatus.toDbStatusReference(
-                    status.statusKey,
-                    ReferenceType.MastodonNotification
-                ),
+        references = listOfNotNull(
+            relatedStatus.toDbStatusReference(
+                status.statusKey,
+                ReferenceType.MastodonNotification
             ),
         ),
     )
@@ -130,29 +137,38 @@ private fun NotificationTypes?.toDbType(): MastodonStatusType {
     }
 }
 
-fun Status.toDbTimeline(
+fun Status.toDbPagingTimeline(
     accountKey: MicroBlogKey,
-    timelineType: TimelineType,
-): DbTimelineWithStatus {
+    pagingKey: String,
+): DbPagingTimelineWithStatus {
+    val status = this.toDbStatusWithReference(accountKey = accountKey)
+
+    return DbPagingTimelineWithStatus(
+        timeline = DbPagingTimeline(
+            _id = UUID.randomUUID().toString(),
+            accountKey = accountKey,
+            timestamp = status.status.data.timestamp,
+            isGap = false,
+            statusKey = status.status.data.statusKey,
+            pagingKey = pagingKey,
+            sortId = status.status.data.timestamp
+        ),
+        status = status,
+    )
+}
+
+fun Status.toDbStatusWithReference(
+    accountKey: MicroBlogKey,
+): DbStatusWithReference {
     val status = this.toDbStatusWithMediaAndUser(accountKey)
     val retweet = this.reblog?.toDbStatusWithMediaAndUser(
         accountKey
     )
 
-    return DbTimelineWithStatus(
-        timeline = DbTimeline(
-            _id = UUID.randomUUID().toString(),
-            accountKey = accountKey,
-            timestamp = status.data.timestamp,
-            isGap = false,
-            statusKey = status.data.statusKey,
-            type = timelineType,
-        ),
-        status = DbStatusWithReference(
-            status = status,
-            references = listOfNotNull(
-                retweet.toDbStatusReference(status.data.statusKey, ReferenceType.Retweet),
-            ),
+    return DbStatusWithReference(
+        status = status,
+        references = listOfNotNull(
+            retweet.toDbStatusReference(status.data.statusKey, ReferenceType.Retweet),
         ),
     )
 }

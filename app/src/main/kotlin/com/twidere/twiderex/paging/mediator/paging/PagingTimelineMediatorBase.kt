@@ -27,10 +27,8 @@ import androidx.room.withTransaction
 import com.twidere.services.http.MicroBlogException
 import com.twidere.services.microblog.model.IStatus
 import com.twidere.twiderex.db.CacheDatabase
-import com.twidere.twiderex.db.mapper.toDbTimeline
-import com.twidere.twiderex.db.model.DbPagingTimeline.Companion.toPagingDbTimeline
+import com.twidere.twiderex.db.mapper.toDbPagingTimeline
 import com.twidere.twiderex.db.model.DbPagingTimelineWithStatus
-import com.twidere.twiderex.db.model.TimelineType
 import com.twidere.twiderex.db.model.saveToDb
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.notification.InAppNotification
@@ -67,8 +65,7 @@ abstract class PagingTimelineMediatorBase<T : IPagination>(
             val last = state.lastItemOrNull()
             val result = load(pageSize, key).let { list ->
                 list.map { status ->
-                    status.toDbTimeline(accountKey, TimelineType.Custom)
-                        .toPagingDbTimeline(pagingKey)
+                    status.toDbPagingTimeline(accountKey, pagingKey)
                 }.filter {
                     last?.status?.status?.data?.statusKey != it.status.status.data.statusKey
                 }.let {

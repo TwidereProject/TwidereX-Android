@@ -24,8 +24,7 @@ import android.content.Context
 import androidx.hilt.work.HiltWorker
 import androidx.work.WorkerParameters
 import com.twidere.services.microblog.StatusService
-import com.twidere.twiderex.db.mapper.toDbTimeline
-import com.twidere.twiderex.db.model.TimelineType
+import com.twidere.twiderex.db.mapper.toDbStatusWithReference
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.model.ui.UiStatus.Companion.toUi
@@ -49,7 +48,7 @@ class UnLikeWorker @AssistedInject constructor(
         status: UiStatus
     ): StatusResult {
         val newStatus = service.unlike(status.statusId)
-            .toDbTimeline(accountKey = accountKey, timelineType = TimelineType.Custom)
+            .toDbStatusWithReference(accountKey = accountKey)
             .toUi(accountKey = accountKey)
         return StatusResult(
             statusKey = status.statusKey,

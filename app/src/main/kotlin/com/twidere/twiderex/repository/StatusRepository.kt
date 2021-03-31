@@ -61,13 +61,10 @@ class StatusRepository(
                 database.statusDao().findWithStatusKey(statusKey),
             ) + database.statusReferenceDao().find(statusKey, ReferenceType.Reply)
                 .map { it.status.data }
-            val timelineToRemove =
-                database.timelineDao().findAllWithStatusKey(statusToRemove.map { it.statusKey })
             val pagingTimelineToRemove =
                 database.pagingTimelineDao()
-                    .findAllWIthStatusKey(statusToRemove.map { it.statusKey })
+                    .findAllWithStatusKey(statusToRemove.map { it.statusKey })
             database.statusDao().delete(statusToRemove)
-            database.timelineDao().delete(timelineToRemove)
             database.pagingTimelineDao().delete(pagingTimelineToRemove)
             database.statusReferenceDao().remove(statusToRemove.map { it.statusKey })
         }
