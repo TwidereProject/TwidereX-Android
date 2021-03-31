@@ -88,13 +88,13 @@ fun StatusScene(
         -50.dp.toPx()
     }
     LaunchedEffect(Unit) {
-        snapshotFlow { source.loadState.refresh }
-            .filter { it is LoadState.NotLoading }
-            .filterNot { source.snapshot().indexOf(status) == -1 }
-            .filter { source.itemCount > 0 }
+        snapshotFlow { source.loadState.refresh to source.snapshot() }
+            .filter { it.first is LoadState.NotLoading }
+            .filter { it.second.any() }
+            .filterNot { it.second.indexOf(status) == -1 }
             .filter { state.firstVisibleItemScrollOffset == 0 && state.firstVisibleItemIndex == 0 }
             .collect {
-                state.scrollToItem(source.snapshot().indexOf(status))
+                state.scrollToItem(it.second.indexOf(status))
                 state.animateScrollBy(distance)
             }
     }
