@@ -87,10 +87,12 @@ fun StatusScene(
     val distance = with(LocalDensity.current) {
         -50.dp.toPx()
     }
-    LaunchedEffect(source.loadState) {
+    LaunchedEffect(Unit) {
         snapshotFlow { source.loadState.refresh }
             .filter { it is LoadState.NotLoading }
             .filterNot { source.snapshot().indexOf(status) == -1 }
+            .filter { source.itemCount > 0 }
+            .filter { state.firstVisibleItemScrollOffset == 0 && state.firstVisibleItemIndex == 0 }
             .collect {
                 state.scrollToItem(source.snapshot().indexOf(status))
                 state.animateScrollBy(distance)
@@ -110,34 +112,39 @@ fun StatusScene(
                 )
             }
         ) {
-            LazyColumn2(
-                state = state,
-                horizontalAlignment = Alignment.CenterHorizontally
+            if (
+                source.loadState.refresh is LoadState.NotLoading && source.itemCount > 0 ||
+                source.loadState.refresh is LoadState.Loading || source.loadState.refresh is LoadState.Error
             ) {
-                if (source.loadState.refresh is LoadState.Loading || source.loadState.refresh is LoadState.Error) {
-                    status?.let {
-                        item(key = it.hashCode()) {
-                            ExpandedStatusComponent(data = it)
+                LazyColumn2(
+                    state = state,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    if (source.loadState.refresh is LoadState.Loading || source.loadState.refresh is LoadState.Error) {
+                        status?.let {
+                            item(key = it.hashCode()) {
+                                ExpandedStatusComponent(data = it)
+                            }
                         }
-                    }
-                    if (source.loadState.refresh is LoadState.Loading) {
-                        item {
-                            CircularProgressIndicator()
+                        if (source.loadState.refresh is LoadState.Loading) {
+                            item {
+                                CircularProgressIndicator()
+                            }
                         }
-                    }
-                } else {
-                    statusesIndexed(source) { index, it ->
-                        it?.let { status ->
-                            Column {
-                                if (status.statusKey == statusKey) {
-                                    ExpandedStatusComponent(data = status)
-                                } else {
-                                    TimelineStatusComponent(data = status)
-                                }
-                                if (index != source.itemCount - 1) {
-                                    StatusDivider()
-                                } else {
-                                    Spacer(modifier = Modifier.fillParentMaxHeight())
+                    } else {
+                        statusesIndexed(source) { index, it ->
+                            it?.let { status ->
+                                Column {
+                                    if (status.statusKey == statusKey) {
+                                        ExpandedStatusComponent(data = status)
+                                    } else {
+                                        TimelineStatusComponent(data = status)
+                                    }
+                                    if (index != source.itemCount - 1) {
+                                        StatusDivider()
+                                    } else {
+                                        Spacer(modifier = Modifier.fillParentMaxHeight())
+                                    }
                                 }
                             }
                         }
