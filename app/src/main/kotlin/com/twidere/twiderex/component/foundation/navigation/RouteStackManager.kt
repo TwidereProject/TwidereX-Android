@@ -136,7 +136,7 @@ internal class RouteStackManager(
 
         if (options?.popUpTo != null && matchResult.route is SceneRoute) {
             val index = _backStacks.indexOfLast { it.scene.route.route == options.popUpTo.route }
-            if (index != -1 && index != _backStacks.lastIndex - 1) {
+            if (index != -1 && index != _backStacks.lastIndex) {
                 _backStacks.removeRange(if (options.popUpTo.inclusive) index else index + 1, _backStacks.lastIndex)
             } else if (options.popUpTo.route.isEmpty()) {
                 _backStacks.removeRange(0, _backStacks.lastIndex)
