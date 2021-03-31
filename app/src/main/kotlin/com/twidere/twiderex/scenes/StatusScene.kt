@@ -30,6 +30,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -87,13 +90,18 @@ fun StatusScene(
     val distance = with(LocalDensity.current) {
         -50.dp.toPx()
     }
+    var animated by rememberSaveable {
+        mutableStateOf(false)
+    }
     LaunchedEffect(Unit) {
         snapshotFlow { source.loadState.refresh to source.snapshot() }
+            .filter { !animated }
             .filter { it.first is LoadState.NotLoading }
             .filter { it.second.any() }
             .filterNot { it.second.indexOf(status) == -1 }
             .filter { state.firstVisibleItemScrollOffset == 0 && state.firstVisibleItemIndex == 0 }
             .collect {
+                animated = true
                 state.scrollToItem(it.second.indexOf(status))
                 state.animateScrollBy(distance)
             }
