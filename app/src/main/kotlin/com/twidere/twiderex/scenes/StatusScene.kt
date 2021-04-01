@@ -26,6 +26,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Divider
 import androidx.compose.material.Text
@@ -99,7 +101,9 @@ fun StatusScene(
             }
         ) {
             if (source.loadState.refresh is LoadState.Loading || source.loadState.refresh is LoadState.Error) {
+                val scrollState = rememberScrollState()
                 Column(
+                    modifier = Modifier.verticalScroll(scrollState),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     status?.let {
@@ -109,6 +113,7 @@ fun StatusScene(
                     if (source.loadState.refresh is LoadState.Loading) {
                         Spacer(modifier = Modifier.height(standardPadding))
                         CircularProgressIndicator()
+                        Spacer(modifier = Modifier.height(standardPadding))
                     }
                 }
             }
