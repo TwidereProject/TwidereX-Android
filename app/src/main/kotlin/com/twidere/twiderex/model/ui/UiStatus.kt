@@ -28,6 +28,7 @@ import com.twidere.twiderex.db.model.DbMastodonStatusExtra
 import com.twidere.twiderex.db.model.DbPagingTimelineWithStatus
 import com.twidere.twiderex.db.model.DbStatusWithMediaAndUser
 import com.twidere.twiderex.db.model.DbStatusWithReference
+import com.twidere.twiderex.db.model.DbTwitterStatusExtra
 import com.twidere.twiderex.db.model.ReferenceType
 import com.twidere.twiderex.model.MastodonStatusType
 import com.twidere.twiderex.model.MicroBlogKey
@@ -57,6 +58,7 @@ data class UiStatus(
     val url: List<UiUrlEntity>,
     val platformType: PlatformType,
     val mastodonExtra: DbMastodonStatusExtra? = null,
+    val twitterExtra: DbTwitterStatusExtra? = null,
     val referenceStatus: Map<ReferenceType, UiStatus> = emptyMap(),
 ) {
     val retweet: UiStatus? by lazy {
@@ -149,6 +151,7 @@ data class UiStatus(
                 rawText = data.rawText,
                 platformType = data.platformType,
                 mastodonExtra = data.mastodonExtra,
+                twitterExtra = data.twitterExtra,
             )
         }
 
@@ -176,6 +179,7 @@ data class UiStatus(
                 rawText = data.rawText,
                 platformType = data.platformType,
                 mastodonExtra = data.mastodonExtra,
+                twitterExtra = data.twitterExtra,
                 referenceStatus = references.map {
                     it.reference.referenceType to it.status.toUi(
                         accountKey = accountKey
@@ -208,6 +212,7 @@ data class UiStatus(
                 rawText = data.rawText,
                 platformType = data.platformType,
                 mastodonExtra = data.mastodonExtra,
+                twitterExtra = data.twitterExtra,
                 referenceStatus = status.references.map {
                     it.reference.referenceType to it.status.toUi(
                         accountKey = accountKey

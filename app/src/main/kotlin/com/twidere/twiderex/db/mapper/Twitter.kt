@@ -211,6 +211,7 @@ private fun StatusV2.toDbStatusWithMediaAndUser(
         mastodonExtra = null,
         twitterExtra = DbTwitterStatusExtra(
             reply_settings = replySettings ?: ReplySettings.Everyone,
+            quoteCount = publicMetrics?.quoteCount
         )
     )
     return DbStatusWithMediaAndUser(

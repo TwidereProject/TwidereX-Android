@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Divider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.ui.profileImageSize
 import com.twidere.twiderex.ui.standardPadding
 
@@ -32,7 +33,7 @@ fun StatusDivider() {
     Divider(
         modifier = Modifier.padding(
             start = profileImageSize + standardPadding * 3,
-            end = standardPadding * 2
-        )
+        ),
+        thickness = 0.5.dp
     )
 }

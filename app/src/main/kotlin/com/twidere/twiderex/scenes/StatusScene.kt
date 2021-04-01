@@ -27,6 +27,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.Divider
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -104,7 +105,7 @@ fun StatusScene(
                     status?.let {
                         ExpandedStatusComponent(data = it)
                     }
-                    StatusDivider()
+                    Divider()
                     if (source.loadState.refresh is LoadState.Loading) {
                         Spacer(modifier = Modifier.height(standardPadding))
                         CircularProgressIndicator()
@@ -119,7 +120,7 @@ fun StatusScene(
                 }
                 val index = remember {
                     for (i in 0..source.itemCount) {
-                        if (source.peekOrNull(i) == status) {
+                        if (source.peekOrNull(i)?.statusKey == status?.statusKey) {
                             return@remember i
                         }
                     }
@@ -158,9 +159,12 @@ fun StatusScene(
                                     } else {
                                         TimelineStatusComponent(data = status)
                                     }
-                                    if (index != source.itemCount - 1) {
-                                        StatusDivider()
+                                    if (status.statusKey == statusKey) {
+                                        Divider()
                                     } else {
+                                        StatusDivider()
+                                    }
+                                    if (index == source.itemCount - 1) {
                                         Spacer(modifier = Modifier.fillParentMaxHeight())
                                     }
                                 }

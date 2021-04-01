@@ -74,6 +74,7 @@ data class DbStatusV2(
 @Serializable
 data class DbTwitterStatusExtra(
     val reply_settings: ReplySettings,
+    val quoteCount: Long? = null,
 )
 
 @Stable

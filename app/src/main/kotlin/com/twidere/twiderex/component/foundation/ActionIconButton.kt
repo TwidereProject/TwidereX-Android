@@ -20,11 +20,8 @@
  */
 package com.twidere.twiderex.component.foundation
 
-import androidx.compose.foundation.layout.size
-import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.IconButton
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 
 @Composable
 fun ActionIconButton(
@@ -34,7 +31,6 @@ fun ActionIconButton(
 ) {
     IconButton(
         onClick = onClick,
-        modifier = Modifier.size(ButtonDefaults.MinWidth),
         enabled = enabled,
         content = content,
     )
