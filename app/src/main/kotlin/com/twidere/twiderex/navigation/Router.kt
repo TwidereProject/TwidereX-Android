@@ -20,6 +20,7 @@
  */
 package com.twidere.twiderex.navigation
 
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.platform.LocalContext
@@ -39,8 +40,10 @@ fun Router(
         LocalNavController provides navController,
         LocalNavigator provides Navigator(navController, context),
     ) {
-        NavHost(navController = navController, initialRoute = initialRoute) {
-            route()
+        BoxWithConstraints {
+            NavHost(navController = navController, initialRoute = initialRoute) {
+                route(constraints)
+            }
         }
     }
 }

@@ -28,6 +28,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.unit.Constraints
 import com.twidere.twiderex.component.RequireAuthorization
 import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.model.MicroBlogKey
@@ -68,6 +69,9 @@ import moe.tlaster.precompose.navigation.BackStackEntry
 import moe.tlaster.precompose.navigation.RouteBuilder
 import moe.tlaster.precompose.navigation.path
 import moe.tlaster.precompose.navigation.query
+import moe.tlaster.precompose.navigation.transition.NavTransition
+import moe.tlaster.precompose.navigation.transition.fadeScaleCreateTransition
+import moe.tlaster.precompose.navigation.transition.fadeScaleDestroyTransition
 import java.net.URLDecoder
 import java.net.URLEncoder
 
@@ -200,9 +204,10 @@ object DeepLinks {
 fun RouteBuilder.authorizedScene(
     route: String,
     deepLinks: List<String> = emptyList(),
+    navTransition: NavTransition? = null,
     content: @Composable (BackStackEntry) -> Unit,
 ) {
-    scene(route, deepLinks) {
+    scene(route, deepLinks, navTransition) {
         RequireAuthorization {
             content.invoke(it)
         }
@@ -286,7 +291,7 @@ fun RequirePlatformAccount(
     }
 }
 
-fun RouteBuilder.route() {
+fun RouteBuilder.route(constraints: Constraints) {
     authorizedScene(Route.Home) {
         HomeScene()
     }
@@ -464,6 +469,18 @@ fun RouteBuilder.route() {
 
     authorizedScene(
         "compose",
+        navTransition = NavTransition(
+            createTransition = {
+                translationY = constraints.maxHeight * (1 - it)
+                alpha = it
+            },
+            destroyTransition = {
+                translationY = constraints.maxHeight * (1 - it)
+                alpha = it
+            },
+            pauseTransition = fadeScaleDestroyTransition,
+            resumeTransition = fadeScaleCreateTransition,
+        )
     ) { backStackEntry ->
         val type = backStackEntry.query<String>("composeType")?.let {
             enumValueOf(it)
