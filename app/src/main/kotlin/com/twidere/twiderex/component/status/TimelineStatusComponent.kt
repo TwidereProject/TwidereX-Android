@@ -22,7 +22,7 @@ package com.twidere.twiderex.component.status
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.foundation.border
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -425,11 +425,7 @@ fun ColumnScope.StatusBody(
         Spacer(modifier = Modifier.height(standardPadding))
         Box(
             modifier = Modifier
-                .border(
-                    1.dp,
-                    LocalContentColor.current.copy(alpha = 0.12f),
-                    MaterialTheme.shapes.medium
-                )
+                .background(LocalContentColor.current.copy(alpha = 0.04f), shape = MaterialTheme.shapes.medium)
                 .clip(MaterialTheme.shapes.medium)
         ) {
             StatusContent(
