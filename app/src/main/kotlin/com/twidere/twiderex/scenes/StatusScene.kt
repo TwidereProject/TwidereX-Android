@@ -20,9 +20,11 @@
  */
 package com.twidere.twiderex.scenes
 
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
@@ -30,10 +32,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
@@ -55,11 +54,9 @@ import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.TwidereScene
+import com.twidere.twiderex.ui.standardPadding
 import com.twidere.twiderex.viewmodel.mastodon.MastodonStatusViewModel
 import com.twidere.twiderex.viewmodel.twitter.TwitterStatusViewModel
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.filterNot
 
 @Composable
 fun StatusScene(
@@ -86,26 +83,6 @@ fun StatusScene(
     }
     val source = viewModel.source.collectAsLazyPagingItems()
     val status by viewModel.status.observeAsState(initial = null)
-    val state = rememberLazyListState()
-    val distance = with(LocalDensity.current) {
-        -50.dp.toPx()
-    }
-    var animated by rememberSaveable {
-        mutableStateOf(false)
-    }
-    LaunchedEffect(Unit) {
-        snapshotFlow { source.loadState.refresh to source.snapshot() }
-            .filter { !animated }
-            .filter { it.first is LoadState.NotLoading }
-            .filter { it.second.any() }
-            .filterNot { it.second.indexOf(status) == -1 }
-            .filter { state.firstVisibleItemScrollOffset == 0 && state.firstVisibleItemIndex == 0 }
-            .collect {
-                animated = true
-                state.scrollToItem(it.second.indexOf(status))
-                state.animateScrollBy(distance)
-            }
-    }
 
     TwidereScene {
         InAppNotificationScaffold(
@@ -120,10 +97,43 @@ fun StatusScene(
                 )
             }
         ) {
+            if (source.loadState.refresh is LoadState.Loading || source.loadState.refresh is LoadState.Error) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    status?.let {
+                        ExpandedStatusComponent(data = it)
+                    }
+                    StatusDivider()
+                    if (source.loadState.refresh is LoadState.Loading) {
+                        Spacer(modifier = Modifier.height(standardPadding))
+                        CircularProgressIndicator()
+                    }
+                }
+            }
             if (
-                source.loadState.refresh is LoadState.NotLoading && source.itemCount > 0 ||
-                source.loadState.refresh is LoadState.Loading || source.loadState.refresh is LoadState.Error
+                source.loadState.refresh is LoadState.NotLoading && source.itemCount > 0
             ) {
+                val distance = with(LocalDensity.current) {
+                    -50.dp.toPx()
+                }
+                val index = remember {
+                    for (i in 0..source.itemCount) {
+                        if (source.peekOrNull(i) == status) {
+                            return@remember i
+                        }
+                    }
+                    0
+                }
+                val state = rememberLazyListState(
+                    initialFirstVisibleItemIndex = index,
+                )
+                LaunchedEffect(Unit) {
+                    if (index != 0 && state.firstVisibleItemIndex == index && state.firstVisibleItemScrollOffset == 0) {
+                        state.animateScrollBy(distance, tween())
+                        state.animateScrollBy(-distance, tween())
+                    }
+                }
                 LazyColumn2(
                     state = state,
                     horizontalAlignment = Alignment.CenterHorizontally
