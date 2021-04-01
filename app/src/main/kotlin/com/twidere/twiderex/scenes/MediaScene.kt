@@ -265,7 +265,7 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int) {
                                     if (videoControl != null) {
                                         AndroidView(factory = { videoControl })
                                     }
-                                    StatusText(status = status)
+                                    StatusText(status = status, maxLines = 2)
                                     Spacer(modifier = Modifier.height(standardPadding))
                                     Row(
                                         verticalAlignment = Alignment.CenterVertically,
