@@ -51,6 +51,7 @@ import com.twidere.twiderex.ui.standardPadding
 @Composable
 fun ColumnScope.StatusText(
     status: UiStatus,
+    maxLines: Int = Int.MAX_VALUE,
 ) {
     val expandable = status.platformType == PlatformType.Mastodon &&
         status.mastodonExtra?.spoilerText != null
@@ -87,6 +88,7 @@ fun ColumnScope.StatusText(
         Column {
             HtmlText(
                 htmlText = status.htmlText,
+                maxLines = maxLines,
                 linkResolver = { href ->
                     status.resolveLink(href)
                 },

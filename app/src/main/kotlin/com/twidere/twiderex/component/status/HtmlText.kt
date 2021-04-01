@@ -64,6 +64,7 @@ data class ResolvedLink(
 fun HtmlText(
     modifier: Modifier = Modifier,
     htmlText: String,
+    maxLines: Int = Int.MAX_VALUE,
     linkResolver: (href: String) -> ResolvedLink = { ResolvedLink(it) },
 ) {
     val navigator = LocalNavigator.current
@@ -71,6 +72,7 @@ fun HtmlText(
         modifier = modifier,
         htmlText = htmlText,
         linkResolver = linkResolver,
+        maxLines = maxLines,
         onLinkClicked = {
             navigator.openLink(it)
         },
@@ -81,6 +83,7 @@ fun HtmlText(
 private fun RenderContent(
     modifier: Modifier = Modifier,
     htmlText: String,
+    maxLines: Int = Int.MAX_VALUE,
     linkResolver: (href: String) -> ResolvedLink = { ResolvedLink(it) },
     onLinkClicked: (String) -> Unit = {},
 ) {
@@ -114,6 +117,7 @@ private fun RenderContent(
                     }
                 }
             },
+            maxLines = maxLines,
             text = value,
             onTextLayout = {
                 layoutResult.value = it
