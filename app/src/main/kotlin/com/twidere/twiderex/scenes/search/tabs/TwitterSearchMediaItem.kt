@@ -23,11 +23,9 @@ package com.twidere.twiderex.scenes.search.tabs
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.height
-import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.paging.LoadState
 import com.twidere.twiderex.R
@@ -85,10 +83,7 @@ class TwitterSearchMediaItem : SearchSceneItem {
                                 StatusMediaPreviewItem(
                                     item.first,
                                     modifier = Modifier
-                                        .aspectRatio(1F)
-                                        .clip(
-                                            MaterialTheme.shapes.medium
-                                        ),
+                                        .aspectRatio(1F),
                                     onClick = {
                                         navigator.media(item.second.statusKey, index)
                                     }

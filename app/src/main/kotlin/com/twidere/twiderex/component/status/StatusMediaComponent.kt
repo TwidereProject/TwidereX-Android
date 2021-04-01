@@ -22,16 +22,21 @@ package com.twidere.twiderex.component.status
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
@@ -44,10 +49,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.R
+import com.twidere.twiderex.component.foundation.GridLayout
 import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.foundation.VideoPlayer
 import com.twidere.twiderex.component.navigation.LocalNavigator
@@ -59,7 +64,7 @@ import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.ui.TwidereTheme
 import com.twidere.twiderex.ui.standardPadding
 
-@OptIn(ExperimentalAnimationApi::class)
+@OptIn(ExperimentalAnimationApi::class, ExperimentalFoundationApi::class)
 @Composable
 fun StatusMediaComponent(
     status: UiStatus,
@@ -95,8 +100,7 @@ fun StatusMediaComponent(
                     it
                 }
             }
-            .aspectRatio(aspectRatio)
-            .clip(MaterialTheme.shapes.medium),
+            .aspectRatio(aspectRatio),
     ) {
         when (media.size) {
             3 -> {
@@ -108,6 +112,11 @@ fun StatusMediaComponent(
                             onClick = onItemClick,
                         )
                     }
+                    Spacer(
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .width(standardPadding)
+                    )
                     Column(
                         modifier = Modifier.weight(1f),
                     ) {
@@ -117,25 +126,29 @@ fun StatusMediaComponent(
                                 modifier = Modifier.weight(1f),
                                 onClick = onItemClick,
                             )
+                            if (it != media.last()) {
+                                Spacer(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(standardPadding)
+                                )
+                            }
                         }
                     }
                 }
             }
             else -> {
                 Column {
-                    for (i in media.indices.filter { it % 2 == 0 }) {
-                        Row(
-                            modifier = Modifier.weight(1f),
-                        ) {
-                            for (y in (i until i + 2)) {
-                                media.elementAtOrNull(y)?.let {
-                                    StatusMediaPreviewItem(
-                                        media = it,
-                                        modifier = Modifier.weight(1f),
-                                        onClick = onItemClick,
-                                    )
-                                }
-                            }
+                    GridLayout(
+                        modifier = Modifier.aspectRatio(aspectRatio),
+                        spacing = standardPadding
+                    ) {
+                        media.forEach {
+                            StatusMediaPreviewItem(
+                                media = it,
+                                modifier = Modifier.weight(1f),
+                                onClick = onItemClick,
+                            )
                         }
                     }
                 }
@@ -166,7 +179,6 @@ fun StatusMediaComponent(
                         )
                     }
                 }
-                Shadow
                 AnimatedVisibility(
                     visible = !sensitive,
                 ) {
@@ -205,6 +217,7 @@ fun StatusMediaPreviewItem(
 ) {
     Box(
         modifier = modifier
+            .clip(MaterialTheme.shapes.medium)
     ) {
         when (media.type) {
             MediaType.photo ->
