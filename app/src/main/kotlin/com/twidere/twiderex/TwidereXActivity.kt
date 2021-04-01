@@ -20,6 +20,7 @@
  */
 package com.twidere.twiderex
 
+import android.content.Intent
 import android.graphics.Color
 import android.net.ConnectivityManager
 import android.net.Network
@@ -61,11 +62,15 @@ import com.twidere.twiderex.utils.LocalPlatformResolver
 import com.twidere.twiderex.utils.PlatformResolver
 import com.twidere.twiderex.viewmodel.ActiveAccountViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import moe.tlaster.precompose.navigation.NavController
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class TwidereXActivity : ComponentActivity() {
 
+    private val navController by lazy {
+        NavController()
+    }
     private val isActiveNetworkMetered = MutableLiveData(false)
     private val networkCallback by lazy {
         object : ConnectivityManager.NetworkCallback() {
@@ -140,11 +145,22 @@ class TwidereXActivity : ComponentActivity() {
                         ProvideWindowInsets(
                             windowInsetsAnimationsEnabled = true
                         ) {
-                            Router()
+                            Router(
+                                navController = navController
+                            )
                         }
                     }
                 }
             }
+        }
+        intent.data?.let {
+            navController.navigate(it.toString())
+        }
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        intent?.data?.let {
+            navController.navigate(it.toString())
         }
     }
 

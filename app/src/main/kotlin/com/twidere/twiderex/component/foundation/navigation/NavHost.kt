@@ -83,7 +83,7 @@ fun NavHost(
     }
 
     LaunchedEffect(manager, initialRoute) {
-        manager.navigate(initialRoute)
+        manager.navigateInitial(initialRoute)
     }
     val currentStack = manager.currentStack
     if (currentStack != null) {

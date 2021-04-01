@@ -34,7 +34,15 @@ fun rememberNavController(): NavController {
 }
 
 class NavController {
-    internal lateinit var stackManager: RouteStackManager
+    // FIXME: 2021/4/1 Temp workaround for deeplink
+    private var pendingNavigation: String? = null
+    internal var stackManager: RouteStackManager? = null
+        set(value) {
+            field = value
+            value?.let {
+                pendingNavigation?.let { it1 -> it.navigate(it1) }
+            }
+        }
 
     /**
      * Navigate to a route in the current RouteGraph.
@@ -43,13 +51,18 @@ class NavController {
      * @param options navigation options for the destination
      */
     fun navigate(route: String, options: NavOptions? = null) {
-        stackManager.navigate(route, options)
+        stackManager?.navigate(route, options) ?: run {
+            pendingNavigation = route
+        }
     }
 
     suspend fun navigateForResult(route: String, options: NavOptions? = null): Any? {
-        stackManager.navigate(route, options)
-        val currentEntry = stackManager.currentEntry ?: return null
-        return stackManager.waitingForResult(currentEntry)
+        stackManager?.navigate(route, options) ?: run {
+            pendingNavigation = route
+            return null
+        }
+        val currentEntry = stackManager?.currentEntry ?: return null
+        return stackManager?.waitingForResult(currentEntry)
     }
 
     /**
@@ -58,11 +71,11 @@ class NavController {
      * (or starting) corner of the app UI.
      */
     fun goBack() {
-        stackManager.goBack()
+        stackManager?.goBack()
     }
 
     fun goBackWith(result: Any? = null) {
-        stackManager.goBack(result)
+        stackManager?.goBack(result)
     }
 
     /**
@@ -76,7 +89,7 @@ class NavController {
      * Check if navigator can navigate up
      */
     val canGoBack: Boolean
-        get() = stackManager.canGoBack
+        get() = stackManager?.canGoBack ?: false
 }
 
 // @Composable

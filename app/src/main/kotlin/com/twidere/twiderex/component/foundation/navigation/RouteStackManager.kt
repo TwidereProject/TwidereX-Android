@@ -41,6 +41,8 @@ internal class RouteStackManager(
     private val stateHolder: SaveableStateHolder,
     private val routeGraph: RouteGraph,
 ) : LifecycleEventObserver {
+    // FIXME: 2021/4/1 Temp workaround for deeplink
+    private var pendingNavigation: String? = null
     private val _suspendResult = linkedMapOf<BackStackEntry, Continuation<Any?>>()
     private val backPressCallback: OnBackPressedCallback = object : OnBackPressedCallback(false) {
         override fun handleOnBackPressed() {
@@ -101,8 +103,10 @@ internal class RouteStackManager(
         val matchResult = routeParser.find(path = routePath)
         checkNotNull(matchResult) { "RouteStackManager: navigate target $path not found" }
         require(matchResult.route is ComposeRoute) { "RouteStackManager: navigate target $path is not ComposeRoute" }
-        val vm = viewModel
-        checkNotNull(vm)
+        val vm = viewModel ?: run {
+            pendingNavigation = path
+            return
+        }
         if (options != null && matchResult.route is SceneRoute && options.launchSingleTop) {
             _backStacks.firstOrNull { it.scene.route.route == matchResult.route.route }?.let {
                 _backStacks.remove(it)
@@ -194,5 +198,9 @@ internal class RouteStackManager(
 
     internal fun indexOf(stack: RouteStack): Int {
         return _backStacks.indexOf(stack)
+    }
+
+    fun navigateInitial(initialRoute: String) {
+        navigate(pendingNavigation ?: initialRoute)
     }
 }
