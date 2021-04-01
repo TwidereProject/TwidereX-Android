@@ -40,10 +40,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
 import androidx.compose.material.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -167,9 +169,14 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int) {
         contentColor = contentColorFor(backgroundColor = MaterialTheme.colors.background)
     ) {
         Box {
+            val pagerState = rememberPagerState(
+                currentPage = selectedIndex,
+                maxPage = status.media.lastIndex,
+            )
+            val currentMedia = status.media[pagerState.currentPage]
             val context = LocalContext.current
             val videoControl = remember(pagerState.currentPage) {
-                if (status.media[pagerState.currentPage].type == MediaType.video) {
+                if (currentMedia.type == MediaType.video) {
                     PlayerControlView(context).apply {
                         showTimeoutMs = 0
                     }
@@ -292,7 +299,17 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int) {
                                         ReplyButton(status = status, withNumber = false)
                                         RetweetButton(status = status, withNumber = false)
                                         LikeButton(status = status, withNumber = false)
-                                        ShareButton(status = status)
+                                        ShareButton(status = status) { callback ->
+                                            DropdownMenuItem(
+                                                onClick = {
+                                                    callback.invoke()
+                                                }
+                                            ) {
+                                                Text(
+                                                    text = "Save",
+                                                )
+                                            }
+                                        }
                                     }
                                 }
                             }
