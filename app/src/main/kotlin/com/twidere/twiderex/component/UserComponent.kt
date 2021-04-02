@@ -41,6 +41,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ContentAlpha
+import androidx.compose.material.Divider
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.ExperimentalMaterialApi
@@ -245,11 +246,6 @@ fun UserStatusTimeline(
             user?.let { user ->
                 item {
                     Row(
-                        modifier = Modifier.background(
-                            color = MaterialTheme.colors.onBackground.copy(
-                                alpha = 0.01f
-                            )
-                        ),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Spacer(modifier = Modifier.width(standardPadding * 2))
@@ -328,6 +324,11 @@ fun UserStatusTimeline(
                             }
                         }
                     }
+                }
+                item {
+                    Divider(
+                        modifier = Modifier.alpha(0.08f)
+                    )
                 }
             }
         },
