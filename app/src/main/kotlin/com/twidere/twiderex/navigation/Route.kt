@@ -214,6 +214,17 @@ fun RouteBuilder.authorizedScene(
     }
 }
 
+fun RouteBuilder.authorizedDialog(
+    route: String,
+    content: @Composable (BackStackEntry) -> Unit,
+) {
+    dialog(route) {
+        RequireAuthorization {
+            content.invoke(it)
+        }
+    }
+}
+
 @Composable
 fun ProvidePlatformType(
     key: MicroBlogKey,
@@ -420,7 +431,7 @@ fun RouteBuilder.route(constraints: Constraints) {
         }
     }
 
-    authorizedScene(
+    authorizedDialog(
         "media/status/{statusKey}",
     ) { backStackEntry ->
         backStackEntry.path<String>("statusKey")?.let {
@@ -438,7 +449,7 @@ fun RouteBuilder.route(constraints: Constraints) {
         }
     }
 
-    authorizedScene(
+    authorizedDialog(
         "media/raw/{url}",
     ) { backStackEntry ->
         backStackEntry.path<String>("url")?.let {

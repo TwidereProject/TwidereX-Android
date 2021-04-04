@@ -44,6 +44,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
+import androidx.compose.material.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
@@ -75,8 +76,10 @@ import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.foundation.Pager
 import com.twidere.twiderex.component.foundation.PagerState
 import com.twidere.twiderex.component.foundation.Swiper
+import com.twidere.twiderex.component.foundation.SwiperState
 import com.twidere.twiderex.component.foundation.VideoPlayer
 import com.twidere.twiderex.component.foundation.rememberPagerState
+import com.twidere.twiderex.component.foundation.rememberSwiperState
 import com.twidere.twiderex.component.status.LikeButton
 import com.twidere.twiderex.component.status.ReplyButton
 import com.twidere.twiderex.component.status.RetweetButton
@@ -144,12 +147,26 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int) {
     var controlVisibility by remember { mutableStateOf(true) }
     val controlPanelColor = MaterialTheme.colors.surface.copy(alpha = 0.6f)
     val navController = LocalNavController.current
-    Scaffold {
+    val swiperState = rememberSwiperState(
+        onDismiss = {
+            navController.popBackStack()
+        },
+        onStart = {
+            controlVisibility = false
+        },
+        onEnd = {
+            controlVisibility = true
+        }
+    )
+    val pagerState = rememberPagerState(
+        currentPage = selectedIndex,
+        maxPage = status.media.lastIndex,
+    )
+    Scaffold(
+        backgroundColor = Color.Transparent,
+        contentColor = contentColorFor(backgroundColor = MaterialTheme.colors.background)
+    ) {
         Box {
-            val pagerState = rememberPagerState(
-                currentPage = selectedIndex,
-                maxPage = status.media.lastIndex,
-            )
             val context = LocalContext.current
             val videoControl = remember(pagerState.currentPage) {
                 if (status.media[pagerState.currentPage].type == MediaType.video) {
@@ -182,12 +199,7 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int) {
                         )
                     }
                 },
-                onSwipeEnd = {
-                    controlVisibility = true
-                },
-                onSwipeStart = {
-                    controlVisibility = false
-                },
+                swiperState = swiperState,
                 customControl = videoControl,
                 pagerState = pagerState,
             )
@@ -199,10 +211,6 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int) {
                     window.showControls()
                 }
             }
-            // val transition = updateTransition(targetState = controlVisibility)
-            // val alpha by transition.animateFloat {
-            //     if (it) 1f else 0f
-            // }
             InAppNotificationScaffold(
                 backgroundColor = Color.Transparent,
                 topBar = {
@@ -304,8 +312,16 @@ fun RawMediaScene(url: String) {
         extendViewIntoStatusBar = true,
         extendViewIntoNavigationBar = true,
     ) {
-        Scaffold {
-            MediaView(media = listOf(MediaData(url, MediaType.photo)))
+        Scaffold(
+            backgroundColor = Color.Transparent
+        ) {
+            val navController = LocalNavController.current
+            val swiperState = rememberSwiperState(
+                onDismiss = {
+                    navController.popBackStack()
+                },
+            )
+            MediaView(media = listOf(MediaData(url, MediaType.photo)), swiperState = swiperState)
         }
     }
 }
@@ -319,15 +335,13 @@ data class MediaData(
 fun MediaView(
     modifier: Modifier = Modifier,
     media: List<MediaData>,
+    swiperState: SwiperState = rememberSwiperState(),
     pagerState: PagerState = rememberPagerState(
         currentPage = 0,
         maxPage = media.lastIndex,
     ),
     customControl: PlayerControlView? = null,
-    onSwipeStart: () -> Unit = {},
-    onSwipeEnd: () -> Unit = {},
 ) {
-    val navController = LocalNavController.current
     val requestManager = LocalRequestManager.current
     LaunchedEffect(Unit) {
         requestManager?.let {
@@ -336,17 +350,14 @@ fun MediaView(
             }
         }
     }
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colors.background.copy(alpha = 1f - swiperState.progress)),
+    )
     Swiper(
         modifier = modifier,
-        onDismiss = {
-            navController.popBackStack()
-        },
-        onStart = {
-            onSwipeStart.invoke()
-        },
-        onEnd = {
-            onSwipeEnd.invoke()
-        }
+        state = swiperState,
     ) {
         Pager(
             state = pagerState,
