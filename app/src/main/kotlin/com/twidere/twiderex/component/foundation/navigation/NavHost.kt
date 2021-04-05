@@ -21,6 +21,7 @@
 package moe.tlaster.precompose.navigation
 
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.gestures.forEachGesture
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
@@ -109,21 +110,23 @@ fun NavHost(
                     ) {
                         routeStack.scene.route.content.invoke(routeStack.scene)
                     }
-                    routeStack.dialogStack.forEach { backStackEntry ->
-                        CompositionLocalProvider(
-                            LocalViewModelStoreOwner provides backStackEntry
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .pointerInput(Unit) {
-                                        forEachGesture {
-                                            awaitPointerEventScope {
-                                                awaitPointerEvent().changes.forEach { it.consumeAllChanges() }
+                    Crossfade(targetState = routeStack.currentDialogStack) {
+                        it?.let { backStackEntry ->
+                            CompositionLocalProvider(
+                                LocalViewModelStoreOwner provides backStackEntry
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .pointerInput(Unit) {
+                                            forEachGesture {
+                                                awaitPointerEventScope {
+                                                    awaitPointerEvent().changes.forEach { it.consumeAllChanges() }
+                                                }
                                             }
                                         }
-                                    }
-                            ) {
-                                backStackEntry.route.content.invoke(backStackEntry)
+                                ) {
+                                    backStackEntry.route.content.invoke(backStackEntry)
+                                }
                             }
                         }
                     }
