@@ -242,15 +242,16 @@ private fun MastodonStatusHeader(
                     )
                 },
                 text = {
-                    val text = if (LocalActiveAccount.current?.let { it.accountKey == data.user.userKey } == true) {
-                        stringResource(
-                            id = R.string.common_notification_own_poll,
-                        )
-                    } else {
-                        stringResource(
-                            id = R.string.common_notification_poll,
-                        )
-                    }
+                    val text =
+                        if (LocalActiveAccount.current?.let { it.accountKey == data.user.userKey } == true) {
+                            stringResource(
+                                id = R.string.common_notification_own_poll,
+                            )
+                        } else {
+                            stringResource(
+                                id = R.string.common_notification_poll,
+                            )
+                        }
 
                     Text(
                         text = text
@@ -344,7 +345,7 @@ fun StatusContent(
                 when (type) {
                     StatusContentType.Normal -> {
                         Spacer(modifier = Modifier.height(standardPadding / 2))
-                        StatusBody(status, type)
+                        StatusBody(status)
                     }
                     StatusContentType.Extend -> UserScreenName(status.user)
                 }
@@ -352,23 +353,61 @@ fun StatusContent(
         }
         if (type == StatusContentType.Extend) {
             Spacer(modifier = Modifier.height(standardPadding))
-            StatusBody(status = status, type = type)
+            StatusBody(status = status)
         }
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun ColumnScope.StatusBody(
     status: UiStatus,
-    type: StatusContentType = StatusContentType.Normal,
 ) {
-    val navigator = LocalNavigator.current
-
     StatusText(
         status = status,
     )
 
+    StatusMedia(status)
+
+    if (!status.placeString.isNullOrEmpty()) {
+        Spacer(modifier = Modifier.height(standardPadding))
+        CompositionLocalProvider(
+            LocalContentAlpha provides ContentAlpha.medium
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Icon(
+                    modifier = Modifier.size(statusActionIconSize),
+                    painter = painterResource(id = R.drawable.ic_map_pin),
+                    contentDescription = stringResource(id = R.string.accessibility_common_status_location)
+                )
+                Box(modifier = Modifier.width(standardPadding))
+                Text(text = status.placeString)
+            }
+        }
+    }
+
+    status.quote?.let { quote ->
+        Spacer(modifier = Modifier.height(standardPadding))
+        Box(
+            modifier = Modifier
+                .background(
+                    LocalContentColor.current.copy(alpha = 0.04f),
+                    shape = MaterialTheme.shapes.medium
+                )
+                .clip(MaterialTheme.shapes.medium)
+        ) {
+            StatusQuote(quote = quote)
+        }
+    }
+}
+
+@Composable
+@OptIn(ExperimentalAnimationApi::class)
+private fun ColumnScope.StatusMedia(
+    status: UiStatus,
+) {
+    val navigator = LocalNavigator.current
     if (status.media.any()) {
         Spacer(modifier = Modifier.height(standardPadding))
         AnimatedVisibility(visible = LocalDisplayPreferences.current.mediaPreview) {
@@ -401,44 +440,41 @@ fun ColumnScope.StatusBody(
             }
         }
     }
+}
 
-    if (!status.placeString.isNullOrEmpty()) {
-        Spacer(modifier = Modifier.height(standardPadding))
-        CompositionLocalProvider(
-            LocalContentAlpha provides ContentAlpha.medium
+@Composable
+fun StatusQuote(quote: UiStatus) {
+    val navigator = LocalNavigator.current
+    Column(
+        modifier = Modifier
+            .clickable(
+                onClick = {
+                    navigator.status(quote)
+                }
+            )
+            .padding(standardPadding),
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
         ) {
+            UserAvatar(
+                user = quote.user,
+                size = LocalTextStyle.current.fontSize.value.dp
+            )
+            Spacer(modifier = Modifier.width(standardPadding))
             Row(
-                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.weight(1f),
             ) {
-                Icon(
-                    modifier = Modifier.size(statusActionIconSize),
-                    painter = painterResource(id = R.drawable.ic_map_pin),
-                    contentDescription = stringResource(id = R.string.accessibility_common_status_location)
-                )
-                Box(modifier = Modifier.width(standardPadding))
-                Text(text = status.placeString)
+                UserName(quote.user)
+                Spacer(modifier = Modifier.width(standardPadding / 2))
+                UserScreenName(quote.user)
             }
         }
-    }
-
-    status.quote?.let { quote ->
-        Spacer(modifier = Modifier.height(standardPadding))
-        Box(
-            modifier = Modifier
-                .background(LocalContentColor.current.copy(alpha = 0.04f), shape = MaterialTheme.shapes.medium)
-                .clip(MaterialTheme.shapes.medium)
-        ) {
-            StatusContent(
-                data = quote,
-                modifier = Modifier
-                    .clickable(
-                        onClick = {
-                            navigator.status(quote)
-                        }
-                    )
-                    .padding(standardPadding),
-                type = type,
-            )
-        }
+        Spacer(modifier = Modifier.height(standardPadding / 2))
+        StatusText(
+            status = quote,
+            maxLines = 5,
+        )
+        StatusMedia(status = quote)
     }
 }
