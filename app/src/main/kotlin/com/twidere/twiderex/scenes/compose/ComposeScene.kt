@@ -381,7 +381,6 @@ private fun ComposeBody(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(standardPadding * 2))
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
