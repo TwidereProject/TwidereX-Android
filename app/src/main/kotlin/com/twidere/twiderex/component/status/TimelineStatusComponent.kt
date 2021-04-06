@@ -47,6 +47,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -419,26 +420,41 @@ private fun ColumnScope.StatusMedia(
             CompositionLocalProvider(
                 LocalContentAlpha provides ContentAlpha.medium
             ) {
-                Row(
-                    modifier = Modifier
-                        .clickable(
-                            onClick = {
-                                navigator.media(statusKey = status.statusKey)
-                            }
-                        )
-                        .fillMaxWidth()
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_photo),
-                        contentDescription = stringResource(
-                            id = R.string.accessibility_common_status_media
-                        )
-                    )
-                    Spacer(modifier = Modifier.width(standardPadding))
-                    Text(text = stringResource(id = R.string.common_controls_status_media))
+                MediaPreviewButton {
+                    navigator.media(statusKey = status.statusKey)
                 }
             }
         }
+    }
+}
+
+@Composable
+fun MediaPreviewButton(
+    onClick: () -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .background(
+                LocalContentColor.current.copy(alpha = 0.04f),
+                shape = MaterialTheme.shapes.small,
+            )
+            .clip(MaterialTheme.shapes.small)
+            .clipToBounds()
+            .clickable(
+                onClick = {
+                    onClick.invoke()
+                }
+            )
+            .padding(4.dp)
+    ) {
+        Icon(
+            painter = painterResource(id = R.drawable.ic_photo),
+            contentDescription = stringResource(
+                id = R.string.accessibility_common_status_media
+            )
+        )
+        Spacer(modifier = Modifier.width(standardPadding))
+        Text(text = stringResource(id = R.string.common_controls_status_media))
     }
 }
 
