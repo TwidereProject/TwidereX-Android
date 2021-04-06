@@ -31,6 +31,7 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Divider
 import androidx.compose.material.LocalContentColor
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -79,9 +80,7 @@ fun LazyUiStatusList(
                                 Divider()
                             }
                             item.isGap -> {
-                                Divider()
                                 LoadMoreButton(items, index, onLoadBetweenClicked, item)
-                                Divider()
                             }
                             else -> {
                                 StatusDivider()
@@ -122,7 +121,8 @@ private fun LoadMoreButton(
             modifier = Modifier.padding(12.dp),
             text = stringResource(
                 id = R.string.common_controls_timeline_load_more
-            )
+            ),
+            color = MaterialTheme.colors.primary,
         )
     }
 }
