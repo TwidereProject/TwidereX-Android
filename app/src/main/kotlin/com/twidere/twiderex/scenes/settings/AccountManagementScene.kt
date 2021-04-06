@@ -41,7 +41,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.navigation.compose.navigate
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
@@ -94,6 +93,7 @@ fun AccountManagementScene() {
                             icon = {
                                 UserAvatar(
                                     user = it,
+                                    withPlatformIcon = true,
                                 )
                             },
                             text = {

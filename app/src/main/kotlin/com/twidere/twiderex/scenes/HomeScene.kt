@@ -69,7 +69,6 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.navigation.compose.navigate
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.UserMetrics
 import com.twidere.twiderex.component.foundation.AppBar
@@ -338,6 +337,7 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
                             icon = {
                                 UserAvatar(
                                     user = user,
+                                    withPlatformIcon = true,
                                 )
                             },
                             text = {
@@ -446,6 +446,7 @@ private fun DrawerUserHeader(
             user?.let {
                 UserAvatar(
                     user = it,
+                    withPlatformIcon = true,
                 )
             }
         },
