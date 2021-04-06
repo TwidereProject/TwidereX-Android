@@ -350,7 +350,7 @@ private fun ComposeBody(
                             status?.let { status ->
                                 Box(
                                     modifier = Modifier.background(
-                                        MaterialTheme.colors.onBackground.copy(
+                                        LocalContentColor.current.copy(
                                             alpha = 0.04f
                                         )
                                     ),

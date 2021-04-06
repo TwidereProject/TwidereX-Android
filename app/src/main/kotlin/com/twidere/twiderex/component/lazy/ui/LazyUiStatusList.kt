@@ -30,7 +30,7 @@ import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Divider
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material.LocalContentColor
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -106,7 +106,7 @@ private fun LoadMoreButton(
 ) {
     Box(
         modifier = Modifier
-            .background(MaterialTheme.colors.onBackground.copy(alpha = 0.04f))
+            .background(LocalContentColor.current.copy(alpha = 0.04f))
             .clickable {
                 items.peekOrNull(index + 1)?.let { next ->
                     onLoadBetweenClicked(
