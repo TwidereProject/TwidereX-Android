@@ -843,13 +843,26 @@ private fun ComposeInput(
                     AnimatedVisibility(visible = isContentWarningEnabled) {
                         val cwText by viewModel.contentWarningTextFieldValue.observeAsState(initial = TextFieldValue())
                         Column {
-                            TextInput(
-                                value = cwText,
-                                onValueChange = { viewModel.setContentWarningText(it) },
-                                placeholder = {
-                                    Text(text = stringResource(id = R.string.scene_compose_cw_placeholder))
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                CompositionLocalProvider(
+                                    LocalContentAlpha provides ContentAlpha.medium,
+                                ) {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.ic_alert_octagon),
+                                        contentDescription = null,
+                                    )
                                 }
-                            )
+                                Spacer(modifier = Modifier.width(standardPadding))
+                                TextInput(
+                                    value = cwText,
+                                    onValueChange = { viewModel.setContentWarningText(it) },
+                                    placeholder = {
+                                        Text(text = stringResource(id = R.string.scene_compose_cw_placeholder))
+                                    }
+                                )
+                            }
                             Spacer(modifier = Modifier.height(standardPadding))
                             Divider()
                             Spacer(modifier = Modifier.height(standardPadding))
