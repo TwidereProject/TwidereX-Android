@@ -20,6 +20,8 @@
  */
 package com.twidere.twiderex.scenes
 
+import androidx.activity.compose.registerForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.expandVertically
@@ -40,10 +42,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
 import androidx.compose.material.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -135,7 +139,7 @@ fun StatusMediaScene(statusKey: MicroBlogKey, selectedIndex: Int) {
             CompositionLocalProvider(
                 LocalVideoPlayback provides DisplayPreferences.AutoPlayback.Always
             ) {
-                StatusMediaScene(status = it, selectedIndex = selectedIndex)
+                StatusMediaScene(status = it, selectedIndex = selectedIndex, viewModel = viewModel)
             }
         }
     }
@@ -143,7 +147,7 @@ fun StatusMediaScene(statusKey: MicroBlogKey, selectedIndex: Int) {
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun StatusMediaScene(status: UiStatus, selectedIndex: Int) {
+fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewModel) {
     var controlVisibility by remember { mutableStateOf(true) }
     val controlPanelColor = MaterialTheme.colors.surface.copy(alpha = 0.6f)
     val navController = LocalNavController.current
@@ -158,18 +162,19 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int) {
             controlVisibility = true
         }
     )
-    val pagerState = rememberPagerState(
-        currentPage = selectedIndex,
-        maxPage = status.media.lastIndex,
-    )
     Scaffold(
         backgroundColor = Color.Transparent,
         contentColor = contentColorFor(backgroundColor = MaterialTheme.colors.background)
     ) {
         Box {
+            val pagerState = rememberPagerState(
+                currentPage = selectedIndex,
+                maxPage = status.media.lastIndex,
+            )
+            val currentMedia = status.media[pagerState.currentPage]
             val context = LocalContext.current
             val videoControl = remember(pagerState.currentPage) {
-                if (status.media[pagerState.currentPage].type == MediaType.video) {
+                if (currentMedia.type == MediaType.video) {
                     PlayerControlView(context).apply {
                         showTimeoutMs = 0
                     }
@@ -292,7 +297,27 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int) {
                                         ReplyButton(status = status, withNumber = false)
                                         RetweetButton(status = status, withNumber = false)
                                         LikeButton(status = status, withNumber = false)
-                                        ShareButton(status = status)
+                                        val saveFileLauncher = registerForActivityResult(
+                                            contract = ActivityResultContracts.CreateDocument()
+                                        ) {
+                                            it?.let {
+                                                viewModel.saveFile(currentMedia, it)
+                                            }
+                                        }
+                                        ShareButton(status = status) { callback ->
+                                            DropdownMenuItem(
+                                                onClick = {
+                                                    callback.invoke()
+                                                    currentMedia.fileName?.let {
+                                                        saveFileLauncher.launch(it)
+                                                    }
+                                                }
+                                            ) {
+                                                Text(
+                                                    text = stringResource(id = R.string.common_controls_actions_save),
+                                                )
+                                            }
+                                        }
                                     }
                                 }
                             }

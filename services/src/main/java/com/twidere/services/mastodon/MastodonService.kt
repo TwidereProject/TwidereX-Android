@@ -20,6 +20,7 @@
  */
 package com.twidere.services.mastodon
 
+import com.twidere.services.http.AuthorizationInterceptor
 import com.twidere.services.http.authorization.BearerAuthorization
 import com.twidere.services.http.retrofit
 import com.twidere.services.mastodon.api.MastodonResources
@@ -35,6 +36,7 @@ import com.twidere.services.mastodon.model.PostVote
 import com.twidere.services.mastodon.model.SearchType
 import com.twidere.services.mastodon.model.UploadResponse
 import com.twidere.services.mastodon.model.exceptions.MastodonException
+import com.twidere.services.microblog.DownloadMediaService
 import com.twidere.services.microblog.LookupService
 import com.twidere.services.microblog.MicroBlogService
 import com.twidere.services.microblog.NotificationService
@@ -48,7 +50,10 @@ import com.twidere.services.microblog.model.ISearchResponse
 import com.twidere.services.microblog.model.IStatus
 import com.twidere.services.microblog.model.IUser
 import com.twidere.services.microblog.model.Relationship
+import com.twidere.services.utils.await
 import okhttp3.MultipartBody
+import okhttp3.OkHttpClient
+import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.InputStream
 
@@ -61,7 +66,8 @@ class MastodonService(
     RelationshipService,
     NotificationService,
     SearchService,
-    StatusService {
+    StatusService,
+    DownloadMediaService {
     private val resources by lazy {
         retrofit<MastodonResources>(
             "https://$host",
@@ -273,4 +279,21 @@ class MastodonService(
     }
 
     suspend fun emojis(): List<Emoji> = resources.emojis()
+
+    override suspend fun download(target: String): InputStream {
+        return OkHttpClient
+            .Builder()
+            .addInterceptor(AuthorizationInterceptor(BearerAuthorization(accessToken)))
+            .build()
+            .newCall(
+                Request
+                    .Builder()
+                    .url(target)
+                    .get()
+                    .build()
+            )
+            .await()
+            .body
+            ?.byteStream() ?: throw IllegalArgumentException()
+    }
 }

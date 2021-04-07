@@ -24,6 +24,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope.Companion.weight
 import androidx.compose.foundation.layout.defaultMinSize
@@ -241,6 +242,7 @@ fun RetweetButton(
 fun ShareButton(
     status: UiStatus,
     compat: Boolean = false,
+    menus: @Composable ColumnScope.(callback: () -> Unit) -> Unit = {},
 ) {
     var expanded by remember { mutableStateOf(false) }
     val actionsViewModel = LocalStatusActions.current
@@ -303,6 +305,9 @@ fun ShareButton(
             expanded = expanded,
             onDismissRequest = { expanded = false },
         ) {
+            menus.invoke(this) {
+                expanded = false
+            }
             DropdownMenuItem(
                 onClick = {
                     expanded = false
