@@ -49,6 +49,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.ListItem
 import androidx.compose.material.LocalContentAlpha
+import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.RadioButton
 import androidx.compose.material.Surface
@@ -79,6 +80,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
 import com.google.accompanist.insets.statusBarsHeight
 import com.twidere.twiderex.R
+import com.twidere.twiderex.component.foundation.HorizontalDivider
 import com.twidere.twiderex.component.foundation.IconTabsComponent
 import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.foundation.Pager
@@ -689,7 +691,9 @@ fun UserMetrics(
     user: UiUser,
 ) {
     val navController = LocalNavController.current
-    Row {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
         MetricsItem(
             modifier = Modifier
                 .weight(1f)
@@ -699,7 +703,9 @@ fun UserMetrics(
             primaryText = user.friendsCount.toString(),
             secondaryText = stringResource(id = R.string.common_controls_profile_dashboard_following),
         )
-
+        HorizontalDivider(
+            modifier = Modifier.height(LocalTextStyle.current.fontSize.value.dp * 2)
+        )
         MetricsItem(
             modifier = Modifier
                 .weight(1f)
@@ -710,6 +716,9 @@ fun UserMetrics(
             secondaryText = stringResource(id = R.string.common_controls_profile_dashboard_followers),
         )
         if (user.platformType == PlatformType.Twitter) {
+            HorizontalDivider(
+                modifier = Modifier.height(LocalTextStyle.current.fontSize.value.dp * 2)
+            )
             MetricsItem(
                 modifier = Modifier
                     .weight(1f),
