@@ -431,7 +431,7 @@ fun RouteBuilder.route(constraints: Constraints) {
         }
     }
 
-    authorizedDialog(
+    authorizedScene(
         "media/status/{statusKey}",
     ) { backStackEntry ->
         backStackEntry.path<String>("statusKey")?.let {
@@ -449,7 +449,7 @@ fun RouteBuilder.route(constraints: Constraints) {
         }
     }
 
-    authorizedDialog(
+    authorizedScene(
         "media/raw/{url}",
     ) { backStackEntry ->
         backStackEntry.path<String>("url")?.let {
