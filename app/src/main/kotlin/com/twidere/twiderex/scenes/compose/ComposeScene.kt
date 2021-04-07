@@ -531,7 +531,7 @@ private fun MastodonExtraActions(
         }
     ) {
         Icon(
-            painter = painterResource(id = R.drawable.ic_cw),
+            painter = painterResource(id = R.drawable.ic_alert_octagon),
             contentDescription = null,
             tint = if (isContentWarning) {
                 MaterialTheme.colors.primary
