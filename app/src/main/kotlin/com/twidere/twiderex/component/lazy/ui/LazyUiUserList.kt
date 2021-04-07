@@ -22,6 +22,8 @@ package com.twidere.twiderex.component.lazy.ui
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -40,6 +42,7 @@ import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.component.status.UserName
 import com.twidere.twiderex.component.status.UserScreenName
 import com.twidere.twiderex.model.ui.UiUser
+import com.twidere.twiderex.ui.standardPadding
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -70,15 +73,22 @@ fun LazyUiUserList(
                     text = {
                         Row {
                             UserName(user = it)
+                            Spacer(modifier = Modifier.width(standardPadding))
                             UserScreenName(user = it)
                         }
                     },
                     secondaryText = {
-                        Text(
-                            text = stringResource(
-                                id = R.string.common_controls_profile_dashboard_followers,
-                            ) + " " + it.followersCount.toString()
-                        )
+                        Row {
+                            Text(
+                                text = stringResource(
+                                    id = R.string.common_controls_profile_dashboard_followers,
+                                )
+                            )
+                            Spacer(modifier = Modifier.width(standardPadding))
+                            Text(
+                                text = it.followersCount.toString()
+                            )
+                        }
                     }
                 )
             }

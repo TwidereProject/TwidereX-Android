@@ -47,6 +47,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -242,15 +243,16 @@ private fun MastodonStatusHeader(
                     )
                 },
                 text = {
-                    val text = if (LocalActiveAccount.current?.let { it.accountKey == data.user.userKey } == true) {
-                        stringResource(
-                            id = R.string.common_notification_own_poll,
-                        )
-                    } else {
-                        stringResource(
-                            id = R.string.common_notification_poll,
-                        )
-                    }
+                    val text =
+                        if (LocalActiveAccount.current?.let { it.accountKey == data.user.userKey } == true) {
+                            stringResource(
+                                id = R.string.common_notification_own_poll,
+                            )
+                        } else {
+                            stringResource(
+                                id = R.string.common_notification_poll,
+                            )
+                        }
 
                     Text(
                         text = text
@@ -344,7 +346,7 @@ fun StatusContent(
                 when (type) {
                     StatusContentType.Normal -> {
                         Spacer(modifier = Modifier.height(standardPadding / 2))
-                        StatusBody(status, type)
+                        StatusBody(status)
                     }
                     StatusContentType.Extend -> UserScreenName(status.user)
                 }
@@ -352,55 +354,20 @@ fun StatusContent(
         }
         if (type == StatusContentType.Extend) {
             Spacer(modifier = Modifier.height(standardPadding))
-            StatusBody(status = status, type = type)
+            StatusBody(status = status)
         }
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun ColumnScope.StatusBody(
     status: UiStatus,
-    type: StatusContentType = StatusContentType.Normal,
 ) {
-    val navigator = LocalNavigator.current
-
     StatusText(
         status = status,
     )
 
-    if (status.media.any()) {
-        Spacer(modifier = Modifier.height(standardPadding))
-        AnimatedVisibility(visible = LocalDisplayPreferences.current.mediaPreview) {
-            StatusMediaComponent(
-                status = status,
-            )
-        }
-        AnimatedVisibility(visible = !LocalDisplayPreferences.current.mediaPreview) {
-            CompositionLocalProvider(
-                LocalContentAlpha provides ContentAlpha.medium
-            ) {
-                Row(
-                    modifier = Modifier
-                        .clickable(
-                            onClick = {
-                                navigator.media(statusKey = status.statusKey)
-                            }
-                        )
-                        .fillMaxWidth()
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_photo),
-                        contentDescription = stringResource(
-                            id = R.string.accessibility_common_status_media
-                        )
-                    )
-                    Spacer(modifier = Modifier.width(standardPadding))
-                    Text(text = stringResource(id = R.string.common_controls_status_media))
-                }
-            }
-        }
-    }
+    StatusMedia(status)
 
     if (!status.placeString.isNullOrEmpty()) {
         Spacer(modifier = Modifier.height(standardPadding))
@@ -425,20 +392,105 @@ fun ColumnScope.StatusBody(
         Spacer(modifier = Modifier.height(standardPadding))
         Box(
             modifier = Modifier
-                .background(LocalContentColor.current.copy(alpha = 0.04f), shape = MaterialTheme.shapes.medium)
+                .background(
+                    LocalContentColor.current.copy(alpha = 0.04f),
+                    shape = MaterialTheme.shapes.medium
+                )
                 .clip(MaterialTheme.shapes.medium)
         ) {
-            StatusContent(
-                data = quote,
-                modifier = Modifier
-                    .clickable(
-                        onClick = {
-                            navigator.status(quote)
-                        }
-                    )
-                    .padding(standardPadding),
-                type = type,
+            StatusQuote(quote = quote)
+        }
+    }
+}
+
+@Composable
+@OptIn(ExperimentalAnimationApi::class)
+private fun ColumnScope.StatusMedia(
+    status: UiStatus,
+) {
+    val navigator = LocalNavigator.current
+    if (status.media.any()) {
+        Spacer(modifier = Modifier.height(standardPadding))
+        AnimatedVisibility(visible = LocalDisplayPreferences.current.mediaPreview) {
+            StatusMediaComponent(
+                status = status,
             )
         }
+        AnimatedVisibility(visible = !LocalDisplayPreferences.current.mediaPreview) {
+            CompositionLocalProvider(
+                LocalContentAlpha provides ContentAlpha.medium
+            ) {
+                MediaPreviewButton {
+                    navigator.media(statusKey = status.statusKey)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun MediaPreviewButton(
+    onClick: () -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .background(
+                LocalContentColor.current.copy(alpha = 0.04f),
+                shape = MaterialTheme.shapes.small,
+            )
+            .clip(MaterialTheme.shapes.small)
+            .clipToBounds()
+            .clickable(
+                onClick = {
+                    onClick.invoke()
+                }
+            )
+            .padding(4.dp)
+    ) {
+        Icon(
+            painter = painterResource(id = R.drawable.ic_photo),
+            contentDescription = stringResource(
+                id = R.string.accessibility_common_status_media
+            )
+        )
+        Spacer(modifier = Modifier.width(standardPadding))
+        Text(text = stringResource(id = R.string.common_controls_status_media))
+    }
+}
+
+@Composable
+fun StatusQuote(quote: UiStatus) {
+    val navigator = LocalNavigator.current
+    Column(
+        modifier = Modifier
+            .clickable(
+                onClick = {
+                    navigator.status(quote)
+                }
+            )
+            .padding(standardPadding),
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            UserAvatar(
+                user = quote.user,
+                size = LocalTextStyle.current.fontSize.value.dp
+            )
+            Spacer(modifier = Modifier.width(standardPadding))
+            Row(
+                modifier = Modifier.weight(1f),
+            ) {
+                UserName(quote.user)
+                Spacer(modifier = Modifier.width(standardPadding / 2))
+                UserScreenName(quote.user)
+            }
+        }
+        Spacer(modifier = Modifier.height(standardPadding / 2))
+        StatusText(
+            status = quote,
+            maxLines = 5,
+        )
+        StatusMedia(status = quote)
     }
 }

@@ -41,7 +41,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ContentAlpha
-import androidx.compose.material.Divider
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.ExperimentalMaterialApi
@@ -49,6 +48,8 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.ListItem
 import androidx.compose.material.LocalContentAlpha
+import androidx.compose.material.LocalContentColor
+import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.RadioButton
 import androidx.compose.material.Surface
@@ -79,6 +80,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
 import com.google.accompanist.insets.statusBarsHeight
 import com.twidere.twiderex.R
+import com.twidere.twiderex.component.foundation.HorizontalDivider
 import com.twidere.twiderex.component.foundation.IconTabsComponent
 import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.foundation.Pager
@@ -246,6 +248,7 @@ fun UserStatusTimeline(
             user?.let { user ->
                 item {
                     Row(
+                        modifier = Modifier.background(LocalContentColor.current.copy(alpha = 0.04f)),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Spacer(modifier = Modifier.width(standardPadding * 2))
@@ -324,11 +327,6 @@ fun UserStatusTimeline(
                             }
                         }
                     }
-                }
-                item {
-                    Divider(
-                        modifier = Modifier.alpha(0.08f)
-                    )
                 }
             }
         },
@@ -689,7 +687,9 @@ fun UserMetrics(
     user: UiUser,
 ) {
     val navController = LocalNavController.current
-    Row {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
         MetricsItem(
             modifier = Modifier
                 .weight(1f)
@@ -699,7 +699,9 @@ fun UserMetrics(
             primaryText = user.friendsCount.toString(),
             secondaryText = stringResource(id = R.string.common_controls_profile_dashboard_following),
         )
-
+        HorizontalDivider(
+            modifier = Modifier.height(LocalTextStyle.current.fontSize.value.dp * 2)
+        )
         MetricsItem(
             modifier = Modifier
                 .weight(1f)
@@ -710,6 +712,9 @@ fun UserMetrics(
             secondaryText = stringResource(id = R.string.common_controls_profile_dashboard_followers),
         )
         if (user.platformType == PlatformType.Twitter) {
+            HorizontalDivider(
+                modifier = Modifier.height(LocalTextStyle.current.fontSize.value.dp * 2)
+            )
             MetricsItem(
                 modifier = Modifier
                     .weight(1f),

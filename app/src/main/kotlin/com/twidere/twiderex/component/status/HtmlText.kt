@@ -42,6 +42,7 @@ import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.style.TextOverflow
 import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.navigation.LocalNavigator
 import kotlinx.coroutines.coroutineScope
@@ -117,6 +118,7 @@ private fun RenderContent(
                     }
                 }
             },
+            overflow = TextOverflow.Ellipsis,
             maxLines = maxLines,
             text = value,
             onTextLayout = {
@@ -134,7 +136,7 @@ private fun RenderContent(
                         data = target,
                     )
                 }
-            )
+            ),
         )
     }
 }

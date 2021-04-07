@@ -303,8 +303,16 @@ open class ComposeViewModel @AssistedInject constructor(
                                     } else {
                                         it
                                     }
-                                }.distinctBy { it }.joinToString(" ", postfix = " ") { it }
-                        setText(TextFieldValue(mentions, selection = TextRange(mentions.length)))
+                                }.distinctBy { it }.takeIf { it.any() }
+                                ?.joinToString(" ", postfix = " ") { it }
+                        if (mentions != null) {
+                            setText(
+                                TextFieldValue(
+                                    mentions,
+                                    selection = TextRange(mentions.length)
+                                )
+                            )
+                        }
                     }
                     status
                 }

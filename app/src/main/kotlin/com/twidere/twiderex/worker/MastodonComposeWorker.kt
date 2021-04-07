@@ -30,6 +30,7 @@ import androidx.work.WorkerParameters
 import com.twidere.services.mastodon.MastodonService
 import com.twidere.services.mastodon.model.PostPoll
 import com.twidere.services.mastodon.model.PostStatus
+import com.twidere.twiderex.R
 import com.twidere.twiderex.model.ComposeData
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.toComposeData
@@ -107,7 +108,7 @@ class MastodonComposeWorker @AssistedInject constructor(
                     )
                 )
             )
-
+            inAppNotification.show(R.string.common_alerts_tweet_sent_title)
             Result.success()
         } catch (e: Throwable) {
             e.notify(inAppNotification)

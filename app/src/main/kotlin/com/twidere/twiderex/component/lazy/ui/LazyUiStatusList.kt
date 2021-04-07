@@ -20,24 +20,24 @@
  */
 package com.twidere.twiderex.component.lazy.ui
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Divider
-import androidx.compose.material.Icon
+import androidx.compose.material.LocalContentColor
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.LoadingProgress
 import com.twidere.twiderex.component.lazy.LazyColumn2
@@ -48,7 +48,6 @@ import com.twidere.twiderex.component.status.StatusDivider
 import com.twidere.twiderex.component.status.TimelineStatusComponent
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiStatus
-import com.twidere.twiderex.ui.standardPadding
 
 @Composable
 fun LazyUiStatusList(
@@ -81,9 +80,7 @@ fun LazyUiStatusList(
                                 Divider()
                             }
                             item.isGap -> {
-                                Divider()
                                 LoadMoreButton(items, index, onLoadBetweenClicked, item)
-                                Divider()
                             }
                             else -> {
                                 StatusDivider()
@@ -106,29 +103,26 @@ private fun LoadMoreButton(
     onLoadBetweenClicked: (current: MicroBlogKey, next: MicroBlogKey) -> Unit,
     item: UiStatus
 ) {
-    TextButton(
+    Box(
         modifier = Modifier
-            .defaultMinSize(
-                minHeight = ButtonDefaults.MinHeight,
-            )
-            .padding(ButtonDefaults.ContentPadding)
-            .fillMaxWidth(),
-        onClick = {
-            items[index + 1]?.let { next ->
-                onLoadBetweenClicked(
-                    item.statusKey,
-                    next.statusKey,
-                )
+            .background(LocalContentColor.current.copy(alpha = 0.04f))
+            .clickable {
+                items.peekOrNull(index + 1)?.let { next ->
+                    onLoadBetweenClicked(
+                        item.statusKey,
+                        next.statusKey,
+                    )
+                }
             }
-        },
+            .fillMaxWidth(),
+        contentAlignment = Alignment.Center,
     ) {
-        Icon(
-            painter = painterResource(id = R.drawable.ic_refresh),
-            contentDescription = stringResource(
-                id = R.string.accessibility_scene_timeline_load_gap
-            )
+        Text(
+            modifier = Modifier.padding(12.dp),
+            text = stringResource(
+                id = R.string.common_controls_timeline_load_more
+            ),
+            color = MaterialTheme.colors.primary,
         )
-        Box(modifier = Modifier.width(standardPadding))
-        Text(text = stringResource(id = R.string.common_controls_timeline_load_more))
     }
 }

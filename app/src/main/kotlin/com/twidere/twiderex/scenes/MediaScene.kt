@@ -353,7 +353,7 @@ fun MediaView(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colors.background.copy(alpha = 1f - swiperState.progress)),
+        // .background(MaterialTheme.colors.background.copy(alpha = 1f - swiperState.progress)),
     )
     Swiper(
         modifier = modifier,

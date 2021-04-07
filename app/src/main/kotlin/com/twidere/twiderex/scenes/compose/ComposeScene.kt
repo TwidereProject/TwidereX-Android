@@ -33,6 +33,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -91,6 +92,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
@@ -300,11 +303,22 @@ private fun ComposeBody(
                                 }
                         }
                     }
+                    val focusRequester = remember {
+                        FocusRequester()
+                    }
                     Column(
                         modifier = Modifier
                             .verticalScroll(
                                 scrollState,
                                 reverseScrolling = composeType == ComposeType.Reply,
+                            )
+                            .clickable(
+                                onClick = {
+                                    focusRequester.requestFocus()
+                                    keyboardController?.showSoftwareKeyboard()
+                                },
+                                interactionSource = remember { MutableInteractionSource() },
+                                indication = null,
                             )
                     ) {
                         val height = with(LocalDensity.current) {
@@ -343,14 +357,15 @@ private fun ComposeBody(
                                     scrollState.value == 0
                                 } else {
                                     true
-                                }
+                                },
+                                focusRequester = focusRequester,
                             )
                         }
                         if (composeType == ComposeType.Quote) {
                             status?.let { status ->
                                 Box(
                                     modifier = Modifier.background(
-                                        MaterialTheme.colors.onBackground.copy(
+                                        LocalContentColor.current.copy(
                                             alpha = 0.04f
                                         )
                                     ),
@@ -381,7 +396,6 @@ private fun ComposeBody(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(standardPadding * 2))
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
@@ -532,7 +546,7 @@ private fun MastodonExtraActions(
         }
     ) {
         Icon(
-            painter = painterResource(id = R.drawable.ic_cw),
+            painter = painterResource(id = R.drawable.ic_alert_octagon),
             contentDescription = null,
             tint = if (isContentWarning) {
                 MaterialTheme.colors.primary
@@ -802,6 +816,7 @@ private fun ComposeInput(
     viewModel: ComposeViewModel,
     account: AccountDetails,
     autoFocus: Boolean = true,
+    focusRequester: FocusRequester,
 ) {
     val text by viewModel.textFieldValue.observeAsState(initial = TextFieldValue())
     Column {
@@ -828,13 +843,26 @@ private fun ComposeInput(
                     AnimatedVisibility(visible = isContentWarningEnabled) {
                         val cwText by viewModel.contentWarningTextFieldValue.observeAsState(initial = TextFieldValue())
                         Column {
-                            TextInput(
-                                value = cwText,
-                                onValueChange = { viewModel.setContentWarningText(it) },
-                                placeholder = {
-                                    Text(text = stringResource(id = R.string.scene_compose_cw_placeholder))
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                CompositionLocalProvider(
+                                    LocalContentAlpha provides ContentAlpha.medium,
+                                ) {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.ic_alert_octagon),
+                                        contentDescription = null,
+                                    )
                                 }
-                            )
+                                Spacer(modifier = Modifier.width(standardPadding))
+                                TextInput(
+                                    value = cwText,
+                                    onValueChange = { viewModel.setContentWarningText(it) },
+                                    placeholder = {
+                                        Text(text = stringResource(id = R.string.scene_compose_cw_placeholder))
+                                    }
+                                )
+                            }
                             Spacer(modifier = Modifier.height(standardPadding))
                             Divider()
                             Spacer(modifier = Modifier.height(standardPadding))
@@ -842,7 +870,9 @@ private fun ComposeInput(
                     }
                 }
                 TextInput(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .focusRequester(focusRequester),
                     value = text,
                     onValueChange = { viewModel.setText(it) },
                     autoFocus = autoFocus,
@@ -1084,8 +1114,8 @@ private fun ComposeActions(
                     onClick = {
                         scope.launch {
                             val result = navController.navigateForResult(Route.Compose.Search.User)
-                                .toString()
-                            if (result.isNotEmpty()) {
+                                ?.toString()
+                            if (!result.isNullOrEmpty()) {
                                 viewModel.insertText("$result ")
                             }
                         }
@@ -1105,8 +1135,8 @@ private fun ComposeActions(
                         scope.launch {
                             val result =
                                 navController.navigateForResult(Route.Mastodon.Compose.Hashtag)
-                                    .toString()
-                            if (result.isNotEmpty()) {
+                                    ?.toString()
+                            if (!result.isNullOrEmpty()) {
                                 viewModel.insertText("$result ")
                             }
                         }
