@@ -1114,8 +1114,8 @@ private fun ComposeActions(
                     onClick = {
                         scope.launch {
                             val result = navController.navigateForResult(Route.Compose.Search.User)
-                                .toString()
-                            if (result.isNotEmpty()) {
+                                ?.toString()
+                            if (!result.isNullOrEmpty()) {
                                 viewModel.insertText("$result ")
                             }
                         }
@@ -1135,8 +1135,8 @@ private fun ComposeActions(
                         scope.launch {
                             val result =
                                 navController.navigateForResult(Route.Mastodon.Compose.Hashtag)
-                                    .toString()
-                            if (result.isNotEmpty()) {
+                                    ?.toString()
+                            if (!result.isNullOrEmpty()) {
                                 viewModel.insertText("$result ")
                             }
                         }
