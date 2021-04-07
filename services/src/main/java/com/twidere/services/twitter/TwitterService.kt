@@ -20,10 +20,12 @@
  */
 package com.twidere.services.twitter
 
+import com.twidere.services.http.AuthorizationInterceptor
 import com.twidere.services.http.Errors
 import com.twidere.services.http.MicroBlogHttpException
 import com.twidere.services.http.authorization.OAuth1Authorization
 import com.twidere.services.http.retrofit
+import com.twidere.services.microblog.DownloadMediaService
 import com.twidere.services.microblog.LookupService
 import com.twidere.services.microblog.MicroBlogService
 import com.twidere.services.microblog.RelationshipService
@@ -52,8 +54,11 @@ import com.twidere.services.twitter.model.fields.PollFields
 import com.twidere.services.twitter.model.fields.TweetFields
 import com.twidere.services.twitter.model.fields.UserFields
 import com.twidere.services.utils.Base64
+import com.twidere.services.utils.await
 import com.twidere.services.utils.copyToInLength
 import com.twidere.services.utils.decodeJson
+import okhttp3.OkHttpClient
+import okhttp3.Request
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
 
@@ -70,16 +75,12 @@ class TwitterService(
     LookupService,
     RelationshipService,
     SearchService,
-    StatusService {
+    StatusService,
+    DownloadMediaService {
     private val resources by lazy {
         retrofit<TwitterResources>(
             TWITTER_BASE_URL,
-            OAuth1Authorization(
-                consumer_key,
-                consumer_secret,
-                access_token,
-                access_token_secret,
-            ),
+            createOAuth1Authorization(),
             { chain ->
                 val response = chain.proceed(chain.request())
                 if (response.code != 200) {
@@ -106,14 +107,16 @@ class TwitterService(
     private val uploadResources by lazy {
         retrofit<UploadResources>(
             UPLOAD_TWITTER_BASE_URL,
-            OAuth1Authorization(
-                consumer_key,
-                consumer_secret,
-                access_token,
-                access_token_secret,
-            ),
+            createOAuth1Authorization(),
         )
     }
+
+    private fun createOAuth1Authorization() = OAuth1Authorization(
+        consumer_key,
+        consumer_secret,
+        access_token,
+        access_token_secret,
+    )
 
     override suspend fun homeTimeline(
         count: Int,
@@ -430,5 +433,22 @@ class TwitterService(
 
     suspend fun verifyCredentials(): User? {
         return resources.verifyCredentials()
+    }
+
+    override suspend fun download(target: String): InputStream {
+        return OkHttpClient
+            .Builder()
+            .addInterceptor(AuthorizationInterceptor(createOAuth1Authorization()))
+            .build()
+            .newCall(
+                Request
+                    .Builder()
+                    .url(target)
+                    .get()
+                    .build()
+            )
+            .await()
+            .body
+            ?.byteStream() ?: throw IllegalArgumentException()
     }
 }

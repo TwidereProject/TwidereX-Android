@@ -20,6 +20,8 @@
  */
 package com.twidere.twiderex.scenes
 
+import androidx.activity.compose.registerForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.expandVertically
@@ -137,7 +139,7 @@ fun StatusMediaScene(statusKey: MicroBlogKey, selectedIndex: Int) {
             CompositionLocalProvider(
                 LocalVideoPlayback provides DisplayPreferences.AutoPlayback.Always
             ) {
-                StatusMediaScene(status = it, selectedIndex = selectedIndex)
+                StatusMediaScene(status = it, selectedIndex = selectedIndex, viewModel = viewModel)
             }
         }
     }
@@ -145,7 +147,7 @@ fun StatusMediaScene(statusKey: MicroBlogKey, selectedIndex: Int) {
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun StatusMediaScene(status: UiStatus, selectedIndex: Int) {
+fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewModel) {
     var controlVisibility by remember { mutableStateOf(true) }
     val controlPanelColor = MaterialTheme.colors.surface.copy(alpha = 0.6f)
     val navController = LocalNavController.current
@@ -159,10 +161,6 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int) {
         onEnd = {
             controlVisibility = true
         }
-    )
-    val pagerState = rememberPagerState(
-        currentPage = selectedIndex,
-        maxPage = status.media.lastIndex,
     )
     Scaffold(
         backgroundColor = Color.Transparent,
@@ -299,14 +297,24 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int) {
                                         ReplyButton(status = status, withNumber = false)
                                         RetweetButton(status = status, withNumber = false)
                                         LikeButton(status = status, withNumber = false)
+                                        val saveFileLauncher = registerForActivityResult(
+                                            contract = ActivityResultContracts.CreateDocument()
+                                        ) {
+                                            it?.let {
+                                                viewModel.saveFile(currentMedia, it)
+                                            }
+                                        }
                                         ShareButton(status = status) { callback ->
                                             DropdownMenuItem(
                                                 onClick = {
                                                     callback.invoke()
+                                                    currentMedia.fileName?.let {
+                                                        saveFileLauncher.launch(it)
+                                                    }
                                                 }
                                             ) {
                                                 Text(
-                                                    text = "Save",
+                                                    text = stringResource(id = R.string.common_controls_actions_save),
                                                 )
                                             }
                                         }
