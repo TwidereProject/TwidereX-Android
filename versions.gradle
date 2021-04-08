@@ -11,7 +11,7 @@ ext {
             room                 : '2.3.0-rc01',
             lifecycle            : '2.4.0-alpha01',
             lifecycle_compose    : '1.0.0-alpha04',
-            okhttp               : '4.9.0',
+            okhttp               : '4.9.1',
             kotlinx_serialization: '1.1.0',
             paging               : '3.0.0-beta03',
             paging_compose       : '1.0.0-alpha08',
