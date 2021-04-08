@@ -29,8 +29,12 @@ internal class RouteMatch {
     var vars = arrayListOf<String>()
     var pathMap = linkedMapOf<String, String>()
     fun key(keys: List<String>) {
-        for (i in 0 until min(keys.size, vars.size)) {
-            pathMap[keys[i]] = vars.removeAt(i)
+        val size = min(keys.size, vars.size)
+        for (i in 0 until size) {
+            pathMap[keys[i]] = vars[i]
+        }
+        for (i in 0 until size) {
+            vars.removeFirst()
         }
     }
 

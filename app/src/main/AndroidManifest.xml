@@ -28,6 +28,7 @@
             tools:node="remove" />
         <activity
             android:exported="true"
+            android:launchMode="singleTop"
             android:hardwareAccelerated="true"
             android:name=".TwidereXActivity"
             android:label="@string/app_name"

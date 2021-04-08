@@ -303,7 +303,10 @@ fun RequirePlatformAccount(
 }
 
 fun RouteBuilder.route(constraints: Constraints) {
-    authorizedScene(Route.Home) {
+    authorizedScene(
+        Route.Home,
+        deepLinks = twitterHosts.map { "$it/*" }
+    ) {
         HomeScene()
     }
 
@@ -411,7 +414,7 @@ fun RouteBuilder.route(constraints: Constraints) {
     authorizedScene(
         Route.DeepLink.Twitter.Status,
         deepLinks = twitterHosts.map {
-            "$it/{screenName}/status/{statusId}"
+            "$it/{screenName}/status/{statusId:[0-9]+}"
         }
     ) { backStackEntry ->
         backStackEntry.path<String>("statusId")?.let { statusId ->

@@ -98,15 +98,15 @@ internal class RouteStackManager(
     }
 
     fun navigate(path: String, options: NavOptions? = null) {
+        val vm = viewModel ?: run {
+            pendingNavigation = path
+            return
+        }
         val query = path.substringAfter('?', "")
         val routePath = path.substringBefore('?')
         val matchResult = routeParser.find(path = routePath)
         checkNotNull(matchResult) { "RouteStackManager: navigate target $path not found" }
         require(matchResult.route is ComposeRoute) { "RouteStackManager: navigate target $path is not ComposeRoute" }
-        val vm = viewModel ?: run {
-            pendingNavigation = path
-            return
-        }
         if (options != null && matchResult.route is SceneRoute && options.launchSingleTop) {
             _backStacks.firstOrNull { it.scene.route.route == matchResult.route.route }?.let {
                 _backStacks.remove(it)
@@ -141,7 +141,10 @@ internal class RouteStackManager(
         if (options?.popUpTo != null && matchResult.route is SceneRoute) {
             val index = _backStacks.indexOfLast { it.scene.route.route == options.popUpTo.route }
             if (index != -1 && index != _backStacks.lastIndex) {
-                _backStacks.removeRange(if (options.popUpTo.inclusive) index else index + 1, _backStacks.lastIndex)
+                _backStacks.removeRange(
+                    if (options.popUpTo.inclusive) index else index + 1,
+                    _backStacks.lastIndex
+                )
             } else if (options.popUpTo.route.isEmpty()) {
                 _backStacks.removeRange(0, _backStacks.lastIndex)
             }
@@ -150,6 +153,11 @@ internal class RouteStackManager(
     }
 
     fun goBack(result: Any? = null) {
+        if (!canGoBack) {
+            updateBackPressCallback()
+            backDispatcher?.onBackPressed()
+            return
+        }
         when {
             currentStack?.canGoBack == true -> {
                 currentStack?.goBack()
@@ -201,6 +209,9 @@ internal class RouteStackManager(
     }
 
     fun navigateInitial(initialRoute: String) {
-        navigate(pendingNavigation ?: initialRoute)
+        navigate(initialRoute)
+        pendingNavigation?.let {
+            navigate(it)
+        }
     }
 }
