@@ -25,7 +25,7 @@ import android.annotation.SuppressLint
 import android.location.Location
 import android.net.Uri
 import androidx.activity.compose.BackHandler
-import androidx.activity.compose.registerForActivityResult
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -296,9 +296,9 @@ private fun ComposeBody(
                                 .distinctUntilChanged()
                                 .collect {
                                     if (it) {
-                                        keyboardController?.hideSoftwareKeyboard()
+                                        keyboardController?.hide()
                                     } else {
-                                        keyboardController?.showSoftwareKeyboard()
+                                        keyboardController?.show()
                                     }
                                 }
                         }
@@ -315,7 +315,7 @@ private fun ComposeBody(
                             .clickable(
                                 onClick = {
                                     focusRequester.requestFocus()
-                                    keyboardController?.showSoftwareKeyboard()
+                                    keyboardController?.show()
                                 },
                                 interactionSource = remember { MutableInteractionSource() },
                                 indication = null,
@@ -426,9 +426,9 @@ private fun ComposeBody(
                 }
                 LaunchedEffect(showEmoji) {
                     if (showEmoji) {
-                        keyboardController?.hideSoftwareKeyboard()
+                        keyboardController?.hide()
                     } else {
-                        keyboardController?.showSoftwareKeyboard()
+                        keyboardController?.show()
                     }
                 }
                 ComposeActions(
@@ -1044,13 +1044,13 @@ private fun ComposeActions(
     }
     val scope = rememberCoroutineScope()
     val navController = LocalNavController.current
-    val filePickerLauncher = registerForActivityResult(
+    val filePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetMultipleContents(),
         onResult = {
             viewModel.putImages(it)
         },
     )
-    val permissionLauncher = registerForActivityResult(
+    val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions(),
         onResult = {
             if (it.all { it.value }) {

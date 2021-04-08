@@ -120,7 +120,7 @@ fun TextInput(
     LaunchedEffect(autoFocus) {
         if (autoFocus) {
             focusRequester.requestFocus()
-            keyboardController?.showSoftwareKeyboard()
+            keyboardController?.show()
         }
     }
     Box(
@@ -134,7 +134,7 @@ fun TextInput(
                 //  Investiate why this is needed here. If it is really needed, instead of doing
                 //  this in the onClick callback, we should move this logic to the focusObserver
                 //  so that it can show or hide the keyboard based on the focus state.
-                keyboardController?.showSoftwareKeyboard()
+                keyboardController?.show()
             },
         contentAlignment = alignment,
     ) {

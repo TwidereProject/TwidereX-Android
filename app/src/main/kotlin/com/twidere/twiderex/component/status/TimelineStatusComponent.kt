@@ -288,9 +288,9 @@ private fun StatusActions(status: UiStatus) {
         LocalContentAlpha provides ContentAlpha.medium,
     ) {
         Row {
-            ReplyButton(status = status)
-            RetweetButton(status = status)
-            LikeButton(status = status)
+            ReplyButton(modifier = Modifier.weight(1f), status = status)
+            RetweetButton(modifier = Modifier.weight(1f), status = status)
+            LikeButton(modifier = Modifier.weight(1f), status = status)
             ShareButton(status = status, compat = true)
         }
     }

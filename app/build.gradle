@@ -23,8 +23,8 @@ plugins {
     id 'org.jetbrains.kotlin.android'
     id "org.jetbrains.kotlin.kapt"
     id "com.google.protobuf" version "0.8.14"
-    id "org.jetbrains.kotlin.plugin.serialization" version "1.4.31"
-    id "com.google.devtools.ksp" version "1.4.31-1.0.0-alpha06"
+    id "org.jetbrains.kotlin.plugin.serialization" version "1.4.32"
+    id "com.google.devtools.ksp" version "1.4.32-1.0.0-alpha07"
 }
 
 if (enableGoogleVariant) {
@@ -166,7 +166,6 @@ dependencies {
 
     implementation "androidx.paging:paging-runtime-ktx:$versions.paging"
     implementation "androidx.paging:paging-compose:$versions.paging_compose"
-    implementation "androidx.navigation:navigation-compose:$versions.navigation_compose"
     implementation "androidx.activity:activity-ktx:$versions.androidx"
     implementation "androidx.activity:activity-compose:$versions.androidx"
     implementation "androidx.datastore:datastore:$versions.dataStore"
@@ -174,7 +173,6 @@ dependencies {
     implementation "com.google.dagger:hilt-android:$versions.hilt"
     kapt "com.google.dagger:hilt-android-compiler:$versions.hilt"
     implementation "androidx.hilt:hilt-work:$versions.androidx_hilt"
-    implementation "androidx.hilt:hilt-navigation-compose:$versions.hilt_compose"
     kapt "androidx.hilt:hilt-compiler:$versions.androidx_hilt"
 
     implementation "androidx.room:room-runtime:$versions.room"
@@ -193,12 +191,12 @@ dependencies {
     implementation "com.google.accompanist:accompanist-glide:$versions.accompanist"
     implementation "com.google.accompanist:accompanist-insets:$versions.accompanist"
 
-    implementation 'com.github.Tlaster:Zoomable:0.2.0'
+    implementation 'com.github.Tlaster:Zoomable:0.2.1'
 
     implementation "com.twitter.twittertext:twitter-text:3.1.0"
     implementation 'org.jsoup:jsoup:1.13.1'
 
-    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.6'
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.7'
 
     implementation "com.google.protobuf:protobuf-javalite:$versions.protobuf"
 
