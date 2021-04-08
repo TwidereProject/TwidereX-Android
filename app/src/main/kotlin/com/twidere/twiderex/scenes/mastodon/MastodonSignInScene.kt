@@ -23,6 +23,8 @@ package com.twidere.twiderex.scenes.mastodon
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
@@ -33,7 +35,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.remember
@@ -42,13 +44,15 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.SignInButton
 import com.twidere.twiderex.component.foundation.SignInScaffold
+import com.twidere.twiderex.component.navigation.INavigator
 import com.twidere.twiderex.component.navigation.LocalNavigator
-import com.twidere.twiderex.extensions.navViewModel
-import com.twidere.twiderex.extensions.navigateForResult
-import com.twidere.twiderex.extensions.setResult
+import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.standardPadding
 import com.twidere.twiderex.viewmodel.mastodon.MastodonSignInViewModel
@@ -56,24 +60,25 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import moe.tlaster.precompose.navigation.NavController
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun MastodonSignInScene() {
-    val viewModel = navViewModel<MastodonSignInViewModel>()
-    val host by viewModel.host.observeAsState(initial = "")
+    val viewModel = assistedViewModel<MastodonSignInViewModel.AssistedFactory, MastodonSignInViewModel> {
+        it.create()
+    }
+    val host by viewModel.host.observeAsState(initial = TextFieldValue())
     val loading by viewModel.loading.observeAsState(initial = false)
     val navController = LocalNavController.current
     val navigator = LocalNavigator.current
-
     SignInScaffold {
         if (loading == true) {
             CircularProgressIndicator()
         } else {
             val focusRequester = remember { FocusRequester() }
-            DisposableEffect(focusRequester) {
+            LaunchedEffect(focusRequester) {
                 focusRequester.requestFocus()
-                onDispose { }
             }
             OutlinedTextField(
                 modifier = Modifier
@@ -81,28 +86,21 @@ fun MastodonSignInScene() {
                     .fillMaxWidth(),
                 value = host,
                 onValueChange = { viewModel.setHost(it) },
-
+                keyboardOptions = KeyboardOptions(
+                    autoCorrect = false,
+                    keyboardType = KeyboardType.Uri,
+                    imeAction = ImeAction.Go,
+                ),
+                keyboardActions = KeyboardActions(
+                    onGo = {
+                        signin(viewModel, host, navController, navigator)
+                    }
+                )
             )
             Spacer(modifier = Modifier.height(standardPadding * 2))
             SignInButton(
                 onClick = {
-                    GlobalScope.launch {
-                        withContext(Dispatchers.Main) {
-                            // TODO: dynamic key && secret
-                            viewModel.beginOAuth(
-                                host,
-                            ) { target ->
-                                navController.navigateForResult("code") {
-                                    navigator.mastodonSignInWeb(target)
-                                }
-                            }.let { success ->
-                                if (success) {
-                                    navController.setResult("success", success)
-                                    navController.popBackStack()
-                                }
-                            }
-                        }
-                    }
+                    signin(viewModel, host, navController, navigator)
                 }
             ) {
                 ListItem(
@@ -131,6 +129,27 @@ fun MastodonSignInScene() {
                         }
                     }
                 )
+            }
+        }
+    }
+}
+
+private fun signin(
+    viewModel: MastodonSignInViewModel,
+    host: TextFieldValue,
+    navController: NavController,
+    navigator: INavigator
+) {
+    GlobalScope.launch {
+        withContext(Dispatchers.Main) {
+            viewModel.beginOAuth(
+                host.text,
+            ) { target ->
+                navigator.mastodonSignInWeb(target)
+            }.let { success ->
+                if (success) {
+                    navController.goBackWith(success)
+                }
             }
         }
     }

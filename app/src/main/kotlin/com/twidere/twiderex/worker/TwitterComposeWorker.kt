@@ -30,6 +30,7 @@ import androidx.work.hasKeyWithValueOfType
 import androidx.work.workDataOf
 import com.twidere.services.http.MicroBlogException
 import com.twidere.services.twitter.TwitterService
+import com.twidere.twiderex.R
 import com.twidere.twiderex.model.ComposeData
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.notification.InAppNotification
@@ -122,6 +123,7 @@ class TwitterComposeWorker @AssistedInject constructor(
                 long = long,
                 exclude_reply_user_ids = draft.excludedReplyUserIds
             )
+            inAppNotification.show(R.string.common_alerts_tweet_sent_title)
             Result.success()
         } catch (e: MicroBlogException) {
             e.notify(inAppNotification)

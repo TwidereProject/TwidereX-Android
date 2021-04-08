@@ -32,5 +32,7 @@ data class Original(
     val frameRate: String? = null,
 
     val duration: Double? = null,
-    val bitrate: Long? = null
+    val bitrate: Long? = null,
+    val size: String? = null,
+    val aspect: Double? = null
 )

@@ -24,7 +24,6 @@ import com.twidere.services.microblog.model.IStatus
 import com.twidere.services.serializer.DateSerializerV2
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonArray
 import java.util.Date
 
 @Serializable
@@ -74,7 +73,8 @@ data class Status(
 
     val mentions: List<Mention>? = null,
     val tags: List<Tag>? = null,
-    val emojis: JsonArray? = null,
+    val emojis: List<Emoji>? = null,
     val card: Card? = null,
-//    val poll: Any? = null,
+    val poll: Poll? = null,
+    val pinned: Boolean? = null,
 ) : IStatus

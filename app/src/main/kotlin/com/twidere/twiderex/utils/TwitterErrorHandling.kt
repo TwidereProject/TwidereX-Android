@@ -34,6 +34,7 @@ import com.twidere.twiderex.notification.StringResWithActionNotificationEvent
 import java.util.concurrent.CancellationException
 
 fun Throwable.notify(notification: InAppNotification) {
+    printStackTrace()
     when (this) {
         is MicroBlogHttpException -> {
             when (this.httpCode) {

@@ -40,15 +40,16 @@ abstract class PagingMediator(
 
 @OptIn(ExperimentalPagingApi::class)
 fun PagingMediator.pager(
-    pageSize: Int = defaultLoadCount,
+    config: PagingConfig = PagingConfig(
+        pageSize = defaultLoadCount,
+        enablePlaceholders = false,
+    ),
     pagingSourceFactory: () -> PagingSource<Int, DbPagingTimelineWithStatus> = {
         database.pagingTimelineDao().getPagingSource(pagingKey = pagingKey, accountKey = accountKey)
     }
 ): Pager<Int, DbPagingTimelineWithStatus> {
     return Pager(
-        config = PagingConfig(
-            pageSize = pageSize,
-        ),
+        config = config,
         remoteMediator = this,
         pagingSourceFactory = pagingSourceFactory,
     )

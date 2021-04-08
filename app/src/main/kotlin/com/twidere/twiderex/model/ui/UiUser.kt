@@ -21,22 +21,29 @@
 package com.twidere.twiderex.model.ui
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.ui.res.painterResource
 import com.twidere.twiderex.R
-import com.twidere.twiderex.db.model.DbUserWithEntity
+import com.twidere.twiderex.db.model.DbMastodonUserExtra
+import com.twidere.twiderex.db.model.DbTwitterUserExtra
+import com.twidere.twiderex.db.model.DbUser
+import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.PlatformType
-import com.twidere.twiderex.model.ui.UiUrlEntity.Companion.toUi
+import com.twidere.twiderex.ui.LocalActiveAccount
 
+@Immutable
 data class UiUser(
     val id: String,
     val userKey: MicroBlogKey,
+    val acct: MicroBlogKey,
     val name: String,
     val screenName: String,
     val profileImage: Any,
     val profileBackgroundImage: String?,
     val followersCount: Long,
     val friendsCount: Long,
+    val statusesCount: Long,
     val listedCount: Long,
     val rawDesc: String,
     val htmlDesc: String,
@@ -45,8 +52,25 @@ data class UiUser(
     val verified: Boolean,
     val protected: Boolean,
     val platformType: PlatformType,
-    val url: List<UiUrlEntity>,
+    val twitterExtra: DbTwitterUserExtra? = null,
+    val mastodonExtra: DbMastodonUserExtra? = null,
 ) {
+    val displayName
+        get() = name.takeUnless { it.isEmpty() } ?: screenName
+    val displayScreenName: String
+        @Composable
+        get() {
+            return LocalActiveAccount.current?.let { getDisplayScreenName(it) } ?: "@$screenName"
+        }
+
+    fun getDisplayScreenName(accountDetails: AccountDetails): String {
+        return if (accountDetails.accountKey.host.let { it != acct.host }) {
+            "@$screenName@${acct.host}"
+        } else {
+            "@$screenName"
+        }
+    }
+
     companion object {
         @Composable
         fun sample() = UiUser(
@@ -58,6 +82,7 @@ data class UiUser(
             followersCount = 0,
             friendsCount = 0,
             listedCount = 0,
+            statusesCount = 0,
             rawDesc = "",
             htmlDesc = "",
             website = null,
@@ -66,10 +91,32 @@ data class UiUser(
             protected = false,
             userKey = MicroBlogKey.Empty,
             platformType = PlatformType.Twitter,
-            url = emptyList(),
+            acct = MicroBlogKey.twitter("TwidereProject")
         )
 
-        fun DbUserWithEntity.toUi() = with(user) {
+        @Composable
+        fun placeHolder() = UiUser(
+            id = "",
+            name = "",
+            screenName = "",
+            profileImage = painterResource(id = R.drawable.ic_profile_image_twidere),
+            profileBackgroundImage = null,
+            followersCount = 0,
+            friendsCount = 0,
+            listedCount = 0,
+            statusesCount = 0,
+            rawDesc = "",
+            htmlDesc = "",
+            website = null,
+            location = null,
+            verified = false,
+            protected = false,
+            userKey = MicroBlogKey.Empty,
+            platformType = PlatformType.Twitter,
+            acct = MicroBlogKey.Empty
+        )
+
+        fun DbUser.toUi() =
             UiUser(
                 id = userId,
                 name = name,
@@ -79,6 +126,7 @@ data class UiUser(
                 followersCount = followersCount,
                 friendsCount = friendsCount,
                 listedCount = listedCount,
+                statusesCount = statusesCount,
                 rawDesc = rawDesc,
                 htmlDesc = htmlDesc,
                 website = website,
@@ -87,8 +135,9 @@ data class UiUser(
                 protected = isProtected,
                 userKey = userKey,
                 platformType = platformType,
-                url = url.map { it.toUi() }
+                twitterExtra = twitterExtra,
+                mastodonExtra = mastodonExtra,
+                acct = acct,
             )
-        }
     }
 }

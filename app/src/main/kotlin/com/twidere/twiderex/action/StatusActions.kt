@@ -27,6 +27,7 @@ import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.worker.database.DeleteDbStatusWorker
 import com.twidere.twiderex.worker.status.DeleteStatusWorker
 import com.twidere.twiderex.worker.status.LikeWorker
+import com.twidere.twiderex.worker.status.MastodonVoteWorker
 import com.twidere.twiderex.worker.status.RetweetWorker
 import com.twidere.twiderex.worker.status.StatusResult
 import com.twidere.twiderex.worker.status.StatusWorker
@@ -41,6 +42,7 @@ interface IStatusActions {
     fun like(status: UiStatus, account: AccountDetails) {}
     fun retweet(status: UiStatus, account: AccountDetails) {}
     fun delete(status: UiStatus, account: AccountDetails) {}
+    fun vote(status: UiStatus, account: AccountDetails, votes: List<Int>) {}
 }
 
 class StatusActions @Inject constructor(
@@ -102,6 +104,16 @@ class StatusActions @Inject constructor(
                 )
             }
         ).then(listOf(UpdateStatusWorker.create())).enqueue()
+    }
+
+    override fun vote(status: UiStatus, account: AccountDetails, votes: List<Int>) {
+        workManager.beginWith(
+            MastodonVoteWorker.create(
+                statusKey = status.statusKey,
+                accountKey = account.accountKey,
+                votes = votes
+            )
+        ).enqueue()
     }
 }
 

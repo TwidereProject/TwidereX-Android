@@ -29,35 +29,18 @@ import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.compositionLocalOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import dev.chrisbanes.accompanist.glide.LocalRequestManager
+import com.google.accompanist.glide.LocalRequestManager
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
 
-val LocalIsScrollInProgress = compositionLocalOf { false }
-
-private class LazyColumnScrollState {
-    private val _isScrollInProgress = MutableStateFlow(false)
-    @OptIn(FlowPreview::class)
-    val isScrollInProgress: Flow<Boolean>
-        get() = _isScrollInProgress.debounce(100)
-
-    suspend fun setIsScrollInProgress(value: Boolean) {
-        _isScrollInProgress.emit(value)
-    }
-}
-
+@OptIn(FlowPreview::class)
 @Composable
 fun LazyColumn2(
     modifier: Modifier = Modifier,
@@ -70,41 +53,33 @@ fun LazyColumn2(
     flingBehavior: FlingBehavior = ScrollableDefaults.flingBehavior(),
     content: LazyListScope.() -> Unit
 ) {
-    val requestManager = LocalRequestManager.current
-    val scrollState = remember {
-        LazyColumnScrollState()
-    }
-    LaunchedEffect(state.isScrollInProgress) {
-        scrollState.setIsScrollInProgress(state.isScrollInProgress)
-    }
-    val isScrollInProgress by scrollState.isScrollInProgress.collectAsState(initial = false)
-    DisposableEffect(isScrollInProgress) {
-        requestManager?.let {
-            if (isScrollInProgress) {
-                if (!requestManager.isPaused) {
-                    requestManager.pauseRequests()
+    LocalRequestManager.current?.let { requestManager ->
+        LaunchedEffect(state) {
+            snapshotFlow { state.isScrollInProgress }
+                .debounce(100)
+                .distinctUntilChanged()
+                .collect {
+                    if (it) {
+                        if (!requestManager.isPaused) {
+                            requestManager.pauseRequests()
+                        }
+                    } else {
+                        if (requestManager.isPaused) {
+                            requestManager.resumeRequests()
+                        }
+                    }
                 }
-            } else {
-                if (requestManager.isPaused) {
-                    requestManager.resumeRequests()
-                }
-            }
         }
+    }
 
-        onDispose { }
-    }
-    CompositionLocalProvider(
-        LocalIsScrollInProgress provides isScrollInProgress
-    ) {
-        LazyColumn(
-            modifier = modifier,
-            state = state,
-            contentPadding = contentPadding,
-            reverseLayout = reverseLayout,
-            verticalArrangement = verticalArrangement,
-            horizontalAlignment = horizontalAlignment,
-            flingBehavior = flingBehavior,
-            content = content,
-        )
-    }
+    LazyColumn(
+        modifier = modifier,
+        state = state,
+        contentPadding = contentPadding,
+        reverseLayout = reverseLayout,
+        verticalArrangement = verticalArrangement,
+        horizontalAlignment = horizontalAlignment,
+        flingBehavior = flingBehavior,
+        content = content,
+    )
 }

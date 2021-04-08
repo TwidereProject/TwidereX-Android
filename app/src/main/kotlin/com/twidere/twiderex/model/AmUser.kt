@@ -20,7 +20,7 @@
  */
 package com.twidere.twiderex.model
 
-import com.twidere.twiderex.db.model.DbUserWithEntity
+import com.twidere.twiderex.db.model.DbUser
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -41,7 +41,7 @@ data class AmUser(
     val isProtected: Boolean,
 )
 
-fun DbUserWithEntity.toAmUser() = with(user) {
+fun DbUser.toAmUser() =
     AmUser(
         userId = userId,
         name = name,
@@ -58,4 +58,3 @@ fun DbUserWithEntity.toAmUser() = with(user) {
         verified = verified,
         isProtected = isProtected,
     )
-}

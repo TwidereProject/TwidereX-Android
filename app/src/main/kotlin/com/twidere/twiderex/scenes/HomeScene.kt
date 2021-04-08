@@ -68,9 +68,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.navigation.compose.navigate
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.UserMetrics
 import com.twidere.twiderex.component.foundation.AppBar
@@ -82,20 +80,24 @@ import com.twidere.twiderex.component.lazy.LazyListController
 import com.twidere.twiderex.component.lazy.LocalLazyListController
 import com.twidere.twiderex.component.lazy.itemDivider
 import com.twidere.twiderex.component.status.UserAvatar
+import com.twidere.twiderex.component.status.UserName
+import com.twidere.twiderex.component.status.UserScreenName
 import com.twidere.twiderex.extensions.withElevation
+import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.preferences.LocalAppearancePreferences
 import com.twidere.twiderex.preferences.proto.AppearancePreferences
 import com.twidere.twiderex.scenes.home.HomeNavigationItem
 import com.twidere.twiderex.scenes.home.HomeTimelineItem
+import com.twidere.twiderex.scenes.home.MastodonNotificationItem
 import com.twidere.twiderex.scenes.home.MeItem
 import com.twidere.twiderex.scenes.home.MentionItem
 import com.twidere.twiderex.scenes.home.SearchItem
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalActiveAccountViewModel
 import com.twidere.twiderex.ui.LocalNavController
-import com.twidere.twiderex.ui.TwidereXTheme
+import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.ui.mediumEmphasisContentContentColor
 import com.twidere.twiderex.ui.standardPadding
 import kotlinx.coroutines.launch
@@ -103,17 +105,29 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun HomeScene() {
+    val account = LocalActiveAccount.current ?: return
     val scope = rememberCoroutineScope()
     val timelineController = remember {
         LazyListController()
     }
     val tabPosition = LocalAppearancePreferences.current.tapPosition
-    val menus = listOf(
-        HomeTimelineItem(),
-        MentionItem(),
-        SearchItem(),
-        MeItem(),
-    )
+    val menus = remember(account.type) {
+        listOf(
+            HomeTimelineItem(),
+        ).let {
+            it + when (account.type) {
+                PlatformType.Twitter -> MentionItem()
+                PlatformType.StatusNet -> TODO()
+                PlatformType.Fanfou -> TODO()
+                PlatformType.Mastodon -> MastodonNotificationItem()
+            }
+        }.let {
+            it + listOf(
+                SearchItem(),
+                MeItem(),
+            )
+        }
+    }
     val pagerState = rememberPagerState(
         maxPage = menus.lastIndex
     )
@@ -125,7 +139,7 @@ fun HomeScene() {
             }
         }
     }
-    TwidereXTheme {
+    TwidereScene {
         Scaffold(
             scaffoldState = scaffoldState,
             topBar = {
@@ -211,10 +225,14 @@ fun HomeScene() {
             Box(
                 modifier = Modifier.padding(it)
             ) {
-                CompositionLocalProvider(
-                    LocalLazyListController provides timelineController
-                ) {
-                    Pager(state = pagerState) {
+                Pager(state = pagerState) {
+                    CompositionLocalProvider(
+                        *if (page == currentPage) {
+                            arrayOf(LocalLazyListController provides timelineController)
+                        } else {
+                            emptyArray()
+                        }
+                    ) {
                         menus[page].content()
                     }
                 }
@@ -319,21 +337,14 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
                             icon = {
                                 UserAvatar(
                                     user = user,
+                                    withPlatformIcon = true,
                                 )
                             },
                             text = {
-                                Text(
-                                    text = user.name,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis,
-                                )
+                                UserName(user = user)
                             },
                             secondaryText = {
-                                Text(
-                                    text = "@${user.screenName}",
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis,
-                                )
+                                UserScreenName(user = user)
                             },
                         )
                     }
@@ -435,22 +446,19 @@ private fun DrawerUserHeader(
             user?.let {
                 UserAvatar(
                     user = it,
+                    withPlatformIcon = true,
                 )
             }
         },
         text = {
-            Text(
-                text = user?.name ?: "",
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
+            if (user != null) {
+                UserName(user = user)
+            }
         },
         secondaryText = {
-            Text(
-                text = "@${user?.screenName}",
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
+            if (user != null) {
+                UserScreenName(user = user)
+            }
         },
         trailing = {
             val transition = updateTransition(targetState = showAccounts)

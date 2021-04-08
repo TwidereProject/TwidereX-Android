@@ -23,7 +23,6 @@ package com.twidere.services.mastodon.model
 import com.twidere.services.microblog.model.IUser
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonArray
 
 @Serializable
 data class Account(
@@ -66,7 +65,7 @@ data class Account(
     @SerialName("last_status_at")
     val lastStatusAt: String? = null,
 
-    val emojis: JsonArray? = null,
+    val emojis: List<Emoji>? = null,
     val fields: List<Field>? = null,
     val source: Source? = null,
 ) : IUser

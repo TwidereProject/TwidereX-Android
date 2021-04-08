@@ -26,25 +26,49 @@ import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.unit.Constraints
 import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 import kotlin.math.withSign
 
+@Composable
+fun rememberSwiperState(
+    onStart: () -> Unit = {},
+    onDismiss: () -> Unit = {},
+    onEnd: () -> Unit = {},
+): SwiperState {
+    return remember {
+        SwiperState(
+            onStart = onStart,
+            onDismiss = onDismiss,
+            onEnd = onEnd,
+        )
+    }
+}
+
+@Stable
 class SwiperState(
-    private val constraints: Constraints,
-    private val onDismiss: () -> Unit,
-    private val onEnd: () -> Unit = {},
+    val onStart: () -> Unit = {},
+    val onDismiss: () -> Unit = {},
+    val onEnd: () -> Unit = {},
 ) {
+    internal var maxHeight: Int = 0
+    private var _offset = Animatable(0f)
+
     val offset: Float
         get() = _offset.value
 
-    private var _offset = Animatable(0f)
+    val progress: Float
+        get() = (offset.absoluteValue / (if (maxHeight == 0) 1 else maxHeight)).coerceIn(
+            maximumValue = 1f,
+            minimumValue = 0f
+        )
 
     suspend fun snap(value: Float) {
         _offset.snapTo(value)
@@ -56,17 +80,17 @@ class SwiperState(
             velocity.absoluteValue > 4000f -> {
                 dismiss()
             }
-            value.absoluteValue < constraints.maxHeight * 0.5 -> {
+            value.absoluteValue < maxHeight * 0.5 -> {
                 restore()
             }
-            value.absoluteValue < constraints.maxHeight -> {
+            value.absoluteValue < maxHeight -> {
                 dismiss()
             }
         }
     }
 
     private suspend fun dismiss() {
-        _offset.animateTo(constraints.maxHeight.toFloat().withSign(_offset.value))
+        _offset.animateTo(maxHeight.toFloat().withSign(_offset.value))
         onDismiss.invoke()
     }
 
@@ -79,24 +103,18 @@ class SwiperState(
 @Composable
 fun Swiper(
     modifier: Modifier = Modifier,
+    state: SwiperState,
     orientation: Orientation = Orientation.Vertical,
     enabled: Boolean = true,
     reverseDirection: Boolean = false,
-    onStart: () -> Unit = {},
-    onEnd: () -> Unit = {},
-    onDismiss: () -> Unit = {},
     content: @Composable () -> Unit,
 ) {
     val scope = rememberCoroutineScope()
     BoxWithConstraints(
         modifier = modifier,
     ) {
-        val state = remember {
-            SwiperState(
-                constraints = constraints,
-                onDismiss = onDismiss,
-                onEnd = onEnd,
-            )
+        LaunchedEffect(constraints.maxHeight) {
+            state.maxHeight = constraints.maxHeight
         }
         Layout(
             modifier = Modifier.draggable(
@@ -109,7 +127,7 @@ fun Swiper(
                     }
                 },
                 onDragStarted = {
-                    onStart.invoke()
+                    state.onStart.invoke()
                 },
                 state = DraggableState { dy ->
                     scope.launch {

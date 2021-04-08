@@ -23,6 +23,7 @@ package com.twidere.twiderex.component.foundation
 import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -32,7 +33,8 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -107,6 +109,7 @@ private fun rememberSwipeToRefreshState(
     }
 }
 
+@Stable
 private class SwipeToRefreshState(
     initialValue: Boolean,
     private val scope: CoroutineScope,
@@ -219,6 +222,7 @@ private class SwipeToRefreshState(
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun SwipeToRefreshLayout(
+    modifier: Modifier = Modifier,
     refreshingState: Boolean,
     onRefresh: () -> Unit,
     refreshIndicator: @Composable () -> Unit = {
@@ -244,8 +248,8 @@ fun SwipeToRefreshLayout(
         onRefresh = onRefresh,
     )
     Box(
-        modifier = Modifier
-            .fillMaxWidth()
+        modifier = modifier
+            .fillMaxSize()
             .nestedScroll(state)
             .pointerInput(Unit) {
                 detectVerticalDragGestures(
@@ -275,11 +279,10 @@ fun SwipeToRefreshLayout(
             }
         }
 
-        DisposableEffect(refreshingState) {
+        LaunchedEffect(refreshingState) {
             scope.launch {
                 state.animateTo(refreshingState)
             }
-            onDispose { }
         }
     }
 }

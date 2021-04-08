@@ -20,10 +20,12 @@
  */
 package com.twidere.services.twitter
 
+import com.twidere.services.http.AuthorizationInterceptor
 import com.twidere.services.http.Errors
 import com.twidere.services.http.MicroBlogHttpException
 import com.twidere.services.http.authorization.OAuth1Authorization
 import com.twidere.services.http.retrofit
+import com.twidere.services.microblog.DownloadMediaService
 import com.twidere.services.microblog.LookupService
 import com.twidere.services.microblog.MicroBlogService
 import com.twidere.services.microblog.RelationshipService
@@ -31,6 +33,7 @@ import com.twidere.services.microblog.SearchService
 import com.twidere.services.microblog.StatusService
 import com.twidere.services.microblog.TimelineService
 import com.twidere.services.microblog.model.IRelationship
+import com.twidere.services.microblog.model.ISearchResponse
 import com.twidere.services.microblog.model.IStatus
 import com.twidere.services.microblog.model.IUser
 import com.twidere.services.microblog.model.Relationship
@@ -51,8 +54,11 @@ import com.twidere.services.twitter.model.fields.PollFields
 import com.twidere.services.twitter.model.fields.TweetFields
 import com.twidere.services.twitter.model.fields.UserFields
 import com.twidere.services.utils.Base64
+import com.twidere.services.utils.await
 import com.twidere.services.utils.copyToInLength
 import com.twidere.services.utils.decodeJson
+import okhttp3.OkHttpClient
+import okhttp3.Request
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
 
@@ -69,16 +75,12 @@ class TwitterService(
     LookupService,
     RelationshipService,
     SearchService,
-    StatusService {
+    StatusService,
+    DownloadMediaService {
     private val resources by lazy {
         retrofit<TwitterResources>(
             TWITTER_BASE_URL,
-            OAuth1Authorization(
-                consumer_key,
-                consumer_secret,
-                access_token,
-                access_token_secret,
-            ),
+            createOAuth1Authorization(),
             { chain ->
                 val response = chain.proceed(chain.request())
                 if (response.code != 200) {
@@ -105,14 +107,16 @@ class TwitterService(
     private val uploadResources by lazy {
         retrofit<UploadResources>(
             UPLOAD_TWITTER_BASE_URL,
-            OAuth1Authorization(
-                consumer_key,
-                consumer_secret,
-                access_token,
-                access_token_secret,
-            ),
+            createOAuth1Authorization(),
         )
     }
+
+    private fun createOAuth1Authorization() = OAuth1Authorization(
+        consumer_key,
+        consumer_secret,
+        access_token,
+        access_token_secret,
+    )
 
     override suspend fun homeTimeline(
         count: Int,
@@ -278,22 +282,32 @@ class TwitterService(
         return data
     }
 
-    override suspend fun userPinnedStatus(userId: String): IStatus? {
+    override suspend fun userPinnedStatus(userId: String): List<IStatus> {
         val user = lookupUser(userId)
-        return user.pinnedTweetID?.let { lookupStatus(it) }
+        return listOfNotNull(user.pinnedTweetID?.let { lookupStatus(it) })
     }
 
     override suspend fun searchTweets(
         query: String,
         count: Int,
-        since_id: String?,
+        nextPage: String?,
+    ): ISearchResponse {
+        return try {
+            searchV2("$query -is:retweet", count = count, nextPage = nextPage)
+        } catch (e: TwitterApiExceptionV2) {
+            searchV1("$query -filter:retweets", count = count, max_id = nextPage)
+        }
+    }
+
+    suspend fun searchV2(
+        query: String,
+        count: Int,
         nextPage: String?,
     ): TwitterSearchResponseV2 {
         val result = resources.search(
             query,
             next_token = nextPage,
             max_results = count,
-            since_id = since_id,
             userFields = UserFields.values().joinToString(",") { it.value },
             pollFields = PollFields.values().joinToString(",") { it.name },
             placeFields = PlaceFields.values().joinToString(",") { it.value },
@@ -310,7 +324,7 @@ class TwitterService(
         return result
     }
 
-    suspend fun searchTweetsV1(
+    suspend fun searchV1(
         query: String,
         count: Int,
         since_id: String? = null,
@@ -345,8 +359,6 @@ class TwitterService(
     override suspend fun retweet(id: String) = resources.retweet(id)
 
     override suspend fun unRetweet(id: String) = resources.unretweet(id)
-
-    override suspend fun compose(content: String) = update(content)
 
     override suspend fun delete(id: String) = resources.destroy(id)
 
@@ -421,5 +433,22 @@ class TwitterService(
 
     suspend fun verifyCredentials(): User? {
         return resources.verifyCredentials()
+    }
+
+    override suspend fun download(target: String): InputStream {
+        return OkHttpClient
+            .Builder()
+            .addInterceptor(AuthorizationInterceptor(createOAuth1Authorization()))
+            .build()
+            .newCall(
+                Request
+                    .Builder()
+                    .url(target)
+                    .get()
+                    .build()
+            )
+            .await()
+            .body
+            ?.byteStream() ?: throw IllegalArgumentException()
     }
 }

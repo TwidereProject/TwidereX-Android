@@ -32,6 +32,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -118,11 +119,10 @@ fun VideoPlayer(
                 VideoPool.set(url, 0L.coerceAtLeast(player.contentPosition))
             }
 
-            DisposableEffect(customControl) {
+            LaunchedEffect(customControl) {
                 if (customControl != null) {
                     customControl.player = player
                 }
-                onDispose { }
             }
 
             DisposableEffect(Unit) {

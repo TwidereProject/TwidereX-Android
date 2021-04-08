@@ -20,11 +20,10 @@
  */
 package com.twidere.twiderex.viewmodel.twitter.user
 
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
 import com.twidere.services.microblog.LookupService
-import com.twidere.services.microblog.RelationshipService
-import com.twidere.twiderex.di.assisted.IAssistedFactory
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.UserRepository
@@ -41,17 +40,19 @@ class TwitterUserViewModel @AssistedInject constructor(
 
     private val repository by lazy {
         account.service.let {
-            factory.create(account.accountKey, it as LookupService, it as RelationshipService)
+            factory.create(account.accountKey, it as LookupService)
         }
     }
 
     @dagger.assisted.AssistedFactory
-    interface AssistedFactory : IAssistedFactory {
+    interface AssistedFactory {
         fun create(
             account: AccountDetails,
             screenName: String?,
         ): TwitterUserViewModel
     }
+
+    val error = MutableLiveData<Throwable>(null)
 
     val user = liveData {
         runCatching {
@@ -59,8 +60,9 @@ class TwitterUserViewModel @AssistedInject constructor(
         }.onSuccess {
             emit(it)
         }.onFailure {
-            emit(null)
             it.notify(inAppNotification)
+            emit(null)
+            error.postValue(it)
         }
     }
 }

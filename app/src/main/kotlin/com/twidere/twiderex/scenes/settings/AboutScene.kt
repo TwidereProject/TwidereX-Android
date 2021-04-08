@@ -41,7 +41,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.navigation.compose.navigate
 import com.twidere.twiderex.BuildConfig
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.LoginLogo
@@ -50,11 +49,11 @@ import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.ui.LocalNavController
-import com.twidere.twiderex.ui.TwidereXTheme
+import com.twidere.twiderex.ui.TwidereScene
 
 @Composable
 fun AboutScene() {
-    TwidereXTheme {
+    TwidereScene {
         InAppNotificationScaffold(
             topBar = {
                 AppBar(
@@ -115,7 +114,7 @@ private fun AboutContent() {
             Row {
                 IconButton(
                     onClick = {
-                        navController.navigate("deeplink/twitter/TwidereProject")
+                        navController.navigate("deeplink/twitter/user/TwidereProject")
                     }
                 ) {
                     Icon(

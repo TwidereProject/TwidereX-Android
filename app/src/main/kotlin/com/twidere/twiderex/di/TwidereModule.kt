@@ -29,6 +29,7 @@ import com.twidere.twiderex.repository.DraftRepository
 import com.twidere.twiderex.repository.ReactionRepository
 import com.twidere.twiderex.repository.SearchRepository
 import com.twidere.twiderex.repository.StatusRepository
+import com.twidere.twiderex.utils.PlatformResolver
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -64,4 +65,9 @@ object TwidereModule {
     @Singleton
     @Provides
     fun provideInAppNotification(): InAppNotification = InAppNotification()
+
+    @Singleton
+    @Provides
+    fun providePlatformResolver(database: CacheDatabase): PlatformResolver =
+        PlatformResolver(database = database)
 }

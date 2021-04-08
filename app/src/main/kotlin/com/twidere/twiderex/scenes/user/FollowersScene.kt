@@ -31,7 +31,7 @@ import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.extensions.viewModel
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.ui.LocalActiveAccount
-import com.twidere.twiderex.ui.TwidereXTheme
+import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.twitter.FollowersViewModel
 
 @Composable
@@ -45,7 +45,7 @@ fun FollowersScene(
     ) {
         FollowersViewModel(account, userKey)
     }
-    TwidereXTheme {
+    TwidereScene {
         InAppNotificationScaffold(
             topBar = {
                 AppBar(

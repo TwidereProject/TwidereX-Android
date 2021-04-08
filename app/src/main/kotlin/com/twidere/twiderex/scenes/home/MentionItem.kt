@@ -35,9 +35,6 @@ class MentionItem : HomeNavigationItem() {
     @Composable
     override fun name(): String = stringResource(R.string.scene_mentions_title)
 
-    override val route: String
-        get() = "mentions"
-
     @Composable
     override fun icon(): Painter = painterResource(id = R.drawable.ic_message_circle)
 

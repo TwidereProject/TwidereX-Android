@@ -20,14 +20,23 @@
  */
 package com.twidere.twiderex.db.model
 
+import androidx.compose.runtime.Stable
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import androidx.room.Relation
+import com.twidere.services.mastodon.model.Card
+import com.twidere.services.mastodon.model.Emoji
+import com.twidere.services.mastodon.model.Mention
+import com.twidere.services.mastodon.model.Poll
+import com.twidere.services.mastodon.model.Visibility
+import com.twidere.services.twitter.model.ReplySettings
 import com.twidere.twiderex.db.CacheDatabase
+import com.twidere.twiderex.model.MastodonStatusType
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.PlatformType
+import kotlinx.serialization.Serializable
 
 @Entity(
     tableName = "status",
@@ -55,11 +64,30 @@ data class DbStatusV2(
     val hasMedia: Boolean,
     val userKey: MicroBlogKey,
     val lang: String?,
-    val replyStatusKey: MicroBlogKey?,
-    val quoteStatusKey: MicroBlogKey?,
-    val retweetStatusKey: MicroBlogKey?,
     val is_possibly_sensitive: Boolean,
     val platformType: PlatformType,
+    var mastodonExtra: DbMastodonStatusExtra? = null,
+    val twitterExtra: DbTwitterStatusExtra? = null,
+)
+
+@Stable
+@Serializable
+data class DbTwitterStatusExtra(
+    val reply_settings: ReplySettings,
+    val quoteCount: Long? = null,
+)
+
+@Stable
+@Serializable
+data class DbMastodonStatusExtra(
+    val type: MastodonStatusType,
+    val emoji: List<Emoji>,
+    val visibility: Visibility,
+    val sensitive: Boolean,
+    val spoilerText: String?,
+    val poll: Poll?,
+    val card: Card?,
+    val mentions: List<Mention>?,
 )
 
 data class DbStatusWithMediaAndUser(
@@ -67,53 +95,28 @@ data class DbStatusWithMediaAndUser(
     val data: DbStatusV2,
     @Relation(parentColumn = "statusKey", entityColumn = "statusKey")
     val media: List<DbMedia>,
-    @Relation(parentColumn = "userKey", entityColumn = "userKey", entity = DbUser::class)
-    val user: DbUserWithEntity,
+    @Relation(parentColumn = "userKey", entityColumn = "userKey")
+    val user: DbUser,
     @Relation(parentColumn = "statusKey", entityColumn = "statusKey")
     val reactions: List<DbStatusReaction>,
     @Relation(parentColumn = "statusKey", entityColumn = "statusKey")
     val url: List<DbUrlEntity>,
 )
 
-data class DbStatusWithReference(
-    @Embedded
-    val status: DbStatusWithMediaAndUser,
-    @Relation(
-        parentColumn = "replyStatusKey",
-        entityColumn = "statusKey",
-        entity = DbStatusV2::class
-    )
-    val replyTo: DbStatusWithMediaAndUser?,
-    @Relation(
-        parentColumn = "quoteStatusKey",
-        entityColumn = "statusKey",
-        entity = DbStatusV2::class
-    )
-    val quote: DbStatusWithMediaAndUser?,
-    @Relation(
-        parentColumn = "retweetStatusKey",
-        entityColumn = "statusKey",
-        entity = DbStatusV2::class
-    )
-    val retweet: DbStatusWithMediaAndUser?,
-)
-
 suspend fun List<DbStatusWithMediaAndUser>.saveToDb(
     database: CacheDatabase
 ) {
-    map { it.user.user }.let {
+    map { it.user }.let {
         database.userDao().insertAll(it)
     }
-    database.mediaDao().insertAll(map { it.media }.flatten())
+    database.mediaDao().insertAll(flatMap { it.media })
     map { it.data }.let {
         database.statusDao().insertAll(it)
     }
-    map { it.url }.let {
-        it + map { it.user.url }
-    }.flatten().let {
+    flatMap { it.url }.let {
         database.urlEntityDao().insertAll(it)
     }
-    map { it.reactions }.flatten().let {
+    flatMap { it.reactions }.let {
         database.reactionDao().insertAll(it)
     }
 }

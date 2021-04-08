@@ -36,7 +36,12 @@ class FollowingViewModel(
     private val userKey: MicroBlogKey
 ) : UserListViewModel() {
     override val source by lazy {
-        Pager(config = PagingConfig(pageSize = defaultLoadCount)) {
+        Pager(
+            config = PagingConfig(
+                pageSize = defaultLoadCount,
+                enablePlaceholders = false,
+            )
+        ) {
             FollowingPagingSource(
                 userKey = userKey,
                 account.service as RelationshipService

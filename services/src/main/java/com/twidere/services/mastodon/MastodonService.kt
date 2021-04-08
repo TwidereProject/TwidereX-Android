@@ -20,24 +20,54 @@
  */
 package com.twidere.services.mastodon
 
+import com.twidere.services.http.AuthorizationInterceptor
 import com.twidere.services.http.authorization.BearerAuthorization
 import com.twidere.services.http.retrofit
 import com.twidere.services.mastodon.api.MastodonResources
+import com.twidere.services.mastodon.model.Context
+import com.twidere.services.mastodon.model.Emoji
+import com.twidere.services.mastodon.model.Hashtag
 import com.twidere.services.mastodon.model.MastodonPaging
+import com.twidere.services.mastodon.model.MastodonSearchResponse
+import com.twidere.services.mastodon.model.NotificationTypes
+import com.twidere.services.mastodon.model.Poll
+import com.twidere.services.mastodon.model.PostStatus
+import com.twidere.services.mastodon.model.PostVote
+import com.twidere.services.mastodon.model.SearchType
+import com.twidere.services.mastodon.model.UploadResponse
 import com.twidere.services.mastodon.model.exceptions.MastodonException
+import com.twidere.services.microblog.DownloadMediaService
 import com.twidere.services.microblog.LookupService
 import com.twidere.services.microblog.MicroBlogService
+import com.twidere.services.microblog.NotificationService
 import com.twidere.services.microblog.RelationshipService
+import com.twidere.services.microblog.SearchService
+import com.twidere.services.microblog.StatusService
 import com.twidere.services.microblog.TimelineService
+import com.twidere.services.microblog.model.INotification
 import com.twidere.services.microblog.model.IRelationship
+import com.twidere.services.microblog.model.ISearchResponse
 import com.twidere.services.microblog.model.IStatus
 import com.twidere.services.microblog.model.IUser
 import com.twidere.services.microblog.model.Relationship
+import com.twidere.services.utils.await
+import okhttp3.MultipartBody
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
+import java.io.InputStream
 
 class MastodonService(
     private val host: String,
     private val accessToken: String,
-) : MicroBlogService, TimelineService, LookupService, RelationshipService {
+) : MicroBlogService,
+    TimelineService,
+    LookupService,
+    RelationshipService,
+    NotificationService,
+    SearchService,
+    StatusService,
+    DownloadMediaService {
     private val resources by lazy {
         retrofit<MastodonResources>(
             "https://$host",
@@ -56,7 +86,12 @@ class MastodonService(
         since_id: String?,
         max_id: String?
     ): List<IStatus> {
-        TODO("Not yet implemented")
+        return resources.notification(
+            max_id = max_id,
+            since_id = since_id,
+            limit = count,
+            exclude_types = NotificationTypes.values().filter { it != NotificationTypes.mention }
+        )
     }
 
     override suspend fun userTimeline(
@@ -100,15 +135,15 @@ class MastodonService(
     }
 
     override suspend fun lookupStatus(id: String): IStatus {
-        TODO("Not yet implemented")
+        return resources.lookupStatus(id)
     }
 
-    override suspend fun userPinnedStatus(userId: String): IStatus? {
-        TODO("Not yet implemented")
+    override suspend fun userPinnedStatus(userId: String): List<IStatus> {
+        return resources.userTimeline(user_id = userId, pinned = true)
     }
 
     override suspend fun showRelationship(target_id: String): IRelationship {
-        val response = resources.showFriendships(target_id).firstOrNull()
+        val response = resources.showFriendships(listOf(target_id)).firstOrNull()
             ?: throw MastodonException("can not fetch relationship")
         return Relationship(
             followedBy = response.following ?: false,
@@ -136,5 +171,129 @@ class MastodonService(
 
     override suspend fun unfollow(user_id: String) {
         resources.unfollow(user_id)
+    }
+
+    override suspend fun notificationTimeline(
+        count: Int,
+        since_id: String?,
+        max_id: String?
+    ): List<INotification> {
+        return resources.notification(
+            max_id = max_id,
+            since_id = since_id,
+            limit = count,
+        )
+    }
+
+    suspend fun context(id: String): Context {
+        return resources.context(id)
+    }
+
+    suspend fun searchHashTag(
+        query: String,
+        offset: Int,
+        count: Int,
+    ): List<Hashtag> {
+        return resources.searchV2(
+            query = query,
+            type = SearchType.hashtags,
+            offset = offset,
+            limit = count,
+        ).hashtags ?: emptyList()
+    }
+
+    override suspend fun searchTweets(
+        query: String,
+        count: Int,
+        nextPage: String?
+    ): ISearchResponse {
+        val result = resources.searchV2(
+            query = query,
+            type = SearchType.statuses,
+            max_id = nextPage,
+            limit = count
+        )
+        return MastodonSearchResponse(
+            nextPage = result.statuses?.lastOrNull()?.id,
+            status = result.statuses ?: emptyList()
+        )
+    }
+
+    override suspend fun searchUsers(query: String, page: Int?, count: Int): List<IUser> {
+        return resources.searchV2(
+            query = query,
+            type = SearchType.accounts,
+            limit = count,
+            offset = (page ?: 0) * count
+        ).accounts ?: emptyList()
+    }
+
+    suspend fun hashtagTimeline(
+        query: String,
+        count: Int? = null,
+        since_id: String? = null,
+        max_id: String? = null,
+    ): List<IStatus> = resources.hashtagTimeline(
+        hashtag = query,
+        limit = count,
+        since_id = since_id,
+        max_id = max_id,
+    )
+
+    override suspend fun like(id: String): IStatus {
+        return resources.favourite(id)
+    }
+
+    override suspend fun unlike(id: String): IStatus {
+        return resources.unfavourite(id).let {
+            it.copy(favouritesCount = it.favouritesCount?.let { it - 1 })
+        }
+    }
+
+    override suspend fun retweet(id: String): IStatus {
+        return resources.reblog(id)
+    }
+
+    override suspend fun unRetweet(id: String): IStatus {
+        return resources.unreblog(id).let {
+            it.copy(favouritesCount = it.reblogsCount?.let { it - 1 })
+        }
+    }
+
+    override suspend fun delete(id: String): IStatus {
+        return resources.delete(id)
+    }
+
+    suspend fun upload(stream: InputStream, name: String): UploadResponse {
+        val body = MultipartBody.Part
+            .createFormData("file", name, stream.readBytes().toRequestBody())
+        return resources.upload(body)
+    }
+
+    suspend fun compose(data: PostStatus): IStatus {
+        return resources.post(data)
+    }
+
+    suspend fun vote(id: String, choice: List<Int>): Poll {
+        return resources.vote(id, PostVote(choices = choice.map { it.toString() }))
+    }
+
+    suspend fun emojis(): List<Emoji> = resources.emojis()
+
+    override suspend fun download(target: String): InputStream {
+        return OkHttpClient
+            .Builder()
+            .addInterceptor(AuthorizationInterceptor(BearerAuthorization(accessToken)))
+            .build()
+            .newCall(
+                Request
+                    .Builder()
+                    .url(target)
+                    .get()
+                    .build()
+            )
+            .await()
+            .body
+            ?.byteStream() ?: throw IllegalArgumentException()
     }
 }

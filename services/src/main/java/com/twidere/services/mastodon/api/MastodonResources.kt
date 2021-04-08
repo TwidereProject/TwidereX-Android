@@ -20,8 +20,17 @@
  */
 package com.twidere.services.mastodon.api
 
+import com.twidere.services.mastodon.model.Emoji
+import retrofit2.http.GET
+
 interface MastodonResources :
     TimelineResources,
     LookupResources,
     FriendshipResources,
-    AccountResources
+    AccountResources,
+    SearchResources,
+    StatusResources {
+
+    @GET("/api/v1/custom_emojis")
+    suspend fun emojis(): List<Emoji>
+}

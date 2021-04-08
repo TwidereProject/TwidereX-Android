@@ -23,11 +23,9 @@ package com.twidere.twiderex.viewmodel.user
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.twidere.services.http.MicroBlogException
 import com.twidere.services.microblog.LookupService
 import com.twidere.services.microblog.RelationshipService
 import com.twidere.services.microblog.model.IRelationship
-import com.twidere.twiderex.di.assisted.IAssistedFactory
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.notification.InAppNotification
@@ -36,8 +34,6 @@ import com.twidere.twiderex.utils.notify
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.launch
-import retrofit2.HttpException
-import java.io.IOException
 
 class UserViewModel @AssistedInject constructor(
     private val factory: UserRepository.AssistedFactory,
@@ -47,7 +43,7 @@ class UserViewModel @AssistedInject constructor(
 ) : ViewModel() {
 
     @dagger.assisted.AssistedFactory
-    interface AssistedFactory : IAssistedFactory {
+    interface AssistedFactory {
         fun create(
             account: AccountDetails,
             initialUserKey: MicroBlogKey?,
@@ -56,9 +52,14 @@ class UserViewModel @AssistedInject constructor(
 
     private val repository by lazy {
         account.service.let {
-            factory.create(account.accountKey, it as LookupService, it as RelationshipService)
+            factory.create(account.accountKey, it as LookupService)
         }
     }
+
+    private val relationshipService by lazy {
+        account.service as RelationshipService
+    }
+
     val refreshing = MutableLiveData(false)
     val loadingRelationship = MutableLiveData(false)
     val user = repository.getUserLiveData(userKey)
@@ -67,39 +68,45 @@ class UserViewModel @AssistedInject constructor(
 
     fun refresh() = viewModelScope.launch {
         refreshing.postValue(true)
-        try {
+        runCatching {
             repository.lookupUserById(userKey.id)
-        } catch (e: MicroBlogException) {
-            e.notify(inAppNotification)
-        } catch (e: IOException) {
-            e.message?.let { inAppNotification.show(it) }
-        } catch (e: HttpException) {
-            e.message?.let { inAppNotification.show(it) }
+        }.onFailure {
+            it.notify(inAppNotification)
         }
         refreshing.postValue(false)
     }
 
     fun follow() = viewModelScope.launch {
         loadingRelationship.postValue(true)
-        repository.follow(userKey.id)
-        loadRelationShip()
+        runCatching {
+            relationshipService.follow(userKey.id)
+        }.onSuccess {
+            loadRelationShip()
+        }.onFailure {
+            loadingRelationship.postValue(false)
+            it.notify(inAppNotification)
+        }
     }
 
     fun unfollow() = viewModelScope.launch {
         loadingRelationship.postValue(true)
-        repository.unfollow(userKey.id)
-        loadRelationShip()
+        runCatching {
+            relationshipService.unfollow(userKey.id)
+        }.onSuccess {
+            loadRelationShip()
+        }.onFailure {
+            loadingRelationship.postValue(false)
+            it.notify(inAppNotification)
+        }
     }
 
     private fun loadRelationShip() = viewModelScope.launch {
         loadingRelationship.postValue(true)
         try {
-            repository.showRelationship(userKey.id).let {
+            relationshipService.showRelationship(userKey.id).let {
                 relationship.postValue(it)
             }
-        } catch (e: MicroBlogException) {
-        } catch (e: IOException) {
-        } catch (e: HttpException) {
+        } catch (e: Exception) {
         }
         loadingRelationship.postValue(false)
     }

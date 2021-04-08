@@ -27,10 +27,8 @@ import androidx.room.withTransaction
 import com.twidere.services.http.MicroBlogException
 import com.twidere.services.microblog.model.IStatus
 import com.twidere.twiderex.db.CacheDatabase
-import com.twidere.twiderex.db.mapper.toDbTimeline
-import com.twidere.twiderex.db.model.DbPagingTimeline.Companion.toPagingDbTimeline
+import com.twidere.twiderex.db.mapper.toDbPagingTimeline
 import com.twidere.twiderex.db.model.DbPagingTimelineWithStatus
-import com.twidere.twiderex.db.model.TimelineType
 import com.twidere.twiderex.db.model.saveToDb
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.notification.InAppNotification
@@ -44,7 +42,7 @@ abstract class PagingTimelineMediatorBase<T : IPagination>(
     database: CacheDatabase,
     private val inAppNotification: InAppNotification
 ) : PagingMediator(accountKey = accountKey, database = database) {
-    private var nextPage: T? = null
+    private var paging: T? = null
 
     override suspend fun load(
         loadType: LoadType,
@@ -53,13 +51,13 @@ abstract class PagingTimelineMediatorBase<T : IPagination>(
         try {
             val key = when (loadType) {
                 LoadType.APPEND -> {
-                    nextPage
+                    paging
                 }
                 LoadType.PREPEND -> {
                     return MediatorResult.Success(endOfPaginationReached = true)
                 }
                 LoadType.REFRESH -> {
-                    nextPage = null
+                    paging = null
                     null
                 }
             }
@@ -67,14 +65,13 @@ abstract class PagingTimelineMediatorBase<T : IPagination>(
             val last = state.lastItemOrNull()
             val result = load(pageSize, key).let { list ->
                 list.map { status ->
-                    status.toDbTimeline(accountKey, TimelineType.Custom)
-                        .toPagingDbTimeline(pagingKey)
+                    status.toDbPagingTimeline(accountKey, pagingKey)
                 }.filter {
                     last?.status?.status?.data?.statusKey != it.status.status.data.statusKey
                 }.let {
-                    transform(loadType, state, it)
+                    transform(state, it, list)
                 }.also {
-                    nextPage = if (list is IPagingList<*, *>) {
+                    paging = if (list is IPagingList<*, *>) {
                         @Suppress("UNCHECKED_CAST")
                         list.nextPage as T
                     } else {
@@ -107,9 +104,9 @@ abstract class PagingTimelineMediatorBase<T : IPagination>(
     ): T
 
     protected open fun transform(
-        type: LoadType,
         state: PagingState<Int, DbPagingTimelineWithStatus>,
-        data: List<DbPagingTimelineWithStatus>
+        data: List<DbPagingTimelineWithStatus>,
+        list: List<IStatus>
     ): List<DbPagingTimelineWithStatus> {
         return data
     }

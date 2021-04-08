@@ -5,19 +5,20 @@ buildscript {
         google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.0.0-alpha08'
+        classpath 'com.android.tools.build:gradle:7.0.0-alpha13'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$versions.kotlin"
     }
 }
 
 plugins {
-    id 'com.diffplug.spotless' version '5.6.1'
+    id 'com.diffplug.spotless' version '5.11.1'
 }
 
 subprojects {
     repositories {
         google()
         mavenCentral()
+        maven { url 'https://jitpack.io' }
         jcenter()// exoplayer still in jcenter
     }
 
@@ -43,9 +44,11 @@ subprojects {
     tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
         kotlinOptions {
             allWarningsAsErrors = true
-            freeCompilerArgs += '-Xopt-in=kotlin.RequiresOptIn'
-            freeCompilerArgs += '-Xallow-unstable-dependencies'
-            jvmTarget = "1.8"
+            freeCompilerArgs = [
+                    '-Xallow-unstable-dependencies',
+                    '-Xopt-in=kotlin.RequiresOptIn',
+            ]
+            jvmTarget = "11"
         }
     }
 }

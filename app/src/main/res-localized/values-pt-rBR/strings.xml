@@ -1,7 +1,7 @@
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="common_alerts_account_temporarily_locked_title">Conta Temporariamente Bloqueada</string>
     <string name="common_alerts_account_temporarily_locked_message">Abra o Twitter para desbloquear</string>
-    <string name="common_alerts_rate_limit_exceeded_title">Limite de Taxa Excedido</string>
+    <string name="common_alerts_rate_limit_exceeded_title">Limite de Acesso Excedido</string>
     <string name="common_alerts_rate_limit_exceeded_message">Atingiu o limite de uso da API do Twitter</string>
     <string name="common_alerts_permission_denied_not_authorized_title">Permissão Negada</string>
     <string name="common_alerts_permission_denied_not_authorized_message">Desculpe, você não está autorizado</string>
@@ -50,6 +50,8 @@
     <string name="common_alerts_report_and_block_user_success_title">%s foi reportado por spam e bloqueado</string>
     <string name="common_alerts_failed_to_report_and_block_user_title">Falha ao reportar e bloquear %s</string>
     <string name="common_alerts_failed_to_report_and_block_user_message">Por favor, tente novamente</string>
+    <string name="common_notification_own_poll">Sua enquete terminou</string>
+    <string name="common_notification_poll">Uma enquete em que você votou terminou</string>
     <string name="common_controls_actions_add">Adicionar</string>
     <string name="common_controls_actions_remove">Remover</string>
     <string name="common_controls_actions_edit">Editar</string>
@@ -69,8 +71,11 @@
     <string name="common_controls_status_actions_copy_link">Copiar link</string>
     <string name="common_controls_status_actions_share_link">Compartilhar link</string>
     <string name="common_controls_status_actions_delete_tweet">Excluir tweet</string>
+    <string name="common_controls_status_actions_vote">Votar</string>
     <string name="common_controls_status_media">Mídia</string>
     <string name="common_controls_status_user_retweeted">%s retweetado</string>
+    <string name="common_controls_status_poll_expired">Fechado</string>
+    <string name="common_controls_status_poll_total_votes">%s votos</string>
     <string name="common_controls_friendship_actions_follow">Seguir</string>
     <string name="common_controls_friendship_actions_unfollow">Deixar de seguir</string>
     <string name="common_controls_friendship_actions_following">Seguindo</string>
@@ -92,22 +97,6 @@
     <string name="common_controls_profile_dashboard_followers">Seguidores</string>
     <string name="common_controls_profile_dashboard_listed">Listado</string>
     <string name="common_controls_ios_photo_library">Biblioteca de Fotos</string>
-    <string name="common_countable_reply_single">resposta</string>
-    <string name="common_countable_reply_mutiple">respostas</string>
-    <string name="common_countable_quote_single">citação</string>
-    <string name="common_countable_quote_mutiple">citações</string>
-    <string name="common_countable_retweet_single">retweet</string>
-    <string name="common_countable_retweet_mutiple">retweets</string>
-    <string name="common_countable_like_single">curtida</string>
-    <string name="common_countable_like_multiple">curtidas</string>
-    <string name="common_countable_member_single">membro</string>
-    <string name="common_countable_member_multiple">membros</string>
-    <string name="common_countable_list_single">lista</string>
-    <string name="common_countable_list_multiple">listas</string>
-    <string name="common_countable_tweet_single">tweet</string>
-    <string name="common_countable_tweet_multiple">tweets</string>
-    <string name="common_countable_photo_single">foto</string>
-    <string name="common_countable_photo_multiple">fotos</string>
     <string name="scene_drawer_sign_in">Entrar</string>
     <string name="scene_drawer_manage_accounts">Gerenciar contas</string>
     <string name="scene_manage_accounts_title">Contas</string>
@@ -120,6 +109,8 @@
     <string name="scene_authentication_title">Autenticação</string>
     <string name="scene_timeline_title">Linha do Tempo</string>
     <string name="scene_mentions_title">Menções</string>
+    <string name="scene_notification_title">Notificação</string>
+    <string name="scene_notification_tabs_all">Tudo</string>
     <string name="scene_messages_title">Mensagens</string>
     <string name="scene_likes_title">Curtidas</string>
     <string name="scene_bookmark_title">Favorito</string>
@@ -139,6 +130,7 @@
     <string name="scene_search_tabs_tweets">Tweets</string>
     <string name="scene_search_tabs_media">Mídia</string>
     <string name="scene_search_tabs_users">Usuários</string>
+    <string name="scene_search_tabs_hashtag">Hashtag</string>
     <string name="scene_profile_title">Eu</string>
     <string name="scene_profile_hide_reply">Ocultar resposta</string>
     <string name="scene_profile_permission_denied_profile_blocked_title">Permissão Negada</string>
@@ -174,7 +166,7 @@
     <string name="scene_lists_details_tabs_subscriber">Inscrito</string>
     <string name="scene_lists_details_no_members_found">Nenhum Membro Encontrado.</string>
     <string name="scene_lists_details_add_members">Adicionar Membros</string>
-    <string name="scene_settings_title">Confirgurações</string>
+    <string name="scene_settings_title">Configurações</string>
     <string name="scene_settings_section_header_general">Geral</string>
     <string name="scene_settings_section_header_about">Sobre</string>
     <string name="scene_settings_appearance_title">Aparência</string>
@@ -185,6 +177,8 @@
     <string name="scene_settings_appearance_tab_position_top">Superior</string>
     <string name="scene_settings_appearance_tab_position_bottom">Inferior</string>
     <string name="scene_settings_appearance_theme_auto">Automático</string>
+    <string name="scene_settings_appearance_theme_light">Claro</string>
+    <string name="scene_settings_appearance_theme_dark">Escuro</string>
     <string name="scene_settings_display_title">Visualização</string>
     <string name="scene_settings_display_section_header_preview">Pré-visualização</string>
     <string name="scene_settings_display_section_header_text">Texto</string>

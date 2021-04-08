@@ -21,18 +21,23 @@
 package com.twidere.twiderex.model.ui
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.ui.res.stringResource
 import com.twidere.twiderex.R
+import com.twidere.twiderex.db.model.DbMastodonStatusExtra
 import com.twidere.twiderex.db.model.DbPagingTimelineWithStatus
 import com.twidere.twiderex.db.model.DbStatusWithMediaAndUser
 import com.twidere.twiderex.db.model.DbStatusWithReference
-import com.twidere.twiderex.db.model.DbTimelineWithStatus
+import com.twidere.twiderex.db.model.DbTwitterStatusExtra
+import com.twidere.twiderex.db.model.ReferenceType
+import com.twidere.twiderex.model.MastodonStatusType
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.ui.UiMedia.Companion.toUi
 import com.twidere.twiderex.model.ui.UiUrlEntity.Companion.toUi
 import com.twidere.twiderex.model.ui.UiUser.Companion.toUi
 
+@Immutable
 data class UiStatus(
     val statusId: String,
     val statusKey: MicroBlogKey,
@@ -48,19 +53,33 @@ data class UiStatus(
     val hasMedia: Boolean,
     val user: UiUser,
     val media: List<UiMedia>,
-    val retweet: UiStatus?,
     val source: String,
-    val quote: UiStatus?,
     val isGap: Boolean,
     val url: List<UiUrlEntity>,
     val platformType: PlatformType,
+    val mastodonExtra: DbMastodonStatusExtra? = null,
+    val twitterExtra: DbTwitterStatusExtra? = null,
+    val referenceStatus: Map<ReferenceType, UiStatus> = emptyMap(),
 ) {
+    val retweet: UiStatus? by lazy {
+        if (platformType == PlatformType.Mastodon && mastodonExtra != null && mastodonExtra.type != MastodonStatusType.Status) {
+            referenceStatus[ReferenceType.MastodonNotification]
+        } else {
+            referenceStatus[ReferenceType.Retweet]?.copy(
+                referenceStatus = referenceStatus.filterNot { it.key == ReferenceType.Retweet }
+            )
+        }
+    }
+
+    val quote: UiStatus? by lazy {
+        referenceStatus[ReferenceType.Quote]
+    }
 
     fun generateShareLink() = "https://${statusKey.host}" + when (platformType) {
         PlatformType.Twitter -> "/${user.screenName}/status/$statusId"
         PlatformType.StatusNet -> TODO()
         PlatformType.Fanfou -> TODO()
-        PlatformType.Mastodon -> "/@${user.screenName}/$statusId"
+        PlatformType.Mastodon -> "/web/statuses/$statusId"
     }
 
     companion object {
@@ -78,9 +97,7 @@ data class UiStatus(
             hasMedia = true,
             user = UiUser.sample(),
             media = UiMedia.sample(),
-            retweet = null,
             source = "TwidereX",
-            quote = null,
             isGap = false,
             url = emptyList(),
             statusKey = MicroBlogKey.Empty,
@@ -88,34 +105,27 @@ data class UiStatus(
             platformType = PlatformType.Twitter,
         )
 
-        fun DbTimelineWithStatus.toUi(
-            accountKey: MicroBlogKey,
-        ) = with(status.status) {
-            val reaction = reactions.firstOrNull { it.accountKey == accountKey }
-            UiStatus(
-                statusId = data.statusId,
-                htmlText = data.htmlText,
-                timestamp = data.timestamp,
-                retweetCount = data.retweetCount,
-                likeCount = data.likeCount,
-                replyCount = data.replyCount,
-                retweeted = reaction?.retweeted ?: false,
-                liked = reaction?.liked ?: false,
-                placeString = data.placeString,
-                hasMedia = data.hasMedia,
-                user = user.toUi(),
-                media = media.toUi(),
-                retweet = status.retweet?.toUi(accountKey)
-                    ?.copy(quote = status.quote?.toUi(accountKey)),
-                quote = status.quote?.toUi(accountKey),
-                isGap = timeline.isGap,
-                source = data.source,
-                url = url.toUi(),
-                statusKey = data.statusKey,
-                rawText = data.rawText,
-                platformType = data.platformType,
-            )
-        }
+        @Composable
+        fun placeHolder() = UiStatus(
+            statusId = "",
+            htmlText = "",
+            timestamp = System.currentTimeMillis(),
+            retweetCount = 0,
+            likeCount = 0,
+            replyCount = 0,
+            retweeted = false,
+            liked = false,
+            placeString = null,
+            hasMedia = true,
+            user = UiUser.placeHolder(),
+            media = emptyList(),
+            source = "",
+            isGap = false,
+            url = emptyList(),
+            statusKey = MicroBlogKey.Empty,
+            rawText = "",
+            platformType = PlatformType.Twitter,
+        )
 
         fun DbStatusWithMediaAndUser.toUi(
             accountKey: MicroBlogKey,
@@ -134,14 +144,14 @@ data class UiStatus(
                 hasMedia = data.hasMedia,
                 user = user.toUi(),
                 media = media.toUi(),
-                retweet = null,
-                quote = null,
                 isGap = false,
                 source = data.source,
                 url = url.toUi(),
                 statusKey = data.statusKey,
                 rawText = data.rawText,
                 platformType = data.platformType,
+                mastodonExtra = data.mastodonExtra,
+                twitterExtra = data.twitterExtra,
             )
         }
 
@@ -162,14 +172,19 @@ data class UiStatus(
                 hasMedia = data.hasMedia,
                 user = user.toUi(),
                 media = media.toUi(),
-                retweet = retweet?.toUi(accountKey)?.copy(quote = quote?.toUi(accountKey)),
-                quote = quote?.toUi(accountKey),
                 isGap = false,
                 source = data.source,
                 url = url.toUi(),
                 statusKey = data.statusKey,
                 rawText = data.rawText,
                 platformType = data.platformType,
+                mastodonExtra = data.mastodonExtra,
+                twitterExtra = data.twitterExtra,
+                referenceStatus = references.map {
+                    it.reference.referenceType to it.status.toUi(
+                        accountKey = accountKey
+                    )
+                }.toMap()
             )
         }
 
@@ -190,15 +205,19 @@ data class UiStatus(
                 hasMedia = data.hasMedia,
                 user = user.toUi(),
                 media = media.toUi(),
-                retweet = status.retweet?.toUi(accountKey)
-                    ?.copy(quote = status.quote?.toUi(accountKey)),
-                quote = status.quote?.toUi(accountKey),
                 isGap = timeline.isGap,
                 source = data.source,
                 url = url.toUi(),
                 statusKey = data.statusKey,
                 rawText = data.rawText,
                 platformType = data.platformType,
+                mastodonExtra = data.mastodonExtra,
+                twitterExtra = data.twitterExtra,
+                referenceStatus = status.references.map {
+                    it.reference.referenceType to it.status.toUi(
+                        accountKey = accountKey
+                    )
+                }.toMap()
             )
         }
     }

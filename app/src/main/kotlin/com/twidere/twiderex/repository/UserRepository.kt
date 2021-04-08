@@ -23,10 +23,9 @@ package com.twidere.twiderex.repository
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.map
 import com.twidere.services.microblog.LookupService
-import com.twidere.services.microblog.RelationshipService
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.db.mapper.toDbUser
-import com.twidere.twiderex.db.model.DbUserWithEntity
+import com.twidere.twiderex.db.model.DbUser
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.toAmUser
 import com.twidere.twiderex.model.ui.UiUser
@@ -39,15 +38,12 @@ class UserRepository @AssistedInject constructor(
     private val accountRepository: AccountRepository,
     @Assisted private val accountKey: MicroBlogKey,
     @Assisted private val lookupService: LookupService,
-    @Assisted private val relationshipService: RelationshipService,
 ) {
-
     @dagger.assisted.AssistedFactory
     interface AssistedFactory {
         fun create(
             accountKey: MicroBlogKey,
             lookupService: LookupService,
-            relationshipService: RelationshipService,
         ): UserRepository
     }
 
@@ -73,10 +69,9 @@ class UserRepository @AssistedInject constructor(
         }
     }
 
-    private suspend fun saveUser(user: DbUserWithEntity) {
-        database.userDao().insertAll(listOf(user.user))
-        database.urlEntityDao().insertAll(user.url)
-        accountRepository.findByAccountKey(user.user.userKey)?.let {
+    private suspend fun saveUser(user: DbUser) {
+        database.userDao().insertAll(listOf(user))
+        accountRepository.findByAccountKey(user.userKey)?.let {
             accountRepository.getAccountDetails(it)
         }?.let { details ->
             user.let {
@@ -84,22 +79,5 @@ class UserRepository @AssistedInject constructor(
                 accountRepository.updateAccount(details)
             }
         }
-    }
-
-    suspend fun showRelationship(target_id: String) = relationshipService.showRelationship(target_id)
-
-//    suspend fun getPinnedStatus(user: UiUser): UiStatus? {
-//        val result = lookupService.userPinnedStatus(user.id) ?: return null
-//        val userKey = UserKey.Empty
-//        val timeline = result.toDbTimeline(userKey = userKey, timelineType = TimelineType.User)
-//        return timeline.toUi(userKey)
-//    }
-
-    suspend fun unfollow(user_id: String) {
-        relationshipService.unfollow(user_id)
-    }
-
-    suspend fun follow(user_id: String) {
-        relationshipService.follow(user_id)
     }
 }

@@ -28,7 +28,6 @@ abstract class HomeNavigationItem {
     @Composable
     abstract fun name(): String
 
-    abstract val route: String
     @Composable
     abstract fun icon(): Painter
     open val withAppBar = true

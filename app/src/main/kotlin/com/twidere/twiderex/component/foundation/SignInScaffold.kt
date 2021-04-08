@@ -48,7 +48,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.LoginLogo
-import com.twidere.twiderex.ui.TwidereXTheme
+import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.ui.standardPadding
 
 @Composable
@@ -57,7 +57,7 @@ fun SignInScaffold(
     content: @Composable ColumnScope.() -> Unit,
 ) {
     var count by remember { mutableStateOf(0) }
-    TwidereXTheme {
+    TwidereScene {
         InAppNotificationScaffold(
             topBar = {
                 AppBar(

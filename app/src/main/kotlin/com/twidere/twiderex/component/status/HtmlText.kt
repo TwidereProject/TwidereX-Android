@@ -23,22 +23,27 @@ package com.twidere.twiderex.component.status
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.forEachGesture
 import androidx.compose.foundation.gestures.waitForUpOrCancellation
+import androidx.compose.foundation.text.InlineTextContent
+import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.consumeDownChange
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.Placeholder
+import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.style.TextOverflow
+import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.navigation.LocalNavigator
 import kotlinx.coroutines.coroutineScope
 import org.jsoup.Jsoup
@@ -47,6 +52,8 @@ import org.jsoup.nodes.Node
 import org.jsoup.nodes.TextNode
 
 private const val TAG_URL = "url"
+
+private const val ID_IMAGE = "image"
 
 data class ResolvedLink(
     val expanded: String?,
@@ -58,29 +65,27 @@ data class ResolvedLink(
 fun HtmlText(
     modifier: Modifier = Modifier,
     htmlText: String,
-    linkResolver: (href: String) -> ResolvedLink,
+    maxLines: Int = Int.MAX_VALUE,
+    linkResolver: (href: String) -> ResolvedLink = { ResolvedLink(it) },
 ) {
     val navigator = LocalNavigator.current
-    val textColor = LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
-    CompositionLocalProvider(
-        LocalTextStyle provides MaterialTheme.typography.body1.copy(color = textColor)
-    ) {
-        RenderContent(
-            modifier = modifier,
-            htmlText = htmlText,
-            linkResolver = linkResolver,
-            onLinkClicked = {
-                navigator.openLink(it)
-            },
-        )
-    }
+    RenderContent(
+        modifier = modifier,
+        htmlText = htmlText,
+        linkResolver = linkResolver,
+        maxLines = maxLines,
+        onLinkClicked = {
+            navigator.openLink(it)
+        },
+    )
 }
 
 @Composable
 private fun RenderContent(
     modifier: Modifier = Modifier,
     htmlText: String,
-    linkResolver: (href: String) -> ResolvedLink,
+    maxLines: Int = Int.MAX_VALUE,
+    linkResolver: (href: String) -> ResolvedLink = { ResolvedLink(it) },
     onLinkClicked: (String) -> Unit = {},
 ) {
     val value = renderContentAnnotatedString(
@@ -96,10 +101,11 @@ private fun RenderContent(
                         val change = awaitPointerEventScope {
                             awaitFirstDown()
                         }
-                        val annotation = layoutResult.value?.getOffsetForPosition(change.position)?.let {
-                            value.getStringAnnotations(start = it, end = it)
-                                .firstOrNull()
-                        }
+                        val annotation =
+                            layoutResult.value?.getOffsetForPosition(change.position)?.let {
+                                value.getStringAnnotations(start = it, end = it)
+                                    .firstOrNull()
+                            }
                         if (annotation != null) {
                             change.consumeDownChange()
                             val up = awaitPointerEventScope {
@@ -112,10 +118,25 @@ private fun RenderContent(
                     }
                 }
             },
+            overflow = TextOverflow.Ellipsis,
+            maxLines = maxLines,
             text = value,
             onTextLayout = {
                 layoutResult.value = it
-            }
+            },
+            inlineContent = mapOf(
+                ID_IMAGE to InlineTextContent(
+                    Placeholder(
+                        width = LocalTextStyle.current.fontSize,
+                        height = LocalTextStyle.current.fontSize,
+                        placeholderVerticalAlign = PlaceholderVerticalAlign.TextCenter
+                    )
+                ) { target ->
+                    NetworkImage(
+                        data = target,
+                    )
+                }
+            ),
         )
     }
 }
@@ -144,7 +165,7 @@ fun renderContentAnnotatedString(
         val document = Jsoup.parse(htmlText.replace("\n", "<br>"))
         buildAnnotatedString {
             document.body().childNodes().forEach {
-                RenderNode(it, renderContext, styleData)
+                renderNode(it, renderContext, styleData)
             }
         }
     }
@@ -159,22 +180,22 @@ data class StyleData(
     val linkStyle: TextStyle,
 )
 
-private fun AnnotatedString.Builder.RenderNode(
+private fun AnnotatedString.Builder.renderNode(
     node: Node,
     context: RenderContext,
     styleData: StyleData
 ) {
     when (node) {
         is Element -> {
-            this.RenderElement(node, context = context, styleData = styleData)
+            this.renderElement(node, context = context, styleData = styleData)
         }
         is TextNode -> {
-            RenderText(node.text(), styleData.textStyle)
+            renderText(node.text(), styleData.textStyle)
         }
     }
 }
 
-private fun AnnotatedString.Builder.RenderText(text: String, textStyle: TextStyle) {
+private fun AnnotatedString.Builder.renderText(text: String, textStyle: TextStyle) {
     pushStyle(
         textStyle.toSpanStyle()
     )
@@ -182,29 +203,44 @@ private fun AnnotatedString.Builder.RenderText(text: String, textStyle: TextStyl
     pop()
 }
 
-private fun AnnotatedString.Builder.RenderElement(
+private fun AnnotatedString.Builder.renderElement(
     element: Element,
     context: RenderContext,
     styleData: StyleData
 ) {
-    if (!element.hasClass("invisible")) {
-        when (element.normalName()) {
-            "a" -> {
-                RenderLink(element, context, styleData)
+    if (skipElement(element = element)) {
+        return
+    }
+    when (element.normalName()) {
+        "a" -> {
+            renderLink(element, context, styleData)
+        }
+        "br" -> {
+            renderText("\n", styleData.textStyle)
+        }
+        "span", "p" -> {
+            element.childNodes().forEach {
+                renderNode(node = it, context = context, styleData = styleData)
             }
-            "br" -> {
-                RenderText("\n", styleData.textStyle)
-            }
-            "span", "p" -> {
-                element.childNodes().forEach {
-                    RenderNode(node = it, context = context, styleData = styleData)
-                }
-            }
+        }
+        "emoji" -> {
+            renderEmoji(element)
         }
     }
 }
 
-private fun AnnotatedString.Builder.RenderLink(
+private fun skipElement(element: Element): Boolean {
+    return element.hasClass("invisible")
+}
+
+private fun AnnotatedString.Builder.renderEmoji(
+    element: Element,
+) {
+    val target = element.attr("target")
+    appendInlineContent(ID_IMAGE, target)
+}
+
+private fun AnnotatedString.Builder.renderLink(
     element: Element,
     context: RenderContext,
     styleData: StyleData
@@ -214,7 +250,7 @@ private fun AnnotatedString.Builder.RenderLink(
     when {
         resolvedLink.expanded != null -> {
             pushStringAnnotation(TAG_URL, resolvedLink.expanded)
-            RenderText(resolvedLink.display ?: resolvedLink.expanded, styleData.linkStyle)
+            renderText(resolvedLink.display ?: resolvedLink.expanded, styleData.linkStyle)
             pop()
         }
         resolvedLink.skip -> {
@@ -222,7 +258,7 @@ private fun AnnotatedString.Builder.RenderLink(
         else -> {
             pushStringAnnotation(TAG_URL, href)
             element.childNodes().forEach {
-                RenderNode(
+                renderNode(
                     node = it,
                     context = context,
                     styleData = styleData.copy(textStyle = styleData.linkStyle)

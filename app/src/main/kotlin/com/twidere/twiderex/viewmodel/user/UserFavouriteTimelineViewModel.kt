@@ -25,7 +25,6 @@ import androidx.paging.cachedIn
 import androidx.paging.map
 import com.twidere.services.microblog.TimelineService
 import com.twidere.twiderex.db.CacheDatabase
-import com.twidere.twiderex.di.assisted.IAssistedFactory
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiStatus.Companion.toUi
@@ -46,7 +45,7 @@ class UserFavouriteTimelineViewModel @AssistedInject constructor(
 ) : PagingViewModel() {
 
     @dagger.assisted.AssistedFactory
-    interface AssistedFactory : IAssistedFactory {
+    interface AssistedFactory {
         fun create(
             account: AccountDetails,
             userKey: MicroBlogKey,
@@ -54,14 +53,7 @@ class UserFavouriteTimelineViewModel @AssistedInject constructor(
     }
 
     override val source by lazy {
-        pagingMediator.pager(
-            pagingSourceFactory = {
-                database.pagingTimelineDao().getPagingSourceAsc(
-                    pagingKey = pagingMediator.pagingKey,
-                    accountKey = pagingMediator.accountKey,
-                )
-            }
-        ).flow.map { pagingData ->
+        pagingMediator.pager().flow.map { pagingData ->
             pagingData.map {
                 it.toUi(pagingMediator.accountKey)
             }

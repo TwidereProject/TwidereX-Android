@@ -25,18 +25,22 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Icon
+import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.R
 import com.twidere.twiderex.model.ui.UiStatus
-import com.twidere.twiderex.ui.mediumEmphasisContentContentColor
 import com.twidere.twiderex.ui.profileImageSize
 import com.twidere.twiderex.ui.standardPadding
 
@@ -44,28 +48,50 @@ import com.twidere.twiderex.ui.standardPadding
 fun RetweetHeader(
     data: UiStatus,
 ) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Box(
-            modifier = Modifier
-                .width(profileImageSize),
-            contentAlignment = Alignment.CenterEnd,
-        ) {
+    TweetHeader(
+        icon = {
             Icon(
-                modifier = Modifier.size(12.dp),
                 painter = painterResource(id = R.drawable.ic_repeat),
-                tint = mediumEmphasisContentContentColor,
-                contentDescription = stringResource(id = R.string.accessibility_common_status_retweeted)
+                contentDescription = stringResource(id = R.string.accessibility_common_status_retweeted),
+                tint = Color(0xFF4C9EEB)
             )
+        },
+        text = {
+            Text(
+                style = MaterialTheme.typography.caption,
+                text = stringResource(
+                    id = R.string.common_controls_status_user_retweeted,
+                    data.user.displayName
+                ),
+            )
+        },
+    )
+}
+
+@Composable
+fun TweetHeader(
+    icon: @Composable () -> Unit,
+    text: @Composable () -> Unit,
+) {
+    ProvideTextStyle(value = MaterialTheme.typography.caption) {
+        CompositionLocalProvider(
+            LocalContentAlpha provides ContentAlpha.medium
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Box(
+                    modifier = Modifier
+                        .width(profileImageSize),
+                    contentAlignment = Alignment.CenterEnd,
+                ) {
+                    Box(modifier = Modifier.size(MaterialTheme.typography.body1.fontSize.value.dp)) {
+                        icon.invoke()
+                    }
+                }
+                Spacer(modifier = Modifier.width(standardPadding))
+                text.invoke()
+            }
         }
-        Spacer(modifier = Modifier.width(standardPadding))
-        Text(
-            style = MaterialTheme.typography.caption,
-            text = stringResource(
-                id = R.string.common_controls_status_user_retweeted,
-                data.user.name
-            ),
-        )
     }
 }

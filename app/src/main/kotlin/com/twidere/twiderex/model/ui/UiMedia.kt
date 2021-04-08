@@ -20,12 +20,15 @@
  */
 package com.twidere.twiderex.model.ui
 
+import android.net.Uri
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.ui.res.painterResource
 import com.twidere.twiderex.R
 import com.twidere.twiderex.db.model.DbMedia
 import com.twidere.twiderex.model.MediaType
 
+@Immutable
 data class UiMedia(
     val url: String?,
     val mediaUrl: String?,
@@ -36,6 +39,26 @@ data class UiMedia(
     val pageUrl: String?,
     val altText: String,
 ) {
+    val fileName: String?
+        get() = mediaUrl?.takeIfFileName() ?: url?.takeIfFileName() ?: findFileName()
+
+    private fun findFileName(): String? {
+        return mediaUrl?.let {
+            val start = it.indexOf("?format=")
+            val end = it.indexOf("&name=")
+            val ext = it.substring(start + "?format=".length, end)
+            Uri.parse(it).lastPathSegment + ".$ext"
+        }
+    }
+
+    private fun String.takeIfFileName(): String? {
+        return let {
+            Uri.parse(it)
+        }?.lastPathSegment?.takeIf {
+            it.contains(".")
+        }
+    }
+
     companion object {
         @Composable
         fun sample() = listOf(

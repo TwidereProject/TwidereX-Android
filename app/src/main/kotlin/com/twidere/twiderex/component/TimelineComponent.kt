@@ -20,42 +20,25 @@
  */
 package com.twidere.twiderex.component
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.Divider
-import androidx.compose.material.Icon
-import androidx.compose.material.Text
-import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
+import androidx.compose.runtime.snapshotFlow
 import androidx.paging.LoadState
-import com.twidere.twiderex.R
-import com.twidere.twiderex.component.foundation.LoadingProgress
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
-import com.twidere.twiderex.component.lazy.LazyColumn2
 import com.twidere.twiderex.component.lazy.LocalLazyListController
 import com.twidere.twiderex.component.lazy.collectAsLazyPagingItems
-import com.twidere.twiderex.component.lazy.loadState
-import com.twidere.twiderex.component.lazy.statusesIndexed
-import com.twidere.twiderex.component.status.StatusDivider
-import com.twidere.twiderex.component.status.TimelineStatusComponent
+import com.twidere.twiderex.component.lazy.ui.LazyUiStatusList
 import com.twidere.twiderex.extensions.refreshOrRetry
-import com.twidere.twiderex.ui.standardPadding
 import com.twidere.twiderex.viewmodel.timeline.TimelineScrollState
 import com.twidere.twiderex.viewmodel.timeline.TimelineViewModel
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 
 @Composable
@@ -84,72 +67,27 @@ fun TimelineComponent(viewModel: TimelineViewModel) {
                     }
                 }
             }
-            DisposableEffect(listState.isScrollInProgress) {
-                if (!listState.isScrollInProgress) {
-                    viewModel.saveScrollState(
-                        TimelineScrollState(
-                            firstVisibleItemIndex = listState.firstVisibleItemIndex,
-                            firstVisibleItemScrollOffset = listState.firstVisibleItemScrollOffset,
-                        )
-                    )
-                }
-                onDispose { }
-            }
-            LazyColumn2(
-                state = listState
-            ) {
-                statusesIndexed(items) { index, it ->
-                    it?.let { item ->
-                        Column {
-                            TimelineStatusComponent(
-                                item,
+            LaunchedEffect(listState) {
+                snapshotFlow { listState.isScrollInProgress }
+                    .distinctUntilChanged()
+                    .filter { !it }
+                    .collect {
+                        viewModel.saveScrollState(
+                            TimelineScrollState(
+                                firstVisibleItemIndex = listState.firstVisibleItemIndex,
+                                firstVisibleItemScrollOffset = listState.firstVisibleItemScrollOffset,
                             )
-                            when {
-                                loadingBetween.contains(item.statusKey) -> {
-                                    Divider()
-                                    LoadingProgress()
-                                    Divider()
-                                }
-                                item.isGap -> {
-                                    Divider()
-                                    TextButton(
-                                        modifier = Modifier
-                                            .defaultMinSize(
-                                                minHeight = ButtonDefaults.MinHeight,
-                                            )
-                                            .padding(ButtonDefaults.ContentPadding)
-                                            .fillMaxWidth(),
-                                        onClick = {
-                                            items[index + 1]?.let { next ->
-                                                viewModel.loadBetween(
-                                                    item.statusKey,
-                                                    next.statusKey,
-                                                )
-                                            }
-                                        },
-                                    ) {
-                                        Icon(
-                                            painter = painterResource(id = R.drawable.ic_refresh),
-                                            contentDescription = stringResource(
-                                                id = R.string.accessibility_scene_timeline_load_gap
-                                            )
-                                        )
-                                        Box(modifier = Modifier.width(standardPadding))
-                                        Text(text = stringResource(id = R.string.common_controls_timeline_load_more))
-                                    }
-                                    Divider()
-                                }
-                                else -> {
-                                    StatusDivider()
-                                }
-                            }
-                        }
+                        )
                     }
-                }
-                loadState(items.loadState.append) {
-                    items.retry()
-                }
             }
+            LazyUiStatusList(
+                state = listState,
+                items = items,
+                loadingBetween = loadingBetween,
+                onLoadBetweenClicked = { current, next ->
+                    viewModel.loadBetween(current, next)
+                },
+            )
         }
     }
 }

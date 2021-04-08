@@ -47,19 +47,21 @@ import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.component.settings.radioItem
 import com.twidere.twiderex.component.settings.switchItem
 import com.twidere.twiderex.component.status.TimelineStatusComponent
-import com.twidere.twiderex.extensions.navViewModel
+import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.preferences.LocalDisplayPreferences
 import com.twidere.twiderex.preferences.proto.DisplayPreferences
-import com.twidere.twiderex.ui.TwidereXTheme
+import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.settings.DisplayViewModel
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun DisplayScene() {
-    val viewModel = navViewModel<DisplayViewModel>()
+    val viewModel = assistedViewModel<DisplayViewModel.AssistedFactory, DisplayViewModel> {
+        it.create()
+    }
     val display = LocalDisplayPreferences.current
-    TwidereXTheme {
+    TwidereScene {
         InAppNotificationScaffold(
             topBar = {
                 AppBar(

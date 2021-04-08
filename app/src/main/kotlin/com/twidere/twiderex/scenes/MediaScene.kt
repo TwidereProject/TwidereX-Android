@@ -20,6 +20,8 @@
  */
 package com.twidere.twiderex.scenes
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.expandVertically
@@ -40,16 +42,17 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.ContentAlpha
+import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
-import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
+import androidx.compose.material.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -64,10 +67,11 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.navigation.compose.navigate
+import com.google.accompanist.glide.LocalRequestManager
+import com.google.accompanist.insets.navigationBarsPadding
+import com.google.accompanist.insets.statusBarsPadding
 import com.google.android.exoplayer2.ui.PlayerControlView
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
@@ -76,14 +80,18 @@ import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.foundation.Pager
 import com.twidere.twiderex.component.foundation.PagerState
 import com.twidere.twiderex.component.foundation.Swiper
+import com.twidere.twiderex.component.foundation.SwiperState
 import com.twidere.twiderex.component.foundation.VideoPlayer
-import com.twidere.twiderex.component.foundation.Zoomable
 import com.twidere.twiderex.component.foundation.rememberPagerState
+import com.twidere.twiderex.component.foundation.rememberSwiperState
 import com.twidere.twiderex.component.status.LikeButton
 import com.twidere.twiderex.component.status.ReplyButton
 import com.twidere.twiderex.component.status.RetweetButton
 import com.twidere.twiderex.component.status.ShareButton
+import com.twidere.twiderex.component.status.StatusText
 import com.twidere.twiderex.component.status.UserAvatar
+import com.twidere.twiderex.component.status.UserName
+import com.twidere.twiderex.component.status.UserScreenName
 import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.extensions.hideControls
 import com.twidere.twiderex.extensions.setOnSystemBarsVisibilityChangeListener
@@ -91,18 +99,16 @@ import com.twidere.twiderex.extensions.showControls
 import com.twidere.twiderex.model.MediaType
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiStatus
-import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.preferences.proto.DisplayPreferences
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.LocalVideoPlayback
 import com.twidere.twiderex.ui.LocalWindow
-import com.twidere.twiderex.ui.TwidereXTheme
+import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.ui.standardPadding
 import com.twidere.twiderex.viewmodel.MediaViewModel
-import dev.chrisbanes.accompanist.glide.LocalRequestManager
-import dev.chrisbanes.accompanist.insets.navigationBarsPadding
-import dev.chrisbanes.accompanist.insets.statusBarsPadding
+import moe.tlaster.zoomable.Zoomable
+import moe.tlaster.zoomable.rememberZoomableState
 
 @Composable
 fun StatusMediaScene(statusKey: MicroBlogKey, selectedIndex: Int) {
@@ -112,7 +118,7 @@ fun StatusMediaScene(statusKey: MicroBlogKey, selectedIndex: Int) {
     }
     val loading by viewModel.loading.observeAsState(initial = false)
     val status by viewModel.status.observeAsState()
-    TwidereXTheme(
+    TwidereScene(
         requireDarkTheme = true,
         extendViewIntoStatusBar = true,
         extendViewIntoNavigationBar = true,
@@ -133,7 +139,7 @@ fun StatusMediaScene(statusKey: MicroBlogKey, selectedIndex: Int) {
             CompositionLocalProvider(
                 LocalVideoPlayback provides DisplayPreferences.AutoPlayback.Always
             ) {
-                StatusMediaScene(status = it, selectedIndex = selectedIndex)
+                StatusMediaScene(status = it, selectedIndex = selectedIndex, viewModel = viewModel)
             }
         }
     }
@@ -141,19 +147,34 @@ fun StatusMediaScene(statusKey: MicroBlogKey, selectedIndex: Int) {
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun StatusMediaScene(status: UiStatus, selectedIndex: Int) {
+fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewModel) {
     var controlVisibility by remember { mutableStateOf(true) }
     val controlPanelColor = MaterialTheme.colors.surface.copy(alpha = 0.6f)
     val navController = LocalNavController.current
-    Scaffold {
+    val swiperState = rememberSwiperState(
+        onDismiss = {
+            navController.popBackStack()
+        },
+        onStart = {
+            controlVisibility = false
+        },
+        onEnd = {
+            controlVisibility = true
+        }
+    )
+    Scaffold(
+        backgroundColor = Color.Transparent,
+        contentColor = contentColorFor(backgroundColor = MaterialTheme.colors.background)
+    ) {
         Box {
             val pagerState = rememberPagerState(
                 currentPage = selectedIndex,
                 maxPage = status.media.lastIndex,
             )
+            val currentMedia = status.media[pagerState.currentPage]
             val context = LocalContext.current
             val videoControl = remember(pagerState.currentPage) {
-                if (status.media[pagerState.currentPage].type == MediaType.video) {
+                if (currentMedia.type == MediaType.video) {
                     PlayerControlView(context).apply {
                         showTimeoutMs = 0
                     }
@@ -183,12 +204,7 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int) {
                         )
                     }
                 },
-                onSwipeEnd = {
-                    controlVisibility = true
-                },
-                onSwipeStart = {
-                    controlVisibility = false
-                },
+                swiperState = swiperState,
                 customControl = videoControl,
                 pagerState = pagerState,
             )
@@ -200,10 +216,6 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int) {
                     window.showControls()
                 }
             }
-            // val transition = updateTransition(targetState = controlVisibility)
-            // val alpha by transition.animateFloat {
-            //     if (it) 1f else 0f
-            // }
             InAppNotificationScaffold(
                 backgroundColor = Color.Transparent,
                 topBar = {
@@ -266,17 +278,7 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int) {
                                     if (videoControl != null) {
                                         AndroidView(factory = { videoControl })
                                     }
-                                    Text(
-                                        modifier = Modifier
-                                            .clickable(
-                                                onClick = {
-                                                    navController.navigate(Route.Status(status.statusKey))
-                                                }
-                                            ),
-                                        text = status.rawText,
-                                        maxLines = 2,
-                                        overflow = TextOverflow.Ellipsis,
-                                    )
+                                    StatusText(status = status, maxLines = 2)
                                     Spacer(modifier = Modifier.height(standardPadding))
                                     Row(
                                         verticalAlignment = Alignment.CenterVertically,
@@ -288,26 +290,34 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int) {
                                         ) {
                                             UserAvatar(user = status.user)
                                             Spacer(modifier = Modifier.width(standardPadding))
-                                            Text(
-                                                text = status.user.name,
-                                                maxLines = 1,
-                                                overflow = TextOverflow.Ellipsis,
-                                            )
+                                            UserName(user = status.user)
                                             Spacer(modifier = Modifier.width(standardPadding))
-                                            CompositionLocalProvider(
-                                                LocalContentAlpha provides ContentAlpha.medium
-                                            ) {
-                                                Text(
-                                                    text = "@${status.user.screenName}",
-                                                    maxLines = 1,
-                                                    overflow = TextOverflow.Ellipsis,
-                                                )
-                                            }
+                                            UserScreenName(user = status.user)
                                         }
                                         ReplyButton(status = status, withNumber = false)
                                         RetweetButton(status = status, withNumber = false)
                                         LikeButton(status = status, withNumber = false)
-                                        ShareButton(status = status)
+                                        val saveFileLauncher = rememberLauncherForActivityResult(
+                                            contract = ActivityResultContracts.CreateDocument()
+                                        ) {
+                                            it?.let {
+                                                viewModel.saveFile(currentMedia, it)
+                                            }
+                                        }
+                                        ShareButton(status = status) { callback ->
+                                            DropdownMenuItem(
+                                                onClick = {
+                                                    callback.invoke()
+                                                    currentMedia.fileName?.let {
+                                                        saveFileLauncher.launch(it)
+                                                    }
+                                                }
+                                            ) {
+                                                Text(
+                                                    text = stringResource(id = R.string.common_controls_actions_save),
+                                                )
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -322,13 +332,21 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int) {
 
 @Composable
 fun RawMediaScene(url: String) {
-    TwidereXTheme(
+    TwidereScene(
         requireDarkTheme = true,
         extendViewIntoStatusBar = true,
         extendViewIntoNavigationBar = true,
     ) {
-        Scaffold {
-            MediaView(media = listOf(MediaData(url, MediaType.photo)))
+        Scaffold(
+            backgroundColor = Color.Transparent
+        ) {
+            val navController = LocalNavController.current
+            val swiperState = rememberSwiperState(
+                onDismiss = {
+                    navController.popBackStack()
+                },
+            )
+            MediaView(media = listOf(MediaData(url, MediaType.photo)), swiperState = swiperState)
         }
     }
 }
@@ -342,49 +360,38 @@ data class MediaData(
 fun MediaView(
     modifier: Modifier = Modifier,
     media: List<MediaData>,
+    swiperState: SwiperState = rememberSwiperState(),
     pagerState: PagerState = rememberPagerState(
         currentPage = 0,
         maxPage = media.lastIndex,
     ),
     customControl: PlayerControlView? = null,
-    onSwipeStart: () -> Unit = {},
-    onSwipeEnd: () -> Unit = {},
 ) {
-    var lockPager by remember { mutableStateOf(false) }
-    val navController = LocalNavController.current
     val requestManager = LocalRequestManager.current
-    DisposableEffect(Unit) {
+    LaunchedEffect(Unit) {
         requestManager?.let {
             if (requestManager.isPaused) {
                 requestManager.resumeRequests()
             }
         }
-        onDispose { }
     }
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+        // .background(MaterialTheme.colors.background.copy(alpha = 1f - swiperState.progress)),
+    )
     Swiper(
         modifier = modifier,
-        enabled = !lockPager,
-        onDismiss = {
-            navController.popBackStack()
-        },
-        onStart = {
-            onSwipeStart.invoke()
-        },
-        onEnd = {
-            onSwipeEnd.invoke()
-        }
+        state = swiperState,
     ) {
         Pager(
             state = pagerState,
-            dragEnabled = !lockPager,
         ) {
             val data = media[this.page]
             when (data.type) {
                 MediaType.photo ->
                     Zoomable(
-                        onZooming = {
-                            lockPager = it != 1F
-                        }
+                        state = rememberZoomableState()
                     ) {
                         NetworkImage(
                             data = data.url,
@@ -394,7 +401,7 @@ fun MediaView(
                             }
                         )
                     }
-                MediaType.video, MediaType.animated_gif ->
+                MediaType.video, MediaType.animated_gif, MediaType.audio ->
                     Box {
                         VideoPlayer(
                             url = data.url,
@@ -402,6 +409,7 @@ fun MediaView(
                             showControls = false
                         )
                     }
+                MediaType.other -> Unit
             }
         }
     }

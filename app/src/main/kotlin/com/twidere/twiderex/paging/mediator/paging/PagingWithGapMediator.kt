@@ -28,10 +28,8 @@ import androidx.room.withTransaction
 import com.twidere.services.http.MicroBlogException
 import com.twidere.services.microblog.model.IStatus
 import com.twidere.twiderex.db.CacheDatabase
-import com.twidere.twiderex.db.mapper.toDbTimeline
-import com.twidere.twiderex.db.model.DbPagingTimeline.Companion.toPagingDbTimeline
+import com.twidere.twiderex.db.mapper.toDbPagingTimeline
 import com.twidere.twiderex.db.model.DbPagingTimelineWithStatus
-import com.twidere.twiderex.db.model.TimelineType
 import com.twidere.twiderex.db.model.saveToDb
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.notification.InAppNotification
@@ -45,9 +43,11 @@ abstract class PagingWithGapMediator(
     database: CacheDatabase,
     private val inAppNotification: InAppNotification,
 ) : PagingMediator(accountKey = accountKey, database = database) {
-    private var loadCount = 0
-    protected open val skipInitialLoad = true
     val loadingBetween = MutableLiveData(listOf<MicroBlogKey>())
+
+    override suspend fun initialize(): InitializeAction {
+        return InitializeAction.SKIP_INITIAL_REFRESH
+    }
 
     override suspend fun load(
         loadType: LoadType,
@@ -82,12 +82,6 @@ abstract class PagingWithGapMediator(
                 }
             }
         }
-        if (skipInitialLoad && loadCount == 0 && loadType == LoadType.REFRESH && sinceStatueKey != null) {
-            loadCount++
-            return MediatorResult.Success(
-                endOfPaginationReached = false
-            )
-        }
         return loadBetween(
             pageSize = state.config.pageSize,
             maxStatusKey = maxStatusKey,
@@ -111,7 +105,7 @@ abstract class PagingWithGapMediator(
                 sinceStatueKey?.let { database.statusDao().findWithStatusKey(it)?.statusId }
             }
             val result = loadBetweenImpl(pageSize, max_id = max_id, since_id = since_id).map {
-                it.toDbTimeline(accountKey, TimelineType.Custom).toPagingDbTimeline(pagingKey)
+                it.toDbPagingTimeline(accountKey, pagingKey)
             }
             database.withTransaction {
                 if (maxStatusKey != null) {

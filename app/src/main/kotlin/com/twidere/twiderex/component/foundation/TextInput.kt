@@ -32,7 +32,7 @@ import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -117,12 +117,11 @@ fun TextInput(
     val textColor = color.takeOrElse {
         LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
     }
-    DisposableEffect(autoFocus) {
+    LaunchedEffect(autoFocus) {
         if (autoFocus) {
             focusRequester.requestFocus()
-            keyboardController?.showSoftwareKeyboard()
+            keyboardController?.show()
         }
-        onDispose { }
     }
     Box(
         modifier = modifier
@@ -135,7 +134,7 @@ fun TextInput(
                 //  Investiate why this is needed here. If it is really needed, instead of doing
                 //  this in the onClick callback, we should move this logic to the focusObserver
                 //  so that it can show or hide the keyboard based on the focus state.
-                keyboardController?.showSoftwareKeyboard()
+                keyboardController?.show()
             },
         contentAlignment = alignment,
     ) {
@@ -146,14 +145,14 @@ fun TextInput(
                 imeAction = imeAction,
             ),
             keyboardActions =
-                KeyboardActions(
-                    onDone = { onImeActionPerformed.invoke(ImeAction.Done, keyboardController) },
-                    onGo = { onImeActionPerformed.invoke(ImeAction.Go, keyboardController) },
-                    onNext = { onImeActionPerformed.invoke(ImeAction.Next, keyboardController) },
-                    onPrevious = { onImeActionPerformed.invoke(ImeAction.Previous, keyboardController) },
-                    onSearch = { onImeActionPerformed.invoke(ImeAction.Search, keyboardController) },
-                    onSend = { onImeActionPerformed.invoke(ImeAction.Send, keyboardController) }
-                ),
+            KeyboardActions(
+                onDone = { onImeActionPerformed.invoke(ImeAction.Done, keyboardController) },
+                onGo = { onImeActionPerformed.invoke(ImeAction.Go, keyboardController) },
+                onNext = { onImeActionPerformed.invoke(ImeAction.Next, keyboardController) },
+                onPrevious = { onImeActionPerformed.invoke(ImeAction.Previous, keyboardController) },
+                onSearch = { onImeActionPerformed.invoke(ImeAction.Search, keyboardController) },
+                onSend = { onImeActionPerformed.invoke(ImeAction.Send, keyboardController) }
+            ),
             // cursorColor = textColor,
             textStyle = textStyle.copy(color = textColor),
             // onTextInputStarted = {

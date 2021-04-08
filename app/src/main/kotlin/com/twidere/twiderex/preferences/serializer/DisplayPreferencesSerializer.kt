@@ -37,7 +37,7 @@ object DisplayPreferencesSerializer : Serializer<DisplayPreferences> {
             .setFontScale(1F)
             .build()
 
-    override fun readFrom(input: InputStream): DisplayPreferences {
+    override suspend fun readFrom(input: InputStream): DisplayPreferences {
         try {
             return DisplayPreferences.parseFrom(input)
         } catch (exception: InvalidProtocolBufferException) {
@@ -45,5 +45,5 @@ object DisplayPreferencesSerializer : Serializer<DisplayPreferences> {
         }
     }
 
-    override fun writeTo(t: DisplayPreferences, output: OutputStream) = t.writeTo(output)
+    override suspend fun writeTo(t: DisplayPreferences, output: OutputStream) = t.writeTo(output)
 }

@@ -60,9 +60,6 @@ class SearchItem : HomeNavigationItem() {
     @Composable
     override fun name(): String = stringResource(R.string.scene_search_title)
 
-    override val route: String
-        get() = "search"
-
     @Composable
     override fun icon(): Painter = painterResource(id = R.drawable.ic_search)
 

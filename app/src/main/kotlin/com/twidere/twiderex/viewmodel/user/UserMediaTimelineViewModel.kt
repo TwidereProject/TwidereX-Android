@@ -22,13 +22,13 @@ package com.twidere.twiderex.viewmodel.user
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.flatMap
 import androidx.paging.map
 import com.twidere.services.microblog.TimelineService
 import com.twidere.twiderex.db.CacheDatabase
-import com.twidere.twiderex.di.assisted.IAssistedFactory
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiMedia
@@ -51,7 +51,7 @@ class UserMediaTimelineViewModel @AssistedInject constructor(
 ) : ViewModel() {
 
     @dagger.assisted.AssistedFactory
-    interface AssistedFactory : IAssistedFactory {
+    interface AssistedFactory {
         fun create(
             account: AccountDetails,
             userKey: MicroBlogKey,
@@ -59,7 +59,13 @@ class UserMediaTimelineViewModel @AssistedInject constructor(
     }
 
     val source: Flow<PagingData<Pair<UiMedia, UiStatus>>> by lazy {
-        pagingMediator.pager(pageSize = 200).flow.map { pagingData ->
+        pagingMediator.pager(
+            config = PagingConfig(
+                pageSize = 200,
+                prefetchDistance = 4,
+                enablePlaceholders = false,
+            )
+        ).flow.map { pagingData ->
             pagingData.map {
                 it.toUi(pagingMediator.accountKey)
             }

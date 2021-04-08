@@ -21,6 +21,7 @@
 package com.twidere.twiderex.viewmodel.mastodon
 
 import android.accounts.Account
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.twidere.services.mastodon.MastodonOAuthService
@@ -36,17 +37,21 @@ import com.twidere.twiderex.repository.ACCOUNT_TYPE
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.scenes.mastodon.MASTODON_CALLBACK_URL
 import com.twidere.twiderex.utils.json
-import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
+import dagger.assisted.AssistedInject
 
-@HiltViewModel
-class MastodonSignInViewModel @Inject constructor(
+class MastodonSignInViewModel @AssistedInject constructor(
     private val repository: AccountRepository,
     private val inAppNotification: InAppNotification,
 ) : ViewModel() {
+
+    @dagger.assisted.AssistedFactory
+    interface AssistedFactory {
+        fun create(): MastodonSignInViewModel
+    }
+
     val loading = MutableLiveData(false)
-    val host = MutableLiveData("")
-    fun setHost(value: String) {
+    val host = MutableLiveData(TextFieldValue())
+    fun setHost(value: TextFieldValue) {
         host.value = value
     }
 

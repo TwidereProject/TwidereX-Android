@@ -20,18 +20,21 @@
  */
 package com.twidere.twiderex.viewmodel
 
+import android.net.Uri
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
+import androidx.work.WorkManager
 import com.twidere.services.http.MicroBlogException
 import com.twidere.services.microblog.LookupService
-import com.twidere.twiderex.di.assisted.IAssistedFactory
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.twitter.TwitterTweetsRepository
 import com.twidere.twiderex.utils.notify
+import com.twidere.twiderex.worker.DownloadMediaWorker
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.launch
@@ -41,12 +44,25 @@ import java.io.IOException
 class MediaViewModel @AssistedInject constructor(
     private val factory: TwitterTweetsRepository.AssistedFactory,
     private val inAppNotification: InAppNotification,
+    private val workManager: WorkManager,
     @Assisted private val account: AccountDetails,
     @Assisted private val statusKey: MicroBlogKey,
 ) : ViewModel() {
 
+    fun saveFile(currentMedia: UiMedia, target: Uri) {
+        currentMedia.mediaUrl?.let {
+            DownloadMediaWorker.create(
+                accountKey = account.accountKey,
+                source = it,
+                target = target
+            )
+        }?.let {
+            workManager.enqueue(it)
+        }
+    }
+
     @dagger.assisted.AssistedFactory
-    interface AssistedFactory : IAssistedFactory {
+    interface AssistedFactory {
         fun create(account: AccountDetails, statusKey: MicroBlogKey): MediaViewModel
     }
 

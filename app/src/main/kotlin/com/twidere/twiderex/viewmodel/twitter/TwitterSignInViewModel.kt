@@ -28,7 +28,6 @@ import com.twidere.services.http.MicroBlogException
 import com.twidere.services.twitter.TwitterOAuthService
 import com.twidere.services.twitter.TwitterService
 import com.twidere.twiderex.db.mapper.toDbUser
-import com.twidere.twiderex.di.assisted.IAssistedFactory
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.PlatformType
@@ -56,7 +55,7 @@ class TwitterSignInViewModel @AssistedInject constructor(
 ) : ViewModel() {
 
     @dagger.assisted.AssistedFactory
-    interface AssistedFactory : IAssistedFactory {
+    interface AssistedFactory {
         fun create(
             @Assisted("consumerKey") consumerKey: String,
             @Assisted("consumerSecret") consumerSecret: String,

@@ -20,127 +20,36 @@
  */
 package com.twidere.twiderex.viewmodel.twitter
 
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.liveData
-import androidx.lifecycle.switchMap
-import androidx.lifecycle.viewModelScope
 import com.twidere.services.twitter.TwitterService
-import com.twidere.services.twitter.model.ReferencedTweetType
-import com.twidere.services.twitter.model.StatusV2
-import com.twidere.twiderex.di.assisted.IAssistedFactory
+import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.notification.InAppNotification
-import com.twidere.twiderex.repository.twitter.TwitterConversationRepository
-import com.twidere.twiderex.utils.notify
+import com.twidere.twiderex.paging.mediator.paging.PagingMediator
+import com.twidere.twiderex.paging.mediator.status.TwitterConversationMediator
+import com.twidere.twiderex.repository.StatusRepository
+import com.twidere.twiderex.viewmodel.StatusPagingViewModel
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import kotlinx.coroutines.launch
 
 class TwitterStatusViewModel @AssistedInject constructor(
-    private val factory: TwitterConversationRepository.AssistedFactory,
-    private val inAppNotification: InAppNotification,
+    statusRepository: StatusRepository,
+    inAppNotification: InAppNotification,
+    database: CacheDatabase,
     @Assisted private val account: AccountDetails,
     @Assisted private val statusKey: MicroBlogKey,
-) : ViewModel() {
+) : StatusPagingViewModel(statusRepository, account, statusKey) {
 
     @dagger.assisted.AssistedFactory
-    interface AssistedFactory : IAssistedFactory {
+    interface AssistedFactory {
         fun create(account: AccountDetails, statusKey: MicroBlogKey): TwitterStatusViewModel
     }
 
-    private lateinit var targetTweet: StatusV2
-    private var nextPage: String? = null
-    private val repository by lazy {
-        account.service.let {
-            factory.create(account.accountKey, it as TwitterService)
-        }
-    }
-
-    val moreConversations = repository.liveData.switchMap { list ->
-        liveData {
-            emit(
-                conversations.mapNotNull { conversation ->
-                    list.firstOrNull {
-                        it.statusId == conversation.statusId
-                    }
-                }
-            )
-        }
-    }
-
-    val previousConversations = repository.liveData.switchMap { list ->
-        liveData {
-            emit(
-                previous.mapNotNull { conversation ->
-                    list.firstOrNull { it.statusId == conversation.id }
-                }
-            )
-        }
-    }
-
-    val status = liveData {
-        emitSource(repository.getStatusLiveData(statusKey))
-    }
-    val loadingPrevious = MutableLiveData(false)
-    val loadingMore = MutableLiveData(false)
-    private val conversations = arrayListOf<UiStatus>()
-    private val previous = arrayListOf<StatusV2>()
-
-    init {
-        viewModelScope.launch {
-            loadingPrevious.postValue(true)
-            loadingMore.postValue(true)
-            runCatching {
-                val tweet = repository.loadTweetFromNetwork(statusKey.id)
-                repository.toUiStatus(tweet)
-                targetTweet =
-                    tweet.referencedTweets?.firstOrNull { it.type == ReferencedTweetType.retweeted }?.status
-                    ?: tweet
-            }.onSuccess {
-                launch {
-                    runCatching {
-                        repository.loadPrevious(targetTweet)
-                    }.onSuccess {
-                        previous.addAll(it)
-                    }.onFailure {
-                        it.notify(inAppNotification)
-                    }
-                    loadingPrevious.postValue(false)
-                }
-                launch {
-                    runCatching {
-                        repository.loadConversation(targetTweet)
-                    }.onFailure {
-                        it.notify(inAppNotification)
-                    }.onSuccess { result ->
-                        nextPage = result.nextPage
-                        conversations.addAll(result.result)
-                    }
-                    loadingMore.postValue(false)
-                }
-            }.onFailure {
-                loadingPrevious.postValue(false)
-                loadingMore.postValue(false)
-                it.notify(inAppNotification)
-            }
-        }
-    }
-
-    suspend fun loadMore() {
-        if (nextPage == null || loadingMore.value == true) {
-            return
-        }
-        loadingMore.postValue(true)
-        try {
-            val result = repository.loadConversation(targetTweet, nextPage = nextPage)
-            nextPage = result.nextPage
-            conversations.addAll(result.result)
-        } catch (e: Throwable) {
-            e.notify(inAppNotification)
-        }
-        loadingMore.postValue(false)
-    }
+    override val pagingMediator: PagingMediator = TwitterConversationMediator(
+        service = account.service as TwitterService,
+        statusKey = statusKey,
+        accountKey = account.accountKey,
+        database = database,
+        inAppNotification = inAppNotification,
+    )
 }

@@ -34,14 +34,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.navigation.compose.navigate
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.ui.LocalNavController
-import com.twidere.twiderex.ui.TwidereXTheme
+import com.twidere.twiderex.ui.TwidereScene
 
 data class SettingItem(
     val name: String,
@@ -86,7 +85,7 @@ fun SettingsScene() {
             )
         )
 
-    TwidereXTheme {
+    TwidereScene {
         InAppNotificationScaffold(
             topBar = {
                 AppBar(

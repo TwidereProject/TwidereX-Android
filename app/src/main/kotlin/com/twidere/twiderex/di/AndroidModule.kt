@@ -21,6 +21,7 @@
 package com.twidere.twiderex.di
 
 import android.accounts.AccountManager
+import android.content.ContentResolver
 import android.content.Context
 import android.content.SharedPreferences
 import android.location.LocationManager
@@ -72,4 +73,8 @@ object AndroidModule {
     @Provides
     fun provideConnectivityManager(@ApplicationContext context: Context): ConnectivityManager =
         context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+
+    @Provides
+    fun provideContentResolver(@ApplicationContext context: Context): ContentResolver =
+        context.contentResolver
 }

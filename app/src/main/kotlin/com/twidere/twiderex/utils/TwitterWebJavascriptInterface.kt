@@ -21,12 +21,11 @@
 package com.twidere.twiderex.utils
 
 import android.webkit.JavascriptInterface
-import androidx.navigation.NavController
-import com.twidere.twiderex.extensions.setResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import moe.tlaster.precompose.navigation.NavController
 
 class TwitterWebJavascriptInterface(
     val navController: NavController,
@@ -37,8 +36,7 @@ class TwitterWebJavascriptInterface(
             content.toIntOrNull()?.let {
                 GlobalScope.launch {
                     withContext(Dispatchers.Main) {
-                        navController.setResult("pin_code", content)
-                        navController.popBackStack()
+                        navController.goBackWith(content)
                     }
                 }
             }

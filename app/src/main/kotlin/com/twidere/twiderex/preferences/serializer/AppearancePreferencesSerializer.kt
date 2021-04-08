@@ -28,7 +28,7 @@ import java.io.InputStream
 import java.io.OutputStream
 
 object AppearancePreferencesSerializer : Serializer<AppearancePreferences> {
-    override fun readFrom(input: InputStream): AppearancePreferences {
+    override suspend fun readFrom(input: InputStream): AppearancePreferences {
         try {
             return AppearancePreferences.parseFrom(input)
         } catch (exception: InvalidProtocolBufferException) {
@@ -36,7 +36,7 @@ object AppearancePreferencesSerializer : Serializer<AppearancePreferences> {
         }
     }
 
-    override fun writeTo(
+    override suspend fun writeTo(
         t: AppearancePreferences,
         output: OutputStream
     ) = t.writeTo(output)

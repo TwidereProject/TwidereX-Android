@@ -21,10 +21,10 @@
 package com.twidere.twiderex.component.foundation
 
 import android.graphics.Bitmap
-import android.print.PrintDocumentAdapter
 import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -41,23 +41,19 @@ import androidx.compose.ui.zIndex
 import com.twidere.twiderex.view.LollipopFixWebView
 
 class WebContext {
-    fun createPrintDocumentAdapter(documentName: String): PrintDocumentAdapter {
-        return webView.createPrintDocumentAdapter(documentName)
-    }
-
     fun goForward() {
-        webView.goForward()
+        webView?.goForward()
     }
 
     fun goBack() {
-        webView.goBack()
+        webView?.goBack()
     }
 
     fun canGoBack(): Boolean {
-        return webView.canGoBack()
+        return webView?.canGoBack() ?: false
     }
 
-    internal lateinit var webView: WebView
+    internal var webView: WebView? = null
 }
 
 private fun WebView.setRef(ref: (WebView) -> Unit) {
@@ -81,10 +77,18 @@ fun WebComponent(
     config: (WebView) -> Unit = {},
 ) {
     var progress by remember { mutableStateOf(0f) }
+    if (webContext.canGoBack()) {
+        BackHandler {
+            webContext.goBack()
+        }
+    }
     Box {
         if (progress != 1f) {
             LinearProgressIndicator(
-                modifier = Modifier.fillMaxWidth().align(Alignment.TopStart).zIndex(1f),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.TopStart)
+                    .zIndex(1f),
                 progress = progress
             )
         }

@@ -20,6 +20,7 @@
  */
 package com.twidere.twiderex
 
+import android.content.Intent
 import android.graphics.Color
 import android.net.ConnectivityManager
 import android.net.Network
@@ -27,6 +28,7 @@ import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import android.os.Bundle
 import android.view.WindowManager
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -35,17 +37,15 @@ import androidx.compose.runtime.remember
 import androidx.core.net.ConnectivityManagerCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.ComposeNavigator
-import androidx.navigation.fragment.DialogFragmentNavigator
 import com.bumptech.glide.Glide
+import com.google.accompanist.glide.LocalRequestManager
+import com.google.accompanist.insets.ExperimentalAnimatedInsets
+import com.google.accompanist.insets.ProvideWindowInsets
 import com.twidere.twiderex.action.LocalStatusActions
 import com.twidere.twiderex.action.StatusActions
 import com.twidere.twiderex.component.foundation.LocalInAppNotification
-import com.twidere.twiderex.di.assisted.AssistedViewModelFactoryHolder
 import com.twidere.twiderex.di.assisted.ProvideAssistedFactory
 import com.twidere.twiderex.navigation.Router
 import com.twidere.twiderex.notification.InAppNotification
@@ -58,25 +58,19 @@ import com.twidere.twiderex.ui.LocalApplication
 import com.twidere.twiderex.ui.LocalIsActiveNetworkMetered
 import com.twidere.twiderex.ui.LocalWindow
 import com.twidere.twiderex.ui.LocalWindowInsetsController
+import com.twidere.twiderex.utils.LocalPlatformResolver
+import com.twidere.twiderex.utils.PlatformResolver
 import com.twidere.twiderex.viewmodel.ActiveAccountViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import dev.chrisbanes.accompanist.glide.LocalRequestManager
-import dev.chrisbanes.accompanist.insets.ExperimentalAnimatedInsets
-import dev.chrisbanes.accompanist.insets.ProvideWindowInsets
+import moe.tlaster.precompose.navigation.NavController
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class TwidereXActivity : FragmentActivity() {
+class TwidereXActivity : ComponentActivity() {
 
-    val navController by lazy {
-        NavHostController(this).apply {
-            navigatorProvider.apply {
-                addNavigator(ComposeNavigator())
-                addNavigator(DialogFragmentNavigator(this@TwidereXActivity, supportFragmentManager))
-            }
-        }
+    private val navController by lazy {
+        NavController()
     }
-
     private val isActiveNetworkMetered = MutableLiveData(false)
     private val networkCallback by lazy {
         object : ConnectivityManager.NetworkCallback() {
@@ -94,19 +88,22 @@ class TwidereXActivity : FragmentActivity() {
     }
 
     @Inject
+    lateinit var viewModelHolder: TwidereXActivityAssistedViewModelHolder
+
+    @Inject
     lateinit var statusActions: StatusActions
 
     @Inject
     lateinit var preferencesHolder: PreferencesHolder
 
     @Inject
-    lateinit var assistedViewModelFactoryHolder: AssistedViewModelFactoryHolder
-
-    @Inject
     lateinit var inAppNotification: InAppNotification
 
     @Inject
     lateinit var connectivityManager: ConnectivityManager
+
+    @Inject
+    lateinit var platformResolver: PlatformResolver
 
     @OptIn(ExperimentalAnimatedInsets::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -137,12 +134,13 @@ class TwidereXActivity : FragmentActivity() {
                 LocalActiveAccountViewModel provides accountViewModel,
                 LocalIsActiveNetworkMetered provides isActiveNetworkMetered,
                 LocalRequestManager provides Glide.with(this),
+                LocalPlatformResolver provides platformResolver,
             ) {
                 ProvidePreferences(
                     preferencesHolder,
                 ) {
                     ProvideAssistedFactory(
-                        assistedViewModelFactoryHolder
+                        viewModelHolder.factory,
                     ) {
                         ProvideWindowInsets(
                             windowInsetsAnimationsEnabled = true
@@ -154,6 +152,15 @@ class TwidereXActivity : FragmentActivity() {
                     }
                 }
             }
+        }
+        intent.data?.let {
+            navController.navigate(it.toString())
+        }
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        intent?.data?.let {
+            navController.navigate(it.toString())
         }
     }
 

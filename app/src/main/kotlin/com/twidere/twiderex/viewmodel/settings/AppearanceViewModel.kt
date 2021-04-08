@@ -24,14 +24,18 @@ import androidx.datastore.core.DataStore
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.twidere.twiderex.preferences.proto.AppearancePreferences
-import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class AppearanceViewModel @Inject constructor(
+class AppearanceViewModel @AssistedInject constructor(
     private val appearancePreferences: DataStore<AppearancePreferences>
 ) : ViewModel() {
+
+    @dagger.assisted.AssistedFactory
+    interface AssistedFactory {
+        fun create(): AppearanceViewModel
+    }
+
     fun setPrimaryColorIndex(index: Int) = viewModelScope.launch {
         appearancePreferences.updateData {
             it.toBuilder().setPrimaryColorIndex(index).build()
