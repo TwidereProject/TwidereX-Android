@@ -73,7 +73,7 @@ fun NavHost(
     val viewModelStoreOwner = checkNotNull(LocalViewModelStoreOwner.current) {
         "NavHost requires a ViewModelStoreOwner to be provided via LocalViewModelStoreOwner"
     }
-    val backDispatcher = LocalOnBackPressedDispatcherOwner.current.onBackPressedDispatcher
+    val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
     DisposableEffect(manager, lifecycleOwner, viewModelStoreOwner, backDispatcher) {
         manager.lifeCycleOwner = lifecycleOwner
         manager.setViewModelStore(viewModelStoreOwner.viewModelStore)

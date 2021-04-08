@@ -20,7 +20,7 @@
  */
 package com.twidere.twiderex.scenes
 
-import androidx.activity.compose.registerForActivityResult
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -297,7 +297,7 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewM
                                         ReplyButton(status = status, withNumber = false)
                                         RetweetButton(status = status, withNumber = false)
                                         LikeButton(status = status, withNumber = false)
-                                        val saveFileLauncher = registerForActivityResult(
+                                        val saveFileLauncher = rememberLauncherForActivityResult(
                                             contract = ActivityResultContracts.CreateDocument()
                                         ) {
                                             it?.let {

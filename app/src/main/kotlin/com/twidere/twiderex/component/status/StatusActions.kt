@@ -26,7 +26,6 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope.Companion.weight
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -35,6 +34,7 @@ import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
@@ -60,7 +60,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.R
 import com.twidere.twiderex.action.LocalStatusActions
-import com.twidere.twiderex.component.foundation.ActionIconButton
 import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.extensions.humanizedCount
 import com.twidere.twiderex.extensions.shareText
@@ -75,6 +74,7 @@ private val rippleSize = 24.dp
 
 @Composable
 fun ReplyButton(
+    modifier: Modifier = Modifier,
     status: UiStatus,
     withNumber: Boolean = true,
 ) {
@@ -86,6 +86,7 @@ fun ReplyButton(
     }
     if (withNumber) {
         StatusActionButtonWithNumbers(
+            modifier = modifier,
             icon = icon,
             color = LocalContentColor.current,
             count = status.replyCount,
@@ -95,7 +96,8 @@ fun ReplyButton(
             },
         )
     } else {
-        ActionIconButton(
+        IconButton(
+            modifier = modifier,
             onClick = {
                 action.invoke()
             },
@@ -111,6 +113,7 @@ fun ReplyButton(
 
 @Composable
 fun LikeButton(
+    modifier: Modifier = Modifier,
     status: UiStatus,
     withNumber: Boolean = true,
 ) {
@@ -130,6 +133,7 @@ fun LikeButton(
     }
     if (withNumber) {
         StatusActionButtonWithNumbers(
+            modifier = modifier,
             icon = icon,
             count = status.likeCount,
             color = color,
@@ -139,7 +143,8 @@ fun LikeButton(
             },
         )
     } else {
-        ActionIconButton(
+        IconButton(
+            modifier = modifier,
             onClick = {
                 action.invoke()
             },
@@ -155,6 +160,7 @@ fun LikeButton(
 
 @Composable
 fun RetweetButton(
+    modifier: Modifier = Modifier,
     status: UiStatus,
     withNumber: Boolean = true,
 ) {
@@ -179,13 +185,7 @@ fun RetweetButton(
         }
     }
     Box(
-        modifier = Modifier.let {
-            if (withNumber) {
-                it.weight(1f)
-            } else {
-                it
-            }
-        }
+        modifier = modifier,
     ) {
         DropdownMenu(
             expanded = expanded,
@@ -223,7 +223,7 @@ fun RetweetButton(
                 },
             )
         } else {
-            ActionIconButton(
+            IconButton(
                 onClick = {
                     retweetAction.invoke()
                 },
@@ -240,6 +240,7 @@ fun RetweetButton(
 
 @Composable
 fun ShareButton(
+    modifier: Modifier = Modifier,
     status: UiStatus,
     compat: Boolean = false,
     menus: @Composable ColumnScope.(callback: () -> Unit) -> Unit = {},
@@ -256,7 +257,9 @@ fun ShareButton(
     )
     val clipboardManager = LocalClipboardManager.current
     val contentDescription = stringResource(id = R.string.accessibility_common_more)
-    Box {
+    Box(
+        modifier = modifier,
+    ) {
         if (compat) {
             Box(
                 modifier = Modifier
@@ -289,7 +292,7 @@ fun ShareButton(
                 )
             }
         } else {
-            ActionIconButton(
+            IconButton(
                 onClick = {
                     expanded = true
                 },
@@ -371,8 +374,7 @@ private fun StatusActionButtonWithNumbers(
 ) {
     val contentColor = color.copy(LocalContentAlpha.current)
     Box(
-        modifier = modifier
-            .weight(1f),
+        modifier = modifier,
     ) {
         val source = remember {
             MutableInteractionSource()

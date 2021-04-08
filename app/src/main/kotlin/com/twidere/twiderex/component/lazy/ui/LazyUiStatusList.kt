@@ -76,7 +76,9 @@ fun LazyUiStatusList(
                         when {
                             loadingBetween.contains(item.statusKey) -> {
                                 Divider()
-                                LoadingProgress()
+                                LoadingProgress(
+                                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                                )
                                 Divider()
                             }
                             item.isGap -> {
@@ -107,12 +109,14 @@ private fun LoadMoreButton(
         modifier = Modifier
             .background(LocalContentColor.current.copy(alpha = 0.04f))
             .clickable {
-                items.peekOrNull(index + 1)?.let { next ->
-                    onLoadBetweenClicked(
-                        item.statusKey,
-                        next.statusKey,
-                    )
-                }
+                items
+                    .peekOrNull(index + 1)
+                    ?.let { next ->
+                        onLoadBetweenClicked(
+                            item.statusKey,
+                            next.statusKey,
+                        )
+                    }
             }
             .fillMaxWidth(),
         contentAlignment = Alignment.Center,
