@@ -65,6 +65,10 @@ android {
 
     }
 
+    packagingOptions {
+        exclude "DebugProbesKt.bin"
+    }
+
     lintOptions{
         disable 'MissingTranslation'
     }
