@@ -25,8 +25,8 @@ ext {
             compileSdkVersion: 'android-S',
             buildToolsVersion: '31.0.0-rc2',
             minSdkVersion    : 21,
-            targetSdkVersion : 31,
-            versionCode      : 35,
-            versionName      : "1.1.0-dev06"
+            targetSdkVersion : 'S',
+            versionCode      : 36,
+            versionName      : "1.1.0-dev07"
     ]
 }

@@ -88,3 +88,7 @@ lint/tmp/
 *.hprof
 
 /.idea
+
+signing.properties
+
+*.jks
