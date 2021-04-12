@@ -32,17 +32,11 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 
 class TwitterUserViewModel @AssistedInject constructor(
-    private val factory: UserRepository.AssistedFactory,
+    private val repository: UserRepository,
     private val inAppNotification: InAppNotification,
     @Assisted private val account: AccountDetails,
     @Assisted private val screenName: String,
 ) : ViewModel() {
-
-    private val repository by lazy {
-        account.service.let {
-            factory.create(account.accountKey, it as LookupService)
-        }
-    }
 
     @dagger.assisted.AssistedFactory
     interface AssistedFactory {
@@ -56,7 +50,11 @@ class TwitterUserViewModel @AssistedInject constructor(
 
     val user = liveData {
         runCatching {
-            repository.lookupUserByName(screenName)
+            repository.lookupUserByName(
+                screenName,
+                accountKey = account.accountKey,
+                lookupService = account.service as LookupService,
+            )
         }.onSuccess {
             emit(it)
         }.onFailure {
