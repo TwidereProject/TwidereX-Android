@@ -23,9 +23,12 @@ package com.twidere.twiderex.repository
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.map
 import androidx.room.withTransaction
+import com.twidere.services.microblog.LookupService
 import com.twidere.twiderex.db.CacheDatabase
+import com.twidere.twiderex.db.mapper.toDbStatusWithReference
 import com.twidere.twiderex.db.model.DbStatusV2
 import com.twidere.twiderex.db.model.ReferenceType
+import com.twidere.twiderex.db.model.saveToDb
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.model.ui.UiStatus.Companion.toUi
@@ -68,5 +71,15 @@ class StatusRepository(
             database.pagingTimelineDao().delete(pagingTimelineToRemove)
             database.statusReferenceDao().remove(statusToRemove.map { it.statusKey })
         }
+    }
+
+    suspend fun loadTweetFromNetwork(
+        id: String,
+        accountKey: MicroBlogKey,
+        lookupService: LookupService
+    ) {
+        listOf(
+            lookupService.lookupStatus(id).toDbStatusWithReference(accountKey = accountKey)
+        ).saveToDb(database)
     }
 }
