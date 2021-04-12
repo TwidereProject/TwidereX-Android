@@ -35,6 +35,7 @@ internal class RouteStack(
     val dialogStack: SnapshotStateList<BackStackEntry> = mutableStateListOf(),
     val navTransition: NavTransition? = null,
 ) : LifecycleOwner {
+    private var destroyAfterTransition = false
     val currentEntry: BackStackEntry
         get() = if (dialogStack.any()) {
             dialogStack.last()
@@ -62,19 +63,22 @@ internal class RouteStack(
     }
 
     fun onInActive() {
-        lifecycleRegistry.currentState.let {
-            if (it != Lifecycle.State.DESTROYED) {
-                lifecycleRegistry.currentState = Lifecycle.State.STARTED
-            }
+        lifecycleRegistry.currentState = Lifecycle.State.STARTED
+        if (destroyAfterTransition) {
+            onDestroyed()
         }
     }
 
     fun onDestroyed() {
-        lifecycleRegistry.currentState = Lifecycle.State.DESTROYED
-        dialogStack.forEach {
-            it.viewModelStore.clear()
+        if (lifecycleRegistry.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
+            destroyAfterTransition = true
+        } else {
+            lifecycleRegistry.currentState = Lifecycle.State.DESTROYED
+            dialogStack.forEach {
+                it.viewModelStore.clear()
+            }
+            scene.viewModelStore.clear()
         }
-        scene.viewModelStore.clear()
     }
 
     override fun getLifecycle(): Lifecycle {
