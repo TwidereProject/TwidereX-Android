@@ -25,10 +25,12 @@ import com.twidere.twiderex.action.ComposeAction
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.db.DraftDatabase
 import com.twidere.twiderex.notification.InAppNotification
+import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.DraftRepository
 import com.twidere.twiderex.repository.ReactionRepository
 import com.twidere.twiderex.repository.SearchRepository
 import com.twidere.twiderex.repository.StatusRepository
+import com.twidere.twiderex.repository.UserRepository
 import com.twidere.twiderex.utils.PlatformResolver
 import dagger.Module
 import dagger.Provides
@@ -61,6 +63,12 @@ object TwidereModule {
     @Provides
     fun provideReactionRepository(database: CacheDatabase): ReactionRepository =
         ReactionRepository(database = database)
+
+    @Provides
+    fun provideUserRepository(
+        database: CacheDatabase,
+        accountRepository: AccountRepository
+    ): UserRepository = UserRepository(database = database, accountRepository = accountRepository)
 
     @Singleton
     @Provides
