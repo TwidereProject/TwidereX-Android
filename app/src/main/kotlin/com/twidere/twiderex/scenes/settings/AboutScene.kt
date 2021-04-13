@@ -20,22 +20,29 @@
  */
 package com.twidere.twiderex.scenes.settings
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -50,6 +57,7 @@ import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
+import com.twidere.twiderex.ui.standardPadding
 
 @Composable
 fun AboutScene() {
@@ -78,38 +86,61 @@ private fun AboutContent() {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .fillMaxHeight(),
+            .padding(standardPadding * 3),
     ) {
-        Column(
+        // Background and header
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .fillMaxHeight()
-                .weight(1.5F),
-            verticalArrangement = Arrangement.Bottom,
-            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            LoginLogo(modifier = Modifier.width(150.dp))
-            Box(modifier = Modifier.height(32.dp))
-            Text(
-                text = stringResource(id = R.string.app_name),
-                style = MaterialTheme.typography.h5,
+            Image(
+                painter = painterResource(id = R.drawable.ic_about_logo_shadow),
+                contentDescription = stringResource(id = R.string.scene_settings_about_logo_background_shadow),
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(top = standardPadding * 4)
             )
+            Image(
+                painter = painterResource(id = R.drawable.ic_about_logo),
+                contentDescription = stringResource(id = R.string.scene_settings_about_logo_background),
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(top = standardPadding)
+            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.TopStart),
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                LoginLogo(modifier = Modifier.width(44.dp))
+                Box(modifier = Modifier.width(25.dp))
+                Text(
+                    text = stringResource(id = R.string.app_name),
+                    style = MaterialTheme.typography.h4,
+                )
+            }
+        }
+
+        // version name
+        Text(
+            text = stringResource(id = R.string.scene_settings_about_version, BuildConfig.VERSION_NAME),
+        )
+        Box(modifier = Modifier.height(20.dp))
+        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
             Text(
-                text = BuildConfig.VERSION_NAME,
+                text = stringResource(id = R.string.scene_settings_about_description),
+                style = MaterialTheme.typography.body2,
             )
         }
-        Box(modifier = Modifier.height(64.dp))
-        Divider(
-            modifier = Modifier.padding(horizontal = 64.dp)
-        )
-        Box(modifier = Modifier.height(64.dp))
-        Column(
+
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .fillMaxHeight()
                 .weight(1F),
-            verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.CenterHorizontally
+            verticalAlignment = Alignment.Bottom
         ) {
             Row {
                 IconButton(
@@ -123,7 +154,7 @@ private fun AboutContent() {
                         contentDescription = stringResource(id = R.string.accessibility_common_logo_twitter)
                     )
                 }
-                Box(modifier = Modifier.width(32.dp))
+                Box(modifier = Modifier.width(standardPadding * 3))
                 IconButton(
                     onClick = {
                         navigator.openLink("https://github.com/TwidereProject/TwidereX-Android")
@@ -135,14 +166,45 @@ private fun AboutContent() {
                         contentDescription = stringResource(id = R.string.accessibility_common_logo_github)
                     )
                 }
+                Box(modifier = Modifier.width(standardPadding * 3))
+                IconButton(
+                    onClick = {
+                        navigator.openLink("https://t.me/twidere_x")
+                    }
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_telegram),
+                        tint = MaterialTheme.colors.onBackground,
+                        contentDescription = stringResource(id = R.string.accessibility_common_logo_github)
+                    )
+                }
             }
-            Box(modifier = Modifier.height(32.dp))
+            Box(modifier = Modifier.weight(1F))
             TextButton(
                 onClick = {
                     navigator.openLink("https://github.com/TwidereProject/TwidereX-Android/blob/develop/LICENSE")
-                }
+                },
+                colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.typography.body1.color)
             ) {
-                Text(text = stringResource(id = R.string.scene_settings_about_license))
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier
+                        .width(IntrinsicSize.Max)
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.scene_settings_about_license),
+                        style = MaterialTheme.typography.body1,
+                        modifier = Modifier
+                            .padding(standardPadding)
+                            .wrapContentWidth(Alignment.CenterHorizontally)
+                    )
+                    Box(modifier = Modifier.height(3.dp))
+                    Divider(
+                        thickness = 2.dp,
+                        modifier = Modifier.fillMaxWidth(),
+                        color = MaterialTheme.colors.primary
+                    )
+                }
             }
         }
     }

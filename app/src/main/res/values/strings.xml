@@ -240,6 +240,11 @@
     <string name="scene_settings_display_media_off">Off</string>
     <string name="scene_settings_about_title">About</string>
     <string name="scene_settings_about_license">License</string>
+    <string name="scene_settings_about_description">Next generation of Twidere for Android 5.0+.
+Still in early stage.</string>
+    <string name="scene_settings_about_version">Ver %s</string>
+    <string name="scene_settings_about_logo_background">About page background logo</string>
+    <string name="scene_settings_about_logo_background_shadow">About page background logo shadow</string>
     <string name="accessibility_common_network_image">Network Image</string>
     <string name="accessibility_common_back">Back</string>
     <string name="accessibility_common_more">More</string>
@@ -249,6 +254,7 @@
     <string name="accessibility_common_logo_twitter">Twitter Logo</string>
     <string name="accessibility_common_logo_mastodon">Mastodon Logo</string>
     <string name="accessibility_common_logo_github">Github Logo</string>
+    <string name="accessibility_common_logo_telegram">Telegram Logo</string>
     <string name="accessibility_common_video_play">Play video</string>
     <string name="accessibility_common_status_location">Location</string>
     <string name="accessibility_common_status_retweeted">Retweeted</string>
