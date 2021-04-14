@@ -67,7 +67,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
@@ -78,14 +77,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
-import com.google.accompanist.insets.statusBarsHeight
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.HorizontalDivider
 import com.twidere.twiderex.component.foundation.IconTabsComponent
 import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.foundation.Pager
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
-import com.twidere.twiderex.component.foundation.TabScaffold
 import com.twidere.twiderex.component.foundation.rememberPagerState
 import com.twidere.twiderex.component.lazy.LazyColumn2
 import com.twidere.twiderex.component.lazy.collectAsLazyPagingItems
@@ -112,18 +109,19 @@ import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.LocalVideoPlayback
 import com.twidere.twiderex.ui.standardPadding
-import com.twidere.twiderex.ui.statusBarColor
 import com.twidere.twiderex.viewmodel.user.UserFavouriteTimelineViewModel
 import com.twidere.twiderex.viewmodel.user.UserMediaTimelineViewModel
 import com.twidere.twiderex.viewmodel.user.UserTimelineViewModel
 import com.twidere.twiderex.viewmodel.user.UserViewModel
 import kotlinx.coroutines.launch
+import moe.tlaster.nestedscrollview.VerticalNestedScrollView
+import moe.tlaster.nestedscrollview.rememberNestedScrollViewState
 import moe.tlaster.precompose.navigation.NavController
 
 @Composable
 fun UserComponent(
     userKey: MicroBlogKey,
-    extendViewIntoStatusBar: Boolean = false,
+    cd
 ) {
     val account = LocalActiveAccount.current ?: return
     val viewModel = assistedViewModel<UserViewModel.AssistedFactory, UserViewModel>(
@@ -164,24 +162,9 @@ fun UserComponent(
             viewModel.refresh()
         },
     ) {
-        var alpha by remember {
-            mutableStateOf(0f)
-        }
-        TabScaffold(
-            onScroll = {
-                alpha = it
-            },
-            appbar = {
-                if (extendViewIntoStatusBar) {
-                    Spacer(
-                        modifier = Modifier
-                            .statusBarsHeight()
-                            .alpha(alpha)
-                            .background(statusBarColor())
-                            .fillMaxWidth()
-                    )
-                }
-            },
+        val nestedScrollViewState = rememberNestedScrollViewState()
+        VerticalNestedScrollView(
+            state = nestedScrollViewState,
             header = {
                 UserInfo(viewModel = viewModel)
             },
