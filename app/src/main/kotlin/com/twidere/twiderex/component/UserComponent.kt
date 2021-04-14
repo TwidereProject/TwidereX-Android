@@ -121,7 +121,6 @@ import moe.tlaster.precompose.navigation.NavController
 @Composable
 fun UserComponent(
     userKey: MicroBlogKey,
-    cd
 ) {
     val account = LocalActiveAccount.current ?: return
     val viewModel = assistedViewModel<UserViewModel.AssistedFactory, UserViewModel>(
