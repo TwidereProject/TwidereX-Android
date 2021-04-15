@@ -21,11 +21,14 @@
 package com.twidere.twiderex.scenes.settings
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -53,7 +56,9 @@ import com.twidere.twiderex.R
 import com.twidere.twiderex.component.LoginLogo
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
+import com.twidere.twiderex.component.foundation.BlurImage
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
+import com.twidere.twiderex.component.foundation.ParallaxLayout
 import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
@@ -85,61 +90,101 @@ private fun AboutContent() {
     val navController = LocalNavController.current
     Column(
         modifier = Modifier
+            .padding(vertical = standardPadding * 3)
             .fillMaxWidth()
-            .padding(standardPadding * 3),
     ) {
         // Background and header
         Box(
             modifier = Modifier
-                .fillMaxWidth()
+                .weight(4F)
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.ic_about_logo_shadow),
-                contentDescription = stringResource(id = R.string.scene_settings_about_logo_background_shadow),
+            val parallaxPaddingStart = standardPadding * 4
+            val parallaxPaddingTop = standardPadding * 3
+            val parallaxPaddingBottom = standardPadding * 10
+            val grayLogoPainter = painterResource(id = R.drawable.ic_about_gray_logo)
+            val aspectRatio = grayLogoPainter.intrinsicSize.width / grayLogoPainter.intrinsicSize.height
+
+            ParallaxLayout(
                 modifier = Modifier
+                    .fillMaxHeight()
                     .align(Alignment.TopEnd)
-                    .padding(top = standardPadding * 4)
-            )
-            Image(
-                painter = painterResource(id = R.drawable.ic_about_logo),
-                contentDescription = stringResource(id = R.string.scene_settings_about_logo_background),
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(top = standardPadding)
-            )
+                    .horizontalScroll(state = ScrollState(0), enabled = false),
+                alignment = Alignment.TopEnd,
+                backContentOffsetX = -standardPadding * 3,
+                backContentOffsetY = standardPadding * 3,
+                rotation = 2.0f,
+                backContentTransition = 50f,
+                backContent = {
+                    BlurImage(
+                        resource = R.drawable.ic_about_gray_logo_shadow,
+                        contentDescription = stringResource(id = R.string.scene_settings_about_logo_background_shadow),
+                        modifier = Modifier
+                            .aspectRatio(aspectRatio)
+                            .fillMaxHeight()
+                            .padding(
+                                start = parallaxPaddingStart,
+                                top = parallaxPaddingTop,
+                                bottom = parallaxPaddingBottom
+                            ),
+                    )
+                }
+            ) {
+                Image(
+                    painter = grayLogoPainter,
+                    contentDescription = stringResource(id = R.string.scene_settings_about_logo_background),
+                    modifier = Modifier
+                        .aspectRatio(aspectRatio)
+                        .fillMaxHeight()
+                        .padding(
+                            start = parallaxPaddingStart,
+                            top = parallaxPaddingTop,
+                            bottom = parallaxPaddingBottom
+                        )
+                )
+            }
+
             Row(
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .padding(horizontal = standardPadding * 3)
                     .align(Alignment.TopStart),
                 horizontalArrangement = Arrangement.Start,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 LoginLogo(modifier = Modifier.width(44.dp))
-                Box(modifier = Modifier.width(25.dp))
+                Box(modifier = Modifier.width(standardPadding * 3))
                 Text(
                     text = stringResource(id = R.string.app_name),
                     style = MaterialTheme.typography.h4,
                 )
             }
+
+            // version name
+            Column(
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .padding(horizontal = standardPadding * 3)
+            ) {
+                Text(
+                    text = stringResource(
+                        id = R.string.scene_settings_about_version,
+                        BuildConfig.VERSION_NAME
+                    ),
+                )
+                Box(modifier = Modifier.height(standardPadding * 3))
+                CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                    Text(
+                        text = stringResource(id = R.string.scene_settings_about_description),
+                        style = MaterialTheme.typography.body2,
+                    )
+                }
+            }
         }
 
-        // version name
-        Text(
-            text = stringResource(id = R.string.scene_settings_about_version, BuildConfig.VERSION_NAME),
-        )
-        Box(modifier = Modifier.height(20.dp))
-        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-            Text(
-                text = stringResource(id = R.string.scene_settings_about_description),
-                style = MaterialTheme.typography.body2,
-            )
-        }
-
+        Box(modifier = Modifier.weight(1F))
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .fillMaxHeight()
-                .weight(1F),
+                .padding(horizontal = standardPadding * 3),
             verticalAlignment = Alignment.Bottom
         ) {
             Row {
@@ -198,7 +243,7 @@ private fun AboutContent() {
                             .padding(standardPadding)
                             .wrapContentWidth(Alignment.CenterHorizontally)
                     )
-                    Box(modifier = Modifier.height(3.dp))
+                    Box(modifier = Modifier.height(standardPadding / 2))
                     Divider(
                         thickness = 2.dp,
                         modifier = Modifier.fillMaxWidth(),
