@@ -48,6 +48,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -99,7 +100,7 @@ private fun AboutContent() {
                 .weight(4F)
         ) {
             val parallaxPaddingStart = standardPadding * 4
-            val parallaxPaddingTop = standardPadding * 3
+            val parallaxPaddingTop = standardPadding * 5
             val parallaxPaddingBottom = standardPadding * 10
             val grayLogoPainter = painterResource(id = R.drawable.ic_about_gray_logo)
             val aspectRatio = grayLogoPainter.intrinsicSize.width / grayLogoPainter.intrinsicSize.height
@@ -140,6 +141,7 @@ private fun AboutContent() {
                             top = parallaxPaddingTop,
                             bottom = parallaxPaddingBottom
                         )
+                        .alpha(0.5f)
                 )
             }
 
@@ -152,10 +154,12 @@ private fun AboutContent() {
             ) {
                 LoginLogo(modifier = Modifier.width(44.dp))
                 Box(modifier = Modifier.width(standardPadding * 3))
-                Text(
-                    text = stringResource(id = R.string.app_name),
-                    style = MaterialTheme.typography.h4,
-                )
+                CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                    Text(
+                        text = stringResource(id = R.string.app_name),
+                        style = MaterialTheme.typography.h4,
+                    )
+                }
             }
 
             // version name
