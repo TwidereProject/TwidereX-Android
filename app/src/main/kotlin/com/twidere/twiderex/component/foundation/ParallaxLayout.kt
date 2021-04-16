@@ -28,9 +28,13 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.listSaver
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,6 +49,99 @@ import kotlin.math.min
 import kotlin.math.roundToInt
 
 @Composable
+fun rememberParallaxLayoutState(maxRotate: Float, maxTransition: Float): ParallaxLayoutState {
+    return rememberSaveable(
+        saver = ParallaxLayoutState.Saver(),
+    ) {
+        ParallaxLayoutState(maxRotate, maxTransition)
+    }
+}
+
+@Stable
+class ParallaxLayoutState(
+    private val maxRotate: Float,
+    private val maxTransition: Float,
+    rotateHorizontal: Float = 0f,
+    rotateVertical: Float = 0f,
+    transitionHorizontal: Float = 0f,
+    transitionVertical: Float = 0f,
+    lastHorizontalProgress: Int = 0,
+    lastVerticalProgress: Int = 0
+) {
+    companion object {
+        fun Saver(): Saver<ParallaxLayoutState, *> = listSaver(
+            save = {
+                listOf(
+                    it.maxRotate,
+                    it.maxTransition,
+                    it.rotateHorizontal,
+                    it.rotateVertical,
+                    it.transitionHorizontal,
+                    it.transitionVertical,
+                    it.lastHorizontalProgress,
+                    it.lastVerticalProgress
+                )
+            },
+            restore = {
+                ParallaxLayoutState(
+                    maxRotate = it[0].toFloat(),
+                    maxTransition = it[1].toFloat(),
+                    rotateHorizontal = it[2].toFloat(),
+                    rotateVertical = it[3].toFloat(),
+                    transitionHorizontal = it[4].toFloat(),
+                    transitionVertical = it[5].toFloat(),
+                    lastHorizontalProgress = it[6].toInt(),
+                    lastVerticalProgress = it[7].toInt(),
+                )
+            }
+        )
+    }
+    private val minRotate = 0f
+    private val minTransition = 0f
+    private var _rotateHorizontal by mutableStateOf(rotateHorizontal.coerceIn(minRotate, maxRotate))
+    var rotateHorizontal: Float
+        get() = _rotateHorizontal
+        set(value) {
+            _rotateHorizontal = value.coerceIn(minRotate, maxRotate)
+        }
+
+    private var _rotateVertical by mutableStateOf(rotateVertical.coerceIn(minRotate, maxRotate))
+    var rotateVertical: Float
+        get() = _rotateVertical
+        set(value) {
+            _rotateVertical = value.coerceIn(minRotate, maxRotate)
+        }
+
+    private var _transitionHorizontal by mutableStateOf(transitionHorizontal.coerceIn(minTransition, maxTransition))
+    var transitionHorizontal: Float
+        get() = _transitionHorizontal
+        set(value) {
+            _transitionHorizontal = value.coerceIn(minTransition, maxTransition)
+        }
+
+    private var _transitionVertical by mutableStateOf(transitionVertical.coerceIn(minTransition, maxTransition))
+    var transitionVertical: Float
+        get() = _transitionVertical
+        set(value) {
+            _transitionVertical = value.coerceIn(minTransition, maxTransition)
+        }
+
+    private var _lastVerticalProgress by mutableStateOf(lastVerticalProgress)
+    var lastVerticalProgress: Int
+        get() = _lastVerticalProgress
+        set(value) {
+            _lastVerticalProgress = value
+        }
+
+    private var _lastHorizontalProgress by mutableStateOf(lastHorizontalProgress)
+    var lastHorizontalProgress: Int
+        get() = _lastHorizontalProgress
+        set(value) {
+            _lastHorizontalProgress = value
+        }
+}
+
+@Composable
 fun ParallaxLayout(
     modifier: Modifier = Modifier,
     alignment: Alignment = Alignment.Center,
@@ -56,23 +153,20 @@ fun ParallaxLayout(
     backContent: @Composable () -> Unit,
     frontContent: @Composable () -> Unit,
 ) {
-    var rotateHorizontal by remember { mutableStateOf(0f) }
-    var rotateVertical by remember { mutableStateOf(0f) }
-    var transitionHorizontal by remember { mutableStateOf(0f) }
-    var transitionVertical by remember { mutableStateOf(0f) }
+    val parallaxLayoutState = rememberParallaxLayoutState(
+        maxRotate = rotation,
+        maxTransition = backContentTransition
+    )
 
     val animateSpec = remember {
         tween<Float>(durationMillis = animateDuration, easing = LinearEasing)
     }
 
-    val rotateAnimateHorizontal = animateFloatAsState(targetValue = rotateHorizontal, animationSpec = animateSpec)
-    val rotateAnimateVertical = animateFloatAsState(targetValue = rotateVertical, animationSpec = animateSpec)
-    val transitionAnimateHorizontal = animateFloatAsState(targetValue = transitionHorizontal, animationSpec = animateSpec)
-    val transitionAnimateVertical = animateFloatAsState(targetValue = transitionVertical, animationSpec = animateSpec)
+    val rotateAnimateHorizontal = animateFloatAsState(targetValue = parallaxLayoutState.rotateHorizontal, animationSpec = animateSpec)
+    val rotateAnimateVertical = animateFloatAsState(targetValue = parallaxLayoutState.rotateVertical, animationSpec = animateSpec)
+    val transitionAnimateHorizontal = animateFloatAsState(targetValue = parallaxLayoutState.transitionHorizontal, animationSpec = animateSpec)
+    val transitionAnimateVertical = animateFloatAsState(targetValue = parallaxLayoutState.transitionVertical, animationSpec = animateSpec)
     val context = LocalContext.current
-
-    var lastVerticalProgress = remember { 0 }
-    var lastHorizontalProgress = remember { 0 }
 
     Box(modifier = modifier) {
         Box(
@@ -114,11 +208,11 @@ fun ParallaxLayout(
                 )
 
                 // use 1% to filter the subtle jitter of orientation sensor
-                if (abs(currentVerticalProgress - lastVerticalProgress) >= 1) {
-                    lastVerticalProgress = currentVerticalProgress
+                if (abs(currentVerticalProgress - parallaxLayoutState.lastVerticalProgress) >= 1) {
+                    parallaxLayoutState.lastVerticalProgress = currentVerticalProgress
                     // calculate rotations and transitions and update
-                    rotateVertical = currentVerticalProgress * rotation / 100
-                    transitionVertical = currentVerticalProgress * backContentTransition / 100
+                    parallaxLayoutState.rotateVertical = currentVerticalProgress * rotation / 100
+                    parallaxLayoutState.transitionVertical = currentVerticalProgress * backContentTransition / 100
                 }
 
                 // calculate horizontal rotation progress, make it round to int
@@ -127,15 +221,15 @@ fun ParallaxLayout(
                     currentValue = currentValues[2]
                 )
                 // use 1% to filter the subtle jitter of orientation sensor
-                if (abs(abs(currentHorizontalProgress) - abs(lastHorizontalProgress)) >= 1) {
-                    lastHorizontalProgress = currentHorizontalProgress
+                if (abs(currentHorizontalProgress - parallaxLayoutState.lastHorizontalProgress) >= 1) {
+                    parallaxLayoutState.lastHorizontalProgress = currentHorizontalProgress
                     // calculate rotations and transitions and update
-                    rotateHorizontal = currentHorizontalProgress * rotation / 100
+                    parallaxLayoutState.rotateHorizontal = currentHorizontalProgress * rotation / 100
                     // when the phone is face up and bottom face to user
                     // and if the values[2] is positive means left is up
                     // in this case we want to move backContent to left
                     // so we add a "-" in front
-                    transitionHorizontal = -currentHorizontalProgress * backContentTransition / 100
+                    parallaxLayoutState.transitionHorizontal = -currentHorizontalProgress * backContentTransition / 100
                 }
             }
         onDispose {
