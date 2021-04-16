@@ -20,19 +20,29 @@
  */
 package com.twidere.twiderex.viewmodel
 
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import androidx.paging.cachedIn
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.repository.StatusRepository
 
-abstract class StatusPagingViewModel(
+class StatusViewModel(
     private val statusRepository: StatusRepository,
     private val account: AccountDetails,
     private val statusKey: MicroBlogKey,
-) : PagingViewModel() {
+) : ViewModel() {
+    @dagger.assisted.AssistedFactory
+    interface AssistedFactory {
+        fun create(account: AccountDetails, statusKey: MicroBlogKey): StatusViewModel
+    }
+
     val status by lazy {
-        statusRepository.loadStatus(
-            statusKey = statusKey,
-            accountKey = account.accountKey,
-        )
+        statusRepository.loadStatus(statusKey = statusKey, accountKey = account.accountKey)
+    }
+
+    val source by lazy {
+        statusRepository.conversation(statusKey = statusKey, account = account)
+            .cachedIn(viewModelScope)
     }
 }

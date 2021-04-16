@@ -18,16 +18,18 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.viewmodel
+package com.twidere.twiderex.extensions
 
-// abstract class PagingViewModel : ViewModel() {
-//     abstract val pagingMediator: PagingMediator
-//
-//     open val source by lazy {
-//         pagingMediator.pager().flow.map { pagingData ->
-//             pagingData.map {
-//                 it.toUi(pagingMediator.accountKey)
-//             }
-//         }.cachedIn(viewModelScope)
-//     }
-// }
+import androidx.paging.Pager
+import androidx.paging.map
+import com.twidere.twiderex.db.model.DbPagingTimelineWithStatus
+import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.ui.UiStatus.Companion.toUi
+import kotlinx.coroutines.flow.map
+
+fun Pager<Int, DbPagingTimelineWithStatus>.toUi(accountKey: MicroBlogKey) =
+    this.flow.map { pagingData ->
+        pagingData.map {
+            it.toUi(accountKey = accountKey)
+        }
+    }

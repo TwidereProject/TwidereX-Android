@@ -55,35 +55,21 @@ import com.twidere.twiderex.component.status.StatusDivider
 import com.twidere.twiderex.component.status.TimelineStatusComponent
 import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.ui.standardPadding
-import com.twidere.twiderex.viewmodel.mastodon.MastodonStatusViewModel
-import com.twidere.twiderex.viewmodel.twitter.TwitterStatusViewModel
+import com.twidere.twiderex.viewmodel.StatusViewModel
 
 @Composable
 fun StatusScene(
     statusKey: MicroBlogKey,
 ) {
     val account = LocalActiveAccount.current ?: return
-    val viewModel = when (account.type) {
-        PlatformType.Twitter ->
-            assistedViewModel<TwitterStatusViewModel.AssistedFactory, TwitterStatusViewModel>(
-                statusKey,
-                account,
-            ) {
-                it.create(account = account, statusKey = statusKey)
-            }
-        PlatformType.StatusNet -> TODO()
-        PlatformType.Fanfou -> TODO()
-        PlatformType.Mastodon ->
-            assistedViewModel<MastodonStatusViewModel.AssistedFactory, MastodonStatusViewModel>(
-                statusKey,
-                account,
-            ) {
-                it.create(account = account, statusKey = statusKey)
-            }
+    val viewModel = assistedViewModel<StatusViewModel.AssistedFactory, StatusViewModel>(
+        statusKey,
+        account,
+    ) {
+        it.create(account = account, statusKey = statusKey)
     }
     val source = viewModel.source.collectAsLazyPagingItems()
     val status by viewModel.status.observeAsState(initial = null)

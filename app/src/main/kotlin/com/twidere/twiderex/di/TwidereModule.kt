@@ -30,6 +30,7 @@ import com.twidere.twiderex.repository.DraftRepository
 import com.twidere.twiderex.repository.ReactionRepository
 import com.twidere.twiderex.repository.SearchRepository
 import com.twidere.twiderex.repository.StatusRepository
+import com.twidere.twiderex.repository.TimelineRepository
 import com.twidere.twiderex.repository.UserRepository
 import com.twidere.twiderex.utils.PlatformResolver
 import dagger.Module
@@ -63,6 +64,10 @@ object TwidereModule {
     @Provides
     fun provideReactionRepository(database: CacheDatabase): ReactionRepository =
         ReactionRepository(database = database)
+
+    @Provides
+    fun provideTimelineRepository(database: CacheDatabase): TimelineRepository =
+        TimelineRepository(database = database)
 
     @Provides
     fun provideUserRepository(
