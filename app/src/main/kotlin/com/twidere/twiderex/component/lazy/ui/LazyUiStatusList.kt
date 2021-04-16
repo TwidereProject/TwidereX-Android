@@ -22,22 +22,32 @@ package com.twidere.twiderex.component.lazy.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Divider
+import androidx.compose.material.Icon
+import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.paging.LoadState
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.LoadingProgress
 import com.twidere.twiderex.component.lazy.LazyColumn2
@@ -48,6 +58,7 @@ import com.twidere.twiderex.component.status.StatusDivider
 import com.twidere.twiderex.component.status.TimelineStatusComponent
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiStatus
+import com.twidere.twiderex.utils.generateNotificationEvent
 
 @Composable
 fun LazyUiStatusList(
@@ -59,7 +70,28 @@ fun LazyUiStatusList(
     key: ((index: Int) -> Any) = { items.peekOrNull(it)?.hashCode() ?: it },
     header: LazyListScope.() -> Unit = {},
 ) {
-    if (items.itemCount > 0) {
+    val refresh = items.loadState.refresh
+    if (items.itemCount == 0 && refresh is LoadState.Error) {
+        val event = remember(refresh) {
+            refresh.error.generateNotificationEvent()
+        }
+        if (event != null) {
+            val message = event.getMessage()
+            Column(
+                modifier = modifier
+                    .fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                CompositionLocalProvider(
+                    LocalContentAlpha provides ContentAlpha.medium
+                ) {
+                    Icon(imageVector = Icons.Default.ErrorOutline, contentDescription = null)
+                    Text(text = message)
+                }
+            }
+        }
+    } else if (items.itemCount > 0) {
         LazyColumn2(
             modifier = modifier,
             state = state

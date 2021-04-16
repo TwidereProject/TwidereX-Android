@@ -30,7 +30,6 @@ import com.twidere.twiderex.db.model.ReferenceType
 import com.twidere.twiderex.db.model.UserTimelineType
 import com.twidere.twiderex.db.model.pagingKey
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.paging.PagingList
 import com.twidere.twiderex.paging.SinceMaxPagination
 import com.twidere.twiderex.paging.mediator.paging.MaxIdPagingMediator
@@ -41,8 +40,7 @@ class UserMediaMediator(
     database: CacheDatabase,
     accountKey: MicroBlogKey,
     private val service: TimelineService,
-    inAppNotification: InAppNotification,
-) : MaxIdPagingMediator(accountKey, database, inAppNotification) {
+) : MaxIdPagingMediator(accountKey, database) {
     override val pagingKey: String
         get() = UserTimelineType.Media.pagingKey(userKey)
 

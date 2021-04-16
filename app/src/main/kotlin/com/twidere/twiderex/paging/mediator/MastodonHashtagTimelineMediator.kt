@@ -24,7 +24,6 @@ import com.twidere.services.mastodon.MastodonService
 import com.twidere.services.microblog.model.IStatus
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.paging.SinceMaxPagination
 import com.twidere.twiderex.paging.mediator.paging.MaxIdPagingMediator
 
@@ -33,8 +32,7 @@ class MastodonHashtagTimelineMediator(
     private val service: MastodonService,
     accountKey: MicroBlogKey,
     database: CacheDatabase,
-    inAppNotification: InAppNotification
-) : MaxIdPagingMediator(accountKey, database, inAppNotification) {
+) : MaxIdPagingMediator(accountKey, database) {
     override suspend fun load(pageSize: Int, paging: SinceMaxPagination?): List<IStatus> {
         return service.hashtagTimeline(
             query = keyword,

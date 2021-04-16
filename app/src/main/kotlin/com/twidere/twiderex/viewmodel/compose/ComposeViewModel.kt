@@ -278,7 +278,7 @@ open class ComposeViewModel @AssistedInject constructor(
     val status = liveData {
         statusKey?.let { statusKey ->
             emitSource(
-                repository.loadLiveDataFromCache(statusKey, accountKey = account.accountKey)
+                repository.loadStatus(statusKey, accountKey = account.accountKey)
                     .map { status ->
                         if (status != null &&
                             textFieldValue.value?.text.isNullOrEmpty() &&

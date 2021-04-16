@@ -30,7 +30,7 @@ abstract class StatusPagingViewModel(
     private val statusKey: MicroBlogKey,
 ) : PagingViewModel() {
     val status by lazy {
-        statusRepository.loadLiveDataFromCache(
+        statusRepository.loadStatus(
             statusKey = statusKey,
             accountKey = account.accountKey,
         )

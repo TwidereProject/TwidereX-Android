@@ -30,51 +30,57 @@ import com.twidere.services.twitter.model.exceptions.TwitterApiExceptionV2
 import com.twidere.services.utils.MicroBlogJsonException
 import com.twidere.twiderex.R
 import com.twidere.twiderex.notification.InAppNotification
+import com.twidere.twiderex.notification.NotificationEvent
+import com.twidere.twiderex.notification.StringNotificationEvent
+import com.twidere.twiderex.notification.StringResNotificationEvent
 import com.twidere.twiderex.notification.StringResWithActionNotificationEvent
 import java.util.concurrent.CancellationException
 
-fun Throwable.notify(notification: InAppNotification) {
-    when (this) {
+fun Throwable.generateNotificationEvent(): NotificationEvent? {
+    return when (this) {
         is MicroBlogHttpException -> {
             when (this.httpCode) {
                 HttpErrorCodes.TooManyRequests -> {
-                    notification.show(R.string.common_alerts_too_many_requests_title)
+                    return StringResNotificationEvent(messageId = R.string.common_alerts_too_many_requests_title)
                 }
+                else -> null
             }
         }
         is MicroBlogJsonException -> {
-            microBlogErrorMessage?.let { notification.show(it) }
+            microBlogErrorMessage?.let { StringNotificationEvent(it) }
         }
         is TwitterApiException -> {
             when (this.errors?.firstOrNull()?.code) {
                 TwitterErrorCodes.TemporarilyLocked -> {
-                    notification.show(
-                        StringResWithActionNotificationEvent(
-                            R.string.common_alerts_account_temporarily_locked_title,
-                            R.string.common_alerts_account_temporarily_locked_message,
-                            actionId = R.string.common_controls_actions_ok
-                        ) {
-                            context.startActivity(
-                                Intent(
-                                    ACTION_VIEW,
-                                    Uri.parse("https://twitter.com/login")
-                                )
+                    StringResWithActionNotificationEvent(
+                        R.string.common_alerts_account_temporarily_locked_title,
+                        R.string.common_alerts_account_temporarily_locked_message,
+                        actionId = R.string.common_controls_actions_ok
+                    ) {
+                        context.startActivity(
+                            Intent(
+                                ACTION_VIEW,
+                                Uri.parse("https://twitter.com/login")
                             )
-                        }
-                    )
+                        )
+                    }
                 }
-                TwitterErrorCodes.RateLimitExceeded -> {
-                    // ignore
-                }
-                else -> microBlogErrorMessage?.let { notification.show(it) }
+                TwitterErrorCodes.RateLimitExceeded -> null
+                else -> microBlogErrorMessage?.let { StringNotificationEvent(it) }
             }
         }
         is TwitterApiExceptionV2 -> {
-            detail?.let { notification.show(it) }
+            detail?.let { StringNotificationEvent(it) }
         }
         !is CancellationException -> {
-            message?.let { notification.show(it) }
+            message?.let { StringNotificationEvent(it) }
         }
-        else -> throw this
+        else -> null
     }
+}
+
+fun Throwable.notify(notification: InAppNotification) {
+    generateNotificationEvent()?.let {
+        notification.show(it)
+    } ?: throw this
 }

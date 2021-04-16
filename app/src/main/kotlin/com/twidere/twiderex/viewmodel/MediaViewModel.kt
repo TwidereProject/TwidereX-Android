@@ -66,7 +66,7 @@ class MediaViewModel @AssistedInject constructor(
     val loading = MutableLiveData(false)
     val status = liveData {
         emitSource(
-            repository.loadLiveDataFromCache(
+            repository.loadStatus(
                 statusKey = statusKey,
                 accountKey = account.accountKey,
             )

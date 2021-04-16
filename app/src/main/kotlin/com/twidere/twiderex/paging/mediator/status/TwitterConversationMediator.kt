@@ -31,7 +31,6 @@ import com.twidere.services.twitter.model.exceptions.TwitterApiExceptionV2
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.defaultLoadCount
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.paging.mediator.paging.CursorWithCustomOrderPagination
 import com.twidere.twiderex.paging.mediator.paging.CursorWithCustomOrderPagingMediator
 import com.twidere.twiderex.paging.mediator.paging.CursorWithCustomOrderPagingResult
@@ -41,11 +40,9 @@ class TwitterConversationMediator(
     private val statusKey: MicroBlogKey,
     accountKey: MicroBlogKey,
     database: CacheDatabase,
-    inAppNotification: InAppNotification
 ) : CursorWithCustomOrderPagingMediator(
     accountKey,
-    database,
-    inAppNotification
+    database
 ) {
     private var _targetTweet: StatusV2? = null
     private suspend fun loadPrevious(): List<StatusV2> {

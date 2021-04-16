@@ -29,7 +29,6 @@ import com.twidere.services.twitter.TwitterService
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.ui.UiStatus.Companion.toUi
-import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.paging.mediator.paging.pager
 import com.twidere.twiderex.paging.mediator.search.SearchMediaMediator
 import dagger.assisted.Assisted
@@ -38,7 +37,6 @@ import kotlinx.coroutines.flow.map
 
 class TwitterSearchMediaViewModel @AssistedInject constructor(
     val database: CacheDatabase,
-    inAppNotification: InAppNotification,
     @Assisted private val account: AccountDetails,
     @Assisted keyword: String,
 ) : ViewModel() {
@@ -51,7 +49,7 @@ class TwitterSearchMediaViewModel @AssistedInject constructor(
         account.service as TwitterService
     }
     val source by lazy {
-        SearchMediaMediator(keyword, database, account.accountKey, service, inAppNotification).pager()
+        SearchMediaMediator(keyword, database, account.accountKey, service).pager()
             .flow.map { it.map { it.status.toUi(account.accountKey) } }.cachedIn(viewModelScope)
             .map {
                 it.flatMap {

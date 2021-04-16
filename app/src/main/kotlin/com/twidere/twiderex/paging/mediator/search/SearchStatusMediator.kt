@@ -25,7 +25,6 @@ import com.twidere.services.microblog.model.IStatus
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.db.model.DbPagingTimelineWithStatus
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.paging.CursorPagination
 import com.twidere.twiderex.paging.mediator.paging.CursorPagingMediator
 import com.twidere.twiderex.paging.mediator.paging.CursorPagingResult
@@ -35,8 +34,7 @@ class SearchStatusMediator(
     database: CacheDatabase,
     accountKey: MicroBlogKey,
     private val service: SearchService,
-    inAppNotification: InAppNotification,
-) : CursorPagingMediator(accountKey, database, inAppNotification) {
+) : CursorPagingMediator(accountKey, database) {
     override val pagingKey = "search:$query:status"
     override suspend fun load(pageSize: Int, paging: CursorPagination?): List<IStatus> {
         val result = service.searchTweets(query, count = pageSize, nextPage = paging?.cursor)
