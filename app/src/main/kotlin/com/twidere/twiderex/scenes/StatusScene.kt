@@ -45,6 +45,7 @@ import androidx.paging.LoadState
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
+import com.twidere.twiderex.component.foundation.ErrorPlaceholder
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.lazy.LazyColumn2
 import com.twidere.twiderex.component.lazy.collectAsLazyPagingItems
@@ -110,10 +111,16 @@ fun StatusScene(
                         ExpandedStatusComponent(data = it)
                     }
                     Divider()
-                    if (source.loadState.refresh is LoadState.Loading) {
-                        Spacer(modifier = Modifier.height(standardPadding))
-                        CircularProgressIndicator()
-                        Spacer(modifier = Modifier.height(standardPadding))
+                    when (val refresh = source.loadState.refresh) {
+                        is LoadState.Loading -> {
+                            Spacer(modifier = Modifier.height(standardPadding))
+                            CircularProgressIndicator()
+                            Spacer(modifier = Modifier.height(standardPadding))
+                        }
+                        is LoadState.Error -> {
+                            ErrorPlaceholder(throwable = refresh.error)
+                        }
+                        else -> Unit
                     }
                 }
             }

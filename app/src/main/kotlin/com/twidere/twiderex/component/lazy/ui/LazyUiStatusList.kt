@@ -28,6 +28,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -42,14 +43,18 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.LoadingProgress
+import com.twidere.twiderex.component.foundation.LocalInAppNotification
 import com.twidere.twiderex.component.lazy.LazyColumn2
 import com.twidere.twiderex.component.lazy.LazyPagingItems
 import com.twidere.twiderex.component.lazy.loadState
@@ -58,7 +63,13 @@ import com.twidere.twiderex.component.status.StatusDivider
 import com.twidere.twiderex.component.status.TimelineStatusComponent
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiStatus
+import com.twidere.twiderex.notification.NotificationEvent
+import com.twidere.twiderex.ui.profileImageSize
+import com.twidere.twiderex.ui.standardPadding
 import com.twidere.twiderex.utils.generateNotificationEvent
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNotNull
 
 @Composable
 fun LazyUiStatusList(
@@ -71,27 +82,25 @@ fun LazyUiStatusList(
     header: LazyListScope.() -> Unit = {},
 ) {
     val refresh = items.loadState.refresh
-    if (items.itemCount == 0 && refresh is LoadState.Error) {
-        val event = remember(refresh) {
+    val event = remember(refresh) {
+        if (refresh is LoadState.Error) {
             refresh.error.generateNotificationEvent()
+        } else {
+            null
         }
-        if (event != null) {
-            val message = event.getMessage()
-            Column(
-                modifier = modifier
-                    .fillMaxSize(),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                CompositionLocalProvider(
-                    LocalContentAlpha provides ContentAlpha.medium
-                ) {
-                    Icon(imageVector = Icons.Default.ErrorOutline, contentDescription = null)
-                    Text(text = message)
-                }
-            }
-        }
+    }
+    if (items.itemCount == 0 && refresh is LoadState.Error) {
+        EmptyErrorPlaceholder(event, modifier)
     } else if (items.itemCount > 0) {
+        val inAppNotification = LocalInAppNotification.current
+        LaunchedEffect(event) {
+            snapshotFlow { event }
+                .distinctUntilChanged()
+                .filterNotNull()
+                .collect {
+                    inAppNotification.show(it)
+                }
+        }
         LazyColumn2(
             modifier = modifier,
             state = state
@@ -126,6 +135,37 @@ fun LazyUiStatusList(
             loadState(items.loadState.append) {
                 items.retry()
             }
+        }
+    }
+}
+
+@Composable
+private fun EmptyErrorPlaceholder(
+    event: NotificationEvent?,
+    modifier: Modifier = Modifier,
+) {
+    val message = event?.getMessage()
+    Column(
+        modifier = modifier
+            .fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        CompositionLocalProvider(
+            LocalContentAlpha provides ContentAlpha.medium
+        ) {
+            Icon(
+                modifier = Modifier
+                    .size(profileImageSize),
+                imageVector = Icons.Default.ErrorOutline,
+                contentDescription = null,
+            )
+            Text(
+                modifier = Modifier
+                    .padding(standardPadding),
+                text = message ?: stringResource(id = R.string.common_alerts_failed_to_load_title),
+                textAlign = TextAlign.Center,
+            )
         }
     }
 }
