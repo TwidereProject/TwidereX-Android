@@ -60,6 +60,7 @@ import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.BlurImage
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.ParallaxLayout
+import com.twidere.twiderex.component.foundation.rememberParallaxLayoutState
 import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
@@ -89,6 +90,7 @@ fun AboutScene() {
 private fun AboutContent() {
     val navigator = LocalNavigator.current
     val navController = LocalNavController.current
+    val parallaxLayoutState = rememberParallaxLayoutState(maxRotate = 2f, maxTransition = 50f)
     Column(
         modifier = Modifier
             .padding(vertical = standardPadding * 3)
@@ -113,8 +115,7 @@ private fun AboutContent() {
                 alignment = Alignment.TopEnd,
                 backContentOffsetX = -standardPadding * 3,
                 backContentOffsetY = standardPadding * 3,
-                rotation = 2.0f,
-                backContentTransition = 50f,
+                parallaxLayoutState = parallaxLayoutState,
                 backContent = {
                     BlurImage(
                         resource = R.drawable.ic_about_gray_logo_shadow,

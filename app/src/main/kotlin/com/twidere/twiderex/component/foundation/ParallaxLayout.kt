@@ -59,8 +59,8 @@ fun rememberParallaxLayoutState(maxRotate: Float, maxTransition: Float): Paralla
 
 @Stable
 class ParallaxLayoutState(
-    private val maxRotate: Float,
-    private val maxTransition: Float,
+    val maxRotate: Float,
+    val maxTransition: Float,
     rotateHorizontal: Float = 0f,
     rotateVertical: Float = 0f,
     transitionHorizontal: Float = 0f,
@@ -145,18 +145,13 @@ class ParallaxLayoutState(
 fun ParallaxLayout(
     modifier: Modifier = Modifier,
     alignment: Alignment = Alignment.Center,
-    rotation: Float = 10f,
-    backContentTransition: Float = 10f,
+    parallaxLayoutState: ParallaxLayoutState,
     backContentOffsetX: Dp = 0.dp,
     backContentOffsetY: Dp = 0.dp,
     animateDuration: Int = 300,
     backContent: @Composable () -> Unit,
     frontContent: @Composable () -> Unit,
 ) {
-    val parallaxLayoutState = rememberParallaxLayoutState(
-        maxRotate = rotation,
-        maxTransition = backContentTransition
-    )
 
     val animateSpec = remember {
         tween<Float>(durationMillis = animateDuration, easing = LinearEasing)
@@ -211,8 +206,8 @@ fun ParallaxLayout(
                 if (abs(currentVerticalProgress - parallaxLayoutState.lastVerticalProgress) >= 1) {
                     parallaxLayoutState.lastVerticalProgress = currentVerticalProgress
                     // calculate rotations and transitions and update
-                    parallaxLayoutState.rotateVertical = currentVerticalProgress * rotation / 100
-                    parallaxLayoutState.transitionVertical = currentVerticalProgress * backContentTransition / 100
+                    parallaxLayoutState.rotateVertical = currentVerticalProgress * parallaxLayoutState.maxRotate / 100
+                    parallaxLayoutState.transitionVertical = currentVerticalProgress * parallaxLayoutState.maxTransition / 100
                 }
 
                 // calculate horizontal rotation progress, make it round to int
@@ -224,12 +219,12 @@ fun ParallaxLayout(
                 if (abs(currentHorizontalProgress - parallaxLayoutState.lastHorizontalProgress) >= 1) {
                     parallaxLayoutState.lastHorizontalProgress = currentHorizontalProgress
                     // calculate rotations and transitions and update
-                    parallaxLayoutState.rotateHorizontal = currentHorizontalProgress * rotation / 100
+                    parallaxLayoutState.rotateHorizontal = currentHorizontalProgress * parallaxLayoutState.maxRotate / 100
                     // when the phone is face up and bottom face to user
                     // and if the values[2] is positive means left is up
                     // in this case we want to move backContent to left
                     // so we add a "-" in front
-                    parallaxLayoutState.transitionHorizontal = -currentHorizontalProgress * backContentTransition / 100
+                    parallaxLayoutState.transitionHorizontal = -currentHorizontalProgress * parallaxLayoutState.maxTransition / 100
                 }
             }
         onDispose {
