@@ -36,7 +36,7 @@ import com.twidere.twiderex.model.ui.UiStatus.Companion.toUi
 class StatusRepository(
     private val database: CacheDatabase,
 ) {
-    fun loadLiveDataFromCache(
+    fun loadStatus(
         statusKey: MicroBlogKey,
         accountKey: MicroBlogKey
     ): LiveData<UiStatus?> {

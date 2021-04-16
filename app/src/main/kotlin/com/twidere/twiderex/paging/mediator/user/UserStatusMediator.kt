@@ -27,7 +27,6 @@ import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.db.model.UserTimelineType
 import com.twidere.twiderex.db.model.pagingKey
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.paging.SinceMaxPagination
 import com.twidere.twiderex.paging.mediator.paging.MaxIdPagingMediator
 
@@ -37,9 +36,8 @@ class UserStatusMediator(
     database: CacheDatabase,
     accountKey: MicroBlogKey,
     private val service: TimelineService,
-    inAppNotification: InAppNotification,
     private val exclude_replies: Boolean = false,
-) : MaxIdPagingMediator(accountKey, database, inAppNotification) {
+) : MaxIdPagingMediator(accountKey, database) {
     override val pagingKey: String
         get() = UserTimelineType.Status.pagingKey(userKey) + ":exclude_replies=$exclude_replies"
 

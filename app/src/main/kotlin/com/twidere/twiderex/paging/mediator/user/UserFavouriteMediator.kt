@@ -30,7 +30,6 @@ import com.twidere.twiderex.db.model.UserTimelineType
 import com.twidere.twiderex.db.model.pagingKey
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.PlatformType
-import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.paging.mediator.paging.CursorWithCustomOrderPagination
 import com.twidere.twiderex.paging.mediator.paging.CursorWithCustomOrderPagingMediator
 import com.twidere.twiderex.paging.mediator.paging.CursorWithCustomOrderPagingResult
@@ -42,8 +41,7 @@ class UserFavouriteMediator(
     database: CacheDatabase,
     accountKey: MicroBlogKey,
     private val service: TimelineService,
-    inAppNotification: InAppNotification,
-) : CursorWithCustomOrderPagingMediator(accountKey, database, inAppNotification) {
+) : CursorWithCustomOrderPagingMediator(accountKey, database) {
     override val pagingKey: String
         get() = UserTimelineType.Favourite.pagingKey(userKey)
 

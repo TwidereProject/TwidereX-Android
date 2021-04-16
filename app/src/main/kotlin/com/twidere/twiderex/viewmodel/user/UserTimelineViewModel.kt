@@ -24,7 +24,6 @@ import com.twidere.services.microblog.TimelineService
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.paging.mediator.paging.PagingMediator
 import com.twidere.twiderex.paging.mediator.user.UserStatusMediator
 import com.twidere.twiderex.viewmodel.PagingViewModel
@@ -33,7 +32,6 @@ import dagger.assisted.AssistedInject
 
 class UserTimelineViewModel @AssistedInject constructor(
     database: CacheDatabase,
-    inAppNotification: InAppNotification,
     @Assisted account: AccountDetails,
     @Assisted userKey: MicroBlogKey,
     @Assisted exclude_replies: Boolean,
@@ -51,10 +49,9 @@ class UserTimelineViewModel @AssistedInject constructor(
     override val pagingMediator: PagingMediator =
         UserStatusMediator(
             userKey = userKey,
-            database,
-            account.accountKey,
-            account.service as TimelineService,
-            inAppNotification,
-            exclude_replies,
+            database = database,
+            accountKey = account.accountKey,
+            service = account.service as TimelineService,
+            exclude_replies = exclude_replies,
         )
 }

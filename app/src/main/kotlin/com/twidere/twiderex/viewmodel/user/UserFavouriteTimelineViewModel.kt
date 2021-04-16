@@ -28,7 +28,6 @@ import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiStatus.Companion.toUi
-import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.paging.mediator.paging.PagingMediator
 import com.twidere.twiderex.paging.mediator.paging.pager
 import com.twidere.twiderex.paging.mediator.user.UserFavouriteMediator
@@ -39,7 +38,6 @@ import kotlinx.coroutines.flow.map
 
 class UserFavouriteTimelineViewModel @AssistedInject constructor(
     database: CacheDatabase,
-    inAppNotification: InAppNotification,
     @Assisted account: AccountDetails,
     @Assisted userKey: MicroBlogKey,
 ) : PagingViewModel() {
@@ -64,9 +62,8 @@ class UserFavouriteTimelineViewModel @AssistedInject constructor(
         UserFavouriteMediator(
             userKey = userKey,
             platformType = account.type,
-            database,
-            account.accountKey,
-            account.service as TimelineService,
-            inAppNotification,
+            database = database,
+            accountKey = account.accountKey,
+            service = account.service as TimelineService,
         )
 }

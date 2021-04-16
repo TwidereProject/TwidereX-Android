@@ -25,7 +25,6 @@ import com.twidere.services.microblog.model.IStatus
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.db.model.DbPagingTimelineWithStatus
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.paging.mediator.paging.CursorWithCustomOrderPagination
 import com.twidere.twiderex.paging.mediator.paging.CursorWithCustomOrderPagingMediator
 import com.twidere.twiderex.paging.mediator.paging.CursorWithCustomOrderPagingResult
@@ -35,8 +34,7 @@ class MastodonStatusContextMediator(
     private val statusKey: MicroBlogKey,
     accountKey: MicroBlogKey,
     database: CacheDatabase,
-    inAppNotification: InAppNotification
-) : CursorWithCustomOrderPagingMediator(accountKey, database, inAppNotification) {
+) : CursorWithCustomOrderPagingMediator(accountKey, database) {
     override suspend fun load(
         pageSize: Int,
         paging: CursorWithCustomOrderPagination?

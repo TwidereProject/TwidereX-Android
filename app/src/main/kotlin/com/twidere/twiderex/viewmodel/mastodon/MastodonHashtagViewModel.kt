@@ -23,7 +23,6 @@ package com.twidere.twiderex.viewmodel.mastodon
 import com.twidere.services.mastodon.MastodonService
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.model.AccountDetails
-import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.paging.mediator.MastodonHashtagTimelineMediator
 import com.twidere.twiderex.paging.mediator.paging.PagingMediator
 import com.twidere.twiderex.viewmodel.PagingViewModel
@@ -32,7 +31,6 @@ import dagger.assisted.AssistedInject
 
 class MastodonHashtagViewModel @AssistedInject constructor(
     database: CacheDatabase,
-    inAppNotification: InAppNotification,
     @Assisted keyword: String,
     @Assisted account: AccountDetails,
 ) : PagingViewModel() {
@@ -48,7 +46,6 @@ class MastodonHashtagViewModel @AssistedInject constructor(
         keyword = keyword,
         service = account.service as MastodonService,
         accountKey = account.accountKey,
-        database = database,
-        inAppNotification = inAppNotification
+        database = database
     )
 }

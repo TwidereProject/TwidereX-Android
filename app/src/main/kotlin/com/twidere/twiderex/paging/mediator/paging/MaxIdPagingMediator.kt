@@ -24,14 +24,12 @@ import com.twidere.services.microblog.model.IStatus
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.db.model.DbPagingTimelineWithStatus
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.paging.SinceMaxPagination
 
 abstract class MaxIdPagingMediator(
     accountKey: MicroBlogKey,
     database: CacheDatabase,
-    inAppNotification: InAppNotification
-) : PagingTimelineMediatorBase<SinceMaxPagination>(accountKey, database, inAppNotification) {
+) : PagingTimelineMediatorBase<SinceMaxPagination>(accountKey, database) {
     override fun provideNextPage(
         raw: List<IStatus>,
         result: List<DbPagingTimelineWithStatus>

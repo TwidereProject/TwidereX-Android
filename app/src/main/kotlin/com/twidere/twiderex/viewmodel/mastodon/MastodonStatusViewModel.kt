@@ -24,7 +24,6 @@ import com.twidere.services.mastodon.MastodonService
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.paging.mediator.paging.PagingMediator
 import com.twidere.twiderex.paging.mediator.status.MastodonStatusContextMediator
 import com.twidere.twiderex.repository.StatusRepository
@@ -34,7 +33,6 @@ import dagger.assisted.AssistedInject
 
 class MastodonStatusViewModel @AssistedInject constructor(
     statusRepository: StatusRepository,
-    inAppNotification: InAppNotification,
     database: CacheDatabase,
     @Assisted private val account: AccountDetails,
     @Assisted private val statusKey: MicroBlogKey,
@@ -50,6 +48,5 @@ class MastodonStatusViewModel @AssistedInject constructor(
         statusKey = statusKey,
         accountKey = account.accountKey,
         database = database,
-        inAppNotification = inAppNotification,
     )
 }

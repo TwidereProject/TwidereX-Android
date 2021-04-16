@@ -24,7 +24,6 @@ import com.twidere.services.microblog.model.IStatus
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.db.model.DbPagingTimelineWithStatus
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.paging.ArrayListCompat
 import com.twidere.twiderex.paging.CursorPagination
 
@@ -33,8 +32,7 @@ class CursorPagingResult<T>(data: List<T>, val cursor: String? = null) : ArrayLi
 abstract class CursorPagingMediator(
     accountKey: MicroBlogKey,
     database: CacheDatabase,
-    inAppNotification: InAppNotification
-) : PagingTimelineMediatorBase<CursorPagination>(accountKey, database, inAppNotification) {
+) : PagingTimelineMediatorBase<CursorPagination>(accountKey, database) {
     override fun provideNextPage(
         raw: List<IStatus>,
         result: List<DbPagingTimelineWithStatus>
