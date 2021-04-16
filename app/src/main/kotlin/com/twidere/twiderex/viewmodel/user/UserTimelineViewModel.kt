@@ -20,22 +20,21 @@
  */
 package com.twidere.twiderex.viewmodel.user
 
-import com.twidere.services.microblog.TimelineService
-import com.twidere.twiderex.db.CacheDatabase
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import androidx.paging.cachedIn
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.paging.mediator.paging.PagingMediator
-import com.twidere.twiderex.paging.mediator.user.UserStatusMediator
-import com.twidere.twiderex.viewmodel.PagingViewModel
+import com.twidere.twiderex.repository.TimelineRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 
 class UserTimelineViewModel @AssistedInject constructor(
-    database: CacheDatabase,
+    private val repository: TimelineRepository,
     @Assisted account: AccountDetails,
     @Assisted userKey: MicroBlogKey,
     @Assisted exclude_replies: Boolean,
-) : PagingViewModel() {
+) : ViewModel() {
 
     @dagger.assisted.AssistedFactory
     interface AssistedFactory {
@@ -46,12 +45,11 @@ class UserTimelineViewModel @AssistedInject constructor(
         ): UserTimelineViewModel
     }
 
-    override val pagingMediator: PagingMediator =
-        UserStatusMediator(
+    val source by lazy {
+        repository.userTimeline(
             userKey = userKey,
-            database = database,
-            accountKey = account.accountKey,
-            service = account.service as TimelineService,
+            account = account,
             exclude_replies = exclude_replies,
-        )
+        ).cachedIn(viewModelScope)
+    }
 }

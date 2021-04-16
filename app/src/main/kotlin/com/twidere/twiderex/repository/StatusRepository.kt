@@ -22,16 +22,27 @@ package com.twidere.twiderex.repository
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.map
+import androidx.paging.ExperimentalPagingApi
+import androidx.paging.PagingData
 import androidx.room.withTransaction
+import com.twidere.services.mastodon.MastodonService
 import com.twidere.services.microblog.LookupService
+import com.twidere.services.twitter.TwitterService
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.db.mapper.toDbStatusWithReference
 import com.twidere.twiderex.db.model.DbStatusV2
 import com.twidere.twiderex.db.model.ReferenceType
 import com.twidere.twiderex.db.model.saveToDb
+import com.twidere.twiderex.extensions.toUi
+import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.model.ui.UiStatus.Companion.toUi
+import com.twidere.twiderex.paging.mediator.paging.pager
+import com.twidere.twiderex.paging.mediator.status.MastodonStatusContextMediator
+import com.twidere.twiderex.paging.mediator.status.TwitterConversationMediator
+import kotlinx.coroutines.flow.Flow
 
 class StatusRepository(
     private val database: CacheDatabase,
@@ -81,5 +92,30 @@ class StatusRepository(
         listOf(
             lookupService.lookupStatus(id).toDbStatusWithReference(accountKey = accountKey)
         ).saveToDb(database)
+    }
+
+    @OptIn(ExperimentalPagingApi::class)
+    fun conversation(
+        statusKey: MicroBlogKey,
+        account: AccountDetails,
+    ): Flow<PagingData<UiStatus>> {
+        // TODO: remove usage of `when`
+        val remoteMediator = when (account.type) {
+            PlatformType.Twitter -> TwitterConversationMediator(
+                service = account.service as TwitterService,
+                statusKey = statusKey,
+                accountKey = account.accountKey,
+                database = database,
+            )
+            PlatformType.StatusNet -> TODO()
+            PlatformType.Fanfou -> TODO()
+            PlatformType.Mastodon -> MastodonStatusContextMediator(
+                service = account.service as MastodonService,
+                statusKey = statusKey,
+                accountKey = account.accountKey,
+                database = database,
+            )
+        }
+        return remoteMediator.pager().toUi(accountKey = account.accountKey)
     }
 }

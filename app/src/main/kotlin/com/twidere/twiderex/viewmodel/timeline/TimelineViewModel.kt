@@ -23,18 +23,18 @@ package com.twidere.twiderex.viewmodel.timeline
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.twidere.twiderex.defaultLoadCount
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.paging.mediator.paging.PagingWithGapMediator
-import com.twidere.twiderex.viewmodel.PagingViewModel
 import kotlinx.coroutines.launch
 
 abstract class TimelineViewModel(
     private val preferences: SharedPreferences,
-) : PagingViewModel() {
+) : ViewModel() {
 
-    abstract override val pagingMediator: PagingWithGapMediator
+    abstract val pagingMediator: PagingWithGapMediator
     abstract val savedStateKey: String
     val loadingBetween: MutableLiveData<List<MicroBlogKey>>
         get() = pagingMediator.loadingBetween
