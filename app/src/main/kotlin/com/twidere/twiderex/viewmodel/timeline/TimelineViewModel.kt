@@ -25,15 +25,20 @@ import androidx.core.content.edit
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.cachedIn
 import com.twidere.twiderex.defaultLoadCount
+import com.twidere.twiderex.extensions.toUi
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.paging.mediator.paging.PagingWithGapMediator
+import com.twidere.twiderex.paging.mediator.paging.pager
 import kotlinx.coroutines.launch
 
 abstract class TimelineViewModel(
     private val preferences: SharedPreferences,
 ) : ViewModel() {
-
+    val source by lazy {
+        pagingMediator.pager().toUi(accountKey = pagingMediator.accountKey).cachedIn(viewModelScope)
+    }
     abstract val pagingMediator: PagingWithGapMediator
     abstract val savedStateKey: String
     val loadingBetween: MutableLiveData<List<MicroBlogKey>>
