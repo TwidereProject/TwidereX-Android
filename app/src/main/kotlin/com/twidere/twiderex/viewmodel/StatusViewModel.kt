@@ -26,11 +26,13 @@ import androidx.paging.cachedIn
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.repository.StatusRepository
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 
-class StatusViewModel(
+class StatusViewModel @AssistedInject constructor(
     private val statusRepository: StatusRepository,
-    private val account: AccountDetails,
-    private val statusKey: MicroBlogKey,
+    @Assisted private val account: AccountDetails,
+    @Assisted private val statusKey: MicroBlogKey,
 ) : ViewModel() {
     @dagger.assisted.AssistedFactory
     interface AssistedFactory {
