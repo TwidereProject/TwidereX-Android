@@ -574,7 +574,7 @@ private fun ProfileItem(
     textColor: Color = Color.Unspecified,
 ) {
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(ProfileItemDefaults.ContentPadding),
     ) {
