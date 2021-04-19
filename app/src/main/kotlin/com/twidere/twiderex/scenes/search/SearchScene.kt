@@ -43,11 +43,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.AppBar
+import com.twidere.twiderex.component.foundation.AppBarDefaults
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.Pager
 import com.twidere.twiderex.component.foundation.TextTabsComponent
-import com.twidere.twiderex.component.foundation.TopAppBarElevation
 import com.twidere.twiderex.component.foundation.rememberPagerState
 import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.model.PlatformType
@@ -85,7 +85,7 @@ fun SearchScene(keyword: String) {
         InAppNotificationScaffold {
             Column {
                 Surface(
-                    elevation = TopAppBarElevation,
+                    elevation = AppBarDefaults.TopAppBarElevation,
                 ) {
                     Column {
                         AppBar(
