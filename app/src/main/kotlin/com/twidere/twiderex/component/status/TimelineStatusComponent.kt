@@ -63,7 +63,6 @@ import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.preferences.LocalDisplayPreferences
 import com.twidere.twiderex.ui.LocalActiveAccount
-import com.twidere.twiderex.ui.statusActionIconSize
 
 @Composable
 fun TimelineStatusComponent(
@@ -405,7 +404,7 @@ fun ColumnScope.StatusBody(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Icon(
-                    modifier = Modifier.size(statusActionIconSize),
+                    modifier = Modifier.size(16.dp),
                     painter = painterResource(id = R.drawable.ic_map_pin),
                     contentDescription = stringResource(id = R.string.accessibility_common_status_location)
                 )
