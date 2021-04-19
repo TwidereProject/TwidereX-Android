@@ -175,7 +175,7 @@ fun AppearanceScene() {
 }
 
 @Composable
-fun primaryColorDialog(
+fun PrimaryColorDialog(
     viewModel: AppearanceViewModel,
     onDismiss: () -> Unit,
 ) {
@@ -192,7 +192,7 @@ fun primaryColorDialog(
             Text(text = stringResource(id = R.string.scene_settings_appearance_pick_color))
         },
         text = {
-            LazyRow() {
+            LazyRow {
                 itemsIndexed(items = colors) { index, it ->
                     Box(
                         modifier = Modifier

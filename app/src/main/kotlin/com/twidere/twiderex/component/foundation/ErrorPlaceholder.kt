@@ -38,10 +38,10 @@ import com.twidere.twiderex.utils.generateNotificationEvent
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ErrorPlaceholder(
-    throwable: Throwable,
+    throwable: Throwable?,
     modifier: Modifier = Modifier,
 ) {
-    val message = throwable.generateNotificationEvent()?.getMessage()
+    val message = throwable?.generateNotificationEvent()?.getMessage()
     ListItem(
         modifier = modifier,
         icon = {
