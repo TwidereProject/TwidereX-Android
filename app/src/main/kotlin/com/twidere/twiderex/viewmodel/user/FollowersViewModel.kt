@@ -18,7 +18,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.viewmodel.twitter
+package com.twidere.twiderex.viewmodel.user
 
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
@@ -28,10 +28,9 @@ import com.twidere.services.microblog.RelationshipService
 import com.twidere.twiderex.defaultLoadCount
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.paging.source.FollowingPagingSource
-import com.twidere.twiderex.viewmodel.UserListViewModel
+import com.twidere.twiderex.paging.source.FollowersPagingSource
 
-class FollowingViewModel(
+class FollowersViewModel(
     private val account: AccountDetails,
     private val userKey: MicroBlogKey
 ) : UserListViewModel() {
@@ -42,7 +41,7 @@ class FollowingViewModel(
                 enablePlaceholders = false,
             )
         ) {
-            FollowingPagingSource(
+            FollowersPagingSource(
                 userKey = userKey,
                 account.service as RelationshipService
             )
