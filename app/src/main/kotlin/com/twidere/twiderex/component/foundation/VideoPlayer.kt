@@ -54,10 +54,10 @@ import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.ui.PlayerControlView
 import com.google.android.exoplayer2.ui.StyledPlayerView
 import com.twidere.twiderex.R
+import com.twidere.twiderex.component.status.UserAvatarDefaults
 import com.twidere.twiderex.preferences.proto.DisplayPreferences
 import com.twidere.twiderex.ui.LocalIsActiveNetworkMetered
 import com.twidere.twiderex.ui.LocalVideoPlayback
-import com.twidere.twiderex.ui.profileImageSize
 import com.twidere.twiderex.utils.video.CacheDataSourceFactory
 import com.twidere.twiderex.utils.video.VideoPool
 
@@ -168,7 +168,7 @@ fun VideoPlayer(
                     tint = Color.White.copy(alpha = LocalContentAlpha.current),
                     modifier = Modifier
                         .align(Alignment.Center)
-                        .size(profileImageSize)
+                        .size(UserAvatarDefaults.AvatarSize)
                         .background(MaterialTheme.colors.primary, CircleShape),
                     contentDescription = stringResource(id = R.string.accessibility_common_video_play)
                 )

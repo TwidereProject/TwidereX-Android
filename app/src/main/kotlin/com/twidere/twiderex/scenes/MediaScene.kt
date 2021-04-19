@@ -34,6 +34,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -98,6 +99,7 @@ import com.twidere.twiderex.extensions.setOnSystemBarsVisibilityChangeListener
 import com.twidere.twiderex.extensions.showControls
 import com.twidere.twiderex.model.MediaType
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.preferences.proto.DisplayPreferences
 import com.twidere.twiderex.ui.LocalActiveAccount
@@ -105,7 +107,6 @@ import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.LocalVideoPlayback
 import com.twidere.twiderex.ui.LocalWindow
 import com.twidere.twiderex.ui.TwidereScene
-import com.twidere.twiderex.ui.standardPadding
 import com.twidere.twiderex.viewmodel.MediaViewModel
 import moe.tlaster.zoomable.Zoomable
 import moe.tlaster.zoomable.rememberZoomableState
@@ -271,55 +272,7 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewM
                                     .align(Alignment.BottomCenter)
                                     .background(color = controlPanelColor),
                             ) {
-                                Column(
-                                    modifier = Modifier
-                                        .padding(standardPadding),
-                                ) {
-                                    if (videoControl != null) {
-                                        AndroidView(factory = { videoControl })
-                                    }
-                                    StatusText(status = status, maxLines = 2)
-                                    Spacer(modifier = Modifier.height(standardPadding))
-                                    Row(
-                                        verticalAlignment = Alignment.CenterVertically,
-                                    ) {
-                                        Row(
-                                            modifier = Modifier
-                                                .weight(1f),
-                                            verticalAlignment = Alignment.CenterVertically,
-                                        ) {
-                                            UserAvatar(user = status.user)
-                                            Spacer(modifier = Modifier.width(standardPadding))
-                                            UserName(user = status.user)
-                                            Spacer(modifier = Modifier.width(standardPadding))
-                                            UserScreenName(user = status.user)
-                                        }
-                                        ReplyButton(status = status, withNumber = false)
-                                        RetweetButton(status = status, withNumber = false)
-                                        LikeButton(status = status, withNumber = false)
-                                        val saveFileLauncher = rememberLauncherForActivityResult(
-                                            contract = ActivityResultContracts.CreateDocument()
-                                        ) {
-                                            it?.let {
-                                                viewModel.saveFile(currentMedia, it)
-                                            }
-                                        }
-                                        ShareButton(status = status) { callback ->
-                                            DropdownMenuItem(
-                                                onClick = {
-                                                    callback.invoke()
-                                                    currentMedia.fileName?.let {
-                                                        saveFileLauncher.launch(it)
-                                                    }
-                                                }
-                                            ) {
-                                                Text(
-                                                    text = stringResource(id = R.string.common_controls_actions_save),
-                                                )
-                                            }
-                                        }
-                                    }
-                                }
+                                StatusMediaInfo(videoControl, status, viewModel, currentMedia)
                             }
                         }
                     }
@@ -328,6 +281,71 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewM
             }
         }
     }
+}
+
+@Composable
+private fun StatusMediaInfo(
+    videoControl: PlayerControlView?,
+    status: UiStatus,
+    viewModel: MediaViewModel,
+    currentMedia: UiMedia
+) {
+    Column(
+        modifier = Modifier
+            .padding(StatusMediaInfoDefaults.ContentPadding),
+    ) {
+        if (videoControl != null) {
+            AndroidView(factory = { videoControl })
+        }
+        StatusText(status = status, maxLines = 2)
+        Spacer(modifier = Modifier.height(StatusMediaInfoDefaults.TextSpacing))
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Row(
+                modifier = Modifier
+                    .weight(1f),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                UserAvatar(user = status.user)
+                Spacer(modifier = Modifier.width(StatusMediaInfoDefaults.AvatarSpacing))
+                UserName(user = status.user)
+                Spacer(modifier = Modifier.width(StatusMediaInfoDefaults.NameSpacing))
+                UserScreenName(user = status.user)
+            }
+            ReplyButton(status = status, withNumber = false)
+            RetweetButton(status = status, withNumber = false)
+            LikeButton(status = status, withNumber = false)
+            val saveFileLauncher = rememberLauncherForActivityResult(
+                contract = ActivityResultContracts.CreateDocument()
+            ) {
+                it?.let {
+                    viewModel.saveFile(currentMedia, it)
+                }
+            }
+            ShareButton(status = status) { callback ->
+                DropdownMenuItem(
+                    onClick = {
+                        callback.invoke()
+                        currentMedia.fileName?.let {
+                            saveFileLauncher.launch(it)
+                        }
+                    }
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.common_controls_actions_save),
+                    )
+                }
+            }
+        }
+    }
+}
+
+private object StatusMediaInfoDefaults {
+    val ContentPadding = PaddingValues(8.dp)
+    val TextSpacing = 8.dp
+    val AvatarSpacing = 8.dp
+    val NameSpacing = 8.dp
 }
 
 @Composable

@@ -27,6 +27,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -62,8 +63,6 @@ import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.preferences.LocalDisplayPreferences
 import com.twidere.twiderex.ui.LocalActiveAccount
-import com.twidere.twiderex.ui.profileImageSize
-import com.twidere.twiderex.ui.standardPadding
 import com.twidere.twiderex.ui.statusActionIconSize
 
 @Composable
@@ -93,24 +92,28 @@ fun MastodonFollowStatus(data: UiStatus) {
             .clickable {
                 navigator.user(data.user)
             }
-            .padding(
-                horizontal = standardPadding * 2,
-            ),
+            .padding(MastodonFollowStatusDefaults.ContentPadding),
     ) {
-        Spacer(modifier = Modifier.height(standardPadding))
         StatusHeader(data = data)
         Row {
             UserAvatar(user = data.user)
-            Spacer(modifier = Modifier.width(standardPadding))
+            Spacer(modifier = Modifier.width(MastodonFollowStatusDefaults.AvatarSpacing))
             Column {
                 UserName(data.user)
-                Spacer(modifier = Modifier.width(standardPadding / 2))
+                Spacer(modifier = Modifier.width(MastodonFollowStatusDefaults.NameSpacing))
                 UserScreenName(data.user)
             }
-            Spacer(modifier = Modifier.width(standardPadding))
         }
-        Spacer(modifier = Modifier.height(standardPadding))
     }
+}
+
+object MastodonFollowStatusDefaults {
+    val ContentPadding = PaddingValues(
+        horizontal = 16.dp,
+        vertical = 8.dp
+    )
+    val AvatarSpacing = 8.dp
+    val NameSpacing = 4.dp
 }
 
 @Composable
@@ -127,28 +130,34 @@ private fun NormalStatus(
                     navigator.status(data)
                 },
             )
-            .padding(
-                horizontal = standardPadding * 2,
-            ),
+            .padding(NormalStatusDefaults.ContentPadding),
     ) {
-        Spacer(modifier = Modifier.height(standardPadding))
+        Spacer(modifier = Modifier.height(NormalStatusDefaults.ContentSpacing))
         StatusContent(
             modifier = Modifier
                 .padding(
-                    end = standardPadding
+                    end = NormalStatusDefaults.ContentSpacing
                 ),
             data = data,
         )
         if (showActions) {
             Row {
-                Spacer(modifier = Modifier.width(profileImageSize))
+                Spacer(modifier = Modifier.width(UserAvatarDefaults.AvatarSize))
                 val status = (data.retweet ?: data)
                 StatusActions(status)
             }
         } else {
-            Spacer(modifier = Modifier.height(standardPadding))
+            Spacer(modifier = Modifier.height(NormalStatusDefaults.ContentSpacing))
         }
     }
+}
+
+private object NormalStatusDefaults {
+    val ContentPadding = PaddingValues(
+        horizontal = 16.dp,
+        vertical = 0.dp
+    )
+    val ContentSpacing = 8.dp
 }
 
 @Composable
@@ -156,13 +165,17 @@ private fun StatusHeader(data: UiStatus) {
     when {
         data.platformType == PlatformType.Mastodon && data.mastodonExtra != null -> {
             MastodonStatusHeader(data.mastodonExtra, data)
-            Spacer(modifier = Modifier.height(standardPadding))
+            Spacer(modifier = Modifier.height(StatusHeaderDefaults.HeaderSpacing))
         }
         data.retweet != null -> {
             RetweetHeader(data = data)
-            Spacer(modifier = Modifier.height(standardPadding))
+            Spacer(modifier = Modifier.height(StatusHeaderDefaults.HeaderSpacing))
         }
     }
+}
+
+private object StatusHeaderDefaults {
+    val HeaderSpacing = 8.dp
 }
 
 @Composable
@@ -313,7 +326,7 @@ fun StatusContent(
         val status = data.retweet ?: data
         Row {
             UserAvatar(user = status.user)
-            Spacer(modifier = Modifier.width(standardPadding))
+            Spacer(modifier = Modifier.width(StatusContentDefaults.AvatarSpacing))
             Column {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -323,7 +336,7 @@ fun StatusContent(
                     ) {
                         UserName(status.user)
                         if (type == StatusContentType.Normal) {
-                            Spacer(modifier = Modifier.width(standardPadding / 2))
+                            Spacer(modifier = Modifier.width(StatusContentDefaults.Normal.UserNameSpacing))
                             UserScreenName(status.user)
                         }
                     }
@@ -336,7 +349,7 @@ fun StatusContent(
                                 painter = status.mastodonExtra.visibility.icon(),
                                 contentDescription = status.mastodonExtra.visibility.name
                             )
-                            Spacer(modifier = Modifier.width(standardPadding / 2))
+                            Spacer(modifier = Modifier.width(StatusContentDefaults.Mastodon.VisibilitySpacing))
                         }
                         if (type == StatusContentType.Normal) {
                             HumanizedTime(time = status.timestamp)
@@ -345,7 +358,7 @@ fun StatusContent(
                 }
                 when (type) {
                     StatusContentType.Normal -> {
-                        Spacer(modifier = Modifier.height(standardPadding / 2))
+                        Spacer(modifier = Modifier.height(StatusContentDefaults.Normal.BodySpacing))
                         StatusBody(status)
                     }
                     StatusContentType.Extend -> UserScreenName(status.user)
@@ -353,9 +366,23 @@ fun StatusContent(
             }
         }
         if (type == StatusContentType.Extend) {
-            Spacer(modifier = Modifier.height(standardPadding))
+            Spacer(modifier = Modifier.height(StatusContentDefaults.Extend.BodySpacing))
             StatusBody(status = status)
         }
+    }
+}
+
+object StatusContentDefaults {
+    val AvatarSpacing = 8.dp
+    object Normal {
+        val BodySpacing = 4.dp
+        val UserNameSpacing = 4.dp
+    }
+    object Extend {
+        val BodySpacing = 8.dp
+    }
+    object Mastodon {
+        val VisibilitySpacing = 4.dp
     }
 }
 
@@ -367,10 +394,10 @@ fun ColumnScope.StatusBody(
         status = status,
     )
 
-    StatusMedia(status)
+    StatusBodyMedia(status)
 
     if (!status.placeString.isNullOrEmpty()) {
-        Spacer(modifier = Modifier.height(standardPadding))
+        Spacer(modifier = Modifier.height(StatusBodyDefaults.PlaceSpacing))
         CompositionLocalProvider(
             LocalContentAlpha provides ContentAlpha.medium
         ) {
@@ -382,14 +409,14 @@ fun ColumnScope.StatusBody(
                     painter = painterResource(id = R.drawable.ic_map_pin),
                     contentDescription = stringResource(id = R.string.accessibility_common_status_location)
                 )
-                Box(modifier = Modifier.width(standardPadding))
+                Box(modifier = Modifier.width(StatusBodyDefaults.PlaceSpacing))
                 Text(text = status.placeString)
             }
         }
     }
 
     status.quote?.let { quote ->
-        Spacer(modifier = Modifier.height(standardPadding))
+        Spacer(modifier = Modifier.height(StatusBodyDefaults.QuoteSpacing))
         Box(
             modifier = Modifier
                 .background(
@@ -403,14 +430,19 @@ fun ColumnScope.StatusBody(
     }
 }
 
+object StatusBodyDefaults {
+    val PlaceSpacing = 8.dp
+    val QuoteSpacing = 8.dp
+}
+
 @Composable
 @OptIn(ExperimentalAnimationApi::class)
-private fun ColumnScope.StatusMedia(
+private fun ColumnScope.StatusBodyMedia(
     status: UiStatus,
 ) {
     val navigator = LocalNavigator.current
     if (status.media.any()) {
-        Spacer(modifier = Modifier.height(standardPadding))
+        Spacer(modifier = Modifier.height(StatusBodyMediaDefaults.Spacing))
         AnimatedVisibility(visible = LocalDisplayPreferences.current.mediaPreview) {
             StatusMediaComponent(
                 status = status,
@@ -426,6 +458,10 @@ private fun ColumnScope.StatusMedia(
             }
         }
     }
+}
+
+private object StatusBodyMediaDefaults {
+    val Spacing = 8.dp
 }
 
 @Composable
@@ -453,9 +489,13 @@ fun MediaPreviewButton(
                 id = R.string.accessibility_common_status_media
             )
         )
-        Spacer(modifier = Modifier.width(standardPadding))
+        Spacer(modifier = Modifier.width(MediaPreviewButtonDefaults.IconSpacing))
         Text(text = stringResource(id = R.string.common_controls_status_media))
     }
+}
+
+object MediaPreviewButtonDefaults {
+    val IconSpacing = 8.dp
 }
 
 @Composable
@@ -468,7 +508,7 @@ fun StatusQuote(quote: UiStatus) {
                     navigator.status(quote)
                 }
             )
-            .padding(standardPadding),
+            .padding(StatusQuoteDefaults.ContentPadding),
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -477,20 +517,27 @@ fun StatusQuote(quote: UiStatus) {
                 user = quote.user,
                 size = LocalTextStyle.current.fontSize.value.dp
             )
-            Spacer(modifier = Modifier.width(standardPadding))
+            Spacer(modifier = Modifier.width(StatusQuoteDefaults.AvatarSpacing))
             Row(
                 modifier = Modifier.weight(1f),
             ) {
                 UserName(quote.user)
-                Spacer(modifier = Modifier.width(standardPadding / 2))
+                Spacer(modifier = Modifier.width(StatusQuoteDefaults.NameSpacing))
                 UserScreenName(quote.user)
             }
         }
-        Spacer(modifier = Modifier.height(standardPadding / 2))
+        Spacer(modifier = Modifier.height(StatusQuoteDefaults.TextSpacing))
         StatusText(
             status = quote,
             maxLines = 5,
         )
-        StatusMedia(status = quote)
+        StatusBodyMedia(status = quote)
     }
+}
+
+object StatusQuoteDefaults {
+    val ContentPadding = PaddingValues(8.dp)
+    val AvatarSpacing = 8.dp
+    val NameSpacing = 4.dp
+    val TextSpacing = 4.dp
 }

@@ -27,9 +27,9 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -84,14 +84,12 @@ import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.foundation.Pager
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
 import com.twidere.twiderex.component.foundation.rememberPagerState
-import com.twidere.twiderex.component.lazy.LazyColumn2
 import com.twidere.twiderex.component.lazy.collectAsLazyPagingItems
-import com.twidere.twiderex.component.lazy.itemsPagingGridIndexed
+import com.twidere.twiderex.component.lazy.ui.LazyUiStatusImageList
 import com.twidere.twiderex.component.lazy.ui.LazyUiStatusList
 import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.component.status.HtmlText
 import com.twidere.twiderex.component.status.ResolvedLink
-import com.twidere.twiderex.component.status.StatusMediaPreviewItem
 import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.component.status.UserName
 import com.twidere.twiderex.component.status.UserScreenName
@@ -104,11 +102,8 @@ import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.navigation.twidereXSchema
-import com.twidere.twiderex.preferences.proto.DisplayPreferences
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalNavController
-import com.twidere.twiderex.ui.LocalVideoPlayback
-import com.twidere.twiderex.ui.standardPadding
 import com.twidere.twiderex.viewmodel.user.UserFavouriteTimelineViewModel
 import com.twidere.twiderex.viewmodel.user.UserMediaTimelineViewModel
 import com.twidere.twiderex.viewmodel.user.UserTimelineViewModel
@@ -229,90 +224,106 @@ fun UserStatusTimeline(
         header = {
             user?.let { user ->
                 item {
-                    Row(
-                        modifier = Modifier.background(LocalContentColor.current.copy(alpha = 0.04f)),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Spacer(modifier = Modifier.width(standardPadding * 2))
-                        Text(
-                            modifier = Modifier.weight(1f),
-                            text = if (user.statusesCount > 1) {
-                                stringResource(
-                                    id = R.string.common_countable_tweet_single,
-                                    user.statusesCount
-                                )
-                            } else {
-                                stringResource(
-                                    id = R.string.common_countable_tweet_multiple,
-                                    user.statusesCount
-                                )
-                            }
-                        )
-                        Box {
-                            var showDropdown by remember {
-                                mutableStateOf(false)
-                            }
-                            DropdownMenu(
-                                expanded = showDropdown,
-                                onDismissRequest = { showDropdown = false }
-                            ) {
-                                DropdownMenuItem(
-                                    onClick = {
-                                        excludeReplies = false
-                                        showDropdown = false
-                                    }
-                                ) {
-                                    ListItem(
-                                        icon = {
-                                            RadioButton(
-                                                selected = !excludeReplies,
-                                                onClick = {
-                                                    excludeReplies = false
-                                                    showDropdown = false
-                                                },
-                                            )
-                                        }
-                                    ) {
-                                        Text(text = stringResource(id = R.string.scene_profile_filter_all))
-                                    }
-                                }
-                                DropdownMenuItem(
-                                    onClick = {
-                                        excludeReplies = true
-                                        showDropdown = false
-                                    }
-                                ) {
-                                    ListItem(
-                                        icon = {
-                                            RadioButton(
-                                                selected = excludeReplies,
-                                                onClick = {
-                                                    excludeReplies = true
-                                                    showDropdown = false
-                                                },
-                                            )
-                                        }
-                                    ) {
-                                        Text(text = stringResource(id = R.string.scene_profile_filter_exclude_replies))
-                                    }
-                                }
-                            }
-                            IconButton(
-                                onClick = {
-                                    showDropdown = !showDropdown
-                                }
-                            ) {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.ic_filter),
-                                    contentDescription = null,
-                                )
-                            }
-                        }
+                    UserStatusTimelineFilter(user, excludeReplies) {
+                        excludeReplies = it
                     }
                 }
             }
         },
     )
+}
+
+@ExperimentalMaterialApi
+@Composable
+private fun UserStatusTimelineFilter(
+    user: UiUser,
+    excludeReplies: Boolean,
+    setExcludeReplies: (Boolean) -> Unit,
+) {
+    Row(
+        modifier = Modifier.background(LocalContentColor.current.copy(alpha = 0.04f)),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Spacer(modifier = Modifier.width(UserStatusTimelineFilterDefaults.StartSpacing))
+        Text(
+            modifier = Modifier.weight(1f),
+            text = if (user.statusesCount > 1) {
+                stringResource(
+                    id = R.string.common_countable_tweet_single,
+                    user.statusesCount
+                )
+            } else {
+                stringResource(
+                    id = R.string.common_countable_tweet_multiple,
+                    user.statusesCount
+                )
+            }
+        )
+        Box {
+            var showDropdown by remember {
+                mutableStateOf(false)
+            }
+            DropdownMenu(
+                expanded = showDropdown,
+                onDismissRequest = { showDropdown = false }
+            ) {
+                DropdownMenuItem(
+                    onClick = {
+                        setExcludeReplies(false)
+                        showDropdown = false
+                    }
+                ) {
+                    ListItem(
+                        icon = {
+                            RadioButton(
+                                selected = !excludeReplies,
+                                onClick = {
+                                    setExcludeReplies(false)
+                                    showDropdown = false
+                                },
+                            )
+                        }
+                    ) {
+                        Text(text = stringResource(id = R.string.scene_profile_filter_all))
+                    }
+                }
+                DropdownMenuItem(
+                    onClick = {
+                        setExcludeReplies(true)
+                        showDropdown = false
+                    }
+                ) {
+                    ListItem(
+                        icon = {
+                            RadioButton(
+                                selected = excludeReplies,
+                                onClick = {
+                                    setExcludeReplies(true)
+                                    showDropdown = false
+                                },
+                            )
+                        }
+                    ) {
+                        Text(text = stringResource(id = R.string.scene_profile_filter_exclude_replies))
+                    }
+                }
+            }
+            IconButton(
+                onClick = {
+                    showDropdown = !showDropdown
+                }
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_filter),
+                    contentDescription = null,
+                )
+            }
+        }
+    }
+}
+
+private object UserStatusTimelineFilterDefaults {
+    val StartSpacing = 16.dp
 }
 
 @Composable
@@ -332,39 +343,7 @@ fun UserMediaTimeline(
     @Suppress("UNUSED_VARIABLE")
     mediaSource.loadState
     if (mediaSource.itemCount > 0) {
-        LazyColumn2 {
-            item {
-                Box(modifier = Modifier.height(standardPadding))
-            }
-            itemsPagingGridIndexed(
-                mediaSource,
-                rowSize = 2,
-                spacing = standardPadding,
-                padding = standardPadding
-            ) { index, pair ->
-                pair?.let { item ->
-                    val navigator = LocalNavigator.current
-                    CompositionLocalProvider(
-                        LocalVideoPlayback provides DisplayPreferences.AutoPlayback.Off,
-                    ) {
-                        StatusMediaPreviewItem(
-                            item.first,
-                            modifier = Modifier
-                                .aspectRatio(1F)
-                                .clip(
-                                    MaterialTheme.shapes.medium
-                                ),
-                            onClick = {
-                                navigator.media(item.second.statusKey, index)
-                            }
-                        )
-                    }
-                }
-            }
-            item {
-                Box(modifier = Modifier.height(standardPadding))
-            }
-        }
+        LazyUiStatusImageList(mediaSource)
     }
 }
 
@@ -392,7 +371,7 @@ fun UserFavouriteTimeline(
 val maxBannerSize = 200.dp
 
 @Composable
-private fun UserInfo(
+fun UserInfo(
     viewModel: UserViewModel,
 ) {
     val user by viewModel.user.observeAsState()
@@ -412,8 +391,8 @@ private fun UserInfo(
                 Spacer(
                     modifier = Modifier.height(
                         min(
-                            maxWidth * 160f / 320f - 72.dp / 2,
-                            maxBannerSize - 72.dp / 2
+                            maxWidth * UserInfoDefaults.BannerAspectRatio - UserInfoDefaults.AvatarSize / 2,
+                            maxBannerSize - UserInfoDefaults.AvatarSize / 2
                         )
                     )
                 )
@@ -425,7 +404,7 @@ private fun UserInfo(
             ) {
                 Spacer(
                     modifier = Modifier
-                        .size(80.dp)
+                        .size(UserInfoDefaults.AvatarSize + UserInfoDefaults.AvatarSpacing)
                         .withAvatarClip()
                         .clipToBounds()
                         .background(MaterialTheme.colors.surface.withElevation())
@@ -433,7 +412,7 @@ private fun UserInfo(
                 user?.let { user ->
                     UserAvatar(
                         user = user,
-                        size = 72.dp
+                        size = UserInfoDefaults.AvatarSize
                     ) {
                         if (user.profileImage is String) {
                             navController.navigate(Route.Media.Raw(user.profileImage))
@@ -441,43 +420,20 @@ private fun UserInfo(
                     }
                 }
             }
-            Spacer(modifier = Modifier.height(standardPadding))
+            Spacer(modifier = Modifier.height(UserInfoDefaults.AvatarSpacing))
             user?.let { user ->
-                Row(
-                    modifier = Modifier.padding(horizontal = standardPadding * 2)
-                ) {
-                    if (user.platformType == PlatformType.Mastodon && user.mastodonExtra?.locked == true) {
-                        CompositionLocalProvider(
-                            LocalContentAlpha provides ContentAlpha.medium,
-                        ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_lock),
-                                contentDescription = null
-                            )
-                        }
-                        Spacer(modifier = Modifier.width(standardPadding / 2))
-                    }
-                    UserName(
-                        user = user,
-                        style = MaterialTheme.typography.h6,
-                        maxLines = Int.MAX_VALUE,
-                        textAlign = TextAlign.Center
-                    )
-                }
-                UserScreenName(user = user)
+                UserInfoName(user)
             }
             if (!viewModel.isMe) {
-                Spacer(modifier = Modifier.height(standardPadding))
+                Spacer(modifier = Modifier.height(UserInfoDefaults.RelationshipSpacing))
                 UserRelationship(viewModel)
             }
-            Spacer(modifier = Modifier.height(standardPadding))
             user?.let { user ->
                 UserDescText(
-                    modifier = Modifier.padding(horizontal = standardPadding * 2),
+                    modifier = Modifier.padding(UserInfoDefaults.DescPaddingValue),
                     htmlDesc = user.htmlDesc,
                     url = user.twitterExtra?.url ?: emptyList(),
                 )
-                Spacer(modifier = Modifier.height(standardPadding))
             }
             user?.website?.let {
                 val navigator = LocalNavigator.current
@@ -488,7 +444,7 @@ private fun UserInfo(
                                 navigator.openLink(it)
                             }
                         )
-                        .padding(vertical = standardPadding)
+                        .padding(UserInfoDefaults.WebsitePaddingValue)
                         .fillMaxWidth(),
                     painter = painterResource(id = R.drawable.ic_globe),
                     contentDescription = stringResource(
@@ -497,7 +453,7 @@ private fun UserInfo(
                     text = it,
                     textColor = MaterialTheme.colors.primary,
                 )
-                Spacer(modifier = Modifier.height(standardPadding))
+                Spacer(modifier = Modifier.height(UserInfoDefaults.WebsiteSpacing))
             }
             user?.location?.takeIf { it.isNotEmpty() }?.let {
                 ProfileItem(
@@ -507,16 +463,68 @@ private fun UserInfo(
                     ),
                     text = it
                 )
-                Spacer(modifier = Modifier.height(standardPadding))
+                Spacer(modifier = Modifier.height(UserInfoDefaults.LocationSpacing))
             }
             user?.let {
                 MastodonUserField(it)
             }
-            Spacer(modifier = Modifier.height(standardPadding))
+            Spacer(modifier = Modifier.height(UserInfoDefaults.UserMetricsSpacing))
             user?.let { UserMetrics(it) }
-            Spacer(modifier = Modifier.height(standardPadding))
+            Spacer(modifier = Modifier.height(UserInfoDefaults.UserMetricsSpacing))
         }
     }
+}
+
+object UserInfoDefaults {
+    val AvatarSize = 72.dp
+    val AvatarSpacing = 8.dp
+    val RelationshipSpacing = 8.dp
+    val WebsiteSpacing = 8.dp
+    val WebsitePaddingValue = PaddingValues(
+        horizontal = 0.dp,
+        vertical = 8.dp
+    )
+    val LocationSpacing = 8.dp
+    val DescPaddingValue = PaddingValues(
+        horizontal = 16.dp,
+        vertical = 8.dp
+    )
+    val UserMetricsSpacing = 8.dp
+    const val BannerAspectRatio = 160f / 320f
+}
+
+@Composable
+private fun UserInfoName(user: UiUser) {
+    Row(
+        modifier = Modifier.padding(UserInfoNameDefaults.ContentPadding)
+    ) {
+        if (user.platformType == PlatformType.Mastodon && user.mastodonExtra?.locked == true) {
+            CompositionLocalProvider(
+                LocalContentAlpha provides ContentAlpha.medium,
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_lock),
+                    contentDescription = null
+                )
+            }
+            Spacer(modifier = Modifier.width(UserInfoNameDefaults.IconSpacing))
+        }
+        UserName(
+            user = user,
+            style = MaterialTheme.typography.h6,
+            maxLines = Int.MAX_VALUE,
+            textAlign = TextAlign.Center
+        )
+    }
+    UserScreenName(user = user)
+}
+
+private object UserInfoNameDefaults {
+    val ContentPadding = PaddingValues(
+        horizontal = 16.dp,
+        vertical = 0.dp
+    )
+    val IconSpacing = 4.dp
 }
 
 @Composable
@@ -528,14 +536,14 @@ fun MastodonUserField(user: UiUser) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = standardPadding * 2)
+                .padding(MastodonUserFieldDefaults.ContentPadding)
         ) {
             CompositionLocalProvider(
                 LocalContentAlpha provides ContentAlpha.medium
             ) {
                 field.name?.let { Text(text = it) }
             }
-            Spacer(modifier = Modifier.width(standardPadding))
+            Spacer(modifier = Modifier.width(MastodonUserFieldDefaults.NameSpacing))
             field.value?.let {
                 HtmlText(
                     htmlText = it,
@@ -543,9 +551,18 @@ fun MastodonUserField(user: UiUser) {
             }
         }
         if (index != user.mastodonExtra.fields.lastIndex) {
-            Spacer(modifier = Modifier.height(standardPadding))
+            Spacer(modifier = Modifier.height(MastodonUserFieldDefaults.ItemSpacing))
         }
     }
+}
+
+object MastodonUserFieldDefaults {
+    val ContentPadding = PaddingValues(
+        horizontal = 16.dp,
+        vertical = 0.dp
+    )
+    val NameSpacing = 8.dp
+    val ItemSpacing = 8.dp
 }
 
 @Composable
@@ -556,29 +573,31 @@ private fun ProfileItem(
     text: String,
     textColor: Color = Color.Unspecified,
 ) {
-    Box(
-        modifier = modifier
-            .fillMaxWidth(),
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(ProfileItemDefaults.ContentPadding),
     ) {
-        Spacer(modifier = Modifier.height(standardPadding))
-        Row(
-            modifier = Modifier
-                .padding(horizontal = standardPadding * 2),
-        ) {
-            Icon(
-                painter = painter,
-                contentDescription = contentDescription
-            )
-            Spacer(modifier = Modifier.width(standardPadding))
-            Text(
-                text = text,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                color = textColor,
-            )
-        }
-        Spacer(modifier = Modifier.height(standardPadding))
+        Icon(
+            painter = painter,
+            contentDescription = contentDescription
+        )
+        Spacer(modifier = Modifier.width(ProfileItemDefaults.IconSpacing))
+        Text(
+            text = text,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            color = textColor,
+        )
     }
+}
+
+private object ProfileItemDefaults {
+    val ContentPadding = PaddingValues(
+        horizontal = 16.dp,
+        vertical = 8.dp
+    )
+    val IconSpacing = 8.dp
 }
 
 @Composable
@@ -630,7 +649,7 @@ private fun UserRelationship(viewModel: UserViewModel) {
                 },
             )
         }
-        Spacer(modifier = Modifier.height(standardPadding / 2))
+        Spacer(modifier = Modifier.height(UserRelationshipDefaults.FollowingSpacing))
         if (relationshipResult.following) {
             Text(
                 text = stringResource(id = R.string.common_controls_friendship_follows_you),
@@ -640,6 +659,10 @@ private fun UserRelationship(viewModel: UserViewModel) {
     } ?: run {
         CircularProgressIndicator()
     }
+}
+
+private object UserRelationshipDefaults {
+    val FollowingSpacing = 4.dp
 }
 
 @Composable

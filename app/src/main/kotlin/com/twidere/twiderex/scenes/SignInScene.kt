@@ -46,13 +46,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.BuildConfig
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.SignInButton
 import com.twidere.twiderex.component.foundation.SignInScaffold
 import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.ui.LocalNavController
-import com.twidere.twiderex.ui.standardPadding
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -60,9 +60,13 @@ import kotlinx.coroutines.launch
 fun SignInScene() {
     SignInScaffold {
         TwitterSignIn()
-        Spacer(modifier = Modifier.height(standardPadding * 2))
+        Spacer(modifier = Modifier.height(SignInSceneDefaults.ButtonSpacing))
         MastodonSignIn()
     }
+}
+
+object SignInSceneDefaults {
+    val ButtonSpacing = 16.dp
 }
 
 @OptIn(ExperimentalMaterialApi::class)

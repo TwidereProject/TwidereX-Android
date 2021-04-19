@@ -33,6 +33,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.lazy.LazyColumn2
 import com.twidere.twiderex.component.lazy.LazyPagingItems
@@ -42,7 +43,6 @@ import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.component.status.UserName
 import com.twidere.twiderex.component.status.UserScreenName
 import com.twidere.twiderex.model.ui.UiUser
-import com.twidere.twiderex.ui.standardPadding
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -73,7 +73,7 @@ fun LazyUiUserList(
                     text = {
                         Row {
                             UserName(user = it)
-                            Spacer(modifier = Modifier.width(standardPadding))
+                            Spacer(modifier = Modifier.width(UiUserListDefaults.HorizontalPadding))
                             UserScreenName(user = it)
                         }
                     },
@@ -84,7 +84,7 @@ fun LazyUiUserList(
                                     id = R.string.common_controls_profile_dashboard_followers,
                                 )
                             )
-                            Spacer(modifier = Modifier.width(standardPadding))
+                            Spacer(modifier = Modifier.width(UiUserListDefaults.HorizontalPadding))
                             Text(
                                 text = it.followersCount.toString()
                             )
@@ -97,4 +97,8 @@ fun LazyUiUserList(
             items.retry()
         }
     }
+}
+
+object UiUserListDefaults {
+    val HorizontalPadding = 8.dp
 }

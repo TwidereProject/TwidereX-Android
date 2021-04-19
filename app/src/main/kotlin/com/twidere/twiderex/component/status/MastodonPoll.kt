@@ -64,7 +64,6 @@ import com.twidere.twiderex.extensions.humanizedTimestamp
 import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.ui.LocalActiveAccount
-import com.twidere.twiderex.ui.standardPadding
 import kotlin.math.max
 
 private val Poll.canVote: Boolean
@@ -104,12 +103,12 @@ fun MastodonPoll(status: UiStatus) {
             }
         )
         if (index != status.mastodonExtra.poll.options?.lastIndex) {
-            Spacer(modifier = Modifier.height(standardPadding))
+            Spacer(modifier = Modifier.height(MastodonPollDefaults.OptionSpacing))
         }
     }
 
     if (status.mastodonExtra.poll.canVote) {
-        Spacer(modifier = Modifier.height(standardPadding))
+        Spacer(modifier = Modifier.height(MastodonPollDefaults.VoteSpacing))
         val statusActions = LocalStatusActions.current
         TextButton(
             onClick = {
@@ -120,7 +119,7 @@ fun MastodonPoll(status: UiStatus) {
         }
     }
 
-    Spacer(modifier = Modifier.height(standardPadding))
+    Spacer(modifier = Modifier.height(MastodonPollDefaults.VoteInfoSpacing))
     Row {
         val countText = status.mastodonExtra.poll.votersCount?.let {
             if (it > 1) {
@@ -150,13 +149,20 @@ fun MastodonPoll(status: UiStatus) {
         if (countText != null) {
             Text(text = countText)
         }
-        Spacer(modifier = Modifier.width(standardPadding))
+        Spacer(modifier = Modifier.width(MastodonPollDefaults.VoteTimeSpacing))
         if (status.mastodonExtra.poll.expired == true) {
             Text(text = stringResource(id = R.string.common_controls_status_poll_expired))
         } else {
             Text(text = status.mastodonExtra.poll.expiresAt?.time?.humanizedTimestamp() ?: "")
         }
     }
+}
+
+object MastodonPollDefaults {
+    val OptionSpacing = 8.dp
+    val VoteSpacing = 8.dp
+    val VoteInfoSpacing = 8.dp
+    val VoteTimeSpacing = 8.dp
 }
 
 @OptIn(ExperimentalAnimationApi::class)
@@ -168,7 +174,7 @@ fun MastodonPollOption(
     voted: Boolean,
     onVote: (voted: Boolean) -> Unit = {},
 ) {
-    val size = LocalTextStyle.current.fontSize.value.dp + standardPadding * 3
+    val size = MastodonPollOptionDefaults.optionSize()
     val transition = updateTransition(targetState = option.votesCount)
     val progress by transition.animateFloat {
         (option.votesCount ?: 0).toFloat() / max((poll.votesCount ?: 0), 1).toFloat()
@@ -228,9 +234,9 @@ fun MastodonPollOption(
                 .height(size),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Spacer(modifier = Modifier.width(standardPadding))
+            Spacer(modifier = Modifier.width(MastodonPollOptionDefaults.ContentPadding))
             Box(
-                modifier = Modifier.width(LocalTextStyle.current.fontSize.value.dp + standardPadding)
+                modifier = Modifier.width(MastodonPollOptionDefaults.iconSize())
             ) {
                 if (poll.canVote) {
                     if (poll.multiple == true) {
@@ -260,13 +266,22 @@ fun MastodonPollOption(
                     }
                 }
             }
-            Spacer(modifier = Modifier.width(standardPadding))
+            Spacer(modifier = Modifier.width(MastodonPollOptionDefaults.IconSpacing))
             Text(
                 modifier = Modifier.weight(1f),
                 text = option.title ?: "",
             )
             Text(text = String.format("%.0f%%", progress * 100))
-            Spacer(modifier = Modifier.width(standardPadding))
+            Spacer(modifier = Modifier.width(MastodonPollOptionDefaults.ContentPadding))
         }
     }
+}
+
+object MastodonPollOptionDefaults {
+    @Composable
+    fun optionSize() = LocalTextStyle.current.fontSize.value.dp + 24.dp
+    @Composable
+    fun iconSize() = LocalTextStyle.current.fontSize.value.dp + 8.dp
+    val ContentPadding = 8.dp
+    val IconSpacing = 8.dp
 }

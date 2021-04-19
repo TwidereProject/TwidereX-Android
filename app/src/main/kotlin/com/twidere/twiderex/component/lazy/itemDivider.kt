@@ -25,12 +25,11 @@ import androidx.compose.material.Divider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.twidere.twiderex.ui.standardPadding
 
 fun LazyListScope.itemDivider(
     modifier: Modifier = Modifier,
     thickness: Dp = 1.dp,
-    startIndent: Dp = standardPadding,
+    startIndent: Dp = ItemDividerDefaults.StartIndent,
 ) {
     item {
         Divider(
@@ -39,4 +38,8 @@ fun LazyListScope.itemDivider(
             startIndent = startIndent,
         )
     }
+}
+
+object ItemDividerDefaults {
+    val StartIndent = 8.dp
 }

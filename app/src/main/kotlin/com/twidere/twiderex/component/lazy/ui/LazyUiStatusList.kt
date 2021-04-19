@@ -22,37 +22,28 @@ package com.twidere.twiderex.component.lazy.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Divider
-import androidx.compose.material.Icon
-import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import com.twidere.twiderex.R
+import com.twidere.twiderex.component.foundation.ErrorPlaceholder
 import com.twidere.twiderex.component.foundation.LoadingProgress
 import com.twidere.twiderex.component.foundation.LocalInAppNotification
 import com.twidere.twiderex.component.lazy.LazyColumn2
@@ -63,13 +54,9 @@ import com.twidere.twiderex.component.status.StatusDivider
 import com.twidere.twiderex.component.status.TimelineStatusComponent
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiStatus
-import com.twidere.twiderex.notification.NotificationEvent
-import com.twidere.twiderex.ui.profileImageSize
-import com.twidere.twiderex.ui.standardPadding
 import com.twidere.twiderex.utils.generateNotificationEvent
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filterNotNull
 
 @Composable
 fun LazyUiStatusList(
@@ -84,21 +71,24 @@ fun LazyUiStatusList(
     val refresh = items.loadState.refresh
     val event = remember(refresh) {
         if (refresh is LoadState.Error) {
-            refresh.error.generateNotificationEvent()
+            refresh.error
         } else {
             null
         }
     }
     if (items.itemCount == 0 && refresh is LoadState.Error) {
-        EmptyErrorPlaceholder(event, modifier)
+        ErrorPlaceholder(event, modifier)
     } else if (items.itemCount > 0) {
         val inAppNotification = LocalInAppNotification.current
         LaunchedEffect(event) {
-            snapshotFlow { event }
+            snapshotFlow { event?.generateNotificationEvent() }
                 .distinctUntilChanged()
-                .filterNotNull()
                 .collect {
-                    inAppNotification.show(it)
+                    it?.let {
+                        inAppNotification.show(it)
+                    } ?: run {
+                        inAppNotification.show(R.string.common_alerts_failed_to_load_title)
+                    }
                 }
         }
         LazyColumn2(
@@ -135,37 +125,6 @@ fun LazyUiStatusList(
             loadState(items.loadState.append) {
                 items.retry()
             }
-        }
-    }
-}
-
-@Composable
-private fun EmptyErrorPlaceholder(
-    event: NotificationEvent?,
-    modifier: Modifier = Modifier,
-) {
-    val message = event?.getMessage()
-    Column(
-        modifier = modifier
-            .fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        CompositionLocalProvider(
-            LocalContentAlpha provides ContentAlpha.medium
-        ) {
-            Icon(
-                modifier = Modifier
-                    .size(profileImageSize),
-                imageVector = Icons.Default.ErrorOutline,
-                contentDescription = null,
-            )
-            Text(
-                modifier = Modifier
-                    .padding(standardPadding),
-                text = message ?: stringResource(id = R.string.common_alerts_failed_to_load_title),
-                textAlign = TextAlign.Center,
-            )
         }
     }
 }
