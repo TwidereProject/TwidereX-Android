@@ -342,9 +342,7 @@ fun UserMediaTimeline(
     // FIXME: 2021/2/20 Recover the scroll position require visiting the loadState once, have no idea why
     @Suppress("UNUSED_VARIABLE")
     mediaSource.loadState
-    if (mediaSource.itemCount > 0) {
-        LazyUiStatusImageList(mediaSource)
-    }
+    LazyUiStatusImageList(mediaSource)
 }
 
 @Composable

@@ -43,37 +43,39 @@ import com.twidere.twiderex.ui.LocalVideoPlayback
 fun LazyUiStatusImageList(
     items: LazyPagingItems<Pair<UiMedia, UiStatus>>,
 ) {
-    LazyColumn2 {
-        item {
-            Box(modifier = Modifier.height(LazyUiStatusImageListDefaults.Spacing))
-        }
-        itemsPagingGridIndexed(
-            items,
-            rowSize = 2,
-            spacing = LazyUiStatusImageListDefaults.Spacing,
-            padding = LazyUiStatusImageListDefaults.Spacing
-        ) { index, pair ->
-            pair?.let { item ->
-                val navigator = LocalNavigator.current
-                CompositionLocalProvider(
-                    LocalVideoPlayback provides DisplayPreferences.AutoPlayback.Off,
-                ) {
-                    StatusMediaPreviewItem(
-                        item.first,
-                        modifier = Modifier
-                            .aspectRatio(1F)
-                            .clip(
-                                MaterialTheme.shapes.medium
-                            ),
-                        onClick = {
-                            navigator.media(item.second.statusKey, index)
-                        }
-                    )
+    LazyUiList(items = items) {
+        LazyColumn2 {
+            item {
+                Box(modifier = Modifier.height(LazyUiStatusImageListDefaults.Spacing))
+            }
+            itemsPagingGridIndexed(
+                items,
+                rowSize = 2,
+                spacing = LazyUiStatusImageListDefaults.Spacing,
+                padding = LazyUiStatusImageListDefaults.Spacing
+            ) { index, pair ->
+                pair?.let { item ->
+                    val navigator = LocalNavigator.current
+                    CompositionLocalProvider(
+                        LocalVideoPlayback provides DisplayPreferences.AutoPlayback.Off,
+                    ) {
+                        StatusMediaPreviewItem(
+                            item.first,
+                            modifier = Modifier
+                                .aspectRatio(1F)
+                                .clip(
+                                    MaterialTheme.shapes.medium
+                                ),
+                            onClick = {
+                                navigator.media(item.second.statusKey, index)
+                            }
+                        )
+                    }
                 }
             }
-        }
-        item {
-            Box(modifier = Modifier.height(LazyUiStatusImageListDefaults.Spacing))
+            item {
+                Box(modifier = Modifier.height(LazyUiStatusImageListDefaults.Spacing))
+            }
         }
     }
 }

@@ -54,47 +54,49 @@ fun LazyUiUserList(
     onItemClicked: (UiUser) -> Unit = {},
     header: LazyListScope.() -> Unit = {},
 ) {
-    LazyColumn2(
-        modifier = modifier,
-        state = state,
-    ) {
-        header.invoke(this)
-        items(items, key = key) {
-            (it ?: UiUser.placeHolder()).let {
-                ListItem(
-                    modifier = Modifier.clickable {
-                        onItemClicked.invoke(it)
-                    },
-                    icon = {
-                        UserAvatar(
-                            user = it,
-                        )
-                    },
-                    text = {
-                        Row {
-                            UserName(user = it)
-                            Spacer(modifier = Modifier.width(UiUserListDefaults.HorizontalPadding))
-                            UserScreenName(user = it)
-                        }
-                    },
-                    secondaryText = {
-                        Row {
-                            Text(
-                                text = stringResource(
-                                    id = R.string.common_controls_profile_dashboard_followers,
+    LazyUiList(items = items) {
+        LazyColumn2(
+            modifier = modifier,
+            state = state,
+        ) {
+            header.invoke(this)
+            items(items, key = key) {
+                (it ?: UiUser.placeHolder()).let {
+                    ListItem(
+                        modifier = Modifier.clickable {
+                            onItemClicked.invoke(it)
+                        },
+                        icon = {
+                            UserAvatar(
+                                user = it,
+                            )
+                        },
+                        text = {
+                            Row {
+                                UserName(user = it)
+                                Spacer(modifier = Modifier.width(UiUserListDefaults.HorizontalPadding))
+                                UserScreenName(user = it)
+                            }
+                        },
+                        secondaryText = {
+                            Row {
+                                Text(
+                                    text = stringResource(
+                                        id = R.string.common_controls_profile_dashboard_followers,
+                                    )
                                 )
-                            )
-                            Spacer(modifier = Modifier.width(UiUserListDefaults.HorizontalPadding))
-                            Text(
-                                text = it.followersCount.toString()
-                            )
+                                Spacer(modifier = Modifier.width(UiUserListDefaults.HorizontalPadding))
+                                Text(
+                                    text = it.followersCount.toString()
+                                )
+                            }
                         }
-                    }
-                )
+                    )
+                }
             }
-        }
-        loadState(items.loadState.append) {
-            items.retry()
+            loadState(items.loadState.append) {
+                items.retry()
+            }
         }
     }
 }

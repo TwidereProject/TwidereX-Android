@@ -34,18 +34,12 @@ import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.paging.LoadState
 import com.twidere.twiderex.R
-import com.twidere.twiderex.component.foundation.ErrorPlaceholder
 import com.twidere.twiderex.component.foundation.LoadingProgress
-import com.twidere.twiderex.component.foundation.LocalInAppNotification
 import com.twidere.twiderex.component.lazy.LazyColumn2
 import com.twidere.twiderex.component.lazy.LazyPagingItems
 import com.twidere.twiderex.component.lazy.loadState
@@ -54,10 +48,6 @@ import com.twidere.twiderex.component.status.StatusDivider
 import com.twidere.twiderex.component.status.TimelineStatusComponent
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiStatus
-import com.twidere.twiderex.utils.generateNotificationEvent
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filterNotNull
 
 @Composable
 fun LazyUiStatusList(
@@ -69,26 +59,7 @@ fun LazyUiStatusList(
     key: ((index: Int) -> Any) = { items.peekOrNull(it)?.hashCode() ?: it },
     header: LazyListScope.() -> Unit = {},
 ) {
-    val refresh = items.loadState.refresh
-    val event = remember(refresh) {
-        if (refresh is LoadState.Error) {
-            refresh.error.generateNotificationEvent()
-        } else {
-            null
-        }
-    }
-    if (items.itemCount == 0 && refresh is LoadState.Error) {
-        ErrorPlaceholder(event, modifier)
-    } else if (items.itemCount > 0) {
-        val inAppNotification = LocalInAppNotification.current
-        LaunchedEffect(event) {
-            snapshotFlow { event }
-                .distinctUntilChanged()
-                .filterNotNull()
-                .collect {
-                    inAppNotification.show(it)
-                }
-        }
+    LazyUiList(items = items) {
         LazyColumn2(
             modifier = modifier,
             state = state
