@@ -22,25 +22,17 @@ package com.twidere.twiderex.component.lazy.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Divider
-import androidx.compose.material.Icon
-import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -48,7 +40,6 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import com.twidere.twiderex.R
@@ -134,37 +125,6 @@ fun LazyUiStatusList(
             loadState(items.loadState.append) {
                 items.retry()
             }
-        }
-    }
-}
-
-@Composable
-private fun EmptyErrorPlaceholder(
-    event: NotificationEvent?,
-    modifier: Modifier = Modifier,
-) {
-    val message = event?.getMessage()
-    Column(
-        modifier = modifier
-            .fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        CompositionLocalProvider(
-            LocalContentAlpha provides ContentAlpha.medium
-        ) {
-            Icon(
-                modifier = Modifier
-                    .size(profileImageSize),
-                imageVector = Icons.Default.ErrorOutline,
-                contentDescription = null,
-            )
-            Text(
-                modifier = Modifier
-                    .padding(standardPadding),
-                text = message ?: stringResource(id = R.string.common_alerts_failed_to_load_title),
-                textAlign = TextAlign.Center,
-            )
         }
     }
 }
