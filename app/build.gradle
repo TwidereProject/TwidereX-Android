@@ -196,6 +196,7 @@ dependencies {
     implementation "com.google.accompanist:accompanist-insets:$versions.accompanist"
 
     implementation 'com.github.Tlaster:Zoomable:0.2.1'
+    implementation 'com.github.Tlaster:NestedScrollView:0.1.0'
 
     implementation "com.twitter.twittertext:twitter-text:3.1.0"
     implementation 'org.jsoup:jsoup:1.13.1'

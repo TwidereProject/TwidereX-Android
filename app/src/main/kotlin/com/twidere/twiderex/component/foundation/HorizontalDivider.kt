@@ -34,7 +34,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun HorizontalDivider(
     modifier: Modifier = Modifier,
-    color: Color = MaterialTheme.colors.onSurface.copy(alpha = DividerAlpha),
+    color: Color = MaterialTheme.colors.onSurface.copy(alpha = HorizontalDividerDefaults.DividerAlpha),
     thickness: Dp = 1.dp,
     startIndent: Dp = 0.dp
 ) {
@@ -50,4 +50,6 @@ fun HorizontalDivider(
     )
 }
 
-private const val DividerAlpha = 0.12f
+object HorizontalDividerDefaults {
+    const val DividerAlpha = 0.12f
+}

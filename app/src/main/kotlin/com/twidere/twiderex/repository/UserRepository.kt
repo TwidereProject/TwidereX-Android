@@ -30,36 +30,24 @@ import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.toAmUser
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.model.ui.UiUser.Companion.toUi
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedInject
 
-class UserRepository @AssistedInject constructor(
+class UserRepository(
     private val database: CacheDatabase,
     private val accountRepository: AccountRepository,
-    @Assisted private val accountKey: MicroBlogKey,
-    @Assisted private val lookupService: LookupService,
 ) {
-    @dagger.assisted.AssistedFactory
-    interface AssistedFactory {
-        fun create(
-            accountKey: MicroBlogKey,
-            lookupService: LookupService,
-        ): UserRepository
-    }
-
-    suspend fun lookupUserByName(name: String): UiUser {
+    suspend fun lookupUserByName(name: String, accountKey: MicroBlogKey, lookupService: LookupService): UiUser {
         val user = lookupService.lookupUserByName(name).toDbUser(accountKey)
         saveUser(user)
         return user.toUi()
     }
 
-    suspend fun lookupUserById(id: String): UiUser {
+    suspend fun lookupUserById(id: String, accountKey: MicroBlogKey, lookupService: LookupService): UiUser {
         val user = lookupService.lookupUser(id).toDbUser(accountKey)
         saveUser(user)
         return user.toUi()
     }
 
-    suspend fun lookupUsersByName(name: List<String>): List<UiUser> {
+    suspend fun lookupUsersByName(name: List<String>, accountKey: MicroBlogKey, lookupService: LookupService): List<UiUser> {
         return lookupService.lookupUsersByName(name = name).map { it.toDbUser(accountKey).toUi() }
     }
 

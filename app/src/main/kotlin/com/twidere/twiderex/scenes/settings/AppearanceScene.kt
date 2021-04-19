@@ -57,14 +57,13 @@ import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.lazy.itemDivider
 import com.twidere.twiderex.component.settings.radioItem
+import com.twidere.twiderex.component.status.UserAvatarDefaults
 import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.extensions.isDarkTheme
 import com.twidere.twiderex.preferences.LocalAppearancePreferences
 import com.twidere.twiderex.preferences.proto.AppearancePreferences
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.ui.primaryColors
-import com.twidere.twiderex.ui.profileImageSize
-import com.twidere.twiderex.ui.standardPadding
 import com.twidere.twiderex.viewmodel.settings.AppearanceViewModel
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -89,7 +88,7 @@ fun AppearanceScene() {
             }
         ) {
             if (showPrimaryColorDialog) {
-                primaryColorDialog(
+                PrimaryColorDialog(
                     viewModel = viewModel,
                     onDismiss = {
                         showPrimaryColorDialog = false
@@ -176,7 +175,7 @@ fun AppearanceScene() {
 }
 
 @Composable
-fun primaryColorDialog(
+fun PrimaryColorDialog(
     viewModel: AppearanceViewModel,
     onDismiss: () -> Unit,
 ) {
@@ -193,15 +192,15 @@ fun primaryColorDialog(
             Text(text = stringResource(id = R.string.scene_settings_appearance_pick_color))
         },
         text = {
-            LazyRow() {
+            LazyRow {
                 itemsIndexed(items = colors) { index, it ->
                     Box(
                         modifier = Modifier
-                            .padding(end = standardPadding)
+                            .padding(end = PrimaryColorDialog.ItemsSpacing)
                     ) {
                         Box(
                             modifier = Modifier
-                                .size(profileImageSize)
+                                .size(UserAvatarDefaults.AvatarSize)
                                 .clip(CircleShape)
                                 .background(it)
                                 .clickable(
@@ -229,4 +228,8 @@ fun primaryColorDialog(
             }
         }
     )
+}
+
+object PrimaryColorDialog {
+    val ItemsSpacing = 8.dp
 }

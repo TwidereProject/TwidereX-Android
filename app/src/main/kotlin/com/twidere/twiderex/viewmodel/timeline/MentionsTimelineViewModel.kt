@@ -24,7 +24,6 @@ import android.content.SharedPreferences
 import com.twidere.services.microblog.TimelineService
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.model.AccountDetails
-import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.paging.mediator.MentionTimelineMediator
 import com.twidere.twiderex.paging.mediator.paging.PagingWithGapMediator
 import dagger.assisted.Assisted
@@ -33,7 +32,6 @@ import dagger.assisted.AssistedInject
 class MentionsTimelineViewModel @AssistedInject constructor(
     preferences: SharedPreferences,
     database: CacheDatabase,
-    inAppNotification: InAppNotification,
     @Assisted private val account: AccountDetails
 ) : TimelineViewModel(preferences) {
     @dagger.assisted.AssistedFactory
@@ -41,6 +39,6 @@ class MentionsTimelineViewModel @AssistedInject constructor(
         fun create(account: AccountDetails): MentionsTimelineViewModel
     }
     override val pagingMediator: PagingWithGapMediator =
-        MentionTimelineMediator(account.service as TimelineService, account.accountKey, database, inAppNotification)
+        MentionTimelineMediator(account.service as TimelineService, account.accountKey, database)
     override val savedStateKey: String = "${account.accountKey}_mentions"
 }

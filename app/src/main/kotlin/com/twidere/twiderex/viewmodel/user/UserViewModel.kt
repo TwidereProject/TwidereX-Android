@@ -36,7 +36,7 @@ import dagger.assisted.AssistedInject
 import kotlinx.coroutines.launch
 
 class UserViewModel @AssistedInject constructor(
-    private val factory: UserRepository.AssistedFactory,
+    private val repository: UserRepository,
     private val inAppNotification: InAppNotification,
     @Assisted private val account: AccountDetails,
     @Assisted private val userKey: MicroBlogKey,
@@ -48,12 +48,6 @@ class UserViewModel @AssistedInject constructor(
             account: AccountDetails,
             initialUserKey: MicroBlogKey?,
         ): UserViewModel
-    }
-
-    private val repository by lazy {
-        account.service.let {
-            factory.create(account.accountKey, it as LookupService)
-        }
     }
 
     private val relationshipService by lazy {
@@ -69,7 +63,11 @@ class UserViewModel @AssistedInject constructor(
     fun refresh() = viewModelScope.launch {
         refreshing.postValue(true)
         runCatching {
-            repository.lookupUserById(userKey.id)
+            repository.lookupUserById(
+                userKey.id,
+                accountKey = account.accountKey,
+                lookupService = account.service as LookupService,
+            )
         }.onFailure {
             it.notify(inAppNotification)
         }

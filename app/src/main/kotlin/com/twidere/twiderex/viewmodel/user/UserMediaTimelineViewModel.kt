@@ -34,7 +34,6 @@ import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.model.ui.UiStatus.Companion.toUi
-import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.paging.mediator.paging.PagingMediator
 import com.twidere.twiderex.paging.mediator.paging.pager
 import com.twidere.twiderex.paging.mediator.user.UserMediaMediator
@@ -45,7 +44,6 @@ import kotlinx.coroutines.flow.map
 
 class UserMediaTimelineViewModel @AssistedInject constructor(
     database: CacheDatabase,
-    inAppNotification: InAppNotification,
     @Assisted account: AccountDetails,
     @Assisted userKey: MicroBlogKey,
 ) : ViewModel() {
@@ -79,9 +77,8 @@ class UserMediaTimelineViewModel @AssistedInject constructor(
     val pagingMediator: PagingMediator =
         UserMediaMediator(
             userKey = userKey,
-            database,
-            account.accountKey,
-            account.service as TimelineService,
-            inAppNotification
+            database = database,
+            accountKey = account.accountKey,
+            service = account.service as TimelineService
         )
 }

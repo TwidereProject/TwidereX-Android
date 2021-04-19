@@ -18,21 +18,13 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.viewmodel
+package com.twidere.twiderex.viewmodel.user
 
-import com.twidere.twiderex.model.AccountDetails
-import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.repository.StatusRepository
+import androidx.lifecycle.ViewModel
+import androidx.paging.PagingData
+import com.twidere.twiderex.model.ui.UiUser
+import kotlinx.coroutines.flow.Flow
 
-abstract class StatusPagingViewModel(
-    private val statusRepository: StatusRepository,
-    private val account: AccountDetails,
-    private val statusKey: MicroBlogKey,
-) : PagingViewModel() {
-    val status by lazy {
-        statusRepository.loadLiveDataFromCache(
-            statusKey = statusKey,
-            accountKey = account.accountKey,
-        )
-    }
+abstract class UserListViewModel : ViewModel() {
+    abstract val source: Flow<PagingData<UiUser>>
 }

@@ -18,11 +18,18 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.repository.twitter.model
+package com.twidere.twiderex.extensions
 
-import com.twidere.twiderex.model.ui.UiStatus
+import androidx.paging.Pager
+import androidx.paging.map
+import com.twidere.twiderex.db.model.DbPagingTimelineWithStatus
+import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.ui.UiStatus.Companion.toUi
+import kotlinx.coroutines.flow.map
 
-data class SearchResult(
-    val result: List<UiStatus>,
-    val nextPage: String?,
-)
+fun Pager<Int, DbPagingTimelineWithStatus>.toUi(accountKey: MicroBlogKey) =
+    this.flow.map { pagingData ->
+        pagingData.map {
+            it.toUi(accountKey = accountKey)
+        }
+    }

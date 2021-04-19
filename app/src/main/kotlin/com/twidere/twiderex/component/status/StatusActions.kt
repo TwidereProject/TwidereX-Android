@@ -66,8 +66,6 @@ import com.twidere.twiderex.extensions.shareText
 import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.ui.LocalActiveAccount
-import com.twidere.twiderex.ui.standardPadding
-import com.twidere.twiderex.ui.statusActionIconSize
 import com.twidere.twiderex.viewmodel.compose.ComposeType
 
 private val rippleSize = 24.dp
@@ -276,16 +274,10 @@ fun ShareButton(
                             expanded = true
                         },
                     )
-                    .padding(
-                        top = ButtonDefaults.ContentPadding.calculateTopPadding(),
-                        bottom = ButtonDefaults.ContentPadding.calculateBottomPadding(),
-                        start = standardPadding,
-                        end = standardPadding,
-                    ),
+                    .padding(StatusActionsDefaults.ContentPadding),
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(
-                    modifier = Modifier.size(statusActionIconSize),
                     imageVector = icon,
                     contentDescription = contentDescription,
                     tint = LocalContentColor.current.copy(LocalContentAlpha.current)
@@ -390,12 +382,7 @@ private fun StatusActionButtonWithNumbers(
                     interactionSource = source,
                     indication = null,
                 )
-                .padding(
-                    top = ButtonDefaults.ContentPadding.calculateTopPadding(),
-                    bottom = ButtonDefaults.ContentPadding.calculateBottomPadding(),
-                    start = standardPadding,
-                    end = standardPadding,
-                ),
+                .padding(StatusActionsDefaults.ContentPadding),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(
@@ -429,4 +416,8 @@ private fun StatusActionButtonWithNumbers(
             }
         }
     }
+}
+
+object StatusActionsDefaults {
+    val ContentPadding = 8.dp
 }

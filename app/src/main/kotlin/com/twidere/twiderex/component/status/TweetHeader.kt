@@ -41,8 +41,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.R
 import com.twidere.twiderex.model.ui.UiStatus
-import com.twidere.twiderex.ui.profileImageSize
-import com.twidere.twiderex.ui.standardPadding
 
 @Composable
 fun RetweetHeader(
@@ -82,16 +80,20 @@ fun TweetHeader(
             ) {
                 Box(
                     modifier = Modifier
-                        .width(profileImageSize),
+                        .width(UserAvatarDefaults.AvatarSize),
                     contentAlignment = Alignment.CenterEnd,
                 ) {
                     Box(modifier = Modifier.size(MaterialTheme.typography.body1.fontSize.value.dp)) {
                         icon.invoke()
                     }
                 }
-                Spacer(modifier = Modifier.width(standardPadding))
+                Spacer(modifier = Modifier.width(TweetHeaderDefaults.IconSpacing))
                 text.invoke()
             }
         }
     }
+}
+
+object TweetHeaderDefaults {
+    val IconSpacing = 8.dp
 }

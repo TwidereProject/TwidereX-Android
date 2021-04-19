@@ -32,7 +32,7 @@ import com.twidere.twiderex.extensions.viewModel
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.TwidereScene
-import com.twidere.twiderex.viewmodel.twitter.FollowingViewModel
+import com.twidere.twiderex.viewmodel.user.FollowingViewModel
 
 @Composable
 fun FollowingScene(

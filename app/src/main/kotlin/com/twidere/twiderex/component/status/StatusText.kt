@@ -26,6 +26,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -46,7 +47,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.ui.UiStatus
-import com.twidere.twiderex.ui.standardPadding
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
@@ -61,7 +61,7 @@ fun ColumnScope.StatusText(
 
     if (expandable && status.mastodonExtra?.spoilerText != null) {
         Text(text = status.mastodonExtra.spoilerText)
-        Spacer(modifier = Modifier.height(2.dp))
+        Spacer(modifier = Modifier.height(StatusTextDefaults.Mastodon.SpoilerSpacing))
         Row(
             modifier = Modifier
                 .background(
@@ -75,10 +75,7 @@ fun ColumnScope.StatusText(
         ) {
             Icon(
                 modifier = Modifier
-                    .padding(
-                        horizontal = standardPadding,
-                        vertical = 2.dp,
-                    ),
+                    .padding(StatusTextDefaults.Mastodon.SpoilerButtonPadding),
                 imageVector = Icons.Default.MoreHoriz,
                 contentDescription = null,
                 tint = MaterialTheme.colors.primary,
@@ -96,10 +93,21 @@ fun ColumnScope.StatusText(
             )
 
             if (status.platformType == PlatformType.Mastodon && status.mastodonExtra?.poll != null) {
-                Spacer(modifier = Modifier.height(standardPadding))
+                Spacer(modifier = Modifier.height(StatusTextDefaults.Mastodon.PollSpacing))
                 MastodonPoll(status)
             }
         }
+    }
+}
+
+object StatusTextDefaults {
+    object Mastodon {
+        val SpoilerSpacing = 2.dp
+        val SpoilerButtonPadding = PaddingValues(
+            horizontal = 8.dp,
+            vertical = 2.dp
+        )
+        val PollSpacing = 8.dp
     }
 }
 

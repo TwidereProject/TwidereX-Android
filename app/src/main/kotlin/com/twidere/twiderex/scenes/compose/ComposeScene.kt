@@ -37,6 +37,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -104,15 +105,18 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.coerceAtLeast
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.insets.LocalWindowInsets
+import com.twidere.services.mastodon.model.Emoji
 import com.twidere.services.mastodon.model.Visibility
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.AppBar
+import com.twidere.twiderex.component.foundation.CheckboxItem
 import com.twidere.twiderex.component.foundation.InAppNotificationBottomSheetScaffold
 import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.foundation.TextInput
 import com.twidere.twiderex.component.status.StatusLineComponent
 import com.twidere.twiderex.component.status.TimelineStatusComponent
 import com.twidere.twiderex.component.status.UserAvatar
+import com.twidere.twiderex.component.status.UserAvatarDefaults
 import com.twidere.twiderex.component.status.UserName
 import com.twidere.twiderex.component.status.UserScreenName
 import com.twidere.twiderex.di.assisted.assistedViewModel
@@ -127,9 +131,6 @@ import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.Orange
 import com.twidere.twiderex.ui.TwidereScene
-import com.twidere.twiderex.ui.composeImageSize
-import com.twidere.twiderex.ui.profileImageSize
-import com.twidere.twiderex.ui.standardPadding
 import com.twidere.twiderex.viewmodel.compose.ComposeType
 import com.twidere.twiderex.viewmodel.compose.ComposeViewModel
 import com.twidere.twiderex.viewmodel.compose.DraftComposeViewModel
@@ -381,19 +382,7 @@ private fun ComposeBody(
                 }
 
                 if (images.any()) {
-                    Spacer(modifier = Modifier.height(standardPadding * 2))
-                    LazyRow(
-                        modifier = Modifier.padding(horizontal = standardPadding * 2),
-                    ) {
-                        itemsIndexed(
-                            items = images,
-                        ) { index, item ->
-                            ComposeImage(item, viewModel)
-                            if (index != images.lastIndex) {
-                                Spacer(modifier = Modifier.width(standardPadding))
-                            }
-                        }
-                    }
+                    ComposeImageList(images, viewModel)
                 }
 
                 Row(
@@ -443,6 +432,35 @@ private fun ComposeBody(
     }
 }
 
+@Composable
+private fun ComposeImageList(
+    images: List<Uri>,
+    viewModel: ComposeViewModel
+) {
+    Spacer(modifier = Modifier.height(ComposeImageListDefaults.Spacing))
+    LazyRow(
+        modifier = Modifier.padding(ComposeImageListDefaults.ContentPadding),
+    ) {
+        itemsIndexed(
+            items = images,
+        ) { index, item ->
+            ComposeImage(item, viewModel)
+            if (index != images.lastIndex) {
+                Spacer(modifier = Modifier.width(ComposeImageListDefaults.ItemSpacing))
+            }
+        }
+    }
+}
+
+private object ComposeImageListDefaults {
+    val Spacing = 16.dp
+    val ItemSpacing = 8.dp
+    val ContentPadding = PaddingValues(
+        horizontal = 16.dp,
+        vertical = 0.dp
+    )
+}
+
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun EmojiPanel(
@@ -485,31 +503,51 @@ fun EmojiPanel(
             contentAlignment = Alignment.Center,
         ) {
             items?.let { items ->
-                LazyVerticalGrid(
-                    cells = GridCells.Adaptive(48.dp),
-                    contentPadding = PaddingValues(horizontal = standardPadding, vertical = 0.dp),
-                    content = {
-                        items(items) { it ->
-                            it.url?.let { it1 ->
-                                NetworkImage(
-                                    modifier = Modifier
-                                        .size(48.dp)
-                                        .padding(4.dp)
-                                        .clickable {
-                                            viewModel.insertEmoji(it)
-                                        },
-                                    data = it1,
-                                    contentScale = ContentScale.Fit,
-                                )
-                            }
-                        }
-                    },
-                )
+                EmojiList(items, viewModel)
             } ?: run {
                 CircularProgressIndicator()
             }
         }
     }
+}
+
+@ExperimentalFoundationApi
+@Composable
+private fun EmojiList(
+    items: List<Emoji>,
+    viewModel: ComposeViewModel
+) {
+    LazyVerticalGrid(
+        cells = GridCells.Adaptive(EmojiListDefaults.Icon.Size),
+        contentPadding = EmojiListDefaults.ContentPadding,
+        content = {
+            items(items) {
+                it.url?.let { it1 ->
+                    NetworkImage(
+                        modifier = Modifier
+                            .size(EmojiListDefaults.Icon.Size)
+                            .padding(EmojiListDefaults.Icon.ContentPadding)
+                            .clickable {
+                                viewModel.insertEmoji(it)
+                            },
+                        data = it1,
+                        contentScale = ContentScale.Fit,
+                    )
+                }
+            }
+        },
+    )
+}
+
+object EmojiListDefaults {
+    object Icon {
+        val Size = 48.dp
+        val ContentPadding = PaddingValues(4.dp)
+    }
+    val ContentPadding = PaddingValues(
+        horizontal = 8.dp,
+        vertical = 0.dp
+    )
 }
 
 @Composable
@@ -570,10 +608,13 @@ private fun LocationDisplay(it: Location) {
                 )
             )
             Text(text = "${it.latitude}, ${it.longitude}")
-            Spacer(modifier = Modifier.width(standardPadding))
-            Spacer(modifier = Modifier.width(standardPadding))
+            Spacer(modifier = Modifier.width(LocationDisplayDefaults.PaddingEnd))
         }
     }
+}
+
+private object LocationDisplayDefaults {
+    val PaddingEnd = 8.dp
 }
 
 @Composable
@@ -600,13 +641,13 @@ private fun TextProgress(textFieldValue: TextFieldValue) {
     ) {
         CircularProgressIndicator(
             modifier = Modifier
-                .size(profileImageSize / 2),
+                .size(UserAvatarDefaults.AvatarSize / 2),
             progress = 1f,
             color = MaterialTheme.colors.onSurface.copy(alpha = 0.12f),
         )
         CircularProgressIndicator(
             modifier = Modifier
-                .size(profileImageSize / 2),
+                .size(UserAvatarDefaults.AvatarSize / 2),
             progress = progress,
             color = when {
                 progress < 0.9 -> MaterialTheme.colors.primary
@@ -662,17 +703,24 @@ fun ComposeMastodonVisibility(
                     .height(48.dp)
                     .clickable {
                         showDropdown = !showDropdown
-                    },
+                    }
+                    .padding(ComposeMastodonVisibilityDefaults.ContentPadding),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Spacer(modifier = Modifier.width(standardPadding))
                 Icon(painter = visibility.icon(), contentDescription = visibility.stringName())
-                Spacer(modifier = Modifier.width(standardPadding))
+                Spacer(modifier = Modifier.width(ComposeMastodonVisibilityDefaults.IconSpacing))
                 Text(text = visibility.stringName())
-                Spacer(modifier = Modifier.width(standardPadding))
             }
         }
     }
+}
+
+object ComposeMastodonVisibilityDefaults {
+    val ContentPadding = PaddingValues(
+        horizontal = 8.dp,
+        vertical = 0.dp
+    )
+    val IconSpacing = 8.dp
 }
 
 @ExperimentalMaterialApi
@@ -829,45 +877,15 @@ private fun ComposeInput(
                 data = account.user.profileImage,
                 modifier = Modifier
                     .clip(CircleShape)
-                    .width(profileImageSize)
-                    .height(profileImageSize)
+                    .width(UserAvatarDefaults.AvatarSize)
+                    .height(UserAvatarDefaults.AvatarSize)
             )
             Spacer(modifier = Modifier.width(16.dp))
             Column(
                 modifier = Modifier.weight(1F)
             ) {
                 if (account.type == PlatformType.Mastodon) {
-                    val isContentWarningEnabled by viewModel.isContentWarningEnabled.observeAsState(
-                        initial = false
-                    )
-                    AnimatedVisibility(visible = isContentWarningEnabled) {
-                        val cwText by viewModel.contentWarningTextFieldValue.observeAsState(initial = TextFieldValue())
-                        Column {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                            ) {
-                                CompositionLocalProvider(
-                                    LocalContentAlpha provides ContentAlpha.medium,
-                                ) {
-                                    Icon(
-                                        painter = painterResource(id = R.drawable.ic_alert_octagon),
-                                        contentDescription = null,
-                                    )
-                                }
-                                Spacer(modifier = Modifier.width(standardPadding))
-                                TextInput(
-                                    value = cwText,
-                                    onValueChange = { viewModel.setContentWarningText(it) },
-                                    placeholder = {
-                                        Text(text = stringResource(id = R.string.scene_compose_cw_placeholder))
-                                    }
-                                )
-                            }
-                            Spacer(modifier = Modifier.height(standardPadding))
-                            Divider()
-                            Spacer(modifier = Modifier.height(standardPadding))
-                        }
-                    }
+                    MastodonContentWarningInput(viewModel)
                 }
                 TextInput(
                     modifier = Modifier
@@ -886,12 +904,57 @@ private fun ComposeInput(
 
                 val voteState by viewModel.voteState.observeAsState(initial = null)
                 voteState?.let {
-                    Spacer(modifier = Modifier.height(standardPadding * 2))
+                    Spacer(modifier = Modifier.height(ComposeInputDefaults.VoteSpacing))
                     ComposeVote(voteState = it)
                 }
             }
         }
     }
+}
+
+private object ComposeInputDefaults {
+    val VoteSpacing = 16.dp
+}
+
+@ExperimentalAnimationApi
+@Composable
+private fun ColumnScope.MastodonContentWarningInput(viewModel: ComposeViewModel) {
+    val isContentWarningEnabled by viewModel.isContentWarningEnabled.observeAsState(
+        initial = false
+    )
+    AnimatedVisibility(visible = isContentWarningEnabled) {
+        val cwText by viewModel.contentWarningTextFieldValue.observeAsState(initial = TextFieldValue())
+        Column {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                CompositionLocalProvider(
+                    LocalContentAlpha provides ContentAlpha.medium,
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_alert_octagon),
+                        contentDescription = null,
+                    )
+                }
+                Spacer(modifier = Modifier.width(MastodonContentWarningInputDefaults.IconSpacing))
+                TextInput(
+                    value = cwText,
+                    onValueChange = { viewModel.setContentWarningText(it) },
+                    placeholder = {
+                        Text(text = stringResource(id = R.string.scene_compose_cw_placeholder))
+                    }
+                )
+            }
+            Spacer(modifier = Modifier.height(MastodonContentWarningInputDefaults.ContentPadding))
+            Divider()
+            Spacer(modifier = Modifier.height(MastodonContentWarningInputDefaults.ContentPadding))
+        }
+    }
+}
+
+private object MastodonContentWarningInputDefaults {
+    val ContentPadding = 8.dp
+    val IconSpacing = 8.dp
 }
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -934,8 +997,8 @@ private fun ComposeReply(
         ) {
             Box(
                 modifier = Modifier
-                    .width(profileImageSize)
-                    .height(profileImageSize)
+                    .width(UserAvatarDefaults.AvatarSize)
+                    .height(UserAvatarDefaults.AvatarSize)
             )
             Spacer(modifier = Modifier.width(16.dp))
             Box(
@@ -974,7 +1037,7 @@ private fun ComposeVote(voteState: VoteState) {
                 onValueChange = { voteState.setOption(it, index) }
             )
         }
-        Spacer(modifier = Modifier.height(standardPadding))
+        Spacer(modifier = Modifier.height(ComposeVoteDefaults.VoteOptionSpacing))
         Box {
             var showDropdown by remember {
                 mutableStateOf(false)
@@ -1006,19 +1069,19 @@ private fun ComposeVote(voteState: VoteState) {
                 Icon(imageVector = Icons.Default.ArrowDropDown, contentDescription = null)
             }
         }
-        Spacer(modifier = Modifier.height(standardPadding))
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable {
-                    voteState.setMultiple(!multiple)
-                }
-        ) {
-            Checkbox(checked = multiple, onCheckedChange = { voteState.setMultiple(!multiple) })
-            Spacer(modifier = Modifier.width(standardPadding))
-            Text(text = stringResource(id = R.string.scene_compose_vote_multiple))
-        }
+        Spacer(modifier = Modifier.height(ComposeVoteDefaults.MultipleCheckBoxSpacing))
+        CheckboxItem(
+            modifier = Modifier.fillMaxWidth(),
+            checked = multiple,
+            onCheckedChange = { voteState.setMultiple(!multiple) },
+            text = stringResource(id = R.string.scene_compose_vote_multiple)
+        )
     }
+}
+
+private object ComposeVoteDefaults {
+    val VoteOptionSpacing = 8.dp
+    val MultipleCheckBoxSpacing = 8.dp
 }
 
 @OptIn(ExperimentalAnimationApi::class)
@@ -1197,7 +1260,7 @@ private fun ComposeImage(item: Uri, viewModel: ComposeViewModel) {
     Box {
         Box(
             modifier = Modifier
-                .heightIn(max = composeImageSize)
+                .heightIn(max = ComposeImageDefaults.ImageSize)
                 .aspectRatio(1F)
                 .border(
                     1.dp,
@@ -1230,4 +1293,8 @@ private fun ComposeImage(item: Uri, viewModel: ComposeViewModel) {
             }
         }
     }
+}
+
+private object ComposeImageDefaults {
+    val ImageSize = 72.dp
 }

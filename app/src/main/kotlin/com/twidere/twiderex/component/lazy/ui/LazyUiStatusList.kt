@@ -59,7 +59,7 @@ fun LazyUiStatusList(
     key: ((index: Int) -> Any) = { items.peekOrNull(it)?.hashCode() ?: it },
     header: LazyListScope.() -> Unit = {},
 ) {
-    if (items.itemCount > 0) {
+    LazyUiList(items = items) {
         LazyColumn2(
             modifier = modifier,
             state = state

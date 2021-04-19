@@ -26,23 +26,20 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import androidx.work.WorkManager
-import com.twidere.services.http.MicroBlogException
 import com.twidere.services.microblog.LookupService
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.notification.InAppNotification
-import com.twidere.twiderex.repository.twitter.TwitterTweetsRepository
+import com.twidere.twiderex.repository.StatusRepository
 import com.twidere.twiderex.utils.notify
 import com.twidere.twiderex.worker.DownloadMediaWorker
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.launch
-import retrofit2.HttpException
-import java.io.IOException
 
 class MediaViewModel @AssistedInject constructor(
-    private val factory: TwitterTweetsRepository.AssistedFactory,
+    private val repository: StatusRepository,
     private val inAppNotification: InAppNotification,
     private val workManager: WorkManager,
     @Assisted private val account: AccountDetails,
@@ -66,27 +63,27 @@ class MediaViewModel @AssistedInject constructor(
         fun create(account: AccountDetails, statusKey: MicroBlogKey): MediaViewModel
     }
 
-    private val repository by lazy {
-        account.service.let {
-            factory.create(account.accountKey, it as LookupService)
-        }
-    }
     val loading = MutableLiveData(false)
     val status = liveData {
-        emitSource(repository.loadTweetFromCache(statusKey))
+        emitSource(
+            repository.loadStatus(
+                statusKey = statusKey,
+                accountKey = account.accountKey,
+            )
+        )
     }
 
     init {
         viewModelScope.launch {
             loading.postValue(true)
             try {
-                repository.loadTweetFromNetwork(statusKey.id)
-            } catch (e: MicroBlogException) {
+                repository.loadTweetFromNetwork(
+                    statusKey.id,
+                    account.accountKey,
+                    account.service as LookupService
+                )
+            } catch (e: Throwable) {
                 e.notify(inAppNotification)
-            } catch (e: IOException) {
-                e.message?.let { inAppNotification.show(it) }
-            } catch (e: HttpException) {
-                e.message?.let { inAppNotification.show(it) }
             }
             loading.postValue(false)
         }

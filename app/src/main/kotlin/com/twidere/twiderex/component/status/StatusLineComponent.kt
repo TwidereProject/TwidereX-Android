@@ -34,17 +34,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.twidere.twiderex.ui.profileImageSize
-import com.twidere.twiderex.ui.standardPadding
-import com.twidere.twiderex.ui.statusLineWidth
 
 @Composable
 fun StatusLineComponent(
     modifier: Modifier = Modifier,
     lineColor: Color = MaterialTheme.colors.onSurface.copy(alpha = 0.12f),
-    lineWidth: Dp = statusLineWidth,
-    startPadding: Dp = standardPadding * 2 + profileImageSize / 2 - lineWidth / 2,
-    topPoint: Dp = standardPadding * 2 + profileImageSize / 2,
+    lineWidth: Dp = StatusLineDefaults.lineWidth,
+    startPadding: Dp = StatusLineDefaults.startPadding(lineWidth = lineWidth),
+    topPoint: Dp = StatusLineDefaults.TopPoint,
     lineDown: Boolean = false,
     lineUp: Boolean = false,
     child: @Composable () -> Unit
@@ -63,7 +60,7 @@ fun StatusLineComponent(
             ) {
                 Box(
                     modifier = Modifier
-                        .width(statusLineWidth)
+                        .width(lineWidth)
                         .fillMaxHeight()
                         .align(Alignment.BottomStart)
                         .background(lineColor)
@@ -76,15 +73,15 @@ fun StatusLineComponent(
             Box(
                 modifier = Modifier
                     .matchParentSize()
-                    .offset(y = (-2).dp)
+                    .offset(y = (-1).dp)
                     .padding(
                         start = startPadding,
                     )
             ) {
                 Box(
                     modifier = Modifier
-                        .width(statusLineWidth)
-                        .height(topPoint + 2.dp)
+                        .width(lineWidth)
+                        .height(topPoint + 1.dp)
                         .align(Alignment.TopStart)
                         .background(lineColor)
 
@@ -93,4 +90,11 @@ fun StatusLineComponent(
         }
         child.invoke()
     }
+}
+
+object StatusLineDefaults {
+    val lineWidth = 2.dp
+    val TopPoint = 16.dp + UserAvatarDefaults.AvatarSize / 2
+    @Composable
+    fun startPadding(lineWidth: Dp) = 16.dp + UserAvatarDefaults.AvatarSize / 2 - lineWidth / 2
 }

@@ -27,6 +27,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -64,7 +65,6 @@ import com.twidere.twiderex.component.foundation.rememberParallaxLayoutState
 import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
-import com.twidere.twiderex.ui.standardPadding
 
 @Composable
 fun AboutScene() {
@@ -93,7 +93,7 @@ private fun AboutContent() {
     val parallaxLayoutState = rememberParallaxLayoutState(maxRotate = 2f, maxTransition = 50f)
     Column(
         modifier = Modifier
-            .padding(vertical = standardPadding * 3)
+            .padding(AboutContentDefaults.ContentPadding)
             .fillMaxWidth()
     ) {
         // Background and header
@@ -101,9 +101,6 @@ private fun AboutContent() {
             modifier = Modifier
                 .weight(4F)
         ) {
-            val parallaxPaddingStart = standardPadding * 4
-            val parallaxPaddingTop = standardPadding * 5
-            val parallaxPaddingBottom = standardPadding * 10
             val grayLogoPainter = painterResource(id = R.drawable.ic_about_gray_logo)
             val aspectRatio = grayLogoPainter.intrinsicSize.width / grayLogoPainter.intrinsicSize.height
 
@@ -113,8 +110,8 @@ private fun AboutContent() {
                     .align(Alignment.TopEnd)
                     .horizontalScroll(state = ScrollState(0), enabled = false),
                 alignment = Alignment.TopEnd,
-                backContentOffsetX = -standardPadding * 3,
-                backContentOffsetY = standardPadding * 3,
+                backContentOffsetX = AboutContentDefaults.BackContentOffsetX,
+                backContentOffsetY = AboutContentDefaults.BackContentOffsetY,
                 parallaxLayoutState = parallaxLayoutState,
                 backContent = {
                     BlurImage(
@@ -124,9 +121,9 @@ private fun AboutContent() {
                             .aspectRatio(aspectRatio)
                             .fillMaxHeight()
                             .padding(
-                                start = parallaxPaddingStart,
-                                top = parallaxPaddingTop,
-                                bottom = parallaxPaddingBottom
+                                start = AboutContentDefaults.ParallaxPaddingStart,
+                                top = AboutContentDefaults.ParallaxPaddingTop,
+                                bottom = AboutContentDefaults.ParallaxPaddingBottom
                             ),
                     )
                 }
@@ -138,9 +135,9 @@ private fun AboutContent() {
                         .aspectRatio(aspectRatio)
                         .fillMaxHeight()
                         .padding(
-                            start = parallaxPaddingStart,
-                            top = parallaxPaddingTop,
-                            bottom = parallaxPaddingBottom
+                            start = AboutContentDefaults.ParallaxPaddingStart,
+                            top = AboutContentDefaults.ParallaxPaddingTop,
+                            bottom = AboutContentDefaults.ParallaxPaddingBottom
                         )
                         .alpha(0.5f)
                 )
@@ -148,13 +145,13 @@ private fun AboutContent() {
 
             Row(
                 modifier = Modifier
-                    .padding(horizontal = standardPadding * 3)
+                    .padding(AboutContentDefaults.Logo.ContentPadding)
                     .align(Alignment.TopStart),
                 horizontalArrangement = Arrangement.Start,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                LoginLogo(modifier = Modifier.width(44.dp))
-                Box(modifier = Modifier.width(standardPadding * 3))
+                LoginLogo(modifier = Modifier.width(AboutContentDefaults.Logo.Size))
+                Box(modifier = Modifier.width(AboutContentDefaults.Logo.IconSpacing))
                 CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
                     Text(
                         text = stringResource(id = R.string.app_name),
@@ -167,7 +164,7 @@ private fun AboutContent() {
             Column(
                 modifier = Modifier
                     .align(Alignment.BottomStart)
-                    .padding(horizontal = standardPadding * 3)
+                    .padding(AboutContentDefaults.VersionName.ContentPadding)
             ) {
                 Text(
                     text = stringResource(
@@ -175,7 +172,7 @@ private fun AboutContent() {
                         BuildConfig.VERSION_NAME
                     ),
                 )
-                Box(modifier = Modifier.height(standardPadding * 3))
+                Box(modifier = Modifier.height(AboutContentDefaults.VersionName.Spacing))
                 CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
                     Text(
                         text = stringResource(id = R.string.scene_settings_about_description),
@@ -189,7 +186,7 @@ private fun AboutContent() {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = standardPadding * 3),
+                .padding(AboutContentDefaults.Icon.ContentPadding),
             verticalAlignment = Alignment.Bottom
         ) {
             Row {
@@ -204,7 +201,7 @@ private fun AboutContent() {
                         contentDescription = stringResource(id = R.string.accessibility_common_logo_twitter)
                     )
                 }
-                Box(modifier = Modifier.width(standardPadding * 3))
+                Box(modifier = Modifier.width(AboutContentDefaults.Icon.Spacing))
                 IconButton(
                     onClick = {
                         navigator.openLink("https://github.com/TwidereProject/TwidereX-Android")
@@ -216,7 +213,7 @@ private fun AboutContent() {
                         contentDescription = stringResource(id = R.string.accessibility_common_logo_github)
                     )
                 }
-                Box(modifier = Modifier.width(standardPadding * 3))
+                Box(modifier = Modifier.width(AboutContentDefaults.Icon.Spacing))
                 IconButton(
                     onClick = {
                         navigator.openLink("https://t.me/twidere_x")
@@ -245,17 +242,56 @@ private fun AboutContent() {
                         text = stringResource(id = R.string.scene_settings_about_license),
                         style = MaterialTheme.typography.body1,
                         modifier = Modifier
-                            .padding(standardPadding)
+                            .padding(AboutContentDefaults.License.TextPadding)
                             .wrapContentWidth(Alignment.CenterHorizontally)
                     )
-                    Box(modifier = Modifier.height(standardPadding / 2))
+                    Box(modifier = Modifier.height(AboutContentDefaults.License.DividerSpacing))
                     Divider(
-                        thickness = 2.dp,
+                        thickness = AboutContentDefaults.License.DividerThickness,
                         modifier = Modifier.fillMaxWidth(),
                         color = MaterialTheme.colors.primary
                     )
                 }
             }
         }
+    }
+}
+
+private object AboutContentDefaults {
+    val ContentPadding = PaddingValues(
+        horizontal = 0.dp,
+        vertical = 24.dp,
+    )
+    val ParallaxPaddingStart = 32.dp
+    val ParallaxPaddingTop = 40.dp
+    val ParallaxPaddingBottom = 80.dp
+    val BackContentOffsetX = (-24).dp
+    val BackContentOffsetY = 24.dp
+    object Logo {
+        val Size = 44.dp
+        val IconSpacing = 24.dp
+        val ContentPadding = PaddingValues(
+            horizontal = 24.dp,
+            vertical = 0.dp
+        )
+    }
+    object VersionName {
+        val ContentPadding = PaddingValues(
+            horizontal = 24.dp,
+            vertical = 0.dp
+        )
+        val Spacing = 24.dp
+    }
+    object Icon {
+        val ContentPadding = PaddingValues(
+            horizontal = 24.dp,
+            vertical = 0.dp
+        )
+        val Spacing = 24.dp
+    }
+    object License {
+        val DividerSpacing = 4.dp
+        val TextPadding = PaddingValues(8.dp)
+        val DividerThickness = 2.dp
     }
 }

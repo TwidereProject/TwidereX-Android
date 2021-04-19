@@ -33,6 +33,7 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -72,9 +73,9 @@ import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.UserMetrics
 import com.twidere.twiderex.component.foundation.AppBar
+import com.twidere.twiderex.component.foundation.AppBarDefaults
 import com.twidere.twiderex.component.foundation.IconTabsComponent
 import com.twidere.twiderex.component.foundation.Pager
-import com.twidere.twiderex.component.foundation.TopAppBarElevation
 import com.twidere.twiderex.component.foundation.rememberPagerState
 import com.twidere.twiderex.component.lazy.LazyListController
 import com.twidere.twiderex.component.lazy.LocalLazyListController
@@ -99,7 +100,6 @@ import com.twidere.twiderex.ui.LocalActiveAccountViewModel
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.ui.mediumEmphasisContentContentColor
-import com.twidere.twiderex.ui.standardPadding
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalAnimationApi::class)
@@ -158,7 +158,7 @@ fun HomeScene() {
                                 MenuAvatar(scaffoldState)
                             },
                             elevation = if (menus[pagerState.currentPage].withAppBar) {
-                                TopAppBarElevation
+                                AppBarDefaults.TopAppBarElevation
                             } else {
                                 0.dp
                             }
@@ -170,7 +170,7 @@ fun HomeScene() {
                     )
                     val elevation by transition.animateDp {
                         if (it) {
-                            TopAppBarElevation
+                            AppBarDefaults.TopAppBarElevation
                         } else {
                             0.dp
                         }
@@ -249,8 +249,8 @@ private fun MenuAvatar(scaffoldState: ScaffoldState) {
             account.toUi()
         }
         UserAvatar(
-            modifier = Modifier.padding(horizontal = standardPadding * 2),
-            size = 32.dp,
+            modifier = Modifier.padding(MenuAvatarDefaults.AvatarPadding),
+            size = MenuAvatarDefaults.Size,
             user = user,
             onClick = {
                 scope.launch {
@@ -263,6 +263,14 @@ private fun MenuAvatar(scaffoldState: ScaffoldState) {
             }
         )
     }
+}
+
+private object MenuAvatarDefaults {
+    val AvatarPadding = PaddingValues(
+        horizontal = 16.dp,
+        vertical = 0.dp
+    )
+    val Size = 32.dp
 }
 
 @Composable
