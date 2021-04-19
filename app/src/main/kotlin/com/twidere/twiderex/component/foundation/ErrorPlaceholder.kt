@@ -33,15 +33,15 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.twidere.twiderex.R
-import com.twidere.twiderex.utils.generateNotificationEvent
+import com.twidere.twiderex.notification.NotificationEvent
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ErrorPlaceholder(
-    throwable: Throwable?,
+    throwable: NotificationEvent?,
     modifier: Modifier = Modifier,
 ) {
-    val message = throwable?.generateNotificationEvent()?.getMessage()
+    val message = throwable?.getMessage()
     ListItem(
         modifier = modifier,
         icon = {

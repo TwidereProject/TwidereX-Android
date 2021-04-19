@@ -62,6 +62,7 @@ import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.TwidereScene
+import com.twidere.twiderex.utils.generateNotificationEvent
 import com.twidere.twiderex.viewmodel.StatusViewModel
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -116,7 +117,7 @@ fun StatusScene(
                             }
                         }
                         is LoadState.Error -> {
-                            ErrorPlaceholder(throwable = refresh.error)
+                            ErrorPlaceholder(throwable = refresh.error.generateNotificationEvent())
                         }
                         else -> Unit
                     }

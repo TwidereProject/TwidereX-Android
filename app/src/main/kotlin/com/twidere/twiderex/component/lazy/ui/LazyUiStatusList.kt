@@ -57,6 +57,7 @@ import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.utils.generateNotificationEvent
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNotNull
 
 @Composable
 fun LazyUiStatusList(
@@ -71,7 +72,7 @@ fun LazyUiStatusList(
     val refresh = items.loadState.refresh
     val event = remember(refresh) {
         if (refresh is LoadState.Error) {
-            refresh.error
+            refresh.error.generateNotificationEvent()
         } else {
             null
         }
@@ -81,14 +82,11 @@ fun LazyUiStatusList(
     } else if (items.itemCount > 0) {
         val inAppNotification = LocalInAppNotification.current
         LaunchedEffect(event) {
-            snapshotFlow { event?.generateNotificationEvent() }
+            snapshotFlow { event }
                 .distinctUntilChanged()
+                .filterNotNull()
                 .collect {
-                    it?.let {
-                        inAppNotification.show(it)
-                    } ?: run {
-                        inAppNotification.show(R.string.common_alerts_failed_to_load_title)
-                    }
+                    inAppNotification.show(it)
                 }
         }
         LazyColumn2(
