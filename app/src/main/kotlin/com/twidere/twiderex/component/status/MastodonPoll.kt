@@ -177,7 +177,7 @@ fun MastodonPollOption(
     val size = MastodonPollOptionDefaults.optionSize()
     val transition = updateTransition(targetState = option.votesCount)
     val progress by transition.animateFloat {
-        (option.votesCount ?: 0).toFloat() / max((poll.votesCount ?: 0), 1).toFloat()
+        (it ?: 0).toFloat() / max((poll.votesCount ?: 0), 1).toFloat()
     }
     val color = if (poll.expired == true) {
         MaterialTheme.colors.onBackground
