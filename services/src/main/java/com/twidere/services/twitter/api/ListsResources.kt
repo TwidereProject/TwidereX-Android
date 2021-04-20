@@ -27,9 +27,10 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Query
 
+// TODO: add unit test
 interface ListsResources {
     @GET("/1.1/lists/list.json")
-    suspend fun twitterLists(
+    suspend fun lists(
         @Query("user_id") user_id: String? = null,
         @Query("screen_name") screen_name: String? = null,
         @Query("reverse") reverse: Boolean = true,
@@ -77,7 +78,21 @@ interface ListsResources {
     /**
      * slug => same as @listSubscribers
      */
-    @POST("/lists/create.json")
+    @POST("/lists/update.json")
+    suspend fun updateList(
+        @Query("name") name: String? = null,
+        @Query("mode") mode: String? = null,
+        @Query("description") description: String? = null,
+        @Query("list_id") list_id: String,
+        @Query("slug") slug: String?,
+        @Query("owner_id") owner_id: String? = null,
+        @Query("owner_screen_name") owner_screen_name: String? = null,
+    ): ListModel
+
+    /**
+     * slug => same as @listSubscribers
+     */
+    @POST("/lists/destroy.json")
     suspend fun destroyList(
         @Query("list_id") list_id: String,
         @Query("slug") slug: String?,

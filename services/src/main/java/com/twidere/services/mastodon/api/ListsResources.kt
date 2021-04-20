@@ -1,0 +1,72 @@
+/*
+ *  Twidere X
+ *
+ *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
+ * 
+ *  This file is part of Twidere X.
+ * 
+ *  Twidere X is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ * 
+ *  Twidere X is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ * 
+ *  You should have received a copy of the GNU General Public License
+ *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
+ */
+package com.twidere.services.mastodon.api
+
+import com.twidere.services.mastodon.model.Account
+import com.twidere.services.mastodon.model.ListModel
+import com.twidere.services.mastodon.model.PostAccounts
+import com.twidere.services.mastodon.model.PostList
+import retrofit2.Response
+import retrofit2.http.Body
+import retrofit2.http.DELETE
+import retrofit2.http.GET
+import retrofit2.http.POST
+import retrofit2.http.PUT
+import retrofit2.http.Path
+import retrofit2.http.Query
+
+// TODO: add unit test
+interface ListsResources {
+    @GET("/api/v1/lists")
+    suspend fun lists(): List<ListModel>
+
+    @POST("/api/v1/lists")
+    suspend fun createList(@Body postList: PostList): ListModel
+
+    @PUT("/api/v1/lists/{id}")
+    suspend fun updateList(
+        @Path("id") id: String,
+        @Body postList: PostList
+    ): ListModel
+
+    @DELETE("/api/v1/lists/{id}")
+    suspend fun deleteList(@Path("id") id: String): Response<Unit>
+
+    @GET("/api/v1/lists/{id}}/accounts")
+    suspend fun listMembers(
+        @Path("id") listId: String,
+        @Query("max_id") max_id: String? = null,
+        @Query("since_id") since_id: String? = null,
+        @Query("limit") limit: Int = 20,
+    ): List<Account>
+
+    @POST("/api/v1/lists/{id}}/accounts")
+    suspend fun addMembers(
+        @Path("id") listId: String,
+        @Body accounts: PostAccounts
+    ): Response<Unit>
+
+    @DELETE("/api/v1/lists/{id}}/accounts")
+    suspend fun deleteMembers(
+        @Path("id") listId: String,
+        @Body accounts: PostAccounts
+    ): Response<Unit>
+}
