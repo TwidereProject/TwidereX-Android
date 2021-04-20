@@ -71,4 +71,17 @@ interface TimelineResources {
         @Query("tweet_mode") tweet_mode: String = "extended",
         @Query("include_ext_alt_text") include_ext_alt_text: Boolean = true,
     ): List<Status>
+
+    @GET("/1.1/lists/statuses.json")
+    suspend fun listTimeline(
+        @Query("list_id") list_id: String,
+        @Query("slug") slug: String? = null,
+        @Query("owner_screen_name") owner_screen_name: String? = null,
+        @Query("owner_id") owner_id: String? = null,
+        @Query("count") count: Int = 20,
+        @Query("since_id") since_id: String? = null,
+        @Query("max_id") max_id: String? = null,
+        @Query("include_entities") include_entities: Boolean? = null,
+        @Query("include_rts") include_rts: Boolean? = null,
+    ): List<Status>
 }

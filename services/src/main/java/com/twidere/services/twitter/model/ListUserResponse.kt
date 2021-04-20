@@ -18,14 +18,21 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.services.twitter.api
+package com.twidere.services.twitter.model
 
-interface TwitterResources :
-    TimelineResources,
-    LookupResources,
-    UsersResources,
-    SearchResources,
-    StatusResources,
-    FriendshipResources,
-    FollowsResources,
-    ListsResources
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class ListUserResponse(
+    @SerialName("next_cursor")
+    val nextCursor: Long? = null,
+    @SerialName("next_cursor_str")
+    val nextCursorStr: String? = null,
+    @SerialName("previous_cursor")
+    val previousCursor: Int? = null,
+    @SerialName("previous_cursor_str")
+    val previousCursorStr: String? = null,
+    @SerialName("users")
+    val users: List<User>? = null
+)
