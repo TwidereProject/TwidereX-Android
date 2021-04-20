@@ -190,7 +190,7 @@ private fun AnnotatedString.Builder.renderNode(
             this.renderElement(node, context = context, styleData = styleData)
         }
         is TextNode -> {
-            renderText(node.text(), styleData.textStyle)
+            renderText(node.wholeText, styleData.textStyle)
         }
     }
 }
