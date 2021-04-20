@@ -19,15 +19,13 @@ test {
 }
 
 dependencies {
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.3"
-    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:$versions.kotlinx_serialization"
-    
-    api "com.squareup.retrofit2:retrofit:$versions.retrofit2"
-    implementation "com.squareup.retrofit2:converter-scalars:$versions.retrofit2"
-    implementation "com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.8.0"
+    implementation libs.kotlinx.coroutines.core
+    implementation libs.kotlinx.serialization.json
 
-    implementation "com.squareup.okhttp3:okhttp:$versions.okhttp"
-    implementation "com.squareup.okhttp3:logging-interceptor:$versions.okhttp"
+    implementation libs.bundles.retrofit
+    implementation libs.retrofit2.kotlinx.serialization.converter
+
+    implementation libs.bundles.okhttp
 
     testImplementation 'org.jetbrains.kotlin:kotlin-test-junit5'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
