@@ -60,6 +60,8 @@ hilt-compiler = { module = "androidx.hilt:hilt-compiler", version.ref = "android
 # Accompanist
 accompanist-glide = { module = "com.google.accompanist:accompanist-glide", version.ref = "accompanist" }
 accompanist-insets = { module = "com.google.accompanist:accompanist-insets", version.ref = "accompanist" }
+accompanist-pager-base = { module = "com.google.accompanist:accompanist-pager", version.ref = "accompanist" }
+accompanist-pager-indicators = { module = "com.google.accompanist:accompanist-pager-indicators", version.ref = "accompanist" }
 
 # AndroidX Activity
 activity-ktx = { module = "androidx.activity:activity-ktx", version.ref = "androidx_activity" }
@@ -136,6 +138,8 @@ hilt-compiler = [
 accompanist = [
     "accompanist-glide",
     "accompanist-insets",
+    "accompanist-pager-base",
+    "accompanist-pager-indicators",
 ]
 activity = [
     "activity-ktx",
