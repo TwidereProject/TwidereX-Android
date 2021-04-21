@@ -31,12 +31,15 @@ import com.twidere.services.mastodon.model.MastodonPaging
 import com.twidere.services.mastodon.model.MastodonSearchResponse
 import com.twidere.services.mastodon.model.NotificationTypes
 import com.twidere.services.mastodon.model.Poll
+import com.twidere.services.mastodon.model.PostAccounts
+import com.twidere.services.mastodon.model.PostList
 import com.twidere.services.mastodon.model.PostStatus
 import com.twidere.services.mastodon.model.PostVote
 import com.twidere.services.mastodon.model.SearchType
 import com.twidere.services.mastodon.model.UploadResponse
 import com.twidere.services.mastodon.model.exceptions.MastodonException
 import com.twidere.services.microblog.DownloadMediaService
+import com.twidere.services.microblog.ListsService
 import com.twidere.services.microblog.LookupService
 import com.twidere.services.microblog.MicroBlogService
 import com.twidere.services.microblog.NotificationService
@@ -60,6 +63,7 @@ import java.io.InputStream
 class MastodonService(
     private val host: String,
     private val accessToken: String,
+    resources: MastodonResources? = null
 ) : MicroBlogService,
     TimelineService,
     LookupService,
@@ -67,9 +71,10 @@ class MastodonService(
     NotificationService,
     SearchService,
     StatusService,
-    DownloadMediaService {
+    DownloadMediaService,
+    ListsService {
     private val resources by lazy {
-        retrofit<MastodonResources>(
+        resources ?: retrofit(
             "https://$host",
             BearerAuthorization(accessToken)
         )
@@ -296,4 +301,53 @@ class MastodonService(
             .body
             ?.byteStream() ?: throw IllegalArgumentException()
     }
+
+    override suspend fun lists(
+        userId: String?,
+        screenName: String?,
+        reverse: Boolean
+    ) = resources.lists()
+
+    override suspend fun createList(
+        name: String,
+        mode: String?,
+        description: String?,
+        repliesPolicy: String?
+    ) = resources.createList(PostList(name, repliesPolicy))
+
+    override suspend fun updateList(
+        listId: String,
+        name: String?,
+        mode: String?,
+        description: String?,
+        repliesPolicy: String?
+    ) = resources.updateList(listId, PostList(name, repliesPolicy))
+
+    override suspend fun destroyList(
+        listId: String
+    ) = "{}".equals(resources.deleteList(listId).body())
+
+    override suspend fun listMembers(
+        listId: String,
+        count: Int,
+        cursor: String?
+    ) = resources.listMembers(listId, max_id = cursor, limit = count)
+
+    override suspend fun addMember(
+        listId: String,
+        userId: String,
+        screenName: String
+    ) = "{}".equals(resources.addMember(listId, PostAccounts(listOf(userId))).body())
+
+    override suspend fun removeMember(
+        listId: String,
+        userId: String,
+        screenName: String
+    ) = "{}".equals(resources.removeMember(listId, PostAccounts(listOf(userId))).body())
+
+    override suspend fun listSubscribers(
+        listId: String,
+        count: Int,
+        cursor: String?
+    ) = emptyList<IUser>()
 }
