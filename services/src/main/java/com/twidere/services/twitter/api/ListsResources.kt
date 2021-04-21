@@ -22,7 +22,6 @@ package com.twidere.services.twitter.api
 
 import com.twidere.services.twitter.model.ListModel
 import com.twidere.services.twitter.model.ListUserResponse
-import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Query
@@ -68,7 +67,7 @@ interface ListsResources {
         @Query("skip_status") skip_status: Boolean? = null,
     ): ListUserResponse
 
-    @POST("/lists/create.json")
+    @POST("/1.1/lists/create.json")
     suspend fun createList(
         @Query("name") name: String,
         @Query("mode") mode: String? = null,
@@ -78,13 +77,13 @@ interface ListsResources {
     /**
      * slug => same as @listSubscribers
      */
-    @POST("/lists/update.json")
+    @POST("/1.1/lists/update.json")
     suspend fun updateList(
         @Query("name") name: String? = null,
         @Query("mode") mode: String? = null,
         @Query("description") description: String? = null,
         @Query("list_id") list_id: String,
-        @Query("slug") slug: String?,
+        @Query("slug") slug: String? = null,
         @Query("owner_id") owner_id: String? = null,
         @Query("owner_screen_name") owner_screen_name: String? = null,
     ): ListModel
@@ -92,10 +91,10 @@ interface ListsResources {
     /**
      * slug => same as @listSubscribers
      */
-    @POST("/lists/destroy.json")
+    @POST("/1.1/lists/destroy.json")
     suspend fun destroyList(
         @Query("list_id") list_id: String,
-        @Query("slug") slug: String?,
+        @Query("slug") slug: String? = null,
         @Query("owner_id") owner_id: String? = null,
         @Query("owner_screen_name") owner_screen_name: String? = null,
     ): ListModel
@@ -103,23 +102,23 @@ interface ListsResources {
     /**
      * slug => same as @listSubscribers
      */
-    @POST("/lists//members/create.json")
+    @POST("/1.1/lists/members/create.json")
     suspend fun addMember(
         @Query("list_id") list_id: String,
         @Query("user_id") user_id: String,
         @Query("screen_name") screen_name: String,
-        @Query("slug") slug: String?,
+        @Query("slug") slug: String? = null,
         @Query("owner_id") owner_id: String? = null,
         @Query("owner_screen_name") owner_screen_name: String? = null,
-    ): Response<Unit>
+    ): ListModel
 
-    @POST("/lists//members/destroy.json")
+    @POST("/1.1/lists/members/destroy.json")
     suspend fun removeMember(
         @Query("list_id") list_id: String,
         @Query("user_id") user_id: String,
         @Query("screen_name") screen_name: String,
-        @Query("slug") slug: String?,
+        @Query("slug") slug: String? = null,
         @Query("owner_id") owner_id: String? = null,
         @Query("owner_screen_name") owner_screen_name: String? = null,
-    ): Response<Unit>
+    ): ListModel
 }
