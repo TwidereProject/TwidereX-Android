@@ -135,6 +135,11 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion libs.versions.compose.get()
     }
+
+    packagingOptions {
+        exclude 'META-INF/AL2.0'
+        exclude 'META-INF/LGPL2.1'
+    }
 }
 
 protobuf {
@@ -198,8 +203,7 @@ dependencies {
     }
 
     testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+    androidTestImplementation libs.bundles.androidx.test
 }
 
 apply from: 'translate.gradle'
