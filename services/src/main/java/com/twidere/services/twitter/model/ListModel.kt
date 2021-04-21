@@ -20,6 +20,7 @@
  */
 package com.twidere.services.twitter.model
 
+import com.twidere.services.microblog.model.IListModel
 import com.twidere.services.serializer.DateSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -58,4 +59,4 @@ data class ListModel(
     val uri: String? = null,
 
     val user: User? = null
-)
+) : IListModel

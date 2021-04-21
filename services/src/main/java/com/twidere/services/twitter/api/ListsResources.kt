@@ -26,7 +26,6 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Query
 
-// TODO: add unit test
 interface ListsResources {
     @GET("/1.1/lists/list.json")
     suspend fun lists(

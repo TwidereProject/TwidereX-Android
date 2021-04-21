@@ -24,7 +24,6 @@ import com.twidere.services.mastodon.model.Account
 import com.twidere.services.mastodon.model.ListModel
 import com.twidere.services.mastodon.model.PostAccounts
 import com.twidere.services.mastodon.model.PostList
-import okhttp3.internal.http.hasBody
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -35,7 +34,6 @@ import retrofit2.http.PUT
 import retrofit2.http.Path
 import retrofit2.http.Query
 
-// TODO: add unit test
 interface ListsResources {
     @GET("/api/v1/lists")
     suspend fun lists(): List<ListModel>

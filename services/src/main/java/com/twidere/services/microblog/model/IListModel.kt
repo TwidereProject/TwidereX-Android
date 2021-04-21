@@ -18,18 +18,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.services.mastodon.model
+package com.twidere.services.microblog.model
 
-import com.twidere.services.microblog.model.IListModel
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
-
-@Serializable
-data class ListModel(
-    @SerialName("id")
-    val id: String? = null,
-    @SerialName("replies_policy")
-    val repliesPolicy: String? = null,
-    @SerialName("title")
-    val title: String? = null
-) : IListModel
+interface IListModel

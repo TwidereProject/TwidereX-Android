@@ -26,6 +26,7 @@ import com.twidere.services.http.MicroBlogHttpException
 import com.twidere.services.http.authorization.OAuth1Authorization
 import com.twidere.services.http.retrofit
 import com.twidere.services.microblog.DownloadMediaService
+import com.twidere.services.microblog.ListsService
 import com.twidere.services.microblog.LookupService
 import com.twidere.services.microblog.MicroBlogService
 import com.twidere.services.microblog.RelationshipService
@@ -70,15 +71,17 @@ class TwitterService(
     private val consumer_secret: String,
     private val access_token: String,
     private val access_token_secret: String,
+    resources: TwitterResources? = null
 ) : MicroBlogService,
     TimelineService,
     LookupService,
     RelationshipService,
     SearchService,
     StatusService,
-    DownloadMediaService {
+    DownloadMediaService,
+    ListsService {
     private val resources by lazy {
-        retrofit<TwitterResources>(
+        resources ?: retrofit(
             TWITTER_BASE_URL,
             createOAuth1Authorization(),
             { chain ->
@@ -451,4 +454,74 @@ class TwitterService(
             .body
             ?.byteStream() ?: throw IllegalArgumentException()
     }
+
+    override suspend fun lists(
+        userId: String?,
+        screenName: String?,
+        reverse: Boolean
+    ) = resources.lists(
+        user_id = userId,
+        screen_name = screenName,
+        reverse = reverse
+    )
+
+    override suspend fun createList(
+        name: String,
+        mode: String?,
+        description: String?,
+        repliesPolicy: String?
+    ) = resources.createList(
+        name = name,
+        mode = mode,
+        description = description
+    )
+
+    override suspend fun updateList(
+        listId: String,
+        name: String?,
+        mode: String?,
+        description: String?,
+        repliesPolicy: String?
+    ) = resources.updateList(
+        list_id = listId,
+        name = name,
+        mode = mode,
+        description = description
+    )
+
+    override suspend fun destroyList(
+        listId: String
+    ) = listId.equals(resources.destroyList(listId).idStr)
+
+    override suspend fun listMembers(
+        listId: String,
+        count: Int,
+        cursor: String?
+    ) = resources.listMembers(
+        list_id = listId,
+        count = count,
+        cursor = cursor
+    ).users ?: emptyList()
+
+    override suspend fun addMember(
+        listId: String,
+        userId: String,
+        screenName: String
+    ) = listId.equals(resources.addMember(listId, userId, screenName).idStr)
+
+    override suspend fun removeMember(
+        listId: String,
+        userId: String,
+        screenName: String
+    ) = listId.equals(resources.removeMember(listId, userId, screenName).idStr)
+
+    override suspend fun listSubscribers(
+        listId: String,
+        count: Int,
+        cursor: String?
+    ) = resources.listSubscribers(
+        list_id = listId,
+        count = count,
+        cursor = cursor
+    ).users ?: emptyList()
 }
