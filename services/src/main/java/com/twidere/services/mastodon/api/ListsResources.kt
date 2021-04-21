@@ -24,10 +24,12 @@ import com.twidere.services.mastodon.model.Account
 import com.twidere.services.mastodon.model.ListModel
 import com.twidere.services.mastodon.model.PostAccounts
 import com.twidere.services.mastodon.model.PostList
+import okhttp3.internal.http.hasBody
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
+import retrofit2.http.HTTP
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
@@ -48,9 +50,9 @@ interface ListsResources {
     ): ListModel
 
     @DELETE("/api/v1/lists/{id}")
-    suspend fun deleteList(@Path("id") id: String): Response<Unit>
+    suspend fun deleteList(@Path("id") id: String): Response<String>
 
-    @GET("/api/v1/lists/{id}}/accounts")
+    @GET("/api/v1/lists/{id}/accounts")
     suspend fun listMembers(
         @Path("id") listId: String,
         @Query("max_id") max_id: String? = null,
@@ -58,15 +60,15 @@ interface ListsResources {
         @Query("limit") limit: Int = 20,
     ): List<Account>
 
-    @POST("/api/v1/lists/{id}}/accounts")
-    suspend fun addMembers(
+    @POST("/api/v1/lists/{id}/accounts")
+    suspend fun addMember(
         @Path("id") listId: String,
         @Body accounts: PostAccounts
-    ): Response<Unit>
+    ): Response<String>
 
-    @DELETE("/api/v1/lists/{id}}/accounts")
-    suspend fun deleteMembers(
+    @HTTP(method = "DELETE", path = "/api/v1/lists/{id}/accounts", hasBody = true)
+    suspend fun removeMember(
         @Path("id") listId: String,
         @Body accounts: PostAccounts
-    ): Response<Unit>
+    ): Response<String>
 }
