@@ -203,10 +203,7 @@ dependencies {
     }
 
     testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation libs.androidx.test.core
-    androidTestImplementation libs.androidx.test.runner
-    androidTestImplementation libs.androidx.test.ext.junit
-    androidTestImplementation libs.androidx.test.espresso
+    androidTestImplementation libs.bundles.androidx.test
 }
 
 apply from: 'translate.gradle'
