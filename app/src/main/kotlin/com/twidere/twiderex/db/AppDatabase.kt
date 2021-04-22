@@ -20,10 +20,11 @@
  */
 package com.twidere.twiderex.db
 
-import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.twidere.twiderex.db.dao.DraftDao
 import com.twidere.twiderex.db.dao.SearchDao
 import com.twidere.twiderex.db.model.DbDraft
@@ -40,7 +41,6 @@ import javax.inject.Singleton
         DbSearch::class,
     ],
     version = 2,
-    autoMigrations = [AutoMigration(from = 1, to = 2)]
 )
 @TypeConverters(
     MicroBlogKeyConverter::class,
@@ -50,4 +50,11 @@ import javax.inject.Singleton
 abstract class AppDatabase : RoomDatabase() {
     abstract fun draftDao(): DraftDao
     abstract fun searchDao(): SearchDao
+}
+
+val AppDatabase_Migration_1_2 = object : Migration(1, 2) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("CREATE TABLE IF NOT EXISTS `search` (`_id` TEXT NOT NULL, `content` TEXT NOT NULL, `lastActive` INTEGER NOT NULL, PRIMARY KEY(`_id`))")
+        database.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_search_content` ON `search` (`content`)")
+    }
 }
