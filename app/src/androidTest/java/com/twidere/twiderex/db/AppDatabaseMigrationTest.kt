@@ -18,15 +18,13 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex
+package com.twidere.twiderex.db
 
 import androidx.room.testing.MigrationTestHelper
 import androidx.sqlite.db.SimpleSQLiteQuery
 import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.twidere.twiderex.db.AppDatabase
-import com.twidere.twiderex.db.AppDatabase_Migration_1_2
 import com.twidere.twiderex.viewmodel.compose.ComposeType
 import org.junit.Rule
 import org.junit.Test
