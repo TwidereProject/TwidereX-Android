@@ -75,7 +75,6 @@ class MediaViewModel @AssistedInject constructor(
 
     init {
         viewModelScope.launch {
-            loading.postValue(true)
             try {
                 repository.loadTweetFromNetwork(
                     statusKey.id,
@@ -85,7 +84,6 @@ class MediaViewModel @AssistedInject constructor(
             } catch (e: Throwable) {
                 e.notify(inAppNotification)
             }
-            loading.postValue(false)
         }
     }
 }

@@ -53,6 +53,9 @@ import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.RadioButton
 import androidx.compose.material.Surface
+import androidx.compose.material.Tab
+import androidx.compose.material.TabRow
+import androidx.compose.material.TabRowDefaults
 import androidx.compose.material.Text
 import androidx.compose.material.contentColorFor
 import androidx.compose.runtime.Composable
@@ -77,13 +80,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.pagerTabIndicatorOffset
+import com.google.accompanist.pager.rememberPagerState
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.HorizontalDivider
-import com.twidere.twiderex.component.foundation.IconTabsComponent
 import com.twidere.twiderex.component.foundation.NetworkImage
-import com.twidere.twiderex.component.foundation.Pager
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
-import com.twidere.twiderex.component.foundation.rememberPagerState
 import com.twidere.twiderex.component.lazy.collectAsLazyPagingItems
 import com.twidere.twiderex.component.lazy.ui.LazyUiStatusImageList
 import com.twidere.twiderex.component.lazy.ui.LazyUiStatusList
@@ -113,6 +117,7 @@ import moe.tlaster.nestedscrollview.VerticalNestedScrollView
 import moe.tlaster.nestedscrollview.rememberNestedScrollViewState
 import moe.tlaster.precompose.navigation.NavController
 
+@OptIn(ExperimentalPagerApi::class)
 @Composable
 fun UserComponent(
     userKey: MicroBlogKey,
@@ -163,22 +168,44 @@ fun UserComponent(
                 UserInfo(viewModel = viewModel)
             },
             content = {
-                val state = rememberPagerState(maxPage = tabs.lastIndex)
+                val pagerState = rememberPagerState(pageCount = tabs.size)
                 Column {
                     val scope = rememberCoroutineScope()
-                    IconTabsComponent(
-                        items = tabs.map { it.icon to it.title },
-                        selectedItem = state.currentPage,
-                        onItemSelected = {
-                            scope.launch {
-                                state.selectPage { state.currentPage = it }
-                            }
-                        },
-                    )
-                    Pager(
-                        modifier = Modifier.weight(1f),
-                        state = state,
+                    TabRow(
+                        selectedTabIndex = pagerState.currentPage,
+                        backgroundColor = MaterialTheme.colors.surface.withElevation(),
+                        indicator = { tabPositions ->
+                            TabRowDefaults.Indicator(
+                                modifier = Modifier.pagerTabIndicatorOffset(
+                                    pagerState,
+                                    tabPositions
+                                ),
+                                color = MaterialTheme.colors.primary,
+                            )
+                        }
                     ) {
+                        tabs.forEachIndexed { index, item ->
+                            Tab(
+                                selected = pagerState.currentPage == index,
+                                onClick = {
+                                    scope.launch {
+                                        pagerState.animateScrollToPage(index)
+                                    }
+                                },
+                                content = {
+                                    Box(
+                                        modifier = Modifier.padding(16.dp)
+                                    ) {
+                                        Icon(painter = item.icon, contentDescription = item.title)
+                                    }
+                                },
+                            )
+                        }
+                    }
+                    HorizontalPager(
+                        modifier = Modifier.weight(1f),
+                        state = pagerState,
+                    ) { page ->
                         Box(
                             modifier = Modifier.fillMaxSize(),
                             contentAlignment = Alignment.TopCenter,

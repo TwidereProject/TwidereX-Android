@@ -73,17 +73,19 @@ import androidx.compose.ui.viewinterop.AndroidView
 import com.google.accompanist.glide.LocalRequestManager
 import com.google.accompanist.insets.navigationBarsPadding
 import com.google.accompanist.insets.statusBarsPadding
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.HorizontalPagerIndicator
+import com.google.accompanist.pager.PagerState
+import com.google.accompanist.pager.rememberPagerState
 import com.google.android.exoplayer2.ui.PlayerControlView
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.LoadingProgress
 import com.twidere.twiderex.component.foundation.NetworkImage
-import com.twidere.twiderex.component.foundation.Pager
-import com.twidere.twiderex.component.foundation.PagerState
 import com.twidere.twiderex.component.foundation.Swiper
 import com.twidere.twiderex.component.foundation.SwiperState
 import com.twidere.twiderex.component.foundation.VideoPlayer
-import com.twidere.twiderex.component.foundation.rememberPagerState
 import com.twidere.twiderex.component.foundation.rememberSwiperState
 import com.twidere.twiderex.component.status.LikeButton
 import com.twidere.twiderex.component.status.ReplyButton
@@ -117,8 +119,8 @@ fun StatusMediaScene(statusKey: MicroBlogKey, selectedIndex: Int) {
     val viewModel = assistedViewModel<MediaViewModel.AssistedFactory, MediaViewModel> {
         it.create(account, statusKey)
     }
-    val loading by viewModel.loading.observeAsState(initial = false)
     val status by viewModel.status.observeAsState()
+    val loading by viewModel.loading.observeAsState(initial = false)
     TwidereDialog(
         requireDarkTheme = true,
         extendViewIntoStatusBar = true,
@@ -146,7 +148,7 @@ fun StatusMediaScene(statusKey: MicroBlogKey, selectedIndex: Int) {
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
+@OptIn(ExperimentalAnimationApi::class, ExperimentalPagerApi::class)
 @Composable
 fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewModel) {
     var controlVisibility by remember { mutableStateOf(true) }
@@ -169,8 +171,8 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewM
     ) {
         Box {
             val pagerState = rememberPagerState(
-                currentPage = selectedIndex,
-                maxPage = status.media.lastIndex,
+                initialPage = selectedIndex,
+                pageCount = status.media.size,
             )
             val currentMedia = status.media[pagerState.currentPage]
             val context = LocalContext.current
@@ -261,18 +263,30 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewM
                         modifier = Modifier
                             .navigationBarsPadding(),
                     ) {
-                        AnimatedVisibility(
-                            visible = controlVisibility,
-                            enter = fadeIn() + expandVertically(),
-                            exit = shrinkVertically() + fadeOut()
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .align(Alignment.BottomCenter)
                         ) {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .align(Alignment.BottomCenter)
-                                    .background(color = controlPanelColor),
+                            if (status.media.size > 1) {
+                                HorizontalPagerIndicator(
+                                    pagerState = pagerState,
+                                    modifier = Modifier
+                                        .padding(16.dp)
+                                        .align(Alignment.CenterHorizontally),
+                                )
+                            }
+                            AnimatedVisibility(
+                                visible = controlVisibility,
+                                enter = fadeIn() + expandVertically(),
+                                exit = shrinkVertically() + fadeOut()
                             ) {
-                                StatusMediaInfo(videoControl, status, viewModel, currentMedia)
+                                Box(
+                                    modifier = Modifier
+                                        .background(color = controlPanelColor),
+                                ) {
+                                    StatusMediaInfo(videoControl, status, viewModel, currentMedia)
+                                }
                             }
                         }
                     }
@@ -374,14 +388,15 @@ data class MediaData(
     val type: MediaType,
 )
 
+@OptIn(ExperimentalPagerApi::class)
 @Composable
 fun MediaView(
     modifier: Modifier = Modifier,
     media: List<MediaData>,
     swiperState: SwiperState = rememberSwiperState(),
     pagerState: PagerState = rememberPagerState(
-        currentPage = 0,
-        maxPage = media.lastIndex,
+        initialPage = 0,
+        pageCount = media.size,
     ),
     customControl: PlayerControlView? = null,
 ) {
@@ -402,10 +417,10 @@ fun MediaView(
         modifier = modifier,
         state = swiperState,
     ) {
-        Pager(
+        HorizontalPager(
             state = pagerState,
-        ) {
-            val data = media[this.page]
+        ) { page ->
+            val data = media[page]
             when (data.type) {
                 MediaType.photo ->
                     Zoomable(
