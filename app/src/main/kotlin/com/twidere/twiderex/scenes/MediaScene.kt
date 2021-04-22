@@ -31,6 +31,7 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -80,6 +81,7 @@ import com.google.accompanist.pager.rememberPagerState
 import com.google.android.exoplayer2.ui.PlayerControlView
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
+import com.twidere.twiderex.component.foundation.LoadingProgress
 import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.foundation.Swiper
 import com.twidere.twiderex.component.foundation.SwiperState
@@ -118,6 +120,7 @@ fun StatusMediaScene(statusKey: MicroBlogKey, selectedIndex: Int) {
         it.create(account, statusKey)
     }
     val status by viewModel.status.observeAsState()
+    val loading by viewModel.loading.observeAsState(initial = false)
     TwidereDialog(
         requireDarkTheme = true,
         extendViewIntoStatusBar = true,
