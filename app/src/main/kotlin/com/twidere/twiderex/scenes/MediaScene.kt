@@ -415,7 +415,12 @@ fun MediaView(
                             data = data.url,
                             contentScale = ContentScale.Fit,
                             placeholder = {
-                                CircularProgressIndicator()
+                                Box(
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentAlignment = Alignment.Center,
+                                ) {
+                                    CircularProgressIndicator()
+                                }
                             }
                         )
                     }
