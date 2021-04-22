@@ -28,8 +28,8 @@ import android.location.LocationManager
 import android.net.ConnectivityManager
 import androidx.room.Room
 import androidx.work.WorkManager
-import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.db.AppDatabase
+import com.twidere.twiderex.db.CacheDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
