@@ -20,11 +20,14 @@
  */
 package com.twidere.twiderex.db
 
+import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.twidere.twiderex.db.dao.DraftDao
+import com.twidere.twiderex.db.dao.SearchDao
 import com.twidere.twiderex.db.model.DbDraft
+import com.twidere.twiderex.db.model.DbSearch
 import com.twidere.twiderex.db.model.converter.ComposeTypeConverter
 import com.twidere.twiderex.db.model.converter.MicroBlogKeyConverter
 import com.twidere.twiderex.db.model.converter.StringListConverter
@@ -34,14 +37,17 @@ import javax.inject.Singleton
 @Database(
     entities = [
         DbDraft::class,
+        DbSearch::class,
     ],
-    version = 1,
+    version = 2,
+    autoMigrations = [AutoMigration(from = 1, to = 2)]
 )
 @TypeConverters(
     MicroBlogKeyConverter::class,
     ComposeTypeConverter::class,
     StringListConverter::class,
 )
-abstract class DraftDatabase : RoomDatabase() {
+abstract class AppDatabase : RoomDatabase() {
     abstract fun draftDao(): DraftDao
+    abstract fun searchDao(): SearchDao
 }

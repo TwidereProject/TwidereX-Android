@@ -41,4 +41,7 @@ interface SearchDao {
 
     @Delete
     suspend fun remove(search: DbSearch)
+
+    @Query("DELETE FROM search")
+    suspend fun clear()
 }
