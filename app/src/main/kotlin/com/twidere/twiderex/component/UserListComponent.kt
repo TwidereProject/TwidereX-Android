@@ -28,7 +28,7 @@ import com.twidere.twiderex.component.lazy.collectAsLazyPagingItems
 import com.twidere.twiderex.component.lazy.ui.LazyUiUserList
 import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.extensions.refreshOrRetry
-import com.twidere.twiderex.viewmodel.UserListViewModel
+import com.twidere.twiderex.viewmodel.user.UserListViewModel
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -43,8 +43,6 @@ fun UserListComponent(
             source.refreshOrRetry()
         }
     ) {
-        if (source.itemCount > 0) {
-            LazyUiUserList(items = source, onItemClicked = { navigator.user(it) })
-        }
+        LazyUiUserList(items = source, onItemClicked = { navigator.user(it) })
     }
 }

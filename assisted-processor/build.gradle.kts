@@ -11,8 +11,7 @@ repositories {
 }
 
 dependencies {
-    implementation(kotlin("stdlib"))
-    implementation("com.google.devtools.ksp:symbol-processing-api:1.4.32-1.0.0-alpha07")
+    implementation(libs.ksp.symbol.processing.api)
 }
 
 sourceSets.main {

@@ -64,6 +64,11 @@ fun SettingsScene() {
                     painterResource(id = R.drawable.ic_template),
                     route = Route.Settings.Display,
                 ),
+                SettingItem(
+                    stringResource(id = R.string.scene_settings_storage_title),
+                    painterResource(id = R.drawable.ic_database),
+                    route = Route.Settings.Storage,
+                ),
                 // TODO
 //                SettingItem(
 //                    "Layout",

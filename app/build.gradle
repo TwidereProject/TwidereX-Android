@@ -51,7 +51,7 @@ android {
 
         javaCompileOptions {
             annotationProcessorOptions {
-                arguments += ["room.schemaLocation": "$buildDir/schemas".toString()]
+                arguments += ["room.schemaLocation": "$projectDir/schemas".toString()]
             }
         }
         def apiKeyProperties = rootProject.file('apiKey.properties')
@@ -63,10 +63,6 @@ android {
             buildConfigField "String", "CONSUMERSECRET", apiKeyProp.get("ConsumerSecret")
         }
 
-    }
-
-    packagingOptions {
-        exclude "DebugProbesKt.bin"
     }
 
     lintOptions{
@@ -121,6 +117,9 @@ android {
         it.res.srcDirs += project.files("src/${it.name}/res-localized")
         it.java.srcDirs += "src/${it.name}/kotlin"
     }
+    sourceSets {
+        androidTest.assets.srcDirs += files("$projectDir/schemas".toString())
+    }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_11
         targetCompatibility JavaVersion.VERSION_11
@@ -133,13 +132,19 @@ android {
         compose true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion versions.compose
+        kotlinCompilerExtensionVersion libs.versions.compose.get()
+    }
+
+    packagingOptions {
+        exclude 'META-INF/AL2.0'
+        exclude 'META-INF/LGPL2.1'
+        exclude "DebugProbesKt.bin"
     }
 }
 
 protobuf {
     protoc {
-        artifact = "com.google.protobuf:protoc:$versions.protobuf"
+        artifact = "com.google.protobuf:protoc:${libs.versions.protobuf.get()}"
     }
     generateProtoTasks {
         all().each { task ->
@@ -153,58 +158,41 @@ protobuf {
 }
 
 dependencies {
-    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:$versions.kotlinx_serialization"
+    implementation libs.kotlinx.serialization.json
 
-    implementation project(":services")
-    ksp project(":assisted-processor")
+    implementation projects.services
+    ksp projects.assistedProcessor
 
-    implementation "androidx.compose.ui:ui:$versions.compose"
-    implementation "androidx.compose.ui:ui-tooling:$versions.compose"
-    implementation "androidx.compose.foundation:foundation:$versions.compose"
-    implementation "androidx.compose.animation:animation:$versions.compose"
-    implementation "androidx.compose.material:material:$versions.compose"
-    implementation "androidx.compose.material:material-icons-core:$versions.compose"
-    implementation "androidx.compose.material:material-icons-extended:$versions.compose"
-    implementation "androidx.compose.runtime:runtime-livedata:$versions.compose"
-    androidTestImplementation "androidx.compose.ui:ui-test:$versions.compose"
+    implementation libs.bundles.compose
+    androidTestImplementation libs.compose.ui.test
 
-    implementation "androidx.paging:paging-runtime-ktx:$versions.paging"
-    implementation "androidx.paging:paging-compose:$versions.paging_compose"
-    implementation "androidx.activity:activity-ktx:$versions.androidx"
-    implementation "androidx.activity:activity-compose:$versions.androidx"
-    implementation "androidx.datastore:datastore:$versions.dataStore"
+    implementation libs.bundles.paging
+    implementation libs.bundles.activity
+    implementation libs.dataStore
 
-    implementation "com.google.dagger:hilt-android:$versions.hilt"
-    kapt "com.google.dagger:hilt-android-compiler:$versions.hilt"
-    implementation "androidx.hilt:hilt-work:$versions.androidx_hilt"
-    kapt "androidx.hilt:hilt-compiler:$versions.androidx_hilt"
+    implementation libs.bundles.hilt.base
+    kapt libs.bundles.hilt.compiler
 
-    implementation "androidx.room:room-runtime:$versions.room"
-    kapt "androidx.room:room-compiler:$versions.room"
-    implementation "androidx.room:room-ktx:$versions.room"
+    implementation libs.bundles.room
+    kapt libs.room.compiler
 
-    implementation "androidx.lifecycle:lifecycle-runtime-ktx:$versions.lifecycle"
-    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$versions.lifecycle"
-    implementation "androidx.lifecycle:lifecycle-livedata-ktx:$versions.lifecycle"
-    implementation "androidx.lifecycle:lifecycle-viewmodel-savedstate:$versions.lifecycle"
-    implementation "androidx.lifecycle:lifecycle-common-java8:$versions.lifecycle"
-    implementation "androidx.lifecycle:lifecycle-viewmodel-compose:$versions.lifecycle_compose"
+    implementation libs.bundles.lifecycle
 
-    implementation "androidx.work:work-runtime-ktx:$versions.work"
+    implementation libs.work.runtime.ktx
 
-    implementation "com.google.accompanist:accompanist-glide:$versions.accompanist"
-    implementation "com.google.accompanist:accompanist-insets:$versions.accompanist"
+    implementation libs.bundles.accompanist
 
-    implementation 'com.github.Tlaster:Zoomable:0.2.1'
+    implementation libs.zoomable
+    implementation libs.nestedScrollView
 
-    implementation "com.twitter.twittertext:twitter-text:3.1.0"
-    implementation 'org.jsoup:jsoup:1.13.1'
+    implementation libs.twittertext
+    implementation libs.jsoup
 
-    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.7'
+    debugImplementation libs.leakcanary
 
-    implementation "com.google.protobuf:protobuf-javalite:$versions.protobuf"
+    implementation libs.protobuf.javalite
 
-    implementation "com.google.android.exoplayer:exoplayer:$versions.exoplayer"
+    implementation libs.exoplayer
 
     if (enableGoogleVariant) {
         // START Non-FOSS component
@@ -215,8 +203,8 @@ dependencies {
     }
 
     testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+    androidTestImplementation libs.room.testing
+    androidTestImplementation libs.bundles.androidx.test
 }
 
 apply from: 'translate.gradle'

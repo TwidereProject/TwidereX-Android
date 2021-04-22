@@ -95,8 +95,7 @@
     <string name="scene_drawer_manage_accounts">アカウントを管理</string>
     <string name="scene_manage_accounts_title">アカウント</string>
     <string name="scene_manage_accounts_delete_account">アカウントの削除</string>
-    <string name="scene_sign_in_hello_sign_in_to_get_started">こんにちは！
-サインインしてはじめましょう。</string>
+    <string name="scene_sign_in_hello_sign_in_to_get_started">こんにちは！\nサインインしてはじめましょう。</string>
     <string name="scene_sign_in_sign_in_with_twitter">Twitter でサインイン</string>
     <string name="scene_sign_in_sign_in_with_mastodon">Mastodonでサインイン</string>
     <string name="scene_sign_in_twitter_options_sign_in_with_custom_twitter_key">カスタム Twitter キーでサインイン</string>

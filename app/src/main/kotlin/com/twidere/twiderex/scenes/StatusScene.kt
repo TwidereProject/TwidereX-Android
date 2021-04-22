@@ -22,14 +22,19 @@ package com.twidere.twiderex.scenes
 
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.gestures.animateScrollBy
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Divider
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -45,44 +50,32 @@ import androidx.paging.LoadState
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
+import com.twidere.twiderex.component.foundation.ErrorPlaceholder
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.lazy.LazyColumn2
 import com.twidere.twiderex.component.lazy.collectAsLazyPagingItems
 import com.twidere.twiderex.component.lazy.statusesIndexed
-import com.twidere.twiderex.component.status.ExpandedStatusComponent
+import com.twidere.twiderex.component.status.DetailedStatusComponent
 import com.twidere.twiderex.component.status.StatusDivider
 import com.twidere.twiderex.component.status.TimelineStatusComponent
 import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.TwidereScene
-import com.twidere.twiderex.ui.standardPadding
-import com.twidere.twiderex.viewmodel.mastodon.MastodonStatusViewModel
-import com.twidere.twiderex.viewmodel.twitter.TwitterStatusViewModel
+import com.twidere.twiderex.utils.generateNotificationEvent
+import com.twidere.twiderex.viewmodel.StatusViewModel
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun StatusScene(
     statusKey: MicroBlogKey,
 ) {
     val account = LocalActiveAccount.current ?: return
-    val viewModel = when (account.type) {
-        PlatformType.Twitter ->
-            assistedViewModel<TwitterStatusViewModel.AssistedFactory, TwitterStatusViewModel>(
-                statusKey,
-                account,
-            ) {
-                it.create(account = account, statusKey = statusKey)
-            }
-        PlatformType.StatusNet -> TODO()
-        PlatformType.Fanfou -> TODO()
-        PlatformType.Mastodon ->
-            assistedViewModel<MastodonStatusViewModel.AssistedFactory, MastodonStatusViewModel>(
-                statusKey,
-                account,
-            ) {
-                it.create(account = account, statusKey = statusKey)
-            }
+    val viewModel = assistedViewModel<StatusViewModel.AssistedFactory, StatusViewModel>(
+        statusKey,
+        account,
+    ) {
+        it.create(account = account, statusKey = statusKey)
     }
     val source = viewModel.source.collectAsLazyPagingItems()
     val status by viewModel.status.observeAsState(initial = null)
@@ -107,13 +100,26 @@ fun StatusScene(
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     status?.let {
-                        ExpandedStatusComponent(data = it)
+                        DetailedStatusComponent(data = it)
                     }
                     Divider()
-                    if (source.loadState.refresh is LoadState.Loading) {
-                        Spacer(modifier = Modifier.height(standardPadding))
-                        CircularProgressIndicator()
-                        Spacer(modifier = Modifier.height(standardPadding))
+                    when (val refresh = source.loadState.refresh) {
+                        is LoadState.Loading -> {
+                            Box(
+                                modifier = Modifier.fillMaxWidth(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier
+                                        .heightIn(min = ButtonDefaults.MinHeight)
+                                        .padding(ButtonDefaults.ContentPadding),
+                                )
+                            }
+                        }
+                        is LoadState.Error -> {
+                            ErrorPlaceholder(throwable = refresh.error.generateNotificationEvent())
+                        }
+                        else -> Unit
                     }
                 }
             }
@@ -147,7 +153,7 @@ fun StatusScene(
                     if (source.loadState.refresh is LoadState.Loading || source.loadState.refresh is LoadState.Error) {
                         status?.let {
                             item(key = it.hashCode()) {
-                                ExpandedStatusComponent(data = it)
+                                DetailedStatusComponent(data = it)
                             }
                         }
                         if (source.loadState.refresh is LoadState.Loading) {
@@ -160,7 +166,7 @@ fun StatusScene(
                             it?.let { status ->
                                 Column {
                                     if (status.statusKey == statusKey) {
-                                        ExpandedStatusComponent(data = status)
+                                        DetailedStatusComponent(data = status)
                                     } else {
                                         TimelineStatusComponent(data = status)
                                     }

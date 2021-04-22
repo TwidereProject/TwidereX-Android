@@ -34,6 +34,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -72,17 +73,19 @@ import androidx.compose.ui.viewinterop.AndroidView
 import com.google.accompanist.glide.LocalRequestManager
 import com.google.accompanist.insets.navigationBarsPadding
 import com.google.accompanist.insets.statusBarsPadding
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.HorizontalPagerIndicator
+import com.google.accompanist.pager.PagerState
+import com.google.accompanist.pager.rememberPagerState
 import com.google.android.exoplayer2.ui.PlayerControlView
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.LoadingProgress
 import com.twidere.twiderex.component.foundation.NetworkImage
-import com.twidere.twiderex.component.foundation.Pager
-import com.twidere.twiderex.component.foundation.PagerState
 import com.twidere.twiderex.component.foundation.Swiper
 import com.twidere.twiderex.component.foundation.SwiperState
 import com.twidere.twiderex.component.foundation.VideoPlayer
-import com.twidere.twiderex.component.foundation.rememberPagerState
 import com.twidere.twiderex.component.foundation.rememberSwiperState
 import com.twidere.twiderex.component.status.LikeButton
 import com.twidere.twiderex.component.status.ReplyButton
@@ -98,14 +101,14 @@ import com.twidere.twiderex.extensions.setOnSystemBarsVisibilityChangeListener
 import com.twidere.twiderex.extensions.showControls
 import com.twidere.twiderex.model.MediaType
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.preferences.proto.DisplayPreferences
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.LocalVideoPlayback
 import com.twidere.twiderex.ui.LocalWindow
-import com.twidere.twiderex.ui.TwidereScene
-import com.twidere.twiderex.ui.standardPadding
+import com.twidere.twiderex.ui.TwidereDialog
 import com.twidere.twiderex.viewmodel.MediaViewModel
 import moe.tlaster.zoomable.Zoomable
 import moe.tlaster.zoomable.rememberZoomableState
@@ -116,14 +119,14 @@ fun StatusMediaScene(statusKey: MicroBlogKey, selectedIndex: Int) {
     val viewModel = assistedViewModel<MediaViewModel.AssistedFactory, MediaViewModel> {
         it.create(account, statusKey)
     }
-    val loading by viewModel.loading.observeAsState(initial = false)
     val status by viewModel.status.observeAsState()
-    TwidereScene(
+    val loading by viewModel.loading.observeAsState(initial = false)
+    TwidereDialog(
         requireDarkTheme = true,
         extendViewIntoStatusBar = true,
         extendViewIntoNavigationBar = true,
     ) {
-        if (loading) {
+        if (loading && status == null) {
             Scaffold {
                 Column(
                     modifier = Modifier
@@ -145,7 +148,7 @@ fun StatusMediaScene(statusKey: MicroBlogKey, selectedIndex: Int) {
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
+@OptIn(ExperimentalAnimationApi::class, ExperimentalPagerApi::class)
 @Composable
 fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewModel) {
     var controlVisibility by remember { mutableStateOf(true) }
@@ -168,8 +171,8 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewM
     ) {
         Box {
             val pagerState = rememberPagerState(
-                currentPage = selectedIndex,
-                maxPage = status.media.lastIndex,
+                initialPage = selectedIndex,
+                pageCount = status.media.size,
             )
             val currentMedia = status.media[pagerState.currentPage]
             val context = LocalContext.current
@@ -260,65 +263,29 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewM
                         modifier = Modifier
                             .navigationBarsPadding(),
                     ) {
-                        AnimatedVisibility(
-                            visible = controlVisibility,
-                            enter = fadeIn() + expandVertically(),
-                            exit = shrinkVertically() + fadeOut()
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .align(Alignment.BottomCenter)
                         ) {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .align(Alignment.BottomCenter)
-                                    .background(color = controlPanelColor),
-                            ) {
-                                Column(
+                            if (status.media.size > 1) {
+                                HorizontalPagerIndicator(
+                                    pagerState = pagerState,
                                     modifier = Modifier
-                                        .padding(standardPadding),
+                                        .padding(16.dp)
+                                        .align(Alignment.CenterHorizontally),
+                                )
+                            }
+                            AnimatedVisibility(
+                                visible = controlVisibility,
+                                enter = fadeIn() + expandVertically(),
+                                exit = shrinkVertically() + fadeOut()
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .background(color = controlPanelColor),
                                 ) {
-                                    if (videoControl != null) {
-                                        AndroidView(factory = { videoControl })
-                                    }
-                                    StatusText(status = status, maxLines = 2)
-                                    Spacer(modifier = Modifier.height(standardPadding))
-                                    Row(
-                                        verticalAlignment = Alignment.CenterVertically,
-                                    ) {
-                                        Row(
-                                            modifier = Modifier
-                                                .weight(1f),
-                                            verticalAlignment = Alignment.CenterVertically,
-                                        ) {
-                                            UserAvatar(user = status.user)
-                                            Spacer(modifier = Modifier.width(standardPadding))
-                                            UserName(user = status.user)
-                                            Spacer(modifier = Modifier.width(standardPadding))
-                                            UserScreenName(user = status.user)
-                                        }
-                                        ReplyButton(status = status, withNumber = false)
-                                        RetweetButton(status = status, withNumber = false)
-                                        LikeButton(status = status, withNumber = false)
-                                        val saveFileLauncher = rememberLauncherForActivityResult(
-                                            contract = ActivityResultContracts.CreateDocument()
-                                        ) {
-                                            it?.let {
-                                                viewModel.saveFile(currentMedia, it)
-                                            }
-                                        }
-                                        ShareButton(status = status) { callback ->
-                                            DropdownMenuItem(
-                                                onClick = {
-                                                    callback.invoke()
-                                                    currentMedia.fileName?.let {
-                                                        saveFileLauncher.launch(it)
-                                                    }
-                                                }
-                                            ) {
-                                                Text(
-                                                    text = stringResource(id = R.string.common_controls_actions_save),
-                                                )
-                                            }
-                                        }
-                                    }
+                                    StatusMediaInfo(videoControl, status, viewModel, currentMedia)
                                 }
                             }
                         }
@@ -331,8 +298,73 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewM
 }
 
 @Composable
+private fun StatusMediaInfo(
+    videoControl: PlayerControlView?,
+    status: UiStatus,
+    viewModel: MediaViewModel,
+    currentMedia: UiMedia
+) {
+    Column(
+        modifier = Modifier
+            .padding(StatusMediaInfoDefaults.ContentPadding),
+    ) {
+        if (videoControl != null) {
+            AndroidView(factory = { videoControl })
+        }
+        StatusText(status = status, maxLines = 2)
+        Spacer(modifier = Modifier.height(StatusMediaInfoDefaults.TextSpacing))
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Row(
+                modifier = Modifier
+                    .weight(1f),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                UserAvatar(user = status.user)
+                Spacer(modifier = Modifier.width(StatusMediaInfoDefaults.AvatarSpacing))
+                UserName(user = status.user)
+                Spacer(modifier = Modifier.width(StatusMediaInfoDefaults.NameSpacing))
+                UserScreenName(user = status.user)
+            }
+            ReplyButton(status = status, withNumber = false)
+            RetweetButton(status = status, withNumber = false)
+            LikeButton(status = status, withNumber = false)
+            val saveFileLauncher = rememberLauncherForActivityResult(
+                contract = ActivityResultContracts.CreateDocument()
+            ) {
+                it?.let {
+                    viewModel.saveFile(currentMedia, it)
+                }
+            }
+            ShareButton(status = status) { callback ->
+                DropdownMenuItem(
+                    onClick = {
+                        callback.invoke()
+                        currentMedia.fileName?.let {
+                            saveFileLauncher.launch(it)
+                        }
+                    }
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.common_controls_actions_save),
+                    )
+                }
+            }
+        }
+    }
+}
+
+private object StatusMediaInfoDefaults {
+    val ContentPadding = PaddingValues(8.dp)
+    val TextSpacing = 8.dp
+    val AvatarSpacing = 8.dp
+    val NameSpacing = 8.dp
+}
+
+@Composable
 fun RawMediaScene(url: String) {
-    TwidereScene(
+    TwidereDialog(
         requireDarkTheme = true,
         extendViewIntoStatusBar = true,
         extendViewIntoNavigationBar = true,
@@ -356,14 +388,15 @@ data class MediaData(
     val type: MediaType,
 )
 
+@OptIn(ExperimentalPagerApi::class)
 @Composable
 fun MediaView(
     modifier: Modifier = Modifier,
     media: List<MediaData>,
     swiperState: SwiperState = rememberSwiperState(),
     pagerState: PagerState = rememberPagerState(
-        currentPage = 0,
-        maxPage = media.lastIndex,
+        initialPage = 0,
+        pageCount = media.size,
     ),
     customControl: PlayerControlView? = null,
 ) {
@@ -378,16 +411,16 @@ fun MediaView(
     Box(
         modifier = Modifier
             .fillMaxSize()
-        // .background(MaterialTheme.colors.background.copy(alpha = 1f - swiperState.progress)),
+            .background(MaterialTheme.colors.background.copy(alpha = 1f - swiperState.progress)),
     )
     Swiper(
         modifier = modifier,
         state = swiperState,
     ) {
-        Pager(
+        HorizontalPager(
             state = pagerState,
-        ) {
-            val data = media[this.page]
+        ) { page ->
+            val data = media[page]
             when (data.type) {
                 MediaType.photo ->
                     Zoomable(
@@ -397,7 +430,12 @@ fun MediaView(
                             data = data.url,
                             contentScale = ContentScale.Fit,
                             placeholder = {
-                                CircularProgressIndicator()
+                                Box(
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentAlignment = Alignment.Center,
+                                ) {
+                                    CircularProgressIndicator()
+                                }
                             }
                         )
                     }

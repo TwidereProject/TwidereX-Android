@@ -238,8 +238,18 @@
     <string name="scene_settings_display_media_automatic">Automatic</string>
     <string name="scene_settings_display_media_always">Always</string>
     <string name="scene_settings_display_media_off">Off</string>
+    <string name="scene_settings_storage_title">Storage</string>
+    <string name="scene_settings_storage_search_title">Clear search history</string>
+    <string name="scene_settings_storage_media_title">Clear media cache</string>
+    <string name="scene_settings_storage_media_sub_title">Clear stored media cache.</string>
+    <string name="scene_settings_storage_all_title">Clear all cache</string>
+    <string name="scene_settings_storage_all_sub_title">Delete all Twidere X cache. Your account credentials will not be lost.</string>
     <string name="scene_settings_about_title">About</string>
     <string name="scene_settings_about_license">License</string>
+    <string name="scene_settings_about_description">Next generation of Twidere for Android 5.0+. \nStill in early stage.</string>
+    <string name="scene_settings_about_version">Ver %s</string>
+    <string name="scene_settings_about_logo_background">About page background logo</string>
+    <string name="scene_settings_about_logo_background_shadow">About page background logo shadow</string>
     <string name="accessibility_common_network_image">Network Image</string>
     <string name="accessibility_common_back">Back</string>
     <string name="accessibility_common_more">More</string>
@@ -249,6 +259,7 @@
     <string name="accessibility_common_logo_twitter">Twitter Logo</string>
     <string name="accessibility_common_logo_mastodon">Mastodon Logo</string>
     <string name="accessibility_common_logo_github">Github Logo</string>
+    <string name="accessibility_common_logo_telegram">Telegram Logo</string>
     <string name="accessibility_common_video_play">Play video</string>
     <string name="accessibility_common_status_location">Location</string>
     <string name="accessibility_common_status_retweeted">Retweeted</string>

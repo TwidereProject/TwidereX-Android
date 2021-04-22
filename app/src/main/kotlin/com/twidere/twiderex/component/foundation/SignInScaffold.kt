@@ -49,7 +49,6 @@ import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.LoginLogo
 import com.twidere.twiderex.ui.TwidereScene
-import com.twidere.twiderex.ui.standardPadding
 
 @Composable
 fun SignInScaffold(
@@ -71,7 +70,9 @@ fun SignInScaffold(
             }
         ) {
             Column(
-                modifier = Modifier.padding(horizontal = 20.dp).fillMaxWidth(),
+                modifier = Modifier
+                    .padding(horizontal = SignInScaffoldDefaults.ContentPadding)
+                    .fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Row(
@@ -90,7 +91,7 @@ fun SignInScaffold(
                                 },
                             )
                     )
-                    Spacer(modifier = Modifier.width(standardPadding * 2))
+                    Spacer(modifier = Modifier.width(SignInScaffoldDefaults.IconSpacing))
                     Text(
                         text = stringResource(id = R.string.app_name),
                         style = MaterialTheme.typography.h4,
@@ -108,8 +109,14 @@ fun SignInScaffold(
 
                 content.invoke(this)
 
-                Spacer(modifier = Modifier.height(standardPadding * 4))
+                Spacer(modifier = Modifier.height(SignInScaffoldDefaults.BottomSpacing))
             }
         }
     }
+}
+
+object SignInScaffoldDefaults {
+    val ContentPadding = 20.dp
+    val IconSpacing = 16.dp
+    val BottomSpacing = 32.dp
 }

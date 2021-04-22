@@ -25,7 +25,6 @@ import com.twidere.services.twitter.TwitterService
 import com.twidere.services.twitter.model.exceptions.TwitterApiExceptionV2
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.paging.CursorPagination
 import com.twidere.twiderex.paging.mediator.paging.CursorPagingMediator
 import com.twidere.twiderex.paging.mediator.paging.CursorPagingResult
@@ -35,8 +34,7 @@ class SearchMediaMediator(
     database: CacheDatabase,
     accountKey: MicroBlogKey,
     private val service: TwitterService,
-    inAppNotification: InAppNotification,
-) : CursorPagingMediator(accountKey, database, inAppNotification) {
+) : CursorPagingMediator(accountKey, database) {
     override val pagingKey = "search:$query:media"
     override suspend fun load(pageSize: Int, paging: CursorPagination?): List<IStatus> {
         val result = try {

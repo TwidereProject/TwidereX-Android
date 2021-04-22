@@ -20,22 +20,19 @@
  */
 package com.twidere.twiderex.viewmodel.mastodon
 
-import com.twidere.services.mastodon.MastodonService
-import com.twidere.twiderex.db.CacheDatabase
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import androidx.paging.cachedIn
 import com.twidere.twiderex.model.AccountDetails
-import com.twidere.twiderex.notification.InAppNotification
-import com.twidere.twiderex.paging.mediator.MastodonHashtagTimelineMediator
-import com.twidere.twiderex.paging.mediator.paging.PagingMediator
-import com.twidere.twiderex.viewmodel.PagingViewModel
+import com.twidere.twiderex.repository.TimelineRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 
 class MastodonHashtagViewModel @AssistedInject constructor(
-    database: CacheDatabase,
-    inAppNotification: InAppNotification,
+    private val repository: TimelineRepository,
     @Assisted keyword: String,
     @Assisted account: AccountDetails,
-) : PagingViewModel() {
+) : ViewModel() {
 
     @dagger.assisted.AssistedFactory
     interface AssistedFactory {
@@ -44,11 +41,11 @@ class MastodonHashtagViewModel @AssistedInject constructor(
             account: AccountDetails,
         ): MastodonHashtagViewModel
     }
-    override val pagingMediator: PagingMediator = MastodonHashtagTimelineMediator(
-        keyword = keyword,
-        service = account.service as MastodonService,
-        accountKey = account.accountKey,
-        database = database,
-        inAppNotification = inAppNotification
-    )
+
+    val source by lazy {
+        repository.mastodonHashtagTimeline(
+            keyword = keyword,
+            account = account,
+        ).cachedIn(viewModelScope)
+    }
 }

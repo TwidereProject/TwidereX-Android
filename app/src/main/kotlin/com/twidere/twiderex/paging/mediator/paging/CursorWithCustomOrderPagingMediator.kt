@@ -25,7 +25,6 @@ import com.twidere.services.microblog.model.IStatus
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.db.model.DbPagingTimelineWithStatus
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.paging.ArrayListCompat
 import com.twidere.twiderex.paging.IPagination
 
@@ -43,11 +42,9 @@ data class CursorWithCustomOrderPagination(
 abstract class CursorWithCustomOrderPagingMediator(
     accountKey: MicroBlogKey,
     database: CacheDatabase,
-    inAppNotification: InAppNotification
 ) : PagingTimelineMediatorBase<CursorWithCustomOrderPagination>(
     accountKey,
-    database,
-    inAppNotification
+    database
 ) {
     override fun provideNextPage(
         raw: List<IStatus>,

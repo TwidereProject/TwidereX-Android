@@ -96,8 +96,7 @@
     <string name="scene_drawer_manage_accounts">Gestiona els comptes</string>
     <string name="scene_manage_accounts_title">Comptes</string>
     <string name="scene_manage_accounts_delete_account">Esborra el compte</string>
-    <string name="scene_sign_in_hello_sign_in_to_get_started">Hola!
-Inicia sessió per començar.</string>
+    <string name="scene_sign_in_hello_sign_in_to_get_started">Hola!\nInicia sessió per començar.</string>
     <string name="scene_sign_in_sign_in_with_twitter">Inicia sessió amb Twitter</string>
     <string name="scene_sign_in_sign_in_with_mastodon">Inicia sessió amb Mastodon</string>
     <string name="scene_sign_in_twitter_options_sign_in_with_custom_twitter_key">Inicia sessió amb clau de Twitter personalitzada</string>

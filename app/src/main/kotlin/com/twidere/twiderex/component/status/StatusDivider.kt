@@ -25,15 +25,17 @@ import androidx.compose.material.Divider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.twidere.twiderex.ui.profileImageSize
-import com.twidere.twiderex.ui.standardPadding
 
 @Composable
 fun StatusDivider() {
     Divider(
         modifier = Modifier.padding(
-            start = profileImageSize + standardPadding * 3,
+            start = StatusDividerDefaults.PaddingStart,
         ),
         thickness = 0.5.dp
     )
+}
+
+object StatusDividerDefaults {
+    val PaddingStart = UserAvatarDefaults.AvatarSize + 24.dp
 }

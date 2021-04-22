@@ -50,10 +50,9 @@ import com.twidere.twiderex.R
 import com.twidere.twiderex.component.HumanizedTime
 import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.ui.UiStatus
-import com.twidere.twiderex.ui.standardPadding
 
 @Composable
-fun ExpandedStatusComponent(
+fun DetailedStatusComponent(
     data: UiStatus,
     showInfo: Boolean = true,
     showActions: Boolean = true,
@@ -66,9 +65,9 @@ fun ExpandedStatusComponent(
         val status = (data.retweet ?: data)
         Column(
             modifier = Modifier.padding(
-                start = standardPadding * 2,
-                end = standardPadding * 2,
-                top = standardPadding * 2,
+                start = DetailedStatusDefaults.ContentPadding,
+                end = DetailedStatusDefaults.ContentPadding,
+                top = DetailedStatusDefaults.ContentPadding,
             ),
         ) {
             StatusContent(
@@ -77,7 +76,7 @@ fun ExpandedStatusComponent(
                 type = StatusContentType.Extend,
             )
             if (showInfo) {
-                Spacer(modifier = Modifier.height(standardPadding * 1.5f))
+                Spacer(modifier = Modifier.height(DetailedStatusDefaults.InfoContentSpacing))
                 ProvideTextStyle(value = MaterialTheme.typography.caption) {
                     CompositionLocalProvider(
                         LocalContentAlpha provides ContentAlpha.medium
@@ -93,7 +92,7 @@ fun ExpandedStatusComponent(
                                 )
                                 Text(text = status.placeString)
                             }
-                            Spacer(modifier = Modifier.height(standardPadding))
+                            Spacer(modifier = Modifier.height(DetailedStatusDefaults.ContentSpacing))
                         }
 
                         Row(
@@ -101,7 +100,7 @@ fun ExpandedStatusComponent(
                                 .align(Alignment.CenterHorizontally)
                         ) {
                             HumanizedTime(time = status.timestamp)
-                            Spacer(modifier = Modifier.width(standardPadding))
+                            Spacer(modifier = Modifier.width(DetailedStatusDefaults.TimestampSpacing))
                             Text(
                                 text = status.source,
                                 maxLines = 1,
@@ -110,7 +109,7 @@ fun ExpandedStatusComponent(
                         }
 
                         if (status.replyCount > 0 || status.retweetCount > 0 || status.likeCount > 0) {
-                            Spacer(modifier = Modifier.height(standardPadding))
+                            Spacer(modifier = Modifier.height(DetailedStatusDefaults.ContentSpacing))
                             Row(
                                 modifier = Modifier
                                     .align(Alignment.CenterHorizontally)
@@ -123,7 +122,7 @@ fun ExpandedStatusComponent(
                                         status.replyCount,
                                     ),
                                 )
-                                Spacer(modifier = Modifier.width(standardPadding * 2))
+                                Spacer(modifier = Modifier.width(DetailedStatusDefaults.StatusStatisticsSpacing))
                                 StatusStatistics(
                                     count = status.retweetCount,
                                     icon = painterResource(id = R.drawable.ic_repeat),
@@ -133,14 +132,14 @@ fun ExpandedStatusComponent(
                                     ),
                                 )
                                 if (status.platformType == PlatformType.Twitter) {
-                                    Spacer(modifier = Modifier.width(standardPadding * 2))
+                                    Spacer(modifier = Modifier.width(DetailedStatusDefaults.StatusStatisticsSpacing))
                                     StatusStatistics(
                                         count = status.twitterExtra?.quoteCount ?: 0,
                                         icon = painterResource(id = R.drawable.ic_blockquote),
                                         contentDescription = null,
                                     )
                                 }
-                                Spacer(modifier = Modifier.width(standardPadding * 2))
+                                Spacer(modifier = Modifier.width(DetailedStatusDefaults.StatusStatisticsSpacing))
                                 StatusStatistics(
                                     count = status.likeCount,
                                     icon = painterResource(id = R.drawable.ic_heart),
@@ -157,7 +156,7 @@ fun ExpandedStatusComponent(
         }
 
         if (showActions) {
-            Spacer(modifier = Modifier.height(standardPadding * 1.5f))
+            Spacer(modifier = Modifier.height(DetailedStatusDefaults.InfoContentSpacing))
             Divider(
                 color = MaterialTheme.colors.onSurface.copy(alpha = 0.06f),
                 thickness = 0.5.dp
@@ -179,6 +178,14 @@ fun ExpandedStatusComponent(
     }
 }
 
+object DetailedStatusDefaults {
+    val ContentPadding = 16.dp
+    val StatusStatisticsSpacing = 16.dp
+    val ContentSpacing = 8.dp
+    val InfoContentSpacing = 12.dp
+    val TimestampSpacing = 8.dp
+}
+
 @Composable
 private fun StatusStatistics(
     count: Long,
@@ -191,7 +198,11 @@ private fun StatusStatistics(
             painter = icon,
             contentDescription = contentDescription,
         )
-        Spacer(modifier = Modifier.width(4.dp))
+        Spacer(modifier = Modifier.width(StatusStatisticsDefaults.IconSpacing))
         Text(text = count.toString())
     }
+}
+
+private object StatusStatisticsDefaults {
+    val IconSpacing = 4.dp
 }

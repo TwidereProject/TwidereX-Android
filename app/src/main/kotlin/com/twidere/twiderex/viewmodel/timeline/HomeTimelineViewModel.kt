@@ -24,7 +24,6 @@ import android.content.SharedPreferences
 import com.twidere.services.microblog.TimelineService
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.model.AccountDetails
-import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.paging.mediator.HomeTimelineMediator
 import com.twidere.twiderex.paging.mediator.paging.PagingWithGapMediator
 import dagger.assisted.Assisted
@@ -33,7 +32,6 @@ import dagger.assisted.AssistedInject
 class HomeTimelineViewModel @AssistedInject constructor(
     preferences: SharedPreferences,
     database: CacheDatabase,
-    inAppNotification: InAppNotification,
     @Assisted account: AccountDetails,
 ) : TimelineViewModel(preferences) {
     @dagger.assisted.AssistedFactory
@@ -46,7 +44,6 @@ class HomeTimelineViewModel @AssistedInject constructor(
             account.service as TimelineService,
             account.accountKey,
             database,
-            inAppNotification,
         )
     override val savedStateKey: String = "${account.accountKey}_home"
 }

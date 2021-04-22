@@ -18,30 +18,13 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.db
+package com.twidere.twiderex.viewmodel.user
 
-import androidx.room.Database
-import androidx.room.RoomDatabase
-import androidx.room.TypeConverters
-import com.twidere.twiderex.db.dao.DraftDao
-import com.twidere.twiderex.db.model.DbDraft
-import com.twidere.twiderex.db.model.converter.ComposeTypeConverter
-import com.twidere.twiderex.db.model.converter.MicroBlogKeyConverter
-import com.twidere.twiderex.db.model.converter.StringListConverter
-import javax.inject.Singleton
+import androidx.lifecycle.ViewModel
+import androidx.paging.PagingData
+import com.twidere.twiderex.model.ui.UiUser
+import kotlinx.coroutines.flow.Flow
 
-@Singleton
-@Database(
-    entities = [
-        DbDraft::class,
-    ],
-    version = 1,
-)
-@TypeConverters(
-    MicroBlogKeyConverter::class,
-    ComposeTypeConverter::class,
-    StringListConverter::class,
-)
-abstract class DraftDatabase : RoomDatabase() {
-    abstract fun draftDao(): DraftDao
+abstract class UserListViewModel : ViewModel() {
+    abstract val source: Flow<PagingData<UiUser>>
 }

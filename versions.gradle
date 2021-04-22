@@ -1,32 +1,14 @@
 ext {
     versions = [
             kotlin               : "1.4.32",
-            compose              : '1.0.0-beta04',
-            androidx             : '1.3.0-alpha06',
-            accompanist          : "0.7.1",
-            retrofit2            : '2.9.0',
             hilt                 : '2.33-beta',
-            hilt_compose         : '1.0.0-alpha01',
-            androidx_hilt        : '1.0.0-beta01',
-            room                 : '2.3.0-rc01',
-            lifecycle            : '2.4.0-alpha01',
-            lifecycle_compose    : '1.0.0-alpha04',
-            okhttp               : '4.9.1',
-            kotlinx_serialization: '1.1.0',
-            paging               : '3.0.0-beta03',
-            paging_compose       : '1.0.0-alpha08',
-            ktlint               : '0.41.0',
-            protobuf             : '3.15.7',
-            work                 : '2.7.0-alpha02',
-            dataStore            : "1.0.0-alpha08",
-            exoplayer            : '2.13.2',
     ]
     global = [
             compileSdkVersion: 'android-S',
-            buildToolsVersion: '31.0.0-rc2',
+            buildToolsVersion: '31.0.0-rc3',
             minSdkVersion    : 21,
-            targetSdkVersion : 'S',
-            versionCode      : 36,
-            versionName      : "1.1.0-dev07"
+            targetSdkVersion : 31,
+            versionCode      : 37,
+            versionName      : "1.1.0-beta03"
     ]
 }

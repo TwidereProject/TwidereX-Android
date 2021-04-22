@@ -9,3 +9,6 @@ rootProject.name = "TwidereX"
 include ':app'
 include ':services'
 include ':assisted-processor'
+
+enableFeaturePreview("VERSION_CATALOGS")
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")

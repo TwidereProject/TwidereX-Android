@@ -25,15 +25,12 @@ import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
 import androidx.paging.PagingState
 import androidx.room.withTransaction
-import com.twidere.services.http.MicroBlogException
 import com.twidere.services.microblog.model.IStatus
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.db.mapper.toDbPagingTimeline
 import com.twidere.twiderex.db.model.DbPagingTimelineWithStatus
 import com.twidere.twiderex.db.model.saveToDb
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.notification.InAppNotification
-import com.twidere.twiderex.utils.notify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -41,7 +38,6 @@ import kotlinx.coroutines.withContext
 abstract class PagingWithGapMediator(
     accountKey: MicroBlogKey,
     database: CacheDatabase,
-    private val inAppNotification: InAppNotification,
 ) : PagingMediator(accountKey = accountKey, database = database) {
     val loadingBetween = MutableLiveData(listOf<MicroBlogKey>())
 
@@ -122,11 +118,7 @@ abstract class PagingWithGapMediator(
             return MediatorResult.Success(
                 endOfPaginationReached = result.isEmpty()
             )
-        } catch (e: MicroBlogException) {
-            e.notify(inAppNotification)
-            return MediatorResult.Error(e)
         } catch (e: Throwable) {
-            e.notify(inAppNotification)
             return MediatorResult.Error(e)
         } finally {
             if (maxStatusKey != null && sinceStatueKey != null) {

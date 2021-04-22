@@ -53,6 +53,7 @@ import com.twidere.twiderex.scenes.settings.AccountManagementScene
 import com.twidere.twiderex.scenes.settings.AppearanceScene
 import com.twidere.twiderex.scenes.settings.DisplayScene
 import com.twidere.twiderex.scenes.settings.SettingsScene
+import com.twidere.twiderex.scenes.settings.StorageScene
 import com.twidere.twiderex.scenes.twitter.TwitterSignInScene
 import com.twidere.twiderex.scenes.twitter.TwitterWebSignInScene
 import com.twidere.twiderex.scenes.twitter.user.TwitterUserScene
@@ -165,6 +166,7 @@ object Route {
         const val Home = "settings"
         const val Appearance = "settings/appearance"
         const val Display = "settings/display"
+        const val Storage = "settings/storage"
         const val About = "settings/about"
         const val AccountManagement = "settings/accountmanagement"
     }
@@ -434,7 +436,7 @@ fun RouteBuilder.route(constraints: Constraints) {
         }
     }
 
-    authorizedScene(
+    authorizedDialog(
         "media/status/{statusKey}",
     ) { backStackEntry ->
         backStackEntry.path<String>("statusKey")?.let {
@@ -452,7 +454,7 @@ fun RouteBuilder.route(constraints: Constraints) {
         }
     }
 
-    authorizedScene(
+    authorizedDialog(
         "media/raw/{url}",
     ) { backStackEntry ->
         backStackEntry.path<String>("url")?.let {
@@ -543,6 +545,10 @@ fun RouteBuilder.route(constraints: Constraints) {
 
     scene(Route.Settings.Display) {
         DisplayScene()
+    }
+
+    scene(Route.Settings.Storage) {
+        StorageScene()
     }
 
     scene(Route.Settings.AccountManagement) {

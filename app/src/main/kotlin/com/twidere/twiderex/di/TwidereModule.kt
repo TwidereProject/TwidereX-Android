@@ -23,12 +23,7 @@ package com.twidere.twiderex.di
 import androidx.work.WorkManager
 import com.twidere.twiderex.action.ComposeAction
 import com.twidere.twiderex.db.CacheDatabase
-import com.twidere.twiderex.db.DraftDatabase
 import com.twidere.twiderex.notification.InAppNotification
-import com.twidere.twiderex.repository.DraftRepository
-import com.twidere.twiderex.repository.ReactionRepository
-import com.twidere.twiderex.repository.SearchRepository
-import com.twidere.twiderex.repository.StatusRepository
 import com.twidere.twiderex.utils.PlatformResolver
 import dagger.Module
 import dagger.Provides
@@ -44,23 +39,6 @@ object TwidereModule {
     fun provideComposeQueue(
         workManager: WorkManager,
     ): ComposeAction = ComposeAction(workManager = workManager)
-
-    @Singleton
-    @Provides
-    fun provideDraftRepository(database: DraftDatabase): DraftRepository =
-        DraftRepository(database = database)
-
-    @Provides
-    fun provideSearchRepository(database: CacheDatabase): SearchRepository =
-        SearchRepository(database = database)
-
-    @Provides
-    fun provideStatusRepository(database: CacheDatabase): StatusRepository =
-        StatusRepository(database = database)
-
-    @Provides
-    fun provideReactionRepository(database: CacheDatabase): ReactionRepository =
-        ReactionRepository(database = database)
 
     @Singleton
     @Provides

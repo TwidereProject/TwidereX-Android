@@ -55,8 +55,8 @@ import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.DraftRepository
+import com.twidere.twiderex.repository.StatusRepository
 import com.twidere.twiderex.repository.UserRepository
-import com.twidere.twiderex.repository.twitter.TwitterTweetsRepository
 import com.twidere.twiderex.utils.MastodonEmojiCache
 import com.twidere.twiderex.utils.notify
 import com.twidere.twiderex.worker.draft.SaveDraftWorker
@@ -94,8 +94,8 @@ class DraftComposeViewModel @AssistedInject constructor(
     draftRepository: DraftRepository,
     locationManager: LocationManager,
     composeAction: ComposeAction,
-    factory: TwitterTweetsRepository.AssistedFactory,
-    userRepositoryFactory: UserRepository.AssistedFactory,
+    repository: StatusRepository,
+    userRepository: UserRepository,
     workManager: WorkManager,
     inAppNotification: InAppNotification,
     @Assisted account: AccountDetails,
@@ -104,8 +104,8 @@ class DraftComposeViewModel @AssistedInject constructor(
     draftRepository,
     locationManager,
     composeAction,
-    factory,
-    userRepositoryFactory,
+    repository,
+    userRepository,
     workManager,
     inAppNotification,
     account,
@@ -190,8 +190,8 @@ open class ComposeViewModel @AssistedInject constructor(
     protected val draftRepository: DraftRepository,
     private val locationManager: LocationManager,
     protected val composeAction: ComposeAction,
-    protected val factory: TwitterTweetsRepository.AssistedFactory,
-    private val userRepositoryFactory: UserRepository.AssistedFactory,
+    protected val repository: StatusRepository,
+    private val userRepository: UserRepository,
     private val workManager: WorkManager,
     private val inAppNotification: InAppNotification,
     @Assisted protected val account: AccountDetails,
@@ -215,20 +215,6 @@ open class ComposeViewModel @AssistedInject constructor(
         } else {
             null
         }
-    }
-
-    protected val repository by lazy {
-        factory.create(
-            account.accountKey,
-            account.service as LookupService,
-        )
-    }
-
-    protected val userRepository by lazy {
-        userRepositoryFactory.create(
-            accountKey = account.accountKey,
-            account.service as LookupService,
-        )
     }
 
     val location = MutableLiveData<Location?>()
@@ -261,7 +247,11 @@ open class ComposeViewModel @AssistedInject constructor(
                     if (it.isNotEmpty()) {
                         loadingReplyUser.postValue(true)
                         runCatching {
-                            userRepository.lookupUsersByName(it)
+                            userRepository.lookupUsersByName(
+                                it,
+                                accountKey = account.accountKey,
+                                lookupService = account.service as LookupService,
+                            )
                         }.onFailure {
                             it.notify(inAppNotification)
                         }.onSuccess {
@@ -288,34 +278,35 @@ open class ComposeViewModel @AssistedInject constructor(
     val status = liveData {
         statusKey?.let { statusKey ->
             emitSource(
-                repository.loadTweetFromCache(statusKey).map { status ->
-                    if (status != null &&
-                        textFieldValue.value?.text.isNullOrEmpty() &&
-                        status.platformType == PlatformType.Mastodon &&
-                        status.mastodonExtra?.mentions != null &&
-                        composeType == ComposeType.Reply
-                    ) {
-                        val mentions =
-                            status.mastodonExtra.mentions.mapNotNull { it.acct }
-                                .filter { it != account.user.screenName }.map { "@$it" }.let {
-                                    if (status.user.userKey != account.user.userKey) {
-                                        listOf(status.user.getDisplayScreenName(account)) + it
-                                    } else {
-                                        it
-                                    }
-                                }.distinctBy { it }.takeIf { it.any() }
-                                ?.joinToString(" ", postfix = " ") { it }
-                        if (mentions != null) {
-                            setText(
-                                TextFieldValue(
-                                    mentions,
-                                    selection = TextRange(mentions.length)
+                repository.loadStatus(statusKey, accountKey = account.accountKey)
+                    .map { status ->
+                        if (status != null &&
+                            textFieldValue.value?.text.isNullOrEmpty() &&
+                            status.platformType == PlatformType.Mastodon &&
+                            status.mastodonExtra?.mentions != null &&
+                            composeType == ComposeType.Reply
+                        ) {
+                            val mentions =
+                                status.mastodonExtra.mentions.mapNotNull { it.acct }
+                                    .filter { it != account.user.screenName }.map { "@$it" }.let {
+                                        if (status.user.userKey != account.user.userKey) {
+                                            listOf(status.user.getDisplayScreenName(account)) + it
+                                        } else {
+                                            it
+                                        }
+                                    }.distinctBy { it }.takeIf { it.any() }
+                                    ?.joinToString(" ", postfix = " ") { it }
+                            if (mentions != null) {
+                                setText(
+                                    TextFieldValue(
+                                        mentions,
+                                        selection = TextRange(mentions.length)
+                                    )
                                 )
-                            )
+                            }
                         }
+                        status
                     }
-                    status
-                }
             )
         } ?: run {
             emit(null)

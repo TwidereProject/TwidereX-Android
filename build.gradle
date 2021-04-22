@@ -5,13 +5,13 @@ buildscript {
         google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.0.0-alpha13'
+        classpath 'com.android.tools.build:gradle:7.0.0-alpha14'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$versions.kotlin"
     }
 }
 
 plugins {
-    id 'com.diffplug.spotless' version '5.11.1'
+    id 'com.diffplug.spotless' version '5.12.4'
 }
 
 subprojects {
@@ -19,7 +19,6 @@ subprojects {
         google()
         mavenCentral()
         maven { url 'https://jitpack.io' }
-        jcenter()// exoplayer still in jcenter
     }
 
     apply plugin: 'com.diffplug.spotless'
@@ -29,7 +28,7 @@ subprojects {
             targetExclude("$buildDir/**/*.kt")
             targetExclude('bin/**/*.kt')
 
-            ktlint(versions.ktlint)//.userData([android: "true"])
+            ktlint(libs.versions.ktlint.get())//.userData([android: "true"])
             licenseHeaderFile rootProject.file('spotless/license.kt')
         }
         java {

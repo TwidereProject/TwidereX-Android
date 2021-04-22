@@ -20,27 +20,15 @@
  */
 package com.twidere.twiderex.component.foundation
 
-import androidx.compose.animation.core.MutableTransitionState
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Stable
-import androidx.compose.runtime.State
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
-import com.google.accompanist.glide.GlideImage
-import com.google.accompanist.imageloading.DataSource
+import com.google.accompanist.glide.rememberGlidePainter
 import com.google.accompanist.imageloading.ImageLoadState
+import com.google.accompanist.imageloading.LoadPainter
 import com.twidere.twiderex.R
 
 @Composable
@@ -48,115 +36,23 @@ fun NetworkImage(
     data: Any,
     modifier: Modifier = Modifier,
     contentScale: ContentScale = ContentScale.Crop,
-    placeholder: @Composable (BoxScope.() -> Unit)? = null,
+    placeholder: @Composable (() -> Unit)? = null,
 ) {
-    if (data is Painter) {
-        Image(
-            painter = data,
-            modifier = modifier,
-            contentScale = contentScale,
-            contentDescription = stringResource(id = R.string.accessibility_common_network_image)
+    val painter = if (data is Painter) {
+        data
+    } else {
+        rememberGlidePainter(
+            request = data,
+            fadeIn = true,
         )
-    } else {
-        GlideImage(
-            data = data,
-            modifier = modifier,
-        ) { imageState ->
-            when (imageState) {
-                is ImageLoadState.Success -> {
-                    MaterialLoadingImage(
-                        result = imageState,
-                        contentDescription = stringResource(id = R.string.accessibility_common_network_image),
-                        contentScale = contentScale,
-                    )
-                }
-                is ImageLoadState.Error -> if (placeholder != null) placeholder()
-                ImageLoadState.Loading -> if (placeholder != null) placeholder()
-                ImageLoadState.Empty -> if (placeholder != null) placeholder()
-            }
-        }
     }
-}
-
-@Composable
-fun MaterialLoadingImage(
-    painter: Painter,
-    contentDescription: String?,
-    modifier: Modifier = Modifier,
-    alignment: Alignment = Alignment.Center,
-    contentScale: ContentScale = ContentScale.Fit,
-    colorFilter: ColorFilter? = null,
-    fadeInEnabled: Boolean = true,
-) {
-    val cf = if (fadeInEnabled) {
-        val fadeInTransition = updateFadeInTransition(key = painter)
-        remember { ColorMatrix() }
-            .apply {
-                setAlpha(fadeInTransition.alpha)
-            }
-            .let { matrix ->
-                ColorFilter.colorMatrix(matrix)
-            }
-    } else {
-        colorFilter
+    if (painter is LoadPainter<*> && painter.loadState == ImageLoadState.Loading) {
+        placeholder?.invoke()
     }
-
     Image(
         painter = painter,
-        contentDescription = contentDescription,
-        alignment = alignment,
-        contentScale = contentScale,
-        colorFilter = cf,
         modifier = modifier,
-    )
-}
-
-@Composable
-fun MaterialLoadingImage(
-    result: ImageLoadState.Success,
-    contentDescription: String?,
-    modifier: Modifier = Modifier,
-    alignment: Alignment = Alignment.Center,
-    contentScale: ContentScale = ContentScale.Fit,
-    colorFilter: ColorFilter? = null,
-    skipFadeWhenLoadedFromMemory: Boolean = true,
-    fadeInEnabled: Boolean = true,
-) {
-    MaterialLoadingImage(
-        painter = result.painter,
-        contentDescription = contentDescription,
-        alignment = alignment,
         contentScale = contentScale,
-        colorFilter = colorFilter,
-        modifier = modifier,
-        fadeInEnabled = fadeInEnabled && !(skipFadeWhenLoadedFromMemory && result.isFromMemory()),
+        contentDescription = stringResource(id = R.string.accessibility_common_network_image)
     )
 }
-
-@Composable
-private fun updateFadeInTransition(key: Any): FadeInTransition {
-    val transitionState = remember(key) {
-        MutableTransitionState(ImageLoadTransitionState.Empty).apply {
-            targetState = ImageLoadTransitionState.Loaded
-        }
-    }
-
-    val transition = updateTransition(transitionState)
-    val alpha = transition.animateFloat(
-        targetValueByState = { if (it == ImageLoadTransitionState.Loaded) 1f else 0f }
-    )
-    return remember(transition) { FadeInTransition(alpha) }
-}
-
-@Stable
-private class FadeInTransition(
-    alpha: State<Float> = mutableStateOf(0f),
-) {
-    val alpha by alpha
-}
-
-private enum class ImageLoadTransitionState { Loaded, Empty }
-
-private fun ImageLoadState.Success.isFromMemory(): Boolean = source == DataSource.MEMORY
-
-private fun ColorMatrix.setAlpha(alpha: Float) = set(row = 3, column = 3, v = alpha)

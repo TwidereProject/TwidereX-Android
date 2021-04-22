@@ -20,28 +20,19 @@
  */
 package com.twidere.twiderex.scenes.search.tabs
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.paging.LoadState
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
-import com.twidere.twiderex.component.lazy.LazyColumn2
 import com.twidere.twiderex.component.lazy.collectAsLazyPagingItems
-import com.twidere.twiderex.component.lazy.itemsPagingGridIndexed
-import com.twidere.twiderex.component.lazy.loadState
-import com.twidere.twiderex.component.navigation.LocalNavigator
-import com.twidere.twiderex.component.status.StatusMediaPreviewItem
+import com.twidere.twiderex.component.lazy.ui.LazyUiStatusImageList
 import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.extensions.refreshOrRetry
 import com.twidere.twiderex.preferences.proto.DisplayPreferences
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalVideoPlayback
-import com.twidere.twiderex.ui.standardPadding
 import com.twidere.twiderex.viewmodel.twitter.search.TwitterSearchMediaViewModel
 
 class TwitterSearchMediaItem : SearchSceneItem {
@@ -68,35 +59,7 @@ class TwitterSearchMediaItem : SearchSceneItem {
                 }
             ) {
                 if (source.itemCount > 0) {
-                    LazyColumn2 {
-                        item {
-                            Box(modifier = Modifier.height(standardPadding))
-                        }
-                        itemsPagingGridIndexed(
-                            source,
-                            rowSize = 2,
-                            spacing = standardPadding,
-                            padding = standardPadding
-                        ) { index, pair ->
-                            pair?.let { item ->
-                                val navigator = LocalNavigator.current
-                                StatusMediaPreviewItem(
-                                    item.first,
-                                    modifier = Modifier
-                                        .aspectRatio(1F),
-                                    onClick = {
-                                        navigator.media(item.second.statusKey, index)
-                                    }
-                                )
-                            }
-                        }
-                        item {
-                            Box(modifier = Modifier.height(standardPadding))
-                        }
-                        loadState(source.loadState.append) {
-                            source.retry()
-                        }
-                    }
+                    LazyUiStatusImageList(items = source)
                 }
             }
         }

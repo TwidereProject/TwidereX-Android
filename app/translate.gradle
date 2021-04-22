@@ -19,7 +19,7 @@ task generateTranslate {
         }
         def xml = """<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">""" + System.lineSeparator() +
                 result.collect {
-                    '    <string name="'+it.key+'">'+it.value+'</string>'
+                    '    <string name="'+it.key+'">'+it.value.replace("'", "\\'").replace(System.lineSeparator(), "\\n")+'</string>'
                 }.join(System.lineSeparator()) + System.lineSeparator() +
                 "</resources>"
         def target = project.file('src/main/res-localized' + '/values-' + file.name.split('_').first() + '-r' + file.name.split('_').last() + "/strings.xml")

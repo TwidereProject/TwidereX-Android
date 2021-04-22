@@ -18,38 +18,33 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.viewmodel.twitter
+package com.twidere.twiderex.viewmodel
 
-import com.twidere.services.twitter.TwitterService
-import com.twidere.twiderex.db.CacheDatabase
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import androidx.paging.cachedIn
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.notification.InAppNotification
-import com.twidere.twiderex.paging.mediator.paging.PagingMediator
-import com.twidere.twiderex.paging.mediator.status.TwitterConversationMediator
 import com.twidere.twiderex.repository.StatusRepository
-import com.twidere.twiderex.viewmodel.StatusPagingViewModel
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 
-class TwitterStatusViewModel @AssistedInject constructor(
-    statusRepository: StatusRepository,
-    inAppNotification: InAppNotification,
-    database: CacheDatabase,
+class StatusViewModel @AssistedInject constructor(
+    private val statusRepository: StatusRepository,
     @Assisted private val account: AccountDetails,
     @Assisted private val statusKey: MicroBlogKey,
-) : StatusPagingViewModel(statusRepository, account, statusKey) {
-
+) : ViewModel() {
     @dagger.assisted.AssistedFactory
     interface AssistedFactory {
-        fun create(account: AccountDetails, statusKey: MicroBlogKey): TwitterStatusViewModel
+        fun create(account: AccountDetails, statusKey: MicroBlogKey): StatusViewModel
     }
 
-    override val pagingMediator: PagingMediator = TwitterConversationMediator(
-        service = account.service as TwitterService,
-        statusKey = statusKey,
-        accountKey = account.accountKey,
-        database = database,
-        inAppNotification = inAppNotification,
-    )
+    val status by lazy {
+        statusRepository.loadStatus(statusKey = statusKey, accountKey = account.accountKey)
+    }
+
+    val source by lazy {
+        statusRepository.conversation(statusKey = statusKey, account = account)
+            .cachedIn(viewModelScope)
+    }
 }

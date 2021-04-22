@@ -30,7 +30,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -62,7 +61,6 @@ import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.ui.TwidereTheme
-import com.twidere.twiderex.ui.standardPadding
 
 @OptIn(ExperimentalAnimationApi::class, ExperimentalFoundationApi::class)
 @Composable
@@ -108,14 +106,15 @@ fun StatusMediaComponent(
                     media.firstOrNull()?.let {
                         StatusMediaPreviewItem(
                             media = it,
-                            modifier = Modifier.weight(1f),
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxSize(),
                             onClick = onItemClick,
                         )
                     }
                     Spacer(
                         modifier = Modifier
-                            .fillMaxHeight()
-                            .width(standardPadding)
+                            .width(StatusMediaDefaults.MediaSpacing)
                     )
                     Column(
                         modifier = Modifier.weight(1f),
@@ -123,14 +122,15 @@ fun StatusMediaComponent(
                         media.drop(1).forEach {
                             StatusMediaPreviewItem(
                                 media = it,
-                                modifier = Modifier.weight(1f),
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .fillMaxSize(),
                                 onClick = onItemClick,
                             )
                             if (it != media.last()) {
                                 Spacer(
                                     modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(standardPadding)
+                                        .height(StatusMediaDefaults.MediaSpacing)
                                 )
                             }
                         }
@@ -141,7 +141,7 @@ fun StatusMediaComponent(
                 Column {
                     GridLayout(
                         modifier = Modifier.aspectRatio(aspectRatio),
-                        spacing = standardPadding
+                        spacing = StatusMediaDefaults.MediaSpacing
                     ) {
                         media.forEach {
                             StatusMediaPreviewItem(
@@ -184,7 +184,7 @@ fun StatusMediaComponent(
                 ) {
                     Box(
                         modifier = Modifier
-                            .padding(standardPadding)
+                            .padding(StatusMediaDefaults.Mastodon.IconSpacing)
                             .alpha(0.5f),
                     ) {
                         IconButton(
@@ -209,6 +209,14 @@ fun StatusMediaComponent(
     }
 }
 
+object StatusMediaDefaults {
+    val MediaSpacing = 8.dp
+
+    object Mastodon {
+        val IconSpacing = 8.dp
+    }
+}
+
 @Composable
 fun StatusMediaPreviewItem(
     media: UiMedia,
@@ -225,7 +233,7 @@ fun StatusMediaPreviewItem(
                     NetworkImage(
                         data = it,
                         modifier = Modifier
-                            .fillMaxWidth()
+                            .fillMaxSize()
                             .clickable(
                                 onClick = {
                                     onClick(media)

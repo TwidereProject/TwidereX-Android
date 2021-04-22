@@ -24,7 +24,6 @@ import android.content.SharedPreferences
 import com.twidere.services.microblog.NotificationService
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.model.AccountDetails
-import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.paging.mediator.NotificationTimelineMediator
 import com.twidere.twiderex.paging.mediator.paging.PagingWithGapMediator
 import dagger.assisted.Assisted
@@ -33,7 +32,6 @@ import dagger.assisted.AssistedInject
 class NotificationTimelineViewModel @AssistedInject constructor(
     preferences: SharedPreferences,
     database: CacheDatabase,
-    inAppNotification: InAppNotification,
     @Assisted private val account: AccountDetails
 ) : TimelineViewModel(preferences) {
     @dagger.assisted.AssistedFactory
@@ -45,8 +43,7 @@ class NotificationTimelineViewModel @AssistedInject constructor(
         NotificationTimelineMediator(
             account.service as NotificationService,
             account.accountKey,
-            database,
-            inAppNotification
+            database
         )
     override val savedStateKey: String = "${account.accountKey}_notification"
 }

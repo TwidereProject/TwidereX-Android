@@ -24,23 +24,19 @@ import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
 import androidx.paging.PagingState
 import androidx.room.withTransaction
-import com.twidere.services.http.MicroBlogException
 import com.twidere.services.microblog.model.IStatus
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.db.mapper.toDbPagingTimeline
 import com.twidere.twiderex.db.model.DbPagingTimelineWithStatus
 import com.twidere.twiderex.db.model.saveToDb
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.paging.IPagination
 import com.twidere.twiderex.paging.IPagingList
-import com.twidere.twiderex.utils.notify
 
 @OptIn(ExperimentalPagingApi::class)
 abstract class PagingTimelineMediatorBase<T : IPagination>(
     accountKey: MicroBlogKey,
     database: CacheDatabase,
-    private val inAppNotification: InAppNotification
 ) : PagingMediator(accountKey = accountKey, database = database) {
     private var paging: T? = null
 
@@ -89,11 +85,7 @@ abstract class PagingTimelineMediatorBase<T : IPagination>(
             return MediatorResult.Success(
                 endOfPaginationReached = !hasMore(result, pageSize)
             )
-        } catch (e: MicroBlogException) {
-            e.notify(inAppNotification)
-            return MediatorResult.Error(e)
         } catch (e: Throwable) {
-            e.notify(inAppNotification)
             return MediatorResult.Error(e)
         }
     }

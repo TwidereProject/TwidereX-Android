@@ -46,13 +46,12 @@ import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.preferences.LocalDisplayPreferences
 import com.twidere.twiderex.preferences.proto.DisplayPreferences
-import com.twidere.twiderex.ui.profileImageSize
 
 @Composable
 fun UserAvatar(
     modifier: Modifier = Modifier,
     user: UiUser,
-    size: Dp = profileImageSize,
+    size: Dp = UserAvatarDefaults.AvatarSize,
     withPlatformIcon: Boolean = false,
     onClick: (() -> Unit)? = null,
 ) {
@@ -113,4 +112,8 @@ fun Modifier.withAvatarClip(): Modifier {
         }
         this.clip(RoundedCornerShape(percent = percent))
     }
+}
+
+object UserAvatarDefaults {
+    val AvatarSize = 44.dp
 }

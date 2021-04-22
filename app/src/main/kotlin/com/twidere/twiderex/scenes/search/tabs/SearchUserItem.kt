@@ -56,12 +56,10 @@ class SearchUserItem : SearchSceneItem {
                 source.refreshOrRetry()
             }
         ) {
-            if (source.itemCount > 0) {
-                LazyUiUserList(
-                    items = source,
-                    onItemClicked = { navigator.user(it) },
-                )
-            }
+            LazyUiUserList(
+                items = source,
+                onItemClicked = { navigator.user(it) },
+            )
         }
     }
 }
