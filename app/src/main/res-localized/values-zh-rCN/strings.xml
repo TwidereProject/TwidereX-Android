@@ -125,8 +125,7 @@
     <string name="scene_drawer_manage_accounts">管理帐号</string>
     <string name="scene_manage_accounts_title">帐号</string>
     <string name="scene_manage_accounts_delete_account">删除帐号</string>
-    <string name="scene_sign_in_hello_sign_in_to_get_started">你好！
-登录后即可开始使用。</string>
+    <string name="scene_sign_in_hello_sign_in_to_get_started">你好！\n登录后即可开始使用。</string>
     <string name="scene_sign_in_sign_in_with_twitter">使用 Twitter 登录</string>
     <string name="scene_sign_in_sign_in_with_mastodon">使用 Mastodon 登录</string>
     <string name="scene_sign_in_twitter_options_sign_in_with_custom_twitter_key">使用自定义 Twitter 口令登录</string>
@@ -189,6 +188,8 @@
     <string name="scene_compose_visibility_unlisted">不公开</string>
     <string name="scene_compose_visibility_private">仅关注者</string>
     <string name="scene_compose_visibility_direct">私信</string>
+    <string name="scene_compose_user_search_search_placeholder">搜索用户</string>
+    <string name="scene_compose_hashtag_search_search_placeholder">搜索标签</string>
     <string name="scene_drafts_title">草稿</string>
     <string name="scene_drafts_actions_delete_draft">删除草稿</string>
     <string name="scene_drafts_actions_edit_draft">编辑草稿</string>
@@ -236,8 +237,18 @@
     <string name="scene_settings_display_media_automatic">自动</string>
     <string name="scene_settings_display_media_always">总是</string>
     <string name="scene_settings_display_media_off">关闭</string>
+    <string name="scene_settings_storage_title">存储空间</string>
+    <string name="scene_settings_storage_search_title">清除搜索记录</string>
+    <string name="scene_settings_storage_media_title">清除媒体缓存</string>
+    <string name="scene_settings_storage_media_sub_title">清除存储的媒体缓存。</string>
+    <string name="scene_settings_storage_all_title">清除所有缓存</string>
+    <string name="scene_settings_storage_all_sub_title">删除所有 Twidere X 缓存。您的帐户凭据不会丢失。</string>
     <string name="scene_settings_about_title">关于</string>
     <string name="scene_settings_about_license">开源协议</string>
+    <string name="scene_settings_about_description">适用于 Android 5.0+ 的下一代Twidere。 \n仍处于早期阶段。</string>
+    <string name="scene_settings_about_version">版本 %s</string>
+    <string name="scene_settings_about_logo_background">关于页面背景徽标</string>
+    <string name="scene_settings_about_logo_background_shadow">关于页面背景徽标阴影</string>
     <string name="accessibility_common_network_image">网络图像</string>
     <string name="accessibility_common_back">返回</string>
     <string name="accessibility_common_more">更多</string>
@@ -247,6 +258,7 @@
     <string name="accessibility_common_logo_twitter">Twitter 徽标</string>
     <string name="accessibility_common_logo_mastodon">Mastodon 徽标</string>
     <string name="accessibility_common_logo_github">Github 徽标</string>
+    <string name="accessibility_common_logo_telegram">Telegram 群组</string>
     <string name="accessibility_common_video_play">播放视频</string>
     <string name="accessibility_common_status_location">地理位置</string>
     <string name="accessibility_common_status_retweeted">转推了</string>
