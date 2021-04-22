@@ -124,7 +124,7 @@ fun StatusMediaScene(statusKey: MicroBlogKey, selectedIndex: Int) {
         extendViewIntoStatusBar = true,
         extendViewIntoNavigationBar = true,
     ) {
-        if (loading) {
+        if (loading && status == null) {
             Scaffold {
                 Column(
                     modifier = Modifier
