@@ -46,10 +46,8 @@ fun NetworkImage(
             fadeIn = true,
         )
     }
-    if (painter is LoadPainter<*>) {
-        if (painter.loadState == ImageLoadState.Loading) {
-            placeholder?.invoke()
-        }
+    if (painter is LoadPainter<*> && painter.loadState == ImageLoadState.Loading) {
+        placeholder?.invoke()
     }
     Image(
         painter = painter,
