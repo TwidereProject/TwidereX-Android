@@ -106,7 +106,7 @@ import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.LocalVideoPlayback
 import com.twidere.twiderex.ui.LocalWindow
-import com.twidere.twiderex.ui.TwidereScene
+import com.twidere.twiderex.ui.TwidereDialog
 import com.twidere.twiderex.viewmodel.MediaViewModel
 import moe.tlaster.zoomable.Zoomable
 import moe.tlaster.zoomable.rememberZoomableState
@@ -119,7 +119,7 @@ fun StatusMediaScene(statusKey: MicroBlogKey, selectedIndex: Int) {
     }
     val loading by viewModel.loading.observeAsState(initial = false)
     val status by viewModel.status.observeAsState()
-    TwidereScene(
+    TwidereDialog(
         requireDarkTheme = true,
         extendViewIntoStatusBar = true,
         extendViewIntoNavigationBar = true,
@@ -350,7 +350,7 @@ private object StatusMediaInfoDefaults {
 
 @Composable
 fun RawMediaScene(url: String) {
-    TwidereScene(
+    TwidereDialog(
         requireDarkTheme = true,
         extendViewIntoStatusBar = true,
         extendViewIntoNavigationBar = true,
@@ -396,7 +396,7 @@ fun MediaView(
     Box(
         modifier = Modifier
             .fillMaxSize()
-        // .background(MaterialTheme.colors.background.copy(alpha = 1f - swiperState.progress)),
+            .background(MaterialTheme.colors.background.copy(alpha = 1f - swiperState.progress)),
     )
     Swiper(
         modifier = modifier,
