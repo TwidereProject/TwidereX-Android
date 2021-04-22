@@ -59,6 +59,7 @@ lifecycle-viewmodel-compose_compose = { module = "androidx.lifecycle:lifecycle-v
 room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
 room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
 room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
+room-testing = { module = "androidx.room:room-testing", version.ref = "room" }
 
 # Hilt
 hilt-android-base = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }

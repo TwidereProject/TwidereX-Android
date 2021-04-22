@@ -117,6 +117,9 @@ android {
         it.res.srcDirs += project.files("src/${it.name}/res-localized")
         it.java.srcDirs += "src/${it.name}/kotlin"
     }
+    sourceSets {
+        androidTest.assets.srcDirs += files("$projectDir/schemas".toString())
+    }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_11
         targetCompatibility JavaVersion.VERSION_11
@@ -200,6 +203,7 @@ dependencies {
     }
 
     testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation libs.room.testing
     androidTestImplementation libs.bundles.androidx.test
 }
 
