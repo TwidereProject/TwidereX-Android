@@ -18,6 +18,8 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
+@file:Suppress("DEPRECATION")
+// for migration: https://developer.android.com/guide/topics/renderscript/migrate
 package com.twidere.twiderex.component.foundation
 
 import android.content.Context
