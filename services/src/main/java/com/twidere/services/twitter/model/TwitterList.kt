@@ -27,7 +27,7 @@ import kotlinx.serialization.Serializable
 import java.util.Date
 
 @Serializable
-data class ListModel(
+data class TwitterList(
     @SerialName("created_at")
     @Serializable(with = DateSerializer::class)
     val createdAt: Date? = null,

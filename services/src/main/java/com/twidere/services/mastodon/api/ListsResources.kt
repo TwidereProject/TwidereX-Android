@@ -21,7 +21,7 @@
 package com.twidere.services.mastodon.api
 
 import com.twidere.services.mastodon.model.Account
-import com.twidere.services.mastodon.model.ListModel
+import com.twidere.services.mastodon.model.MastodonList
 import com.twidere.services.mastodon.model.PostAccounts
 import com.twidere.services.mastodon.model.PostList
 import retrofit2.Response
@@ -36,16 +36,16 @@ import retrofit2.http.Query
 
 interface ListsResources {
     @GET("/api/v1/lists")
-    suspend fun lists(): List<ListModel>
+    suspend fun lists(): List<MastodonList>
 
     @POST("/api/v1/lists")
-    suspend fun createList(@Body postList: PostList): ListModel
+    suspend fun createList(@Body postList: PostList): MastodonList
 
     @PUT("/api/v1/lists/{id}")
     suspend fun updateList(
         @Path("id") id: String,
         @Body postList: PostList
-    ): ListModel
+    ): MastodonList
 
     @DELETE("/api/v1/lists/{id}")
     suspend fun deleteList(@Path("id") id: String): Response<String>

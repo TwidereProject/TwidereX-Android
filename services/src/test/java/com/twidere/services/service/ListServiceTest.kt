@@ -32,7 +32,7 @@ abstract class ListServiceTest {
     private lateinit var listService: ListsService
 
     @BeforeAll
-    fun beforeTest() {
+    fun setUp() {
         listService = createService()
     }
 

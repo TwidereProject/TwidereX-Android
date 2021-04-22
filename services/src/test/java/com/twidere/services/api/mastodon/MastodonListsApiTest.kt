@@ -35,7 +35,7 @@ class MastodonListsApiTest {
     private lateinit var listResources: ListsResources
 
     @BeforeAll
-    fun beforeTest() {
+    fun setUp() {
         listResources = mockRetrofit("https://test.mastodon.com/", MastodonRequest2AssetPathConvertor())
     }
 

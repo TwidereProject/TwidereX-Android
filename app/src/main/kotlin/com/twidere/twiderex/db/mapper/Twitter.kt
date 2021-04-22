@@ -24,8 +24,10 @@ import com.twidere.services.twitter.model.ReferencedTweetType
 import com.twidere.services.twitter.model.ReplySettings
 import com.twidere.services.twitter.model.Status
 import com.twidere.services.twitter.model.StatusV2
+import com.twidere.services.twitter.model.TwitterList
 import com.twidere.services.twitter.model.User
 import com.twidere.services.twitter.model.UserV2
+import com.twidere.twiderex.db.model.DbList
 import com.twidere.twiderex.db.model.DbMedia
 import com.twidere.twiderex.db.model.DbPagingTimeline
 import com.twidere.twiderex.db.model.DbPagingTimelineWithStatus
@@ -489,3 +491,14 @@ enum class ProfileImageSize {
     normal,
     mini,
 }
+
+fun TwitterList.toDbList(accountKey: MicroBlogKey) = DbList(
+    _id = UUID.randomUUID().toString(),
+    listId = idStr ?: throw IllegalArgumentException("list.idStr should not be null"),
+    title = name ?: "",
+    description = description ?: "",
+    mode = mode ?: "",
+    replyPolicy = "",
+    accountKey = accountKey,
+    listKey = MicroBlogKey.twitter(idStr ?: throw IllegalArgumentException("list.idStr should not be null"),)
+)

@@ -33,7 +33,7 @@ class TwitterListsApiTest {
     private lateinit var listResources: ListsResources
 
     @BeforeAll
-    fun beforeTest() {
+    fun setUp() {
         listResources = mockRetrofit("https://api.twitter.com/", TwitterRequest2AssetPathConvertor())
     }
 

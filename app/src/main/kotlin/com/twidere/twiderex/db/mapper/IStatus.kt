@@ -20,8 +20,11 @@
  */
 package com.twidere.twiderex.db.mapper
 
+import com.twidere.services.mastodon.model.MastodonList
+import com.twidere.services.microblog.model.IListModel
 import com.twidere.services.microblog.model.IStatus
 import com.twidere.services.microblog.model.IUser
+import com.twidere.services.twitter.model.TwitterList
 import com.twidere.twiderex.db.model.DbStatusWithReference
 import com.twidere.twiderex.model.MicroBlogKey
 
@@ -82,5 +85,13 @@ fun IUser.toDbUser(
     is MastodonUser -> this.toDbUser(
         accountKey = accountKey
     )
+    else -> throw NotImplementedError()
+}
+
+fun IListModel.toDbList(
+    accountKey: MicroBlogKey
+) = when (this) {
+    is TwitterList -> this.toDbList(accountKey)
+    is MastodonList -> this.toDbList(accountKey)
     else -> throw NotImplementedError()
 }

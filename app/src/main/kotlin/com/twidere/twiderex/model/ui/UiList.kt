@@ -18,18 +18,14 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.services.mastodon.model
+package com.twidere.twiderex.model.ui
+import androidx.compose.runtime.Immutable
 
-import com.twidere.services.microblog.model.IListModel
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
-
-@Serializable
-data class ListModel(
-    @SerialName("id")
-    val id: String? = null,
-    @SerialName("replies_policy")
-    val repliesPolicy: String? = null,
-    @SerialName("title")
-    val title: String? = null
-) : IListModel
+@Immutable
+data class UiList(
+    val id: String,
+    val title: String,
+    val descriptions: String,
+    val mode: String,
+    val replyPolicy: String,
+)

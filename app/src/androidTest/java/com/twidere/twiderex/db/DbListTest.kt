@@ -1,0 +1,146 @@
+/*
+ *  Twidere X
+ *
+ *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
+ * 
+ *  This file is part of Twidere X.
+ * 
+ *  Twidere X is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ * 
+ *  Twidere X is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ * 
+ *  You should have received a copy of the GNU General Public License
+ *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
+ */
+package com.twidere.twiderex.db
+
+import androidx.room.Room
+import androidx.test.core.app.ApplicationProvider
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.twidere.services.mastodon.model.MastodonList
+import com.twidere.services.microblog.model.IListModel
+import com.twidere.services.twitter.model.TwitterList
+import com.twidere.twiderex.db.dao.ListsDao
+import com.twidere.twiderex.db.mapper.toDbList
+import com.twidere.twiderex.model.MicroBlogKey
+import kotlinx.coroutines.runBlocking
+import org.junit.After
+import org.junit.Assert
+import org.junit.Before
+import org.junit.Test
+import org.junit.runner.RunWith
+
+@RunWith(AndroidJUnit4::class)
+class DbListTest {
+    private lateinit var listsDao: ListsDao
+    private lateinit var cacheDatabase: CacheDatabase
+    private val twitterAccountKey = MicroBlogKey("123", "twitter.com")
+    private val mastodonAccountKey = MicroBlogKey("456", "mastodon.com")
+    private val originData = mutableListOf<IListModel>()
+    private val twitterCount = 4
+    private val mastodonCount = 2
+
+    @Before
+    fun setUp() {
+        cacheDatabase = Room.inMemoryDatabaseBuilder(ApplicationProvider.getApplicationContext(), CacheDatabase::class.java)
+            .build()
+        listsDao = cacheDatabase.listsDao()
+        for (i in 0 until twitterCount) {
+            originData.add(
+                TwitterList(
+                    id = i.toLong(),
+                    name = "twitter name $i",
+                    description = "description $i",
+                    mode = "private",
+                    idStr = i.toString()
+                )
+            )
+        }
+        for (i in 0 until mastodonCount) {
+            originData.add(
+                MastodonList(
+                    id = i.toString(),
+                    title = "mastodon name $i",
+                )
+            )
+        }
+        runBlocking {
+            val dbLists = originData.map {
+                it.toDbList(if (it is TwitterList) twitterAccountKey else mastodonAccountKey)
+            }
+            Assert.assertEquals(originData.size, dbLists.size)
+            listsDao.insertAll(dbLists)
+        }
+    }
+
+    @After
+    fun tearDown() {
+        cacheDatabase.close()
+    }
+
+    @Test
+    fun checkInsertDbLists() {
+        runBlocking {
+            val result = listsDao.findAll()
+            Assert.assertEquals(originData.size, result?.size)
+        }
+    }
+
+    @Test
+    fun findDbListWithListKey() {
+        runBlocking {
+            val twitterList = listsDao.findWithListKey(MicroBlogKey.twitter("0"), twitterAccountKey)
+            Assert.assertEquals("0", twitterList?.listId)
+            twitterList?.let { assert(it.title.startsWith("twitter")) }
+
+            val mastodonList = listsDao.findWithListKey(MicroBlogKey("0", mastodonAccountKey.host), mastodonAccountKey)
+            Assert.assertEquals("0", mastodonList?.listId)
+            mastodonList?.let { assert(it.title.startsWith("mastodon")) }
+        }
+    }
+
+    @Test
+    fun findDbListsWithAccountKey() {
+        runBlocking {
+            val twitterLists = listsDao.findWithAccountKey(twitterAccountKey)
+            Assert.assertEquals(twitterCount, twitterLists?.size)
+            twitterLists?.forEach {
+                assert(it.title.startsWith("twitter"))
+            }
+            val mastodonList = listsDao.findWithAccountKey(mastodonAccountKey)
+            Assert.assertEquals(mastodonCount, mastodonList?.size)
+            mastodonList?.forEach {
+                assert(it.title.startsWith("mastodon"))
+            }
+        }
+    }
+
+    @Test
+    fun updateDbList() {
+        runBlocking {
+            var updateList = listsDao.findWithListKey(MicroBlogKey.twitter("0"), twitterAccountKey)
+            Assert.assertNotNull(updateList)
+            listsDao.update(listOf(updateList!!.update(title = "updated title")))
+            updateList = listsDao.findWithListKey(MicroBlogKey.twitter("0"), twitterAccountKey)
+            Assert.assertNotNull(updateList)
+            Assert.assertEquals("updated title", updateList?.title)
+        }
+    }
+
+    @Test
+    fun deleteDbList() {
+        runBlocking {
+            var deleteList = listsDao.findWithListKey(MicroBlogKey.twitter("0"), twitterAccountKey)
+            Assert.assertNotNull(deleteList)
+            listsDao.delete(listOf(deleteList!!))
+            deleteList = listsDao.findWithListKey(MicroBlogKey.twitter("0"), twitterAccountKey)
+            Assert.assertNull(deleteList)
+        }
+    }
+}

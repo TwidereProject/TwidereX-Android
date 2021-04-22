@@ -20,8 +20,8 @@
  */
 package com.twidere.services.twitter.api
 
-import com.twidere.services.twitter.model.ListModel
 import com.twidere.services.twitter.model.ListUserResponse
+import com.twidere.services.twitter.model.TwitterList
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Query
@@ -32,7 +32,7 @@ interface ListsResources {
         @Query("user_id") user_id: String? = null,
         @Query("screen_name") screen_name: String? = null,
         @Query("reverse") reverse: Boolean = true,
-    ): List<ListModel>
+    ): List<TwitterList>
 
     /**
      *You can identify a list by its slug instead of its numerical id.
@@ -71,7 +71,7 @@ interface ListsResources {
         @Query("name") name: String,
         @Query("mode") mode: String? = null,
         @Query("description") description: String? = null,
-    ): ListModel
+    ): TwitterList
 
     /**
      * slug => same as @listSubscribers
@@ -85,7 +85,7 @@ interface ListsResources {
         @Query("slug") slug: String? = null,
         @Query("owner_id") owner_id: String? = null,
         @Query("owner_screen_name") owner_screen_name: String? = null,
-    ): ListModel
+    ): TwitterList
 
     /**
      * slug => same as @listSubscribers
@@ -96,7 +96,7 @@ interface ListsResources {
         @Query("slug") slug: String? = null,
         @Query("owner_id") owner_id: String? = null,
         @Query("owner_screen_name") owner_screen_name: String? = null,
-    ): ListModel
+    ): TwitterList
 
     /**
      * slug => same as @listSubscribers
@@ -109,7 +109,7 @@ interface ListsResources {
         @Query("slug") slug: String? = null,
         @Query("owner_id") owner_id: String? = null,
         @Query("owner_screen_name") owner_screen_name: String? = null,
-    ): ListModel
+    ): TwitterList
 
     @POST("/1.1/lists/members/destroy.json")
     suspend fun removeMember(
@@ -119,5 +119,5 @@ interface ListsResources {
         @Query("slug") slug: String? = null,
         @Query("owner_id") owner_id: String? = null,
         @Query("owner_screen_name") owner_screen_name: String? = null,
-    ): ListModel
+    ): TwitterList
 }
