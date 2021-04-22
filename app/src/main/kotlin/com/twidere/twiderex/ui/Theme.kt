@@ -36,6 +36,7 @@ import androidx.compose.material.Typography
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
@@ -73,6 +74,28 @@ fun TwidereTheme(
         typography = typography,
         shapes = shapes,
         content = content,
+    )
+}
+
+@Composable
+fun TwidereDialog(
+    requireDarkTheme: Boolean = false,
+    extendViewIntoStatusBar: Boolean = false,
+    extendViewIntoNavigationBar: Boolean = false,
+    content: @Composable () -> Unit,
+) {
+    val currentDarkTheme = isDarkTheme(requireDarkTheme = false)
+    val windowInsetsController = LocalWindowInsetsController.current
+    DisposableEffect(currentDarkTheme) {
+        onDispose {
+            windowInsetsController.isAppearanceLightStatusBars = !currentDarkTheme
+        }
+    }
+    TwidereScene(
+        requireDarkTheme,
+        extendViewIntoStatusBar,
+        extendViewIntoNavigationBar,
+        content,
     )
 }
 

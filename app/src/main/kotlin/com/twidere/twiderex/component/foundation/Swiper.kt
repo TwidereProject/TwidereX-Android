@@ -28,8 +28,11 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.Layout
 import kotlinx.coroutines.launch
@@ -59,6 +62,7 @@ class SwiperState(
     val onEnd: () -> Unit = {},
 ) {
     internal var maxHeight: Int = 0
+    internal var dismissed by mutableStateOf(false)
     private var _offset = Animatable(0f)
 
     val offset: Float
@@ -90,6 +94,7 @@ class SwiperState(
     }
 
     private suspend fun dismiss() {
+        dismissed = true
         _offset.animateTo(maxHeight.toFloat().withSign(_offset.value))
         onDismiss.invoke()
     }
@@ -119,7 +124,7 @@ fun Swiper(
         Layout(
             modifier = Modifier.draggable(
                 orientation = orientation,
-                enabled = enabled,
+                enabled = enabled && !state.dismissed,
                 reverseDirection = reverseDirection,
                 onDragStopped = { velocity ->
                     scope.launch {

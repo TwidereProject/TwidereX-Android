@@ -106,7 +106,9 @@ fun StatusMediaComponent(
                     media.firstOrNull()?.let {
                         StatusMediaPreviewItem(
                             media = it,
-                            modifier = Modifier.weight(1f),
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxSize(),
                             onClick = onItemClick,
                         )
                     }
@@ -120,7 +122,9 @@ fun StatusMediaComponent(
                         media.drop(1).forEach {
                             StatusMediaPreviewItem(
                                 media = it,
-                                modifier = Modifier.weight(1f),
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .fillMaxSize(),
                                 onClick = onItemClick,
                             )
                             if (it != media.last()) {
@@ -229,7 +233,7 @@ fun StatusMediaPreviewItem(
                     NetworkImage(
                         data = it,
                         modifier = Modifier
-                            .fillMaxWidth()
+                            .fillMaxSize()
                             .clickable(
                                 onClick = {
                                     onClick(media)
