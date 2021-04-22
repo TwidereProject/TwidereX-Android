@@ -106,7 +106,7 @@ import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.LocalVideoPlayback
 import com.twidere.twiderex.ui.LocalWindow
-import com.twidere.twiderex.ui.TwidereScene
+import com.twidere.twiderex.ui.TwidereDialog
 import com.twidere.twiderex.viewmodel.MediaViewModel
 import moe.tlaster.zoomable.Zoomable
 import moe.tlaster.zoomable.rememberZoomableState
@@ -118,11 +118,23 @@ fun StatusMediaScene(statusKey: MicroBlogKey, selectedIndex: Int) {
         it.create(account, statusKey)
     }
     val status by viewModel.status.observeAsState()
-    TwidereScene(
+    TwidereDialog(
         requireDarkTheme = true,
         extendViewIntoStatusBar = true,
         extendViewIntoNavigationBar = true,
     ) {
+        if (loading && status == null) {
+            Scaffold {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    LoadingProgress()
+                }
+            }
+        }
         status?.let {
             CompositionLocalProvider(
                 LocalVideoPlayback provides DisplayPreferences.AutoPlayback.Always
@@ -349,7 +361,7 @@ private object StatusMediaInfoDefaults {
 
 @Composable
 fun RawMediaScene(url: String) {
-    TwidereScene(
+    TwidereDialog(
         requireDarkTheme = true,
         extendViewIntoStatusBar = true,
         extendViewIntoNavigationBar = true,
@@ -396,7 +408,7 @@ fun MediaView(
     Box(
         modifier = Modifier
             .fillMaxSize()
-        // .background(MaterialTheme.colors.background.copy(alpha = 1f - swiperState.progress)),
+            .background(MaterialTheme.colors.background.copy(alpha = 1f - swiperState.progress)),
     )
     Swiper(
         modifier = modifier,
