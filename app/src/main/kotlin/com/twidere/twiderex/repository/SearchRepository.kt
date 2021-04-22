@@ -20,14 +20,14 @@
  */
 package com.twidere.twiderex.repository
 
-import com.twidere.twiderex.db.CacheDatabase
+import com.twidere.twiderex.db.AppDatabase
 import com.twidere.twiderex.db.model.DbSearch
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.util.UUID
 
 class SearchRepository(
-    private val database: CacheDatabase
+    private val database: AppDatabase
 ) {
     val source by lazy {
         database.searchDao().getAll()

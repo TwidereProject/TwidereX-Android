@@ -51,7 +51,7 @@ android {
 
         javaCompileOptions {
             annotationProcessorOptions {
-                arguments += ["room.schemaLocation": "$buildDir/schemas".toString()]
+                arguments += ["room.schemaLocation": "$projectDir/schemas".toString()]
             }
         }
         def apiKeyProperties = rootProject.file('apiKey.properties')
@@ -116,6 +116,9 @@ android {
     sourceSets.each {
         it.res.srcDirs += project.files("src/${it.name}/res-localized")
         it.java.srcDirs += "src/${it.name}/kotlin"
+    }
+    sourceSets {
+        androidTest.assets.srcDirs += files("$projectDir/schemas".toString())
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_11
@@ -200,6 +203,7 @@ dependencies {
     }
 
     testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation libs.room.testing
     androidTestImplementation libs.bundles.androidx.test
 }
 

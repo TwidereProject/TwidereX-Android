@@ -26,7 +26,6 @@ import androidx.room.TypeConverters
 import com.twidere.twiderex.db.dao.MediaDao
 import com.twidere.twiderex.db.dao.PagingTimelineDao
 import com.twidere.twiderex.db.dao.ReactionDao
-import com.twidere.twiderex.db.dao.SearchDao
 import com.twidere.twiderex.db.dao.StatusDao
 import com.twidere.twiderex.db.dao.StatusReferenceDao
 import com.twidere.twiderex.db.dao.UrlEntityDao
@@ -60,7 +59,7 @@ import javax.inject.Singleton
         DbSearch::class,
         DbStatusReference::class,
     ],
-    version = 9,
+    version = 10,
 )
 @TypeConverters(
     MicroBlogKeyConverter::class,
@@ -78,6 +77,5 @@ abstract class CacheDatabase : RoomDatabase() {
     abstract fun reactionDao(): ReactionDao
     abstract fun pagingTimelineDao(): PagingTimelineDao
     abstract fun urlEntityDao(): UrlEntityDao
-    abstract fun searchDao(): SearchDao
     abstract fun statusReferenceDao(): StatusReferenceDao
 }
