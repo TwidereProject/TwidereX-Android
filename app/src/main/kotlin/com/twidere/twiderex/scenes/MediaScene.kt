@@ -83,10 +83,7 @@ import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.LoadingProgress
 import com.twidere.twiderex.component.foundation.NetworkImage
-import com.twidere.twiderex.component.foundation.Swiper
-import com.twidere.twiderex.component.foundation.SwiperState
 import com.twidere.twiderex.component.foundation.VideoPlayer
-import com.twidere.twiderex.component.foundation.rememberSwiperState
 import com.twidere.twiderex.component.status.LikeButton
 import com.twidere.twiderex.component.status.ReplyButton
 import com.twidere.twiderex.component.status.RetweetButton
@@ -110,6 +107,9 @@ import com.twidere.twiderex.ui.LocalVideoPlayback
 import com.twidere.twiderex.ui.LocalWindow
 import com.twidere.twiderex.ui.TwidereDialog
 import com.twidere.twiderex.viewmodel.MediaViewModel
+import moe.tlaster.swiper.Swiper
+import moe.tlaster.swiper.SwiperState
+import moe.tlaster.swiper.rememberSwiperState
 import moe.tlaster.zoomable.Zoomable
 import moe.tlaster.zoomable.rememberZoomableState
 
