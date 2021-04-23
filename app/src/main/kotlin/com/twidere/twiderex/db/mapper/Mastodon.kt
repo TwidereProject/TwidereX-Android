@@ -330,6 +330,7 @@ fun Account.toDbUser(
 fun MastodonList.toDbList(accountKey: MicroBlogKey): DbList {
     return DbList(
         _id = UUID.randomUUID().toString(),
+        ownerId = accountKey.id,
         listId = id ?: throw IllegalArgumentException("list.idStr should not be null"),
         title = title ?: "",
         description = "",

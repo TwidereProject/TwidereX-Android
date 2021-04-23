@@ -20,12 +20,36 @@
  */
 package com.twidere.twiderex.model.ui
 import androidx.compose.runtime.Immutable
+import com.twidere.twiderex.db.model.DbList
+import com.twidere.twiderex.model.MicroBlogKey
 
 @Immutable
 data class UiList(
     val id: String,
+    val ownerId: String,
     val title: String,
     val descriptions: String,
     val mode: String,
     val replyPolicy: String,
-)
+    val accountKey: MicroBlogKey,
+    val listKey: MicroBlogKey,
+) {
+
+    fun isOwner(userId: String): Boolean {
+        return ownerId == userId
+    }
+
+    companion object {
+        fun DbList.toUi()=
+            UiList(
+                id = listId,
+                ownerId = ownerId,
+                listKey = listKey,
+                accountKey = accountKey,
+                title = title,
+                descriptions = description,
+                mode = mode,
+                replyPolicy = replyPolicy,
+            )
+    }
+}

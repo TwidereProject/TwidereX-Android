@@ -20,11 +20,13 @@
  */
 package com.twidere.twiderex.db.dao
 
+import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Update
 import com.twidere.twiderex.db.model.DbList
 import com.twidere.twiderex.model.MicroBlogKey
@@ -43,9 +45,20 @@ interface ListsDao {
     @Query("SELECT * FROM lists WHERE accountKey == :accountKey")
     suspend fun findWithAccountKey(accountKey: MicroBlogKey): List<DbList>?
 
+    @Transaction
+    @Query("SELECT * FROM lists WHERE accountKey == :accountKey")
+    fun getPagingSource(
+        accountKey: MicroBlogKey,
+    ): PagingSource<Int, DbList>
+
     @Update(onConflict = OnConflictStrategy.REPLACE)
     suspend fun update(lists: List<DbList>)
 
     @Delete
     suspend fun delete(lists: List<DbList>)
+
+    @Query("DELETE FROM lists WHERE accountKey == :accountKey")
+    suspend fun clearAll(
+        accountKey: MicroBlogKey,
+    )
 }

@@ -20,18 +20,22 @@
  */
 package com.twidere.twiderex.repository
 
+import androidx.paging.PagingData
 import com.twidere.services.microblog.ListsService
+import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.ui.UiList
+import com.twidere.twiderex.paging.mediator.list.ListsMediator
+import com.twidere.twiderex.paging.mediator.list.ListsMediator.Companion.toUi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 
-class ListsRepository {
-
-    fun fetchLists(account: AccountDetails): Flow<List<UiList>> {
-        return flow<List<UiList>> {
-            val service = account.service as ListsService
-            service.lists()
-        }
+class ListsRepository(private val database: CacheDatabase) {
+    fun fetchLists(account: AccountDetails): Flow<PagingData<UiList>> {
+        val mediator = ListsMediator(
+            database = database,
+            accountKey = account.accountKey,
+            service = account.service as ListsService,
+        )
+        return mediator.pager().toUi()
     }
 }

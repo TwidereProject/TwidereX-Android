@@ -33,6 +33,7 @@ data class DbList(
     @PrimaryKey
     var _id: String,
     val listId: String,
+    val ownerId: String,
     val accountKey: MicroBlogKey,
     val listKey: MicroBlogKey,
     val title: String,
@@ -48,6 +49,7 @@ data class DbList(
     ) = DbList(
         _id = _id,
         listId = listId,
+        ownerId = ownerId,
         accountKey = accountKey,
         listKey = listKey,
         title = title ?: this.title,

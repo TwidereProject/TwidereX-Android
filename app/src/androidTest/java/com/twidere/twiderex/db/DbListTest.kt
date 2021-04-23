@@ -20,12 +20,14 @@
  */
 package com.twidere.twiderex.db
 
+import androidx.paging.PagingSource
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.twidere.services.mastodon.model.MastodonList
 import com.twidere.services.microblog.model.IListModel
 import com.twidere.services.twitter.model.TwitterList
+import com.twidere.services.twitter.model.User
 import com.twidere.twiderex.db.dao.ListsDao
 import com.twidere.twiderex.db.mapper.toDbList
 import com.twidere.twiderex.model.MicroBlogKey
@@ -43,8 +45,8 @@ class DbListTest {
     private val twitterAccountKey = MicroBlogKey("123", "twitter.com")
     private val mastodonAccountKey = MicroBlogKey("456", "mastodon.com")
     private val originData = mutableListOf<IListModel>()
-    private val twitterCount = 4
-    private val mastodonCount = 2
+    private val twitterCount = 10
+    private val mastodonCount = 10
 
     @Before
     fun setUp() {
@@ -52,13 +54,15 @@ class DbListTest {
             .build()
         listsDao = cacheDatabase.listsDao()
         for (i in 0 until twitterCount) {
+            val ownerId = if (i % 2 == 0) twitterAccountKey.id else "789"
             originData.add(
                 TwitterList(
                     id = i.toLong(),
                     name = "twitter name $i",
                     description = "description $i",
                     mode = "private",
-                    idStr = i.toString()
+                    idStr = i.toString(),
+                    user = User( id = ownerId.toLong(), idStr = ownerId)
                 )
             )
         }
@@ -141,6 +145,29 @@ class DbListTest {
             listsDao.delete(listOf(deleteList!!))
             deleteList = listsDao.findWithListKey(MicroBlogKey.twitter("0"), twitterAccountKey)
             Assert.assertNull(deleteList)
+        }
+    }
+
+    @Test
+    fun testPagingSource() {
+        runBlocking {
+            val pagingSource = listsDao.getPagingSource(twitterAccountKey)
+            val resultFirst = pagingSource.load(PagingSource.LoadParams.Refresh(null, loadSize = 2, false))
+            Assert.assertEquals(2,(resultFirst as PagingSource.LoadResult.Page).data.size)
+            Assert.assertEquals("0", resultFirst.data[0].listId)
+
+            val resultLoadMore = pagingSource.load(PagingSource.LoadParams.Append(resultFirst.nextKey?:2, loadSize = 2, false))
+            Assert.assertEquals(2,(resultLoadMore as PagingSource.LoadResult.Page).data.size)
+            Assert.assertEquals("2", resultLoadMore.data[0].listId)
+        }
+    }
+
+    @Test
+    fun clearDbList() {
+        runBlocking {
+            listsDao.clearAll(twitterAccountKey)
+            val restLists = listsDao.findAll()
+            Assert.assertEquals(mastodonCount, restLists?.size)
         }
     }
 }

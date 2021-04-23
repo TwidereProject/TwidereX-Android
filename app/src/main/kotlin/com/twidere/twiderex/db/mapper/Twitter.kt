@@ -494,6 +494,7 @@ enum class ProfileImageSize {
 
 fun TwitterList.toDbList(accountKey: MicroBlogKey) = DbList(
     _id = UUID.randomUUID().toString(),
+    ownerId = user?.idStr ?: "",
     listId = idStr ?: throw IllegalArgumentException("list.idStr should not be null"),
     title = name ?: "",
     description = description ?: "",
