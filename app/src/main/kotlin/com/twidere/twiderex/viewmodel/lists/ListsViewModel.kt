@@ -23,7 +23,6 @@ package com.twidere.twiderex.viewmodel.lists
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
-import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.filter
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.repository.ListsRepository

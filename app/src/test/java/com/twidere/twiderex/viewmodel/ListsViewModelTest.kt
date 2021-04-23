@@ -1,3 +1,23 @@
+/*
+ *  Twidere X
+ *
+ *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
+ * 
+ *  This file is part of Twidere X.
+ * 
+ *  Twidere X is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ * 
+ *  Twidere X is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ * 
+ *  You should have received a copy of the GNU General Public License
+ *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
+ */
 package com.twidere.twiderex.viewmodel
 
 import androidx.paging.PagingData
@@ -46,9 +66,9 @@ class ListsViewModelTest : ViewModelTestBase() {
         )
 
         whenever(mockRepository.fetchLists(any())).thenReturn(
-                flow {
-                    emit(PagingData.from(listOf(ownerList, subscribeList)))
-                }
+            flow {
+                emit(PagingData.from(listOf(ownerList, subscribeList)))
+            }
         )
 
         whenever(ownerList.isOwner(any())).thenReturn(true)
@@ -68,13 +88,12 @@ class ListsViewModelTest : ViewModelTestBase() {
         val ownerItems = LazyPagingItems(viewModel.ownerSource)
         ownerItems.collectPagingData()
         Assert.assertEquals(1, ownerItems.itemCount)
-        Assert.assertEquals("owner",  ownerItems[0]?.title)
+        Assert.assertEquals("owner", ownerItems[0]?.title)
 
         // make sure subscribedSource only emit data which isOwner() returns false
         val subscribeItems = LazyPagingItems(viewModel.subscribedSource)
         subscribeItems.collectPagingData()
         Assert.assertEquals(1, subscribeItems.itemCount)
-        Assert.assertEquals("subscribe",  subscribeItems[0]?.title)
+        Assert.assertEquals("subscribe", subscribeItems[0]?.title)
     }
-
 }

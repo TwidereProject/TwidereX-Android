@@ -62,7 +62,7 @@ class DbListTest {
                     description = "description $i",
                     mode = "private",
                     idStr = i.toString(),
-                    user = User( id = ownerId.toLong(), idStr = ownerId)
+                    user = User(id = ownerId.toLong(), idStr = ownerId)
                 )
             )
         }
@@ -153,11 +153,11 @@ class DbListTest {
         runBlocking {
             val pagingSource = listsDao.getPagingSource(twitterAccountKey)
             val resultFirst = pagingSource.load(PagingSource.LoadParams.Refresh(null, loadSize = 2, false))
-            Assert.assertEquals(2,(resultFirst as PagingSource.LoadResult.Page).data.size)
+            Assert.assertEquals(2, (resultFirst as PagingSource.LoadResult.Page).data.size)
             Assert.assertEquals("0", resultFirst.data[0].listId)
 
-            val resultLoadMore = pagingSource.load(PagingSource.LoadParams.Append(resultFirst.nextKey?:2, loadSize = 2, false))
-            Assert.assertEquals(2,(resultLoadMore as PagingSource.LoadResult.Page).data.size)
+            val resultLoadMore = pagingSource.load(PagingSource.LoadParams.Append(resultFirst.nextKey ?: 2, loadSize = 2, false))
+            Assert.assertEquals(2, (resultLoadMore as PagingSource.LoadResult.Page).data.size)
             Assert.assertEquals("2", resultLoadMore.data[0].listId)
         }
     }

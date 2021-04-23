@@ -40,7 +40,7 @@ data class UiList(
     }
 
     companion object {
-        fun DbList.toUi()=
+        fun DbList.toUi() =
             UiList(
                 id = listId,
                 ownerId = ownerId,
