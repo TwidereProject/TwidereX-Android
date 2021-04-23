@@ -23,8 +23,11 @@ package com.twidere.twiderex.repository
 import androidx.paging.PagingData
 import com.twidere.services.microblog.ListsService
 import com.twidere.twiderex.db.CacheDatabase
+import com.twidere.twiderex.db.mapper.toDbList
 import com.twidere.twiderex.model.AccountDetails
+import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiList
+import com.twidere.twiderex.model.ui.UiList.Companion.toUi
 import com.twidere.twiderex.paging.mediator.list.ListsMediator
 import com.twidere.twiderex.paging.mediator.list.ListsMediator.Companion.toUi
 import kotlinx.coroutines.flow.Flow
@@ -37,5 +40,58 @@ class ListsRepository(private val database: CacheDatabase) {
             service = account.service as ListsService,
         )
         return mediator.pager().toUi()
+    }
+
+    suspend fun createLists(
+        account: AccountDetails,
+        title: String,
+        description: String? = null,
+        mode: String? = null,
+        replyPolicy: String? = null
+    ): UiList {
+        val result = (account.service as ListsService).createList(
+            name = title,
+            description = description,
+            mode = mode,
+            repliesPolicy = replyPolicy
+        ).toDbList(account.accountKey)
+        // save to db
+        database.listsDao().insertAll(listOf(result))
+        return result.toUi()
+    }
+
+    suspend fun updateLists(
+        account: AccountDetails,
+        listId: String,
+        title: String? = null,
+        description: String? = null,
+        mode: String? = null,
+        replyPolicy: String? = null
+    ): UiList {
+        val result = (account.service as ListsService).updateList(
+            listId = listId,
+            name = title,
+            description = description,
+            mode = mode,
+            repliesPolicy = replyPolicy
+        ).toDbList(account.accountKey)
+        database.listsDao().update(listOf(result))
+        return result.toUi()
+    }
+
+    suspend fun deleteLists(
+        account: AccountDetails,
+        listKey: MicroBlogKey,
+        listId: String
+    ): UiList? {
+        val result = (account.service as ListsService).destroyList(listId)
+        if (result) {
+            val deleteItem = database.listsDao().findWithListKey(listKey, account.accountKey)
+            deleteItem?.let {
+                database.listsDao().delete(listOf(deleteItem))
+                return it.toUi()
+            }
+        }
+        return null
     }
 }

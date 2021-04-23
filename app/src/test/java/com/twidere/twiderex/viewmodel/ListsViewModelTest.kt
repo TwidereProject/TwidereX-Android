@@ -21,7 +21,6 @@
 package com.twidere.twiderex.viewmodel
 
 import androidx.paging.PagingData
-import androidx.paging.PagingSource
 import com.twidere.twiderex.component.lazy.LazyPagingItems
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.AmUser
@@ -51,20 +50,15 @@ class ListsViewModelTest : ViewModelTestBase() {
     private lateinit var mockUser: AmUser
 
     @Mock
-    private lateinit var mockSource: PagingSource<Int, UiList>
-
-    @Mock
     private lateinit var ownerList: UiList
 
     @Mock
-    lateinit var subscribeList: UiList
+    private lateinit var subscribeList: UiList
 
-    @Test
-    fun testOwnerSource(): Unit = runBlocking(Dispatchers.Main) {
-        whenever(mockSource.load(any())).thenReturn(
-            PagingSource.LoadResult.Page(data = listOf(ownerList, subscribeList), null, null)
-        )
+    private lateinit var viewModel: ListsViewModel
 
+    override fun setUp() {
+        super.setUp()
         whenever(mockRepository.fetchLists(any())).thenReturn(
             flow {
                 emit(PagingData.from(listOf(ownerList, subscribeList)))
@@ -77,20 +71,29 @@ class ListsViewModelTest : ViewModelTestBase() {
         whenever(subscribeList.title).thenReturn("subscribe")
         whenever(mockAccount.user).thenReturn(mockUser)
         whenever(mockUser.userId).thenReturn("123")
+        viewModel = ListsViewModel(mockRepository, mockAccount)
+    }
 
+    @Test
+    fun source_containsAllLists(): Unit = runBlocking(Dispatchers.Main) {
         // check the source
-        val viewModel = ListsViewModel(mockRepository, mockAccount)
         val sourceItems = LazyPagingItems(viewModel.source)
         sourceItems.collectPagingData()
         Assert.assertEquals(2, sourceItems.itemCount)
+    }
 
+    @Test
+    fun ownerSource_containsOwnedLists(): Unit = runBlocking(Dispatchers.Main) {
         // make sure ownerSource only emit data which isOwner() returns true
         val ownerItems = LazyPagingItems(viewModel.ownerSource)
         ownerItems.collectPagingData()
         Assert.assertEquals(1, ownerItems.itemCount)
         Assert.assertEquals("owner", ownerItems[0]?.title)
+    }
 
-        // make sure subscribedSource only emit data which isOwner() returns false
+    @Test
+    fun subscribeSource_containsSubscribedLists(): Unit = runBlocking(Dispatchers.Main) {
+        // make sure ownerSource only emit data which isOwner() returns true
         val subscribeItems = LazyPagingItems(viewModel.subscribedSource)
         subscribeItems.collectPagingData()
         Assert.assertEquals(1, subscribeItems.itemCount)
