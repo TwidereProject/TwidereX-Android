@@ -10,21 +10,16 @@ import com.twidere.twiderex.repository.ListsRepository
 import com.twidere.twiderex.viewmodel.lists.ListsViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.newSingleThreadContext
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.resetMain
-import kotlinx.coroutines.test.setMain
 import org.junit.Assert
-import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
-import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
 import org.mockito.kotlin.whenever
 
-class ListsViewModelTest {
+@OptIn(ExperimentalCoroutinesApi::class)
+class ListsViewModelTest : ViewModelTestBase() {
 
     @Mock
     private lateinit var mockRepository: ListsRepository
@@ -44,27 +39,6 @@ class ListsViewModelTest {
     @Mock
     lateinit var subscribeList: UiList
 
-    lateinit var mocks: AutoCloseable
-
-    @OptIn(ObsoleteCoroutinesApi::class)
-    private val mainThreadSurrogate = newSingleThreadContext("UI thread")
-
-    @ExperimentalCoroutinesApi
-    @Before
-    fun setUp() {
-        Dispatchers.setMain(mainThreadSurrogate)
-        mocks = MockitoAnnotations.openMocks(this)
-    }
-
-    @ExperimentalCoroutinesApi
-    @Test
-    fun tearDown() {
-        Dispatchers.resetMain() // reset main dispatcher to the original Main dispatcher
-        mainThreadSurrogate.close()
-        mocks.close()
-    }
-
-    @ExperimentalCoroutinesApi
     @Test
     fun testOwnerSource(): Unit = runBlocking(Dispatchers.Main) {
         whenever(mockSource.load(any())).thenReturn(
@@ -83,7 +57,6 @@ class ListsViewModelTest {
         whenever(subscribeList.title).thenReturn("subscribe")
         whenever(mockAccount.user).thenReturn(mockUser)
         whenever(mockUser.userId).thenReturn("123")
-
 
         // check the source
         val viewModel = ListsViewModel(mockRepository, mockAccount)
