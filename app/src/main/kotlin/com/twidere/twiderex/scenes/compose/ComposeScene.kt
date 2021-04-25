@@ -201,16 +201,15 @@ private fun ComposeBody(
     val canSaveDraft by viewModel.canSaveDraft.observeAsState(initial = false)
     var showSaveDraftDialog by remember { mutableStateOf(false) }
     val scaffoldState = rememberBottomSheetScaffoldState()
-    BackHandler {
-        when {
-            showSaveDraftDialog -> {
-                showSaveDraftDialog = false
-            }
-            canSaveDraft -> {
-                showSaveDraftDialog = true
-            }
-            else -> {
-                navController.popBackStack()
+    if (showSaveDraftDialog || canSaveDraft) {
+        BackHandler {
+            when {
+                showSaveDraftDialog -> {
+                    showSaveDraftDialog = false
+                }
+                canSaveDraft -> {
+                    showSaveDraftDialog = true
+                }
             }
         }
     }
@@ -544,6 +543,7 @@ object EmojiListDefaults {
         val Size = 48.dp
         val ContentPadding = PaddingValues(4.dp)
     }
+
     val ContentPadding = PaddingValues(
         horizontal = 8.dp,
         vertical = 0.dp
