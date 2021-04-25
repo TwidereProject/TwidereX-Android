@@ -63,9 +63,11 @@ internal class RouteStack(
     }
 
     fun onInActive() {
-        lifecycleRegistry.currentState = Lifecycle.State.STARTED
-        if (destroyAfterTransition) {
-            onDestroyed()
+        if (lifecycleRegistry.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
+            lifecycleRegistry.currentState = Lifecycle.State.STARTED
+            if (destroyAfterTransition) {
+                onDestroyed()
+            }
         }
     }
 
