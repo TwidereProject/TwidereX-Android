@@ -39,7 +39,22 @@ data class UiList(
         return ownerId == userId
     }
 
+    val isPrivate: Boolean
+        get() = mode == ListsMode.PRIVATE.value
+
     companion object {
+
+        fun sample() = UiList(
+            id = "1",
+            ownerId = "1",
+            title = "Sample List",
+            descriptions = "Sample List",
+            mode = "public",
+            replyPolicy = "",
+            accountKey = MicroBlogKey.Empty,
+            listKey = MicroBlogKey.Empty
+        )
+
         fun DbList.toUi() =
             UiList(
                 id = listId,
@@ -52,4 +67,10 @@ data class UiList(
                 replyPolicy = replyPolicy,
             )
     }
+}
+
+enum class ListsMode(val value: String) {
+    PRIVATE("private"),
+    PUBLIC("public"),
+    DEFAULT("")
 }

@@ -18,7 +18,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.viewmodel
+package com.twidere.twiderex.viewmodel.lists
 
 import androidx.paging.PagingData
 import com.twidere.twiderex.component.lazy.LazyPagingItems
@@ -26,7 +26,7 @@ import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.AmUser
 import com.twidere.twiderex.model.ui.UiList
 import com.twidere.twiderex.repository.ListsRepository
-import com.twidere.twiderex.viewmodel.lists.ListsViewModel
+import com.twidere.twiderex.viewmodel.ViewModelTestBase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flow
