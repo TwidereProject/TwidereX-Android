@@ -101,11 +101,13 @@ class MastodonComposeWorker @AssistedInject constructor(
                     sensitive = composeData.isSensitive,
                     spoilerText = composeData.contentWarningText,
                     visibility = composeData.visibility,
-                    poll = PostPoll(
-                        options = composeData.voteOptions,
-                        expiresIn = composeData.voteExpired?.value,
-                        multiple = composeData.voteMultiple
-                    )
+                    poll = composeData.voteOptions?.let {
+                        PostPoll(
+                            options = composeData.voteOptions,
+                            expiresIn = composeData.voteExpired?.value,
+                            multiple = composeData.voteMultiple
+                        )
+                    }
                 )
             )
             inAppNotification.show(R.string.common_alerts_tweet_sent_title)
