@@ -26,6 +26,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.location.LocationManager
 import android.net.ConnectivityManager
+import androidx.core.app.NotificationManagerCompat
 import androidx.room.Room
 import androidx.work.WorkManager
 import com.twidere.twiderex.db.AppDatabase
@@ -78,4 +79,8 @@ object AndroidModule {
     @Provides
     fun provideContentResolver(@ApplicationContext context: Context): ContentResolver =
         context.contentResolver
+
+    @Provides
+    fun provideNotificationManagerCompat(@ApplicationContext context: Context): NotificationManagerCompat =
+        NotificationManagerCompat.from(context)
 }
