@@ -25,7 +25,7 @@ import androidx.core.app.NotificationChannelCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.startup.Initializer
 
-object NotificationChannelInitializerHolder
+class NotificationChannelInitializerHolder
 
 class NotificationChannelInitializer : Initializer<NotificationChannelInitializerHolder> {
     override fun create(context: Context): NotificationChannelInitializerHolder {
@@ -50,7 +50,7 @@ class NotificationChannelInitializer : Initializer<NotificationChannelInitialize
                 notificationManagerCompat.deleteNotificationChannel(it.id)
             }
         }
-        return NotificationChannelInitializerHolder
+        return NotificationChannelInitializerHolder()
     }
 
     override fun dependencies(): List<Class<out Initializer<*>>> {
