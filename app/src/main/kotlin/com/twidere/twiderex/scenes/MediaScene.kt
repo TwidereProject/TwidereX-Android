@@ -142,7 +142,11 @@ fun StatusMediaScene(statusKey: MicroBlogKey, selectedIndex: Int) {
             CompositionLocalProvider(
                 LocalVideoPlayback provides DisplayPreferences.AutoPlayback.Always
             ) {
-                StatusMediaScene(status = it, selectedIndex = selectedIndex, viewModel = viewModel)
+                StatusMediaScene(
+                    status = it,
+                    selectedIndex = selectedIndex.coerceIn(0, it.media.lastIndex),
+                    viewModel = viewModel,
+                )
             }
         }
     }
