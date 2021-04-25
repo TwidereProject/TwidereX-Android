@@ -125,7 +125,7 @@ class ListsRepositoryTest {
             val listsDatabase = mutableListOf(TwitterList(idStr = "123", name = "waiting for delete"))
             // note that whenever will cause null pointer exception
             // when mock suspend method that returns Basic data type such as boolean
-            `when`(mockListsService.destroyList(any())).thenReturn(true)
+            `when`(mockListsService.destroyList(any())).thenReturn(Unit)
             whenever(mockListDao.findWithListKey(any(), any())).thenReturn(
                 TwitterList(idStr = "123").toDbList(MicroBlogKey.twitter("123"))
             )

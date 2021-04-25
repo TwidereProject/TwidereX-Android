@@ -75,7 +75,7 @@ class MastodonListsApiTest {
     fun fetchMembers() {
         runBlocking {
             val accounts = listResources.listMembers("13585")
-            assertEquals("ikea shark fan account", accounts[0].displayName)
+            assertEquals("ikea shark fan account", accounts.body()!![0].displayName)
         }
     }
 

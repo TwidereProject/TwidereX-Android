@@ -56,7 +56,7 @@ interface ListsResources {
         @Query("max_id") max_id: String? = null,
         @Query("since_id") since_id: String? = null,
         @Query("limit") limit: Int = 20,
-    ): List<Account>
+    ): Response<List<Account>>
 
     @POST("/api/v1/lists/{id}/accounts")
     suspend fun addMember(

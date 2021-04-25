@@ -325,25 +325,34 @@ class MastodonService(
 
     override suspend fun destroyList(
         listId: String
-    ) = "{}".equals(resources.deleteList(listId).body())
+    ) {
+        resources.deleteList(listId)
+    }
 
     override suspend fun listMembers(
         listId: String,
         count: Int,
         cursor: String?
     ) = resources.listMembers(listId, max_id = cursor, limit = count)
+        .let {
+            MastodonPaging.from(it)
+        }
 
     override suspend fun addMember(
         listId: String,
         userId: String,
         screenName: String
-    ) = "{}".equals(resources.addMember(listId, PostAccounts(listOf(userId))).body())
+    ) {
+        resources.addMember(listId, PostAccounts(listOf(userId)))
+    }
 
     override suspend fun removeMember(
         listId: String,
         userId: String,
         screenName: String
-    ) = "{}".equals(resources.removeMember(listId, PostAccounts(listOf(userId))).body())
+    ) {
+        resources.removeMember(listId, PostAccounts(listOf(userId)))
+    }
 
     override suspend fun listSubscribers(
         listId: String,

@@ -119,7 +119,7 @@ class ListsModifyViewModelTest : ViewModelTestBase() {
     @Test
     fun deleteList_successExpectTrue(): Unit = runBlocking(Dispatchers.Main) {
         whenever(mockRepository.deleteLists(any(), any(), any()))
-            .thenReturn(UiList.sample())
+            .thenReturn(Unit)
         verifySuccessAndLoadingBefore(mockLoadingObserver, mockSuccessObserver)
         async {
             viewModel.deleteList(listId = "123", MicroBlogKey.Empty)

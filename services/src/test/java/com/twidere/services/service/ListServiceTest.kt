@@ -69,8 +69,8 @@ abstract class ListServiceTest {
     @Test
     fun destroyList() {
         runBlocking {
-            val result = listService.destroyList(testListId())
-            assert(result)
+            listService.destroyList(testListId())
+            assert(true)
         }
     }
 
@@ -85,16 +85,16 @@ abstract class ListServiceTest {
     @Test
     fun addMember() {
         runBlocking {
-            val result = listService.addMember(testListId(), testUserId(), "test")
-            assert(result)
+            listService.addMember(testListId(), testUserId(), "test")
+            assert(true)
         }
     }
 
     @Test
     fun removeMember() {
         runBlocking {
-            val result = listService.removeMember(testListId(), testUserId(), "test")
-            assert(result)
+            listService.removeMember(testListId(), testUserId(), "test")
+            assert(true)
         }
     }
 

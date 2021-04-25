@@ -491,7 +491,9 @@ class TwitterService(
 
     override suspend fun destroyList(
         listId: String
-    ) = listId.equals(resources.destroyList(listId).idStr)
+    ) {
+        resources.destroyList(listId)
+    }
 
     override suspend fun listMembers(
         listId: String,
@@ -501,19 +503,25 @@ class TwitterService(
         list_id = listId,
         count = count,
         cursor = cursor
-    ).users ?: emptyList()
+    ).let {
+        TwitterPaging(data = it.users ?: emptyList(), nextPage = it.nextCursorStr)
+    }
 
     override suspend fun addMember(
         listId: String,
         userId: String,
         screenName: String
-    ) = listId.equals(resources.addMember(listId, userId, screenName).idStr)
+    ) {
+        resources.addMember(listId, userId, screenName)
+    }
 
     override suspend fun removeMember(
         listId: String,
         userId: String,
         screenName: String
-    ) = listId.equals(resources.removeMember(listId, userId, screenName).idStr)
+    ) {
+        resources.removeMember(listId, userId, screenName)
+    }
 
     override suspend fun listSubscribers(
         listId: String,
@@ -523,5 +531,7 @@ class TwitterService(
         list_id = listId,
         count = count,
         cursor = cursor
-    ).users ?: emptyList()
+    ).let {
+        TwitterPaging(data = it.users ?: emptyList(), nextPage = it.nextCursorStr)
+    }
 }

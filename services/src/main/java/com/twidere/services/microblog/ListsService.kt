@@ -47,7 +47,7 @@ interface ListsService {
 
     suspend fun destroyList(
         listId: String,
-    ): Boolean
+    )
 
     suspend fun listMembers(
         listId: String,
@@ -59,13 +59,13 @@ interface ListsService {
         listId: String,
         userId: String,
         screenName: String,
-    ): Boolean
+    )
 
     suspend fun removeMember(
         listId: String,
         userId: String,
         screenName: String,
-    ): Boolean
+    )
 
     suspend fun listSubscribers(
         listId: String,
