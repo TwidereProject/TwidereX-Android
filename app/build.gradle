@@ -180,6 +180,8 @@ dependencies {
 
     implementation libs.work.runtime.ktx
 
+    implementation libs.startup
+
     implementation libs.bundles.accompanist
 
     implementation libs.zoomable

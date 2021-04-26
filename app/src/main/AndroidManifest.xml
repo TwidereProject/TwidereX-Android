@@ -31,6 +31,9 @@
                 android:name="androidx.work.WorkManagerInitializer"
                 android:value="androidx.startup"
                 tools:node="remove" />
+            <meta-data
+                android:name="com.twidere.twiderex.notification.NotificationChannelInitializer"
+                android:value="androidx.startup" />
         </provider>
         <activity
             android:exported="true"

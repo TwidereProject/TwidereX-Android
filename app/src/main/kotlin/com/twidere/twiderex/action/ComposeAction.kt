@@ -24,8 +24,8 @@ import androidx.work.WorkManager
 import com.twidere.twiderex.model.ComposeData
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.PlatformType
-import com.twidere.twiderex.worker.MastodonComposeWorker
-import com.twidere.twiderex.worker.TwitterComposeWorker
+import com.twidere.twiderex.worker.compose.MastodonComposeWorker
+import com.twidere.twiderex.worker.compose.TwitterComposeWorker
 import com.twidere.twiderex.worker.draft.RemoveDraftWorker
 import com.twidere.twiderex.worker.draft.SaveDraftWorker
 
