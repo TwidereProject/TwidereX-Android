@@ -30,6 +30,7 @@ import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.paging.mediator.MastodonHashtagTimelineMediator
+import com.twidere.twiderex.paging.mediator.list.ListsTimelineMediator
 import com.twidere.twiderex.paging.mediator.paging.pager
 import com.twidere.twiderex.paging.mediator.user.UserFavouriteMediator
 import com.twidere.twiderex.paging.mediator.user.UserStatusMediator
@@ -64,6 +65,18 @@ class TimelineRepository(
             accountKey = account.accountKey,
             service = account.service as TimelineService,
             exclude_replies = exclude_replies,
+        ).pager().toUi(accountKey = account.accountKey)
+    }
+
+    fun listTimeline(
+        account: AccountDetails,
+        listKey: MicroBlogKey,
+    ): Flow<PagingData<UiStatus>> {
+        return ListsTimelineMediator(
+            accountKey = account.accountKey,
+            database = database,
+            listKey = listKey,
+            service = account.service as TimelineService
         ).pager().toUi(accountKey = account.accountKey)
     }
 

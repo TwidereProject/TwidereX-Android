@@ -127,6 +127,18 @@ class MastodonService(
         return MastodonPaging.from(response)
     }
 
+    override suspend fun listTimeline(
+        list_id: String,
+        count: Int,
+        max_id: String?,
+        since_id: String?
+    ) = resources.listTimeline(
+        listId = list_id,
+        max_id = max_id,
+        since_id = since_id,
+        limit = count,
+    )
+
     override suspend fun lookupUserByName(name: String): IUser {
         TODO("Not yet implemented")
     }

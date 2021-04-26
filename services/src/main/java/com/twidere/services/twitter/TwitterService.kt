@@ -177,6 +177,19 @@ class TwitterService(
             include_entities = true,
         )
 
+    override suspend fun listTimeline(
+        list_id: String,
+        count: Int,
+        max_id: String?,
+        since_id: String?
+    ) = resources.listTimeline(
+        list_id = list_id,
+        count = count,
+        max_id = max_id,
+        since_id = since_id,
+        include_entities = true
+    )
+
     override suspend fun lookupUserByName(
         name: String
     ): UserV2 {
