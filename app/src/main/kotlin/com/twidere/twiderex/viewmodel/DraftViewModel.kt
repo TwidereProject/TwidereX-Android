@@ -20,6 +20,7 @@
  */
 package com.twidere.twiderex.viewmodel
 
+import androidx.core.app.NotificationManagerCompat
 import androidx.lifecycle.ViewModel
 import androidx.work.WorkManager
 import com.twidere.twiderex.db.model.DbDraft
@@ -30,6 +31,7 @@ import dagger.assisted.AssistedInject
 class DraftViewModel @AssistedInject constructor(
     private val repository: DraftRepository,
     private val workManager: WorkManager,
+    private val notificationManagerCompat: NotificationManagerCompat,
 ) : ViewModel() {
 
     @dagger.assisted.AssistedFactory
@@ -39,6 +41,7 @@ class DraftViewModel @AssistedInject constructor(
 
     fun delete(it: DbDraft) {
         workManager.beginWith(RemoveDraftWorker.create(it._id)).enqueue()
+        notificationManagerCompat.cancel(it._id.hashCode())
     }
 
     val source by lazy {

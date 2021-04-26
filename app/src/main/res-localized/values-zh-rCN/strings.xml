@@ -14,11 +14,16 @@
     <string name="common_alerts_unfollow_user_message">是否取消关注用户 %s？</string>
     <string name="common_alerts_cancel_follow_request_message">取消关注 %s 的请求？</string>
     <string name="common_alerts_tweet_sent_title">推文已发送</string>
+    <string name="common_alerts_tweet_sending_title">正在发送推文</string>
     <string name="common_alerts_tweet_fail_title">推文发送失败</string>
     <string name="common_alerts_tweet_fail_message">请重试</string>
     <string name="common_alerts_tweet_deleted_title">推文已删除</string>
     <string name="common_alerts_failed_to_delete_tweet_title">删除推文失败</string>
     <string name="common_alerts_failed_to_delete_tweet_message">请重试</string>
+    <string name="common_alerts_media_saving_title">正在保存媒体</string>
+    <string name="common_alerts_media_saved_title">媒体已保存</string>
+    <string name="common_alerts_media_save_fail_title">保存媒体失败</string>
+    <string name="common_alerts_media_save_fail_message">请重试</string>
     <string name="common_alerts_photo_saved_title">照片已保存</string>
     <string name="common_alerts_photo_save_fail_title">保存照片失败</string>
     <string name="common_alerts_photo_save_fail_message">请重试</string>
@@ -121,6 +126,7 @@
     <string name="common_countable_tweet_multiple">%s 推文</string>
     <string name="common_countable_photo_single">%s 图片</string>
     <string name="common_countable_photo_multiple">%s 图片</string>
+    <string name="common_notification_channel_background_progresses_name">后台操作</string>
     <string name="scene_drawer_sign_in">登录</string>
     <string name="scene_drawer_manage_accounts">管理帐号</string>
     <string name="scene_manage_accounts_title">帐号</string>

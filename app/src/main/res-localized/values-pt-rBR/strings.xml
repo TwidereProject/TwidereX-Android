@@ -19,6 +19,7 @@
     <string name="common_alerts_tweet_deleted_title">Tweet Excluído</string>
     <string name="common_alerts_failed_to_delete_tweet_title">Falha ao Excluir Tweet</string>
     <string name="common_alerts_failed_to_delete_tweet_message">Por favor, tente novamente</string>
+    <string name="common_alerts_media_save_fail_message">Por favor, tente novamente</string>
     <string name="common_alerts_photo_saved_title">Foto Salva</string>
     <string name="common_alerts_photo_save_fail_title">Falha ao Salvar Foto</string>
     <string name="common_alerts_photo_save_fail_message">Por favor, tente novamente</string>
@@ -188,6 +189,8 @@
     <string name="scene_compose_visibility_unlisted">Não listado</string>
     <string name="scene_compose_visibility_private">Privado</string>
     <string name="scene_compose_visibility_direct">Direto</string>
+    <string name="scene_compose_user_search_search_placeholder">Buscar usuários</string>
+    <string name="scene_compose_hashtag_search_search_placeholder">Buscar hashtag</string>
     <string name="scene_drafts_title">Rascunhos</string>
     <string name="scene_drafts_actions_delete_draft">Excluir rascunho</string>
     <string name="scene_drafts_actions_edit_draft">Editar rascunho</string>
@@ -235,8 +238,18 @@
     <string name="scene_settings_display_media_automatic">Automático</string>
     <string name="scene_settings_display_media_always">Sempre</string>
     <string name="scene_settings_display_media_off">Desligado</string>
+    <string name="scene_settings_storage_title">Armazenamento</string>
+    <string name="scene_settings_storage_search_title">Limpar histórico de busca</string>
+    <string name="scene_settings_storage_media_title">Limpar cache de mídia</string>
+    <string name="scene_settings_storage_media_sub_title">Limpar cache de mídia armazenado.</string>
+    <string name="scene_settings_storage_all_title">Limpar todo o cache</string>
+    <string name="scene_settings_storage_all_sub_title">Exclua todo o cache do Twidere X. Suas credenciais de conta não serão perdidas.</string>
     <string name="scene_settings_about_title">Sobre</string>
     <string name="scene_settings_about_license">Licença</string>
+    <string name="scene_settings_about_description">Próxima geração do Twidere para Android 5.0+. \nAinda na fase inicial.</string>
+    <string name="scene_settings_about_version">Ver %s</string>
+    <string name="scene_settings_about_logo_background">Sobre o logo da página de fundo</string>
+    <string name="scene_settings_about_logo_background_shadow">Sobre a sombra do logo da página de fundo</string>
     <string name="accessibility_common_network_image">Imagem da Rede</string>
     <string name="accessibility_common_back">Voltar</string>
     <string name="accessibility_common_more">Mais</string>
@@ -246,6 +259,7 @@
     <string name="accessibility_common_logo_twitter">Logo do Twitter</string>
     <string name="accessibility_common_logo_mastodon">Logo do Mastodon</string>
     <string name="accessibility_common_logo_github">Logo do Github</string>
+    <string name="accessibility_common_logo_telegram">Logo do Telegram</string>
     <string name="accessibility_common_video_play">Reproduzir vídeo</string>
     <string name="accessibility_common_status_location">Localização</string>
     <string name="accessibility_common_status_retweeted">Retweetado</string>

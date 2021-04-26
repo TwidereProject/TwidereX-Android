@@ -15,11 +15,16 @@
     <string name="common_alerts_unfollow_user_message">Unfollow user %s?</string>
     <string name="common_alerts_cancel_follow_request_message">Cancel follow request for %s?</string>
     <string name="common_alerts_tweet_sent_title">Tweet Sent</string>
+    <string name="common_alerts_tweet_sending_title">Sending tweet</string>
     <string name="common_alerts_tweet_fail_title">Failed to Tweet</string>
     <string name="common_alerts_tweet_fail_message">Please try again</string>
     <string name="common_alerts_tweet_deleted_title">Tweet Deleted</string>
     <string name="common_alerts_failed_to_delete_tweet_title">Failed to Delete Tweet</string>
     <string name="common_alerts_failed_to_delete_tweet_message">Please try again</string>
+    <string name="common_alerts_media_saving_title">Saving media</string>
+    <string name="common_alerts_media_saved_title">Media saved</string>
+    <string name="common_alerts_media_save_fail_title">Failed to save media</string>
+    <string name="common_alerts_media_save_fail_message">Please try again</string>
     <string name="common_alerts_photo_saved_title">Photo Saved</string>
     <string name="common_alerts_photo_save_fail_title">Failed to Save Photo</string>
     <string name="common_alerts_photo_save_fail_message">Please try again</string>
@@ -122,6 +127,7 @@
     <string name="common_countable_tweet_multiple">%s tweets</string>
     <string name="common_countable_photo_single">%s photo</string>
     <string name="common_countable_photo_multiple">%s photos</string>
+    <string name="common_notification_channel_background_progresses_name">Background progresses</string>
     <string name="scene_drawer_sign_in">Sign in</string>
     <string name="scene_drawer_manage_accounts">Manage accounts</string>
     <string name="scene_manage_accounts_title">Accounts</string>

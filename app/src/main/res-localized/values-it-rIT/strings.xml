@@ -7,6 +7,7 @@
     <string name="common_alerts_tweet_fail_title">Tweet non riuscito</string>
     <string name="common_alerts_tweet_fail_message">Si prega di riprovare</string>
     <string name="common_alerts_failed_to_delete_tweet_message">Si prega di riprovare</string>
+    <string name="common_alerts_media_save_fail_message">Si prega di riprovare</string>
     <string name="common_alerts_photo_saved_title">Foto Salvata</string>
     <string name="common_alerts_photo_save_fail_title">Salvataggio foto non riuscito</string>
     <string name="common_alerts_photo_save_fail_message">Si prega di riprovare</string>
