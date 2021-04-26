@@ -93,7 +93,6 @@ abstract class ComposeWorker<T : MicroBlogService>(
             notificationManagerCompat.notify(notificationId, builder.build())
             Result.success()
         } catch (e: Throwable) {
-            e.printStackTrace()
             val intent =
                 Intent(Intent.ACTION_VIEW, Uri.parse(Route.DeepLink.Draft(composeData.draftId)))
             val pendingIntent =
