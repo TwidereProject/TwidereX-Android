@@ -43,6 +43,7 @@ import com.twidere.twiderex.scenes.compose.ComposeScene
 import com.twidere.twiderex.scenes.compose.ComposeSearchHashtagScene
 import com.twidere.twiderex.scenes.compose.ComposeSearchUserScene
 import com.twidere.twiderex.scenes.compose.DraftComposeScene
+import com.twidere.twiderex.scenes.lists.ListTimeLineScene
 import com.twidere.twiderex.scenes.lists.ListsScene
 import com.twidere.twiderex.scenes.mastodon.MastodonHashtagScene
 import com.twidere.twiderex.scenes.mastodon.MastodonSignInScene
@@ -192,6 +193,7 @@ object Route {
 
     object Lists {
         const val Home = "lists"
+        fun Timeline(listKey: MicroBlogKey) = "$Home/timeline/$listKey"
     }
 }
 
@@ -592,5 +594,13 @@ fun RouteBuilder.route(constraints: Constraints) {
 
     authorizedScene(Route.Lists.Home) {
         ListsScene()
+    }
+
+    authorizedScene(
+        "lists/timeline/{listKey}"
+    ) { backStackEntry ->
+        backStackEntry.path<String>("listKey")?.let {
+            ListTimeLineScene(listKey = MicroBlogKey.valueOf(it))
+        }
     }
 }

@@ -35,20 +35,24 @@ import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
 import com.twidere.twiderex.component.lazy.collectAsLazyPagingItems
 import com.twidere.twiderex.component.lazy.ui.LazyUiListList
 import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.ui.LocalActiveAccount
+import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.lists.ListsViewModel
+import moe.tlaster.precompose.navigation.NavController
 
 // 1.Done finished layout of this page
 // 2.Done finished ui style (size, padding, text)
 // 3.Done bind viewmodel to this scene
 // 4.TODO navigate to create list
-// 5.TODO navigate to listTimes
-// 6.TODO ADD this scene to route
+// 5.Done navigate to list timeline
+// 6.Done ADD this scene to route
 // 7.TODO ADD TEXT RESOURCES
 
 @Composable
 fun ListsScene() {
+    val navController = LocalNavController.current
     TwidereScene {
         InAppNotificationScaffold(
             topBar = {
@@ -72,13 +76,13 @@ fun ListsScene() {
                 }
             }
         ) {
-            ListsContent()
+            ListsContent(navController)
         }
     }
 }
 
 @Composable
-fun ListsContent() {
+fun ListsContent(navController: NavController) {
     val account = LocalActiveAccount.current ?: return
     // if list type is all , display title of each type
     val listsViewMode = assistedViewModel<ListsViewModel.AssistedFactory, ListsViewModel>(
@@ -96,7 +100,7 @@ fun ListsContent() {
             listType = account.listType,
             ownerItems = ownerItems,
             subscribedItems = subscribeItems,
-            onItemClicked = { /*to lists timeline page*/ }
+            onItemClicked = { navController.navigate(Route.Lists.Timeline(it.listKey)) }
         )
     }
 }

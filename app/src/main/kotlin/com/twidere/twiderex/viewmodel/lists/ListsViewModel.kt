@@ -76,6 +76,9 @@ class ListsModifyViewModel @AssistedInject constructor(
     val modifySuccess = MutableLiveData<Boolean>(false)
     val loading = MutableLiveData<Boolean>(false)
 
+    fun source(listKey: MicroBlogKey) =
+        listsRepository.findListWithListKey(account = account, listKey = listKey)
+
     fun createList(
         title: String,
         description: String? = null,

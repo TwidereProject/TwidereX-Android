@@ -20,6 +20,7 @@
  */
 package com.twidere.twiderex.db.dao
 
+import androidx.lifecycle.LiveData
 import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Delete
@@ -38,6 +39,9 @@ interface ListsDao {
 
     @Query("SELECT * FROM lists WHERE listKey == :listKey AND accountKey == :accountKey")
     suspend fun findWithListKey(listKey: MicroBlogKey, accountKey: MicroBlogKey): DbList?
+
+    @Query("SELECT * FROM lists WHERE listKey == :listKey AND accountKey == :accountKey")
+    fun findWithListKeyWithLiveData(listKey: MicroBlogKey, accountKey: MicroBlogKey): LiveData<DbList?>
 
     @Query("SELECT * FROM lists")
     suspend fun findAll(): List<DbList>?

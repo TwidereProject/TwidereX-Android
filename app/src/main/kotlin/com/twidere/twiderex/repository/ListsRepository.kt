@@ -20,6 +20,8 @@
  */
 package com.twidere.twiderex.repository
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.map
 import androidx.paging.PagingData
 import com.twidere.services.microblog.ListsService
 import com.twidere.twiderex.db.CacheDatabase
@@ -33,6 +35,14 @@ import com.twidere.twiderex.paging.mediator.list.ListsMediator.Companion.toUi
 import kotlinx.coroutines.flow.Flow
 
 class ListsRepository(private val database: CacheDatabase) {
+
+    fun findListWithListKey(account: AccountDetails, listKey: MicroBlogKey): LiveData<UiList?> {
+        return database.listsDao().findWithListKeyWithLiveData(listKey = listKey, accountKey = account.accountKey)
+            .map {
+                it?.toUi()
+            }
+    }
+
     fun fetchLists(account: AccountDetails): Flow<PagingData<UiList>> {
         val mediator = ListsMediator(
             database = database,
