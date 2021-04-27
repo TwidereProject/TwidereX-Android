@@ -19,6 +19,7 @@
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
 package com.twidere.twiderex.model.ui
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import com.twidere.twiderex.db.model.DbList
 import com.twidere.twiderex.model.MicroBlogKey
@@ -43,13 +44,24 @@ data class UiList(
         get() = mode == ListsMode.PRIVATE.value
 
     companion object {
+        @Composable
+        fun placeHolder() = UiList(
+            id = "",
+            title = "",
+            ownerId = "",
+            descriptions = "",
+            mode = "",
+            replyPolicy = "",
+            accountKey = MicroBlogKey.Empty,
+            listKey = MicroBlogKey.Empty
+        )
 
         fun sample() = UiList(
             id = "1",
             ownerId = "1",
             title = "Sample List",
             descriptions = "Sample List",
-            mode = "public",
+            mode = "private",
             replyPolicy = "",
             accountKey = MicroBlogKey.Empty,
             listKey = MicroBlogKey.Empty
