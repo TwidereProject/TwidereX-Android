@@ -77,16 +77,22 @@ fun StatusMediaComponent(
         navigator.media(statusKey = status.statusKey, selectedIndex = index)
     }
 
-    val aspectRatio = if (media.size > 1) {
-        270f / 162f
-    } else {
-        val first = media.first()
-        (first.width.toFloat() / first.height.toFloat()).let {
-            if (it.isNaN()) {
-                270f / 162f
-            } else {
-                it
+    val aspectRatio = when (media.size) {
+        in 2..4 -> {
+            270f / 162f
+        }
+        1 -> {
+            val first = media.first()
+            (first.width.toFloat() / first.height.toFloat()).let {
+                if (it.isNaN()) {
+                    270f / 162f
+                } else {
+                    it
+                }
             }
+        }
+        else -> {
+            null
         }
     }
     Box(
@@ -98,7 +104,12 @@ fun StatusMediaComponent(
                     it
                 }
             }
-            .aspectRatio(aspectRatio),
+            .let { modifier ->
+                aspectRatio?.let {
+                    modifier.aspectRatio(aspectRatio)
+                } ?: modifier
+            }
+            .clip(MaterialTheme.shapes.medium)
     ) {
         when (media.size) {
             3 -> {
@@ -138,18 +149,14 @@ fun StatusMediaComponent(
                 }
             }
             else -> {
-                Column {
-                    GridLayout(
-                        modifier = Modifier.aspectRatio(aspectRatio),
-                        spacing = StatusMediaDefaults.MediaSpacing
-                    ) {
-                        media.forEach {
-                            StatusMediaPreviewItem(
-                                media = it,
-                                modifier = Modifier.weight(1f),
-                                onClick = onItemClick,
-                            )
-                        }
+                GridLayout(
+                    spacing = StatusMediaDefaults.MediaSpacing
+                ) {
+                    media.forEach {
+                        StatusMediaPreviewItem(
+                            media = it,
+                            onClick = onItemClick,
+                        )
                     }
                 }
             }
@@ -161,11 +168,12 @@ fun StatusMediaComponent(
             }
             TwidereTheme(darkTheme = true) {
                 AnimatedVisibility(
+                    modifier = Modifier
+                        .matchParentSize(),
                     visible = sensitive,
                 ) {
                     Box(
                         modifier = Modifier
-                            .fillMaxSize()
                             .background(MaterialTheme.colors.surface.withElevation())
                             .clickable {
                                 sensitive = false
