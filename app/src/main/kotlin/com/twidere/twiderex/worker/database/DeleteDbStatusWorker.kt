@@ -25,6 +25,7 @@ import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkerParameters
+import androidx.work.workDataOf
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.repository.StatusRepository
 import dagger.assisted.Assisted
@@ -38,14 +39,21 @@ class DeleteDbStatusWorker @AssistedInject constructor(
 ) : CoroutineWorker(appContext, params) {
 
     companion object {
-        fun create() = OneTimeWorkRequestBuilder<DeleteDbStatusWorker>().build()
+        fun create(
+            statusKey: MicroBlogKey
+        ) = OneTimeWorkRequestBuilder<DeleteDbStatusWorker>()
+            .setInputData(
+                workDataOf(
+                    "statusKey" to statusKey.toString(),
+                )
+            ).build()
     }
 
     override suspend fun doWork(): Result {
-        val status = inputData.getString("statusKey")?.let {
+        val statusKey = inputData.getString("statusKey")?.let {
             MicroBlogKey.valueOf(it)
         } ?: return Result.failure()
-        statusRepository.removeStatus(status)
+        statusRepository.removeStatus(statusKey)
         return Result.success()
     }
 }
