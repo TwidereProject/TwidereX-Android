@@ -82,7 +82,10 @@ fun DetailedStatusComponent(
                         LocalContentAlpha provides ContentAlpha.disabled
                     ) {
                         if (!status.placeString.isNullOrEmpty()) {
-                            Row {
+                            Row(
+                                modifier = Modifier
+                                    .align(Alignment.CenterHorizontally)
+                            ) {
                                 Icon(
                                     modifier = Modifier.size(MaterialTheme.typography.body1.fontSize.value.dp),
                                     painter = painterResource(id = R.drawable.ic_map_pin),
