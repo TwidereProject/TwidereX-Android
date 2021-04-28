@@ -54,7 +54,7 @@ class StatusActions @Inject constructor(
                 status = status,
                 accountKey = account.accountKey
             )
-        ).then(DeleteDbStatusWorker.create())
+        ).then(DeleteDbStatusWorker.create(status.statusKey))
             .enqueue()
     }
 
