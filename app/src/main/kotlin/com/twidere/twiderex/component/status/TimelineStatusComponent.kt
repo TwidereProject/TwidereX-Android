@@ -358,7 +358,7 @@ fun StatusContent(
                 when (type) {
                     StatusContentType.Normal -> {
                         Spacer(modifier = Modifier.height(StatusContentDefaults.Normal.BodySpacing))
-                        StatusBody(status)
+                        StatusBody(status, type = type)
                     }
                     StatusContentType.Extend -> UserScreenName(status.user)
                 }
@@ -366,7 +366,7 @@ fun StatusContent(
         }
         if (type == StatusContentType.Extend) {
             Spacer(modifier = Modifier.height(StatusContentDefaults.Extend.BodySpacing))
-            StatusBody(status = status)
+            StatusBody(status = status, type = type)
         }
     }
 }
@@ -388,6 +388,7 @@ object StatusContentDefaults {
 @Composable
 fun ColumnScope.StatusBody(
     status: UiStatus,
+    type: StatusContentType,
 ) {
     StatusText(
         status = status,
@@ -395,7 +396,7 @@ fun ColumnScope.StatusBody(
 
     StatusBodyMedia(status)
 
-    if (!status.placeString.isNullOrEmpty()) {
+    if (!status.placeString.isNullOrEmpty() && type == StatusContentType.Normal) {
         Spacer(modifier = Modifier.height(StatusBodyDefaults.PlaceSpacing))
         CompositionLocalProvider(
             LocalContentAlpha provides ContentAlpha.medium
