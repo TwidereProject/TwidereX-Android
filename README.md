@@ -17,15 +17,18 @@ Next generation of Twidere for Android 5.0+. **Still in early stage.**
 
 
 ## What's Happening
-### 1.0.3 - January 2021 Update
- - You can now search and @ user while composing new tweet  
- - New design for login with custom API key support  
- - Stability improve  
+### 1.1.0 - April 2021 Update
+- **Mastodon Support is here!**
+- You can now save media for a tweet
+- You can now filtering user timeline by reply
+- Add clear image and tweet cache support
+- UI/UX tweaking  
+- Stability improve  
 
-### What is being planned for 1.1 - January 2021
+### What is being planned for 1.1.1 - April 2021
 
-For 1.1, we are proactively working on:
-- **Mastodon Support!**
+For 1.1.1, we are proactively working on:
+- **List Timeline Support!**
 - Stability
 - UI/UX tweaking
 
