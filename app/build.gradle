@@ -188,6 +188,7 @@ dependencies {
     implementation libs.zoomable
     implementation libs.nestedScrollView
     implementation libs.swiper
+    implementation libs.placeholder
 
     implementation libs.twittertext
     implementation libs.jsoup
