@@ -28,13 +28,14 @@ import androidx.compose.ui.layout.MeasurePolicy
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import kotlin.math.ceil
 import kotlin.math.sqrt
 
 @Composable
 fun GridLayout(
     modifier: Modifier = Modifier,
-    spacing: Dp,
+    spacing: Dp = 0.dp,
     content: @Composable () -> Unit
 ) {
     val pxSpacing = with(LocalDensity.current) {
@@ -55,15 +56,20 @@ private fun gridLayoutMeasurePolicy(
     MeasurePolicy { measurables, constraints ->
         val columns = ceil(sqrt(measurables.size.toDouble()))
         val rows = ceil((measurables.size.toDouble() / columns))
-        val itemWidth = ((constraints.maxWidth.toDouble() - spacing * (columns - 1)) / columns).toInt()
-        val itemHeight = ((constraints.maxHeight.toDouble() - spacing * (rows - 1)) / rows).toInt()
+        val itemWidth =
+            ((constraints.maxWidth.toDouble() - spacing * (columns - 1)) / columns).toInt()
+        val itemHeight = if (constraints.maxHeight != Constraints.Infinity) {
+            ((constraints.maxHeight.toDouble() - spacing * (rows - 1)) / rows).toInt()
+        } else {
+            itemWidth
+        }
         val placeables = measurables.map { measurable ->
             measurable.measure(Constraints.fixed(width = itemWidth, height = itemHeight))
         }
 
         layout(
             width = constraints.maxWidth,
-            height = constraints.maxHeight
+            height = (itemHeight * rows + spacing * (rows - 1)).toInt()
         ) {
             var currentX = 0
             var currentY = 0
