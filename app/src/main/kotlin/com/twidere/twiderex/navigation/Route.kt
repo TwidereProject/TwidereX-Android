@@ -45,6 +45,7 @@ import com.twidere.twiderex.scenes.compose.ComposeSearchUserScene
 import com.twidere.twiderex.scenes.compose.DraftComposeScene
 import com.twidere.twiderex.scenes.lists.ListTimeLineScene
 import com.twidere.twiderex.scenes.lists.ListsScene
+import com.twidere.twiderex.scenes.lists.platform.TwitterListsCreateScene
 import com.twidere.twiderex.scenes.mastodon.MastodonHashtagScene
 import com.twidere.twiderex.scenes.mastodon.MastodonSignInScene
 import com.twidere.twiderex.scenes.mastodon.MastodonWebSignInScene
@@ -193,6 +194,7 @@ object Route {
 
     object Lists {
         const val Home = "lists"
+        const val TwitterCreate = "$Home/twitter/create"
         fun Timeline(listKey: MicroBlogKey) = "$Home/timeline/$listKey"
     }
 }
@@ -594,6 +596,10 @@ fun RouteBuilder.route(constraints: Constraints) {
 
     authorizedScene(Route.Lists.Home) {
         ListsScene()
+    }
+
+    authorizedScene(Route.Lists.TwitterCreate) {
+        TwitterListsCreateScene()
     }
 
     authorizedScene(

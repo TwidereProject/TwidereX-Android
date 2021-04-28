@@ -24,7 +24,6 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import com.twidere.services.utils.MicroBlogJsonException
 import com.twidere.twiderex.model.AccountDetails
-import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiList
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.notification.NotificationEvent
@@ -43,7 +42,7 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
-class ListsModifyViewModelTest : ViewModelTestBase() {
+class ListsCreateViewModelTest : ViewModelTestBase() {
     @get:Rule
     val rule = InstantTaskExecutorRule()
 
@@ -64,52 +63,28 @@ class ListsModifyViewModelTest : ViewModelTestBase() {
 
     private var errorNotification: NotificationEvent? = null
 
-    private lateinit var modifyViewModel: ListsModifyViewModel
+    private lateinit var createViewModel: ListsCreateViewModel
 
     @Test
-    fun updateList_successExpectTrue(): Unit = runBlocking(Dispatchers.Main) {
-        whenever(mockRepository.updateLists(any(), any(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull()))
+    fun createList_successExpectTrue(): Unit = runBlocking(Dispatchers.Main) {
+        whenever(mockRepository.createLists(any(), any(), anyOrNull(), anyOrNull(), anyOrNull()))
             .thenReturn(UiList.sample())
 
         verifySuccessAndLoadingBefore(mockLoadingObserver, mockSuccessObserver)
         async {
-            modifyViewModel.editList(listId = "123", title = "title", private = false)
+            createViewModel.createList(title = "title", private = false)
         }.await()
         verifySuccessAndLoadingAfter(mockLoadingObserver, mockSuccessObserver, true)
     }
 
     @Test
-    fun updateList_failedExpectFalseAndShowNotification(): Unit = runBlocking(Dispatchers.Main) {
-        whenever(mockRepository.updateLists(any(), any(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull()))
+    fun createList_failedExpectFalseAndShowNotification(): Unit = runBlocking(Dispatchers.Main) {
+        whenever(mockRepository.createLists(any(), any(), anyOrNull(), anyOrNull(), anyOrNull()))
             .thenAnswer { throw MicroBlogJsonException("test exception") }
         verifySuccessAndLoadingBefore(mockLoadingObserver, mockSuccessObserver)
         Assert.assertNull(errorNotification)
         async {
-            modifyViewModel.editList(listId = "", title = "title", private = false)
-        }.await()
-        verifySuccessAndLoadingAfter(mockLoadingObserver, mockSuccessObserver, false)
-        Assert.assertNotNull(errorNotification)
-    }
-
-    @Test
-    fun deleteList_successExpectTrue(): Unit = runBlocking(Dispatchers.Main) {
-        whenever(mockRepository.deleteLists(any(), any(), any()))
-            .thenReturn(Unit)
-        verifySuccessAndLoadingBefore(mockLoadingObserver, mockSuccessObserver)
-        async {
-            modifyViewModel.deleteList(listId = "123", MicroBlogKey.Empty)
-        }.await()
-        verifySuccessAndLoadingAfter(mockLoadingObserver, mockSuccessObserver, true)
-    }
-
-    @Test
-    fun deleteList_failedExpectFalseAndShowNotification(): Unit = runBlocking(Dispatchers.Main) {
-        whenever(mockRepository.deleteLists(any(), any(), any()))
-            .thenAnswer { throw MicroBlogJsonException("test exception") }
-        verifySuccessAndLoadingBefore(mockLoadingObserver, mockSuccessObserver)
-        Assert.assertNull(errorNotification)
-        async {
-            modifyViewModel.deleteList(listId = "123", MicroBlogKey.Empty)
+            createViewModel.createList(title = "title", private = false)
         }.await()
         verifySuccessAndLoadingAfter(mockLoadingObserver, mockSuccessObserver, false)
         Assert.assertNotNull(errorNotification)
@@ -117,11 +92,10 @@ class ListsModifyViewModelTest : ViewModelTestBase() {
 
     override fun setUp() {
         super.setUp()
-        modifyViewModel = ListsModifyViewModel(
-            mockRepository,
+        createViewModel = ListsCreateViewModel(
             mockAppNotification,
-            mockAccount,
-            listKey = MicroBlogKey.Empty,
+            mockRepository,
+            mockAccount
         ) {
             mockSuccessObserver.onChanged(it)
         }
@@ -131,8 +105,7 @@ class ListsModifyViewModelTest : ViewModelTestBase() {
         }
         errorNotification = null
         mockSuccessObserver.onChanged(false)
-        // modifyViewModel.modifySuccess.observeForever(mockSuccessObserver)
-        modifyViewModel.loading.observeForever(mockLoadingObserver)
+        createViewModel.loading.observeForever(mockLoadingObserver)
     }
 
     private fun verifySuccessAndLoadingBefore(loadingObserver: Observer<Boolean>, successObserver: Observer<Boolean>) {

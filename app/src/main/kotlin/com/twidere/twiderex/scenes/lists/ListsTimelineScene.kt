@@ -71,9 +71,10 @@ fun ListTimeLineScene(
 ) {
     val account = LocalActiveAccount.current ?: return
     val viewModel = assistedViewModel<ListsModifyViewModel.AssistedFactory, ListsModifyViewModel>(
-        account,
+        account, listKey
     ) {
-        it.create(account, listKey)
+        it.create(account, listKey) {
+        }
     }
     val source by viewModel.source.observeAsState()
     TwidereScene {

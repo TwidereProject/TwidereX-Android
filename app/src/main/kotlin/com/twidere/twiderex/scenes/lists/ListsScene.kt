@@ -20,10 +20,15 @@
  */
 package com.twidere.twiderex.scenes.lists
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.paging.LoadState
@@ -35,17 +40,18 @@ import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
 import com.twidere.twiderex.component.lazy.collectAsLazyPagingItems
 import com.twidere.twiderex.component.lazy.ui.LazyUiListList
 import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.navigation.Route
+import com.twidere.twiderex.scenes.lists.platform.MastodonListsCreateDialog
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.lists.ListsViewModel
-import moe.tlaster.precompose.navigation.NavController
 
 // 1.Done finished layout of this page
 // 2.Done finished ui style (size, padding, text)
 // 3.Done bind viewmodel to this scene
-// 4.TODO navigate to create list
+// 4.Done navigate to create list
 // 5.Done navigate to list timeline
 // 6.Done ADD this scene to route
 // 7.Done ADD TEXT RESOURCES
@@ -54,6 +60,18 @@ import moe.tlaster.precompose.navigation.NavController
 @Composable
 fun ListsScene() {
     val navController = LocalNavController.current
+    val account = LocalActiveAccount.current ?: return
+    // if list type is all , display title of each type
+    val listsViewMode = assistedViewModel<ListsViewModel.AssistedFactory, ListsViewModel>(
+        account,
+    ) {
+        it.create(account)
+    }
+    val ownerItems = listsViewMode.ownerSource.collectAsLazyPagingItems()
+    val subscribeItems = listsViewMode.subscribedSource.collectAsLazyPagingItems()
+    var showCreateDialog by remember {
+        mutableStateOf(false)
+    }
     TwidereScene {
         InAppNotificationScaffold(
             topBar = {
@@ -67,7 +85,15 @@ fun ListsScene() {
                 )
             },
             floatingActionButton = {
-                FloatingActionButton(onClick = { /*TODO*/ }) {
+                FloatingActionButton(
+                    onClick = {
+                        if (account.type == PlatformType.Mastodon) {
+                            showCreateDialog = true
+                        } else {
+                            navController.navigate(Route.Lists.TwitterCreate)
+                        }
+                    }
+                ) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_add),
                         contentDescription = stringResource(
@@ -77,31 +103,22 @@ fun ListsScene() {
                 }
             }
         ) {
-            ListsContent(navController)
+            Box {
+                SwipeToRefreshLayout(
+                    refreshingState = ownerItems.loadState.refresh is LoadState.Loading,
+                    onRefresh = { ownerItems.refresh() }
+                ) {
+                    LazyUiListList(
+                        listType = account.listType,
+                        ownerItems = ownerItems,
+                        subscribedItems = subscribeItems,
+                        onItemClicked = { navController.navigate(Route.Lists.Timeline(it.listKey)) }
+                    )
+                }
+                if (showCreateDialog) {
+                    MastodonListsCreateDialog(onDismissRequest = { showCreateDialog = false })
+                }
+            }
         }
-    }
-}
-
-@Composable
-fun ListsContent(navController: NavController) {
-    val account = LocalActiveAccount.current ?: return
-    // if list type is all , display title of each type
-    val listsViewMode = assistedViewModel<ListsViewModel.AssistedFactory, ListsViewModel>(
-        account,
-    ) {
-        it.create(account)
-    }
-    val ownerItems = listsViewMode.ownerSource.collectAsLazyPagingItems()
-    val subscribeItems = listsViewMode.subscribedSource.collectAsLazyPagingItems()
-    SwipeToRefreshLayout(
-        refreshingState = ownerItems.loadState.refresh is LoadState.Loading,
-        onRefresh = { ownerItems.refresh() }
-    ) {
-        LazyUiListList(
-            listType = account.listType,
-            ownerItems = ownerItems,
-            subscribedItems = subscribeItems,
-            onItemClicked = { navController.navigate(Route.Lists.Timeline(it.listKey)) }
-        )
     }
 }

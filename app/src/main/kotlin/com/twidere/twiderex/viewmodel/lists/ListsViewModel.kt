@@ -62,23 +62,40 @@ class ListsViewModel @AssistedInject constructor(
     }
 }
 
-class ListsModifyViewModel @AssistedInject constructor(
-    private val listsRepository: ListsRepository,
-    private val inAppNotification: InAppNotification,
-    @Assisted private val account: AccountDetails,
-    @Assisted private val listKey: MicroBlogKey,
+abstract class ListsOperatorViewModel(
+    protected val inAppNotification: InAppNotification,
+    protected val onResult: (success: Boolean) -> Unit,
 ) : ViewModel() {
-
-    @dagger.assisted.AssistedFactory
-    interface AssistedFactory {
-        fun create(account: AccountDetails, listKey: MicroBlogKey): ListsModifyViewModel
-    }
-
     val modifySuccess = MutableLiveData(false)
     val loading = MutableLiveData(false)
 
-    val source by lazy {
-        listsRepository.findListWithListKey(account = account, listKey = listKey)
+    protected fun loadingRequest(request: suspend () -> Unit) {
+        loading.postValue(true)
+        viewModelScope.launch {
+            try {
+                request()
+                modifySuccess.postValue(true)
+                onResult(true)
+            } catch (e: Throwable) {
+                e.notify(inAppNotification)
+                modifySuccess.postValue(false)
+                onResult(false)
+            } finally {
+                loading.postValue(false)
+            }
+        }
+    }
+}
+
+class ListsCreateViewModel @AssistedInject constructor(
+    inAppNotification: InAppNotification,
+    private val listsRepository: ListsRepository,
+    @Assisted private val account: AccountDetails,
+    @Assisted onResult: (success: Boolean) -> Unit
+) : ListsOperatorViewModel(inAppNotification, onResult) {
+    @dagger.assisted.AssistedFactory
+    interface AssistedFactory {
+        fun create(account: AccountDetails, onResult: (success: Boolean) -> Unit): ListsCreateViewModel
     }
 
     fun createList(
@@ -94,6 +111,24 @@ class ListsModifyViewModel @AssistedInject constructor(
                 mode = if (private)ListsMode.PRIVATE.value else ListsMode.PUBLIC.value
             )
         }
+    }
+}
+
+class ListsModifyViewModel @AssistedInject constructor(
+    private val listsRepository: ListsRepository,
+    inAppNotification: InAppNotification,
+    @Assisted private val account: AccountDetails,
+    @Assisted private val listKey: MicroBlogKey,
+    @Assisted onResult: (success: Boolean) -> Unit
+) : ListsOperatorViewModel(inAppNotification, onResult) {
+
+    @dagger.assisted.AssistedFactory
+    interface AssistedFactory {
+        fun create(account: AccountDetails, listKey: MicroBlogKey, onResult: (success: Boolean) -> Unit): ListsModifyViewModel
+    }
+
+    val source by lazy {
+        listsRepository.findListWithListKey(account = account, listKey = listKey)
     }
 
     fun editList(
@@ -123,21 +158,6 @@ class ListsModifyViewModel @AssistedInject constructor(
                 listKey = listKey,
                 listId = listId,
             )
-        }
-    }
-
-    private fun loadingRequest(request: suspend () -> Unit) {
-        loading.postValue(true)
-        viewModelScope.launch {
-            try {
-                request()
-                modifySuccess.postValue(true)
-            } catch (e: Throwable) {
-                e.notify(inAppNotification)
-                modifySuccess.postValue(false)
-            } finally {
-                loading.postValue(false)
-            }
         }
     }
 }
