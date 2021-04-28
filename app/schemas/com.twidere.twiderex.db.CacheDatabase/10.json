@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 10,
-    "identityHash": "ca3423ec8b109801a8495ea45db21bdf",
+    "identityHash": "9101e338724db0f85c2ae91610743c33",
     "entities": [
       {
         "tableName": "status",
@@ -659,7 +659,7 @@
       },
       {
         "tableName": "lists",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` TEXT NOT NULL, `listId` TEXT NOT NULL, `ownerId` TEXT NOT NULL, `accountKey` TEXT NOT NULL, `listKey` TEXT NOT NULL, `title` TEXT NOT NULL, `description` TEXT NOT NULL, `mode` TEXT NOT NULL, `replyPolicy` TEXT NOT NULL, PRIMARY KEY(`_id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` TEXT NOT NULL, `listId` TEXT NOT NULL, `ownerId` TEXT NOT NULL, `accountKey` TEXT NOT NULL, `listKey` TEXT NOT NULL, `title` TEXT NOT NULL, `description` TEXT NOT NULL, `mode` TEXT NOT NULL, `replyPolicy` TEXT NOT NULL, `isFollowed` INTEGER NOT NULL, `allowToSubscribe` INTEGER NOT NULL, PRIMARY KEY(`_id`))",
         "fields": [
           {
             "fieldPath": "_id",
@@ -714,6 +714,18 @@
             "columnName": "replyPolicy",
             "affinity": "TEXT",
             "notNull": true
+          },
+          {
+            "fieldPath": "isFollowed",
+            "columnName": "isFollowed",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "allowToSubscribe",
+            "columnName": "allowToSubscribe",
+            "affinity": "INTEGER",
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -739,7 +751,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'ca3423ec8b109801a8495ea45db21bdf')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '9101e338724db0f85c2ae91610743c33')"
     ]
   }
 }

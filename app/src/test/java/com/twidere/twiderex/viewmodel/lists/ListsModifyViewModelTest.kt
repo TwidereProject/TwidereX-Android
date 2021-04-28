@@ -146,6 +146,7 @@ class ListsModifyViewModelTest : ViewModelTestBase() {
             mockRepository,
             mockAppNotification,
             mockAccount,
+            listKey = MicroBlogKey.Empty
         )
         whenever(mockAppNotification.show(any<NotificationEvent>())).then {
             errorNotification = it.getArgument(0) as NotificationEvent

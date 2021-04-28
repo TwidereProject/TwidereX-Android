@@ -46,6 +46,7 @@ import com.twidere.twiderex.db.model.toDbStatusReference
 import com.twidere.twiderex.model.MediaType
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.PlatformType
+import com.twidere.twiderex.model.ui.ListsMode
 import com.twidere.twiderex.navigation.DeepLinks
 import com.twitter.twittertext.Autolink
 import java.util.UUID
@@ -501,5 +502,7 @@ fun TwitterList.toDbList(accountKey: MicroBlogKey) = DbList(
     mode = mode ?: "",
     replyPolicy = "",
     accountKey = accountKey,
-    listKey = MicroBlogKey.twitter(idStr ?: throw IllegalArgumentException("list.idStr should not be null"),)
+    listKey = MicroBlogKey.twitter(idStr ?: throw IllegalArgumentException("list.idStr should not be null"),),
+    isFollowed = following ?: true,
+    allowToSubscribe = mode != ListsMode.PRIVATE.value
 )

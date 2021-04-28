@@ -24,6 +24,7 @@ import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.ui.ListsMode
 
 @Entity(
     tableName = "lists",
@@ -40,11 +41,14 @@ data class DbList(
     val description: String,
     val mode: String,
     val replyPolicy: String,
+    val isFollowed: Boolean,
+    val allowToSubscribe: Boolean
 ) {
     fun update(
         title: String? = null,
         description: String? = null,
         mode: String? = null,
+        isFollowed: Boolean? = null,
         replyPolicy: String? = null
     ) = DbList(
         _id = _id,
@@ -55,6 +59,8 @@ data class DbList(
         title = title ?: this.title,
         description = description ?: this.description,
         mode = mode ?: this.mode,
-        replyPolicy = replyPolicy ?: this.replyPolicy
+        replyPolicy = replyPolicy ?: this.replyPolicy,
+        isFollowed = isFollowed ?: this.isFollowed,
+        allowToSubscribe = this.allowToSubscribe && mode != ListsMode.PRIVATE.value
     )
 }

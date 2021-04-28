@@ -34,6 +34,8 @@ data class UiList(
     val replyPolicy: String,
     val accountKey: MicroBlogKey,
     val listKey: MicroBlogKey,
+    val isFollowed: Boolean,
+    val allowToSubscribe: Boolean
 ) {
 
     fun isOwner(userId: String): Boolean {
@@ -53,7 +55,9 @@ data class UiList(
             mode = "",
             replyPolicy = "",
             accountKey = MicroBlogKey.Empty,
-            listKey = MicroBlogKey.Empty
+            listKey = MicroBlogKey.Empty,
+            isFollowed = true,
+            allowToSubscribe = true,
         )
 
         fun sample() = UiList(
@@ -64,7 +68,9 @@ data class UiList(
             mode = "private",
             replyPolicy = "",
             accountKey = MicroBlogKey.Empty,
-            listKey = MicroBlogKey.Empty
+            listKey = MicroBlogKey.Empty,
+            isFollowed = true,
+            allowToSubscribe = true,
         )
 
         fun DbList.toUi() =
@@ -77,6 +83,8 @@ data class UiList(
                 descriptions = description,
                 mode = mode,
                 replyPolicy = replyPolicy,
+                isFollowed = isFollowed,
+                allowToSubscribe = allowToSubscribe,
             )
     }
 }

@@ -48,7 +48,8 @@ import moe.tlaster.precompose.navigation.NavController
 // 4.TODO navigate to create list
 // 5.Done navigate to list timeline
 // 6.Done ADD this scene to route
-// 7.TODO ADD TEXT RESOURCES
+// 7.Done ADD TEXT RESOURCES
+// Todo empty page
 
 @Composable
 fun ListsScene() {
@@ -70,7 +71,7 @@ fun ListsScene() {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_add),
                         contentDescription = stringResource(
-                            id = R.string.scene_lists_tabs_created
+                            id = R.string.scene_lists_icons_create
                         )
                     )
                 }

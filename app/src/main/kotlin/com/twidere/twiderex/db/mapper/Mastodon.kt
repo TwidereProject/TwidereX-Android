@@ -340,7 +340,9 @@ fun MastodonList.toDbList(accountKey: MicroBlogKey): DbList {
         listKey = MicroBlogKey(
             id ?: throw IllegalArgumentException("list.idStr should not be null"),
             accountKey.host
-        )
+        ),
+        isFollowed = true,
+        allowToSubscribe = false,
     )
 }
 

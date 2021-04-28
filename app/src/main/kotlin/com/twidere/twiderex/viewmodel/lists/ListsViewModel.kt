@@ -66,18 +66,20 @@ class ListsModifyViewModel @AssistedInject constructor(
     private val listsRepository: ListsRepository,
     private val inAppNotification: InAppNotification,
     @Assisted private val account: AccountDetails,
+    @Assisted private val listKey: MicroBlogKey,
 ) : ViewModel() {
 
     @dagger.assisted.AssistedFactory
     interface AssistedFactory {
-        fun create(account: AccountDetails): ListsModifyViewModel
+        fun create(account: AccountDetails, listKey: MicroBlogKey): ListsModifyViewModel
     }
 
-    val modifySuccess = MutableLiveData<Boolean>(false)
-    val loading = MutableLiveData<Boolean>(false)
+    val modifySuccess = MutableLiveData(false)
+    val loading = MutableLiveData(false)
 
-    fun source(listKey: MicroBlogKey) =
+    val source by lazy {
         listsRepository.findListWithListKey(account = account, listKey = listKey)
+    }
 
     fun createList(
         title: String,
@@ -95,7 +97,7 @@ class ListsModifyViewModel @AssistedInject constructor(
     }
 
     fun editList(
-        listId: String,
+        listId: String = listKey.id,
         title: String,
         description: String? = null,
         private: Boolean = false
@@ -112,8 +114,8 @@ class ListsModifyViewModel @AssistedInject constructor(
     }
 
     fun deleteList(
-        listId: String,
-        listKey: MicroBlogKey
+        listId: String = this.listKey.id,
+        listKey: MicroBlogKey = this.listKey
     ) {
         loadingRequest {
             listsRepository.deleteLists(

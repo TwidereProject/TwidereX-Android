@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
@@ -33,6 +34,9 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -57,7 +61,7 @@ import com.twidere.twiderex.viewmodel.lists.ListsTimelineViewModel
 
 // Done title and lock icon
 // Done status timeline
-// Todo refactor ListsModifyViewModel to get a source in order to update source
+// Done refactor ListsModifyViewModel to get a source in order to update source
 // Todo  Empty tweets
 // Todo  DropDownMenus, include:members, subscribers, add members, editlist
 // Todo  update this page when source has updated
@@ -69,9 +73,9 @@ fun ListTimeLineScene(
     val viewModel = assistedViewModel<ListsModifyViewModel.AssistedFactory, ListsModifyViewModel>(
         account,
     ) {
-        it.create(account)
+        it.create(account, listKey)
     }
-    val source by viewModel.source(listKey).observeAsState()
+    val source by viewModel.source.observeAsState()
     TwidereScene {
         InAppNotificationScaffold(
             topBar = {
@@ -85,23 +89,65 @@ fun ListTimeLineScene(
                             if (source?.isPrivate == true)
                                 Icon(
                                     painter = painterResource(id = R.drawable.ic_lock),
-                                    contentDescription = "",
-                                    modifier = Modifier.alpha(ContentAlpha.disabled)
+                                    contentDescription = stringResource(id = R.string.scene_lists_icons_private),
+                                    modifier = Modifier
+                                        .alpha(ContentAlpha.disabled)
                                         .padding(start = ListTimelineSceneDefaults.LockIconPadding)
                                         .size(ListTimelineSceneDefaults.LockIconSize)
                                 )
                         }
                     },
                     actions = {
-                        IconButton(onClick = { /*TODO*/ }) {
+                        var menuExpand by remember {
+                            mutableStateOf(false)
+                        }
+                        IconButton(onClick = { menuExpand = !menuExpand }) {
                             Icon(
                                 imageVector = Icons.Default.MoreVert,
                                 contentDescription = stringResource(
-                                    id = R.string.scene_lists_details_title
+                                    id = R.string.scene_lists_details_menu_actions_edit_list
                                 )
                             )
                         }
-                        DropdownMenu(expanded = false, onDismissRequest = { /*TODO*/ }) {
+                        source?.let { uiList ->
+                            DropdownMenu(
+                                expanded = menuExpand,
+                                onDismissRequest = { menuExpand = false }
+                            ) {
+                                if (!uiList.isOwner(account.user.userId)) {
+                                    val following = uiList.isFollowed
+                                    DropdownMenuItem(
+                                        onClick = {
+                                            /*TODO follow/unfollow*/
+                                        }
+                                    ) {
+                                        Text(
+                                            text = stringResource(
+                                                id = if (following)
+                                                    R.string.scene_lists_details_menu_actions_unfollow
+                                                else
+                                                    R.string.scene_lists_details_menu_actions_follow
+                                            )
+                                        )
+                                    }
+                                }
+
+                                DropdownMenuItem(onClick = { /*TODO view members*/ }) {
+                                    Text(text = stringResource(id = R.string.scene_lists_details_tabs_members))
+                                }
+
+                                if (uiList.allowToSubscribe) {
+                                    DropdownMenuItem(onClick = { /*TODO view subscribers*/ }) {
+                                        Text(text = stringResource(id = R.string.scene_lists_details_tabs_subscriber))
+                                    }
+                                }
+
+                                if (uiList.isOwner(account.user.userId)) {
+                                    DropdownMenuItem(onClick = { /*TODO edit list*/ }) {
+                                        Text(text = stringResource(id = R.string.scene_lists_details_menu_actions_edit_list))
+                                    }
+                                }
+                            }
                         }
                     },
                 )

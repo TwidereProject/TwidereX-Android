@@ -40,6 +40,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.R
@@ -71,8 +72,8 @@ fun LazyUiListList(
         header.invoke(this)
         // my lists title
         if (listType == ListType.All) {
-            item("MY LISTS") {
-                LazyUiListTitleItem(title = "MY LISTS")
+            item {
+                LazyUiListTitleItem(title = stringResource(id = R.string.scene_lists_tabs_created))
             }
         }
         if (listType == ListType.All || listType == ListType.Owned) {
@@ -87,8 +88,8 @@ fun LazyUiListList(
             }
         }
         if (listType == ListType.All) {
-            item("SUBSCRIBED") {
-                LazyUiListTitleItem(title = "SUBSCRIBED")
+            item {
+                LazyUiListTitleItem(title = stringResource(id = R.string.scene_lists_tabs_subscribed))
             }
         }
 
@@ -120,7 +121,7 @@ private fun LazyUiListItem(uiList: UiList, onItemClicked: (UiList) -> Unit = {})
             if (uiList.isPrivate) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_lock),
-                    contentDescription = "List Private",
+                    contentDescription = stringResource(id = R.string.scene_lists_icons_private),
                     modifier = Modifier
                         .alpha(ContentAlpha.disabled)
                         .size(LazyUiListItemDefaults.LockIconSize)
