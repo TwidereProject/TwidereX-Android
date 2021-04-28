@@ -102,6 +102,7 @@ okhttp-logging = { module = "com.squareup.okhttp3:logging-interceptor", version.
 # KSP
 ksp-symbol-processing-api = { module = "com.google.devtools.ksp:symbol-processing-api", version.ref = "ksp" }
 
+placeholder = "com.github.Tlaster:Placeholder:0.1.0"
 zoomable = "com.github.Tlaster:Zoomable:0.3.0"
 nestedScrollView = "com.github.Tlaster:NestedScrollView:0.2.0"
 swiper = "com.github.Tlaster:Swiper:0.1.0"
