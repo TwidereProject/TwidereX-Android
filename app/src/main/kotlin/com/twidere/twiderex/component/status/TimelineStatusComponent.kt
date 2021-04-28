@@ -399,7 +399,7 @@ fun ColumnScope.StatusBody(
     if (!status.placeString.isNullOrEmpty() && type == StatusContentType.Normal) {
         Spacer(modifier = Modifier.height(StatusBodyDefaults.PlaceSpacing))
         CompositionLocalProvider(
-            LocalContentAlpha provides ContentAlpha.medium
+            LocalContentAlpha provides ContentAlpha.disabled
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,

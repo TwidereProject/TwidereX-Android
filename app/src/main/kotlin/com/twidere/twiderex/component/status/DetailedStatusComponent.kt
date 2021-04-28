@@ -79,7 +79,7 @@ fun DetailedStatusComponent(
                 Spacer(modifier = Modifier.height(DetailedStatusDefaults.InfoContentSpacing))
                 ProvideTextStyle(value = MaterialTheme.typography.caption) {
                     CompositionLocalProvider(
-                        LocalContentAlpha provides ContentAlpha.medium
+                        LocalContentAlpha provides ContentAlpha.disabled
                     ) {
                         if (!status.placeString.isNullOrEmpty()) {
                             Row {
