@@ -25,9 +25,9 @@ Next generation of Twidere for Android 5.0+. **Still in early stage.**
 - UI/UX tweaking  
 - Stability improve  
 
-### What is being planned for 1.1.1 - April 2021
+### What is being planned for 1.2.0 - April 2021
 
-For 1.1.1, we are proactively working on:
+For 1.2.0, we are proactively working on:
 - **List Timeline Support!**
 - Stability
 - UI/UX tweaking
