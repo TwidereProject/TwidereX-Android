@@ -31,7 +31,6 @@ import com.twidere.services.twitter.TwitterService
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.db.mapper.toDbStatusWithReference
 import com.twidere.twiderex.db.model.DbStatusV2
-import com.twidere.twiderex.db.model.ReferenceType
 import com.twidere.twiderex.db.model.saveToDb
 import com.twidere.twiderex.extensions.toUi
 import com.twidere.twiderex.model.AccountDetails
@@ -71,16 +70,9 @@ class StatusRepository(
 
     suspend fun removeStatus(statusKey: MicroBlogKey) {
         database.withTransaction {
-            val statusToRemove = listOfNotNull(
-                database.statusDao().findWithStatusKey(statusKey),
-            ) + database.statusReferenceDao().find(statusKey, ReferenceType.Reply)
-                .map { it.status.data }
-            val pagingTimelineToRemove =
-                database.pagingTimelineDao()
-                    .findAllWithStatusKey(statusToRemove.map { it.statusKey })
-            database.statusDao().delete(statusToRemove)
-            database.pagingTimelineDao().delete(pagingTimelineToRemove)
-            database.statusReferenceDao().remove(statusToRemove.map { it.statusKey })
+            database.statusDao().delete(statusKey)
+            database.pagingTimelineDao().delete(statusKey)
+            database.statusReferenceDao().delete(statusKey)
         }
     }
 

@@ -56,4 +56,7 @@ interface StatusDao {
 
     @Delete
     suspend fun delete(status: List<DbStatusV2>)
+
+    @Query("DELETE FROM status WHERE statusKey == :key")
+    suspend fun delete(key: MicroBlogKey)
 }
