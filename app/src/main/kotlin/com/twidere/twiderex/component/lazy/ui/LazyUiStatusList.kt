@@ -22,20 +22,29 @@ package com.twidere.twiderex.component.lazy.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Divider
+import androidx.compose.material.Icon
+import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.R
@@ -59,7 +68,10 @@ fun LazyUiStatusList(
     key: ((index: Int) -> Any) = { items.peekOrNull(it)?.hashCode() ?: it },
     header: LazyListScope.() -> Unit = {},
 ) {
-    LazyUiList(items = items) {
+    LazyUiList(
+        items = items,
+        empty = { EmptyStatusList() }
+    ) {
         LazyColumn2(
             modifier = modifier,
             state = state
@@ -129,4 +141,29 @@ private fun LoadMoreButton(
             color = MaterialTheme.colors.primary,
         )
     }
+}
+
+@Composable
+private fun EmptyStatusList() {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Icon(
+            painter = painterResource(id = R.drawable.ic_empty_status),
+            contentDescription = stringResource(id = R.string.common_alerts_no_tweets_found_title)
+        )
+        Spacer(modifier = Modifier.height(EmptyStatusListDefaults.VerticalPadding))
+        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.disabled) {
+            Text(
+                text = stringResource(id = R.string.common_alerts_no_tweets_found_title),
+                style = MaterialTheme.typography.h6
+            )
+        }
+    }
+}
+
+private object EmptyStatusListDefaults {
+    val VerticalPadding = 48.dp
 }
