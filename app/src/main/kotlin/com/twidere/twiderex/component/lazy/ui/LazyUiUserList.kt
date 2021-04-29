@@ -53,6 +53,7 @@ fun LazyUiUserList(
     key: ((index: Int) -> Any) = { items.peekOrNull(it)?.userKey?.hashCode() ?: it },
     onItemClicked: (UiUser) -> Unit = {},
     header: LazyListScope.() -> Unit = {},
+    action: @Composable (user: UiUser) -> Unit = {}
 ) {
     LazyUiList(items = items) {
         LazyColumn2(
@@ -90,6 +91,9 @@ fun LazyUiUserList(
                                     text = it.followersCount.toString()
                                 )
                             }
+                        },
+                        trailing = {
+                            action.invoke(it)
                         }
                     )
                 }
