@@ -20,6 +20,7 @@
  */
 package com.twidere.twiderex.scenes.lists
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -54,7 +55,11 @@ import com.twidere.twiderex.component.lazy.ui.LazyUiStatusList
 import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.PlatformType
+import com.twidere.twiderex.navigation.Route
+import com.twidere.twiderex.scenes.lists.platform.MastodonListsEditDialog
 import com.twidere.twiderex.ui.LocalActiveAccount
+import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.lists.ListsModifyViewModel
 import com.twidere.twiderex.viewmodel.lists.ListsTimelineViewModel
@@ -70,6 +75,7 @@ fun ListTimeLineScene(
     listKey: MicroBlogKey
 ) {
     val account = LocalActiveAccount.current ?: return
+    val navController = LocalNavController.current
     val viewModel = assistedViewModel<ListsModifyViewModel.AssistedFactory, ListsModifyViewModel>(
         account, listKey
     ) {
@@ -77,6 +83,9 @@ fun ListTimeLineScene(
         }
     }
     val source by viewModel.source.observeAsState()
+    var showEditDialog by remember {
+        mutableStateOf(false)
+    }
     TwidereScene {
         InAppNotificationScaffold(
             topBar = {
@@ -144,7 +153,16 @@ fun ListTimeLineScene(
                                 }
 
                                 if (uiList.isOwner(account.user.userId)) {
-                                    DropdownMenuItem(onClick = { /*TODO edit list*/ }) {
+                                    DropdownMenuItem(
+                                        onClick = {
+                                            when (account.type) {
+                                                PlatformType.Twitter -> navController.navigate(Route.Lists.TwitterEdit(listKey = listKey))
+                                                PlatformType.StatusNet -> TODO()
+                                                PlatformType.Fanfou -> TODO()
+                                                PlatformType.Mastodon -> showEditDialog = true
+                                            }
+                                        }
+                                    ) {
                                         Text(text = stringResource(id = R.string.scene_lists_details_menu_actions_edit_list))
                                     }
                                 }
@@ -154,7 +172,14 @@ fun ListTimeLineScene(
                 )
             },
         ) {
-            ListTimelineComponent(account, listKey)
+            Box {
+                ListTimelineComponent(account, listKey)
+                if (showEditDialog) {
+                    MastodonListsEditDialog(listKey) {
+                        showEditDialog = false
+                    }
+                }
+            }
         }
     }
 }

@@ -23,6 +23,9 @@ package com.twidere.twiderex.scenes.lists.platform
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.LocalContentAlpha
+import androidx.compose.material.LocalContentColor
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -79,6 +82,7 @@ fun TwitterListsCreateScene() {
                     },
                     actions = {
                         IconButton(
+                            enabled = name.isNotEmpty(),
                             onClick = {
                                 listsCreateViewModel.createList(
                                     title = name,
@@ -89,7 +93,8 @@ fun TwitterListsCreateScene() {
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Done,
-                                contentDescription = stringResource(id = R.string.common_controls_actions_confirm)
+                                contentDescription = stringResource(id = R.string.common_controls_actions_confirm),
+                                tint = if (name.isNotEmpty()) MaterialTheme.colors.primary else LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
                             )
                         }
                     }

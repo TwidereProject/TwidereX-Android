@@ -87,10 +87,11 @@ fun ListsScene() {
             floatingActionButton = {
                 FloatingActionButton(
                     onClick = {
-                        if (account.type == PlatformType.Mastodon) {
-                            showCreateDialog = true
-                        } else {
-                            navController.navigate(Route.Lists.TwitterCreate)
+                        when (account.type) {
+                            PlatformType.Twitter -> navController.navigate(Route.Lists.TwitterCreate)
+                            PlatformType.StatusNet -> TODO()
+                            PlatformType.Fanfou -> TODO()
+                            PlatformType.Mastodon -> showCreateDialog = true
                         }
                     }
                 ) {

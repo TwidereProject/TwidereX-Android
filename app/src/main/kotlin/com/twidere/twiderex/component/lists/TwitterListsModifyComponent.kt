@@ -31,6 +31,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Switch
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -40,6 +41,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.TextInput
@@ -84,18 +86,17 @@ fun TwitterListsModifyComponent(
                 style = MaterialTheme.typography.caption
             )
         }
-        Spacer(modifier = Modifier.height(TwitterListsModifyComponentDefaults.VerticalPadding))
-        TextInput(
-            modifier = Modifier
-                .fillMaxWidth()
-                .focusRequester(focusRequester),
-            value = desc,
-            onValueChange = onDescChanged,
-            autoFocus = false,
-            placeholder = {
-                Text(text = stringResource(id = R.string.scene_lists_modify_description))
-            }
-        )
+        ProvideTextStyle(value = MaterialTheme.typography.subtitle1) {
+            TextInput(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .focusRequester(focusRequester),
+                value = desc,
+                onValueChange = onDescChanged,
+                autoFocus = false,
+                imeAction = ImeAction.Done,
+            )
+        }
         Spacer(modifier = Modifier.height(TwitterListsModifyComponentDefaults.VerticalPadding))
         Row(
             modifier = Modifier.fillMaxWidth(),
