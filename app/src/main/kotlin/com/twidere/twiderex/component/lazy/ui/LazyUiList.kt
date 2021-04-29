@@ -36,6 +36,7 @@ import kotlinx.coroutines.flow.filterNotNull
 @Composable
 fun <T : Any> LazyUiList(
     items: LazyPagingItems<T>,
+    empty: @Composable () -> Unit = {},
     content: @Composable () -> Unit,
 ) {
     val refresh = items.loadState.refresh
@@ -48,6 +49,8 @@ fun <T : Any> LazyUiList(
     }
     if (items.itemCount == 0 && refresh is LoadState.Error) {
         ErrorPlaceholder(event)
+    } else if (items.itemCount == 0 && refresh is LoadState.NotLoading) {
+        empty.invoke()
     } else if (items.itemCount > 0) {
         val inAppNotification = LocalInAppNotification.current
         LaunchedEffect(event) {
