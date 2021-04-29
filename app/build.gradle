@@ -211,6 +211,7 @@ dependencies {
     testImplementation 'org.mockito:mockito-core:3.8.0'
     testImplementation 'org.mockito.kotlin:mockito-kotlin:3.1.0'
     testImplementation 'android.arch.core:core-testing:1.1.1'
+    androidTestImplementation 'android.arch.core:core-testing:1.1.1'
     testImplementation libs.kotlinx.coroutines.test
     androidTestImplementation libs.bundles.androidx.test
 }

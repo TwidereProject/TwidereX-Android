@@ -101,6 +101,9 @@ class ListsRepositoryTest {
             ).then {
                 TwitterList(idStr = it.getArgument(0), name = it.getArgument(1))
             }
+            whenever(mockListDao.findWithListKey(any(), any())).then {
+                listsDatabase[0].toDbList(accountKey = mockAccountDetails.accountKey)
+            }
             whenever(mockListDao.update(any())).then {
                 listsDatabase.replaceAll { list ->
                     val input = (it.getArgument(0) as List<DbList>)[0]

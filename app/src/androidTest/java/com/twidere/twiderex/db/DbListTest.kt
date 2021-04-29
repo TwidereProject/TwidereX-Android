@@ -20,6 +20,8 @@
  */
 package com.twidere.twiderex.db
 
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.lifecycle.Observer
 import androidx.paging.PagingSource
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
@@ -30,11 +32,13 @@ import com.twidere.services.twitter.model.TwitterList
 import com.twidere.services.twitter.model.User
 import com.twidere.twiderex.db.dao.ListsDao
 import com.twidere.twiderex.db.mapper.toDbList
+import com.twidere.twiderex.db.model.DbList
 import com.twidere.twiderex.model.MicroBlogKey
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -47,6 +51,8 @@ class DbListTest {
     private val originData = mutableListOf<IListModel>()
     private val twitterCount = 10
     private val mastodonCount = 10
+    @get:Rule
+    val rule = InstantTaskExecutorRule()
 
     @Before
     fun setUp() {
@@ -106,6 +112,21 @@ class DbListTest {
             val mastodonList = listsDao.findWithListKey(MicroBlogKey("0", mastodonAccountKey.host), mastodonAccountKey)
             Assert.assertEquals("0", mastodonList?.listId)
             mastodonList?.let { assert(it.title.startsWith("mastodon")) }
+        }
+    }
+
+    @Test
+    fun findDbListWithListKeyWithLiveData_AutoUpdateAfterDbUpdate() {
+        runBlocking {
+            val source = listsDao.findWithListKeyWithLiveData(MicroBlogKey.twitter("0"), twitterAccountKey)
+            val observer = Observer<DbList?> { }
+            source.observeForever(observer)
+            Assert.assertEquals("description 0", source.value?.description)
+            source.value?.let {
+                listsDao.update(listOf(it.update(description = "Update 0")))
+            }
+            Assert.assertEquals("Update 0", source.value?.description)
+            source.removeObserver(observer)
         }
     }
 

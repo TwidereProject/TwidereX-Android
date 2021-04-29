@@ -85,7 +85,20 @@ class ListsRepository(private val database: CacheDatabase) {
             mode = mode,
             repliesPolicy = replyPolicy
         ).toDbList(account.accountKey)
-        database.listsDao().update(listOf(result))
+        val originSource = database.listsDao().findWithListKey(result.listKey, result.accountKey)
+        originSource?.let {
+            database.listsDao().update(
+                listOf(
+                    it.update(
+                        title = result.title,
+                        description = result.description,
+                        mode = result.mode,
+                        isFollowed = result.isFollowed,
+                        replyPolicy = result.replyPolicy
+                    )
+                )
+            )
+        }
         return result.toUi()
     }
 
