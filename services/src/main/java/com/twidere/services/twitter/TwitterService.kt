@@ -517,7 +517,10 @@ class TwitterService(
         count = count,
         cursor = cursor
     ).let {
-        TwitterPaging(data = it.users ?: emptyList(), nextPage = it.nextCursorStr)
+        TwitterPaging(
+            data = it.users ?: emptyList(),
+            nextPage = if (0 < it.nextCursor ?: 0) it.nextCursorStr else null
+        )
     }
 
     override suspend fun addMember(
@@ -545,6 +548,9 @@ class TwitterService(
         count = count,
         cursor = cursor
     ).let {
-        TwitterPaging(data = it.users ?: emptyList(), nextPage = it.nextCursorStr)
+        TwitterPaging(
+            data = it.users ?: emptyList(),
+            nextPage = if (0 < it.nextCursor ?: 0) it.nextCursorStr else null
+        )
     }
 }

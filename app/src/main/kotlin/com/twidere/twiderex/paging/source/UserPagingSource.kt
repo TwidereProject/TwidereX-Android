@@ -45,7 +45,7 @@ abstract class UserPagingSource(
             val users = result.map {
                 it.toDbUser(userKey).toUi()
             }
-            val nextPage = if (result is IPaging) {
+            val nextPage = if (result is IPaging && users.isNotEmpty()) {
                 result.nextPage
             } else {
                 null

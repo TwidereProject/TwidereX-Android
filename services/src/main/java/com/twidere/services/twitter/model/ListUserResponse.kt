@@ -30,7 +30,7 @@ data class ListUserResponse(
     @SerialName("next_cursor_str")
     val nextCursorStr: String? = null,
     @SerialName("previous_cursor")
-    val previousCursor: Int? = null,
+    val previousCursor: Long? = null,
     @SerialName("previous_cursor_str")
     val previousCursorStr: String? = null,
     @SerialName("users")

@@ -44,7 +44,9 @@ import com.twidere.twiderex.scenes.compose.ComposeSearchHashtagScene
 import com.twidere.twiderex.scenes.compose.ComposeSearchUserScene
 import com.twidere.twiderex.scenes.compose.DraftComposeScene
 import com.twidere.twiderex.scenes.lists.ListTimeLineScene
+import com.twidere.twiderex.scenes.lists.ListsMembersScene
 import com.twidere.twiderex.scenes.lists.ListsScene
+import com.twidere.twiderex.scenes.lists.ListsSubscribersScene
 import com.twidere.twiderex.scenes.lists.platform.TwitterListsCreateScene
 import com.twidere.twiderex.scenes.lists.platform.TwitterListsEditScene
 import com.twidere.twiderex.scenes.mastodon.MastodonHashtagScene
@@ -198,6 +200,8 @@ object Route {
         const val TwitterCreate = "$Home/twitter/create"
         fun TwitterEdit(listKey: MicroBlogKey) = "$Home/twitter/edit/$listKey"
         fun Timeline(listKey: MicroBlogKey) = "$Home/timeline/$listKey"
+        fun Members(listKey: MicroBlogKey, owned: Boolean) = "$Home/members/$listKey?owned=$owned"
+        fun Subscribers(listKey: MicroBlogKey) = "$Home/subscribers/$listKey"
     }
 }
 
@@ -617,6 +621,22 @@ fun RouteBuilder.route(constraints: Constraints) {
     ) { backStackEntry ->
         backStackEntry.path<String>("listKey")?.let {
             ListTimeLineScene(listKey = MicroBlogKey.valueOf(it))
+        }
+    }
+
+    authorizedScene(
+        "${Route.Lists.Home}/members/{listKey}"
+    ) { backStackEntry ->
+        backStackEntry.path<String>("listKey")?.let {
+            ListsMembersScene(listKey = MicroBlogKey.valueOf(it), backStackEntry.query<Boolean>("owned") ?: false)
+        }
+    }
+
+    authorizedScene(
+        "${Route.Lists.Home}/subscribers/{listKey}"
+    ) { backStackEntry ->
+        backStackEntry.path<String>("listKey")?.let {
+            ListsSubscribersScene(listKey = MicroBlogKey.valueOf(it))
         }
     }
 }

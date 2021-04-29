@@ -68,8 +68,8 @@ import com.twidere.twiderex.viewmodel.lists.ListsTimelineViewModel
 // Done status timeline
 // Done refactor ListsModifyViewModel to get a source in order to update source
 // Todo  Empty tweets
-// Todo  DropDownMenus, include:members, subscribers, add members, editlist
-// Todo  update this page when source has updated
+// Done  DropDownMenus, include:members, subscribers, editlist
+// Done  update this page when source has updated
 @Composable
 fun ListTimeLineScene(
     listKey: MicroBlogKey
@@ -142,12 +142,29 @@ fun ListTimeLineScene(
                                     }
                                 }
 
-                                DropdownMenuItem(onClick = { /*TODO view members*/ }) {
+                                DropdownMenuItem(
+                                    onClick = {
+                                        navController.navigate(
+                                            Route.Lists.Members(
+                                                listKey,
+                                                uiList.isOwner(account.user.userId)
+                                            )
+                                        )
+                                    }
+                                ) {
                                     Text(text = stringResource(id = R.string.scene_lists_details_tabs_members))
                                 }
 
                                 if (uiList.allowToSubscribe) {
-                                    DropdownMenuItem(onClick = { /*TODO view subscribers*/ }) {
+                                    DropdownMenuItem(
+                                        onClick = {
+                                            navController.navigate(
+                                                Route.Lists.Subscribers(
+                                                    listKey
+                                                )
+                                            )
+                                        }
+                                    ) {
                                         Text(text = stringResource(id = R.string.scene_lists_details_tabs_subscriber))
                                     }
                                 }

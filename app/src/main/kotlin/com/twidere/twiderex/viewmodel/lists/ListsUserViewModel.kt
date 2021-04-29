@@ -23,23 +23,28 @@ package com.twidere.twiderex.viewmodel.lists
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.twidere.twiderex.model.AccountDetails
+import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.ListUsersRepository
 import com.twidere.twiderex.utils.notify
+import com.twidere.twiderex.viewmodel.user.UserListViewModel
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
 class ListsUserViewModel @AssistedInject constructor(
     private val listsUsersRepository: ListUsersRepository,
     @Assisted private val account: AccountDetails,
     @Assisted private val listId: String,
-) : ViewModel() {
+    @Assisted private val viewMembers: Boolean = true,
+) : UserListViewModel() {
     @dagger.assisted.AssistedFactory
     interface AssistedFactory {
-        fun create(account: AccountDetails, listId: String): ListsUserViewModel
+        fun create(account: AccountDetails, listId: String, viewMembers: Boolean = true): ListsUserViewModel
     }
 
     val members by lazy {
@@ -49,6 +54,11 @@ class ListsUserViewModel @AssistedInject constructor(
     val subscribers by lazy {
         listsUsersRepository.fetchSubscribers(account = account, listId = listId).cachedIn(viewModelScope)
     }
+
+    override val source: Flow<PagingData<UiUser>>
+        get() {
+            return if (viewMembers) members else subscribers
+        }
 }
 
 class ListsUserModifyViewModel @AssistedInject constructor(

@@ -216,7 +216,7 @@
     <string name="scene_lists_details_menu_actions_follow">Follow</string>
     <string name="scene_lists_details_menu_actions_unfollow">Unfollow</string>
     <string name="scene_lists_details_tabs_members">List Members</string>
-    <string name="scene_lists_details_tabs_subscriber">List Subscribers</string>
+    <string name="scene_lists_details_tabs_subscriber">Subscribers</string>
     <string name="scene_lists_details_no_members_found">No Members Found.</string>
     <string name="scene_lists_details_add_members">Add Members</string>
     <string name="scene_lists_modify_create_title">New List</string>
