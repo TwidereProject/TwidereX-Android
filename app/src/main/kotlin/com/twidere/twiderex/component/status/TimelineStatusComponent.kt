@@ -151,7 +151,7 @@ private fun NormalStatus(
     }
 }
 
-private object NormalStatusDefaults {
+object NormalStatusDefaults {
     val ContentPadding = PaddingValues(
         horizontal = 16.dp,
         vertical = 0.dp
@@ -460,7 +460,7 @@ private fun ColumnScope.StatusBodyMedia(
     }
 }
 
-private object StatusBodyMediaDefaults {
+object StatusBodyMediaDefaults {
     val Spacing = 8.dp
 }
 

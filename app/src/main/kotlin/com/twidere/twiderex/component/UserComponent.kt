@@ -115,6 +115,7 @@ import com.twidere.twiderex.viewmodel.user.UserViewModel
 import kotlinx.coroutines.launch
 import moe.tlaster.nestedscrollview.VerticalNestedScrollView
 import moe.tlaster.nestedscrollview.rememberNestedScrollViewState
+import moe.tlaster.placeholder.Placeholder
 import moe.tlaster.precompose.navigation.NavController
 
 @OptIn(ExperimentalPagerApi::class)
@@ -709,6 +710,9 @@ private fun UserBanner(
         NetworkImage(
             modifier = Modifier.fillMaxSize(),
             data = bannerUrl,
+            placeholder = {
+                Placeholder(modifier = Modifier.fillMaxSize())
+            }
         )
     }
 }
