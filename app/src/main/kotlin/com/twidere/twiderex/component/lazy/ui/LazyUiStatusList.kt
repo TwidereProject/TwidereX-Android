@@ -53,6 +53,7 @@ import com.twidere.twiderex.component.lazy.LazyColumn2
 import com.twidere.twiderex.component.lazy.LazyPagingItems
 import com.twidere.twiderex.component.lazy.loadState
 import com.twidere.twiderex.component.lazy.statusesIndexed
+import com.twidere.twiderex.component.placeholder.UiStatusPlaceholder
 import com.twidere.twiderex.component.status.StatusDivider
 import com.twidere.twiderex.component.status.TimelineStatusComponent
 import com.twidere.twiderex.model.MicroBlogKey
@@ -70,7 +71,8 @@ fun LazyUiStatusList(
 ) {
     LazyUiList(
         items = items,
-        empty = { EmptyStatusList() }
+        empty = { EmptyStatusList() },
+        loading = { LoadingStatusPlaceholder() }
     ) {
         LazyColumn2(
             modifier = modifier,
@@ -79,7 +81,8 @@ fun LazyUiStatusList(
             header.invoke(this)
             statusesIndexed(items, key = key) { index, item ->
                 if (item == null) {
-                    TimelineStatusComponent(data = UiStatus.placeHolder())
+                    UiStatusPlaceholder()
+                    StatusDivider()
                 } else {
                     Column {
                         TimelineStatusComponent(
@@ -166,4 +169,16 @@ private fun EmptyStatusList() {
 
 private object EmptyStatusListDefaults {
     val VerticalPadding = 48.dp
+}
+
+@Composable
+private fun LoadingStatusPlaceholder() {
+    Column {
+        repeat(10) {
+            UiStatusPlaceholder(
+                delayMillis = it * 50L
+            )
+            StatusDivider()
+        }
+    }
 }

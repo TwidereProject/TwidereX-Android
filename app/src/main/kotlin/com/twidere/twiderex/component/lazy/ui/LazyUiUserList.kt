@@ -21,6 +21,7 @@
 package com.twidere.twiderex.component.lazy.ui
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.width
@@ -39,6 +40,7 @@ import com.twidere.twiderex.component.lazy.LazyColumn2
 import com.twidere.twiderex.component.lazy.LazyPagingItems
 import com.twidere.twiderex.component.lazy.items
 import com.twidere.twiderex.component.lazy.loadState
+import com.twidere.twiderex.component.placeholder.UiUserPlaceholder
 import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.component.status.UserName
 import com.twidere.twiderex.component.status.UserScreenName
@@ -55,14 +57,17 @@ fun LazyUiUserList(
     header: LazyListScope.() -> Unit = {},
     action: @Composable (user: UiUser) -> Unit = {}
 ) {
-    LazyUiList(items = items) {
+    LazyUiList(
+        items = items,
+        loading = { LoadingUserPlaceholder() }
+    ) {
         LazyColumn2(
             modifier = modifier,
             state = state,
         ) {
             header.invoke(this)
             items(items, key = key) {
-                (it ?: UiUser.placeHolder()).let {
+                it?.let {
                     ListItem(
                         modifier = Modifier.clickable {
                             onItemClicked.invoke(it)
@@ -96,6 +101,8 @@ fun LazyUiUserList(
                             action.invoke(it)
                         }
                     )
+                } ?: run {
+                    UiUserPlaceholder()
                 }
             }
             loadState(items.loadState.append) {
@@ -107,4 +114,15 @@ fun LazyUiUserList(
 
 object UiUserListDefaults {
     val HorizontalPadding = 8.dp
+}
+
+@Composable
+private fun LoadingUserPlaceholder() {
+    Column {
+        repeat(10) {
+            UiUserPlaceholder(
+                delayMillis = it * 50L
+            )
+        }
+    }
 }
