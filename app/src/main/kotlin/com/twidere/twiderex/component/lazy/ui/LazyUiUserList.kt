@@ -35,10 +35,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.items
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.lazy.LazyColumn2
-import com.twidere.twiderex.component.lazy.LazyPagingItems
-import com.twidere.twiderex.component.lazy.items
 import com.twidere.twiderex.component.lazy.loadState
 import com.twidere.twiderex.component.placeholder.UiUserPlaceholder
 import com.twidere.twiderex.component.status.UserAvatar
@@ -52,7 +52,7 @@ fun LazyUiUserList(
     modifier: Modifier = Modifier,
     items: LazyPagingItems<UiUser>,
     state: LazyListState = rememberLazyListState(),
-    key: ((index: Int) -> Any) = { items.peekOrNull(it)?.userKey?.hashCode() ?: it },
+    // key: ((index: Int) -> Any) = { items.peek(it)?.userKey?.hashCode() ?: it },
     onItemClicked: (UiUser) -> Unit = {},
     header: LazyListScope.() -> Unit = {},
     action: @Composable (user: UiUser) -> Unit = {}
@@ -66,7 +66,10 @@ fun LazyUiUserList(
             state = state,
         ) {
             header.invoke(this)
-            items(items, key = key) {
+            items(
+                items,
+                // key = key
+            ) {
                 it?.let {
                     ListItem(
                         modifier = Modifier.clickable {

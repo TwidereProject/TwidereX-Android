@@ -47,12 +47,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.itemsIndexed
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.LoadingProgress
 import com.twidere.twiderex.component.lazy.LazyColumn2
-import com.twidere.twiderex.component.lazy.LazyPagingItems
 import com.twidere.twiderex.component.lazy.loadState
-import com.twidere.twiderex.component.lazy.statusesIndexed
 import com.twidere.twiderex.component.placeholder.UiStatusPlaceholder
 import com.twidere.twiderex.component.status.StatusDivider
 import com.twidere.twiderex.component.status.TimelineStatusComponent
@@ -66,7 +66,7 @@ fun LazyUiStatusList(
     state: LazyListState = rememberLazyListState(),
     loadingBetween: List<MicroBlogKey> = emptyList(),
     onLoadBetweenClicked: (current: MicroBlogKey, next: MicroBlogKey) -> Unit = { _, _ -> },
-    key: ((index: Int) -> Any) = { items.peekOrNull(it)?.hashCode() ?: it },
+    // key: ((index: Int) -> Any) = { items.peekOrNull(it)?.hashCode() ?: it },
     header: LazyListScope.() -> Unit = {},
 ) {
     LazyUiList(
@@ -79,7 +79,10 @@ fun LazyUiStatusList(
             state = state
         ) {
             header.invoke(this)
-            statusesIndexed(items, key = key) { index, item ->
+            itemsIndexed(
+                items,
+                // key = key
+            ) { index, item ->
                 if (item == null) {
                     UiStatusPlaceholder()
                     StatusDivider()
@@ -124,8 +127,7 @@ private fun LoadMoreButton(
         modifier = Modifier
             .background(LocalContentColor.current.copy(alpha = 0.04f))
             .clickable {
-                items
-                    .peekOrNull(index + 1)
+                items.peek(index + 1)
                     ?.let { next ->
                         onLoadBetweenClicked(
                             item.statusKey,

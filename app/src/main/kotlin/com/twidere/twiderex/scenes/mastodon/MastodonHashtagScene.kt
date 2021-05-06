@@ -23,11 +23,11 @@ package com.twidere.twiderex.scenes.mastodon
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.paging.LoadState
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
-import com.twidere.twiderex.component.lazy.collectAsLazyPagingItems
 import com.twidere.twiderex.component.lazy.ui.LazyUiStatusList
 import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.extensions.refreshOrRetry

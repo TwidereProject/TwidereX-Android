@@ -25,9 +25,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
 import androidx.paging.LoadState
+import androidx.paging.compose.LazyPagingItems
 import com.twidere.twiderex.component.foundation.ErrorPlaceholder
 import com.twidere.twiderex.component.foundation.LocalInAppNotification
-import com.twidere.twiderex.component.lazy.LazyPagingItems
 import com.twidere.twiderex.utils.generateNotificationEvent
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.distinctUntilChanged

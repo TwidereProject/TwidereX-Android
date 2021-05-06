@@ -21,28 +21,12 @@
 package com.twidere.twiderex.component.lazy
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ListItem
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.paging.LoadState
 import com.twidere.twiderex.component.foundation.loading
-
-fun <T : Any> LazyListScope.itemsPaging(
-    lazyPagingItems: LazyPagingItems<T>,
-    key: ((index: Int) -> Any) = { lazyPagingItems.peekOrNull(it)?.hashCode() ?: it },
-    itemContent: @Composable LazyItemScope.(value: T?) -> Unit
-) {
-    loadState(lazyPagingItems.loadState.refresh) {
-        lazyPagingItems.retry()
-    }
-    items(lazyPagingItems = lazyPagingItems, key = key, itemContent = itemContent)
-    loadState(lazyPagingItems.loadState.append) {
-        lazyPagingItems.retry()
-    }
-}
 
 @OptIn(ExperimentalMaterialApi::class)
 fun LazyListScope.loadState(
