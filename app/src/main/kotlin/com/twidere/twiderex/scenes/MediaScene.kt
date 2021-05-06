@@ -421,6 +421,7 @@ fun MediaView(
                         state = rememberZoomableState()
                     ) {
                         NetworkImage(
+                            modifier = Modifier.fillMaxSize(),
                             data = data.url,
                             contentScale = ContentScale.Fit,
                             placeholder = {
