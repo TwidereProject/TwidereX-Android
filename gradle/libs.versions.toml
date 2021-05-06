@@ -69,7 +69,7 @@ hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", ve
 hilt-compiler = { module = "androidx.hilt:hilt-compiler", version.ref = "androidx_hilt" }
 
 # Accompanist
-accompanist-glide = { module = "com.google.accompanist:accompanist-glide", version.ref = "accompanist" }
+accompanist-coil = { module = "com.google.accompanist:accompanist-coil", version.ref = "accompanist" }
 accompanist-insets = { module = "com.google.accompanist:accompanist-insets", version.ref = "accompanist" }
 accompanist-pager-base = { module = "com.google.accompanist:accompanist-pager", version.ref = "accompanist" }
 accompanist-pager-indicators = { module = "com.google.accompanist:accompanist-pager-indicators", version.ref = "accompanist" }
@@ -111,6 +111,7 @@ leakcanary = "com.squareup.leakcanary:leakcanary-android:2.7"
 protobuf-javalite = { module = "com.google.protobuf:protobuf-javalite", version.ref = "protobuf" }
 exoplayer = { module = "com.google.android.exoplayer:exoplayer", version.ref = "exoplayer" }
 startup = { module = "androidx.startup:startup-runtime", version.ref = "startup" }
+vectordrawable = "androidx.vectordrawable:vectordrawable:1.1.0"
 
 [bundles]
 androidx-test = [
@@ -155,7 +156,7 @@ hilt-compiler = [
     "hilt-compiler",
 ]
 accompanist = [
-    "accompanist-glide",
+    "accompanist-coil",
     "accompanist-insets",
     "accompanist-pager-base",
     "accompanist-pager-indicators",

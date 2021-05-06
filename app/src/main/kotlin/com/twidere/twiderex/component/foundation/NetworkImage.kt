@@ -26,7 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
-import com.google.accompanist.glide.rememberGlidePainter
+import com.google.accompanist.coil.rememberCoilPainter
 import com.google.accompanist.imageloading.ImageLoadState
 import com.google.accompanist.imageloading.LoadPainter
 import com.twidere.twiderex.R
@@ -41,10 +41,7 @@ fun NetworkImage(
     val painter = if (data is Painter) {
         data
     } else {
-        rememberGlidePainter(
-            request = data,
-            fadeIn = true,
-        )
+        rememberCoilPainter(request = data, fadeIn = true)
     }
     if (painter is LoadPainter<*> && painter.loadState is ImageLoadState.Loading) {
         placeholder?.invoke()
