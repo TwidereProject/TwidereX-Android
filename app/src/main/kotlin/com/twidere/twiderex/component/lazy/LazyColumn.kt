@@ -29,16 +29,10 @@ import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.google.accompanist.glide.LocalRequestManager
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.distinctUntilChanged
 
 @OptIn(FlowPreview::class)
 @Composable
@@ -53,25 +47,6 @@ fun LazyColumn2(
     flingBehavior: FlingBehavior = ScrollableDefaults.flingBehavior(),
     content: LazyListScope.() -> Unit
 ) {
-    LocalRequestManager.current?.let { requestManager ->
-        LaunchedEffect(state) {
-            snapshotFlow { state.isScrollInProgress }
-                .debounce(100)
-                .distinctUntilChanged()
-                .collect {
-                    if (it) {
-                        if (!requestManager.isPaused) {
-                            requestManager.pauseRequests()
-                        }
-                    } else {
-                        if (requestManager.isPaused) {
-                            requestManager.resumeRequests()
-                        }
-                    }
-                }
-        }
-    }
-
     LazyColumn(
         modifier = modifier,
         state = state,

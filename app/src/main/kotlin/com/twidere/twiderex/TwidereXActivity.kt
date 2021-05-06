@@ -39,8 +39,6 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.bumptech.glide.Glide
-import com.google.accompanist.glide.LocalRequestManager
 import com.google.accompanist.insets.ExperimentalAnimatedInsets
 import com.google.accompanist.insets.ProvideWindowInsets
 import com.twidere.twiderex.action.LocalStatusActions
@@ -133,7 +131,6 @@ class TwidereXActivity : ComponentActivity() {
                 LocalActivity provides this,
                 LocalActiveAccountViewModel provides accountViewModel,
                 LocalIsActiveNetworkMetered provides isActiveNetworkMetered,
-                LocalRequestManager provides Glide.with(this),
                 LocalPlatformResolver provides platformResolver,
             ) {
                 ProvidePreferences(

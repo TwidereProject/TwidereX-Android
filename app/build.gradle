@@ -159,6 +159,7 @@ protobuf {
 
 dependencies {
     implementation libs.kotlinx.serialization.json
+    implementation libs.vectordrawable
 
     implementation projects.services
     ksp projects.assistedProcessor

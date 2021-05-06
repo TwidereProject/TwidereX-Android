@@ -707,6 +707,7 @@ private fun UserBanner(
             )
     ) {
         NetworkImage(
+            modifier = Modifier.fillMaxSize(),
             data = bannerUrl,
         )
     }

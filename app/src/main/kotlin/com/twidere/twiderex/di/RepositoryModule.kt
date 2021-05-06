@@ -21,7 +21,8 @@
 package com.twidere.twiderex.di
 
 import android.content.Context
-import com.bumptech.glide.Glide
+import coil.imageLoader
+import coil.util.CoilUtils
 import com.twidere.twiderex.db.AppDatabase
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.repository.AccountRepository
@@ -59,8 +60,9 @@ object RepositoryModule {
     ): CacheRepository = CacheRepository(
         database = database,
         appDatabase = appDatabase,
-        glide = Glide.get(context),
-        cacheDirs = listOf(context.cacheDir, *context.externalCacheDirs)
+        cache = CoilUtils.createDefaultCache(context),
+        imageLoader = context.imageLoader,
+        cacheDirs = listOf(context.cacheDir, *context.externalCacheDirs),
     )
 
     @Provides
