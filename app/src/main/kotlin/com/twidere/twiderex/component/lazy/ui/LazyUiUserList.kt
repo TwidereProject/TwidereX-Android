@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -32,6 +33,7 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ListItem
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -121,7 +123,13 @@ object UiUserListDefaults {
 
 @Composable
 private fun LoadingUserPlaceholder() {
-    Column {
+    Column(
+        modifier = Modifier
+            .wrapContentHeight(
+                align = Alignment.Top,
+                unbounded = true
+            )
+    ) {
         repeat(10) {
             UiUserPlaceholder(
                 delayMillis = it * 50L
