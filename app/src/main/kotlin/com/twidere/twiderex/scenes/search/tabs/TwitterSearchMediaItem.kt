@@ -58,9 +58,7 @@ class TwitterSearchMediaItem : SearchSceneItem {
                     source.refreshOrRetry()
                 }
             ) {
-                if (source.itemCount > 0) {
-                    LazyUiStatusImageList(items = source)
-                }
+                LazyUiStatusImageList(items = source)
             }
         }
     }
