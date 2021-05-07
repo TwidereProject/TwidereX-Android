@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
@@ -117,4 +118,15 @@ fun UiStatusPlaceholder(
             }
         }
     }
+}
+
+@Composable
+fun UiImagePlaceholder(
+    modifier: Modifier = Modifier,
+    delayMillis: Long = 0,
+) {
+    Placeholder(
+        modifier = modifier.aspectRatio(1f).fillMaxSize().clip(MaterialTheme.shapes.medium),
+        delayMillis = delayMillis,
+    )
 }
