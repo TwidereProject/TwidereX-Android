@@ -49,8 +49,8 @@ fun <T : Any> LazyUiList(
             null
         }
     }
-    Crossfade(targetState = items.itemCount) { count ->
-        if (count == 0) {
+    Crossfade(targetState = items.itemCount == 0) { isEmpty ->
+        if (isEmpty) {
             Crossfade(targetState = refresh) { refresh ->
                 when (refresh) {
                     is LoadState.NotLoading -> empty()
