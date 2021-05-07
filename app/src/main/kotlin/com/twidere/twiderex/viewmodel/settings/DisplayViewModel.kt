@@ -42,12 +42,6 @@ class DisplayViewModel @AssistedInject constructor(
         }
     }
 
-    fun setFontScale(value: Float) = viewModelScope.launch {
-        displayPreferences.updateData {
-            it.toBuilder().setFontScale(value).build()
-        }
-    }
-
     fun setAvatarStyle(value: DisplayPreferences.AvatarStyle) = viewModelScope.launch {
         displayPreferences.updateData {
             it.toBuilder().setAvatarStyle(value).build()
@@ -63,6 +57,12 @@ class DisplayViewModel @AssistedInject constructor(
     fun setAutoPlayback(value: DisplayPreferences.AutoPlayback) = viewModelScope.launch {
         displayPreferences.updateData {
             it.toBuilder().setAutoPlayback(value).build()
+        }
+    }
+
+    fun commitFontScale(value: Float) = viewModelScope.launch {
+        displayPreferences.updateData {
+            it.toBuilder().setFontScale(value).build()
         }
     }
 }

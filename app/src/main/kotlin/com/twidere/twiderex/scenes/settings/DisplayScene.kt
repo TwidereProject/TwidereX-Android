@@ -31,6 +31,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -110,11 +114,15 @@ fun DisplayScene() {
                                 )
                             },
                             text = {
+                                var fontSize by remember {
+                                    mutableStateOf(display.fontScale)
+                                }
                                 Slider(
                                     steps = ((1.4f - 0.8f) * 10).toInt(),
-                                    value = display.fontScale,
-                                    onValueChange = { viewModel.setFontScale(it) },
-                                    valueRange = 0.8f..1.4f
+                                    value = fontSize,
+                                    onValueChange = { fontSize = it },
+                                    valueRange = 0.8f..1.4f,
+                                    onValueChangeFinished = { viewModel.commitFontScale(fontSize) }
                                 )
                             },
                             trailing = {
