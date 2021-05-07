@@ -20,51 +20,21 @@
  */
 package com.twidere.twiderex.component.placeholder
 
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.ListItem
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import com.twidere.twiderex.component.status.UserAvatarDefaults
 import moe.tlaster.placeholder.Placeholder
-import moe.tlaster.placeholder.TextPlaceHolder
-
-@OptIn(ExperimentalMaterialApi::class)
-@Composable
-fun UiUserPlaceholder(
-    delayMillis: Long = 0,
-) {
-    ListItem(
-        icon = {
-            AvatarPlaceHolder(
-                delayMillis = delayMillis,
-            )
-        },
-        text = {
-            TextPlaceHolder(
-                length = 14,
-                delayMillis = delayMillis,
-            )
-        },
-        secondaryText = {
-            TextPlaceHolder(
-                length = 10,
-                delayMillis = delayMillis
-            )
-        }
-    )
-}
 
 @Composable
-fun AvatarPlaceHolder(
+fun UiImagePlaceholder(
+    modifier: Modifier = Modifier,
     delayMillis: Long = 0,
 ) {
     Placeholder(
-        modifier = Modifier
-            .size(UserAvatarDefaults.AvatarSize)
-            .clip(CircleShape),
+        modifier = modifier.aspectRatio(1f).fillMaxSize().clip(MaterialTheme.shapes.medium),
         delayMillis = delayMillis,
     )
 }
