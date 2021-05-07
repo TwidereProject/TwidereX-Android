@@ -20,12 +20,14 @@
  */
 package com.twidere.twiderex.viewmodel.lists
 
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.twidere.twiderex.model.AccountDetails
+import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.ListUsersRepository
@@ -75,6 +77,19 @@ class ListsUserModifyViewModel @AssistedInject constructor(
 
     val modifySuccess = MutableLiveData<Boolean>(false)
     val loading = MutableLiveData<Boolean>(false)
+    val pendingMap = mutableStateMapOf<MicroBlogKey, UiUser>()
+
+    fun addToOrRemoveFromPendingLists(user: UiUser) {
+        if (pendingMap[user.userKey] == null) {
+            pendingMap[user.userKey] = user
+        } else {
+            pendingMap.remove(user.userKey)
+        }
+    }
+
+    fun isInPendingList(user: UiUser): Boolean {
+        return pendingMap[user.userKey] != null
+    }
 
     fun addMember(
         userId: String,

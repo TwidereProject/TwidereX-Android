@@ -33,7 +33,9 @@ import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.ui.LocalActiveAccount
+import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.lists.ListsUserViewModel
 
@@ -44,6 +46,7 @@ fun ListsMembersScene(
     owned: Boolean,
 ) {
     val account = LocalActiveAccount.current ?: return
+    val navController = LocalNavController.current
     listKey.toString()
     val viewModel = assistedViewModel<ListsUserViewModel.AssistedFactory, ListsUserViewModel>(
         account
@@ -63,7 +66,11 @@ fun ListsMembersScene(
                 )
             },
             floatingActionButton = {
-                if (owned) FloatingActionButton(onClick = { /*TODO add members*/ }) {
+                if (owned) FloatingActionButton(
+                    onClick = {
+                        navController.navigate(Route.Lists.AddMembers(listKey = listKey))
+                    }
+                ) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_add),
                         contentDescription = stringResource(

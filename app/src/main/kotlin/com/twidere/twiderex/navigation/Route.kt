@@ -44,6 +44,7 @@ import com.twidere.twiderex.scenes.compose.ComposeSearchHashtagScene
 import com.twidere.twiderex.scenes.compose.ComposeSearchUserScene
 import com.twidere.twiderex.scenes.compose.DraftComposeScene
 import com.twidere.twiderex.scenes.lists.ListTimeLineScene
+import com.twidere.twiderex.scenes.lists.ListsAddMembersScene
 import com.twidere.twiderex.scenes.lists.ListsMembersScene
 import com.twidere.twiderex.scenes.lists.ListsScene
 import com.twidere.twiderex.scenes.lists.ListsSubscribersScene
@@ -202,6 +203,7 @@ object Route {
         fun Timeline(listKey: MicroBlogKey) = "$Home/timeline/$listKey"
         fun Members(listKey: MicroBlogKey, owned: Boolean) = "$Home/members/$listKey?owned=$owned"
         fun Subscribers(listKey: MicroBlogKey) = "$Home/subscribers/$listKey"
+        fun AddMembers(listKey: MicroBlogKey) = "$Home/members/$listKey/add"
     }
 }
 
@@ -637,6 +639,14 @@ fun RouteBuilder.route(constraints: Constraints) {
     ) { backStackEntry ->
         backStackEntry.path<String>("listKey")?.let {
             ListsSubscribersScene(listKey = MicroBlogKey.valueOf(it))
+        }
+    }
+
+    authorizedScene(
+        "${Route.Lists.Home}/members/{listKey}/add"
+    ) { backStackEntry ->
+        backStackEntry.path<String>("listKey")?.let {
+            ListsAddMembersScene(listKey = MicroBlogKey.valueOf(it))
         }
     }
 }

@@ -64,12 +64,6 @@ import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.lists.ListsModifyViewModel
 import com.twidere.twiderex.viewmodel.lists.ListsTimelineViewModel
 
-// Done title and lock icon
-// Done status timeline
-// Done refactor ListsModifyViewModel to get a source in order to update source
-// Todo  Empty tweets
-// Done  DropDownMenus, include:members, subscribers, editlist
-// Done  update this page when source has updated
 @Composable
 fun ListTimeLineScene(
     listKey: MicroBlogKey
