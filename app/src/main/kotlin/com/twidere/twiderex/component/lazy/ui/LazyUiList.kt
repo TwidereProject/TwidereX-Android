@@ -20,6 +20,7 @@
  */
 package com.twidere.twiderex.component.lazy.ui
 
+import androidx.compose.animation.Crossfade
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -48,22 +49,26 @@ fun <T : Any> LazyUiList(
             null
         }
     }
-    if (items.itemCount == 0 && refresh is LoadState.Error) {
-        ErrorPlaceholder(event)
-    } else if (items.itemCount == 0 && refresh is LoadState.NotLoading) {
-        empty.invoke()
-    } else if (items.itemCount == 0 && refresh is LoadState.Loading) {
-        loading()
-    } else if (items.itemCount > 0) {
-        val inAppNotification = LocalInAppNotification.current
-        LaunchedEffect(event) {
-            snapshotFlow { event }
-                .distinctUntilChanged()
-                .filterNotNull()
-                .collect {
-                    inAppNotification.show(it)
+    Crossfade(targetState = items.itemCount) { count ->
+        if (count == 0) {
+            Crossfade(targetState = refresh) { refresh ->
+                when (refresh) {
+                    is LoadState.NotLoading -> empty()
+                    LoadState.Loading -> loading()
+                    is LoadState.Error -> ErrorPlaceholder(event)
                 }
+            }
+        } else {
+            val inAppNotification = LocalInAppNotification.current
+            LaunchedEffect(event) {
+                snapshotFlow { event }
+                    .distinctUntilChanged()
+                    .filterNotNull()
+                    .collect {
+                        inAppNotification.show(it)
+                    }
+            }
+            content.invoke()
         }
-        content.invoke()
     }
 }
