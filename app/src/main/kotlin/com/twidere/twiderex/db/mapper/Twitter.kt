@@ -214,17 +214,19 @@ private fun StatusV2.toDbStatusWithMediaAndUser(
             reply_settings = replySettings ?: ReplySettings.Everyone,
             quoteCount = publicMetrics?.quoteCount
         ),
-        previewCard = entities?.urls?.firstOrNull()?.let {
-            it.expandedURL?.let { url ->
-                DbPreviewCard(
-                    link = url,
-                    title = it.title,
-                    desc = it.description,
-                    image = it.images?.firstOrNull()?.url,
-                    displayLink = it.displayURL,
-                )
+        previewCard = entities?.urls?.firstOrNull()
+            ?.takeUnless { url -> url.displayURL?.contains("pic.twitter.com") == true }
+            ?.let {
+                it.expandedURL?.let { url ->
+                    DbPreviewCard(
+                        link = url,
+                        title = it.title,
+                        desc = it.description,
+                        image = it.images?.firstOrNull()?.url,
+                        displayLink = it.displayURL,
+                    )
+                }
             }
-        }
     )
     return DbStatusWithMediaAndUser(
         data = status,
@@ -319,6 +321,7 @@ private fun Status.toDbStatusWithMediaAndUser(
         ),
         previewCard = entities?.urls?.firstOrNull()
             ?.takeUnless { url -> quotedStatus?.idStr?.let { id -> url.expandedURL?.endsWith(id) == true } == true }
+            ?.takeUnless { url -> url.expandedURL?.contains("pic.twitter.com") == true }
             ?.let {
                 it.url?.let { url ->
                     DbPreviewCard(
