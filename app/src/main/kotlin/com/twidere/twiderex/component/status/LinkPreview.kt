@@ -21,16 +21,16 @@
 package com.twidere.twiderex.component.status
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Icon
-import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -40,7 +40,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.NetworkImage
@@ -95,6 +97,14 @@ object LinkPreviewDefaults {
         vertical = 12.dp,
     )
     val TextPaddingStart = 16.dp
+
+    val TitleStyle
+        @Composable
+        get() = MaterialTheme.typography.subtitle2
+
+    val DescStyle
+        @Composable
+        get() = MaterialTheme.typography.caption
 }
 
 @Composable
@@ -105,16 +115,22 @@ private fun LinkOnlyPreview(
     CompositionLocalProvider(
         LocalContentColor provides MaterialTheme.colors.primary
     ) {
-        Row(
-            modifier.padding(LinkPreviewDefaults.ContentPadding),
-            verticalAlignment = Alignment.CenterVertically,
+        Box(
+            modifier = modifier.padding(LinkPreviewDefaults.ContentPadding),
+            contentAlignment = Alignment.CenterStart
         ) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_planet),
-                contentDescription = null
-            )
-            Spacer(modifier = Modifier.width(LinkPreviewDefaults.TextPaddingStart))
-            Text(text = link)
+            Column {
+                Text(text = "", style = LinkPreviewDefaults.TitleStyle)
+                Text(text = "")
+            }
+            Row {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_planet),
+                    contentDescription = null
+                )
+                Spacer(modifier = Modifier.width(LinkPreviewDefaults.TextPaddingStart))
+                Text(text = link)
+            }
         }
     }
 }
@@ -126,7 +142,8 @@ private fun LinkWithTitlePreview(
     modifier: Modifier = Modifier,
 ) {
     Row(
-        modifier = modifier.padding(LinkPreviewDefaults.ContentPadding),
+        modifier = modifier
+            .padding(LinkPreviewDefaults.ContentPadding),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         CompositionLocalProvider(
@@ -136,7 +153,7 @@ private fun LinkWithTitlePreview(
         }
         Spacer(modifier = Modifier.width(LinkPreviewDefaults.TextPaddingStart))
         Column {
-            Text(text = title, style = MaterialTheme.typography.subtitle2)
+            Text(text = title, style = LinkPreviewDefaults.TitleStyle)
             CompositionLocalProvider(
                 LocalContentColor provides MaterialTheme.colors.primary
             ) {
@@ -153,23 +170,38 @@ private fun LinkWithTitleAndSmallImagePreview(
     link: String,
     modifier: Modifier = Modifier,
 ) {
-    Row(
+    Layout(
         modifier = modifier,
-    ) {
-        NetworkImage(
-            data = image
-        )
-        Column(
-            modifier = Modifier
-                .weight(1f)
-                .padding(LinkPreviewDefaults.ContentPadding)
-        ) {
-            Text(text = title, style = MaterialTheme.typography.subtitle2)
-            CompositionLocalProvider(
-                LocalContentColor provides MaterialTheme.colors.primary
+        content = {
+            NetworkImage(
+                data = image
+            )
+            Column(
+                modifier = Modifier
+                    .padding(LinkPreviewDefaults.ContentPadding)
             ) {
-                Text(text = link)
+                Text(text = title, style = LinkPreviewDefaults.TitleStyle)
+                CompositionLocalProvider(
+                    LocalContentColor provides MaterialTheme.colors.primary
+                ) {
+                    Text(text = link)
+                }
             }
+        }
+    ) { measurables, constraints ->
+        val textPlaceable = measurables[1].measure(constraints = constraints)
+        val imagePlaceable = measurables[0].measure(
+            Constraints.fixed(
+                textPlaceable.measuredHeight,
+                textPlaceable.measuredHeight
+            )
+        )
+        layout(
+            width = textPlaceable.measuredWidth + imagePlaceable.measuredWidth,
+            height = textPlaceable.measuredHeight
+        ) {
+            imagePlaceable.placeRelative(0, 0)
+            textPlaceable.placeRelative(imagePlaceable.measuredWidth, 0)
         }
     }
 }
@@ -184,12 +216,8 @@ private fun LinkWithTitleAndDescPreview(
     Column(
         modifier = modifier.padding(LinkPreviewDefaults.ContentPadding),
     ) {
-        Text(text = title, style = MaterialTheme.typography.subtitle2)
-        CompositionLocalProvider(
-            LocalContentAlpha provides ContentAlpha.medium
-        ) {
-            Text(text = desc)
-        }
+        Text(text = title, style = LinkPreviewDefaults.TitleStyle)
+        Text(text = desc, style = LinkPreviewDefaults.DescStyle)
         CompositionLocalProvider(
             LocalContentColor provides MaterialTheme.colors.primary
         ) {
@@ -206,27 +234,35 @@ private fun LinkWithTitleAndLargeImagePreview(
     link: String,
     modifier: Modifier = Modifier,
 ) {
-    Column(
+    Layout(
         modifier = modifier,
-    ) {
-        NetworkImage(
-            modifier = Modifier.aspectRatio(270f / 135f),
-            data = image
-        )
-        Column(
-            modifier = Modifier.padding(LinkPreviewDefaults.ContentPadding),
+        content = {
+            NetworkImage(
+                modifier = Modifier.aspectRatio(270f / 135f),
+                data = image
+            )
+            Column(
+                modifier = Modifier.padding(LinkPreviewDefaults.ContentPadding),
+            ) {
+                Text(text = title, style = LinkPreviewDefaults.TitleStyle)
+                Text(text = desc, style = LinkPreviewDefaults.DescStyle)
+                CompositionLocalProvider(
+                    LocalContentColor provides MaterialTheme.colors.primary
+                ) {
+                    Text(text = link)
+                }
+            }
+        }
+    ) { measurables, constraints ->
+        val textPlaceable = measurables[1].measure(constraints = constraints)
+        val imagePlaceable =
+            measurables[0].measure(constraints = constraints.copy(minWidth = textPlaceable.measuredWidth))
+        layout(
+            width = textPlaceable.measuredWidth,
+            height = textPlaceable.measuredHeight + imagePlaceable.measuredHeight
         ) {
-            Text(text = title, style = MaterialTheme.typography.subtitle2)
-            CompositionLocalProvider(
-                LocalContentAlpha provides ContentAlpha.medium
-            ) {
-                Text(text = desc)
-            }
-            CompositionLocalProvider(
-                LocalContentColor provides MaterialTheme.colors.primary
-            ) {
-                Text(text = link)
-            }
+            imagePlaceable.placeRelative(0, 0)
+            textPlaceable.placeRelative(0, imagePlaceable.measuredHeight)
         }
     }
 }
