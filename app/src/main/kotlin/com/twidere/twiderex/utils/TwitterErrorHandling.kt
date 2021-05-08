@@ -24,6 +24,7 @@ import android.content.Intent
 import android.content.Intent.ACTION_VIEW
 import android.net.Uri
 import com.twidere.services.http.MicroBlogHttpException
+import com.twidere.services.mastodon.model.exceptions.MastodonException
 import com.twidere.services.twitter.TwitterErrorCodes
 import com.twidere.services.twitter.model.exceptions.TwitterApiException
 import com.twidere.services.twitter.model.exceptions.TwitterApiExceptionV2
@@ -71,6 +72,9 @@ fun Throwable.generateNotificationEvent(): NotificationEvent? {
         }
         is TwitterApiExceptionV2 -> {
             detail?.let { StringNotificationEvent(it) }
+        }
+        is MastodonException -> {
+            microBlogErrorMessage?.let { StringNotificationEvent(it) }
         }
         !is CancellationException -> {
             message?.let { StringNotificationEvent(it) }

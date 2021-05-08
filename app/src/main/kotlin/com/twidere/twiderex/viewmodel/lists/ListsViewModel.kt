@@ -72,15 +72,16 @@ abstract class ListsOperatorViewModel(
     protected fun loadingRequest(request: suspend () -> Unit) {
         loading.postValue(true)
         viewModelScope.launch {
-            try {
+            runCatching {
                 request()
                 modifySuccess.postValue(true)
                 onResult(true)
-            } catch (e: Throwable) {
-                e.notify(inAppNotification)
+            }.onFailure {
+                it.notify(inAppNotification)
                 modifySuccess.postValue(false)
                 onResult(false)
-            } finally {
+                loading.postValue(false)
+            }.onSuccess {
                 loading.postValue(false)
             }
         }

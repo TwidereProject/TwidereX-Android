@@ -26,6 +26,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import com.twidere.services.microblog.ListsService
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiUser
@@ -94,11 +95,12 @@ class ListsAddMemberViewModel @AssistedInject constructor(
 
     fun addToOrRemove(user: UiUser) {
         if (pendingMap[user.userKey] == null) {
+            loading.postValue(true)
             loadingRequest {
-                listsUsersRepository.addMember(
-                    account = account,
+                (account.service as ListsService).addMember(
                     listId = listId,
-                    user = user
+                    userId = user.id,
+                    screenName = user.screenName
                 )
                 pendingMap[user.userKey] = user
             }
@@ -121,11 +123,12 @@ class ListsAddMemberViewModel @AssistedInject constructor(
     private fun loadingRequest(request: suspend () -> Unit) {
         loading.postValue(true)
         viewModelScope.launch {
-            try {
+            runCatching {
                 request()
-            } catch (e: Throwable) {
-                e.notify(inAppNotification)
-            } finally {
+            }.onFailure {
+                it.notify(inAppNotification)
+                loading.postValue(false)
+            }.onSuccess {
                 loading.postValue(false)
             }
         }

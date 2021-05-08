@@ -349,7 +349,7 @@ class TwitterService(
         return resources.searchV1(query, count = count, max_id = max_id, since_id = since_id)
     }
 
-    override suspend fun searchUsers(query: String, page: Int?, count: Int) =
+    override suspend fun searchUsers(query: String, page: Int?, count: Int, following: Boolean) =
         resources.searchUser(query, page, count)
 
     override suspend fun showRelationship(target_id: String): IRelationship {

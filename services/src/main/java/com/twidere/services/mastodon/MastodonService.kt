@@ -236,12 +236,13 @@ class MastodonService(
         )
     }
 
-    override suspend fun searchUsers(query: String, page: Int?, count: Int): List<IUser> {
+    override suspend fun searchUsers(query: String, page: Int?, count: Int, following: Boolean): List<IUser> {
         return resources.searchV2(
             query = query,
             type = SearchType.accounts,
             limit = count,
-            offset = (page ?: 0) * count
+            offset = (page ?: 0) * count,
+            following = following,
         ).accounts ?: emptyList()
     }
 
@@ -356,6 +357,11 @@ class MastodonService(
         screenName: String
     ) {
         resources.addMember(listId, PostAccounts(listOf(userId)))
+            .errorBody()?.let {
+                it.string()
+            }?.let {
+                throw MastodonException(it)
+            }
     }
 
     override suspend fun removeMember(
@@ -364,6 +370,11 @@ class MastodonService(
         screenName: String
     ) {
         resources.removeMember(listId, PostAccounts(listOf(userId)))
+            .errorBody()?.let {
+                it.string()
+            }?.let {
+                throw MastodonException(it)
+            }
     }
 
     override suspend fun listSubscribers(

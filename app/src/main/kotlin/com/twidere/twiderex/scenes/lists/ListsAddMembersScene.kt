@@ -67,6 +67,7 @@ import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.extensions.refreshOrRetry
 import com.twidere.twiderex.extensions.viewModel
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalNavController
@@ -164,11 +165,15 @@ fun ListsAddMembersScene(
 @Composable
 private fun SearchResultsContent(keyword: String, pendingList: List<UiUser>, onAction: (user: UiUser) -> Unit, statusChecker: (user: UiUser) -> Boolean) {
     val account = LocalActiveAccount.current ?: return
+    val onlySearchFollowing = when (account.type) {
+        PlatformType.Mastodon -> true
+        else -> false
+    }
     val viewModel = viewModel(
         account,
         keyword,
     ) {
-        SearchUserViewModel(account, keyword)
+        SearchUserViewModel(account, keyword, onlySearchFollowing)
     }
     val source = viewModel.source.collectAsLazyPagingItems()
     val navigator = LocalNavigator.current
