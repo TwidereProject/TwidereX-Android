@@ -23,6 +23,7 @@ package com.twidere.twiderex.db.model.converter
 import androidx.room.TypeConverter
 import com.twidere.twiderex.db.model.DbMastodonStatusExtra
 import com.twidere.twiderex.db.model.DbMastodonUserExtra
+import com.twidere.twiderex.db.model.DbPreviewCard
 import com.twidere.twiderex.db.model.DbTwitterStatusExtra
 import com.twidere.twiderex.db.model.DbTwitterUserExtra
 import com.twidere.twiderex.utils.fromJson
@@ -66,6 +67,16 @@ class ExtraConverter {
 
     @TypeConverter
     fun fromTarget(target: DbMastodonUserExtra?): String? {
+        return target?.json()
+    }
+
+    @TypeConverter
+    fun fromDbPreviewCard(value: String?): DbPreviewCard? {
+        return value?.fromJson()
+    }
+
+    @TypeConverter
+    fun fromTarget(target: DbPreviewCard?): String? {
         return target?.json()
     }
 }

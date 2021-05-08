@@ -72,6 +72,9 @@ data class Status(
     @SerialName("quoted_status")
     val quotedStatus: Status? = null,
 
+    @SerialName("quoted_status_permalink")
+    val quotedStatusPermalink: QuotedStatusPermalink? = null,
+
     @SerialName("is_quote_status")
     val isQuoteStatus: Boolean? = null,
 

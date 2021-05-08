@@ -27,7 +27,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.Icon
@@ -129,7 +128,7 @@ private fun LinkOnlyPreview(
                     contentDescription = null
                 )
                 Spacer(modifier = Modifier.width(LinkPreviewDefaults.TextPaddingStart))
-                Text(text = link)
+                Text(text = link, maxLines = 1)
             }
         }
     }
@@ -157,7 +156,7 @@ private fun LinkWithTitlePreview(
             CompositionLocalProvider(
                 LocalContentColor provides MaterialTheme.colors.primary
             ) {
-                Text(text = link)
+                Text(text = link, maxLines = 1)
             }
         }
     }
@@ -184,7 +183,7 @@ private fun LinkWithTitleAndSmallImagePreview(
                 CompositionLocalProvider(
                     LocalContentColor provides MaterialTheme.colors.primary
                 ) {
-                    Text(text = link)
+                    Text(text = link, maxLines = 1)
                 }
             }
         }
@@ -201,7 +200,7 @@ private fun LinkWithTitleAndSmallImagePreview(
             height = textPlaceable.measuredHeight
         ) {
             imagePlaceable.placeRelative(0, 0)
-            textPlaceable.placeRelative(imagePlaceable.measuredWidth, 0)
+            textPlaceable.placeRelative(textPlaceable.measuredHeight, 0)
         }
     }
 }
@@ -221,7 +220,7 @@ private fun LinkWithTitleAndDescPreview(
         CompositionLocalProvider(
             LocalContentColor provides MaterialTheme.colors.primary
         ) {
-            Text(text = link)
+            Text(text = link, maxLines = 1)
         }
     }
 }
@@ -249,7 +248,7 @@ private fun LinkWithTitleAndLargeImagePreview(
                 CompositionLocalProvider(
                     LocalContentColor provides MaterialTheme.colors.primary
                 ) {
-                    Text(text = link)
+                    Text(text = link, maxLines = 1)
                 }
             }
         }
