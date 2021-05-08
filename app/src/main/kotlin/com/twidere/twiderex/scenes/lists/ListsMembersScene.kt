@@ -82,7 +82,7 @@ fun ListsMembersScene(
                     Icon(
                         painter = painterResource(id = R.drawable.ic_add),
                         contentDescription = stringResource(
-                            id = R.string.scene_lists_icons_create
+                            id = R.string.scene_lists_details_add_members
                         )
                     )
                 }

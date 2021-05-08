@@ -22,25 +22,25 @@ package com.twidere.twiderex.scenes.lists
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
-import androidx.compose.material.LocalContentAlpha
-import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -50,13 +50,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.paging.LoadState
 import androidx.paging.PagingData
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarDefaults
-import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
+import com.twidere.twiderex.component.foundation.LoadingProgress
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
 import com.twidere.twiderex.component.foundation.TextInput
 import com.twidere.twiderex.component.lazy.collectAsLazyPagingItems
@@ -68,8 +69,9 @@ import com.twidere.twiderex.extensions.viewModel
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.ui.LocalActiveAccount
+import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
-import com.twidere.twiderex.viewmodel.lists.ListsUserModifyViewModel
+import com.twidere.twiderex.viewmodel.lists.ListsAddMemberViewModel
 import com.twidere.twiderex.viewmodel.search.SearchUserViewModel
 import kotlinx.coroutines.flow.flowOf
 
@@ -78,16 +80,17 @@ fun ListsAddMembersScene(
     listKey: MicroBlogKey,
 ) {
     val account = LocalActiveAccount.current ?: return
-    val viewModel = assistedViewModel<ListsUserModifyViewModel.AssistedFactory, ListsUserModifyViewModel>(
+    val viewModel = assistedViewModel<ListsAddMemberViewModel.AssistedFactory, ListsAddMemberViewModel>(
         account, listKey.id
     ) {
         it.create(account, listKey.id)
     }
-    viewModel.toString()
 
     var keyword by rememberSaveable {
         mutableStateOf("")
     }
+
+    val loading by viewModel.loading.observeAsState()
 
     TwidereScene {
         InAppNotificationScaffold(
@@ -96,26 +99,22 @@ fun ListsAddMembersScene(
                     Column {
                         AppBar(
                             navigationIcon = {
-                                AppBarNavigationButton(Icons.Default.Close)
+                                val navController = LocalNavController.current
+                                IconButton(
+                                    onClick = {
+                                        navController.goBackWith(viewModel.pendingMap.values.toList())
+                                    }
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.ArrowBack,
+                                        contentDescription = stringResource(id = R.string.accessibility_common_back)
+                                    )
+                                }
                             },
                             title = {
                                 Text(text = stringResource(id = R.string.scene_lists_users_add_title))
                             },
                             elevation = 0.dp,
-                            actions = {
-                                IconButton(
-                                    enabled = viewModel.pendingMap.isNotEmpty(),
-                                    onClick = {
-                                        /*TODO Submit*/
-                                    }
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.Done,
-                                        contentDescription = stringResource(id = R.string.common_controls_actions_confirm),
-                                        tint = if (viewModel.pendingMap.isNotEmpty()) MaterialTheme.colors.primary else LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
-                                    )
-                                }
-                            }
                         )
                         Row(
                             modifier = Modifier.padding(ListsAddMembersSceneDefaults.SearchInput.ContentPadding),
@@ -141,16 +140,21 @@ fun ListsAddMembersScene(
                 }
             },
         ) {
-            Column {
+            Box(modifier = Modifier.fillMaxSize()) {
                 // search result
                 SearchResultsContent(
                     keyword = keyword,
                     pendingList = viewModel.pendingMap.values.toMutableList(),
                     onAction = {
-                        viewModel.addToOrRemoveFromPendingLists(it)
+                        viewModel.addToOrRemove(it)
                     }
                 ) {
                     viewModel.isInPendingList(it)
+                }
+                if (loading == true) {
+                    Dialog(onDismissRequest = { }) {
+                        LoadingProgress()
+                    }
                 }
             }
         }
@@ -196,7 +200,6 @@ private fun SearchResultsContent(keyword: String, pendingList: List<UiUser>, onA
                         )
                     } else {
                         Text(
-
                             text = stringResource(id = R.string.scene_lists_users_menu_actions_add),
                             style = MaterialTheme.typography.button,
                             color = MaterialTheme.colors.primary,

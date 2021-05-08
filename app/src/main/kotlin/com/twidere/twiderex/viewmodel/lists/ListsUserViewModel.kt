@@ -77,7 +77,7 @@ class ListsUserViewModel @AssistedInject constructor(
     }
 }
 
-class ListsUserModifyViewModel @AssistedInject constructor(
+class ListsAddMemberViewModel @AssistedInject constructor(
     private val listsUsersRepository: ListUsersRepository,
     private val inAppNotification: InAppNotification,
     @Assisted private val account: AccountDetails,
@@ -86,18 +86,31 @@ class ListsUserModifyViewModel @AssistedInject constructor(
 
     @dagger.assisted.AssistedFactory
     interface AssistedFactory {
-        fun create(account: AccountDetails, listId: String): ListsUserModifyViewModel
+        fun create(account: AccountDetails, listId: String): ListsAddMemberViewModel
     }
 
-    val modifySuccess = MutableLiveData<Boolean>(false)
     val loading = MutableLiveData<Boolean>(false)
     val pendingMap = mutableStateMapOf<MicroBlogKey, UiUser>()
 
-    fun addToOrRemoveFromPendingLists(user: UiUser) {
+    fun addToOrRemove(user: UiUser) {
         if (pendingMap[user.userKey] == null) {
-            pendingMap[user.userKey] = user
+            loadingRequest {
+                listsUsersRepository.addMember(
+                    account = account,
+                    listId = listId,
+                    user = user
+                )
+                pendingMap[user.userKey] = user
+            }
         } else {
-            pendingMap.remove(user.userKey)
+            loadingRequest {
+                listsUsersRepository.removeMember(
+                    account = account,
+                    listId = listId,
+                    user = user
+                )
+                pendingMap.remove(user.userKey)
+            }
         }
     }
 
@@ -110,10 +123,8 @@ class ListsUserModifyViewModel @AssistedInject constructor(
         viewModelScope.launch {
             try {
                 request()
-                modifySuccess.postValue(true)
             } catch (e: Throwable) {
                 e.notify(inAppNotification)
-                modifySuccess.postValue(false)
             } finally {
                 loading.postValue(false)
             }

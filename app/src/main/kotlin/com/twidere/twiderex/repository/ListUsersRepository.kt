@@ -98,4 +98,8 @@ class ListUsersRepository(private val database: CacheDatabase) {
             screenName = user.screenName
         )
     }
+
+    fun insertCache(users: List<UiUser>, listId: String) {
+        membersCaches[listId]?.insert(users, 0)
+    }
 }
