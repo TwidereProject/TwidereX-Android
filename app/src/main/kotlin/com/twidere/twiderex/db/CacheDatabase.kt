@@ -59,7 +59,7 @@ import javax.inject.Singleton
         DbSearch::class,
         DbStatusReference::class,
     ],
-    version = 10,
+    version = 11,
 )
 @TypeConverters(
     MicroBlogKeyConverter::class,
