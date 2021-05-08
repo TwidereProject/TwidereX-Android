@@ -400,9 +400,11 @@ fun ColumnScope.StatusBody(
 
     StatusBodyMedia(status)
 
-    status.linkPreview?.let {
-        Spacer(modifier = Modifier.height(StatusBodyDefaults.LinkPreviewSpacing))
-        StatusLinkPreview(it)
+    if (LocalDisplayPreferences.current.urlPreview) {
+        status.linkPreview?.let {
+            Spacer(modifier = Modifier.height(StatusBodyDefaults.LinkPreviewSpacing))
+            StatusLinkPreview(it)
+        }
     }
 
     if (!status.placeString.isNullOrEmpty() && type == StatusContentType.Normal) {

@@ -60,6 +60,12 @@ class DisplayViewModel @AssistedInject constructor(
         }
     }
 
+    fun setUrlPreview(value: Boolean) = viewModelScope.launch {
+        displayPreferences.updateData {
+            it.toBuilder().setUrlPreview(value).build()
+        }
+    }
+
     fun setAutoPlayback(value: DisplayPreferences.AutoPlayback) = viewModelScope.launch {
         displayPreferences.updateData {
             it.toBuilder().setAutoPlayback(value).build()

@@ -238,6 +238,7 @@
     <string name="scene_settings_display_text_rounded_square">圆角矩形</string>
     <string name="scene_settings_display_date_format_relative">相对的</string>
     <string name="scene_settings_display_date_format_absolute">绝对的</string>
+    <string name="scene_settings_display_url_preview">网址预览</string>
     <string name="scene_settings_display_media_media_previews">媒体预览</string>
     <string name="scene_settings_display_media_auto_playback">自动播放</string>
     <string name="scene_settings_display_media_automatic">自动</string>
