@@ -20,14 +20,11 @@
  */
 package com.twidere.twiderex.paging.source
 
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.twidere.services.microblog.model.IPaging
 import com.twidere.services.microblog.model.IUser
 import com.twidere.twiderex.db.mapper.toDbUser
-import com.twidere.twiderex.defaultLoadCount
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.model.ui.UiUser.Companion.toUi
@@ -57,15 +54,4 @@ abstract class UserPagingSource(
     }
 
     abstract suspend fun loadUsers(params: LoadParams<String>): List<IUser>
-
-    fun pager(): Pager<String, UiUser> {
-        return Pager(
-            config = PagingConfig(
-                pageSize = defaultLoadCount,
-                enablePlaceholders = false,
-            )
-        ) {
-            this
-        }
-    }
 }

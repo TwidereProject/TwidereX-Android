@@ -55,6 +55,12 @@ class PagingMemoryCache<Value> : InvalidateTracker {
         }
     }
 
+    fun deleteAll(items: List<Value>) {
+        if (cacheList.removeAll(items)) {
+            dispatchInvalidate()
+        }
+    }
+
     fun clear() {
         cacheList.clear()
     }

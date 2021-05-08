@@ -1,65 +1,63 @@
-package com.twidere.twiderex.paging.mediator
+/*
+ *  Twidere X
+ *
+ *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
+ * 
+ *  This file is part of Twidere X.
+ * 
+ *  Twidere X is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ * 
+ *  Twidere X is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ * 
+ *  You should have received a copy of the GNU General Public License
+ *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
+ */
+package com.twidere.twiderex.paging.mediator.list
 
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
+import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import androidx.paging.RemoteMediator
 import com.twidere.services.microblog.model.IPaging
 import com.twidere.services.microblog.model.IUser
 import com.twidere.twiderex.db.mapper.toDbUser
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.model.ui.UiUser.Companion.toUi
-import com.twidere.twiderex.paging.crud.MemoryCachePagingSource
+import com.twidere.twiderex.paging.crud.MemoryCachePagingMediator
 import com.twidere.twiderex.paging.crud.PagingMemoryCache
 
 @ExperimentalPagingApi
-abstract class UserPagingMediator(
+abstract class ListsUserPagingMediator(
     protected val userKey: MicroBlogKey,
-    protected val memoryCache: PagingMemoryCache<String, UiUser>,
-): RemoteMediator<String, UiUser>() {
-    private var paging:String? = null
+    memoryCache: PagingMemoryCache<UiUser>,
+) : MemoryCachePagingMediator<String, UiUser>(memoryCache) {
     override suspend fun load(
+        key: String?,
         loadType: LoadType,
-        state: PagingState<String, UiUser>
-    ): MediatorResult {
+        state: PagingState<Int, UiUser>
+    ): PagingSource.LoadResult<String, UiUser> {
         return try {
-            paging = when(loadType) {
-                LoadType.APPEND -> paging
-                LoadType.REFRESH -> null
-                LoadType.PREPEND -> return MediatorResult.Success(endOfPaginationReached = true)
-            }
-            val result = loadUsers(paging, state.config.pageSize)
+            val result = loadUsers(key, state.config.pageSize)
             val users = result.map {
                 it.toDbUser(userKey).toUi()
             }
-            // clear cache if refresh
-            if (paging == null) {
-                memoryCache.clear()
-            }
-
-            paging = if (result is IPaging && users.isNotEmpty()) {
+            val nextKey = if (result is IPaging && users.isNotEmpty()) {
                 result.nextPage
             } else {
                 null
             }
-            // save users to cache
-            memoryCache.insert(users)
-            MediatorResult.Success(paging == null)
+            PagingSource.LoadResult.Page(users, null, nextKey)
         } catch (e: Exception) {
-            MediatorResult.Error(e)
+            PagingSource.LoadResult.Error(e)
         }
     }
 
     abstract suspend fun loadUsers(key: String?, count: Int): List<IUser>
-}
-
-class UserPagingSource(memoryCache: PagingMemoryCache<String, UiUser>): MemoryCachePagingSource<String, UiUser>(memoryCache) {
-    override fun getRefreshKey(state: PagingState<String, UiUser>): String? {
-        return null
-    }
-
-    override fun provideNextKey(paging: Int): String? {
-        return paging.toString()
-    }
 }

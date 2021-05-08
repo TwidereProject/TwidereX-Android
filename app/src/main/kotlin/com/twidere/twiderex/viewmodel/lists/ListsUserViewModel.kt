@@ -61,6 +61,20 @@ class ListsUserViewModel @AssistedInject constructor(
         get() {
             return if (viewMembers) members else subscribers
         }
+
+    fun removeMember(user: UiUser) {
+        try {
+            viewModelScope.launch {
+                listsUsersRepository.removeMember(
+                    account = account,
+                    listId = listId,
+                    user = user
+                )
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
 }
 
 class ListsUserModifyViewModel @AssistedInject constructor(
@@ -89,34 +103,6 @@ class ListsUserModifyViewModel @AssistedInject constructor(
 
     fun isInPendingList(user: UiUser): Boolean {
         return pendingMap[user.userKey] != null
-    }
-
-    fun addMember(
-        userId: String,
-        screenName: String
-    ) {
-        loadingRequest {
-            listsUsersRepository.addMember(
-                account = account,
-                listId = listId,
-                userId = userId,
-                screenName = screenName
-            )
-        }
-    }
-
-    fun removeMember(
-        userId: String,
-        screenName: String
-    ) {
-        loadingRequest {
-            listsUsersRepository.removeMember(
-                account = account,
-                listId = listId,
-                userId = userId,
-                screenName = screenName
-            )
-        }
     }
 
     private fun loadingRequest(request: suspend () -> Unit) {

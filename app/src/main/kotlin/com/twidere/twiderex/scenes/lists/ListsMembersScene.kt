@@ -20,10 +20,19 @@
  */
 package com.twidere.twiderex.scenes.lists
 
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.twidere.twiderex.R
@@ -39,7 +48,6 @@ import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.lists.ListsUserViewModel
 
-// TODO user actions
 @Composable
 fun ListsMembersScene(
     listKey: MicroBlogKey,
@@ -80,7 +88,39 @@ fun ListsMembersScene(
                 }
             }
         ) {
-            UserListComponent(viewModel = viewModel)
+            UserListComponent(
+                viewModel = viewModel,
+                action = {
+                    if (!owned) return@UserListComponent
+                    var menuExpand by remember {
+                        mutableStateOf(false)
+                    }
+                    IconButton(onClick = { menuExpand = !menuExpand }) {
+                        Icon(
+                            imageVector = Icons.Default.MoreVert,
+                            contentDescription = stringResource(
+                                id = R.string.scene_lists_users_menu_actions_remove
+                            )
+                        )
+                    }
+                    DropdownMenu(
+                        expanded = menuExpand,
+                        onDismissRequest = { menuExpand = false }
+                    ) {
+                        DropdownMenuItem(
+                            onClick = {
+                                viewModel.removeMember(it)
+                            }
+                        ) {
+                            Text(
+                                text = stringResource(
+                                    R.string.scene_lists_users_menu_actions_remove
+                                )
+                            )
+                        }
+                    }
+                }
+            )
         }
     }
 }

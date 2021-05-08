@@ -20,52 +20,82 @@
  */
 package com.twidere.twiderex.repository
 
+import androidx.paging.ExperimentalPagingApi
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.twidere.services.microblog.ListsService
 import com.twidere.twiderex.db.CacheDatabase
+import com.twidere.twiderex.defaultLoadCount
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.ui.UiUser
-import com.twidere.twiderex.paging.source.ListsMembersPagingSource
+import com.twidere.twiderex.paging.crud.MemoryCachePagingSource
+import com.twidere.twiderex.paging.crud.PagingMemoryCache
+import com.twidere.twiderex.paging.mediator.list.ListsMembersMediator
 import com.twidere.twiderex.paging.source.ListsSubscribersPagingSource
 import kotlinx.coroutines.flow.Flow
 
 class ListUsersRepository(private val database: CacheDatabase) {
+    private val membersCaches = mutableMapOf<String, PagingMemoryCache<UiUser>>()
+
+    @OptIn(ExperimentalPagingApi::class)
     fun fetchMembers(account: AccountDetails, listId: String): Flow<PagingData<UiUser>> {
-        return ListsMembersPagingSource(
-            userKey = account.accountKey,
-            service = account.service as ListsService,
-            listId = listId
-        ).pager().flow
+        val cache = membersCaches[listId] ?: PagingMemoryCache()
+        membersCaches[listId] = cache
+        return Pager(
+            config = PagingConfig(
+                pageSize = defaultLoadCount,
+                enablePlaceholders = false,
+            ),
+            remoteMediator = ListsMembersMediator(
+                cache,
+                account.accountKey,
+                account.service as ListsService,
+                listId
+            )
+        ) {
+            MemoryCachePagingSource(cache)
+        }.flow
     }
 
     fun fetchSubscribers(account: AccountDetails, listId: String): Flow<PagingData<UiUser>> {
-        return ListsSubscribersPagingSource(
-            userKey = account.accountKey,
-            service = account.service as ListsService,
-            listId = listId
-        ).pager().flow
+        return Pager(
+            config = PagingConfig(
+                pageSize = defaultLoadCount,
+                enablePlaceholders = false,
+            ),
+        ) {
+            ListsSubscribersPagingSource(
+                userKey = account.accountKey,
+                service = account.service as ListsService,
+                listId = listId
+            )
+        }.flow
     }
 
     suspend fun addMember(
         account: AccountDetails,
         listId: String,
-        userId: String,
-        screenName: String
-    ) =
+        user: UiUser,
+    ) {
         (account.service as ListsService).addMember(
             listId = listId,
-            userId = userId,
-            screenName = screenName
+            userId = user.id,
+            screenName = user.screenName
         )
+        membersCaches[listId]?.insert(listOf(user))
+    }
 
     suspend fun removeMember(
         account: AccountDetails,
         listId: String,
-        userId: String,
-        screenName: String
-    ) = (account.service as ListsService).removeMember(
-        listId = listId,
-        userId = userId,
-        screenName = screenName
-    )
+        user: UiUser,
+    ) {
+        membersCaches[listId]?.delete(user)
+        (account.service as ListsService).removeMember(
+            listId = listId,
+            userId = user.id,
+            screenName = user.screenName
+        )
+    }
 }
