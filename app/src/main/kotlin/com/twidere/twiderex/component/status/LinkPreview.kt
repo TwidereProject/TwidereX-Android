@@ -55,8 +55,9 @@ fun LinkPreview(
     desc: String? = null,
 ) {
     val styledModifier = Modifier
+        .background(LinkPreviewDefaults.BackgroundColor, MaterialTheme.shapes.medium)
+        .padding(1.dp)
         .clip(MaterialTheme.shapes.medium)
-        .background(Color.Black.copy(alpha = 0.04f))
         .then(modifier)
     when {
         title == null && image == null && desc == null -> LinkOnlyPreview(
@@ -96,6 +97,7 @@ object LinkPreviewDefaults {
         vertical = 12.dp,
     )
     val TextPaddingStart = 16.dp
+    val BackgroundColor = Color.Black.copy(alpha = 0.04f)
 
     val TitleStyle
         @Composable
