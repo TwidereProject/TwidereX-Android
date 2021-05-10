@@ -20,4 +20,5 @@ message DisplayPreferences {
   AvatarStyle avatarStyle = 3;
   bool mediaPreview = 4;
   AutoPlayback autoPlayback = 5;
+  bool urlPreview = 6;
 }

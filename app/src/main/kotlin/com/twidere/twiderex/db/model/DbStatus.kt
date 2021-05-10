@@ -20,7 +20,7 @@
  */
 package com.twidere.twiderex.db.model
 
-import androidx.compose.runtime.Stable
+import androidx.compose.runtime.Immutable
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.Index
@@ -68,16 +68,27 @@ data class DbStatusV2(
     val platformType: PlatformType,
     var mastodonExtra: DbMastodonStatusExtra? = null,
     val twitterExtra: DbTwitterStatusExtra? = null,
+    val previewCard: DbPreviewCard? = null,
 )
 
-@Stable
+@Immutable
+@Serializable
+data class DbPreviewCard(
+    val link: String,
+    val displayLink: String?,
+    val title: String?,
+    val desc: String?,
+    val image: String?,
+)
+
+@Immutable
 @Serializable
 data class DbTwitterStatusExtra(
     val reply_settings: ReplySettings,
     val quoteCount: Long? = null,
 )
 
-@Stable
+@Immutable
 @Serializable
 data class DbMastodonStatusExtra(
     val type: MastodonStatusType,

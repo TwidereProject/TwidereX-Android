@@ -57,6 +57,7 @@ import com.twidere.twiderex.R
 import com.twidere.twiderex.component.HumanizedTime
 import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.db.model.DbMastodonStatusExtra
+import com.twidere.twiderex.db.model.DbPreviewCard
 import com.twidere.twiderex.extensions.icon
 import com.twidere.twiderex.model.MastodonStatusType
 import com.twidere.twiderex.model.PlatformType
@@ -373,13 +374,16 @@ fun StatusContent(
 
 object StatusContentDefaults {
     val AvatarSpacing = 8.dp
+
     object Normal {
         val BodySpacing = 4.dp
         val UserNameSpacing = 4.dp
     }
+
     object Extend {
         val BodySpacing = 8.dp
     }
+
     object Mastodon {
         val VisibilitySpacing = 4.dp
     }
@@ -395,6 +399,13 @@ fun ColumnScope.StatusBody(
     )
 
     StatusBodyMedia(status)
+
+    if (LocalDisplayPreferences.current.urlPreview && !status.media.any()) {
+        status.linkPreview?.let {
+            Spacer(modifier = Modifier.height(StatusBodyDefaults.LinkPreviewSpacing))
+            StatusLinkPreview(it)
+        }
+    }
 
     if (!status.placeString.isNullOrEmpty() && type == StatusContentType.Normal) {
         Spacer(modifier = Modifier.height(StatusBodyDefaults.PlaceSpacing))
@@ -431,8 +442,25 @@ fun ColumnScope.StatusBody(
 }
 
 object StatusBodyDefaults {
+    val LinkPreviewSpacing = 8.dp
     val PlaceSpacing = 8.dp
     val QuoteSpacing = 8.dp
+}
+
+@Composable
+private fun StatusLinkPreview(card: DbPreviewCard) {
+    val navigator = LocalNavigator.current
+    LinkPreview(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable {
+                navigator.openLink(card.link)
+            },
+        link = card.displayLink ?: card.link,
+        title = card.title,
+        image = card.image,
+        desc = card.desc,
+    )
 }
 
 @Composable

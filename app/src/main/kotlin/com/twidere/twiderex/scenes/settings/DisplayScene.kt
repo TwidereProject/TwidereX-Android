@@ -163,6 +163,15 @@ fun DisplayScene() {
                     Text(text = stringResource(id = R.string.scene_settings_display_section_header_media))
                 }
                 switchItem(
+                    value = display.urlPreview,
+                    onChanged = {
+                        viewModel.setUrlPreview(it)
+                    },
+                    title = {
+                        Text(text = stringResource(id = R.string.scene_settings_display_url_preview))
+                    }
+                )
+                switchItem(
                     value = display.mediaPreview,
                     onChanged = {
                         viewModel.setMediaPreview(it)

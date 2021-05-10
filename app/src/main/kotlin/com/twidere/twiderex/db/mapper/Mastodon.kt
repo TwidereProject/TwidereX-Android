@@ -32,6 +32,7 @@ import com.twidere.twiderex.db.model.DbMastodonUserExtra
 import com.twidere.twiderex.db.model.DbMedia
 import com.twidere.twiderex.db.model.DbPagingTimeline
 import com.twidere.twiderex.db.model.DbPagingTimelineWithStatus
+import com.twidere.twiderex.db.model.DbPreviewCard
 import com.twidere.twiderex.db.model.DbStatusReaction
 import com.twidere.twiderex.db.model.DbStatusV2
 import com.twidere.twiderex.db.model.DbStatusWithMediaAndUser
@@ -220,7 +221,16 @@ private fun Status.toDbStatusWithMediaAndUser(
             poll = poll,
             card = card,
             mentions = mentions,
-        )
+        ),
+        previewCard = card?.url?.let { url ->
+            DbPreviewCard(
+                link = url,
+                displayLink = card?.url,
+                title = card?.title,
+                desc = card?.description?.takeIf { it.isNotEmpty() && it.isNotBlank() },
+                image = card?.image,
+            )
+        }
     )
     return DbStatusWithMediaAndUser(
         data = status,

@@ -29,6 +29,7 @@ import com.twidere.services.twitter.model.UserV2
 import com.twidere.twiderex.db.model.DbMedia
 import com.twidere.twiderex.db.model.DbPagingTimeline
 import com.twidere.twiderex.db.model.DbPagingTimelineWithStatus
+import com.twidere.twiderex.db.model.DbPreviewCard
 import com.twidere.twiderex.db.model.DbStatusReaction
 import com.twidere.twiderex.db.model.DbStatusV2
 import com.twidere.twiderex.db.model.DbStatusWithMediaAndUser
@@ -212,7 +213,20 @@ private fun StatusV2.toDbStatusWithMediaAndUser(
         twitterExtra = DbTwitterStatusExtra(
             reply_settings = replySettings ?: ReplySettings.Everyone,
             quoteCount = publicMetrics?.quoteCount
-        )
+        ),
+        previewCard = entities?.urls?.firstOrNull()
+            ?.takeUnless { url -> url.displayURL?.contains("pic.twitter.com") == true }
+            ?.let {
+                it.expandedURL?.let { url ->
+                    DbPreviewCard(
+                        link = url,
+                        title = it.title,
+                        desc = it.description,
+                        image = it.images?.firstOrNull()?.url,
+                        displayLink = it.displayURL,
+                    )
+                }
+            }
     )
     return DbStatusWithMediaAndUser(
         data = status,
@@ -304,7 +318,21 @@ private fun Status.toDbStatusWithMediaAndUser(
         mastodonExtra = null,
         twitterExtra = DbTwitterStatusExtra(
             reply_settings = ReplySettings.Everyone,
-        )
+        ),
+        previewCard = entities?.urls?.firstOrNull()
+            ?.takeUnless { url -> quotedStatus?.idStr?.let { id -> url.expandedURL?.endsWith(id) == true } == true }
+            ?.takeUnless { url -> url.expandedURL?.contains("pic.twitter.com") == true }
+            ?.let {
+                it.url?.let { url ->
+                    DbPreviewCard(
+                        link = it.expandedURL ?: url,
+                        displayLink = it.displayURL,
+                        image = null,
+                        title = null,
+                        desc = null,
+                    )
+                }
+            }
     )
     return DbStatusWithMediaAndUser(
         data = status,
