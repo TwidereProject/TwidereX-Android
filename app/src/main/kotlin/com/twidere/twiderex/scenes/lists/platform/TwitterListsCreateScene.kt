@@ -45,10 +45,13 @@ import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.LoadingProgress
 import com.twidere.twiderex.component.lists.TwitterListsModifyComponent
 import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.lists.ListsCreateViewModel
+import moe.tlaster.precompose.navigation.NavOptions
+import moe.tlaster.precompose.navigation.PopUpTo
 
 @Composable
 fun TwitterListsCreateScene() {
@@ -57,8 +60,15 @@ fun TwitterListsCreateScene() {
     val listsCreateViewModel = assistedViewModel<ListsCreateViewModel.AssistedFactory, ListsCreateViewModel>(
         account
     ) {
-        it.create(account) { success ->
-            if (success) navController.popBackStack()
+        it.create(account) { success, list ->
+            if (success) list?.apply {
+                navController.navigate(
+                    Route.Lists.Timeline(listKey),
+                    options = NavOptions(
+                        popUpTo = PopUpTo(Route.Lists.Home)
+                    )
+                )
+            }
         }
     }
     val loading by listsCreateViewModel.loading.observeAsState()

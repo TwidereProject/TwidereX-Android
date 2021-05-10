@@ -60,7 +60,7 @@ fun TwitterListsEditScene(
     val listsEditViewModel = assistedViewModel<ListsModifyViewModel.AssistedFactory, ListsModifyViewModel>(
         account, listKey
     ) {
-        it.create(account, listKey) { success ->
+        it.create(account, listKey) { success, _ ->
             if (success) navController.popBackStack()
         }
     }

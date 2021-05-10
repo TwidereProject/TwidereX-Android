@@ -122,8 +122,8 @@ class ListsModifyViewModelTest : ViewModelTestBase() {
             mockAppNotification,
             mockAccount,
             listKey = MicroBlogKey.Empty,
-        ) {
-            mockSuccessObserver.onChanged(it)
+        ) { success, _ ->
+            mockSuccessObserver.onChanged(success)
         }
         whenever(mockAppNotification.show(any<NotificationEvent>())).then {
             errorNotification = it.getArgument(0) as NotificationEvent

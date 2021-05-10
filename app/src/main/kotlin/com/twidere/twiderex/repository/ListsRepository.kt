@@ -106,11 +106,12 @@ class ListsRepository(private val database: CacheDatabase) {
         account: AccountDetails,
         listKey: MicroBlogKey,
         listId: String
-    ) {
+    ): UiList? {
         (account.service as ListsService).destroyList(listId)
         val deleteItem = database.listsDao().findWithListKey(listKey, account.accountKey)
         deleteItem?.let {
             database.listsDao().delete(listOf(deleteItem))
         }
+        return deleteItem?.toUi()
     }
 }

@@ -73,7 +73,7 @@ fun ListTimeLineScene(
     val viewModel = assistedViewModel<ListsModifyViewModel.AssistedFactory, ListsModifyViewModel>(
         account, listKey
     ) {
-        it.create(account, listKey) {
+        it.create(account, listKey) { _, _ ->
         }
     }
     val source by viewModel.source.observeAsState()

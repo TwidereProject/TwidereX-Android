@@ -32,12 +32,15 @@ import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.LoadingProgress
 import com.twidere.twiderex.component.lists.MastodonListsModifyComponent
 import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.ui.LocalActiveAccount
+import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.viewmodel.lists.ListsCreateViewModel
 
 @Composable
 fun MastodonListsCreateDialog(onDismissRequest: () -> Unit) {
     val account = LocalActiveAccount.current ?: return
+    val navController = LocalNavController.current
     var showMastodonComponent by remember {
         mutableStateOf(true)
     }
@@ -48,8 +51,15 @@ fun MastodonListsCreateDialog(onDismissRequest: () -> Unit) {
     val listsCreateViewModel = assistedViewModel<ListsCreateViewModel.AssistedFactory, ListsCreateViewModel>(
         account
     ) {
-        it.create(account) {
+        it.create(account) { success, list ->
             dismiss()
+            if (success) {
+                list?.apply {
+                    navController.navigate(
+                        Route.Lists.Timeline(listKey),
+                    )
+                }
+            }
         }
     }
     val loading by listsCreateViewModel.loading.observeAsState()

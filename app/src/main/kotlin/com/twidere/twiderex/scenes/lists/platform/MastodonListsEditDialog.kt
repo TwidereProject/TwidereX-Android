@@ -49,7 +49,7 @@ fun MastodonListsEditDialog(listKey: MicroBlogKey, onDismissRequest: () -> Unit)
     val listsEditViewModel = assistedViewModel<ListsModifyViewModel.AssistedFactory, ListsModifyViewModel>(
         account
     ) {
-        it.create(account, listKey) {
+        it.create(account, listKey) { _, _ ->
             dismiss()
         }
     }

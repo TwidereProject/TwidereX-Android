@@ -28,6 +28,7 @@ import androidx.paging.filter
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.ListsMode
+import com.twidere.twiderex.model.ui.UiList
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.ListsRepository
 import com.twidere.twiderex.utils.notify
@@ -64,22 +65,22 @@ class ListsViewModel @AssistedInject constructor(
 
 abstract class ListsOperatorViewModel(
     protected val inAppNotification: InAppNotification,
-    protected val onResult: (success: Boolean) -> Unit,
+    protected val onResult: (success: Boolean, list: UiList?) -> Unit,
 ) : ViewModel() {
     val modifySuccess = MutableLiveData(false)
     val loading = MutableLiveData(false)
 
-    protected fun loadingRequest(request: suspend () -> Unit) {
+    protected fun loadingRequest(request: suspend () -> UiList?) {
         loading.postValue(true)
         viewModelScope.launch {
             runCatching {
-                request()
+                val result = request()
                 modifySuccess.postValue(true)
-                onResult(true)
+                onResult(true, result)
             }.onFailure {
                 it.notify(inAppNotification)
                 modifySuccess.postValue(false)
-                onResult(false)
+                onResult(false, null)
                 loading.postValue(false)
             }.onSuccess {
                 loading.postValue(false)
@@ -92,11 +93,11 @@ class ListsCreateViewModel @AssistedInject constructor(
     inAppNotification: InAppNotification,
     private val listsRepository: ListsRepository,
     @Assisted private val account: AccountDetails,
-    @Assisted onResult: (success: Boolean) -> Unit
+    @Assisted onResult: (success: Boolean, list: UiList?) -> Unit
 ) : ListsOperatorViewModel(inAppNotification, onResult) {
     @dagger.assisted.AssistedFactory
     interface AssistedFactory {
-        fun create(account: AccountDetails, onResult: (success: Boolean) -> Unit): ListsCreateViewModel
+        fun create(account: AccountDetails, onResult: (success: Boolean, list: UiList?) -> Unit): ListsCreateViewModel
     }
 
     fun createList(
@@ -120,12 +121,12 @@ class ListsModifyViewModel @AssistedInject constructor(
     inAppNotification: InAppNotification,
     @Assisted private val account: AccountDetails,
     @Assisted private val listKey: MicroBlogKey,
-    @Assisted onResult: (success: Boolean) -> Unit
+    @Assisted onResult: (success: Boolean, list: UiList?) -> Unit
 ) : ListsOperatorViewModel(inAppNotification, onResult) {
 
     @dagger.assisted.AssistedFactory
     interface AssistedFactory {
-        fun create(account: AccountDetails, listKey: MicroBlogKey, onResult: (success: Boolean) -> Unit): ListsModifyViewModel
+        fun create(account: AccountDetails, listKey: MicroBlogKey, onResult: (success: Boolean, list: UiList?) -> Unit): ListsModifyViewModel
     }
 
     val source by lazy {

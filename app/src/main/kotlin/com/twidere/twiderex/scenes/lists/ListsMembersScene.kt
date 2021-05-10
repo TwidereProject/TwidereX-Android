@@ -20,11 +20,16 @@
  */
 package com.twidere.twiderex.scenes.lists
 
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.FabPosition
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
@@ -33,8 +38,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.UserListComponent
 import com.twidere.twiderex.component.foundation.AppBar
@@ -47,6 +55,7 @@ import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.lists.ListsUserViewModel
+import java.util.Locale
 
 @Composable
 fun ListsMembersScene(
@@ -79,14 +88,26 @@ fun ListsMembersScene(
                         navController.navigate(Route.Lists.AddMembers(listKey = listKey))
                     }
                 ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_add),
-                        contentDescription = stringResource(
-                            id = R.string.scene_lists_details_add_members
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(ListsMembersSceneDefaults.Fab.ContentPadding)
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_add),
+                            contentDescription = stringResource(
+                                id = R.string.scene_lists_details_add_members
+                            ),
+                            modifier = Modifier.padding(ListsMembersSceneDefaults.Fab.IconPadding)
                         )
-                    )
+                        Text(
+                            text = stringResource(id = R.string.scene_lists_users_add_title)
+                                .toUpperCase(Locale.getDefault()),
+                            style = MaterialTheme.typography.button
+                        )
+                    }
                 }
-            }
+            },
+            floatingActionButtonPosition = FabPosition.Center
         ) {
             UserListComponent(
                 viewModel = viewModel,
@@ -122,5 +143,12 @@ fun ListsMembersScene(
                 }
             )
         }
+    }
+}
+
+private object ListsMembersSceneDefaults {
+    object Fab {
+        val ContentPadding = PaddingValues(horizontal = 22.dp)
+        val IconPadding = PaddingValues(end = 17.dp)
     }
 }
