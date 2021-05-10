@@ -198,7 +198,10 @@ private fun LinkWithTitleAndSmallImagePreview(
             )
         )
         layout(
-            width = textPlaceable.measuredWidth + imagePlaceable.measuredWidth,
+            width = minOf(
+                textPlaceable.measuredWidth + imagePlaceable.measuredWidth,
+                constraints.maxWidth
+            ),
             height = textPlaceable.measuredHeight
         ) {
             imagePlaceable.placeRelative(0, 0)
