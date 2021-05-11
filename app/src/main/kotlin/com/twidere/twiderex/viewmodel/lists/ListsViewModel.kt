@@ -58,7 +58,7 @@ class ListsViewModel @AssistedInject constructor(
 
     val subscribedSource by lazy {
         source.map { pagingData ->
-            pagingData.filter { !it.isOwner(account.user.userId) }
+            pagingData.filter { !it.isOwner(account.user.userId) && it.isFollowed }
         }
     }
 }

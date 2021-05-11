@@ -44,11 +44,13 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.paging.LoadState
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
+import com.twidere.twiderex.component.foundation.LoadingProgress
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
 import com.twidere.twiderex.component.lazy.collectAsLazyPagingItems
 import com.twidere.twiderex.component.lazy.ui.LazyUiStatusList
@@ -76,6 +78,7 @@ fun ListTimeLineScene(
         it.create(account, listKey)
     }
     val source by viewModel.source.observeAsState()
+    val loading by viewModel.loading.observeAsState()
     var showEditDialog by remember {
         mutableStateOf(false)
     }
@@ -121,7 +124,12 @@ fun ListTimeLineScene(
                                     val following = uiList.isFollowed
                                     DropdownMenuItem(
                                         onClick = {
-                                            /*TODO follow/unfollow*/
+                                            if (following) {
+                                                viewModel.unsubscribeList(uiList.listKey)
+                                            } else {
+                                                viewModel.subscribeList(uiList.listKey)
+                                            }
+                                            menuExpand = false
                                         }
                                     ) {
                                         Text(
@@ -176,6 +184,18 @@ fun ListTimeLineScene(
                                         Text(text = stringResource(id = R.string.scene_lists_details_menu_actions_edit_list))
                                     }
                                 }
+
+                                if (uiList.isOwner(account.user.userId)) {
+                                    DropdownMenuItem(
+                                        onClick = {
+                                            viewModel.deleteList { success, _ ->
+                                                if (success) navController.popBackStack()
+                                            }
+                                        }
+                                    ) {
+                                        Text(text = stringResource(id = R.string.scene_lists_details_menu_actions_delete_list))
+                                    }
+                                }
                             }
                         }
                     },
@@ -187,6 +207,11 @@ fun ListTimeLineScene(
                 if (showEditDialog) {
                     MastodonListsEditDialog(listKey) {
                         showEditDialog = false
+                    }
+                }
+                if (loading == true) {
+                    Dialog(onDismissRequest = { }) {
+                        LoadingProgress()
                     }
                 }
             }
