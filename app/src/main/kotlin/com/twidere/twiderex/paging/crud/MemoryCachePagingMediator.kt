@@ -28,7 +28,7 @@ import androidx.paging.RemoteMediator
 
 @OptIn(ExperimentalPagingApi::class)
 abstract class MemoryCachePagingMediator<Key : Any, Value : Any>(protected val memoryCache: PagingMemoryCache<Value>) : RemoteMediator<Int, Value>() {
-    private var paging: Key? = null
+    protected var paging: Key? = null
     override suspend fun load(loadType: LoadType, state: PagingState<Int, Value>): MediatorResult {
         return try {
             val key = when (loadType) {
