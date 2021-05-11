@@ -32,6 +32,11 @@ androidx-test-runner = {module = "androidx.test:runner", version.ref = "androidx
 androidx-test-ext-junit = {module = "androidx.test.ext:junit", version.ref = "extJUnitVersion"}
 androidx-test-espresso = {module = "androidx.test.espresso:espresso-core", version.ref = "espressoVersion"}
 
+mockito-core-test = 'org.mockito:mockito-core:3.8.0'
+mockito-kotlin-test = 'org.mockito.kotlin:mockito-kotlin:3.1.0'
+android-test-core = 'android.arch.core:core-testing:1.1.1'
+
+
 # Compose
 compose-ui-base = { module = "androidx.compose.ui:ui", version.ref = "compose" }
 compose-ui-test = { module = "androidx.compose.ui:ui-test", version.ref = "compose" }
@@ -122,6 +127,12 @@ androidx-test = [
     "androidx-test-ext-junit",
     "androidx-test-espresso",
 ]
+
+mockito-test = [
+    "mockito-core-test",
+    "mockito-kotlin-test"
+]
+
 compose = [
     "compose-ui-base",
     "compose-ui-tooling",

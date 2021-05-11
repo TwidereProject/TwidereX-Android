@@ -57,15 +57,6 @@ import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.lists.ListsViewModel
 import java.util.Locale
 
-// 1.Done finished layout of this page
-// 2.Done finished ui style (size, padding, text)
-// 3.Done bind viewmodel to this scene
-// 4.Done navigate to create list
-// 5.Done navigate to list timeline
-// 6.Done ADD this scene to route
-// 7.Done ADD TEXT RESOURCES
-// Todo empty page
-
 @Composable
 fun ListsScene() {
     val navController = LocalNavController.current
