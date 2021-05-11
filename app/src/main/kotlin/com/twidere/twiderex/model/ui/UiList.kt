@@ -60,7 +60,7 @@ data class UiList(
             allowToSubscribe = true,
         )
 
-        fun sample() = UiList(
+        fun sample(isFollowed: Boolean = true) = UiList(
             id = "1",
             ownerId = "1",
             title = "Sample List",
@@ -69,7 +69,7 @@ data class UiList(
             replyPolicy = "",
             accountKey = MicroBlogKey.Empty,
             listKey = MicroBlogKey.Empty,
-            isFollowed = true,
+            isFollowed = isFollowed,
             allowToSubscribe = true,
         )
 

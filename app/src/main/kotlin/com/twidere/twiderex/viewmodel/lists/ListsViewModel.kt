@@ -65,12 +65,11 @@ class ListsViewModel @AssistedInject constructor(
 
 abstract class ListsOperatorViewModel(
     protected val inAppNotification: InAppNotification,
-    protected val onResult: (success: Boolean, list: UiList?) -> Unit,
 ) : ViewModel() {
     val modifySuccess = MutableLiveData(false)
     val loading = MutableLiveData(false)
 
-    protected fun loadingRequest(request: suspend () -> UiList?) {
+    protected fun loadingRequest(onResult: (success: Boolean, list: UiList?) -> Unit, request: suspend () -> UiList?) {
         loading.postValue(true)
         viewModelScope.launch {
             runCatching {
@@ -93,8 +92,8 @@ class ListsCreateViewModel @AssistedInject constructor(
     inAppNotification: InAppNotification,
     private val listsRepository: ListsRepository,
     @Assisted private val account: AccountDetails,
-    @Assisted onResult: (success: Boolean, list: UiList?) -> Unit
-) : ListsOperatorViewModel(inAppNotification, onResult) {
+    @Assisted private val onResult: (success: Boolean, list: UiList?) -> Unit
+) : ListsOperatorViewModel(inAppNotification) {
     @dagger.assisted.AssistedFactory
     interface AssistedFactory {
         fun create(account: AccountDetails, onResult: (success: Boolean, list: UiList?) -> Unit): ListsCreateViewModel
@@ -105,7 +104,7 @@ class ListsCreateViewModel @AssistedInject constructor(
         description: String? = null,
         private: Boolean = false
     ) {
-        loadingRequest {
+        loadingRequest(onResult) {
             listsRepository.createLists(
                 account = account,
                 title = title,
@@ -121,12 +120,11 @@ class ListsModifyViewModel @AssistedInject constructor(
     inAppNotification: InAppNotification,
     @Assisted private val account: AccountDetails,
     @Assisted private val listKey: MicroBlogKey,
-    @Assisted onResult: (success: Boolean, list: UiList?) -> Unit
-) : ListsOperatorViewModel(inAppNotification, onResult) {
+) : ListsOperatorViewModel(inAppNotification) {
 
     @dagger.assisted.AssistedFactory
     interface AssistedFactory {
-        fun create(account: AccountDetails, listKey: MicroBlogKey, onResult: (success: Boolean, list: UiList?) -> Unit): ListsModifyViewModel
+        fun create(account: AccountDetails, listKey: MicroBlogKey): ListsModifyViewModel
     }
 
     val source by lazy {
@@ -137,9 +135,10 @@ class ListsModifyViewModel @AssistedInject constructor(
         listId: String = listKey.id,
         title: String,
         description: String? = null,
-        private: Boolean = false
+        private: Boolean = false,
+        onResult: (success: Boolean, list: UiList?) -> Unit = { _, _ -> }
     ) {
-        loadingRequest {
+        loadingRequest(onResult) {
             listsRepository.updateLists(
                 account = account,
                 listId = listId,
@@ -152,13 +151,38 @@ class ListsModifyViewModel @AssistedInject constructor(
 
     fun deleteList(
         listId: String = this.listKey.id,
-        listKey: MicroBlogKey = this.listKey
+        listKey: MicroBlogKey = this.listKey,
+        onResult: (success: Boolean, list: UiList?) -> Unit = { _, _ -> }
     ) {
-        loadingRequest {
+        loadingRequest(onResult) {
             listsRepository.deleteLists(
                 account = account,
                 listKey = listKey,
                 listId = listId,
+            )
+        }
+    }
+
+    fun subscribeList(
+        listKey: MicroBlogKey = this.listKey,
+        onResult: (success: Boolean, list: UiList?) -> Unit = { _, _ -> }
+    ) {
+        loadingRequest(onResult) {
+            listsRepository.subscribeLists(
+                account = account,
+                listKey = listKey
+            )
+        }
+    }
+
+    fun unsubscribeList(
+        listKey: MicroBlogKey = this.listKey,
+        onResult: (success: Boolean, list: UiList?) -> Unit = { _, _ -> }
+    ) {
+        loadingRequest(onResult) {
+            listsRepository.unsubscribeLists(
+                account = account,
+                listKey = listKey
             )
         }
     }

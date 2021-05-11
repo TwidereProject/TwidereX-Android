@@ -72,4 +72,8 @@ interface ListsService {
         count: Int = 20,
         cursor: String? = null,
     ): List<IUser>
+
+    suspend fun unsubscribeList(listId: String): IListModel
+
+    suspend fun subscribeList(listId: String): IListModel
 }

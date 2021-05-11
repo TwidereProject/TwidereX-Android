@@ -49,9 +49,7 @@ fun MastodonListsEditDialog(listKey: MicroBlogKey, onDismissRequest: () -> Unit)
     val listsEditViewModel = assistedViewModel<ListsModifyViewModel.AssistedFactory, ListsModifyViewModel>(
         account
     ) {
-        it.create(account, listKey) { _, _ ->
-            dismiss()
-        }
+        it.create(account, listKey)
     }
     val source by listsEditViewModel.source.observeAsState()
     val loading by listsEditViewModel.loading.observeAsState()

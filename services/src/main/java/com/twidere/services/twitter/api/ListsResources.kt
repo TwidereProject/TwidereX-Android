@@ -120,4 +120,20 @@ interface ListsResources {
         @Query("owner_id") owner_id: String? = null,
         @Query("owner_screen_name") owner_screen_name: String? = null,
     ): TwitterList
+
+    @POST("/1.1/lists/subscribers/destroy.json")
+    suspend fun unsubscribeLists(
+        @Query("list_id") list_id: String,
+        @Query("slug") slug: String? = null,
+        @Query("owner_id") owner_id: String? = null,
+        @Query("owner_screen_name") owner_screen_name: String? = null,
+    ): TwitterList
+
+    @POST("/1.1/lists/subscribers/create.json")
+    suspend fun subscribeLists(
+        @Query("list_id") list_id: String,
+        @Query("slug") slug: String? = null,
+        @Query("owner_id") owner_id: String? = null,
+        @Query("owner_screen_name") owner_screen_name: String? = null,
+    ): TwitterList
 }

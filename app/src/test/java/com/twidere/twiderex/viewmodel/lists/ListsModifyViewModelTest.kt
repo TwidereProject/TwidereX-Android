@@ -73,7 +73,9 @@ class ListsModifyViewModelTest : ViewModelTestBase() {
 
         verifySuccessAndLoadingBefore(mockLoadingObserver, mockSuccessObserver)
         async {
-            modifyViewModel.editList(listId = "123", title = "title", private = false)
+            modifyViewModel.editList(listId = "123", title = "title", private = false) { success, _ ->
+                mockSuccessObserver.onChanged(success)
+            }
         }.await()
         verifySuccessAndLoadingAfter(mockLoadingObserver, mockSuccessObserver, true)
     }
@@ -85,7 +87,9 @@ class ListsModifyViewModelTest : ViewModelTestBase() {
         verifySuccessAndLoadingBefore(mockLoadingObserver, mockSuccessObserver)
         Assert.assertNull(errorNotification)
         async {
-            modifyViewModel.editList(listId = "", title = "title", private = false)
+            modifyViewModel.editList(listId = "", title = "title", private = false) { success, _ ->
+                mockSuccessObserver.onChanged(success)
+            }
         }.await()
         verifySuccessAndLoadingAfter(mockLoadingObserver, mockSuccessObserver, false)
         Assert.assertNotNull(errorNotification)
@@ -94,10 +98,12 @@ class ListsModifyViewModelTest : ViewModelTestBase() {
     @Test
     fun deleteList_successExpectTrue(): Unit = runBlocking(Dispatchers.Main) {
         whenever(mockRepository.deleteLists(any(), any(), any()))
-            .thenReturn(Unit)
+            .thenReturn(null)
         verifySuccessAndLoadingBefore(mockLoadingObserver, mockSuccessObserver)
         async {
-            modifyViewModel.deleteList(listId = "123", MicroBlogKey.Empty)
+            modifyViewModel.deleteList(listId = "123", MicroBlogKey.Empty) { success, _ ->
+                mockSuccessObserver.onChanged(success)
+            }
         }.await()
         verifySuccessAndLoadingAfter(mockLoadingObserver, mockSuccessObserver, true)
     }
@@ -109,7 +115,65 @@ class ListsModifyViewModelTest : ViewModelTestBase() {
         verifySuccessAndLoadingBefore(mockLoadingObserver, mockSuccessObserver)
         Assert.assertNull(errorNotification)
         async {
-            modifyViewModel.deleteList(listId = "123", MicroBlogKey.Empty)
+            modifyViewModel.deleteList(listId = "123", MicroBlogKey.Empty) { success, _ ->
+                mockSuccessObserver.onChanged(success)
+            }
+        }.await()
+        verifySuccessAndLoadingAfter(mockLoadingObserver, mockSuccessObserver, false)
+        Assert.assertNotNull(errorNotification)
+    }
+
+    @Test
+    fun subscribeList_successExpectTrue(): Unit = runBlocking(Dispatchers.Main) {
+        whenever(mockRepository.subscribeLists(any(), any()))
+            .thenReturn(UiList.sample())
+        verifySuccessAndLoadingBefore(mockLoadingObserver, mockSuccessObserver)
+        async {
+            modifyViewModel.subscribeList(MicroBlogKey.twitter("123")) { success, _ ->
+                mockSuccessObserver.onChanged(success)
+            }
+        }.await()
+        verifySuccessAndLoadingAfter(mockLoadingObserver, mockSuccessObserver, true)
+    }
+
+    @Test
+    fun subscribeList_failedExpectFalseAndShowNotification(): Unit = runBlocking(Dispatchers.Main) {
+        whenever(mockRepository.subscribeLists(any(), any()))
+            .thenAnswer { throw MicroBlogJsonException("test exception") }
+        verifySuccessAndLoadingBefore(mockLoadingObserver, mockSuccessObserver)
+        Assert.assertNull(errorNotification)
+        async {
+            modifyViewModel.subscribeList(MicroBlogKey.twitter("123")) { success, _ ->
+                mockSuccessObserver.onChanged(success)
+            }
+        }.await()
+        verifySuccessAndLoadingAfter(mockLoadingObserver, mockSuccessObserver, false)
+        Assert.assertNotNull(errorNotification)
+    }
+
+    @Test
+    fun unsubscribeList_successExpectTrue(): Unit = runBlocking(Dispatchers.Main) {
+        whenever(mockRepository.unsubscribeLists(any(), any()))
+            .thenReturn(UiList.sample())
+        verifySuccessAndLoadingBefore(mockLoadingObserver, mockSuccessObserver)
+        async {
+            modifyViewModel.unsubscribeList(MicroBlogKey.twitter("123")) { success, _ ->
+                mockSuccessObserver.onChanged(success)
+            }
+        }.await()
+        verifySuccessAndLoadingAfter(mockLoadingObserver, mockSuccessObserver, true)
+    }
+
+    @Test
+    fun unsubscribeList_failedExpectFalseAndShowNotification(): Unit = runBlocking(Dispatchers.Main) {
+        whenever(mockRepository.unsubscribeLists(any(), any()))
+            .thenAnswer { throw MicroBlogJsonException("test exception") }
+        verifySuccessAndLoadingBefore(mockLoadingObserver, mockSuccessObserver)
+        Assert.assertNull(errorNotification)
+        async {
+            modifyViewModel.unsubscribeList(MicroBlogKey.twitter("123")) { success, _ ->
+                mockSuccessObserver.onChanged(success)
+            }
         }.await()
         verifySuccessAndLoadingAfter(mockLoadingObserver, mockSuccessObserver, false)
         Assert.assertNotNull(errorNotification)
@@ -122,16 +186,13 @@ class ListsModifyViewModelTest : ViewModelTestBase() {
             mockAppNotification,
             mockAccount,
             listKey = MicroBlogKey.Empty,
-        ) { success, _ ->
-            mockSuccessObserver.onChanged(success)
-        }
+        )
         whenever(mockAppNotification.show(any<NotificationEvent>())).then {
             errorNotification = it.getArgument(0) as NotificationEvent
             Unit
         }
         errorNotification = null
         mockSuccessObserver.onChanged(false)
-        // modifyViewModel.modifySuccess.observeForever(mockSuccessObserver)
         modifyViewModel.loading.observeForever(mockLoadingObserver)
     }
 

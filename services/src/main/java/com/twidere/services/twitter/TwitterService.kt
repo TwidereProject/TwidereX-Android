@@ -553,4 +553,12 @@ class TwitterService(
             nextPage = if (0 < it.nextCursor ?: 0) it.nextCursorStr else null
         )
     }
+
+    override suspend fun unsubscribeList(
+        listId: String
+    ) = resources.unsubscribeLists(listId)
+
+    override suspend fun subscribeList(
+        listId: String
+    ) = resources.subscribeLists(listId)
 }

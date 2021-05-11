@@ -60,9 +60,7 @@ fun TwitterListsEditScene(
     val listsEditViewModel = assistedViewModel<ListsModifyViewModel.AssistedFactory, ListsModifyViewModel>(
         account, listKey
     ) {
-        it.create(account, listKey) { success, _ ->
-            if (success) navController.popBackStack()
-        }
+        it.create(account, listKey)
     }
     val loading by listsEditViewModel.loading.observeAsState()
     val source by listsEditViewModel.source.observeAsState()
@@ -87,7 +85,9 @@ fun TwitterListsEditScene(
                                         title = name,
                                         description = desc,
                                         private = isPrivate
-                                    )
+                                    ) { success, _ ->
+                                        if (success) navController.popBackStack()
+                                    }
                                 }
                             ) {
                                 Icon(

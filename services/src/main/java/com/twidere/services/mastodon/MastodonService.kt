@@ -47,6 +47,7 @@ import com.twidere.services.microblog.RelationshipService
 import com.twidere.services.microblog.SearchService
 import com.twidere.services.microblog.StatusService
 import com.twidere.services.microblog.TimelineService
+import com.twidere.services.microblog.model.IListModel
 import com.twidere.services.microblog.model.INotification
 import com.twidere.services.microblog.model.IRelationship
 import com.twidere.services.microblog.model.ISearchResponse
@@ -382,4 +383,14 @@ class MastodonService(
         count: Int,
         cursor: String?
     ) = emptyList<IUser>()
+
+    override suspend fun unsubscribeList(listId: String): IListModel {
+        // do nothing
+        throw MastodonException("no such method")
+    }
+
+    override suspend fun subscribeList(listId: String): IListModel {
+        // do nothing
+        throw MastodonException("no such method")
+    }
 }

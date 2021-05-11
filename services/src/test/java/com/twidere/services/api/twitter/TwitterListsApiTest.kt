@@ -100,4 +100,20 @@ class TwitterListsApiTest {
             assertEquals("58300198", listModel.idStr)
         }
     }
+
+    @Test
+    fun unsubscribeLists() {
+        runBlocking {
+            val listModel = listResources.unsubscribeLists("58300198")
+            assertEquals("58300198", listModel.idStr)
+        }
+    }
+
+    @Test
+    fun subscribeLists() {
+        runBlocking {
+            val listModel = listResources.subscribeLists("58300198")
+            assertEquals("58300198", listModel.idStr)
+        }
+    }
 }

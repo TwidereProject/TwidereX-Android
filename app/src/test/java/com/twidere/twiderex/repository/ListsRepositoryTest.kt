@@ -28,6 +28,8 @@ import com.twidere.twiderex.db.mapper.toDbList
 import com.twidere.twiderex.db.model.DbList
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.ui.UiList
+import com.twidere.twiderex.model.ui.UiList.Companion.toUi
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert
@@ -141,6 +143,57 @@ class ListsRepositoryTest {
             assert(listsDatabase.isNotEmpty())
             repository.deleteLists(mockAccountDetails, MicroBlogKey.twitter("123"), "123")
             assert(listsDatabase.isEmpty())
+        }
+    }
+
+    @Test
+    fun unsubscribeList_updateFollowingInDatabase() {
+        runBlocking {
+            val listsDatabase = mutableListOf(UiList.sample(isFollowed = true))
+            // note that whenever will cause null pointer exception
+            // when mock suspend method that returns Basic data type such as boolean
+            `when`(mockListsService.unsubscribeList(any())).thenReturn(TwitterList(idStr = "123", name = "waiting for unsubscribe"))
+            whenever(mockListDao.findWithListKey(any(), any())).thenReturn(
+                TwitterList(idStr = "1").toDbList(MicroBlogKey.twitter("1"))
+            )
+            whenever(mockListDao.update(any())).then {
+                listsDatabase[0] = (it.getArgument(0) as List<DbList>)[0].toUi()
+                Unit
+            }
+            // check if the repository update result in db after unsubscribe request success
+            assert(listsDatabase[0].isFollowed)
+            repository.unsubscribeLists(mockAccountDetails, MicroBlogKey.twitter("123"))
+            assert(!listsDatabase[0].isFollowed)
+        }
+    }
+
+    @Test
+    fun subscribeList_updateOrSaveToDatabase() {
+        runBlocking {
+            val listsDatabase = mutableListOf(UiList.sample(isFollowed = false))
+            whenever(mockListsService.subscribeList(any())).then {
+                TwitterList(idStr = it.getArgument(0), name = "subscribe")
+            }
+            whenever(mockListDao.findWithListKey(any(), any())).then {
+                if ((it.getArgument(0) as MicroBlogKey).id == "1")
+                    TwitterList(idStr = "1").toDbList(MicroBlogKey.twitter("1"))
+                else null
+            }
+            whenever(mockListDao.update(any())).then {
+                listsDatabase[0] = (it.getArgument(0) as List<DbList>)[0].toUi()
+                Unit
+            }
+            whenever(mockListDao.insertAll(any())).then {
+                listsDatabase.addAll(it.getArgument(0))
+            }
+            // check if the repository save result to db after subscribe request success
+            assert(!listsDatabase[0].isFollowed)
+            repository.subscribeLists(mockAccountDetails, MicroBlogKey.twitter("1"))
+            assert(listsDatabase[0].isFollowed)
+
+            assert(listsDatabase.size == 1)
+            repository.subscribeLists(mockAccountDetails, MicroBlogKey.twitter("123"))
+            assert(listsDatabase.size == 2)
         }
     }
 }

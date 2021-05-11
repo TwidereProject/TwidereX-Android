@@ -114,4 +114,30 @@ class ListsRepository(private val database: CacheDatabase) {
         }
         return deleteItem?.toUi()
     }
+
+    suspend fun unsubscribeLists(
+        account: AccountDetails,
+        listKey: MicroBlogKey
+    ): UiList? {
+        (account.service as ListsService).unsubscribeList(listId = listKey.id)
+        val updateItem = database.listsDao().findWithListKey(listKey, account.accountKey)
+        updateItem?.let {
+            database.listsDao().update(listOf(updateItem.update(isFollowed = false)))
+        }
+        return updateItem?.toUi()
+    }
+
+    suspend fun subscribeLists(
+        account: AccountDetails,
+        listKey: MicroBlogKey
+    ): UiList {
+        val result = (account.service as ListsService)
+            .subscribeList(listId = listKey.id)
+            .toDbList(accountKey = account.accountKey)
+        val updateItem = database.listsDao().findWithListKey(listKey, account.accountKey)
+        updateItem?.let {
+            database.listsDao().update(listOf(updateItem.update(isFollowed = true)))
+        } ?: database.listsDao().insertAll(listOf(result))
+        return result.toUi()
+    }
 }
