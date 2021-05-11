@@ -69,6 +69,7 @@ class ListsViewModelTest : ViewModelTestBase() {
         whenever(subscribeList.isOwner(any())).thenReturn(false)
         whenever(ownerList.title).thenReturn("owner")
         whenever(subscribeList.title).thenReturn("subscribe")
+        whenever(subscribeList.isFollowed).thenReturn(true)
         whenever(mockAccount.user).thenReturn(mockUser)
         whenever(mockUser.userId).thenReturn("123")
         viewModel = ListsViewModel(mockRepository, mockAccount)

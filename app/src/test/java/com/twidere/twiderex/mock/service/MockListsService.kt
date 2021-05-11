@@ -25,6 +25,7 @@ import com.twidere.services.microblog.MicroBlogService
 import com.twidere.services.microblog.model.IListModel
 import com.twidere.services.microblog.model.IUser
 import com.twidere.services.twitter.model.TwitterList
+import com.twidere.services.twitter.model.exceptions.TwitterApiException
 
 class MockListsService : ListsService, MicroBlogService {
     override suspend fun lists(
@@ -52,6 +53,7 @@ class MockListsService : ListsService, MicroBlogService {
         description: String?,
         repliesPolicy: String?
     ): IListModel {
+        if (name == "error") throw TwitterApiException(error = "throw exception intentional")
         val id = System.currentTimeMillis()
         return TwitterList(
             id = id,
@@ -69,6 +71,7 @@ class MockListsService : ListsService, MicroBlogService {
         description: String?,
         repliesPolicy: String?
     ): IListModel {
+        if (listId == "error") throw TwitterApiException(error = "throw exception intentional")
         return TwitterList(
             id = listId.toLong(),
             idStr = listId,
@@ -79,26 +82,32 @@ class MockListsService : ListsService, MicroBlogService {
     }
 
     override suspend fun destroyList(listId: String) {
+        if (listId == "error") throw TwitterApiException(error = "throw exception intentional")
         // do nothing
     }
 
     override suspend fun listMembers(listId: String, count: Int, cursor: String?): List<IUser> {
+        if (listId == "error") throw TwitterApiException(error = "throw exception intentional")
         TODO("Not yet implemented")
     }
 
     override suspend fun addMember(listId: String, userId: String, screenName: String) {
+        if (listId == "error") throw TwitterApiException(error = "throw exception intentional")
         // do nothing
     }
 
     override suspend fun removeMember(listId: String, userId: String, screenName: String) {
+        if (listId == "error") throw TwitterApiException(error = "throw exception intentional")
         // do nothing
     }
 
     override suspend fun listSubscribers(listId: String, count: Int, cursor: String?): List<IUser> {
+        if (listId == "error") throw TwitterApiException(error = "throw exception intentional")
         TODO("Not yet implemented")
     }
 
     override suspend fun unsubscribeList(listId: String): IListModel {
+        if (listId == "error") throw TwitterApiException(error = "throw exception intentional")
         return TwitterList(
             id = listId.toLong(),
             idStr = listId,
@@ -108,6 +117,7 @@ class MockListsService : ListsService, MicroBlogService {
     }
 
     override suspend fun subscribeList(listId: String): IListModel {
+        if (listId == "error") throw TwitterApiException(error = "throw exception intentional")
         return TwitterList(
             id = listId.toLong(),
             idStr = listId,

@@ -22,9 +22,9 @@ package com.twidere.twiderex.viewmodel.lists
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
-import com.twidere.services.utils.MicroBlogJsonException
+import com.twidere.twiderex.mock.MockCenter
 import com.twidere.twiderex.model.AccountDetails
-import com.twidere.twiderex.model.ui.UiList
+import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.notification.NotificationEvent
 import com.twidere.twiderex.repository.ListsRepository
@@ -37,7 +37,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.kotlin.any
-import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -46,7 +45,6 @@ class ListsCreateViewModelTest : ViewModelTestBase() {
     @get:Rule
     val rule = InstantTaskExecutorRule()
 
-    @Mock
     private lateinit var mockRepository: ListsRepository
 
     @Mock
@@ -65,33 +63,9 @@ class ListsCreateViewModelTest : ViewModelTestBase() {
 
     private lateinit var createViewModel: ListsCreateViewModel
 
-    @Test
-    fun createList_successExpectTrue(): Unit = runBlocking(Dispatchers.Main) {
-        whenever(mockRepository.createLists(any(), any(), anyOrNull(), anyOrNull(), anyOrNull()))
-            .thenReturn(UiList.sample())
-
-        verifySuccessAndLoadingBefore(mockLoadingObserver, mockSuccessObserver)
-        async {
-            createViewModel.createList(title = "title", private = false)
-        }.await()
-        verifySuccessAndLoadingAfter(mockLoadingObserver, mockSuccessObserver, true)
-    }
-
-    @Test
-    fun createList_failedExpectFalseAndShowNotification(): Unit = runBlocking(Dispatchers.Main) {
-        whenever(mockRepository.createLists(any(), any(), anyOrNull(), anyOrNull(), anyOrNull()))
-            .thenAnswer { throw MicroBlogJsonException("test exception") }
-        verifySuccessAndLoadingBefore(mockLoadingObserver, mockSuccessObserver)
-        Assert.assertNull(errorNotification)
-        async {
-            createViewModel.createList(title = "title", private = false)
-        }.await()
-        verifySuccessAndLoadingAfter(mockLoadingObserver, mockSuccessObserver, false)
-        Assert.assertNotNull(errorNotification)
-    }
-
     override fun setUp() {
         super.setUp()
+        mockRepository = ListsRepository(MockCenter.mockCacheDatabase())
         createViewModel = ListsCreateViewModel(
             mockAppNotification,
             mockRepository,
@@ -103,9 +77,31 @@ class ListsCreateViewModelTest : ViewModelTestBase() {
             errorNotification = it.getArgument(0) as NotificationEvent
             Unit
         }
+        whenever(mockAccount.service).thenReturn(MockCenter.mockListsService())
+        whenever(mockAccount.accountKey).thenReturn(MicroBlogKey.twitter("123"))
         errorNotification = null
         mockSuccessObserver.onChanged(false)
         createViewModel.loading.observeForever(mockLoadingObserver)
+    }
+
+    @Test
+    fun createList_successExpectTrue(): Unit = runBlocking(Dispatchers.Main) {
+        verifySuccessAndLoadingBefore(mockLoadingObserver, mockSuccessObserver)
+        async {
+            createViewModel.createList(title = "title", private = false)
+        }.await()
+        verifySuccessAndLoadingAfter(mockLoadingObserver, mockSuccessObserver, true)
+    }
+
+    @Test
+    fun createList_failedExpectFalseAndShowNotification(): Unit = runBlocking(Dispatchers.Main) {
+        verifySuccessAndLoadingBefore(mockLoadingObserver, mockSuccessObserver)
+        Assert.assertNull(errorNotification)
+        async {
+            createViewModel.createList(title = "error", private = false)
+        }.await()
+        verifySuccessAndLoadingAfter(mockLoadingObserver, mockSuccessObserver, false)
+        Assert.assertNotNull(errorNotification)
     }
 
     private fun verifySuccessAndLoadingBefore(loadingObserver: Observer<Boolean>, successObserver: Observer<Boolean>) {
