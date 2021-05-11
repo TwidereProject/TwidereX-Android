@@ -27,6 +27,10 @@ class PagingMemoryCache<Value> : InvalidateTracker {
     private val cacheList = CopyOnWriteArrayList<Value>()
     private var observer: OnInvalidateObserver? = null
 
+    fun size(): Int {
+        return cacheList.size
+    }
+
     fun insert(list: List<Value>, pos: Int = -1) {
         if (list.isEmpty()) return
         if (pos < 0) cacheList.addAll(list) else cacheList.addAll(pos, list)
