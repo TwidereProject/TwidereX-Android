@@ -26,12 +26,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import com.twidere.services.microblog.ListsService
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.notification.InAppNotification
-import com.twidere.twiderex.repository.ListUsersRepository
+import com.twidere.twiderex.repository.ListsUsersRepository
 import com.twidere.twiderex.utils.notify
 import com.twidere.twiderex.viewmodel.user.UserListViewModel
 import dagger.assisted.Assisted
@@ -40,7 +39,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
 class ListsUserViewModel @AssistedInject constructor(
-    private val listsUsersRepository: ListUsersRepository,
+    private val listsUsersRepository: ListsUsersRepository,
     @Assisted private val account: AccountDetails,
     @Assisted private val listId: String,
     @Assisted private val viewMembers: Boolean = true,
@@ -50,11 +49,11 @@ class ListsUserViewModel @AssistedInject constructor(
         fun create(account: AccountDetails, listId: String, viewMembers: Boolean = true): ListsUserViewModel
     }
 
-    val members by lazy {
+    private val members by lazy {
         listsUsersRepository.fetchMembers(account = account, listId = listId).cachedIn(viewModelScope)
     }
 
-    val subscribers by lazy {
+    private val subscribers by lazy {
         listsUsersRepository.fetchSubscribers(account = account, listId = listId).cachedIn(viewModelScope)
     }
 
@@ -79,7 +78,7 @@ class ListsUserViewModel @AssistedInject constructor(
 }
 
 class ListsAddMemberViewModel @AssistedInject constructor(
-    private val listsUsersRepository: ListUsersRepository,
+    private val listsUsersRepository: ListsUsersRepository,
     private val inAppNotification: InAppNotification,
     @Assisted private val account: AccountDetails,
     @Assisted private val listId: String,
@@ -97,10 +96,10 @@ class ListsAddMemberViewModel @AssistedInject constructor(
         if (pendingMap[user.userKey] == null) {
             loading.postValue(true)
             loadingRequest {
-                (account.service as ListsService).addMember(
+                listsUsersRepository.addMember(
                     listId = listId,
-                    userId = user.id,
-                    screenName = user.screenName
+                    user = user,
+                    account = account
                 )
                 pendingMap[user.userKey] = user
             }

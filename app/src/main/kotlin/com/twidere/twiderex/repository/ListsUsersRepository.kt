@@ -25,7 +25,6 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.twidere.services.microblog.ListsService
-import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.defaultLoadCount
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.ui.UiUser
@@ -35,8 +34,7 @@ import com.twidere.twiderex.paging.mediator.list.ListsMembersMediator
 import com.twidere.twiderex.paging.source.ListsSubscribersPagingSource
 import kotlinx.coroutines.flow.Flow
 
-class ListUsersRepository(private val database: CacheDatabase) {
-    private val membersCaches = mutableMapOf<String, PagingMemoryCache<UiUser>>()
+class ListsUsersRepository(private val membersCaches: MutableMap<String, PagingMemoryCache<UiUser>> = mutableMapOf()) {
 
     @OptIn(ExperimentalPagingApi::class)
     fun fetchMembers(account: AccountDetails, listId: String): Flow<PagingData<UiUser>> {
@@ -83,7 +81,9 @@ class ListUsersRepository(private val database: CacheDatabase) {
             userId = user.id,
             screenName = user.screenName
         )
-        membersCaches[listId]?.insert(listOf(user))
+        val cache = membersCaches[listId] ?: PagingMemoryCache()
+        membersCaches[listId] = cache
+        cache.insert(listOf(user))
     }
 
     suspend fun removeMember(
@@ -97,9 +97,5 @@ class ListUsersRepository(private val database: CacheDatabase) {
             userId = user.id,
             screenName = user.screenName
         )
-    }
-
-    fun insertCache(users: List<UiUser>, listId: String) {
-        membersCaches[listId]?.insert(users, 0)
     }
 }

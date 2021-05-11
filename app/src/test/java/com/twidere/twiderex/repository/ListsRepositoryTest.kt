@@ -20,39 +20,26 @@
  */
 package com.twidere.twiderex.repository
 
-import com.twidere.services.twitter.TwitterService
-import com.twidere.services.twitter.model.TwitterList
-import com.twidere.twiderex.db.CacheDatabase
-import com.twidere.twiderex.db.dao.ListsDao
-import com.twidere.twiderex.db.mapper.toDbList
-import com.twidere.twiderex.db.model.DbList
+import com.twidere.twiderex.mock.MockCenter
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.ui.UiList
-import com.twidere.twiderex.model.ui.UiList.Companion.toUi
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
-import org.mockito.Mockito.`when`
 import org.mockito.MockitoAnnotations
-import org.mockito.kotlin.any
-import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.whenever
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class ListsRepositoryTest {
     private lateinit var repository: ListsRepository
 
-    @Mock
-    private lateinit var mockDatabase: CacheDatabase
+    private var mockDatabase = MockCenter.mockCacheDatabase()
 
-    @Mock
-    private lateinit var mockListDao: ListsDao
-
-    @Mock
-    private lateinit var mockListsService: TwitterService
+    private var mockListsService = MockCenter.mockListsService()
 
     @Mock
     private lateinit var mockAccountDetails: AccountDetails
@@ -63,7 +50,6 @@ class ListsRepositoryTest {
     fun setUp() {
         mocks = MockitoAnnotations.openMocks(this)
         repository = ListsRepository(mockDatabase)
-        whenever(mockDatabase.listsDao()).thenReturn(mockListDao)
         whenever(mockAccountDetails.accountKey).thenReturn(MicroBlogKey.twitter("123"))
         whenever(mockAccountDetails.service).thenReturn(mockListsService)
     }
@@ -74,126 +60,66 @@ class ListsRepositoryTest {
     }
 
     @Test
-    fun createList_saveToDatabase() {
-        runBlocking {
-            val listsDatabase = mutableListOf<DbList>()
-            whenever(mockListsService.createList(any(), anyOrNull(), anyOrNull(), anyOrNull())).then {
-                TwitterList(id = 123, idStr = "123", name = it.getArgument(0))
-            }
-            whenever(mockListDao.insertAll(any())).then {
-                listsDatabase.addAll(it.getArgument(0))
-            }
-            // check if the repository save result to db after create request success
-            assert(listsDatabase.isEmpty())
-            repository.createLists(mockAccountDetails, "create lists")
-            assert(listsDatabase.isNotEmpty())
-            Assert.assertEquals("create lists", listsDatabase[0].title)
-        }
+    fun createList_saveToDatabase() = runBlocking {
+        // check if the repository save result to db after create request success
+        val originList = mockDatabase.listsDao().findAll()
+        repository.createLists(mockAccountDetails, "create lists")
+        val createList = mockDatabase.listsDao().findAll()
+        Assert.assertNotNull(createList)
+        Assert.assertEquals(1, (createList?.size ?: 0) - (originList?.size ?: 0))
+        Assert.assertEquals("create lists", createList!![0].title)
     }
 
     @Test
-    fun updateList_updateToDatabase() {
-        runBlocking {
-            val listsDatabase = mutableListOf(TwitterList(idStr = "123", name = "before update"))
-            whenever(
-                mockListsService.updateList(
-                    any(),
-                    anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull()
-                )
-            ).then {
-                TwitterList(idStr = it.getArgument(0), name = it.getArgument(1))
-            }
-            whenever(mockListDao.findWithListKey(any(), any())).then {
-                listsDatabase[0].toDbList(accountKey = mockAccountDetails.accountKey)
-            }
-            whenever(mockListDao.update(any())).then {
-                listsDatabase.replaceAll { list ->
-                    val input = (it.getArgument(0) as List<DbList>)[0]
-                    if (list.idStr == input.listId) {
-                        TwitterList(idStr = input.listId, name = input.title)
-                    } else {
-                        list
-                    }
-                }
-            }
-            // check if the repository save result to db after update request success
-            Assert.assertEquals("before update", listsDatabase[0].name)
-            repository.updateLists(mockAccountDetails, "123", "after update")
-            assert(listsDatabase.isNotEmpty())
-            Assert.assertEquals("after update", listsDatabase[0].name)
-        }
+    fun updateList_updateToDatabase() = runBlocking {
+        val originData = repository.createLists(mockAccountDetails, "before title", description = "before title", mode = "public")
+        repository.updateLists(
+            mockAccountDetails,
+            originData.id,
+            "after title",
+            description = "after desc",
+            mode = "private"
+        )
+        val updateData = mockDatabase.listsDao()
+            .findWithListKey(originData.listKey, accountKey = mockAccountDetails.accountKey)
+        Assert.assertNotNull(updateData)
+        Assert.assertEquals("after title", updateData?.title)
+        Assert.assertEquals("after desc", updateData?.description)
+        Assert.assertEquals("private", updateData?.mode)
     }
 
     @Test
-    fun deleteList_deleteInDatabase() {
-        runBlocking {
-            val listsDatabase = mutableListOf(TwitterList(idStr = "123", name = "waiting for delete"))
-            // note that whenever will cause null pointer exception
-            // when mock suspend method that returns Basic data type such as boolean
-            `when`(mockListsService.destroyList(any())).thenReturn(Unit)
-            whenever(mockListDao.findWithListKey(any(), any())).thenReturn(
-                TwitterList(idStr = "123").toDbList(MicroBlogKey.twitter("123"))
-            )
-            whenever(mockListDao.delete(any())).then {
-                listsDatabase.removeIf { list ->
-                    list.idStr == (it.getArgument(0) as List<DbList>)[0].listId
-                }
-            }
-            // check if the repository delete result in db after delete request success
-            assert(listsDatabase.isNotEmpty())
-            repository.deleteLists(mockAccountDetails, MicroBlogKey.twitter("123"), "123")
-            assert(listsDatabase.isEmpty())
-        }
+    fun deleteList_deleteInDatabase() = runBlocking {
+        val originData = repository.createLists(mockAccountDetails, "delete")
+        val originList = mockDatabase.listsDao().findAll()
+        repository.deleteLists(
+            mockAccountDetails,
+            originData.listKey,
+            originData.id
+        )
+        val deleteList = mockDatabase.listsDao().findAll()
+        Assert.assertEquals(1, originList!!.size - deleteList!!.size)
     }
 
     @Test
-    fun unsubscribeList_updateFollowingInDatabase() {
-        runBlocking {
-            val listsDatabase = mutableListOf(UiList.sample(isFollowed = true))
-            // note that whenever will cause null pointer exception
-            // when mock suspend method that returns Basic data type such as boolean
-            `when`(mockListsService.unsubscribeList(any())).thenReturn(TwitterList(idStr = "123", name = "waiting for unsubscribe"))
-            whenever(mockListDao.findWithListKey(any(), any())).thenReturn(
-                TwitterList(idStr = "1").toDbList(MicroBlogKey.twitter("1"))
-            )
-            whenever(mockListDao.update(any())).then {
-                listsDatabase[0] = (it.getArgument(0) as List<DbList>)[0].toUi()
-                Unit
-            }
-            // check if the repository update result in db after unsubscribe request success
-            assert(listsDatabase[0].isFollowed)
-            repository.unsubscribeLists(mockAccountDetails, MicroBlogKey.twitter("123"))
-            assert(!listsDatabase[0].isFollowed)
-        }
+    fun unsubscribeList_updateFollowingInDatabase() = runBlocking {
+        val originData = repository.createLists(mockAccountDetails, "delete")
+        repository.unsubscribeLists(
+            mockAccountDetails,
+            originData.listKey,
+        )
+        val unsubscribeData = mockDatabase.listsDao().findWithListKey(originData.listKey, mockAccountDetails.accountKey)
+        Assert.assertEquals(false, unsubscribeData?.isFollowed)
     }
 
     @Test
-    fun subscribeList_updateOrSaveToDatabase() {
-        runBlocking {
-            val listsDatabase = mutableListOf(UiList.sample(isFollowed = false))
-            whenever(mockListsService.subscribeList(any())).then {
-                TwitterList(idStr = it.getArgument(0), name = "subscribe")
-            }
-            whenever(mockListDao.findWithListKey(any(), any())).then {
-                if ((it.getArgument(0) as MicroBlogKey).id == "1")
-                    TwitterList(idStr = "1").toDbList(MicroBlogKey.twitter("1"))
-                else null
-            }
-            whenever(mockListDao.update(any())).then {
-                listsDatabase[0] = (it.getArgument(0) as List<DbList>)[0].toUi()
-                Unit
-            }
-            whenever(mockListDao.insertAll(any())).then {
-                listsDatabase.addAll(it.getArgument(0))
-            }
-            // check if the repository save result to db after subscribe request success
-            assert(!listsDatabase[0].isFollowed)
-            repository.subscribeLists(mockAccountDetails, MicroBlogKey.twitter("1"))
-            assert(listsDatabase[0].isFollowed)
-
-            assert(listsDatabase.size == 1)
-            repository.subscribeLists(mockAccountDetails, MicroBlogKey.twitter("123"))
-            assert(listsDatabase.size == 2)
-        }
+    fun subscribeList_updateFollowingInDatabase() = runBlocking {
+        val originData = repository.createLists(mockAccountDetails, "delete")
+        repository.subscribeLists(
+            mockAccountDetails,
+            originData.listKey,
+        )
+        val unsubscribeData = mockDatabase.listsDao().findWithListKey(originData.listKey, mockAccountDetails.accountKey)
+        Assert.assertEquals(true, unsubscribeData?.isFollowed)
     }
 }
