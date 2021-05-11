@@ -21,7 +21,9 @@
 package com.twidere.twiderex.component.lazy.ui
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyListScope
@@ -37,6 +39,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.painterResource
@@ -59,52 +62,55 @@ import com.twidere.twiderex.model.ui.UiList
 fun LazyUiListList(
     listType: ListType,
     modifier: Modifier = Modifier,
+    source: LazyPagingItems<UiList>,
     ownerItems: LazyPagingItems<UiList>,
     subscribedItems: LazyPagingItems<UiList>,
     state: LazyListState = rememberLazyListState(),
     onItemClicked: (UiList) -> Unit = {},
     header: LazyListScope.() -> Unit = {},
 ) {
-    LazyColumn2(
-        modifier = modifier,
-        state = state,
-    ) {
-        header.invoke(this)
-        // my lists title
-        if (listType == ListType.All) {
-            item {
-                LazyUiListTitleItem(title = stringResource(id = R.string.scene_lists_tabs_created))
+    LazyUiList(items = source, empty = { EmptyList() }) {
+        LazyColumn2(
+            modifier = modifier,
+            state = state,
+        ) {
+            header.invoke(this)
+            // my lists title
+            if (listType == ListType.All) {
+                item {
+                    LazyUiListTitleItem(title = stringResource(id = R.string.scene_lists_tabs_created))
+                }
             }
-        }
-        if (listType == ListType.All || listType == ListType.Owned) {
-            items(ownerItems, key = { ownerItems.peekOrNull(it)?.listKey?.hashCode() ?: it }) {
-                LazyUiListItem(
-                    uiList = (it ?: UiList.placeHolder()),
-                    onItemClicked = onItemClicked
-                )
+            if (listType == ListType.All || listType == ListType.Owned) {
+                items(ownerItems, key = { ownerItems.peekOrNull(it)?.listKey?.hashCode() ?: it }) {
+                    LazyUiListItem(
+                        uiList = (it ?: UiList.placeHolder()),
+                        onItemClicked = onItemClicked
+                    )
+                }
+                loadState(ownerItems.loadState.append) {
+                    ownerItems.retry()
+                }
             }
-            loadState(ownerItems.loadState.append) {
-                ownerItems.retry()
+            if (listType == ListType.All) {
+                item {
+                    LazyUiListTitleItem(title = stringResource(id = R.string.scene_lists_tabs_subscribed))
+                }
             }
-        }
-        if (listType == ListType.All) {
-            item {
-                LazyUiListTitleItem(title = stringResource(id = R.string.scene_lists_tabs_subscribed))
-            }
-        }
 
-        if (listType == ListType.All || listType == ListType.Subscribed) {
-            items(
-                subscribedItems,
-                key = { subscribedItems.peekOrNull(it)?.listKey?.hashCode() ?: it }
-            ) {
-                LazyUiListItem(
-                    uiList = (it ?: UiList.placeHolder()),
-                    onItemClicked = onItemClicked
-                )
-            }
-            loadState(subscribedItems.loadState.append) {
-                subscribedItems.retry()
+            if (listType == ListType.All || listType == ListType.Subscribed) {
+                items(
+                    subscribedItems,
+                    key = { subscribedItems.peekOrNull(it)?.listKey?.hashCode() ?: it }
+                ) {
+                    LazyUiListItem(
+                        uiList = (it ?: UiList.placeHolder()),
+                        onItemClicked = onItemClicked
+                    )
+                }
+                loadState(subscribedItems.loadState.append) {
+                    subscribedItems.retry()
+                }
             }
         }
     }
@@ -169,6 +175,20 @@ private fun DividerListItem(
 @Composable
 private fun PreviewLazyListItem() {
     LazyUiListItem(uiList = UiList.sample())
+}
+
+@Composable
+private fun EmptyList() {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Icon(
+            painter = painterResource(id = R.drawable.ic_empty_list),
+            contentDescription = stringResource(id = R.string.common_alerts_no_tweets_found_title)
+        )
+    }
 }
 
 object LazyUiListItemDefaults {

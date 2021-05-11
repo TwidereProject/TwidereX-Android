@@ -78,6 +78,7 @@ fun ListsScene() {
     }
     val ownerItems = listsViewMode.ownerSource.collectAsLazyPagingItems()
     val subscribeItems = listsViewMode.subscribedSource.collectAsLazyPagingItems()
+    val sourceItems = listsViewMode.source.collectAsLazyPagingItems()
     var showCreateDialog by remember {
         mutableStateOf(false)
     }
@@ -132,6 +133,7 @@ fun ListsScene() {
                 ) {
                     LazyUiListList(
                         listType = account.listType,
+                        source = sourceItems,
                         ownerItems = ownerItems,
                         subscribedItems = subscribeItems,
                         onItemClicked = { navController.navigate(Route.Lists.Timeline(it.listKey)) }
