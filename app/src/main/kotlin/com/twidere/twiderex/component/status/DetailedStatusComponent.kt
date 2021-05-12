@@ -111,47 +111,46 @@ fun DetailedStatusComponent(
                             )
                         }
 
-                        if (status.replyCount > 0 || status.retweetCount > 0 || status.likeCount > 0) {
-                            Spacer(modifier = Modifier.height(DetailedStatusDefaults.ContentSpacing))
-                            Row(
-                                modifier = Modifier
-                                    .align(Alignment.CenterHorizontally)
-                            ) {
-                                StatusStatistics(
-                                    count = status.replyCount,
-                                    icon = painterResource(id = R.drawable.ic_corner_up_left),
-                                    contentDescription = stringResource(
-                                        id = R.string.scene_status_reply_mutiple,
-                                        status.replyCount,
-                                    ),
-                                )
+                        Spacer(modifier = Modifier.height(DetailedStatusDefaults.ContentSpacing))
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center,
+                        ) {
+                            StatusStatistics(
+                                count = status.replyCount,
+                                icon = painterResource(id = R.drawable.ic_corner_up_left),
+                                contentDescription = stringResource(
+                                    id = R.string.scene_status_reply_mutiple,
+                                    status.replyCount,
+                                ),
+                            )
+                            Spacer(modifier = Modifier.width(DetailedStatusDefaults.StatusStatisticsSpacing))
+                            StatusStatistics(
+                                count = status.retweetCount,
+                                icon = painterResource(id = R.drawable.ic_repeat),
+                                contentDescription = stringResource(
+                                    id = R.string.scene_status_retweet_mutiple,
+                                    status.retweetCount,
+                                ),
+                            )
+                            if (status.platformType == PlatformType.Twitter) {
                                 Spacer(modifier = Modifier.width(DetailedStatusDefaults.StatusStatisticsSpacing))
                                 StatusStatistics(
-                                    count = status.retweetCount,
-                                    icon = painterResource(id = R.drawable.ic_repeat),
-                                    contentDescription = stringResource(
-                                        id = R.string.scene_status_retweet_mutiple,
-                                        status.retweetCount,
-                                    ),
-                                )
-                                if (status.platformType == PlatformType.Twitter) {
-                                    Spacer(modifier = Modifier.width(DetailedStatusDefaults.StatusStatisticsSpacing))
-                                    StatusStatistics(
-                                        count = status.twitterExtra?.quoteCount ?: 0,
-                                        icon = painterResource(id = R.drawable.ic_blockquote),
-                                        contentDescription = null,
-                                    )
-                                }
-                                Spacer(modifier = Modifier.width(DetailedStatusDefaults.StatusStatisticsSpacing))
-                                StatusStatistics(
-                                    count = status.likeCount,
-                                    icon = painterResource(id = R.drawable.ic_heart),
-                                    contentDescription = stringResource(
-                                        id = R.string.scene_status_like_multiple,
-                                        status.likeCount,
-                                    ),
+                                    count = status.twitterExtra?.quoteCount ?: 0,
+                                    icon = painterResource(id = R.drawable.ic_blockquote),
+                                    contentDescription = null,
                                 )
                             }
+                            Spacer(modifier = Modifier.width(DetailedStatusDefaults.StatusStatisticsSpacing))
+                            StatusStatistics(
+                                count = status.likeCount,
+                                icon = painterResource(id = R.drawable.ic_heart),
+                                contentDescription = stringResource(
+                                    id = R.string.scene_status_like_multiple,
+                                    status.likeCount,
+                                ),
+                            )
                         }
                     }
                 }
@@ -183,7 +182,7 @@ fun DetailedStatusComponent(
 
 object DetailedStatusDefaults {
     val ContentPadding = 16.dp
-    val StatusStatisticsSpacing = 16.dp
+    val StatusStatisticsSpacing = 32.dp
     val ContentSpacing = 8.dp
     val InfoContentSpacing = 12.dp
     val TimestampSpacing = 8.dp
