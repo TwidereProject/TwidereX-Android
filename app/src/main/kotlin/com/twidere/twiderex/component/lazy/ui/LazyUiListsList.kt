@@ -53,6 +53,7 @@ import com.twidere.twiderex.component.lazy.items
 import com.twidere.twiderex.component.lazy.loadState
 import com.twidere.twiderex.model.ListType
 import com.twidere.twiderex.model.ui.UiList
+import java.util.Locale
 
 /**
  *  LazyList for UiList
@@ -78,7 +79,8 @@ fun LazyUiListList(
             // my lists title
             if (listType == ListType.All) {
                 item {
-                    LazyUiListTitleItem(title = stringResource(id = R.string.scene_lists_tabs_created))
+                    LazyUiListTitleItem(title = stringResource(id = R.string.scene_lists_tabs_created).toUpperCase(
+                        Locale.getDefault()))
                 }
             }
             if (listType == ListType.All || listType == ListType.Owned) {
@@ -94,7 +96,8 @@ fun LazyUiListList(
             }
             if (listType == ListType.All) {
                 item {
-                    LazyUiListTitleItem(title = stringResource(id = R.string.scene_lists_tabs_subscribed))
+                    LazyUiListTitleItem(title = stringResource(id = R.string.scene_lists_tabs_subscribed).toUpperCase(
+                        Locale.getDefault()))
                 }
             }
 
