@@ -79,8 +79,11 @@ fun LazyUiListList(
             // my lists title
             if (listType == ListType.All) {
                 item {
-                    LazyUiListTitleItem(title = stringResource(id = R.string.scene_lists_tabs_created).toUpperCase(
-                        Locale.getDefault()))
+                    LazyUiListTitleItem(
+                        title = stringResource(id = R.string.scene_lists_tabs_created).toUpperCase(
+                            Locale.getDefault()
+                        )
+                    )
                 }
             }
             if (listType == ListType.All || listType == ListType.Owned) {
@@ -96,8 +99,11 @@ fun LazyUiListList(
             }
             if (listType == ListType.All) {
                 item {
-                    LazyUiListTitleItem(title = stringResource(id = R.string.scene_lists_tabs_subscribed).toUpperCase(
-                        Locale.getDefault()))
+                    LazyUiListTitleItem(
+                        title = stringResource(id = R.string.scene_lists_tabs_subscribed).toUpperCase(
+                            Locale.getDefault()
+                        )
+                    )
                 }
             }
 
