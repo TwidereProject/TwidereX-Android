@@ -37,24 +37,31 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.paging.LoadState
 import com.twidere.twiderex.R
-import com.twidere.twiderex.component.UserListComponent
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
+import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
+import com.twidere.twiderex.component.lazy.collectAsLazyPagingItems
+import com.twidere.twiderex.component.lazy.ui.LazyUiUserList
+import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.extensions.refreshOrRetry
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.lists.ListsUserViewModel
+import kotlinx.coroutines.launch
 import java.util.Locale
 
 @Composable
@@ -64,12 +71,14 @@ fun ListsMembersScene(
 ) {
     val account = LocalActiveAccount.current ?: return
     val navController = LocalNavController.current
-    listKey.toString()
     val viewModel = assistedViewModel<ListsUserViewModel.AssistedFactory, ListsUserViewModel>(
         account
     ) {
         it.create(account, listKey.id)
     }
+    val source = viewModel.source.collectAsLazyPagingItems()
+    val navigator = LocalNavigator.current
+    val scope = rememberCoroutineScope()
     TwidereScene {
         InAppNotificationScaffold(
             topBar = {
@@ -85,7 +94,10 @@ fun ListsMembersScene(
             floatingActionButton = {
                 if (owned) FloatingActionButton(
                     onClick = {
-                        navController.navigate(Route.Lists.AddMembers(listKey = listKey))
+                        scope.launch {
+                            val result = navController.navigateForResult(Route.Lists.AddMembers(listKey = listKey)) as List<*>
+                            if (result.isNotEmpty()) source.refresh()
+                        }
                     }
                 ) {
                     Row(
@@ -109,39 +121,46 @@ fun ListsMembersScene(
             },
             floatingActionButtonPosition = FabPosition.Center
         ) {
-            UserListComponent(
-                viewModel = viewModel,
-                action = {
-                    if (!owned) return@UserListComponent
-                    var menuExpand by remember {
-                        mutableStateOf(false)
-                    }
-                    IconButton(onClick = { menuExpand = !menuExpand }) {
-                        Icon(
-                            imageVector = Icons.Default.MoreVert,
-                            contentDescription = stringResource(
-                                id = R.string.scene_lists_users_menu_actions_remove
-                            )
-                        )
-                    }
-                    DropdownMenu(
-                        expanded = menuExpand,
-                        onDismissRequest = { menuExpand = false }
-                    ) {
-                        DropdownMenuItem(
-                            onClick = {
-                                viewModel.removeMember(it)
-                            }
-                        ) {
-                            Text(
-                                text = stringResource(
-                                    R.string.scene_lists_users_menu_actions_remove
+            SwipeToRefreshLayout(
+                refreshingState = source.loadState.refresh is LoadState.Loading,
+                onRefresh = {
+                    source.refreshOrRetry()
+                }
+            ) {
+                LazyUiUserList(
+                    items = source, onItemClicked = { navigator.user(it) },
+                    action = {
+                        if (!owned) return@LazyUiUserList
+                        var menuExpand by remember {
+                            mutableStateOf(false)
+                        }
+                        IconButton(onClick = { menuExpand = !menuExpand }) {
+                            Icon(
+                                imageVector = Icons.Default.MoreVert,
+                                contentDescription = stringResource(
+                                    id = R.string.scene_lists_users_menu_actions_remove
                                 )
                             )
                         }
+                        DropdownMenu(
+                            expanded = menuExpand,
+                            onDismissRequest = { menuExpand = false }
+                        ) {
+                            DropdownMenuItem(
+                                onClick = {
+                                    viewModel.removeMember(it)
+                                }
+                            ) {
+                                Text(
+                                    text = stringResource(
+                                        R.string.scene_lists_users_menu_actions_remove
+                                    )
+                                )
+                            }
+                        }
                     }
-                }
-            )
+                )
+            }
         }
     }
 }

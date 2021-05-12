@@ -20,22 +20,19 @@
  */
 package com.twidere.twiderex.scenes.lists
 
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
@@ -187,14 +184,10 @@ private fun SearchResultsContent(keyword: String, pendingList: List<UiUser>, onA
             items = if (keyword.isNotEmpty()) source else flowOf(PagingData.from(pendingList)).collectAsLazyPagingItems(),
             onItemClicked = { navigator.user(it) },
             action = {
-                Column(
-                    modifier = Modifier
-                        .requiredHeight(IntrinsicSize.Max)
-                        .padding(ListsAddMembersSceneDefaults.SearchContent.Action.ContentPadding)
-                        .clickable {
-                            onAction(it)
-                        },
-                    verticalArrangement = Arrangement.Center
+                TextButton(
+                    onClick = {
+                        onAction(it)
+                    }
                 ) {
                     val pending = statusChecker(it)
                     if (pending) {

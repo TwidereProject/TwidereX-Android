@@ -69,6 +69,7 @@
     <string name="common_controls_actions_save">Save</string>
     <string name="common_controls_actions_ok">OK</string>
     <string name="common_controls_actions_confirm">Confirm</string>
+    <string name="common_controls_actions_yes">Yes</string>
     <string name="common_controls_actions_cancel">Cancel</string>
     <string name="common_controls_actions_take_photo">Take photo</string>
     <string name="common_controls_actions_save_photo">Save photo</string>
@@ -212,11 +213,13 @@
     <string name="scene_lists_details_descriptions_multiple_subscribers">%d Subscribers</string>
     <string name="scene_lists_details_menu_actions_add_member">Add Member</string>
     <string name="scene_lists_details_menu_actions_edit_list">Edit List</string>
+    <string name="scene_lists_details_menu_actions_rename_list">Rename List</string>
     <string name="scene_lists_details_menu_actions_delete_list">Delete List</string>
     <string name="scene_lists_details_menu_actions_follow">Follow</string>
     <string name="scene_lists_details_menu_actions_unfollow">Unfollow</string>
     <string name="scene_lists_details_tabs_members">List Members</string>
     <string name="scene_lists_details_tabs_subscriber">Subscribers</string>
+    <string name="scene_lists_details_delete_list_confirm">Delete this list: %s</string>
     <string name="scene_lists_details_no_members_found">No Members Found.</string>
     <string name="scene_lists_details_add_members">Add Members</string>
     <string name="scene_lists_modify_create_title">New List</string>

@@ -24,12 +24,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.AlertDialog
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
+import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.runtime.Composable
@@ -80,6 +82,9 @@ fun ListTimeLineScene(
     val source by viewModel.source.observeAsState()
     val loading by viewModel.loading.observeAsState()
     var showEditDialog by remember {
+        mutableStateOf(false)
+    }
+    var showDeleteConfirmDialog by remember {
         mutableStateOf(false)
     }
     TwidereScene {
@@ -145,6 +150,7 @@ fun ListTimeLineScene(
 
                                 DropdownMenuItem(
                                     onClick = {
+                                        menuExpand = false
                                         navController.navigate(
                                             Route.Lists.Members(
                                                 listKey,
@@ -159,6 +165,7 @@ fun ListTimeLineScene(
                                 if (uiList.allowToSubscribe) {
                                     DropdownMenuItem(
                                         onClick = {
+                                            menuExpand = false
                                             navController.navigate(
                                                 Route.Lists.Subscribers(
                                                     listKey
@@ -173,6 +180,7 @@ fun ListTimeLineScene(
                                 if (uiList.isOwner(account.user.userId)) {
                                     DropdownMenuItem(
                                         onClick = {
+                                            menuExpand = false
                                             when (account.type) {
                                                 PlatformType.Twitter -> navController.navigate(Route.Lists.TwitterEdit(listKey = listKey))
                                                 PlatformType.StatusNet -> TODO()
@@ -181,16 +189,20 @@ fun ListTimeLineScene(
                                             }
                                         }
                                     ) {
-                                        Text(text = stringResource(id = R.string.scene_lists_details_menu_actions_edit_list))
+                                        Text(
+                                            text = if (account.type == PlatformType.Mastodon)
+                                                stringResource(id = R.string.scene_lists_details_menu_actions_rename_list)
+                                            else
+                                                stringResource(id = R.string.scene_lists_details_menu_actions_edit_list)
+                                        )
                                     }
                                 }
 
                                 if (uiList.isOwner(account.user.userId)) {
                                     DropdownMenuItem(
                                         onClick = {
-                                            viewModel.deleteList { success, _ ->
-                                                if (success) navController.popBackStack()
-                                            }
+                                            menuExpand = false
+                                            showDeleteConfirmDialog = true
                                         }
                                     ) {
                                         Text(text = stringResource(id = R.string.scene_lists_details_menu_actions_delete_list))
@@ -214,13 +226,27 @@ fun ListTimeLineScene(
                         LoadingProgress()
                     }
                 }
+                source?.let {
+                    if (showDeleteConfirmDialog) {
+                        ListDeleteConfirmDialog(
+                            title = it.title,
+                            onDismissRequest = {
+                                showDeleteConfirmDialog = false
+                            }
+                        ) {
+                            viewModel.deleteList { success, _ ->
+                                if (success) navController.popBackStack()
+                            }
+                        }
+                    }
+                }
             }
         }
     }
 }
 
 @Composable
-fun ListTimelineComponent(account: AccountDetails, listKey: MicroBlogKey) {
+private fun ListTimelineComponent(account: AccountDetails, listKey: MicroBlogKey) {
     val viewModel = assistedViewModel<ListsTimelineViewModel.AssistedFactory, ListsTimelineViewModel>(
         account, listKey
     ) {
@@ -238,6 +264,39 @@ fun ListTimelineComponent(account: AccountDetails, listKey: MicroBlogKey) {
             items = timelineSource,
         )
     }
+}
+
+@Composable
+private fun ListDeleteConfirmDialog(title: String, onDismissRequest: () -> Unit, onConfirm: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = {
+            onDismissRequest.invoke()
+        },
+        title = {
+            Text(
+                text = stringResource(id = R.string.scene_lists_details_delete_list_confirm, title),
+            )
+        },
+        dismissButton = {
+            TextButton(
+                onClick = {
+                    onDismissRequest.invoke()
+                }
+            ) {
+                Text(text = stringResource(id = R.string.common_controls_actions_cancel))
+            }
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    onConfirm()
+                    onDismissRequest.invoke()
+                }
+            ) {
+                Text(text = stringResource(id = R.string.common_controls_actions_yes))
+            }
+        },
+    )
 }
 
 object ListTimelineSceneDefaults {
