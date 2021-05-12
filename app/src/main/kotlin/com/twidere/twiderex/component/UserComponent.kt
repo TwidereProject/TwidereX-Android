@@ -501,7 +501,7 @@ fun UserInfo(
 }
 
 object UserInfoDefaults {
-    val AvatarSize = 72.dp
+    val AvatarSize = 88.dp
     val AvatarSpacing = 8.dp
     val RelationshipSpacing = 8.dp
     val WebsiteSpacing = 8.dp
