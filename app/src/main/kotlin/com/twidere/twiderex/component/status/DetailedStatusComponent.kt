@@ -47,7 +47,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.R
-import com.twidere.twiderex.component.HumanizedTime
+import com.twidere.twiderex.component.FormattedTime
 import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.ui.UiStatus
 
@@ -102,7 +102,7 @@ fun DetailedStatusComponent(
                             modifier = Modifier
                                 .align(Alignment.CenterHorizontally)
                         ) {
-                            HumanizedTime(time = status.timestamp)
+                            FormattedTime(time = status.timestamp)
                             Spacer(modifier = Modifier.width(DetailedStatusDefaults.TimestampSpacing))
                             Text(
                                 text = status.source,
