@@ -34,7 +34,7 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -104,7 +104,7 @@ fun ListsAddMembersScene(
                                     }
                                 ) {
                                     Icon(
-                                        imageVector = Icons.Default.ArrowBack,
+                                        imageVector = Icons.Default.Close,
                                         contentDescription = stringResource(id = R.string.accessibility_common_back)
                                     )
                                 }
@@ -217,11 +217,6 @@ private object ListsAddMembersSceneDefaults {
         )
         object Icon {
             val Padding = PaddingValues(end = 23.dp)
-        }
-    }
-    object SearchContent {
-        object Action {
-            val ContentPadding = PaddingValues(horizontal = 10.dp, vertical = 0.dp)
         }
     }
 }

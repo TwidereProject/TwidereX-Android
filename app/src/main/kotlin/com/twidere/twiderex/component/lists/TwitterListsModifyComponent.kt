@@ -35,8 +35,6 @@ import androidx.compose.material.ContentAlpha
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ProvideTextStyle
-import androidx.compose.material.Switch
-import androidx.compose.material.SwitchDefaults
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
@@ -58,6 +56,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.R
+import com.twidere.twiderex.component.foundation.ColoredSwitch
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -150,13 +149,9 @@ fun TwitterListsModifyComponent(
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             Text(text = stringResource(id = R.string.scene_lists_modify_private), style = MaterialTheme.typography.body1)
-            Switch(
+            ColoredSwitch(
                 checked = isPrivate,
                 onCheckedChange = onPrivateChanged,
-                colors = SwitchDefaults.colors(
-                    uncheckedThumbColor = Color(0x99000000),
-                    uncheckedTrackColor = Color(0x61000000)
-                )
             )
         }
     }

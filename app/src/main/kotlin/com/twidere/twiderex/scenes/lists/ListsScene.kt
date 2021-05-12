@@ -46,7 +46,7 @@ import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
 import com.twidere.twiderex.component.lazy.collectAsLazyPagingItems
-import com.twidere.twiderex.component.lazy.ui.LazyUiListList
+import com.twidere.twiderex.component.lazy.ui.LazyUiListsList
 import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.navigation.Route
@@ -122,7 +122,7 @@ fun ListsScene() {
                     refreshingState = ownerItems.loadState.refresh is LoadState.Loading,
                     onRefresh = { ownerItems.refresh() }
                 ) {
-                    LazyUiListList(
+                    LazyUiListsList(
                         listType = account.listType,
                         source = sourceItems,
                         ownerItems = ownerItems,

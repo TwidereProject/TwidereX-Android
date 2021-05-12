@@ -44,6 +44,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.R
@@ -60,7 +61,7 @@ import java.util.Locale
  */
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun LazyUiListList(
+fun LazyUiListsList(
     listType: ListType,
     modifier: Modifier = Modifier,
     source: LazyPagingItems<UiList>,
@@ -102,7 +103,8 @@ fun LazyUiListList(
                     LazyUiListTitleItem(
                         title = stringResource(id = R.string.scene_lists_tabs_subscribed).toUpperCase(
                             Locale.getDefault()
-                        )
+                        ),
+                        divider = true
                     )
                 }
             }
@@ -139,23 +141,31 @@ private fun LazyUiListItem(uiList: UiList, onItemClicked: (UiList) -> Unit = {})
                     contentDescription = stringResource(id = R.string.scene_lists_icons_private),
                     modifier = Modifier
                         .alpha(ContentAlpha.disabled)
-                        .size(LazyUiListItemDefaults.LockIconSize)
+                        .size(LazyUiListsItemDefaults.LockIconSize)
                 )
             }
         }
     ) {
         CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
-            Text(text = uiList.title, style = MaterialTheme.typography.body1)
+            Text(
+                text = uiList.title,
+                style = MaterialTheme.typography.body1,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
         }
     }
 }
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-private fun LazyUiListTitleItem(title: String) {
-    DividerListItem {
+private fun LazyUiListTitleItem(title: String, divider: Boolean = false) {
+    DividerListItem(divider = divider) {
         CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.disabled) {
-            Text(text = title, style = MaterialTheme.typography.overline)
+            Text(
+                text = title,
+                style = MaterialTheme.typography.overline,
+            )
         }
     }
 }
@@ -164,18 +174,21 @@ private fun LazyUiListTitleItem(title: String) {
 @Composable
 private fun DividerListItem(
     modifier: Modifier = Modifier,
+    divider: Boolean = false,
     trailing: @Composable (() -> Unit)? = null,
     text: @Composable () -> Unit
 ) {
     Column {
+        if (divider) {
+            Divider(
+                Modifier.padding(start = LazyUiListsItemDefaults.HorizontalPadding),
+                thickness = LazyUiListsItemDefaults.DividerThickness
+            )
+        }
         ListItem(
             modifier = modifier,
             text = text,
             trailing = trailing
-        )
-        Divider(
-            Modifier.padding(start = LazyUiListItemDefaults.HorizontalPadding),
-            thickness = LazyUiListItemDefaults.DividerThickness
         )
     }
 }
@@ -200,7 +213,7 @@ private fun EmptyList() {
     }
 }
 
-object LazyUiListItemDefaults {
+private object LazyUiListsItemDefaults {
     val HorizontalPadding = 16.dp
     val LockIconSize = 16.dp
     val DividerThickness = 1.dp
