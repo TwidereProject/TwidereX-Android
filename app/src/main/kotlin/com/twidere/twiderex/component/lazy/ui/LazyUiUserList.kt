@@ -21,8 +21,10 @@
 package com.twidere.twiderex.component.lazy.ui
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
@@ -31,6 +33,7 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ListItem
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -63,39 +66,44 @@ fun LazyUiUserList(
             header.invoke(this)
             items(items, key = key) {
                 (it ?: UiUser.placeHolder()).let {
-                    ListItem(
+                    Row(
                         modifier = Modifier.clickable {
                             onItemClicked.invoke(it)
                         },
-                        icon = {
-                            UserAvatar(
-                                user = it,
-                            )
-                        },
-                        text = {
-                            Row {
-                                UserName(user = it)
-                                Spacer(modifier = Modifier.width(UiUserListDefaults.HorizontalPadding))
-                                UserScreenName(user = it)
-                            }
-                        },
-                        secondaryText = {
-                            Row {
-                                Text(
-                                    text = stringResource(
-                                        id = R.string.common_controls_profile_dashboard_followers,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        ListItem(
+                            modifier = Modifier.weight(1f),
+                            icon = {
+                                UserAvatar(
+                                    user = it,
+                                )
+                            },
+                            text = {
+                                Row {
+                                    UserName(user = it)
+                                    Spacer(modifier = Modifier.width(UiUserListDefaults.HorizontalPadding))
+                                    UserScreenName(user = it)
+                                }
+                            },
+                            secondaryText = {
+                                Row {
+                                    Text(
+                                        text = stringResource(
+                                            id = R.string.common_controls_profile_dashboard_followers,
+                                        )
                                     )
-                                )
-                                Spacer(modifier = Modifier.width(UiUserListDefaults.HorizontalPadding))
-                                Text(
-                                    text = it.followersCount.toString()
-                                )
-                            }
-                        },
-                        trailing = {
+                                    Spacer(modifier = Modifier.width(UiUserListDefaults.HorizontalPadding))
+                                    Text(
+                                        text = it.followersCount.toString()
+                                    )
+                                }
+                            },
+                        )
+                        Box(modifier = Modifier.padding(end = UiUserListDefaults.TrailingRightPadding)) {
                             action.invoke(it)
                         }
-                    )
+                    }
                 }
             }
             loadState(items.loadState.append) {
@@ -107,4 +115,5 @@ fun LazyUiUserList(
 
 object UiUserListDefaults {
     val HorizontalPadding = 8.dp
+    val TrailingRightPadding = 16.dp
 }
