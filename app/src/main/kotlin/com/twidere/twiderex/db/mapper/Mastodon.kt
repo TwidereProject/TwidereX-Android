@@ -22,11 +22,13 @@ package com.twidere.twiderex.db.mapper
 
 import com.twidere.services.mastodon.model.Account
 import com.twidere.services.mastodon.model.Emoji
+import com.twidere.services.mastodon.model.MastodonList
 import com.twidere.services.mastodon.model.Mention
 import com.twidere.services.mastodon.model.Notification
 import com.twidere.services.mastodon.model.NotificationTypes
 import com.twidere.services.mastodon.model.Status
 import com.twidere.services.mastodon.model.Visibility
+import com.twidere.twiderex.db.model.DbList
 import com.twidere.twiderex.db.model.DbMastodonStatusExtra
 import com.twidere.twiderex.db.model.DbMastodonUserExtra
 import com.twidere.twiderex.db.model.DbMedia
@@ -322,6 +324,25 @@ fun Account.toDbUser(
             locked = locked ?: false,
             emoji = emojis ?: emptyList(),
         )
+    )
+}
+
+fun MastodonList.toDbList(accountKey: MicroBlogKey): DbList {
+    return DbList(
+        _id = UUID.randomUUID().toString(),
+        ownerId = accountKey.id,
+        listId = id ?: throw IllegalArgumentException("list.idStr should not be null"),
+        title = title ?: "",
+        description = "",
+        mode = "",
+        replyPolicy = repliesPolicy ?: "",
+        accountKey = accountKey,
+        listKey = MicroBlogKey(
+            id ?: throw IllegalArgumentException("list.idStr should not be null"),
+            accountKey.host
+        ),
+        isFollowed = true,
+        allowToSubscribe = false,
     )
 }
 

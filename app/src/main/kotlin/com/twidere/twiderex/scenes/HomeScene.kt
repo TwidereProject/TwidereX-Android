@@ -21,6 +21,8 @@
 package com.twidere.twiderex.scenes
 
 import androidx.activity.compose.BackHandler
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.animateDp
@@ -393,23 +395,21 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
             ) {
                 LazyColumn {
                     item {
-                        ListItem(
-                            modifier = Modifier.clickable(
-                                onClick = {
-                                    navController.navigate(Route.Draft.List)
-                                }
-                            ),
-                            text = {
-                                Text(text = stringResource(id = R.string.scene_drafts_title))
+                        DrawerMenuItem(
+                            onClick = {
+                                navController.navigate(Route.Draft.List)
                             },
-                            icon = {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.ic_note),
-                                    contentDescription = stringResource(
-                                        id = R.string.scene_drafts_title
-                                    )
-                                )
+                            title = R.string.scene_drafts_title,
+                            icon = R.drawable.ic_note,
+                        )
+                    }
+                    item {
+                        DrawerMenuItem(
+                            onClick = {
+                                navController.navigate(Route.Lists.Home)
                             },
+                            title = R.string.scene_lists_title,
+                            icon = R.drawable.ic_lists,
                         )
                     }
                 }
@@ -440,6 +440,33 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
             }
         )
     }
+}
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+private fun DrawerMenuItem(
+    onClick: () -> Unit,
+    @StringRes title: Int,
+    @DrawableRes icon: Int,
+    @StringRes iconDescription: Int = title
+) {
+    ListItem(
+        modifier = Modifier.clickable(
+            onClick = {
+                onClick.invoke()
+            }
+        ),
+        text = {
+            Text(text = stringResource(id = title))
+        },
+        icon = {
+            Icon(
+                painter = painterResource(id = icon),
+                contentDescription = stringResource(
+                    id = iconDescription
+                )
+            )
+        },
+    )
 }
 
 @OptIn(ExperimentalMaterialApi::class)

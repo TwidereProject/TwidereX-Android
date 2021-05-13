@@ -49,4 +49,11 @@ interface TimelineService {
         since_id: String? = null,
         max_id: String? = null,
     ): List<IStatus>
+
+    suspend fun listTimeline(
+        list_id: String,
+        count: Int = 20,
+        max_id: String? = null,
+        since_id: String? = null,
+    ): List<IStatus>
 }

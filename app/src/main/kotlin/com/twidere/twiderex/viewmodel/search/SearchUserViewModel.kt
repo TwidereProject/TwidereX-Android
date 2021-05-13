@@ -33,6 +33,7 @@ import com.twidere.twiderex.paging.source.SearchUserPagingSource
 class SearchUserViewModel(
     private val account: AccountDetails,
     keyword: String,
+    following: Boolean = false,
 ) : ViewModel() {
 
     val source by lazy {
@@ -45,7 +46,8 @@ class SearchUserViewModel(
             SearchUserPagingSource(
                 accountKey = account.accountKey,
                 keyword,
-                account.service as SearchService
+                account.service as SearchService,
+                following = following
             )
         }.flow.cachedIn(viewModelScope)
     }

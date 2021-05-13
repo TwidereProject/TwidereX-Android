@@ -34,5 +34,6 @@ interface SearchService {
         query: String,
         page: Int? = null,
         count: Int = 20,
+        following: Boolean = false
     ): List<IUser>
 }

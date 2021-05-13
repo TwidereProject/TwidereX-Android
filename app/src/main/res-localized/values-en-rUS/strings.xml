@@ -200,7 +200,7 @@
     <string name="scene_drafts_actions_delete_draft">Delete draft</string>
     <string name="scene_drafts_actions_edit_draft">Edit draft</string>
     <string name="scene_lists_title">Lists</string>
-    <string name="scene_lists_tabs_created">Created</string>
+    <string name="scene_lists_tabs_created">My Lists</string>
     <string name="scene_lists_tabs_subscribed">Subscribed</string>
     <string name="scene_lists_details_title">Lists Details</string>
     <string name="scene_lists_details_descriptions_single_member">1 Member</string>
@@ -209,8 +209,8 @@
     <string name="scene_lists_details_descriptions_multiple_subscribers">%d Subscribers</string>
     <string name="scene_lists_details_menu_actions_add_member">Add Member</string>
     <string name="scene_lists_details_menu_actions_edit_list">Edit List</string>
-    <string name="scene_lists_details_tabs_members">Members</string>
-    <string name="scene_lists_details_tabs_subscriber">Subscriber</string>
+    <string name="scene_lists_details_tabs_members">List Members</string>
+    <string name="scene_lists_details_tabs_subscriber">Subscribers</string>
     <string name="scene_lists_details_no_members_found">No Members Found.</string>
     <string name="scene_lists_details_add_members">Add Members</string>
     <string name="scene_settings_title">Settings</string>
