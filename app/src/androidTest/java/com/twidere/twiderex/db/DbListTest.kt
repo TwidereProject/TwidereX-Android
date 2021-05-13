@@ -46,7 +46,7 @@ import org.junit.runner.RunWith
 class DbListTest {
     private lateinit var listsDao: ListsDao
     private lateinit var cacheDatabase: CacheDatabase
-    private val twitterAccountKey = MicroBlogKey("123", "twitter.com")
+    private val twitterAccountKey = MicroBlogKey.twitter("123")
     private val mastodonAccountKey = MicroBlogKey("456", "mastodon.com")
     private val originData = mutableListOf<IListModel>()
     private val twitterCount = 10
@@ -123,7 +123,7 @@ class DbListTest {
             source.observeForever(observer)
             Assert.assertEquals("description 0", source.value?.description)
             source.value?.let {
-                listsDao.update(listOf(it.update(description = "Update 0")))
+                listsDao.update(listOf(it.copy(description = "Update 0")))
             }
             Assert.assertEquals("Update 0", source.value?.description)
             source.removeObserver(observer)
@@ -151,7 +151,7 @@ class DbListTest {
         runBlocking {
             var updateList = listsDao.findWithListKey(MicroBlogKey.twitter("0"), twitterAccountKey)
             Assert.assertNotNull(updateList)
-            listsDao.update(listOf(updateList!!.update(title = "updated title")))
+            listsDao.update(listOf(updateList!!.copy(title = "updated title")))
             updateList = listsDao.findWithListKey(MicroBlogKey.twitter("0"), twitterAccountKey)
             Assert.assertNotNull(updateList)
             Assert.assertEquals("updated title", updateList?.title)

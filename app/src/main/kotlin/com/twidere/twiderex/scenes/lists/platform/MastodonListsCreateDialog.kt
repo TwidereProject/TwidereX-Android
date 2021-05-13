@@ -48,6 +48,9 @@ fun MastodonListsCreateDialog(onDismissRequest: () -> Unit) {
         onDismissRequest.invoke()
         showMastodonComponent = true
     }
+    var name by remember {
+        mutableStateOf("")
+    }
     val listsCreateViewModel = assistedViewModel<ListsCreateViewModel.AssistedFactory, ListsCreateViewModel>(
         account
     ) {
@@ -62,9 +65,9 @@ fun MastodonListsCreateDialog(onDismissRequest: () -> Unit) {
             }
         }
     }
-    val loading by listsCreateViewModel.loading.observeAsState()
+    val loading by listsCreateViewModel.loading.observeAsState(initial = false)
 
-    if (loading == true) {
+    if (loading) {
         Dialog(
             onDismissRequest = {
                 dismiss()
@@ -79,7 +82,8 @@ fun MastodonListsCreateDialog(onDismissRequest: () -> Unit) {
         MastodonListsModifyComponent(
             onDismissRequest = { dismiss() },
             title = stringResource(id = R.string.scene_lists_modify_dialog_create),
-            initName = ""
+            name = name,
+            onNameChanged = { name = it }
         ) {
             listsCreateViewModel.createList(
                 title = it

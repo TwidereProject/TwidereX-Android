@@ -32,8 +32,6 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -44,10 +42,11 @@ import com.twidere.twiderex.R
 fun MastodonListsModifyComponent(
     onDismissRequest: () -> Unit,
     title: String,
-    initName: String,
+    name: String,
+    onNameChanged: (name: String) -> Unit,
     onConfirm: (name: String) -> Unit
 ) {
-    var name by remember { mutableStateOf(initName) }
+    // var name by remember { mutableStateOf(initName) }
     AlertDialog(
         onDismissRequest = {
             onDismissRequest.invoke()
@@ -64,7 +63,7 @@ fun MastodonListsModifyComponent(
                     modifier = Modifier
                         .fillMaxWidth(),
                     value = name,
-                    onValueChange = { name = it },
+                    onValueChange = onNameChanged,
                     placeholder = {
                         Text(
                             text = stringResource(id = R.string.scene_lists_modify_name),
@@ -96,6 +95,6 @@ fun MastodonListsModifyComponent(
     )
 }
 
-object MastodonListsModifyComponentDefaults {
+private object MastodonListsModifyComponentDefaults {
     val VerticalPadding = 20.dp
 }

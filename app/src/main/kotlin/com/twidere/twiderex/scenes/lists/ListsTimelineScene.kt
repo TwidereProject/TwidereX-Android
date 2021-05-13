@@ -81,7 +81,7 @@ fun ListTimeLineScene(
         it.create(account, listKey)
     }
     val source by viewModel.source.observeAsState()
-    val loading by viewModel.loading.observeAsState()
+    val loading by viewModel.loading.observeAsState(initial = false)
     var showEditDialog by remember {
         mutableStateOf(false)
     }
@@ -226,7 +226,7 @@ fun ListTimeLineScene(
                         showEditDialog = false
                     }
                 }
-                if (loading == true) {
+                if (loading) {
                     Dialog(onDismissRequest = { }) {
                         LoadingProgress()
                     }

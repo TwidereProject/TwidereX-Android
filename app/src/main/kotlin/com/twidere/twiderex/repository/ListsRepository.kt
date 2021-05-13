@@ -28,6 +28,7 @@ import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.db.mapper.toDbList
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.ui.ListsMode
 import com.twidere.twiderex.model.ui.UiList
 import com.twidere.twiderex.model.ui.UiList.Companion.toUi
 import com.twidere.twiderex.paging.mediator.list.ListsMediator
@@ -89,12 +90,13 @@ class ListsRepository(private val database: CacheDatabase) {
         originSource?.let {
             database.listsDao().update(
                 listOf(
-                    it.update(
+                    it.copy(
                         title = result.title,
                         description = result.description,
                         mode = result.mode,
                         isFollowed = result.isFollowed,
-                        replyPolicy = result.replyPolicy
+                        replyPolicy = result.replyPolicy,
+                        allowToSubscribe = it.allowToSubscribe && result.mode != ListsMode.PRIVATE.value
                     )
                 )
             )
@@ -122,7 +124,7 @@ class ListsRepository(private val database: CacheDatabase) {
         (account.service as ListsService).unsubscribeList(listId = listKey.id)
         val updateItem = database.listsDao().findWithListKey(listKey, account.accountKey)
         updateItem?.let {
-            database.listsDao().update(listOf(updateItem.update(isFollowed = false)))
+            database.listsDao().update(listOf(updateItem.copy(isFollowed = false)))
         }
         return updateItem?.toUi()
     }
@@ -136,7 +138,7 @@ class ListsRepository(private val database: CacheDatabase) {
             .toDbList(accountKey = account.accountKey)
         val updateItem = database.listsDao().findWithListKey(listKey, account.accountKey)
         updateItem?.let {
-            database.listsDao().update(listOf(updateItem.update(isFollowed = true)))
+            database.listsDao().update(listOf(updateItem.copy(isFollowed = true)))
         } ?: database.listsDao().insertAll(listOf(result))
         return result.toUi()
     }

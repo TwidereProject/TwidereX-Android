@@ -52,9 +52,9 @@ fun MastodonListsEditDialog(listKey: MicroBlogKey, onDismissRequest: () -> Unit)
         it.create(account, listKey)
     }
     val source by listsEditViewModel.source.observeAsState()
-    val loading by listsEditViewModel.loading.observeAsState()
+    val loading by listsEditViewModel.loading.observeAsState(initial = false)
     source?.let { uiList ->
-        if (loading == true) {
+        if (loading) {
             Dialog(
                 onDismissRequest = {
                     dismiss()
@@ -66,15 +66,21 @@ fun MastodonListsEditDialog(listKey: MicroBlogKey, onDismissRequest: () -> Unit)
         }
 
         if (showMastodonComponent) {
+            var name by remember {
+                mutableStateOf(uiList.title)
+            }
             MastodonListsModifyComponent(
                 onDismissRequest = { dismiss() },
                 title = stringResource(id = R.string.scene_lists_modify_dialog_edit),
-                initName = uiList.title
+                name = name,
+                onNameChanged = { name = it }
             ) {
                 listsEditViewModel.editList(
                     listId = listKey.id,
                     title = it
-                )
+                ) { success, _ ->
+                    if (success) onDismissRequest.invoke()
+                }
             }
         }
     }

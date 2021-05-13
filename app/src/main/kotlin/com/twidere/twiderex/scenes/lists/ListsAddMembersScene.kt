@@ -36,11 +36,9 @@ import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -57,6 +55,7 @@ import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.LoadingProgress
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
 import com.twidere.twiderex.component.foundation.TextInput
+import com.twidere.twiderex.component.lazy.LazyPagingItems
 import com.twidere.twiderex.component.lazy.collectAsLazyPagingItems
 import com.twidere.twiderex.component.lazy.ui.LazyUiUserList
 import com.twidere.twiderex.component.navigation.LocalNavigator
@@ -70,7 +69,7 @@ import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.lists.ListsAddMemberViewModel
-import com.twidere.twiderex.viewmodel.search.SearchUserViewModel
+import com.twidere.twiderex.viewmodel.lists.ListsSearchUserViewModel
 import kotlinx.coroutines.flow.flowOf
 
 @Composable
@@ -84,12 +83,22 @@ fun ListsAddMembersScene(
         it.create(account, listKey.id)
     }
 
-    var keyword by rememberSaveable {
-        mutableStateOf("")
+    val loading by viewModel.loading.observeAsState(initial = false)
+
+    val onlySearchFollowing = when (account.type) {
+        PlatformType.Mastodon -> true
+        else -> false
     }
 
-    val loading by viewModel.loading.observeAsState()
+    val searchViewModel = viewModel(
+        account,
+    ) {
+        ListsSearchUserViewModel(account, onlySearchFollowing)
+    }
 
+    val keyword by searchViewModel.text.observeAsState(initial = "")
+    val searchSourceState by searchViewModel.sourceFlow.collectAsState(initial = null)
+    val searchSource = searchSourceState?.collectAsLazyPagingItems()
     TwidereScene {
         InAppNotificationScaffold(
             topBar = {
@@ -129,7 +138,7 @@ fun ListsAddMembersScene(
                                     Text(text = stringResource(id = R.string.scene_lists_users_add_search))
                                 },
                                 onValueChange = {
-                                    keyword = it
+                                    searchViewModel.text.value = it
                                 },
                                 modifier = Modifier.fillMaxWidth()
                             )
@@ -141,15 +150,14 @@ fun ListsAddMembersScene(
             Box(modifier = Modifier.fillMaxSize()) {
                 // search result
                 SearchResultsContent(
-                    keyword = keyword,
-                    pendingList = viewModel.pendingMap.values.toMutableList(),
+                    source = searchSource ?: flowOf(PagingData.from(viewModel.pendingMap.values.toMutableList())).collectAsLazyPagingItems(),
                     onAction = {
                         viewModel.addToOrRemove(it)
-                    }
-                ) {
-                    viewModel.isInPendingList(it)
-                }
-                if (loading == true) {
+                    },
+                    statusChecker = { viewModel.isInPendingList(it) }
+                )
+
+                if (loading) {
                     Dialog(onDismissRequest = { }) {
                         LoadingProgress()
                     }
@@ -160,19 +168,7 @@ fun ListsAddMembersScene(
 }
 
 @Composable
-private fun SearchResultsContent(keyword: String, pendingList: List<UiUser>, onAction: (user: UiUser) -> Unit, statusChecker: (user: UiUser) -> Boolean) {
-    val account = LocalActiveAccount.current ?: return
-    val onlySearchFollowing = when (account.type) {
-        PlatformType.Mastodon -> true
-        else -> false
-    }
-    val viewModel = viewModel(
-        account,
-        keyword,
-    ) {
-        SearchUserViewModel(account, keyword, onlySearchFollowing)
-    }
-    val source = viewModel.source.collectAsLazyPagingItems()
+private fun SearchResultsContent(source: LazyPagingItems<UiUser>, onAction: (user: UiUser) -> Unit, statusChecker: (user: UiUser) -> Boolean) {
     val navigator = LocalNavigator.current
     SwipeToRefreshLayout(
         refreshingState = source.loadState.refresh is LoadState.Loading,
@@ -181,7 +177,7 @@ private fun SearchResultsContent(keyword: String, pendingList: List<UiUser>, onA
         }
     ) {
         LazyUiUserList(
-            items = if (keyword.isNotEmpty()) source else flowOf(PagingData.from(pendingList)).collectAsLazyPagingItems(),
+            items = source,
             onItemClicked = { navigator.user(it) },
             action = {
                 TextButton(

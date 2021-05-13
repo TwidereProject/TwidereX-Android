@@ -62,7 +62,7 @@ fun TwitterListsEditScene(
     ) {
         it.create(account, listKey)
     }
-    val loading by listsEditViewModel.loading.observeAsState()
+    val loading by listsEditViewModel.loading.observeAsState(initial = false)
     val source by listsEditViewModel.source.observeAsState()
     source?.let { uiList ->
         TwidereScene {
@@ -107,11 +107,9 @@ fun TwitterListsEditScene(
                         isPrivate = isPrivate,
                         onNameChanged = { name = it },
                         onDescChanged = { desc = it },
-                    ) {
-                        isPrivate = it
-                    }
-
-                    if (loading == true) {
+                        onPrivateChanged = { isPrivate = it }
+                    )
+                    if (loading) {
                         Dialog(onDismissRequest = { }) {
                             LoadingProgress()
                         }

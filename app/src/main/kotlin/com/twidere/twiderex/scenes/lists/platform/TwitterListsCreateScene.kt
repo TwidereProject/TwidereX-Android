@@ -71,7 +71,7 @@ fun TwitterListsCreateScene() {
             }
         }
     }
-    val loading by listsCreateViewModel.loading.observeAsState()
+    val loading by listsCreateViewModel.loading.observeAsState(initial = false)
 
     TwidereScene {
         var name by remember {
@@ -121,7 +121,7 @@ fun TwitterListsCreateScene() {
                 ) {
                     isPrivate = it
                 }
-                if (loading == true) {
+                if (loading) {
                     Dialog(onDismissRequest = { }) {
                         LoadingProgress()
                     }
