@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 11,
-    "identityHash": "7170054c1333e7280609ac36351d7cbb",
+    "identityHash": "d58a0e728cdd3615d7203c2543f4ce5a",
     "entities": [
       {
         "tableName": "status",
@@ -662,102 +662,12 @@
           }
         ],
         "foreignKeys": []
-      },
-      {
-        "tableName": "lists",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` TEXT NOT NULL, `listId` TEXT NOT NULL, `ownerId` TEXT NOT NULL, `accountKey` TEXT NOT NULL, `listKey` TEXT NOT NULL, `title` TEXT NOT NULL, `description` TEXT NOT NULL, `mode` TEXT NOT NULL, `replyPolicy` TEXT NOT NULL, `isFollowed` INTEGER NOT NULL, `allowToSubscribe` INTEGER NOT NULL, PRIMARY KEY(`_id`))",
-        "fields": [
-          {
-            "fieldPath": "_id",
-            "columnName": "_id",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "listId",
-            "columnName": "listId",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "ownerId",
-            "columnName": "ownerId",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "accountKey",
-            "columnName": "accountKey",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "listKey",
-            "columnName": "listKey",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "title",
-            "columnName": "title",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "description",
-            "columnName": "description",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "mode",
-            "columnName": "mode",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "replyPolicy",
-            "columnName": "replyPolicy",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "isFollowed",
-            "columnName": "isFollowed",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "allowToSubscribe",
-            "columnName": "allowToSubscribe",
-            "affinity": "INTEGER",
-            "notNull": true
-          }
-        ],
-        "primaryKey": {
-          "columnNames": [
-            "_id"
-          ],
-          "autoGenerate": false
-        },
-        "indices": [
-          {
-            "name": "index_lists_accountKey_listKey",
-            "unique": true,
-            "columnNames": [
-              "accountKey",
-              "listKey"
-            ],
-            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_lists_accountKey_listKey` ON `${TABLE_NAME}` (`accountKey`, `listKey`)"
-          }
-        ],
-        "foreignKeys": []
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '7170054c1333e7280609ac36351d7cbb')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'd58a0e728cdd3615d7203c2543f4ce5a')"
     ]
   }
 }
