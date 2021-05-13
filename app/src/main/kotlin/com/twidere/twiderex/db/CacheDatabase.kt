@@ -62,7 +62,7 @@ import javax.inject.Singleton
         DbStatusReference::class,
         DbList::class
     ],
-    version = 11,
+    version = 12,
 )
 @TypeConverters(
     MicroBlogKeyConverter::class,

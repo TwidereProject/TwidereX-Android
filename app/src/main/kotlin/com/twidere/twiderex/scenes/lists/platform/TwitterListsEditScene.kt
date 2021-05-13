@@ -33,9 +33,6 @@ import androidx.compose.material.icons.filled.Done
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.window.Dialog
 import com.twidere.twiderex.R
@@ -66,9 +63,9 @@ fun TwitterListsEditScene(
     val source by listsEditViewModel.source.observeAsState()
     source?.let { uiList ->
         TwidereScene {
-            var name by remember { mutableStateOf(uiList.title) }
-            var desc by remember { mutableStateOf(uiList.descriptions) }
-            var isPrivate by remember { mutableStateOf(uiList.isPrivate) }
+            val name by listsEditViewModel.editName.observeAsState(uiList.title)
+            val desc by listsEditViewModel.editDesc.observeAsState(uiList.descriptions)
+            val isPrivate by listsEditViewModel.editPrivate.observeAsState(uiList.isPrivate)
             InAppNotificationScaffold(
                 topBar = {
                     AppBar(
@@ -105,9 +102,9 @@ fun TwitterListsEditScene(
                         name = name,
                         desc = desc,
                         isPrivate = isPrivate,
-                        onNameChanged = { name = it },
-                        onDescChanged = { desc = it },
-                        onPrivateChanged = { isPrivate = it }
+                        onNameChanged = { listsEditViewModel.editName.value = it },
+                        onDescChanged = { listsEditViewModel.editDesc.value = it },
+                        onPrivateChanged = { listsEditViewModel.editPrivate.value = it }
                     )
                     if (loading) {
                         Dialog(onDismissRequest = { }) {

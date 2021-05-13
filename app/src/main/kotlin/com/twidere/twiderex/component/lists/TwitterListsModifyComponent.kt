@@ -76,8 +76,12 @@ fun TwitterListsModifyComponent(
     ) {
         val nameInputFocusRequester = remember { FocusRequester() }
         val descInputFocusRequester = remember { FocusRequester() }
-        val nameTextFieldVale = mutableStateOf(TextFieldValue(name, TextRange(name.length)))
-        val descTextFieldVale = mutableStateOf(TextFieldValue(desc, TextRange(name.length)))
+        val nameTextFieldVale = remember {
+            mutableStateOf(TextFieldValue(name, TextRange(name.length)))
+        }
+        val descTextFieldVale = remember {
+            mutableStateOf(TextFieldValue(desc, TextRange(desc.length)))
+        }
         CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.disabled) {
             Text(
                 text = stringResource(id = R.string.scene_lists_modify_name),
@@ -93,9 +97,9 @@ fun TwitterListsModifyComponent(
             TextField(
                 value = nameTextFieldVale.value,
                 onValueChange = {
-                    if (it.text == nameTextFieldVale.value.text)
-                        nameTextFieldVale.value = it
-                    else onNameChanged(it.text)
+                    if (it.text != nameTextFieldVale.value.text)
+                        onNameChanged(it.text)
+                    nameTextFieldVale.value = it
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -124,9 +128,9 @@ fun TwitterListsModifyComponent(
             TextField(
                 value = descTextFieldVale.value,
                 onValueChange = {
-                    if (it.text == descTextFieldVale.value.text)
-                        descTextFieldVale.value = it
-                    else onDescChanged(it.text)
+                    if (it.text != descTextFieldVale.value.text)
+                        onDescChanged(it.text)
+                    descTextFieldVale.value = it
                 },
                 modifier = Modifier
                     .fillMaxWidth()

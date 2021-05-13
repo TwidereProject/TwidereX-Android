@@ -359,7 +359,8 @@ class MastodonService(
     ) {
         resources.addMember(listId, PostAccounts(listOf(userId)))
             .errorBody()?.let {
-                it.string()
+                if (it.string().contains("Record not found", true))
+                    "You need to follow this user first" else it.string()
             }?.let {
                 throw MastodonException(it)
             }

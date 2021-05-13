@@ -20,6 +20,8 @@
  */
 package com.twidere.twiderex.viewmodel.lists
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -130,6 +132,10 @@ class ListsModifyViewModel @AssistedInject constructor(
     val source by lazy {
         listsRepository.findListWithListKey(account = account, listKey = listKey)
     }
+
+    val editName = MutableLiveData<String>()
+    var editDesc = MutableLiveData<String>()
+    var editPrivate = MutableLiveData<Boolean>()
 
     fun editList(
         listId: String = listKey.id,
