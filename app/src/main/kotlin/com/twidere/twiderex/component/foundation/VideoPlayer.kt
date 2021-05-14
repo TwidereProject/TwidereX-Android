@@ -20,6 +20,7 @@
  */
 package com.twidere.twiderex.component.foundation
 
+import android.view.SurfaceView
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -68,6 +69,7 @@ fun VideoPlayer(
     volume: Float = 1f,
     customControl: PlayerControlView? = null,
     showControls: Boolean = customControl == null,
+    zOrderMediaOverlay: Boolean = false,
     thumb: @Composable (() -> Unit)? = null,
 ) {
     var playing by remember { mutableStateOf(false) }
@@ -136,6 +138,9 @@ fun VideoPlayer(
                 modifier = modifier,
                 factory = { context ->
                     StyledPlayerView(context).also { playerView ->
+                        playerView.videoSurfaceView?.let {
+                            if (it is SurfaceView) it.setZOrderMediaOverlay(zOrderMediaOverlay)
+                        }
                         playerView.useController = showControls
                         lifecycle.addObserver(object : LifecycleObserver {
                             @OnLifecycleEvent(Lifecycle.Event.ON_START)
