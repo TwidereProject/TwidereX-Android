@@ -24,11 +24,14 @@ import com.twidere.services.twitter.model.ReferencedTweetType
 import com.twidere.services.twitter.model.ReplySettings
 import com.twidere.services.twitter.model.Status
 import com.twidere.services.twitter.model.StatusV2
+import com.twidere.services.twitter.model.TwitterList
 import com.twidere.services.twitter.model.User
 import com.twidere.services.twitter.model.UserV2
+import com.twidere.twiderex.db.model.DbList
 import com.twidere.twiderex.db.model.DbMedia
 import com.twidere.twiderex.db.model.DbPagingTimeline
 import com.twidere.twiderex.db.model.DbPagingTimelineWithStatus
+import com.twidere.twiderex.db.model.DbPreviewCard
 import com.twidere.twiderex.db.model.DbStatusReaction
 import com.twidere.twiderex.db.model.DbStatusV2
 import com.twidere.twiderex.db.model.DbStatusWithMediaAndUser
@@ -43,6 +46,7 @@ import com.twidere.twiderex.db.model.toDbStatusReference
 import com.twidere.twiderex.model.MediaType
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.PlatformType
+import com.twidere.twiderex.model.ui.ListsMode
 import com.twidere.twiderex.navigation.DeepLinks
 import com.twitter.twittertext.Autolink
 import java.util.UUID
@@ -212,7 +216,20 @@ private fun StatusV2.toDbStatusWithMediaAndUser(
         twitterExtra = DbTwitterStatusExtra(
             reply_settings = replySettings ?: ReplySettings.Everyone,
             quoteCount = publicMetrics?.quoteCount
-        )
+        ),
+        previewCard = entities?.urls?.firstOrNull()
+            ?.takeUnless { url -> url.displayURL?.contains("pic.twitter.com") == true }
+            ?.let {
+                it.expandedURL?.let { url ->
+                    DbPreviewCard(
+                        link = url,
+                        title = it.title,
+                        desc = it.description,
+                        image = it.images?.firstOrNull()?.url,
+                        displayLink = it.displayURL,
+                    )
+                }
+            }
     )
     return DbStatusWithMediaAndUser(
         data = status,
@@ -304,7 +321,21 @@ private fun Status.toDbStatusWithMediaAndUser(
         mastodonExtra = null,
         twitterExtra = DbTwitterStatusExtra(
             reply_settings = ReplySettings.Everyone,
-        )
+        ),
+        previewCard = entities?.urls?.firstOrNull()
+            ?.takeUnless { url -> quotedStatus?.idStr?.let { id -> url.expandedURL?.endsWith(id) == true } == true }
+            ?.takeUnless { url -> url.expandedURL?.contains("pic.twitter.com") == true }
+            ?.let {
+                it.url?.let { url ->
+                    DbPreviewCard(
+                        link = it.expandedURL ?: url,
+                        displayLink = it.displayURL,
+                        image = null,
+                        title = null,
+                        desc = null,
+                    )
+                }
+            }
     )
     return DbStatusWithMediaAndUser(
         data = status,
@@ -461,3 +492,17 @@ enum class ProfileImageSize {
     normal,
     mini,
 }
+
+fun TwitterList.toDbList(accountKey: MicroBlogKey) = DbList(
+    _id = UUID.randomUUID().toString(),
+    ownerId = user?.idStr ?: "",
+    listId = idStr ?: throw IllegalArgumentException("list.idStr should not be null"),
+    title = name ?: "",
+    description = description ?: "",
+    mode = mode ?: "",
+    replyPolicy = "",
+    accountKey = accountKey,
+    listKey = MicroBlogKey.twitter(idStr ?: throw IllegalArgumentException("list.idStr should not be null"),),
+    isFollowed = following ?: true,
+    allowToSubscribe = mode != ListsMode.PRIVATE.value
+)

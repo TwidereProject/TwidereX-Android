@@ -31,12 +31,15 @@ import com.twidere.services.mastodon.model.MastodonPaging
 import com.twidere.services.mastodon.model.MastodonSearchResponse
 import com.twidere.services.mastodon.model.NotificationTypes
 import com.twidere.services.mastodon.model.Poll
+import com.twidere.services.mastodon.model.PostAccounts
+import com.twidere.services.mastodon.model.PostList
 import com.twidere.services.mastodon.model.PostStatus
 import com.twidere.services.mastodon.model.PostVote
 import com.twidere.services.mastodon.model.SearchType
 import com.twidere.services.mastodon.model.UploadResponse
 import com.twidere.services.mastodon.model.exceptions.MastodonException
 import com.twidere.services.microblog.DownloadMediaService
+import com.twidere.services.microblog.ListsService
 import com.twidere.services.microblog.LookupService
 import com.twidere.services.microblog.MicroBlogService
 import com.twidere.services.microblog.NotificationService
@@ -44,6 +47,7 @@ import com.twidere.services.microblog.RelationshipService
 import com.twidere.services.microblog.SearchService
 import com.twidere.services.microblog.StatusService
 import com.twidere.services.microblog.TimelineService
+import com.twidere.services.microblog.model.IListModel
 import com.twidere.services.microblog.model.INotification
 import com.twidere.services.microblog.model.IRelationship
 import com.twidere.services.microblog.model.ISearchResponse
@@ -60,6 +64,7 @@ import java.io.InputStream
 class MastodonService(
     private val host: String,
     private val accessToken: String,
+    resources: MastodonResources? = null
 ) : MicroBlogService,
     TimelineService,
     LookupService,
@@ -67,9 +72,10 @@ class MastodonService(
     NotificationService,
     SearchService,
     StatusService,
-    DownloadMediaService {
+    DownloadMediaService,
+    ListsService {
     private val resources by lazy {
-        retrofit<MastodonResources>(
+        resources ?: retrofit(
             "https://$host",
             BearerAuthorization(accessToken)
         )
@@ -121,6 +127,18 @@ class MastodonService(
         )
         return MastodonPaging.from(response)
     }
+
+    override suspend fun listTimeline(
+        list_id: String,
+        count: Int,
+        max_id: String?,
+        since_id: String?
+    ) = resources.listTimeline(
+        listId = list_id,
+        max_id = max_id,
+        since_id = since_id,
+        limit = count,
+    )
 
     override suspend fun lookupUserByName(name: String): IUser {
         TODO("Not yet implemented")
@@ -219,12 +237,13 @@ class MastodonService(
         )
     }
 
-    override suspend fun searchUsers(query: String, page: Int?, count: Int): List<IUser> {
+    override suspend fun searchUsers(query: String, page: Int?, count: Int, following: Boolean): List<IUser> {
         return resources.searchV2(
             query = query,
             type = SearchType.accounts,
             limit = count,
-            offset = (page ?: 0) * count
+            offset = (page ?: 0) * count,
+            following = following,
         ).accounts ?: emptyList()
     }
 
@@ -295,5 +314,84 @@ class MastodonService(
             .await()
             .body
             ?.byteStream() ?: throw IllegalArgumentException()
+    }
+
+    override suspend fun lists(
+        userId: String?,
+        screenName: String?,
+        reverse: Boolean
+    ) = resources.lists()
+
+    override suspend fun createList(
+        name: String,
+        mode: String?,
+        description: String?,
+        repliesPolicy: String?
+    ) = resources.createList(PostList(name, repliesPolicy))
+
+    override suspend fun updateList(
+        listId: String,
+        name: String?,
+        mode: String?,
+        description: String?,
+        repliesPolicy: String?
+    ) = resources.updateList(listId, PostList(name, repliesPolicy))
+
+    override suspend fun destroyList(
+        listId: String
+    ) {
+        resources.deleteList(listId)
+    }
+
+    override suspend fun listMembers(
+        listId: String,
+        count: Int,
+        cursor: String?
+    ) = resources.listMembers(listId, max_id = cursor, limit = count)
+        .let {
+            MastodonPaging.from(it)
+        }
+
+    override suspend fun addMember(
+        listId: String,
+        userId: String,
+        screenName: String
+    ) {
+        resources.addMember(listId, PostAccounts(listOf(userId)))
+            .errorBody()?.let {
+                if (it.string().contains("Record not found", true))
+                    "You need to follow this user first" else it.string()
+            }?.let {
+                throw MastodonException(it)
+            }
+    }
+
+    override suspend fun removeMember(
+        listId: String,
+        userId: String,
+        screenName: String
+    ) {
+        resources.removeMember(listId, PostAccounts(listOf(userId)))
+            .errorBody()?.let {
+                it.string()
+            }?.let {
+                throw MastodonException(it)
+            }
+    }
+
+    override suspend fun listSubscribers(
+        listId: String,
+        count: Int,
+        cursor: String?
+    ) = emptyList<IUser>()
+
+    override suspend fun unsubscribeList(listId: String): IListModel {
+        // do nothing
+        throw MastodonException("no such method")
+    }
+
+    override suspend fun subscribeList(listId: String): IListModel {
+        // do nothing
+        throw MastodonException("no such method")
     }
 }

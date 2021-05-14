@@ -85,6 +85,14 @@ data class AccountDetails(
         }
     }
 
+    val listType: ListType
+        get() = when (type) {
+            PlatformType.Twitter -> ListType.All
+            PlatformType.StatusNet -> TODO()
+            PlatformType.Fanfou -> TODO()
+            PlatformType.Mastodon -> ListType.Owned
+        }
+
     fun toUi() = with(user) {
         UiUser(
             id = userId,

@@ -26,6 +26,7 @@ import androidx.compose.ui.res.stringResource
 import com.twidere.twiderex.R
 import com.twidere.twiderex.db.model.DbMastodonStatusExtra
 import com.twidere.twiderex.db.model.DbPagingTimelineWithStatus
+import com.twidere.twiderex.db.model.DbPreviewCard
 import com.twidere.twiderex.db.model.DbStatusWithMediaAndUser
 import com.twidere.twiderex.db.model.DbStatusWithReference
 import com.twidere.twiderex.db.model.DbTwitterStatusExtra
@@ -59,6 +60,7 @@ data class UiStatus(
     val platformType: PlatformType,
     val mastodonExtra: DbMastodonStatusExtra? = null,
     val twitterExtra: DbTwitterStatusExtra? = null,
+    val linkPreview: DbPreviewCard? = null,
     val referenceStatus: Map<ReferenceType, UiStatus> = emptyMap(),
 ) {
     val retweet: UiStatus? by lazy {
@@ -130,6 +132,7 @@ data class UiStatus(
                 platformType = data.platformType,
                 mastodonExtra = data.mastodonExtra,
                 twitterExtra = data.twitterExtra,
+                linkPreview = data.previewCard,
             )
         }
 
@@ -162,7 +165,8 @@ data class UiStatus(
                     it.reference.referenceType to it.status.toUi(
                         accountKey = accountKey
                     )
-                }.toMap()
+                }.toMap(),
+                linkPreview = data.previewCard,
             )
         }
 
@@ -195,7 +199,8 @@ data class UiStatus(
                     it.reference.referenceType to it.status.toUi(
                         accountKey = accountKey
                     )
-                }.toMap()
+                }.toMap(),
+                linkPreview = data.previewCard,
             )
         }
     }

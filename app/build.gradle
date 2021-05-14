@@ -209,6 +209,10 @@ dependencies {
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation libs.room.testing
+    testImplementation libs.bundles.mockito.test
+    testImplementation libs.android.test.core
+    androidTestImplementation libs.android.test.core
+    testImplementation libs.kotlinx.coroutines.test
     androidTestImplementation libs.bundles.androidx.test
 }
 

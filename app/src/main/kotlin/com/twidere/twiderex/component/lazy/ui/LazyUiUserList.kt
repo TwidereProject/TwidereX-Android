@@ -24,6 +24,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyListScope
@@ -77,32 +78,37 @@ fun LazyUiUserList(
                         modifier = Modifier.clickable {
                             onItemClicked.invoke(it)
                         },
-                        icon = {
-                            UserAvatar(
-                                user = it,
-                            )
-                        },
-                        text = {
-                            Row {
-                                UserName(user = it)
-                                Spacer(modifier = Modifier.width(UiUserListDefaults.HorizontalPadding))
-                                UserScreenName(user = it)
-                            }
-                        },
-                        secondaryText = {
-                            Row {
-                                Text(
-                                    text = stringResource(
-                                        id = R.string.common_controls_profile_dashboard_followers,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        ListItem(
+                            modifier = Modifier.weight(1f),
+                            icon = {
+                                UserAvatar(
+                                    user = it,
+                                )
+                            },
+                            text = {
+                                Row {
+                                    UserName(user = it)
+                                    Spacer(modifier = Modifier.width(UiUserListDefaults.HorizontalPadding))
+                                    UserScreenName(user = it)
+                                }
+                            },
+                            secondaryText = {
+                                Row {
+                                    Text(
+                                        text = stringResource(
+                                            id = R.string.common_controls_profile_dashboard_followers,
+                                        )
                                     )
-                                )
-                                Spacer(modifier = Modifier.width(UiUserListDefaults.HorizontalPadding))
-                                Text(
-                                    text = it.followersCount.toString()
-                                )
-                            }
-                        },
-                        trailing = {
+                                    Spacer(modifier = Modifier.width(UiUserListDefaults.HorizontalPadding))
+                                    Text(
+                                        text = it.followersCount.toString()
+                                    )
+                                }
+                            },
+                        )
+                        Box(modifier = Modifier.padding(end = UiUserListDefaults.TrailingRightPadding)) {
                             action.invoke(it)
                         }
                     )
@@ -119,6 +125,7 @@ fun LazyUiUserList(
 
 object UiUserListDefaults {
     val HorizontalPadding = 8.dp
+    val TrailingRightPadding = 16.dp
 }
 
 @Composable

@@ -28,6 +28,8 @@ import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.CacheRepository
 import com.twidere.twiderex.repository.DraftRepository
+import com.twidere.twiderex.repository.ListsRepository
+import com.twidere.twiderex.repository.ListsUsersRepository
 import com.twidere.twiderex.repository.ReactionRepository
 import com.twidere.twiderex.repository.SearchRepository
 import com.twidere.twiderex.repository.StatusRepository
@@ -82,4 +84,12 @@ object RepositoryModule {
         database: CacheDatabase,
         accountRepository: AccountRepository
     ): UserRepository = UserRepository(database = database, accountRepository = accountRepository)
+
+    @Provides
+    fun provideListsRepository(
+        database: CacheDatabase
+    ) = ListsRepository(database = database)
+
+    @Provides
+    fun provideListUsersRepository() = ListsUsersRepository()
 }
