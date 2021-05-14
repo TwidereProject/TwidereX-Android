@@ -138,10 +138,8 @@ fun VideoPlayer(
                 modifier = modifier,
                 factory = { context ->
                     StyledPlayerView(context).also { playerView ->
-                        try {
-                            (playerView.videoSurfaceView as SurfaceView).setZOrderMediaOverlay(zOrderMediaOverlay)
-                        } catch (e: Exception) {
-                            // ignore
+                        playerView.videoSurfaceView?.let {
+                            if (it is SurfaceView) it.setZOrderMediaOverlay(zOrderMediaOverlay)
                         }
                         playerView.useController = showControls
                         lifecycle.addObserver(object : LifecycleObserver {
