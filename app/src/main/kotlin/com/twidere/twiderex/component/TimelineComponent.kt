@@ -29,9 +29,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
 import androidx.paging.LoadState
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
 import com.twidere.twiderex.component.lazy.LocalLazyListController
-import com.twidere.twiderex.component.lazy.collectAsLazyPagingItems
 import com.twidere.twiderex.component.lazy.ui.LazyUiStatusList
 import com.twidere.twiderex.extensions.refreshOrRetry
 import com.twidere.twiderex.viewmodel.timeline.TimelineScrollState
@@ -51,43 +51,41 @@ fun TimelineComponent(viewModel: TimelineViewModel) {
             items.refreshOrRetry()
         },
     ) {
-        if (items.itemCount > 0) {
-            val lastScrollState = remember {
-                viewModel.restoreScrollState()
-            }
-            val listState = rememberLazyListState(
-                initialFirstVisibleItemIndex = lastScrollState.firstVisibleItemIndex,
-                initialFirstVisibleItemScrollOffset = lastScrollState.firstVisibleItemScrollOffset,
-            )
-            val scope = rememberCoroutineScope()
-            LocalLazyListController.current.requestScrollTop = remember {
-                {
-                    scope.launch {
-                        listState.scrollToItem(0)
-                    }
+        val lastScrollState = remember {
+            viewModel.restoreScrollState()
+        }
+        val listState = rememberLazyListState(
+            initialFirstVisibleItemIndex = lastScrollState.firstVisibleItemIndex,
+            initialFirstVisibleItemScrollOffset = lastScrollState.firstVisibleItemScrollOffset,
+        )
+        val scope = rememberCoroutineScope()
+        LocalLazyListController.current.requestScrollTop = remember {
+            {
+                scope.launch {
+                    listState.scrollToItem(0)
                 }
             }
-            LaunchedEffect(listState) {
-                snapshotFlow { listState.isScrollInProgress }
-                    .distinctUntilChanged()
-                    .filter { !it }
-                    .collect {
-                        viewModel.saveScrollState(
-                            TimelineScrollState(
-                                firstVisibleItemIndex = listState.firstVisibleItemIndex,
-                                firstVisibleItemScrollOffset = listState.firstVisibleItemScrollOffset,
-                            )
-                        )
-                    }
-            }
-            LazyUiStatusList(
-                state = listState,
-                items = items,
-                loadingBetween = loadingBetween,
-                onLoadBetweenClicked = { current, next ->
-                    viewModel.loadBetween(current, next)
-                },
-            )
         }
+        LaunchedEffect(listState) {
+            snapshotFlow { listState.isScrollInProgress }
+                .distinctUntilChanged()
+                .filter { !it }
+                .collect {
+                    viewModel.saveScrollState(
+                        TimelineScrollState(
+                            firstVisibleItemIndex = listState.firstVisibleItemIndex,
+                            firstVisibleItemScrollOffset = listState.firstVisibleItemScrollOffset,
+                        )
+                    )
+                }
+        }
+        LazyUiStatusList(
+            state = listState,
+            items = items,
+            loadingBetween = loadingBetween,
+            onLoadBetweenClicked = { current, next ->
+                viewModel.loadBetween(current, next)
+            },
+        )
     }
 }

@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -47,13 +48,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.items
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.lazy.LazyColumn2
-import com.twidere.twiderex.component.lazy.LazyPagingItems
-import com.twidere.twiderex.component.lazy.items
 import com.twidere.twiderex.component.lazy.loadState
+import com.twidere.twiderex.component.status.StatusDivider
 import com.twidere.twiderex.model.ListType
 import com.twidere.twiderex.model.ui.UiList
+import moe.tlaster.placeholder.TextPlaceHolder
 import java.util.Locale
 
 /**
@@ -71,7 +74,11 @@ fun LazyUiListsList(
     onItemClicked: (UiList) -> Unit = {},
     header: LazyListScope.() -> Unit = {},
 ) {
-    LazyUiList(items = source, empty = { EmptyList() }) {
+    LazyUiList(
+        items = source,
+        empty = { EmptyList() },
+        loading = { LoadingListsPlaceholder() }
+    ) {
         LazyColumn2(
             modifier = modifier,
             state = state,
@@ -88,11 +95,18 @@ fun LazyUiListsList(
                 }
             }
             if (listType == ListType.All || listType == ListType.Owned) {
-                items(ownerItems, key = { ownerItems.peekOrNull(it)?.listKey?.hashCode() ?: it }) {
-                    LazyUiListItem(
-                        uiList = (it ?: UiList.placeHolder()),
-                        onItemClicked = onItemClicked
-                    )
+                items(
+                    ownerItems,
+                    // key = { ownerItems.peekOrNull(it)?.listKey?.hashCode() ?: it }
+                ) {
+                    if (it != null) {
+                        LazyUiListItem(
+                            uiList = it,
+                            onItemClicked = onItemClicked
+                        )
+                    } else {
+                        LazyUiListItemPlaceHolder()
+                    }
                 }
                 loadState(ownerItems.loadState.append) {
                     ownerItems.retry()
@@ -112,17 +126,51 @@ fun LazyUiListsList(
             if (listType == ListType.All || listType == ListType.Subscribed) {
                 items(
                     subscribedItems,
-                    key = { subscribedItems.peekOrNull(it)?.listKey?.hashCode() ?: it }
+                    // key = { subscribedItems.peekOrNull(it)?.listKey?.hashCode() ?: it }
                 ) {
-                    LazyUiListItem(
-                        uiList = (it ?: UiList.placeHolder()),
-                        onItemClicked = onItemClicked
-                    )
+                    if (it != null) {
+                        LazyUiListItem(
+                            uiList = it,
+                            onItemClicked = onItemClicked
+                        )
+                    } else {
+                        LazyUiListItemPlaceHolder()
+                    }
                 }
                 loadState(subscribedItems.loadState.append) {
                     subscribedItems.retry()
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun LoadingListsPlaceholder() {
+    Column(
+        modifier = Modifier
+            .wrapContentHeight(
+                align = Alignment.Top,
+                unbounded = true
+            )
+    ) {
+        repeat(10) {
+            LazyUiListItemPlaceHolder(
+                delayMillis = it * 50L
+            )
+            StatusDivider()
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+private fun LazyUiListItemPlaceHolder(
+    delayMillis: Long = 0,
+) {
+    DividerListItem {
+        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
+            TextPlaceHolder(length = 10, delayMillis = delayMillis)
         }
     }
 }

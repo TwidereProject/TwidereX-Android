@@ -20,8 +20,11 @@
  */
 package com.twidere.twiderex.viewmodel.lists
 
+import androidx.paging.CombinedLoadStates
+import androidx.paging.DifferCallback
+import androidx.paging.NullPaddedList
 import androidx.paging.PagingData
-import com.twidere.twiderex.component.lazy.LazyPagingItems
+import androidx.paging.PagingDataDiffer
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.AmUser
 import com.twidere.twiderex.model.ui.UiList
@@ -29,8 +32,10 @@ import com.twidere.twiderex.repository.ListsRepository
 import com.twidere.twiderex.viewmodel.ViewModelTestBase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.TestCoroutineDispatcher
 import org.junit.Assert
 import org.junit.Test
 import org.mockito.Mock
@@ -78,26 +83,55 @@ class ListsViewModelTest : ViewModelTestBase() {
     @Test
     fun source_containsAllLists(): Unit = runBlocking(Dispatchers.Main) {
         // check the source
-        val sourceItems = LazyPagingItems(viewModel.source)
-        sourceItems.collectPagingData()
-        Assert.assertEquals(2, sourceItems.itemCount)
+        viewModel.source.collectLatest {
+            val sourceItems = it.collectDataForTest()
+            Assert.assertEquals(2, sourceItems.size)
+        }
     }
 
     @Test
     fun ownerSource_containsOwnedLists(): Unit = runBlocking(Dispatchers.Main) {
         // make sure ownerSource only emit data which isOwner() returns true
-        val ownerItems = LazyPagingItems(viewModel.ownerSource)
-        ownerItems.collectPagingData()
-        Assert.assertEquals(1, ownerItems.itemCount)
-        Assert.assertEquals("owner", ownerItems[0]?.title)
+        viewModel.ownerSource.collectLatest {
+            val ownerItems = it.collectDataForTest()
+            Assert.assertEquals(1, ownerItems.size)
+            Assert.assertEquals("owner", ownerItems[0].title)
+        }
     }
 
     @Test
     fun subscribeSource_containsSubscribedLists(): Unit = runBlocking(Dispatchers.Main) {
         // make sure ownerSource only emit data which isOwner() returns true
-        val subscribeItems = LazyPagingItems(viewModel.subscribedSource)
-        subscribeItems.collectPagingData()
-        Assert.assertEquals(1, subscribeItems.itemCount)
-        Assert.assertEquals("subscribe", subscribeItems[0]?.title)
+        viewModel.subscribedSource.collectLatest {
+            val subscribeItems = it.collectDataForTest()
+            Assert.assertEquals(1, subscribeItems.size)
+            Assert.assertEquals("subscribe", subscribeItems[0].title)
+        }
     }
+}
+
+@OptIn(ExperimentalCoroutinesApi::class)
+private suspend fun <T : Any> PagingData<T>.collectDataForTest(): List<T> {
+    val dcb = object : DifferCallback {
+        override fun onChanged(position: Int, count: Int) {}
+        override fun onInserted(position: Int, count: Int) {}
+        override fun onRemoved(position: Int, count: Int) {}
+    }
+    val items = mutableListOf<T>()
+    val dif = object : PagingDataDiffer<T>(dcb, TestCoroutineDispatcher()) {
+        override suspend fun presentNewList(
+            previousList: NullPaddedList<T>,
+            newList: NullPaddedList<T>,
+            newCombinedLoadStates: CombinedLoadStates,
+            lastAccessedIndex: Int,
+            onListPresentable: () -> Unit
+        ): Int? {
+            for (idx in 0 until newList.size)
+                items.add(newList.getFromStorage(idx))
+            onListPresentable()
+            return null
+        }
+    }
+    dif.collectFrom(this)
+    return items
 }

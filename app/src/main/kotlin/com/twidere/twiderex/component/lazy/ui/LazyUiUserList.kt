@@ -22,10 +22,12 @@ package com.twidere.twiderex.component.lazy.ui
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -37,11 +39,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.items
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.lazy.LazyColumn2
-import com.twidere.twiderex.component.lazy.LazyPagingItems
-import com.twidere.twiderex.component.lazy.items
 import com.twidere.twiderex.component.lazy.loadState
+import com.twidere.twiderex.component.placeholder.UiUserPlaceholder
 import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.component.status.UserName
 import com.twidere.twiderex.component.status.UserScreenName
@@ -53,7 +56,7 @@ fun LazyUiUserList(
     modifier: Modifier = Modifier,
     items: LazyPagingItems<UiUser>,
     state: LazyListState = rememberLazyListState(),
-    key: ((index: Int) -> Any) = { items.peekOrNull(it)?.userKey?.hashCode() ?: it },
+    // key: ((index: Int) -> Any) = { items.peekOrNull(it)?.userKey?.hashCode() ?: it },
     onItemClicked: (UiUser) -> Unit = {},
     header: LazyListScope.() -> Unit = {},
     action: @Composable (user: UiUser) -> Unit = {}
@@ -64,8 +67,11 @@ fun LazyUiUserList(
             state = state,
         ) {
             header.invoke(this)
-            items(items, key = key) {
-                (it ?: UiUser.placeHolder()).let {
+            items(
+                items,
+                // key = key
+            ) {
+                it?.let {
                     Row(
                         modifier = Modifier.clickable {
                             onItemClicked.invoke(it)
@@ -104,6 +110,8 @@ fun LazyUiUserList(
                             action.invoke(it)
                         }
                     }
+                } ?: run {
+                    LoadingUserPlaceholder()
                 }
             }
             loadState(items.loadState.append) {
@@ -116,4 +124,21 @@ fun LazyUiUserList(
 object UiUserListDefaults {
     val HorizontalPadding = 8.dp
     val TrailingRightPadding = 16.dp
+}
+
+@Composable
+private fun LoadingUserPlaceholder() {
+    Column(
+        modifier = Modifier
+            .wrapContentHeight(
+                align = Alignment.Top,
+                unbounded = true
+            )
+    ) {
+        repeat(10) {
+            UiUserPlaceholder(
+                delayMillis = it * 50L
+            )
+        }
+    }
 }

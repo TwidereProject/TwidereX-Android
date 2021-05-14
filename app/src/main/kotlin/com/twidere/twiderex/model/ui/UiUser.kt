@@ -94,28 +94,6 @@ data class UiUser(
             acct = MicroBlogKey.twitter("TwidereProject")
         )
 
-        @Composable
-        fun placeHolder() = UiUser(
-            id = "",
-            name = "",
-            screenName = "",
-            profileImage = painterResource(id = R.drawable.ic_profile_image_twidere),
-            profileBackgroundImage = null,
-            followersCount = 0,
-            friendsCount = 0,
-            listedCount = 0,
-            statusesCount = 0,
-            rawDesc = "",
-            htmlDesc = "",
-            website = null,
-            location = null,
-            verified = false,
-            protected = false,
-            userKey = MicroBlogKey.Empty,
-            platformType = PlatformType.Twitter,
-            acct = MicroBlogKey.Empty
-        )
-
         fun DbUser.toUi() =
             UiUser(
                 id = userId,

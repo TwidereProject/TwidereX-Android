@@ -30,6 +30,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -47,12 +48,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.itemsIndexed
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.LoadingProgress
 import com.twidere.twiderex.component.lazy.LazyColumn2
-import com.twidere.twiderex.component.lazy.LazyPagingItems
 import com.twidere.twiderex.component.lazy.loadState
-import com.twidere.twiderex.component.lazy.statusesIndexed
+import com.twidere.twiderex.component.placeholder.UiStatusPlaceholder
 import com.twidere.twiderex.component.status.StatusDivider
 import com.twidere.twiderex.component.status.TimelineStatusComponent
 import com.twidere.twiderex.model.MicroBlogKey
@@ -65,21 +67,26 @@ fun LazyUiStatusList(
     state: LazyListState = rememberLazyListState(),
     loadingBetween: List<MicroBlogKey> = emptyList(),
     onLoadBetweenClicked: (current: MicroBlogKey, next: MicroBlogKey) -> Unit = { _, _ -> },
-    key: ((index: Int) -> Any) = { items.peekOrNull(it)?.hashCode() ?: it },
+    // key: ((index: Int) -> Any) = { items.peekOrNull(it)?.hashCode() ?: it },
     header: LazyListScope.() -> Unit = {},
 ) {
     LazyUiList(
         items = items,
-        empty = { EmptyStatusList() }
+        empty = { EmptyStatusList() },
+        loading = { LoadingStatusPlaceholder() }
     ) {
         LazyColumn2(
             modifier = modifier,
             state = state
         ) {
             header.invoke(this)
-            statusesIndexed(items, key = key) { index, item ->
+            itemsIndexed(
+                items,
+                // key = key
+            ) { index, item ->
                 if (item == null) {
-                    TimelineStatusComponent(data = UiStatus.placeHolder())
+                    UiStatusPlaceholder()
+                    StatusDivider()
                 } else {
                     Column {
                         TimelineStatusComponent(
@@ -121,8 +128,7 @@ private fun LoadMoreButton(
         modifier = Modifier
             .background(LocalContentColor.current.copy(alpha = 0.04f))
             .clickable {
-                items
-                    .peekOrNull(index + 1)
+                items.peek(index + 1)
                     ?.let { next ->
                         onLoadBetweenClicked(
                             item.statusKey,
@@ -166,4 +172,22 @@ private fun EmptyStatusList() {
 
 private object EmptyStatusListDefaults {
     val VerticalPadding = 48.dp
+}
+
+@Composable
+private fun LoadingStatusPlaceholder() {
+    Column(
+        modifier = Modifier
+            .wrapContentHeight(
+                align = Alignment.Top,
+                unbounded = true
+            )
+    ) {
+        repeat(10) {
+            UiStatusPlaceholder(
+                delayMillis = it * 50L
+            )
+            StatusDivider()
+        }
+    }
 }

@@ -21,18 +21,25 @@
 package com.twidere.twiderex.component.lazy.ui
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
+import androidx.paging.compose.LazyPagingItems
 import com.twidere.twiderex.component.lazy.LazyColumn2
-import com.twidere.twiderex.component.lazy.LazyPagingItems
 import com.twidere.twiderex.component.lazy.itemsPagingGridIndexed
 import com.twidere.twiderex.component.navigation.LocalNavigator
+import com.twidere.twiderex.component.placeholder.UiImagePlaceholder
 import com.twidere.twiderex.component.status.StatusMediaPreviewItem
 import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.model.ui.UiStatus
@@ -43,7 +50,10 @@ import com.twidere.twiderex.ui.LocalVideoPlayback
 fun LazyUiStatusImageList(
     items: LazyPagingItems<Pair<UiMedia, UiStatus>>,
 ) {
-    LazyUiList(items = items) {
+    LazyUiList(
+        items = items,
+        loading = { LoadingImagePlaceholder() }
+    ) {
         LazyColumn2 {
             item {
                 Box(modifier = Modifier.height(LazyUiStatusImageListDefaults.Spacing))
@@ -71,6 +81,8 @@ fun LazyUiStatusImageList(
                             }
                         )
                     }
+                } ?: run {
+                    UiImagePlaceholder()
                 }
             }
             item {
@@ -82,4 +94,32 @@ fun LazyUiStatusImageList(
 
 object LazyUiStatusImageListDefaults {
     val Spacing = 8.dp
+}
+
+@Composable
+private fun LoadingImagePlaceholder() {
+    Column(
+        modifier = Modifier
+            .wrapContentHeight(
+                align = Alignment.Top,
+                unbounded = true,
+            )
+    ) {
+        repeat(10) {
+            Row {
+                Spacer(modifier = Modifier.width(LazyUiStatusImageListDefaults.Spacing))
+                UiImagePlaceholder(
+                    modifier = Modifier.weight(1f),
+                    delayMillis = it * 50L
+                )
+                Spacer(modifier = Modifier.width(LazyUiStatusImageListDefaults.Spacing))
+                UiImagePlaceholder(
+                    modifier = Modifier.weight(1f),
+                    delayMillis = it * 50L
+                )
+                Spacer(modifier = Modifier.width(LazyUiStatusImageListDefaults.Spacing))
+            }
+            Spacer(modifier = Modifier.height(LazyUiStatusImageListDefaults.Spacing))
+        }
+    }
 }

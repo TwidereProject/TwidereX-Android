@@ -28,11 +28,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.paging.LoadState
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.items
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
 import com.twidere.twiderex.component.lazy.LazyColumn2
-import com.twidere.twiderex.component.lazy.collectAsLazyPagingItems
-import com.twidere.twiderex.component.lazy.items
 import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.extensions.refreshOrRetry
 import com.twidere.twiderex.extensions.viewModel

@@ -18,15 +18,23 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.extensions
+package com.twidere.twiderex.component.placeholder
 
-import androidx.paging.LoadState
-import androidx.paging.compose.LazyPagingItems
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import moe.tlaster.placeholder.Placeholder
 
-inline fun <reified T : Any> LazyPagingItems<T>.refreshOrRetry() {
-    if (loadState.refresh is LoadState.Error) {
-        retry()
-    } else {
-        refresh()
-    }
+@Composable
+fun UiImagePlaceholder(
+    modifier: Modifier = Modifier,
+    delayMillis: Long = 0,
+) {
+    Placeholder(
+        modifier = modifier.aspectRatio(1f).fillMaxSize().clip(MaterialTheme.shapes.medium),
+        delayMillis = delayMillis,
+    )
 }

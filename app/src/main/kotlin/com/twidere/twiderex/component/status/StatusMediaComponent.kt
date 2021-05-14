@@ -61,6 +61,7 @@ import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.ui.TwidereTheme
+import moe.tlaster.placeholder.Placeholder
 
 @OptIn(ExperimentalAnimationApi::class, ExperimentalFoundationApi::class)
 @Composable
@@ -79,13 +80,13 @@ fun StatusMediaComponent(
 
     val aspectRatio = when (media.size) {
         in 2..4 -> {
-            270f / 162f
+            StatusMediaDefaults.DefaultAspectRatio
         }
         1 -> {
             val first = media.first()
             (first.width.toFloat() / first.height.toFloat()).let {
                 if (it.isNaN()) {
-                    270f / 162f
+                    StatusMediaDefaults.DefaultAspectRatio
                 } else {
                     it
                 }
@@ -99,7 +100,7 @@ fun StatusMediaComponent(
         modifier = Modifier
             .let {
                 if (media.size == 1) {
-                    it.heightIn(max = 400.dp)
+                    it.heightIn(max = StatusMediaDefaults.DefaultMaxHeight)
                 } else {
                     it
                 }
@@ -219,6 +220,8 @@ fun StatusMediaComponent(
 
 object StatusMediaDefaults {
     val MediaSpacing = 8.dp
+    val DefaultAspectRatio = 270f / 162f
+    val DefaultMaxHeight = 400.dp
 
     object Mastodon {
         val IconSpacing = 8.dp
@@ -247,6 +250,9 @@ fun StatusMediaPreviewItem(
                                     onClick(media)
                                 }
                             ),
+                        placeholder = {
+                            Placeholder(modifier = Modifier.fillMaxSize())
+                        },
                     )
                 }
             MediaType.video, MediaType.animated_gif -> media.mediaUrl?.let {
@@ -272,6 +278,9 @@ fun StatusMediaPreviewItem(
                                         onClick(media)
                                     }
                                 ),
+                            placeholder = {
+                                Placeholder(modifier = Modifier.fillMaxSize())
+                            },
                         )
                     }
                 }
