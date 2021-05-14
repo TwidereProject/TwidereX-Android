@@ -45,7 +45,7 @@ data class UiList(
         get() = mode == ListsMode.PRIVATE.value
 
     companion object {
-        
+
         fun sample(isFollowed: Boolean = true) = UiList(
             id = "1",
             ownerId = "1",
