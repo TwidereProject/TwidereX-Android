@@ -144,7 +144,11 @@ android {
 
 protobuf {
     protoc {
-        artifact = "com.google.protobuf:protoc:${libs.versions.protobuf.get()}"
+        if (osdetector.os == "osx") {
+            artifact = "com.google.protobuf:protoc:${libs.versions.protobuf.get()}:osx-x86_64"
+        } else {
+            artifact = "com.google.protobuf:protoc:${libs.versions.protobuf.get()}"
+        }
     }
     generateProtoTasks {
         all().each { task ->
@@ -176,6 +180,9 @@ dependencies {
 
     implementation libs.bundles.room
     kapt libs.room.compiler
+    if (osdetector.os == "osx") {
+        kapt "org.xerial:sqlite-jdbc:3.34.0"
+    }
 
     implementation libs.bundles.lifecycle
 
