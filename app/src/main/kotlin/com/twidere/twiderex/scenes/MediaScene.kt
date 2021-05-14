@@ -439,7 +439,8 @@ fun MediaView(
                         VideoPlayer(
                             url = data.url,
                             customControl = customControl,
-                            showControls = false
+                            showControls = false,
+                            zOrderMediaOverlay = true
                         )
                     }
                 MediaType.other -> Unit
