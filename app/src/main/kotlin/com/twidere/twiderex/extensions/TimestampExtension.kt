@@ -21,6 +21,8 @@
 package com.twidere.twiderex.extensions
 
 import android.text.format.DateUtils
+import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.Locale
 
 fun Long.humanizedTimestamp(): String {
@@ -29,6 +31,10 @@ fun Long.humanizedTimestamp(): String {
         DateUtils.MINUTE_IN_MILLIS,
         DateUtils.FORMAT_ABBREV_ALL
     ).toString()
+}
+
+fun Long.formattedTimestamp(): String {
+    return SimpleDateFormat.getDateTimeInstance().format(Date(this))
 }
 
 val countUnits = arrayOf(null, "K", "M", "B")

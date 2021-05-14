@@ -341,7 +341,7 @@ fun StatusContent(
                         }
                     }
                     CompositionLocalProvider(
-                        LocalContentAlpha provides ContentAlpha.medium
+                        LocalContentAlpha provides ContentAlpha.disabled
                     ) {
                         if (status.platformType == PlatformType.Mastodon && status.mastodonExtra != null) {
                             Icon(
