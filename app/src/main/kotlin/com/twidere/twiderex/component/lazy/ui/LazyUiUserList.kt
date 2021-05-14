@@ -21,6 +21,7 @@
 package com.twidere.twiderex.component.lazy.ui
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -55,15 +56,12 @@ fun LazyUiUserList(
     modifier: Modifier = Modifier,
     items: LazyPagingItems<UiUser>,
     state: LazyListState = rememberLazyListState(),
-    // key: ((index: Int) -> Any) = { items.peek(it)?.userKey?.hashCode() ?: it },
+    // key: ((index: Int) -> Any) = { items.peekOrNull(it)?.userKey?.hashCode() ?: it },
     onItemClicked: (UiUser) -> Unit = {},
     header: LazyListScope.() -> Unit = {},
     action: @Composable (user: UiUser) -> Unit = {}
 ) {
-    LazyUiList(
-        items = items,
-        loading = { LoadingUserPlaceholder() }
-    ) {
+    LazyUiList(items = items) {
         LazyColumn2(
             modifier = modifier,
             state = state,
@@ -74,7 +72,7 @@ fun LazyUiUserList(
                 // key = key
             ) {
                 it?.let {
-                    ListItem(
+                    Row(
                         modifier = Modifier.clickable {
                             onItemClicked.invoke(it)
                         },
@@ -111,9 +109,9 @@ fun LazyUiUserList(
                         Box(modifier = Modifier.padding(end = UiUserListDefaults.TrailingRightPadding)) {
                             action.invoke(it)
                         }
-                    )
+                    }
                 } ?: run {
-                    UiUserPlaceholder()
+                    LoadingUserPlaceholder()
                 }
             }
             loadState(items.loadState.append) {

@@ -20,8 +20,9 @@
  */
 package com.twidere.twiderex.viewmodel.lists
 
+import androidx.compose.runtime.Composable
 import androidx.paging.PagingData
-import com.twidere.twiderex.component.lazy.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.AmUser
 import com.twidere.twiderex.model.ui.UiList
@@ -76,27 +77,27 @@ class ListsViewModelTest : ViewModelTestBase() {
     }
 
     @Test
+    @Composable
     fun source_containsAllLists(): Unit = runBlocking(Dispatchers.Main) {
         // check the source
-        val sourceItems = LazyPagingItems(viewModel.source)
-        sourceItems.collectPagingData()
+        val sourceItems = viewModel.source.collectAsLazyPagingItems()
         Assert.assertEquals(2, sourceItems.itemCount)
     }
 
     @Test
+    @Composable
     fun ownerSource_containsOwnedLists(): Unit = runBlocking(Dispatchers.Main) {
         // make sure ownerSource only emit data which isOwner() returns true
-        val ownerItems = LazyPagingItems(viewModel.ownerSource)
-        ownerItems.collectPagingData()
+        val ownerItems = viewModel.ownerSource.collectAsLazyPagingItems()
         Assert.assertEquals(1, ownerItems.itemCount)
         Assert.assertEquals("owner", ownerItems[0]?.title)
     }
 
     @Test
+    @Composable
     fun subscribeSource_containsSubscribedLists(): Unit = runBlocking(Dispatchers.Main) {
         // make sure ownerSource only emit data which isOwner() returns true
-        val subscribeItems = LazyPagingItems(viewModel.subscribedSource)
-        subscribeItems.collectPagingData()
+        val subscribeItems = viewModel.subscribedSource.collectAsLazyPagingItems()
         Assert.assertEquals(1, subscribeItems.itemCount)
         Assert.assertEquals("subscribe", subscribeItems[0]?.title)
     }
