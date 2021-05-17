@@ -28,6 +28,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -36,7 +37,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.paging.compose.LazyPagingItems
-import com.twidere.twiderex.component.lazy.LazyColumn2
 import com.twidere.twiderex.component.lazy.itemsPagingGridIndexed
 import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.component.placeholder.UiImagePlaceholder
@@ -54,7 +54,7 @@ fun LazyUiStatusImageList(
         items = items,
         loading = { LoadingImagePlaceholder() }
     ) {
-        LazyColumn2 {
+        LazyColumn {
             item {
                 Box(modifier = Modifier.height(LazyUiStatusImageListDefaults.Spacing))
             }

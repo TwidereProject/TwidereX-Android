@@ -28,6 +28,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -42,7 +43,6 @@ import androidx.compose.ui.unit.dp
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.items
 import com.twidere.twiderex.R
-import com.twidere.twiderex.component.lazy.LazyColumn2
 import com.twidere.twiderex.component.lazy.loadState
 import com.twidere.twiderex.component.placeholder.UiUserPlaceholder
 import com.twidere.twiderex.component.status.UserAvatar
@@ -62,7 +62,7 @@ fun LazyUiUserList(
     action: @Composable (user: UiUser) -> Unit = {}
 ) {
     LazyUiList(items = items) {
-        LazyColumn2(
+        LazyColumn(
             modifier = modifier,
             state = state,
         ) {

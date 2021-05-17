@@ -28,6 +28,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -54,7 +55,6 @@ import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.ErrorPlaceholder
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
-import com.twidere.twiderex.component.lazy.LazyColumn2
 import com.twidere.twiderex.component.status.DetailedStatusComponent
 import com.twidere.twiderex.component.status.StatusDivider
 import com.twidere.twiderex.component.status.TimelineStatusComponent
@@ -146,7 +146,7 @@ fun StatusScene(
                         state.animateScrollBy(-distance, tween())
                     }
                 }
-                LazyColumn2(
+                LazyColumn(
                     state = state,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {

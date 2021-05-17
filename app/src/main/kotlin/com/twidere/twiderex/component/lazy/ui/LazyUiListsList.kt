@@ -27,6 +27,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -51,7 +52,6 @@ import androidx.compose.ui.unit.dp
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.items
 import com.twidere.twiderex.R
-import com.twidere.twiderex.component.lazy.LazyColumn2
 import com.twidere.twiderex.component.lazy.loadState
 import com.twidere.twiderex.component.status.StatusDivider
 import com.twidere.twiderex.model.ListType
@@ -79,7 +79,7 @@ fun LazyUiListsList(
         empty = { EmptyList() },
         loading = { LoadingListsPlaceholder() }
     ) {
-        LazyColumn2(
+        LazyColumn(
             modifier = modifier,
             state = state,
         ) {

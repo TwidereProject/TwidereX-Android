@@ -21,6 +21,7 @@
 package com.twidere.twiderex.scenes.search.tabs
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ListItem
 import androidx.compose.material.Text
@@ -32,7 +33,6 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.items
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
-import com.twidere.twiderex.component.lazy.LazyColumn2
 import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.extensions.refreshOrRetry
 import com.twidere.twiderex.extensions.viewModel
@@ -64,7 +64,7 @@ class MastodonSearchHashtagItem : SearchSceneItem {
             }
         ) {
             if (source.itemCount > 0) {
-                LazyColumn2 {
+                LazyColumn {
                     items(source) {
                         it?.name?.let { name ->
                             ListItem(
