@@ -59,8 +59,10 @@ fun TimelineComponent(
             initialFirstVisibleItemIndex = lastScrollState.firstVisibleItemIndex,
             initialFirstVisibleItemScrollOffset = lastScrollState.firstVisibleItemScrollOffset,
         )
-        LaunchedEffect(lazyListController) {
-            lazyListController?.listState = listState
+        if (items.itemCount > 0) {
+            LaunchedEffect(lazyListController) {
+                lazyListController?.listState = listState
+            }
         }
         LaunchedEffect(listState) {
             snapshotFlow { listState.isScrollInProgress }
