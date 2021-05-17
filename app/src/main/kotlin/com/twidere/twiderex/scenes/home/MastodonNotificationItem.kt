@@ -21,6 +21,7 @@
 package com.twidere.twiderex.scenes.home
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.graphics.painter.Painter
@@ -32,6 +33,7 @@ import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.Pager
 import com.twidere.twiderex.component.foundation.TextTabsComponent
 import com.twidere.twiderex.component.foundation.rememberPagerState
+import com.twidere.twiderex.component.lazy.LazyListController
 import com.twidere.twiderex.ui.LocalActiveAccount
 import kotlinx.coroutines.launch
 
@@ -46,6 +48,8 @@ class MastodonNotificationItem : HomeNavigationItem() {
         return painterResource(id = R.drawable.ic_bell)
     }
 
+    override var lazyListController: LazyListController = LazyListController()
+
     @Composable
     override fun Content() {
         val account = LocalActiveAccount.current ?: return
@@ -59,6 +63,9 @@ class MastodonNotificationItem : HomeNavigationItem() {
             )
         }
         val pagerState = rememberPagerState(maxPage = tabs.lastIndex)
+        LaunchedEffect(pagerState.currentPage) {
+            lazyListController = tabs[pagerState.currentPage].lazyListController
+        }
         val scope = rememberCoroutineScope()
         InAppNotificationScaffold(
             topBar = {

@@ -48,7 +48,10 @@ class MentionItem : HomeNavigationItem() {
                 it.create(account)
             }
         InAppNotificationScaffold {
-            TimelineComponent(viewModel = viewModel)
+            TimelineComponent(
+                viewModel = viewModel,
+                lazyListController = lazyListController,
+            )
         }
     }
 }

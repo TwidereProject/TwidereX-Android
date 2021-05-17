@@ -54,7 +54,10 @@ class AllNotificationItem : HomeNavigationItem() {
                 it.create(account = account)
             }
         InAppNotificationScaffold {
-            TimelineComponent(viewModel = viewModel)
+            TimelineComponent(
+                viewModel = viewModel,
+                lazyListController = lazyListController,
+            )
         }
     }
 }

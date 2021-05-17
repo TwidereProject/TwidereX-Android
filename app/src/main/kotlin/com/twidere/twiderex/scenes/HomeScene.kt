@@ -59,7 +59,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -79,8 +78,6 @@ import com.twidere.twiderex.component.foundation.AppBarDefaults
 import com.twidere.twiderex.component.foundation.IconTabsComponent
 import com.twidere.twiderex.component.foundation.Pager
 import com.twidere.twiderex.component.foundation.rememberPagerState
-import com.twidere.twiderex.component.lazy.LazyListController
-import com.twidere.twiderex.component.lazy.LocalLazyListController
 import com.twidere.twiderex.component.lazy.itemDivider
 import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.component.status.UserName
@@ -109,9 +106,6 @@ import kotlinx.coroutines.launch
 fun HomeScene() {
     val account = LocalActiveAccount.current ?: return
     val scope = rememberCoroutineScope()
-    val timelineController = remember {
-        LazyListController()
-    }
     val tabPosition = LocalAppearancePreferences.current.tapPosition
     val menus = remember(account.type) {
         listOf(
@@ -193,7 +187,9 @@ fun HomeScene() {
                                 },
                                 onItemSelected = {
                                     if (pagerState.currentPage == it) {
-                                        timelineController.scrollToTop()
+                                        scope.launch {
+                                            menus[it].lazyListController.scrollToTop()
+                                        }
                                     }
                                     scope.launch {
                                         pagerState.selectPage {
@@ -210,7 +206,9 @@ fun HomeScene() {
                 if (tabPosition == AppearancePreferences.TabPosition.Bottom) {
                     HomeBottomNavigation(menus, pagerState.currentPage) {
                         if (pagerState.currentPage == it) {
-                            timelineController.scrollToTop()
+                            scope.launch {
+                                menus[it].lazyListController.scrollToTop()
+                            }
                         }
                         scope.launch {
                             pagerState.selectPage {
@@ -225,17 +223,11 @@ fun HomeScene() {
             }
         ) {
             Box(
-                modifier = Modifier.padding(it)
+                modifier = Modifier
+                    .padding(it)
             ) {
                 Pager(state = pagerState) {
                     menus[page].Content()
-                        *if (page == currentPage) {
-                            arrayOf(LocalLazyListController provides timelineController)
-                        } else {
-                            emptyArray()
-                        }
-                    ) {
-                    }
                 }
             }
         }
@@ -440,6 +432,7 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
         )
     }
 }
+
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun DrawerMenuItem(

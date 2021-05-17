@@ -22,6 +22,7 @@ package com.twidere.twiderex.scenes.home
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.painter.Painter
+import com.twidere.twiderex.component.lazy.LazyListController
 
 abstract class HomeNavigationItem {
 
@@ -31,6 +32,7 @@ abstract class HomeNavigationItem {
     @Composable
     abstract fun icon(): Painter
     open val withAppBar = true
+    open val lazyListController = LazyListController()
 
     @Composable
     abstract fun Content()

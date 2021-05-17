@@ -68,7 +68,10 @@ class HomeTimelineItem : HomeNavigationItem() {
                 }
             }
         ) {
-            TimelineComponent(viewModel = viewModel)
+            TimelineComponent(
+                viewModel = viewModel,
+                lazyListController = lazyListController
+            )
         }
     }
 }

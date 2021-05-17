@@ -26,12 +26,11 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
-import com.twidere.twiderex.component.lazy.LocalLazyListController
+import com.twidere.twiderex.component.lazy.LazyListController
 import com.twidere.twiderex.component.lazy.ui.LazyUiStatusList
 import com.twidere.twiderex.extensions.refreshOrRetry
 import com.twidere.twiderex.viewmodel.timeline.TimelineScrollState
@@ -39,10 +38,12 @@ import com.twidere.twiderex.viewmodel.timeline.TimelineViewModel
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.launch
 
 @Composable
-fun TimelineComponent(viewModel: TimelineViewModel) {
+fun TimelineComponent(
+    viewModel: TimelineViewModel,
+    lazyListController: LazyListController? = null,
+) {
     val items = viewModel.source.collectAsLazyPagingItems()
     val loadingBetween by viewModel.loadingBetween.observeAsState(initial = listOf())
     SwipeToRefreshLayout(
@@ -58,13 +59,8 @@ fun TimelineComponent(viewModel: TimelineViewModel) {
             initialFirstVisibleItemIndex = lastScrollState.firstVisibleItemIndex,
             initialFirstVisibleItemScrollOffset = lastScrollState.firstVisibleItemScrollOffset,
         )
-        val scope = rememberCoroutineScope()
-        LocalLazyListController.current.requestScrollTop = remember {
-            {
-                scope.launch {
-                    listState.scrollToItem(0)
-                }
-            }
+        LaunchedEffect(lazyListController) {
+            lazyListController?.listState = listState
         }
         LaunchedEffect(listState) {
             snapshotFlow { listState.isScrollInProgress }
@@ -80,8 +76,8 @@ fun TimelineComponent(viewModel: TimelineViewModel) {
                 }
         }
         LazyUiStatusList(
-            state = listState,
             items = items,
+            state = listState,
             loadingBetween = loadingBetween,
             onLoadBetweenClicked = { current, next ->
                 viewModel.loadBetween(current, next)
