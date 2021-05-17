@@ -68,7 +68,7 @@ jobs:
           java-version: 11
 
       - name: Set up Android SDK License
-        run: yes | /usr/local/lib/android/sdk/tools/bin/sdkmanager --licenses
+        run: yes | /Users/runner/Library/Android/sdk/tools/bin/sdkmanager --licenses
   
       - name: Apply Signing
         if: ${{ github.event_name != 'pull_request' }}
