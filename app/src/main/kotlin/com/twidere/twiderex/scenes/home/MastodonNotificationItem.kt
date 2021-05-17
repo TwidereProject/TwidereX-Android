@@ -64,6 +64,7 @@ class MastodonNotificationItem : HomeNavigationItem() {
         }
         val pagerState = rememberPagerState(maxPage = tabs.lastIndex)
         LaunchedEffect(pagerState.currentPage) {
+            // FIXME: 2021/5/17 A little bit dirty 
             lazyListController = tabs[pagerState.currentPage].lazyListController
         }
         val scope = rememberCoroutineScope()
