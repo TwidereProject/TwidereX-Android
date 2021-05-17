@@ -31,6 +31,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -52,7 +53,6 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.itemsIndexed
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.LoadingProgress
-import com.twidere.twiderex.component.lazy.LazyColumn2
 import com.twidere.twiderex.component.lazy.loadState
 import com.twidere.twiderex.component.placeholder.UiStatusPlaceholder
 import com.twidere.twiderex.component.status.StatusDivider
@@ -75,9 +75,9 @@ fun LazyUiStatusList(
         empty = { EmptyStatusList() },
         loading = { LoadingStatusPlaceholder() }
     ) {
-        LazyColumn2(
+        LazyColumn(
             modifier = modifier,
-            state = state
+            state = state,
         ) {
             header.invoke(this)
             itemsIndexed(
@@ -128,7 +128,8 @@ private fun LoadMoreButton(
         modifier = Modifier
             .background(LocalContentColor.current.copy(alpha = 0.04f))
             .clickable {
-                items.peek(index + 1)
+                items
+                    .peek(index + 1)
                     ?.let { next ->
                         onLoadBetweenClicked(
                             item.statusKey,
