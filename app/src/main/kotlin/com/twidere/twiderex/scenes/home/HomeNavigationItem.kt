@@ -33,5 +33,5 @@ abstract class HomeNavigationItem {
     open val withAppBar = true
 
     @Composable
-    abstract fun content()
+    abstract fun Content()
 }

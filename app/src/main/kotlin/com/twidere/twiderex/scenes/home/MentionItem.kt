@@ -39,7 +39,7 @@ class MentionItem : HomeNavigationItem() {
     override fun icon(): Painter = painterResource(id = R.drawable.ic_message_circle)
 
     @Composable
-    override fun content() {
+    override fun Content() {
         val account = LocalActiveAccount.current ?: return
         val viewModel =
             assistedViewModel<MentionsTimelineViewModel.AssistedFactory, MentionsTimelineViewModel>(

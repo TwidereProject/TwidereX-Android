@@ -68,7 +68,7 @@ class SearchItem : HomeNavigationItem() {
 
     @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
     @Composable
-    override fun content() {
+    override fun Content() {
         val account = LocalActiveAccount.current ?: return
         val viewModel =
             assistedViewModel<SearchInputViewModel.AssistedFactory, SearchInputViewModel>(

@@ -228,14 +228,13 @@ fun HomeScene() {
                 modifier = Modifier.padding(it)
             ) {
                 Pager(state = pagerState) {
-                    CompositionLocalProvider(
+                    menus[page].Content()
                         *if (page == currentPage) {
                             arrayOf(LocalLazyListController provides timelineController)
                         } else {
                             emptyArray()
                         }
                     ) {
-                        menus[page].content()
                     }
                 }
             }

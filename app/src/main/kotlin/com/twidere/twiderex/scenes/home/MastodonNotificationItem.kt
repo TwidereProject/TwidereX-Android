@@ -47,7 +47,7 @@ class MastodonNotificationItem : HomeNavigationItem() {
     }
 
     @Composable
-    override fun content() {
+    override fun Content() {
         val account = LocalActiveAccount.current ?: return
         if (account.service !is NotificationService) {
             return
@@ -76,7 +76,7 @@ class MastodonNotificationItem : HomeNavigationItem() {
             }
         ) {
             Pager(state = pagerState) {
-                tabs[page].content()
+                tabs[page].Content()
             }
         }
     }

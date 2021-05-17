@@ -40,7 +40,7 @@ class NotificationItem : HomeNavigationItem() {
     override fun icon(): Painter = painterResource(id = R.drawable.ic_message_circle)
 
     @Composable
-    override fun content() {
+    override fun Content() {
         val account = LocalActiveAccount.current ?: return
         if (account.service !is NotificationService) {
             return
