@@ -20,7 +20,9 @@
  */
 package com.twidere.services.twitter.api
 
+import com.twidere.services.twitter.model.RelationshipResponse
 import com.twidere.services.twitter.model.User
+import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Query
 
@@ -34,4 +36,7 @@ interface FriendshipResources {
     suspend fun unfollow(
         @Query(value = "user_id") user_id: String,
     ): User
+
+    @GET("/1.1/friendships/show.json")
+    suspend fun showFriendships(@Query("target_id") target_id: String): RelationshipResponse
 }

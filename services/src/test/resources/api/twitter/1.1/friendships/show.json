@@ -1,0 +1,31 @@
+{
+  "relationship": {
+    "source": {
+      "id": 1242393337509720064,
+      "id_str": "1242393337509720064",
+      "screen_name": "TwidereHK",
+      "following": false,
+      "followed_by": false,
+      "live_following": false,
+      "following_received": false,
+      "following_requested": false,
+      "notifications_enabled": false,
+      "can_dm": false,
+      "blocking": false,
+      "blocked_by": false,
+      "muting": false,
+      "want_retweets": false,
+      "all_replies": false,
+      "marked_spam": false
+    },
+    "target": {
+      "id": 783214,
+      "id_str": "783214",
+      "screen_name": "Twitter",
+      "following": false,
+      "followed_by": false,
+      "following_received": false,
+      "following_requested": false
+    }
+  }
+}

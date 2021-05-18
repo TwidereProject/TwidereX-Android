@@ -1,0 +1,103 @@
+{
+  "id": 783214,
+  "id_str": "783214",
+  "name": "Twitter",
+  "screen_name": "Twitter",
+  "location": "everywhere",
+  "description": "What's happening?!",
+  "url": "https://t.co/TAXQpsHa5X",
+  "entities": {
+    "url": {
+      "urls": [
+        {
+          "url": "https://t.co/TAXQpsHa5X",
+          "expanded_url": "https://about.twitter.com/",
+          "display_url": "about.twitter.com",
+          "indices": [
+            0,
+            23
+          ]
+        }
+      ]
+    },
+    "description": {
+      "urls": []
+    }
+  },
+  "protected": false,
+  "followers_count": 59497466,
+  "friends_count": 35,
+  "listed_count": 87330,
+  "created_at": "Tue Feb 20 14:35:54 +0000 2007",
+  "favourites_count": 6318,
+  "utc_offset": null,
+  "time_zone": null,
+  "geo_enabled": true,
+  "verified": true,
+  "statuses_count": 14285,
+  "lang": null,
+  "status": {
+    "created_at": "Mon May 10 21:09:13 +0000 2021",
+    "id": 1391862914525638658,
+    "id_str": "1391862914525638658",
+    "text": "@annaeatcarrots us scrolling the timeline",
+    "truncated": false,
+    "entities": {
+      "hashtags": [],
+      "symbols": [],
+      "user_mentions": [
+        {
+          "screen_name": "annaeatcarrots",
+          "name": "anna doesn't have a rulpert pfp",
+          "id": 1348222825237278723,
+          "id_str": "1348222825237278723",
+          "indices": [
+            0,
+            15
+          ]
+        }
+      ],
+      "urls": []
+    },
+    "source": "<a href=\"https://www.sprinklr.com\" rel=\"nofollow\">Sprinklr</a>",
+    "in_reply_to_status_id": 1391857532415655936,
+    "in_reply_to_status_id_str": "1391857532415655936",
+    "in_reply_to_user_id": 1348222825237278723,
+    "in_reply_to_user_id_str": "1348222825237278723",
+    "in_reply_to_screen_name": "annaeatcarrots",
+    "geo": null,
+    "coordinates": null,
+    "place": null,
+    "contributors": null,
+    "is_quote_status": false,
+    "retweet_count": 27,
+    "favorite_count": 2133,
+    "favorited": false,
+    "retweeted": false,
+    "lang": "en"
+  },
+  "contributors_enabled": false,
+  "is_translator": false,
+  "is_translation_enabled": false,
+  "profile_background_color": "ACDED6",
+  "profile_background_image_url": "http://abs.twimg.com/images/themes/theme18/bg.gif",
+  "profile_background_image_url_https": "https://abs.twimg.com/images/themes/theme18/bg.gif",
+  "profile_background_tile": true,
+  "profile_image_url": "http://pbs.twimg.com/profile_images/1354479643882004483/Btnfm47p_normal.jpg",
+  "profile_image_url_https": "https://pbs.twimg.com/profile_images/1354479643882004483/Btnfm47p_normal.jpg",
+  "profile_banner_url": "https://pbs.twimg.com/profile_banners/783214/1619544410",
+  "profile_link_color": "1B95E0",
+  "profile_sidebar_border_color": "FFFFFF",
+  "profile_sidebar_fill_color": "F6F6F6",
+  "profile_text_color": "333333",
+  "profile_use_background_image": true,
+  "has_extended_profile": true,
+  "default_profile": false,
+  "default_profile_image": false,
+  "following": false,
+  "follow_request_sent": false,
+  "notifications": false,
+  "muting": false,
+  "translator_type": "regular",
+  "withheld_in_countries": []
+}
