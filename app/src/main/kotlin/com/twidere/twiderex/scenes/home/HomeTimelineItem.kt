@@ -32,6 +32,8 @@ import com.twidere.twiderex.component.foundation.EdgePadding
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.preferences.LocalAppearancePreferences
+import com.twidere.twiderex.preferences.proto.AppearancePreferences
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.viewmodel.compose.ComposeType
 import com.twidere.twiderex.viewmodel.timeline.HomeTimelineViewModel
@@ -69,7 +71,7 @@ class HomeTimelineItem : HomeNavigationItem() {
                 }
             },
             floatingActionButtonEdgePadding = EdgePadding(
-                bottom = false,
+                bottom = LocalAppearancePreferences.current.tapPosition != AppearancePreferences.TabPosition.Bottom,
             )
         ) {
             TimelineComponent(viewModel = viewModel)
