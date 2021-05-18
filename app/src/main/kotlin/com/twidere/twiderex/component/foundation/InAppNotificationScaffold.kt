@@ -169,6 +169,7 @@ fun InAppNotificationScaffold(
     bottomBar: @Composable () -> Unit = {},
     snackbarHost: @Composable (SnackbarHostState) -> Unit = { SnackbarHost(it) },
     floatingActionButton: @Composable () -> Unit = {},
+    floatingActionButtonEdgePadding: EdgePadding = EdgePadding(),
     floatingActionButtonPosition: FabPosition = FabPosition.End,
     isFloatingActionButtonDocked: Boolean = false,
     drawerContent: @Composable (ColumnScope.() -> Unit)? = null,
@@ -189,7 +190,11 @@ fun InAppNotificationScaffold(
         topBar = topBar,
         bottomBar = bottomBar,
         snackbarHost = snackbarHost,
-        floatingActionButton = floatingActionButton,
+        floatingActionButton = {
+            EdgeToEdgeBox(edgePadding = floatingActionButtonEdgePadding) {
+                floatingActionButton.invoke()
+            }
+        },
         floatingActionButtonPosition = floatingActionButtonPosition,
         isFloatingActionButtonDocked = isFloatingActionButtonDocked,
         drawerContent = drawerContent,

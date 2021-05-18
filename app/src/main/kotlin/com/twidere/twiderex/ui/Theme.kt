@@ -102,8 +102,8 @@ fun TwidereDialog(
 @Composable
 fun TwidereScene(
     requireDarkTheme: Boolean = false,
-    extendViewIntoStatusBar: Boolean = false,
-    extendViewIntoNavigationBar: Boolean = false,
+    extendViewIntoStatusBar: Boolean = LocalIsActiveEdgeToEdge.current,
+    extendViewIntoNavigationBar: Boolean = LocalIsActiveEdgeToEdge.current,
     content: @Composable () -> Unit,
 ) {
     val darkTheme = isDarkTheme(requireDarkTheme)

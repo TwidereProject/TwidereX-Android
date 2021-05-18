@@ -42,3 +42,4 @@ val LocalApplication = staticCompositionLocalOf<Application> { error("No Applica
 val LocalActivity = staticCompositionLocalOf<Activity> { error("NoActivity") }
 val LocalVideoPlayback = compositionLocalOf { DisplayPreferences.AutoPlayback.Auto }
 val LocalIsActiveNetworkMetered = compositionLocalOf { false }
+val LocalIsActiveEdgeToEdge = compositionLocalOf { false }

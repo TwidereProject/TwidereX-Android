@@ -53,6 +53,7 @@ import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalActiveAccountViewModel
 import com.twidere.twiderex.ui.LocalActivity
 import com.twidere.twiderex.ui.LocalApplication
+import com.twidere.twiderex.ui.LocalIsActiveEdgeToEdge
 import com.twidere.twiderex.ui.LocalIsActiveNetworkMetered
 import com.twidere.twiderex.ui.LocalWindow
 import com.twidere.twiderex.ui.LocalWindowInsetsController
@@ -84,6 +85,8 @@ class TwidereXActivity : ComponentActivity() {
             }
         }
     }
+
+    private val isActiveEdgeToEdge = MutableLiveData(true)
 
     @Inject
     lateinit var viewModelHolder: TwidereXActivityAssistedViewModelHolder
@@ -121,6 +124,7 @@ class TwidereXActivity : ComponentActivity() {
             val accountViewModel = viewModel<ActiveAccountViewModel>()
             val account by accountViewModel.account.observeAsState()
             val isActiveNetworkMetered by isActiveNetworkMetered.observeAsState(initial = false)
+            val isActiveEdgeToEdge by isActiveEdgeToEdge.observeAsState(initial = true)
             CompositionLocalProvider(
                 LocalInAppNotification provides inAppNotification,
                 LocalWindow provides window,
@@ -132,6 +136,7 @@ class TwidereXActivity : ComponentActivity() {
                 LocalActiveAccountViewModel provides accountViewModel,
                 LocalIsActiveNetworkMetered provides isActiveNetworkMetered,
                 LocalPlatformResolver provides platformResolver,
+                LocalIsActiveEdgeToEdge provides isActiveEdgeToEdge,
             ) {
                 ProvidePreferences(
                     preferencesHolder,

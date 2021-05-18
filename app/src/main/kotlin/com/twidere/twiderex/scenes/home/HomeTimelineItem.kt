@@ -28,6 +28,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.TimelineComponent
+import com.twidere.twiderex.component.foundation.EdgePadding
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.di.assisted.assistedViewModel
@@ -66,7 +67,10 @@ class HomeTimelineItem : HomeNavigationItem() {
                         )
                     )
                 }
-            }
+            },
+            floatingActionButtonEdgePadding = EdgePadding(
+                bottom = false,
+            )
         ) {
             TimelineComponent(viewModel = viewModel)
         }

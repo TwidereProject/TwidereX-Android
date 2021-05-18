@@ -42,7 +42,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Divider
 import androidx.compose.material.ExperimentalMaterialApi
@@ -69,13 +68,18 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.google.accompanist.insets.LocalWindowInsets
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.UserMetrics
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarDefaults
+import com.twidere.twiderex.component.foundation.AppBottomNavigation
+import com.twidere.twiderex.component.foundation.EdgePadding
+import com.twidere.twiderex.component.foundation.EdgeToEdgeBox
 import com.twidere.twiderex.component.foundation.IconTabsComponent
 import com.twidere.twiderex.component.foundation.Pager
 import com.twidere.twiderex.component.foundation.rememberPagerState
@@ -99,6 +103,7 @@ import com.twidere.twiderex.scenes.home.MentionItem
 import com.twidere.twiderex.scenes.home.SearchItem
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalActiveAccountViewModel
+import com.twidere.twiderex.ui.LocalIsActiveEdgeToEdge
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.ui.mediumEmphasisContentContentColor
@@ -281,8 +286,10 @@ fun HomeBottomNavigation(
     selectedItem: Int,
     onItemSelected: (Int) -> Unit,
 ) {
-    BottomNavigation(
-        backgroundColor = MaterialTheme.colors.background
+    val navBottom = with(LocalDensity.current) { LocalWindowInsets.current.systemBars.bottom.toDp() }
+    AppBottomNavigation(
+        backgroundColor = MaterialTheme.colors.background,
+        modifier = if (LocalIsActiveEdgeToEdge.current) Modifier.padding(bottom = navBottom) else Modifier
     ) {
         items.forEachIndexed { index, item ->
             BottomNavigationItem(
@@ -300,145 +307,146 @@ fun HomeBottomNavigation(
 @Composable
 private fun HomeDrawer(scaffoldState: ScaffoldState) {
     var showAccounts by remember { mutableStateOf(false) }
+    EdgeToEdgeBox(edgePadding = EdgePadding(end = false)) {
+        Column {
+            Spacer(modifier = Modifier.height(16.dp))
 
-    Column {
-        Spacer(modifier = Modifier.height(16.dp))
-
-        val account = LocalActiveAccount.current
-        val currentUser = account?.toUi()
-        val navController = LocalNavController.current
-        DrawerUserHeader(
-            currentUser,
-            showAccounts,
-        ) {
-            showAccounts = !showAccounts
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        if (currentUser != null) {
-            UserMetrics(user = currentUser)
-        }
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Divider()
-        Box(
-            modifier = Modifier
-                .weight(1f)
-        ) {
-            val activeAccountViewModel = LocalActiveAccountViewModel.current
-            val accounts by activeAccountViewModel.allAccounts.observeAsState(initial = emptyList())
-            val allAccounts = accounts.filter { it.accountKey != account?.accountKey }
-            androidx.compose.animation.AnimatedVisibility(
-                visible = showAccounts,
-                enter = fadeIn() + expandVertically(),
-                exit = shrinkVertically() + fadeOut(),
+            val account = LocalActiveAccount.current
+            val currentUser = account?.toUi()
+            val navController = LocalNavController.current
+            DrawerUserHeader(
+                currentUser,
+                showAccounts,
             ) {
-                LazyColumn {
-                    items(allAccounts) {
-                        val user = it.toUi()
-                        ListItem(
-                            modifier = Modifier.clickable(
-                                onClick = {
-                                    activeAccountViewModel.setActiveAccount(it)
+                showAccounts = !showAccounts
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            if (currentUser != null) {
+                UserMetrics(user = currentUser)
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Divider()
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+            ) {
+                val activeAccountViewModel = LocalActiveAccountViewModel.current
+                val accounts by activeAccountViewModel.allAccounts.observeAsState(initial = emptyList())
+                val allAccounts = accounts.filter { it.accountKey != account?.accountKey }
+                androidx.compose.animation.AnimatedVisibility(
+                    visible = showAccounts,
+                    enter = fadeIn() + expandVertically(),
+                    exit = shrinkVertically() + fadeOut(),
+                ) {
+                    LazyColumn {
+                        items(allAccounts) {
+                            val user = it.toUi()
+                            ListItem(
+                                modifier = Modifier.clickable(
+                                    onClick = {
+                                        activeAccountViewModel.setActiveAccount(it)
+                                    }
+                                ),
+                                icon = {
+                                    UserAvatar(
+                                        user = user,
+                                        withPlatformIcon = true,
+                                    )
+                                },
+                                text = {
+                                    UserName(user = user)
+                                },
+                                secondaryText = {
+                                    UserScreenName(user = user)
+                                },
+                            )
+                        }
+                        if (allAccounts.any()) {
+                            itemDivider()
+                        }
+                        item {
+                            ListItem(
+                                modifier = Modifier.clickable(
+                                    onClick = {
+                                        navController.navigate(Route.SignIn.Default)
+                                    }
+                                ),
+                                text = {
+                                    Text(text = stringResource(id = R.string.scene_drawer_sign_in))
                                 }
-                            ),
-                            icon = {
-                                UserAvatar(
-                                    user = user,
-                                    withPlatformIcon = true,
-                                )
-                            },
-                            text = {
-                                UserName(user = user)
-                            },
-                            secondaryText = {
-                                UserScreenName(user = user)
-                            },
-                        )
-                    }
-                    if (allAccounts.any()) {
+                            )
+                        }
                         itemDivider()
-                    }
-                    item {
-                        ListItem(
-                            modifier = Modifier.clickable(
-                                onClick = {
-                                    navController.navigate(Route.SignIn.Default)
+                        item {
+                            ListItem(
+                                modifier = Modifier.clickable(
+                                    onClick = {
+                                        navController.navigate(Route.Settings.AccountManagement)
+                                    }
+                                ),
+                                text = {
+                                    Text(text = stringResource(id = R.string.scene_manage_accounts_title))
                                 }
-                            ),
-                            text = {
-                                Text(text = stringResource(id = R.string.scene_drawer_sign_in))
-                            }
-                        )
+                            )
+                        }
                     }
-                    itemDivider()
-                    item {
-                        ListItem(
-                            modifier = Modifier.clickable(
+                }
+                androidx.compose.animation.AnimatedVisibility(
+                    visible = !showAccounts,
+                    enter = fadeIn() + expandVertically(),
+                    exit = shrinkVertically() + fadeOut(),
+                ) {
+                    LazyColumn {
+                        item {
+                            DrawerMenuItem(
                                 onClick = {
-                                    navController.navigate(Route.Settings.AccountManagement)
-                                }
-                            ),
-                            text = {
-                                Text(text = stringResource(id = R.string.scene_manage_accounts_title))
-                            }
-                        )
+                                    navController.navigate(Route.Draft.List)
+                                },
+                                title = R.string.scene_drafts_title,
+                                icon = R.drawable.ic_note,
+                            )
+                        }
+                        item {
+                            DrawerMenuItem(
+                                onClick = {
+                                    navController.navigate(Route.Lists.Home)
+                                },
+                                title = R.string.scene_lists_title,
+                                icon = R.drawable.ic_lists,
+                            )
+                        }
                     }
                 }
             }
-            androidx.compose.animation.AnimatedVisibility(
-                visible = !showAccounts,
-                enter = fadeIn() + expandVertically(),
-                exit = shrinkVertically() + fadeOut(),
-            ) {
-                LazyColumn {
-                    item {
-                        DrawerMenuItem(
-                            onClick = {
-                                navController.navigate(Route.Draft.List)
-                            },
-                            title = R.string.scene_drafts_title,
-                            icon = R.drawable.ic_note,
-                        )
-                    }
-                    item {
-                        DrawerMenuItem(
-                            onClick = {
-                                navController.navigate(Route.Lists.Home)
-                            },
-                            title = R.string.scene_lists_title,
-                            icon = R.drawable.ic_lists,
-                        )
-                    }
-                }
-            }
-        }
 
-        Divider()
-        val scope = rememberCoroutineScope()
-        ListItem(
-            modifier = Modifier.clickable(
-                onClick = {
-                    scope.launch {
-                        scaffoldState.drawerState.close()
-                        navController.navigate(Route.Settings.Home)
+            Divider()
+            val scope = rememberCoroutineScope()
+            ListItem(
+                modifier = Modifier.clickable(
+                    onClick = {
+                        scope.launch {
+                            scaffoldState.drawerState.close()
+                            navController.navigate(Route.Settings.Home)
+                        }
                     }
-                }
-            ),
-            icon = {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_adjustments_horizontal),
-                    contentDescription = stringResource(
-                        id = R.string.scene_settings_title
+                ),
+                icon = {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_adjustments_horizontal),
+                        contentDescription = stringResource(
+                            id = R.string.scene_settings_title
+                        )
                     )
-                )
-            },
-            text = {
-                Text(text = stringResource(id = R.string.scene_settings_title))
-            }
-        )
+                },
+                text = {
+                    Text(text = stringResource(id = R.string.scene_settings_title))
+                }
+            )
+        }
     }
 }
 @OptIn(ExperimentalMaterialApi::class)
