@@ -145,6 +145,7 @@ android {
 protobuf {
     protoc {
         if (osdetector.os == "osx") {
+            // TODO: Workaround for Apple M1
             artifact = "com.google.protobuf:protoc:${libs.versions.protobuf.get()}:osx-x86_64"
         } else {
             artifact = "com.google.protobuf:protoc:${libs.versions.protobuf.get()}"
@@ -181,6 +182,8 @@ dependencies {
     implementation libs.bundles.room
     kapt libs.room.compiler
     if (osdetector.os == "osx") {
+        // TODO: Workaround for Apple M1
+        // https://issuetracker.google.com/issues/174695268#comment9
         kapt "org.xerial:sqlite-jdbc:3.34.0"
     }
 
