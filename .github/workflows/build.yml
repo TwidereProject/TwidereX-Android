@@ -68,7 +68,7 @@ jobs:
           java-version: 11
 
       - name: Set up Android SDK License
-        run: yes | /Users/runner/Library/Android/sdk/cmdline-tools/latest/bin/sdkmanager --licenses
+        run: (while sleep 3; do echo "y"; done) | /Users/runner/Library/Android/sdk/cmdline-tools/latest/bin/sdkmanager --licenses
   
       - name: Apply Signing
         if: ${{ github.event_name != 'pull_request' }}
