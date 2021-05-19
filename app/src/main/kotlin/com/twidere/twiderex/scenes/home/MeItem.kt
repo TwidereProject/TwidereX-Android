@@ -20,10 +20,13 @@
  */
 package com.twidere.twiderex.scenes.home
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import com.google.accompanist.insets.LocalWindowInsets
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.UserComponent
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
@@ -45,7 +48,8 @@ class MeItem : HomeNavigationItem() {
         val account = LocalActiveAccount.current
         account?.toUi()?.let { user ->
             InAppNotificationScaffold {
-                UserComponent(userKey = user.userKey)
+                val tabTop = with(LocalDensity.current) { LocalWindowInsets.current.statusBars.top.toDp() }
+                UserComponent(userKey = user.userKey, tabTopPadding = PaddingValues(top = tabTop))
             }
         }
     }

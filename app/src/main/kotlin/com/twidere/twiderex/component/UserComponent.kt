@@ -117,11 +117,13 @@ import moe.tlaster.nestedscrollview.VerticalNestedScrollView
 import moe.tlaster.nestedscrollview.rememberNestedScrollViewState
 import moe.tlaster.placeholder.Placeholder
 import moe.tlaster.precompose.navigation.NavController
+import kotlin.math.abs
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun UserComponent(
     userKey: MicroBlogKey,
+    tabTopPadding: PaddingValues = PaddingValues(0.dp)
 ) {
     val account = LocalActiveAccount.current ?: return
     val viewModel = assistedViewModel<UserViewModel.AssistedFactory, UserViewModel>(
@@ -163,6 +165,7 @@ fun UserComponent(
         },
     ) {
         val nestedScrollViewState = rememberNestedScrollViewState()
+        val tabTop = tabTopPadding.calculateTopPadding().value * abs(nestedScrollViewState.offset / nestedScrollViewState.maxOffset)
         VerticalNestedScrollView(
             state = nestedScrollViewState,
             header = {
@@ -170,7 +173,7 @@ fun UserComponent(
             },
             content = {
                 val pagerState = rememberPagerState(pageCount = tabs.size)
-                Column {
+                Column(modifier = Modifier.padding(top = tabTop.toInt().dp)) {
                     val scope = rememberCoroutineScope()
                     TabRow(
                         selectedTabIndex = pagerState.currentPage,
