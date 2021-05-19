@@ -56,18 +56,15 @@ import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.viewmodel.mastodon.MastodonSignInViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import moe.tlaster.precompose.navigation.NavController
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun MastodonSignInScene() {
-    val viewModel = assistedViewModel<MastodonSignInViewModel.AssistedFactory, MastodonSignInViewModel> {
-        it.create()
-    }
+    val viewModel =
+        assistedViewModel<MastodonSignInViewModel.AssistedFactory, MastodonSignInViewModel> {
+            it.create()
+        }
     val host by viewModel.host.observeAsState(initial = TextFieldValue())
     val loading by viewModel.loading.observeAsState(initial = false)
     val navController = LocalNavController.current
@@ -140,17 +137,15 @@ private fun signin(
     navController: NavController,
     navigator: INavigator
 ) {
-    GlobalScope.launch {
-        withContext(Dispatchers.Main) {
-            viewModel.beginOAuth(
-                host.text,
-            ) { target ->
-                navigator.mastodonSignInWeb(target)
-            }.let { success ->
-                if (success) {
-                    navController.goBackWith(success)
-                }
+    viewModel.beginOAuth(
+        host.text,
+        { target ->
+            navigator.mastodonSignInWeb(target)
+        },
+        { success ->
+            if (success) {
+                navController.goBackWith(success)
             }
-        }
-    }
+        },
+    )
 }

@@ -22,11 +22,13 @@ package com.twidere.twiderex.viewmodel.search
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
+import androidx.lifecycle.viewModelScope
 import com.twidere.twiderex.db.model.DbSearch
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.repository.SearchRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.launch
 
 class SearchInputViewModel @AssistedInject constructor(
     private val repository: SearchRepository,
@@ -42,11 +44,11 @@ class SearchInputViewModel @AssistedInject constructor(
         emitSource(repository.source)
     }
 
-    fun remove(item: DbSearch) {
+    fun remove(item: DbSearch) = viewModelScope.launch {
         repository.remove(item)
     }
 
-    fun addOrUpgrade(content: String) {
+    fun addOrUpgrade(content: String) = viewModelScope.launch {
         repository.addOrUpgrade(content)
     }
 }

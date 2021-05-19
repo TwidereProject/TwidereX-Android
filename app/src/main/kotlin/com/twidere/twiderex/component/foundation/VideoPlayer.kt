@@ -92,7 +92,7 @@ fun VideoPlayer(
                 SimpleExoPlayer.Builder(context).build().apply {
                     repeatMode = Player.REPEAT_MODE_ALL
                     playWhenReady = autoPlay
-                    addListener(object : Player.EventListener {
+                    addListener(object : Player.Listener {
                         override fun onPlaybackStateChanged(state: Int) {
                             shouldShowThumb = state != Player.STATE_READY
                         }

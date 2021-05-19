@@ -31,6 +31,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -46,7 +47,9 @@ fun <T> LazyListScope.itemsGridIndexed(
     val rows = data.windowed(rowSize, rowSize, true)
     itemsIndexed(rows) { index, row ->
         Column(
-            modifier = Modifier.fillParentMaxWidth().padding(horizontal = padding)
+            modifier = Modifier
+                .fillParentMaxWidth()
+                .padding(horizontal = padding)
         ) {
             Row {
                 for (i in row.indices) {
@@ -77,7 +80,8 @@ fun <T : Any> LazyListScope.itemsPagingGridIndexed(
         data.retry()
     }
     itemsGridIndexed((0 until data.itemCount).toList(), rowSize = rowSize, spacing = spacing, padding = padding) { _, index ->
-        itemContent.invoke(this, index, data[index])
+        val item by data.getAsState(index = index)
+        itemContent.invoke(this, index, item)
     }
     loadState(data.loadState.append) {
         data.retry()
