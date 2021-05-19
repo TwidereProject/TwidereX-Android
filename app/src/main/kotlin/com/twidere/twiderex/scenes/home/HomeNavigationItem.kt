@@ -20,10 +20,16 @@
  */
 package com.twidere.twiderex.scenes.home
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.unit.dp
+import com.twidere.twiderex.component.foundation.EdgePadding
 
 abstract class HomeNavigationItem {
+
+    var contentPadding = PaddingValues(0.dp)
+    var edgePadding = EdgePadding()
 
     @Composable
     abstract fun name(): String

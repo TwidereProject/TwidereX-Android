@@ -58,14 +58,22 @@ fun AppBar(
     actions: @Composable RowScope.() -> Unit = {},
     backgroundColor: Color = MaterialTheme.colors.surface,
     contentColor: Color = contentColorFor(backgroundColor),
-    elevation: Dp = AppBarDefaults.TopAppBarElevation
+    elevation: Dp = AppBarDefaults.TopAppBarElevation,
+    edgePadding: EdgePadding = EdgePadding(bottom = false)
 ) {
+    val edgeModifier = if (LocalIsActiveEdgeToEdge.current) {
+        var temp = modifier.navigationBarsPadding(bottom = edgePadding.bottom)
+        if (edgePadding.top) temp = modifier.statusBarsPadding()
+        temp
+    } else modifier
     StatusTopAppBar(
         title,
-        if (LocalIsActiveEdgeToEdge.current) modifier.statusBarsPadding()
-            .navigationBarsPadding(bottom = false)
-        else modifier,
-        navigationIcon, actions, backgroundColor, contentColor, elevation,
+        edgeModifier,
+        navigationIcon,
+        actions,
+        backgroundColor,
+        contentColor,
+        elevation,
     )
 }
 

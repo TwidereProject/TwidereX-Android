@@ -20,14 +20,19 @@
  */
 package com.twidere.twiderex.scenes.home
 
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import com.twidere.services.microblog.NotificationService
 import com.twidere.twiderex.R
+import com.twidere.twiderex.component.foundation.EdgePadding
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.Pager
 import com.twidere.twiderex.component.foundation.TextTabsComponent
@@ -63,6 +68,7 @@ class MastodonNotificationItem : HomeNavigationItem() {
         InAppNotificationScaffold(
             topBar = {
                 TextTabsComponent(
+                    modifier = Modifier.padding(contentPadding),
                     items = tabs.map { it.name() },
                     selectedItem = pagerState.currentPage,
                     onItemSelected = {
@@ -76,6 +82,8 @@ class MastodonNotificationItem : HomeNavigationItem() {
             }
         ) {
             Pager(state = pagerState) {
+                tabs[page].contentPadding = PaddingValues(0.dp)
+                tabs[page].edgePadding = EdgePadding(top = false, bottom = false)
                 tabs[page].content()
             }
         }

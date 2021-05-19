@@ -21,6 +21,7 @@
 package com.twidere.twiderex.scenes.twitter
 
 import androidx.compose.runtime.Composable
+import com.twidere.twiderex.component.foundation.EdgeToEdgeBox
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.WebComponent
 import com.twidere.twiderex.ui.LocalNavController
@@ -35,17 +36,19 @@ fun TwitterWebSignInScene(target: String) {
     val navController = LocalNavController.current
     TwidereScene {
         InAppNotificationScaffold {
-            WebComponent(
-                url = target,
-                onPageFinished = { view, _ ->
-                    view.loadUrl(INJECT_CONTENT)
-                },
-                javascriptInterface = mapOf(
-                    "injector" to TwitterWebJavascriptInterface(
-                        navController
-                    )
-                ),
-            )
+            EdgeToEdgeBox {
+                WebComponent(
+                    url = target,
+                    onPageFinished = { view, _ ->
+                        view.loadUrl(INJECT_CONTENT)
+                    },
+                    javascriptInterface = mapOf(
+                        "injector" to TwitterWebJavascriptInterface(
+                            navController
+                        )
+                    ),
+                )
+            }
         }
     }
 }

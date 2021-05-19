@@ -24,7 +24,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.ExperimentalMaterialApi
@@ -47,9 +47,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.AppBar
+import com.twidere.twiderex.component.foundation.EdgePadding
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
+import com.twidere.twiderex.component.lazy.LazyColumn2
 import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.ui.LocalActiveAccount
@@ -81,6 +84,10 @@ class SearchItem : HomeNavigationItem() {
         InAppNotificationScaffold(
             topBar = {
                 AppBar(
+                    edgePadding = EdgePadding(
+                        bottom = false,
+                        top = contentPadding.calculateTopPadding() <= 0.dp
+                    ),
                     title = {
                         ProvideTextStyle(value = MaterialTheme.typography.body1) {
                             Row(
@@ -118,9 +125,10 @@ class SearchItem : HomeNavigationItem() {
                         }
                     }
                 )
-            }
+            },
+            modifier = Modifier.padding(contentPadding)
         ) {
-            LazyColumn {
+            LazyColumn2(edgePadding = EdgePadding(top = false, bottom = false)) {
                 items(items = source) {
                     ListItem(
                         modifier = Modifier.clickable(

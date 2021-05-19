@@ -21,7 +21,6 @@
 package com.twidere.twiderex.scenes
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
@@ -44,6 +43,7 @@ import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
+import com.twidere.twiderex.component.lazy.LazyColumn2
 import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.ui.LocalNavController
@@ -71,7 +71,7 @@ fun DraftListScene() {
                 )
             }
         ) {
-            LazyColumn {
+            LazyColumn2 {
                 items(items = source, key = { it._id.hashCode() }) {
                     ListItem(
                         text = {

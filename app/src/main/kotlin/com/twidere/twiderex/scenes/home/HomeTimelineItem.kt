@@ -74,7 +74,7 @@ class HomeTimelineItem : HomeNavigationItem() {
                 bottom = LocalAppearancePreferences.current.tapPosition != AppearancePreferences.TabPosition.Bottom,
             )
         ) {
-            TimelineComponent(viewModel = viewModel)
+            TimelineComponent(viewModel = viewModel, contentPadding = contentPadding, edgePadding = edgePadding)
         }
     }
 }

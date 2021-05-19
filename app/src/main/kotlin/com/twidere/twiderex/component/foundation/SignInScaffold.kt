@@ -69,47 +69,49 @@ fun SignInScaffold(
                 )
             }
         ) {
-            Column(
-                modifier = Modifier
-                    .padding(horizontal = SignInScaffoldDefaults.ContentPadding)
-                    .fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                Row(
-                    modifier = Modifier.align(Alignment.Start),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    LoginLogo(
-                        modifier = Modifier
-                            .size(with(LocalDensity.current) { MaterialTheme.typography.h4.fontSize.toDp() })
-                            .clickable(
-                                indication = null,
-                                interactionSource = remember { MutableInteractionSource() },
-                                onClick = {
-                                    count++
-                                    countAction.invoke(count)
-                                },
-                            )
-                    )
-                    Spacer(modifier = Modifier.width(SignInScaffoldDefaults.IconSpacing))
-                    Text(
-                        text = stringResource(id = R.string.app_name),
-                        style = MaterialTheme.typography.h4,
-                    )
-                }
-                Text(
+            EdgeToEdgeBox {
+                Column(
                     modifier = Modifier
-                        .weight(1F)
-                        .align(Alignment.Start),
-                    text = stringResource(id = R.string.scene_sign_in_hello_sign_in_to_get_started),
-                    fontWeight = FontWeight.Bold,
-                    style = MaterialTheme.typography.h3,
-                    color = MaterialTheme.colors.primary,
-                )
+                        .padding(horizontal = SignInScaffoldDefaults.ContentPadding)
+                        .fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Row(
+                        modifier = Modifier.align(Alignment.Start),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        LoginLogo(
+                            modifier = Modifier
+                                .size(with(LocalDensity.current) { MaterialTheme.typography.h4.fontSize.toDp() })
+                                .clickable(
+                                    indication = null,
+                                    interactionSource = remember { MutableInteractionSource() },
+                                    onClick = {
+                                        count++
+                                        countAction.invoke(count)
+                                    },
+                                )
+                        )
+                        Spacer(modifier = Modifier.width(SignInScaffoldDefaults.IconSpacing))
+                        Text(
+                            text = stringResource(id = R.string.app_name),
+                            style = MaterialTheme.typography.h4,
+                        )
+                    }
+                    Text(
+                        modifier = Modifier
+                            .weight(1F)
+                            .align(Alignment.Start),
+                        text = stringResource(id = R.string.scene_sign_in_hello_sign_in_to_get_started),
+                        fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.h3,
+                        color = MaterialTheme.colors.primary,
+                    )
 
-                content.invoke(this)
+                    content.invoke(this)
 
-                Spacer(modifier = Modifier.height(SignInScaffoldDefaults.BottomSpacing))
+                    Spacer(modifier = Modifier.height(SignInScaffoldDefaults.BottomSpacing))
+                }
             }
         }
     }

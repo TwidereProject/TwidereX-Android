@@ -110,6 +110,7 @@ import com.twidere.services.mastodon.model.Visibility
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.CheckboxItem
+import com.twidere.twiderex.component.foundation.EdgeToEdgeBox
 import com.twidere.twiderex.component.foundation.InAppNotificationBottomSheetScaffold
 import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.foundation.TextInput
@@ -283,54 +284,94 @@ private fun ComposeBody(
                 )
             }
         ) {
-            Column {
-                BoxWithConstraints(
-                    modifier = Modifier
-                        .weight(1f),
-                ) {
-                    val scrollState = rememberScrollState()
-                    LaunchedEffect(scrollState) {
-                        if (composeType == ComposeType.Reply) {
-                            snapshotFlow { scrollState.value }
-                                .map { it > 0 }
-                                .distinctUntilChanged()
-                                .collect {
-                                    if (it) {
-                                        keyboardController?.hide()
-                                    } else {
+            EdgeToEdgeBox {
+                Column {
+                    BoxWithConstraints(
+                        modifier = Modifier
+                            .weight(1f),
+                    ) {
+                        val scrollState = rememberScrollState()
+                        LaunchedEffect(scrollState) {
+                            if (composeType == ComposeType.Reply) {
+                                snapshotFlow { scrollState.value }
+                                    .map { it > 0 }
+                                    .distinctUntilChanged()
+                                    .collect {
+                                        if (it) {
+                                            keyboardController?.hide()
+                                        } else {
+                                            keyboardController?.show()
+                                        }
+                                    }
+                            }
+                        }
+                        val focusRequester = remember {
+                            FocusRequester()
+                        }
+                        Column(
+                            modifier = Modifier
+                                .verticalScroll(
+                                    scrollState,
+                                    reverseScrolling = composeType == ComposeType.Reply,
+                                )
+                                .clickable(
+                                    onClick = {
+                                        focusRequester.requestFocus()
                                         keyboardController?.show()
+                                    },
+                                    interactionSource = remember { MutableInteractionSource() },
+                                    indication = null,
+                                )
+                        ) {
+                            val height = with(LocalDensity.current) {
+                                this@BoxWithConstraints.constraints.maxHeight.toDp()
+                            }
+                            if (composeType == ComposeType.Reply) {
+                                status?.let { status ->
+                                    Box(
+                                        modifier = Modifier
+                                            .background(MaterialTheme.colors.surface.withElevation())
+                                    ) {
+                                        StatusLineComponent(lineDown = true) {
+                                            TimelineStatusComponent(
+                                                data = status,
+                                                showActions = false,
+                                            )
+                                        }
                                     }
                                 }
-                        }
-                    }
-                    val focusRequester = remember {
-                        FocusRequester()
-                    }
-                    Column(
-                        modifier = Modifier
-                            .verticalScroll(
-                                scrollState,
-                                reverseScrolling = composeType == ComposeType.Reply,
-                            )
-                            .clickable(
-                                onClick = {
-                                    focusRequester.requestFocus()
-                                    keyboardController?.show()
+                            }
+                            StatusLineComponent(
+                                modifier = Modifier.let {
+                                    if (composeType != ComposeType.Quote) {
+                                        it.heightIn(min = height)
+                                    } else {
+                                        it
+                                    }
                                 },
-                                interactionSource = remember { MutableInteractionSource() },
-                                indication = null,
-                            )
-                    ) {
-                        val height = with(LocalDensity.current) {
-                            this@BoxWithConstraints.constraints.maxHeight.toDp()
-                        }
-                        if (composeType == ComposeType.Reply) {
-                            status?.let { status ->
-                                Box(
-                                    modifier = Modifier
-                                        .background(MaterialTheme.colors.surface.withElevation())
-                                ) {
-                                    StatusLineComponent(lineDown = true) {
+                                lineUp = composeType == ComposeType.Reply,
+                            ) {
+                                ComposeInput(
+                                    scaffoldState,
+                                    viewModel,
+                                    account,
+                                    autoFocus = if (composeType == ComposeType.Reply) {
+                                        scrollState.value == 0
+                                    } else {
+                                        true
+                                    },
+                                    focusRequester = focusRequester,
+                                )
+                            }
+                            if (composeType == ComposeType.Quote) {
+                                status?.let { status ->
+                                    Box(
+                                        modifier = Modifier.background(
+                                            LocalContentColor.current.copy(
+                                                alpha = 0.04f
+                                            )
+                                        ),
+                                    ) {
                                         TimelineStatusComponent(
                                             data = status,
                                             showActions = false,
@@ -339,93 +380,55 @@ private fun ComposeBody(
                                 }
                             }
                         }
-                        StatusLineComponent(
-                            modifier = Modifier.let {
-                                if (composeType != ComposeType.Quote) {
-                                    it.heightIn(min = height)
-                                } else {
-                                    it
-                                }
-                            },
-                            lineUp = composeType == ComposeType.Reply,
-                        ) {
-                            ComposeInput(
-                                scaffoldState,
-                                viewModel,
-                                account,
-                                autoFocus = if (composeType == ComposeType.Reply) {
-                                    scrollState.value == 0
-                                } else {
-                                    true
-                                },
-                                focusRequester = focusRequester,
+                    }
+
+                    if (images.any()) {
+                        ComposeImageList(images, viewModel)
+                    }
+
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        TextProgress(textFieldValue)
+                        if (account.type == PlatformType.Mastodon) {
+                            ComposeMastodonVisibility(
+                                modifier = Modifier.weight(1f),
+                                viewModel = viewModel,
                             )
+                            MastodonExtraActions(images, viewModel)
+                        } else {
+                            Spacer(modifier = Modifier.weight(1F))
                         }
-                        if (composeType == ComposeType.Quote) {
-                            status?.let { status ->
-                                Box(
-                                    modifier = Modifier.background(
-                                        LocalContentColor.current.copy(
-                                            alpha = 0.04f
-                                        )
-                                    ),
-                                ) {
-                                    TimelineStatusComponent(
-                                        data = status,
-                                        showActions = false,
-                                    )
-                                }
+                        if (locationEnabled) {
+                            location?.let {
+                                LocationDisplay(it)
                             }
                         }
                     }
-                }
-
-                if (images.any()) {
-                    ComposeImageList(images, viewModel)
-                }
-
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    TextProgress(textFieldValue)
-                    if (account.type == PlatformType.Mastodon) {
-                        ComposeMastodonVisibility(
-                            modifier = Modifier.weight(1f),
-                            viewModel = viewModel,
-                        )
-                        MastodonExtraActions(images, viewModel)
-                    } else {
-                        Spacer(modifier = Modifier.weight(1F))
+                    Divider()
+                    var showEmoji by remember { mutableStateOf(false) }
+                    val ime = LocalWindowInsets.current.ime
+                    LaunchedEffect(ime) {
+                        snapshotFlow { ime.isVisible }
+                            .distinctUntilChanged()
+                            .filter { it && showEmoji }
+                            .collect { showEmoji = false }
                     }
-                    if (locationEnabled) {
-                        location?.let {
-                            LocationDisplay(it)
+                    LaunchedEffect(showEmoji) {
+                        if (showEmoji) {
+                            keyboardController?.hide()
+                        } else {
+                            keyboardController?.show()
                         }
                     }
+                    ComposeActions(
+                        viewModel,
+                        emojiButtonClicked = {
+                            showEmoji = !showEmoji
+                        },
+                    )
+                    EmojiPanel(viewModel = viewModel, showEmoji = showEmoji)
                 }
-                Divider()
-                var showEmoji by remember { mutableStateOf(false) }
-                val ime = LocalWindowInsets.current.ime
-                LaunchedEffect(ime) {
-                    snapshotFlow { ime.isVisible }
-                        .distinctUntilChanged()
-                        .filter { it && showEmoji }
-                        .collect { showEmoji = false }
-                }
-                LaunchedEffect(showEmoji) {
-                    if (showEmoji) {
-                        keyboardController?.hide()
-                    } else {
-                        keyboardController?.show()
-                    }
-                }
-                ComposeActions(
-                    viewModel,
-                    emojiButtonClicked = {
-                        showEmoji = !showEmoji
-                    },
-                )
-                EmojiPanel(viewModel = viewModel, showEmoji = showEmoji)
             }
         }
     }

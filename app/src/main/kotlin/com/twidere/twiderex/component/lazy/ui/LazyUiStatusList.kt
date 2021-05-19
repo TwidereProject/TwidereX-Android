@@ -25,6 +25,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -51,6 +52,7 @@ import androidx.compose.ui.unit.dp
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.itemsIndexed
 import com.twidere.twiderex.R
+import com.twidere.twiderex.component.foundation.EdgePadding
 import com.twidere.twiderex.component.foundation.LoadingProgress
 import com.twidere.twiderex.component.lazy.LazyColumn2
 import com.twidere.twiderex.component.lazy.loadState
@@ -63,6 +65,8 @@ import com.twidere.twiderex.model.ui.UiStatus
 @Composable
 fun LazyUiStatusList(
     modifier: Modifier = Modifier,
+    edgePadding: EdgePadding = EdgePadding(top = false),
+    contentPadding: PaddingValues = PaddingValues(0.dp),
     items: LazyPagingItems<UiStatus>,
     state: LazyListState = rememberLazyListState(),
     loadingBetween: List<MicroBlogKey> = emptyList(),
@@ -77,7 +81,9 @@ fun LazyUiStatusList(
     ) {
         LazyColumn2(
             modifier = modifier,
-            state = state
+            state = state,
+            edgePadding = edgePadding,
+            contentPadding = contentPadding
         ) {
             header.invoke(this)
             itemsIndexed(

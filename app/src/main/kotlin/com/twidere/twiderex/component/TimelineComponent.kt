@@ -20,6 +20,7 @@
  */
 package com.twidere.twiderex.component
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -28,8 +29,10 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.twidere.twiderex.component.foundation.EdgePadding
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
 import com.twidere.twiderex.component.lazy.LocalLazyListController
 import com.twidere.twiderex.component.lazy.ui.LazyUiStatusList
@@ -42,7 +45,11 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 
 @Composable
-fun TimelineComponent(viewModel: TimelineViewModel) {
+fun TimelineComponent(
+    viewModel: TimelineViewModel,
+    edgePadding: EdgePadding = EdgePadding(top = false),
+    contentPadding: PaddingValues = PaddingValues(0.dp),
+) {
     val items = viewModel.source.collectAsLazyPagingItems()
     val loadingBetween by viewModel.loadingBetween.observeAsState(initial = listOf())
     SwipeToRefreshLayout(
@@ -86,6 +93,8 @@ fun TimelineComponent(viewModel: TimelineViewModel) {
             onLoadBetweenClicked = { current, next ->
                 viewModel.loadBetween(current, next)
             },
+            edgePadding = edgePadding,
+            contentPadding = contentPadding
         )
     }
 }

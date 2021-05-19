@@ -196,7 +196,9 @@ fun HomeScene() {
                             scaffoldState = scaffoldState,
                             timelineController = timelineController,
                             scope = scope
-                        ) {
+                        ) { contentPadding, edgePadding ->
+                            menus[page].contentPadding = contentPadding
+                            menus[page].edgePadding = edgePadding
                             menus[page].content()
                         }
                     }
@@ -214,7 +216,7 @@ fun NestedScrollConnectionAppBars(
     scaffoldState: ScaffoldState,
     timelineController: LazyListController,
     scope: CoroutineScope,
-    content: @Composable () -> Unit
+    content: @Composable (contentPadding: PaddingValues, edgePadding: EdgePadding) -> Unit
 ) {
     val isEdgeToEdgeActive = LocalIsActiveEdgeToEdge.current
     val statusTop = with(LocalDensity.current) {
@@ -238,8 +240,13 @@ fun NestedScrollConnectionAppBars(
             .fillMaxSize()
             .nestedScroll(nestedScrollConnection)
     ) {
-        // todo add content padding to timeline
-        content.invoke()
+        content(
+            if (menus[pagerState.currentPage].withAppBar ||
+                tabPosition == AppearancePreferences.TabPosition.Top
+            )
+                PaddingValues(top = toolbarHeight) else PaddingValues(0.dp),
+            EdgePadding(bottom = false, top = false)
+        )
         if (tabPosition == AppearancePreferences.TabPosition.Bottom) {
             AnimatedVisibility(
                 visible = menus[pagerState.currentPage].withAppBar,

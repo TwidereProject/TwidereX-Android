@@ -22,7 +22,6 @@ package com.twidere.twiderex.scenes.search
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
@@ -51,6 +50,7 @@ import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.TextInput
+import com.twidere.twiderex.component.lazy.LazyColumn2
 import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.ui.LocalActiveAccount
@@ -128,7 +128,7 @@ fun SearchInputScene(initial: String? = null) {
                 )
             }
         ) {
-            LazyColumn {
+            LazyColumn2 {
                 items(items = source) {
                     ListItem(
                         modifier = Modifier.clickable(

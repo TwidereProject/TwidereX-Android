@@ -22,6 +22,7 @@ package com.twidere.twiderex.scenes.mastodon
 
 import android.net.Uri
 import androidx.compose.runtime.Composable
+import com.twidere.twiderex.component.foundation.EdgeToEdgeBox
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.WebComponent
 import com.twidere.twiderex.ui.LocalNavController
@@ -34,19 +35,21 @@ fun MastodonWebSignInScene(target: String) {
     val navController = LocalNavController.current
     TwidereScene {
         InAppNotificationScaffold {
-            WebComponent(
-                url = target,
-                onPageStarted = { _, url ->
-                    if (url.startsWith(MASTODON_CALLBACK_URL)) {
-                        val uri = Uri.parse(url)
-                        uri.getQueryParameter("code")?.takeIf {
-                            it.isNotEmpty()
-                        }?.let {
-                            navController.goBackWith(it)
+            EdgeToEdgeBox {
+                WebComponent(
+                    url = target,
+                    onPageStarted = { _, url ->
+                        if (url.startsWith(MASTODON_CALLBACK_URL)) {
+                            val uri = Uri.parse(url)
+                            uri.getQueryParameter("code")?.takeIf {
+                                it.isNotEmpty()
+                            }?.let {
+                                navController.goBackWith(it)
+                            }
                         }
-                    }
-                },
-            )
+                    },
+                )
+            }
         }
     }
 }
