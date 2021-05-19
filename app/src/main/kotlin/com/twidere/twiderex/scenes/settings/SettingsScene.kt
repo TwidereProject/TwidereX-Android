@@ -21,7 +21,6 @@
 package com.twidere.twiderex.scenes.settings
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
@@ -38,6 +37,7 @@ import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
+import com.twidere.twiderex.component.lazy.LazyColumn2
 import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
@@ -103,7 +103,7 @@ fun SettingsScene() {
                 )
             }
         ) {
-            LazyColumn(
+            LazyColumn2(
                 contentPadding = it
             ) {
                 settings.forEach {

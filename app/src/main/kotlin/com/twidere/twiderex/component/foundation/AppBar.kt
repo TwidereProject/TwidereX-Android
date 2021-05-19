@@ -44,12 +44,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import com.google.accompanist.insets.LocalWindowInsets
+import com.google.accompanist.insets.navigationBarsPadding
+import com.google.accompanist.insets.statusBarsPadding
 import com.twidere.twiderex.ui.LocalIsActiveEdgeToEdge
 
 @Composable
@@ -62,24 +60,13 @@ fun AppBar(
     contentColor: Color = contentColorFor(backgroundColor),
     elevation: Dp = AppBarDefaults.TopAppBarElevation
 ) {
-    with(LocalDensity.current) {
-        val layoutDirection = LocalLayoutDirection.current
-        StatusTopAppBar(
-            title,
-            if (LocalIsActiveEdgeToEdge.current) modifier.padding(
-                top = LocalWindowInsets.current.statusBars.top.toDp(),
-                start = when (layoutDirection) {
-                    LayoutDirection.Ltr -> LocalWindowInsets.current.systemBars.left.toDp()
-                    LayoutDirection.Rtl -> LocalWindowInsets.current.systemBars.right.toDp()
-                },
-                end = when (layoutDirection) {
-                    LayoutDirection.Ltr -> LocalWindowInsets.current.systemBars.right.toDp()
-                    LayoutDirection.Rtl -> LocalWindowInsets.current.systemBars.left.toDp()
-                }
-            ) else modifier,
-            navigationIcon, actions, backgroundColor, contentColor, elevation,
-        )
-    }
+    StatusTopAppBar(
+        title,
+        if (LocalIsActiveEdgeToEdge.current) modifier.statusBarsPadding()
+            .navigationBarsPadding(bottom = false)
+        else modifier,
+        navigationIcon, actions, backgroundColor, contentColor, elevation,
+    )
 }
 
 @Composable

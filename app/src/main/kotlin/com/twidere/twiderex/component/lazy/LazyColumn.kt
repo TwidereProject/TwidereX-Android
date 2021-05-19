@@ -31,7 +31,12 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
+import com.google.accompanist.insets.LocalWindowInsets
+import com.google.accompanist.insets.navigationBarsPadding
+import com.twidere.twiderex.component.foundation.EdgePadding
+import com.twidere.twiderex.ui.LocalIsActiveEdgeToEdge
 import kotlinx.coroutines.FlowPreview
 
 @OptIn(FlowPreview::class)
@@ -45,16 +50,29 @@ fun LazyColumn2(
         if (!reverseLayout) Arrangement.Top else Arrangement.Bottom,
     horizontalAlignment: Alignment.Horizontal = Alignment.Start,
     flingBehavior: FlingBehavior = ScrollableDefaults.flingBehavior(),
+    edgePadding: EdgePadding = EdgePadding(top = false),
     content: LazyListScope.() -> Unit
 ) {
-    LazyColumn(
-        modifier = modifier,
-        state = state,
-        contentPadding = contentPadding,
-        reverseLayout = reverseLayout,
-        verticalArrangement = verticalArrangement,
-        horizontalAlignment = horizontalAlignment,
-        flingBehavior = flingBehavior,
-        content = content,
-    )
+    with(LocalDensity.current) {
+        // support top and bottom edge padding, must use content padding for scroll
+        val edgeContentPadding = if (LocalIsActiveEdgeToEdge.current) PaddingValues(
+            top = if (edgePadding.top)
+                LocalWindowInsets.current.statusBars.top.toDp() + contentPadding.calculateTopPadding()
+            else contentPadding.calculateTopPadding(),
+            bottom = if (edgePadding.bottom)
+                LocalWindowInsets.current.systemBars.bottom.toDp() + contentPadding.calculateBottomPadding()
+            else contentPadding.calculateBottomPadding()
+        ) else contentPadding
+
+        LazyColumn(
+            modifier = modifier.navigationBarsPadding(bottom = false),
+            state = state,
+            contentPadding = edgeContentPadding,
+            reverseLayout = reverseLayout,
+            verticalArrangement = verticalArrangement,
+            horizontalAlignment = horizontalAlignment,
+            flingBehavior = flingBehavior,
+            content = content,
+        )
+    }
 }

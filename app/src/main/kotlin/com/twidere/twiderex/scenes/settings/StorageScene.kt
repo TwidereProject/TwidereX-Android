@@ -39,6 +39,8 @@ import androidx.compose.ui.window.DialogProperties
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
+import com.twidere.twiderex.component.foundation.EdgePadding
+import com.twidere.twiderex.component.foundation.EdgeToEdgeBox
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.ui.TwidereScene
@@ -77,41 +79,46 @@ fun StorageScene() {
                 )
             }
         ) {
-            Column(
-                modifier = Modifier.verticalScroll(rememberScrollState()),
-            ) {
-                ListItem(
-                    modifier = Modifier
-                        .clickable {
-                            viewModel.clearSearchHistory()
-                        },
+            EdgeToEdgeBox(edgePadding = EdgePadding(top = false)) {
+                Column(
+                    modifier = Modifier.verticalScroll(rememberScrollState()),
                 ) {
-                    Text(text = stringResource(id = R.string.scene_settings_storage_search_title))
+                    ListItem(
+                        modifier = Modifier
+                            .clickable {
+                                viewModel.clearSearchHistory()
+                            },
+                    ) {
+                        Text(text = stringResource(id = R.string.scene_settings_storage_search_title))
+                    }
+                    ListItem(
+                        modifier = Modifier
+                            .clickable {
+                                viewModel.clearImageCache()
+                            },
+                        text = {
+                            Text(text = stringResource(id = R.string.scene_settings_storage_media_title))
+                        },
+                        secondaryText = {
+                            Text(text = stringResource(id = R.string.scene_settings_storage_media_sub_title))
+                        },
+                    )
+                    ListItem(
+                        modifier = Modifier
+                            .clickable {
+                                viewModel.clearDatabaseCache()
+                            },
+                        text = {
+                            Text(
+                                text = stringResource(id = R.string.scene_settings_storage_all_title),
+                                color = Color.Red
+                            )
+                        },
+                        secondaryText = {
+                            Text(text = stringResource(id = R.string.scene_settings_storage_all_sub_title))
+                        },
+                    )
                 }
-                ListItem(
-                    modifier = Modifier
-                        .clickable {
-                            viewModel.clearImageCache()
-                        },
-                    text = {
-                        Text(text = stringResource(id = R.string.scene_settings_storage_media_title))
-                    },
-                    secondaryText = {
-                        Text(text = stringResource(id = R.string.scene_settings_storage_media_sub_title))
-                    },
-                )
-                ListItem(
-                    modifier = Modifier
-                        .clickable {
-                            viewModel.clearDatabaseCache()
-                        },
-                    text = {
-                        Text(text = stringResource(id = R.string.scene_settings_storage_all_title), color = Color.Red)
-                    },
-                    secondaryText = {
-                        Text(text = stringResource(id = R.string.scene_settings_storage_all_sub_title))
-                    },
-                )
             }
         }
     }

@@ -21,14 +21,12 @@
 package com.twidere.twiderex.component.foundation
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
-import androidx.compose.ui.unit.dp
-import com.google.accompanist.insets.LocalWindowInsets
+import com.google.accompanist.insets.navigationBarsPadding
+import com.google.accompanist.insets.statusBarsPadding
 import com.twidere.twiderex.ui.LocalIsActiveEdgeToEdge
 
 @Composable
@@ -37,24 +35,30 @@ fun EdgeToEdgeBox(
     edgePadding: EdgePadding = EdgePadding(),
     content: @Composable () -> Unit,
 ) {
-    with(LocalDensity.current) {
-        val layoutDirection = LocalLayoutDirection.current
-        Box(
-            modifier = if (LocalIsActiveEdgeToEdge.current) modifier.padding(
-                top = if (edgePadding.top) LocalWindowInsets.current.statusBars.top.toDp() else 0.dp,
-                start = if (edgePadding.start) when (layoutDirection) {
-                    LayoutDirection.Ltr -> LocalWindowInsets.current.systemBars.left.toDp()
-                    LayoutDirection.Rtl -> LocalWindowInsets.current.systemBars.right.toDp()
-                } else 0.dp,
-                end = if (edgePadding.end) when (layoutDirection) {
-                    LayoutDirection.Ltr -> LocalWindowInsets.current.systemBars.right.toDp()
-                    LayoutDirection.Rtl -> LocalWindowInsets.current.systemBars.left.toDp()
-                } else 0.dp,
-                bottom = if (edgePadding.bottom) LocalWindowInsets.current.systemBars.bottom.toDp() else 0.dp
-            ) else Modifier
-        ) {
-            content.invoke()
+    val layoutDirection = LocalLayoutDirection.current
+    val edgeModifier = if (LocalIsActiveEdgeToEdge.current) {
+        var temp = modifier.navigationBarsPadding(
+            bottom = edgePadding.bottom,
+            left = when (layoutDirection) {
+                LayoutDirection.Ltr -> edgePadding.start
+                LayoutDirection.Rtl -> edgePadding.end
+            },
+            right = when (layoutDirection) {
+                LayoutDirection.Ltr -> edgePadding.end
+                LayoutDirection.Rtl -> edgePadding.start
+            }
+        )
+        if (edgePadding.top) {
+            temp = temp.statusBarsPadding()
         }
+        temp
+    } else {
+        modifier
+    }
+    Box(
+        modifier = edgeModifier
+    ) {
+        content.invoke()
     }
 }
 

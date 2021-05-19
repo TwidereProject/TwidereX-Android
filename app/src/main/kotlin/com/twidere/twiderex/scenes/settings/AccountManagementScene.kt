@@ -21,7 +21,6 @@
 package com.twidere.twiderex.scenes.settings
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
@@ -45,6 +44,7 @@ import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
+import com.twidere.twiderex.component.lazy.LazyColumn2
 import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.component.status.UserName
 import com.twidere.twiderex.component.status.UserScreenName
@@ -86,7 +86,7 @@ fun AccountManagementScene() {
         ) {
             val activeAccountViewModel = LocalActiveAccountViewModel.current
             val accounts by activeAccountViewModel.allAccounts.observeAsState(initial = emptyList())
-            LazyColumn {
+            LazyColumn2 {
                 items(items = accounts) { detail ->
                     detail.toUi().let {
                         ListItem(

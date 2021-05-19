@@ -80,6 +80,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.insets.LocalWindowInsets
+import com.google.accompanist.insets.navigationBarsPadding
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.UserMetrics
 import com.twidere.twiderex.component.foundation.AppBar
@@ -346,10 +347,9 @@ fun HomeBottomNavigation(
     selectedItem: Int,
     onItemSelected: (Int) -> Unit,
 ) {
-    val navBottom = with(LocalDensity.current) { LocalWindowInsets.current.systemBars.bottom.toDp() }
     AppBottomNavigation(
         backgroundColor = MaterialTheme.colors.background,
-        modifier = if (LocalIsActiveEdgeToEdge.current) Modifier.padding(bottom = navBottom) else Modifier
+        modifier = if (LocalIsActiveEdgeToEdge.current) Modifier.navigationBarsPadding() else Modifier
     ) {
         items.forEachIndexed { index, item ->
             BottomNavigationItem(

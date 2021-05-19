@@ -21,7 +21,6 @@
 package com.twidere.twiderex.scenes.settings
 
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.ListItem
@@ -44,6 +43,7 @@ import com.twidere.twiderex.action.LocalStatusActions
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
+import com.twidere.twiderex.component.lazy.LazyColumn2
 import com.twidere.twiderex.component.lazy.itemDivider
 import com.twidere.twiderex.component.lazy.itemHeader
 import com.twidere.twiderex.component.navigation.FakeNavigator
@@ -78,7 +78,7 @@ fun DisplayScene() {
                 )
             }
         ) {
-            LazyColumn {
+            LazyColumn2 {
                 itemHeader {
                     Text(text = stringResource(id = R.string.scene_settings_display_section_header_preview))
                 }

@@ -28,7 +28,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
@@ -55,6 +54,7 @@ import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
+import com.twidere.twiderex.component.lazy.LazyColumn2
 import com.twidere.twiderex.component.lazy.itemDivider
 import com.twidere.twiderex.component.settings.radioItem
 import com.twidere.twiderex.component.status.UserAvatarDefaults
@@ -95,7 +95,8 @@ fun AppearanceScene() {
                     }
                 )
             }
-            LazyColumn {
+            // EdgeToEdgeBox(edgePadding = EdgePadding(top = false)) {
+            LazyColumn2 {
                 item {
                     ListItem(
                         modifier = Modifier.clickable(
@@ -171,6 +172,7 @@ fun AppearanceScene() {
                 )
             }
         }
+        // }
     }
 }
 

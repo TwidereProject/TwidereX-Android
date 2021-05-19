@@ -59,6 +59,7 @@ import com.twidere.twiderex.component.LoginLogo
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.BlurImage
+import com.twidere.twiderex.component.foundation.EdgeToEdgeBox
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.ParallaxLayout
 import com.twidere.twiderex.component.foundation.rememberParallaxLayoutState
@@ -81,7 +82,9 @@ fun AboutScene() {
                 )
             }
         ) {
-            AboutContent()
+            EdgeToEdgeBox {
+                AboutContent()
+            }
         }
     }
 }
