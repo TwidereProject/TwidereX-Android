@@ -1,0 +1,121 @@
+{
+    "data": {
+        "id": "1390725076996268038",
+        "conversation_id": "1390725076996268038",
+        "created_at": "2021-05-07T17:47:51.000Z",
+        "lang": "en",
+        "text": "open Twitter \nclose Twitter\nopen Twitter \nclose Twitter",
+        "context_annotations": [
+            {
+                "domain": {
+                    "id": "46",
+                    "name": "Brand Category",
+                    "description": "Categories within Brand Verticals that narrow down the scope of Brands"
+                },
+                "entity": {
+                    "id": "781974596752842752",
+                    "name": "Services"
+                }
+            },
+            {
+                "domain": {
+                    "id": "47",
+                    "name": "Brand",
+                    "description": "Brands and Companies"
+                },
+                "entity": {
+                    "id": "10045225402",
+                    "name": "Twitter"
+                }
+            },
+            {
+                "domain": {
+                    "id": "47",
+                    "name": "Brand",
+                    "description": "Brands and Companies"
+                },
+                "entity": {
+                    "id": "10045225402",
+                    "name": "Twitter"
+                }
+            }
+        ],
+        "source": "Sprinklr",
+        "author_id": "783214",
+        "reply_settings": "everyone",
+        "public_metrics": {
+            "retweet_count": 20857,
+            "reply_count": 6011,
+            "like_count": 126211,
+            "quote_count": 3408
+        },
+        "possibly_sensitive": false,
+        "entities": {
+            "annotations": [
+                {
+                    "start": 5,
+                    "end": 11,
+                    "probability": 0.4714,
+                    "type": "Product",
+                    "normalized_text": "Twitter"
+                },
+                {
+                    "start": 20,
+                    "end": 26,
+                    "probability": 0.5071,
+                    "type": "Product",
+                    "normalized_text": "Twitter"
+                },
+                {
+                    "start": 33,
+                    "end": 39,
+                    "probability": 0.4429,
+                    "type": "Product",
+                    "normalized_text": "Twitter"
+                },
+                {
+                    "start": 48,
+                    "end": 54,
+                    "probability": 0.6156,
+                    "type": "Product",
+                    "normalized_text": "Twitter"
+                }
+            ]
+        }
+    },
+    "includes": {
+        "users": [
+            {
+                "public_metrics": {
+                    "followers_count": 59456410,
+                    "following_count": 35,
+                    "tweet_count": 14285,
+                    "listed_count": 87335
+                },
+                "description": "What's happening?!",
+                "username": "Twitter",
+                "entities": {
+                    "url": {
+                        "urls": [
+                            {
+                                "start": 0,
+                                "end": 23,
+                                "url": "https://t.co/TAXQpsHa5X",
+                                "expanded_url": "https://about.twitter.com/",
+                                "display_url": "about.twitter.com"
+                            }
+                        ]
+                    }
+                },
+                "profile_image_url": "https://pbs.twimg.com/profile_images/1354479643882004483/Btnfm47p_normal.jpg",
+                "location": "everywhere",
+                "url": "https://t.co/TAXQpsHa5X",
+                "name": "Twitter",
+                "verified": true,
+                "id": "783214",
+                "protected": false,
+                "created_at": "2007-02-20T14:35:54.000Z"
+            }
+        ]
+    }
+}
