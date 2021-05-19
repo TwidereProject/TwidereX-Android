@@ -1,0 +1,45 @@
+{
+  "data": {
+    "description": "Twidere /'twidele/ Lang: English &amp; 中文 → Android version: https://t.co/B6aWarJqTC",
+    "profile_image_url": "https://pbs.twimg.com/profile_images/809741368134234112/htSiXXAU_normal.jpg",
+    "pinned_tweet_id": "1223499933170331648",
+    "created_at": "2012-05-18T01:06:57.000Z",
+    "location": "Inside The Great Firewall",
+    "url": "https://t.co/dg8eXEc9je",
+    "public_metrics": {
+      "followers_count": 3954,
+      "following_count": 0,
+      "tweet_count": 6248,
+      "listed_count": 124
+    },
+    "username": "TwidereProject",
+    "protected": false,
+    "id": "583328497",
+    "entities": {
+      "url": {
+        "urls": [
+          {
+            "start": 0,
+            "end": 23,
+            "url": "https://t.co/dg8eXEc9je",
+            "expanded_url": "https://github.com/TwidereProject",
+            "display_url": "github.com/TwidereProject"
+          }
+        ]
+      },
+      "description": {
+        "urls": [
+          {
+            "start": 61,
+            "end": 84,
+            "url": "https://t.co/B6aWarJqTC",
+            "expanded_url": "https://play.google.com/store/apps/details?id=org.mariotaku.twidere",
+            "display_url": "play.google.com/store/apps/det…"
+          }
+        ]
+      }
+    },
+    "verified": false,
+    "name": "Twidere Project"
+  }
+}
