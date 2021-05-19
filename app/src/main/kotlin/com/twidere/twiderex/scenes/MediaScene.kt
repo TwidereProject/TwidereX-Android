@@ -63,12 +63,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.graphics.alpha
+import androidx.core.graphics.blue
+import androidx.core.graphics.green
+import androidx.core.graphics.red
 import com.google.accompanist.insets.navigationBarsPadding
 import com.google.accompanist.insets.statusBarsPadding
 import com.google.accompanist.pager.ExperimentalPagerApi
@@ -217,8 +222,17 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewM
                 window.setOnSystemBarsVisibilityChangeListener { visibility ->
                     controlVisibility = visibility
                 }
+                // make sure the system bars color is same to control panel
+                window.navigationBarColor = android.graphics.Color.argb(
+                    controlPanelColor.toArgb().alpha,
+                    controlPanelColor.toArgb().red,
+                    controlPanelColor.toArgb().green,
+                    controlPanelColor.toArgb().blue
+                )
                 onDispose {
                     window.showControls()
+                    // restore it to transparent
+                    window.navigationBarColor = android.graphics.Color.TRANSPARENT
                 }
             }
             InAppNotificationScaffold(
