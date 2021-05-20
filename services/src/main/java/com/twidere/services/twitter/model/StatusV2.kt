@@ -91,6 +91,6 @@ enum class ReplySettings {
     Everyone,
     @SerialName("mentioned_users")
     MentionedUsers,
-    @SerialName("followers")
+    @SerialName("following")
     Followers,
 }
