@@ -26,7 +26,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -42,13 +41,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.layout
-import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -76,9 +72,6 @@ fun StatusScene(
     statusKey: MicroBlogKey,
 ) {
     val account = LocalActiveAccount.current ?: return
-    val appBarHeight = 56
-    val availableHeight = LocalConfiguration.current.screenHeightDp - appBarHeight
-    var spacerHeight by remember { mutableStateOf(0) }
     val viewModel = assistedViewModel<StatusViewModel.AssistedFactory, StatusViewModel>(
         statusKey,
         account,
@@ -172,38 +165,48 @@ fun StatusScene(
                     } else {
                         itemsIndexed(source) { index, it ->
                             it?.let { status ->
-                                Column {
-                                    Column(
-                                        Modifier.layout { measurable, constraints ->
-                                            val placeable = measurable.measure(constraints)
-                                            layout(placeable.width, placeable.height) {
-                                                if (index == source.itemCount - 1) {
-                                                    val lastItemHeight =
-                                                        placeable.measuredHeight.toDp().value.toInt()
-                                                    spacerHeight =
-                                                        availableHeight - (lastItemHeight % availableHeight)
-                                                }
-                                                placeable.placeRelative(0, 0)
+                                Layout(
+                                    content = {
+                                        Column {
+                                            if (status.statusKey == statusKey) {
+                                                DetailedStatusComponent(data = status)
+                                            } else {
+                                                TimelineStatusComponent(data = status)
+                                            }
+                                            if (status.statusKey == statusKey) {
+                                                Divider()
+                                            } else {
+                                                StatusDivider()
                                             }
                                         }
-                                    ) {
-                                        if (status.statusKey == statusKey) {
-                                            DetailedStatusComponent(data = status)
-                                        } else {
-                                            TimelineStatusComponent(data = status)
+                                        if (index == source.itemCount - 1) {
+                                            Spacer(
+                                                Modifier.fillParentMaxHeight()
+                                            )
                                         }
-                                        if (status.statusKey == statusKey) {
-                                            Divider()
-                                        } else {
-                                            StatusDivider()
+                                    },
+                                    measurePolicy = { measurables, constraints ->
+                                        val placeables = measurables.map { measurable ->
+                                            measurable.measure(constraints)
+                                        }
+                                        var maxHeight = 0
+                                        placeables.forEach {
+                                            maxHeight += it.measuredHeight
+                                        }
+                                        if (index == source.itemCount - 1) {
+                                            val itemHeight = placeables.first().measuredHeight
+                                            val spacerHeight = placeables.last().measuredHeight
+                                            maxHeight -= itemHeight % spacerHeight
+                                        }
+                                        var offsetY = 0
+                                        layout(constraints.maxWidth, maxHeight) {
+                                            placeables.forEach { placeable ->
+                                                placeable.placeRelative(x = 0, y = offsetY)
+                                                offsetY += placeable.height
+                                            }
                                         }
                                     }
-                                    if (index == source.itemCount - 1) {
-                                        Spacer(
-                                            modifier = Modifier.height(spacerHeight.dp)
-                                        )
-                                    }
-                                }
+                                )
                             }
                         }
                     }
