@@ -29,7 +29,8 @@ interface MastodonResources :
     FriendshipResources,
     AccountResources,
     SearchResources,
-    StatusResources {
+    StatusResources,
+    ListsResources {
 
     @GET("/api/v1/custom_emojis")
     suspend fun emojis(): List<Emoji>

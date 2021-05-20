@@ -20,14 +20,12 @@
  */
 package com.twidere.twiderex.component.lazy
 
-import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.foundation.lazy.LazyListState
 
 class LazyListController {
-    internal var requestScrollTop: () -> Unit = {}
+    internal var listState: LazyListState? = null
 
-    fun scrollToTop() {
-        requestScrollTop.invoke()
+    suspend fun scrollToTop() {
+        listState?.scrollToItem(0)
     }
 }
-
-val LocalLazyListController = compositionLocalOf { LazyListController() }

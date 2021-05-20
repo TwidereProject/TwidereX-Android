@@ -143,6 +143,12 @@ class AccountRepository @Inject constructor(
             ACCOUNT_USER_DATA_LAST_ACTIVE,
             detail.lastActive.toString()
         )
+        activeAccount.value = getCurrentAccount()
+        accounts.postValue(
+            getAccounts().map {
+                getAccountDetails(it)
+            }
+        )
     }
 
     fun delete(detail: AccountDetails) {

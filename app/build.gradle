@@ -144,7 +144,12 @@ android {
 
 protobuf {
     protoc {
-        artifact = "com.google.protobuf:protoc:${libs.versions.protobuf.get()}"
+        if (osdetector.os == "osx") {
+            // TODO: Workaround for Apple M1
+            artifact = "com.google.protobuf:protoc:${libs.versions.protobuf.get()}:osx-x86_64"
+        } else {
+            artifact = "com.google.protobuf:protoc:${libs.versions.protobuf.get()}"
+        }
     }
     generateProtoTasks {
         all().each { task ->
@@ -159,6 +164,7 @@ protobuf {
 
 dependencies {
     implementation libs.kotlinx.serialization.json
+    implementation libs.vectordrawable
 
     implementation projects.services
     ksp projects.assistedProcessor
@@ -175,6 +181,11 @@ dependencies {
 
     implementation libs.bundles.room
     kapt libs.room.compiler
+    if (osdetector.os == "osx") {
+        // TODO: Workaround for Apple M1
+        // https://issuetracker.google.com/issues/174695268#comment9
+        kapt "org.xerial:sqlite-jdbc:3.34.0"
+    }
 
     implementation libs.bundles.lifecycle
 
@@ -187,6 +198,7 @@ dependencies {
     implementation libs.zoomable
     implementation libs.nestedScrollView
     implementation libs.swiper
+    implementation libs.placeholder
 
     implementation libs.twittertext
     implementation libs.jsoup
@@ -207,6 +219,10 @@ dependencies {
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation libs.room.testing
+    testImplementation libs.bundles.mockito.test
+    testImplementation libs.android.test.core
+    androidTestImplementation libs.android.test.core
+    testImplementation libs.kotlinx.coroutines.test
     androidTestImplementation libs.bundles.androidx.test
 }
 

@@ -32,12 +32,13 @@ import com.twidere.twiderex.model.ui.UiUser.Companion.toUi
 class SearchUserPagingSource(
     private val accountKey: MicroBlogKey,
     private val query: String,
-    private val service: SearchService
+    private val service: SearchService,
+    private val following: Boolean = false
 ) : PagingSource<Int, UiUser>() {
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, UiUser> {
         return try {
             val page = params.key ?: 0
-            val result = service.searchUsers(query, page = page, count = defaultLoadCount).map {
+            val result = service.searchUsers(query, page = page, count = defaultLoadCount, following = following).map {
                 it.toDbUser(accountKey).toUi()
             }
             LoadResult.Page(

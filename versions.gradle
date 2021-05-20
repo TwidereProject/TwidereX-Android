@@ -5,10 +5,10 @@ ext {
     ]
     global = [
             compileSdkVersion: 'android-S',
-            buildToolsVersion: '31.0.0-rc3',
+            buildToolsVersion: '31.0.0-rc4',
             minSdkVersion    : 21,
             targetSdkVersion : 31,
-            versionCode      : 39,
-            versionName      : "1.1.0"
+            versionCode      : 42,
+            versionName      : "1.2.0"
     ]
 }

@@ -42,7 +42,7 @@ abstract class PagingMediator(
 fun PagingMediator.pager(
     config: PagingConfig = PagingConfig(
         pageSize = defaultLoadCount,
-        enablePlaceholders = false,
+        enablePlaceholders = true,
     ),
     pagingSourceFactory: () -> PagingSource<Int, DbPagingTimelineWithStatus> = {
         database.pagingTimelineDao().getPagingSource(pagingKey = pagingKey, accountKey = accountKey)

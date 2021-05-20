@@ -25,9 +25,8 @@ import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -46,6 +45,7 @@ import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.preferences.LocalDisplayPreferences
 import com.twidere.twiderex.preferences.proto.DisplayPreferences
+import moe.tlaster.placeholder.Placeholder
 
 @Composable
 fun UserAvatar(
@@ -81,8 +81,10 @@ fun UserAvatar(
                             }
                         }
                     )
-                    .width(size)
-                    .height(size)
+                    .size(size),
+                placeholder = {
+                    Placeholder(modifier = Modifier.size(size))
+                },
             )
         }
         if (withPlatformIcon) {

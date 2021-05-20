@@ -21,6 +21,8 @@
 package com.twidere.twiderex.scenes
 
 import androidx.activity.compose.BackHandler
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.animateDp
@@ -57,7 +59,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -77,8 +78,6 @@ import com.twidere.twiderex.component.foundation.AppBarDefaults
 import com.twidere.twiderex.component.foundation.IconTabsComponent
 import com.twidere.twiderex.component.foundation.Pager
 import com.twidere.twiderex.component.foundation.rememberPagerState
-import com.twidere.twiderex.component.lazy.LazyListController
-import com.twidere.twiderex.component.lazy.LocalLazyListController
 import com.twidere.twiderex.component.lazy.itemDivider
 import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.component.status.UserName
@@ -107,9 +106,6 @@ import kotlinx.coroutines.launch
 fun HomeScene() {
     val account = LocalActiveAccount.current ?: return
     val scope = rememberCoroutineScope()
-    val timelineController = remember {
-        LazyListController()
-    }
     val tabPosition = LocalAppearancePreferences.current.tapPosition
     val menus = remember(account.type) {
         listOf(
@@ -191,7 +187,9 @@ fun HomeScene() {
                                 },
                                 onItemSelected = {
                                     if (pagerState.currentPage == it) {
-                                        timelineController.scrollToTop()
+                                        scope.launch {
+                                            menus[it].lazyListController.scrollToTop()
+                                        }
                                     }
                                     scope.launch {
                                         pagerState.selectPage {
@@ -208,7 +206,9 @@ fun HomeScene() {
                 if (tabPosition == AppearancePreferences.TabPosition.Bottom) {
                     HomeBottomNavigation(menus, pagerState.currentPage) {
                         if (pagerState.currentPage == it) {
-                            timelineController.scrollToTop()
+                            scope.launch {
+                                menus[it].lazyListController.scrollToTop()
+                            }
                         }
                         scope.launch {
                             pagerState.selectPage {
@@ -223,18 +223,11 @@ fun HomeScene() {
             }
         ) {
             Box(
-                modifier = Modifier.padding(it)
+                modifier = Modifier
+                    .padding(it)
             ) {
                 Pager(state = pagerState) {
-                    CompositionLocalProvider(
-                        *if (page == currentPage) {
-                            arrayOf(LocalLazyListController provides timelineController)
-                        } else {
-                            emptyArray()
-                        }
-                    ) {
-                        menus[page].content()
-                    }
+                    menus[page].Content()
                 }
             }
         }
@@ -393,23 +386,21 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
             ) {
                 LazyColumn {
                     item {
-                        ListItem(
-                            modifier = Modifier.clickable(
-                                onClick = {
-                                    navController.navigate(Route.Draft.List)
-                                }
-                            ),
-                            text = {
-                                Text(text = stringResource(id = R.string.scene_drafts_title))
+                        DrawerMenuItem(
+                            onClick = {
+                                navController.navigate(Route.Draft.List)
                             },
-                            icon = {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.ic_note),
-                                    contentDescription = stringResource(
-                                        id = R.string.scene_drafts_title
-                                    )
-                                )
+                            title = R.string.scene_drafts_title,
+                            icon = R.drawable.ic_note,
+                        )
+                    }
+                    item {
+                        DrawerMenuItem(
+                            onClick = {
+                                navController.navigate(Route.Lists.Home)
                             },
+                            title = R.string.scene_lists_title,
+                            icon = R.drawable.ic_lists,
                         )
                     }
                 }
@@ -440,6 +431,34 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
             }
         )
     }
+}
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+private fun DrawerMenuItem(
+    onClick: () -> Unit,
+    @StringRes title: Int,
+    @DrawableRes icon: Int,
+    @StringRes iconDescription: Int = title
+) {
+    ListItem(
+        modifier = Modifier.clickable(
+            onClick = {
+                onClick.invoke()
+            }
+        ),
+        text = {
+            Text(text = stringResource(id = title))
+        },
+        icon = {
+            Icon(
+                painter = painterResource(id = icon),
+                contentDescription = stringResource(
+                    id = iconDescription
+                )
+            )
+        },
+    )
 }
 
 @OptIn(ExperimentalMaterialApi::class)

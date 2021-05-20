@@ -23,12 +23,11 @@ package com.twidere.twiderex.component
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import com.twidere.twiderex.extensions.humanizedTimestamp
 
 @Composable
 fun HumanizedTime(time: Long) {
-    val text by remember(time) { mutableStateOf(time.humanizedTimestamp()) }
+    val text = remember(time) { time.humanizedTimestamp() }
     Text(text = text)
 }

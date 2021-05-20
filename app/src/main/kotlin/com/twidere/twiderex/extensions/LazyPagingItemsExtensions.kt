@@ -21,7 +21,7 @@
 package com.twidere.twiderex.extensions
 
 import androidx.paging.LoadState
-import com.twidere.twiderex.component.lazy.LazyPagingItems
+import androidx.paging.compose.LazyPagingItems
 
 inline fun <reified T : Any> LazyPagingItems<T>.refreshOrRetry() {
     if (loadState.refresh is LoadState.Error) {

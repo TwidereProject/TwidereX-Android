@@ -57,6 +57,7 @@ import com.twidere.twiderex.R
 import com.twidere.twiderex.component.HumanizedTime
 import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.db.model.DbMastodonStatusExtra
+import com.twidere.twiderex.db.model.DbPreviewCard
 import com.twidere.twiderex.extensions.icon
 import com.twidere.twiderex.model.MastodonStatusType
 import com.twidere.twiderex.model.PlatformType
@@ -151,7 +152,7 @@ private fun NormalStatus(
     }
 }
 
-private object NormalStatusDefaults {
+object NormalStatusDefaults {
     val ContentPadding = PaddingValues(
         horizontal = 16.dp,
         vertical = 0.dp
@@ -340,7 +341,7 @@ fun StatusContent(
                         }
                     }
                     CompositionLocalProvider(
-                        LocalContentAlpha provides ContentAlpha.medium
+                        LocalContentAlpha provides ContentAlpha.disabled
                     ) {
                         if (status.platformType == PlatformType.Mastodon && status.mastodonExtra != null) {
                             Icon(
@@ -358,7 +359,7 @@ fun StatusContent(
                 when (type) {
                     StatusContentType.Normal -> {
                         Spacer(modifier = Modifier.height(StatusContentDefaults.Normal.BodySpacing))
-                        StatusBody(status)
+                        StatusBody(status, type = type)
                     }
                     StatusContentType.Extend -> UserScreenName(status.user)
                 }
@@ -366,20 +367,23 @@ fun StatusContent(
         }
         if (type == StatusContentType.Extend) {
             Spacer(modifier = Modifier.height(StatusContentDefaults.Extend.BodySpacing))
-            StatusBody(status = status)
+            StatusBody(status = status, type = type)
         }
     }
 }
 
 object StatusContentDefaults {
     val AvatarSpacing = 8.dp
+
     object Normal {
         val BodySpacing = 4.dp
         val UserNameSpacing = 4.dp
     }
+
     object Extend {
         val BodySpacing = 8.dp
     }
+
     object Mastodon {
         val VisibilitySpacing = 4.dp
     }
@@ -388,6 +392,7 @@ object StatusContentDefaults {
 @Composable
 fun ColumnScope.StatusBody(
     status: UiStatus,
+    type: StatusContentType,
 ) {
     StatusText(
         status = status,
@@ -395,10 +400,17 @@ fun ColumnScope.StatusBody(
 
     StatusBodyMedia(status)
 
-    if (!status.placeString.isNullOrEmpty()) {
+    if (LocalDisplayPreferences.current.urlPreview && !status.media.any()) {
+        status.linkPreview?.let {
+            Spacer(modifier = Modifier.height(StatusBodyDefaults.LinkPreviewSpacing))
+            StatusLinkPreview(it)
+        }
+    }
+
+    if (!status.placeString.isNullOrEmpty() && type == StatusContentType.Normal) {
         Spacer(modifier = Modifier.height(StatusBodyDefaults.PlaceSpacing))
         CompositionLocalProvider(
-            LocalContentAlpha provides ContentAlpha.medium
+            LocalContentAlpha provides ContentAlpha.disabled
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -430,8 +442,25 @@ fun ColumnScope.StatusBody(
 }
 
 object StatusBodyDefaults {
+    val LinkPreviewSpacing = 8.dp
     val PlaceSpacing = 8.dp
     val QuoteSpacing = 8.dp
+}
+
+@Composable
+private fun StatusLinkPreview(card: DbPreviewCard) {
+    val navigator = LocalNavigator.current
+    LinkPreview(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable {
+                navigator.openLink(card.link)
+            },
+        link = card.displayLink ?: card.link,
+        title = card.title,
+        image = card.image,
+        desc = card.desc,
+    )
 }
 
 @Composable
@@ -459,7 +488,7 @@ private fun ColumnScope.StatusBodyMedia(
     }
 }
 
-private object StatusBodyMediaDefaults {
+object StatusBodyMediaDefaults {
     val Spacing = 8.dp
 }
 

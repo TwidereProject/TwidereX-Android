@@ -28,6 +28,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -47,14 +48,13 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.itemsIndexed
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.ErrorPlaceholder
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
-import com.twidere.twiderex.component.lazy.LazyColumn2
-import com.twidere.twiderex.component.lazy.collectAsLazyPagingItems
-import com.twidere.twiderex.component.lazy.statusesIndexed
 import com.twidere.twiderex.component.status.DetailedStatusComponent
 import com.twidere.twiderex.component.status.StatusDivider
 import com.twidere.twiderex.component.status.TimelineStatusComponent
@@ -131,7 +131,7 @@ fun StatusScene(
                 }
                 val index = remember {
                     for (i in 0..source.itemCount) {
-                        if (source.peekOrNull(i)?.statusKey == status?.statusKey) {
+                        if (source.peek(i)?.statusKey == status?.statusKey) {
                             return@remember i
                         }
                     }
@@ -146,7 +146,7 @@ fun StatusScene(
                         state.animateScrollBy(-distance, tween())
                     }
                 }
-                LazyColumn2(
+                LazyColumn(
                     state = state,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
@@ -162,7 +162,7 @@ fun StatusScene(
                             }
                         }
                     } else {
-                        statusesIndexed(source) { index, it ->
+                        itemsIndexed(source) { index, it ->
                             it?.let { status ->
                                 Column {
                                     if (status.statusKey == statusKey) {

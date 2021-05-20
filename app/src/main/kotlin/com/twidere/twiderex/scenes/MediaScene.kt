@@ -53,7 +53,6 @@ import androidx.compose.material.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -70,7 +69,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import com.google.accompanist.glide.LocalRequestManager
 import com.google.accompanist.insets.navigationBarsPadding
 import com.google.accompanist.insets.statusBarsPadding
 import com.google.accompanist.pager.ExperimentalPagerApi
@@ -404,14 +402,6 @@ fun MediaView(
     ),
     customControl: PlayerControlView? = null,
 ) {
-    val requestManager = LocalRequestManager.current
-    LaunchedEffect(Unit) {
-        requestManager?.let {
-            if (requestManager.isPaused) {
-                requestManager.resumeRequests()
-            }
-        }
-    }
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -431,6 +421,7 @@ fun MediaView(
                         state = rememberZoomableState()
                     ) {
                         NetworkImage(
+                            modifier = Modifier.fillMaxSize(),
                             data = data.url,
                             contentScale = ContentScale.Fit,
                             placeholder = {
@@ -448,7 +439,8 @@ fun MediaView(
                         VideoPlayer(
                             url = data.url,
                             customControl = customControl,
-                            showControls = false
+                            showControls = false,
+                            zOrderMediaOverlay = true
                         )
                     }
                 MediaType.other -> Unit

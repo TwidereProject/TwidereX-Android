@@ -26,6 +26,7 @@ import com.twidere.services.http.MicroBlogHttpException
 import com.twidere.services.http.authorization.OAuth1Authorization
 import com.twidere.services.http.retrofit
 import com.twidere.services.microblog.DownloadMediaService
+import com.twidere.services.microblog.ListsService
 import com.twidere.services.microblog.LookupService
 import com.twidere.services.microblog.MicroBlogService
 import com.twidere.services.microblog.RelationshipService
@@ -70,15 +71,17 @@ class TwitterService(
     private val consumer_secret: String,
     private val access_token: String,
     private val access_token_secret: String,
+    resources: TwitterResources? = null
 ) : MicroBlogService,
     TimelineService,
     LookupService,
     RelationshipService,
     SearchService,
     StatusService,
-    DownloadMediaService {
+    DownloadMediaService,
+    ListsService {
     private val resources by lazy {
-        retrofit<TwitterResources>(
+        resources ?: retrofit(
             TWITTER_BASE_URL,
             createOAuth1Authorization(),
             { chain ->
@@ -173,6 +176,19 @@ class TwitterService(
             max_id = max_id,
             include_entities = true,
         )
+
+    override suspend fun listTimeline(
+        list_id: String,
+        count: Int,
+        max_id: String?,
+        since_id: String?
+    ) = resources.listTimeline(
+        list_id = list_id,
+        count = count,
+        max_id = max_id,
+        since_id = since_id,
+        include_entities = true
+    )
 
     override suspend fun lookupUserByName(
         name: String
@@ -333,7 +349,7 @@ class TwitterService(
         return resources.searchV1(query, count = count, max_id = max_id, since_id = since_id)
     }
 
-    override suspend fun searchUsers(query: String, page: Int?, count: Int) =
+    override suspend fun searchUsers(query: String, page: Int?, count: Int, following: Boolean) =
         resources.searchUser(query, page, count)
 
     override suspend fun showRelationship(target_id: String): IRelationship {
@@ -451,4 +467,98 @@ class TwitterService(
             .body
             ?.byteStream() ?: throw IllegalArgumentException()
     }
+
+    override suspend fun lists(
+        userId: String?,
+        screenName: String?,
+        reverse: Boolean
+    ) = resources.lists(
+        user_id = userId,
+        screen_name = screenName,
+        reverse = reverse
+    )
+
+    override suspend fun createList(
+        name: String,
+        mode: String?,
+        description: String?,
+        repliesPolicy: String?
+    ) = resources.createList(
+        name = name,
+        mode = mode,
+        description = description
+    )
+
+    override suspend fun updateList(
+        listId: String,
+        name: String?,
+        mode: String?,
+        description: String?,
+        repliesPolicy: String?
+    ) = resources.updateList(
+        list_id = listId,
+        name = name,
+        mode = mode,
+        description = description
+    )
+
+    override suspend fun destroyList(
+        listId: String
+    ) {
+        resources.destroyList(listId)
+    }
+
+    override suspend fun listMembers(
+        listId: String,
+        count: Int,
+        cursor: String?
+    ) = resources.listMembers(
+        list_id = listId,
+        count = count,
+        cursor = cursor
+    ).let {
+        TwitterPaging(
+            data = it.users ?: emptyList(),
+            nextPage = if (0 < it.nextCursor ?: 0) it.nextCursorStr else null
+        )
+    }
+
+    override suspend fun addMember(
+        listId: String,
+        userId: String,
+        screenName: String
+    ) {
+        resources.addMember(listId, userId, screenName)
+    }
+
+    override suspend fun removeMember(
+        listId: String,
+        userId: String,
+        screenName: String
+    ) {
+        resources.removeMember(listId, userId, screenName)
+    }
+
+    override suspend fun listSubscribers(
+        listId: String,
+        count: Int,
+        cursor: String?
+    ) = resources.listSubscribers(
+        list_id = listId,
+        count = count,
+        cursor = cursor
+    ).let {
+        TwitterPaging(
+            data = it.users ?: emptyList(),
+            nextPage = if (0 < it.nextCursor ?: 0) it.nextCursorStr else null
+        )
+    }
+
+    override suspend fun unsubscribeList(
+        listId: String
+    ) = resources.unsubscribeLists(listId)
+
+    override suspend fun subscribeList(
+        listId: String
+    ) = resources.subscribeLists(listId)
 }

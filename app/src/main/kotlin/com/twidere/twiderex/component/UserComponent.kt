@@ -80,6 +80,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.pagerTabIndicatorOffset
@@ -88,7 +89,6 @@ import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.HorizontalDivider
 import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
-import com.twidere.twiderex.component.lazy.collectAsLazyPagingItems
 import com.twidere.twiderex.component.lazy.ui.LazyUiStatusImageList
 import com.twidere.twiderex.component.lazy.ui.LazyUiStatusList
 import com.twidere.twiderex.component.navigation.LocalNavigator
@@ -115,6 +115,7 @@ import com.twidere.twiderex.viewmodel.user.UserViewModel
 import kotlinx.coroutines.launch
 import moe.tlaster.nestedscrollview.VerticalNestedScrollView
 import moe.tlaster.nestedscrollview.rememberNestedScrollViewState
+import moe.tlaster.placeholder.Placeholder
 import moe.tlaster.precompose.navigation.NavController
 
 @OptIn(ExperimentalPagerApi::class)
@@ -501,7 +502,7 @@ fun UserInfo(
 }
 
 object UserInfoDefaults {
-    val AvatarSize = 72.dp
+    val AvatarSize = 88.dp
     val AvatarSpacing = 8.dp
     val RelationshipSpacing = 8.dp
     val WebsiteSpacing = 8.dp
@@ -707,7 +708,11 @@ private fun UserBanner(
             )
     ) {
         NetworkImage(
+            modifier = Modifier.fillMaxSize(),
             data = bannerUrl,
+            placeholder = {
+                Placeholder(modifier = Modifier.fillMaxSize())
+            }
         )
     }
 }

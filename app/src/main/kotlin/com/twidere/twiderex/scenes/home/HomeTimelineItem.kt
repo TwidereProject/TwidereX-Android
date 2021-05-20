@@ -44,7 +44,7 @@ class HomeTimelineItem : HomeNavigationItem() {
     override fun icon(): Painter = painterResource(id = R.drawable.ic_home)
 
     @Composable
-    override fun content() {
+    override fun Content() {
         val account = LocalActiveAccount.current ?: return
         val viewModel = assistedViewModel<HomeTimelineViewModel.AssistedFactory, HomeTimelineViewModel>(
             account
@@ -68,7 +68,10 @@ class HomeTimelineItem : HomeNavigationItem() {
                 }
             }
         ) {
-            TimelineComponent(viewModel = viewModel)
+            TimelineComponent(
+                viewModel = viewModel,
+                lazyListController = lazyListController
+            )
         }
     }
 }

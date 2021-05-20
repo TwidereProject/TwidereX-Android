@@ -22,28 +22,39 @@ package com.twidere.twiderex.component.lazy.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Divider
+import androidx.compose.material.Icon
+import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.itemsIndexed
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.LoadingProgress
-import com.twidere.twiderex.component.lazy.LazyColumn2
-import com.twidere.twiderex.component.lazy.LazyPagingItems
 import com.twidere.twiderex.component.lazy.loadState
-import com.twidere.twiderex.component.lazy.statusesIndexed
+import com.twidere.twiderex.component.placeholder.UiStatusPlaceholder
 import com.twidere.twiderex.component.status.StatusDivider
 import com.twidere.twiderex.component.status.TimelineStatusComponent
 import com.twidere.twiderex.model.MicroBlogKey
@@ -56,18 +67,26 @@ fun LazyUiStatusList(
     state: LazyListState = rememberLazyListState(),
     loadingBetween: List<MicroBlogKey> = emptyList(),
     onLoadBetweenClicked: (current: MicroBlogKey, next: MicroBlogKey) -> Unit = { _, _ -> },
-    key: ((index: Int) -> Any) = { items.peekOrNull(it)?.hashCode() ?: it },
+    // key: ((index: Int) -> Any) = { items.peekOrNull(it)?.hashCode() ?: it },
     header: LazyListScope.() -> Unit = {},
 ) {
-    LazyUiList(items = items) {
-        LazyColumn2(
+    LazyUiList(
+        items = items,
+        empty = { EmptyStatusList() },
+        loading = { LoadingStatusPlaceholder() }
+    ) {
+        LazyColumn(
             modifier = modifier,
-            state = state
+            state = state,
         ) {
             header.invoke(this)
-            statusesIndexed(items, key = key) { index, item ->
+            itemsIndexed(
+                items,
+                // key = key
+            ) { index, item ->
                 if (item == null) {
-                    TimelineStatusComponent(data = UiStatus.placeHolder())
+                    UiStatusPlaceholder()
+                    StatusDivider()
                 } else {
                     Column {
                         TimelineStatusComponent(
@@ -110,7 +129,7 @@ private fun LoadMoreButton(
             .background(LocalContentColor.current.copy(alpha = 0.04f))
             .clickable {
                 items
-                    .peekOrNull(index + 1)
+                    .peek(index + 1)
                     ?.let { next ->
                         onLoadBetweenClicked(
                             item.statusKey,
@@ -128,5 +147,48 @@ private fun LoadMoreButton(
             ),
             color = MaterialTheme.colors.primary,
         )
+    }
+}
+
+@Composable
+private fun EmptyStatusList() {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Icon(
+            painter = painterResource(id = R.drawable.ic_empty_status),
+            contentDescription = stringResource(id = R.string.common_alerts_no_tweets_found_title)
+        )
+        Spacer(modifier = Modifier.height(EmptyStatusListDefaults.VerticalPadding))
+        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.disabled) {
+            Text(
+                text = stringResource(id = R.string.common_alerts_no_tweets_found_title),
+                style = MaterialTheme.typography.h6
+            )
+        }
+    }
+}
+
+private object EmptyStatusListDefaults {
+    val VerticalPadding = 48.dp
+}
+
+@Composable
+private fun LoadingStatusPlaceholder() {
+    Column(
+        modifier = Modifier
+            .wrapContentHeight(
+                align = Alignment.Top,
+                unbounded = true
+            )
+    ) {
+        repeat(10) {
+            UiStatusPlaceholder(
+                delayMillis = it * 50L
+            )
+            StatusDivider()
+        }
     }
 }

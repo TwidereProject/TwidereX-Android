@@ -83,4 +83,13 @@ interface TimelineResources {
         @Query("local") local: Boolean? = null,
         @Query("only_media") only_media: Boolean? = null,
     ): List<Status>
+
+    @GET("/api/v1//timelines/list/{id}")
+    suspend fun listTimeline(
+        @Path("id") listId: String,
+        @Query("max_id") max_id: String? = null,
+        @Query("since_id") since_id: String? = null,
+        @Query("min_id") min_id: String? = null,
+        @Query("limit") limit: Int? = null,
+    ): List<Status>
 }

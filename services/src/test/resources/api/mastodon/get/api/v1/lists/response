@@ -1,0 +1,12 @@
+[
+  {
+    "id": "12249",
+    "title": "Friends",
+    "replies_policy": "followed"
+  },
+  {
+  "id": "13585",
+  "title": "test",
+  "replies_policy": "list"
+  }
+]

@@ -41,7 +41,7 @@ class MeItem : HomeNavigationItem() {
         get() = false
 
     @Composable
-    override fun content() {
+    override fun Content() {
         val account = LocalActiveAccount.current
         account?.toUi()?.let { user ->
             InAppNotificationScaffold {

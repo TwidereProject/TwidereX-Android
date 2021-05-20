@@ -42,7 +42,7 @@ class AllNotificationItem : HomeNavigationItem() {
     override fun icon(): Painter = painterResource(id = R.drawable.ic_message_circle)
 
     @Composable
-    override fun content() {
+    override fun Content() {
         val account = LocalActiveAccount.current ?: return
         if (account.service !is NotificationService) {
             return
@@ -54,7 +54,10 @@ class AllNotificationItem : HomeNavigationItem() {
                 it.create(account = account)
             }
         InAppNotificationScaffold {
-            TimelineComponent(viewModel = viewModel)
+            TimelineComponent(
+                viewModel = viewModel,
+                lazyListController = lazyListController,
+            )
         }
     }
 }

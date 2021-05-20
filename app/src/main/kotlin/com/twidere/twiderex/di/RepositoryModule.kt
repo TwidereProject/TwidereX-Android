@@ -21,12 +21,15 @@
 package com.twidere.twiderex.di
 
 import android.content.Context
-import com.bumptech.glide.Glide
+import coil.imageLoader
+import coil.util.CoilUtils
 import com.twidere.twiderex.db.AppDatabase
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.CacheRepository
 import com.twidere.twiderex.repository.DraftRepository
+import com.twidere.twiderex.repository.ListsRepository
+import com.twidere.twiderex.repository.ListsUsersRepository
 import com.twidere.twiderex.repository.ReactionRepository
 import com.twidere.twiderex.repository.SearchRepository
 import com.twidere.twiderex.repository.StatusRepository
@@ -59,8 +62,9 @@ object RepositoryModule {
     ): CacheRepository = CacheRepository(
         database = database,
         appDatabase = appDatabase,
-        glide = Glide.get(context),
-        cacheDirs = listOf(context.cacheDir, *context.externalCacheDirs)
+        cache = CoilUtils.createDefaultCache(context),
+        imageLoader = context.imageLoader,
+        cacheDirs = listOf(context.cacheDir, *context.externalCacheDirs),
     )
 
     @Provides
@@ -80,4 +84,12 @@ object RepositoryModule {
         database: CacheDatabase,
         accountRepository: AccountRepository
     ): UserRepository = UserRepository(database = database, accountRepository = accountRepository)
+
+    @Provides
+    fun provideListsRepository(
+        database: CacheDatabase
+    ) = ListsRepository(database = database)
+
+    @Provides
+    fun provideListUsersRepository() = ListsUsersRepository()
 }
