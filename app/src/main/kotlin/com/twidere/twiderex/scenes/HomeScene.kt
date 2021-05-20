@@ -169,22 +169,22 @@ fun HomeScene() {
                 HomeDrawer(scaffoldState)
             }
         ) {
-                Box(
-                    modifier = Modifier
-                        .padding(it)
+            Box(
+                modifier = Modifier
+                    .padding(it)
+            ) {
+                NestedScrollConnectionAppBars(
+                    tabPosition = tabPosition,
+                    menus = menus,
+                    pagerState = pagerState,
+                    scaffoldState = scaffoldState,
+                    scope = scope
                 ) {
-                    NestedScrollConnectionAppBars(
-                        tabPosition = tabPosition,
-                        menus = menus,
-                        pagerState = pagerState,
-                        scaffoldState = scaffoldState,
-                        scope = scope
-                    ) {
-                        Pager(state = pagerState) {
-                            menus[page].Content()
-                        }
+                    Pager(state = pagerState) {
+                        menus[page].Content()
                     }
                 }
+            }
         }
     }
 }
@@ -219,73 +219,73 @@ fun NestedScrollConnectionAppBars(
             .nestedScroll(nestedScrollConnection)
     ) {
         content.invoke()
-            if (tabPosition == AppearancePreferences.TabPosition.Bottom) {
-                AnimatedVisibility(
-                    visible = menus[pagerState.currentPage].withAppBar,
-                    enter = expandVertically(clip = false),
-                    exit = shrinkVertically(clip = false),
-                    modifier = Modifier
-                        .offset { IntOffset(x = 0, y = toolbarOffsetHeightPx.value.roundToInt()) }
-                ) {
-                    AppBar(
-                        backgroundColor = MaterialTheme.colors.surface.withElevation(),
-                        title = {
-                            Text(text = menus[pagerState.currentPage].name())
-                        },
-                        navigationIcon = {
-                            MenuAvatar(scaffoldState)
-                        },
-                        elevation = if (menus[pagerState.currentPage].withAppBar) {
-                            AppBarDefaults.TopAppBarElevation
-                        } else {
-                            0.dp
-                        }
-                    )
-                }
-            } else {
-                val transition = updateTransition(
-                    targetState = menus[pagerState.currentPage].withAppBar,
-                )
-                val elevation by transition.animateDp {
-                    if (it) {
+        if (tabPosition == AppearancePreferences.TabPosition.Bottom) {
+            AnimatedVisibility(
+                visible = menus[pagerState.currentPage].withAppBar,
+                enter = expandVertically(clip = false),
+                exit = shrinkVertically(clip = false),
+                modifier = Modifier
+                    .offset { IntOffset(x = 0, y = toolbarOffsetHeightPx.value.roundToInt()) }
+            ) {
+                AppBar(
+                    backgroundColor = MaterialTheme.colors.surface.withElevation(),
+                    title = {
+                        Text(text = menus[pagerState.currentPage].name())
+                    },
+                    navigationIcon = {
+                        MenuAvatar(scaffoldState)
+                    },
+                    elevation = if (menus[pagerState.currentPage].withAppBar) {
                         AppBarDefaults.TopAppBarElevation
                     } else {
                         0.dp
                     }
+                )
+            }
+        } else {
+            val transition = updateTransition(
+                targetState = menus[pagerState.currentPage].withAppBar,
+            )
+            val elevation by transition.animateDp {
+                if (it) {
+                    AppBarDefaults.TopAppBarElevation
+                } else {
+                    0.dp
                 }
-                Surface(
-                    elevation = elevation,
-                    modifier = Modifier
-                        .offset { IntOffset(x = 0, y = toolbarOffsetHeightPx.value.roundToInt()) }
+            }
+            Surface(
+                elevation = elevation,
+                modifier = Modifier
+                    .offset { IntOffset(x = 0, y = toolbarOffsetHeightPx.value.roundToInt()) }
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        MenuAvatar(scaffoldState)
-                        IconTabsComponent(
-                            modifier = Modifier.weight(1f),
-                            items = menus.map { it.icon() to it.name() },
-                            selectedItem = pagerState.currentPage,
-                            divider = {
-                                TabRowDefaults.Divider(thickness = 0.dp)
-                            },
-                            onItemSelected = {
-                                if (pagerState.currentPage == it) {
-                                    scope.launch {
-                                        menus[it].lazyListController.scrollToTop()
-                                    }
-                                }
+                    MenuAvatar(scaffoldState)
+                    IconTabsComponent(
+                        modifier = Modifier.weight(1f),
+                        items = menus.map { it.icon() to it.name() },
+                        selectedItem = pagerState.currentPage,
+                        divider = {
+                            TabRowDefaults.Divider(thickness = 0.dp)
+                        },
+                        onItemSelected = {
+                            if (pagerState.currentPage == it) {
                                 scope.launch {
-                                    pagerState.selectPage {
-                                        pagerState.currentPage = it
-                                    }
+                                    menus[it].lazyListController.scrollToTop()
                                 }
-                            },
-                        )
-                    }
+                            }
+                            scope.launch {
+                                pagerState.selectPage {
+                                    pagerState.currentPage = it
+                                }
+                            }
+                        },
+                    )
                 }
             }
         }
+    }
 }
 
 @Composable
