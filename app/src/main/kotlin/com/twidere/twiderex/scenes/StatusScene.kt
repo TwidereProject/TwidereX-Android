@@ -173,7 +173,7 @@ fun StatusScene(
                         itemsIndexed(source) { index, it ->
                             it?.let { status ->
                                 Column {
-                                    Column(modifier = Modifier.then(Modifier.layout { measurable, constraints ->
+                                    Column(Modifier.layout { measurable, constraints ->
                                         val placeable = measurable.measure(constraints)
                                         layout(placeable.width, placeable.height) {
                                             if (index == source.itemCount - 1) {
@@ -184,7 +184,7 @@ fun StatusScene(
                                             }
                                             placeable.placeRelative(0, 0)
                                         }
-                                    })) {
+                                    }) {
                                         if (status.statusKey == statusKey) {
                                             DetailedStatusComponent(data = status)
                                         } else {
@@ -198,12 +198,7 @@ fun StatusScene(
                                     }
                                     if (index == source.itemCount - 1) {
                                         Spacer(
-                                            modifier = Modifier.height(
-                                                maxOf(
-                                                    0,
-                                                    spacerHeight
-                                                ).dp
-                                            )
+                                            modifier = Modifier.height(spacerHeight.dp)
                                         )
                                     }
                                 }
