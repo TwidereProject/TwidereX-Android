@@ -112,7 +112,7 @@ fun TwidereScene(
         LaunchedEffect(darkTheme) {
             windowInsetsController.isAppearanceLightStatusBars = !darkTheme
         }
-        val navigationBarColor = Color.Black
+        val navigationBarColor = navigationBarColor(darkTheme)
         val statusBarColor = statusBarColor()
         Box {
             val actual = provideSystemInsets(
@@ -191,6 +191,15 @@ fun TwidereScene(
                 }.align(Alignment.BottomCenter)
             )
         }
+    }
+}
+
+@Composable
+fun navigationBarColor(darkTheme: Boolean): Color {
+    return if (darkTheme) {
+        Color.Black
+    } else {
+        Color(0xFFF1F1F1)
     }
 }
 
