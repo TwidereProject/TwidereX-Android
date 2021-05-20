@@ -196,10 +196,14 @@ fun TwidereScene(
 
 @Composable
 fun navigationBarColor(darkTheme: Boolean): Color {
-    return if (darkTheme) {
+    return if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O_MR1) {
         Color.Black
     } else {
-        Color(0xFFF1F1F1)
+        if (darkTheme) {
+            Color.Black
+        } else {
+            Color(0xFFF1F1F1)
+        }
     }
 }
 
