@@ -23,6 +23,7 @@ package com.twidere.twiderex.component.foundation
 import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
@@ -224,6 +225,7 @@ private class SwipeToRefreshState(
 fun SwipeToRefreshLayout(
     modifier: Modifier = Modifier,
     refreshingState: Boolean,
+    refreshIndicatorPadding: PaddingValues = PaddingValues(0.dp),
     onRefresh: () -> Unit,
     refreshIndicator: @Composable () -> Unit = {
         Surface(elevation = 10.dp, shape = CircleShape) {
@@ -271,6 +273,7 @@ fun SwipeToRefreshLayout(
             modifier = Modifier
                 .fillMaxWidth()
                 .align(Alignment.TopCenter)
+                .padding(refreshIndicatorPadding)
                 .offset { IntOffset(0, state.offset.roundToInt()) },
             contentAlignment = Alignment.TopCenter,
         ) {

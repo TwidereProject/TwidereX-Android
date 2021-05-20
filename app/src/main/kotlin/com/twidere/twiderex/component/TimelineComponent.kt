@@ -54,6 +54,7 @@ fun TimelineComponent(
         onRefresh = {
             items.refreshOrRetry()
         },
+        refreshIndicatorPadding = contentPadding
     ) {
         val lastScrollState = remember {
             viewModel.restoreScrollState()
