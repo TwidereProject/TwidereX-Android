@@ -181,7 +181,7 @@ fun HomeScene() {
                     scope = scope
                 ) {
                     Pager(state = pagerState) {
-                        menus[page].Content()
+                        menus[page].Content(it)
                     }
                 }
             }
@@ -197,9 +197,9 @@ fun NestedScrollConnectionAppBars(
     pagerState: PagerState,
     scaffoldState: ScaffoldState,
     scope: CoroutineScope,
-    content: @Composable () -> Unit
+    content: @Composable (PaddingValues) -> Unit
 ) {
-    val toolbarHeight = 56.dp
+    val toolbarHeight = AppBarDefaults.AppBarHeight
     val toolbarHeightPx = with(LocalDensity.current) { toolbarHeight.roundToPx().toFloat() }
     val toolbarOffsetHeightPx = remember { mutableStateOf(0f) }
     val nestedScrollConnection = remember {
@@ -218,7 +218,12 @@ fun NestedScrollConnectionAppBars(
             .fillMaxSize()
             .nestedScroll(nestedScrollConnection)
     ) {
-        content.invoke()
+        content.invoke(
+            if (menus[pagerState.currentPage].withAppBar ||
+                tabPosition == AppearancePreferences.TabPosition.Top
+            )
+                PaddingValues(top = toolbarHeight) else PaddingValues(0.dp)
+        )
         if (tabPosition == AppearancePreferences.TabPosition.Bottom) {
             AnimatedVisibility(
                 visible = menus[pagerState.currentPage].withAppBar,

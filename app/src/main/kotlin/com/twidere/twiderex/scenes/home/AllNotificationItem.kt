@@ -20,6 +20,7 @@
  */
 package com.twidere.twiderex.scenes.home
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
@@ -42,7 +43,7 @@ class AllNotificationItem : HomeNavigationItem() {
     override fun icon(): Painter = painterResource(id = R.drawable.ic_message_circle)
 
     @Composable
-    override fun Content() {
+    override fun Content(contentPadding: PaddingValues) {
         val account = LocalActiveAccount.current ?: return
         if (account.service !is NotificationService) {
             return
@@ -57,6 +58,7 @@ class AllNotificationItem : HomeNavigationItem() {
             TimelineComponent(
                 viewModel = viewModel,
                 lazyListController = lazyListController,
+                contentPadding = contentPadding
             )
         }
     }

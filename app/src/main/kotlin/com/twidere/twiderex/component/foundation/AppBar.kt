@@ -47,4 +47,5 @@ fun AppBar(
 
 object AppBarDefaults {
     val TopAppBarElevation = 4.dp
+    val AppBarHeight = 56.dp
 }

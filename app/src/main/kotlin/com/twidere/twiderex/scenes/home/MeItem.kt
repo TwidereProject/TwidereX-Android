@@ -20,6 +20,7 @@
  */
 package com.twidere.twiderex.scenes.home
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
@@ -41,7 +42,7 @@ class MeItem : HomeNavigationItem() {
         get() = false
 
     @Composable
-    override fun Content() {
+    override fun Content(contentPadding: PaddingValues) {
         val account = LocalActiveAccount.current
         account?.toUi()?.let { user ->
             InAppNotificationScaffold {

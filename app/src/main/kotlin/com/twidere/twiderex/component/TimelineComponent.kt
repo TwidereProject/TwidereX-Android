@@ -20,6 +20,7 @@
  */
 package com.twidere.twiderex.component
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -27,6 +28,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
@@ -42,6 +44,7 @@ import kotlinx.coroutines.flow.filter
 @Composable
 fun TimelineComponent(
     viewModel: TimelineViewModel,
+    contentPadding: PaddingValues = PaddingValues(0.dp),
     lazyListController: LazyListController? = null,
 ) {
     val items = viewModel.source.collectAsLazyPagingItems()
@@ -80,6 +83,7 @@ fun TimelineComponent(
         LazyUiStatusList(
             items = items,
             state = listState,
+            contentPadding = contentPadding,
             loadingBetween = loadingBetween,
             onLoadBetweenClicked = { current, next ->
                 viewModel.loadBetween(current, next)
