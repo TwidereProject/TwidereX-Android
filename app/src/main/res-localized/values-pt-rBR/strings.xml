@@ -14,11 +14,15 @@
     <string name="common_alerts_unfollow_user_message">Deixar de seguir o usuário %s?</string>
     <string name="common_alerts_cancel_follow_request_message">Cancelar pedido para seguir %s?</string>
     <string name="common_alerts_tweet_sent_title">Tweet Enviado</string>
+    <string name="common_alerts_tweet_sending_title">Enviando tweet</string>
     <string name="common_alerts_tweet_fail_title">Tweet Falhou</string>
     <string name="common_alerts_tweet_fail_message">Por favor, tente novamente</string>
     <string name="common_alerts_tweet_deleted_title">Tweet Excluído</string>
     <string name="common_alerts_failed_to_delete_tweet_title">Falha ao Excluir Tweet</string>
     <string name="common_alerts_failed_to_delete_tweet_message">Por favor, tente novamente</string>
+    <string name="common_alerts_media_saving_title">Salvando mídia</string>
+    <string name="common_alerts_media_saved_title">Mídia salva</string>
+    <string name="common_alerts_media_save_fail_title">Falha ao salvar mídia</string>
     <string name="common_alerts_media_save_fail_message">Por favor, tente novamente</string>
     <string name="common_alerts_photo_saved_title">Foto Salva</string>
     <string name="common_alerts_photo_save_fail_title">Falha ao Salvar Foto</string>
@@ -122,6 +126,7 @@
     <string name="common_countable_tweet_multiple">%s tweets</string>
     <string name="common_countable_photo_single">%s foto</string>
     <string name="common_countable_photo_multiple">%s fotos</string>
+    <string name="common_notification_channel_background_progresses_name">Progressos em segundo plano</string>
     <string name="scene_drawer_sign_in">Entrar</string>
     <string name="scene_drawer_manage_accounts">Gerenciar contas</string>
     <string name="scene_manage_accounts_title">Contas</string>
@@ -233,6 +238,7 @@
     <string name="scene_settings_display_text_rounded_square">Quadrado Arredondado</string>
     <string name="scene_settings_display_date_format_relative">Relativo</string>
     <string name="scene_settings_display_date_format_absolute">Absoluto</string>
+    <string name="scene_settings_display_url_preview">Pré-visualizações do Url</string>
     <string name="scene_settings_display_media_media_previews">Pré-visualizações de mídia</string>
     <string name="scene_settings_display_media_auto_playback">Reprodução automática</string>
     <string name="scene_settings_display_media_automatic">Automático</string>

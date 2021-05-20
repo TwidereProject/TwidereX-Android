@@ -14,11 +14,15 @@
     <string name="common_alerts_unfollow_user_message">%s를 그만 팔로우할까요?</string>
     <string name="common_alerts_cancel_follow_request_message">%s의 팔로우 요청을 취소할까요?</string>
     <string name="common_alerts_tweet_sent_title">트윗 보냄</string>
+    <string name="common_alerts_tweet_sending_title">트윗을 보냅니다</string>
     <string name="common_alerts_tweet_fail_title">트윗이 올라가지 않았습니다.</string>
     <string name="common_alerts_tweet_fail_message">다시 해보세요.</string>
     <string name="common_alerts_tweet_deleted_title">트윗을 지웠습니다.</string>
     <string name="common_alerts_failed_to_delete_tweet_title">트윗을 지우지 못했습니다.</string>
     <string name="common_alerts_failed_to_delete_tweet_message">다시 해보세요.</string>
+    <string name="common_alerts_media_saving_title">저장하기</string>
+    <string name="common_alerts_media_saved_title">저장했습니다</string>
+    <string name="common_alerts_media_save_fail_title">저장에 실패했습니다</string>
     <string name="common_alerts_media_save_fail_message">다시 해보세요.</string>
     <string name="common_alerts_photo_saved_title">이미지를 저장했습니다.</string>
     <string name="common_alerts_photo_save_fail_title">이미지를 저장하지 못했습니다.</string>
@@ -122,6 +126,7 @@
     <string name="common_countable_tweet_multiple">%s개 트윗</string>
     <string name="common_countable_photo_single">사진 %s장</string>
     <string name="common_countable_photo_multiple">사진 %s장</string>
+    <string name="common_notification_channel_background_progresses_name">백그라운드에서 작동</string>
     <string name="scene_drawer_sign_in">로그인</string>
     <string name="scene_drawer_manage_accounts">계정 관리</string>
     <string name="scene_manage_accounts_title">계정</string>
@@ -233,6 +238,7 @@
     <string name="scene_settings_display_text_rounded_square">둥근 네모</string>
     <string name="scene_settings_display_date_format_relative">상대적 시간 (~분 전)</string>
     <string name="scene_settings_display_date_format_absolute">절대 시간</string>
+    <string name="scene_settings_display_url_preview">링크 미리보기</string>
     <string name="scene_settings_display_media_media_previews">미디어 미리보기</string>
     <string name="scene_settings_display_media_auto_playback">자동 재생</string>
     <string name="scene_settings_display_media_automatic">자동</string>
