@@ -17,20 +17,32 @@ Next generation of Twidere for Android 5.0+. **Still in early stage.**
 
 
 ## What's Happening
-### 1.1.0 - April 2021 Update
-- **Mastodon Support is here!**
-- You can now save media for a tweet
-- You can now filtering user timeline by reply
-- Add clear image and tweet cache support
-- UI/UX tweaking  
-- Stability improve  
 
-### What is being planned for 1.2.0 - April 2021
+### 1.2.0 - May 2021 Update
 
-For 1.2.0, we are proactively working on:
-- **List Timeline Support!**
-- Stability
+- **Twitter/Mastodon list support is here**
+- Link preview is here and suppoted by the data from Twitter/Mastodon server. It's off by default.
+- Add placeholder to show loading state and empty state.
+- Fix video preview overlay issue #81
+- Fix font size slider #66
+- UI tweaking for status display
+- Upgrade Jetpack Compose to beta06
+
+### What is being planned for 1.3.0 - May 2021
+For 1.3.0, we're focusing on stability and UI/UX improve, you can check out our [milestore](https://github.com/TwidereProject/TwidereX-Android/milestone/1) for detail. Here is a short list:
+
+- Twitter/Mastodon thread improve, including reading and sending.
+- Notification support (background tasks only).
+- Edge to edge support.
 - UI/UX tweaking
+- Stability
+
+### Roadmap for 2.0 - May 2021
+For 2.0, we're considering these options, but it is still an early thought and might change over time.
+
+- Desktop (Linux/Windows) support (by [compose-jb](https://github.com/JetBrains/compose-jb)).
+- Javascript extension support.
+- View-Only mode (aka Anonymous Browse)
 
 ## Contributing
 
