@@ -89,8 +89,8 @@ data class StatusV2(
 enum class ReplySettings {
     @SerialName("everyone")
     Everyone,
-    @SerialName("mentioned_users")
+    @SerialName("mentionedUsers")
     MentionedUsers,
-    @SerialName("followers")
-    Followers,
+    @SerialName("following")
+    FollowingUsers,
 }
