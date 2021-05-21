@@ -89,6 +89,7 @@ fun TwidereDialog(
     DisposableEffect(currentDarkTheme) {
         onDispose {
             windowInsetsController.isAppearanceLightStatusBars = !currentDarkTheme
+            windowInsetsController.isAppearanceLightNavigationBars = !currentDarkTheme
         }
     }
     TwidereScene(
@@ -111,8 +112,9 @@ fun TwidereScene(
         val windowInsetsController = LocalWindowInsetsController.current
         LaunchedEffect(darkTheme) {
             windowInsetsController.isAppearanceLightStatusBars = !darkTheme
+            windowInsetsController.isAppearanceLightNavigationBars = !darkTheme
         }
-        val navigationBarColor = Color.Black
+        val navigationBarColor = navigationBarColor(darkTheme)
         val statusBarColor = statusBarColor()
         Box {
             val actual = provideSystemInsets(
@@ -190,6 +192,19 @@ fun TwidereScene(
                     Modifier
                 }.align(Alignment.BottomCenter)
             )
+        }
+    }
+}
+
+@Composable
+fun navigationBarColor(darkTheme: Boolean): Color {
+    return if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O_MR1) {
+        Color.Black
+    } else {
+        if (darkTheme) {
+            Color.Black
+        } else {
+            Color(0xFFF1F1F1)
         }
     }
 }

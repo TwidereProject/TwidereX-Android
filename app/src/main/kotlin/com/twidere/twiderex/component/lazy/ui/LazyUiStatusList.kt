@@ -25,6 +25,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -66,6 +67,7 @@ fun LazyUiStatusList(
     items: LazyPagingItems<UiStatus>,
     state: LazyListState = rememberLazyListState(),
     loadingBetween: List<MicroBlogKey> = emptyList(),
+    contentPadding: PaddingValues = PaddingValues(0.dp),
     onLoadBetweenClicked: (current: MicroBlogKey, next: MicroBlogKey) -> Unit = { _, _ -> },
     // key: ((index: Int) -> Any) = { items.peekOrNull(it)?.hashCode() ?: it },
     header: LazyListScope.() -> Unit = {},
@@ -78,6 +80,7 @@ fun LazyUiStatusList(
         LazyColumn(
             modifier = modifier,
             state = state,
+            contentPadding = contentPadding,
         ) {
             header.invoke(this)
             itemsIndexed(

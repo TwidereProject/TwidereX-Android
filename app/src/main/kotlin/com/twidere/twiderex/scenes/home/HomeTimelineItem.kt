@@ -51,26 +51,27 @@ class HomeTimelineItem : HomeNavigationItem() {
         ) {
             it.create(account)
         }
-        InAppNotificationScaffold(
-            floatingActionButton = {
-                val navigator = LocalNavigator.current
-                FloatingActionButton(
-                    onClick = {
-                        navigator.compose(ComposeType.New)
-                    }
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_feather),
-                        contentDescription = stringResource(
-                            id = R.string.accessibility_scene_home_compose
-                        )
-                    )
-                }
-            }
-        ) {
+        InAppNotificationScaffold {
             TimelineComponent(
                 viewModel = viewModel,
-                lazyListController = lazyListController
+                lazyListController = lazyListController,
+            )
+        }
+    }
+
+    @Composable
+    override fun Fab() {
+        val navigator = LocalNavigator.current
+        FloatingActionButton(
+            onClick = {
+                navigator.compose(ComposeType.New)
+            }
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_feather),
+                contentDescription = stringResource(
+                    id = R.string.accessibility_scene_home_compose
+                )
             )
         }
     }

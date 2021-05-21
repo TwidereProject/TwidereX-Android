@@ -261,10 +261,7 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewM
                     }
                 },
                 bottomBar = {
-                    Box(
-                        modifier = Modifier
-                            .navigationBarsPadding(),
-                    ) {
+                    Box {
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -285,7 +282,8 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewM
                             ) {
                                 Box(
                                     modifier = Modifier
-                                        .background(color = controlPanelColor),
+                                        .background(color = controlPanelColor)
+                                        .navigationBarsPadding(),
                                 ) {
                                     StatusMediaInfo(videoControl, status, viewModel, currentMedia)
                                 }
