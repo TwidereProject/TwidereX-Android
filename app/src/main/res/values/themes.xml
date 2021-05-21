@@ -2,6 +2,5 @@
     <style name="Theme.TwidereX" parent="android:Theme.DeviceDefault.NoActionBar">
         <item name="android:windowLayoutInDisplayCutoutMode" tools:targetApi="o_mr1">shortEdges</item>
         <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
-        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
     </style>
 </resources>
