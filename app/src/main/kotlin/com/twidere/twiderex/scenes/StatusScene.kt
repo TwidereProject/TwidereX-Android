@@ -189,21 +189,13 @@ fun StatusScene(
                                         val placeables = measurables.map { measurable ->
                                             measurable.measure(constraints)
                                         }
-                                        var maxHeight = 0
-                                        placeables.forEach {
-                                            maxHeight += it.measuredHeight
-                                        }
+                                        var itemHeight = placeables.first().measuredHeight
                                         if (index == source.itemCount - 1) {
-                                            val itemHeight = placeables.first().measuredHeight
-                                            val spacerHeight = placeables.last().measuredHeight
-                                            maxHeight -= itemHeight % spacerHeight
+                                            var spacerHeight = placeables.last().measuredHeight
+                                            itemHeight = maxOf(itemHeight, spacerHeight)
                                         }
-                                        var offsetY = 0
-                                        layout(constraints.maxWidth, maxHeight) {
-                                            placeables.forEach { placeable ->
-                                                placeable.placeRelative(x = 0, y = offsetY)
-                                                offsetY += placeable.height
-                                            }
+                                        layout(constraints.maxWidth, itemHeight) {
+                                            placeables.getOrNull(0)?.place(0, 0)
                                         }
                                     }
                                 )
