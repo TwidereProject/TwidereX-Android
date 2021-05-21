@@ -44,6 +44,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -164,21 +165,40 @@ fun StatusScene(
                     } else {
                         itemsIndexed(source) { index, it ->
                             it?.let { status ->
-                                Column {
-                                    if (status.statusKey == statusKey) {
-                                        DetailedStatusComponent(data = status)
-                                    } else {
-                                        TimelineStatusComponent(data = status)
+                                Layout(
+                                    content = {
+                                        Column {
+                                            if (status.statusKey == statusKey) {
+                                                DetailedStatusComponent(data = status)
+                                            } else {
+                                                TimelineStatusComponent(data = status)
+                                            }
+                                            if (status.statusKey == statusKey) {
+                                                Divider()
+                                            } else {
+                                                StatusDivider()
+                                            }
+                                        }
+                                        if (index == source.itemCount - 1) {
+                                            Spacer(
+                                                Modifier.fillParentMaxHeight()
+                                            )
+                                        }
+                                    },
+                                    measurePolicy = { measurables, constraints ->
+                                        val placeables = measurables.map { measurable ->
+                                            measurable.measure(constraints)
+                                        }
+                                        var itemHeight = placeables.first().measuredHeight
+                                        if (index == source.itemCount - 1) {
+                                            var spacerHeight = placeables.last().measuredHeight
+                                            itemHeight = maxOf(itemHeight, spacerHeight)
+                                        }
+                                        layout(constraints.maxWidth, itemHeight) {
+                                            placeables.getOrNull(0)?.place(0, 0)
+                                        }
                                     }
-                                    if (status.statusKey == statusKey) {
-                                        Divider()
-                                    } else {
-                                        StatusDivider()
-                                    }
-                                    if (index == source.itemCount - 1) {
-                                        Spacer(modifier = Modifier.fillParentMaxHeight())
-                                    }
-                                }
+                                )
                             }
                         }
                     }
