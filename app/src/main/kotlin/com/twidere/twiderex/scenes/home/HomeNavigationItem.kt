@@ -20,10 +20,8 @@
  */
 package com.twidere.twiderex.scenes.home
 
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.component.lazy.LazyListController
 
 abstract class HomeNavigationItem {
@@ -37,5 +35,5 @@ abstract class HomeNavigationItem {
     open val lazyListController = LazyListController()
 
     @Composable
-    abstract fun Content(contentPadding: PaddingValues = PaddingValues(0.dp))
+    abstract fun Content()
 }

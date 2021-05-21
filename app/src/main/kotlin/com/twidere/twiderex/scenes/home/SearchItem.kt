@@ -23,9 +23,7 @@ package com.twidere.twiderex.scenes.home
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.ContentAlpha
@@ -70,7 +68,7 @@ class SearchItem : HomeNavigationItem() {
 
     @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
     @Composable
-    override fun Content(contentPadding: PaddingValues) {
+    override fun Content() {
         val account = LocalActiveAccount.current ?: return
         val viewModel =
             assistedViewModel<SearchInputViewModel.AssistedFactory, SearchInputViewModel>(
@@ -83,7 +81,6 @@ class SearchItem : HomeNavigationItem() {
         InAppNotificationScaffold(
             topBar = {
                 AppBar(
-                    modifier = Modifier.padding(contentPadding),
                     title = {
                         ProvideTextStyle(value = MaterialTheme.typography.body1) {
                             Row(

@@ -181,7 +181,7 @@ fun HomeScene() {
                     scope = scope
                 ) {
                     Pager(state = pagerState) {
-                        menus[page].Content(it)
+                        menus[page].Content()
                     }
                 }
             }
@@ -197,15 +197,19 @@ fun NestedScrollConnectionAppBars(
     pagerState: PagerState,
     scaffoldState: ScaffoldState,
     scope: CoroutineScope,
-    content: @Composable (PaddingValues) -> Unit
+    content: @Composable () -> Unit
 ) {
     val toolbarHeight = AppBarDefaults.AppBarHeight
     val toolbarHeightPx = with(LocalDensity.current) { toolbarHeight.roundToPx().toFloat() }
     val toolbarOffsetHeightPx = remember { mutableStateOf(0f) }
     val nestedScrollConnection = remember {
         object : NestedScrollConnection {
-            override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
-                val delta = available.y
+            override fun onPostScroll(
+                consumed: Offset,
+                available: Offset,
+                source: NestedScrollSource
+            ): Offset {
+                val delta = consumed.y
                 val newOffset = toolbarOffsetHeightPx.value + delta
                 toolbarOffsetHeightPx.value = newOffset.coerceIn(-toolbarHeightPx, 0f)
                 return Offset.Zero
@@ -218,12 +222,19 @@ fun NestedScrollConnectionAppBars(
             .fillMaxSize()
             .nestedScroll(nestedScrollConnection)
     ) {
-        content.invoke(
-            if (menus[pagerState.currentPage].withAppBar ||
-                tabPosition == AppearancePreferences.TabPosition.Top
-            )
-                PaddingValues(top = toolbarHeight) else PaddingValues(0.dp)
-        )
+        Box(
+            modifier = Modifier
+                .offset {
+                    if (menus[pagerState.currentPage].withAppBar ||
+                        tabPosition == AppearancePreferences.TabPosition.Top
+                    )
+                        IntOffset(x = 0, y = toolbarOffsetHeightPx.value.roundToInt() + toolbarHeightPx.roundToInt())
+                    else IntOffset.Zero
+                }
+        ) {
+            content.invoke()
+        }
+
         if (tabPosition == AppearancePreferences.TabPosition.Bottom) {
             AnimatedVisibility(
                 visible = menus[pagerState.currentPage].withAppBar,

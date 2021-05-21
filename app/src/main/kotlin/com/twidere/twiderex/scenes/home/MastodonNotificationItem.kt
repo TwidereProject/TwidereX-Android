@@ -20,7 +20,6 @@
  */
 package com.twidere.twiderex.scenes.home
 
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -52,7 +51,7 @@ class MastodonNotificationItem : HomeNavigationItem() {
     override var lazyListController: LazyListController = LazyListController()
 
     @Composable
-    override fun Content(contentPadding: PaddingValues) {
+    override fun Content() {
         val account = LocalActiveAccount.current ?: return
         if (account.service !is NotificationService) {
             return
@@ -85,7 +84,7 @@ class MastodonNotificationItem : HomeNavigationItem() {
             }
         ) {
             Pager(state = pagerState) {
-                tabs[page].Content(contentPadding)
+                tabs[page].Content()
             }
         }
     }

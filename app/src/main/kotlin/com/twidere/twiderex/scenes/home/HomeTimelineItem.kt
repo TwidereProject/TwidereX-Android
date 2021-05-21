@@ -20,7 +20,6 @@
  */
 package com.twidere.twiderex.scenes.home
 
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.runtime.Composable
@@ -45,7 +44,7 @@ class HomeTimelineItem : HomeNavigationItem() {
     override fun icon(): Painter = painterResource(id = R.drawable.ic_home)
 
     @Composable
-    override fun Content(contentPadding: PaddingValues) {
+    override fun Content() {
         val account = LocalActiveAccount.current ?: return
         val viewModel = assistedViewModel<HomeTimelineViewModel.AssistedFactory, HomeTimelineViewModel>(
             account
@@ -72,7 +71,6 @@ class HomeTimelineItem : HomeNavigationItem() {
             TimelineComponent(
                 viewModel = viewModel,
                 lazyListController = lazyListController,
-                contentPadding = contentPadding
             )
         }
     }
