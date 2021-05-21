@@ -36,4 +36,9 @@ abstract class HomeNavigationItem {
 
     @Composable
     abstract fun Content()
+
+    @Composable
+    open fun Fab() {
+        // implement this method to apply FloatingActionButton
+    }
 }

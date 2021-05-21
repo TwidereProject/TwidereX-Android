@@ -167,6 +167,9 @@ fun HomeScene() {
             },
             drawerContent = {
                 HomeDrawer(scaffoldState)
+            },
+            floatingActionButton = {
+                menus[pagerState.currentPage].Fab()
             }
         ) {
             Box(
