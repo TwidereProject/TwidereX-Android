@@ -22,6 +22,7 @@ package com.twidere.twiderex.scenes.home
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.component.lazy.LazyListController
 
 abstract class HomeNavigationItem {
@@ -41,4 +42,7 @@ abstract class HomeNavigationItem {
     open fun Fab() {
         // implement this method to apply FloatingActionButton
     }
+
+    // offset to hide fab when scroll timeline
+    open val fabSize = 0.dp
 }
