@@ -119,6 +119,9 @@ fun HomeScene() {
     val account = LocalActiveAccount.current ?: return
     val scope = rememberCoroutineScope()
     val tabPosition = LocalAppearancePreferences.current.tapPosition
+    val hideTab = LocalAppearancePreferences.current.hideTabBarWhenScroll
+    val hideFab = LocalAppearancePreferences.current.hideFabWhenScroll
+    val hideAppBar = LocalAppearancePreferences.current.hideFabWhenScroll
     val menus = remember(account.type) {
         listOf(
             HomeTimelineItem(),
@@ -176,7 +179,10 @@ fun HomeScene() {
                 if (tabPosition == AppearancePreferences.TabPosition.Bottom) {
                     HomeBottomNavigation(
                         // navigation bar height is the same to toolbar
-                        modifier = Modifier.offset { IntOffset(x = 0, y = - toolbarOffsetHeightPx.value.roundToInt()) },
+                        modifier = if (hideTab)
+                            Modifier.offset { IntOffset(x = 0, y = - toolbarOffsetHeightPx.value.roundToInt()) }
+                        else
+                            Modifier,
                         menus, pagerState.currentPage,
                     ) {
                         if (pagerState.currentPage == it) {
@@ -199,7 +205,7 @@ fun HomeScene() {
                 with(LocalDensity.current) {
                     val maxFabOffset = menus[pagerState.currentPage].fabSize.roundToPx() + HomeSceneDefaults.FabSpacing.roundToPx() + toolbarHeightPx
                     val realFabOffset = maxFabOffset * abs(toolbarOffsetHeightPx.value) / toolbarHeightPx
-                    Box(modifier = Modifier.offset { IntOffset(x = 0, y = realFabOffset.roundToInt()) }) {
+                    Box(modifier = if (hideFab) Modifier.offset { IntOffset(x = 0, y = realFabOffset.roundToInt()) } else Modifier) {
                         menus[pagerState.currentPage].Fab()
                     }
                 }
@@ -213,18 +219,24 @@ fun HomeScene() {
                 Pager(
                     state = pagerState,
                     modifier = Modifier.offset {
-                        if (menus[pagerState.currentPage].withAppBar ||
+                        if ((menus[pagerState.currentPage].withAppBar && hideAppBar) ||
                             tabPosition == AppearancePreferences.TabPosition.Top
                         )
-                            IntOffset(x = 0, y = toolbarOffsetHeightPx.value.roundToInt() + toolbarHeightPx.roundToInt())
-                        else IntOffset.Zero
+                            IntOffset(
+                                x = 0,
+                                y = toolbarOffsetHeightPx.value.roundToInt() + toolbarHeightPx.roundToInt()
+                            )
+                        else
+                            IntOffset.Zero
                     }
                 ) {
                     menus[page].Content()
                 }
                 HomeAppBar(
-                    modifier = Modifier
-                        .offset { IntOffset(0, toolbarOffsetHeightPx.value.roundToInt()) },
+                    modifier = if (hideAppBar)
+                        Modifier.offset { IntOffset(0, toolbarOffsetHeightPx.value.roundToInt()) }
+                    else
+                        Modifier,
                     tabPosition = tabPosition,
                     menus = menus,
                     pagerState = pagerState,

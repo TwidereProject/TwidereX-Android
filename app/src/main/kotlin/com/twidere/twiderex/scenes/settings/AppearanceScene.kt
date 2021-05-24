@@ -56,7 +56,9 @@ import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.lazy.itemDivider
+import com.twidere.twiderex.component.lazy.itemHeader
 import com.twidere.twiderex.component.settings.radioItem
+import com.twidere.twiderex.component.settings.switchItem
 import com.twidere.twiderex.component.status.UserAvatarDefaults
 import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.extensions.isDarkTheme
@@ -142,6 +144,40 @@ fun AppearanceScene() {
                             )
                         )
                     }
+                )
+                itemDivider()
+                // Scrolling Timeline
+                itemHeader {
+                    Text(text = "SCROLLING TIMELINE")
+                }
+                switchItem(
+                    value = appearance.hideAppBarWhenScroll,
+                    onChanged = {
+                        viewModel.setHideAppBarWhenScrolling(it)
+                    },
+                    title = {
+                        Text(text = "Hide app bar when scrolling")
+                    },
+                )
+
+                switchItem(
+                    value = appearance.hideTabBarWhenScroll,
+                    onChanged = {
+                        viewModel.setHideTabBarWhenScrolling(it)
+                    },
+                    title = {
+                        Text(text = "Hide tab bar when scrolling")
+                    },
+                )
+
+                switchItem(
+                    value = appearance.hideFabWhenScroll,
+                    onChanged = {
+                        viewModel.setHideFabWhenScrolling(it)
+                    },
+                    title = {
+                        Text(text = "Hide FAB when scrolling")
+                    },
                 )
                 itemDivider()
                 radioItem(
