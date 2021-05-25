@@ -36,10 +36,11 @@ import com.twidere.twiderex.model.toComposeData
 import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.notification.NotificationChannelSpec
 import com.twidere.twiderex.repository.AccountRepository
+import com.twidere.twiderex.utils.ExifScrambler
 import kotlin.math.roundToInt
 
 abstract class ComposeWorker<T : MicroBlogService>(
-    context: Context,
+    protected val context: Context,
     workerParams: WorkerParameters,
     private val accountRepository: AccountRepository,
     private val notificationManagerCompat: NotificationManagerCompat,
@@ -69,12 +70,14 @@ abstract class ComposeWorker<T : MicroBlogService>(
         notificationManagerCompat.notify(notificationId, builder.build())
 
         return try {
+            val exifScrambler = ExifScrambler(context)
             val mediaIds = arrayListOf<String>()
             val images = composeData.images.map {
                 Uri.parse(it)
             }
             images.forEachIndexed { index, uri ->
-                val id = uploadImage(uri, service)
+                val scramblerUri = exifScrambler.removeExifData(uri)
+                val id = uploadImage(uri, scramblerUri, service)
                 id?.let { mediaIds.add(it) }
                 builder.setProgress(
                     100,
@@ -82,6 +85,7 @@ abstract class ComposeWorker<T : MicroBlogService>(
                     false
                 )
                 notificationManagerCompat.notify(notificationId, builder.build())
+                exifScrambler.deleteCacheFile(scramblerUri)
             }
             builder.setProgress(100, 99, false)
             notificationManagerCompat.notify(notificationId, builder.build())
@@ -121,7 +125,8 @@ abstract class ComposeWorker<T : MicroBlogService>(
     )
 
     protected abstract suspend fun uploadImage(
-        uri: Uri,
+        originUri: Uri,
+        scramblerUri: Uri,
         service: T
     ): String?
 }
