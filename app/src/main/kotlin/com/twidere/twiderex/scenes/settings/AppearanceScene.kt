@@ -148,35 +148,33 @@ fun AppearanceScene() {
                 itemDivider()
                 // Scrolling Timeline
                 itemHeader {
-                    Text(text = "SCROLLING TIMELINE")
+                    Text(text = stringResource(id = R.string.scene_settings_appearance_section_header_scrolling_timeline))
                 }
-                switchItem(
-                    value = appearance.hideAppBarWhenScroll,
-                    onChanged = {
-                        viewModel.setHideAppBarWhenScrolling(it)
-                    },
-                    title = {
-                        Text(text = "Hide app bar when scrolling")
-                    },
-                )
-
                 switchItem(
                     value = appearance.hideTabBarWhenScroll,
                     onChanged = {
                         viewModel.setHideTabBarWhenScrolling(it)
                     },
                     title = {
-                        Text(text = "Hide tab bar when scrolling")
+                        Text(text = stringResource(id = R.string.scene_settings_appearance_scrolling_timeline_tab_bar))
                     },
                 )
-
+                switchItem(
+                    value = appearance.hideAppBarWhenScroll,
+                    onChanged = {
+                        viewModel.setHideAppBarWhenScrolling(it)
+                    },
+                    title = {
+                        Text(text = stringResource(id = R.string.scene_settings_appearance_scrolling_timeline_app_bar))
+                    },
+                )
                 switchItem(
                     value = appearance.hideFabWhenScroll,
                     onChanged = {
                         viewModel.setHideFabWhenScrolling(it)
                     },
                     title = {
-                        Text(text = "Hide FAB when scrolling")
+                        Text(text = stringResource(id = R.string.scene_settings_appearance_scrolling_timeline_fab))
                     },
                 )
                 itemDivider()

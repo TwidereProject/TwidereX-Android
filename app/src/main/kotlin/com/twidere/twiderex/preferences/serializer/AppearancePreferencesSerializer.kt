@@ -46,8 +46,5 @@ object AppearancePreferencesSerializer : Serializer<AppearancePreferences> {
             .getDefaultInstance()
             .toBuilder()
             .setTapPosition(AppearancePreferences.TabPosition.Bottom)
-            .setHideFabWhenScroll(true)
-            .setHideTabBarWhenScroll(true)
-            .setHideAppBarWhenScroll(true)
             .build()
 }

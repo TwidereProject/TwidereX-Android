@@ -219,14 +219,21 @@ fun HomeScene() {
                 Pager(
                     state = pagerState,
                     modifier = Modifier.offset {
-                        if ((menus[pagerState.currentPage].withAppBar && hideAppBar) ||
+                        if ((menus[pagerState.currentPage].withAppBar) ||
                             tabPosition == AppearancePreferences.TabPosition.Top
-                        )
-                            IntOffset(
-                                x = 0,
-                                y = toolbarOffsetHeightPx.value.roundToInt() + toolbarHeightPx.roundToInt()
-                            )
-                        else
+                        ) {
+                            if (hideAppBar) {
+                                IntOffset(
+                                    x = 0,
+                                    y = toolbarOffsetHeightPx.value.roundToInt() + toolbarHeightPx.roundToInt()
+                                )
+                            } else {
+                                IntOffset(
+                                    x = 0,
+                                    y = toolbarHeightPx.roundToInt()
+                                )
+                            }
+                        } else
                             IntOffset.Zero
                     }
                 ) {
