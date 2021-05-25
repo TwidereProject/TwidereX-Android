@@ -121,7 +121,7 @@ fun HomeScene() {
     val tabPosition = LocalAppearancePreferences.current.tapPosition
     val hideTab = LocalAppearancePreferences.current.hideTabBarWhenScroll
     val hideFab = LocalAppearancePreferences.current.hideFabWhenScroll
-    val hideAppBar = LocalAppearancePreferences.current.hideFabWhenScroll
+    val hideAppBar = LocalAppearancePreferences.current.hideAppBarWhenScroll
     val menus = remember(account.type) {
         listOf(
             HomeTimelineItem(),
