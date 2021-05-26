@@ -1237,6 +1237,18 @@ private fun ComposeActions(
                     )
                 }
             }
+            IconButton(
+                onClick = {
+                    /*Todo Thread mode*/
+                    /*Todo highlight when enable*/
+                    /*Todo change send icon to thread mode send icon*/
+                },
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_thread_mode),
+                    contentDescription = "thread mode"
+                )
+            }
             Spacer(modifier = Modifier.weight(1f))
             IconButton(
                 onClick = {
