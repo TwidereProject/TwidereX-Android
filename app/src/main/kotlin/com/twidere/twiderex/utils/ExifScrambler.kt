@@ -33,48 +33,50 @@ class ExifScrambler(private val context: Context) {
     fun removeExifData(uri: Uri, compress: Int = 100): Uri {
         // first get input stream
         val contentResolver = context.contentResolver
-        val input = contentResolver.openInputStream(uri) ?: return uri
-        // get decode to bitmap because bitmap won't store exif meta data
-        val bitmap = try {
-            BitmapFactory.decodeStream(input)
-        } catch (oom: OutOfMemoryError) {
-            return uri
-        }
-        // create an cache image
-        val mimeType = contentResolver.getType(uri) ?: ""
-        val imageType = getImageType(mimeType)
-        val imageCache = File(context.externalCacheDir, "${UUID.randomUUID()}.${imageType.name.toLowerCase()}")
-        if (!imageCache.exists()) imageCache.createNewFile()
-        // write to disk without exif meta data
-        when (imageType) {
-            ImageType.JPG -> {
-                val originExif = ExifInterface(input)
-                imageCache.outputStream().use {
-                    bitmap.compress(Bitmap.CompressFormat.JPEG, compress, it)
-                    it.flush()
+        contentResolver.openInputStream(uri)?.use { input ->
+            // decode to bitmap because bitmap won't store exif meta data
+            val bitmap = try {
+                BitmapFactory.decodeStream(input)
+            } catch (oom: OutOfMemoryError) {
+                return uri
+            }
+            // create an cache image
+            val mimeType = contentResolver.getType(uri) ?: ""
+            val imageType = getImageType(mimeType)
+            val imageCache = File(context.externalCacheDir, "${UUID.randomUUID()}.${imageType.name.toLowerCase()}")
+            if (!imageCache.exists()) imageCache.createNewFile()
+            // write to disk without exif meta data
+            when (imageType) {
+                ImageType.JPG -> {
+                    val originExif = ExifInterface(input)
+                    imageCache.outputStream().use {
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, compress, it)
+                        it.flush()
+                    }
+                    // keep origin images orientation
+                    originExif.getAttribute(ExifInterface.TAG_ORIENTATION)?.let {
+                        ExifInterface(imageCache.absolutePath).apply {
+                            setAttribute(ExifInterface.TAG_ORIENTATION, it)
+                            saveAttributes()
+                        }
+                    }
                 }
-                // keep origin images orientation
-                originExif.getAttribute(ExifInterface.TAG_ORIENTATION)?.let {
-                    ExifInterface(imageCache.absolutePath).apply {
-                        setAttribute(ExifInterface.TAG_ORIENTATION, it)
-                        saveAttributes()
+                ImageType.PNG -> {
+                    imageCache.outputStream().use {
+                        bitmap.compress(Bitmap.CompressFormat.PNG, compress, it)
+                        it.flush()
+                    }
+                }
+                ImageType.UNKNOWN -> {
+                    imageCache.outputStream().use {
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, compress, it)
+                        it.flush()
                     }
                 }
             }
-            ImageType.PNG -> {
-                imageCache.outputStream().use {
-                    bitmap.compress(Bitmap.CompressFormat.PNG, compress, it)
-                    it.flush()
-                }
-            }
-            ImageType.UNKNOWN -> {
-                imageCache.outputStream().use {
-                    bitmap.compress(Bitmap.CompressFormat.JPEG, compress, it)
-                    it.flush()
-                }
-            }
+            return imageCache.toUri()
         }
-        return imageCache.toUri()
+        return uri
     }
 
     fun deleteCacheFile(uri: Uri) {
