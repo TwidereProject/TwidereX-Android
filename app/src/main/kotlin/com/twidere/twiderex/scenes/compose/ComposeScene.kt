@@ -199,6 +199,7 @@ private fun ComposeBody(
     val textFieldValue by viewModel.textFieldValue.observeAsState(initial = TextFieldValue())
     val keyboardController = LocalSoftwareKeyboardController.current
     val canSaveDraft by viewModel.canSaveDraft.observeAsState(initial = false)
+    val enableThreadMode by viewModel.enableThreadMode.observeAsState(initial = false)
     var showSaveDraftDialog by remember { mutableStateOf(false) }
     val scaffoldState = rememberBottomSheetScaffoldState()
     if (showSaveDraftDialog || canSaveDraft) {
@@ -273,10 +274,11 @@ private fun ComposeBody(
                             }
                         ) {
                             Icon(
-                                painter = painterResource(id = R.drawable.ic_send),
+                                painter = painterResource(id = if (enableThreadMode) R.drawable.ic_send_thread else R.drawable.ic_send),
                                 contentDescription = stringResource(
                                     id = R.string.accessibility_scene_compose_send
-                                )
+                                ),
+                                tint = if (textFieldValue.text.isNotEmpty()) MaterialTheme.colors.primary else LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
                             )
                         }
                     }
@@ -1094,6 +1096,7 @@ private fun ComposeActions(
     val account = LocalActiveAccount.current ?: return
     val images by viewModel.images.observeAsState(initial = emptyList())
     val isInVoteState by viewModel.isInVoteMode.observeAsState(initial = false)
+    val enableThreadMode by viewModel.enableThreadMode.observeAsState(initial = false)
     val allowImage by derivedStateOf {
         account.type == PlatformType.Twitter || (account.type == PlatformType.Mastodon && !isInVoteState)
     }
@@ -1239,6 +1242,7 @@ private fun ComposeActions(
             }
             IconButton(
                 onClick = {
+                    viewModel.setEnableThreadMode(!enableThreadMode)
                     /*Todo Thread mode*/
                     /*Todo highlight when enable*/
                     /*Todo change send icon to thread mode send icon*/
@@ -1246,7 +1250,8 @@ private fun ComposeActions(
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_thread_mode),
-                    contentDescription = "thread mode"
+                    contentDescription = "thread mode",
+                    tint = if (enableThreadMode) MaterialTheme.colors.primary else LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
                 )
             }
             Spacer(modifier = Modifier.weight(1f))

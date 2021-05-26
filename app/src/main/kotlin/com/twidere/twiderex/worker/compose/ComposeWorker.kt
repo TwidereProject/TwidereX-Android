@@ -33,6 +33,7 @@ import com.twidere.twiderex.R
 import com.twidere.twiderex.model.ComposeData
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.toComposeData
+import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.notification.NotificationChannelSpec
 import com.twidere.twiderex.repository.AccountRepository
@@ -118,7 +119,7 @@ abstract class ComposeWorker<T : MicroBlogService>(
         service: T,
         composeData: ComposeData,
         mediaIds: ArrayList<String>
-    )
+    ): UiStatus
 
     protected abstract suspend fun uploadImage(
         uri: Uri,

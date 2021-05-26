@@ -44,6 +44,7 @@ data class ComposeData(
     val visibility: Visibility? = null,
     val isSensitive: Boolean? = null,
     val contentWarningText: String? = null,
+    val isThreadMode: Boolean = false
 )
 
 fun ComposeData.toWorkData() = workDataOf(
@@ -61,6 +62,7 @@ fun ComposeData.toWorkData() = workDataOf(
     "visibility" to visibility?.name,
     "isSensitive" to isSensitive,
     "contentWarningText" to contentWarningText,
+    "isThreadMode" to isThreadMode,
 )
 
 fun Data.toComposeData() = ComposeData(
@@ -78,4 +80,5 @@ fun Data.toComposeData() = ComposeData(
     visibility = getString("visibility")?.let { Visibility.valueOf(it) },
     isSensitive = getNullableBoolean("isSensitive"),
     contentWarningText = getString("contentWarningText"),
+    isThreadMode = getBoolean("isThreadMode", false),
 )

@@ -30,9 +30,12 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkerParameters
 import androidx.work.hasKeyWithValueOfType
 import com.twidere.services.twitter.TwitterService
+import com.twidere.twiderex.db.mapper.toDbStatusWithReference
 import com.twidere.twiderex.model.ComposeData
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.toWorkData
+import com.twidere.twiderex.model.ui.UiStatus
+import com.twidere.twiderex.model.ui.UiStatus.Companion.toUi
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.StatusRepository
 import com.twidere.twiderex.viewmodel.compose.ComposeType
@@ -73,7 +76,7 @@ class TwitterComposeWorker @AssistedInject constructor(
         service: TwitterService,
         composeData: ComposeData,
         mediaIds: ArrayList<String>
-    ) {
+    ): UiStatus {
         val accountKey = inputData.getString("accountKey")?.let {
             MicroBlogKey.valueOf(it)
         } ?: throw Error()
@@ -94,7 +97,7 @@ class TwitterComposeWorker @AssistedInject constructor(
                 it
             }
         }
-        service.update(
+        return service.update(
             content,
             media_ids = mediaIds,
             in_reply_to_status_id = if (composeData.composeType == ComposeType.Reply) composeData.statusKey?.id else null,
@@ -102,7 +105,7 @@ class TwitterComposeWorker @AssistedInject constructor(
             lat = lat,
             long = long,
             exclude_reply_user_ids = composeData.excludedReplyUserIds
-        )
+        ).toDbStatusWithReference(accountKey).toUi(accountKey)
     }
 
     override suspend fun uploadImage(

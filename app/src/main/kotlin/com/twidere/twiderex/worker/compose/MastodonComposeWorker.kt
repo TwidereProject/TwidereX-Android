@@ -31,9 +31,12 @@ import androidx.work.WorkerParameters
 import com.twidere.services.mastodon.MastodonService
 import com.twidere.services.mastodon.model.PostPoll
 import com.twidere.services.mastodon.model.PostStatus
+import com.twidere.twiderex.db.mapper.toDbStatusWithReference
 import com.twidere.twiderex.model.ComposeData
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.toWorkData
+import com.twidere.twiderex.model.ui.UiStatus
+import com.twidere.twiderex.model.ui.UiStatus.Companion.toUi
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.viewmodel.compose.ComposeType
 import dagger.assisted.Assisted
@@ -67,8 +70,11 @@ class MastodonComposeWorker @AssistedInject constructor(
         service: MastodonService,
         composeData: ComposeData,
         mediaIds: ArrayList<String>
-    ) {
-        service.compose(
+    ): UiStatus {
+        val accountKey = inputData.getString("accountKey")?.let {
+            MicroBlogKey.valueOf(it)
+        } ?: throw Error()
+        return service.compose(
             PostStatus(
                 status = composeData.content,
                 inReplyToID = if (composeData.composeType == ComposeType.Reply) composeData.statusKey?.id else null,
@@ -84,7 +90,7 @@ class MastodonComposeWorker @AssistedInject constructor(
                     )
                 }
             )
-        )
+        ).toDbStatusWithReference(accountKey).toUi(accountKey)
     }
 
     override suspend fun uploadImage(
