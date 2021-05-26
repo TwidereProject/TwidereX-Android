@@ -88,13 +88,14 @@ class MastodonComposeWorker @AssistedInject constructor(
     }
 
     override suspend fun uploadImage(
-        uri: Uri,
+        originUri: Uri,
+        scramblerUri: Uri,
         service: MastodonService
     ): String? {
-        val id = contentResolver.openInputStream(uri)?.use {
+        val id = contentResolver.openInputStream(scramblerUri)?.use { input ->
             service.upload(
-                it,
-                uri.path?.let { File(it).name }?.takeIf { it.isNotEmpty() } ?: "file"
+                input,
+                originUri.path?.let { File(it).name }?.takeIf { it.isNotEmpty() } ?: "file"
             )
         } ?: throw Error()
         return id.id
