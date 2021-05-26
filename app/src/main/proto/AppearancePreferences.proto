@@ -18,4 +18,7 @@ message AppearancePreferences {
   int32 primaryColorIndex = 1;
   TabPosition tapPosition = 2;
   Theme theme = 3;
+  bool hideTabBarWhenScroll = 4;
+  bool hideFabWhenScroll = 5;
+  bool hideAppBarWhenScroll = 6;
 }
