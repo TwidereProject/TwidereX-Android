@@ -37,6 +37,7 @@ import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.notification.NotificationChannelSpec
 import com.twidere.twiderex.repository.AccountRepository
+import com.twidere.twiderex.viewmodel.compose.ComposeType
 import kotlin.math.roundToInt
 
 abstract class ComposeWorker<T : MicroBlogService>(
@@ -86,14 +87,26 @@ abstract class ComposeWorker<T : MicroBlogService>(
             }
             builder.setProgress(100, 99, false)
             notificationManagerCompat.notify(notificationId, builder.build())
-            compose(service, composeData, mediaIds)
+            // TODO insert status into database
+            val status = compose(service, composeData, mediaIds)
             builder.setOngoing(false)
                 .setProgress(0, 0, false)
                 .setSilent(false)
                 .setContentTitle(applicationContext.getString(R.string.common_alerts_tweet_sent_title))
             notificationManagerCompat.notify(notificationId, builder.build())
+            if (composeData.isThreadMode) {
+                applicationContext.startActivity(
+                    Intent(
+                        Intent.ACTION_VIEW,
+                        Uri.parse(Route.DeepLink.Compose(ComposeType.Thread, status.statusKey))
+                    ).apply {
+                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    }
+                )
+            }
             Result.success()
         } catch (e: Throwable) {
+            e.printStackTrace()
             val intent =
                 Intent(Intent.ACTION_VIEW, Uri.parse(Route.DeepLink.Draft(composeData.draftId)))
             val pendingIntent =

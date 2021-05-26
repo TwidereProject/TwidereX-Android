@@ -100,7 +100,7 @@ class TwitterComposeWorker @AssistedInject constructor(
         return service.update(
             content,
             media_ids = mediaIds,
-            in_reply_to_status_id = if (composeData.composeType == ComposeType.Reply) composeData.statusKey?.id else null,
+            in_reply_to_status_id = if (composeData.composeType == ComposeType.Reply || composeData.composeType == ComposeType.Thread) composeData.statusKey?.id else null,
             repost_status_id = if (composeData.composeType == ComposeType.Quote) composeData.statusKey?.id else null,
             lat = lat,
             long = long,

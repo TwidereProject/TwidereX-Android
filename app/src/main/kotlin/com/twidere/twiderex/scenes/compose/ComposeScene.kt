@@ -292,7 +292,7 @@ private fun ComposeBody(
                 ) {
                     val scrollState = rememberScrollState()
                     LaunchedEffect(scrollState) {
-                        if (composeType == ComposeType.Reply) {
+                        if (composeType == ComposeType.Reply || composeType == ComposeType.Thread) {
                             snapshotFlow { scrollState.value }
                                 .map { it > 0 }
                                 .distinctUntilChanged()
@@ -312,7 +312,7 @@ private fun ComposeBody(
                         modifier = Modifier
                             .verticalScroll(
                                 scrollState,
-                                reverseScrolling = composeType == ComposeType.Reply,
+                                reverseScrolling = composeType == ComposeType.Reply || composeType == ComposeType.Thread,
                             )
                             .clickable(
                                 onClick = {
@@ -326,7 +326,7 @@ private fun ComposeBody(
                         val height = with(LocalDensity.current) {
                             this@BoxWithConstraints.constraints.maxHeight.toDp()
                         }
-                        if (composeType == ComposeType.Reply) {
+                        if (composeType == ComposeType.Reply || composeType == ComposeType.Thread) {
                             status?.let { status ->
                                 Box(
                                     modifier = Modifier
@@ -349,13 +349,13 @@ private fun ComposeBody(
                                     it
                                 }
                             },
-                            lineUp = composeType == ComposeType.Reply,
+                            lineUp = composeType == ComposeType.Reply || composeType == ComposeType.Thread,
                         ) {
                             ComposeInput(
                                 scaffoldState,
                                 viewModel,
                                 account,
-                                autoFocus = if (composeType == ComposeType.Reply) {
+                                autoFocus = if (composeType == ComposeType.Reply || composeType == ComposeType.Thread) {
                                     scrollState.value == 0
                                 } else {
                                     true

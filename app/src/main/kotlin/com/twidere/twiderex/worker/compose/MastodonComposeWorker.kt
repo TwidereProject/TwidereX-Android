@@ -77,7 +77,7 @@ class MastodonComposeWorker @AssistedInject constructor(
         return service.compose(
             PostStatus(
                 status = composeData.content,
-                inReplyToID = if (composeData.composeType == ComposeType.Reply) composeData.statusKey?.id else null,
+                inReplyToID = if (composeData.composeType == ComposeType.Reply || composeData.composeType == ComposeType.Thread) composeData.statusKey?.id else null,
                 mediaIDS = mediaIds,
                 sensitive = composeData.isSensitive,
                 spoilerText = composeData.contentWarningText,

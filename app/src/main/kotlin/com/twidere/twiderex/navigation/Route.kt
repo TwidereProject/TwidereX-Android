@@ -184,6 +184,8 @@ object Route {
             const val Status = "deeplink/twitter/status/{statusId}"
         }
         fun Draft(id: String) = "$twidereXSchema://draft/compose/$id"
+
+        fun Compose(composeType: ComposeType, statusKey: MicroBlogKey? = null) = "$twidereXSchema://${Route.Compose(composeType, statusKey)}"
     }
 
     fun Status(statusKey: MicroBlogKey) = "status/$statusKey"
@@ -221,6 +223,7 @@ object DeepLinks {
     const val SignIn = "$twidereXSchema://signin"
 
     const val Draft = "$twidereXSchema://draft/compose/{draftId}"
+    const val Compose = "$twidereXSchema://compose"
 }
 
 fun RouteBuilder.authorizedScene(
@@ -516,6 +519,9 @@ fun RouteBuilder.route(constraints: Constraints) {
             },
             pauseTransition = fadeScaleDestroyTransition,
             resumeTransition = fadeScaleCreateTransition,
+        ),
+        deepLinks = listOf(
+            DeepLinks.Compose
         )
     ) { backStackEntry ->
         val type = backStackEntry.query<String>("composeType")?.let {
