@@ -26,6 +26,7 @@ import androidx.sqlite.db.SupportSQLiteOpenHelper
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.db.dao.ListsDao
 import com.twidere.twiderex.db.dao.MediaDao
+import com.twidere.twiderex.db.dao.NotificationCursorDao
 import com.twidere.twiderex.db.dao.PagingTimelineDao
 import com.twidere.twiderex.db.dao.ReactionDao
 import com.twidere.twiderex.db.dao.StatusDao
@@ -65,6 +66,10 @@ class MockCacheDatabase : CacheDatabase() {
     private val listsDao = MockListsDao()
     override fun listsDao(): ListsDao {
         return listsDao
+    }
+
+    override fun notificationCursorDao(): NotificationCursorDao {
+        TODO("Not yet implemented")
     }
 
     override fun createOpenHelper(config: DatabaseConfiguration?): SupportSQLiteOpenHelper {
