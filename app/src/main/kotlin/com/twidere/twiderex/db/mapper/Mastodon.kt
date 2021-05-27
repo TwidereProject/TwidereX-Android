@@ -28,6 +28,7 @@ import com.twidere.services.mastodon.model.Notification
 import com.twidere.services.mastodon.model.NotificationTypes
 import com.twidere.services.mastodon.model.Status
 import com.twidere.services.mastodon.model.Visibility
+import com.twidere.services.twitter.model.User
 import com.twidere.twiderex.db.model.DbList
 import com.twidere.twiderex.db.model.DbMastodonStatusExtra
 import com.twidere.twiderex.db.model.DbMastodonUserExtra
@@ -108,7 +109,8 @@ fun Notification.toDbStatusWithReference(
             poll = null,
             card = null,
             mentions = null,
-        )
+        ),
+        isInThread = false
     )
     return DbStatusWithReference(
         status = DbStatusWithMediaAndUser(
@@ -232,7 +234,8 @@ private fun Status.toDbStatusWithMediaAndUser(
                 desc = card?.description?.takeIf { it.isNotEmpty() && it.isNotBlank() },
                 image = card?.image,
             )
-        }
+        },
+        isInThread = user.userId == inReplyToAccountID
     )
     return DbStatusWithMediaAndUser(
         data = status,

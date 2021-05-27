@@ -62,6 +62,7 @@ data class UiStatus(
     val twitterExtra: DbTwitterStatusExtra? = null,
     val linkPreview: DbPreviewCard? = null,
     val referenceStatus: Map<ReferenceType, UiStatus> = emptyMap(),
+    val isInThread: Boolean
 ) {
     val retweet: UiStatus? by lazy {
         if (platformType == PlatformType.Mastodon && mastodonExtra != null && mastodonExtra.type != MastodonStatusType.Status) {
@@ -105,6 +106,7 @@ data class UiStatus(
             statusKey = MicroBlogKey.Empty,
             rawText = "",
             platformType = PlatformType.Twitter,
+            isInThread = false
         )
 
         fun DbStatusWithMediaAndUser.toUi(
@@ -133,6 +135,7 @@ data class UiStatus(
                 mastodonExtra = data.mastodonExtra,
                 twitterExtra = data.twitterExtra,
                 linkPreview = data.previewCard,
+                isInThread = data.isInThread
             )
         }
 
@@ -167,6 +170,7 @@ data class UiStatus(
                     )
                 }.toMap(),
                 linkPreview = data.previewCard,
+                isInThread = data.isInThread
             )
         }
 
@@ -201,6 +205,7 @@ data class UiStatus(
                     )
                 }.toMap(),
                 linkPreview = data.previewCard,
+                isInThread = data.isInThread
             )
         }
     }

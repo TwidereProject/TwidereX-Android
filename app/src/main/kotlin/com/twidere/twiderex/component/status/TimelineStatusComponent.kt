@@ -43,6 +43,7 @@ import androidx.compose.material.LocalContentColor
 import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
@@ -122,32 +123,44 @@ private fun NormalStatus(
     showActions: Boolean
 ) {
     val navigator = LocalNavigator.current
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(
-                onClick = {
-                    navigator.status(data)
-                },
-            )
-            .padding(NormalStatusDefaults.ContentPadding),
+    StatusLineComponent(
+        lineDown = data.isInThread,
+        modifier = Modifier.padding(vertical = NormalStatusDefaults.ContentSpacing)
     ) {
-        Spacer(modifier = Modifier.height(NormalStatusDefaults.ContentSpacing))
-        StatusContent(
+        Column(
             modifier = Modifier
-                .padding(
-                    end = NormalStatusDefaults.ContentSpacing
-                ),
-            data = data,
-        )
-        if (showActions) {
-            Row {
-                Spacer(modifier = Modifier.width(UserAvatarDefaults.AvatarSize))
-                val status = (data.retweet ?: data)
-                StatusActions(status)
+                .fillMaxWidth()
+                .clickable(
+                    onClick = {
+                        navigator.status(data)
+                    },
+                )
+                .padding(NormalStatusDefaults.ContentPadding),
+        ) {
+            StatusContent(
+                modifier = Modifier
+                    .padding(
+                        end = NormalStatusDefaults.ContentSpacing
+                    ),
+                data = data,
+            )
+            if (showActions) {
+                Row {
+                    Spacer(modifier = Modifier.width(UserAvatarDefaults.AvatarSize))
+                    val status = (data.retweet ?: data)
+                    StatusActions(status)
+                }
+            } else {
+                Spacer(modifier = Modifier.height(NormalStatusDefaults.ContentSpacing))
             }
-        } else {
-            Spacer(modifier = Modifier.height(NormalStatusDefaults.ContentSpacing))
+            if (data.isInThread) {
+                StatusThread(
+                    data,
+                    onClick = {
+                        navigator.status(data)
+                    }
+                )
+            }
         }
     }
 }
@@ -158,6 +171,33 @@ object NormalStatusDefaults {
         vertical = 0.dp
     )
     val ContentSpacing = 8.dp
+}
+
+@Composable
+private fun StatusThread(data: UiStatus, onClick: () -> Unit) {
+    Row(modifier = Modifier.padding(top = NormalStatusDefaults.ContentSpacing)) {
+        UserAvatar(
+            user = data.user,
+            size = StatusThreadDefaults.AvatarSize,
+            modifier = Modifier.padding(start = StatusThreadDefaults.HorizontalSpacing)
+        )
+        TextButton(
+            onClick = onClick,
+            modifier = Modifier
+                .padding(start = StatusThreadDefaults.HorizontalSpacing)
+                .height(StatusThreadDefaults.AvatarSize)
+        ) {
+            Text(
+                text = stringResource(id = R.string.accessibility_common_status_thread_show),
+                style = MaterialTheme.typography.body2
+            )
+        }
+    }
+}
+
+object StatusThreadDefaults {
+    val AvatarSize = 32.dp
+    val HorizontalSpacing = (UserAvatarDefaults.AvatarSize - AvatarSize) / 2
 }
 
 @Composable

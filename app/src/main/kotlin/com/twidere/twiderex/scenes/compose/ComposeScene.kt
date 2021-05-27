@@ -276,7 +276,7 @@ private fun ComposeBody(
                             Icon(
                                 painter = painterResource(id = if (enableThreadMode) R.drawable.ic_send_thread else R.drawable.ic_send),
                                 contentDescription = stringResource(
-                                    id = R.string.accessibility_scene_compose_send
+                                    id = if (enableThreadMode) R.string.accessibility_common_status_thread_compose else R.string.accessibility_scene_compose_send
                                 ),
                                 tint = if (textFieldValue.text.isNotEmpty()) MaterialTheme.colors.primary else LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
                             )
@@ -1243,14 +1243,11 @@ private fun ComposeActions(
             IconButton(
                 onClick = {
                     viewModel.setEnableThreadMode(!enableThreadMode)
-                    /*Todo Thread mode*/
-                    /*Todo highlight when enable*/
-                    /*Todo change send icon to thread mode send icon*/
                 },
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_thread_mode),
-                    contentDescription = "thread mode",
+                    contentDescription = stringResource(id = R.string.accessibility_common_status_thread_compose),
                     tint = if (enableThreadMode) MaterialTheme.colors.primary else LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
                 )
             }
