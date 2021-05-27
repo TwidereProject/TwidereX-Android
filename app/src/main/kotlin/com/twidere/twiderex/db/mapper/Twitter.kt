@@ -230,7 +230,7 @@ private fun StatusV2.toDbStatusWithMediaAndUser(
                     )
                 }
             },
-        isInThread = user.userId == referencedTweets?.find { it.type == ReferencedTweetType.replied_to }?.status?.authorID
+        isInThread = user.userId == inReplyToUserId
     )
     return DbStatusWithMediaAndUser(
         data = status,
