@@ -316,4 +316,6 @@
     <string name="accessibility_scene_compose_draft">Open draft</string>
     <string name="accessibility_scene_manage_accounts_add">Add</string>
     <string name="accessibility_scene_settings_display_font_size">Font Size</string>
+    <string name="notification_channel_name_content_interactions">interactions</string>
+    <string name="notification_channel_description_content_interactions">content interactions</string>
 </resources>

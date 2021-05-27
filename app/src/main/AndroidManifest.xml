@@ -34,6 +34,9 @@
             <meta-data
                 android:name="com.twidere.twiderex.notification.NotificationChannelInitializer"
                 android:value="androidx.startup" />
+            <meta-data
+                android:name="com.twidere.twiderex.notification.NotificationInitializer"
+                android:value="androidx.startup" />
         </provider>
         <activity
             android:exported="true"

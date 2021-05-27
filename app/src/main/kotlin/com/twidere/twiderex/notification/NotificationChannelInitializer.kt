@@ -21,18 +21,28 @@
 package com.twidere.twiderex.notification
 
 import android.content.Context
+import android.net.Uri
 import androidx.core.app.NotificationChannelCompat
+import androidx.core.app.NotificationChannelGroupCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.startup.Initializer
+import com.twidere.twiderex.di.InitializerEntryPoint
+import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.repository.AccountRepository
+import javax.inject.Inject
 
 class NotificationChannelInitializerHolder
 
 class NotificationChannelInitializer : Initializer<NotificationChannelInitializerHolder> {
+    @Inject
+    lateinit var repository: AccountRepository
+
     override fun create(context: Context): NotificationChannelInitializerHolder {
+        InitializerEntryPoint.resolve(context).inject(this)
+
         val notificationManagerCompat = NotificationManagerCompat.from(context)
         val addedChannels = mutableListOf<String>()
-        for (spec in NotificationChannelSpec.values()) {
-            if (spec.grouped) continue
+        for (spec in NotificationChannelSpec.values().filter { !it.grouped }) {
             val builder = NotificationChannelCompat.Builder(spec.id, spec.importance)
                 .setName(context.getString(spec.nameRes))
 
@@ -50,10 +60,71 @@ class NotificationChannelInitializer : Initializer<NotificationChannelInitialize
                 notificationManagerCompat.deleteNotificationChannel(it.id)
             }
         }
+
+        updateAccountChannelsAndGroups(context)
+
         return NotificationChannelInitializerHolder()
+    }
+
+    private fun updateAccountChannelsAndGroups(context: Context) {
+        val notificationManagerCompat = NotificationManagerCompat.from(context)
+        val accounts = repository.getAccounts().map { repository.getAccountDetails(it) }
+        val specs = NotificationChannelSpec.values().filter { it.grouped }
+
+        val addedChannels = mutableListOf<String>()
+        val addedGroups = mutableListOf<String>()
+
+        accounts.forEach { account ->
+            val group = NotificationChannelGroupCompat
+                .Builder(account.accountKey.notificationChannelGroupId())
+                .setName(account.account.name.let { MicroBlogKey.valueOf(it) }.id)
+                .setDescription(account.account.name)
+                .build()
+            addedGroups.add(group.id)
+            notificationManagerCompat.createNotificationChannelGroup(group)
+
+            for (spec in specs) {
+                val channel = NotificationChannelCompat
+                    .Builder(account.accountKey.notificationChannelId(spec.id), spec.importance)
+                    .setName(context.getString(spec.nameRes))
+                    .let {
+                        if (spec.descriptionRes != 0) {
+                            it.setDescription(context.getString(spec.descriptionRes))
+                        } else {
+                            it
+                        }
+                    }
+                    .setGroup(group.id)
+                    .setShowBadge(spec.showBadge)
+                    .build()
+
+                notificationManagerCompat.createNotificationChannel(channel)
+                addedChannels.add(channel.id)
+            }
+        }
+
+        // Delete all channels and groups of non-existing accounts
+        notificationManagerCompat.notificationChannelsCompat.forEach {
+            if (it.id !in addedChannels && it.group != null) {
+                notificationManagerCompat.deleteNotificationChannel(it.id)
+            }
+        }
+        notificationManagerCompat.notificationChannelGroupsCompat.forEach {
+            if (it.id !in addedGroups) {
+                notificationManagerCompat.deleteNotificationChannelGroup(it.id)
+            }
+        }
     }
 
     override fun dependencies(): List<Class<out Initializer<*>>> {
         return emptyList()
     }
+}
+
+fun MicroBlogKey.notificationChannelId(id: String): String {
+    return "${id}_${Uri.encode(toString())}"
+}
+
+fun MicroBlogKey.notificationChannelGroupId(): String {
+    return Uri.encode(toString())
 }
