@@ -30,7 +30,9 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkerParameters
 import androidx.work.hasKeyWithValueOfType
 import com.twidere.services.twitter.TwitterService
+import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.db.mapper.toDbStatusWithReference
+import com.twidere.twiderex.db.model.saveToDb
 import com.twidere.twiderex.model.ComposeData
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.toWorkData
@@ -50,6 +52,7 @@ class TwitterComposeWorker @AssistedInject constructor(
     notificationManagerCompat: NotificationManagerCompat,
     private val statusRepository: StatusRepository,
     private val contentResolver: ContentResolver,
+    private val cacheDatabase: CacheDatabase,
 ) : ComposeWorker<TwitterService>(
     context,
     workerParams,
@@ -97,7 +100,7 @@ class TwitterComposeWorker @AssistedInject constructor(
                 it
             }
         }
-        return service.update(
+        val result = service.update(
             content,
             media_ids = mediaIds,
             in_reply_to_status_id = if (composeData.composeType == ComposeType.Reply || composeData.composeType == ComposeType.Thread) composeData.statusKey?.id else null,
@@ -105,7 +108,9 @@ class TwitterComposeWorker @AssistedInject constructor(
             lat = lat,
             long = long,
             exclude_reply_user_ids = composeData.excludedReplyUserIds
-        ).toDbStatusWithReference(accountKey).toUi(accountKey)
+        ).toDbStatusWithReference(accountKey)
+        listOf(result).saveToDb(cacheDatabase)
+        return result.toUi(accountKey)
     }
 
     override suspend fun uploadImage(

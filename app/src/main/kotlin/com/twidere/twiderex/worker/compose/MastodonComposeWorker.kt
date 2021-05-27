@@ -31,7 +31,9 @@ import androidx.work.WorkerParameters
 import com.twidere.services.mastodon.MastodonService
 import com.twidere.services.mastodon.model.PostPoll
 import com.twidere.services.mastodon.model.PostStatus
+import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.db.mapper.toDbStatusWithReference
+import com.twidere.twiderex.db.model.saveToDb
 import com.twidere.twiderex.model.ComposeData
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.toWorkData
@@ -50,6 +52,7 @@ class MastodonComposeWorker @AssistedInject constructor(
     accountRepository: AccountRepository,
     notificationManagerCompat: NotificationManagerCompat,
     private val contentResolver: ContentResolver,
+    private val cacheDatabase: CacheDatabase,
 ) : ComposeWorker<MastodonService>(context, workerParams, accountRepository, notificationManagerCompat) {
 
     companion object {
@@ -74,7 +77,7 @@ class MastodonComposeWorker @AssistedInject constructor(
         val accountKey = inputData.getString("accountKey")?.let {
             MicroBlogKey.valueOf(it)
         } ?: throw Error()
-        return service.compose(
+        val result = service.compose(
             PostStatus(
                 status = composeData.content,
                 inReplyToID = if (composeData.composeType == ComposeType.Reply || composeData.composeType == ComposeType.Thread) composeData.statusKey?.id else null,
@@ -90,7 +93,9 @@ class MastodonComposeWorker @AssistedInject constructor(
                     )
                 }
             )
-        ).toDbStatusWithReference(accountKey).toUi(accountKey)
+        ).toDbStatusWithReference(accountKey)
+        listOf(result).saveToDb(cacheDatabase)
+        return result.toUi(accountKey)
     }
 
     override suspend fun uploadImage(

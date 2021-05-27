@@ -95,6 +95,7 @@ abstract class ComposeWorker<T : MicroBlogService>(
                 .setContentTitle(applicationContext.getString(R.string.common_alerts_tweet_sent_title))
             notificationManagerCompat.notify(notificationId, builder.build())
             if (composeData.isThreadMode) {
+                // open compose scene in thread mode
                 applicationContext.startActivity(
                     Intent(
                         Intent.ACTION_VIEW,
