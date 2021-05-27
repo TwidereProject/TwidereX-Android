@@ -421,12 +421,14 @@ private fun ComposeBody(
                         keyboardController?.show()
                     }
                 }
-                ComposeActions(
-                    viewModel,
-                    emojiButtonClicked = {
-                        showEmoji = !showEmoji
-                    },
-                )
+                CompositionLocalProvider(LocalContentAlpha.provides(ContentAlpha.medium)) {
+                    ComposeActions(
+                        viewModel,
+                        emojiButtonClicked = {
+                            showEmoji = !showEmoji
+                        },
+                    )
+                }
                 EmojiPanel(viewModel = viewModel, showEmoji = showEmoji)
             }
         }

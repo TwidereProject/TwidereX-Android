@@ -70,6 +70,7 @@ import com.twidere.twiderex.ui.LocalActiveAccount
 fun TimelineStatusComponent(
     data: UiStatus,
     showActions: Boolean = true,
+    showThread: Boolean = false,
 ) {
     when {
         data.platformType == PlatformType.Mastodon &&
@@ -80,7 +81,7 @@ fun TimelineStatusComponent(
                 ) -> {
             MastodonFollowStatus(data)
         }
-        else -> NormalStatus(data, showActions)
+        else -> NormalStatus(data, showActions, showThread)
     }
 }
 
@@ -120,11 +121,12 @@ object MastodonFollowStatusDefaults {
 @Composable
 private fun NormalStatus(
     data: UiStatus,
-    showActions: Boolean
+    showActions: Boolean,
+    showThread: Boolean,
 ) {
     val navigator = LocalNavigator.current
     StatusLineComponent(
-        lineDown = data.isInThread,
+        lineDown = data.isInThread && showThread,
         modifier = Modifier.padding(vertical = NormalStatusDefaults.ContentSpacing)
     ) {
         Column(
@@ -153,7 +155,7 @@ private fun NormalStatus(
             } else {
                 Spacer(modifier = Modifier.height(NormalStatusDefaults.ContentSpacing))
             }
-            if (data.isInThread) {
+            if (data.isInThread && showThread) {
                 StatusThread(
                     data,
                     onClick = {

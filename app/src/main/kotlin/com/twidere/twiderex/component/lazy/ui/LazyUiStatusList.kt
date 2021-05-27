@@ -94,6 +94,7 @@ fun LazyUiStatusList(
                     Column {
                         TimelineStatusComponent(
                             item,
+                            showThread = true
                         )
                         when {
                             loadingBetween.contains(item.statusKey) -> {
