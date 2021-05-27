@@ -43,7 +43,6 @@ import androidx.compose.material.LocalContentColor
 import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
@@ -70,7 +69,7 @@ import com.twidere.twiderex.ui.LocalActiveAccount
 fun TimelineStatusComponent(
     data: UiStatus,
     showActions: Boolean = true,
-    showThread: Boolean = false,
+    threadStyle: StatusThreadStyle = StatusThreadStyle.NONE,
 ) {
     when {
         data.platformType == PlatformType.Mastodon &&
@@ -81,7 +80,7 @@ fun TimelineStatusComponent(
                 ) -> {
             MastodonFollowStatus(data)
         }
-        else -> NormalStatus(data, showActions, showThread)
+        else -> NormalStatus(data, showActions, threadStyle)
     }
 }
 
@@ -122,11 +121,11 @@ object MastodonFollowStatusDefaults {
 private fun NormalStatus(
     data: UiStatus,
     showActions: Boolean,
-    showThread: Boolean,
+    threadStyle: StatusThreadStyle
 ) {
     val navigator = LocalNavigator.current
     StatusLineComponent(
-        lineDown = data.isInThread && showThread,
+        lineDown = data.isInThread && threadStyle.lineDown,
         modifier = Modifier.padding(vertical = NormalStatusDefaults.ContentSpacing)
     ) {
         Column(
@@ -155,13 +154,29 @@ private fun NormalStatus(
             } else {
                 Spacer(modifier = Modifier.height(NormalStatusDefaults.ContentSpacing))
             }
-            if (data.isInThread && showThread) {
-                StatusThread(
-                    data,
-                    onClick = {
-                        navigator.status(data)
+            if (data.isInThread) {
+                when (threadStyle) {
+                    StatusThreadStyle.NONE -> {
+                        // show nothing
                     }
-                )
+                    StatusThreadStyle.WITH_AVATAR -> {
+                        StatusThreadWithAvatar(
+                            modifier = Modifier.padding(top = NormalStatusDefaults.ContentSpacing),
+                            data = data,
+                            onClick = {
+                                navigator.status(data)
+                            }
+                        )
+                    }
+                    StatusThreadStyle.TEXT_ONLY -> {
+                        StatusThread(
+                            modifier = Modifier.padding(start = UserAvatarDefaults.AvatarSize),
+                            onClick = {
+                                navigator.status(data)
+                            }
+                        )
+                    }
+                }
             }
         }
     }
@@ -173,33 +188,6 @@ object NormalStatusDefaults {
         vertical = 0.dp
     )
     val ContentSpacing = 8.dp
-}
-
-@Composable
-private fun StatusThread(data: UiStatus, onClick: () -> Unit) {
-    Row(modifier = Modifier.padding(top = NormalStatusDefaults.ContentSpacing)) {
-        UserAvatar(
-            user = data.user,
-            size = StatusThreadDefaults.AvatarSize,
-            modifier = Modifier.padding(start = StatusThreadDefaults.HorizontalSpacing)
-        )
-        TextButton(
-            onClick = onClick,
-            modifier = Modifier
-                .padding(start = StatusThreadDefaults.HorizontalSpacing)
-                .height(StatusThreadDefaults.AvatarSize)
-        ) {
-            Text(
-                text = stringResource(id = R.string.accessibility_common_status_thread_show),
-                style = MaterialTheme.typography.body2
-            )
-        }
-    }
-}
-
-object StatusThreadDefaults {
-    val AvatarSize = 32.dp
-    val HorizontalSpacing = (UserAvatarDefaults.AvatarSize - AvatarSize) / 2
 }
 
 @Composable

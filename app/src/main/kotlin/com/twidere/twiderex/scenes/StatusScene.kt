@@ -58,6 +58,8 @@ import com.twidere.twiderex.component.foundation.ErrorPlaceholder
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.status.DetailedStatusComponent
 import com.twidere.twiderex.component.status.StatusDivider
+import com.twidere.twiderex.component.status.StatusLineComponent
+import com.twidere.twiderex.component.status.StatusThreadStyle
 import com.twidere.twiderex.component.status.TimelineStatusComponent
 import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.model.MicroBlogKey
@@ -147,11 +149,13 @@ fun StatusScene(
                         state.animateScrollBy(-distance, tween())
                     }
                 }
+                var detailIndex = -1
                 LazyColumn(
                     state = state,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     if (source.loadState.refresh is LoadState.Loading || source.loadState.refresh is LoadState.Error) {
+                        detailIndex = -1
                         status?.let {
                             item(key = it.hashCode()) {
                                 DetailedStatusComponent(data = it)
@@ -169,9 +173,23 @@ fun StatusScene(
                                     content = {
                                         Column {
                                             if (status.statusKey == statusKey) {
-                                                DetailedStatusComponent(data = status)
+                                                detailIndex = index
+                                                StatusLineComponent(lineUp = detailIndex > 0) {
+                                                    DetailedStatusComponent(data = status)
+                                                }
                                             } else {
-                                                TimelineStatusComponent(data = status)
+                                                StatusLineComponent(
+                                                    lineDown = index < detailIndex,
+                                                    lineUp = index in 1 until detailIndex
+                                                ) {
+                                                    TimelineStatusComponent(
+                                                        data = status,
+                                                        threadStyle = if (index > detailIndex)
+                                                            StatusThreadStyle.TEXT_ONLY
+                                                        else
+                                                            StatusThreadStyle.NONE
+                                                    )
+                                                }
                                             }
                                             if (status.statusKey == statusKey) {
                                                 Divider()
