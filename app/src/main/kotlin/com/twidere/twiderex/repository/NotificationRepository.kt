@@ -43,17 +43,17 @@ class NotificationRepository(
                 val notifications = service.notificationTimeline()
                     .map { it.toDbStatusWithReference(account.accountKey) }
                     .map { it.toUi(account.accountKey) }
-                val cursor = findCursor(account.accountKey, NotificationCursorType.General)
-                if (cursor != null) {
-                    notifications.takeWhile { it.statusId != cursor.value }
+                val currentCursor = findCursor(account.accountKey, NotificationCursorType.General)
+                if (notifications.any()) {
+                    addCursor(
+                        accountKey = account.accountKey,
+                        type = NotificationCursorType.General,
+                        value = notifications.first().statusId
+                    )
+                }
+                if (currentCursor != null) {
+                    notifications.takeWhile { it.statusId != currentCursor.value }
                 } else {
-                    if (notifications.any()) {
-                        addCursor(
-                            accountKey = account.accountKey,
-                            type = NotificationCursorType.General,
-                            value = notifications.first().statusId
-                        )
-                    }
                     emptyList()
                 }
             }
@@ -62,17 +62,17 @@ class NotificationRepository(
                     val mentions = service.mentionsTimeline()
                         .map { it.toDbStatusWithReference(account.accountKey) }
                         .map { it.toUi(account.accountKey) }
-                    val cursor = findCursor(account.accountKey, NotificationCursorType.Mentions)
-                    if (cursor != null) {
-                        mentions.takeWhile { it.statusId != cursor.value }
+                    val currentCursor = findCursor(account.accountKey, NotificationCursorType.Mentions)
+                    if (mentions.any()) {
+                        addCursor(
+                            accountKey = account.accountKey,
+                            type = NotificationCursorType.Mentions,
+                            value = mentions.first().statusId,
+                        )
+                    }
+                    if (currentCursor != null) {
+                        mentions.takeWhile { it.statusId != currentCursor.value }
                     } else {
-                        if (mentions.any()) {
-                            addCursor(
-                                accountKey = account.accountKey,
-                                type = NotificationCursorType.Mentions,
-                                value = mentions.first().statusId,
-                            )
-                        }
                         emptyList()
                     }
                 } else {

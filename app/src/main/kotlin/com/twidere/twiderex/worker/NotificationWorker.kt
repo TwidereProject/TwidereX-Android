@@ -26,11 +26,16 @@ import android.content.Intent
 import android.net.Uri
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.graphics.drawable.toBitmap
+import androidx.core.text.HtmlCompat
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import coil.Coil
+import coil.request.ImageRequest
+import coil.request.SuccessResult
 import com.twidere.twiderex.R
-import com.twidere.twiderex.component.status.normalizeHtmlText
+import com.twidere.twiderex.db.model.ReferenceType
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MastodonStatusType
 import com.twidere.twiderex.model.PlatformType
@@ -70,7 +75,7 @@ class NotificationWorker @AssistedInject constructor(
         Result.success()
     }
 
-    private fun notify(account: AccountDetails, status: UiStatus) {
+    private suspend fun notify(account: AccountDetails, status: UiStatus) {
         val notificationId = "${account.accountKey}_${status.statusKey}"
         val builder = NotificationCompat
             .Builder(
@@ -82,158 +87,136 @@ class NotificationWorker @AssistedInject constructor(
             .setSmallIcon(R.drawable.ic_notification)
             .setCategory(NotificationCompat.CATEGORY_SOCIAL)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setAutoCancel(true)
 
-        when (status.platformType) {
+        val notificationData = when (status.platformType) {
             PlatformType.Twitter -> {
-                val intent =
-                    Intent(
-                        Intent.ACTION_VIEW,
-                        Uri.parse(DeepLinks.Twitter.Status(status.statusId))
-                    )
-                val pendingIntent =
-                    PendingIntent.getActivity(
-                        applicationContext,
-                        0,
-                        intent,
-                        PendingIntent.FLAG_MUTABLE
-                    )
-                builder.setContentTitle("${status.user.screenName} just mentions you")
-                    .setContentTitle(status.htmlText.normalizeHtmlText())
-                    .setContentIntent(pendingIntent)
+                NotificationData(
+                    title = "${status.user.screenName} just mentions you",
+                    htmlContent = status.htmlText,
+                    deepLink = DeepLinks.Twitter.Status(status.statusId),
+                    profileImage = status.user.profileImage,
+                )
             }
             PlatformType.StatusNet -> TODO()
             PlatformType.Fanfou -> TODO()
             PlatformType.Mastodon -> {
-                updateMastodonNotificationBuilder(builder, status)
+                generateMastodonNotificationData(
+                    status,
+                )
             }
         }
-        notificationManagerCompat.notify(notificationId.hashCode(), builder.build())
+        if (notificationData != null) {
+            builder.setContentTitle(notificationData.title)
+            if (notificationData.htmlContent != null) {
+                val html = HtmlCompat.fromHtml(
+                    notificationData.htmlContent,
+                    HtmlCompat.FROM_HTML_MODE_COMPACT
+                )
+                builder
+                    .setContentText(html)
+                    .setStyle(
+                        NotificationCompat.BigTextStyle()
+                            .bigText(html)
+                    )
+            }
+            if (notificationData.deepLink != null) {
+                builder.setContentIntent(
+                    PendingIntent.getActivity(
+                        applicationContext,
+                        0,
+                        Intent(Intent.ACTION_VIEW, Uri.parse(notificationData.deepLink)),
+                        PendingIntent.FLAG_MUTABLE
+                    )
+                )
+            }
+            if (notificationData.profileImage != null) {
+                val result = Coil.execute(
+                    ImageRequest.Builder(applicationContext)
+                        .data(notificationData.profileImage)
+                        .build()
+                )
+                if (result is SuccessResult) {
+                    builder.setLargeIcon(result.drawable.toBitmap())
+                }
+            }
+            notificationManagerCompat.notify(notificationId.hashCode(), builder.build())
+        }
     }
 
-    private fun updateMastodonNotificationBuilder(
-        builder: NotificationCompat.Builder,
+    private fun generateMastodonNotificationData(
         status: UiStatus
-    ) {
-        if (status.mastodonExtra == null) {
-            return
+    ): NotificationData? {
+        val actualStatus = status.referenceStatus[ReferenceType.MastodonNotification]
+        if (status.mastodonExtra == null || actualStatus == null) {
+            return null
         }
-        when (status.mastodonExtra.type) {
-            MastodonStatusType.Status -> Unit
+        return when (status.mastodonExtra.type) {
+            MastodonStatusType.Status -> null
             MastodonStatusType.NotificationFollow -> {
-                builder
-                    .setContentTitle(
-                        applicationContext.getString(
-                            R.string.common_notification_follow,
-                            status.user.displayName
-                        )
-                    )
-                    .setContentIntent(
-                        PendingIntent.getActivity(
-                            applicationContext,
-                            0,
-                            Intent(
-                                Intent.ACTION_VIEW,
-                                Uri.parse(DeepLinks.User(status.user.userKey)),
-                            ),
-                            PendingIntent.FLAG_MUTABLE,
-                        )
-                    )
+                NotificationData(
+                    title = applicationContext.getString(
+                        R.string.common_notification_follow,
+                        actualStatus.user.displayName
+                    ),
+                    deepLink = DeepLinks.User(actualStatus.user.userKey),
+                    profileImage = actualStatus.user.profileImage,
+                )
             }
             MastodonStatusType.NotificationFollowRequest -> {
-                builder
-                    .setContentTitle(
-                        applicationContext.getString(
-                            R.string.common_notification_follow_request,
-                            status.user.displayName
-                        )
-                    )
-                    .setContentIntent(
-                        PendingIntent.getActivity(
-                            applicationContext,
-                            0,
-                            Intent(
-                                Intent.ACTION_VIEW,
-                                Uri.parse(DeepLinks.User(status.user.userKey)),
-                            ),
-                            PendingIntent.FLAG_MUTABLE,
-                        )
-                    )
+                NotificationData(
+                    title = applicationContext.getString(
+                        R.string.common_notification_follow_request,
+                        actualStatus.user.displayName
+                    ),
+                    deepLink = DeepLinks.User(actualStatus.user.userKey)
+                )
             }
             MastodonStatusType.NotificationMention -> {
-                builder.setContentTitle("${status.user.screenName} just mentions you")
-                    .setContentTitle(status.htmlText.normalizeHtmlText())
-                    .setContentIntent(
-                        PendingIntent.getActivity(
-                            applicationContext,
-                            0,
-                            Intent(
-                                Intent.ACTION_VIEW,
-                                Uri.parse(DeepLinks.Status(status.statusKey))
-                            ),
-                            PendingIntent.FLAG_MUTABLE,
-                        )
-                    )
+                NotificationData(
+                    title = "${actualStatus.user.screenName} just mentions you",
+                    htmlContent = actualStatus.htmlText,
+                    deepLink = DeepLinks.Status(actualStatus.statusKey),
+                    profileImage = actualStatus.user.profileImage,
+                )
             }
             MastodonStatusType.NotificationReblog -> {
-                builder
-                    .setContentTitle(
-                        applicationContext.getString(
-                            R.string.common_notification_reblog,
-                            status.user.displayName
-                        )
-                    )
-                    .setContentIntent(
-                        PendingIntent.getActivity(
-                            applicationContext,
-                            0,
-                            Intent(
-                                Intent.ACTION_VIEW,
-                                Uri.parse(DeepLinks.Status(status.statusKey))
-                            ),
-                            PendingIntent.FLAG_MUTABLE,
-                        )
-                    )
+                NotificationData(
+                    title = applicationContext.getString(
+                        R.string.common_notification_reblog,
+                        actualStatus.user.displayName
+                    ),
+                    deepLink = DeepLinks.Status(actualStatus.statusKey),
+                    profileImage = actualStatus.user.profileImage,
+                )
             }
             MastodonStatusType.NotificationFavourite -> {
-                builder
-                    .setContentTitle(
-                        applicationContext.getString(
-                            R.string.common_notification_favourite,
-                            status.user.displayName
-                        )
-                    )
-                    .setContentIntent(
-                        PendingIntent.getActivity(
-                            applicationContext,
-                            0,
-                            Intent(
-                                Intent.ACTION_VIEW,
-                                Uri.parse(DeepLinks.Status(status.statusKey))
-                            ),
-                            PendingIntent.FLAG_MUTABLE,
-                        )
-                    )
+                NotificationData(
+                    title = applicationContext.getString(
+                        R.string.common_notification_favourite,
+                        actualStatus.user.displayName
+                    ),
+                    deepLink = DeepLinks.Status(actualStatus.statusKey),
+                    profileImage = actualStatus.user.profileImage,
+                )
             }
             MastodonStatusType.NotificationPoll -> {
-                builder
-                    .setContentTitle(
-                        applicationContext.getString(
-                            R.string.common_notification_poll,
-                        )
-                    )
-                    .setContentIntent(
-                        PendingIntent.getActivity(
-                            applicationContext,
-                            0,
-                            Intent(
-                                Intent.ACTION_VIEW,
-                                Uri.parse(DeepLinks.Status(status.statusKey))
-                            ),
-                            PendingIntent.FLAG_MUTABLE,
-                        )
-                    )
+                NotificationData(
+                    title = applicationContext.getString(
+                        R.string.common_notification_poll,
+                    ),
+                    deepLink = DeepLinks.Status(actualStatus.statusKey),
+                    profileImage = actualStatus.user.profileImage,
+                )
             }
-            MastodonStatusType.NotificationStatus -> Unit
+            MastodonStatusType.NotificationStatus -> null
         }
     }
 }
+
+private data class NotificationData(
+    val title: String,
+    val profileImage: Any? = null,
+    val htmlContent: String? = null,
+    val deepLink: String? = null,
+)

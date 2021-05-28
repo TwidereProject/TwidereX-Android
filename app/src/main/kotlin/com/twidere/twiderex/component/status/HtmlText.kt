@@ -61,12 +61,6 @@ data class ResolvedLink(
     val display: String? = null,
 )
 
-fun String.normalizeHtmlText(): String {
-    return Jsoup.parse(this)
-        .body()
-        .wholeText()
-}
-
 @Composable
 fun HtmlText(
     modifier: Modifier = Modifier,

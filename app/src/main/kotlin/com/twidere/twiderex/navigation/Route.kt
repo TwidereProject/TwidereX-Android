@@ -220,7 +220,7 @@ object DeepLinks {
 
     const val User = "$twidereXSchema://user"
     fun User(userKey: MicroBlogKey) = "$twidereXSchema://user/$userKey"
-    const val Status = "$twidereXSchema://status/{statusId}"
+    const val Status = "$twidereXSchema://status/{statusKey}"
     fun Status(statusKey: MicroBlogKey) = "$twidereXSchema://status/$statusKey"
     const val Search = "$twidereXSchema://search"
     const val SignIn = "$twidereXSchema://signin"

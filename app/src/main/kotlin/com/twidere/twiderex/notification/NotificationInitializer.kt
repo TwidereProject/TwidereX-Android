@@ -38,15 +38,17 @@ class NotificationInitializer : Initializer<NotificationInitializerHolder> {
 
     override fun create(context: Context): NotificationInitializerHolder {
         InitializerEntryPoint.resolve(context).inject(this)
-        val request = PeriodicWorkRequestBuilder<NotificationWorker>(1, TimeUnit.MINUTES)
+        val request = PeriodicWorkRequestBuilder<NotificationWorker>(15, TimeUnit.MINUTES)
             .build()
         workManager.enqueueUniquePeriodicWork(
             "notification",
             ExistingPeriodicWorkPolicy.KEEP,
             request
         )
+
         return NotificationInitializerHolder()
     }
+
     override fun dependencies() = listOf(
         NotificationChannelInitializer::class.java,
     )
