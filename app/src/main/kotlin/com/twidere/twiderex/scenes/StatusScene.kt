@@ -132,7 +132,7 @@ fun StatusScene(
                 val distance = with(LocalDensity.current) {
                     -50.dp.toPx()
                 }
-                val index = remember {
+                val firstVisibleIndex = remember {
                     for (i in 0..source.itemCount) {
                         if (source.peek(i)?.statusKey == status?.statusKey) {
                             return@remember i
@@ -141,21 +141,20 @@ fun StatusScene(
                     0
                 }
                 val state = rememberLazyListState(
-                    initialFirstVisibleItemIndex = index,
+                    initialFirstVisibleItemIndex = firstVisibleIndex,
                 )
                 LaunchedEffect(Unit) {
-                    if (index != 0 && state.firstVisibleItemIndex == index && state.firstVisibleItemScrollOffset == 0) {
+                    if (firstVisibleIndex != 0 && state.firstVisibleItemIndex == firstVisibleIndex && state.firstVisibleItemScrollOffset == 0) {
                         state.animateScrollBy(distance, tween())
                         state.animateScrollBy(-distance, tween())
                     }
                 }
-                var detailIndex = -1
+
                 LazyColumn(
                     state = state,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     if (source.loadState.refresh is LoadState.Loading || source.loadState.refresh is LoadState.Error) {
-                        detailIndex = -1
                         status?.let {
                             item(key = it.hashCode()) {
                                 DetailedStatusComponent(data = it)
@@ -173,18 +172,17 @@ fun StatusScene(
                                     content = {
                                         Column {
                                             if (status.statusKey == statusKey) {
-                                                detailIndex = index
-                                                StatusLineComponent(lineUp = detailIndex > 0) {
+                                                StatusLineComponent(lineUp = firstVisibleIndex > 0) {
                                                     DetailedStatusComponent(data = status)
                                                 }
                                             } else {
                                                 StatusLineComponent(
-                                                    lineDown = index < detailIndex,
-                                                    lineUp = index in 1 until detailIndex
+                                                    lineDown = index < firstVisibleIndex,
+                                                    lineUp = index in 1 until firstVisibleIndex
                                                 ) {
                                                     TimelineStatusComponent(
                                                         data = status,
-                                                        threadStyle = if (index > detailIndex)
+                                                        threadStyle = if (index > firstVisibleIndex)
                                                             StatusThreadStyle.TEXT_ONLY
                                                         else
                                                             StatusThreadStyle.NONE
