@@ -395,7 +395,9 @@ private fun ComposeBody(
                             modifier = Modifier.weight(1f),
                             viewModel = viewModel,
                         )
-                        MastodonExtraActions(images, viewModel)
+                        CompositionLocalProvider(LocalContentAlpha.provides(ContentAlpha.medium)) {
+                            MastodonExtraActions(images, viewModel)
+                        }
                     } else {
                         Spacer(modifier = Modifier.weight(1F))
                     }
@@ -933,7 +935,7 @@ private fun ColumnScope.MastodonContentWarningInput(viewModel: ComposeViewModel)
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 CompositionLocalProvider(
-                    LocalContentAlpha provides ContentAlpha.medium,
+                    LocalContentAlpha provides ContentAlpha.disabled,
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_alert_octagon),
@@ -945,7 +947,11 @@ private fun ColumnScope.MastodonContentWarningInput(viewModel: ComposeViewModel)
                     value = cwText,
                     onValueChange = { viewModel.setContentWarningText(it) },
                     placeholder = {
-                        Text(text = stringResource(id = R.string.scene_compose_cw_placeholder))
+                        CompositionLocalProvider(
+                            LocalContentAlpha provides ContentAlpha.disabled,
+                        ) {
+                            Text(text = stringResource(id = R.string.scene_compose_cw_placeholder))
+                        }
                     }
                 )
             }
