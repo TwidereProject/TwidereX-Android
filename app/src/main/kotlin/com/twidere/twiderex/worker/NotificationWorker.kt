@@ -63,12 +63,14 @@ class NotificationWorker @AssistedInject constructor(
         accountRepository.getAccounts().map { accountRepository.getAccountDetails(it) }
             .map { account ->
                 launch {
-                    runCatching {
-                        val activities = repository.activities(account)
-                        activities.forEach { status ->
-                            notify(account, status)
-                        }
-                    }.onFailure {
+                    val activities = try {
+                        repository.activities(account)
+                    } catch (e: Throwable) {
+                        // Ignore any exception cause there's no needs ot handle it
+                        emptyList()
+                    }
+                    activities.forEach { status ->
+                        notify(account, status)
                     }
                 }
             }.joinAll()
