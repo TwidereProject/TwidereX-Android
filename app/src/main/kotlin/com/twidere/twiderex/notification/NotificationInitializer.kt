@@ -32,6 +32,8 @@ import javax.inject.Inject
 
 class NotificationInitializerHolder
 
+private const val NotificationWorkName = "twiderex_notification"
+
 class NotificationInitializer : Initializer<NotificationInitializerHolder> {
     @Inject
     lateinit var workManager: WorkManager
@@ -41,7 +43,7 @@ class NotificationInitializer : Initializer<NotificationInitializerHolder> {
         val request = PeriodicWorkRequestBuilder<NotificationWorker>(15, TimeUnit.MINUTES)
             .build()
         workManager.enqueueUniquePeriodicWork(
-            "notification",
+            NotificationWorkName,
             ExistingPeriodicWorkPolicy.KEEP,
             request
         )

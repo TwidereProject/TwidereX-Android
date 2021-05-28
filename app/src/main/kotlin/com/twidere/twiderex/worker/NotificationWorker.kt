@@ -92,7 +92,10 @@ class NotificationWorker @AssistedInject constructor(
         val notificationData = when (status.platformType) {
             PlatformType.Twitter -> {
                 NotificationData(
-                    title = "${status.user.screenName} just mentions you",
+                    title = applicationContext.getString(
+                        R.string.common_notification_mentions,
+                        status.user.displayName
+                    ),
                     htmlContent = status.htmlText,
                     deepLink = DeepLinks.Twitter.Status(status.statusId),
                     profileImage = status.user.profileImage,
@@ -174,7 +177,10 @@ class NotificationWorker @AssistedInject constructor(
             }
             MastodonStatusType.NotificationMention -> {
                 NotificationData(
-                    title = "${actualStatus.user.screenName} just mentions you",
+                    title = applicationContext.getString(
+                        R.string.common_notification_mentions,
+                        actualStatus.user.displayName
+                    ),
                     htmlContent = actualStatus.htmlText,
                     deepLink = DeepLinks.Status(actualStatus.statusKey),
                     profileImage = actualStatus.user.profileImage,
