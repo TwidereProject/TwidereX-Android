@@ -576,8 +576,8 @@ private fun MastodonExtraActions(
                 tint = if (isImageSensitive) {
                     MaterialTheme.colors.primary
                 } else {
-                    LocalContentColor.current
-                }.copy(alpha = LocalContentAlpha.current)
+                    LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
+                }
             )
         }
     }
@@ -595,8 +595,8 @@ private fun MastodonExtraActions(
             tint = if (isContentWarning) {
                 MaterialTheme.colors.primary
             } else {
-                LocalContentColor.current
-            }.copy(alpha = LocalContentAlpha.current)
+                LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
+            }
         )
     }
 }
@@ -904,7 +904,9 @@ private fun ComposeInput(
                         // TODO: scroll lazyColumn
                     },
                     placeholder = {
-                        Text(text = stringResource(id = R.string.scene_compose_placeholder))
+                        CompositionLocalProvider(LocalContentAlpha.provides(ContentAlpha.disabled)) {
+                            Text(text = stringResource(id = R.string.scene_compose_placeholder))
+                        }
                     }
                 )
 
@@ -1174,8 +1176,8 @@ private fun ComposeActions(
                         tint = if (isInVoteState) {
                             MaterialTheme.colors.primary
                         } else {
-                            LocalContentColor.current
-                        }.copy(alpha = LocalContentAlpha.current)
+                            LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
+                        }
                     )
                 }
             }
