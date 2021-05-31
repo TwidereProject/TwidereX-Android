@@ -904,7 +904,7 @@ private fun ComposeInput(
                         // TODO: scroll lazyColumn
                     },
                     placeholder = {
-                        CompositionLocalProvider(LocalContentAlpha.provides(ContentAlpha.disabled)) {
+                        CompositionLocalProvider(LocalContentAlpha.provides(ContentAlpha.medium)) {
                             Text(text = stringResource(id = R.string.scene_compose_placeholder))
                         }
                     }

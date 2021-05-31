@@ -209,6 +209,8 @@ dependencies {
 
     implementation libs.exoplayer
 
+    implementation libs.constraintLayout
+
     if (enableGoogleVariant) {
         // START Non-FOSS component
         googleImplementation platform('com.google.firebase:firebase-bom:26.1.0')

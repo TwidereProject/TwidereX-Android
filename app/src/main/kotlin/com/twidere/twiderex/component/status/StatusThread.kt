@@ -56,7 +56,7 @@ fun StatusThreadWithAvatar(modifier: Modifier = Modifier, data: UiStatus, onClic
 }
 
 @Composable
-fun StatusThread(modifier: Modifier = Modifier, onClick: () -> Unit) {
+fun StatusThreadTextOnly(modifier: Modifier = Modifier, onClick: () -> Unit) {
     Row(modifier = modifier) {
         TextButton(
             onClick = onClick,

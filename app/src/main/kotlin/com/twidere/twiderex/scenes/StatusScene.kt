@@ -58,7 +58,6 @@ import com.twidere.twiderex.component.foundation.ErrorPlaceholder
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.status.DetailedStatusComponent
 import com.twidere.twiderex.component.status.StatusDivider
-import com.twidere.twiderex.component.status.StatusLineComponent
 import com.twidere.twiderex.component.status.StatusThreadStyle
 import com.twidere.twiderex.component.status.TimelineStatusComponent
 import com.twidere.twiderex.di.assisted.assistedViewModel
@@ -172,22 +171,17 @@ fun StatusScene(
                                     content = {
                                         Column {
                                             if (status.statusKey == statusKey) {
-                                                StatusLineComponent(lineUp = firstVisibleIndex > 0) {
-                                                    DetailedStatusComponent(data = status)
-                                                }
+                                                DetailedStatusComponent(data = status, lineUp = firstVisibleIndex > 0)
                                             } else {
-                                                StatusLineComponent(
+                                                TimelineStatusComponent(
+                                                    data = status,
+                                                    threadStyle = if (index > firstVisibleIndex)
+                                                        StatusThreadStyle.TEXT_ONLY
+                                                    else
+                                                        StatusThreadStyle.NONE,
                                                     lineDown = index < firstVisibleIndex,
                                                     lineUp = index in 1 until firstVisibleIndex
-                                                ) {
-                                                    TimelineStatusComponent(
-                                                        data = status,
-                                                        threadStyle = if (index > firstVisibleIndex)
-                                                            StatusThreadStyle.TEXT_ONLY
-                                                        else
-                                                            StatusThreadStyle.NONE
-                                                    )
-                                                }
+                                                )
                                             }
                                             if (status.statusKey == statusKey) {
                                                 Divider()
