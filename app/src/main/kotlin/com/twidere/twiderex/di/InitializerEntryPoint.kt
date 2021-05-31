@@ -18,30 +18,29 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex
+package com.twidere.twiderex.di
 
-import android.app.Application
-import androidx.hilt.work.HiltWorkerFactory
-import androidx.startup.AppInitializer
-import androidx.work.Configuration
+import android.content.Context
+import com.twidere.twiderex.notification.NotificationChannelInitializer
 import com.twidere.twiderex.notification.NotificationInitializer
-import dagger.hilt.android.HiltAndroidApp
-import javax.inject.Inject
+import dagger.hilt.EntryPoint
+import dagger.hilt.InstallIn
+import dagger.hilt.android.EntryPointAccessors
+import dagger.hilt.components.SingletonComponent
 
-@HiltAndroidApp
-class TwidereApp : Application(), Configuration.Provider {
-    @Inject
-    lateinit var workerFactory: HiltWorkerFactory
-
-    override fun getWorkManagerConfiguration() =
-        Configuration.Builder()
-            .setWorkerFactory(workerFactory)
-            .build()
-
-    override fun onCreate() {
-        super.onCreate()
-        // manually setup NotificationInitializer since it require HiltWorkerFactory
-        AppInitializer.getInstance(this)
-            .initializeComponent(NotificationInitializer::class.java)
+@EntryPoint
+@InstallIn(SingletonComponent::class)
+interface InitializerEntryPoint {
+    companion object {
+        fun resolve(context: Context): InitializerEntryPoint {
+            val appContext = context.applicationContext ?: throw IllegalStateException()
+            return EntryPointAccessors.fromApplication(
+                appContext,
+                InitializerEntryPoint::class.java
+            )
+        }
     }
+
+    fun inject(initializer: NotificationChannelInitializer)
+    fun inject(initializer: NotificationInitializer)
 }
