@@ -110,6 +110,7 @@ import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.ui.mediumEmphasisContentContentColor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlin.math.abs
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalAnimationApi::class)
@@ -118,6 +119,9 @@ fun HomeScene() {
     val account = LocalActiveAccount.current ?: return
     val scope = rememberCoroutineScope()
     val tabPosition = LocalAppearancePreferences.current.tapPosition
+    val hideTab = LocalAppearancePreferences.current.hideTabBarWhenScroll
+    val hideFab = LocalAppearancePreferences.current.hideFabWhenScroll
+    val hideAppBar = LocalAppearancePreferences.current.hideAppBarWhenScroll
     val menus = remember(account.type) {
         listOf(
             HomeTimelineItem(),
@@ -146,12 +150,41 @@ fun HomeScene() {
             }
         }
     }
+    // nested scroll
+    val toolbarHeightPx = with(LocalDensity.current) { AppBarDefaults.AppBarHeight.roundToPx().toFloat() }
+    val toolbarOffsetHeightPx = remember { mutableStateOf(0f) }
+    val fabOffsetPx = remember {
+        mutableStateOf(0f)
+    }
+    val nestedScrollConnection = remember {
+        object : NestedScrollConnection {
+            override fun onPostScroll(
+                consumed: Offset,
+                available: Offset,
+                source: NestedScrollSource
+            ): Offset {
+                val delta = consumed.y
+                val barOffset = toolbarOffsetHeightPx.value + delta
+                toolbarOffsetHeightPx.value = barOffset.coerceIn(-toolbarHeightPx, 0f)
+                fabOffsetPx.value = fabOffsetPx.value + delta
+                return Offset.Zero
+            }
+        }
+    }
+
     TwidereScene {
         Scaffold(
             scaffoldState = scaffoldState,
             bottomBar = {
                 if (tabPosition == AppearancePreferences.TabPosition.Bottom) {
-                    HomeBottomNavigation(menus, pagerState.currentPage) {
+                    HomeBottomNavigation(
+                        // navigation bar height is the same to toolbar
+                        modifier = if (hideTab)
+                            Modifier.offset { IntOffset(x = 0, y = - toolbarOffsetHeightPx.value.roundToInt()) }
+                        else
+                            Modifier,
+                        menus, pagerState.currentPage,
+                    ) {
                         if (pagerState.currentPage == it) {
                             scope.launch {
                                 menus[it].lazyListController.scrollToTop()
@@ -169,139 +202,134 @@ fun HomeScene() {
                 HomeDrawer(scaffoldState)
             },
             floatingActionButton = {
-                menus[pagerState.currentPage].Fab()
+                with(LocalDensity.current) {
+                    val maxFabOffset = menus[pagerState.currentPage].fabSize.roundToPx() + HomeSceneDefaults.FabSpacing.roundToPx() + toolbarHeightPx
+                    val realFabOffset = maxFabOffset * abs(toolbarOffsetHeightPx.value) / toolbarHeightPx
+                    Box(modifier = if (hideFab) Modifier.offset { IntOffset(x = 0, y = realFabOffset.roundToInt()) } else Modifier) {
+                        menus[pagerState.currentPage].Fab()
+                    }
+                }
             }
         ) {
             Box(
                 modifier = Modifier
-                    .padding(it)
+                    .fillMaxSize()
+                    .nestedScroll(nestedScrollConnection)
             ) {
-                NestedScrollConnectionAppBars(
+                Pager(
+                    state = pagerState,
+                    modifier = Modifier.offset {
+                        if ((menus[pagerState.currentPage].withAppBar) ||
+                            tabPosition == AppearancePreferences.TabPosition.Top
+                        ) {
+                            if (hideAppBar) {
+                                IntOffset(
+                                    x = 0,
+                                    y = toolbarOffsetHeightPx.value.roundToInt() + toolbarHeightPx.roundToInt()
+                                )
+                            } else {
+                                IntOffset(
+                                    x = 0,
+                                    y = toolbarHeightPx.roundToInt()
+                                )
+                            }
+                        } else
+                            IntOffset.Zero
+                    }
+                ) {
+                    menus[page].Content()
+                }
+                HomeAppBar(
+                    modifier = if (hideAppBar)
+                        Modifier.offset { IntOffset(0, toolbarOffsetHeightPx.value.roundToInt()) }
+                    else
+                        Modifier,
                     tabPosition = tabPosition,
                     menus = menus,
                     pagerState = pagerState,
                     scaffoldState = scaffoldState,
-                    scope = scope
-                ) {
-                    Pager(state = pagerState) {
-                        menus[page].Content()
-                    }
-                }
+                    scope = scope,
+                )
             }
         }
     }
 }
 
+private object HomeSceneDefaults {
+    val FabSpacing = 16.dp
+}
+
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun NestedScrollConnectionAppBars(
+fun HomeAppBar(
+    modifier: Modifier = Modifier,
     tabPosition: AppearancePreferences.TabPosition,
     menus: List<HomeNavigationItem>,
     pagerState: PagerState,
     scaffoldState: ScaffoldState,
     scope: CoroutineScope,
-    content: @Composable () -> Unit
 ) {
-    val toolbarHeight = AppBarDefaults.AppBarHeight
-    val toolbarHeightPx = with(LocalDensity.current) { toolbarHeight.roundToPx().toFloat() }
-    val toolbarOffsetHeightPx = remember { mutableStateOf(0f) }
-    val nestedScrollConnection = remember {
-        object : NestedScrollConnection {
-            override fun onPostScroll(
-                consumed: Offset,
-                available: Offset,
-                source: NestedScrollSource
-            ): Offset {
-                val delta = consumed.y
-                val newOffset = toolbarOffsetHeightPx.value + delta
-                toolbarOffsetHeightPx.value = newOffset.coerceIn(-toolbarHeightPx, 0f)
-                return Offset.Zero
-            }
-        }
-    }
-
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .nestedScroll(nestedScrollConnection)
-    ) {
-        Box(
-            modifier = Modifier
-                .offset {
-                    if (menus[pagerState.currentPage].withAppBar ||
-                        tabPosition == AppearancePreferences.TabPosition.Top
-                    )
-                        IntOffset(x = 0, y = toolbarOffsetHeightPx.value.roundToInt() + toolbarHeightPx.roundToInt())
-                    else IntOffset.Zero
-                }
+    if (tabPosition == AppearancePreferences.TabPosition.Bottom) {
+        AnimatedVisibility(
+            visible = menus[pagerState.currentPage].withAppBar,
+            enter = expandVertically(clip = false),
+            exit = shrinkVertically(clip = false),
+            modifier = modifier
         ) {
-            content.invoke()
-        }
-
-        if (tabPosition == AppearancePreferences.TabPosition.Bottom) {
-            AnimatedVisibility(
-                visible = menus[pagerState.currentPage].withAppBar,
-                enter = expandVertically(clip = false),
-                exit = shrinkVertically(clip = false),
-                modifier = Modifier
-                    .offset { IntOffset(x = 0, y = toolbarOffsetHeightPx.value.roundToInt()) }
-            ) {
-                AppBar(
-                    backgroundColor = MaterialTheme.colors.surface.withElevation(),
-                    title = {
-                        Text(text = menus[pagerState.currentPage].name())
-                    },
-                    navigationIcon = {
-                        MenuAvatar(scaffoldState)
-                    },
-                    elevation = if (menus[pagerState.currentPage].withAppBar) {
-                        AppBarDefaults.TopAppBarElevation
-                    } else {
-                        0.dp
-                    }
-                )
-            }
-        } else {
-            val transition = updateTransition(
-                targetState = menus[pagerState.currentPage].withAppBar,
-            )
-            val elevation by transition.animateDp {
-                if (it) {
+            AppBar(
+                backgroundColor = MaterialTheme.colors.surface.withElevation(),
+                title = {
+                    Text(text = menus[pagerState.currentPage].name())
+                },
+                navigationIcon = {
+                    MenuAvatar(scaffoldState)
+                },
+                elevation = if (menus[pagerState.currentPage].withAppBar) {
                     AppBarDefaults.TopAppBarElevation
                 } else {
                     0.dp
-                }
+                },
+            )
+        }
+    } else {
+        val transition = updateTransition(
+            targetState = menus[pagerState.currentPage].withAppBar,
+        )
+        val elevation by transition.animateDp {
+            if (it) {
+                AppBarDefaults.TopAppBarElevation
+            } else {
+                0.dp
             }
-            Surface(
-                elevation = elevation,
-                modifier = Modifier
-                    .offset { IntOffset(x = 0, y = toolbarOffsetHeightPx.value.roundToInt()) }
+        }
+        Surface(
+            elevation = elevation,
+            modifier = modifier
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    MenuAvatar(scaffoldState)
-                    IconTabsComponent(
-                        modifier = Modifier.weight(1f),
-                        items = menus.map { it.icon() to it.name() },
-                        selectedItem = pagerState.currentPage,
-                        divider = {
-                            TabRowDefaults.Divider(thickness = 0.dp)
-                        },
-                        onItemSelected = {
-                            if (pagerState.currentPage == it) {
-                                scope.launch {
-                                    menus[it].lazyListController.scrollToTop()
-                                }
-                            }
+                MenuAvatar(scaffoldState)
+                IconTabsComponent(
+                    modifier = Modifier.weight(1f),
+                    items = menus.map { it.icon() to it.name() },
+                    selectedItem = pagerState.currentPage,
+                    divider = {
+                        TabRowDefaults.Divider(thickness = 0.dp)
+                    },
+                    onItemSelected = {
+                        if (pagerState.currentPage == it) {
                             scope.launch {
-                                pagerState.selectPage {
-                                    pagerState.currentPage = it
-                                }
+                                menus[it].lazyListController.scrollToTop()
                             }
-                        },
-                    )
-                }
+                        }
+                        scope.launch {
+                            pagerState.selectPage {
+                                pagerState.currentPage = it
+                            }
+                        }
+                    },
+                )
             }
         }
     }
@@ -341,12 +369,14 @@ private object MenuAvatarDefaults {
 
 @Composable
 fun HomeBottomNavigation(
+    modifier: Modifier = Modifier,
     items: List<HomeNavigationItem>,
     selectedItem: Int,
     onItemSelected: (Int) -> Unit,
 ) {
     BottomNavigation(
-        backgroundColor = MaterialTheme.colors.background
+        backgroundColor = MaterialTheme.colors.background,
+        modifier = modifier
     ) {
         items.forEachIndexed { index, item ->
             BottomNavigationItem(

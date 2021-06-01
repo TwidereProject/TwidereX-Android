@@ -26,6 +26,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.TimelineComponent
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
@@ -75,4 +77,11 @@ class HomeTimelineItem : HomeNavigationItem() {
             )
         }
     }
+
+    override val fabSize: Dp
+        get() = HomeTimeLineItemDefaults.FabSize
+}
+
+private object HomeTimeLineItemDefaults {
+    val FabSize = 56.dp
 }

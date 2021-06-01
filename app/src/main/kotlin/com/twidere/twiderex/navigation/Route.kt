@@ -212,6 +212,8 @@ object Route {
 object DeepLinks {
     object Twitter {
         const val User = "$twidereXSchema://twitter/user"
+        const val Status = "$twidereXSchema://twitter/status/{statusId}"
+        fun Status(id: String) = "$twidereXSchema://twitter/status/$id"
     }
 
     object Mastodon {
@@ -219,6 +221,9 @@ object DeepLinks {
     }
 
     const val User = "$twidereXSchema://user"
+    fun User(userKey: MicroBlogKey) = "$twidereXSchema://user/$userKey"
+    const val Status = "$twidereXSchema://status/{statusKey}"
+    fun Status(statusKey: MicroBlogKey) = "$twidereXSchema://status/$statusKey"
     const val Search = "$twidereXSchema://search"
     const val SignIn = "$twidereXSchema://signin"
 
@@ -424,6 +429,9 @@ fun RouteBuilder.route(constraints: Constraints) {
 
     authorizedScene(
         "status/{statusKey}",
+        deepLinks = listOf(
+            DeepLinks.Status,
+        )
     ) { backStackEntry ->
         backStackEntry.path<String>("statusKey")?.let {
             MicroBlogKey.valueOf(it)
@@ -440,7 +448,9 @@ fun RouteBuilder.route(constraints: Constraints) {
         Route.DeepLink.Twitter.Status,
         deepLinks = twitterHosts.map {
             "$it/{screenName}/status/{statusId:[0-9]+}"
-        }
+        } + listOf(
+            DeepLinks.Twitter.Status
+        )
     ) { backStackEntry ->
         backStackEntry.path<String>("statusId")?.let { statusId ->
             val navigator = LocalNavigator.current

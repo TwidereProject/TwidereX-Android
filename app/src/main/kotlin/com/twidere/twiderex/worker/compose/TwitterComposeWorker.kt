@@ -114,12 +114,13 @@ class TwitterComposeWorker @AssistedInject constructor(
     }
 
     override suspend fun uploadImage(
-        uri: Uri,
+        originUri: Uri,
+        scramblerUri: Uri,
         service: TwitterService
     ): String {
-        val type = contentResolver.getType(uri)
-        val size = contentResolver.openFileDescriptor(uri, "r")?.statSize
-        return contentResolver.openInputStream(uri)?.use {
+        val type = contentResolver.getType(originUri)
+        val size = contentResolver.openFileDescriptor(scramblerUri, "r")?.statSize
+        return contentResolver.openInputStream(scramblerUri)?.use {
             service.uploadFile(
                 it,
                 type ?: "image/*",

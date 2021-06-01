@@ -63,6 +63,7 @@
     <string name="common_notification_follow_request">%s has requested to follow you</string>
     <string name="common_notification_favourite">%s favourited your toot</string>
     <string name="common_notification_follow">%s followed you</string>
+    <string name="common_notification_mentions">%s mentions you</string>
     <string name="common_controls_actions_add">Add</string>
     <string name="common_controls_actions_remove">Remove</string>
     <string name="common_controls_actions_edit">Edit</string>
@@ -129,6 +130,8 @@
     <string name="common_countable_photo_single">%s photo</string>
     <string name="common_countable_photo_multiple">%s photos</string>
     <string name="common_notification_channel_background_progresses_name">Background progresses</string>
+    <string name="common_notification_channel_content_interactions_name">Interactions</string>
+    <string name="common_notification_channel_content_interactions_description">Interactions like mentions and retweets</string>
     <string name="scene_drawer_sign_in">Sign in</string>
     <string name="scene_drawer_manage_accounts">Manage accounts</string>
     <string name="scene_manage_accounts_title">Accounts</string>
@@ -241,11 +244,15 @@
     <string name="scene_settings_appearance_pick_color">Pick color</string>
     <string name="scene_settings_appearance_section_header_tab_position">Tab position</string>
     <string name="scene_settings_appearance_section_header_theme">Theme</string>
+    <string name="scene_settings_appearance_section_header_scrolling_timeline">Scrolling timeline</string>
     <string name="scene_settings_appearance_tab_position_top">Top</string>
     <string name="scene_settings_appearance_tab_position_bottom">Bottom</string>
     <string name="scene_settings_appearance_theme_auto">Auto</string>
     <string name="scene_settings_appearance_theme_light">Light</string>
     <string name="scene_settings_appearance_theme_dark">Dark</string>
+    <string name="scene_settings_appearance_scrolling_timeline_tab_bar">Hide tab bar when scrolling</string>
+    <string name="scene_settings_appearance_scrolling_timeline_app_bar">Hide app bar when scrolling</string>
+    <string name="scene_settings_appearance_scrolling_timeline_fab">Hide FAB when scrolling</string>
     <string name="scene_settings_display_title">Display</string>
     <string name="scene_settings_display_section_header_preview">Preview</string>
     <string name="scene_settings_display_section_header_text">Text</string>
@@ -258,12 +265,12 @@
     <string name="scene_settings_display_text_rounded_square">Rounded Square</string>
     <string name="scene_settings_display_date_format_relative">Relative</string>
     <string name="scene_settings_display_date_format_absolute">Absolute</string>
-    <string name="scene_settings_display_url_preview">Url previews</string>
     <string name="scene_settings_display_media_media_previews">Media previews</string>
     <string name="scene_settings_display_media_auto_playback">Auto playback</string>
     <string name="scene_settings_display_media_automatic">Automatic</string>
     <string name="scene_settings_display_media_always">Always</string>
     <string name="scene_settings_display_media_off">Off</string>
+    <string name="scene_settings_display_url_preview">Url previews</string>
     <string name="scene_settings_storage_title">Storage</string>
     <string name="scene_settings_storage_search_title">Clear search history</string>
     <string name="scene_settings_storage_media_title">Clear media cache</string>

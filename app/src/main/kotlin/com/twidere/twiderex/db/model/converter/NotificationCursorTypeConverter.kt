@@ -18,31 +18,19 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.scenes.home
+package com.twidere.twiderex.db.model.converter
 
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.unit.dp
-import com.twidere.twiderex.component.lazy.LazyListController
+import androidx.room.TypeConverter
+import com.twidere.twiderex.db.model.NotificationCursorType
 
-abstract class HomeNavigationItem {
-
-    @Composable
-    abstract fun name(): String
-
-    @Composable
-    abstract fun icon(): Painter
-    open val withAppBar = true
-    open val lazyListController = LazyListController()
-
-    @Composable
-    abstract fun Content()
-
-    @Composable
-    open fun Fab() {
-        // implement this method to apply FloatingActionButton
+class NotificationCursorTypeConverter {
+    @TypeConverter
+    fun fromString(value: String?): NotificationCursorType? {
+        return value?.let { NotificationCursorType.valueOf(it) }
     }
 
-    // offset to hide fab when scroll timeline
-    open val fabSize = 0.dp
+    @TypeConverter
+    fun fromNotificationType(type: NotificationCursorType?): String? {
+        return type?.name
+    }
 }

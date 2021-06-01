@@ -18,31 +18,35 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.scenes.home
+package com.twidere.twiderex.db.model
 
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.unit.dp
-import com.twidere.twiderex.component.lazy.LazyListController
+import androidx.room.Entity
+import androidx.room.Index
+import androidx.room.PrimaryKey
+import com.twidere.twiderex.model.MicroBlogKey
 
-abstract class HomeNavigationItem {
+@Entity(
+    tableName = "notification_cursor",
+    indices = [
+        Index(
+            value = ["accountKey", "type"],
+            unique = true
+        )
+    ],
+)
+data class DbNotificationCursor(
+    /**
+     * Id that being used in the database
+     */
+    @PrimaryKey
+    val _id: String,
+    val accountKey: MicroBlogKey,
+    val type: NotificationCursorType,
+    val value: String,
+)
 
-    @Composable
-    abstract fun name(): String
-
-    @Composable
-    abstract fun icon(): Painter
-    open val withAppBar = true
-    open val lazyListController = LazyListController()
-
-    @Composable
-    abstract fun Content()
-
-    @Composable
-    open fun Fab() {
-        // implement this method to apply FloatingActionButton
-    }
-
-    // offset to hide fab when scroll timeline
-    open val fabSize = 0.dp
+enum class NotificationCursorType {
+    General,
+    Mentions,
+    Follower,
 }

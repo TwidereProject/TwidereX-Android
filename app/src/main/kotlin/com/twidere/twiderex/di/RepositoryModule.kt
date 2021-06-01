@@ -30,6 +30,7 @@ import com.twidere.twiderex.repository.CacheRepository
 import com.twidere.twiderex.repository.DraftRepository
 import com.twidere.twiderex.repository.ListsRepository
 import com.twidere.twiderex.repository.ListsUsersRepository
+import com.twidere.twiderex.repository.NotificationRepository
 import com.twidere.twiderex.repository.ReactionRepository
 import com.twidere.twiderex.repository.SearchRepository
 import com.twidere.twiderex.repository.StatusRepository
@@ -92,4 +93,9 @@ object RepositoryModule {
 
     @Provides
     fun provideListUsersRepository() = ListsUsersRepository()
+
+    @Provides
+    fun provideNotificationRepository(
+        database: CacheDatabase,
+    ): NotificationRepository = NotificationRepository(database = database)
 }
