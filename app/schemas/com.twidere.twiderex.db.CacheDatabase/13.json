@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 13,
-    "identityHash": "b41dbe0b06838a87e03cdcbba18107fe",
+    "identityHash": "c2e117fd784d435facf4f59b1a2f892c",
     "entities": [
       {
         "tableName": "status",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` TEXT NOT NULL, `statusId` TEXT NOT NULL, `statusKey` TEXT NOT NULL, `htmlText` TEXT NOT NULL, `rawText` TEXT NOT NULL, `timestamp` INTEGER NOT NULL, `retweetCount` INTEGER NOT NULL, `likeCount` INTEGER NOT NULL, `replyCount` INTEGER NOT NULL, `placeString` TEXT, `source` TEXT NOT NULL, `hasMedia` INTEGER NOT NULL, `userKey` TEXT NOT NULL, `lang` TEXT, `is_possibly_sensitive` INTEGER NOT NULL, `platformType` TEXT NOT NULL, `mastodonExtra` TEXT, `twitterExtra` TEXT, `previewCard` TEXT, `isInThread` INTEGER NOT NULL, PRIMARY KEY(`_id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` TEXT NOT NULL, `statusId` TEXT NOT NULL, `statusKey` TEXT NOT NULL, `htmlText` TEXT NOT NULL, `rawText` TEXT NOT NULL, `timestamp` INTEGER NOT NULL, `retweetCount` INTEGER NOT NULL, `likeCount` INTEGER NOT NULL, `replyCount` INTEGER NOT NULL, `placeString` TEXT, `source` TEXT NOT NULL, `hasMedia` INTEGER NOT NULL, `userKey` TEXT NOT NULL, `lang` TEXT, `is_possibly_sensitive` INTEGER NOT NULL, `platformType` TEXT NOT NULL, `mastodonExtra` TEXT, `twitterExtra` TEXT, `previewCard` TEXT, PRIMARY KEY(`_id`))",
         "fields": [
           {
             "fieldPath": "_id",
@@ -121,12 +121,6 @@
             "columnName": "previewCard",
             "affinity": "TEXT",
             "notNull": false
-          },
-          {
-            "fieldPath": "isInThread",
-            "columnName": "isInThread",
-            "affinity": "INTEGER",
-            "notNull": true
           }
         ],
         "primaryKey": {
@@ -811,7 +805,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b41dbe0b06838a87e03cdcbba18107fe')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'c2e117fd784d435facf4f59b1a2f892c')"
     ]
   }
 }
