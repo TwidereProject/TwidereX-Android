@@ -37,8 +37,8 @@ import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.notification.NotificationChannelSpec
 import com.twidere.twiderex.repository.AccountRepository
-import com.twidere.twiderex.viewmodel.compose.ComposeType
 import com.twidere.twiderex.utils.ExifScrambler
+import com.twidere.twiderex.viewmodel.compose.ComposeType
 import kotlin.math.roundToInt
 
 abstract class ComposeWorker<T : MicroBlogService>(
