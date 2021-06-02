@@ -26,7 +26,7 @@ test {
 dependencies {
     implementation libs.kotlinx.coroutines.core
     implementation libs.kotlinx.serialization.json
-    implementation "com.github.Tlaster:Hson:0.1.2"
+    implementation libs.hson
 
     api libs.bundles.retrofit
     implementation libs.retrofit2.kotlinx.serialization.converter
