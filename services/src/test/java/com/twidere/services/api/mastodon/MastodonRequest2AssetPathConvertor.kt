@@ -28,6 +28,6 @@ class MastodonRequest2AssetPathConvertor : Request2AssetPathConvertor {
         private const val PathPrefix = "/mastodon"
     }
     override fun url2Path(request: Request): String {
-        return "$PathPrefix/${request.method.toLowerCase()}${request.url.encodedPath}/response"
+        return "$PathPrefix/${request.method.lowercase()}${request.url.encodedPath}/response"
     }
 }
