@@ -24,6 +24,7 @@ package com.twidere.twiderex.component.foundation
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.Matrix
 import android.renderscript.Allocation
 import android.renderscript.Element
 import android.renderscript.RenderScript
@@ -42,7 +43,18 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.core.graphics.drawable.toBitmap
+import androidx.core.graphics.drawable.toDrawable
 import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat
+import coil.ImageLoader
+import coil.bitmap.BitmapPool
+import coil.memory.MemoryCache
+import coil.request.DefaultRequestOptions
+import coil.request.Disposable
+import coil.request.ImageRequest
+import coil.request.ImageResult
+import coil.request.SuccessResult
+import com.google.accompanist.coil.CoilPainterDefaults
+import com.google.accompanist.coil.rememberCoilPainter
 
 @Composable
 fun BlurImage(
@@ -53,13 +65,14 @@ fun BlurImage(
     contentScale: ContentScale = ContentScale.Fit,
     alpha: Float = DefaultAlpha,
     colorFilter: ColorFilter? = null,
-    blurRadius: Float = 25f
+    blurRadius: Float = 25f,
+    bitmapScale: Float = 1f
 ) {
     val context = LocalContext.current
     val painter = remember {
         VectorDrawableCompat.create(context.resources, resource, null)
             ?.toBitmap()?.let {
-                applyBlurFilter(it, context, blurRadius)
+                applyBlurFilter(it, context, blurRadius, bitmapScale)
             }?.let {
                 BitmapPainter(it.asImageBitmap())
             }
@@ -75,18 +88,73 @@ fun BlurImage(
     )
 }
 
-private fun applyBlurFilter(bitmap: Bitmap, context: Context, blurRadius: Float): Bitmap {
-    val result: Bitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true)
-    val renderScript: RenderScript = RenderScript.create(context)
-    val tmpIn: Allocation = Allocation.createFromBitmap(renderScript, bitmap)
-    val tmpOut: Allocation = Allocation.createFromBitmap(renderScript, result)
-    val theIntrinsic: ScriptIntrinsicBlur =
-        ScriptIntrinsicBlur.create(renderScript, Element.U8_4(renderScript))
-    theIntrinsic.setRadius(blurRadius)
-    theIntrinsic.setInput(tmpIn)
-    theIntrinsic.forEach(tmpOut)
+@Composable
+fun NetworkBlurImage(
+    data: Any,
+    modifier: Modifier = Modifier,
+    contentScale: ContentScale = ContentScale.Crop,
+    blurRadius: Float = 12f,
+    bitmapScale: Float = 0.5f,
+    placeholder: @Composable (() -> Unit)? = null,
+) {
+    val context = LocalContext.current
+    val painter = rememberCoilPainter(
+        request = data,
+        imageLoader = object : ImageLoader {
+            val realPainter = CoilPainterDefaults.defaultImageLoader()
+            override val bitmapPool: BitmapPool
+                get() = realPainter.bitmapPool
+            override val defaults: DefaultRequestOptions
+                get() = realPainter.defaults
+            override val memoryCache: MemoryCache
+                get() = realPainter.memoryCache
 
-    tmpOut.copyTo(result)
+            override fun enqueue(request: ImageRequest): Disposable {
+                return realPainter.enqueue(request)
+            }
 
-    return result
+            override suspend fun execute(request: ImageRequest): ImageResult {
+                val result = realPainter.execute(request)
+                if (result !is SuccessResult) return result
+                return result.drawable.let {
+                    applyBlurFilter(it.toBitmap(), context, blurRadius, bitmapScale)
+                }.let {
+                    SuccessResult(it.toDrawable(context.resources), request, result.metadata)
+                }
+            }
+
+            override fun shutdown() {
+                realPainter.shutdown()
+            }
+        }
+    )
+    NetworkImage(
+        data = if (blurRadius != 0f || bitmapScale != 1f) painter else data,
+        modifier = modifier,
+        contentScale = contentScale,
+        placeholder = placeholder
+    )
+}
+
+private fun applyBlurFilter(src: Bitmap, context: Context, blurRadius: Float, bitmapScale: Float): Bitmap {
+    val rs = RenderScript.create(context.applicationContext)
+
+    val matrix = Matrix().apply {
+        postScale(bitmapScale, bitmapScale)
+    }
+    // scale bitmap first then blur
+    val scaleBitmap = if (bitmapScale == 1f) {
+        src
+    } else {
+        Bitmap.createBitmap(src, 0, 0, src.width, src.height, matrix, true)
+    }.copy(Bitmap.Config.ARGB_8888, true)
+
+    val input = Allocation.createFromBitmap(rs, scaleBitmap)
+    val output = Allocation.createTyped(rs, input.type)
+    val script = ScriptIntrinsicBlur.create(rs, Element.U8_4(rs))
+    script.setRadius(blurRadius)
+    script.setInput(input)
+    script.forEach(output)
+    output.copyTo(scaleBitmap)
+    return scaleBitmap
 }

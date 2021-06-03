@@ -37,6 +37,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -52,10 +53,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.GridLayout
+import com.twidere.twiderex.component.foundation.NetworkBlurImage
 import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.foundation.VideoPlayer
 import com.twidere.twiderex.component.navigation.LocalNavigator
-import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.model.MediaType
 import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.ui.UiMedia
@@ -76,6 +77,9 @@ fun StatusMediaComponent(
     val onItemClick = { it: UiMedia ->
         val index = media.indexOf(it)
         navigator.media(statusKey = status.statusKey, selectedIndex = index)
+    }
+    var sensitive by rememberSaveable(status.statusKey.toString()) {
+        mutableStateOf(status.mastodonExtra?.sensitive ?: false)
     }
 
     val aspectRatio = when (media.size) {
@@ -121,6 +125,7 @@ fun StatusMediaComponent(
                             modifier = Modifier
                                 .weight(1f)
                                 .fillMaxSize(),
+                            sensitive = sensitive,
                             onClick = onItemClick,
                         )
                     }
@@ -137,6 +142,7 @@ fun StatusMediaComponent(
                                 modifier = Modifier
                                     .weight(1f)
                                     .fillMaxSize(),
+                                sensitive = sensitive,
                                 onClick = onItemClick,
                             )
                             if (it != media.last()) {
@@ -157,6 +163,7 @@ fun StatusMediaComponent(
                         StatusMediaPreviewItem(
                             media = it,
                             onClick = onItemClick,
+                            sensitive = sensitive
                         )
                     }
                 }
@@ -164,9 +171,6 @@ fun StatusMediaComponent(
         }
 
         if (status.platformType == PlatformType.Mastodon && status.mastodonExtra != null) {
-            var sensitive by rememberSaveable(status.statusKey.toString()) {
-                mutableStateOf(status.mastodonExtra.sensitive)
-            }
             TwidereTheme(darkTheme = true) {
                 AnimatedVisibility(
                     modifier = Modifier
@@ -175,17 +179,28 @@ fun StatusMediaComponent(
                 ) {
                     Box(
                         modifier = Modifier
-                            .background(MaterialTheme.colors.surface.withElevation())
                             .clickable {
                                 sensitive = false
                             },
                         contentAlignment = Alignment.Center,
                     ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_alert_triangle),
-                            contentDescription = null,
-                            tint = MaterialTheme.colors.onSurface,
-                        )
+                        Box(
+                            modifier = Modifier
+                                .background(
+                                    MaterialTheme.colors.surface.copy(alpha = 0.25f),
+                                    shape = CircleShape
+                                )
+                                .size(StatusMediaDefaults.Sensitive.BackgroundSize)
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_alert_triangle),
+                                contentDescription = null,
+                                tint = MaterialTheme.colors.onSurface,
+                                modifier = Modifier
+                                    .size(StatusMediaDefaults.Sensitive.IconSize)
+                                    .align(Alignment.Center)
+                            )
+                        }
                     }
                 }
                 AnimatedVisibility(
@@ -230,12 +245,18 @@ object StatusMediaDefaults {
     object Icon {
         val ContentPadding = 6.dp
     }
+
+    object Sensitive {
+        val BackgroundSize = 48.dp
+        val IconSize = 30.dp
+    }
 }
 
 @Composable
 fun StatusMediaPreviewItem(
     media: UiMedia,
     modifier: Modifier = Modifier,
+    sensitive: Boolean = false,
     onClick: (UiMedia) -> Unit,
 ) {
     Box(
@@ -245,38 +266,20 @@ fun StatusMediaPreviewItem(
         when (media.type) {
             MediaType.photo ->
                 media.previewUrl?.let {
-                    NetworkImage(
-                        data = it,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .clickable(
-                                onClick = {
-                                    onClick(media)
-                                }
-                            ),
-                        placeholder = {
-                            Placeholder(modifier = Modifier.fillMaxSize())
-                        },
-                    )
-                }
-            MediaType.video, MediaType.animated_gif -> media.mediaUrl?.let {
-                VideoPlayer(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .clickable(
-                            onClick = {
-                                onClick(media)
-                            }
-                        ),
-                    url = it,
-                    showControls = false,
-                    volume = 0F
-                ) {
-                    media.previewUrl?.let {
+                    if (sensitive) {
+                        NetworkBlurImage(
+                            data = it,
+                            modifier = Modifier
+                                .fillMaxSize(),
+                            placeholder = {
+                                Placeholder(modifier = Modifier.fillMaxSize())
+                            },
+                        )
+                    } else {
                         NetworkImage(
                             data = it,
                             modifier = Modifier
-                                .fillMaxWidth()
+                                .fillMaxSize()
                                 .clickable(
                                     onClick = {
                                         onClick(media)
@@ -286,6 +289,46 @@ fun StatusMediaPreviewItem(
                                 Placeholder(modifier = Modifier.fillMaxSize())
                             },
                         )
+                    }
+                }
+            MediaType.video, MediaType.animated_gif -> media.mediaUrl?.let {
+                if (sensitive && media.previewUrl != null) {
+                    NetworkBlurImage(
+                        data = media.previewUrl,
+                        modifier = Modifier
+                            .fillMaxSize(),
+                        placeholder = {
+                            Placeholder(modifier = Modifier.fillMaxSize())
+                        },
+                    )
+                } else {
+                    VideoPlayer(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .clickable(
+                                onClick = {
+                                    onClick(media)
+                                }
+                            ),
+                        url = it,
+                        showControls = false,
+                        volume = 0F
+                    ) {
+                        media.previewUrl?.let {
+                            NetworkImage(
+                                data = it,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable(
+                                        onClick = {
+                                            onClick(media)
+                                        }
+                                    ),
+                                placeholder = {
+                                    Placeholder(modifier = Modifier.fillMaxSize())
+                                },
+                            )
+                        }
                     }
                 }
             }
