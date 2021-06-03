@@ -492,7 +492,7 @@ fun StatusContent(
                 StatusBody(status = status, type = type)
             }
         }
-        Column(modifier = Modifier.layoutId("footer")) {
+        Column(modifier = Modifier.layoutId(StatusContentDefaults.Ref.Footer)) {
             footer.invoke()
             Spacer(modifier = Modifier.height(contentPadding.calculateBottomPadding()))
         }
