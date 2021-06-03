@@ -22,9 +22,10 @@ package com.twidere.assisted
 
 import com.google.devtools.ksp.processing.CodeGenerator
 import com.google.devtools.ksp.processing.Dependencies
-import com.google.devtools.ksp.processing.KSPLogger
 import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.processing.SymbolProcessor
+import com.google.devtools.ksp.processing.SymbolProcessorEnvironment
+import com.google.devtools.ksp.processing.SymbolProcessorProvider
 import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSNode
@@ -35,26 +36,16 @@ private fun OutputStream.appendText(str: String) {
     this.write(str.toByteArray())
 }
 
-class AssistedViewModelProcessor : SymbolProcessor {
-    lateinit var codeGenerator: CodeGenerator
-    lateinit var logger: KSPLogger
-
-    override fun init(
-        options: Map<String, String>,
-        kotlinVersion: KotlinVersion,
-        codeGenerator: CodeGenerator,
-        logger: KSPLogger
-    ) {
-        this.codeGenerator = codeGenerator
-        this.logger = logger
-    }
+class AssistedViewModelProcessor(
+    val codeGenerator: CodeGenerator,
+) : SymbolProcessor {
 
     override fun process(resolver: Resolver): List<KSAnnotated> {
         val factorySymbol =
             resolver.getSymbolsWithAnnotation("dagger.assisted.AssistedFactory")
         val holder =
             resolver.getSymbolsWithAnnotation("dagger.hilt.android.AndroidEntryPoint")
-        val factory = factorySymbol.filterIsInstance<KSClassDeclaration>()
+        val factory = factorySymbol.filterIsInstance<KSClassDeclaration>().toList()
         holder.forEach { it.accept(HolderVisitor(), factory) }
         return emptyList()
     }
@@ -109,5 +100,13 @@ class AssistedViewModelProcessor : SymbolProcessor {
                 outputStream.appendText("}${System.lineSeparator()}")
             }
         }
+    }
+}
+
+class AssistedViewModelProcessorProvider : SymbolProcessorProvider {
+    override fun create(
+        environment: SymbolProcessorEnvironment
+    ): SymbolProcessor {
+        return AssistedViewModelProcessor(environment.codeGenerator)
     }
 }

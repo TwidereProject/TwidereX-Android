@@ -1,11 +1,11 @@
 ext {
     versions = [
-            kotlin: "1.4.32",
-            hilt  : '2.36',
+            kotlin: "1.5.10",
+            hilt  : "2.36",
     ]
     global = [
-            compileSdkVersion: 'android-S',
-            buildToolsVersion: '31.0.0-rc4',
+            compileSdkVersion: "android-S",
+            buildToolsVersion: "31.0.0-rc4",
             minSdkVersion    : 21,
             targetSdkVersion : 31,
             versionCode      : 42,

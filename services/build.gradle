@@ -1,6 +1,6 @@
 plugins {
-    id 'org.jetbrains.kotlin.jvm'
-    id "org.jetbrains.kotlin.plugin.serialization" version "1.4.32"
+    id "org.jetbrains.kotlin.jvm"
+    id "org.jetbrains.kotlin.plugin.serialization" version "1.5.10"
 }
 
 java {
@@ -27,7 +27,7 @@ dependencies {
 
     implementation libs.bundles.okhttp
 
-    testImplementation 'org.jetbrains.kotlin:kotlin-test-junit5'
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
+    testImplementation "org.jetbrains.kotlin:kotlin-test-junit5"
+    testImplementation "org.junit.jupiter:junit-jupiter-api:5.7.0"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.7.0"
 }

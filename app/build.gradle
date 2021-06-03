@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        enableGoogleVariant = project.file('google-services.json').exists()
+        enableGoogleVariant = project.file("google-services.json").exists()
     }
     repositories {
         google()
@@ -11,30 +11,30 @@ buildscript {
         classpath "com.google.dagger:hilt-android-gradle-plugin:$versions.hilt"
         if (enableGoogleVariant) {
             // START Non-FOSS component
-            classpath 'com.google.gms:google-services:4.3.4'
-            classpath 'com.google.firebase:firebase-crashlytics-gradle:2.4.1'
+            classpath "com.google.gms:google-services:4.3.4"
+            classpath "com.google.firebase:firebase-crashlytics-gradle:2.4.1"
             // END Non-FOSS component
         }
     }
 }
 
 plugins {
-    id 'com.android.application'
-    id 'org.jetbrains.kotlin.android'
+    id "com.android.application"
+    id "org.jetbrains.kotlin.android"
     id "org.jetbrains.kotlin.kapt"
     id "com.google.protobuf" version "0.8.14"
-    id "org.jetbrains.kotlin.plugin.serialization" version "1.4.32"
-    id "com.google.devtools.ksp" version "1.4.32-1.0.0-alpha07"
+    id "org.jetbrains.kotlin.plugin.serialization" version "1.5.10"
+    id "com.google.devtools.ksp" version "1.5.10-1.0.0-beta01"
 }
 
 if (enableGoogleVariant) {
     // START Non-FOSS component
-    apply plugin: 'com.google.gms.google-services'
-    apply plugin: 'com.google.firebase.crashlytics'
+    apply plugin: "com.google.gms.google-services"
+    apply plugin: "com.google.firebase.crashlytics"
     // END Non-FOSS component
 }
 
-apply plugin: 'dagger.hilt.android.plugin'
+apply plugin: "dagger.hilt.android.plugin"
 
 android {
     compileSdkVersion global.compileSdkVersion
@@ -54,7 +54,7 @@ android {
                 arguments += ["room.schemaLocation": "$projectDir/schemas".toString()]
             }
         }
-        def apiKeyProperties = rootProject.file('apiKey.properties')
+        def apiKeyProperties = rootProject.file("apiKey.properties")
         def hasApiKeyProps = apiKeyProperties.exists()
         if (hasApiKeyProps) {
             Properties apiKeyProp = new Properties()
@@ -66,24 +66,24 @@ android {
     }
 
     lintOptions{
-        disable 'MissingTranslation'
+        disable "MissingTranslation"
     }
 
-    flavorDimensions 'channel'
+    flavorDimensions "channel"
     productFlavors {
         if (enableGoogleVariant) {
             // START Non-FOSS component
             google {
-                dimension 'channel'
+                dimension "channel"
             }
             // END Non-FOSS component
         }
         fdroid {
-            dimension 'channel'
+            dimension "channel"
         }
     }
 
-    def file = rootProject.file('signing.properties')
+    def file = rootProject.file("signing.properties")
     def hasSigningProps = file.exists()
 
     signingConfigs {
@@ -91,10 +91,10 @@ android {
             twidere {
                 Properties signingProp = new Properties()
                 signingProp.load(file.newInputStream())
-                storeFile = rootProject.file(signingProp.get('storeFile'))
-                storePassword = (String) signingProp.get('storePassword')
-                keyAlias = (String) signingProp.get('keyAlias')
-                keyPassword = (String) signingProp.get('keyPassword')
+                storeFile = rootProject.file(signingProp.get("storeFile"))
+                storePassword = (String) signingProp.get("storePassword")
+                keyAlias = (String) signingProp.get("keyAlias")
+                keyPassword = (String) signingProp.get("keyPassword")
             }
         }
     }
@@ -110,7 +110,7 @@ android {
                 signingConfig signingConfigs.twidere
             }
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
         }
     }
     sourceSets.each {
@@ -125,7 +125,7 @@ android {
         targetCompatibility JavaVersion.VERSION_11
     }
     kotlinOptions {
-        jvmTarget = '11'
+        jvmTarget = "11"
         useIR = true
     }
     buildFeatures {
@@ -136,8 +136,8 @@ android {
     }
 
     packagingOptions {
-        exclude 'META-INF/AL2.0'
-        exclude 'META-INF/LGPL2.1'
+        exclude "META-INF/AL2.0"
+        exclude "META-INF/LGPL2.1"
         exclude "DebugProbesKt.bin"
     }
 }
@@ -215,13 +215,13 @@ dependencies {
 
     if (enableGoogleVariant) {
         // START Non-FOSS component
-        googleImplementation platform('com.google.firebase:firebase-bom:26.1.0')
-        googleImplementation 'com.google.firebase:firebase-analytics-ktx'
-        googleImplementation 'com.google.firebase:firebase-crashlytics-ktx'
+        googleImplementation platform("com.google.firebase:firebase-bom:26.1.0")
+        googleImplementation "com.google.firebase:firebase-analytics-ktx"
+        googleImplementation "com.google.firebase:firebase-crashlytics-ktx"
         // END Non-FOSS component
     }
 
-    testImplementation 'junit:junit:4.13.2'
+    testImplementation "junit:junit:4.13.2"
     androidTestImplementation libs.room.testing
     testImplementation libs.bundles.mockito.test
     testImplementation libs.android.test.core
@@ -230,4 +230,4 @@ dependencies {
     androidTestImplementation libs.bundles.androidx.test
 }
 
-apply from: 'translate.gradle'
+apply from: "translate.gradle"
