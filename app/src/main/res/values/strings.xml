@@ -300,6 +300,8 @@
     <string name="accessibility_common_status_actions_reply">Reply</string>
     <string name="accessibility_common_status_actions_retweet">Retweet</string>
     <string name="accessibility_common_status_actions_like">Like</string>
+    <string name="accessibility_common_status_thread_show">Show this thread</string>
+    <string name="accessibility_common_status_thread_compose">thread mode</string>
     <string name="accessibility_scene_home_compose">Compose</string>
     <string name="accessibility_scene_home_menu">Menu</string>
     <string name="accessibility_scene_home_drawer_account_dropdown">Account DropDown</string>

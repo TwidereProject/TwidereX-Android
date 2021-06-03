@@ -57,6 +57,7 @@ import com.twidere.twiderex.component.foundation.LoadingProgress
 import com.twidere.twiderex.component.lazy.loadState
 import com.twidere.twiderex.component.placeholder.UiStatusPlaceholder
 import com.twidere.twiderex.component.status.StatusDivider
+import com.twidere.twiderex.component.status.StatusThreadStyle
 import com.twidere.twiderex.component.status.TimelineStatusComponent
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiStatus
@@ -94,6 +95,7 @@ fun LazyUiStatusList(
                     Column {
                         TimelineStatusComponent(
                             item,
+                            threadStyle = StatusThreadStyle.WITH_AVATAR
                         )
                         when {
                             loadingBetween.contains(item.statusKey) -> {

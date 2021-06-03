@@ -199,6 +199,7 @@ private fun ComposeBody(
     val textFieldValue by viewModel.textFieldValue.observeAsState(initial = TextFieldValue())
     val keyboardController = LocalSoftwareKeyboardController.current
     val canSaveDraft by viewModel.canSaveDraft.observeAsState(initial = false)
+    val enableThreadMode by viewModel.enableThreadMode.observeAsState(initial = false)
     var showSaveDraftDialog by remember { mutableStateOf(false) }
     val scaffoldState = rememberBottomSheetScaffoldState()
     if (showSaveDraftDialog || canSaveDraft) {
@@ -273,10 +274,11 @@ private fun ComposeBody(
                             }
                         ) {
                             Icon(
-                                painter = painterResource(id = R.drawable.ic_send),
+                                painter = painterResource(id = if (enableThreadMode) R.drawable.ic_send_thread else R.drawable.ic_send),
                                 contentDescription = stringResource(
-                                    id = R.string.accessibility_scene_compose_send
-                                )
+                                    id = if (enableThreadMode) R.string.accessibility_common_status_thread_compose else R.string.accessibility_scene_compose_send
+                                ),
+                                tint = if (textFieldValue.text.isNotEmpty()) MaterialTheme.colors.primary else LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
                             )
                         }
                     }
@@ -290,7 +292,7 @@ private fun ComposeBody(
                 ) {
                     val scrollState = rememberScrollState()
                     LaunchedEffect(scrollState) {
-                        if (composeType == ComposeType.Reply) {
+                        if (composeType == ComposeType.Reply || composeType == ComposeType.Thread) {
                             snapshotFlow { scrollState.value }
                                 .map { it > 0 }
                                 .distinctUntilChanged()
@@ -310,7 +312,7 @@ private fun ComposeBody(
                         modifier = Modifier
                             .verticalScroll(
                                 scrollState,
-                                reverseScrolling = composeType == ComposeType.Reply,
+                                reverseScrolling = composeType == ComposeType.Reply || composeType == ComposeType.Thread,
                             )
                             .clickable(
                                 onClick = {
@@ -324,7 +326,7 @@ private fun ComposeBody(
                         val height = with(LocalDensity.current) {
                             this@BoxWithConstraints.constraints.maxHeight.toDp()
                         }
-                        if (composeType == ComposeType.Reply) {
+                        if (composeType == ComposeType.Reply || composeType == ComposeType.Thread) {
                             status?.let { status ->
                                 Box(
                                     modifier = Modifier
@@ -347,13 +349,13 @@ private fun ComposeBody(
                                     it
                                 }
                             },
-                            lineUp = composeType == ComposeType.Reply,
+                            lineUp = composeType == ComposeType.Reply || composeType == ComposeType.Thread,
                         ) {
                             ComposeInput(
                                 scaffoldState,
                                 viewModel,
                                 account,
-                                autoFocus = if (composeType == ComposeType.Reply) {
+                                autoFocus = if (composeType == ComposeType.Reply || composeType == ComposeType.Thread) {
                                     scrollState.value == 0
                                 } else {
                                     true
@@ -393,7 +395,9 @@ private fun ComposeBody(
                             modifier = Modifier.weight(1f),
                             viewModel = viewModel,
                         )
-                        MastodonExtraActions(images, viewModel)
+                        CompositionLocalProvider(LocalContentAlpha.provides(ContentAlpha.medium)) {
+                            MastodonExtraActions(images, viewModel)
+                        }
                     } else {
                         Spacer(modifier = Modifier.weight(1F))
                     }
@@ -419,12 +423,14 @@ private fun ComposeBody(
                         keyboardController?.show()
                     }
                 }
-                ComposeActions(
-                    viewModel,
-                    emojiButtonClicked = {
-                        showEmoji = !showEmoji
-                    },
-                )
+                CompositionLocalProvider(LocalContentAlpha.provides(ContentAlpha.medium)) {
+                    ComposeActions(
+                        viewModel,
+                        emojiButtonClicked = {
+                            showEmoji = !showEmoji
+                        },
+                    )
+                }
                 EmojiPanel(viewModel = viewModel, showEmoji = showEmoji)
             }
         }
@@ -570,8 +576,8 @@ private fun MastodonExtraActions(
                 tint = if (isImageSensitive) {
                     MaterialTheme.colors.primary
                 } else {
-                    LocalContentColor.current
-                }.copy(alpha = LocalContentAlpha.current)
+                    LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
+                }
             )
         }
     }
@@ -589,8 +595,8 @@ private fun MastodonExtraActions(
             tint = if (isContentWarning) {
                 MaterialTheme.colors.primary
             } else {
-                LocalContentColor.current
-            }.copy(alpha = LocalContentAlpha.current)
+                LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
+            }
         )
     }
 }
@@ -898,7 +904,9 @@ private fun ComposeInput(
                         // TODO: scroll lazyColumn
                     },
                     placeholder = {
-                        Text(text = stringResource(id = R.string.scene_compose_placeholder))
+                        CompositionLocalProvider(LocalContentAlpha.provides(ContentAlpha.medium)) {
+                            Text(text = stringResource(id = R.string.scene_compose_placeholder))
+                        }
                     }
                 )
 
@@ -929,7 +937,7 @@ private fun ColumnScope.MastodonContentWarningInput(viewModel: ComposeViewModel)
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 CompositionLocalProvider(
-                    LocalContentAlpha provides ContentAlpha.medium,
+                    LocalContentAlpha provides ContentAlpha.disabled,
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_alert_octagon),
@@ -941,7 +949,11 @@ private fun ColumnScope.MastodonContentWarningInput(viewModel: ComposeViewModel)
                     value = cwText,
                     onValueChange = { viewModel.setContentWarningText(it) },
                     placeholder = {
-                        Text(text = stringResource(id = R.string.scene_compose_cw_placeholder))
+                        CompositionLocalProvider(
+                            LocalContentAlpha provides ContentAlpha.disabled,
+                        ) {
+                            Text(text = stringResource(id = R.string.scene_compose_cw_placeholder))
+                        }
                     }
                 )
             }
@@ -1094,6 +1106,7 @@ private fun ComposeActions(
     val account = LocalActiveAccount.current ?: return
     val images by viewModel.images.observeAsState(initial = emptyList())
     val isInVoteState by viewModel.isInVoteMode.observeAsState(initial = false)
+    val enableThreadMode by viewModel.enableThreadMode.observeAsState(initial = false)
     val allowImage by derivedStateOf {
         account.type == PlatformType.Twitter || (account.type == PlatformType.Mastodon && !isInVoteState)
     }
@@ -1163,8 +1176,8 @@ private fun ComposeActions(
                         tint = if (isInVoteState) {
                             MaterialTheme.colors.primary
                         } else {
-                            LocalContentColor.current
-                        }.copy(alpha = LocalContentAlpha.current)
+                            LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
+                        }
                     )
                 }
             }
@@ -1236,6 +1249,17 @@ private fun ComposeActions(
                         )
                     )
                 }
+            }
+            IconButton(
+                onClick = {
+                    viewModel.setEnableThreadMode(!enableThreadMode)
+                },
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_thread_mode),
+                    contentDescription = stringResource(id = R.string.accessibility_common_status_thread_compose),
+                    tint = if (enableThreadMode) MaterialTheme.colors.primary else LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
+                )
             }
             Spacer(modifier = Modifier.weight(1f))
             IconButton(

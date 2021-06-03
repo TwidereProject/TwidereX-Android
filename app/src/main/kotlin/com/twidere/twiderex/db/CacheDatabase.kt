@@ -66,7 +66,7 @@ import javax.inject.Singleton
         DbList::class,
         DbNotificationCursor::class,
     ],
-    version = 13,
+    version = 14,
 )
 @TypeConverters(
     MicroBlogKeyConverter::class,

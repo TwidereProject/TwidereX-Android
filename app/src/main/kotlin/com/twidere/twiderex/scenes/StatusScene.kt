@@ -58,6 +58,7 @@ import com.twidere.twiderex.component.foundation.ErrorPlaceholder
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.status.DetailedStatusComponent
 import com.twidere.twiderex.component.status.StatusDivider
+import com.twidere.twiderex.component.status.StatusThreadStyle
 import com.twidere.twiderex.component.status.TimelineStatusComponent
 import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.model.MicroBlogKey
@@ -130,7 +131,7 @@ fun StatusScene(
                 val distance = with(LocalDensity.current) {
                     -50.dp.toPx()
                 }
-                val index = remember {
+                val firstVisibleIndex = remember {
                     for (i in 0..source.itemCount) {
                         if (source.peek(i)?.statusKey == status?.statusKey) {
                             return@remember i
@@ -139,14 +140,15 @@ fun StatusScene(
                     0
                 }
                 val state = rememberLazyListState(
-                    initialFirstVisibleItemIndex = index,
+                    initialFirstVisibleItemIndex = firstVisibleIndex,
                 )
                 LaunchedEffect(Unit) {
-                    if (index != 0 && state.firstVisibleItemIndex == index && state.firstVisibleItemScrollOffset == 0) {
+                    if (firstVisibleIndex != 0 && state.firstVisibleItemIndex == firstVisibleIndex && state.firstVisibleItemScrollOffset == 0) {
                         state.animateScrollBy(distance, tween())
                         state.animateScrollBy(-distance, tween())
                     }
                 }
+
                 LazyColumn(
                     state = state,
                     horizontalAlignment = Alignment.CenterHorizontally
@@ -169,9 +171,17 @@ fun StatusScene(
                                     content = {
                                         Column {
                                             if (status.statusKey == statusKey) {
-                                                DetailedStatusComponent(data = status)
+                                                DetailedStatusComponent(data = status, lineUp = firstVisibleIndex > 0)
                                             } else {
-                                                TimelineStatusComponent(data = status)
+                                                TimelineStatusComponent(
+                                                    data = status,
+                                                    threadStyle = if (index > firstVisibleIndex && status.isInThread(statusKey.id))
+                                                        StatusThreadStyle.TEXT_ONLY
+                                                    else
+                                                        StatusThreadStyle.NONE,
+                                                    lineDown = index < firstVisibleIndex,
+                                                    lineUp = index in 1 until firstVisibleIndex
+                                                )
                                             }
                                             if (status.statusKey == statusKey) {
                                                 Divider()

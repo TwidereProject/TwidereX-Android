@@ -108,7 +108,9 @@ fun Notification.toDbStatusWithReference(
             poll = null,
             card = null,
             mentions = null,
-        )
+        ),
+        inReplyToStatusId = null,
+        inReplyToUserId = null,
     )
     return DbStatusWithReference(
         status = DbStatusWithMediaAndUser(
@@ -232,7 +234,9 @@ private fun Status.toDbStatusWithMediaAndUser(
                 desc = card?.description?.takeIf { it.isNotEmpty() && it.isNotBlank() },
                 image = card?.image,
             )
-        }
+        },
+        inReplyToUserId = inReplyToAccountID,
+        inReplyToStatusId = inReplyToID
     )
     return DbStatusWithMediaAndUser(
         data = status,

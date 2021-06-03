@@ -30,11 +30,15 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
@@ -50,9 +54,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.layout.layoutId
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.ConstraintSet
+import androidx.constraintlayout.compose.Dimension
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.HumanizedTime
 import com.twidere.twiderex.component.navigation.LocalNavigator
@@ -69,6 +80,9 @@ import com.twidere.twiderex.ui.LocalActiveAccount
 fun TimelineStatusComponent(
     data: UiStatus,
     showActions: Boolean = true,
+    lineUp: Boolean = false,
+    lineDown: Boolean = false,
+    threadStyle: StatusThreadStyle = StatusThreadStyle.NONE,
 ) {
     when {
         data.platformType == PlatformType.Mastodon &&
@@ -79,7 +93,7 @@ fun TimelineStatusComponent(
                 ) -> {
             MastodonFollowStatus(data)
         }
-        else -> NormalStatus(data, showActions)
+        else -> NormalStatus(data, showActions, threadStyle, lineUp, lineDown)
     }
 }
 
@@ -119,7 +133,10 @@ object MastodonFollowStatusDefaults {
 @Composable
 private fun NormalStatus(
     data: UiStatus,
-    showActions: Boolean
+    showActions: Boolean,
+    threadStyle: StatusThreadStyle,
+    lineUp: Boolean,
+    lineDown: Boolean
 ) {
     val navigator = LocalNavigator.current
     Column(
@@ -130,34 +147,74 @@ private fun NormalStatus(
                     navigator.status(data)
                 },
             )
-            .padding(NormalStatusDefaults.ContentPadding),
     ) {
-        Spacer(modifier = Modifier.height(NormalStatusDefaults.ContentSpacing))
         StatusContent(
-            modifier = Modifier
-                .padding(
-                    end = NormalStatusDefaults.ContentSpacing
-                ),
+            contentPadding = NormalStatusDefaults.ContentPadding,
+            lineUp = lineUp,
+            lineDown = lineDown || (threadStyle.lineDown && data.isInThread()),
+            lineDownPadding = if (threadStyle == StatusThreadStyle.WITH_AVATAR)
+                PaddingValues(
+                    top = StatusContentDefaults.AvatarLine.Spacing,
+                    bottom = NormalStatusDefaults.ContentPadding.calculateBottomPadding() +
+                        StatusThreadDefaults.AvatarSize +
+                        StatusContentDefaults.AvatarLine.Spacing
+                )
+            else
+                PaddingValues(top = StatusContentDefaults.AvatarLine.Spacing),
             data = data,
-        )
-        if (showActions) {
-            Row {
-                Spacer(modifier = Modifier.width(UserAvatarDefaults.AvatarSize))
-                val status = (data.retweet ?: data)
-                StatusActions(status)
+            footer = {
+                Column {
+                    if (showActions) {
+                        Row {
+                            Spacer(modifier = Modifier.width(UserAvatarDefaults.AvatarSize))
+                            val status = (data.retweet ?: data)
+                            StatusActions(status)
+                        }
+                    } else {
+                        Spacer(modifier = Modifier.height(NormalStatusDefaults.ContentSpacing))
+                    }
+                    if (data.isInThread()) {
+                        StatusThread(threadStyle, data)
+                    }
+                }
             }
-        } else {
-            Spacer(modifier = Modifier.height(NormalStatusDefaults.ContentSpacing))
-        }
+        )
     }
 }
 
 object NormalStatusDefaults {
     val ContentPadding = PaddingValues(
         horizontal = 16.dp,
-        vertical = 0.dp
+        vertical = 8.dp
     )
     val ContentSpacing = 8.dp
+}
+
+@Composable
+private fun StatusThread(threadStyle: StatusThreadStyle, data: UiStatus) {
+    val navigator = LocalNavigator.current
+    when (threadStyle) {
+        StatusThreadStyle.NONE -> {
+            // show nothing
+        }
+        StatusThreadStyle.WITH_AVATAR -> {
+            StatusThreadWithAvatar(
+                modifier = Modifier.padding(top = NormalStatusDefaults.ContentSpacing),
+                data = data,
+                onClick = {
+                    navigator.status(data)
+                }
+            )
+        }
+        StatusThreadStyle.TEXT_ONLY -> {
+            StatusThreadTextOnly(
+                modifier = Modifier.padding(start = UserAvatarDefaults.AvatarSize),
+                onClick = {
+                    navigator.status(data)
+                }
+            )
+        }
+    }
 }
 
 @Composable
@@ -165,11 +222,9 @@ private fun StatusHeader(data: UiStatus) {
     when {
         data.platformType == PlatformType.Mastodon && data.mastodonExtra != null -> {
             MastodonStatusHeader(data.mastodonExtra, data)
-            Spacer(modifier = Modifier.height(StatusHeaderDefaults.HeaderSpacing))
         }
         data.retweet != null -> {
             RetweetHeader(data = data)
-            Spacer(modifier = Modifier.height(StatusHeaderDefaults.HeaderSpacing))
         }
     }
 }
@@ -314,18 +369,84 @@ enum class StatusContentType {
     Extend,
 }
 
+@Composable
+fun AvatarConnectLine(
+    modifier: Modifier = Modifier,
+    lineWidth: Dp = AvatarConnectLineDefaults.LineWidth,
+    lineShape: Shape = RoundedCornerShape(lineWidth / 2),
+    lineColor: Color = MaterialTheme.colors.onSurface.copy(alpha = 0.12f)
+) {
+    Box(modifier.clip(lineShape)) {
+        Box(
+            modifier = Modifier
+                .width(lineWidth)
+                .fillMaxHeight()
+                .background(lineColor)
+        )
+    }
+}
+
+object AvatarConnectLineDefaults {
+    val LineWidth = 2.dp
+}
+
 @OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun StatusContent(
     modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(0.dp),
     data: UiStatus,
     type: StatusContentType = StatusContentType.Normal,
+    lineDown: Boolean = false,
+    lineUp: Boolean = false,
+    lineDownPadding: PaddingValues = PaddingValues(top = StatusContentDefaults.AvatarLine.Spacing),
+    lineUpPadding: PaddingValues = PaddingValues(bottom = StatusContentDefaults.AvatarLine.Spacing - StatusDividerDefaults.ThickNess),
+    footer: @Composable () -> Unit = {},
 ) {
-    Column(modifier = modifier) {
-        StatusHeader(data)
+    val layoutDirection = LocalLayoutDirection.current
+    ConstraintLayout(
+        constraintSet = statusConstraintSets(),
+        modifier = modifier
+            .padding(
+                start = contentPadding.calculateLeftPadding(layoutDirection),
+                end = contentPadding.calculateRightPadding(layoutDirection)
+            )
+            .wrapContentHeight()
+            .fillMaxWidth()
+    ) {
+        if (lineUp) {
+            AvatarConnectLine(
+                modifier = Modifier
+                    .layoutId(StatusContentDefaults.Ref.LineUp)
+                    .padding(lineUpPadding)
+                    .offset(y = -StatusDividerDefaults.ThickNess),
+                lineShape = RoundedCornerShape(
+                    bottomStart = AvatarConnectLineDefaults.LineWidth / 2,
+                    bottomEnd = AvatarConnectLineDefaults.LineWidth / 2
+                )
+            )
+        }
+        if (lineDown) {
+            AvatarConnectLine(
+                modifier = Modifier
+                    .layoutId(StatusContentDefaults.Ref.LineDown)
+                    .padding(lineDownPadding),
+                lineShape = RoundedCornerShape(
+                    topStart = AvatarConnectLineDefaults.LineWidth / 2,
+                    topEnd = AvatarConnectLineDefaults.LineWidth / 2
+                )
+            )
+        }
+        Column(modifier = Modifier.layoutId(StatusContentDefaults.Ref.StatusHeader)) {
+            Spacer(modifier = Modifier.height(contentPadding.calculateTopPadding()))
+            StatusHeader(data)
+            Spacer(modifier = Modifier.height(StatusHeaderDefaults.HeaderSpacing))
+        }
         val status = data.retweet ?: data
-        Row {
+        Box(modifier = Modifier.layoutId(StatusContentDefaults.Ref.Avatar)) {
             UserAvatar(user = status.user)
+        }
+        Row(modifier = Modifier.layoutId(StatusContentDefaults.Ref.Content)) {
             Spacer(modifier = Modifier.width(StatusContentDefaults.AvatarSpacing))
             Column {
                 Row(
@@ -366,9 +487,55 @@ fun StatusContent(
             }
         }
         if (type == StatusContentType.Extend) {
-            Spacer(modifier = Modifier.height(StatusContentDefaults.Extend.BodySpacing))
-            StatusBody(status = status, type = type)
+            Column(modifier = Modifier.layoutId(StatusContentDefaults.Ref.Extend)) {
+                Spacer(modifier = Modifier.height(StatusContentDefaults.Extend.BodySpacing))
+                StatusBody(status = status, type = type)
+            }
         }
+        Column(modifier = Modifier.layoutId(StatusContentDefaults.Ref.Footer)) {
+            footer.invoke()
+            Spacer(modifier = Modifier.height(contentPadding.calculateBottomPadding()))
+        }
+    }
+}
+
+@Composable
+fun statusConstraintSets() = ConstraintSet {
+    val avatarRef = createRefFor(StatusContentDefaults.Ref.Avatar)
+    val statusHeaderRef = createRefFor(StatusContentDefaults.Ref.StatusHeader)
+    val contentRef = createRefFor(StatusContentDefaults.Ref.Content)
+    val extendRef = createRefFor(StatusContentDefaults.Ref.Extend)
+    val footerRef = createRefFor(StatusContentDefaults.Ref.Footer)
+    val lineUpRef = createRefFor(StatusContentDefaults.Ref.LineUp)
+    val lineDownRef = createRefFor(StatusContentDefaults.Ref.LineDown)
+    constrain(avatarRef) {
+        top.linkTo(statusHeaderRef.bottom)
+    }
+    constrain(contentRef) {
+        start.linkTo(avatarRef.end, margin = StatusContentDefaults.AvatarSpacing)
+        top.linkTo(avatarRef.top)
+        end.linkTo(parent.end)
+        width = Dimension.fillToConstraints
+    }
+    constrain(extendRef) {
+        top.linkTo(contentRef.bottom)
+    }
+    constrain(footerRef) {
+        top.linkTo(contentRef.bottom)
+    }
+    constrain(lineUpRef) {
+        bottom.linkTo(avatarRef.top)
+        top.linkTo(parent.top)
+        start.linkTo(avatarRef.start)
+        end.linkTo(avatarRef.end)
+        height = Dimension.fillToConstraints
+    }
+    constrain(lineDownRef) {
+        top.linkTo(avatarRef.bottom)
+        bottom.linkTo(parent.bottom)
+        start.linkTo(avatarRef.start)
+        end.linkTo(avatarRef.end)
+        height = Dimension.fillToConstraints
     }
 }
 
@@ -386,6 +553,20 @@ object StatusContentDefaults {
 
     object Mastodon {
         val VisibilitySpacing = 4.dp
+    }
+
+    object AvatarLine {
+        val Spacing = 1.dp
+    }
+
+    object Ref {
+        const val Avatar = "avatar"
+        const val StatusHeader = "statusHeader"
+        const val Content = "content"
+        const val Extend = "extend"
+        const val Footer = "footer"
+        const val LineUp = "lineUp"
+        const val LineDown = "lineDown"
     }
 }
 

@@ -229,7 +229,9 @@ private fun StatusV2.toDbStatusWithMediaAndUser(
                         displayLink = it.displayURL,
                     )
                 }
-            }
+            },
+        inReplyToStatusId = referencedTweets?.find { it.type == ReferencedTweetType.replied_to }?.id,
+        inReplyToUserId = inReplyToUserId,
     )
     return DbStatusWithMediaAndUser(
         data = status,
@@ -335,7 +337,9 @@ private fun Status.toDbStatusWithMediaAndUser(
                         desc = null,
                     )
                 }
-            }
+            },
+        inReplyToUserId = inReplyToUserIDStr,
+        inReplyToStatusId = inReplyToStatusIDStr
     )
     return DbStatusWithMediaAndUser(
         data = status,

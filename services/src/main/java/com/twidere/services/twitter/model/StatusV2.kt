@@ -60,7 +60,10 @@ data class StatusV2(
     @SerialName("reply_settings")
     val replySettings: ReplySettings? = null,
 
-    val attachments: AttachmentsV2? = null
+    val attachments: AttachmentsV2? = null,
+
+    @SerialName("in_reply_to_user_id")
+    val inReplyToUserId: String? = null
 ) : IStatus {
     internal fun setExtra(includesV2: IncludesV2) {
         if (authorID != null) {

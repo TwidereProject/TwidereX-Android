@@ -209,6 +209,8 @@ dependencies {
 
     implementation libs.exoplayer
 
+    implementation libs.constraintLayout
+
     implementation libs.exifinterface
 
     if (enableGoogleVariant) {
