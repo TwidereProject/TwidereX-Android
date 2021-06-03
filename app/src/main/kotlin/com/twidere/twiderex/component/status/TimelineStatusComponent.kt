@@ -59,6 +59,7 @@ import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -455,7 +456,7 @@ fun StatusContent(
                     Row(
                         modifier = Modifier.weight(1f),
                     ) {
-                        UserName(status.user)
+                        UserName(status.user, fontWeight = FontWeight.W500)
                         if (type == StatusContentType.Normal) {
                             Spacer(modifier = Modifier.width(StatusContentDefaults.Normal.UserNameSpacing))
                             UserScreenName(status.user)

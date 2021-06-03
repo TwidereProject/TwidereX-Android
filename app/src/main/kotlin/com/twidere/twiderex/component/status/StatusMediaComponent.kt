@@ -35,9 +35,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -196,14 +196,15 @@ fun StatusMediaComponent(
                             .padding(StatusMediaDefaults.Mastodon.IconSpacing)
                             .alpha(0.5f),
                     ) {
-                        IconButton(
+                        Box(
                             modifier = Modifier
                                 .background(
                                     MaterialTheme.colors.surface,
-                                    shape = MaterialTheme.shapes.medium,
+                                    shape = MaterialTheme.shapes.small,
                                 )
-                                .align(Alignment.TopStart),
-                            onClick = { sensitive = true }
+                                .align(Alignment.TopStart)
+                                .clickable { sensitive = true }
+                                .padding(StatusMediaDefaults.Icon.ContentPadding),
                         ) {
                             Icon(
                                 painter = painterResource(id = R.drawable.ic_eye_off),
@@ -225,6 +226,9 @@ object StatusMediaDefaults {
 
     object Mastodon {
         val IconSpacing = 8.dp
+    }
+    object Icon {
+        val ContentPadding = 6.dp
     }
 }
 

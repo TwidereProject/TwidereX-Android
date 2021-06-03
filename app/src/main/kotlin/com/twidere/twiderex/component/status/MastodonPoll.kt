@@ -29,6 +29,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -39,7 +40,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Checkbox
+import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Icon
+import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.RadioButton
@@ -48,6 +51,7 @@ import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
@@ -107,20 +111,12 @@ fun MastodonPoll(status: UiStatus) {
         }
     }
 
-    if (status.mastodonExtra.poll.canVote) {
-        Spacer(modifier = Modifier.height(MastodonPollDefaults.VoteSpacing))
-        val statusActions = LocalStatusActions.current
-        TextButton(
-            onClick = {
-                statusActions.vote(status = status, account = account, votes = voteState)
-            }
-        ) {
-            Text(text = stringResource(id = R.string.common_controls_status_actions_vote))
-        }
-    }
-
     Spacer(modifier = Modifier.height(MastodonPollDefaults.VoteInfoSpacing))
-    Row {
+    Row(
+        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
         val countText = status.mastodonExtra.poll.votersCount?.let {
             if (it > 1) {
                 stringResource(
@@ -146,14 +142,33 @@ fun MastodonPoll(status: UiStatus) {
                 )
             }
         }
-        if (countText != null) {
-            Text(text = countText)
+        Row {
+            CompositionLocalProvider(
+                LocalTextStyle.provides(MaterialTheme.typography.caption),
+                LocalContentAlpha.provides(ContentAlpha.disabled)
+            ) {
+                if (countText != null) {
+                    Text(text = countText)
+                }
+                Spacer(modifier = Modifier.width(MastodonPollDefaults.VoteTimeSpacing))
+                if (status.mastodonExtra.poll.expired == true) {
+                    Text(text = stringResource(id = R.string.common_controls_status_poll_expired))
+                } else {
+                    Text(text = status.mastodonExtra.poll.expiresAt?.time?.humanizedTimestamp() ?: "")
+                }
+            }
         }
-        Spacer(modifier = Modifier.width(MastodonPollDefaults.VoteTimeSpacing))
-        if (status.mastodonExtra.poll.expired == true) {
-            Text(text = stringResource(id = R.string.common_controls_status_poll_expired))
-        } else {
-            Text(text = status.mastodonExtra.poll.expiresAt?.time?.humanizedTimestamp() ?: "")
+
+        if (status.mastodonExtra.poll.canVote) {
+            val statusActions = LocalStatusActions.current
+            TextButton(
+                onClick = {
+                    statusActions.vote(status = status, account = account, votes = voteState)
+                },
+                enabled = voteState.isNotEmpty(),
+            ) {
+                Text(text = stringResource(id = R.string.common_controls_status_actions_vote))
+            }
         }
     }
 }
@@ -270,8 +285,12 @@ fun MastodonPollOption(
             Text(
                 modifier = Modifier.weight(1f),
                 text = option.title ?: "",
+                style = MaterialTheme.typography.body2
             )
-            Text(text = String.format("%.0f%%", progress * 100))
+            Text(
+                text = String.format("%.0f%%", progress * 100),
+                style = MaterialTheme.typography.caption
+            )
             Spacer(modifier = Modifier.width(MastodonPollOptionDefaults.ContentPadding))
         }
     }
@@ -279,9 +298,9 @@ fun MastodonPollOption(
 
 object MastodonPollOptionDefaults {
     @Composable
-    fun optionSize() = LocalTextStyle.current.fontSize.value.dp + 24.dp
+    fun iconSize() = 20.dp
     @Composable
-    fun iconSize() = LocalTextStyle.current.fontSize.value.dp + 8.dp
-    val ContentPadding = 8.dp
+    fun optionSize() = iconSize() + ContentPadding * 2
+    val ContentPadding = 6.dp
     val IconSpacing = 8.dp
 }
