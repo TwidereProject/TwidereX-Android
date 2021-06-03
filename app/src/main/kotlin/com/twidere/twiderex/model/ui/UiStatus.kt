@@ -62,7 +62,8 @@ data class UiStatus(
     val twitterExtra: DbTwitterStatusExtra? = null,
     val linkPreview: DbPreviewCard? = null,
     val referenceStatus: Map<ReferenceType, UiStatus> = emptyMap(),
-    val isInThread: Boolean
+    val inReplyToUserId: String? = null,
+    val inReplyToStatusId: String? = null,
 ) {
     val retweet: UiStatus? by lazy {
         if (platformType == PlatformType.Mastodon && mastodonExtra != null && mastodonExtra.type != MastodonStatusType.Status) {
@@ -76,6 +77,17 @@ data class UiStatus(
 
     val quote: UiStatus? by lazy {
         referenceStatus[ReferenceType.Quote]
+    }
+
+    fun isInThread(detailStatusId: String? = null): Boolean {
+        return if (detailStatusId == null) {
+            // show all reply as thread
+            inReplyToStatusId != null
+        } else {
+            // in detail scene only show thread when reply to other status
+            // or reply to self
+            inReplyToStatusId != detailStatusId || inReplyToUserId == user.id
+        }
     }
 
     fun generateShareLink() = "https://${statusKey.host}" + when (platformType) {
@@ -106,7 +118,6 @@ data class UiStatus(
             statusKey = MicroBlogKey.Empty,
             rawText = "",
             platformType = PlatformType.Twitter,
-            isInThread = false
         )
 
         fun DbStatusWithMediaAndUser.toUi(
@@ -135,7 +146,8 @@ data class UiStatus(
                 mastodonExtra = data.mastodonExtra,
                 twitterExtra = data.twitterExtra,
                 linkPreview = data.previewCard,
-                isInThread = data.isInThread
+                inReplyToStatusId = data.inReplyToStatusId,
+                inReplyToUserId = data.inReplyToStatusId
             )
         }
 
@@ -170,7 +182,8 @@ data class UiStatus(
                     )
                 }.toMap(),
                 linkPreview = data.previewCard,
-                isInThread = data.isInThread
+                inReplyToUserId = data.inReplyToUserId,
+                inReplyToStatusId = data.inReplyToStatusId
             )
         }
 
@@ -205,7 +218,8 @@ data class UiStatus(
                     )
                 }.toMap(),
                 linkPreview = data.previewCard,
-                isInThread = data.isInThread
+                inReplyToUserId = data.inReplyToUserId,
+                inReplyToStatusId = data.inReplyToStatusId
             )
         }
     }

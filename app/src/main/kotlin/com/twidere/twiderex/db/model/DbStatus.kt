@@ -69,7 +69,8 @@ data class DbStatusV2(
     var mastodonExtra: DbMastodonStatusExtra? = null,
     val twitterExtra: DbTwitterStatusExtra? = null,
     val previewCard: DbPreviewCard? = null,
-    val isInThread: Boolean
+    val inReplyToUserId: String? = null,
+    val inReplyToStatusId: String? = null
 )
 
 @Immutable

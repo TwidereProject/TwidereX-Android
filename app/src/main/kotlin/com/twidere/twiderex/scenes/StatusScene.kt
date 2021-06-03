@@ -175,7 +175,7 @@ fun StatusScene(
                                             } else {
                                                 TimelineStatusComponent(
                                                     data = status,
-                                                    threadStyle = if (index > firstVisibleIndex)
+                                                    threadStyle = if (index > firstVisibleIndex && status.isInThread(statusKey.id))
                                                         StatusThreadStyle.TEXT_ONLY
                                                     else
                                                         StatusThreadStyle.NONE,

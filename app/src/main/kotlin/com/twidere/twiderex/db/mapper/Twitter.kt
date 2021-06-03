@@ -230,7 +230,8 @@ private fun StatusV2.toDbStatusWithMediaAndUser(
                     )
                 }
             },
-        isInThread = user.userId == inReplyToUserId
+        inReplyToStatusId = referencedTweets?.find { it.type == ReferencedTweetType.replied_to }?.id,
+        inReplyToUserId = inReplyToUserId,
     )
     return DbStatusWithMediaAndUser(
         data = status,
@@ -337,7 +338,8 @@ private fun Status.toDbStatusWithMediaAndUser(
                     )
                 }
             },
-        isInThread = inReplyToUserIDStr == user.userId
+        inReplyToUserId = inReplyToUserIDStr,
+        inReplyToStatusId = inReplyToStatusIDStr
     )
     return DbStatusWithMediaAndUser(
         data = status,

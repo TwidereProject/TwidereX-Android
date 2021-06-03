@@ -151,7 +151,7 @@ private fun NormalStatus(
         StatusContent(
             contentPadding = NormalStatusDefaults.ContentPadding,
             lineUp = lineUp,
-            lineDown = lineDown || (threadStyle.lineDown && data.isInThread),
+            lineDown = lineDown || (threadStyle.lineDown && data.isInThread()),
             lineDownPadding = if (threadStyle == StatusThreadStyle.WITH_AVATAR)
                 PaddingValues(
                     top = StatusContentDefaults.AvatarLine.Spacing,
@@ -173,7 +173,7 @@ private fun NormalStatus(
                     } else {
                         Spacer(modifier = Modifier.height(NormalStatusDefaults.ContentSpacing))
                     }
-                    if (data.isInThread) {
+                    if (data.isInThread()) {
                         StatusThread(threadStyle, data)
                     }
                 }
