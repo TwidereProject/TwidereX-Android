@@ -11,7 +11,7 @@ buildscript {
 }
 
 plugins {
-    id "com.diffplug.spotless" version "5.12.4"
+    id "com.diffplug.spotless" version "5.12.5"
 }
 
 subprojects {
@@ -37,17 +37,6 @@ subprojects {
             targetExclude("bin/**/*.java")
 
             licenseHeaderFile rootProject.file("spotless/license.kt")
-        }
-    }
-
-    tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
-        kotlinOptions {
-            allWarningsAsErrors = true
-            freeCompilerArgs = [
-                    "-Xallow-unstable-dependencies",
-                    "-Xopt-in=kotlin.RequiresOptIn",
-            ]
-            jvmTarget = "11"
         }
     }
 }

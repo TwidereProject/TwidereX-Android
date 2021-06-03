@@ -109,7 +109,7 @@ fun ListsScene() {
                         )
                         Text(
                             text = stringResource(id = R.string.scene_lists_modify_create_title)
-                                .toUpperCase(Locale.getDefault()),
+                                .uppercase(Locale.getDefault()),
                             style = MaterialTheme.typography.button
                         )
                     }

@@ -22,8 +22,6 @@ package com.twidere.twiderex.repository
 
 import com.twidere.twiderex.db.AppDatabase
 import com.twidere.twiderex.db.model.DbSearch
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import java.util.UUID
 
 class SearchRepository(
@@ -33,23 +31,19 @@ class SearchRepository(
         database.searchDao().getAll()
     }
 
-    fun addOrUpgrade(
+    suspend fun addOrUpgrade(
         content: String,
     ) {
-        GlobalScope.launch {
-            database.searchDao().insertAll(
-                DbSearch(
-                    _id = UUID.randomUUID().toString(),
-                    content = content,
-                    lastActive = System.currentTimeMillis()
-                )
+        database.searchDao().insertAll(
+            DbSearch(
+                _id = UUID.randomUUID().toString(),
+                content = content,
+                lastActive = System.currentTimeMillis()
             )
-        }
+        )
     }
 
-    fun remove(item: DbSearch) {
-        GlobalScope.launch {
-            database.searchDao().remove(item)
-        }
+    suspend fun remove(item: DbSearch) {
+        database.searchDao().remove(item)
     }
 }

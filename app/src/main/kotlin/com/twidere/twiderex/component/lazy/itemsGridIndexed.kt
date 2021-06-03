@@ -46,7 +46,9 @@ fun <T> LazyListScope.itemsGridIndexed(
     val rows = data.windowed(rowSize, rowSize, true)
     itemsIndexed(rows) { index, row ->
         Column(
-            modifier = Modifier.fillParentMaxWidth().padding(horizontal = padding)
+            modifier = Modifier
+                .fillParentMaxWidth()
+                .padding(horizontal = padding)
         ) {
             Row {
                 for (i in row.indices) {
@@ -77,7 +79,7 @@ fun <T : Any> LazyListScope.itemsPagingGridIndexed(
         data.retry()
     }
     itemsGridIndexed((0 until data.itemCount).toList(), rowSize = rowSize, spacing = spacing, padding = padding) { _, index ->
-        itemContent.invoke(this, index, data[index])
+        itemContent.invoke(this, index, data.getAsState(index = index).value)
     }
     loadState(data.loadState.append) {
         data.retry()

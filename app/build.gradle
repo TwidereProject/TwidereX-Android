@@ -125,6 +125,10 @@ android {
         targetCompatibility JavaVersion.VERSION_11
     }
     kotlinOptions {
+        allWarningsAsErrors = true
+        freeCompilerArgs = [
+                "-Xopt-in=kotlin.RequiresOptIn",
+        ]
         jvmTarget = "11"
         useIR = true
     }

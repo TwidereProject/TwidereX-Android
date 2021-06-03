@@ -10,7 +10,12 @@ java {
 
 tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
     kotlinOptions {
+        allWarningsAsErrors = true
+        freeCompilerArgs = [
+                "-Xopt-in=kotlin.RequiresOptIn",
+        ]
         jvmTarget = "11"
+        useIR = true
     }
 }
 

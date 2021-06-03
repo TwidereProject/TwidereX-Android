@@ -43,7 +43,7 @@ class ExifScrambler(private val context: Context) {
             // create an cache image
             val mimeType = contentResolver.getType(uri) ?: ""
             val imageType = getImageType(mimeType)
-            val imageCache = File(context.externalCacheDir, "${UUID.randomUUID()}.${imageType.name.toLowerCase()}")
+            val imageCache = File(context.externalCacheDir, "${UUID.randomUUID()}.${imageType.name.lowercase()}")
             if (!imageCache.exists()) imageCache.createNewFile()
             // write to disk without exif meta data
             when (imageType) {
