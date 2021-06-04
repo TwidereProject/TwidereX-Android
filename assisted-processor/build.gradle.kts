@@ -2,9 +2,6 @@ plugins {
     kotlin("jvm")
 }
 
-group = "com.twidere"
-version = "1.0-SNAPSHOT"
-
 repositories {
     mavenCentral()
     google()

@@ -21,8 +21,8 @@
 package com.twidere.twiderex.component.foundation
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Surface
@@ -33,8 +33,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.semantics.Role
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun SignInButton(
     border: BorderStroke? = null,
@@ -46,15 +46,12 @@ fun SignInButton(
     Surface(
         modifier = Modifier
             .clip(MaterialTheme.shapes.small)
-            .clipToBounds()
-            .clickable(
-                role = Role.Button,
-                onClick = onClick,
-            ),
+            .clipToBounds(),
         shape = MaterialTheme.shapes.small,
         border = border,
         contentColor = contentColor,
         color = color,
+        onClick = onClick
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
