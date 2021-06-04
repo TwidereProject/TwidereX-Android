@@ -31,12 +31,16 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Checkbox
@@ -189,7 +193,6 @@ fun MastodonPollOption(
     voted: Boolean,
     onVote: (voted: Boolean) -> Unit = {},
 ) {
-    val size = MastodonPollOptionDefaults.optionSize()
     val transition = updateTransition(targetState = option.votesCount)
     val progress by transition.animateFloat {
         (it ?: 0).toFloat() / max((poll.votesCount ?: 0), 1).toFloat()
@@ -201,6 +204,7 @@ fun MastodonPollOption(
     }
     Box(
         modifier = Modifier
+            .height(IntrinsicSize.Min)
             .clip(
                 if (poll.multiple == true) {
                     RoundedCornerShape(4.dp)
@@ -219,13 +223,12 @@ fun MastodonPollOption(
     ) {
         Box(
             modifier = Modifier
-                .height(size)
-                .fillMaxWidth()
-                .background(color.copy(alpha = 0.0304f)),
+                .fillMaxSize()
+                .background(color.copy(alpha = 0.08f))
         )
         Box(
             modifier = Modifier
-                .height(size)
+                .fillMaxHeight()
                 .fillMaxWidth(progress)
                 .clip(
                     if (poll.multiple == true) {
@@ -236,20 +239,23 @@ fun MastodonPollOption(
                 )
                 .background(
                     color.let {
+                        // foreGroundAlpha =1 - (1 - wantedAlpha)/(1 - backgroundAlpha)
                         if (poll.ownVotes?.contains(index) == true) {
-                            it.copy(alpha = 0.285f)
+                            // wanted alpha is 0.75f
+                            it.copy(alpha = 0.62f)
                         } else {
-                            it.copy(alpha = 0.076f)
+                            // wanted alpha is 0.2f
+                            it.copy(alpha = 0.13f)
                         }
                     }
                 ),
         )
         Row(
             modifier = Modifier
-                .height(size),
+                .wrapContentSize()
+                .padding(MastodonPollOptionDefaults.ContentPadding),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Spacer(modifier = Modifier.width(MastodonPollOptionDefaults.ContentPadding))
             Box(
                 modifier = Modifier.width(MastodonPollOptionDefaults.iconSize())
             ) {
@@ -287,11 +293,11 @@ fun MastodonPollOption(
                 text = option.title ?: "",
                 style = MaterialTheme.typography.body2
             )
+            Spacer(modifier = Modifier.width(MastodonPollOptionDefaults.IconSpacing))
             Text(
                 text = String.format("%.0f%%", progress * 100),
                 style = MaterialTheme.typography.caption
             )
-            Spacer(modifier = Modifier.width(MastodonPollOptionDefaults.ContentPadding))
         }
     }
 }
@@ -299,8 +305,6 @@ fun MastodonPollOption(
 object MastodonPollOptionDefaults {
     @Composable
     fun iconSize() = 20.dp
-    @Composable
-    fun optionSize() = iconSize() + ContentPadding * 2
     val ContentPadding = 6.dp
     val IconSpacing = 8.dp
 }
