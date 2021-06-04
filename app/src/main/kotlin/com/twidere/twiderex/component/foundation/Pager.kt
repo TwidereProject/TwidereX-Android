@@ -21,7 +21,10 @@
 package com.twidere.twiderex.component.foundation
 
 import androidx.compose.animation.core.Animatable
-import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.awaitHorizontalTouchSlopOrCancellation
+import androidx.compose.foundation.gestures.forEachGesture
+import androidx.compose.foundation.gestures.horizontalDrag
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
@@ -39,8 +42,11 @@ import androidx.compose.runtime.structuralEqualityPolicy
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.pointer.PointerInputChange
+import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.input.pointer.consumePositionChange
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.input.pointer.util.VelocityTracker
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.Measurable
@@ -212,7 +218,7 @@ fun Pager(
         modifier = modifier
             .pointerInput(Unit) {
                 if (dragEnabled) {
-                    detectHorizontalDragGestures(
+                    detectHorizontalDrag(
                         onHorizontalDrag = { change, dragAmount ->
                             with(state) {
                                 selectionState = PagerState.SelectionState.Undecided
@@ -300,4 +306,30 @@ class PagerScope(
      */
     val selectionState: PagerState.SelectionState
         get() = state.selectionState
+}
+
+private suspend fun PointerInputScope.detectHorizontalDrag(
+    onDragStart: (Offset) -> Unit = { },
+    onDragEnd: () -> Unit = { },
+    onDragCancel: () -> Unit = { },
+    onHorizontalDrag: (change: PointerInputChange, dragAmount: Float) -> Unit
+) {
+    forEachGesture {
+        awaitPointerEventScope {
+            val down = awaitFirstDown(requireUnconsumed = false)
+            val drag = awaitHorizontalTouchSlopOrCancellation(down.id, onHorizontalDrag)
+            if (drag != null) {
+                onDragStart.invoke(drag.position)
+                if (
+                    horizontalDrag(drag.id) {
+                        onHorizontalDrag(it, it.positionChange().x)
+                    }
+                ) {
+                    onDragEnd()
+                } else {
+                    onDragCancel()
+                }
+            }
+        }
+    }
 }
