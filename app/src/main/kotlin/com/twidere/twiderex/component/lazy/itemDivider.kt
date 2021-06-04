@@ -41,7 +41,7 @@ fun ColumnScope.ItemDivider(
     )
 }
 
-fun LazyListScope.itemDivider(
+fun LazyListScope.divider(
     modifier: Modifier = Modifier,
     thickness: Dp = 1.dp,
     startIndent: Dp = ItemDividerDefaults.StartIndent,

@@ -88,7 +88,7 @@ import com.twidere.twiderex.component.foundation.IconTabsComponent
 import com.twidere.twiderex.component.foundation.Pager
 import com.twidere.twiderex.component.foundation.PagerState
 import com.twidere.twiderex.component.foundation.rememberPagerState
-import com.twidere.twiderex.component.lazy.itemDivider
+import com.twidere.twiderex.component.lazy.divider
 import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.component.status.UserName
 import com.twidere.twiderex.component.status.UserScreenName
@@ -456,7 +456,7 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
                         )
                     }
                     if (allAccounts.any()) {
-                        itemDivider()
+                        divider()
                     }
                     item {
                         ListItem(
@@ -470,7 +470,7 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
                             }
                         )
                     }
-                    itemDivider()
+                    divider()
                     item {
                         ListItem(
                             modifier = Modifier.clickable(
