@@ -43,6 +43,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.SoftwareKeyboardController
@@ -153,17 +154,12 @@ fun TextInput(
                 onSearch = { onImeActionPerformed.invoke(ImeAction.Search, keyboardController) },
                 onSend = { onImeActionPerformed.invoke(ImeAction.Send, keyboardController) }
             ),
-            // cursorColor = textColor,
+            cursorBrush = SolidColor(MaterialTheme.colors.primary),
             textStyle = textStyle.copy(color = textColor),
-            // onTextInputStarted = {
-            //     keyboardController.value = it
-            //     onTextInputStarted?.invoke(it)
-            // },
             value = value,
             onValueChange = {
                 onValueChange(it)
             },
-
         )
         if (value.text.isEmpty()) {
             CompositionLocalProvider(
