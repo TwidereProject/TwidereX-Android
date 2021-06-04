@@ -53,7 +53,7 @@ class RetweetWorker @AssistedInject constructor(
                 it.retweet ?: it
             }
         return StatusResult(
-            statusKey = status.statusKey,
+            statusKey = newStatus.statusKey,
             accountKey = accountKey,
             retweeted = true,
             retweetCount = newStatus.retweetCount,

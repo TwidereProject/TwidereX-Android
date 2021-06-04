@@ -49,9 +49,11 @@ class UnRetweetWorker @AssistedInject constructor(
     ): StatusResult {
         val newStatus = service.unRetweet(status.statusId)
             .toDbStatusWithReference(accountKey = accountKey)
-            .toUi(accountKey = accountKey)
+            .toUi(accountKey = accountKey).let {
+                it.retweet ?: it
+            }
         return StatusResult(
-            statusKey = status.statusKey,
+            statusKey = newStatus.statusKey,
             accountKey = accountKey,
             retweeted = false,
             retweetCount = newStatus.retweetCount,
