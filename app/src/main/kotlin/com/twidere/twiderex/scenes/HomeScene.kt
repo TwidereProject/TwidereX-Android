@@ -378,7 +378,7 @@ fun HomeBottomNavigation(
     onItemSelected: (Int) -> Unit,
 ) {
     BottomNavigation(
-        backgroundColor = MaterialTheme.colors.background,
+        backgroundColor = MaterialTheme.colors.surface.withElevation(),
         modifier = modifier
     ) {
         items.forEachIndexed { index, item ->
