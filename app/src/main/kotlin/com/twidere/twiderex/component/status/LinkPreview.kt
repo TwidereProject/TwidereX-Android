@@ -53,6 +53,7 @@ fun LinkPreview(
     title: String? = null,
     image: String? = null,
     desc: String? = null,
+    maxLines: Int = Int.MAX_VALUE
 ) {
     val styledModifier = Modifier
         .background(LinkPreviewDefaults.BackgroundColor, MaterialTheme.shapes.medium)
@@ -81,12 +82,14 @@ fun LinkPreview(
             image = image,
             desc = desc,
             link = link,
+            maxLines = maxLines,
         )
         title != null && image == null && desc != null -> LinkWithTitleAndDescPreview(
             modifier = styledModifier,
             title = title,
             desc = desc,
             link = link,
+            maxLines = maxLines,
         )
     }
 }
@@ -216,12 +219,13 @@ private fun LinkWithTitleAndDescPreview(
     desc: String,
     link: String,
     modifier: Modifier = Modifier,
+    maxLines: Int,
 ) {
     Column(
         modifier = modifier.padding(LinkPreviewDefaults.ContentPadding),
     ) {
         Text(text = title, style = LinkPreviewDefaults.TitleStyle)
-        Text(text = desc, style = LinkPreviewDefaults.DescStyle)
+        Text(text = desc, style = LinkPreviewDefaults.DescStyle, maxLines = maxLines)
         CompositionLocalProvider(
             LocalContentColor provides MaterialTheme.colors.primary
         ) {
@@ -237,6 +241,7 @@ private fun LinkWithTitleAndLargeImagePreview(
     desc: String,
     link: String,
     modifier: Modifier = Modifier,
+    maxLines: Int,
 ) {
     Layout(
         modifier = modifier,
@@ -249,7 +254,7 @@ private fun LinkWithTitleAndLargeImagePreview(
                 modifier = Modifier.padding(LinkPreviewDefaults.ContentPadding),
             ) {
                 Text(text = title, style = LinkPreviewDefaults.TitleStyle)
-                Text(text = desc, style = LinkPreviewDefaults.DescStyle)
+                Text(text = desc, style = LinkPreviewDefaults.DescStyle, maxLines = maxLines)
                 CompositionLocalProvider(
                     LocalContentColor provides MaterialTheme.colors.primary
                 ) {
