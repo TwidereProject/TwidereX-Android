@@ -130,7 +130,6 @@ android {
                 "-Xopt-in=kotlin.RequiresOptIn",
         ]
         jvmTarget = "11"
-        useIR = true
     }
     buildFeatures {
         compose true
