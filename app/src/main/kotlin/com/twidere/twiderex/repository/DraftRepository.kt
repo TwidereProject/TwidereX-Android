@@ -35,6 +35,10 @@ class DraftRepository(
         database.draftDao().getAll()
     }
 
+    val sourceCount by lazy {
+        database.draftDao().getDraftCount()
+    }
+
     suspend fun addOrUpgrade(
         content: String,
         media: List<String>,
