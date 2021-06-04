@@ -173,10 +173,10 @@ fun DetailedStatusComponent(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceEvenly,
                 ) {
-                    ReplyButton(status = status, withNumber = false)
-                    RetweetButton(status = status, withNumber = false)
-                    LikeButton(status = status, withNumber = false)
-                    ShareButton(status = status)
+                    ReplyButton(status = data, withNumber = false)
+                    RetweetButton(status = data, withNumber = false)
+                    LikeButton(status = data, withNumber = false)
+                    ShareButton(status = data)
                 }
             }
         }

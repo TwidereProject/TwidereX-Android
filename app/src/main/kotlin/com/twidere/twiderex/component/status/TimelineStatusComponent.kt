@@ -167,8 +167,7 @@ private fun NormalStatus(
                     if (showActions) {
                         Row {
                             Spacer(modifier = Modifier.width(UserAvatarDefaults.AvatarSize))
-                            val status = (data.retweet ?: data)
-                            StatusActions(status)
+                            StatusActions(data)
                         }
                     } else {
                         Spacer(modifier = Modifier.height(NormalStatusDefaults.ContentSpacing))
