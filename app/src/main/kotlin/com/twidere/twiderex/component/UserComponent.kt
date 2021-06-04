@@ -626,6 +626,7 @@ private object ProfileItemDefaults {
     val IconSpacing = 8.dp
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun UserRelationship(viewModel: UserViewModel) {
     val relationship by viewModel.relationship.observeAsState(initial = null)
@@ -646,14 +647,7 @@ private fun UserRelationship(viewModel: UserViewModel) {
                         )
                     }
                 }
-                .clip(shape)
-                .clickable {
-                    if (relationshipResult.followedBy) {
-                        viewModel.unfollow()
-                    } else {
-                        viewModel.follow()
-                    }
-                },
+                .clip(shape),
             contentColor = if (relationshipResult.followedBy) {
                 contentColorFor(backgroundColor = MaterialTheme.colors.primary)
             } else {
@@ -663,6 +657,13 @@ private fun UserRelationship(viewModel: UserViewModel) {
                 MaterialTheme.colors.primary
             } else {
                 MaterialTheme.colors.background
+            },
+            onClick = {
+                if (relationshipResult.followedBy) {
+                    viewModel.unfollow()
+                } else {
+                    viewModel.follow()
+                }
             }
         ) {
             Text(
