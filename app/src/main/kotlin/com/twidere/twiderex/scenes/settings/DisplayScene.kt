@@ -20,8 +20,10 @@
  */
 package com.twidere.twiderex.scenes.settings
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.ListItem
@@ -44,11 +46,11 @@ import com.twidere.twiderex.action.LocalStatusActions
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
-import com.twidere.twiderex.component.lazy.itemDivider
-import com.twidere.twiderex.component.lazy.itemHeader
+import com.twidere.twiderex.component.lazy.ItemDivider
+import com.twidere.twiderex.component.lazy.ItemHeader
 import com.twidere.twiderex.component.navigation.FakeNavigator
 import com.twidere.twiderex.component.navigation.LocalNavigator
-import com.twidere.twiderex.component.settings.radioItem
+import com.twidere.twiderex.component.settings.RadioItem
 import com.twidere.twiderex.component.settings.switchItem
 import com.twidere.twiderex.component.status.TimelineStatusComponent
 import com.twidere.twiderex.di.assisted.assistedViewModel
@@ -78,20 +80,23 @@ fun DisplayScene() {
                 )
             }
         ) {
-            LazyColumn {
-                itemHeader {
+            Column(
+                modifier = Modifier
+                    .verticalScroll(
+                        rememberScrollState()
+                    )
+            ) {
+                ItemHeader {
                     Text(text = stringResource(id = R.string.scene_settings_display_section_header_preview))
                 }
-                item {
-                    CompositionLocalProvider(
-                        LocalNavigator provides FakeNavigator,
-                        LocalStatusActions provides FakeStatusActions,
-                    ) {
-                        TimelineStatusComponent(data = UiStatus.sample())
-                    }
+                CompositionLocalProvider(
+                    LocalNavigator provides FakeNavigator,
+                    LocalStatusActions provides FakeStatusActions,
+                ) {
+                    TimelineStatusComponent(data = UiStatus.sample())
                 }
-                itemDivider()
-                itemHeader {
+                ItemDivider()
+                ItemHeader {
                     Text(text = stringResource(id = R.string.scene_settings_display_section_header_text))
                 }
                 switchItem(
@@ -104,38 +109,36 @@ fun DisplayScene() {
                     },
                 )
                 if (!display.useSystemFontSize) {
-                    item {
-                        ListItem(
-                            icon = {
-                                Icon(
-                                    modifier = Modifier.size(12.dp),
-                                    imageVector = Icons.Default.TextFields,
-                                    contentDescription = stringResource(id = R.string.accessibility_scene_settings_display_font_size)
-                                )
-                            },
-                            text = {
-                                var fontSize by remember {
-                                    mutableStateOf(display.fontScale)
-                                }
-                                Slider(
-                                    steps = ((1.4f - 0.8f) * 10).toInt(),
-                                    value = fontSize,
-                                    onValueChange = { fontSize = it },
-                                    valueRange = 0.8f..1.4f,
-                                    onValueChangeFinished = { viewModel.commitFontScale(fontSize) }
-                                )
-                            },
-                            trailing = {
-                                Icon(
-                                    imageVector = Icons.Default.TextFields,
-                                    contentDescription = stringResource(id = R.string.accessibility_scene_settings_display_font_size)
-                                )
+                    ListItem(
+                        icon = {
+                            Icon(
+                                modifier = Modifier.size(12.dp),
+                                imageVector = Icons.Default.TextFields,
+                                contentDescription = stringResource(id = R.string.accessibility_scene_settings_display_font_size)
+                            )
+                        },
+                        text = {
+                            var fontSize by remember {
+                                mutableStateOf(display.fontScale)
                             }
-                        )
-                    }
+                            Slider(
+                                steps = ((1.4f - 0.8f) * 10).toInt(),
+                                value = fontSize,
+                                onValueChange = { fontSize = it },
+                                valueRange = 0.8f..1.4f,
+                                onValueChangeFinished = { viewModel.commitFontScale(fontSize) }
+                            )
+                        },
+                        trailing = {
+                            Icon(
+                                imageVector = Icons.Default.TextFields,
+                                contentDescription = stringResource(id = R.string.accessibility_scene_settings_display_font_size)
+                            )
+                        }
+                    )
                 }
-                itemDivider()
-                radioItem(
+                ItemDivider()
+                RadioItem(
                     options = listOf(
                         DisplayPreferences.AvatarStyle.Round,
                         DisplayPreferences.AvatarStyle.Square,
@@ -158,8 +161,8 @@ fun DisplayScene() {
                         )
                     }
                 )
-                itemDivider()
-                itemHeader {
+                ItemDivider()
+                ItemHeader {
                     Text(text = stringResource(id = R.string.scene_settings_display_section_header_media))
                 }
                 switchItem(
@@ -181,7 +184,7 @@ fun DisplayScene() {
                     }
                 )
                 if (display.mediaPreview) {
-                    radioItem(
+                    RadioItem(
                         options = listOf(
                             DisplayPreferences.AutoPlayback.Auto,
                             DisplayPreferences.AutoPlayback.Always,
