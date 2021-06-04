@@ -206,7 +206,7 @@ fun HomeScene() {
                 with(LocalDensity.current) {
                     val maxFabOffset = menus[pagerState.currentPage].fabSize.roundToPx() + HomeSceneDefaults.FabSpacing.roundToPx() + toolbarHeightPx
                     val realFabOffset = maxFabOffset * abs(toolbarOffsetHeightPx.value) / toolbarHeightPx
-                    key(menus[pagerState.currentPage].name()) {
+                    key(pagerState.currentPage) {
                         Box(modifier = if (hideFab) Modifier.offset { IntOffset(x = 0, y = realFabOffset.roundToInt()) } else Modifier) {
                             menus[pagerState.currentPage].Fab()
                         }
