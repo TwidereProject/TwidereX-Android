@@ -69,15 +69,12 @@ fun TwidereTheme(
 ) {
     val colors = provideThemeColors(darkTheme)
     val typography = provideTypography()
-    // FIXME: 2021/6/4 Workaround for theming bug in compose-beta08
-    key(colors, typography) {
-        MaterialTheme(
-            colors = colors,
-            typography = typography,
-            shapes = shapes,
-            content = content,
-        )
-    }
+    MaterialTheme(
+        colors = colors,
+        typography = typography,
+        shapes = shapes,
+        content = content,
+    )
 }
 
 @Composable
