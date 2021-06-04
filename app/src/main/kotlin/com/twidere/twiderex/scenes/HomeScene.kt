@@ -62,6 +62,7 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -205,8 +206,10 @@ fun HomeScene() {
                 with(LocalDensity.current) {
                     val maxFabOffset = menus[pagerState.currentPage].fabSize.roundToPx() + HomeSceneDefaults.FabSpacing.roundToPx() + toolbarHeightPx
                     val realFabOffset = maxFabOffset * abs(toolbarOffsetHeightPx.value) / toolbarHeightPx
-                    Box(modifier = if (hideFab) Modifier.offset { IntOffset(x = 0, y = realFabOffset.roundToInt()) } else Modifier) {
-                        menus[pagerState.currentPage].Fab()
+                    key(menus[pagerState.currentPage].name()) {
+                        Box(modifier = if (hideFab) Modifier.offset { IntOffset(x = 0, y = realFabOffset.roundToInt()) } else Modifier) {
+                            menus[pagerState.currentPage].Fab()
+                        }
                     }
                 }
             }
