@@ -107,7 +107,7 @@ object StatusTextDefaults {
             horizontal = 8.dp,
             vertical = 2.dp
         )
-        val PollSpacing = 8.dp
+        val PollSpacing = 10.dp
     }
 }
 
