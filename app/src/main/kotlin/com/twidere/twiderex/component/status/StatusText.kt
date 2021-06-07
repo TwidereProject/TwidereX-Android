@@ -53,6 +53,7 @@ import com.twidere.twiderex.model.ui.UiStatus
 fun ColumnScope.StatusText(
     status: UiStatus,
     maxLines: Int = Int.MAX_VALUE,
+    showMastodonPoll: Boolean = true
 ) {
     val expandable = status.platformType == PlatformType.Mastodon &&
         status.mastodonExtra?.spoilerText != null
@@ -91,7 +92,7 @@ fun ColumnScope.StatusText(
                 },
             )
 
-            if (status.platformType == PlatformType.Mastodon && status.mastodonExtra?.poll != null) {
+            if (showMastodonPoll && status.platformType == PlatformType.Mastodon && status.mastodonExtra?.poll != null) {
                 Spacer(modifier = Modifier.height(StatusTextDefaults.Mastodon.PollSpacing))
                 MastodonPoll(status)
             }

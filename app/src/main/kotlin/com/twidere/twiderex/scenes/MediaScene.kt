@@ -311,7 +311,7 @@ private fun StatusMediaInfo(
         if (videoControl != null) {
             AndroidView(factory = { videoControl })
         }
-        StatusText(status = status, maxLines = 2)
+        StatusText(status = status, maxLines = 2, showMastodonPoll = false)
         Spacer(modifier = Modifier.height(StatusMediaInfoDefaults.TextSpacing))
         Row(
             verticalAlignment = Alignment.CenterVertically,
