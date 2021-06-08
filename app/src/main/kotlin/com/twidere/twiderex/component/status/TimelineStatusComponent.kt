@@ -461,7 +461,7 @@ fun StatusContent(
                     Row(
                         modifier = Modifier.weight(1f),
                     ) {
-                        UserName(status.user, fontWeight = FontWeight.W500)
+                        UserName(status.user, fontWeight = FontWeight.W600)
                         if (type == StatusContentType.Normal) {
                             Spacer(modifier = Modifier.width(StatusContentDefaults.Normal.UserNameSpacing))
                             UserScreenName(status.user)

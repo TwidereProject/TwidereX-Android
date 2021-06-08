@@ -31,6 +31,7 @@ import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -43,6 +44,8 @@ import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.TextUnitType
 import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.navigation.LocalNavigator
 import kotlinx.coroutines.coroutineScope
@@ -141,13 +144,14 @@ private fun RenderContent(
     }
 }
 
+@OptIn(ExperimentalComposeApi::class)
 @Composable
 fun renderContentAnnotatedString(
     htmlText: String,
     linkResolver: (href: String) -> ResolvedLink,
 ): AnnotatedString {
     val textColor = LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
-    val textStyle = MaterialTheme.typography.body1.copy(color = textColor)
+    val textStyle = MaterialTheme.typography.body1.copy(color = textColor, letterSpacing = TextUnit(0.25f, TextUnitType.Sp))
     val linkStyle = textStyle.copy(MaterialTheme.colors.primary)
     val styleData = remember(textStyle, linkStyle) {
         StyleData(
