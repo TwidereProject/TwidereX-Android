@@ -88,7 +88,7 @@ fun LazyUiListsList(
             if (listType == ListType.All) {
                 item {
                     LazyUiListTitleItem(
-                        title = stringResource(id = R.string.scene_lists_tabs_created).toUpperCase(
+                        title = stringResource(id = R.string.scene_lists_tabs_created).uppercase(
                             Locale.getDefault()
                         )
                     )
@@ -115,7 +115,7 @@ fun LazyUiListsList(
             if (listType == ListType.All) {
                 item {
                     LazyUiListTitleItem(
-                        title = stringResource(id = R.string.scene_lists_tabs_subscribed).toUpperCase(
+                        title = stringResource(id = R.string.scene_lists_tabs_subscribed).uppercase(
                             Locale.getDefault()
                         ),
                         divider = true

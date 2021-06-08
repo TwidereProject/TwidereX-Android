@@ -62,6 +62,7 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -87,7 +88,7 @@ import com.twidere.twiderex.component.foundation.IconTabsComponent
 import com.twidere.twiderex.component.foundation.Pager
 import com.twidere.twiderex.component.foundation.PagerState
 import com.twidere.twiderex.component.foundation.rememberPagerState
-import com.twidere.twiderex.component.lazy.itemDivider
+import com.twidere.twiderex.component.lazy.divider
 import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.component.status.UserName
 import com.twidere.twiderex.component.status.UserScreenName
@@ -205,8 +206,10 @@ fun HomeScene() {
                 with(LocalDensity.current) {
                     val maxFabOffset = menus[pagerState.currentPage].fabSize.roundToPx() + HomeSceneDefaults.FabSpacing.roundToPx() + toolbarHeightPx
                     val realFabOffset = maxFabOffset * abs(toolbarOffsetHeightPx.value) / toolbarHeightPx
-                    Box(modifier = if (hideFab) Modifier.offset { IntOffset(x = 0, y = realFabOffset.roundToInt()) } else Modifier) {
-                        menus[pagerState.currentPage].Fab()
+                    key(pagerState.currentPage) {
+                        Box(modifier = if (hideFab) Modifier.offset { IntOffset(x = 0, y = realFabOffset.roundToInt()) } else Modifier) {
+                            menus[pagerState.currentPage].Fab()
+                        }
                     }
                 }
             }
@@ -375,7 +378,7 @@ fun HomeBottomNavigation(
     onItemSelected: (Int) -> Unit,
 ) {
     BottomNavigation(
-        backgroundColor = MaterialTheme.colors.background,
+        backgroundColor = MaterialTheme.colors.surface.withElevation(),
         modifier = modifier
     ) {
         items.forEachIndexed { index, item ->
@@ -453,7 +456,7 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
                         )
                     }
                     if (allAccounts.any()) {
-                        itemDivider()
+                        divider()
                     }
                     item {
                         ListItem(
@@ -467,7 +470,7 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
                             }
                         )
                     }
-                    itemDivider()
+                    divider()
                     item {
                         ListItem(
                             modifier = Modifier.clickable(

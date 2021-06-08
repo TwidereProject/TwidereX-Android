@@ -22,16 +22,18 @@ package com.twidere.twiderex.scenes.settings
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Checkbox
 import androidx.compose.material.CheckboxDefaults
@@ -55,9 +57,9 @@ import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
-import com.twidere.twiderex.component.lazy.itemDivider
-import com.twidere.twiderex.component.lazy.itemHeader
-import com.twidere.twiderex.component.settings.radioItem
+import com.twidere.twiderex.component.lazy.ItemDivider
+import com.twidere.twiderex.component.lazy.ItemHeader
+import com.twidere.twiderex.component.settings.RadioItem
 import com.twidere.twiderex.component.settings.switchItem
 import com.twidere.twiderex.component.status.UserAvatarDefaults
 import com.twidere.twiderex.di.assisted.assistedViewModel
@@ -97,32 +99,35 @@ fun AppearanceScene() {
                     }
                 )
             }
-            LazyColumn {
-                item {
-                    ListItem(
-                        modifier = Modifier.clickable(
-                            onClick = {
-                                showPrimaryColorDialog = true
-                            }
-                        ),
-                        text = {
-                            Text(text = stringResource(id = R.string.scene_settings_appearance_highlight_color))
-                        },
-                        trailing = {
-                            Box(
-                                modifier = Modifier
-                                    .height(24.dp)
-                                    .width(32.dp)
-                                    .clip(MaterialTheme.shapes.small)
-                                    .aspectRatio(1F)
-                                    .background(MaterialTheme.colors.primary),
-                            ) {
-                            }
-                        }
+            Column(
+                modifier = Modifier
+                    .verticalScroll(
+                        rememberScrollState()
                     )
-                }
-                itemDivider()
-                radioItem(
+            ) {
+                ListItem(
+                    modifier = Modifier.clickable(
+                        onClick = {
+                            showPrimaryColorDialog = true
+                        }
+                    ),
+                    text = {
+                        Text(text = stringResource(id = R.string.scene_settings_appearance_highlight_color))
+                    },
+                    trailing = {
+                        Box(
+                            modifier = Modifier
+                                .height(24.dp)
+                                .width(32.dp)
+                                .clip(MaterialTheme.shapes.small)
+                                .aspectRatio(1F)
+                                .background(MaterialTheme.colors.primary),
+                        ) {
+                        }
+                    }
+                )
+                ItemDivider()
+                RadioItem(
                     options = listOf(
                         AppearancePreferences.TabPosition.Top,
                         AppearancePreferences.TabPosition.Bottom,
@@ -145,9 +150,9 @@ fun AppearanceScene() {
                         )
                     }
                 )
-                itemDivider()
+                ItemDivider()
                 // Scrolling Timeline
-                itemHeader {
+                ItemHeader {
                     Text(text = stringResource(id = R.string.scene_settings_appearance_section_header_scrolling_timeline))
                 }
                 switchItem(
@@ -177,8 +182,8 @@ fun AppearanceScene() {
                         Text(text = stringResource(id = R.string.scene_settings_appearance_scrolling_timeline_fab))
                     },
                 )
-                itemDivider()
-                radioItem(
+                ItemDivider()
+                RadioItem(
                     options = listOf(
                         AppearancePreferences.Theme.Auto,
                         AppearancePreferences.Theme.Light,
@@ -226,8 +231,10 @@ fun PrimaryColorDialog(
             Text(text = stringResource(id = R.string.scene_settings_appearance_pick_color))
         },
         text = {
-            LazyRow {
-                itemsIndexed(items = colors) { index, it ->
+            Row(
+                modifier = Modifier.horizontalScroll(rememberScrollState())
+            ) {
+                colors.forEachIndexed { index, it ->
                     Box(
                         modifier = Modifier
                             .padding(end = PrimaryColorDialog.ItemsSpacing)

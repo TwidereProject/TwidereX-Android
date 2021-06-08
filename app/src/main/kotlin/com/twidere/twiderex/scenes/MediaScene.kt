@@ -69,6 +69,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import com.google.accompanist.insets.navigationBarsHeight
 import com.google.accompanist.insets.navigationBarsPadding
 import com.google.accompanist.insets.statusBarsPadding
 import com.google.accompanist.pager.ExperimentalPagerApi
@@ -153,54 +154,83 @@ fun StatusMediaScene(statusKey: MicroBlogKey, selectedIndex: Int) {
 @OptIn(ExperimentalAnimationApi::class, ExperimentalPagerApi::class)
 @Composable
 fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewModel) {
+    val window = LocalWindow.current
     var controlVisibility by remember { mutableStateOf(true) }
     val controlPanelColor = MaterialTheme.colors.surface.copy(alpha = 0.6f)
     val navController = LocalNavController.current
+    val pagerState = rememberPagerState(
+        initialPage = selectedIndex,
+        pageCount = status.media.size,
+    )
+    val currentMedia = status.media[pagerState.currentPage]
+    val context = LocalContext.current
+    val videoControl = remember(pagerState.currentPage) {
+        if (currentMedia.type == MediaType.video) {
+            PlayerControlView(context).apply {
+                showTimeoutMs = 0
+            }
+        } else {
+            null
+        }
+    }
     val swiperState = rememberSwiperState(
         onDismiss = {
             navController.popBackStack()
         },
-        onStart = {
-            controlVisibility = false
-        },
-        onEnd = {
-            controlVisibility = true
-        }
     )
-    Scaffold(
+    InAppNotificationScaffold(
         backgroundColor = Color.Transparent,
-        contentColor = contentColorFor(backgroundColor = MaterialTheme.colors.background)
-    ) {
-        Box {
-            val pagerState = rememberPagerState(
-                initialPage = selectedIndex,
-                pageCount = status.media.size,
-            )
-            val currentMedia = status.media[pagerState.currentPage]
-            val context = LocalContext.current
-            val videoControl = remember(pagerState.currentPage) {
-                if (currentMedia.type == MediaType.video) {
-                    PlayerControlView(context).apply {
-                        showTimeoutMs = 0
+        contentColor = contentColorFor(backgroundColor = MaterialTheme.colors.background),
+        bottomBar = {
+            Column(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                if (status.media.size > 1) {
+                    HorizontalPagerIndicator(
+                        pagerState = pagerState,
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .align(Alignment.CenterHorizontally),
+                    )
+                    AnimatedVisibility(
+                        visible = !(controlVisibility && swiperState.progress == 0f),
+                        enter = expandVertically(),
+                        exit = shrinkVertically(),
+                    ) {
+                        Spacer(modifier = Modifier.navigationBarsHeight())
                     }
-                } else {
-                    null
+                }
+                AnimatedVisibility(
+                    visible = controlVisibility && swiperState.progress == 0f,
+                    enter = fadeIn() + expandVertically(),
+                    exit = shrinkVertically() + fadeOut()
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .background(color = controlPanelColor)
+                            .navigationBarsPadding(),
+                    ) {
+                        StatusMediaInfo(videoControl, status, viewModel, currentMedia)
+                    }
                 }
             }
-            val window = LocalWindow.current
+        }
+    ) {
+        Box(
+            modifier = Modifier
+                .clickable(
+                    onClick = {
+                        if (controlVisibility) {
+                            window.hideControls()
+                        } else {
+                            window.showControls()
+                        }
+                    },
+                    indication = null,
+                    interactionSource = remember { MutableInteractionSource() }
+                ),
+        ) {
             MediaView(
-                modifier = Modifier
-                    .clickable(
-                        onClick = {
-                            if (controlVisibility) {
-                                window.hideControls()
-                            } else {
-                                window.showControls()
-                            }
-                        },
-                        indication = null,
-                        interactionSource = remember { MutableInteractionSource() }
-                    ),
                 media = status.media.mapNotNull {
                     it.mediaUrl?.let { it1 ->
                         MediaData(
@@ -221,77 +251,40 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewM
                     window.showControls()
                 }
             }
-            InAppNotificationScaffold(
-                backgroundColor = Color.Transparent,
-                topBar = {
-                    AnimatedVisibility(
-                        visible = controlVisibility,
-                        enter = fadeIn() + expandVertically(),
-                        exit = shrinkVertically() + fadeOut()
+            AnimatedVisibility(
+                visible = controlVisibility && swiperState.progress == 0f,
+                enter = fadeIn() + expandVertically(),
+                exit = shrinkVertically() + fadeOut()
+            ) {
+                Box(
+                    modifier = Modifier
+                        .statusBarsPadding()
+                        .padding(16.dp),
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.TopStart)
+                            .clip(MaterialTheme.shapes.small)
+                            .background(
+                                color = controlPanelColor,
+                                shape = MaterialTheme.shapes.small
+                            )
+                            .clipToBounds()
                     ) {
-                        Box(
-                            modifier = Modifier
-                                .statusBarsPadding()
-                                .padding(16.dp),
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .align(Alignment.TopStart)
-                                    .clip(MaterialTheme.shapes.small)
-                                    .background(
-                                        color = controlPanelColor,
-                                        shape = MaterialTheme.shapes.small
-                                    )
-                                    .clipToBounds()
-                            ) {
-                                IconButton(
-                                    onClick = {
-                                        navController.popBackStack()
-                                    }
-                                ) {
-                                    Icon(
-                                        painter = painterResource(id = R.drawable.ic_x),
-                                        contentDescription = stringResource(
-                                            id = R.string.accessibility_common_close
-                                        )
-                                    )
-                                }
+                        IconButton(
+                            onClick = {
+                                navController.popBackStack()
                             }
-                        }
-                    }
-                },
-                bottomBar = {
-                    Box {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .align(Alignment.BottomCenter)
                         ) {
-                            if (status.media.size > 1) {
-                                HorizontalPagerIndicator(
-                                    pagerState = pagerState,
-                                    modifier = Modifier
-                                        .padding(16.dp)
-                                        .align(Alignment.CenterHorizontally),
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_x),
+                                contentDescription = stringResource(
+                                    id = R.string.accessibility_common_close
                                 )
-                            }
-                            AnimatedVisibility(
-                                visible = controlVisibility,
-                                enter = fadeIn() + expandVertically(),
-                                exit = shrinkVertically() + fadeOut()
-                            ) {
-                                Box(
-                                    modifier = Modifier
-                                        .background(color = controlPanelColor)
-                                        .navigationBarsPadding(),
-                                ) {
-                                    StatusMediaInfo(videoControl, status, viewModel, currentMedia)
-                                }
-                            }
+                            )
                         }
                     }
                 }
-            ) {
             }
         }
     }

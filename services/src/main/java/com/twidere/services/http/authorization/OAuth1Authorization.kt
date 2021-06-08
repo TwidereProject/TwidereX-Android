@@ -98,13 +98,13 @@ class OAuth1Authorization(
             requestBody?.writeTo(body)
             if (requestBody != null && requestBody.contentLength() > 2) {
                 while (!body.exhausted()) {
-                    val keyEnd = body.indexOf('='.toByte())
+                    val keyEnd = body.indexOf('='.code.toByte())
                     if (keyEnd == -1L) {
                         break // throw new IllegalStateException("Key with no value: " + body.readUtf8());
                     }
                     val key = body.readUtf8(keyEnd)
                     body.skip(1) // Equals.
-                    val valueEnd = body.indexOf('&'.toByte())
+                    val valueEnd = body.indexOf('&'.code.toByte())
                     val value = if (valueEnd == -1L) body.readUtf8() else body.readUtf8(valueEnd)
                     if (valueEnd != -1L) {
                         body.skip(1) // Ampersand.
@@ -116,9 +116,9 @@ class OAuth1Authorization(
         return Buffer().use { base ->
             val method = request.method
             base.writeUtf8(method)
-            base.writeByte('&'.toInt())
+            base.writeByte('&'.code)
             base.writeUtf8(encodeUrl(request.url.newBuilder().query(null).build().toString()))
-            base.writeByte('&'.toInt())
+            base.writeByte('&'.code)
             var first = true
             for ((key, value) in parameters) {
                 if (!first) {

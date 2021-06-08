@@ -20,7 +20,7 @@
  */
 package com.twidere.twiderex.component.lazy
 
-import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ListItem
 import androidx.compose.material.MaterialTheme
@@ -28,12 +28,11 @@ import androidx.compose.material.ProvideTextStyle
 import androidx.compose.runtime.Composable
 
 @OptIn(ExperimentalMaterialApi::class)
-fun LazyListScope.itemHeader(title: @Composable () -> Unit) {
-    item {
-        ListItem {
-            ProvideTextStyle(value = MaterialTheme.typography.button) {
-                title.invoke()
-            }
+@Composable
+fun ColumnScope.ItemHeader(title: @Composable () -> Unit) {
+    ListItem {
+        ProvideTextStyle(value = MaterialTheme.typography.button) {
+            title.invoke()
         }
     }
 }
