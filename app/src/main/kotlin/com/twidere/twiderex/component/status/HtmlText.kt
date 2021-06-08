@@ -44,6 +44,7 @@ import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.ExperimentalUnitApi
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import com.twidere.twiderex.component.foundation.NetworkImage
@@ -83,6 +84,7 @@ fun HtmlText(
     )
 }
 
+@OptIn(ExperimentalUnitApi::class)
 @Composable
 private fun RenderContent(
     modifier: Modifier = Modifier,
@@ -144,6 +146,7 @@ private fun RenderContent(
     }
 }
 
+@ExperimentalUnitApi
 @OptIn(ExperimentalComposeApi::class)
 @Composable
 fun renderContentAnnotatedString(

@@ -57,6 +57,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.ExperimentalUnitApi
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.R
 import com.twidere.twiderex.action.LocalStatusActions
@@ -239,6 +240,7 @@ fun RetweetButton(
     }
 }
 
+@OptIn(ExperimentalUnitApi::class)
 @Composable
 fun ShareButton(
     modifier: Modifier = Modifier,

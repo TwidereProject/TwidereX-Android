@@ -100,33 +100,12 @@ fun NetworkBlurImage(
     val context = LocalContext.current
     val painter = rememberCoilPainter(
         request = data,
-        imageLoader = object : ImageLoader {
-            val realPainter = CoilPainterDefaults.defaultImageLoader()
-            override val bitmapPool: BitmapPool
-                get() = realPainter.bitmapPool
-            override val defaults: DefaultRequestOptions
-                get() = realPainter.defaults
-            override val memoryCache: MemoryCache
-                get() = realPainter.memoryCache
-
-            override fun enqueue(request: ImageRequest): Disposable {
-                return realPainter.enqueue(request)
-            }
-
-            override suspend fun execute(request: ImageRequest): ImageResult {
-                val result = realPainter.execute(request)
-                if (result !is SuccessResult) return result
-                return result.drawable.let {
-                    applyBlurFilter(it.toBitmap(), context, blurRadius, bitmapScale)
-                }.let {
-                    SuccessResult(it.toDrawable(context.resources), request, result.metadata)
-                }
-            }
-
-            override fun shutdown() {
-                realPainter.shutdown()
-            }
-        }
+        imageLoader = BlurImageLoader(
+            context,
+            blurRadius,
+            bitmapScale,
+            CoilPainterDefaults.defaultImageLoader()
+        )
     )
     NetworkImage(
         data = if (blurRadius != 0f || bitmapScale != 1f) painter else data,
@@ -157,4 +136,38 @@ private fun applyBlurFilter(src: Bitmap, context: Context, blurRadius: Float, bi
     script.forEach(output)
     output.copyTo(scaleBitmap)
     return scaleBitmap
+}
+
+class BlurImageLoader(
+    private val context: Context,
+    private val blurRadius: Float,
+    private val bitmapScale: Float,
+    private val realPainter: ImageLoader
+) : ImageLoader {
+    override val bitmapPool: BitmapPool
+        get() = realPainter.bitmapPool
+    override val defaults: DefaultRequestOptions
+        get() = realPainter.defaults
+    override val memoryCache: MemoryCache
+        get() = realPainter.memoryCache
+
+    override fun enqueue(request: ImageRequest): Disposable {
+        return realPainter.enqueue(request)
+    }
+
+    override suspend fun execute(request: ImageRequest): ImageResult {
+        val result = realPainter.execute(request)
+        if (result !is SuccessResult) return result
+        return result.drawable.let {
+            applyBlurFilter(it.toBitmap(), context, blurRadius, bitmapScale)
+        }.let {
+            SuccessResult(it.toDrawable(context.resources), request, result.metadata)
+        }
+    }
+
+    override fun shutdown() {
+        realPainter.shutdown()
+    }
+
+    override fun newBuilder() = ImageLoader.Builder(context)
 }
