@@ -175,12 +175,12 @@ fun StatusScene(
                                             } else {
                                                 TimelineStatusComponent(
                                                     data = status,
-                                                    threadStyle = if (index > firstVisibleIndex && status.isInThread(statusKey.id))
-                                                        StatusThreadStyle.TEXT_ONLY
+                                                    threadStyle = if (index < source.itemCount - 1 && source.peek(index + 1)?.inReplyToStatusId == status.statusId)
+                                                        StatusThreadStyle.NONE
                                                     else
-                                                        StatusThreadStyle.NONE,
-                                                    lineDown = index < firstVisibleIndex,
-                                                    lineUp = index in 1 until firstVisibleIndex
+                                                        StatusThreadStyle.TEXT_ONLY,
+                                                    lineUp = index > 0 && source.peek(index - 1)?.statusId == status.inReplyToStatusId,
+                                                    lineDown = index < source.itemCount - 1 && source.peek(index + 1)?.inReplyToStatusId == status.statusId,
                                                 )
                                             }
                                             if (status.statusKey == statusKey) {

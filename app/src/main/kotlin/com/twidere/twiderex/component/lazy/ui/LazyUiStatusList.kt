@@ -95,7 +95,9 @@ fun LazyUiStatusList(
                     Column {
                         TimelineStatusComponent(
                             item,
-                            threadStyle = StatusThreadStyle.WITH_AVATAR
+                            threadStyle = StatusThreadStyle.WITH_AVATAR,
+                            lineUp = index > 0 && items.peek(index - 1)?.statusId == item.inReplyToStatusId,
+                            lineDown = index < items.itemCount - 1 && items.peek(index + 1)?.inReplyToStatusId == item.statusId,
                         )
                         when {
                             loadingBetween.contains(item.statusKey) -> {
