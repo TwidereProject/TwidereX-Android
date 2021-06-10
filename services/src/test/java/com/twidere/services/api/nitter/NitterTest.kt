@@ -34,14 +34,14 @@ class NitterTest {
     @Test
     fun userTest() = runBlocking {
         val file = File("src/test/resources/api/nitter/sample_user.html").readText()
-        val statuses = Hson.deserializeObject<UserTimeline>(file)
+        val statuses = Hson.deserializeKData<UserTimeline>(file)
         assert(statuses.statuses.any())
     }
 
     @Test
     fun conversationTest(): Unit = runBlocking {
         val file = File("src/test/resources/api/nitter/sample_conversation.html").readText()
-        val timeline = Hson.deserializeObject<ConversationTimeline>(file)
+        val timeline = Hson.deserializeKData<ConversationTimeline>(file)
         assert(timeline.items.any())
         assertNotNull(timeline.nextPage)
     }
