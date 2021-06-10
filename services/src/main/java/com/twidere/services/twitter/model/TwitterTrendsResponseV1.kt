@@ -20,6 +20,7 @@
  */
 package com.twidere.services.twitter.model
 
+import com.twidere.services.microblog.model.ITrend
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -47,7 +48,7 @@ data class Trend(
     val tweetVolume: Long? = null,
     @SerialName("url")
     val url: String? = null
-)
+) : ITrend
 
 @Serializable
 data class Location(
