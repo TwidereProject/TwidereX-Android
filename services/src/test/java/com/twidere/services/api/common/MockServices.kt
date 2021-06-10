@@ -18,21 +18,29 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.services.mastodon.api
+package com.twidere.services.api.common
 
-import com.twidere.services.mastodon.model.Emoji
-import retrofit2.http.GET
+import com.twidere.services.api.mastodon.MastodonRequest2AssetPathConvertor
+import com.twidere.services.api.twitter.TwitterRequest2AssetPathConvertor
+import com.twidere.services.mastodon.MastodonService
+import com.twidere.services.twitter.TwitterService
 
-interface MastodonResources :
-    TimelineResources,
-    LookupResources,
-    FriendshipResources,
-    AccountResources,
-    SearchResources,
-    StatusResources,
-    ListsResources,
-    TrendsResources {
+fun mockMastodonService(): MastodonService {
+    return MastodonService(
+        "", "",
+        resources = mockRetrofit(
+            "https://test.mastodon.com/",
+            MastodonRequest2AssetPathConvertor()
+        )
+    )
+}
 
-    @GET("/api/v1/custom_emojis")
-    suspend fun emojis(): List<Emoji>
+fun mockTwitterService(): TwitterService {
+    return TwitterService(
+        "", "", "", "",
+        resources = mockRetrofit(
+            "https://api.twitter.com/",
+            TwitterRequest2AssetPathConvertor()
+        )
+    )
 }

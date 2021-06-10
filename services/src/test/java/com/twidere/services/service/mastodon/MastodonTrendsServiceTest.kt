@@ -18,21 +18,27 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.services.mastodon.api
+package com.twidere.services.service.mastodon
 
-import com.twidere.services.mastodon.model.Emoji
-import retrofit2.http.GET
+import com.twidere.services.api.common.mockMastodonService
+import com.twidere.services.microblog.TrendsService
+import kotlinx.coroutines.runBlocking
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 
-interface MastodonResources :
-    TimelineResources,
-    LookupResources,
-    FriendshipResources,
-    AccountResources,
-    SearchResources,
-    StatusResources,
-    ListsResources,
-    TrendsResources {
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class MastodonTrendsServiceTest {
+    private lateinit var trendsService: TrendsService
 
-    @GET("/api/v1/custom_emojis")
-    suspend fun emojis(): List<Emoji>
+    @BeforeAll
+    fun setUp() {
+        trendsService = mockMastodonService()
+    }
+
+    @Test
+    fun trends(): Unit = runBlocking {
+        val result = trendsService.trends("1")
+        assert(result.isNotEmpty())
+    }
 }

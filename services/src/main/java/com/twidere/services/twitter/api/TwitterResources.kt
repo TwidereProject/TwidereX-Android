@@ -28,4 +28,5 @@ interface TwitterResources :
     StatusResources,
     FriendshipResources,
     FollowsResources,
-    ListsResources
+    ListsResources,
+    TrendsResources

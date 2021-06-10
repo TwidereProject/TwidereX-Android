@@ -33,6 +33,7 @@ import com.twidere.services.microblog.RelationshipService
 import com.twidere.services.microblog.SearchService
 import com.twidere.services.microblog.StatusService
 import com.twidere.services.microblog.TimelineService
+import com.twidere.services.microblog.TrendsService
 import com.twidere.services.microblog.model.IRelationship
 import com.twidere.services.microblog.model.ISearchResponse
 import com.twidere.services.microblog.model.IStatus
@@ -79,7 +80,8 @@ class TwitterService(
     SearchService,
     StatusService,
     DownloadMediaService,
-    ListsService {
+    ListsService,
+    TrendsService {
     private val resources by lazy {
         resources ?: retrofit(
             TWITTER_BASE_URL,
@@ -561,4 +563,16 @@ class TwitterService(
     override suspend fun subscribeList(
         listId: String
     ) = resources.subscribeLists(listId)
+
+    // worldwide id = 1
+    override suspend fun trends(
+        locationId: String,
+        limit: Int?
+    ) = resources.trends(locationId).let {
+        it[0]
+    }.trends?.let { list ->
+        limit?.let {
+            list.subList(0, it.coerceIn(1, list.size - 1))
+        } ?: list
+    } ?: emptyList()
 }

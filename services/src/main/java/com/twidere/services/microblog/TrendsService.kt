@@ -18,21 +18,13 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.services.mastodon.api
+package com.twidere.services.microblog
 
-import com.twidere.services.mastodon.model.Emoji
-import retrofit2.http.GET
+import com.twidere.services.microblog.model.ITrend
 
-interface MastodonResources :
-    TimelineResources,
-    LookupResources,
-    FriendshipResources,
-    AccountResources,
-    SearchResources,
-    StatusResources,
-    ListsResources,
-    TrendsResources {
-
-    @GET("/api/v1/custom_emojis")
-    suspend fun emojis(): List<Emoji>
+interface TrendsService {
+    suspend fun trends(
+        locationId: String,
+        limit: Int? = null
+    ): List<ITrend>
 }

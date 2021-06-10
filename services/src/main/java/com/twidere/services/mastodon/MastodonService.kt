@@ -47,6 +47,7 @@ import com.twidere.services.microblog.RelationshipService
 import com.twidere.services.microblog.SearchService
 import com.twidere.services.microblog.StatusService
 import com.twidere.services.microblog.TimelineService
+import com.twidere.services.microblog.TrendsService
 import com.twidere.services.microblog.model.IListModel
 import com.twidere.services.microblog.model.INotification
 import com.twidere.services.microblog.model.IRelationship
@@ -73,7 +74,8 @@ class MastodonService(
     SearchService,
     StatusService,
     DownloadMediaService,
-    ListsService {
+    ListsService,
+    TrendsService {
     private val resources by lazy {
         resources ?: retrofit(
             "https://$host",
@@ -394,4 +396,6 @@ class MastodonService(
         // do nothing
         throw MastodonException("no such method")
     }
+
+    override suspend fun trends(locationId: String, limit: Int?) = resources.trends(limit)
 }
