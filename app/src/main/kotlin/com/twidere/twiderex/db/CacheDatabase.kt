@@ -30,6 +30,8 @@ import com.twidere.twiderex.db.dao.PagingTimelineDao
 import com.twidere.twiderex.db.dao.ReactionDao
 import com.twidere.twiderex.db.dao.StatusDao
 import com.twidere.twiderex.db.dao.StatusReferenceDao
+import com.twidere.twiderex.db.dao.TrendDao
+import com.twidere.twiderex.db.dao.TrendHistoryDao
 import com.twidere.twiderex.db.dao.UrlEntityDao
 import com.twidere.twiderex.db.dao.UserDao
 import com.twidere.twiderex.db.model.DbList
@@ -40,6 +42,8 @@ import com.twidere.twiderex.db.model.DbSearch
 import com.twidere.twiderex.db.model.DbStatusReaction
 import com.twidere.twiderex.db.model.DbStatusReference
 import com.twidere.twiderex.db.model.DbStatusV2
+import com.twidere.twiderex.db.model.DbTrend
+import com.twidere.twiderex.db.model.DbTrendHistory
 import com.twidere.twiderex.db.model.DbUrlEntity
 import com.twidere.twiderex.db.model.DbUser
 import com.twidere.twiderex.db.model.converter.ExtraConverter
@@ -65,8 +69,10 @@ import javax.inject.Singleton
         DbStatusReference::class,
         DbList::class,
         DbNotificationCursor::class,
+        DbTrend::class,
+        DbTrendHistory::class
     ],
-    version = 14,
+    version = 15,
 )
 @TypeConverters(
     MicroBlogKeyConverter::class,
@@ -88,4 +94,6 @@ abstract class CacheDatabase : RoomDatabase() {
     abstract fun statusReferenceDao(): StatusReferenceDao
     abstract fun listsDao(): ListsDao
     abstract fun notificationCursorDao(): NotificationCursorDao
+    abstract fun trendDao(): TrendDao
+    abstract fun trendHistoryDao(): TrendHistoryDao
 }
