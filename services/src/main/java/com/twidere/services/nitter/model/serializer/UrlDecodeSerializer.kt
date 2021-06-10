@@ -23,10 +23,9 @@ package com.twidere.services.nitter.model.serializer
 import moe.tlaster.hson.HtmlSerializer
 import org.jsoup.nodes.Element
 import java.net.URLDecoder
-import java.nio.charset.Charset
 
 class UrlDecodeSerializer : HtmlSerializer<String> {
     override fun decode(element: Element, wholeText: String): String {
-        return URLDecoder.decode(wholeText, Charset.forName("UTF-8"))
+        return URLDecoder.decode(wholeText, "UTF-8")
     }
 }

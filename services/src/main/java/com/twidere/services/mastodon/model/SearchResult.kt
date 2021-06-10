@@ -20,8 +20,6 @@
  */
 package com.twidere.services.mastodon.model
 
-import com.twidere.services.microblog.model.ISearchResponse
-import com.twidere.services.microblog.model.IStatus
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -30,8 +28,3 @@ data class SearchResult(
     val statuses: List<Status>? = null,
     val hashtags: List<Hashtag>? = null
 )
-
-data class MastodonSearchResponse(
-    override val nextPage: String?,
-    override val status: List<IStatus>
-) : ISearchResponse

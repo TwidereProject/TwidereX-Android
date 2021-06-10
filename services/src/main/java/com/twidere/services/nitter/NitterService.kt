@@ -20,6 +20,7 @@
  */
 package com.twidere.services.nitter
 
+import com.twidere.services.http.MicroBlogHttpException
 import com.twidere.services.nitter.model.ConversationTimeline
 import com.twidere.services.utils.await
 import moe.tlaster.hson.Hson
@@ -34,7 +35,7 @@ class NitterService(
         statusId: String,
         cursor: String? = null,
     ): ConversationTimeline? {
-        val target = "https://$host/$screenName/status/$statusId".let {
+        val target = "$host/$screenName/status/$statusId".let {
             if (cursor != null) {
                 it + cursor
             } else {
@@ -43,6 +44,13 @@ class NitterService(
         }
         return OkHttpClient
             .Builder()
+            .addNetworkInterceptor {
+                it.proceed(it.request()).also {
+                    if (it.code != 200) {
+                        throw MicroBlogHttpException(it.code)
+                    }
+                }
+            }
             .build()
             .newCall(
                 Request
@@ -55,7 +63,7 @@ class NitterService(
             .body
             ?.string()
             ?.let {
-                Hson.deserializeObject(it)
+                Hson.deserializeKData(it)
             }
     }
 }
