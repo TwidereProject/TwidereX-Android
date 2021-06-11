@@ -23,6 +23,7 @@ package com.twidere.twiderex.scenes.settings
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.AlertDialog
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
@@ -33,10 +34,14 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
+import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -44,6 +49,7 @@ import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
+import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.settings.MiscViewModel
@@ -62,7 +68,7 @@ fun MiscScene() {
                         AppBarNavigationButton()
                     },
                     title = {
-                        Text(text = stringResource(id = R.string.scene_settings_display_title))
+                        Text(text = stringResource(id = R.string.scene_settings_misc_title))
                     }
                 )
             }
@@ -83,16 +89,40 @@ fun MiscScene() {
 @Composable
 fun NitterPreference(viewModel: MiscViewModel) {
     val value by viewModel.nitter.observeAsState(initial = "")
+    var showInformationDialog by remember {
+        mutableStateOf(false)
+    }
+    var showUsageDialog by remember {
+        mutableStateOf(false)
+    }
+    if (showUsageDialog) {
+        NitterUsageDialog(
+            onDismissRequest = {
+                showUsageDialog = false
+            }
+        )
+    }
+    if (showInformationDialog) {
+        NitterInformationDialog(
+            onDismissRequest = {
+                showInformationDialog = false
+            }
+        )
+    }
     ListItem(
         text = {
             ProvideTextStyle(value = MaterialTheme.typography.caption) {
                 CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-                    Text(text = "Third-party Twitter data provider")
+                    Text(text = stringResource(id = R.string.scene_settings_misc_nitter_title))
                 }
             }
         },
         trailing = {
-            IconButton(onClick = { /*TODO*/ }) {
+            IconButton(
+                onClick = {
+                    showInformationDialog = true
+                }
+            ) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_info_circle),
                     contentDescription = null,
@@ -107,11 +137,15 @@ fun NitterPreference(viewModel: MiscViewModel) {
                 onValueChange = { viewModel.setNitterInstance(it) },
                 placeholder = {
                     Text(
-                        text = "Nitter Instance"
+                        text = stringResource(id = R.string.scene_settings_misc_nitter_input_placeholder)
                     )
                 },
                 trailingIcon = {
-                    IconButton(onClick = { /*TODO*/ }) {
+                    IconButton(
+                        onClick = {
+                            showUsageDialog = true
+                        }
+                    ) {
                         Icon(
                             painter = painterResource(id = R.drawable.ic_info_circle),
                             contentDescription = null,
@@ -121,7 +155,64 @@ fun NitterPreference(viewModel: MiscViewModel) {
             )
         },
         secondaryText = {
-            Text(text = "Alternative Twitter front-end focused on privacy.")
+            Text(text = stringResource(id = R.string.scene_settings_misc_nitter_input_description))
+        }
+    )
+}
+
+@Composable
+fun NitterUsageDialog(
+    onDismissRequest: () -> Unit,
+) {
+    val navigator = LocalNavigator.current
+    AlertDialog(
+        onDismissRequest = onDismissRequest,
+        title = {
+            Text(text = stringResource(id = R.string.scene_settings_misc_nitter_dialog_usage_title))
+        },
+        text = {
+            Text(text = stringResource(id = R.string.scene_settings_misc_nitter_dialog_usage_content))
+        },
+        confirmButton = {
+            TextButton(onClick = onDismissRequest) {
+                Text(text = stringResource(id = R.string.common_controls_actions_ok))
+            }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = {
+                    navigator.openLink(
+                        "https://github.com/zedeus/nitter",
+                        deepLink = false
+                    )
+                }
+            ) {
+                Text(text = stringResource(id = R.string.scene_settings_misc_nitter_dialog_usage_project_button))
+            }
+        }
+    )
+}
+
+@Composable
+fun NitterInformationDialog(
+    onDismissRequest: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = {
+                           onDismissRequest.invoke()
+        },
+        title = {
+            Text(text = stringResource(id = R.string.scene_settings_misc_nitter_dialog_information_title))
+        },
+        text = {
+            Text(text = stringResource(id = R.string.scene_settings_misc_nitter_dialog_information_content))
+        },
+        confirmButton = {
+            TextButton(
+                onClick = onDismissRequest,
+            ) {
+                Text(text = stringResource(id = R.string.common_controls_actions_ok))
+            }
         }
     )
 }

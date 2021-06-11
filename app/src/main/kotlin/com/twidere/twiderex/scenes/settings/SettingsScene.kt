@@ -70,8 +70,8 @@ fun SettingsScene() {
                     route = Route.Settings.Storage,
                 ),
                 SettingItem(
-                    stringResource(id = R.string.scene_settings_storage_title),
-                    painterResource(id = R.drawable.ic_database),
+                    stringResource(id = R.string.scene_settings_misc_title),
+                    painterResource(id = R.drawable.ic_triangle_square_circle),
                     route = Route.Settings.Misc,
                 ),
                 // TODO
