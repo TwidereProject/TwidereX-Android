@@ -11,6 +11,8 @@
     <string name="scene_search_tabs_media">මාධ්‍යය</string>
     <string name="scene_search_tabs_users">පරිශිලකයන්</string>
     <string name="scene_compose_and">, </string>
+    <string name="scene_lists_users_menu_actions_add">එකතු කරන්න</string>
+    <string name="scene_lists_users_menu_actions_remove">ඉවත් කරන්න</string>
     <string name="scene_settings_title">සැකසුම්</string>
     <string name="scene_settings_display_section_header_media">මාධ්‍යය</string>
     <string name="accessibility_common_status_media">මාධ්‍යය</string>

@@ -146,8 +146,6 @@
     <string name="scene_drafts_actions_delete_draft">Entwurf löschen</string>
     <string name="scene_drafts_actions_edit_draft">Entwurf bearbeiten</string>
     <string name="scene_lists_title">Listen</string>
-    <string name="scene_lists_tabs_created">Erstellt</string>
-    <string name="scene_lists_tabs_subscribed">Abonniert</string>
     <string name="scene_lists_details_title">Listendetails</string>
     <string name="scene_lists_details_descriptions_single_member">1 Mitglied</string>
     <string name="scene_lists_details_descriptions_multiple_members">%d Mitglieder</string>
@@ -155,10 +153,14 @@
     <string name="scene_lists_details_descriptions_multiple_subscribers">%d Abonnenten</string>
     <string name="scene_lists_details_menu_actions_add_member">Mitglied hinzufügen</string>
     <string name="scene_lists_details_menu_actions_edit_list">Liste bearbeiten</string>
-    <string name="scene_lists_details_tabs_members">Mitglieder</string>
-    <string name="scene_lists_details_tabs_subscriber">Abonnent</string>
+    <string name="scene_lists_details_menu_actions_follow">Folgen</string>
+    <string name="scene_lists_details_menu_actions_unfollow">Entfolgen</string>
     <string name="scene_lists_details_no_members_found">Keine Mitglieder gefunden.</string>
     <string name="scene_lists_details_add_members">Mitglieder hinzufügen</string>
+    <string name="scene_lists_modify_edit_title">Liste bearbeiten</string>
+    <string name="scene_lists_users_menu_actions_add">Hinzufügen</string>
+    <string name="scene_lists_users_menu_actions_remove">Entfernen</string>
+    <string name="scene_lists_users_add_title">Mitglied hinzufügen</string>
     <string name="scene_settings_title">Einstellungen</string>
     <string name="scene_settings_section_header_general">Allgemein</string>
     <string name="scene_settings_section_header_about">Über</string>

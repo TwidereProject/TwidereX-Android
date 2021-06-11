@@ -1201,7 +1201,7 @@ private fun ComposeActions(
                     Icon(
                         painter = painterResource(id = R.drawable.ic_at_sign),
                         contentDescription = stringResource(
-                            id = R.string.accessibility_scene_compose_at
+                            id = R.string.accessibility_scene_compose_add_mention,
                         )
                     )
                 }
