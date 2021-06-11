@@ -24,6 +24,7 @@ import com.twidere.services.microblog.MicroBlogService
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.mock.db.MockCacheDatabase
 import com.twidere.twiderex.mock.service.MockListsService
+import com.twidere.twiderex.mock.service.MockTrendService
 
 object MockCenter {
     fun mockCacheDatabase(): CacheDatabase {
@@ -32,5 +33,9 @@ object MockCenter {
 
     fun mockListsService(): MicroBlogService {
         return MockListsService()
+    }
+
+    fun mockTrendService(): MicroBlogService {
+        return MockTrendService()
     }
 }

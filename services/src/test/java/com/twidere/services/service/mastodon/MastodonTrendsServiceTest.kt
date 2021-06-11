@@ -21,7 +21,7 @@
 package com.twidere.services.service.mastodon
 
 import com.twidere.services.api.common.mockMastodonService
-import com.twidere.services.microblog.TrendsService
+import com.twidere.services.microblog.TrendService
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
@@ -29,7 +29,7 @@ import org.junit.jupiter.api.TestInstance
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class MastodonTrendsServiceTest {
-    private lateinit var trendsService: TrendsService
+    private lateinit var trendsService: TrendService
 
     @BeforeAll
     fun setUp() {

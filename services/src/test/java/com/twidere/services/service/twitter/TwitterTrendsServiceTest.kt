@@ -21,7 +21,7 @@
 package com.twidere.services.service.twitter
 
 import com.twidere.services.api.common.mockTwitterService
-import com.twidere.services.microblog.TrendsService
+import com.twidere.services.microblog.TrendService
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
@@ -30,7 +30,7 @@ import kotlin.test.assertEquals
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class TwitterTrendsServiceTest {
-    private lateinit var trendsService: TrendsService
+    private lateinit var trendsService: TrendService
 
     @BeforeAll
     fun setUp() {
@@ -43,5 +43,7 @@ class TwitterTrendsServiceTest {
         assertEquals(1, result.size)
         result = trendsService.trends("1", limit = 2)
         assertEquals(2, result.size)
+        result = trendsService.trends("1", limit = 100)
+        assertEquals(10, result.size)
     }
 }

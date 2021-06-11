@@ -18,10 +18,13 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.repository
+package com.twidere.services.microblog
 
-class TrendsRepository {
-    // fun trends(
-    //     account: Account
-    // ):
+import com.twidere.services.microblog.model.ITrend
+
+interface TrendService {
+    suspend fun trends(
+        locationId: String,
+        limit: Int? = null
+    ): List<ITrend>
 }

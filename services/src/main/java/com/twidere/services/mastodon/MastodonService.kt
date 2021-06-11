@@ -47,7 +47,7 @@ import com.twidere.services.microblog.RelationshipService
 import com.twidere.services.microblog.SearchService
 import com.twidere.services.microblog.StatusService
 import com.twidere.services.microblog.TimelineService
-import com.twidere.services.microblog.TrendsService
+import com.twidere.services.microblog.TrendService
 import com.twidere.services.microblog.model.IListModel
 import com.twidere.services.microblog.model.INotification
 import com.twidere.services.microblog.model.IRelationship
@@ -75,7 +75,7 @@ class MastodonService(
     StatusService,
     DownloadMediaService,
     ListsService,
-    TrendsService {
+    TrendService {
     private val resources by lazy {
         resources ?: retrofit(
             "https://$host",
