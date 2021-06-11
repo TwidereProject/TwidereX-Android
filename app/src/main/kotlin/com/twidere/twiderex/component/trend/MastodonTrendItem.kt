@@ -20,15 +20,25 @@
  */
 package com.twidere.twiderex.component.trend
 
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ListItem
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.model.ui.UiTrend
+import com.twidere.twiderex.model.ui.UiTrendHistory
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -41,12 +51,46 @@ fun MastodonTrendItem(trend: UiTrend, onClick: (UiTrend) -> Unit) {
             Text(text = "${trend.dailyAccounts} people talking", style = MaterialTheme.typography.body2)
         },
         trailing = {
-            Row {
-                Text(text = "${trend.dailyUses}")
-                // TODO add graph
+            Row(verticalAlignment = Alignment.Top) {
+                Text(text = "${trend.dailyUses}", style = MaterialTheme.typography.body1)
+                Spacer(modifier = Modifier.width(16.dp))
+                MastodonTrendChart(
+                    trendHistories = trend.sortedHistory,
+                    modifier = Modifier
+                        .width(66.dp)
+                        .height(27.dp)
+                )
             }
         }
     ) {
         Text(text = trend.displayName, style = MaterialTheme.typography.subtitle1)
+    }
+}
+
+@Composable
+fun MastodonTrendChart(trendHistories: List<UiTrendHistory>, modifier: Modifier) {
+    val color = MaterialTheme.colors.primary
+    Canvas(modifier = modifier) {
+        val maxUses = trendHistories.maxOf { it.uses }
+        val yDelta = size.height / maxUses.toFloat()
+        val xDelta = size.width / (trendHistories.size - 1)
+        val path = Path()
+        trendHistories.forEachIndexed { index, uiTrendHistory ->
+            if (index == 0) {
+                path.moveTo(size.width - xDelta * index, size.height - uiTrendHistory.uses * yDelta)
+            } else {
+                // reverse the y index
+                path.lineTo(size.width - xDelta * index, size.height - uiTrendHistory.uses * yDelta)
+            }
+        }
+        // draw the line
+        drawPath(path, color = color, style = Stroke(width = 8f))
+        // TODO add the gradient color  for this chart
+        // draw the color bellow
+        path.lineTo(0f, size.height)
+        path.lineTo(size.width, size.height)
+        // path.lineTo(size.width - xDelta * 0, size.height - trendHistories[0].uses * yDelta)
+        path.close()
+        drawPath(path, color = Color.LightGray)
     }
 }
