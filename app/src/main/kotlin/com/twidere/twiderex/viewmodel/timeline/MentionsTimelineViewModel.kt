@@ -26,19 +26,27 @@ import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.paging.mediator.MentionTimelineMediator
 import com.twidere.twiderex.paging.mediator.paging.PagingWithGapMediator
+import com.twidere.twiderex.repository.NotificationRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 
 class MentionsTimelineViewModel @AssistedInject constructor(
     preferences: SharedPreferences,
     database: CacheDatabase,
+    notificationRepository: NotificationRepository,
     @Assisted private val account: AccountDetails
 ) : TimelineViewModel(preferences) {
     @dagger.assisted.AssistedFactory
     interface AssistedFactory {
         fun create(account: AccountDetails): MentionsTimelineViewModel
     }
+
     override val pagingMediator: PagingWithGapMediator =
-        MentionTimelineMediator(account.service as TimelineService, account.accountKey, database)
+        MentionTimelineMediator(
+            service = account.service as TimelineService,
+            accountKey = account.accountKey,
+            database = database,
+            notificationRepository = notificationRepository
+        )
     override val savedStateKey: String = "${account.accountKey}_mentions"
 }
