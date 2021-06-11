@@ -24,19 +24,16 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.AlertDialog
-import androidx.compose.material.ContentAlpha
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.ListItem
-import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -111,10 +108,8 @@ fun NitterPreference(viewModel: MiscViewModel) {
     }
     ListItem(
         text = {
-            ProvideTextStyle(value = MaterialTheme.typography.caption) {
-                CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-                    Text(text = stringResource(id = R.string.scene_settings_misc_nitter_title))
-                }
+            ProvideTextStyle(value = MaterialTheme.typography.button) {
+                Text(text = stringResource(id = R.string.scene_settings_misc_nitter_title))
             }
         },
         trailing = {
