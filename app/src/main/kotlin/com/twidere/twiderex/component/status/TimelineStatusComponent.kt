@@ -653,6 +653,7 @@ private fun StatusLinkPreview(card: DbPreviewCard) {
         title = card.title,
         image = card.image,
         desc = card.desc,
+        maxLines = 5,
     )
 }
 
