@@ -650,9 +650,9 @@ private fun StatusLinkPreview(card: DbPreviewCard) {
                 navigator.openLink(card.link)
             },
         link = card.displayLink ?: card.link,
-        title = card.title,
+        title = card.title?.trim(),
         image = card.image,
-        desc = card.desc,
+        desc = card.desc?.trim(),
         maxLines = 5,
     )
 }
