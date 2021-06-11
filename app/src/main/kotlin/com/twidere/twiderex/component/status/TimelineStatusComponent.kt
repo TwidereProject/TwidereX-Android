@@ -226,7 +226,6 @@ private fun StatusHeader(data: UiStatus) {
     when {
         data.platformType == PlatformType.Mastodon && data.mastodonExtra != null -> {
             MastodonStatusHeader(data.mastodonExtra, data)
-            Spacer(modifier = Modifier.height(StatusHeaderDefaults.HeaderSpacing))
         }
         data.retweet != null -> {
             RetweetHeader(data = data)
@@ -264,6 +263,7 @@ private fun MastodonStatusHeader(
                     )
                 }
             )
+            Spacer(modifier = Modifier.height(StatusHeaderDefaults.HeaderSpacing))
         }
         MastodonStatusType.NotificationFollowRequest -> {
             TweetHeader(
@@ -283,10 +283,12 @@ private fun MastodonStatusHeader(
                     )
                 }
             )
+            Spacer(modifier = Modifier.height(StatusHeaderDefaults.HeaderSpacing))
         }
         MastodonStatusType.NotificationMention -> Unit
         MastodonStatusType.NotificationReblog -> {
             RetweetHeader(data = data)
+            Spacer(modifier = Modifier.height(StatusHeaderDefaults.HeaderSpacing))
         }
         MastodonStatusType.NotificationFavourite -> {
             TweetHeader(
@@ -306,6 +308,7 @@ private fun MastodonStatusHeader(
                     )
                 }
             )
+            Spacer(modifier = Modifier.height(StatusHeaderDefaults.HeaderSpacing))
         }
         MastodonStatusType.NotificationPoll -> {
             TweetHeader(
@@ -333,6 +336,7 @@ private fun MastodonStatusHeader(
                     )
                 }
             )
+            Spacer(modifier = Modifier.height(StatusHeaderDefaults.HeaderSpacing))
         }
         MastodonStatusType.NotificationStatus -> {
             TweetHeader(
@@ -352,6 +356,7 @@ private fun MastodonStatusHeader(
                     )
                 }
             )
+            Spacer(modifier = Modifier.height(StatusHeaderDefaults.HeaderSpacing))
         }
     }
 }
