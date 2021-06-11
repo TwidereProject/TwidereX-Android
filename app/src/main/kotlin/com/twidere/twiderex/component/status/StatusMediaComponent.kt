@@ -22,6 +22,8 @@ package com.twidere.twiderex.component.status
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -205,6 +207,8 @@ fun StatusMediaComponent(
                 }
                 AnimatedVisibility(
                     visible = !sensitive,
+                    enter = fadeIn(),
+                    exit = fadeOut()
                 ) {
                     Box(
                         modifier = Modifier
@@ -252,6 +256,7 @@ object StatusMediaDefaults {
     }
 }
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun StatusMediaPreviewItem(
     media: UiMedia,
@@ -266,7 +271,11 @@ fun StatusMediaPreviewItem(
         when (media.type) {
             MediaType.photo ->
                 media.previewUrl?.let {
-                    if (sensitive) {
+                    AnimatedVisibility(
+                        visible = sensitive,
+                        enter = fadeIn(),
+                        exit = fadeOut()
+                    ) {
                         NetworkBlurImage(
                             data = it,
                             modifier = Modifier
@@ -275,7 +284,12 @@ fun StatusMediaPreviewItem(
                                 Placeholder(modifier = Modifier.fillMaxSize())
                             },
                         )
-                    } else {
+                    }
+                    AnimatedVisibility(
+                        visible = !sensitive,
+                        enter = fadeIn(),
+                        exit = fadeOut()
+                    ) {
                         NetworkImage(
                             data = it,
                             modifier = Modifier
