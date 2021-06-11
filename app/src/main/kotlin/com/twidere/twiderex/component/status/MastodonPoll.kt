@@ -75,7 +75,9 @@ import com.twidere.twiderex.ui.LocalActiveAccount
 import kotlin.math.max
 
 private val Poll.canVote: Boolean
-    get() = voted != true && expiresAt?.time?.let { it > System.currentTimeMillis() } == true
+    get() = voted != true &&
+        !(expired ?: false) &&
+        expiresAt?.time?.let { it > System.currentTimeMillis() } ?: true // some instance allows expires time == null
 
 @Composable
 fun MastodonPoll(status: UiStatus) {
