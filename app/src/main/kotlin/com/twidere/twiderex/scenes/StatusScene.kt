@@ -166,24 +166,38 @@ fun StatusScene(
                         }
                     } else {
                         itemsIndexed(source) { index, it ->
-                            it?.let { status ->
+                            it?.let { item ->
                                 Layout(
                                     content = {
                                         Column {
-                                            if (status.statusKey == statusKey) {
-                                                DetailedStatusComponent(data = status, lineUp = firstVisibleIndex > 0)
+                                            if (item.statusKey == statusKey) {
+                                                DetailedStatusComponent(
+                                                    data = item,
+                                                    lineUp = firstVisibleIndex > 0
+                                                )
                                             } else {
                                                 TimelineStatusComponent(
-                                                    data = status,
-                                                    threadStyle = if (index > firstVisibleIndex && status.isInThread(statusKey.id))
-                                                        StatusThreadStyle.TEXT_ONLY
+                                                    data = item,
+                                                    threadStyle = if (index < source.itemCount - 1 &&
+                                                        source.peek(index + 1)?.inReplyToStatusId == item.statusId ||
+                                                        status?.statusId == item.inReplyToStatusId
+                                                    )
+                                                        StatusThreadStyle.NONE
                                                     else
-                                                        StatusThreadStyle.NONE,
-                                                    lineDown = index < firstVisibleIndex,
-                                                    lineUp = index in 1 until firstVisibleIndex
+                                                        StatusThreadStyle.TEXT_ONLY,
+                                                    lineUp = index > 0 && source.peek(index - 1)
+                                                        .let { previous ->
+                                                            // is reply to the previous status
+                                                            previous?.statusId == item.inReplyToStatusId &&
+                                                                // and if it is replying to the detail status, make sure it's the same author
+                                                                if (previous?.statusKey == statusKey) item.user.userKey == previous.user.userKey else true
+                                                        },
+                                                    lineDown = index < source.itemCount - 1 &&
+                                                        // make sure next status is replying to the current status
+                                                        source.peek(index + 1)?.inReplyToStatusId == item.statusId,
                                                 )
                                             }
-                                            if (status.statusKey == statusKey) {
+                                            if (item.statusKey == statusKey) {
                                                 Divider()
                                             } else {
                                                 StatusDivider()

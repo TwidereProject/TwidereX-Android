@@ -18,14 +18,11 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.services.microblog.model
+package com.twidere.services.nitter.model
 
-interface ISearchResponse {
-    val nextPage: String?
-    val status: List<IStatus>
-}
+import moe.tlaster.hson.annotations.HtmlSerializable
 
-data class BasicSearchResponse(
-    override val nextPage: String?,
-    override val status: List<IStatus>
-) : ISearchResponse
+data class UserTimeline(
+    @HtmlSerializable(".timeline-item:not(.show-more):not(.unavailable)")
+    val statuses: List<Status>
+)

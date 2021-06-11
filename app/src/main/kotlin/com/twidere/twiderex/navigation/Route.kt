@@ -59,6 +59,7 @@ import com.twidere.twiderex.scenes.settings.AboutScene
 import com.twidere.twiderex.scenes.settings.AccountManagementScene
 import com.twidere.twiderex.scenes.settings.AppearanceScene
 import com.twidere.twiderex.scenes.settings.DisplayScene
+import com.twidere.twiderex.scenes.settings.MiscScene
 import com.twidere.twiderex.scenes.settings.SettingsScene
 import com.twidere.twiderex.scenes.settings.StorageScene
 import com.twidere.twiderex.scenes.twitter.TwitterSignInScene
@@ -176,6 +177,7 @@ object Route {
         const val Storage = "settings/storage"
         const val About = "settings/about"
         const val AccountManagement = "settings/accountmanagement"
+        const val Misc = "settings/misc"
     }
 
     object DeepLink {
@@ -589,6 +591,10 @@ fun RouteBuilder.route(constraints: Constraints) {
 
     scene(Route.Settings.AccountManagement) {
         AccountManagementScene()
+    }
+
+    scene(Route.Settings.Misc) {
+        MiscScene()
     }
 
     scene(Route.Settings.About) {

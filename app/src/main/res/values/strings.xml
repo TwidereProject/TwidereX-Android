@@ -277,6 +277,15 @@
     <string name="scene_settings_storage_media_sub_title">Clear stored media cache.</string>
     <string name="scene_settings_storage_all_title">Clear all cache</string>
     <string name="scene_settings_storage_all_sub_title">Delete all Twidere X cache. Your account credentials will not be lost.</string>
+    <string name="scene_settings_misc_title">Misc</string>
+    <string name="scene_settings_misc_nitter_title">Third-party Twitter data provider</string>
+    <string name="scene_settings_misc_nitter_input_placeholder">Nitter Instance</string>
+    <string name="scene_settings_misc_nitter_input_description">Alternative Twitter front-end focused on privacy.</string>
+    <string name="scene_settings_misc_nitter_dialog_information_title">Third party Twitter data provider</string>
+    <string name="scene_settings_misc_nitter_dialog_information_content">Due to the limitation of Twitter API, some data might not be able to fetch from Twitter, you can use a third-party data provider to provide these data. Twidere does not take any responsibility for them.</string>
+    <string name="scene_settings_misc_nitter_dialog_usage_title">Using Third-party data provider in</string>
+    <string name="scene_settings_misc_nitter_dialog_usage_content">- Twitter status threading</string>
+    <string name="scene_settings_misc_nitter_dialog_usage_project_button">Project URL</string>
     <string name="scene_settings_about_title">About</string>
     <string name="scene_settings_about_license">License</string>
     <string name="scene_settings_about_description">Next generation of Twidere for Android 5.0+. \nStill in early stage.</string>

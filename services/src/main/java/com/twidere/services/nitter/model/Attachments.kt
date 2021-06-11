@@ -18,14 +18,14 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.services.microblog.model
+package com.twidere.services.nitter.model
 
-interface ISearchResponse {
-    val nextPage: String?
-    val status: List<IStatus>
-}
+import com.twidere.services.nitter.model.serializer.UrlDecodeSerializer
+import moe.tlaster.hson.annotations.HtmlSerializable
 
-data class BasicSearchResponse(
-    override val nextPage: String?,
-    override val status: List<IStatus>
-) : ISearchResponse
+data class Attachments(
+    @HtmlSerializable("img", attr = "src", serializer = UrlDecodeSerializer::class)
+    val source: String?,
+    @HtmlSerializable("video", attr = "poster", serializer = UrlDecodeSerializer::class)
+    val videoCover: String?,
+)
