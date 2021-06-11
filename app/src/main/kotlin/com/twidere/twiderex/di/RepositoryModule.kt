@@ -35,6 +35,7 @@ import com.twidere.twiderex.repository.ReactionRepository
 import com.twidere.twiderex.repository.SearchRepository
 import com.twidere.twiderex.repository.StatusRepository
 import com.twidere.twiderex.repository.TimelineRepository
+import com.twidere.twiderex.repository.TrendRepository
 import com.twidere.twiderex.repository.UserRepository
 import dagger.Module
 import dagger.Provides
@@ -98,4 +99,9 @@ object RepositoryModule {
     fun provideNotificationRepository(
         database: CacheDatabase,
     ): NotificationRepository = NotificationRepository(database = database)
+
+    @Provides
+    fun provideTrendRepository(
+        database: CacheDatabase
+    ) = TrendRepository(database = database)
 }
