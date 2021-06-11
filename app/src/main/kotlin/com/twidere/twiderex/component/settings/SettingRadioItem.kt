@@ -38,7 +38,7 @@ fun <T : Enum<T>> ColumnScope.RadioItem(
     title: @Composable () -> Unit,
     itemContent: @Composable (T) -> Unit,
 ) {
-    ItemHeader {
+    ItemHeader() {
         title.invoke()
     }
 

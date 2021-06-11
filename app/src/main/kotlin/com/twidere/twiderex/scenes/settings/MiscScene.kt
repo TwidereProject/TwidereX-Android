@@ -28,9 +28,7 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.ListItem
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
@@ -46,6 +44,7 @@ import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
+import com.twidere.twiderex.component.lazy.ItemHeader
 import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.ui.TwidereScene
@@ -106,12 +105,7 @@ fun NitterPreference(viewModel: MiscViewModel) {
             }
         )
     }
-    ListItem(
-        text = {
-            ProvideTextStyle(value = MaterialTheme.typography.button) {
-                Text(text = stringResource(id = R.string.scene_settings_misc_nitter_title))
-            }
-        },
+    ItemHeader(
         trailing = {
             IconButton(
                 onClick = {
@@ -124,7 +118,9 @@ fun NitterPreference(viewModel: MiscViewModel) {
                 )
             }
         }
-    )
+    ) {
+        Text(text = stringResource(id = R.string.scene_settings_misc_nitter_title))
+    }
     ListItem(
         text = {
             OutlinedTextField(
