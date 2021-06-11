@@ -146,8 +146,6 @@
     <string name="scene_drafts_actions_delete_draft">刪除草稿</string>
     <string name="scene_drafts_actions_edit_draft">編輯草稿</string>
     <string name="scene_lists_title">列表</string>
-    <string name="scene_lists_tabs_created">已建立</string>
-    <string name="scene_lists_tabs_subscribed">已訂閱</string>
     <string name="scene_lists_details_title">列出細節</string>
     <string name="scene_lists_details_descriptions_single_member">1 位成員</string>
     <string name="scene_lists_details_descriptions_multiple_members">%d 個成員</string>
@@ -155,10 +153,14 @@
     <string name="scene_lists_details_descriptions_multiple_subscribers">%d 位訂閱者</string>
     <string name="scene_lists_details_menu_actions_add_member">新增成員</string>
     <string name="scene_lists_details_menu_actions_edit_list">編輯列表</string>
-    <string name="scene_lists_details_tabs_members">成員</string>
-    <string name="scene_lists_details_tabs_subscriber">訂閱者</string>
+    <string name="scene_lists_details_menu_actions_follow">跟隨</string>
+    <string name="scene_lists_details_menu_actions_unfollow">取消跟隨</string>
     <string name="scene_lists_details_no_members_found">無會員</string>
     <string name="scene_lists_details_add_members">增加成員</string>
+    <string name="scene_lists_modify_edit_title">編輯列表</string>
+    <string name="scene_lists_users_menu_actions_add">新增</string>
+    <string name="scene_lists_users_menu_actions_remove">移除</string>
+    <string name="scene_lists_users_add_title">新增成員</string>
     <string name="scene_settings_title">設定</string>
     <string name="scene_settings_section_header_general">一般</string>
     <string name="scene_settings_section_header_about">關於</string>
@@ -221,7 +223,6 @@
     <string name="accessibility_scene_compose_send">傳送</string>
     <string name="accessibility_scene_compose_location_enable">啟用定位功能</string>
     <string name="accessibility_scene_compose_location_disable">啟用定位功能</string>
-    <string name="accessibility_scene_compose_at">在</string>
     <string name="accessibility_scene_compose_image">新增圖片</string>
     <string name="accessibility_scene_compose_draft">開啟草稿</string>
     <string name="accessibility_scene_manage_accounts_add">新增</string>

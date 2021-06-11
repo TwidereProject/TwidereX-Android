@@ -152,8 +152,6 @@
     <string name="scene_drafts_actions_delete_draft">下書きを削除</string>
     <string name="scene_drafts_actions_edit_draft">下書きを編集</string>
     <string name="scene_lists_title">リスト</string>
-    <string name="scene_lists_tabs_created">作成済み</string>
-    <string name="scene_lists_tabs_subscribed">フォロー済</string>
     <string name="scene_lists_details_title">リストの詳細</string>
     <string name="scene_lists_details_descriptions_single_member">1 メンバー</string>
     <string name="scene_lists_details_descriptions_multiple_members">%d メンバー</string>
@@ -161,10 +159,14 @@
     <string name="scene_lists_details_descriptions_multiple_subscribers">%d フォロワー</string>
     <string name="scene_lists_details_menu_actions_add_member">メンバーを追加</string>
     <string name="scene_lists_details_menu_actions_edit_list">リストを編集</string>
-    <string name="scene_lists_details_tabs_members">メンバー</string>
-    <string name="scene_lists_details_tabs_subscriber">フォロワー</string>
+    <string name="scene_lists_details_menu_actions_follow">フォロー</string>
+    <string name="scene_lists_details_menu_actions_unfollow">フォロー解除</string>
     <string name="scene_lists_details_no_members_found">メンバーが見つかりません。</string>
     <string name="scene_lists_details_add_members">メンバーを追加</string>
+    <string name="scene_lists_modify_edit_title">リストを編集</string>
+    <string name="scene_lists_users_menu_actions_add">追加</string>
+    <string name="scene_lists_users_menu_actions_remove">削除</string>
+    <string name="scene_lists_users_add_title">メンバーを追加</string>
     <string name="scene_settings_title">設定</string>
     <string name="scene_settings_section_header_general">一般</string>
     <string name="scene_settings_section_header_about">情報</string>
@@ -221,7 +223,6 @@
     <string name="accessibility_scene_compose_send">送信</string>
     <string name="accessibility_scene_compose_location_enable">位置情報を有効化</string>
     <string name="accessibility_scene_compose_location_disable">位置情報を無効化</string>
-    <string name="accessibility_scene_compose_at">場所</string>
     <string name="accessibility_scene_compose_image">画像を追加</string>
     <string name="accessibility_scene_compose_draft">下書きを開く</string>
     <string name="accessibility_scene_manage_accounts_add">追加</string>
