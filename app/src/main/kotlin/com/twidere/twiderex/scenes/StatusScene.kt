@@ -132,7 +132,7 @@ fun StatusScene(
                     -50.dp.toPx()
                 }
                 val firstVisibleIndex = remember {
-                    for (i in 0..source.itemCount) {
+                    for (i in 0 until source.itemCount) {
                         if (source.peek(i)?.statusKey == status?.statusKey) {
                             return@remember i
                         }
