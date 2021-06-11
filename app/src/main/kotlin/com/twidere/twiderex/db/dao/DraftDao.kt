@@ -41,4 +41,7 @@ interface DraftDao {
 
     @Delete
     suspend fun remove(draft: DbDraft)
+
+    @Query("SELECT COUNT(*) FROM draft")
+    fun getDraftCount(): LiveData<Long>
 }

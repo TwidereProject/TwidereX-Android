@@ -29,17 +29,24 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Checkbox
+import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Icon
+import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.RadioButton
@@ -48,6 +55,7 @@ import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
@@ -67,7 +75,9 @@ import com.twidere.twiderex.ui.LocalActiveAccount
 import kotlin.math.max
 
 private val Poll.canVote: Boolean
-    get() = voted != true && expiresAt?.time?.let { it > System.currentTimeMillis() } == true
+    get() = voted != true &&
+        !(expired ?: false) &&
+        expiresAt?.time?.let { it > System.currentTimeMillis() } ?: true // some instance allows expires time == null
 
 @Composable
 fun MastodonPoll(status: UiStatus) {
@@ -107,20 +117,12 @@ fun MastodonPoll(status: UiStatus) {
         }
     }
 
-    if (status.mastodonExtra.poll.canVote) {
-        Spacer(modifier = Modifier.height(MastodonPollDefaults.VoteSpacing))
-        val statusActions = LocalStatusActions.current
-        TextButton(
-            onClick = {
-                statusActions.vote(status = status, account = account, votes = voteState)
-            }
-        ) {
-            Text(text = stringResource(id = R.string.common_controls_status_actions_vote))
-        }
-    }
-
     Spacer(modifier = Modifier.height(MastodonPollDefaults.VoteInfoSpacing))
-    Row {
+    Row(
+        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
         val countText = status.mastodonExtra.poll.votersCount?.let {
             if (it > 1) {
                 stringResource(
@@ -146,14 +148,33 @@ fun MastodonPoll(status: UiStatus) {
                 )
             }
         }
-        if (countText != null) {
-            Text(text = countText)
+        Row {
+            CompositionLocalProvider(
+                LocalTextStyle.provides(MaterialTheme.typography.caption),
+                LocalContentAlpha.provides(ContentAlpha.disabled)
+            ) {
+                if (countText != null) {
+                    Text(text = countText)
+                }
+                Spacer(modifier = Modifier.width(MastodonPollDefaults.VoteTimeSpacing))
+                if (status.mastodonExtra.poll.expired == true) {
+                    Text(text = stringResource(id = R.string.common_controls_status_poll_expired))
+                } else {
+                    Text(text = status.mastodonExtra.poll.expiresAt?.time?.humanizedTimestamp() ?: "")
+                }
+            }
         }
-        Spacer(modifier = Modifier.width(MastodonPollDefaults.VoteTimeSpacing))
-        if (status.mastodonExtra.poll.expired == true) {
-            Text(text = stringResource(id = R.string.common_controls_status_poll_expired))
-        } else {
-            Text(text = status.mastodonExtra.poll.expiresAt?.time?.humanizedTimestamp() ?: "")
+
+        if (status.mastodonExtra.poll.canVote) {
+            val statusActions = LocalStatusActions.current
+            TextButton(
+                onClick = {
+                    statusActions.vote(status = status, account = account, votes = voteState)
+                },
+                enabled = voteState.isNotEmpty(),
+            ) {
+                Text(text = stringResource(id = R.string.common_controls_status_actions_vote))
+            }
         }
     }
 }
@@ -174,7 +195,6 @@ fun MastodonPollOption(
     voted: Boolean,
     onVote: (voted: Boolean) -> Unit = {},
 ) {
-    val size = MastodonPollOptionDefaults.optionSize()
     val transition = updateTransition(targetState = option.votesCount)
     val progress by transition.animateFloat {
         (it ?: 0).toFloat() / max((poll.votesCount ?: 0), 1).toFloat()
@@ -186,6 +206,7 @@ fun MastodonPollOption(
     }
     Box(
         modifier = Modifier
+            .height(IntrinsicSize.Min)
             .clip(
                 if (poll.multiple == true) {
                     RoundedCornerShape(4.dp)
@@ -204,13 +225,12 @@ fun MastodonPollOption(
     ) {
         Box(
             modifier = Modifier
-                .height(size)
-                .fillMaxWidth()
-                .background(color.copy(alpha = 0.0304f)),
+                .fillMaxSize()
+                .background(color.copy(alpha = 0.08f))
         )
         Box(
             modifier = Modifier
-                .height(size)
+                .fillMaxHeight()
                 .fillMaxWidth(progress)
                 .clip(
                     if (poll.multiple == true) {
@@ -221,20 +241,23 @@ fun MastodonPollOption(
                 )
                 .background(
                     color.let {
+                        // foreGroundAlpha =1 - (1 - wantedAlpha)/(1 - backgroundAlpha)
                         if (poll.ownVotes?.contains(index) == true) {
-                            it.copy(alpha = 0.285f)
+                            // wanted alpha is 0.75f
+                            it.copy(alpha = 0.62f)
                         } else {
-                            it.copy(alpha = 0.076f)
+                            // wanted alpha is 0.2f
+                            it.copy(alpha = 0.13f)
                         }
                     }
                 ),
         )
         Row(
             modifier = Modifier
-                .height(size),
+                .wrapContentSize()
+                .padding(MastodonPollOptionDefaults.ContentPadding),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Spacer(modifier = Modifier.width(MastodonPollOptionDefaults.ContentPadding))
             Box(
                 modifier = Modifier.width(MastodonPollOptionDefaults.iconSize())
             ) {
@@ -270,18 +293,20 @@ fun MastodonPollOption(
             Text(
                 modifier = Modifier.weight(1f),
                 text = option.title ?: "",
+                style = MaterialTheme.typography.body2
             )
-            Text(text = String.format("%.0f%%", progress * 100))
-            Spacer(modifier = Modifier.width(MastodonPollOptionDefaults.ContentPadding))
+            Spacer(modifier = Modifier.width(MastodonPollOptionDefaults.IconSpacing))
+            Text(
+                text = String.format("%.0f%%", progress * 100),
+                style = MaterialTheme.typography.caption
+            )
         }
     }
 }
 
 object MastodonPollOptionDefaults {
     @Composable
-    fun optionSize() = LocalTextStyle.current.fontSize.value.dp + 24.dp
-    @Composable
-    fun iconSize() = LocalTextStyle.current.fontSize.value.dp + 8.dp
-    val ContentPadding = 8.dp
+    fun iconSize() = 20.dp
+    val ContentPadding = 6.dp
     val IconSpacing = 8.dp
 }
