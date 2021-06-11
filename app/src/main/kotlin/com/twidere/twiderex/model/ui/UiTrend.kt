@@ -33,6 +33,13 @@ data class UiTrend(
     val volume: Long,
     val history: List<UiTrendHistory>,
 ) {
+    val sortedHistory = history.sortedByDescending { it.day }
+    val dailyAccounts: Long
+        get() = if (sortedHistory.isNotEmpty()) sortedHistory[0].accounts else 0L
+
+    val dailyUses: Long
+        get() = if (sortedHistory.isNotEmpty()) sortedHistory[0].uses else 0L
+
     companion object {
         fun DbTrendWithHistory.toUi() = UiTrend(
             trendKey = trend.trendKey,

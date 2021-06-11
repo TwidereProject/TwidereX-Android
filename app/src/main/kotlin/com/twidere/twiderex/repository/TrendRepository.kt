@@ -29,7 +29,7 @@ import com.twidere.twiderex.model.ui.UiTrend
 import com.twidere.twiderex.model.ui.UiTrend.Companion.toUi
 
 class TrendRepository(private val database: CacheDatabase) {
-    private val defaultLimit = 10
+    private val defaultLimit = 20
     private val worldWideId = "1"
 
     suspend fun trends(

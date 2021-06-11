@@ -23,10 +23,12 @@ package com.twidere.twiderex.scenes.home
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.ContentAlpha
+import androidx.compose.material.Divider
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -51,9 +53,13 @@ import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.navigation.LocalNavigator
+import com.twidere.twiderex.component.trend.MastodonTrendItem
+import com.twidere.twiderex.component.trend.TwitterTrendItem
 import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.viewmodel.search.SearchInputViewModel
+import com.twidere.twiderex.viewmodel.trend.TrendViewModel
 
 class SearchItem : HomeNavigationItem() {
 
@@ -76,8 +82,15 @@ class SearchItem : HomeNavigationItem() {
             ) {
                 it.create(account = account)
             }
+        val trendViewModel = assistedViewModel<TrendViewModel.AssistedFactory, TrendViewModel>(
+            account
+        ) {
+            it.create(account = account)
+        }
         val source by viewModel.source.observeAsState(initial = emptyList())
+        val trends by trendViewModel.source.observeAsState(initial = emptyList())
         val navigator = LocalNavigator.current
+        val searchCount = 3
         InAppNotificationScaffold(
             topBar = {
                 AppBar(
@@ -121,7 +134,15 @@ class SearchItem : HomeNavigationItem() {
             }
         ) {
             LazyColumn {
-                items(items = source) {
+                item {
+                    if (source.isNotEmpty()) ListItem {
+                        Text(
+                            text = stringResource(id = R.string.scene_search_saved_search),
+                            style = MaterialTheme.typography.overline
+                        )
+                    }
+                }
+                items(items = source.filterIndexed { index, _ -> index < searchCount }) {
                     ListItem(
                         modifier = Modifier.clickable(
                             onClick = {
@@ -155,6 +176,59 @@ class SearchItem : HomeNavigationItem() {
                             Text(text = it.content)
                         },
                     )
+                }
+                item {
+                    if (source.size > searchCount) ListItem(
+                        modifier = Modifier.clickable {
+                            navigator.searchInput()
+                        }
+                    ) {
+                        Text(
+                            text = "Show more",
+                            style = MaterialTheme.typography.subtitle1,
+                            color = MaterialTheme.colors.primary
+                        )
+                    }
+                }
+                item {
+                    if (trends.isNotEmpty()) Column {
+                        Divider()
+                        when (account.type) {
+                            PlatformType.Twitter -> ListItem {
+                                Text(
+                                    text = "TRENDS - WORLDWIDE",
+                                    style = MaterialTheme.typography.overline
+                                )
+                            }
+                            PlatformType.Mastodon -> ListItem {
+                                Text(
+                                    text = "TRENDING NOW",
+                                    style = MaterialTheme.typography.overline
+                                )
+                            }
+                            PlatformType.Fanfou -> TODO()
+                            PlatformType.StatusNet -> TODO()
+                        }
+                    }
+                }
+                items(trends) { trend ->
+                    when (account.type) {
+                        PlatformType.Twitter -> TwitterTrendItem(
+                            trend = trend,
+                            onClick = {
+                                viewModel.addOrUpgrade(it.query)
+                                navigator.search(it.query)
+                            }
+                        )
+                        PlatformType.StatusNet -> TODO()
+                        PlatformType.Fanfou -> TODO()
+                        PlatformType.Mastodon -> MastodonTrendItem(
+                            trend = trend,
+                            onClick = {
+                                navigator.hashtag(it.query)
+                            }
+                        )
+                    }
                 }
             }
         }
