@@ -199,7 +199,7 @@ fun NitterInformationDialog(
 ) {
     AlertDialog(
         onDismissRequest = {
-                           onDismissRequest.invoke()
+            onDismissRequest.invoke()
         },
         title = {
             Text(text = stringResource(id = R.string.scene_settings_misc_nitter_dialog_information_title))
