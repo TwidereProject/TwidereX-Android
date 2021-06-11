@@ -18,14 +18,19 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.services.microblog.model
+package com.twidere.services.nitter.model
 
-interface ISearchResponse {
-    val nextPage: String?
-    val status: List<IStatus>
-}
+import moe.tlaster.hson.annotations.HtmlSerializable
 
-data class BasicSearchResponse(
-    override val nextPage: String?,
-    override val status: List<IStatus>
-) : ISearchResponse
+data class StatusCard(
+    @HtmlSerializable("a", attr = "href")
+    val link: String? = null,
+    @HtmlSerializable("img", attr = "src")
+    val img: String? = null,
+    @HtmlSerializable(".card-title")
+    val title: String? = null,
+    @HtmlSerializable(".card-description")
+    val desc: String? = null,
+    @HtmlSerializable(".card-destination")
+    val destination: String? = null,
+)

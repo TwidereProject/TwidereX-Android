@@ -18,14 +18,14 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.services.microblog.model
+package com.twidere.services.nitter.model.serializer
 
-interface ISearchResponse {
-    val nextPage: String?
-    val status: List<IStatus>
+import moe.tlaster.hson.HtmlSerializer
+import org.jsoup.nodes.Element
+import java.net.URLDecoder
+
+class UrlDecodeSerializer : HtmlSerializer<String> {
+    override fun decode(element: Element, wholeText: String): String {
+        return URLDecoder.decode(wholeText, "UTF-8")
+    }
 }
-
-data class BasicSearchResponse(
-    override val nextPage: String?,
-    override val status: List<IStatus>
-) : ISearchResponse

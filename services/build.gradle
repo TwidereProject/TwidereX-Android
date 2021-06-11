@@ -26,6 +26,7 @@ test {
 dependencies {
     implementation libs.kotlinx.coroutines.core
     implementation libs.kotlinx.serialization.json
+    implementation libs.hson
 
     api libs.bundles.retrofit
     implementation libs.retrofit2.kotlinx.serialization.converter

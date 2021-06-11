@@ -18,14 +18,24 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.services.microblog.model
+package com.twidere.services.nitter.model.serializer
 
-interface ISearchResponse {
-    val nextPage: String?
-    val status: List<IStatus>
+import moe.tlaster.hson.HtmlSerializer
+import org.jsoup.nodes.Element
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
+
+class DateSerializer : HtmlSerializer<Date> {
+    override fun decode(element: Element, wholeText: String): Date {
+        return getDateFormat().parse(wholeText)
+    }
+
+    private fun getDateFormat(): SimpleDateFormat {
+        val format = SimpleDateFormat("dd/MM/yyyy, HH:mm:ss", Locale.ENGLISH)
+        format.isLenient = true
+        format.timeZone = TimeZone.getTimeZone("UTC")
+        return format
+    }
 }
-
-data class BasicSearchResponse(
-    override val nextPage: String?,
-    override val status: List<IStatus>
-) : ISearchResponse

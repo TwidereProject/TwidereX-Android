@@ -23,6 +23,7 @@ package com.twidere.twiderex.di
 import android.content.Context
 import coil.imageLoader
 import coil.util.CoilUtils
+import com.twidere.services.nitter.NitterService
 import com.twidere.twiderex.db.AppDatabase
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.repository.AccountRepository
@@ -69,8 +70,13 @@ object RepositoryModule {
     )
 
     @Provides
-    fun provideStatusRepository(database: CacheDatabase): StatusRepository =
-        StatusRepository(database = database)
+    fun provideStatusRepository(
+        database: CacheDatabase,
+        nitterService: NitterService?,
+    ): StatusRepository = StatusRepository(
+        database = database,
+        nitterService = nitterService,
+    )
 
     @Provides
     fun provideReactionRepository(database: CacheDatabase): ReactionRepository =
