@@ -21,12 +21,17 @@
 package com.twidere.twiderex.paging.mediator
 
 import com.twidere.services.microblog.NotificationService
+import com.twidere.services.microblog.model.IStatus
 import com.twidere.twiderex.db.CacheDatabase
+import com.twidere.twiderex.db.model.DbPagingTimelineWithStatus
+import com.twidere.twiderex.db.model.NotificationCursorType
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.paging.mediator.paging.PagingWithGapMediator
+import com.twidere.twiderex.repository.NotificationRepository
 
 class NotificationTimelineMediator(
     private val service: NotificationService,
+    private val notificationRepository: NotificationRepository,
     accountKey: MicroBlogKey,
     database: CacheDatabase,
 ) : PagingWithGapMediator(accountKey, database) {
@@ -35,6 +40,20 @@ class NotificationTimelineMediator(
         max_id: String?,
         since_id: String?
     ) = service.notificationTimeline(count = pageSize, max_id = max_id, since_id = since_id)
+
+    override suspend fun transform(
+        data: List<DbPagingTimelineWithStatus>,
+        list: List<IStatus>
+    ): List<DbPagingTimelineWithStatus> {
+        if (data.any()) {
+            notificationRepository.addCursor(
+                accountKey,
+                NotificationCursorType.General,
+                data.first().status.status.data.statusId,
+            )
+        }
+        return super.transform(data, list)
+    }
 
     override val pagingKey: String = "notification:$accountKey"
 }
