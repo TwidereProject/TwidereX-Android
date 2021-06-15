@@ -20,6 +20,7 @@
  */
 package com.twidere.twiderex.viewmodel.search
 
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
@@ -43,6 +44,8 @@ class SearchInputViewModel @AssistedInject constructor(
     val source = liveData {
         emitSource(repository.source)
     }
+
+    val expandSearch = MutableLiveData(false)
 
     fun remove(item: DbSearch) = viewModelScope.launch {
         repository.remove(item)

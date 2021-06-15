@@ -37,8 +37,6 @@ import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.History
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -91,6 +89,7 @@ class SearchItem : HomeNavigationItem() {
         val trends by trendViewModel.source.observeAsState(initial = emptyList())
         val navigator = LocalNavigator.current
         val searchCount = 3
+        val expandSearch by viewModel.expandSearch.observeAsState(false)
         InAppNotificationScaffold(
             topBar = {
                 AppBar(
@@ -142,7 +141,7 @@ class SearchItem : HomeNavigationItem() {
                         )
                     }
                 }
-                items(items = source.filterIndexed { index, _ -> index < searchCount }) {
+                items(items = source.filterIndexed { index, _ -> index < searchCount || expandSearch }) {
                     ListItem(
                         modifier = Modifier.clickable(
                             onClick = {
@@ -150,14 +149,6 @@ class SearchItem : HomeNavigationItem() {
                                 navigator.search(it.content)
                             }
                         ),
-                        icon = {
-                            Icon(
-                                imageVector = Icons.Default.History,
-                                contentDescription = stringResource(
-                                    id = R.string.accessibility_scene_search_history
-                                )
-                            )
-                        },
                         trailing = {
                             IconButton(
                                 onClick = {
@@ -165,7 +156,7 @@ class SearchItem : HomeNavigationItem() {
                                 }
                             ) {
                                 Icon(
-                                    painter = painterResource(id = R.drawable.ic_x),
+                                    painter = painterResource(id = R.drawable.ic_trash_can),
                                     contentDescription = stringResource(
                                         id = R.string.common_controls_actions_remove
                                     )
@@ -173,18 +164,21 @@ class SearchItem : HomeNavigationItem() {
                             }
                         },
                         text = {
-                            Text(text = it.content)
+                            Text(
+                                text = it.content,
+                                style = MaterialTheme.typography.subtitle1
+                            )
                         },
                     )
                 }
                 item {
                     if (source.size > searchCount) ListItem(
                         modifier = Modifier.clickable {
-                            navigator.searchInput()
+                            viewModel.expandSearch.value = !expandSearch
                         }
                     ) {
                         Text(
-                            text = stringResource(id = R.string.scene_search_show_more_search),
+                            text = if (expandSearch) stringResource(id = R.string.scene_search_show_less) else stringResource(id = R.string.scene_search_show_more),
                             style = MaterialTheme.typography.subtitle1,
                             color = MaterialTheme.colors.primary
                         )

@@ -169,7 +169,8 @@
     <string name="scene_search_tabs_media">Media</string>
     <string name="scene_search_tabs_users">Users</string>
     <string name="scene_search_tabs_hashtag">Hashtag</string>
-    <string name="scene_search_show_more_search">Show more</string>
+    <string name="scene_search_show_more">Show more</string>
+    <string name="scene_search_show_less">Show less</string>
     <string name="scene_profile_title">Me</string>
     <string name="scene_profile_hide_reply">Hide reply</string>
     <string name="scene_profile_permission_denied_profile_blocked_title">Permission Denied</string>
