@@ -204,102 +204,126 @@ fun MastodonPollOption(
     } else {
         MaterialTheme.colors.primary
     }
-    Box(
-        modifier = Modifier
-            .height(IntrinsicSize.Min)
-            .clip(
-                if (poll.multiple == true) {
-                    RoundedCornerShape(4.dp)
-                } else {
-                    RoundedCornerShape(percent = 50)
-                }
-            ).let {
-                if (!poll.canVote) {
-                    it
-                } else {
-                    it.clickable {
-                        onVote.invoke(!voted)
-                    }
-                }
-            }
+    CompositionLocalProvider(
+        *if (poll.expired == true) {
+            arrayOf(LocalContentAlpha provides ContentAlpha.medium)
+        } else {
+            emptyArray()
+        }
     ) {
         Box(
             modifier = Modifier
-                .fillMaxSize()
-                .background(color.copy(alpha = 0.08f))
-        )
-        Box(
-            modifier = Modifier
-                .fillMaxHeight()
-                .fillMaxWidth(progress)
+                .height(IntrinsicSize.Min)
                 .clip(
                     if (poll.multiple == true) {
                         RoundedCornerShape(4.dp)
                     } else {
                         RoundedCornerShape(percent = 50)
                     }
-                )
-                .background(
-                    color.let {
-                        // foreGroundAlpha =1 - (1 - wantedAlpha)/(1 - backgroundAlpha)
-                        if (poll.ownVotes?.contains(index) == true) {
-                            // wanted alpha is 0.75f
-                            it.copy(alpha = 0.62f)
-                        } else {
-                            // wanted alpha is 0.2f
-                            it.copy(alpha = 0.13f)
-                        }
-                    }
-                ),
-        )
-        Row(
-            modifier = Modifier
-                .wrapContentSize()
-                .padding(MastodonPollOptionDefaults.ContentPadding),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Box(
-                modifier = Modifier.width(MastodonPollOptionDefaults.iconSize())
-            ) {
-                if (poll.canVote) {
-                    if (poll.multiple == true) {
-                        Checkbox(checked = voted, onCheckedChange = { onVote.invoke(it) })
+                ).let {
+                    if (!poll.canVote) {
+                        it
                     } else {
-                        RadioButton(selected = voted, onClick = { onVote.invoke(!voted) })
-                    }
-                } else {
-                    androidx.compose.animation.AnimatedVisibility(
-                        visible = poll.ownVotes?.contains(
-                            index
-                        ) == true,
-                        enter = fadeIn() + expandIn(expandFrom = Alignment.Center),
-                        exit = shrinkOut(shrinkTowards = Alignment.Center) + fadeOut(),
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .background(MaterialTheme.colors.surface, shape = CircleShape),
-                        ) {
-                            Icon(
-                                modifier = Modifier
-                                    .padding(4.dp),
-                                imageVector = Icons.Default.Check,
-                                contentDescription = null,
-                            )
+                        it.clickable {
+                            onVote.invoke(!voted)
                         }
                     }
                 }
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        if (poll.expired == true) {
+                            color.copy(alpha = 0.0304f)
+                        } else {
+                            color.copy(alpha = 0.08f)
+                        }
+                    )
+            )
+            Box(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .fillMaxWidth(progress)
+                    .clip(
+                        if (poll.multiple == true) {
+                            RoundedCornerShape(4.dp)
+                        } else {
+                            RoundedCornerShape(percent = 50)
+                        }
+                    )
+                    .background(
+                        color.let {
+                            // foreGroundAlpha =1 - (1 - wantedAlpha)/(1 - backgroundAlpha)
+                            if (poll.ownVotes?.contains(index) == true) {
+                                if (poll.expired == true) {
+                                    // wanted alpha is 0.75f * 0.38f, but still a little bit heaver, so down to 0.185f
+                                    it.copy(alpha = 0.185f)
+                                } else {
+                                    // wanted alpha is 0.75f
+                                    it.copy(alpha = 0.62f)
+                                }
+                            } else {
+                                if (poll.expired == true) {
+                                    // wanted alpha is 0.2f * 0.38f
+                                    it.copy(alpha = 0.076f)
+                                } else {
+                                    // wanted alpha is 0.2f
+                                    it.copy(alpha = 0.13f)
+                                }
+                            }
+                        }
+                    ),
+            )
+            Row(
+                modifier = Modifier
+                    .wrapContentSize()
+                    .padding(MastodonPollOptionDefaults.ContentPadding),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Box(
+                    modifier = Modifier.width(MastodonPollOptionDefaults.iconSize())
+                ) {
+                    if (poll.canVote) {
+                        if (poll.multiple == true) {
+                            Checkbox(checked = voted, onCheckedChange = { onVote.invoke(it) })
+                        } else {
+                            RadioButton(selected = voted, onClick = { onVote.invoke(!voted) })
+                        }
+                    } else {
+                        androidx.compose.animation.AnimatedVisibility(
+                            visible = poll.ownVotes?.contains(
+                                index
+                            ) == true,
+                            enter = fadeIn() + expandIn(expandFrom = Alignment.Center),
+                            exit = shrinkOut(shrinkTowards = Alignment.Center) + fadeOut(),
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .background(MaterialTheme.colors.surface, shape = CircleShape),
+                            ) {
+                                Icon(
+                                    modifier = Modifier
+                                        .padding(4.dp),
+                                    imageVector = Icons.Default.Check,
+                                    contentDescription = null,
+                                )
+                            }
+                        }
+                    }
+                }
+                Spacer(modifier = Modifier.width(MastodonPollOptionDefaults.IconSpacing))
+                Text(
+                    modifier = Modifier.weight(1f),
+                    text = option.title ?: "",
+                    style = MaterialTheme.typography.body2
+                )
+                Spacer(modifier = Modifier.width(MastodonPollOptionDefaults.IconSpacing))
+                Text(
+                    text = String.format("%.0f%%", progress * 100),
+                    style = MaterialTheme.typography.caption
+                )
             }
-            Spacer(modifier = Modifier.width(MastodonPollOptionDefaults.IconSpacing))
-            Text(
-                modifier = Modifier.weight(1f),
-                text = option.title ?: "",
-                style = MaterialTheme.typography.body2
-            )
-            Spacer(modifier = Modifier.width(MastodonPollOptionDefaults.IconSpacing))
-            Text(
-                text = String.format("%.0f%%", progress * 100),
-                style = MaterialTheme.typography.caption
-            )
         }
     }
 }
