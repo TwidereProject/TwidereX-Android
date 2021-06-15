@@ -176,25 +176,24 @@ fun StatusScene(
                                                     lineUp = firstVisibleIndex > 0
                                                 )
                                             } else {
+                                                val lineUp = index > 0 && source.peek(index - 1)
+                                                    .let { previous ->
+                                                        // is reply to the previous status
+                                                        previous?.statusId == item.inReplyToStatusId &&
+                                                            // and if it is replying to the detail status, make sure it's the same author
+                                                            if (previous?.statusKey == statusKey) item.user.userKey == previous.user.userKey else true
+                                                    }
+                                                val lineDown = index < source.itemCount - 1 &&
+                                                    // make sure next status is replying to the current status
+                                                    source.peek(index + 1)?.inReplyToStatusId == item.statusId
                                                 TimelineStatusComponent(
                                                     data = item,
-                                                    threadStyle = if (index < source.itemCount - 1 &&
-                                                        source.peek(index + 1)?.inReplyToStatusId == item.statusId ||
-                                                        status?.statusId == item.inReplyToStatusId
-                                                    )
-                                                        StatusThreadStyle.NONE
+                                                    threadStyle = if (lineUp && !lineDown)
+                                                        StatusThreadStyle.TEXT_ONLY
                                                     else
-                                                        StatusThreadStyle.TEXT_ONLY,
-                                                    lineUp = index > 0 && source.peek(index - 1)
-                                                        .let { previous ->
-                                                            // is reply to the previous status
-                                                            previous?.statusId == item.inReplyToStatusId &&
-                                                                // and if it is replying to the detail status, make sure it's the same author
-                                                                if (previous?.statusKey == statusKey) item.user.userKey == previous.user.userKey else true
-                                                        },
-                                                    lineDown = index < source.itemCount - 1 &&
-                                                        // make sure next status is replying to the current status
-                                                        source.peek(index + 1)?.inReplyToStatusId == item.statusId,
+                                                        StatusThreadStyle.NONE,
+                                                    lineUp = lineUp,
+                                                    lineDown = lineDown,
                                                 )
                                             }
                                             if (item.statusKey == statusKey) {
