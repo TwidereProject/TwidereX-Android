@@ -76,21 +76,6 @@ fun MastodonSignInScene() {
     val loading by viewModel.loading.observeAsState(initial = false)
     val navController = LocalNavController.current
     val context = LocalContext.current
-    DisposableEffect(Unit) {
-        val connection = object : CustomTabsServiceConnection() {
-            override fun onServiceDisconnected(p0: ComponentName?) {
-            }
-            override fun onCustomTabsServiceConnected(
-                name: ComponentName,
-                client: CustomTabsClient
-            ) {
-                client.warmup(0)
-            }
-        }
-        CustomTabsClient.bindCustomTabsService(context, context.packageName, connection)
-        onDispose {
-        }
-    }
     SignInScaffold {
         if (loading == true) {
             CircularProgressIndicator()
