@@ -184,7 +184,7 @@ class SearchItem : HomeNavigationItem() {
                         }
                     ) {
                         Text(
-                            text = "Show more",
+                            text = stringResource(id = R.string.scene_search_show_more_search),
                             style = MaterialTheme.typography.subtitle1,
                             color = MaterialTheme.colors.primary
                         )
@@ -196,13 +196,13 @@ class SearchItem : HomeNavigationItem() {
                         when (account.type) {
                             PlatformType.Twitter -> ListItem {
                                 Text(
-                                    text = "TRENDS - WORLDWIDE",
+                                    text = stringResource(id = R.string.scene_trends_world_wide),
                                     style = MaterialTheme.typography.overline
                                 )
                             }
                             PlatformType.Mastodon -> ListItem {
                                 Text(
-                                    text = "TRENDING NOW",
+                                    text = stringResource(id = R.string.scene_trends_now),
                                     style = MaterialTheme.typography.overline
                                 )
                             }

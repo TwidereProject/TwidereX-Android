@@ -520,7 +520,7 @@ fun Trend.toDbTrend(accountKey: MicroBlogKey) = DbTrendWithHistory(
         trendKey = MicroBlogKey.twitter("$name:$url"),
         accountKey = accountKey,
         displayName = name ?: "",
-        query = query ?: "",
+        query = name ?: "",
         url = url ?: "",
         volume = tweetVolume ?: 0,
     ),

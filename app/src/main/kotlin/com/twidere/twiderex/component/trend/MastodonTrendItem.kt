@@ -24,7 +24,8 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ListItem
@@ -39,50 +40,73 @@ import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.twidere.twiderex.R
 import com.twidere.twiderex.model.ui.UiTrend
 import com.twidere.twiderex.model.ui.UiTrendHistory
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun MastodonTrendItem(trend: UiTrend, onClick: (UiTrend) -> Unit) {
-    ListItem(
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.clickable(
-            onClick = { onClick(trend) }
-        ),
-        secondaryText = {
-            Text(text = "${trend.dailyAccounts} people talking", style = MaterialTheme.typography.body2)
-        },
-        trailing = {
-            Row(verticalAlignment = Alignment.Top) {
-                Text(text = "${trend.dailyUses}", style = MaterialTheme.typography.body1)
-                Spacer(modifier = Modifier.width(16.dp))
-                MastodonTrendChart(
-                    trendHistories = trend.sortedHistory,
-                    modifier = Modifier
-                        .width(66.dp)
-                        .height(27.dp)
-                )
-            }
-        }
+            onClick = { onClick(trend) },
+        )
     ) {
-        Text(text = trend.displayName, style = MaterialTheme.typography.subtitle1)
+        ListItem(
+            modifier = Modifier.weight(1f),
+            secondaryText = {
+                Text(text = stringResource(id = R.string.scene_trends_accounts, trend.dailyAccounts), style = MaterialTheme.typography.body2)
+            },
+            text = {
+                Text(text = trend.displayName, style = MaterialTheme.typography.subtitle1)
+            },
+        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(end = MastodonTrendItemDefaults.ContentPadding)
+        ) {
+            Text(text = "${trend.dailyUses}", style = MaterialTheme.typography.body1)
+            Spacer(modifier = Modifier.width(MastodonTrendItemDefaults.ContentSpacing))
+            MastodonTrendChart(
+                trendHistories = trend.sortedHistory,
+                modifier = Modifier
+                    .size(MastodonTrendItemDefaults.ChartWidth, MastodonTrendItemDefaults.ChartHeight),
+                lineChartPaddingTop = MastodonTrendItemDefaults.ContentPadding,
+                lineChartPaddingBottom = MastodonTrendItemDefaults.ContentPadding
+            )
+        }
     }
 }
 
+private object MastodonTrendItemDefaults {
+    val ContentSpacing = 16.dp
+    val ContentPadding = 12.dp
+    val ChartWidth = 66.dp
+    val ChartHeight = 40.dp
+}
+
 @Composable
-fun MastodonTrendChart(trendHistories: List<UiTrendHistory>, modifier: Modifier) {
+fun MastodonTrendChart(
+    trendHistories: List<UiTrendHistory>,
+    modifier: Modifier,
+    lineChartPaddingTop: Dp = 0.dp,
+    lineChartPaddingBottom: Dp = 0.dp,
+) {
     val color = MaterialTheme.colors.primary.copy(0.75f)
     Canvas(modifier = modifier) {
-        val maxUses = trendHistories.maxOf { it.uses }
-        val yDelta = size.height / maxUses.toFloat()
+        val maxUses = trendHistories.maxOfOrNull { it.uses } ?: 0
+        val yDelta = (size.height - (lineChartPaddingTop + lineChartPaddingBottom).toPx()) / maxUses.toFloat()
         val xDelta = size.width / (trendHistories.size - 1)
         val linePath = Path()
         val gradientPath = Path()
-        val lineWidth = MastodonTrendChartDefaults.ChartWidth
+        val lineWidth = MastodonTrendChartDefaults.ChartWidth.toPx()
         trendHistories.forEachIndexed { index, uiTrendHistory ->
             val x = size.width - xDelta * index
-            val y = size.height - uiTrendHistory.uses * yDelta
+            val y = size.height - lineChartPaddingBottom.toPx() - uiTrendHistory.uses * yDelta
             when (index) {
                 0 -> {
                     linePath.moveTo(x, y)
@@ -101,8 +125,8 @@ fun MastodonTrendChart(trendHistories: List<UiTrendHistory>, modifier: Modifier)
         }
 
         // draw the gradient color bellow
-        gradientPath.lineTo(0f, size.height + lineWidth)
-        gradientPath.lineTo(size.width, size.height + lineWidth)
+        gradientPath.lineTo(0f, size.height)
+        gradientPath.lineTo(size.width, size.height)
         gradientPath.close()
         drawPath(
             gradientPath,
@@ -111,7 +135,7 @@ fun MastodonTrendChart(trendHistories: List<UiTrendHistory>, modifier: Modifier)
                     color,
                     color.copy(0f)
                 )
-            )
+            ),
         )
         // draw the chart linen
         drawPath(
@@ -121,13 +145,13 @@ fun MastodonTrendChart(trendHistories: List<UiTrendHistory>, modifier: Modifier)
                 width = lineWidth,
                 join = StrokeJoin.Round,
                 cap = StrokeCap.Round,
-                pathEffect = PathEffect.cornerPathEffect(MastodonTrendChartDefaults.CornerPathRadius)
+                pathEffect = PathEffect.cornerPathEffect(MastodonTrendChartDefaults.CornerPathRadius.toPx())
             )
         )
     }
 }
 
 private object MastodonTrendChartDefaults {
-    const val ChartWidth = 8f
-    const val CornerPathRadius = 8f
+    val ChartWidth = 1.dp
+    val CornerPathRadius = 2.dp
 }
