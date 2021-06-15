@@ -104,12 +104,15 @@ fun MastodonTrendChart(trendHistories: List<UiTrendHistory>, modifier: Modifier)
         gradientPath.lineTo(0f, size.height + lineWidth)
         gradientPath.lineTo(size.width, size.height + lineWidth)
         gradientPath.close()
-        drawPath(gradientPath,brush = Brush.verticalGradient(
-           colors = listOf(
-               color,
-               color.copy(0f)
-           )
-        ))
+        drawPath(
+            gradientPath,
+            brush = Brush.verticalGradient(
+                colors = listOf(
+                    color,
+                    color.copy(0f)
+                )
+            )
+        )
         // draw the chart linen
         drawPath(
             linePath,
