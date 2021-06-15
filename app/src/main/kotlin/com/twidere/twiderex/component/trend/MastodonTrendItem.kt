@@ -33,8 +33,11 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.model.ui.UiTrend
@@ -69,28 +72,59 @@ fun MastodonTrendItem(trend: UiTrend, onClick: (UiTrend) -> Unit) {
 
 @Composable
 fun MastodonTrendChart(trendHistories: List<UiTrendHistory>, modifier: Modifier) {
-    val color = MaterialTheme.colors.primary
+    val color = MaterialTheme.colors.primary.copy(0.75f)
     Canvas(modifier = modifier) {
         val maxUses = trendHistories.maxOf { it.uses }
         val yDelta = size.height / maxUses.toFloat()
         val xDelta = size.width / (trendHistories.size - 1)
-        val path = Path()
+        val linePath = Path()
+        val gradientPath = Path()
+        val lineWidth = MastodonTrendChartDefaults.ChartWidth
         trendHistories.forEachIndexed { index, uiTrendHistory ->
-            if (index == 0) {
-                path.moveTo(size.width - xDelta * index, size.height - uiTrendHistory.uses * yDelta)
-            } else {
-                // reverse the y index
-                path.lineTo(size.width - xDelta * index, size.height - uiTrendHistory.uses * yDelta)
+            val x = size.width - xDelta * index
+            val y = size.height - uiTrendHistory.uses * yDelta
+            when (index) {
+                0 -> {
+                    linePath.moveTo(x, y)
+                    gradientPath.moveTo(x, y)
+                }
+                trendHistories.size - 1 -> {
+                    // reverse the y index
+                    linePath.lineTo(0f, y)
+                    gradientPath.lineTo(0f, y)
+                }
+                else -> {
+                    linePath.lineTo(x, y)
+                    gradientPath.lineTo(x, y)
+                }
             }
         }
-        // draw the line
-        drawPath(path, color = color, style = Stroke(width = 8f))
-        // TODO add the gradient color  for this chart
-        // draw the color bellow
-        path.lineTo(0f, size.height)
-        path.lineTo(size.width, size.height)
-        // path.lineTo(size.width - xDelta * 0, size.height - trendHistories[0].uses * yDelta)
-        path.close()
-        drawPath(path, color = Color.LightGray)
+
+        // draw the gradient color bellow
+        gradientPath.lineTo(0f, size.height + lineWidth)
+        gradientPath.lineTo(size.width, size.height + lineWidth)
+        gradientPath.close()
+        drawPath(gradientPath,brush = Brush.verticalGradient(
+           colors = listOf(
+               color,
+               color.copy(0f)
+           )
+        ))
+        // draw the chart linen
+        drawPath(
+            linePath,
+            color = color,
+            style = Stroke(
+                width = lineWidth,
+                join = StrokeJoin.Round,
+                cap = StrokeCap.Round,
+                pathEffect = PathEffect.cornerPathEffect(MastodonTrendChartDefaults.CornerPathRadius)
+            )
+        )
     }
+}
+
+private object MastodonTrendChartDefaults {
+    const val ChartWidth = 8f
+    const val CornerPathRadius = 8f
 }
