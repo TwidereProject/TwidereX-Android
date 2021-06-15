@@ -78,6 +78,7 @@ import com.google.accompanist.pager.HorizontalPagerIndicator
 import com.google.accompanist.pager.PagerState
 import com.google.accompanist.pager.rememberPagerState
 import com.google.android.exoplayer2.ui.PlayerControlView
+import com.mxalbert.zoomable.Zoomable
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.LoadingProgress
@@ -109,8 +110,6 @@ import com.twidere.twiderex.viewmodel.MediaViewModel
 import moe.tlaster.swiper.Swiper
 import moe.tlaster.swiper.SwiperState
 import moe.tlaster.swiper.rememberSwiperState
-import moe.tlaster.zoomable.Zoomable
-import moe.tlaster.zoomable.rememberZoomableState
 
 @Composable
 fun StatusMediaScene(statusKey: MicroBlogKey, selectedIndex: Int) {
@@ -408,9 +407,7 @@ fun MediaView(
             val data = media[page]
             when (data.type) {
                 MediaType.photo ->
-                    Zoomable(
-                        state = rememberZoomableState()
-                    ) {
+                    Zoomable {
                         NetworkImage(
                             modifier = Modifier.fillMaxSize(),
                             data = data.url,
