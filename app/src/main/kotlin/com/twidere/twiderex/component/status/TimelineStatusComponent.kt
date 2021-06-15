@@ -552,7 +552,7 @@ fun statusConstraintSets() = ConstraintSet {
 
 object StatusContentDefaults {
     val ContentSpacing = 10.dp
-    val AvatarSpacing = ContentSpacing
+    val AvatarSpacing = 4.dp
 
     object Normal {
         val BodySpacing = 4.dp
