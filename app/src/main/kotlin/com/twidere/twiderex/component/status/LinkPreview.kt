@@ -38,7 +38,6 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Constraints
@@ -100,7 +99,10 @@ object LinkPreviewDefaults {
         vertical = 12.dp,
     )
     val TextPaddingStart = 16.dp
-    val BackgroundColor = Color.Black.copy(alpha = 0.04f)
+
+    val BackgroundColor
+        @Composable
+        get() = MaterialTheme.colors.onBackground.copy(alpha = 0.04f)
 
     val TitleStyle
         @Composable
