@@ -24,10 +24,11 @@ import android.net.Uri
 import androidx.compose.runtime.Composable
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.WebComponent
+import com.twidere.twiderex.navigation.twidereXSchema
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
 
-val MASTODON_CALLBACK_URL = "https://org.mariotaku.twidere/auth/callback/mastodon"
+val MASTODON_CALLBACK_URL = "$twidereXSchema://auth/callback/mastodon"
 
 @Composable
 fun MastodonWebSignInScene(target: String) {

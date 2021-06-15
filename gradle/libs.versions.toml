@@ -31,6 +31,7 @@ zoomable = "1.0.1"
 swiper = "0.4.0"
 nestedScrollView = "0.5.1"
 hson = "0.1.4"
+browser = "1.3.0"
 
 [libraries]
 # androidx test
@@ -130,6 +131,7 @@ exoplayer = { module = "com.google.android.exoplayer:exoplayer", version.ref = "
 startup = { module = "androidx.startup:startup-runtime", version.ref = "startup" }
 vectordrawable = "androidx.vectordrawable:vectordrawable:1.1.0"
 hson = { module = "com.github.Tlaster:Hson", version.ref = "hson" }
+browser = { module = "androidx.browser:browser", version.ref = "browser" }
 
 [bundles]
 androidx-test = [

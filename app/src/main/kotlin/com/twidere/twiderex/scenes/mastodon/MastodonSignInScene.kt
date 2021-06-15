@@ -20,6 +20,12 @@
  */
 package com.twidere.twiderex.scenes.mastodon
 
+import android.content.ComponentName
+import android.content.Context
+import android.net.Uri
+import androidx.browser.customtabs.CustomTabsClient
+import androidx.browser.customtabs.CustomTabsIntent
+import androidx.browser.customtabs.CustomTabsServiceConnection
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -35,6 +41,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -42,6 +49,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -51,10 +59,9 @@ import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.SignInButton
 import com.twidere.twiderex.component.foundation.SignInScaffold
-import com.twidere.twiderex.component.navigation.INavigator
-import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.ui.LocalNavController
+import com.twidere.twiderex.utils.CustomTabSignInChannel
 import com.twidere.twiderex.viewmodel.mastodon.MastodonSignInViewModel
 import moe.tlaster.precompose.navigation.NavController
 
@@ -68,7 +75,22 @@ fun MastodonSignInScene() {
     val host by viewModel.host.observeAsState(initial = TextFieldValue())
     val loading by viewModel.loading.observeAsState(initial = false)
     val navController = LocalNavController.current
-    val navigator = LocalNavigator.current
+    val context = LocalContext.current
+    DisposableEffect(Unit) {
+        val connection = object : CustomTabsServiceConnection() {
+            override fun onServiceDisconnected(p0: ComponentName?) {
+            }
+            override fun onCustomTabsServiceConnected(
+                name: ComponentName,
+                client: CustomTabsClient
+            ) {
+                client.warmup(0)
+            }
+        }
+        CustomTabsClient.bindCustomTabsService(context, context.packageName, connection)
+        onDispose {
+        }
+    }
     SignInScaffold {
         if (loading == true) {
             CircularProgressIndicator()
@@ -90,14 +112,14 @@ fun MastodonSignInScene() {
                 ),
                 keyboardActions = KeyboardActions(
                     onGo = {
-                        signin(viewModel, host, navController, navigator)
+                        signin(viewModel, context, host, navController)
                     }
                 )
             )
             Spacer(modifier = Modifier.height(16.dp))
             SignInButton(
                 onClick = {
-                    signin(viewModel, host, navController, navigator)
+                    signin(viewModel, context, host, navController)
                 }
             ) {
                 ListItem(
@@ -133,14 +155,17 @@ fun MastodonSignInScene() {
 
 private fun signin(
     viewModel: MastodonSignInViewModel,
+    context: Context,
     host: TextFieldValue,
     navController: NavController,
-    navigator: INavigator
 ) {
     viewModel.beginOAuth(
         host.text,
         { target ->
-            navigator.mastodonSignInWeb(target)
+            CustomTabsIntent.Builder()
+                .setShareState(CustomTabsIntent.SHARE_STATE_OFF)
+                .build().launchUrl(context, Uri.parse(target))
+            CustomTabSignInChannel.waitOne().getQueryParameter("code")
         },
         { success ->
             if (success) {
