@@ -147,7 +147,6 @@ fun HomeScene() {
     TwidereScene {
         NestedScrollScaffold(
             scaffoldState = scaffoldState,
-            // navigation bar height is the same to toolbar
             enableBottomBarNestedScroll = hideTab,
             bottomBar = {
                 if (tabPosition == AppearancePreferences.TabPosition.Bottom) {

@@ -70,9 +70,6 @@ private class TopBarState(
     }
 
     companion object {
-        /**
-         * The default [Saver] implementation for [TopBarState].
-         */
         val Saver: Saver<TopBarState, *> = listSaver(
             save = {
                 listOf(
@@ -105,9 +102,6 @@ private class BottomBarState(
     }
 
     companion object {
-        /**
-         * The default [Saver] implementation for [TopBarState].
-         */
         val Saver: Saver<BottomBarState, *> = listSaver(
             save = {
                 listOf(
