@@ -38,6 +38,7 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -155,17 +156,22 @@ fun NestedScrollScaffold(
     val fabState = rememberSaveable(saver = BottomBarState.Saver) {
         BottomBarState()
     }
+    val enableTopBarNestedScrollState = rememberUpdatedState(newValue = enableTopBarNestedScroll)
+    val enableBottomBarNestedScrollState =
+        rememberUpdatedState(newValue = enableBottomBarNestedScroll)
+    val enableFloatingActionButtonNestedScrollState =
+        rememberUpdatedState(newValue = enableFloatingActionButtonNestedScroll)
     val nestedScrollConnection = remember {
         object : NestedScrollConnection {
             override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
                 val delta = available.y
-                if (enableTopBarNestedScroll) {
+                if (enableTopBarNestedScrollState.value) {
                     topBarState.scroll(delta)
                 }
-                if (enableBottomBarNestedScroll) {
+                if (enableBottomBarNestedScrollState.value) {
                     bottomBarState.scroll(delta)
                 }
-                if (enableFloatingActionButtonNestedScroll) {
+                if (enableFloatingActionButtonNestedScrollState.value) {
                     fabState.scroll(delta)
                 }
                 return Offset.Zero
