@@ -36,4 +36,5 @@ data class DbSearch(
     val _id: String,
     val content: String,
     val lastActive: Long,
+    val saved: Boolean
 )

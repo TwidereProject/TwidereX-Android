@@ -31,19 +31,35 @@ class SearchRepository(
         database.searchDao().getAll()
     }
 
+    val savedSource by lazy {
+        database.searchDao().getAllSaved()
+    }
+
     suspend fun addOrUpgrade(
         content: String,
+        saved: Boolean = false
     ) {
-        database.searchDao().insertAll(
-            DbSearch(
-                _id = UUID.randomUUID().toString(),
-                content = content,
-                lastActive = System.currentTimeMillis()
+        val search = database.searchDao().get(content)?.let {
+            it.copy(
+                lastActive = System.currentTimeMillis(),
+                saved = if (it.saved) it.saved else saved
             )
+        } ?: DbSearch(
+            _id = UUID.randomUUID().toString(),
+            content = content,
+            lastActive = System.currentTimeMillis(),
+            saved = false
+        )
+        database.searchDao().insertAll(
+            search
         )
     }
 
     suspend fun remove(item: DbSearch) {
         database.searchDao().remove(item)
+    }
+
+    suspend fun get(content: String): DbSearch? {
+        return database.searchDao().get(content)
     }
 }

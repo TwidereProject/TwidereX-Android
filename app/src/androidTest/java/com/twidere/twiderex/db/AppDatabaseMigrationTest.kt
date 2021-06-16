@@ -74,4 +74,38 @@ class AppDatabaseMigrationTest {
             close()
         }
     }
+
+    @Test
+    @Throws(IOException::class)
+    fun migrate2To3() {
+        val id = UUID.randomUUID().toString()
+        val content = "Content"
+        val lastActive = 1000L
+        helper.createDatabase(TEST_DB, 2).apply {
+            execSQL(
+                "INSERT INTO search (_id, content, lastActive) VALUES (?, ?, ?)",
+                arrayOf(id, content, lastActive)
+            )
+            close()
+        }
+
+        helper.runMigrationsAndValidate(TEST_DB, 3, true, AppDatabase_Migration_2_3).apply {
+            query(SimpleSQLiteQuery("SELECT * FROM search WHERE _id = ?", arrayOf(id))).apply {
+                moveToFirst()
+                getString(getColumnIndex("_id")).also {
+                    assert(it == id)
+                }
+                getString(getColumnIndex("content")).also {
+                    assert(it == content)
+                }
+                getLong(getColumnIndex("lastActive")).also {
+                    assert(it == lastActive)
+                }
+                getInt(getColumnIndex("saved")).also {
+                    assert(it == 0)
+                }
+            }
+            close()
+        }
+    }
 }

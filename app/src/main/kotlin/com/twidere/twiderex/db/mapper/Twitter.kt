@@ -501,7 +501,7 @@ enum class ProfileImageSize {
 }
 
 fun TwitterList.toDbList(accountKey: MicroBlogKey) = DbList(
-    _id = UUID.randomUUID().toString(),
+    _id = System.currentTimeMillis().toString(),
     ownerId = user?.idStr ?: "",
     listId = idStr ?: throw IllegalArgumentException("list.idStr should not be null"),
     title = name ?: "",
@@ -516,7 +516,7 @@ fun TwitterList.toDbList(accountKey: MicroBlogKey) = DbList(
 
 fun Trend.toDbTrend(accountKey: MicroBlogKey) = DbTrendWithHistory(
     trend = DbTrend(
-        _id = UUID.randomUUID().toString(),
+        _id = System.currentTimeMillis().toString(),
         trendKey = MicroBlogKey.twitter("$name:$url"),
         accountKey = accountKey,
         displayName = name ?: "",

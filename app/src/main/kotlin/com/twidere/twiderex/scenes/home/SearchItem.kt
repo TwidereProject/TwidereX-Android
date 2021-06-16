@@ -85,7 +85,7 @@ class SearchItem : HomeNavigationItem() {
         ) {
             it.create(account = account)
         }
-        val source by viewModel.source.observeAsState(initial = emptyList())
+        val source by viewModel.savedSource.observeAsState(initial = emptyList())
         val trends by trendViewModel.source.observeAsState(initial = emptyList())
         val navigator = LocalNavigator.current
         val searchCount = 3

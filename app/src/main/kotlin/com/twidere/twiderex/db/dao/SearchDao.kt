@@ -36,6 +36,9 @@ interface SearchDao {
     @Query("SELECT * FROM search ORDER BY lastActive DESC")
     fun getAll(): LiveData<List<DbSearch>>
 
+    @Query("SELECT * FROM search where saved == 1 ORDER BY lastActive DESC")
+    fun getAllSaved(): LiveData<List<DbSearch>>
+
     @Query("SELECT * FROM search WHERE content == :content")
     suspend fun get(content: String): DbSearch?
 

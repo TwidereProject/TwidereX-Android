@@ -357,7 +357,7 @@ fun MastodonList.toDbList(accountKey: MicroBlogKey): DbList {
 fun Trend.toDbTrend(accountKey: MicroBlogKey): DbTrendWithHistory {
     return DbTrendWithHistory(
         trend = DbTrend(
-            _id = UUID.randomUUID().toString(),
+            _id = System.currentTimeMillis().toString(),
             trendKey = MicroBlogKey("$name:$url", accountKey.host),
             accountKey = accountKey,
             displayName = name ?: "",
@@ -367,7 +367,7 @@ fun Trend.toDbTrend(accountKey: MicroBlogKey): DbTrendWithHistory {
         ),
         history = history?.map {
             DbTrendHistory(
-                _id = UUID.randomUUID().toString(),
+                _id = System.currentTimeMillis().toString(),
                 trendKey = MicroBlogKey("$name:$url", accountKey.host),
                 day = it.day?.toLong() ?: 0L,
                 uses = it.uses?.toLong() ?: 0L,

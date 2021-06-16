@@ -38,7 +38,6 @@ import com.twidere.twiderex.db.model.DbList
 import com.twidere.twiderex.db.model.DbMedia
 import com.twidere.twiderex.db.model.DbNotificationCursor
 import com.twidere.twiderex.db.model.DbPagingTimeline
-import com.twidere.twiderex.db.model.DbSearch
 import com.twidere.twiderex.db.model.DbStatusReaction
 import com.twidere.twiderex.db.model.DbStatusReference
 import com.twidere.twiderex.db.model.DbStatusV2
@@ -65,14 +64,13 @@ import javax.inject.Singleton
         DbStatusReaction::class,
         DbPagingTimeline::class,
         DbUrlEntity::class,
-        DbSearch::class,
         DbStatusReference::class,
         DbList::class,
         DbNotificationCursor::class,
         DbTrend::class,
         DbTrendHistory::class
     ],
-    version = 15,
+    version = 16,
 )
 @TypeConverters(
     MicroBlogKeyConverter::class,

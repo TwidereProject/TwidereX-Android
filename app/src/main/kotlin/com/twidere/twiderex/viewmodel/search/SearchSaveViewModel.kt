@@ -22,40 +22,43 @@ package com.twidere.twiderex.viewmodel.search
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
-import com.twidere.twiderex.db.model.DbSearch
-import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.repository.SearchRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.launch
 
-class SearchInputViewModel @AssistedInject constructor(
+class SearchSaveViewModel @AssistedInject constructor(
     private val repository: SearchRepository,
-    @Assisted private val account: AccountDetails,
+    @Assisted private val content: String,
 ) : ViewModel() {
 
     @dagger.assisted.AssistedFactory
     interface AssistedFactory {
-        fun create(account: AccountDetails): SearchInputViewModel
+        fun create(content: String): SearchSaveViewModel
     }
 
-    val source = liveData {
-        emitSource(repository.source)
+    val loading = MutableLiveData(false)
+
+    val isSaved = MutableLiveData(false)
+
+    init {
+        viewModelScope.launch {
+            isSaved.postValue(repository.get(content)?.saved ?: false)
+        }
     }
 
-    val savedSource = liveData {
-        emitSource(repository.savedSource)
-    }
-
-    val expandSearch = MutableLiveData(false)
-
-    fun remove(item: DbSearch) = viewModelScope.launch {
-        repository.remove(item)
-    }
-
-    fun addOrUpgrade(content: String) = viewModelScope.launch {
-        repository.addOrUpgrade(content)
+    fun save() {
+        viewModelScope.launch {
+            loading.postValue(true)
+            try {
+                repository.addOrUpgrade(content = content, saved = true)
+                isSaved.postValue(true)
+            } catch (e: Exception) {
+                isSaved.postValue(false)
+            } finally {
+                loading.postValue(false)
+            }
+        }
     }
 }

@@ -40,7 +40,7 @@ import javax.inject.Singleton
         DbDraft::class,
         DbSearch::class,
     ],
-    version = 2,
+    version = 3,
 )
 @TypeConverters(
     MicroBlogKeyConverter::class,
@@ -56,5 +56,11 @@ val AppDatabase_Migration_1_2 = object : Migration(1, 2) {
     override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL("CREATE TABLE IF NOT EXISTS `search` (`_id` TEXT NOT NULL, `content` TEXT NOT NULL, `lastActive` INTEGER NOT NULL, PRIMARY KEY(`_id`))")
         database.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_search_content` ON `search` (`content`)")
+    }
+}
+
+val AppDatabase_Migration_2_3 = object : Migration(2, 3) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("ALTER TABLE `search` ADD COLUMN `saved` INTEGER DEFAULT 0 NOT NULL")
     }
 }
