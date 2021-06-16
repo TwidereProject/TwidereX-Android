@@ -76,6 +76,7 @@ import com.twidere.twiderex.R
 import com.twidere.twiderex.component.UserMetrics
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarDefaults
+import com.twidere.twiderex.component.foundation.ApplyNotification
 import com.twidere.twiderex.component.foundation.IconTabsComponent
 import com.twidere.twiderex.component.foundation.NestedScrollScaffold
 import com.twidere.twiderex.component.foundation.Pager
@@ -142,7 +143,7 @@ fun HomeScene() {
             }
         }
     }
-    // nested scroll
+    ApplyNotification(scaffoldState.snackbarHostState)
     TwidereScene {
         NestedScrollScaffold(
             scaffoldState = scaffoldState,

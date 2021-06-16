@@ -20,7 +20,6 @@
  */
 package com.twidere.twiderex.component.foundation
 
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material.BottomSheetScaffold
@@ -57,9 +56,8 @@ import com.twidere.twiderex.notification.NotificationWithActionEvent
 
 val LocalInAppNotification = compositionLocalOf { InAppNotification() }
 
-@ExperimentalMaterialApi
 @Composable
-private fun ApplyNotification(
+fun ApplyNotification(
     snackbarHostState: SnackbarHostState
 ) {
     val inAppNotification = LocalInAppNotification.current
@@ -105,7 +103,6 @@ private fun ApplyNotification(
 
 @Composable
 @ExperimentalMaterialApi
-@OptIn(ExperimentalAnimationApi::class)
 fun InAppNotificationBottomSheetScaffold(
     sheetContent: @Composable ColumnScope.() -> Unit,
     modifier: Modifier = Modifier,
@@ -161,7 +158,6 @@ fun InAppNotificationBottomSheetScaffold(
 }
 
 @Composable
-@OptIn(ExperimentalMaterialApi::class)
 fun InAppNotificationScaffold(
     modifier: Modifier = Modifier,
     scaffoldState: ScaffoldState = rememberScaffoldState(),
