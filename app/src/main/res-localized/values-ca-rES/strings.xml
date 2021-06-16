@@ -146,8 +146,6 @@
     <string name="scene_drafts_actions_delete_draft">Suprimeix l\'esborrany</string>
     <string name="scene_drafts_actions_edit_draft">Edita l\'esborrany</string>
     <string name="scene_lists_title">Llistes</string>
-    <string name="scene_lists_tabs_created">Creats</string>
-    <string name="scene_lists_tabs_subscribed">Subscripcions</string>
     <string name="scene_lists_details_title">Detalls de la llista</string>
     <string name="scene_lists_details_descriptions_single_member">1 Membre</string>
     <string name="scene_lists_details_descriptions_multiple_members">%d Membres</string>
@@ -155,10 +153,14 @@
     <string name="scene_lists_details_descriptions_multiple_subscribers">%d subscriptors</string>
     <string name="scene_lists_details_menu_actions_add_member">Afegeix membre</string>
     <string name="scene_lists_details_menu_actions_edit_list">Edita la llista</string>
-    <string name="scene_lists_details_tabs_members">Membres</string>
-    <string name="scene_lists_details_tabs_subscriber">Subscriptor</string>
+    <string name="scene_lists_details_menu_actions_follow">Segueix</string>
+    <string name="scene_lists_details_menu_actions_unfollow">Deixa de seguir</string>
     <string name="scene_lists_details_no_members_found">No s\'han trobat membres.</string>
     <string name="scene_lists_details_add_members">Afegir membres</string>
+    <string name="scene_lists_modify_edit_title">Edita la llista</string>
+    <string name="scene_lists_users_menu_actions_add">Afegir</string>
+    <string name="scene_lists_users_menu_actions_remove">Elimina</string>
+    <string name="scene_lists_users_add_title">Afegeix membre</string>
     <string name="scene_settings_title">Configuració</string>
     <string name="scene_settings_section_header_general">General</string>
     <string name="scene_settings_section_header_about">Quant a</string>
@@ -219,7 +221,6 @@
     <string name="accessibility_scene_compose_send">Enviar</string>
     <string name="accessibility_scene_compose_location_enable">Habilita la ubicació</string>
     <string name="accessibility_scene_compose_location_disable">Desactivar la ubicació</string>
-    <string name="accessibility_scene_compose_at">A</string>
     <string name="accessibility_scene_compose_image">Afegeix imatge</string>
     <string name="accessibility_scene_compose_draft">Obre esborrany</string>
     <string name="accessibility_scene_manage_accounts_add">Afegir</string>

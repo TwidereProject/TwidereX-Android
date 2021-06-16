@@ -86,7 +86,7 @@ fun DisplayScene() {
                         rememberScrollState()
                     )
             ) {
-                ItemHeader {
+                ItemHeader() {
                     Text(text = stringResource(id = R.string.scene_settings_display_section_header_preview))
                 }
                 CompositionLocalProvider(
@@ -96,7 +96,7 @@ fun DisplayScene() {
                     TimelineStatusComponent(data = UiStatus.sample())
                 }
                 ItemDivider()
-                ItemHeader {
+                ItemHeader() {
                     Text(text = stringResource(id = R.string.scene_settings_display_section_header_text))
                 }
                 switchItem(
@@ -162,7 +162,7 @@ fun DisplayScene() {
                     }
                 )
                 ItemDivider()
-                ItemHeader {
+                ItemHeader() {
                     Text(text = stringResource(id = R.string.scene_settings_display_section_header_media))
                 }
                 switchItem(

@@ -35,8 +35,6 @@ import androidx.compose.material.Icon
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -44,7 +42,9 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.twidere.twiderex.R
 import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.ui.UiStatus
 
@@ -53,6 +53,7 @@ import com.twidere.twiderex.model.ui.UiStatus
 fun ColumnScope.StatusText(
     status: UiStatus,
     maxLines: Int = Int.MAX_VALUE,
+    showMastodonPoll: Boolean = true
 ) {
     val expandable = status.platformType == PlatformType.Mastodon &&
         status.mastodonExtra?.spoilerText != null
@@ -74,9 +75,8 @@ fun ColumnScope.StatusText(
                 },
         ) {
             Icon(
-                modifier = Modifier
-                    .padding(StatusTextDefaults.Mastodon.SpoilerButtonPadding),
-                imageVector = Icons.Default.MoreHoriz,
+                modifier = Modifier.padding(StatusTextDefaults.Mastodon.SpoilerButtonPadding),
+                painter = painterResource(id = R.drawable.ic_expand_more),
                 contentDescription = null,
                 tint = MaterialTheme.colors.primary,
             )
@@ -92,7 +92,7 @@ fun ColumnScope.StatusText(
                 },
             )
 
-            if (status.platformType == PlatformType.Mastodon && status.mastodonExtra?.poll != null) {
+            if (showMastodonPoll && status.platformType == PlatformType.Mastodon && status.mastodonExtra?.poll != null) {
                 Spacer(modifier = Modifier.height(StatusTextDefaults.Mastodon.PollSpacing))
                 MastodonPoll(status)
             }
@@ -104,10 +104,9 @@ object StatusTextDefaults {
     object Mastodon {
         val SpoilerSpacing = 2.dp
         val SpoilerButtonPadding = PaddingValues(
-            horizontal = 8.dp,
-            vertical = 2.dp
+            2.dp
         )
-        val PollSpacing = 8.dp
+        val PollSpacing = 10.dp
     }
 }
 

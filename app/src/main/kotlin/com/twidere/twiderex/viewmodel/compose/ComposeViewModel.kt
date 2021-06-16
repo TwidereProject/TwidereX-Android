@@ -218,6 +218,10 @@ open class ComposeViewModel @AssistedInject constructor(
         }
     }
 
+    val draftCount by lazy {
+        draftRepository.sourceCount
+    }
+
     val location = MutableLiveData<Location?>()
     val excludedReplyUserIds = MutableLiveData<List<String>>(emptyList())
 

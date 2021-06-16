@@ -1134,6 +1134,7 @@ private fun ComposeActions(
             }
         },
     )
+    val draftCount = viewModel.draftCount.observeAsState(0)
     Box {
         Row {
             AnimatedVisibility(visible = allowImage) {
@@ -1200,7 +1201,7 @@ private fun ComposeActions(
                     Icon(
                         painter = painterResource(id = R.drawable.ic_at_sign),
                         contentDescription = stringResource(
-                            id = R.string.accessibility_scene_compose_at
+                            id = R.string.accessibility_scene_compose_add_mention,
                         )
                     )
                 }
@@ -1262,17 +1263,19 @@ private fun ComposeActions(
                 )
             }
             Spacer(modifier = Modifier.weight(1f))
-            IconButton(
-                onClick = {
-                    navController.navigate(Route.Draft.List)
-                }
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_note),
-                    contentDescription = stringResource(
-                        id = R.string.accessibility_scene_compose_draft
+            if (draftCount.value > 0) {
+                IconButton(
+                    onClick = {
+                        navController.navigate(Route.Draft.List)
+                    }
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_note),
+                        contentDescription = stringResource(
+                            id = R.string.accessibility_scene_compose_draft
+                        )
                     )
-                )
+                }
             }
         }
     }

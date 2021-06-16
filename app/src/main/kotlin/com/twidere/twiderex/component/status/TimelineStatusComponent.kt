@@ -59,6 +59,7 @@ import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -155,7 +156,7 @@ private fun NormalStatus(
             lineDownPadding = if (threadStyle == StatusThreadStyle.WITH_AVATAR)
                 PaddingValues(
                     top = StatusContentDefaults.AvatarLine.Spacing,
-                    bottom = NormalStatusDefaults.ContentPadding.calculateBottomPadding() +
+                    bottom = NormalStatusDefaults.ThreadBottomPadding +
                         StatusThreadDefaults.AvatarSize +
                         StatusContentDefaults.AvatarLine.Spacing
                 )
@@ -174,6 +175,7 @@ private fun NormalStatus(
                     }
                     if (data.isInThread()) {
                         StatusThread(threadStyle, data)
+                        Spacer(modifier = Modifier.height(NormalStatusDefaults.ThreadBottomPadding))
                     }
                 }
             }
@@ -183,10 +185,13 @@ private fun NormalStatus(
 
 object NormalStatusDefaults {
     val ContentPadding = PaddingValues(
-        horizontal = 16.dp,
-        vertical = 8.dp
+        start = 16.dp,
+        end = 16.dp,
+        top = 12.dp
     )
     val ContentSpacing = 8.dp
+    val ThreadSpacing = 18.dp
+    val ThreadBottomPadding = 6.dp
 }
 
 @Composable
@@ -198,7 +203,7 @@ private fun StatusThread(threadStyle: StatusThreadStyle, data: UiStatus) {
         }
         StatusThreadStyle.WITH_AVATAR -> {
             StatusThreadWithAvatar(
-                modifier = Modifier.padding(top = NormalStatusDefaults.ContentSpacing),
+                modifier = Modifier.padding(top = NormalStatusDefaults.ThreadSpacing),
                 data = data,
                 onClick = {
                     navigator.status(data)
@@ -224,6 +229,7 @@ private fun StatusHeader(data: UiStatus) {
         }
         data.retweet != null -> {
             RetweetHeader(data = data)
+            Spacer(modifier = Modifier.height(StatusHeaderDefaults.HeaderSpacing))
         }
     }
 }
@@ -257,6 +263,7 @@ private fun MastodonStatusHeader(
                     )
                 }
             )
+            Spacer(modifier = Modifier.height(StatusHeaderDefaults.HeaderSpacing))
         }
         MastodonStatusType.NotificationFollowRequest -> {
             TweetHeader(
@@ -276,10 +283,12 @@ private fun MastodonStatusHeader(
                     )
                 }
             )
+            Spacer(modifier = Modifier.height(StatusHeaderDefaults.HeaderSpacing))
         }
         MastodonStatusType.NotificationMention -> Unit
         MastodonStatusType.NotificationReblog -> {
             RetweetHeader(data = data)
+            Spacer(modifier = Modifier.height(StatusHeaderDefaults.HeaderSpacing))
         }
         MastodonStatusType.NotificationFavourite -> {
             TweetHeader(
@@ -299,6 +308,7 @@ private fun MastodonStatusHeader(
                     )
                 }
             )
+            Spacer(modifier = Modifier.height(StatusHeaderDefaults.HeaderSpacing))
         }
         MastodonStatusType.NotificationPoll -> {
             TweetHeader(
@@ -326,6 +336,7 @@ private fun MastodonStatusHeader(
                     )
                 }
             )
+            Spacer(modifier = Modifier.height(StatusHeaderDefaults.HeaderSpacing))
         }
         MastodonStatusType.NotificationStatus -> {
             TweetHeader(
@@ -345,6 +356,7 @@ private fun MastodonStatusHeader(
                     )
                 }
             )
+            Spacer(modifier = Modifier.height(StatusHeaderDefaults.HeaderSpacing))
         }
     }
 }
@@ -439,7 +451,6 @@ fun StatusContent(
         Column(modifier = Modifier.layoutId(StatusContentDefaults.Ref.StatusHeader)) {
             Spacer(modifier = Modifier.height(contentPadding.calculateTopPadding()))
             StatusHeader(data)
-            Spacer(modifier = Modifier.height(StatusHeaderDefaults.HeaderSpacing))
         }
         val status = data.retweet ?: data
         Box(modifier = Modifier.layoutId(StatusContentDefaults.Ref.Avatar)) {
@@ -454,7 +465,7 @@ fun StatusContent(
                     Row(
                         modifier = Modifier.weight(1f),
                     ) {
-                        UserName(status.user)
+                        UserName(status.user, fontWeight = FontWeight.W600)
                         if (type == StatusContentType.Normal) {
                             Spacer(modifier = Modifier.width(StatusContentDefaults.Normal.UserNameSpacing))
                             UserScreenName(status.user)
@@ -492,6 +503,7 @@ fun StatusContent(
             }
         }
         Column(modifier = Modifier.layoutId(StatusContentDefaults.Ref.Footer)) {
+            Spacer(modifier = Modifier.height(StatusContentDefaults.ContentSpacing))
             footer.invoke()
             Spacer(modifier = Modifier.height(contentPadding.calculateBottomPadding()))
         }
@@ -539,7 +551,8 @@ fun statusConstraintSets() = ConstraintSet {
 }
 
 object StatusContentDefaults {
-    val AvatarSpacing = 8.dp
+    val ContentSpacing = 10.dp
+    val AvatarSpacing = 4.dp
 
     object Normal {
         val BodySpacing = 4.dp
@@ -622,9 +635,9 @@ fun ColumnScope.StatusBody(
 }
 
 object StatusBodyDefaults {
-    val LinkPreviewSpacing = 8.dp
-    val PlaceSpacing = 8.dp
-    val QuoteSpacing = 8.dp
+    val LinkPreviewSpacing = 10.dp
+    val PlaceSpacing = 10.dp
+    val QuoteSpacing = 10.dp
 }
 
 @Composable
@@ -637,9 +650,10 @@ private fun StatusLinkPreview(card: DbPreviewCard) {
                 navigator.openLink(card.link)
             },
         link = card.displayLink ?: card.link,
-        title = card.title,
+        title = card.title?.trim(),
         image = card.image,
-        desc = card.desc,
+        desc = card.desc?.trim(),
+        maxLines = 5,
     )
 }
 
@@ -669,7 +683,7 @@ private fun ColumnScope.StatusBodyMedia(
 }
 
 object StatusBodyMediaDefaults {
-    val Spacing = 8.dp
+    val Spacing = 10.dp
 }
 
 @Composable

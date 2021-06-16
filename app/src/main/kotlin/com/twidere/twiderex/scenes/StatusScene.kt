@@ -132,7 +132,7 @@ fun StatusScene(
                     -50.dp.toPx()
                 }
                 val firstVisibleIndex = remember {
-                    for (i in 0..source.itemCount) {
+                    for (i in 0 until source.itemCount) {
                         if (source.peek(i)?.statusKey == status?.statusKey) {
                             return@remember i
                         }
@@ -166,24 +166,37 @@ fun StatusScene(
                         }
                     } else {
                         itemsIndexed(source) { index, it ->
-                            it?.let { status ->
+                            it?.let { item ->
                                 Layout(
                                     content = {
                                         Column {
-                                            if (status.statusKey == statusKey) {
-                                                DetailedStatusComponent(data = status, lineUp = firstVisibleIndex > 0)
+                                            if (item.statusKey == statusKey) {
+                                                DetailedStatusComponent(
+                                                    data = item,
+                                                    lineUp = firstVisibleIndex > 0
+                                                )
                                             } else {
+                                                val lineUp = index > 0 && source.peek(index - 1)
+                                                    .let { previous ->
+                                                        // is reply to the previous status
+                                                        previous?.statusId == item.inReplyToStatusId &&
+                                                            // and if it is replying to the detail status, make sure it's the same author
+                                                            if (previous?.statusKey == statusKey) item.user.userKey == previous.user.userKey else true
+                                                    }
+                                                val lineDown = index < source.itemCount - 1 &&
+                                                    // make sure next status is replying to the current status
+                                                    source.peek(index + 1)?.inReplyToStatusId == item.statusId
                                                 TimelineStatusComponent(
-                                                    data = status,
-                                                    threadStyle = if (index > firstVisibleIndex && status.isInThread(statusKey.id))
+                                                    data = item,
+                                                    threadStyle = if (lineUp && !lineDown)
                                                         StatusThreadStyle.TEXT_ONLY
                                                     else
                                                         StatusThreadStyle.NONE,
-                                                    lineDown = index < firstVisibleIndex,
-                                                    lineUp = index in 1 until firstVisibleIndex
+                                                    lineUp = lineUp,
+                                                    lineDown = lineDown,
                                                 )
                                             }
-                                            if (status.statusKey == statusKey) {
+                                            if (item.statusKey == statusKey) {
                                                 Divider()
                                             } else {
                                                 StatusDivider()

@@ -27,6 +27,7 @@ import androidx.paging.PagingData
 import androidx.room.withTransaction
 import com.twidere.services.mastodon.MastodonService
 import com.twidere.services.microblog.LookupService
+import com.twidere.services.nitter.NitterService
 import com.twidere.services.twitter.TwitterService
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.db.mapper.toDbStatusWithReference
@@ -45,6 +46,7 @@ import kotlinx.coroutines.flow.Flow
 
 class StatusRepository(
     private val database: CacheDatabase,
+    private val nitterService: NitterService?,
 ) {
     fun loadStatus(
         statusKey: MicroBlogKey,
@@ -95,6 +97,7 @@ class StatusRepository(
         val remoteMediator = when (account.type) {
             PlatformType.Twitter -> TwitterConversationMediator(
                 service = account.service as TwitterService,
+                nitterService = nitterService,
                 statusKey = statusKey,
                 accountKey = account.accountKey,
                 database = database,

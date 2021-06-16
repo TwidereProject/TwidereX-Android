@@ -21,8 +21,10 @@
 package com.twidere.twiderex.paging.mediator.status
 
 import com.twidere.services.http.MicroBlogException
+import com.twidere.services.microblog.model.BasicSearchResponse
 import com.twidere.services.microblog.model.ISearchResponse
 import com.twidere.services.microblog.model.IStatus
+import com.twidere.services.nitter.NitterService
 import com.twidere.services.twitter.TwitterService
 import com.twidere.services.twitter.model.ReferencedTweetType
 import com.twidere.services.twitter.model.Status
@@ -38,6 +40,7 @@ import com.twidere.twiderex.paging.mediator.paging.CursorWithCustomOrderPagingRe
 class TwitterConversationMediator(
     private val service: TwitterService,
     private val statusKey: MicroBlogKey,
+    private val nitterService: NitterService?,
     accountKey: MicroBlogKey,
     database: CacheDatabase,
 ) : CursorWithCustomOrderPagingMediator(
@@ -68,6 +71,22 @@ class TwitterConversationMediator(
     }
 
     private suspend fun loadConversation(nextPage: String? = null): ISearchResponse {
+        if (nitterService != null) {
+            try {
+                val nitterResult = nitterService.conversation(statusKey.id, statusKey.id, nextPage)
+                return nitterResult?.let {
+                    it.items.flatMap { it.statuses }
+                }?.takeIf { it.isNotEmpty() }?.let { items ->
+                    val result = service.lookupStatuses(items.mapNotNull { it.statusId })
+                    BasicSearchResponse(
+                        nextPage = nitterResult.nextPage,
+                        status = result
+                    )
+                } ?: BasicSearchResponse(null, emptyList())
+            } catch (e: MicroBlogException) {
+                e.printStackTrace()
+            }
+        }
         return try {
             service.searchV2(
                 "conversation_id:${_targetTweet?.conversationID}",
@@ -100,7 +119,7 @@ class TwitterConversationMediator(
             emptyList()
         }
         val descendantsResult = loadConversation(paging?.cursor)
-        val result = (ancestors + buildConversation(descendantsResult.status))
+        val result = (ancestors + descendantsResult.status)
 
         return CursorWithCustomOrderPagingResult(
             data = result,

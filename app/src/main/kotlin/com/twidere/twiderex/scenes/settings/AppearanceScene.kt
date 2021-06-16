@@ -152,7 +152,7 @@ fun AppearanceScene() {
                 )
                 ItemDivider()
                 // Scrolling Timeline
-                ItemHeader {
+                ItemHeader() {
                     Text(text = stringResource(id = R.string.scene_settings_appearance_section_header_scrolling_timeline))
                 }
                 switchItem(

@@ -300,6 +300,25 @@ class TwitterService(
         return data
     }
 
+    suspend fun lookupStatuses(id: List<String>): List<StatusV2> {
+        val response = resources.lookupTweets(
+            id.joinToString(","),
+            userFields = UserFields.values().joinToString(",") { it.value },
+            pollFields = PollFields.values().joinToString(",") { it.name },
+            placeFields = PlaceFields.values().joinToString(",") { it.value },
+            mediaFields = MediaFields.values()
+                .joinToString(",") { it.name },
+            expansions = Expansions.values().joinToString(",") { it.value },
+            tweetFields = TweetFields.values().joinToString(",") { it.value },
+        )
+        response.data?.forEach { status ->
+            response.includes?.let {
+                status.setExtra(it)
+            }
+        }
+        return response.data ?: emptyList()
+    }
+
     override suspend fun userPinnedStatus(userId: String): List<IStatus> {
         val user = lookupUser(userId)
         return listOfNotNull(user.pinnedTweetID?.let { lookupStatus(it) })
