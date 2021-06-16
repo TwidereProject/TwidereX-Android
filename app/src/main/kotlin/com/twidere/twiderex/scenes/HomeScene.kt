@@ -219,28 +219,36 @@ fun HomeScene() {
                     .fillMaxSize()
                     .nestedScroll(nestedScrollConnection)
             ) {
-                Pager(
-                    state = pagerState,
-                    modifier = Modifier.offset {
-                        if ((menus[pagerState.currentPage].withAppBar) ||
-                            tabPosition == AppearancePreferences.TabPosition.Top
-                        ) {
-                            if (hideAppBar) {
-                                IntOffset(
-                                    x = 0,
-                                    y = toolbarOffsetHeightPx.value.roundToInt() + toolbarHeightPx.roundToInt()
-                                )
-                            } else {
-                                IntOffset(
-                                    x = 0,
-                                    y = toolbarHeightPx.roundToInt()
-                                )
-                            }
-                        } else
-                            IntOffset.Zero
+                with(LocalDensity.current) {
+                    Pager(
+                        state = pagerState,
+                        modifier = Modifier.offset {
+                            if ((menus[pagerState.currentPage].withAppBar) ||
+                                tabPosition == AppearancePreferences.TabPosition.Top
+                            ) {
+                                if (hideAppBar) {
+                                    IntOffset(
+                                        x = 0,
+                                        y = toolbarOffsetHeightPx.value.roundToInt() + toolbarHeightPx.roundToInt()
+                                    )
+                                } else {
+                                    IntOffset(
+                                        x = 0,
+                                        y = toolbarHeightPx.roundToInt()
+                                    )
+                                }
+                            } else
+                                IntOffset.Zero
+                        }.padding(
+                            bottom = if (hideTab)
+                            // in case some list been covered by bottom bar
+                                toolbarOffsetHeightPx.value.roundToInt().toDp() + toolbarHeightPx.roundToInt().toDp()
+                            else
+                                toolbarHeightPx.roundToInt().toDp()
+                        )
+                    ) {
+                        menus[page].Content()
                     }
-                ) {
-                    menus[page].Content()
                 }
                 HomeAppBar(
                     modifier = if (hideAppBar)
