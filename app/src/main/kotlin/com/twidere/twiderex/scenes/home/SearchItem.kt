@@ -137,7 +137,7 @@ class SearchItem : HomeNavigationItem() {
                     if (source.isNotEmpty()) ListItem {
                         Text(
                             text = stringResource(id = R.string.scene_search_saved_search),
-                            style = MaterialTheme.typography.overline
+                            style = MaterialTheme.typography.button
                         )
                     }
                 }
@@ -191,13 +191,13 @@ class SearchItem : HomeNavigationItem() {
                             PlatformType.Twitter -> ListItem {
                                 Text(
                                     text = stringResource(id = R.string.scene_trends_world_wide),
-                                    style = MaterialTheme.typography.overline
+                                    style = MaterialTheme.typography.button
                                 )
                             }
                             PlatformType.Mastodon -> ListItem {
                                 Text(
                                     text = stringResource(id = R.string.scene_trends_now),
-                                    style = MaterialTheme.typography.overline
+                                    style = MaterialTheme.typography.button
                                 )
                             }
                             PlatformType.Fanfou -> TODO()

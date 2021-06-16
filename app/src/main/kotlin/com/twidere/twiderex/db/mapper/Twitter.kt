@@ -516,7 +516,7 @@ fun TwitterList.toDbList(accountKey: MicroBlogKey) = DbList(
 
 fun Trend.toDbTrend(accountKey: MicroBlogKey) = DbTrendWithHistory(
     trend = DbTrend(
-        _id = System.currentTimeMillis().toString(),
+        _id = UUID.randomUUID().toString(),
         trendKey = MicroBlogKey.twitter("$name:$url"),
         accountKey = accountKey,
         displayName = name ?: "",

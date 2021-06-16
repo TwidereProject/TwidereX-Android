@@ -80,9 +80,9 @@ fun SearchScene(keyword: String) {
 
     val viewModel =
         assistedViewModel<SearchSaveViewModel.AssistedFactory, SearchSaveViewModel>(
-            keyword
+            account, keyword
         ) {
-            it.create(keyword)
+            it.create(account, keyword)
         }
 
     val tabs = remember {

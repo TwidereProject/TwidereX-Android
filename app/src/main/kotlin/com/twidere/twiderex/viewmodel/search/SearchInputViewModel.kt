@@ -42,11 +42,11 @@ class SearchInputViewModel @AssistedInject constructor(
     }
 
     val source = liveData {
-        emitSource(repository.source)
+        emitSource(repository.searchHistory(account.accountKey))
     }
 
     val savedSource = liveData {
-        emitSource(repository.savedSource)
+        emitSource(repository.savedSearch(account.accountKey))
     }
 
     val expandSearch = MutableLiveData(false)
@@ -56,6 +56,6 @@ class SearchInputViewModel @AssistedInject constructor(
     }
 
     fun addOrUpgrade(content: String) = viewModelScope.launch {
-        repository.addOrUpgrade(content)
+        repository.addOrUpgrade(content, account.accountKey)
     }
 }

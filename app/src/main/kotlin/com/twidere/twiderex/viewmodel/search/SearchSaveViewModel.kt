@@ -23,6 +23,7 @@ package com.twidere.twiderex.viewmodel.search
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.repository.SearchRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -30,12 +31,13 @@ import kotlinx.coroutines.launch
 
 class SearchSaveViewModel @AssistedInject constructor(
     private val repository: SearchRepository,
+    @Assisted private val account: AccountDetails,
     @Assisted private val content: String,
 ) : ViewModel() {
 
     @dagger.assisted.AssistedFactory
     interface AssistedFactory {
-        fun create(content: String): SearchSaveViewModel
+        fun create(account: AccountDetails, content: String): SearchSaveViewModel
     }
 
     val loading = MutableLiveData(false)
@@ -44,7 +46,7 @@ class SearchSaveViewModel @AssistedInject constructor(
 
     init {
         viewModelScope.launch {
-            isSaved.postValue(repository.get(content)?.saved ?: false)
+            isSaved.postValue(repository.get(content, account.accountKey)?.saved ?: false)
         }
     }
 
@@ -52,7 +54,7 @@ class SearchSaveViewModel @AssistedInject constructor(
         viewModelScope.launch {
             loading.postValue(true)
             try {
-                repository.addOrUpgrade(content = content, saved = true)
+                repository.addOrUpgrade(content = content, accountKey = account.accountKey, saved = true)
                 isSaved.postValue(true)
             } catch (e: Exception) {
                 isSaved.postValue(false)

@@ -150,8 +150,8 @@
     <string name="scene_likes_title">Likes</string>
     <string name="scene_bookmark_title">Bookmark</string>
     <string name="scene_trends_title">Trends</string>
-    <string name="scene_trends_world_wide">TRENDS - WORLDWIDE</string>
-    <string name="scene_trends_now">TRENDING NOW</string>
+    <string name="scene_trends_world_wide">Trends - WorldWide</string>
+    <string name="scene_trends_now">Trending Now</string>
     <string name="scene_trends_accounts">%d people talking</string>
     <string name="scene_status_title">Tweet</string>
     <string name="scene_status_reply_single">1 Reply</string>

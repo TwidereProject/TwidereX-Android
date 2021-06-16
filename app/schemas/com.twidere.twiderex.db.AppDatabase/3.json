@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 3,
-    "identityHash": "52464ce8bca4ab04f5ccac849682e96e",
+    "identityHash": "dc07be0d28ea8489c5d3fbd70ece74ac",
     "entities": [
       {
         "tableName": "draft",
@@ -62,7 +62,7 @@
       },
       {
         "tableName": "search",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` TEXT NOT NULL, `content` TEXT NOT NULL, `lastActive` INTEGER NOT NULL, `saved` INTEGER NOT NULL, PRIMARY KEY(`_id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` TEXT NOT NULL, `content` TEXT NOT NULL, `lastActive` INTEGER NOT NULL, `saved` INTEGER NOT NULL, `accountKey` TEXT NOT NULL, PRIMARY KEY(`_id`))",
         "fields": [
           {
             "fieldPath": "_id",
@@ -87,6 +87,12 @@
             "columnName": "saved",
             "affinity": "INTEGER",
             "notNull": true
+          },
+          {
+            "fieldPath": "accountKey",
+            "columnName": "accountKey",
+            "affinity": "TEXT",
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -97,12 +103,13 @@
         },
         "indices": [
           {
-            "name": "index_search_content",
+            "name": "index_search_content_accountKey",
             "unique": true,
             "columnNames": [
-              "content"
+              "content",
+              "accountKey"
             ],
-            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_search_content` ON `${TABLE_NAME}` (`content`)"
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_search_content_accountKey` ON `${TABLE_NAME}` (`content`, `accountKey`)"
           }
         ],
         "foreignKeys": []
@@ -111,7 +118,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '52464ce8bca4ab04f5ccac849682e96e')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'dc07be0d28ea8489c5d3fbd70ece74ac')"
     ]
   }
 }

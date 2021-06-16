@@ -62,5 +62,8 @@ val AppDatabase_Migration_1_2 = object : Migration(1, 2) {
 val AppDatabase_Migration_2_3 = object : Migration(2, 3) {
     override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL("ALTER TABLE `search` ADD COLUMN `saved` INTEGER DEFAULT 0 NOT NULL")
+        database.execSQL("ALTER TABLE `search` ADD COLUMN `accountKey` TEXT DEFAULT 'null' NOT NULL")
+        database.execSQL("DROP INDEX `index_search_content`")
+        database.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_search_content_accountKey` ON `search` (`content`, `accountKey`)")
     }
 }
