@@ -52,6 +52,7 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.unit.Dp
+import kotlin.math.absoluteValue
 
 @Stable
 private class TopBarState(
@@ -185,7 +186,9 @@ fun NestedScrollScaffold(
                         width = placeable.width,
                         height = placeable.height + topBarState.offset,
                     ) {
-                        placeable.placeRelative(0, topBarState.offset)
+                        if (topBarState.offset.absoluteValue != placeable.height) {
+                            placeable.placeRelative(0, topBarState.offset)
+                        }
                     }
                 }
             ) {
