@@ -187,4 +187,11 @@ class TwidereXActivity : ComponentActivity() {
         super.onStop()
         connectivityManager.unregisterNetworkCallback(networkCallback)
     }
+
+    override fun onResume() {
+        super.onResume()
+        lifecycleScope.launchWhenResumed {
+            CustomTabSignInChannel.onClose()
+        }
+    }
 }

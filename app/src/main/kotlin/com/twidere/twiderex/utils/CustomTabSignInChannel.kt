@@ -26,10 +26,14 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 
 object CustomTabSignInChannel {
+    private var waiting = false
     private val channel: Channel<Uri> = Channel()
 
     suspend fun send(uri: Uri) {
-        channel.send(uri)
+        if (waiting) {
+            channel.send(uri)
+        }
+        waiting = false
     }
 
     fun canHandle(uri: Uri): Boolean {
@@ -38,9 +42,14 @@ object CustomTabSignInChannel {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     suspend fun waitOne(): Uri {
-        while (!channel.isEmpty) {
-            channel.receive()
-        }
+        waiting = true
         return channel.receive()
+    }
+
+    suspend fun onClose() {
+        if (waiting) {
+            send(Uri.EMPTY)
+            waiting = false
+        }
     }
 }
