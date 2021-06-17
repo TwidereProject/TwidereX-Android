@@ -427,6 +427,7 @@ private fun ComposeBody(
                 CompositionLocalProvider(LocalContentAlpha.provides(ContentAlpha.medium)) {
                     ComposeActions(
                         viewModel,
+                        showEmoji = showEmoji,
                         emojiButtonClicked = {
                             showEmoji = !showEmoji
                         },
@@ -1102,6 +1103,7 @@ private object ComposeVoteDefaults {
 @Composable
 private fun ComposeActions(
     viewModel: ComposeViewModel,
+    showEmoji: Boolean = false,
     emojiButtonClicked: () -> Unit = {},
 ) {
     val account = LocalActiveAccount.current ?: return
@@ -1161,8 +1163,12 @@ private fun ComposeActions(
                     }
                 ) {
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_mood_smile),
+                        painter = painterResource(id = if (showEmoji) R.drawable.ic_keyboard else R.drawable.ic_mood_smile),
                         contentDescription = null,
+                        tint = if (showEmoji)
+                            MaterialTheme.colors.primary
+                        else
+                            LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
                     )
                 }
             }
