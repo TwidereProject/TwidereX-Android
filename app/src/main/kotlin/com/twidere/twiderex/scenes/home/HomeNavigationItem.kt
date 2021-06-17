@@ -44,7 +44,7 @@ abstract class HomeNavigationItem {
     @Composable
     open fun Fab() {
         // implement this method to apply FloatingActionButton
-        // Workaround for Scaffold#256 which will filter out fab when size == 0
+        // FIXME: 2021/6/17 Workaround for Scaffold#256 which will filter out fab when size == 0
         Spacer(modifier = Modifier.sizeIn(minWidth = 1.dp, minHeight = 1.dp))
     }
 
