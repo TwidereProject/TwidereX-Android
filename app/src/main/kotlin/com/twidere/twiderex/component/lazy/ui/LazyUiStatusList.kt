@@ -20,6 +20,12 @@
  */
 package com.twidere.twiderex.component.lazy.ui
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -38,13 +44,16 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Divider
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -61,7 +70,9 @@ import com.twidere.twiderex.component.status.StatusThreadStyle
 import com.twidere.twiderex.component.status.TimelineStatusComponent
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiStatus
+import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun LazyUiStatusList(
     modifier: Modifier = Modifier,
@@ -78,47 +89,80 @@ fun LazyUiStatusList(
         empty = { EmptyStatusList() },
         loading = { LoadingStatusPlaceholder() }
     ) {
-        LazyColumn(
-            modifier = modifier,
-            state = state,
-            contentPadding = contentPadding,
-        ) {
-            header.invoke(this)
-            itemsIndexed(
-                items,
-                key = key
-            ) { index, item ->
-                if (item == null) {
-                    UiStatusPlaceholder()
-                    StatusDivider()
-                } else {
-                    Column {
-                        TimelineStatusComponent(
-                            item,
-                            threadStyle = StatusThreadStyle.WITH_AVATAR,
-                            lineUp = index > 0 && items.peek(index - 1)?.statusId == item.inReplyToStatusId,
-                            lineDown = index < items.itemCount - 1 && items.peek(index + 1)?.inReplyToStatusId == item.statusId,
-                        )
-                        when {
-                            loadingBetween.contains(item.statusKey) -> {
-                                Divider()
-                                LoadingProgress(
-                                    modifier = Modifier.align(Alignment.CenterHorizontally)
-                                )
-                                Divider()
-                            }
-                            item.isGap -> {
-                                LoadMoreButton(items, index, onLoadBetweenClicked, item)
-                            }
-                            else -> {
-                                StatusDivider()
+        Box {
+            LazyColumn(
+                modifier = modifier,
+                state = state,
+                contentPadding = contentPadding,
+            ) {
+                header.invoke(this)
+                itemsIndexed(
+                    items,
+                    key = key
+                ) { index, item ->
+                    if (item == null) {
+                        UiStatusPlaceholder()
+                        StatusDivider()
+                    } else {
+                        Column {
+                            TimelineStatusComponent(
+                                item,
+                                threadStyle = StatusThreadStyle.WITH_AVATAR,
+                                lineUp = index > 0 && items.peek(index - 1)?.statusId == item.inReplyToStatusId,
+                                lineDown = index < items.itemCount - 1 && items.peek(index + 1)?.inReplyToStatusId == item.statusId,
+                            )
+                            when {
+                                loadingBetween.contains(item.statusKey) -> {
+                                    Divider()
+                                    LoadingProgress(
+                                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                                    )
+                                    Divider()
+                                }
+                                item.isGap -> {
+                                    LoadMoreButton(items, index, onLoadBetweenClicked, item)
+                                }
+                                else -> {
+                                    StatusDivider()
+                                }
                             }
                         }
                     }
                 }
+                loadState(items.loadState.append) {
+                    items.retry()
+                }
             }
-            loadState(items.loadState.append) {
-                items.retry()
+            Box(
+                modifier = Modifier.align(Alignment.TopEnd),
+            ) {
+                AnimatedVisibility(
+                    visible = state.firstVisibleItemIndex != 0,
+                    enter = fadeIn() + slideInHorizontally(initialOffsetX = { it / 2 }),
+                    exit = slideOutHorizontally(targetOffsetX = { it / 2 }) + fadeOut(),
+                ) {
+                    Box(
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        val scope = rememberCoroutineScope()
+                        Surface(
+                            color = MaterialTheme.colors.onBackground.copy(alpha = 0.6f),
+                            shape = MaterialTheme.shapes.small,
+                            contentColor = MaterialTheme.colors.background,
+                            onClick = {
+                                scope.launch {
+                                    state.animateScrollToItem(0)
+                                }
+                            }
+                        ) {
+                            Text(
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                                text = state.firstVisibleItemIndex.toString(),
+                                style = MaterialTheme.typography.caption,
+                            )
+                        }
+                    }
+                }
             }
         }
     }
