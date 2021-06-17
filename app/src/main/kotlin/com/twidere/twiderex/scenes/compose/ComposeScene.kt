@@ -101,6 +101,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.coerceAtLeast
 import androidx.compose.ui.unit.dp
@@ -1269,15 +1270,36 @@ private fun ComposeActions(
                         navController.navigate(Route.Draft.List)
                     }
                 ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_note),
-                        contentDescription = stringResource(
-                            id = R.string.accessibility_scene_compose_draft
+                    Box {
+                        Icon(
+                            painter = painterResource(
+                                id = if (draftCount.value > 9)
+                                    R.drawable.ic_drafts_more
+                                else
+                                    R.drawable.ic_draft_number
+                            ),
+                            contentDescription = stringResource(
+                                id = R.string.accessibility_scene_compose_draft
+                            )
                         )
-                    )
+                        if (draftCount.value < 9) {
+                            Text(
+                                text = draftCount.value.toString(),
+                                style = MaterialTheme.typography.overline.copy(fontWeight = FontWeight.Bold),
+                                modifier = Modifier.align(Alignment.Center)
+                                    .padding(ComposeActionsDefaults.Draft.CountPadding)
+                            )
+                        }
+                    }
                 }
             }
         }
+    }
+}
+
+private object ComposeActionsDefaults {
+    object Draft {
+        val CountPadding = PaddingValues(end = 1.dp, bottom = 1.dp)
     }
 }
 
