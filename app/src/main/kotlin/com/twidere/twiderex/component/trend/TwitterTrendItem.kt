@@ -32,9 +32,8 @@ import com.twidere.twiderex.model.ui.UiTrend
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun TwitterTrendItem(trend: UiTrend, onClick: (UiTrend) -> Unit, header: @Composable () -> Unit = {}) {
+fun TwitterTrendItem(trend: UiTrend, onClick: (UiTrend) -> Unit) {
     Column {
-        header.invoke()
         ListItem(
             modifier = Modifier.clickable(
                 onClick = { onClick(trend) }

@@ -48,7 +48,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.paging.compose.collectAsLazyPagingItems
-import androidx.paging.compose.itemsIndexed
+import androidx.paging.compose.items
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
@@ -186,26 +186,39 @@ class SearchItem : HomeNavigationItem() {
                         )
                     }
                 }
-                itemsIndexed(trends) { index, trend ->
-                    trend?.let {
-                        when (account.type) {
-                            PlatformType.Twitter -> TwitterTrendItem(
-                                trend = it,
-                                onClick = {
-                                    viewModel.addOrUpgrade(it.query)
-                                    navigator.search(it.query)
-                                }
-                            ) {
-                                if (index == 0) Column {
-                                    Divider()
-                                    ListItem {
+                if (trends.itemCount > 0) {
+                    item {
+                        Column {
+                            Divider()
+                            ListItem {
+                                when (account.type) {
+                                    PlatformType.Twitter ->
                                         Text(
                                             text = stringResource(id = R.string.scene_trends_world_wide),
                                             style = MaterialTheme.typography.button
                                         )
-                                    }
+                                    PlatformType.StatusNet -> TODO()
+                                    PlatformType.Fanfou -> TODO()
+                                    PlatformType.Mastodon ->
+                                        Text(
+                                            text = stringResource(id = R.string.scene_trends_world_wide),
+                                            style = MaterialTheme.typography.button
+                                        )
                                 }
                             }
+                        }
+                    }
+                }
+                items(trends) {
+                    it?.let { trend ->
+                        when (account.type) {
+                            PlatformType.Twitter -> TwitterTrendItem(
+                                trend = it,
+                                onClick = {
+                                    viewModel.addOrUpgrade(trend.query)
+                                    navigator.search(trend.query)
+                                }
+                            )
                             PlatformType.StatusNet -> TODO()
                             PlatformType.Fanfou -> TODO()
                             PlatformType.Mastodon -> MastodonTrendItem(
@@ -213,17 +226,7 @@ class SearchItem : HomeNavigationItem() {
                                 onClick = {
                                     navigator.hashtag(it.query)
                                 }
-                            ) {
-                                if (index == 0) Column {
-                                    Divider()
-                                    ListItem {
-                                        Text(
-                                            text = stringResource(id = R.string.scene_trends_now),
-                                            style = MaterialTheme.typography.button
-                                        )
-                                    }
-                                }
-                            }
+                            )
                         }
                     }
                 }

@@ -50,9 +50,8 @@ import com.twidere.twiderex.model.ui.UiTrendHistory
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun MastodonTrendItem(trend: UiTrend, onClick: (UiTrend) -> Unit, header: @Composable () -> Unit = {}) {
+fun MastodonTrendItem(trend: UiTrend, onClick: (UiTrend) -> Unit) {
     Column {
-        header.invoke()
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.clickable(
