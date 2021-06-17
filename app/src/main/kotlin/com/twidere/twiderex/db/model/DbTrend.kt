@@ -47,7 +47,11 @@ data class DbTrendWithHistory(
     @Embedded
     val trend: DbTrend,
 
-    @Relation(parentColumn = "trendKey", entityColumn = "trendKey")
+    @Relation(
+        parentColumn = "trendKey",
+        entityColumn = "trendKey",
+        entity = DbTrendHistory::class
+    )
     val history: List<DbTrendHistory>,
 )
 

@@ -22,6 +22,7 @@ package com.twidere.twiderex.component.trend
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
@@ -49,35 +50,38 @@ import com.twidere.twiderex.model.ui.UiTrendHistory
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun MastodonTrendItem(trend: UiTrend, onClick: (UiTrend) -> Unit) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.clickable(
-            onClick = { onClick(trend) },
-        )
-    ) {
-        ListItem(
-            modifier = Modifier.weight(1f),
-            secondaryText = {
-                Text(text = stringResource(id = R.string.scene_trends_accounts, trend.dailyAccounts), style = MaterialTheme.typography.body2)
-            },
-            text = {
-                Text(text = trend.displayName, style = MaterialTheme.typography.subtitle1)
-            },
-        )
+fun MastodonTrendItem(trend: UiTrend, onClick: (UiTrend) -> Unit, header: @Composable () -> Unit = {}) {
+    Column {
+        header.invoke()
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(end = MastodonTrendItemDefaults.ContentPadding)
-        ) {
-            Text(text = "${trend.dailyUses}", style = MaterialTheme.typography.body1)
-            Spacer(modifier = Modifier.width(MastodonTrendItemDefaults.ContentSpacing))
-            MastodonTrendChart(
-                trendHistories = trend.sortedHistory,
-                modifier = Modifier
-                    .size(MastodonTrendItemDefaults.ChartWidth, MastodonTrendItemDefaults.ChartHeight),
-                lineChartPaddingTop = MastodonTrendItemDefaults.ContentPadding,
-                lineChartPaddingBottom = MastodonTrendItemDefaults.ContentPadding
+            modifier = Modifier.clickable(
+                onClick = { onClick(trend) },
             )
+        ) {
+            ListItem(
+                modifier = Modifier.weight(1f),
+                secondaryText = {
+                    Text(text = stringResource(id = R.string.scene_trends_accounts, trend.dailyAccounts), style = MaterialTheme.typography.body2)
+                },
+                text = {
+                    Text(text = trend.displayName, style = MaterialTheme.typography.subtitle1)
+                },
+            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(end = MastodonTrendItemDefaults.ContentPadding)
+            ) {
+                Text(text = "${trend.dailyUses}", style = MaterialTheme.typography.body1)
+                Spacer(modifier = Modifier.width(MastodonTrendItemDefaults.ContentSpacing))
+                MastodonTrendChart(
+                    trendHistories = trend.sortedHistory,
+                    modifier = Modifier
+                        .size(MastodonTrendItemDefaults.ChartWidth, MastodonTrendItemDefaults.ChartHeight),
+                    lineChartPaddingTop = MastodonTrendItemDefaults.ContentPadding,
+                    lineChartPaddingBottom = MastodonTrendItemDefaults.ContentPadding
+                )
+            }
         }
     }
 }

@@ -20,33 +20,28 @@
  */
 package com.twidere.twiderex.repository
 
+import androidx.paging.PagingData
 import com.twidere.services.microblog.TrendService
 import com.twidere.twiderex.db.CacheDatabase
-import com.twidere.twiderex.db.mapper.toDbTrend
-import com.twidere.twiderex.db.model.saveToDb
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.ui.UiTrend
 import com.twidere.twiderex.model.ui.UiTrend.Companion.toUi
+import com.twidere.twiderex.paging.mediator.trend.TrendMediator
+import com.twidere.twiderex.paging.mediator.trend.TrendMediator.Companion.toUi
+import kotlinx.coroutines.flow.Flow
 
 class TrendRepository(private val database: CacheDatabase) {
-    private val defaultLimit = 50
     private val worldWideId = "1"
 
-    suspend fun trends(
+    fun trendsSource(
         account: AccountDetails,
         locationId: String = worldWideId
-    ): List<UiTrend> {
-        val result = try {
-            val response = (account.service as TrendService).trends(locationId, defaultLimit).map {
-                it.toDbTrend(accountKey = account.accountKey)
-            }
-            database.trendDao().clearAll(account.accountKey)
-            database.trendHistoryDao().clearAll(account.accountKey)
-            response.saveToDb(database)
-            response
-        } catch (e: Exception) {
-            database.trendDao().find(account.accountKey, defaultLimit)
-        }
-        return result.map { it.toUi() }
+    ): Flow<PagingData<UiTrend>> {
+        return TrendMediator(
+            database = database,
+            service = account.service as TrendService,
+            accountKey = account.accountKey,
+            locationId = locationId
+        ).pager().toUi()
     }
 }

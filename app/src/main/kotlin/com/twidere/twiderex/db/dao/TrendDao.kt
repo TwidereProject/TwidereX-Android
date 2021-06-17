@@ -20,6 +20,7 @@
  */
 package com.twidere.twiderex.db.dao
 
+import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -35,8 +36,14 @@ interface TrendDao {
     suspend fun insertAll(trends: List<DbTrend>)
 
     @Transaction
-    @Query("SELECT * FROM trends where accountKey == :accountKey  LIMIT :limit")
+    @Query("SELECT * FROM trends WHERE accountKey == :accountKey  LIMIT :limit")
     suspend fun find(accountKey: MicroBlogKey, limit: Int): List<DbTrendWithHistory>
+
+    @Transaction
+    @Query("SELECT * FROM trends WHERE accountKey == :accountKey")
+    fun getPagingSource(
+        accountKey: MicroBlogKey,
+    ): PagingSource<Int, DbTrendWithHistory>
 
     @Query("DELETE FROM trends WHERE accountKey == :accountKey")
     suspend fun clearAll(

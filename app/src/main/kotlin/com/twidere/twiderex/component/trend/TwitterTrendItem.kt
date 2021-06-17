@@ -21,6 +21,7 @@
 package com.twidere.twiderex.component.trend
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ListItem
 import androidx.compose.material.MaterialTheme
@@ -31,12 +32,15 @@ import com.twidere.twiderex.model.ui.UiTrend
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun TwitterTrendItem(trend: UiTrend, onClick: (UiTrend) -> Unit) {
-    ListItem(
-        modifier = Modifier.clickable(
-            onClick = { onClick(trend) }
-        )
-    ) {
-        Text(text = trend.displayName, style = MaterialTheme.typography.subtitle1)
+fun TwitterTrendItem(trend: UiTrend, onClick: (UiTrend) -> Unit, header: @Composable () -> Unit = {}) {
+    Column {
+        header.invoke()
+        ListItem(
+            modifier = Modifier.clickable(
+                onClick = { onClick(trend) }
+            )
+        ) {
+            Text(text = trend.displayName, style = MaterialTheme.typography.subtitle1)
+        }
     }
 }

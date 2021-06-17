@@ -21,6 +21,7 @@
 package com.twidere.twiderex.db
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.paging.PagingSource
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -103,6 +104,19 @@ class DbTrendTest {
         assert(mastodonTrends[0].trend.url.startsWith("https://mastodon"))
         // check if the history trend key is the same to trend
         Assert.assertEquals(mastodonTrends[0].trend.trendKey, mastodonTrends[0].history[0].trendKey)
+    }
+
+    @Test
+    fun testPagingSource() = runBlocking {
+        trends.saveToDb(cacheDatabase)
+        val pagingSource = cacheDatabase.trendDao().getPagingSource(twitterAccountKey)
+        val resultFirst = pagingSource.load(PagingSource.LoadParams.Refresh(null, loadSize = 2, false))
+        Assert.assertEquals(2, (resultFirst as PagingSource.LoadResult.Page).data.size)
+        Assert.assertEquals("tweet 0", resultFirst.data[0].trend.displayName)
+
+        val resultLoadMore = pagingSource.load(PagingSource.LoadParams.Append(resultFirst.nextKey ?: 2, loadSize = 2, false))
+        Assert.assertEquals(2, (resultLoadMore as PagingSource.LoadResult.Page).data.size)
+        Assert.assertEquals("tweet 2", resultLoadMore.data[0].trend.displayName)
     }
 
     @Test

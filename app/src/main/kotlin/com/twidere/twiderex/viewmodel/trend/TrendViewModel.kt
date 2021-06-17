@@ -21,7 +21,6 @@
 package com.twidere.twiderex.viewmodel.trend
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.liveData
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.repository.TrendRepository
 import dagger.assisted.Assisted
@@ -37,7 +36,7 @@ class TrendViewModel @AssistedInject constructor(
         fun create(account: AccountDetails): TrendViewModel
     }
 
-    val source = liveData {
-        emit(repository.trends(account))
+    val source by lazy {
+        repository.trendsSource(account)
     }
 }

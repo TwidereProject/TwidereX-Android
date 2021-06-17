@@ -47,6 +47,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.itemsIndexed
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
@@ -86,7 +88,7 @@ class SearchItem : HomeNavigationItem() {
             it.create(account = account)
         }
         val source by viewModel.savedSource.observeAsState(initial = emptyList())
-        val trends by trendViewModel.source.observeAsState(initial = emptyList())
+        val trends = trendViewModel.source.collectAsLazyPagingItems()
         val navigator = LocalNavigator.current
         val searchCount = 3
         val expandSearch by viewModel.expandSearch.observeAsState(false)
@@ -184,44 +186,45 @@ class SearchItem : HomeNavigationItem() {
                         )
                     }
                 }
-                item {
-                    if (trends.isNotEmpty()) Column {
-                        Divider()
+                itemsIndexed(trends) { index, trend ->
+                    trend?.let {
                         when (account.type) {
-                            PlatformType.Twitter -> ListItem {
-                                Text(
-                                    text = stringResource(id = R.string.scene_trends_world_wide),
-                                    style = MaterialTheme.typography.button
-                                )
+                            PlatformType.Twitter -> TwitterTrendItem(
+                                trend = it,
+                                onClick = {
+                                    viewModel.addOrUpgrade(it.query)
+                                    navigator.search(it.query)
+                                }
+                            ) {
+                                if (index == 0) Column {
+                                    Divider()
+                                    ListItem {
+                                        Text(
+                                            text = stringResource(id = R.string.scene_trends_world_wide),
+                                            style = MaterialTheme.typography.button
+                                        )
+                                    }
+                                }
                             }
-                            PlatformType.Mastodon -> ListItem {
-                                Text(
-                                    text = stringResource(id = R.string.scene_trends_now),
-                                    style = MaterialTheme.typography.button
-                                )
-                            }
-                            PlatformType.Fanfou -> TODO()
                             PlatformType.StatusNet -> TODO()
+                            PlatformType.Fanfou -> TODO()
+                            PlatformType.Mastodon -> MastodonTrendItem(
+                                trend = it,
+                                onClick = {
+                                    navigator.hashtag(it.query)
+                                }
+                            ) {
+                                if (index == 0) Column {
+                                    Divider()
+                                    ListItem {
+                                        Text(
+                                            text = stringResource(id = R.string.scene_trends_now),
+                                            style = MaterialTheme.typography.button
+                                        )
+                                    }
+                                }
+                            }
                         }
-                    }
-                }
-                items(trends) { trend ->
-                    when (account.type) {
-                        PlatformType.Twitter -> TwitterTrendItem(
-                            trend = trend,
-                            onClick = {
-                                viewModel.addOrUpgrade(it.query)
-                                navigator.search(it.query)
-                            }
-                        )
-                        PlatformType.StatusNet -> TODO()
-                        PlatformType.Fanfou -> TODO()
-                        PlatformType.Mastodon -> MastodonTrendItem(
-                            trend = trend,
-                            onClick = {
-                                navigator.hashtag(it.query)
-                            }
-                        )
                     }
                 }
             }
