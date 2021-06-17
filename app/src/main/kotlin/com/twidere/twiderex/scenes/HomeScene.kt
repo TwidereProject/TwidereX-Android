@@ -24,6 +24,7 @@ import androidx.activity.compose.BackHandler
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.Crossfade
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.animateFloat
@@ -60,7 +61,6 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -171,8 +171,8 @@ fun HomeScene() {
                 HomeDrawer(scaffoldState)
             },
             floatingActionButton = {
-                key(pagerState.currentPage) {
-                    menus[pagerState.currentPage].Fab()
+                Crossfade(pagerState.currentPage) {
+                    menus[it].Fab()
                 }
             },
             enableFloatingActionButtonNestedScroll = hideFab,
