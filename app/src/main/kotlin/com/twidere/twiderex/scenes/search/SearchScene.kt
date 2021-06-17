@@ -25,6 +25,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -133,19 +134,19 @@ fun SearchScene(keyword: String) {
                                             maxLines = 1,
                                             textAlign = TextAlign.Start,
                                         )
-
-                                        IconButton(
-                                            onClick = {
-                                                if (!loading && !isSaved) viewModel.save()
-                                            }
-                                        ) {
-                                            if (loading) {
-                                                CircularProgressIndicator(
-                                                    modifier = Modifier.size(SearchSceneDefaults.Loading.size),
-                                                    strokeWidth = SearchSceneDefaults.Loading.width,
-                                                    color = SearchSceneDefaults.Loading.color
-                                                )
-                                            } else if (!isSaved) {
+                                        if (loading) {
+                                            CircularProgressIndicator(
+                                                modifier = Modifier.size(SearchSceneDefaults.Loading.size)
+                                                    .padding(SearchSceneDefaults.Loading.padding),
+                                                strokeWidth = SearchSceneDefaults.Loading.width,
+                                                color = SearchSceneDefaults.Loading.color
+                                            )
+                                        } else if (!isSaved) {
+                                            IconButton(
+                                                onClick = {
+                                                    if (!loading && !isSaved) viewModel.save()
+                                                }
+                                            ) {
                                                 Icon(
                                                     painter = painterResource(id = R.drawable.ic_device_floppy),
                                                     contentDescription = stringResource(
@@ -206,7 +207,8 @@ fun SearchScene(keyword: String) {
 
 private object SearchSceneDefaults {
     object Loading {
-        val size = 24.dp
+        val padding = PaddingValues(12.dp)
+        val size = 48.dp
         val width = 2.dp
         val color = Color(0x21212121)
     }

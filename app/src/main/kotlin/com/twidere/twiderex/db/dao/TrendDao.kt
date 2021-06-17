@@ -24,6 +24,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import com.twidere.twiderex.db.model.DbTrend
 import com.twidere.twiderex.db.model.DbTrendWithHistory
 import com.twidere.twiderex.model.MicroBlogKey
@@ -33,6 +34,7 @@ interface TrendDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(trends: List<DbTrend>)
 
+    @Transaction
     @Query("SELECT * FROM trends where accountKey == :accountKey  LIMIT :limit")
     suspend fun find(accountKey: MicroBlogKey, limit: Int): List<DbTrendWithHistory>
 
