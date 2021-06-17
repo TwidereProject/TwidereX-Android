@@ -70,7 +70,7 @@ fun LazyUiStatusList(
     loadingBetween: List<MicroBlogKey> = emptyList(),
     contentPadding: PaddingValues = PaddingValues(0.dp),
     onLoadBetweenClicked: (current: MicroBlogKey, next: MicroBlogKey) -> Unit = { _, _ -> },
-    // key: ((index: Int) -> Any) = { items.peekOrNull(it)?.hashCode() ?: it },
+    key: ((index: Int) -> Any) = { items.peek(it)?.hashCode() ?: it },
     header: LazyListScope.() -> Unit = {},
 ) {
     LazyUiList(
@@ -86,7 +86,7 @@ fun LazyUiStatusList(
             header.invoke(this)
             itemsIndexed(
                 items,
-                // key = key
+                key = key
             ) { index, item ->
                 if (item == null) {
                     UiStatusPlaceholder()
