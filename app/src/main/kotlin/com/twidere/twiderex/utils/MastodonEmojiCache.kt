@@ -23,19 +23,20 @@ package com.twidere.twiderex.utils
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.liveData
 import com.twidere.services.mastodon.MastodonService
-import com.twidere.services.mastodon.model.Emoji
 import com.twidere.twiderex.model.AccountDetails
+import com.twidere.twiderex.model.ui.UiEmoji
+import com.twidere.twiderex.model.ui.UiEmoji.Companion.toUi
 
 object MastodonEmojiCache {
-    private val items = hashMapOf<String, LiveData<List<Emoji>>>()
-    fun get(account: AccountDetails): LiveData<List<Emoji>> {
+    private val items = hashMapOf<String, LiveData<List<UiEmoji>>>()
+    fun get(account: AccountDetails): LiveData<List<UiEmoji>> {
         return items.getOrPut(account.accountKey.host) {
             liveData {
                 account.service.let {
                     it as MastodonService
                 }.let {
                     try {
-                        it.emojis()
+                        it.emojis().toUi()
                     } catch (e: Throwable) {
                         emptyList()
                     }
