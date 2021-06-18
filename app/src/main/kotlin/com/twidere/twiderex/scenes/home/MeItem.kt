@@ -20,13 +20,13 @@
  */
 package com.twidere.twiderex.scenes.home
 
+import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.UserComponent
-import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.ui.LocalActiveAccount
 
 class MeItem : HomeNavigationItem() {
@@ -44,7 +44,7 @@ class MeItem : HomeNavigationItem() {
     override fun Content() {
         val account = LocalActiveAccount.current
         account?.toUi()?.let { user ->
-            InAppNotificationScaffold {
+            Scaffold {
                 UserComponent(userKey = user.userKey)
             }
         }

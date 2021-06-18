@@ -20,13 +20,13 @@
  */
 package com.twidere.twiderex.scenes.home
 
+import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.TimelineComponent
-import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.viewmodel.timeline.MentionsTimelineViewModel
@@ -47,7 +47,7 @@ class MentionItem : HomeNavigationItem() {
             ) {
                 it.create(account)
             }
-        InAppNotificationScaffold {
+        Scaffold {
             TimelineComponent(
                 viewModel = viewModel,
                 lazyListController = lazyListController,

@@ -24,6 +24,7 @@ import androidx.activity.compose.BackHandler
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.Crossfade
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.animateFloat
@@ -40,7 +41,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -52,7 +52,6 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.ListItem
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
 import androidx.compose.material.ScaffoldState
 import androidx.compose.material.Surface
 import androidx.compose.material.TabRowDefaults
@@ -62,7 +61,6 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -71,20 +69,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
-import androidx.compose.ui.input.nestedscroll.NestedScrollSource
-import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.UserMetrics
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarDefaults
+import com.twidere.twiderex.component.foundation.ApplyNotification
 import com.twidere.twiderex.component.foundation.IconTabsComponent
+import com.twidere.twiderex.component.foundation.NestedScrollScaffold
 import com.twidere.twiderex.component.foundation.Pager
 import com.twidere.twiderex.component.foundation.PagerState
 import com.twidere.twiderex.component.foundation.rememberPagerState
@@ -111,8 +105,6 @@ import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.ui.mediumEmphasisContentContentColor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import kotlin.math.abs
-import kotlin.math.roundToInt
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
@@ -151,40 +143,16 @@ fun HomeScene() {
             }
         }
     }
-    // nested scroll
-    val toolbarHeightPx = with(LocalDensity.current) { AppBarDefaults.AppBarHeight.roundToPx().toFloat() }
-    val toolbarOffsetHeightPx = remember { mutableStateOf(0f) }
-    val fabOffsetPx = remember {
-        mutableStateOf(0f)
-    }
-    val nestedScrollConnection = remember {
-        object : NestedScrollConnection {
-            override fun onPostScroll(
-                consumed: Offset,
-                available: Offset,
-                source: NestedScrollSource
-            ): Offset {
-                val delta = consumed.y
-                val barOffset = toolbarOffsetHeightPx.value + delta
-                toolbarOffsetHeightPx.value = barOffset.coerceIn(-toolbarHeightPx, 0f)
-                fabOffsetPx.value = fabOffsetPx.value + delta
-                return Offset.Zero
-            }
-        }
-    }
-
+    ApplyNotification(scaffoldState.snackbarHostState)
     TwidereScene {
-        Scaffold(
+        NestedScrollScaffold(
             scaffoldState = scaffoldState,
+            enableBottomBarNestedScroll = hideTab,
             bottomBar = {
                 if (tabPosition == AppearancePreferences.TabPosition.Bottom) {
                     HomeBottomNavigation(
-                        // navigation bar height is the same to toolbar
-                        modifier = if (hideTab)
-                            Modifier.offset { IntOffset(x = 0, y = - toolbarOffsetHeightPx.value.roundToInt()) }
-                        else
-                            Modifier,
-                        menus, pagerState.currentPage,
+                        items = menus,
+                        selectedItem = pagerState.currentPage,
                     ) {
                         if (pagerState.currentPage == it) {
                             scope.launch {
@@ -203,63 +171,35 @@ fun HomeScene() {
                 HomeDrawer(scaffoldState)
             },
             floatingActionButton = {
-                with(LocalDensity.current) {
-                    val maxFabOffset = menus[pagerState.currentPage].fabSize.roundToPx() + HomeSceneDefaults.FabSpacing.roundToPx() + toolbarHeightPx
-                    val realFabOffset = maxFabOffset * abs(toolbarOffsetHeightPx.value) / toolbarHeightPx
-                    key(pagerState.currentPage) {
-                        Box(modifier = if (hideFab) Modifier.offset { IntOffset(x = 0, y = realFabOffset.roundToInt()) } else Modifier) {
-                            menus[pagerState.currentPage].Fab()
-                        }
-                    }
+                Crossfade(pagerState.currentPage) {
+                    menus[it].Fab()
                 }
-            }
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .nestedScroll(nestedScrollConnection)
-            ) {
-                Pager(
-                    state = pagerState,
-                    modifier = Modifier.offset {
-                        if ((menus[pagerState.currentPage].withAppBar) ||
-                            tabPosition == AppearancePreferences.TabPosition.Top
-                        ) {
-                            if (hideAppBar) {
-                                IntOffset(
-                                    x = 0,
-                                    y = toolbarOffsetHeightPx.value.roundToInt() + toolbarHeightPx.roundToInt()
-                                )
-                            } else {
-                                IntOffset(
-                                    x = 0,
-                                    y = toolbarHeightPx.roundToInt()
-                                )
-                            }
-                        } else
-                            IntOffset.Zero
-                    }
-                ) {
-                    menus[page].Content()
-                }
+            },
+            enableFloatingActionButtonNestedScroll = hideFab,
+            topBar = {
                 HomeAppBar(
-                    modifier = if (hideAppBar)
-                        Modifier.offset { IntOffset(0, toolbarOffsetHeightPx.value.roundToInt()) }
-                    else
-                        Modifier,
                     tabPosition = tabPosition,
                     menus = menus,
                     pagerState = pagerState,
                     scaffoldState = scaffoldState,
                     scope = scope,
                 )
+            },
+            enableTopBarNestedScroll = hideAppBar
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(it)
+            ) {
+                Pager(
+                    state = pagerState,
+                ) {
+                    menus[page].Content()
+                }
             }
         }
     }
-}
-
-private object HomeSceneDefaults {
-    val FabSpacing = 16.dp
 }
 
 @OptIn(ExperimentalAnimationApi::class)

@@ -34,6 +34,7 @@ import androidx.compose.material.ListItem
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ProvideTextStyle
+import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.History
@@ -49,7 +50,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.AppBar
-import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.ui.LocalActiveAccount
@@ -78,7 +78,7 @@ class SearchItem : HomeNavigationItem() {
             }
         val source by viewModel.source.observeAsState(initial = emptyList())
         val navigator = LocalNavigator.current
-        InAppNotificationScaffold(
+        Scaffold(
             topBar = {
                 AppBar(
                     title = {
