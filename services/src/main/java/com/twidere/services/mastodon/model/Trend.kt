@@ -18,25 +18,28 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.db.model
+package com.twidere.services.mastodon.model
 
-import androidx.room.Entity
-import androidx.room.Index
-import androidx.room.PrimaryKey
-import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.services.microblog.model.ITrend
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-@Entity(
-    tableName = "search",
-    indices = [Index(value = ["content", "accountKey"], unique = true)],
-)
-data class DbSearch(
-    /**
-     * Id that being used in the database
-     */
-    @PrimaryKey
-    val _id: String,
-    val content: String,
-    val lastActive: Long,
-    val saved: Boolean,
-    val accountKey: MicroBlogKey
+@Serializable
+data class Trend(
+    @SerialName("history")
+    val history: List<TrendHistory>? = null,
+    @SerialName("name")
+    val name: String? = null,
+    @SerialName("url")
+    val url: String? = null
+) : ITrend
+
+@Serializable
+data class TrendHistory(
+    @SerialName("accounts")
+    val accounts: String? = null,
+    @SerialName("day")
+    val day: String? = null,
+    @SerialName("uses")
+    val uses: String? = null
 )

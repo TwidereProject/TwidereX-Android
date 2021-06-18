@@ -22,28 +22,43 @@ package com.twidere.twiderex.repository
 
 import com.twidere.twiderex.db.AppDatabase
 import com.twidere.twiderex.db.model.DbSearch
+import com.twidere.twiderex.model.MicroBlogKey
 import java.util.UUID
 
 class SearchRepository(
     private val database: AppDatabase
 ) {
-    val source by lazy {
-        database.searchDao().getAll()
-    }
+    fun searchHistory(accountKey: MicroBlogKey) = database.searchDao().getAllHistory(accountKey)
+
+    fun savedSearch(accountKey: MicroBlogKey) = database.searchDao().getAllSaved(accountKey)
 
     suspend fun addOrUpgrade(
         content: String,
+        accountKey: MicroBlogKey,
+        saved: Boolean = false
     ) {
-        database.searchDao().insertAll(
-            DbSearch(
-                _id = UUID.randomUUID().toString(),
-                content = content,
-                lastActive = System.currentTimeMillis()
+        val search = database.searchDao().get(content, accountKey)?.let {
+            it.copy(
+                lastActive = System.currentTimeMillis(),
+                saved = if (it.saved) it.saved else saved
             )
+        } ?: DbSearch(
+            _id = UUID.randomUUID().toString(),
+            content = content,
+            lastActive = System.currentTimeMillis(),
+            saved = false,
+            accountKey = accountKey
+        )
+        database.searchDao().insertAll(
+            listOf(search)
         )
     }
 
     suspend fun remove(item: DbSearch) {
         database.searchDao().remove(item)
+    }
+
+    suspend fun get(content: String, accountKey: MicroBlogKey): DbSearch? {
+        return database.searchDao().get(content, accountKey)
     }
 }

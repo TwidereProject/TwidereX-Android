@@ -20,21 +20,13 @@
  */
 package com.twidere.services.service.mastodon
 
-import com.twidere.services.api.common.mockRetrofit
-import com.twidere.services.api.mastodon.MastodonRequest2AssetPathConvertor
-import com.twidere.services.mastodon.MastodonService
+import com.twidere.services.api.common.mockMastodonService
 import com.twidere.services.microblog.ListsService
 import com.twidere.services.service.ListServiceTest
 
 class MastodonListServiceTest : ListServiceTest() {
     override fun createService(): ListsService {
-        return MastodonService(
-            "", "",
-            resources = mockRetrofit(
-                "https://test.mastodon.com/",
-                MastodonRequest2AssetPathConvertor()
-            )
-        )
+        return mockMastodonService()
     }
 
     override fun testListId(): String {

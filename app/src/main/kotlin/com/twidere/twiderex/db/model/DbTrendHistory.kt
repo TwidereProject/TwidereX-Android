@@ -26,17 +26,15 @@ import androidx.room.PrimaryKey
 import com.twidere.twiderex.model.MicroBlogKey
 
 @Entity(
-    tableName = "search",
-    indices = [Index(value = ["content", "accountKey"], unique = true)],
+    tableName = "trend_histories",
+    indices = [Index(value = ["trendKey", "day"], unique = true)],
 )
-data class DbSearch(
-    /**
-     * Id that being used in the database
-     */
+data class DbTrendHistory(
     @PrimaryKey
     val _id: String,
-    val content: String,
-    val lastActive: Long,
-    val saved: Boolean,
+    val trendKey: MicroBlogKey,
+    val day: Long,
+    val uses: Long,
+    val accounts: Long,
     val accountKey: MicroBlogKey
 )

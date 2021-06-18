@@ -18,25 +18,22 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.db.model
+package com.twidere.twiderex.db.dao
 
-import androidx.room.Entity
-import androidx.room.Index
-import androidx.room.PrimaryKey
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import com.twidere.twiderex.db.model.DbTrendHistory
 import com.twidere.twiderex.model.MicroBlogKey
 
-@Entity(
-    tableName = "search",
-    indices = [Index(value = ["content", "accountKey"], unique = true)],
-)
-data class DbSearch(
-    /**
-     * Id that being used in the database
-     */
-    @PrimaryKey
-    val _id: String,
-    val content: String,
-    val lastActive: Long,
-    val saved: Boolean,
-    val accountKey: MicroBlogKey
-)
+@Dao
+interface TrendHistoryDao {
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAll(histories: List<DbTrendHistory>)
+
+    @Query("DELETE FROM trend_histories WHERE accountKey == :accountKey")
+    suspend fun clearAll(
+        accountKey: MicroBlogKey,
+    )
+}

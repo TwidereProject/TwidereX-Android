@@ -31,6 +31,7 @@ import androidx.room.Room
 import androidx.work.WorkManager
 import com.twidere.twiderex.db.AppDatabase
 import com.twidere.twiderex.db.AppDatabase_Migration_1_2
+import com.twidere.twiderex.db.AppDatabase_Migration_2_3
 import com.twidere.twiderex.db.CacheDatabase
 import dagger.Module
 import dagger.Provides
@@ -66,6 +67,7 @@ object AndroidModule {
     fun provideDraftDatabase(@ApplicationContext context: Context): AppDatabase =
         Room.databaseBuilder(context, AppDatabase::class.java, "twiderex-draft-db")
             .addMigrations(AppDatabase_Migration_1_2)
+            .addMigrations(AppDatabase_Migration_2_3)
             .build()
 
     @Provides

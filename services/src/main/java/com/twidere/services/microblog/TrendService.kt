@@ -18,25 +18,13 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.db.model
+package com.twidere.services.microblog
 
-import androidx.room.Entity
-import androidx.room.Index
-import androidx.room.PrimaryKey
-import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.services.microblog.model.ITrend
 
-@Entity(
-    tableName = "search",
-    indices = [Index(value = ["content", "accountKey"], unique = true)],
-)
-data class DbSearch(
-    /**
-     * Id that being used in the database
-     */
-    @PrimaryKey
-    val _id: String,
-    val content: String,
-    val lastActive: Long,
-    val saved: Boolean,
-    val accountKey: MicroBlogKey
-)
+interface TrendService {
+    suspend fun trends(
+        locationId: String,
+        limit: Int? = null
+    ): List<ITrend>
+}

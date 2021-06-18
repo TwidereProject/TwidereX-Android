@@ -18,25 +18,16 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.db.model
+package com.twidere.services.twitter.api
 
-import androidx.room.Entity
-import androidx.room.Index
-import androidx.room.PrimaryKey
-import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.services.twitter.model.TwitterTrendsResponseV1
+import retrofit2.http.GET
+import retrofit2.http.Query
 
-@Entity(
-    tableName = "search",
-    indices = [Index(value = ["content", "accountKey"], unique = true)],
-)
-data class DbSearch(
-    /**
-     * Id that being used in the database
-     */
-    @PrimaryKey
-    val _id: String,
-    val content: String,
-    val lastActive: Long,
-    val saved: Boolean,
-    val accountKey: MicroBlogKey
-)
+interface TrendsResources {
+    @GET("/1.1/trends/place.json")
+    suspend fun trends(
+        @Query("id") id: String,
+        @Query("exclude") exclude: String? = null // Setting this equal to hashtags will remove all hashtags from the trends list.
+    ): List<TwitterTrendsResponseV1>
+}
