@@ -156,7 +156,7 @@ compose = [
 ]
 paging = [
     "paging-runtime",
-    "paging-compose",
+#     "paging-compose",
 ]
 lifecycle = [
     "lifecycle-runtime-ktx",

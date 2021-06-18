@@ -20,6 +20,12 @@
  */
 package com.twidere.twiderex.component.lazy.ui
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -38,13 +44,24 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Divider
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.listSaver
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -61,7 +78,45 @@ import com.twidere.twiderex.component.status.StatusThreadStyle
 import com.twidere.twiderex.component.status.TimelineStatusComponent
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiStatus
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.mapNotNull
 
+@Stable
+class LazyUiStatusListState(
+    initialStatusKey: MicroBlogKey? = null,
+    initialShowCursor: Boolean = false,
+) {
+    private var _statusKey by mutableStateOf(initialStatusKey)
+    private var _showCursor by mutableStateOf(initialShowCursor)
+    val showCursor get() = _showCursor
+    val statusKey get() = _statusKey
+    fun update(newKey: MicroBlogKey) {
+        if (!showCursor) {
+            _showCursor = statusKey != null && statusKey != newKey
+            _statusKey = newKey
+        }
+    }
+
+    fun hide() {
+        _showCursor = false
+    }
+
+    companion object {
+        val Saver: Saver<LazyUiStatusListState, Any> = listSaver(
+            save = { listOfNotNull(it.showCursor, it.statusKey) },
+            restore = {
+                LazyUiStatusListState(
+                    initialShowCursor = it[0] as Boolean,
+                    initialStatusKey = it.getOrNull(1) as MicroBlogKey?
+                )
+            }
+        )
+    }
+}
+
+@OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun LazyUiStatusList(
     modifier: Modifier = Modifier,
@@ -70,55 +125,103 @@ fun LazyUiStatusList(
     loadingBetween: List<MicroBlogKey> = emptyList(),
     contentPadding: PaddingValues = PaddingValues(0.dp),
     onLoadBetweenClicked: (current: MicroBlogKey, next: MicroBlogKey) -> Unit = { _, _ -> },
-    // key: ((index: Int) -> Any) = { items.peekOrNull(it)?.hashCode() ?: it },
+    key: ((index: Int) -> Any) = { items.peek(it)?.hashCode() ?: it },
     header: LazyListScope.() -> Unit = {},
 ) {
+    val listState = rememberSaveable(saver = LazyUiStatusListState.Saver) {
+        LazyUiStatusListState()
+    }
+    LaunchedEffect(Unit) {
+        snapshotFlow { items.itemCount }
+            .filter { it > 0 }
+            .mapNotNull { items.peek(0)?.statusKey }
+            .distinctUntilChanged()
+            .collect {
+                listState.update(it)
+            }
+    }
+    LaunchedEffect(Unit) {
+        snapshotFlow { state.firstVisibleItemIndex }
+            .distinctUntilChanged()
+            .collect {
+                if (it == 0) {
+                    listState.hide()
+                }
+            }
+    }
     LazyUiList(
         items = items,
         empty = { EmptyStatusList() },
         loading = { LoadingStatusPlaceholder() }
     ) {
-        LazyColumn(
-            modifier = modifier,
-            state = state,
-            contentPadding = contentPadding,
-        ) {
-            header.invoke(this)
-            itemsIndexed(
-                items,
-                // key = key
-            ) { index, item ->
-                if (item == null) {
-                    UiStatusPlaceholder()
-                    StatusDivider()
-                } else {
-                    Column {
-                        TimelineStatusComponent(
-                            item,
-                            threadStyle = StatusThreadStyle.WITH_AVATAR,
-                            lineUp = index > 0 && items.peek(index - 1)?.statusId == item.inReplyToStatusId,
-                            lineDown = index < items.itemCount - 1 && items.peek(index + 1)?.inReplyToStatusId == item.statusId,
-                        )
-                        when {
-                            loadingBetween.contains(item.statusKey) -> {
-                                Divider()
-                                LoadingProgress(
-                                    modifier = Modifier.align(Alignment.CenterHorizontally)
-                                )
-                                Divider()
-                            }
-                            item.isGap -> {
-                                LoadMoreButton(items, index, onLoadBetweenClicked, item)
-                            }
-                            else -> {
-                                StatusDivider()
+        Box {
+            LazyColumn(
+                modifier = modifier,
+                state = state,
+                contentPadding = contentPadding,
+            ) {
+                header.invoke(this)
+                itemsIndexed(
+                    items,
+                    key = key
+                ) { index, item ->
+                    if (item == null) {
+                        UiStatusPlaceholder()
+                        StatusDivider()
+                    } else {
+                        Column {
+                            TimelineStatusComponent(
+                                item,
+                                threadStyle = StatusThreadStyle.WITH_AVATAR,
+                                lineUp = index > 0 && items.peek(index - 1)?.statusId == item.inReplyToStatusId,
+                                lineDown = index < items.itemCount - 1 && items.peek(index + 1)?.inReplyToStatusId == item.statusId,
+                            )
+                            when {
+                                loadingBetween.contains(item.statusKey) -> {
+                                    Divider()
+                                    LoadingProgress(
+                                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                                    )
+                                    Divider()
+                                }
+                                item.isGap -> {
+                                    LoadMoreButton(items, index, onLoadBetweenClicked, item)
+                                }
+                                else -> {
+                                    StatusDivider()
+                                }
                             }
                         }
                     }
                 }
+                loadState(items.loadState.append) {
+                    items.retry()
+                }
             }
-            loadState(items.loadState.append) {
-                items.retry()
+            Box(
+                modifier = Modifier.align(Alignment.TopEnd),
+            ) {
+                AnimatedVisibility(
+                    visible = listState.showCursor,
+                    enter = fadeIn() + slideInHorizontally(initialOffsetX = { it / 2 }),
+                    exit = slideOutHorizontally(targetOffsetX = { it / 2 }) + fadeOut(),
+                ) {
+                    Box(
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        Surface(
+                            color = MaterialTheme.colors.onBackground.copy(alpha = 0.6f),
+                            shape = MaterialTheme.shapes.small,
+                            contentColor = MaterialTheme.colors.background,
+                        ) {
+                            Text(
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                                text = state.firstVisibleItemIndex.toString(),
+                                style = MaterialTheme.typography.caption,
+                            )
+                        }
+                    }
+                }
             }
         }
     }
