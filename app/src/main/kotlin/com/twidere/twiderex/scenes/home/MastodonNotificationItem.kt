@@ -20,6 +20,7 @@
  */
 package com.twidere.twiderex.scenes.home
 
+import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -29,7 +30,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.twidere.services.microblog.NotificationService
 import com.twidere.twiderex.R
-import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.Pager
 import com.twidere.twiderex.component.foundation.TextTabsComponent
 import com.twidere.twiderex.component.foundation.rememberPagerState
@@ -68,7 +68,7 @@ class MastodonNotificationItem : HomeNavigationItem() {
             lazyListController = tabs[pagerState.currentPage].lazyListController
         }
         val scope = rememberCoroutineScope()
-        InAppNotificationScaffold(
+        Scaffold(
             topBar = {
                 TextTabsComponent(
                     items = tabs.map { it.name() },

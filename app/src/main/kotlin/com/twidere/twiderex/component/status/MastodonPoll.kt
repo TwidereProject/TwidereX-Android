@@ -39,10 +39,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Checkbox
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Icon
@@ -148,9 +150,11 @@ fun MastodonPoll(status: UiStatus) {
                 )
             }
         }
-        Row {
+        Row(
+            modifier = Modifier.height(ButtonDefaults.MinHeight),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
             CompositionLocalProvider(
-                LocalTextStyle.provides(MaterialTheme.typography.caption),
                 LocalContentAlpha.provides(ContentAlpha.disabled)
             ) {
                 if (countText != null) {
@@ -286,9 +290,17 @@ fun MastodonPollOption(
                 ) {
                     if (poll.canVote) {
                         if (poll.multiple == true) {
-                            Checkbox(checked = voted, onCheckedChange = { onVote.invoke(it) })
+                            Checkbox(
+                                modifier = Modifier.size(LocalTextStyle.current.fontSize.value.dp),
+                                checked = voted,
+                                onCheckedChange = { onVote.invoke(it) },
+                            )
                         } else {
-                            RadioButton(selected = voted, onClick = { onVote.invoke(!voted) })
+                            RadioButton(
+                                modifier = Modifier.size(LocalTextStyle.current.fontSize.value.dp),
+                                selected = voted,
+                                onClick = { onVote.invoke(!voted) },
+                            )
                         }
                     } else {
                         androidx.compose.animation.AnimatedVisibility(

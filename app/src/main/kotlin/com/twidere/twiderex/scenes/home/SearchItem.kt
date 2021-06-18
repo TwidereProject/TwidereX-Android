@@ -36,6 +36,7 @@ import androidx.compose.material.ListItem
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ProvideTextStyle
+import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -51,7 +52,6 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.items
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.AppBar
-import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.component.trend.MastodonTrendItem
 import com.twidere.twiderex.component.trend.TwitterTrendItem
@@ -92,7 +92,7 @@ class SearchItem : HomeNavigationItem() {
         val navigator = LocalNavigator.current
         val searchCount = 3
         val expandSearch by viewModel.expandSearch.observeAsState(false)
-        InAppNotificationScaffold(
+        Scaffold(
             topBar = {
                 AppBar(
                     title = {

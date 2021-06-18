@@ -503,7 +503,7 @@ fun StatusContent(
             }
         }
         Column(modifier = Modifier.layoutId(StatusContentDefaults.Ref.Footer)) {
-            Spacer(modifier = Modifier.height(StatusContentDefaults.ContentSpacing))
+            Spacer(modifier = Modifier.height(StatusContentDefaults.FooterSpacing))
             footer.invoke()
             Spacer(modifier = Modifier.height(contentPadding.calculateBottomPadding()))
         }
@@ -551,7 +551,7 @@ fun statusConstraintSets() = ConstraintSet {
 }
 
 object StatusContentDefaults {
-    val ContentSpacing = 10.dp
+    val FooterSpacing = 4.dp
     val AvatarSpacing = 4.dp
 
     object Normal {
