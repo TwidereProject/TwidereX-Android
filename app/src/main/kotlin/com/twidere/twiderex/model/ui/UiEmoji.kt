@@ -24,20 +24,11 @@ import com.twidere.services.mastodon.model.Emoji
 
 data class UiEmoji(
     val category: String?,
-    private val _emojis: MutableList<Emoji> = mutableListOf()
+    val emoji: List<Emoji>
 ) {
-    val emoji get() = _emojis.toList()
-
     companion object {
-        fun List<Emoji>.toUi(): List<UiEmoji> {
-            val temp = mutableMapOf<String?, UiEmoji>()
-            map {
-                val category = if (it.category.isNullOrEmpty())null else it.category
-                temp[category] = (temp[category] ?: UiEmoji(category)).also { emoji ->
-                    emoji._emojis.add(it)
-                }
-            }
-            return temp.values.toList()
+        fun List<Emoji>.toUi(): List<UiEmoji> = groupBy({ it.category }, { it }).map {
+            UiEmoji(if (it.key.isNullOrEmpty()) null else it.key, it.value)
         }
     }
 }
