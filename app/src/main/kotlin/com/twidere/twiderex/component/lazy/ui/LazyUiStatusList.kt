@@ -53,7 +53,15 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.listSaver
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -70,7 +78,43 @@ import com.twidere.twiderex.component.status.StatusThreadStyle
 import com.twidere.twiderex.component.status.TimelineStatusComponent
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiStatus
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.mapNotNull
+
+@Stable
+class LazyUiStatusListState(
+    initialStatusKey: MicroBlogKey? = null,
+    initialShowCursor: Boolean = false,
+) {
+    private var _statusKey by mutableStateOf(initialStatusKey)
+    private var _showCursor by mutableStateOf(initialShowCursor)
+    val showCursor get() = _showCursor
+    val statusKey get() = _statusKey
+    fun update(newKey: MicroBlogKey) {
+        if (!showCursor) {
+            _showCursor = statusKey != null && statusKey != newKey
+            _statusKey = newKey
+        }
+    }
+
+    fun hide() {
+        _showCursor = false
+    }
+
+    companion object {
+        val Saver: Saver<LazyUiStatusListState, Any> = listSaver(
+            save = { listOfNotNull(it.showCursor, it.statusKey) },
+            restore = {
+                LazyUiStatusListState(
+                    initialShowCursor = it[0] as Boolean,
+                    initialStatusKey = it.getOrNull(1) as MicroBlogKey?
+                )
+            }
+        )
+    }
+}
 
 @OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialApi::class)
 @Composable
@@ -84,6 +128,27 @@ fun LazyUiStatusList(
     key: ((index: Int) -> Any) = { items.peek(it)?.hashCode() ?: it },
     header: LazyListScope.() -> Unit = {},
 ) {
+    val listState = rememberSaveable(saver = LazyUiStatusListState.Saver) {
+        LazyUiStatusListState()
+    }
+    LaunchedEffect(Unit) {
+        snapshotFlow { items.itemCount }
+            .filter { it > 0 }
+            .mapNotNull { items.peek(0)?.statusKey }
+            .distinctUntilChanged()
+            .collect {
+                listState.update(it)
+            }
+    }
+    LaunchedEffect(Unit) {
+        snapshotFlow { state.firstVisibleItemIndex }
+            .distinctUntilChanged()
+            .collect {
+                if (it == 0) {
+                    listState.hide()
+                }
+            }
+    }
     LazyUiList(
         items = items,
         empty = { EmptyStatusList() },
@@ -137,23 +202,17 @@ fun LazyUiStatusList(
                 modifier = Modifier.align(Alignment.TopEnd),
             ) {
                 AnimatedVisibility(
-                    visible = state.firstVisibleItemIndex != 0,
+                    visible = listState.showCursor,
                     enter = fadeIn() + slideInHorizontally(initialOffsetX = { it / 2 }),
                     exit = slideOutHorizontally(targetOffsetX = { it / 2 }) + fadeOut(),
                 ) {
                     Box(
                         modifier = Modifier.padding(16.dp)
                     ) {
-                        val scope = rememberCoroutineScope()
                         Surface(
                             color = MaterialTheme.colors.onBackground.copy(alpha = 0.6f),
                             shape = MaterialTheme.shapes.small,
                             contentColor = MaterialTheme.colors.background,
-                            onClick = {
-                                scope.launch {
-                                    state.animateScrollToItem(0)
-                                }
-                            }
                         ) {
                             Text(
                                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
