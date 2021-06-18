@@ -92,3 +92,5 @@ lint/tmp/
 signing.properties
 
 *.jks
+
+.DS_Store
