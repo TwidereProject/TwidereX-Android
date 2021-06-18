@@ -18,21 +18,17 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.services.mastodon.model
+package com.twidere.twiderex.model.ui
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.twidere.services.mastodon.model.Emoji
 
-@Serializable
-data class Emoji(
-    val shortcode: String? = null,
-    val url: String? = null,
-
-    @SerialName("static_url")
-    val staticURL: String? = null,
-
-    @SerialName("visible_in_picker")
-    val visibleInPicker: Boolean? = null,
-
-    val category: String? = null
-)
+data class UiEmoji(
+    val category: String?,
+    val emoji: List<Emoji>
+) {
+    companion object {
+        fun List<Emoji>.toUi(): List<UiEmoji> = groupBy({ it.category }, { it }).map {
+            UiEmoji(if (it.key.isNullOrEmpty()) null else it.key, it.value)
+        }
+    }
+}

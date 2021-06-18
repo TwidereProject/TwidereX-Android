@@ -48,10 +48,8 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.GridCells
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.LazyVerticalGrid
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -101,11 +99,11 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.coerceAtLeast
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.insets.LocalWindowInsets
-import com.twidere.services.mastodon.model.Emoji
 import com.twidere.services.mastodon.model.Visibility
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.AppBar
@@ -113,6 +111,7 @@ import com.twidere.twiderex.component.foundation.CheckboxItem
 import com.twidere.twiderex.component.foundation.InAppNotificationBottomSheetScaffold
 import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.foundation.TextInput
+import com.twidere.twiderex.component.lazy.itemsGridIndexed
 import com.twidere.twiderex.component.status.StatusLineComponent
 import com.twidere.twiderex.component.status.TimelineStatusComponent
 import com.twidere.twiderex.component.status.UserAvatar
@@ -126,6 +125,7 @@ import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.PlatformType
+import com.twidere.twiderex.model.ui.UiEmoji
 import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalNavController
@@ -426,6 +426,7 @@ private fun ComposeBody(
                 CompositionLocalProvider(LocalContentAlpha.provides(ContentAlpha.medium)) {
                     ComposeActions(
                         viewModel,
+                        showEmoji = showEmoji,
                         emojiButtonClicked = {
                             showEmoji = !showEmoji
                         },
@@ -519,29 +520,42 @@ fun EmojiPanel(
 @ExperimentalFoundationApi
 @Composable
 private fun EmojiList(
-    items: List<Emoji>,
+    items: List<UiEmoji>,
     viewModel: ComposeViewModel
 ) {
-    LazyVerticalGrid(
-        cells = GridCells.Adaptive(EmojiListDefaults.Icon.Size),
-        contentPadding = EmojiListDefaults.ContentPadding,
-        content = {
-            items(items) {
-                it.url?.let { it1 ->
-                    NetworkImage(
-                        modifier = Modifier
-                            .size(EmojiListDefaults.Icon.Size)
-                            .padding(EmojiListDefaults.Icon.ContentPadding)
-                            .clickable {
-                                viewModel.insertEmoji(it)
-                            },
-                        data = it1,
-                        contentScale = ContentScale.Fit,
-                    )
+    BoxWithConstraints(modifier = Modifier.padding(EmojiListDefaults.ContentPadding)) {
+        val column = maxOf((maxWidth / EmojiListDefaults.Icon.Size).toInt(), 1)
+        LazyColumn {
+            items.forEach {
+                it.category?.let { category ->
+                    item {
+                        Text(
+                            text = category,
+                            style = MaterialTheme.typography.h6,
+                            modifier = Modifier.padding(EmojiListDefaults.Category.ContentPadding)
+                        )
+                    }
+                }
+                itemsGridIndexed(
+                    data = it.emoji,
+                    rowSize = column,
+                ) { _, item ->
+                    item.url?.let { it1 ->
+                        NetworkImage(
+                            modifier = Modifier
+                                .size(EmojiListDefaults.Icon.Size)
+                                .padding(EmojiListDefaults.Icon.ContentPadding)
+                                .clickable {
+                                    viewModel.insertEmoji(item)
+                                },
+                            data = it1,
+                            contentScale = ContentScale.Fit,
+                        )
+                    }
                 }
             }
-        },
-    )
+        }
+    }
 }
 
 object EmojiListDefaults {
@@ -554,6 +568,10 @@ object EmojiListDefaults {
         horizontal = 8.dp,
         vertical = 0.dp
     )
+
+    object Category {
+        val ContentPadding = PaddingValues(vertical = 16.dp, horizontal = 4.dp)
+    }
 }
 
 @Composable
@@ -1101,6 +1119,7 @@ private object ComposeVoteDefaults {
 @Composable
 private fun ComposeActions(
     viewModel: ComposeViewModel,
+    showEmoji: Boolean = false,
     emojiButtonClicked: () -> Unit = {},
 ) {
     val account = LocalActiveAccount.current ?: return
@@ -1160,8 +1179,12 @@ private fun ComposeActions(
                     }
                 ) {
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_mood_smile),
+                        painter = painterResource(id = if (showEmoji) R.drawable.ic_keyboard else R.drawable.ic_mood_smile),
                         contentDescription = null,
+                        tint = if (showEmoji)
+                            MaterialTheme.colors.primary
+                        else
+                            LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
                     )
                 }
             }
@@ -1269,15 +1292,37 @@ private fun ComposeActions(
                         navController.navigate(Route.Draft.List)
                     }
                 ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_note),
-                        contentDescription = stringResource(
-                            id = R.string.accessibility_scene_compose_draft
+                    Box {
+                        Icon(
+                            painter = painterResource(
+                                id = if (draftCount.value > 9)
+                                    R.drawable.ic_drafts_more
+                                else
+                                    R.drawable.ic_draft_number
+                            ),
+                            contentDescription = stringResource(
+                                id = R.string.accessibility_scene_compose_draft
+                            )
                         )
-                    )
+                        if (draftCount.value < 9) {
+                            Text(
+                                text = draftCount.value.toString(),
+                                style = MaterialTheme.typography.overline.copy(fontWeight = FontWeight.Bold),
+                                modifier = Modifier
+                                    .align(Alignment.Center)
+                                    .padding(ComposeActionsDefaults.Draft.CountPadding)
+                            )
+                        }
+                    }
                 }
             }
         }
+    }
+}
+
+private object ComposeActionsDefaults {
+    object Draft {
+        val CountPadding = PaddingValues(end = 1.dp, bottom = 1.dp)
     }
 }
 
