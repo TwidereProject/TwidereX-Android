@@ -22,7 +22,6 @@ package com.twidere.twiderex.db
 
 import androidx.room.testing.MigrationTestHelper
 import androidx.sqlite.db.SimpleSQLiteQuery
-import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.twidere.twiderex.viewmodel.compose.ComposeType
@@ -39,8 +38,7 @@ class AppDatabaseMigrationTest {
     @get:Rule
     val helper: MigrationTestHelper = MigrationTestHelper(
         InstrumentationRegistry.getInstrumentation(),
-        AppDatabase::class.java.canonicalName,
-        FrameworkSQLiteOpenHelperFactory()
+        AppDatabase::class.java,
     )
 
     @Test
