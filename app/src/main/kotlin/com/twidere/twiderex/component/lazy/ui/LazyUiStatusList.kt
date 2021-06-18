@@ -104,12 +104,12 @@ class LazyUiStatusListState(
     }
 
     companion object {
-        val Saver: Saver<LazyUiStatusListState, Any> = listSaver(
-            save = { listOfNotNull(it.showCursor, it.statusKey) },
+        val Saver: Saver<LazyUiStatusListState, *> = listSaver(
+            save = { listOfNotNull<Any>(it.showCursor, it.statusKey?.toString()) },
             restore = {
                 LazyUiStatusListState(
                     initialShowCursor = it[0] as Boolean,
-                    initialStatusKey = it.getOrNull(1) as MicroBlogKey?
+                    initialStatusKey = it.getOrNull(1)?.let { MicroBlogKey.valueOf(it.toString()) }
                 )
             }
         )
