@@ -25,8 +25,11 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
@@ -37,6 +40,8 @@ import androidx.compose.material.TabRow
 import androidx.compose.material.TabRowDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -55,6 +60,7 @@ import com.twidere.twiderex.component.foundation.AppBarDefaults
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.navigation.LocalNavigator
+import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.scenes.search.tabs.MastodonSearchHashtagItem
@@ -63,6 +69,7 @@ import com.twidere.twiderex.scenes.search.tabs.SearchUserItem
 import com.twidere.twiderex.scenes.search.tabs.TwitterSearchMediaItem
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.TwidereScene
+import com.twidere.twiderex.viewmodel.search.SearchSaveViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalPagerApi::class)
@@ -70,6 +77,13 @@ import kotlinx.coroutines.launch
 fun SearchScene(keyword: String) {
     val account = LocalActiveAccount.current ?: return
     val navigator = LocalNavigator.current
+
+    val viewModel =
+        assistedViewModel<SearchSaveViewModel.AssistedFactory, SearchSaveViewModel>(
+            account, keyword
+        ) {
+            it.create(account, keyword)
+        }
 
     val tabs = remember {
         when (account.type) {
@@ -87,6 +101,8 @@ fun SearchScene(keyword: String) {
     }
     val pagerState = rememberPagerState(pageCount = tabs.size)
     val scope = rememberCoroutineScope()
+    val isSaved by viewModel.isSaved.observeAsState(false)
+    val loading by viewModel.loading.observeAsState(initial = false)
     TwidereScene {
         InAppNotificationScaffold {
             Column {
@@ -117,16 +133,26 @@ fun SearchScene(keyword: String) {
                                             maxLines = 1,
                                             textAlign = TextAlign.Start,
                                         )
-                                        IconButton(
-                                            onClick = {
-                                            }
-                                        ) {
-                                            Icon(
-                                                painter = painterResource(id = R.drawable.ic_device_floppy),
-                                                contentDescription = stringResource(
-                                                    id = R.string.accessibility_scene_search_save
-                                                )
+                                        if (loading) {
+                                            CircularProgressIndicator(
+                                                modifier = Modifier.size(SearchSceneDefaults.Loading.size)
+                                                    .padding(SearchSceneDefaults.Loading.padding),
+                                                strokeWidth = SearchSceneDefaults.Loading.width,
+                                                color = MaterialTheme.colors.onSurface.copy(0.08f)
                                             )
+                                        } else if (!isSaved) {
+                                            IconButton(
+                                                onClick = {
+                                                    if (!loading && !isSaved) viewModel.save()
+                                                }
+                                            ) {
+                                                Icon(
+                                                    painter = painterResource(id = R.drawable.ic_device_floppy),
+                                                    contentDescription = stringResource(
+                                                        id = R.string.accessibility_scene_search_save
+                                                    )
+                                                )
+                                            }
                                         }
                                     }
                                 }
@@ -175,5 +201,13 @@ fun SearchScene(keyword: String) {
                 }
             }
         }
+    }
+}
+
+private object SearchSceneDefaults {
+    object Loading {
+        val padding = PaddingValues(12.dp)
+        val size = 48.dp
+        val width = 2.dp
     }
 }

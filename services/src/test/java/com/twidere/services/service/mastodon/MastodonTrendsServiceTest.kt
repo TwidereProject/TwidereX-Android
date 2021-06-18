@@ -18,25 +18,27 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.db.model
+package com.twidere.services.service.mastodon
 
-import androidx.room.Entity
-import androidx.room.Index
-import androidx.room.PrimaryKey
-import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.services.api.common.mockMastodonService
+import com.twidere.services.microblog.TrendService
+import kotlinx.coroutines.runBlocking
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 
-@Entity(
-    tableName = "search",
-    indices = [Index(value = ["content", "accountKey"], unique = true)],
-)
-data class DbSearch(
-    /**
-     * Id that being used in the database
-     */
-    @PrimaryKey
-    val _id: String,
-    val content: String,
-    val lastActive: Long,
-    val saved: Boolean,
-    val accountKey: MicroBlogKey
-)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class MastodonTrendsServiceTest {
+    private lateinit var trendsService: TrendService
+
+    @BeforeAll
+    fun setUp() {
+        trendsService = mockMastodonService()
+    }
+
+    @Test
+    fun trends(): Unit = runBlocking {
+        val result = trendsService.trends("1")
+        assert(result.isNotEmpty())
+    }
+}

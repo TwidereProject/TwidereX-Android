@@ -18,25 +18,29 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.db.model
+package com.twidere.services.api.common
 
-import androidx.room.Entity
-import androidx.room.Index
-import androidx.room.PrimaryKey
-import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.services.api.mastodon.MastodonRequest2AssetPathConvertor
+import com.twidere.services.api.twitter.TwitterRequest2AssetPathConvertor
+import com.twidere.services.mastodon.MastodonService
+import com.twidere.services.twitter.TwitterService
 
-@Entity(
-    tableName = "search",
-    indices = [Index(value = ["content", "accountKey"], unique = true)],
-)
-data class DbSearch(
-    /**
-     * Id that being used in the database
-     */
-    @PrimaryKey
-    val _id: String,
-    val content: String,
-    val lastActive: Long,
-    val saved: Boolean,
-    val accountKey: MicroBlogKey
-)
+fun mockMastodonService(): MastodonService {
+    return MastodonService(
+        "", "",
+        resources = mockRetrofit(
+            "https://test.mastodon.com/",
+            MastodonRequest2AssetPathConvertor()
+        )
+    )
+}
+
+fun mockTwitterService(): TwitterService {
+    return TwitterService(
+        "", "", "", "",
+        resources = mockRetrofit(
+            "https://api.twitter.com/",
+            TwitterRequest2AssetPathConvertor()
+        )
+    )
+}

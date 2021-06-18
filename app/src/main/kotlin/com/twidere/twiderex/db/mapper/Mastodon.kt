@@ -27,6 +27,7 @@ import com.twidere.services.mastodon.model.Mention
 import com.twidere.services.mastodon.model.Notification
 import com.twidere.services.mastodon.model.NotificationTypes
 import com.twidere.services.mastodon.model.Status
+import com.twidere.services.mastodon.model.Trend
 import com.twidere.services.mastodon.model.Visibility
 import com.twidere.twiderex.db.model.DbList
 import com.twidere.twiderex.db.model.DbMastodonStatusExtra
@@ -39,6 +40,9 @@ import com.twidere.twiderex.db.model.DbStatusReaction
 import com.twidere.twiderex.db.model.DbStatusV2
 import com.twidere.twiderex.db.model.DbStatusWithMediaAndUser
 import com.twidere.twiderex.db.model.DbStatusWithReference
+import com.twidere.twiderex.db.model.DbTrend
+import com.twidere.twiderex.db.model.DbTrendHistory
+import com.twidere.twiderex.db.model.DbTrendWithHistory
 import com.twidere.twiderex.db.model.DbUser
 import com.twidere.twiderex.db.model.ReferenceType
 import com.twidere.twiderex.db.model.toDbStatusReference
@@ -347,6 +351,30 @@ fun MastodonList.toDbList(accountKey: MicroBlogKey): DbList {
         ),
         isFollowed = true,
         allowToSubscribe = false,
+    )
+}
+
+fun Trend.toDbTrend(accountKey: MicroBlogKey): DbTrendWithHistory {
+    return DbTrendWithHistory(
+        trend = DbTrend(
+            _id = UUID.randomUUID().toString(),
+            trendKey = MicroBlogKey("$name:$url", accountKey.host),
+            accountKey = accountKey,
+            displayName = name ?: "",
+            query = name ?: "",
+            url = url ?: "",
+            volume = 0
+        ),
+        history = history?.map {
+            DbTrendHistory(
+                _id = UUID.randomUUID().toString(),
+                trendKey = MicroBlogKey("$name:$url", accountKey.host),
+                day = it.day?.toLong() ?: 0L,
+                uses = it.uses?.toLong() ?: 0L,
+                accounts = it.accounts?.toLong() ?: 0L,
+                accountKey = accountKey
+            )
+        } ?: emptyList()
     )
 }
 

@@ -20,23 +20,51 @@
  */
 package com.twidere.twiderex.db.model
 
+import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import androidx.room.Relation
+import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.model.MicroBlogKey
 
 @Entity(
-    tableName = "search",
-    indices = [Index(value = ["content", "accountKey"], unique = true)],
+    tableName = "trends",
+    indices = [Index(value = ["trendKey", "url"], unique = true)],
 )
-data class DbSearch(
-    /**
-     * Id that being used in the database
-     */
+data class DbTrend(
     @PrimaryKey
     val _id: String,
-    val content: String,
-    val lastActive: Long,
-    val saved: Boolean,
-    val accountKey: MicroBlogKey
+    val trendKey: MicroBlogKey,
+    val accountKey: MicroBlogKey,
+    val displayName: String,
+    val url: String,
+    val query: String,
+    val volume: Long,
 )
+
+data class DbTrendWithHistory(
+    @Embedded
+    val trend: DbTrend,
+
+    @Relation(
+        parentColumn = "trendKey",
+        entityColumn = "trendKey",
+        entity = DbTrendHistory::class
+    )
+    val history: List<DbTrendHistory>,
+)
+
+suspend fun List<DbTrendWithHistory>.saveToDb(
+    database: CacheDatabase
+) {
+    map { it.trend }.let {
+        database.trendDao().insertAll(it)
+    }
+
+    map { it.history }
+        .flatten()
+        .let {
+            database.trendHistoryDao().insertAll(it)
+        }
+}

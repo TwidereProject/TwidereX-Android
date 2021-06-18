@@ -18,25 +18,27 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.db.model
+package com.twidere.services.api.mastodon
 
-import androidx.room.Entity
-import androidx.room.Index
-import androidx.room.PrimaryKey
-import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.services.api.common.mockRetrofit
+import com.twidere.services.mastodon.api.TrendsResources
+import kotlinx.coroutines.runBlocking
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 
-@Entity(
-    tableName = "search",
-    indices = [Index(value = ["content", "accountKey"], unique = true)],
-)
-data class DbSearch(
-    /**
-     * Id that being used in the database
-     */
-    @PrimaryKey
-    val _id: String,
-    val content: String,
-    val lastActive: Long,
-    val saved: Boolean,
-    val accountKey: MicroBlogKey
-)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class MastodonTrendsApiTest {
+    private lateinit var trendsResources: TrendsResources
+
+    @BeforeAll
+    fun setUp() {
+        trendsResources = mockRetrofit("https://test.mastodon.com/", MastodonRequest2AssetPathConvertor())
+    }
+
+    @Test
+    fun trends_listIsNotEmpty(): Unit = runBlocking {
+        val result = trendsResources.trends()
+        assert(result.isNotEmpty())
+    }
+}

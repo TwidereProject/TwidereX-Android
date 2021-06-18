@@ -24,6 +24,7 @@ import com.twidere.services.twitter.model.ReferencedTweetType
 import com.twidere.services.twitter.model.ReplySettings
 import com.twidere.services.twitter.model.Status
 import com.twidere.services.twitter.model.StatusV2
+import com.twidere.services.twitter.model.Trend
 import com.twidere.services.twitter.model.TwitterList
 import com.twidere.services.twitter.model.User
 import com.twidere.services.twitter.model.UserV2
@@ -36,6 +37,8 @@ import com.twidere.twiderex.db.model.DbStatusReaction
 import com.twidere.twiderex.db.model.DbStatusV2
 import com.twidere.twiderex.db.model.DbStatusWithMediaAndUser
 import com.twidere.twiderex.db.model.DbStatusWithReference
+import com.twidere.twiderex.db.model.DbTrend
+import com.twidere.twiderex.db.model.DbTrendWithHistory
 import com.twidere.twiderex.db.model.DbTwitterStatusExtra
 import com.twidere.twiderex.db.model.DbTwitterUserExtra
 import com.twidere.twiderex.db.model.DbUrlEntity
@@ -509,4 +512,17 @@ fun TwitterList.toDbList(accountKey: MicroBlogKey) = DbList(
     listKey = MicroBlogKey.twitter(idStr ?: throw IllegalArgumentException("list.idStr should not be null"),),
     isFollowed = following ?: true,
     allowToSubscribe = mode != ListsMode.PRIVATE.value
+)
+
+fun Trend.toDbTrend(accountKey: MicroBlogKey) = DbTrendWithHistory(
+    trend = DbTrend(
+        _id = UUID.randomUUID().toString(),
+        trendKey = MicroBlogKey.twitter("$name:$url"),
+        accountKey = accountKey,
+        displayName = name ?: "",
+        query = name ?: "",
+        url = url ?: "",
+        volume = tweetVolume ?: 0,
+    ),
+    history = emptyList()
 )

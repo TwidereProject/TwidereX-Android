@@ -20,35 +20,33 @@
  */
 package com.twidere.twiderex.db.dao
 
-import androidx.lifecycle.LiveData
+import androidx.paging.PagingSource
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.twidere.twiderex.db.model.DbSearch
+import androidx.room.Transaction
+import com.twidere.twiderex.db.model.DbTrend
+import com.twidere.twiderex.db.model.DbTrendWithHistory
 import com.twidere.twiderex.model.MicroBlogKey
 
 @Dao
-interface SearchDao {
+interface TrendDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAll(search: List<DbSearch>)
+    suspend fun insertAll(trends: List<DbTrend>)
 
-    @Query("SELECT * FROM search where accountKey == :accountKey ORDER BY lastActive DESC")
-    fun getAll(accountKey: MicroBlogKey): LiveData<List<DbSearch>>
+    @Transaction
+    @Query("SELECT * FROM trends WHERE accountKey == :accountKey  LIMIT :limit")
+    suspend fun find(accountKey: MicroBlogKey, limit: Int): List<DbTrendWithHistory>
 
-    @Query("SELECT * FROM search where saved == 0 AND accountKey == :accountKey ORDER BY lastActive DESC")
-    fun getAllHistory(accountKey: MicroBlogKey): LiveData<List<DbSearch>>
+    @Transaction
+    @Query("SELECT * FROM trends WHERE accountKey == :accountKey")
+    fun getPagingSource(
+        accountKey: MicroBlogKey,
+    ): PagingSource<Int, DbTrendWithHistory>
 
-    @Query("SELECT * FROM search where saved == 1 AND accountKey == :accountKey ORDER BY lastActive DESC")
-    fun getAllSaved(accountKey: MicroBlogKey): LiveData<List<DbSearch>>
-
-    @Query("SELECT * FROM search WHERE content == :content AND accountKey == :accountKey")
-    suspend fun get(content: String, accountKey: MicroBlogKey): DbSearch?
-
-    @Delete
-    suspend fun remove(search: DbSearch)
-
-    @Query("DELETE FROM search where saved == 0")
-    suspend fun clear()
+    @Query("DELETE FROM trends WHERE accountKey == :accountKey")
+    suspend fun clearAll(
+        accountKey: MicroBlogKey,
+    )
 }

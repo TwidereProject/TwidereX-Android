@@ -18,24 +18,28 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.mock
+package com.twidere.services.api.twitter
 
-import com.twidere.services.microblog.MicroBlogService
-import com.twidere.twiderex.db.CacheDatabase
-import com.twidere.twiderex.mock.db.MockCacheDatabase
-import com.twidere.twiderex.mock.service.MockListsService
-import com.twidere.twiderex.mock.service.MockTrendService
+import com.twidere.services.api.common.mockRetrofit
+import com.twidere.services.twitter.api.TrendsResources
+import kotlinx.coroutines.runBlocking
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 
-object MockCenter {
-    fun mockCacheDatabase(): CacheDatabase {
-        return MockCacheDatabase()
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class TwitterTrendsApiTest {
+    private lateinit var trendsResources: TrendsResources
+
+    @BeforeAll
+    fun setUp() {
+        trendsResources = mockRetrofit("https://api.twitter.com/", TwitterRequest2AssetPathConvertor())
     }
 
-    fun mockListsService(): MicroBlogService {
-        return MockListsService()
-    }
-
-    fun mockTrendService(): MicroBlogService {
-        return MockTrendService()
+    @Test
+    fun trends_listIsNotEmpty(): Unit = runBlocking {
+        val result = trendsResources.trends("1")
+        assert(result.isNotEmpty())
+        assert(result[0].trends?.isNotEmpty() ?: false)
     }
 }

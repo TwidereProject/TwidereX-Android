@@ -21,19 +21,29 @@
 package com.twidere.services.service.twitter
 
 import com.twidere.services.api.common.mockTwitterService
-import com.twidere.services.microblog.ListsService
-import com.twidere.services.service.ListServiceTest
+import com.twidere.services.microblog.TrendService
+import kotlinx.coroutines.runBlocking
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
+import kotlin.test.assertEquals
 
-class TwitterListServiceTest : ListServiceTest() {
-    override fun createService(): ListsService {
-        return mockTwitterService()
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class TwitterTrendsServiceTest {
+    private lateinit var trendsService: TrendService
+
+    @BeforeAll
+    fun setUp() {
+        trendsService = mockTwitterService()
     }
 
-    override fun testListId(): String {
-        return "58300198"
-    }
-
-    override fun testUserId(): String {
-        return "14895163"
+    @Test
+    fun trends_limitCount(): Unit = runBlocking {
+        var result = trendsService.trends("1", limit = 1)
+        assertEquals(1, result.size)
+        result = trendsService.trends("1", limit = 2)
+        assertEquals(2, result.size)
+        result = trendsService.trends("1", limit = 100)
+        assertEquals(10, result.size)
     }
 }
