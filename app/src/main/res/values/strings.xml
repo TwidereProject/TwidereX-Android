@@ -96,6 +96,7 @@
     <string name="common_controls_status_poll_total_vote">%s vote</string>
     <string name="common_controls_status_poll_total_people">%s people</string>
     <string name="common_controls_status_poll_total_votes">%s votes</string>
+    <string name="common_controls_status_thread_show">Show this thread</string>
     <string name="common_controls_friendship_actions_follow">Follow</string>
     <string name="common_controls_friendship_actions_unfollow">Unfollow</string>
     <string name="common_controls_friendship_actions_following">Following</string>
@@ -158,6 +159,7 @@
     <string name="scene_trends_now">Trending Now</string>
     <string name="scene_trends_accounts">%d people talking</string>
     <string name="scene_status_title">Tweet</string>
+    <string name="scene_status_title_mastodon">Toot</string>
     <string name="scene_status_reply_single">1 Reply</string>
     <string name="scene_status_reply_mutiple">%d Replies</string>
     <string name="scene_status_quote_single">1 Quote</string>
@@ -318,8 +320,6 @@
     <string name="accessibility_common_status_actions_reply">Reply</string>
     <string name="accessibility_common_status_actions_retweet">Retweet</string>
     <string name="accessibility_common_status_actions_like">Like</string>
-    <string name="accessibility_common_status_thread_show">Show this thread</string>
-    <string name="accessibility_common_status_thread_compose">thread mode</string>
     <string name="accessibility_scene_home_compose">Compose</string>
     <string name="accessibility_scene_home_menu">Menu</string>
     <string name="accessibility_scene_home_drawer_account_dropdown">Account DropDown</string>
@@ -337,6 +337,7 @@
     <string name="accessibility_scene_compose_add_mention">Add mention</string>
     <string name="accessibility_scene_compose_image">Add image</string>
     <string name="accessibility_scene_compose_draft">Open draft</string>
+    <string name="accessibility_scene_compose_thread">Thread mode</string>
     <string name="accessibility_scene_manage_accounts_add">Add</string>
     <string name="accessibility_scene_settings_display_font_size">Font Size</string>
 </resources>
