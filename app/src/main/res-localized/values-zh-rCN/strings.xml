@@ -95,6 +95,7 @@
     <string name="common_controls_status_poll_total_vote">%s 票</string>
     <string name="common_controls_status_poll_total_people">%s 人</string>
     <string name="common_controls_status_poll_total_votes">%s 票</string>
+    <string name="common_controls_status_thread_show">显示此主题帖</string>
     <string name="common_controls_friendship_actions_follow">关注</string>
     <string name="common_controls_friendship_actions_unfollow">取消关注</string>
     <string name="common_controls_friendship_actions_following">已关注</string>
@@ -153,7 +154,11 @@
     <string name="scene_likes_title">喜欢</string>
     <string name="scene_bookmark_title">书签</string>
     <string name="scene_trends_title">趋势</string>
+    <string name="scene_trends_world_wide">趋势 - 全球范围</string>
+    <string name="scene_trends_now">现在的趋势</string>
+    <string name="scene_trends_accounts">%d 人正讨论</string>
     <string name="scene_status_title">推文</string>
+    <string name="scene_status_title_mastodon">嘟文</string>
     <string name="scene_status_reply_single">1 条回复</string>
     <string name="scene_status_reply_mutiple">%d 条回复</string>
     <string name="scene_status_quote_single">1 引用</string>
@@ -169,6 +174,8 @@
     <string name="scene_search_tabs_media">媒体</string>
     <string name="scene_search_tabs_users">用户</string>
     <string name="scene_search_tabs_hashtag">标签</string>
+    <string name="scene_search_show_more">显示更多</string>
+    <string name="scene_search_show_less">显示更少</string>
     <string name="scene_profile_title">我的</string>
     <string name="scene_profile_hide_reply">隐藏回复</string>
     <string name="scene_profile_permission_denied_profile_blocked_title">权限已被拒绝</string>
@@ -312,8 +319,6 @@
     <string name="accessibility_common_status_actions_reply">回复</string>
     <string name="accessibility_common_status_actions_retweet">转推</string>
     <string name="accessibility_common_status_actions_like">喜欢</string>
-    <string name="accessibility_common_status_thread_show">显示此主题帖</string>
-    <string name="accessibility_common_status_thread_compose">会话模式</string>
     <string name="accessibility_scene_home_compose">撰写</string>
     <string name="accessibility_scene_home_menu">菜单</string>
     <string name="accessibility_scene_home_drawer_account_dropdown">账户下拉列表</string>
@@ -331,6 +336,7 @@
     <string name="accessibility_scene_compose_add_mention">添加提及</string>
     <string name="accessibility_scene_compose_image">添加图片</string>
     <string name="accessibility_scene_compose_draft">打开草稿</string>
+    <string name="accessibility_scene_compose_thread">会话模式</string>
     <string name="accessibility_scene_manage_accounts_add">添加</string>
     <string name="accessibility_scene_settings_display_font_size">字体大小</string>
 </resources>

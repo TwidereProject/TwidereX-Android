@@ -37,11 +37,11 @@
     <string name="common_alerts_unfollowing_success_title">Deixou de Seguir com Sucesso</string>
     <string name="common_alerts_following_request_sent_title">Pedido para Seguir Enviado</string>
     <string name="common_alerts_too_many_requests_title">Muitas solicitações</string>
-    <string name="common_alerts_mute_user_success_title">%s foi mutado</string>
-    <string name="common_alerts_failed_to_mute_user_title">Falha ao mutar %s</string>
+    <string name="common_alerts_mute_user_success_title">%s foi silenciado</string>
+    <string name="common_alerts_failed_to_mute_user_title">Falha ao silenciar %s</string>
     <string name="common_alerts_failed_to_mute_user_message">Por favor, tente novamente</string>
-    <string name="common_alerts_unmute_user_success_title">%s foi desmutado</string>
-    <string name="common_alerts_failed_to_unmute_user_title">Falha ao desmutar %s</string>
+    <string name="common_alerts_unmute_user_success_title">%s foi dessilenciado</string>
+    <string name="common_alerts_failed_to_unmute_user_title">Falha ao dessilenciar %s</string>
     <string name="common_alerts_failed_to_unmute_user_message">Por favor, tente novamente</string>
     <string name="common_alerts_block_user_success_title">%s foi bloqueado</string>
     <string name="common_alerts_failed_to_block_user_title">Falha ao bloquear %s</string>
@@ -99,8 +99,8 @@
     <string name="common_controls_friendship_actions_unfollow">Deixar de seguir</string>
     <string name="common_controls_friendship_actions_following">Seguindo</string>
     <string name="common_controls_friendship_actions_pending">Pendente</string>
-    <string name="common_controls_friendship_actions_mute">Mutar</string>
-    <string name="common_controls_friendship_actions_unmute">Desmutar</string>
+    <string name="common_controls_friendship_actions_mute">Silenciar</string>
+    <string name="common_controls_friendship_actions_unmute">Dessilenciar</string>
     <string name="common_controls_friendship_actions_block">Bloquear</string>
     <string name="common_controls_friendship_actions_unblock">Desbloquear</string>
     <string name="common_controls_friendship_actions_report">Reportar</string>
@@ -110,7 +110,7 @@
     <string name="common_controls_friendship_follows_you">Segue você</string>
     <string name="common_controls_friendship_user_is_not_following_you">%s não está seguindo você</string>
     <string name="common_controls_friendship_user_is_following_you">%s está seguindo você</string>
-    <string name="common_controls_friendship_mute_user">Mutar %s</string>
+    <string name="common_controls_friendship_mute_user">Silenciar %s</string>
     <string name="common_controls_friendship_block_user">Bloquear %s</string>
     <string name="common_controls_profile_dashboard_following">Seguindo</string>
     <string name="common_controls_profile_dashboard_followers">Seguidores</string>
@@ -303,7 +303,7 @@
     <string name="accessibility_common_logo_twidere">Logo do Twidere X</string>
     <string name="accessibility_common_logo_twitter">Logo do Twitter</string>
     <string name="accessibility_common_logo_mastodon">Logo do Mastodon</string>
-    <string name="accessibility_common_logo_github">Logo do Github</string>
+    <string name="accessibility_common_logo_github">Logo do GitHub</string>
     <string name="accessibility_common_logo_telegram">Logo do Telegram</string>
     <string name="accessibility_common_video_play">Reproduzir vídeo</string>
     <string name="accessibility_common_status_location">Localização</string>
@@ -312,8 +312,6 @@
     <string name="accessibility_common_status_actions_reply">Responder</string>
     <string name="accessibility_common_status_actions_retweet">Retweet</string>
     <string name="accessibility_common_status_actions_like">Curtir</string>
-    <string name="accessibility_common_status_thread_show">Mostrar esta thread</string>
-    <string name="accessibility_common_status_thread_compose">modo thread</string>
     <string name="accessibility_scene_home_compose">Compor</string>
     <string name="accessibility_scene_home_menu">Menu</string>
     <string name="accessibility_scene_home_drawer_account_dropdown">Abaixar Conta</string>
