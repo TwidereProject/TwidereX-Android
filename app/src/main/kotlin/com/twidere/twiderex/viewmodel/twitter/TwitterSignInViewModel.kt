@@ -27,6 +27,7 @@ import androidx.lifecycle.viewModelScope
 import com.twidere.services.http.MicroBlogException
 import com.twidere.services.twitter.TwitterOAuthService
 import com.twidere.services.twitter.TwitterService
+import com.twidere.twiderex.BuildConfig
 import com.twidere.twiderex.db.mapper.toDbUser
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
@@ -34,6 +35,7 @@ import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.cred.CredentialsType
 import com.twidere.twiderex.model.cred.OAuthCredentials
 import com.twidere.twiderex.model.toAmUser
+import com.twidere.twiderex.navigation.DeepLinks
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.ACCOUNT_TYPE
 import com.twidere.twiderex.repository.AccountRepository
@@ -50,7 +52,8 @@ class TwitterSignInViewModel @AssistedInject constructor(
     private val inAppNotification: InAppNotification,
     @Assisted("consumerKey") private val consumerKey: String,
     @Assisted("consumerSecret") private val consumerSecret: String,
-    @Assisted private val pinCodeProvider: suspend (url: String) -> String?,
+    @Assisted("oauthVerifierProvider") private val oauthVerifierProvider: suspend (url: String) -> String?,
+    @Assisted("pinCodeProvider") private val pinCodeProvider: suspend (url: String) -> String?,
     @Assisted private val onResult: (success: Boolean) -> Unit,
 ) : ViewModel() {
 
@@ -59,12 +62,12 @@ class TwitterSignInViewModel @AssistedInject constructor(
         fun create(
             @Assisted("consumerKey") consumerKey: String,
             @Assisted("consumerSecret") consumerSecret: String,
-            @Assisted pinCodeProvider: suspend (url: String) -> String?,
+            @Assisted("oauthVerifierProvider") oauthVerifierProvider: suspend (url: String) -> String?,
+            @Assisted("pinCodeProvider") pinCodeProvider: suspend (url: String) -> String?,
             @Assisted onResult: (success: Boolean) -> Unit,
         ): TwitterSignInViewModel
     }
 
-    val pinCode = MutableLiveData<String>()
     val success = MutableLiveData(false)
     val loading = MutableLiveData(false)
 
@@ -79,8 +82,18 @@ class TwitterSignInViewModel @AssistedInject constructor(
         loading.postValue(true)
         try {
             val service = TwitterOAuthService(consumerKey, consumerSecret)
-            val token = service.getOAuthToken()
-            val pinCode = pinCodeProvider.invoke(service.getWebOAuthUrl(token))
+            val token = service.getOAuthToken(
+                if (isBuiltInKey()) {
+                    DeepLinks.Callback.SignIn.Twitter
+                } else {
+                    "oob"
+                }
+            )
+            val pinCode = if (isBuiltInKey()) {
+                oauthVerifierProvider.invoke(service.getWebOAuthUrl(token))
+            } else {
+                pinCodeProvider.invoke(service.getWebOAuthUrl(token))
+            }
             if (!pinCode.isNullOrBlank()) {
                 val accessToken = service.getAccessToken(pinCode, token)
                 val user = TwitterService(
@@ -135,6 +148,10 @@ class TwitterSignInViewModel @AssistedInject constructor(
         }
         loading.postValue(false)
         return false
+    }
+
+    private fun isBuiltInKey(): Boolean {
+        return consumerKey == BuildConfig.CONSUMERKEY && consumerSecret == BuildConfig.CONSUMERSECRET
     }
 
     fun cancel() {

@@ -33,10 +33,10 @@ import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.cred.CredentialsType
 import com.twidere.twiderex.model.cred.OAuth2Credentials
 import com.twidere.twiderex.model.toAmUser
+import com.twidere.twiderex.navigation.DeepLinks
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.ACCOUNT_TYPE
 import com.twidere.twiderex.repository.AccountRepository
-import com.twidere.twiderex.scenes.mastodon.MASTODON_CALLBACK_URL
 import com.twidere.twiderex.utils.json
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.launch
@@ -68,7 +68,7 @@ class MastodonSignInViewModel @AssistedInject constructor(
                 host = "https://$host",
                 client_name = "Twidere X",
                 website = "https://github.com/TwidereProject/TwidereX-Android",
-                redirect_uri = MASTODON_CALLBACK_URL,
+                redirect_uri = DeepLinks.Callback.SignIn.Mastodon,
             )
             val application = service.createApplication()
             val target = service.getWebOAuthUrl(application)

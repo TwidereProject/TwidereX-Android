@@ -20,14 +20,18 @@
  */
 package com.twidere.twiderex.scenes.twitter
 
+import android.net.Uri
+import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.platform.LocalContext
 import com.twidere.twiderex.component.foundation.SignInScaffold
 import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.ui.LocalNavController
+import com.twidere.twiderex.utils.CustomTabSignInChannel
 import com.twidere.twiderex.viewmodel.twitter.TwitterSignInViewModel
 
 @Composable
@@ -36,16 +40,23 @@ fun TwitterSignInScene(
     consumerSecret: String,
 ) {
     val navController = LocalNavController.current
+    val context = LocalContext.current
     val navigator = LocalNavigator.current
     val viewModel =
         assistedViewModel<TwitterSignInViewModel.AssistedFactory, TwitterSignInViewModel> {
             it.create(
                 consumerKey,
                 consumerSecret,
-                { target ->
+                oauthVerifierProvider = { target ->
+                    CustomTabsIntent.Builder()
+                        .setShareState(CustomTabsIntent.SHARE_STATE_OFF)
+                        .build().launchUrl(context, Uri.parse(target))
+                    CustomTabSignInChannel.waitOne().getQueryParameter("oauth_verifier")
+                },
+                pinCodeProvider = { target ->
                     navigator.twitterSignInWeb(target)
                 },
-                { success ->
+                onResult = { success ->
                     navController.goBackWith(success)
                 }
             )

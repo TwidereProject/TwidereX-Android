@@ -31,14 +31,16 @@ class TwitterOAuthService(
     private val consumerKey: String,
     private val consumerSecret: String,
 ) {
-    suspend fun getOAuthToken(): OAuthToken {
+    suspend fun getOAuthToken(
+        callback: String = "oob"
+    ): OAuthToken {
         return retrofit<TwitterOAuthResources>(
             TWITTER_BASE_URL,
             OAuth1Authorization(
                 consumerKey,
                 consumerSecret,
             ),
-        ).requestToken("oob").queryString()
+        ).requestToken(callback).queryString()
     }
 
     suspend fun getAccessToken(pinCode: String, token: OAuthToken): AccessToken {
