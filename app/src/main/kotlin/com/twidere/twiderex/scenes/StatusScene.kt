@@ -44,6 +44,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -57,6 +58,7 @@ import com.twidere.twiderex.component.foundation.ErrorPlaceholder
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.status.DetailedStatusComponent
 import com.twidere.twiderex.component.status.StatusDivider
+import com.twidere.twiderex.component.status.StatusThreadStyle
 import com.twidere.twiderex.component.status.TimelineStatusComponent
 import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.model.MicroBlogKey
@@ -129,8 +131,8 @@ fun StatusScene(
                 val distance = with(LocalDensity.current) {
                     -50.dp.toPx()
                 }
-                val index = remember {
-                    for (i in 0..source.itemCount) {
+                val firstVisibleIndex = remember {
+                    for (i in 0 until source.itemCount) {
                         if (source.peek(i)?.statusKey == status?.statusKey) {
                             return@remember i
                         }
@@ -138,14 +140,15 @@ fun StatusScene(
                     0
                 }
                 val state = rememberLazyListState(
-                    initialFirstVisibleItemIndex = index,
+                    initialFirstVisibleItemIndex = firstVisibleIndex,
                 )
                 LaunchedEffect(Unit) {
-                    if (index != 0 && state.firstVisibleItemIndex == index && state.firstVisibleItemScrollOffset == 0) {
+                    if (firstVisibleIndex != 0 && state.firstVisibleItemIndex == firstVisibleIndex && state.firstVisibleItemScrollOffset == 0) {
                         state.animateScrollBy(distance, tween())
                         state.animateScrollBy(-distance, tween())
                     }
                 }
+
                 LazyColumn(
                     state = state,
                     horizontalAlignment = Alignment.CenterHorizontally
@@ -163,22 +166,62 @@ fun StatusScene(
                         }
                     } else {
                         itemsIndexed(source) { index, it ->
-                            it?.let { status ->
-                                Column {
-                                    if (status.statusKey == statusKey) {
-                                        DetailedStatusComponent(data = status)
-                                    } else {
-                                        TimelineStatusComponent(data = status)
+                            it?.let { item ->
+                                Layout(
+                                    content = {
+                                        Column {
+                                            if (item.statusKey == statusKey) {
+                                                DetailedStatusComponent(
+                                                    data = item,
+                                                    lineUp = firstVisibleIndex > 0
+                                                )
+                                            } else {
+                                                val lineUp = index > 0 && source.peek(index - 1)
+                                                    .let { previous ->
+                                                        // is reply to the previous status
+                                                        previous?.statusId == item.inReplyToStatusId &&
+                                                            // and if it is replying to the detail status, make sure it's the same author
+                                                            if (previous?.statusKey == statusKey) item.user.userKey == previous.user.userKey else true
+                                                    }
+                                                val lineDown = index < source.itemCount - 1 &&
+                                                    // make sure next status is replying to the current status
+                                                    source.peek(index + 1)?.inReplyToStatusId == item.statusId
+                                                TimelineStatusComponent(
+                                                    data = item,
+                                                    threadStyle = if (lineUp && !lineDown)
+                                                        StatusThreadStyle.TEXT_ONLY
+                                                    else
+                                                        StatusThreadStyle.NONE,
+                                                    lineUp = lineUp,
+                                                    lineDown = lineDown,
+                                                )
+                                            }
+                                            if (item.statusKey == statusKey) {
+                                                Divider()
+                                            } else {
+                                                StatusDivider()
+                                            }
+                                        }
+                                        if (index == source.itemCount - 1) {
+                                            Spacer(
+                                                Modifier.fillParentMaxHeight()
+                                            )
+                                        }
+                                    },
+                                    measurePolicy = { measurables, constraints ->
+                                        val placeables = measurables.map { measurable ->
+                                            measurable.measure(constraints)
+                                        }
+                                        var itemHeight = placeables.first().measuredHeight
+                                        if (index == source.itemCount - 1) {
+                                            var spacerHeight = placeables.last().measuredHeight
+                                            itemHeight = maxOf(itemHeight, spacerHeight)
+                                        }
+                                        layout(constraints.maxWidth, itemHeight) {
+                                            placeables.getOrNull(0)?.place(0, 0)
+                                        }
                                     }
-                                    if (status.statusKey == statusKey) {
-                                        Divider()
-                                    } else {
-                                        StatusDivider()
-                                    }
-                                    if (index == source.itemCount - 1) {
-                                        Spacer(modifier = Modifier.fillParentMaxHeight())
-                                    }
-                                }
+                                )
                             }
                         }
                     }

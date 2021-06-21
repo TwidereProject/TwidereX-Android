@@ -48,10 +48,8 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.GridCells
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.LazyVerticalGrid
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -101,11 +99,11 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.coerceAtLeast
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.insets.LocalWindowInsets
-import com.twidere.services.mastodon.model.Emoji
 import com.twidere.services.mastodon.model.Visibility
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.AppBar
@@ -113,6 +111,7 @@ import com.twidere.twiderex.component.foundation.CheckboxItem
 import com.twidere.twiderex.component.foundation.InAppNotificationBottomSheetScaffold
 import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.foundation.TextInput
+import com.twidere.twiderex.component.lazy.itemsGridIndexed
 import com.twidere.twiderex.component.status.StatusLineComponent
 import com.twidere.twiderex.component.status.TimelineStatusComponent
 import com.twidere.twiderex.component.status.UserAvatar
@@ -126,6 +125,7 @@ import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.PlatformType
+import com.twidere.twiderex.model.ui.UiEmoji
 import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalNavController
@@ -199,6 +199,7 @@ private fun ComposeBody(
     val textFieldValue by viewModel.textFieldValue.observeAsState(initial = TextFieldValue())
     val keyboardController = LocalSoftwareKeyboardController.current
     val canSaveDraft by viewModel.canSaveDraft.observeAsState(initial = false)
+    val enableThreadMode by viewModel.enableThreadMode.observeAsState(initial = false)
     var showSaveDraftDialog by remember { mutableStateOf(false) }
     val scaffoldState = rememberBottomSheetScaffoldState()
     if (showSaveDraftDialog || canSaveDraft) {
@@ -273,10 +274,11 @@ private fun ComposeBody(
                             }
                         ) {
                             Icon(
-                                painter = painterResource(id = R.drawable.ic_send),
+                                painter = painterResource(id = if (enableThreadMode) R.drawable.ic_send_thread else R.drawable.ic_send),
                                 contentDescription = stringResource(
-                                    id = R.string.accessibility_scene_compose_send
-                                )
+                                    id = if (enableThreadMode) R.string.accessibility_scene_compose_thread else R.string.accessibility_scene_compose_send
+                                ),
+                                tint = if (textFieldValue.text.isNotEmpty()) MaterialTheme.colors.primary else LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
                             )
                         }
                     }
@@ -290,7 +292,7 @@ private fun ComposeBody(
                 ) {
                     val scrollState = rememberScrollState()
                     LaunchedEffect(scrollState) {
-                        if (composeType == ComposeType.Reply) {
+                        if (composeType == ComposeType.Reply || composeType == ComposeType.Thread) {
                             snapshotFlow { scrollState.value }
                                 .map { it > 0 }
                                 .distinctUntilChanged()
@@ -310,7 +312,7 @@ private fun ComposeBody(
                         modifier = Modifier
                             .verticalScroll(
                                 scrollState,
-                                reverseScrolling = composeType == ComposeType.Reply,
+                                reverseScrolling = composeType == ComposeType.Reply || composeType == ComposeType.Thread,
                             )
                             .clickable(
                                 onClick = {
@@ -324,7 +326,7 @@ private fun ComposeBody(
                         val height = with(LocalDensity.current) {
                             this@BoxWithConstraints.constraints.maxHeight.toDp()
                         }
-                        if (composeType == ComposeType.Reply) {
+                        if (composeType == ComposeType.Reply || composeType == ComposeType.Thread) {
                             status?.let { status ->
                                 Box(
                                     modifier = Modifier
@@ -347,13 +349,13 @@ private fun ComposeBody(
                                     it
                                 }
                             },
-                            lineUp = composeType == ComposeType.Reply,
+                            lineUp = composeType == ComposeType.Reply || composeType == ComposeType.Thread,
                         ) {
                             ComposeInput(
                                 scaffoldState,
                                 viewModel,
                                 account,
-                                autoFocus = if (composeType == ComposeType.Reply) {
+                                autoFocus = if (composeType == ComposeType.Reply || composeType == ComposeType.Thread) {
                                     scrollState.value == 0
                                 } else {
                                     true
@@ -393,7 +395,9 @@ private fun ComposeBody(
                             modifier = Modifier.weight(1f),
                             viewModel = viewModel,
                         )
-                        MastodonExtraActions(images, viewModel)
+                        CompositionLocalProvider(LocalContentAlpha.provides(ContentAlpha.medium)) {
+                            MastodonExtraActions(images, viewModel)
+                        }
                     } else {
                         Spacer(modifier = Modifier.weight(1F))
                     }
@@ -419,12 +423,15 @@ private fun ComposeBody(
                         keyboardController?.show()
                     }
                 }
-                ComposeActions(
-                    viewModel,
-                    emojiButtonClicked = {
-                        showEmoji = !showEmoji
-                    },
-                )
+                CompositionLocalProvider(LocalContentAlpha.provides(ContentAlpha.medium)) {
+                    ComposeActions(
+                        viewModel,
+                        showEmoji = showEmoji,
+                        emojiButtonClicked = {
+                            showEmoji = !showEmoji
+                        },
+                    )
+                }
                 EmojiPanel(viewModel = viewModel, showEmoji = showEmoji)
             }
         }
@@ -513,29 +520,42 @@ fun EmojiPanel(
 @ExperimentalFoundationApi
 @Composable
 private fun EmojiList(
-    items: List<Emoji>,
+    items: List<UiEmoji>,
     viewModel: ComposeViewModel
 ) {
-    LazyVerticalGrid(
-        cells = GridCells.Adaptive(EmojiListDefaults.Icon.Size),
-        contentPadding = EmojiListDefaults.ContentPadding,
-        content = {
-            items(items) {
-                it.url?.let { it1 ->
-                    NetworkImage(
-                        modifier = Modifier
-                            .size(EmojiListDefaults.Icon.Size)
-                            .padding(EmojiListDefaults.Icon.ContentPadding)
-                            .clickable {
-                                viewModel.insertEmoji(it)
-                            },
-                        data = it1,
-                        contentScale = ContentScale.Fit,
-                    )
+    BoxWithConstraints(modifier = Modifier.padding(EmojiListDefaults.ContentPadding)) {
+        val column = maxOf((maxWidth / EmojiListDefaults.Icon.Size).toInt(), 1)
+        LazyColumn {
+            items.forEach {
+                it.category?.let { category ->
+                    item {
+                        Text(
+                            text = category,
+                            style = MaterialTheme.typography.h6,
+                            modifier = Modifier.padding(EmojiListDefaults.Category.ContentPadding)
+                        )
+                    }
+                }
+                itemsGridIndexed(
+                    data = it.emoji,
+                    rowSize = column,
+                ) { _, item ->
+                    item.url?.let { it1 ->
+                        NetworkImage(
+                            modifier = Modifier
+                                .size(EmojiListDefaults.Icon.Size)
+                                .padding(EmojiListDefaults.Icon.ContentPadding)
+                                .clickable {
+                                    viewModel.insertEmoji(item)
+                                },
+                            data = it1,
+                            contentScale = ContentScale.Fit,
+                        )
+                    }
                 }
             }
-        },
-    )
+        }
+    }
 }
 
 object EmojiListDefaults {
@@ -548,6 +568,10 @@ object EmojiListDefaults {
         horizontal = 8.dp,
         vertical = 0.dp
     )
+
+    object Category {
+        val ContentPadding = PaddingValues(vertical = 16.dp, horizontal = 4.dp)
+    }
 }
 
 @Composable
@@ -570,8 +594,8 @@ private fun MastodonExtraActions(
                 tint = if (isImageSensitive) {
                     MaterialTheme.colors.primary
                 } else {
-                    LocalContentColor.current
-                }.copy(alpha = LocalContentAlpha.current)
+                    LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
+                }
             )
         }
     }
@@ -589,8 +613,8 @@ private fun MastodonExtraActions(
             tint = if (isContentWarning) {
                 MaterialTheme.colors.primary
             } else {
-                LocalContentColor.current
-            }.copy(alpha = LocalContentAlpha.current)
+                LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
+            }
         )
     }
 }
@@ -898,7 +922,9 @@ private fun ComposeInput(
                         // TODO: scroll lazyColumn
                     },
                     placeholder = {
-                        Text(text = stringResource(id = R.string.scene_compose_placeholder))
+                        CompositionLocalProvider(LocalContentAlpha.provides(ContentAlpha.medium)) {
+                            Text(text = stringResource(id = R.string.scene_compose_placeholder))
+                        }
                     }
                 )
 
@@ -929,7 +955,7 @@ private fun ColumnScope.MastodonContentWarningInput(viewModel: ComposeViewModel)
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 CompositionLocalProvider(
-                    LocalContentAlpha provides ContentAlpha.medium,
+                    LocalContentAlpha provides ContentAlpha.disabled,
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_alert_octagon),
@@ -941,7 +967,11 @@ private fun ColumnScope.MastodonContentWarningInput(viewModel: ComposeViewModel)
                     value = cwText,
                     onValueChange = { viewModel.setContentWarningText(it) },
                     placeholder = {
-                        Text(text = stringResource(id = R.string.scene_compose_cw_placeholder))
+                        CompositionLocalProvider(
+                            LocalContentAlpha provides ContentAlpha.disabled,
+                        ) {
+                            Text(text = stringResource(id = R.string.scene_compose_cw_placeholder))
+                        }
                     }
                 )
             }
@@ -1089,11 +1119,13 @@ private object ComposeVoteDefaults {
 @Composable
 private fun ComposeActions(
     viewModel: ComposeViewModel,
+    showEmoji: Boolean = false,
     emojiButtonClicked: () -> Unit = {},
 ) {
     val account = LocalActiveAccount.current ?: return
     val images by viewModel.images.observeAsState(initial = emptyList())
     val isInVoteState by viewModel.isInVoteMode.observeAsState(initial = false)
+    val enableThreadMode by viewModel.enableThreadMode.observeAsState(initial = false)
     val allowImage by derivedStateOf {
         account.type == PlatformType.Twitter || (account.type == PlatformType.Mastodon && !isInVoteState)
     }
@@ -1121,6 +1153,7 @@ private fun ComposeActions(
             }
         },
     )
+    val draftCount = viewModel.draftCount.observeAsState(0)
     Box {
         Row {
             AnimatedVisibility(visible = allowImage) {
@@ -1146,8 +1179,12 @@ private fun ComposeActions(
                     }
                 ) {
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_mood_smile),
+                        painter = painterResource(id = if (showEmoji) R.drawable.ic_keyboard else R.drawable.ic_mood_smile),
                         contentDescription = null,
+                        tint = if (showEmoji)
+                            MaterialTheme.colors.primary
+                        else
+                            LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
                     )
                 }
             }
@@ -1163,8 +1200,8 @@ private fun ComposeActions(
                         tint = if (isInVoteState) {
                             MaterialTheme.colors.primary
                         } else {
-                            LocalContentColor.current
-                        }.copy(alpha = LocalContentAlpha.current)
+                            LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
+                        }
                     )
                 }
             }
@@ -1187,7 +1224,7 @@ private fun ComposeActions(
                     Icon(
                         painter = painterResource(id = R.drawable.ic_at_sign),
                         contentDescription = stringResource(
-                            id = R.string.accessibility_scene_compose_at
+                            id = R.string.accessibility_scene_compose_add_mention,
                         )
                     )
                 }
@@ -1237,20 +1274,55 @@ private fun ComposeActions(
                     )
                 }
             }
-            Spacer(modifier = Modifier.weight(1f))
             IconButton(
                 onClick = {
-                    navController.navigate(Route.Draft.List)
-                }
+                    viewModel.setEnableThreadMode(!enableThreadMode)
+                },
             ) {
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_note),
-                    contentDescription = stringResource(
-                        id = R.string.accessibility_scene_compose_draft
-                    )
+                    painter = painterResource(id = R.drawable.ic_thread_mode),
+                    contentDescription = stringResource(id = R.string.accessibility_scene_compose_thread),
+                    tint = if (enableThreadMode) MaterialTheme.colors.primary else LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
                 )
             }
+            Spacer(modifier = Modifier.weight(1f))
+            if (draftCount.value > 0) {
+                IconButton(
+                    onClick = {
+                        navController.navigate(Route.Draft.List)
+                    }
+                ) {
+                    Box {
+                        Icon(
+                            painter = painterResource(
+                                id = if (draftCount.value > 9)
+                                    R.drawable.ic_drafts_more
+                                else
+                                    R.drawable.ic_draft_number
+                            ),
+                            contentDescription = stringResource(
+                                id = R.string.accessibility_scene_compose_draft
+                            )
+                        )
+                        if (draftCount.value < 9) {
+                            Text(
+                                text = draftCount.value.toString(),
+                                style = MaterialTheme.typography.overline.copy(fontWeight = FontWeight.Bold),
+                                modifier = Modifier
+                                    .align(Alignment.Center)
+                                    .padding(ComposeActionsDefaults.Draft.CountPadding)
+                            )
+                        }
+                    }
+                }
+            }
         }
+    }
+}
+
+private object ComposeActionsDefaults {
+    object Draft {
+        val CountPadding = PaddingValues(end = 1.dp, bottom = 1.dp)
     }
 }
 

@@ -100,8 +100,12 @@ abstract class PagingWithGapMediator(
             val since_id = withContext(Dispatchers.IO) {
                 sinceStatueKey?.let { database.statusDao().findWithStatusKey(it)?.statusId }
             }
-            val result = loadBetweenImpl(pageSize, max_id = max_id, since_id = since_id).map {
-                it.toDbPagingTimeline(accountKey, pagingKey)
+            val result = loadBetweenImpl(pageSize, max_id = max_id, since_id = since_id).let { list ->
+                list.map {
+                    it.toDbPagingTimeline(accountKey, pagingKey)
+                }.let {
+                    transform(it, list)
+                }
             }
             database.withTransaction {
                 if (maxStatusKey != null) {
@@ -125,6 +129,13 @@ abstract class PagingWithGapMediator(
                 loadingBetween.postValue((loadingBetween.value ?: listOf()) - maxStatusKey)
             }
         }
+    }
+
+    protected open suspend fun transform(
+        data: List<DbPagingTimelineWithStatus>,
+        list: List<IStatus>
+    ): List<DbPagingTimelineWithStatus> {
+        return data
     }
 
     protected abstract suspend fun loadBetweenImpl(

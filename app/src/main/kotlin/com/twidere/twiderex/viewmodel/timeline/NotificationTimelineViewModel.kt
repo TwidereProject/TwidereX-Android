@@ -26,12 +26,14 @@ import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.paging.mediator.NotificationTimelineMediator
 import com.twidere.twiderex.paging.mediator.paging.PagingWithGapMediator
+import com.twidere.twiderex.repository.NotificationRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 
 class NotificationTimelineViewModel @AssistedInject constructor(
     preferences: SharedPreferences,
     database: CacheDatabase,
+    notificationRepository: NotificationRepository,
     @Assisted private val account: AccountDetails
 ) : TimelineViewModel(preferences) {
     @dagger.assisted.AssistedFactory
@@ -41,9 +43,10 @@ class NotificationTimelineViewModel @AssistedInject constructor(
 
     override val pagingMediator: PagingWithGapMediator =
         NotificationTimelineMediator(
-            account.service as NotificationService,
-            account.accountKey,
-            database
+            service = account.service as NotificationService,
+            accountKey = account.accountKey,
+            database = database,
+            notificationRepository = notificationRepository,
         )
     override val savedStateKey: String = "${account.accountKey}_notification"
 }

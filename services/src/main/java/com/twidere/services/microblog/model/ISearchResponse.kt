@@ -24,3 +24,8 @@ interface ISearchResponse {
     val nextPage: String?
     val status: List<IStatus>
 }
+
+data class BasicSearchResponse(
+    override val nextPage: String?,
+    override val status: List<IStatus>
+) : ISearchResponse

@@ -1,0 +1,84 @@
+[
+    {
+        "name": "anime",
+        "url": "https://koyu.space/tags/anime",
+        "history": [
+            {
+                "day": "1623283200",
+                "uses": "3",
+                "accounts": "3"
+            },
+            {
+                "day": "1623196800",
+                "uses": "10",
+                "accounts": "9"
+            },
+            {
+                "day": "1623110400",
+                "uses": "0",
+                "accounts": "0"
+            },
+            {
+                "day": "1623024000",
+                "uses": "2",
+                "accounts": "2"
+            },
+            {
+                "day": "1622937600",
+                "uses": "6",
+                "accounts": "6"
+            },
+            {
+                "day": "1622851200",
+                "uses": "3",
+                "accounts": "3"
+            },
+            {
+                "day": "1622764800",
+                "uses": "5",
+                "accounts": "5"
+            }
+        ]
+    },
+    {
+        "name": "git",
+        "url": "https://koyu.space/tags/git",
+        "history": [
+            {
+                "day": "1623283200",
+                "uses": "0",
+                "accounts": "0"
+            },
+            {
+                "day": "1623196800",
+                "uses": "10",
+                "accounts": "10"
+            },
+            {
+                "day": "1623110400",
+                "uses": "0",
+                "accounts": "0"
+            },
+            {
+                "day": "1623024000",
+                "uses": "1",
+                "accounts": "1"
+            },
+            {
+                "day": "1622937600",
+                "uses": "7",
+                "accounts": "7"
+            },
+            {
+                "day": "1622851200",
+                "uses": "2",
+                "accounts": "2"
+            },
+            {
+                "day": "1622764800",
+                "uses": "2",
+                "accounts": "2"
+            }
+        ]
+    }
+]

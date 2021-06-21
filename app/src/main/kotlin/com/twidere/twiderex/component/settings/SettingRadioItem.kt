@@ -21,28 +21,28 @@
 package com.twidere.twiderex.component.settings
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.lazy.LazyListScope
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ListItem
 import androidx.compose.material.RadioButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.twidere.twiderex.component.lazy.itemHeader
+import com.twidere.twiderex.component.lazy.ItemHeader
 
 @OptIn(ExperimentalMaterialApi::class)
-fun <T : Enum<T>> LazyListScope.radioItem(
+@Composable
+fun <T : Enum<T>> ColumnScope.RadioItem(
     options: List<T>,
     value: T,
     onChanged: (T) -> Unit,
     title: @Composable () -> Unit,
     itemContent: @Composable (T) -> Unit,
 ) {
-    itemHeader {
+    ItemHeader() {
         title.invoke()
     }
 
-    items(options) {
+    options.forEach {
         ListItem(
             modifier = Modifier.clickable(onClick = { onChanged.invoke(it) }),
             text = {

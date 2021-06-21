@@ -34,7 +34,7 @@ inline fun <reified VM : ViewModel> viewModel(
     noinline creator: (() -> VM)? = null,
 ): VM {
     return viewModel(
-        if (dependsOn.any()) {
+        key = if (dependsOn.any()) {
             dependsOn.joinToString { it.hashCode().toString() } + VM::class.java.canonicalName
         } else {
             null

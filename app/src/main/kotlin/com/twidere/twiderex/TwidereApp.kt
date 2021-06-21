@@ -22,7 +22,9 @@ package com.twidere.twiderex
 
 import android.app.Application
 import androidx.hilt.work.HiltWorkerFactory
+import androidx.startup.AppInitializer
 import androidx.work.Configuration
+import com.twidere.twiderex.notification.NotificationInitializer
 import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
 
@@ -35,4 +37,11 @@ class TwidereApp : Application(), Configuration.Provider {
         Configuration.Builder()
             .setWorkerFactory(workerFactory)
             .build()
+
+    override fun onCreate() {
+        super.onCreate()
+        // manually setup NotificationInitializer since it require HiltWorkerFactory
+        AppInitializer.getInstance(this)
+            .initializeComponent(NotificationInitializer::class.java)
+    }
 }

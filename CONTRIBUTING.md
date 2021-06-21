@@ -19,14 +19,16 @@ For those able & willing to help fix issues and/or implement features ...
 ### Development environment
 
 Make sure you have
- - The latest Android Studio Canary
- - JDK 11
+ - Android Studio Arctic Fox 2020.3.1 or later
+ - JDK 11  
 
-### Working Branch
+### Working branch
 
-You should make changes on the `develop` branch, changes will be merged into `release` branch after a stable version released.
+You should make changes on the `develop` branch, changes will be merged into `master` branch after a stable version released.
 
-### Code style
-
+### Code guidelines
 Twidere X uses [ktlint](https://github.com/pinterest/ktlint) to check the code style, so make sure run `./gradlew spotlessCheck` and fix the errors before you submit any PR.  
 Twidere X treat warnings as errors, **DO NOT** use `@Suppress` to ignore any warnings unless you known what's happening.
+
+#### For UI code
+Twidere X follows [Compose Api Guidelines](https://github.com/androidx/androidx/blob/androidx-main/compose/docs/compose-api-guidelines.md), please read the guidelines before you contribute.  

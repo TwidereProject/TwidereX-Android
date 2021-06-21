@@ -59,4 +59,15 @@ interface LookupResources {
         @Query("poll.fields", encoded = true) pollFields: String? = null,
         @Query("user.fields", encoded = true) userFields: String? = null,
     ): TwitterResponseV2<StatusV2>
+
+    @GET("/2/tweets")
+    suspend fun lookupTweets(
+        @Query(value = "ids") ids: String,
+        @Query("tweet.fields", encoded = true) tweetFields: String? = null,
+        @Query("expansions", encoded = true) expansions: String? = null,
+        @Query("media.fields", encoded = true) mediaFields: String? = null,
+        @Query("place.fields", encoded = true) placeFields: String? = null,
+        @Query("poll.fields", encoded = true) pollFields: String? = null,
+        @Query("user.fields", encoded = true) userFields: String? = null,
+    ): TwitterResponseV2<List<StatusV2>>
 }

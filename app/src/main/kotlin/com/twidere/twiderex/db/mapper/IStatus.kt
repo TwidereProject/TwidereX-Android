@@ -23,6 +23,7 @@ package com.twidere.twiderex.db.mapper
 import com.twidere.services.mastodon.model.MastodonList
 import com.twidere.services.microblog.model.IListModel
 import com.twidere.services.microblog.model.IStatus
+import com.twidere.services.microblog.model.ITrend
 import com.twidere.services.microblog.model.IUser
 import com.twidere.services.twitter.model.TwitterList
 import com.twidere.twiderex.db.model.DbStatusWithReference
@@ -32,9 +33,11 @@ private typealias TwitterUser = com.twidere.services.twitter.model.User
 private typealias TwitterUserV2 = com.twidere.services.twitter.model.UserV2
 private typealias TwitterStatus = com.twidere.services.twitter.model.Status
 private typealias TwitterStatusV2 = com.twidere.services.twitter.model.StatusV2
+private typealias TwitterTrend = com.twidere.services.twitter.model.Trend
 private typealias MastodonStatus = com.twidere.services.mastodon.model.Status
 private typealias MastodonNotification = com.twidere.services.mastodon.model.Notification
 private typealias MastodonUser = com.twidere.services.mastodon.model.Account
+private typealias MastodonTrend = com.twidere.services.mastodon.model.Trend
 
 fun IStatus.toDbPagingTimeline(
     accountKey: MicroBlogKey,
@@ -93,5 +96,13 @@ fun IListModel.toDbList(
 ) = when (this) {
     is TwitterList -> this.toDbList(accountKey)
     is MastodonList -> this.toDbList(accountKey)
+    else -> throw NotImplementedError()
+}
+
+fun ITrend.toDbTrend(
+    accountKey: MicroBlogKey
+) = when (this) {
+    is TwitterTrend -> this.toDbTrend(accountKey)
+    is MastodonTrend -> this.toDbTrend(accountKey)
     else -> throw NotImplementedError()
 }

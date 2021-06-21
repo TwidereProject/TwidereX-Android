@@ -53,4 +53,22 @@ class AppearanceViewModel @AssistedInject constructor(
             it.toBuilder().setTheme(theme).build()
         }
     }
+
+    fun setHideTabBarWhenScrolling(hide: Boolean) = viewModelScope.launch {
+        appearancePreferences.updateData {
+            it.toBuilder().setHideTabBarWhenScroll(hide).build()
+        }
+    }
+
+    fun setHideFabWhenScrolling(hide: Boolean) = viewModelScope.launch {
+        appearancePreferences.updateData {
+            it.toBuilder().setHideFabWhenScroll(hide).build()
+        }
+    }
+
+    fun setHideAppBarWhenScrolling(hide: Boolean) = viewModelScope.launch {
+        appearancePreferences.updateData {
+            it.toBuilder().setHideAppBarWhenScroll(hide).build()
+        }
+    }
 }

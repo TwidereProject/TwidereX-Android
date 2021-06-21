@@ -69,6 +69,7 @@ enum class ComposeType {
     New,
     Reply,
     Quote,
+    Thread,
 }
 
 class DraftItemViewModel @AssistedInject constructor(
@@ -217,6 +218,10 @@ open class ComposeViewModel @AssistedInject constructor(
         }
     }
 
+    val draftCount by lazy {
+        draftRepository.sourceCount
+    }
+
     val location = MutableLiveData<Location?>()
     val excludedReplyUserIds = MutableLiveData<List<String>>(emptyList())
 
@@ -275,6 +280,7 @@ open class ComposeViewModel @AssistedInject constructor(
     val canSaveDraft =
         textFieldValue.combineWith(images) { text, imgs -> !text?.text.isNullOrEmpty() || !imgs.isNullOrEmpty() }
     val locationEnabled = MutableLiveData(false)
+    val enableThreadMode = MutableLiveData(composeType == ComposeType.Thread)
     val status = liveData {
         statusKey?.let { statusKey ->
             emitSource(
@@ -329,6 +335,10 @@ open class ComposeViewModel @AssistedInject constructor(
         isImageSensitive.value = value
     }
 
+    fun setEnableThreadMode(value: Boolean) {
+        enableThreadMode.value = value
+    }
+
     fun setVisibility(value: Visibility) {
         visibility.value = value
     }
@@ -379,6 +389,7 @@ open class ComposeViewModel @AssistedInject constructor(
         visibility = visibility.value,
         isSensitive = isImageSensitive.value,
         contentWarningText = contentWarningTextFieldValue.value?.text,
+        isThreadMode = enableThreadMode.value ?: false,
     )
 
     fun putImages(value: List<Uri>) {

@@ -20,20 +20,35 @@
  */
 package com.twidere.twiderex.component.lazy
 
-import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ListItem
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ProvideTextStyle
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 
 @OptIn(ExperimentalMaterialApi::class)
-fun LazyListScope.itemHeader(title: @Composable () -> Unit) {
-    item {
-        ListItem {
+@Composable
+fun ItemHeader(
+    modifier: Modifier = Modifier,
+    icon: @Composable (() -> Unit)? = null,
+    secondaryText: @Composable (() -> Unit)? = null,
+    singleLineSecondaryText: Boolean = true,
+    overlineText: @Composable (() -> Unit)? = null,
+    trailing: @Composable (() -> Unit)? = null,
+    text: @Composable () -> Unit
+) {
+    ListItem(
+        modifier,
+        icon,
+        secondaryText,
+        singleLineSecondaryText,
+        overlineText,
+        trailing,
+        text = {
             ProvideTextStyle(value = MaterialTheme.typography.button) {
-                title.invoke()
+                text.invoke()
             }
-        }
-    }
+        },
+    )
 }

@@ -37,4 +37,5 @@ enum class TweetFields(val value: String) {
     source("source"),
     text("text"),
     withheld("withheld"),
+    reply_settings("reply_settings")
 }

@@ -24,6 +24,7 @@ import androidx.activity.compose.BackHandler
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.Crossfade
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.animateFloat
@@ -38,6 +39,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -50,7 +52,6 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.ListItem
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
 import androidx.compose.material.ScaffoldState
 import androidx.compose.material.Surface
 import androidx.compose.material.TabRowDefaults
@@ -75,10 +76,13 @@ import com.twidere.twiderex.R
 import com.twidere.twiderex.component.UserMetrics
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarDefaults
+import com.twidere.twiderex.component.foundation.ApplyNotification
 import com.twidere.twiderex.component.foundation.IconTabsComponent
+import com.twidere.twiderex.component.foundation.NestedScrollScaffold
 import com.twidere.twiderex.component.foundation.Pager
+import com.twidere.twiderex.component.foundation.PagerState
 import com.twidere.twiderex.component.foundation.rememberPagerState
-import com.twidere.twiderex.component.lazy.itemDivider
+import com.twidere.twiderex.component.lazy.divider
 import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.component.status.UserName
 import com.twidere.twiderex.component.status.UserScreenName
@@ -99,6 +103,7 @@ import com.twidere.twiderex.ui.LocalActiveAccountViewModel
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.ui.mediumEmphasisContentContentColor
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalAnimationApi::class)
@@ -107,6 +112,9 @@ fun HomeScene() {
     val account = LocalActiveAccount.current ?: return
     val scope = rememberCoroutineScope()
     val tabPosition = LocalAppearancePreferences.current.tapPosition
+    val hideTab = LocalAppearancePreferences.current.hideTabBarWhenScroll
+    val hideFab = LocalAppearancePreferences.current.hideFabWhenScroll
+    val hideAppBar = LocalAppearancePreferences.current.hideAppBarWhenScroll
     val menus = remember(account.type) {
         listOf(
             HomeTimelineItem(),
@@ -135,76 +143,17 @@ fun HomeScene() {
             }
         }
     }
+    ApplyNotification(scaffoldState.snackbarHostState)
     TwidereScene {
-        Scaffold(
+        NestedScrollScaffold(
             scaffoldState = scaffoldState,
-            topBar = {
-                if (tabPosition == AppearancePreferences.TabPosition.Bottom) {
-                    AnimatedVisibility(
-                        visible = menus[pagerState.currentPage].withAppBar,
-                        enter = expandVertically(clip = false),
-                        exit = shrinkVertically(clip = false),
-                    ) {
-                        AppBar(
-                            backgroundColor = MaterialTheme.colors.surface.withElevation(),
-                            title = {
-                                Text(text = menus[pagerState.currentPage].name())
-                            },
-                            navigationIcon = {
-                                MenuAvatar(scaffoldState)
-                            },
-                            elevation = if (menus[pagerState.currentPage].withAppBar) {
-                                AppBarDefaults.TopAppBarElevation
-                            } else {
-                                0.dp
-                            }
-                        )
-                    }
-                } else {
-                    val transition = updateTransition(
-                        targetState = menus[pagerState.currentPage].withAppBar,
-                    )
-                    val elevation by transition.animateDp {
-                        if (it) {
-                            AppBarDefaults.TopAppBarElevation
-                        } else {
-                            0.dp
-                        }
-                    }
-                    Surface(
-                        elevation = elevation
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            MenuAvatar(scaffoldState)
-                            IconTabsComponent(
-                                modifier = Modifier.weight(1f),
-                                items = menus.map { it.icon() to it.name() },
-                                selectedItem = pagerState.currentPage,
-                                divider = {
-                                    TabRowDefaults.Divider(thickness = 0.dp)
-                                },
-                                onItemSelected = {
-                                    if (pagerState.currentPage == it) {
-                                        scope.launch {
-                                            menus[it].lazyListController.scrollToTop()
-                                        }
-                                    }
-                                    scope.launch {
-                                        pagerState.selectPage {
-                                            pagerState.currentPage = it
-                                        }
-                                    }
-                                },
-                            )
-                        }
-                    }
-                }
-            },
+            enableBottomBarNestedScroll = hideTab,
             bottomBar = {
                 if (tabPosition == AppearancePreferences.TabPosition.Bottom) {
-                    HomeBottomNavigation(menus, pagerState.currentPage) {
+                    HomeBottomNavigation(
+                        items = menus,
+                        selectedItem = pagerState.currentPage,
+                    ) {
                         if (pagerState.currentPage == it) {
                             scope.launch {
                                 menus[it].lazyListController.scrollToTop()
@@ -220,15 +169,110 @@ fun HomeScene() {
             },
             drawerContent = {
                 HomeDrawer(scaffoldState)
-            }
+            },
+            floatingActionButton = {
+                Crossfade(pagerState.currentPage) {
+                    menus[it].Fab()
+                }
+            },
+            enableFloatingActionButtonNestedScroll = hideFab,
+            topBar = {
+                HomeAppBar(
+                    tabPosition = tabPosition,
+                    menus = menus,
+                    pagerState = pagerState,
+                    scaffoldState = scaffoldState,
+                    scope = scope,
+                )
+            },
+            enableTopBarNestedScroll = hideAppBar
         ) {
             Box(
                 modifier = Modifier
+                    .fillMaxSize()
                     .padding(it)
             ) {
-                Pager(state = pagerState) {
+                Pager(
+                    state = pagerState,
+                ) {
                     menus[page].Content()
                 }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalAnimationApi::class)
+@Composable
+fun HomeAppBar(
+    modifier: Modifier = Modifier,
+    tabPosition: AppearancePreferences.TabPosition,
+    menus: List<HomeNavigationItem>,
+    pagerState: PagerState,
+    scaffoldState: ScaffoldState,
+    scope: CoroutineScope,
+) {
+    if (tabPosition == AppearancePreferences.TabPosition.Bottom) {
+        AnimatedVisibility(
+            visible = menus[pagerState.currentPage].withAppBar,
+            enter = expandVertically(clip = false),
+            exit = shrinkVertically(clip = false),
+            modifier = modifier
+        ) {
+            AppBar(
+                backgroundColor = MaterialTheme.colors.surface.withElevation(),
+                title = {
+                    Text(text = menus[pagerState.currentPage].name())
+                },
+                navigationIcon = {
+                    MenuAvatar(scaffoldState)
+                },
+                elevation = if (menus[pagerState.currentPage].withAppBar) {
+                    AppBarDefaults.TopAppBarElevation
+                } else {
+                    0.dp
+                },
+            )
+        }
+    } else {
+        val transition = updateTransition(
+            targetState = menus[pagerState.currentPage].withAppBar,
+        )
+        val elevation by transition.animateDp {
+            if (it) {
+                AppBarDefaults.TopAppBarElevation
+            } else {
+                0.dp
+            }
+        }
+        Surface(
+            elevation = elevation,
+            modifier = modifier
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                MenuAvatar(scaffoldState)
+                IconTabsComponent(
+                    modifier = Modifier.weight(1f),
+                    items = menus.map { it.icon() to it.name() },
+                    selectedItem = pagerState.currentPage,
+                    divider = {
+                        TabRowDefaults.Divider(thickness = 0.dp)
+                    },
+                    onItemSelected = {
+                        if (pagerState.currentPage == it) {
+                            scope.launch {
+                                menus[it].lazyListController.scrollToTop()
+                            }
+                        }
+                        scope.launch {
+                            pagerState.selectPage {
+                                pagerState.currentPage = it
+                            }
+                        }
+                    },
+                )
             }
         }
     }
@@ -268,12 +312,14 @@ private object MenuAvatarDefaults {
 
 @Composable
 fun HomeBottomNavigation(
+    modifier: Modifier = Modifier,
     items: List<HomeNavigationItem>,
     selectedItem: Int,
     onItemSelected: (Int) -> Unit,
 ) {
     BottomNavigation(
-        backgroundColor = MaterialTheme.colors.background
+        backgroundColor = MaterialTheme.colors.surface.withElevation(),
+        modifier = modifier
     ) {
         items.forEachIndexed { index, item ->
             BottomNavigationItem(
@@ -350,7 +396,7 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
                         )
                     }
                     if (allAccounts.any()) {
-                        itemDivider()
+                        divider()
                     }
                     item {
                         ListItem(
@@ -364,7 +410,7 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
                             }
                         )
                     }
-                    itemDivider()
+                    divider()
                     item {
                         ListItem(
                             modifier = Modifier.clickable(

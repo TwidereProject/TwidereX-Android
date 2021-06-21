@@ -22,7 +22,6 @@ package com.twidere.twiderex.db
 
 import androidx.room.testing.MigrationTestHelper
 import androidx.sqlite.db.SimpleSQLiteQuery
-import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.twidere.twiderex.viewmodel.compose.ComposeType
@@ -39,8 +38,7 @@ class AppDatabaseMigrationTest {
     @get:Rule
     val helper: MigrationTestHelper = MigrationTestHelper(
         InstrumentationRegistry.getInstrumentation(),
-        AppDatabase::class.java.canonicalName,
-        FrameworkSQLiteOpenHelperFactory()
+        AppDatabase::class.java,
     )
 
     @Test
@@ -69,6 +67,40 @@ class AppDatabaseMigrationTest {
                 }
                 getLong(getColumnIndex("createdAt")).also {
                     assert(it == createdAt)
+                }
+            }
+            close()
+        }
+    }
+
+    @Test
+    @Throws(IOException::class)
+    fun migrate2To3() {
+        val id = UUID.randomUUID().toString()
+        val content = "Content"
+        val lastActive = 1000L
+        helper.createDatabase(TEST_DB, 2).apply {
+            execSQL(
+                "INSERT INTO search (_id, content, lastActive) VALUES (?, ?, ?)",
+                arrayOf(id, content, lastActive)
+            )
+            close()
+        }
+
+        helper.runMigrationsAndValidate(TEST_DB, 3, true, AppDatabase_Migration_2_3).apply {
+            query(SimpleSQLiteQuery("SELECT * FROM search WHERE _id = ?", arrayOf(id))).apply {
+                moveToFirst()
+                getString(getColumnIndex("_id")).also {
+                    assert(it == id)
+                }
+                getString(getColumnIndex("content")).also {
+                    assert(it == content)
+                }
+                getLong(getColumnIndex("lastActive")).also {
+                    assert(it == lastActive)
+                }
+                getInt(getColumnIndex("saved")).also {
+                    assert(it == 0)
                 }
             }
             close()

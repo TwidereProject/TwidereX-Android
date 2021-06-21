@@ -49,9 +49,11 @@ class LikeWorker @AssistedInject constructor(
     ): StatusResult {
         val newStatus = service.like(status.statusId)
             .toDbStatusWithReference(accountKey = accountKey)
-            .toUi(accountKey = accountKey)
+            .toUi(accountKey = accountKey).let {
+                it.retweet ?: it
+            }
         return StatusResult(
-            statusKey = status.statusKey,
+            statusKey = newStatus.statusKey,
             accountKey = accountKey,
             liked = true,
             retweetCount = newStatus.retweetCount,

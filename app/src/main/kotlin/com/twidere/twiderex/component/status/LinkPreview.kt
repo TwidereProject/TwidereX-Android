@@ -38,7 +38,6 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Constraints
@@ -53,6 +52,7 @@ fun LinkPreview(
     title: String? = null,
     image: String? = null,
     desc: String? = null,
+    maxLines: Int = Int.MAX_VALUE
 ) {
     val styledModifier = Modifier
         .background(LinkPreviewDefaults.BackgroundColor, MaterialTheme.shapes.medium)
@@ -81,12 +81,14 @@ fun LinkPreview(
             image = image,
             desc = desc,
             link = link,
+            maxLines = maxLines,
         )
         title != null && image == null && desc != null -> LinkWithTitleAndDescPreview(
             modifier = styledModifier,
             title = title,
             desc = desc,
             link = link,
+            maxLines = maxLines,
         )
     }
 }
@@ -97,7 +99,10 @@ object LinkPreviewDefaults {
         vertical = 12.dp,
     )
     val TextPaddingStart = 16.dp
-    val BackgroundColor = Color.Black.copy(alpha = 0.04f)
+
+    val BackgroundColor
+        @Composable
+        get() = MaterialTheme.colors.onBackground.copy(alpha = 0.04f)
 
     val TitleStyle
         @Composable
@@ -216,12 +221,13 @@ private fun LinkWithTitleAndDescPreview(
     desc: String,
     link: String,
     modifier: Modifier = Modifier,
+    maxLines: Int,
 ) {
     Column(
         modifier = modifier.padding(LinkPreviewDefaults.ContentPadding),
     ) {
         Text(text = title, style = LinkPreviewDefaults.TitleStyle)
-        Text(text = desc, style = LinkPreviewDefaults.DescStyle)
+        Text(text = desc, style = LinkPreviewDefaults.DescStyle, maxLines = maxLines)
         CompositionLocalProvider(
             LocalContentColor provides MaterialTheme.colors.primary
         ) {
@@ -237,6 +243,7 @@ private fun LinkWithTitleAndLargeImagePreview(
     desc: String,
     link: String,
     modifier: Modifier = Modifier,
+    maxLines: Int,
 ) {
     Layout(
         modifier = modifier,
@@ -249,7 +256,7 @@ private fun LinkWithTitleAndLargeImagePreview(
                 modifier = Modifier.padding(LinkPreviewDefaults.ContentPadding),
             ) {
                 Text(text = title, style = LinkPreviewDefaults.TitleStyle)
-                Text(text = desc, style = LinkPreviewDefaults.DescStyle)
+                Text(text = desc, style = LinkPreviewDefaults.DescStyle, maxLines = maxLines)
                 CompositionLocalProvider(
                     LocalContentColor provides MaterialTheme.colors.primary
                 ) {

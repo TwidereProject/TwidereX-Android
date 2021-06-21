@@ -28,7 +28,6 @@ import com.twidere.services.mastodon.model.Context
 import com.twidere.services.mastodon.model.Emoji
 import com.twidere.services.mastodon.model.Hashtag
 import com.twidere.services.mastodon.model.MastodonPaging
-import com.twidere.services.mastodon.model.MastodonSearchResponse
 import com.twidere.services.mastodon.model.NotificationTypes
 import com.twidere.services.mastodon.model.Poll
 import com.twidere.services.mastodon.model.PostAccounts
@@ -47,6 +46,8 @@ import com.twidere.services.microblog.RelationshipService
 import com.twidere.services.microblog.SearchService
 import com.twidere.services.microblog.StatusService
 import com.twidere.services.microblog.TimelineService
+import com.twidere.services.microblog.TrendService
+import com.twidere.services.microblog.model.BasicSearchResponse
 import com.twidere.services.microblog.model.IListModel
 import com.twidere.services.microblog.model.INotification
 import com.twidere.services.microblog.model.IRelationship
@@ -73,7 +74,8 @@ class MastodonService(
     SearchService,
     StatusService,
     DownloadMediaService,
-    ListsService {
+    ListsService,
+    TrendService {
     private val resources by lazy {
         resources ?: retrofit(
             "https://$host",
@@ -231,7 +233,7 @@ class MastodonService(
             max_id = nextPage,
             limit = count
         )
-        return MastodonSearchResponse(
+        return BasicSearchResponse(
             nextPage = result.statuses?.lastOrNull()?.id,
             status = result.statuses ?: emptyList()
         )
@@ -394,4 +396,6 @@ class MastodonService(
         // do nothing
         throw MastodonException("no such method")
     }
+
+    override suspend fun trends(locationId: String, limit: Int?) = resources.trends(limit)
 }

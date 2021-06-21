@@ -23,6 +23,7 @@ package com.twidere.twiderex.di
 import android.content.Context
 import coil.imageLoader
 import coil.util.CoilUtils
+import com.twidere.services.nitter.NitterService
 import com.twidere.twiderex.db.AppDatabase
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.repository.AccountRepository
@@ -30,10 +31,12 @@ import com.twidere.twiderex.repository.CacheRepository
 import com.twidere.twiderex.repository.DraftRepository
 import com.twidere.twiderex.repository.ListsRepository
 import com.twidere.twiderex.repository.ListsUsersRepository
+import com.twidere.twiderex.repository.NotificationRepository
 import com.twidere.twiderex.repository.ReactionRepository
 import com.twidere.twiderex.repository.SearchRepository
 import com.twidere.twiderex.repository.StatusRepository
 import com.twidere.twiderex.repository.TimelineRepository
+import com.twidere.twiderex.repository.TrendRepository
 import com.twidere.twiderex.repository.UserRepository
 import dagger.Module
 import dagger.Provides
@@ -68,8 +71,13 @@ object RepositoryModule {
     )
 
     @Provides
-    fun provideStatusRepository(database: CacheDatabase): StatusRepository =
-        StatusRepository(database = database)
+    fun provideStatusRepository(
+        database: CacheDatabase,
+        nitterService: NitterService?,
+    ): StatusRepository = StatusRepository(
+        database = database,
+        nitterService = nitterService,
+    )
 
     @Provides
     fun provideReactionRepository(database: CacheDatabase): ReactionRepository =
@@ -92,4 +100,14 @@ object RepositoryModule {
 
     @Provides
     fun provideListUsersRepository() = ListsUsersRepository()
+
+    @Provides
+    fun provideNotificationRepository(
+        database: CacheDatabase,
+    ): NotificationRepository = NotificationRepository(database = database)
+
+    @Provides
+    fun provideTrendRepository(
+        database: CacheDatabase
+    ) = TrendRepository(database = database)
 }

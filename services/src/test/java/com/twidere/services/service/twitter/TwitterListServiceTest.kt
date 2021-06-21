@@ -20,21 +20,13 @@
  */
 package com.twidere.services.service.twitter
 
-import com.twidere.services.api.common.mockRetrofit
-import com.twidere.services.api.twitter.TwitterRequest2AssetPathConvertor
+import com.twidere.services.api.common.mockTwitterService
 import com.twidere.services.microblog.ListsService
 import com.twidere.services.service.ListServiceTest
-import com.twidere.services.twitter.TwitterService
 
 class TwitterListServiceTest : ListServiceTest() {
     override fun createService(): ListsService {
-        return TwitterService(
-            "", "", "", "",
-            resources = mockRetrofit(
-                "https://api.twitter.com/",
-                TwitterRequest2AssetPathConvertor()
-            )
-        )
+        return mockTwitterService()
     }
 
     override fun testListId(): String {

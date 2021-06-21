@@ -20,13 +20,28 @@
  */
 package com.twidere.twiderex.component.lazy
 
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.material.Divider
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
-fun LazyListScope.itemDivider(
+@Composable
+fun ColumnScope.ItemDivider(
+    modifier: Modifier = Modifier,
+    thickness: Dp = 1.dp,
+    startIndent: Dp = ItemDividerDefaults.StartIndent,
+) {
+    Divider(
+        modifier = modifier,
+        thickness = thickness,
+        startIndent = startIndent,
+    )
+}
+
+fun LazyListScope.divider(
     modifier: Modifier = Modifier,
     thickness: Dp = 1.dp,
     startIndent: Dp = ItemDividerDefaults.StartIndent,

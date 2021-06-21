@@ -1,6 +1,11 @@
 # Twidere X
-![Build Status](https://github.com/TwidereProject/TwidereX-Android/workflows/Android%20CI/badge.svg)
+[![Build Status](https://github.com/TwidereProject/TwidereX-Android/workflows/Android%20CI/badge.svg)](https://github.com/TwidereProject/TwidereX-Android/actions)
 [![Crowdin](https://badges.crowdin.net/twidere-x/localized.svg)](https://crowdin.com/project/twidere-x)
+[![Version](https://img.shields.io/github/v/release/TwidereProject/TwidereX-Android)](https://github.com/TwidereProject/TwidereX-Android/releases/latest)
+[![Issues](https://img.shields.io/github/issues/TwidereProject/TwidereX-Android)](https://github.com/TwidereProject/TwidereX-Android/issues)
+[![License](https://img.shields.io/github/license/TwidereProject/TwidereX-Android)](https://github.com/TwidereProject/TwidereX-Android/blob/develop/LICENSE)
+![Activity](https://img.shields.io/github/commit-activity/m/TwidereProject/TwidereX-Android)
+[![Contributors](https://img.shields.io/github/contributors/TwidereProject/TwidereX-Android)](https://github.com/TwidereProject/TwidereX-Android/graphs/contributors)
 
 [<img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt="Get it on Google Play" height="80">](https://play.google.com/store/apps/details?id=com.twidere.twiderex)
 [<img src="https://f-droid.org/badge/get-it-on.png" alt="Get it on F-Droid" height="80">](https://f-droid.org/en/packages/com.twidere.twiderex/)
@@ -18,31 +23,36 @@ Next generation of Twidere for Android 5.0+. **Still in early stage.**
 
 ## What's Happening
 
-### 1.2.0 - May 2021 Update
+### What's new in 1.3.0 - Jun 2021 Update
 
-- **Twitter/Mastodon list support is here**
-- Link preview is here and suppoted by the data from Twitter/Mastodon server. It's off by default.
-- Add placeholder to show loading state and empty state.
-- Fix video preview overlay issue #81
-- Fix font size slider #66
-- UI tweaking for status display
-- Upgrade Jetpack Compose to beta06
+- Twitter/Mastodon thread improve, you can send thread by enabling thread mode in compose page.
+- Add [Nitter](https://github.com/zedeus/nitter) support for fetching Twitter thread data.
+- Add account notification (background tasks only).
+- You can view trends in the search tab now.
+- Add options to hide fab/tab/bottom when scrolling timeline.
+- The read position now is retained after refreshing the timeline.
+- Exif metadata will be removed before uploading.
+- UI tweaking for status display, now thread status will display properly.
+- Fix input cursor color in compose page.
+- Fix status detail blank screen for the last item [#102](https://github.com/TwidereProject/TwidereX-Android/pull/102) by [HuixingWong](https://github.com/HuixingWong)
+- Upgrade Jetpack Compose to beta09.
 
-### What is being planned for 1.3.0 - May 2021
-For 1.3.0, we're focusing on stability and UI/UX improve, you can check out our [milestore](https://github.com/TwidereProject/TwidereX-Android/milestone/1) for detail. Here is a short list:
+### What is being planned for 1.4.0 - Jun 2021 Update
+For 1.4.0, we're working on Twitter DM support, this is one of the most important features that we want, you can check out our [milestore](https://github.com/TwidereProject/TwidereX-Android/milestone/2) for detail. Here is a shortlist:
 
-- Twitter/Mastodon thread improve, including reading and sending.
-- Notification support (background tasks only).
-- Edge to edge support.
+- Twitter DM (Direct Message) support.
+- Fido key and password manager support when login.
+- Pure dark mode.
 - UI/UX tweaking
 - Stability
 
-### Roadmap for 2.0 - May 2021
+### Roadmap for 2.0 - Jun 2021 Update
 For 2.0, we're considering these options, but it is still an early thought and might change over time.
 
 - Desktop (Linux/Windows) support (by [compose-jb](https://github.com/JetBrains/compose-jb)).
+- Tablet mode.
 - Javascript extension support.
-- View-Only mode (aka Anonymous Browse)
+- View-Only mode (aka Anonymous Browse).
 
 ## Contributing
 

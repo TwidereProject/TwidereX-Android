@@ -35,7 +35,7 @@ inline fun <reified AF, reified VM : ViewModel> assistedViewModel(
     val factories = LocalAssistedFactories.current
     val factory = factories.firstOrNull { AF::class.java.isInstance(it) } as? AF
     return viewModel(
-        if (dependsOn.any()) {
+        key = if (dependsOn.any()) {
             dependsOn.joinToString { it.hashCode().toString() } + VM::class.java.canonicalName
         } else {
             null

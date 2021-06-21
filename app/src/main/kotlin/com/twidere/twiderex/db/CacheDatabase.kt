@@ -25,24 +25,30 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.twidere.twiderex.db.dao.ListsDao
 import com.twidere.twiderex.db.dao.MediaDao
+import com.twidere.twiderex.db.dao.NotificationCursorDao
 import com.twidere.twiderex.db.dao.PagingTimelineDao
 import com.twidere.twiderex.db.dao.ReactionDao
 import com.twidere.twiderex.db.dao.StatusDao
 import com.twidere.twiderex.db.dao.StatusReferenceDao
+import com.twidere.twiderex.db.dao.TrendDao
+import com.twidere.twiderex.db.dao.TrendHistoryDao
 import com.twidere.twiderex.db.dao.UrlEntityDao
 import com.twidere.twiderex.db.dao.UserDao
 import com.twidere.twiderex.db.model.DbList
 import com.twidere.twiderex.db.model.DbMedia
+import com.twidere.twiderex.db.model.DbNotificationCursor
 import com.twidere.twiderex.db.model.DbPagingTimeline
-import com.twidere.twiderex.db.model.DbSearch
 import com.twidere.twiderex.db.model.DbStatusReaction
 import com.twidere.twiderex.db.model.DbStatusReference
 import com.twidere.twiderex.db.model.DbStatusV2
+import com.twidere.twiderex.db.model.DbTrend
+import com.twidere.twiderex.db.model.DbTrendHistory
 import com.twidere.twiderex.db.model.DbUrlEntity
 import com.twidere.twiderex.db.model.DbUser
 import com.twidere.twiderex.db.model.converter.ExtraConverter
 import com.twidere.twiderex.db.model.converter.MediaTypeConverter
 import com.twidere.twiderex.db.model.converter.MicroBlogKeyConverter
+import com.twidere.twiderex.db.model.converter.NotificationCursorTypeConverter
 import com.twidere.twiderex.db.model.converter.NotificationTypeConverter
 import com.twidere.twiderex.db.model.converter.PlatformTypeConverter
 import com.twidere.twiderex.db.model.converter.StringListConverter
@@ -58,11 +64,13 @@ import javax.inject.Singleton
         DbStatusReaction::class,
         DbPagingTimeline::class,
         DbUrlEntity::class,
-        DbSearch::class,
         DbStatusReference::class,
-        DbList::class
+        DbList::class,
+        DbNotificationCursor::class,
+        DbTrend::class,
+        DbTrendHistory::class
     ],
-    version = 12,
+    version = 16,
 )
 @TypeConverters(
     MicroBlogKeyConverter::class,
@@ -72,6 +80,7 @@ import javax.inject.Singleton
     StringListConverter::class,
     NotificationTypeConverter::class,
     ExtraConverter::class,
+    NotificationCursorTypeConverter::class,
 )
 abstract class CacheDatabase : RoomDatabase() {
     abstract fun statusDao(): StatusDao
@@ -82,4 +91,7 @@ abstract class CacheDatabase : RoomDatabase() {
     abstract fun urlEntityDao(): UrlEntityDao
     abstract fun statusReferenceDao(): StatusReferenceDao
     abstract fun listsDao(): ListsDao
+    abstract fun notificationCursorDao(): NotificationCursorDao
+    abstract fun trendDao(): TrendDao
+    abstract fun trendHistoryDao(): TrendHistoryDao
 }

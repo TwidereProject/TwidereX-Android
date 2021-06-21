@@ -23,10 +23,12 @@ package com.twidere.twiderex.scenes.home
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.ContentAlpha
+import androidx.compose.material.Divider
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -34,9 +36,8 @@ import androidx.compose.material.ListItem
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ProvideTextStyle
+import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.History
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -47,13 +48,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.items
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.AppBar
-import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.navigation.LocalNavigator
+import com.twidere.twiderex.component.trend.MastodonTrendItem
+import com.twidere.twiderex.component.trend.TwitterTrendItem
 import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.viewmodel.search.SearchInputViewModel
+import com.twidere.twiderex.viewmodel.trend.TrendViewModel
 
 class SearchItem : HomeNavigationItem() {
 
@@ -76,9 +82,17 @@ class SearchItem : HomeNavigationItem() {
             ) {
                 it.create(account = account)
             }
-        val source by viewModel.source.observeAsState(initial = emptyList())
+        val trendViewModel = assistedViewModel<TrendViewModel.AssistedFactory, TrendViewModel>(
+            account
+        ) {
+            it.create(account = account)
+        }
+        val source by viewModel.savedSource.observeAsState(initial = emptyList())
+        val trends = trendViewModel.source.collectAsLazyPagingItems()
         val navigator = LocalNavigator.current
-        InAppNotificationScaffold(
+        val searchCount = 3
+        val expandSearch by viewModel.expandSearch.observeAsState(false)
+        Scaffold(
             topBar = {
                 AppBar(
                     title = {
@@ -121,7 +135,15 @@ class SearchItem : HomeNavigationItem() {
             }
         ) {
             LazyColumn {
-                items(items = source) {
+                item {
+                    if (source.isNotEmpty()) ListItem {
+                        Text(
+                            text = stringResource(id = R.string.scene_search_saved_search),
+                            style = MaterialTheme.typography.button
+                        )
+                    }
+                }
+                items(items = source.filterIndexed { index, _ -> index < searchCount || expandSearch }) {
                     ListItem(
                         modifier = Modifier.clickable(
                             onClick = {
@@ -129,14 +151,6 @@ class SearchItem : HomeNavigationItem() {
                                 navigator.search(it.content)
                             }
                         ),
-                        icon = {
-                            Icon(
-                                imageVector = Icons.Default.History,
-                                contentDescription = stringResource(
-                                    id = R.string.accessibility_scene_search_history
-                                )
-                            )
-                        },
                         trailing = {
                             IconButton(
                                 onClick = {
@@ -144,7 +158,7 @@ class SearchItem : HomeNavigationItem() {
                                 }
                             ) {
                                 Icon(
-                                    painter = painterResource(id = R.drawable.ic_x),
+                                    painter = painterResource(id = R.drawable.ic_trash_can),
                                     contentDescription = stringResource(
                                         id = R.string.common_controls_actions_remove
                                     )
@@ -152,9 +166,69 @@ class SearchItem : HomeNavigationItem() {
                             }
                         },
                         text = {
-                            Text(text = it.content)
+                            Text(
+                                text = it.content,
+                                style = MaterialTheme.typography.subtitle1
+                            )
                         },
                     )
+                }
+                item {
+                    if (source.size > searchCount) ListItem(
+                        modifier = Modifier.clickable {
+                            viewModel.expandSearch.value = !expandSearch
+                        }
+                    ) {
+                        Text(
+                            text = if (expandSearch) stringResource(id = R.string.scene_search_show_less) else stringResource(id = R.string.scene_search_show_more),
+                            style = MaterialTheme.typography.subtitle1,
+                            color = MaterialTheme.colors.primary
+                        )
+                    }
+                }
+                if (trends.itemCount > 0) {
+                    item {
+                        Column {
+                            Divider()
+                            ListItem {
+                                when (account.type) {
+                                    PlatformType.Twitter ->
+                                        Text(
+                                            text = stringResource(id = R.string.scene_trends_world_wide),
+                                            style = MaterialTheme.typography.button
+                                        )
+                                    PlatformType.StatusNet -> TODO()
+                                    PlatformType.Fanfou -> TODO()
+                                    PlatformType.Mastodon ->
+                                        Text(
+                                            text = stringResource(id = R.string.scene_trends_world_wide),
+                                            style = MaterialTheme.typography.button
+                                        )
+                                }
+                            }
+                        }
+                    }
+                }
+                items(trends) {
+                    it?.let { trend ->
+                        when (account.type) {
+                            PlatformType.Twitter -> TwitterTrendItem(
+                                trend = it,
+                                onClick = {
+                                    viewModel.addOrUpgrade(trend.query)
+                                    navigator.search(trend.query)
+                                }
+                            )
+                            PlatformType.StatusNet -> TODO()
+                            PlatformType.Fanfou -> TODO()
+                            PlatformType.Mastodon -> MastodonTrendItem(
+                                trend = it,
+                                onClick = {
+                                    navigator.hashtag(it.query)
+                                }
+                            )
+                        }
+                    }
                 }
             }
         }

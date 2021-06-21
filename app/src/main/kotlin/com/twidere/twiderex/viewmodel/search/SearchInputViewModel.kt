@@ -20,13 +20,16 @@
  */
 package com.twidere.twiderex.viewmodel.search
 
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
+import androidx.lifecycle.viewModelScope
 import com.twidere.twiderex.db.model.DbSearch
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.repository.SearchRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.launch
 
 class SearchInputViewModel @AssistedInject constructor(
     private val repository: SearchRepository,
@@ -39,14 +42,20 @@ class SearchInputViewModel @AssistedInject constructor(
     }
 
     val source = liveData {
-        emitSource(repository.source)
+        emitSource(repository.searchHistory(account.accountKey))
     }
 
-    fun remove(item: DbSearch) {
+    val savedSource = liveData {
+        emitSource(repository.savedSearch(account.accountKey))
+    }
+
+    val expandSearch = MutableLiveData(false)
+
+    fun remove(item: DbSearch) = viewModelScope.launch {
         repository.remove(item)
     }
 
-    fun addOrUpgrade(content: String) {
-        repository.addOrUpgrade(content)
+    fun addOrUpgrade(content: String) = viewModelScope.launch {
+        repository.addOrUpgrade(content, account.accountKey)
     }
 }

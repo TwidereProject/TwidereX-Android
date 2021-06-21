@@ -32,10 +32,11 @@ fun StatusDivider() {
         modifier = Modifier.padding(
             start = StatusDividerDefaults.PaddingStart,
         ),
-        thickness = 0.5.dp
+        thickness = StatusDividerDefaults.ThickNess
     )
 }
 
 object StatusDividerDefaults {
     val PaddingStart = UserAvatarDefaults.AvatarSize + 24.dp
+    val ThickNess = 0.5.dp
 }

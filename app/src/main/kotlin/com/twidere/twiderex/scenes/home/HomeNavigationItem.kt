@@ -20,8 +20,12 @@
  */
 package com.twidere.twiderex.scenes.home
 
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.component.lazy.LazyListController
 
 abstract class HomeNavigationItem {
@@ -36,4 +40,14 @@ abstract class HomeNavigationItem {
 
     @Composable
     abstract fun Content()
+
+    @Composable
+    open fun Fab() {
+        // implement this method to apply FloatingActionButton
+        // FIXME: 2021/6/17 Workaround for Scaffold#256 which will filter out fab when size == 0
+        Spacer(modifier = Modifier.sizeIn(minWidth = 1.dp, minHeight = 1.dp))
+    }
+
+    // offset to hide fab when scroll timeline
+    open val fabSize = 0.dp
 }

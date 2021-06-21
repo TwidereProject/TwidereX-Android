@@ -24,6 +24,7 @@ import android.accounts.Account
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.twidere.services.mastodon.MastodonOAuthService
 import com.twidere.twiderex.db.mapper.toDbUser
 import com.twidere.twiderex.model.AccountDetails
@@ -38,6 +39,7 @@ import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.scenes.mastodon.MASTODON_CALLBACK_URL
 import com.twidere.twiderex.utils.json
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.launch
 
 class MastodonSignInViewModel @AssistedInject constructor(
     private val repository: AccountRepository,
@@ -55,10 +57,11 @@ class MastodonSignInViewModel @AssistedInject constructor(
         host.value = value
     }
 
-    suspend fun beginOAuth(
+    fun beginOAuth(
         host: String,
         codeProvider: suspend (url: String) -> String?,
-    ): Boolean {
+        finished: (success: Boolean) -> Unit,
+    ) = viewModelScope.launch {
         loading.postValue(true)
         runCatching {
             val service = MastodonOAuthService(
@@ -104,7 +107,7 @@ class MastodonSignInViewModel @AssistedInject constructor(
                                 )
                             )
                         }
-                        return true
+                        finished.invoke(true)
                     }
                 }
             }
@@ -112,6 +115,6 @@ class MastodonSignInViewModel @AssistedInject constructor(
             inAppNotification.show(it.message.toString())
         }
         loading.postValue(false)
-        return false
+        finished.invoke(false)
     }
 }

@@ -31,9 +31,14 @@ import androidx.work.WorkerParameters
 import com.twidere.services.mastodon.MastodonService
 import com.twidere.services.mastodon.model.PostPoll
 import com.twidere.services.mastodon.model.PostStatus
+import com.twidere.twiderex.db.CacheDatabase
+import com.twidere.twiderex.db.mapper.toDbStatusWithReference
+import com.twidere.twiderex.db.model.saveToDb
 import com.twidere.twiderex.model.ComposeData
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.toWorkData
+import com.twidere.twiderex.model.ui.UiStatus
+import com.twidere.twiderex.model.ui.UiStatus.Companion.toUi
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.viewmodel.compose.ComposeType
 import dagger.assisted.Assisted
@@ -47,6 +52,7 @@ class MastodonComposeWorker @AssistedInject constructor(
     accountRepository: AccountRepository,
     notificationManagerCompat: NotificationManagerCompat,
     private val contentResolver: ContentResolver,
+    private val cacheDatabase: CacheDatabase,
 ) : ComposeWorker<MastodonService>(context, workerParams, accountRepository, notificationManagerCompat) {
 
     companion object {
@@ -67,11 +73,14 @@ class MastodonComposeWorker @AssistedInject constructor(
         service: MastodonService,
         composeData: ComposeData,
         mediaIds: ArrayList<String>
-    ) {
-        service.compose(
+    ): UiStatus {
+        val accountKey = inputData.getString("accountKey")?.let {
+            MicroBlogKey.valueOf(it)
+        } ?: throw Error()
+        val result = service.compose(
             PostStatus(
                 status = composeData.content,
-                inReplyToID = if (composeData.composeType == ComposeType.Reply) composeData.statusKey?.id else null,
+                inReplyToID = if (composeData.composeType == ComposeType.Reply || composeData.composeType == ComposeType.Thread) composeData.statusKey?.id else null,
                 mediaIDS = mediaIds,
                 sensitive = composeData.isSensitive,
                 spoilerText = composeData.contentWarningText,
@@ -84,17 +93,20 @@ class MastodonComposeWorker @AssistedInject constructor(
                     )
                 }
             )
-        )
+        ).toDbStatusWithReference(accountKey)
+        listOf(result).saveToDb(cacheDatabase)
+        return result.toUi(accountKey)
     }
 
     override suspend fun uploadImage(
-        uri: Uri,
+        originUri: Uri,
+        scramblerUri: Uri,
         service: MastodonService
     ): String? {
-        val id = contentResolver.openInputStream(uri)?.use {
+        val id = contentResolver.openInputStream(scramblerUri)?.use { input ->
             service.upload(
-                it,
-                uri.path?.let { File(it).name }?.takeIf { it.isNotEmpty() } ?: "file"
+                input,
+                originUri.path?.let { File(it).name }?.takeIf { it.isNotEmpty() } ?: "file"
             )
         } ?: throw Error()
         return id.id

@@ -27,21 +27,28 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.twidere.twiderex.db.model.DbSearch
+import com.twidere.twiderex.model.MicroBlogKey
 
 @Dao
 interface SearchDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAll(vararg search: DbSearch)
+    suspend fun insertAll(search: List<DbSearch>)
 
-    @Query("SELECT * FROM search ORDER BY lastActive DESC")
-    fun getAll(): LiveData<List<DbSearch>>
+    @Query("SELECT * FROM search where accountKey == :accountKey ORDER BY lastActive DESC")
+    fun getAll(accountKey: MicroBlogKey): LiveData<List<DbSearch>>
 
-    @Query("SELECT * FROM search WHERE content == :content")
-    suspend fun get(content: String): DbSearch?
+    @Query("SELECT * FROM search where saved == 0 AND accountKey == :accountKey ORDER BY lastActive DESC")
+    fun getAllHistory(accountKey: MicroBlogKey): LiveData<List<DbSearch>>
+
+    @Query("SELECT * FROM search where saved == 1 AND accountKey == :accountKey ORDER BY lastActive DESC")
+    fun getAllSaved(accountKey: MicroBlogKey): LiveData<List<DbSearch>>
+
+    @Query("SELECT * FROM search WHERE content == :content AND accountKey == :accountKey")
+    suspend fun get(content: String, accountKey: MicroBlogKey): DbSearch?
 
     @Delete
     suspend fun remove(search: DbSearch)
 
-    @Query("DELETE FROM search")
+    @Query("DELETE FROM search where saved == 0")
     suspend fun clear()
 }

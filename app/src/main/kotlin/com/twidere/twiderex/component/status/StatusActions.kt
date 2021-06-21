@@ -57,6 +57,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.ExperimentalUnitApi
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.R
 import com.twidere.twiderex.action.LocalStatusActions
@@ -82,12 +83,13 @@ fun ReplyButton(
     val action = {
         navigator.compose(ComposeType.Reply, statusKey = status.statusKey)
     }
+    val data = status.retweet ?: status
     if (withNumber) {
         StatusActionButtonWithNumbers(
             modifier = modifier,
             icon = icon,
             color = LocalContentColor.current,
-            count = status.replyCount,
+            count = data.replyCount,
             contentDescription = contentDescription,
             onClick = {
                 action.invoke()
@@ -129,11 +131,12 @@ fun LikeButton(
             actionsViewModel.like(status, account)
         }
     }
+    val data = status.retweet ?: status
     if (withNumber) {
         StatusActionButtonWithNumbers(
             modifier = modifier,
             icon = icon,
-            count = status.likeCount,
+            count = data.likeCount,
             color = color,
             contentDescription = contentDescription,
             onClick = {
@@ -210,10 +213,11 @@ fun RetweetButton(
                 )
             }
         }
+        val data = status.retweet ?: status
         if (withNumber) {
             StatusActionButtonWithNumbers(
                 icon = icon,
-                count = status.retweetCount,
+                count = data.retweetCount,
                 color = color,
                 contentDescription = contentDescription,
                 onClick = {
@@ -236,6 +240,7 @@ fun RetweetButton(
     }
 }
 
+@OptIn(ExperimentalUnitApi::class)
 @Composable
 fun ShareButton(
     modifier: Modifier = Modifier,
@@ -244,14 +249,15 @@ fun ShareButton(
     menus: @Composable ColumnScope.(callback: () -> Unit) -> Unit = {},
 ) {
     var expanded by remember { mutableStateOf(false) }
+    val data = status.retweet ?: status
     val actionsViewModel = LocalStatusActions.current
     val account = LocalActiveAccount.current
     val accountKey = account?.accountKey
     val context = LocalContext.current
     val icon = Icons.Default.MoreHoriz
     val text = renderContentAnnotatedString(
-        htmlText = status.htmlText,
-        linkResolver = { status.resolveLink(it) },
+        htmlText = data.htmlText,
+        linkResolver = { data.resolveLink(it) },
     )
     val clipboardManager = LocalClipboardManager.current
     val contentDescription = stringResource(id = R.string.accessibility_common_more)
@@ -337,11 +343,11 @@ fun ShareButton(
                     text = stringResource(id = R.string.common_controls_status_actions_share_link),
                 )
             }
-            if (status.user.userKey == accountKey) {
+            if (data.user.userKey == accountKey) {
                 DropdownMenuItem(
                     onClick = {
                         expanded = false
-                        actionsViewModel.delete(status, account)
+                        actionsViewModel.delete(data, account)
                     }
                 ) {
                     Text(

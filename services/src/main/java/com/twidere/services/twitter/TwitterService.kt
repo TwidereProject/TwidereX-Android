@@ -33,6 +33,7 @@ import com.twidere.services.microblog.RelationshipService
 import com.twidere.services.microblog.SearchService
 import com.twidere.services.microblog.StatusService
 import com.twidere.services.microblog.TimelineService
+import com.twidere.services.microblog.TrendService
 import com.twidere.services.microblog.model.IRelationship
 import com.twidere.services.microblog.model.ISearchResponse
 import com.twidere.services.microblog.model.IStatus
@@ -79,7 +80,8 @@ class TwitterService(
     SearchService,
     StatusService,
     DownloadMediaService,
-    ListsService {
+    ListsService,
+    TrendService {
     private val resources by lazy {
         resources ?: retrofit(
             TWITTER_BASE_URL,
@@ -296,6 +298,25 @@ class TwitterService(
             data.setExtra(it)
         }
         return data
+    }
+
+    suspend fun lookupStatuses(id: List<String>): List<StatusV2> {
+        val response = resources.lookupTweets(
+            id.joinToString(","),
+            userFields = UserFields.values().joinToString(",") { it.value },
+            pollFields = PollFields.values().joinToString(",") { it.name },
+            placeFields = PlaceFields.values().joinToString(",") { it.value },
+            mediaFields = MediaFields.values()
+                .joinToString(",") { it.name },
+            expansions = Expansions.values().joinToString(",") { it.value },
+            tweetFields = TweetFields.values().joinToString(",") { it.value },
+        )
+        response.data?.forEach { status ->
+            response.includes?.let {
+                status.setExtra(it)
+            }
+        }
+        return response.data ?: emptyList()
     }
 
     override suspend fun userPinnedStatus(userId: String): List<IStatus> {
@@ -561,4 +582,16 @@ class TwitterService(
     override suspend fun subscribeList(
         listId: String
     ) = resources.subscribeLists(listId)
+
+    // worldwide id = 1
+    override suspend fun trends(
+        locationId: String,
+        limit: Int?
+    ) = resources.trends(locationId).let {
+        it[0]
+    }.trends?.let { list ->
+        limit?.let {
+            list.subList(0, it.coerceIn(0, list.size))
+        } ?: list
+    } ?: emptyList()
 }
