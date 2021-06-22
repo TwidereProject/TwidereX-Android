@@ -21,4 +21,5 @@ message AppearancePreferences {
   bool hideTabBarWhenScroll = 4;
   bool hideFabWhenScroll = 5;
   bool hideAppBarWhenScroll = 6;
+  bool isDarkModePureBlack = 7;
 }
