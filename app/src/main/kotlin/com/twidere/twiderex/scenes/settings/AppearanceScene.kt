@@ -218,7 +218,7 @@ fun AppearanceScene() {
                             viewModel.setIsDarkModePureBlack(it)
                         },
                     ) {
-                        Text(text = "AMOLED optimized mode")
+                        Text(text = stringResource(id = R.string.scene_settings_appearance_AMOLED_optimized_mode))
                     }
                 }
             }
