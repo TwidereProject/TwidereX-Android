@@ -231,6 +231,13 @@ object DeepLinks {
 
     const val Draft = "$twidereXSchema://draft/compose/{draftId}"
     const val Compose = "$twidereXSchema://compose"
+
+    object Callback {
+        object SignIn {
+            const val Mastodon = "$twidereXSchema://auth/callback/mastodon"
+            const val Twitter = "$twidereXSchema://auth/callback/twitter"
+        }
+    }
 }
 
 fun RouteBuilder.authorizedScene(
