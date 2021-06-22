@@ -116,9 +116,6 @@ class TwidereXActivity : ComponentActivity() {
         )
         WindowCompat.setDecorFitsSystemWindows(window, false)
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-        // set Color.TRANSPARENT is not fully transparent
-        window.navigationBarColor = Color.parseColor("#01FFFFFF")
-        window.statusBarColor = Color.TRANSPARENT
         setContent {
             val windowInsetsControllerCompat =
                 remember { WindowInsetsControllerCompat(window, window.decorView) }
