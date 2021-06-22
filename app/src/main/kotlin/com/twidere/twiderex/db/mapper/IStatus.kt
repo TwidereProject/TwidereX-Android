@@ -21,10 +21,12 @@
 package com.twidere.twiderex.db.mapper
 
 import com.twidere.services.mastodon.model.MastodonList
+import com.twidere.services.microblog.model.IDirectMessage
 import com.twidere.services.microblog.model.IListModel
 import com.twidere.services.microblog.model.IStatus
 import com.twidere.services.microblog.model.ITrend
 import com.twidere.services.microblog.model.IUser
+import com.twidere.services.twitter.model.DirectMessageEvent
 import com.twidere.services.twitter.model.TwitterList
 import com.twidere.twiderex.db.model.DbStatusWithReference
 import com.twidere.twiderex.model.MicroBlogKey
@@ -104,5 +106,12 @@ fun ITrend.toDbTrend(
 ) = when (this) {
     is TwitterTrend -> this.toDbTrend(accountKey)
     is MastodonTrend -> this.toDbTrend(accountKey)
+    else -> throw NotImplementedError()
+}
+
+fun IDirectMessage.toDbDirectMessage(
+    accountKey: MicroBlogKey
+) = when (this) {
+    is DirectMessageEvent -> this.toDbDirectMessage(accountKey)
     else -> throw NotImplementedError()
 }

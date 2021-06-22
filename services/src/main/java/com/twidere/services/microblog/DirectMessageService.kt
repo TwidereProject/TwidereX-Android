@@ -18,16 +18,21 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.services.twitter.api
+package com.twidere.services.microblog
 
-interface TwitterResources :
-    TimelineResources,
-    LookupResources,
-    UsersResources,
-    SearchResources,
-    StatusResources,
-    FriendshipResources,
-    FollowsResources,
-    ListsResources,
-    TrendsResources,
-    DirectMessagesResources
+import com.twidere.services.microblog.model.IDirectMessage
+
+interface DirectMessageService {
+    suspend fun getDirectMessages(
+        cursor: String? = null,
+        count: Int? = null,
+    ): List<IDirectMessage>
+
+    suspend fun showDirectMessage(
+        id: String
+    ): IDirectMessage?
+
+    suspend fun destroyDirectMessage(
+        id: String
+    )
+}

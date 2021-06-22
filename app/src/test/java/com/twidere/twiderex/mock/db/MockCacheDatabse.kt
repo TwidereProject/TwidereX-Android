@@ -24,6 +24,8 @@ import androidx.room.DatabaseConfiguration
 import androidx.room.InvalidationTracker
 import androidx.sqlite.db.SupportSQLiteOpenHelper
 import com.twidere.twiderex.db.CacheDatabase
+import com.twidere.twiderex.db.dao.DirectMessageConversationDao
+import com.twidere.twiderex.db.dao.DirectMessageDao
 import com.twidere.twiderex.db.dao.ListsDao
 import com.twidere.twiderex.db.dao.MediaDao
 import com.twidere.twiderex.db.dao.NotificationCursorDao
@@ -82,6 +84,14 @@ class MockCacheDatabase : CacheDatabase() {
     private val trendHistoryDao = MockTrendHistoryDao()
     override fun trendHistoryDao(): TrendHistoryDao {
         return trendHistoryDao
+    }
+
+    override fun directMessageConversationDao(): DirectMessageConversationDao {
+        TODO("Not yet implemented")
+    }
+
+    override fun directMessageDao(): DirectMessageDao {
+        TODO("Not yet implemented")
     }
 
     override fun createOpenHelper(config: DatabaseConfiguration?): SupportSQLiteOpenHelper {

@@ -20,6 +20,7 @@
  */
 package com.twidere.services.twitter.model
 
+import com.twidere.services.microblog.model.IDirectMessage
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -45,7 +46,7 @@ data class DirectMessageEvent(
     val messageCreate: MessageCreate? = null,
     @SerialName("type")
     val type: String? = null
-)
+) : IDirectMessage
 
 @Serializable
 data class MessageCreate(

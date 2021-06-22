@@ -25,6 +25,7 @@ import com.twidere.services.http.Errors
 import com.twidere.services.http.MicroBlogHttpException
 import com.twidere.services.http.authorization.OAuth1Authorization
 import com.twidere.services.http.retrofit
+import com.twidere.services.microblog.DirectMessageService
 import com.twidere.services.microblog.DownloadMediaService
 import com.twidere.services.microblog.ListsService
 import com.twidere.services.microblog.LookupService
@@ -81,7 +82,8 @@ class TwitterService(
     StatusService,
     DownloadMediaService,
     ListsService,
-    TrendService {
+    TrendService,
+    DirectMessageService {
     private val resources by lazy {
         resources ?: retrofit(
             TWITTER_BASE_URL,
@@ -594,4 +596,22 @@ class TwitterService(
             list.subList(0, it.coerceIn(0, list.size))
         } ?: list
     } ?: emptyList()
+
+    override suspend fun getDirectMessages(cursor: String?, count: Int?) = resources.getMessages(
+        cursor,
+        count
+    ).let {
+        TwitterPaging(
+            data = it.events ?: emptyList(),
+            nextPage = it.nextCursor
+        )
+    }
+
+    override suspend fun showDirectMessage(id: String) = resources.showMessage(id).event
+
+    override suspend fun destroyDirectMessage(id: String) {
+        resources.destroyMessage(id)
+    }
+
+    // TODO send directMessage
 }

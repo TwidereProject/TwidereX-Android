@@ -18,16 +18,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.services.twitter.api
+package com.twidere.services.microblog.model
 
-interface TwitterResources :
-    TimelineResources,
-    LookupResources,
-    UsersResources,
-    SearchResources,
-    StatusResources,
-    FriendshipResources,
-    FollowsResources,
-    ListsResources,
-    TrendsResources,
-    DirectMessagesResources
+interface IDirectMessage

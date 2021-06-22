@@ -30,13 +30,15 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Query
 
-// Todo store dm event into database using conversation model
 interface DirectMessagesResources {
     @POST("/1.1/direct_messages/events/new.json")
     suspend fun sendMessage(@Body event: DirectMessageEventObject): DirectMessageEvent
 
     @GET("/1.1/direct_messages/events/list.json")
-    suspend fun getMessages(): DirectMessageResponse
+    suspend fun getMessages(
+        @Query("cursor") cursor: String? = null,
+        @Query("count") count: Int? = null // default 20, 50 max
+    ): DirectMessageResponse
 
     @GET("/1.1/direct_messages/events/show.json")
     suspend fun showMessage(@Query("id") id: String): DirectMessageEventObject
