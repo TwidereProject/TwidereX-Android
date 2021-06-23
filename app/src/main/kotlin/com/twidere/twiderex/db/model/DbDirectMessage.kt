@@ -25,6 +25,8 @@ import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import androidx.room.Relation
+import com.twidere.twiderex.db.CacheDatabase
+import com.twidere.twiderex.db.model.DbDirectMessage.Companion.saveToDb
 import com.twidere.twiderex.model.MicroBlogKey
 
 @Entity(
@@ -46,7 +48,13 @@ data class DbDirectMessage(
     val messageType: String,
     val senderAccountKey: MicroBlogKey,
     val recipientAccountKey: MicroBlogKey,
-)
+) {
+    companion object {
+        suspend fun List<DbDirectMessage>.saveToDb(cacheDatabase: CacheDatabase) {
+            cacheDatabase.directMessageDao().insertAll(this)
+        }
+    }
+}
 
 data class DbDirectMessageWithMedia(
     @Embedded
@@ -57,4 +65,24 @@ data class DbDirectMessageWithMedia(
 
     @Relation(parentColumn = "messageKey", entityColumn = "statusKey", entity = DbUrlEntity::class)
     val urlEntity: List<DbUrlEntity>,
-)
+) {
+    companion object {
+        suspend fun List<DbDirectMessageWithMedia>.saveToDb(cacheDatabase: CacheDatabase) {
+            map {
+                it.message
+            }.saveToDb(cacheDatabase)
+
+            cacheDatabase.mediaDao().insertAll(
+                map {
+                    it.media
+                }.flatten()
+            )
+
+            cacheDatabase.urlEntityDao().insertAll(
+                map {
+                    it.urlEntity
+                }.flatten()
+            )
+        }
+    }
+}

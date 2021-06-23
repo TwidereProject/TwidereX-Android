@@ -1,0 +1,216 @@
+/*
+ *  Twidere X
+ *
+ *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
+ * 
+ *  This file is part of Twidere X.
+ * 
+ *  Twidere X is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ * 
+ *  Twidere X is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ * 
+ *  You should have received a copy of the GNU General Public License
+ *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
+ */
+package com.twidere.twiderex.db
+
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.room.Room
+import androidx.test.core.app.ApplicationProvider
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.twidere.services.twitter.model.Attachment
+import com.twidere.services.twitter.model.DirectMessageEvent
+import com.twidere.services.twitter.model.Entities
+import com.twidere.services.twitter.model.EntitiesURL
+import com.twidere.services.twitter.model.MessageCreate
+import com.twidere.services.twitter.model.MessageData
+import com.twidere.services.twitter.model.MessageTarget
+import com.twidere.services.twitter.model.PurpleMedia
+import com.twidere.twiderex.db.mapper.toDbDirectMessage
+import com.twidere.twiderex.db.model.DbDirectMessageConversation
+import com.twidere.twiderex.db.model.DbDirectMessageConversation.Companion.saveToDb
+import com.twidere.twiderex.db.model.DbDirectMessageWithMedia
+import com.twidere.twiderex.db.model.DbDirectMessageWithMedia.Companion.saveToDb
+import com.twidere.twiderex.model.MicroBlogKey
+import kotlinx.coroutines.runBlocking
+import org.junit.After
+import org.junit.Assert
+import org.junit.Before
+import org.junit.Rule
+import org.junit.Test
+import org.junit.runner.RunWith
+import java.util.UUID
+
+@RunWith(AndroidJUnit4::class)
+class DbDirectMessageTest {
+    private lateinit var cacheDatabase: CacheDatabase
+    private val user1AccountKey = MicroBlogKey.twitter("1")
+    private val user2AccountKey = MicroBlogKey.twitter("2")
+    private val messageCount = 5
+
+    @get:Rule
+    val rule = InstantTaskExecutorRule()
+
+    @Before
+    fun setUp() {
+        cacheDatabase = Room.inMemoryDatabaseBuilder(ApplicationProvider.getApplicationContext(), CacheDatabase::class.java)
+            .build()
+        runBlocking {
+            generateDirectMessage(messageCount, accountKey = user1AccountKey, UUID.randomUUID().toString(), user1AccountKey.id).also {
+                it.saveToDb(cacheDatabase)
+            }.toConversation()
+                .saveToDb(cacheDatabase)
+            generateDirectMessage(messageCount, accountKey = user2AccountKey, UUID.randomUUID().toString(), user2AccountKey.id).also {
+                it.saveToDb(cacheDatabase)
+            }.toConversation()
+                .saveToDb(cacheDatabase)
+        }
+    }
+
+    private fun List<DbDirectMessageWithMedia>.toConversation() =
+        groupBy {
+            it.message.conversationKey
+        }.map {
+            it.value.maxByOrNull { msg -> msg.message.sortId }?.message!!
+        }.map {
+            DbDirectMessageConversation(
+                _id = UUID.randomUUID().toString(),
+                accountKey = it.accountKey,
+                sortId = it.sortId,
+                conversationId = it.conversationKey.id,
+                conversationKey = it.conversationKey,
+                conversationAvatar = "",
+                conversationName = it.htmlText,
+                conversationType = DbDirectMessageConversation.Type.ONE_TO_ONE,
+                lastUpdateTime = it.createdTimestamp
+            )
+        }
+
+    private fun generateDirectMessage(count: Int, accountKey: MicroBlogKey, senderId: String, recipientId: String): List<DbDirectMessageWithMedia> {
+        val messageList = mutableListOf<DbDirectMessageWithMedia>()
+        for (i in 0 until count) {
+            messageList.add(
+                DirectMessageEvent(
+                    createdTimestamp = System.currentTimeMillis().toString(),
+                    id = UUID.randomUUID().toString(),
+                    type = "message_create",
+                    messageCreate = MessageCreate(
+                        messageData = MessageData(
+                            text = "message:$count",
+                            entities = Entities(
+                                urls = listOf(
+                                    EntitiesURL(
+                                        display_url = "url$count",
+                                        expanded_url = "expanded:$count",
+                                        url = "url:$count",
+                                        indices = listOf(0, 1)
+                                    )
+                                )
+                            ),
+                            attachment = Attachment(
+                                type = "media",
+                                media = PurpleMedia(
+                                    id = count.toLong(),
+                                    idStr = count.toString(),
+                                )
+                            )
+                        ),
+                        senderId = senderId,
+                        target = MessageTarget(
+                            recipientId
+                        )
+                    )
+                ).toDbDirectMessage(accountKey)
+            )
+        }
+        return messageList
+    }
+
+    @After
+    fun tearDown() {
+        cacheDatabase.close()
+    }
+
+    @Test
+    fun insertMessages_GetAllMessagesByAccountKey() = runBlocking {
+        val user1Messages = cacheDatabase.directMessageDao().getAll(accountKey = user1AccountKey)
+        user1Messages.forEach {
+            Assert.assertEquals(user1AccountKey, it.message.accountKey)
+        }
+        val user2Messages = cacheDatabase.directMessageDao().getAll(accountKey = user2AccountKey)
+        user2Messages.forEach {
+            Assert.assertEquals(user2AccountKey, it.message.accountKey)
+        }
+    }
+
+    @Test
+    fun getAllMessages_ContainsDbMediaAndUrl() = runBlocking {
+        val user1Messages = cacheDatabase.directMessageDao().getAll(accountKey = user1AccountKey)
+        user1Messages.forEach {
+            assert(it.media.isNotEmpty())
+            assert(it.urlEntity.isNotEmpty())
+            it.media.forEach { media ->
+                Assert.assertEquals(it.message.messageKey, media.statusKey)
+            }
+            it.urlEntity.forEach { url ->
+                Assert.assertEquals(it.message.messageKey, url.statusKey)
+            }
+        }
+    }
+
+    @Test
+    fun insertAllConversations_GetConversationsByAccountKey() = runBlocking {
+        val user1Conversation = cacheDatabase.directMessageConversationDao().find(accountKey = user1AccountKey)
+        user1Conversation.forEach {
+            Assert.assertEquals(user1AccountKey, it.conversation.accountKey)
+        }
+        val user2Conversation = cacheDatabase.directMessageConversationDao().find(accountKey = user2AccountKey)
+        user2Conversation.forEach {
+            Assert.assertEquals(user2AccountKey, it.conversation.accountKey)
+        }
+    }
+
+    @Test
+    fun foundConversations_ContainsLatestMessages() = runBlocking {
+        val conversations = cacheDatabase.directMessageConversationDao().find(accountKey = user1AccountKey)
+        conversations.forEach {
+            // check if latest message belong to this conversation
+            Assert.assertEquals(it.conversation.conversationKey, it.latestMessage.message.conversationKey)
+            // check if it is the latest message
+            val latestMessage = cacheDatabase.directMessageDao().find(it.conversation.accountKey, it.conversation.conversationKey)
+                .maxByOrNull { msg -> msg.message.sortId }
+            Assert.assertEquals(it.latestMessage.message.messageId, latestMessage?.message?.messageId)
+        }
+    }
+
+    @Test
+    fun deleteAndClearMessages() = runBlocking {
+        val result = cacheDatabase.directMessageDao().getAll(user1AccountKey)
+        cacheDatabase.directMessageDao().delete(result[0].message)
+        Assert.assertEquals(result.size - 1, cacheDatabase.directMessageDao().getAll(user1AccountKey).size)
+
+        cacheDatabase.directMessageDao().clearAll(user1AccountKey)
+        assert(cacheDatabase.directMessageDao().find(user1AccountKey, result[1].message.conversationKey).isEmpty())
+    }
+
+    @Test
+    fun deleteConversation() = runBlocking {
+        val result = cacheDatabase.directMessageConversationDao().find(user1AccountKey)
+        cacheDatabase.directMessageDao().clearConversation(user1AccountKey, result[0].conversation.conversationKey)
+        cacheDatabase.directMessageConversationDao().delete(result[0].conversation)
+        Assert.assertEquals(result.size - 1, cacheDatabase.directMessageConversationDao().find(user1AccountKey).size)
+    }
+
+    @Test
+    fun clearConversation() = runBlocking {
+        cacheDatabase.directMessageDao().clearAll(user1AccountKey)
+        cacheDatabase.directMessageConversationDao().clearAll(user1AccountKey)
+        assert(cacheDatabase.directMessageConversationDao().find(user1AccountKey).isEmpty())
+    }
+}

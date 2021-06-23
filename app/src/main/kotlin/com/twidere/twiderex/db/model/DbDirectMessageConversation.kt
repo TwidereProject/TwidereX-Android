@@ -25,6 +25,7 @@ import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import androidx.room.Relation
+import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.model.MicroBlogKey
 
 @Entity(
@@ -41,20 +42,25 @@ data class DbDirectMessageConversation(
     val conversationKey: MicroBlogKey,
     val conversationAvatar: String,
     val conversationName: String,
-    val conversationType: DbDirectMessageConversation.Type,
+    val conversationType: Type,
     val lastUpdateTime: Long,
 ) {
     enum class Type {
         ONE_TO_ONE,
         GROUP
     }
+
+    companion object {
+        suspend fun List<DbDirectMessageConversation>.saveToDb(cacheDatabase: CacheDatabase) {
+            cacheDatabase.directMessageConversationDao().insertAll(this)
+        }
+    }
 }
 
 data class DbDirectMessageConversationWithMessage(
-    @Embedded
+    @Relation(parentColumn = "conversationKey", entityColumn = "conversationKey")
     val conversation: DbDirectMessageConversation,
 
-    //todo get latest message by create time
-    @Relation(parentColumn = "conversationKey", entityColumn = "conversationKey", entity = DbDirectMessage::class)
+    @Embedded
     val latestMessage: DbDirectMessageWithMedia
 )

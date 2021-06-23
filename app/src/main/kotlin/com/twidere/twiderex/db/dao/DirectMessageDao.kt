@@ -37,6 +37,10 @@ interface DirectMessageDao {
     suspend fun insertAll(trends: List<DbDirectMessage>)
 
     @Transaction
+    @Query("SELECT * FROM direct_message WHERE accountKey == :accountKey ORDER BY sortId DESC")
+    suspend fun getAll(accountKey: MicroBlogKey): List<DbDirectMessageWithMedia>
+
+    @Transaction
     @Query("SELECT * FROM direct_message WHERE accountKey == :accountKey AND conversationKey == :conversationKey ORDER BY sortId DESC")
     suspend fun find(accountKey: MicroBlogKey, conversationKey: MicroBlogKey): List<DbDirectMessageWithMedia>
 
@@ -48,8 +52,11 @@ interface DirectMessageDao {
     ): PagingSource<Int, DbDirectMessageWithMedia>
 
     @Delete
-    suspend fun delete(data: DbDirectMessage): DbDirectMessage
+    suspend fun delete(data: DbDirectMessage)
 
     @Query("DELETE FROM direct_message WHERE accountKey == :accountKey AND conversationKey == :conversationKey")
-    suspend fun clearAll(accountKey: MicroBlogKey, conversationKey: MicroBlogKey)
+    suspend fun clearConversation(accountKey: MicroBlogKey, conversationKey: MicroBlogKey)
+
+    @Query("DELETE FROM direct_message WHERE accountKey == :accountKey")
+    suspend fun clearAll(accountKey: MicroBlogKey)
 }
