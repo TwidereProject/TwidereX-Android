@@ -21,7 +21,6 @@
 package com.twidere.twiderex
 
 import android.content.Intent
-import android.graphics.Color
 import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
