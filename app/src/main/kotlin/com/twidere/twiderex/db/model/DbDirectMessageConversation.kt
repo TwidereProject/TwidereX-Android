@@ -36,14 +36,13 @@ data class DbDirectMessageConversation(
     @PrimaryKey
     val _id: String,
     val accountKey: MicroBlogKey,
-    val sortId: Long,
     // conversation
     val conversationId: String,
     val conversationKey: MicroBlogKey,
     val conversationAvatar: String,
     val conversationName: String,
+    val conversationSubName: String,
     val conversationType: Type,
-    val lastUpdateTime: Long,
 ) {
     enum class Type {
         ONE_TO_ONE,

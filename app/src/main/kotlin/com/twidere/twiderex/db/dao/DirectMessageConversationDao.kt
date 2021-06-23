@@ -30,13 +30,14 @@ import androidx.room.Transaction
 import com.twidere.twiderex.db.model.DbDirectMessageConversation
 import com.twidere.twiderex.db.model.DbDirectMessageConversationWithMessage
 import com.twidere.twiderex.model.MicroBlogKey
+import org.jetbrains.annotations.TestOnly
 
 @Dao
 interface DirectMessageConversationDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAll(trends: List<DbDirectMessageConversation>)
+    suspend fun insertAll(conversations: List<DbDirectMessageConversation>)
 
-    // use join to found latest msg under each conversation, then use relation to found the conversation
+    @TestOnly
     @Transaction
     @Query(
         """
@@ -48,6 +49,7 @@ interface DirectMessageConversationDao {
     )
     suspend fun find(accountKey: MicroBlogKey): List<DbDirectMessageConversationWithMessage>
 
+    // use join to found latest msg under each conversation, then use relation to found the conversation
     @Transaction
     @Query(
         """

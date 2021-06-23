@@ -43,12 +43,14 @@ class MockCacheDatabase : CacheDatabase() {
         TODO("Not yet implemented")
     }
 
+    private val mediaDao = MockMediaDao()
     override fun mediaDao(): MediaDao {
-        TODO("Not yet implemented")
+        return mediaDao
     }
 
+    private val userDao = MockUserDao()
     override fun userDao(): UserDao {
-        TODO("Not yet implemented")
+        return userDao
     }
 
     override fun reactionDao(): ReactionDao {
@@ -59,8 +61,9 @@ class MockCacheDatabase : CacheDatabase() {
         TODO("Not yet implemented")
     }
 
+    private val urlEntityDao = MockUrlEntityDao()
     override fun urlEntityDao(): UrlEntityDao {
-        TODO("Not yet implemented")
+        return urlEntityDao
     }
 
     override fun statusReferenceDao(): StatusReferenceDao {
@@ -86,12 +89,14 @@ class MockCacheDatabase : CacheDatabase() {
         return trendHistoryDao
     }
 
+    private val conversationDao = MockDirectMessageConversationDao()
     override fun directMessageConversationDao(): DirectMessageConversationDao {
-        TODO("Not yet implemented")
+        return conversationDao
     }
 
+    private val dmDao = MockDirectMessageDao()
     override fun directMessageDao(): DirectMessageDao {
-        TODO("Not yet implemented")
+        return dmDao
     }
 
     override fun createOpenHelper(config: DatabaseConfiguration?): SupportSQLiteOpenHelper {

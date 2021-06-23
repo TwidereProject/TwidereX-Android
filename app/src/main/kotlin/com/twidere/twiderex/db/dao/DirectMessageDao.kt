@@ -34,7 +34,7 @@ import com.twidere.twiderex.model.MicroBlogKey
 @Dao
 interface DirectMessageDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAll(trends: List<DbDirectMessage>)
+    suspend fun insertAll(messages: List<DbDirectMessage>)
 
     @Transaction
     @Query("SELECT * FROM direct_message WHERE accountKey == :accountKey ORDER BY sortId DESC")

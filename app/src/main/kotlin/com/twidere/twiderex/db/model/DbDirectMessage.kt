@@ -49,6 +49,12 @@ data class DbDirectMessage(
     val senderAccountKey: MicroBlogKey,
     val recipientAccountKey: MicroBlogKey,
 ) {
+    val isInComeDM: Boolean
+        get() = accountKey == recipientAccountKey
+
+    val conversationUserKey: MicroBlogKey
+        get() = if (accountKey == senderAccountKey) recipientAccountKey else senderAccountKey
+
     companion object {
         suspend fun List<DbDirectMessage>.saveToDb(cacheDatabase: CacheDatabase) {
             cacheDatabase.directMessageDao().insertAll(this)
@@ -65,6 +71,9 @@ data class DbDirectMessageWithMedia(
 
     @Relation(parentColumn = "messageKey", entityColumn = "statusKey", entity = DbUrlEntity::class)
     val urlEntity: List<DbUrlEntity>,
+
+    @Relation(parentColumn = "senderAccountKey", entityColumn = "userKey", entity = DbUser::class)
+    val sender: DbUser
 ) {
     companion object {
         suspend fun List<DbDirectMessageWithMedia>.saveToDb(cacheDatabase: CacheDatabase) {
@@ -82,6 +91,10 @@ data class DbDirectMessageWithMedia(
                 map {
                     it.urlEntity
                 }.flatten()
+            )
+
+            cacheDatabase.userDao().insertAll(
+                map { it.sender }
             )
         }
     }

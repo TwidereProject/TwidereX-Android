@@ -33,7 +33,9 @@ import com.twidere.services.twitter.model.MessageCreate
 import com.twidere.services.twitter.model.MessageData
 import com.twidere.services.twitter.model.MessageTarget
 import com.twidere.services.twitter.model.PurpleMedia
+import com.twidere.services.twitter.model.User
 import com.twidere.twiderex.db.mapper.toDbDirectMessage
+import com.twidere.twiderex.db.mapper.toDbUser
 import com.twidere.twiderex.db.model.DbDirectMessageConversation
 import com.twidere.twiderex.db.model.DbDirectMessageConversation.Companion.saveToDb
 import com.twidere.twiderex.db.model.DbDirectMessageWithMedia
@@ -67,7 +69,7 @@ class DbDirectMessageTest {
             for (i in 0 until conversationCount) {
                 generateDirectMessage(
                     accountKey = user1AccountKey,
-                    UUID.randomUUID().toString(),
+                    System.currentTimeMillis().toString(),
                     user1AccountKey.id
                 ).also {
                     it.saveToDb(cacheDatabase)
@@ -75,7 +77,7 @@ class DbDirectMessageTest {
                     .saveToDb(cacheDatabase)
                 generateDirectMessage(
                     accountKey = user2AccountKey,
-                    UUID.randomUUID().toString(),
+                    System.currentTimeMillis().toString(),
                     user2AccountKey.id
                 ).also {
                     it.saveToDb(cacheDatabase)
@@ -94,13 +96,12 @@ class DbDirectMessageTest {
             DbDirectMessageConversation(
                 _id = UUID.randomUUID().toString(),
                 accountKey = it.accountKey,
-                sortId = it.sortId,
                 conversationId = it.conversationKey.id,
                 conversationKey = it.conversationKey,
                 conversationAvatar = "",
                 conversationName = it.htmlText,
                 conversationType = DbDirectMessageConversation.Type.ONE_TO_ONE,
-                lastUpdateTime = it.createdTimestamp
+                conversationSubName = ""
             )
         }
 
@@ -139,7 +140,14 @@ class DbDirectMessageTest {
                             recipientId
                         )
                     )
-                ).toDbDirectMessage(accountKey)
+                ).toDbDirectMessage(
+                    accountKey,
+                    User(
+                        id = senderId.toLong(),
+                        idStr = senderId,
+
+                    ).toDbUser()
+                )
             )
             delay(1)
         }
@@ -256,7 +264,7 @@ class DbDirectMessageTest {
     fun get_OrderBySortId() = runBlocking {
         val result = cacheDatabase.directMessageConversationDao().find(accountKey = user1AccountKey)
         result.forEachIndexed { index, con ->
-            if (index < result.size - 2) assert(con.conversation.sortId > result[index + 1].conversation.sortId)
+            if (index < result.size - 2) assert(con.latestMessage.message.sortId > result[index + 1].latestMessage.message.sortId)
         }
 
         val message = cacheDatabase.directMessageDao().find(accountKey = user1AccountKey, conversationKey = result[0].conversation.conversationKey)

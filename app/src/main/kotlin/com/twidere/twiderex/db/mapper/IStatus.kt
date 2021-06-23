@@ -29,6 +29,7 @@ import com.twidere.services.microblog.model.IUser
 import com.twidere.services.twitter.model.DirectMessageEvent
 import com.twidere.services.twitter.model.TwitterList
 import com.twidere.twiderex.db.model.DbStatusWithReference
+import com.twidere.twiderex.db.model.DbUser
 import com.twidere.twiderex.model.MicroBlogKey
 
 private typealias TwitterUser = com.twidere.services.twitter.model.User
@@ -110,8 +111,9 @@ fun ITrend.toDbTrend(
 }
 
 fun IDirectMessage.toDbDirectMessage(
-    accountKey: MicroBlogKey
+    accountKey: MicroBlogKey,
+    sender: DbUser
 ) = when (this) {
-    is DirectMessageEvent -> this.toDbDirectMessage(accountKey)
+    is DirectMessageEvent -> this.toDbDirectMessage(accountKey, sender)
     else -> throw NotImplementedError()
 }

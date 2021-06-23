@@ -538,7 +538,7 @@ fun DirectMessageEvent.generateConversationId(accountKey: MicroBlogKey): String 
     }
 }
 
-fun DirectMessageEvent.toDbDirectMessage(accountKey: MicroBlogKey): DbDirectMessageWithMedia {
+fun DirectMessageEvent.toDbDirectMessage(accountKey: MicroBlogKey, sender: DbUser): DbDirectMessageWithMedia {
     val message = DbDirectMessage(
         _id = UUID.randomUUID().toString(),
         accountKey = accountKey,
@@ -590,6 +590,7 @@ fun DirectMessageEvent.toDbDirectMessage(accountKey: MicroBlogKey): DbDirectMess
                 description = null,
                 image = null,
             )
-        } ?: emptyList()
+        } ?: emptyList(),
+        sender = sender
     )
 }

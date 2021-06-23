@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 17,
-    "identityHash": "e44b053dcb31f6507b27b05f5d2d26b1",
+    "identityHash": "fdd1f2a7bf21aa9dd94d3eea0c7fa0ff",
     "entities": [
       {
         "tableName": "status",
@@ -900,7 +900,7 @@
       },
       {
         "tableName": "dm_conversation",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` TEXT NOT NULL, `accountKey` TEXT NOT NULL, `sortId` INTEGER NOT NULL, `conversationId` TEXT NOT NULL, `conversationKey` TEXT NOT NULL, `conversationAvatar` TEXT NOT NULL, `conversationName` TEXT NOT NULL, `conversationType` TEXT NOT NULL, `lastUpdateTime` INTEGER NOT NULL, PRIMARY KEY(`_id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` TEXT NOT NULL, `accountKey` TEXT NOT NULL, `conversationId` TEXT NOT NULL, `conversationKey` TEXT NOT NULL, `conversationAvatar` TEXT NOT NULL, `conversationName` TEXT NOT NULL, `conversationSubName` TEXT NOT NULL, `conversationType` TEXT NOT NULL, PRIMARY KEY(`_id`))",
         "fields": [
           {
             "fieldPath": "_id",
@@ -912,12 +912,6 @@
             "fieldPath": "accountKey",
             "columnName": "accountKey",
             "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "sortId",
-            "columnName": "sortId",
-            "affinity": "INTEGER",
             "notNull": true
           },
           {
@@ -945,15 +939,15 @@
             "notNull": true
           },
           {
-            "fieldPath": "conversationType",
-            "columnName": "conversationType",
+            "fieldPath": "conversationSubName",
+            "columnName": "conversationSubName",
             "affinity": "TEXT",
             "notNull": true
           },
           {
-            "fieldPath": "lastUpdateTime",
-            "columnName": "lastUpdateTime",
-            "affinity": "INTEGER",
+            "fieldPath": "conversationType",
+            "columnName": "conversationType",
+            "affinity": "TEXT",
             "notNull": true
           }
         ],
@@ -1071,7 +1065,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'e44b053dcb31f6507b27b05f5d2d26b1')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'fdd1f2a7bf21aa9dd94d3eea0c7fa0ff')"
     ]
   }
 }

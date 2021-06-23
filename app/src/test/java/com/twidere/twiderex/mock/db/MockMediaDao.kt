@@ -18,29 +18,12 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.mock
+package com.twidere.twiderex.mock.db
 
-import com.twidere.services.microblog.MicroBlogService
-import com.twidere.twiderex.db.CacheDatabase
-import com.twidere.twiderex.mock.db.MockCacheDatabase
-import com.twidere.twiderex.mock.service.MockDirectMessageService
-import com.twidere.twiderex.mock.service.MockListsService
-import com.twidere.twiderex.mock.service.MockTrendService
+import com.twidere.twiderex.db.dao.MediaDao
+import com.twidere.twiderex.db.model.DbMedia
 
-object MockCenter {
-    fun mockCacheDatabase(): CacheDatabase {
-        return MockCacheDatabase()
-    }
-
-    fun mockListsService(): MicroBlogService {
-        return MockListsService()
-    }
-
-    fun mockTrendService(): MicroBlogService {
-        return MockTrendService()
-    }
-
-    fun mockDirectMessageService(): MicroBlogService {
-        return MockDirectMessageService()
+class MockMediaDao : MediaDao {
+    override suspend fun insertAll(media: List<DbMedia>) {
     }
 }

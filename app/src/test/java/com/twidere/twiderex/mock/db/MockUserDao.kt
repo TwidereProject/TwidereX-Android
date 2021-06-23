@@ -18,29 +18,26 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.mock
+package com.twidere.twiderex.mock.db
 
-import com.twidere.services.microblog.MicroBlogService
-import com.twidere.twiderex.db.CacheDatabase
-import com.twidere.twiderex.mock.db.MockCacheDatabase
-import com.twidere.twiderex.mock.service.MockDirectMessageService
-import com.twidere.twiderex.mock.service.MockListsService
-import com.twidere.twiderex.mock.service.MockTrendService
+import androidx.lifecycle.LiveData
+import com.twidere.twiderex.db.dao.UserDao
+import com.twidere.twiderex.db.model.DbUser
+import com.twidere.twiderex.model.MicroBlogKey
 
-object MockCenter {
-    fun mockCacheDatabase(): CacheDatabase {
-        return MockCacheDatabase()
+class MockUserDao : UserDao {
+    override suspend fun insertAll(user: List<DbUser>) {
     }
 
-    fun mockListsService(): MicroBlogService {
-        return MockListsService()
+    override fun findWithUserKeyLiveData(userKey: MicroBlogKey): LiveData<DbUser?> {
+        TODO("Not yet implemented")
     }
 
-    fun mockTrendService(): MicroBlogService {
-        return MockTrendService()
+    override suspend fun findWithUserKey(userKey: MicroBlogKey): DbUser? {
+        TODO("Not yet implemented")
     }
 
-    fun mockDirectMessageService(): MicroBlogService {
-        return MockDirectMessageService()
+    override suspend fun update(user: List<DbUser>) {
+        TODO("Not yet implemented")
     }
 }
