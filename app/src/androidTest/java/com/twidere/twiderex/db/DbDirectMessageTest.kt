@@ -21,6 +21,7 @@
 package com.twidere.twiderex.db
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.paging.PagingSource
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -38,6 +39,7 @@ import com.twidere.twiderex.db.model.DbDirectMessageConversation.Companion.saveT
 import com.twidere.twiderex.db.model.DbDirectMessageWithMedia
 import com.twidere.twiderex.db.model.DbDirectMessageWithMedia.Companion.saveToDb
 import com.twidere.twiderex.model.MicroBlogKey
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert
@@ -52,7 +54,7 @@ class DbDirectMessageTest {
     private lateinit var cacheDatabase: CacheDatabase
     private val user1AccountKey = MicroBlogKey.twitter("1")
     private val user2AccountKey = MicroBlogKey.twitter("2")
-    private val messageCount = 5
+    private val conversationCount = 5
 
     @get:Rule
     val rule = InstantTaskExecutorRule()
@@ -62,14 +64,24 @@ class DbDirectMessageTest {
         cacheDatabase = Room.inMemoryDatabaseBuilder(ApplicationProvider.getApplicationContext(), CacheDatabase::class.java)
             .build()
         runBlocking {
-            generateDirectMessage(messageCount, accountKey = user1AccountKey, UUID.randomUUID().toString(), user1AccountKey.id).also {
-                it.saveToDb(cacheDatabase)
-            }.toConversation()
-                .saveToDb(cacheDatabase)
-            generateDirectMessage(messageCount, accountKey = user2AccountKey, UUID.randomUUID().toString(), user2AccountKey.id).also {
-                it.saveToDb(cacheDatabase)
-            }.toConversation()
-                .saveToDb(cacheDatabase)
+            for (i in 0 until conversationCount) {
+                generateDirectMessage(
+                    accountKey = user1AccountKey,
+                    UUID.randomUUID().toString(),
+                    user1AccountKey.id
+                ).also {
+                    it.saveToDb(cacheDatabase)
+                }.toConversation()
+                    .saveToDb(cacheDatabase)
+                generateDirectMessage(
+                    accountKey = user2AccountKey,
+                    UUID.randomUUID().toString(),
+                    user2AccountKey.id
+                ).also {
+                    it.saveToDb(cacheDatabase)
+                }.toConversation()
+                    .saveToDb(cacheDatabase)
+            }
         }
     }
 
@@ -92,8 +104,9 @@ class DbDirectMessageTest {
             )
         }
 
-    private fun generateDirectMessage(count: Int, accountKey: MicroBlogKey, senderId: String, recipientId: String): List<DbDirectMessageWithMedia> {
+    private suspend fun generateDirectMessage(accountKey: MicroBlogKey, senderId: String, recipientId: String): List<DbDirectMessageWithMedia> {
         val messageList = mutableListOf<DbDirectMessageWithMedia>()
+        val count = 5
         for (i in 0 until count) {
             messageList.add(
                 DirectMessageEvent(
@@ -128,6 +141,7 @@ class DbDirectMessageTest {
                     )
                 ).toDbDirectMessage(accountKey)
             )
+            delay(1)
         }
         return messageList
     }
@@ -167,6 +181,7 @@ class DbDirectMessageTest {
     @Test
     fun insertAllConversations_GetConversationsByAccountKey() = runBlocking {
         val user1Conversation = cacheDatabase.directMessageConversationDao().find(accountKey = user1AccountKey)
+        Assert.assertEquals(conversationCount, user1Conversation.size)
         user1Conversation.forEach {
             Assert.assertEquals(user1AccountKey, it.conversation.accountKey)
         }
@@ -179,6 +194,7 @@ class DbDirectMessageTest {
     @Test
     fun foundConversations_ContainsLatestMessages() = runBlocking {
         val conversations = cacheDatabase.directMessageConversationDao().find(accountKey = user1AccountKey)
+        Assert.assertEquals(conversationCount, conversations.size)
         conversations.forEach {
             // check if latest message belong to this conversation
             Assert.assertEquals(it.conversation.conversationKey, it.latestMessage.message.conversationKey)
@@ -187,6 +203,15 @@ class DbDirectMessageTest {
                 .maxByOrNull { msg -> msg.message.sortId }
             Assert.assertEquals(it.latestMessage.message.messageId, latestMessage?.message?.messageId)
         }
+    }
+
+    @Test
+    fun deleteConversation() = runBlocking {
+        val result = cacheDatabase.directMessageConversationDao().find(accountKey = user1AccountKey)
+        Assert.assertEquals(conversationCount, result.size)
+        cacheDatabase.directMessageDao().clearConversation(user1AccountKey, result[0].conversation.conversationKey)
+        cacheDatabase.directMessageConversationDao().delete(result[0].conversation)
+        Assert.assertEquals(result.size - 1, cacheDatabase.directMessageConversationDao().find(user1AccountKey).size)
     }
 
     @Test
@@ -200,17 +225,43 @@ class DbDirectMessageTest {
     }
 
     @Test
-    fun deleteConversation() = runBlocking {
-        val result = cacheDatabase.directMessageConversationDao().find(user1AccountKey)
-        cacheDatabase.directMessageDao().clearConversation(user1AccountKey, result[0].conversation.conversationKey)
-        cacheDatabase.directMessageConversationDao().delete(result[0].conversation)
-        Assert.assertEquals(result.size - 1, cacheDatabase.directMessageConversationDao().find(user1AccountKey).size)
-    }
-
-    @Test
     fun clearConversation() = runBlocking {
         cacheDatabase.directMessageDao().clearAll(user1AccountKey)
         cacheDatabase.directMessageConversationDao().clearAll(user1AccountKey)
         assert(cacheDatabase.directMessageConversationDao().find(user1AccountKey).isEmpty())
+    }
+
+    @Test
+    fun testMessagePagingSource() = runBlocking {
+        val conversation = cacheDatabase.directMessageConversationDao().find(user1AccountKey)[0]
+        val pagingSource = cacheDatabase.directMessageDao().getPagingSource(user1AccountKey, conversation.conversation.conversationKey)
+        val resultFirst = pagingSource.load(PagingSource.LoadParams.Refresh(null, loadSize = 2, false))
+        Assert.assertEquals(2, (resultFirst as PagingSource.LoadResult.Page).data.size)
+
+        val resultLoadMore = pagingSource.load(PagingSource.LoadParams.Append(resultFirst.nextKey ?: 2, loadSize = 2, false))
+        Assert.assertEquals(2, (resultLoadMore as PagingSource.LoadResult.Page).data.size)
+    }
+
+    @Test
+    fun testConversationPagingSource() = runBlocking {
+        val conversationPagingSource = cacheDatabase.directMessageConversationDao().getPagingSource(user1AccountKey)
+        val resultFirst = conversationPagingSource.load(PagingSource.LoadParams.Refresh(null, loadSize = 2, false))
+        Assert.assertEquals(2, (resultFirst as PagingSource.LoadResult.Page).data.size)
+
+        val resultLoadMore = conversationPagingSource.load(PagingSource.LoadParams.Append(resultFirst.nextKey ?: 2, loadSize = 2, false))
+        Assert.assertEquals(2, (resultLoadMore as PagingSource.LoadResult.Page).data.size)
+    }
+
+    @Test
+    fun get_OrderBySortId() = runBlocking {
+        val result = cacheDatabase.directMessageConversationDao().find(accountKey = user1AccountKey)
+        result.forEachIndexed { index, con ->
+            if (index < result.size - 2) assert(con.conversation.sortId > result[index + 1].conversation.sortId)
+        }
+
+        val message = cacheDatabase.directMessageDao().find(accountKey = user1AccountKey, conversationKey = result[0].conversation.conversationKey)
+        message.forEachIndexed { index, msg ->
+            if (index < result.size - 2) assert(msg.message.sortId > message[index + 1].message.sortId)
+        }
     }
 }

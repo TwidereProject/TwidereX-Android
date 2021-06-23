@@ -39,19 +39,23 @@ interface DirectMessageConversationDao {
     // use join to found latest msg under each conversation, then use relation to found the conversation
     @Transaction
     @Query(
-        "SELECT * FROM direct_message AS table1 " +
-            "JOIN (SELECT conversationKey, max(sortId) as sortId FROM direct_message WHERE accountKey == :accountKey) AS table2 " +
-            "ON table1.conversationKey = table2.conversationKey AND table1.sortId = table2.sortId " +
-            "WHERE table1.accountKey == :accountKey"
+        """
+            SELECT * FROM direct_message AS table1 
+            JOIN (SELECT conversationKey, max(sortId) as sortId FROM direct_message WHERE accountKey == :accountKey GROUP BY conversationKey) AS table2
+            ON table1.conversationKey = table2.conversationKey AND table1.sortId = table2.sortId 
+            WHERE table1.accountKey == :accountKey ORDER BY table1.sortId DESC
+        """
     )
     suspend fun find(accountKey: MicroBlogKey): List<DbDirectMessageConversationWithMessage>
 
     @Transaction
     @Query(
-        "SELECT * FROM direct_message AS table1 " +
-            "JOIN (SELECT conversationKey, max(sortId) as sortId FROM direct_message WHERE accountKey == :accountKey) AS table2 " +
-            "ON table1.conversationKey = table2.conversationKey AND table1.sortId = table2.sortId " +
-            "WHERE table1.accountKey == :accountKey"
+        """
+            SELECT * FROM direct_message AS table1 
+            JOIN (SELECT conversationKey, max(sortId) as sortId FROM direct_message WHERE accountKey == :accountKey GROUP BY conversationKey) AS table2
+            ON table1.conversationKey = table2.conversationKey AND table1.sortId = table2.sortId 
+            WHERE table1.accountKey == :accountKey ORDER BY table1.sortId DESC
+        """
     )
     fun getPagingSource(
         accountKey: MicroBlogKey,
