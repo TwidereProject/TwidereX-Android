@@ -59,7 +59,7 @@ jobs:
           path: "**/build/test-results/**/*.xml"
 
   connected-test:
-    runs-on: macOS-latest
+    runs-on: macOS-11
     needs: build
     timeout-minutes: 60
     
