@@ -43,6 +43,7 @@ import com.twidere.twiderex.scenes.compose.ComposeScene
 import com.twidere.twiderex.scenes.compose.ComposeSearchHashtagScene
 import com.twidere.twiderex.scenes.compose.ComposeSearchUserScene
 import com.twidere.twiderex.scenes.compose.DraftComposeScene
+import com.twidere.twiderex.scenes.dm.DMConversationListScene
 import com.twidere.twiderex.scenes.lists.ListTimeLineScene
 import com.twidere.twiderex.scenes.lists.ListsAddMembersScene
 import com.twidere.twiderex.scenes.lists.ListsMembersScene
@@ -208,6 +209,10 @@ object Route {
         fun Members(listKey: MicroBlogKey, owned: Boolean) = "$Home/members/$listKey?owned=$owned"
         fun Subscribers(listKey: MicroBlogKey) = "$Home/subscribers/$listKey"
         fun AddMembers(listKey: MicroBlogKey) = "$Home/members/$listKey/add"
+    }
+
+    object Messages {
+        const val Home = "messages"
     }
 }
 
@@ -677,5 +682,9 @@ fun RouteBuilder.route(constraints: Constraints) {
         backStackEntry.path<String>("listKey")?.let {
             ListsAddMembersScene(listKey = MicroBlogKey.valueOf(it))
         }
+    }
+
+    authorizedScene(Route.Messages.Home) {
+        DMConversationListScene()
     }
 }

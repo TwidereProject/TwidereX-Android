@@ -24,6 +24,7 @@ import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
+import androidx.room.withTransaction
 import com.twidere.services.microblog.DirectMessageService
 import com.twidere.services.microblog.model.IPaging
 import com.twidere.services.twitter.model.DirectMessageEvent
@@ -60,24 +61,26 @@ abstract class BaseDirectMessageMediator<Key : Any, Value : Any>(
                 } else throw NotImplementedError()
             }
             // save message, media
-            result.saveToDb(database)
-            result.groupBy { it.message.conversationKey }
-                .map { entry ->
-                    val msgWithData = entry.value.first()
-                    val chatUser = msgWithData.message.conversationUserKey.let {
-                        userLookup(it)
-                    }
-                    DbDMConversation(
-                        _id = UUID.randomUUID().toString(),
-                        accountKey = accountKey,
-                        conversationId = msgWithData.message.conversationKey.id,
-                        conversationKey = msgWithData.message.conversationKey,
-                        conversationAvatar = chatUser.profileImage,
-                        conversationName = chatUser.name,
-                        conversationSubName = chatUser.screenName,
-                        conversationType = DbDMConversation.Type.ONE_TO_ONE
-                    )
-                }.saveToDb(database)
+            database.withTransaction {
+                result.saveToDb(database)
+                result.groupBy { it.message.conversationKey }
+                    .map { entry ->
+                        val msgWithData = entry.value.first()
+                        val chatUser = msgWithData.message.conversationUserKey.let {
+                            userLookup(it)
+                        }
+                        DbDMConversation(
+                            _id = UUID.randomUUID().toString(),
+                            accountKey = accountKey,
+                            conversationId = msgWithData.message.conversationKey.id,
+                            conversationKey = msgWithData.message.conversationKey,
+                            conversationAvatar = chatUser.profileImage,
+                            conversationName = chatUser.name,
+                            conversationSubName = chatUser.screenName,
+                            conversationType = DbDMConversation.Type.ONE_TO_ONE
+                        )
+                    }.saveToDb(database)
+            }
             paging = if (result is IPaging) {
                 result.nextPage
             } else {

@@ -25,6 +25,7 @@ import com.twidere.services.microblog.DirectMessageService
 import com.twidere.services.microblog.LookupService
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.db.mapper.toDbUser
+import com.twidere.twiderex.db.model.DbUser
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiDMConversation
@@ -45,10 +46,8 @@ class DirectMessageRepository(
             database = database,
             service = account.service as DirectMessageService,
             accountKey = account.accountKey,
-            userLookup = {
-                val user = (account.service as LookupService).lookupUser(it.id).toDbUser(account.accountKey)
-                database.userDao().insertAll(listOf(user))
-                user
+            userLookup = { userKey ->
+                lookupUser(account, userKey)
             }
         ).pager().toUi()
     }
@@ -62,11 +61,18 @@ class DirectMessageRepository(
             conversationKey = conversationKey,
             service = account.service as DirectMessageService,
             accountKey = account.accountKey,
-            userLookup = {
-                val user = (account.service as LookupService).lookupUser(it.id).toDbUser(account.accountKey)
-                database.userDao().insertAll(listOf(user))
-                user
+            userLookup = { userKey ->
+                lookupUser(account, userKey)
             }
         ).pager().toUi()
+    }
+
+    private suspend fun lookupUser(account: AccountDetails, userKey: MicroBlogKey): DbUser {
+        return database.userDao().findWithUserKey(userKey) ?: let {
+            val user = (account.service as LookupService).lookupUser(userKey.id)
+                .toDbUser(account.accountKey)
+            database.userDao().insertAll(listOf(user))
+            user
+        }
     }
 }

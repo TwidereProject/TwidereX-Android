@@ -63,6 +63,7 @@ data class ResolvedLink(
     val expanded: String?,
     val skip: Boolean = false,
     val display: String? = null,
+    val clickable: Boolean = true,
 )
 
 @Composable
@@ -256,22 +257,36 @@ private fun AnnotatedString.Builder.renderLink(
     val resolvedLink = context.linkResolver.invoke(href)
     when {
         resolvedLink.expanded != null -> {
-            pushStringAnnotation(TAG_URL, resolvedLink.expanded)
-            renderText(resolvedLink.display ?: resolvedLink.expanded, styleData.linkStyle)
-            pop()
+            if (resolvedLink.clickable) {
+                pushStringAnnotation(TAG_URL, resolvedLink.expanded)
+                renderText(resolvedLink.display ?: resolvedLink.expanded, styleData.linkStyle)
+                pop()
+            } else {
+                renderText(resolvedLink.display ?: resolvedLink.expanded, styleData.textStyle)
+            }
         }
         resolvedLink.skip -> {
         }
         else -> {
-            pushStringAnnotation(TAG_URL, href)
-            element.childNodes().forEach {
-                renderNode(
-                    node = it,
-                    context = context,
-                    styleData = styleData.copy(textStyle = styleData.linkStyle)
-                )
+            if (resolvedLink.clickable) {
+                pushStringAnnotation(TAG_URL, href)
+                element.childNodes().forEach {
+                    renderNode(
+                        node = it,
+                        context = context,
+                        styleData = styleData.copy(textStyle = styleData.linkStyle)
+                    )
+                }
+                pop()
+            } else {
+                element.childNodes().forEach {
+                    renderNode(
+                        node = it,
+                        context = context,
+                        styleData = styleData.copy(textStyle = styleData.textStyle)
+                    )
+                }
             }
-            pop()
         }
     }
 }
