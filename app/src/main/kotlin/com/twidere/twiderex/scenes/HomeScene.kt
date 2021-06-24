@@ -144,7 +144,11 @@ fun HomeScene() {
         }
     }
     ApplyNotification(scaffoldState.snackbarHostState)
-    TwidereScene {
+    TwidereScene(
+        navigationBarColorProvider = {
+            MaterialTheme.colors.surface.withElevation()
+        },
+    ) {
         NestedScrollScaffold(
             scaffoldState = scaffoldState,
             enableBottomBarNestedScroll = hideTab,
