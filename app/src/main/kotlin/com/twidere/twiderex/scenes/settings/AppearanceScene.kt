@@ -20,6 +20,8 @@
  */
 package com.twidere.twiderex.scenes.settings
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -70,7 +72,7 @@ import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.ui.primaryColors
 import com.twidere.twiderex.viewmodel.settings.AppearanceViewModel
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalAnimationApi::class)
 @Composable
 fun AppearanceScene() {
     var showPrimaryColorDialog by remember { mutableStateOf(false) }
@@ -208,6 +210,17 @@ fun AppearanceScene() {
                         )
                     }
                 )
+                val isLightTheme = MaterialTheme.colors.isLight
+                AnimatedVisibility(visible = !isLightTheme) {
+                    switchItem(
+                        value = appearance.isDarkModePureBlack,
+                        onChanged = {
+                            viewModel.setIsDarkModePureBlack(it)
+                        },
+                    ) {
+                        Text(text = stringResource(id = R.string.scene_settings_appearance_AMOLED_optimized_mode))
+                    }
+                }
             }
         }
     }
