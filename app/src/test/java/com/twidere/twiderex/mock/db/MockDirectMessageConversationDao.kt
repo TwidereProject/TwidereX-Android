@@ -24,15 +24,15 @@ import androidx.paging.PagingSource
 import com.twidere.services.twitter.model.User
 import com.twidere.twiderex.db.dao.DirectMessageConversationDao
 import com.twidere.twiderex.db.mapper.toDbUser
-import com.twidere.twiderex.db.model.DbDirectMessage
-import com.twidere.twiderex.db.model.DbDirectMessageConversation
+import com.twidere.twiderex.db.model.DbDMConversation
+import com.twidere.twiderex.db.model.DbDMEvent
+import com.twidere.twiderex.db.model.DbDMEventWithAttachments
 import com.twidere.twiderex.db.model.DbDirectMessageConversationWithMessage
-import com.twidere.twiderex.db.model.DbDirectMessageWithMedia
 import com.twidere.twiderex.model.MicroBlogKey
 
 class MockDirectMessageConversationDao : DirectMessageConversationDao {
-    val db = mutableListOf<DbDirectMessageConversation>()
-    override suspend fun insertAll(conversations: List<DbDirectMessageConversation>) {
+    val db = mutableListOf<DbDMConversation>()
+    override suspend fun insertAll(conversations: List<DbDMConversation>) {
         db.addAll(conversations)
     }
 
@@ -40,8 +40,8 @@ class MockDirectMessageConversationDao : DirectMessageConversationDao {
         return db.map {
             DbDirectMessageConversationWithMessage(
                 conversation = it,
-                latestMessage = DbDirectMessageWithMedia(
-                    message = DbDirectMessage(
+                latestMessage = DbDMEventWithAttachments(
+                    message = DbDMEvent(
                         "",
                         accountKey,
                         1,
@@ -52,7 +52,8 @@ class MockDirectMessageConversationDao : DirectMessageConversationDao {
                         System.currentTimeMillis(),
                         "",
                         accountKey,
-                        accountKey
+                        accountKey,
+                        sendStatus = DbDMEvent.SendStatus.SUCCESS
                     ),
                     emptyList(),
                     emptyList(),
@@ -69,7 +70,7 @@ class MockDirectMessageConversationDao : DirectMessageConversationDao {
         TODO("Not yet implemented")
     }
 
-    override suspend fun delete(data: DbDirectMessageConversation) {
+    override suspend fun delete(data: DbDMConversation) {
         TODO("Not yet implemented")
     }
 

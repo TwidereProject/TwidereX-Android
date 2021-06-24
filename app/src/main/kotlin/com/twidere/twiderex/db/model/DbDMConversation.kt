@@ -32,7 +32,7 @@ import com.twidere.twiderex.model.MicroBlogKey
     tableName = "dm_conversation",
     indices = [Index(value = ["accountKey", "conversationKey"], unique = true)],
 )
-data class DbDirectMessageConversation(
+data class DbDMConversation(
     @PrimaryKey
     val _id: String,
     val accountKey: MicroBlogKey,
@@ -50,7 +50,7 @@ data class DbDirectMessageConversation(
     }
 
     companion object {
-        suspend fun List<DbDirectMessageConversation>.saveToDb(cacheDatabase: CacheDatabase) {
+        suspend fun List<DbDMConversation>.saveToDb(cacheDatabase: CacheDatabase) {
             cacheDatabase.directMessageConversationDao().insertAll(this)
         }
     }
@@ -58,8 +58,8 @@ data class DbDirectMessageConversation(
 
 data class DbDirectMessageConversationWithMessage(
     @Relation(parentColumn = "conversationKey", entityColumn = "conversationKey")
-    val conversation: DbDirectMessageConversation,
+    val conversation: DbDMConversation,
 
     @Embedded
-    val latestMessage: DbDirectMessageWithMedia
+    val latestMessage: DbDMEventWithAttachments
 )

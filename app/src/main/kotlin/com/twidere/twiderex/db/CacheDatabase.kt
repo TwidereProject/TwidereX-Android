@@ -24,7 +24,7 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.twidere.twiderex.db.dao.DirectMessageConversationDao
-import com.twidere.twiderex.db.dao.DirectMessageDao
+import com.twidere.twiderex.db.dao.DirectMessageEventDao
 import com.twidere.twiderex.db.dao.ListsDao
 import com.twidere.twiderex.db.dao.MediaDao
 import com.twidere.twiderex.db.dao.NotificationCursorDao
@@ -36,8 +36,8 @@ import com.twidere.twiderex.db.dao.TrendDao
 import com.twidere.twiderex.db.dao.TrendHistoryDao
 import com.twidere.twiderex.db.dao.UrlEntityDao
 import com.twidere.twiderex.db.dao.UserDao
-import com.twidere.twiderex.db.model.DbDirectMessage
-import com.twidere.twiderex.db.model.DbDirectMessageConversation
+import com.twidere.twiderex.db.model.DbDMConversation
+import com.twidere.twiderex.db.model.DbDMEvent
 import com.twidere.twiderex.db.model.DbList
 import com.twidere.twiderex.db.model.DbMedia
 import com.twidere.twiderex.db.model.DbNotificationCursor
@@ -73,8 +73,8 @@ import javax.inject.Singleton
         DbNotificationCursor::class,
         DbTrend::class,
         DbTrendHistory::class,
-        DbDirectMessageConversation::class,
-        DbDirectMessage::class
+        DbDMConversation::class,
+        DbDMEvent::class
     ],
     version = 17,
 )
@@ -101,5 +101,5 @@ abstract class CacheDatabase : RoomDatabase() {
     abstract fun trendDao(): TrendDao
     abstract fun trendHistoryDao(): TrendHistoryDao
     abstract fun directMessageConversationDao(): DirectMessageConversationDao
-    abstract fun directMessageDao(): DirectMessageDao
+    abstract fun directMessageDao(): DirectMessageEventDao
 }

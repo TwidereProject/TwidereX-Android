@@ -27,7 +27,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
-import com.twidere.twiderex.db.model.DbDirectMessageConversation
+import com.twidere.twiderex.db.model.DbDMConversation
 import com.twidere.twiderex.db.model.DbDirectMessageConversationWithMessage
 import com.twidere.twiderex.model.MicroBlogKey
 import org.jetbrains.annotations.TestOnly
@@ -35,14 +35,14 @@ import org.jetbrains.annotations.TestOnly
 @Dao
 interface DirectMessageConversationDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAll(conversations: List<DbDirectMessageConversation>)
+    suspend fun insertAll(conversations: List<DbDMConversation>)
 
     @TestOnly
     @Transaction
     @Query(
         """
-            SELECT * FROM direct_message AS table1 
-            JOIN (SELECT conversationKey, max(sortId) as sortId FROM direct_message WHERE accountKey == :accountKey GROUP BY conversationKey) AS table2
+            SELECT * FROM dm_event AS table1 
+            JOIN (SELECT conversationKey, max(sortId) as sortId FROM dm_event WHERE accountKey == :accountKey GROUP BY conversationKey) AS table2
             ON table1.conversationKey = table2.conversationKey AND table1.sortId = table2.sortId 
             WHERE table1.accountKey == :accountKey ORDER BY table1.sortId DESC
         """
@@ -53,8 +53,8 @@ interface DirectMessageConversationDao {
     @Transaction
     @Query(
         """
-            SELECT * FROM direct_message AS table1 
-            JOIN (SELECT conversationKey, max(sortId) as sortId FROM direct_message WHERE accountKey == :accountKey GROUP BY conversationKey) AS table2
+            SELECT * FROM dm_event AS table1 
+            JOIN (SELECT conversationKey, max(sortId) as sortId FROM dm_event WHERE accountKey == :accountKey GROUP BY conversationKey) AS table2
             ON table1.conversationKey = table2.conversationKey AND table1.sortId = table2.sortId 
             WHERE table1.accountKey == :accountKey ORDER BY table1.sortId DESC
         """
@@ -64,7 +64,7 @@ interface DirectMessageConversationDao {
     ): PagingSource<Int, DbDirectMessageConversationWithMessage>
 
     @Delete
-    suspend fun delete(data: DbDirectMessageConversation)
+    suspend fun delete(data: DbDMConversation)
 
     @Query("DELETE FROM dm_conversation WHERE accountKey == :accountKey")
     suspend fun clearAll(accountKey: MicroBlogKey)

@@ -29,9 +29,9 @@ import com.twidere.services.microblog.model.IPaging
 import com.twidere.services.twitter.model.DirectMessageEvent
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.db.mapper.toDbDirectMessage
-import com.twidere.twiderex.db.model.DbDirectMessageConversation
-import com.twidere.twiderex.db.model.DbDirectMessageConversation.Companion.saveToDb
-import com.twidere.twiderex.db.model.DbDirectMessageWithMedia.Companion.saveToDb
+import com.twidere.twiderex.db.model.DbDMConversation
+import com.twidere.twiderex.db.model.DbDMConversation.Companion.saveToDb
+import com.twidere.twiderex.db.model.DbDMEventWithAttachments.Companion.saveToDb
 import com.twidere.twiderex.db.model.DbUser
 import com.twidere.twiderex.model.MicroBlogKey
 import java.util.UUID
@@ -67,7 +67,7 @@ abstract class BaseDirectMessageMediator<Key : Any, Value : Any>(
                     val chatUser = msgWithData.message.conversationUserKey.let {
                         userLookup(it)
                     }
-                    DbDirectMessageConversation(
+                    DbDMConversation(
                         _id = UUID.randomUUID().toString(),
                         accountKey = accountKey,
                         conversationId = msgWithData.message.conversationKey.id,
@@ -75,7 +75,7 @@ abstract class BaseDirectMessageMediator<Key : Any, Value : Any>(
                         conversationAvatar = chatUser.profileImage,
                         conversationName = chatUser.name,
                         conversationSubName = chatUser.screenName,
-                        conversationType = DbDirectMessageConversation.Type.ONE_TO_ONE
+                        conversationType = DbDMConversation.Type.ONE_TO_ONE
                     )
                 }.saveToDb(database)
             paging = if (result is IPaging) {

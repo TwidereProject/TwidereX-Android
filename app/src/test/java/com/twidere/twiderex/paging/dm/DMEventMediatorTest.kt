@@ -29,7 +29,7 @@ import com.twidere.twiderex.db.mapper.toDbUser
 import com.twidere.twiderex.db.model.DbDirectMessageConversationWithMessage
 import com.twidere.twiderex.mock.MockCenter
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.paging.mediator.dm.DirectMessageConversationMediator
+import com.twidere.twiderex.paging.mediator.dm.DMConversationMediator
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert
 import org.junit.Test
@@ -41,7 +41,7 @@ import org.mockito.junit.MockitoJUnitRunner
  */
 
 @RunWith(MockitoJUnitRunner::class)
-class DirectMessageMediatorTest {
+class DMEventMediatorTest {
     private var mockDataBase = MockCenter.mockCacheDatabase()
 
     private var mockService = MockCenter.mockDirectMessageService() as DirectMessageService
@@ -52,7 +52,7 @@ class DirectMessageMediatorTest {
             assert(mockDataBase.directMessageConversationDao().find(MicroBlogKey.twitter("123")).isEmpty())
             assert(mockDataBase.directMessageDao().getAll(MicroBlogKey.twitter("123")).isEmpty())
             Assert.assertEquals(0, mockDataBase.listsDao().findAll()?.size)
-            val mediator = DirectMessageConversationMediator(mockDataBase, mockService, accountKey = MicroBlogKey.twitter("123"),) {
+            val mediator = DMConversationMediator(mockDataBase, mockService, accountKey = MicroBlogKey.twitter("123"),) {
                 User(
                     id = it.id.toLong(),
                     idStr = it.id

@@ -25,7 +25,7 @@ import androidx.room.InvalidationTracker
 import androidx.sqlite.db.SupportSQLiteOpenHelper
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.db.dao.DirectMessageConversationDao
-import com.twidere.twiderex.db.dao.DirectMessageDao
+import com.twidere.twiderex.db.dao.DirectMessageEventDao
 import com.twidere.twiderex.db.dao.ListsDao
 import com.twidere.twiderex.db.dao.MediaDao
 import com.twidere.twiderex.db.dao.NotificationCursorDao
@@ -94,8 +94,8 @@ class MockCacheDatabase : CacheDatabase() {
         return conversationDao
     }
 
-    private val dmDao = MockDirectMessageDao()
-    override fun directMessageDao(): DirectMessageDao {
+    private val dmDao = MockDirectMessageEventDao()
+    override fun directMessageDao(): DirectMessageEventDao {
         return dmDao
     }
 

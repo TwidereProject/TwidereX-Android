@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 17,
-    "identityHash": "fdd1f2a7bf21aa9dd94d3eea0c7fa0ff",
+    "identityHash": "ce1fb3e1b2732645621884482923e75c",
     "entities": [
       {
         "tableName": "status",
@@ -971,8 +971,8 @@
         "foreignKeys": []
       },
       {
-        "tableName": "direct_message",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` TEXT NOT NULL, `accountKey` TEXT NOT NULL, `sortId` INTEGER NOT NULL, `conversationKey` TEXT NOT NULL, `messageId` TEXT NOT NULL, `messageKey` TEXT NOT NULL, `htmlText` TEXT NOT NULL, `createdTimestamp` INTEGER NOT NULL, `messageType` TEXT NOT NULL, `senderAccountKey` TEXT NOT NULL, `recipientAccountKey` TEXT NOT NULL, PRIMARY KEY(`_id`))",
+        "tableName": "dm_event",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` TEXT NOT NULL, `accountKey` TEXT NOT NULL, `sortId` INTEGER NOT NULL, `conversationKey` TEXT NOT NULL, `messageId` TEXT NOT NULL, `messageKey` TEXT NOT NULL, `htmlText` TEXT NOT NULL, `createdTimestamp` INTEGER NOT NULL, `messageType` TEXT NOT NULL, `senderAccountKey` TEXT NOT NULL, `recipientAccountKey` TEXT NOT NULL, `sendStatus` TEXT NOT NULL, PRIMARY KEY(`_id`))",
         "fields": [
           {
             "fieldPath": "_id",
@@ -1039,6 +1039,12 @@
             "columnName": "recipientAccountKey",
             "affinity": "TEXT",
             "notNull": true
+          },
+          {
+            "fieldPath": "sendStatus",
+            "columnName": "sendStatus",
+            "affinity": "TEXT",
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -1049,14 +1055,14 @@
         },
         "indices": [
           {
-            "name": "index_direct_message_accountKey_conversationKey_messageKey",
+            "name": "index_dm_event_accountKey_conversationKey_messageKey",
             "unique": true,
             "columnNames": [
               "accountKey",
               "conversationKey",
               "messageKey"
             ],
-            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_direct_message_accountKey_conversationKey_messageKey` ON `${TABLE_NAME}` (`accountKey`, `conversationKey`, `messageKey`)"
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_dm_event_accountKey_conversationKey_messageKey` ON `${TABLE_NAME}` (`accountKey`, `conversationKey`, `messageKey`)"
           }
         ],
         "foreignKeys": []
@@ -1065,7 +1071,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'fdd1f2a7bf21aa9dd94d3eea0c7fa0ff')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'ce1fb3e1b2732645621884482923e75c')"
     ]
   }
 }

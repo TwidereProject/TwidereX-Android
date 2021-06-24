@@ -23,39 +23,52 @@ package com.twidere.twiderex.paging.mediator.dm
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import androidx.paging.PagingSource
+import androidx.paging.map
 import com.twidere.services.microblog.DirectMessageService
 import com.twidere.twiderex.db.CacheDatabase
-import com.twidere.twiderex.db.model.DbDirectMessageWithMedia
+import com.twidere.twiderex.db.model.DbDirectMessageConversationWithMessage
 import com.twidere.twiderex.db.model.DbUser
 import com.twidere.twiderex.defaultLoadCount
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.ui.UiDMConversation
+import com.twidere.twiderex.model.ui.UiDMConversation.Companion.toUi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 @OptIn(ExperimentalPagingApi::class)
-class DirectMessageMediator(
-    private val conversationKey: MicroBlogKey,
+class DMConversationMediator(
     database: CacheDatabase,
     service: DirectMessageService,
     accountKey: MicroBlogKey,
     userLookup: suspend (userKey: MicroBlogKey) -> DbUser
-) : BaseDirectMessageMediator<Int, DbDirectMessageWithMedia>(database, service, accountKey, userLookup) {
-
-    override fun reverse() = true
+) : BaseDirectMessageMediator<Int, DbDirectMessageConversationWithMessage>(database, service, accountKey, userLookup) {
+    override fun reverse() = false
 
     fun pager(
         config: PagingConfig = PagingConfig(
             pageSize = defaultLoadCount,
             enablePlaceholders = false
         ),
-        pagingSourceFactory: () -> PagingSource<Int, DbDirectMessageWithMedia> = {
-            database.directMessageDao()
-                .getPagingSource(accountKey = accountKey, conversationKey = conversationKey)
+        pagingSourceFactory: () -> PagingSource<Int, DbDirectMessageConversationWithMessage> = {
+            database.directMessageConversationDao().getPagingSource(accountKey = accountKey)
         }
-    ): Pager<Int, DbDirectMessageWithMedia> {
+    ): Pager<Int, DbDirectMessageConversationWithMessage> {
         return Pager(
             config = config,
             remoteMediator = this,
             pagingSourceFactory = pagingSourceFactory,
         )
+    }
+
+    companion object {
+        fun Pager<Int, DbDirectMessageConversationWithMessage>.toUi(): Flow<PagingData<UiDMConversation>> {
+            return this.flow.map { pagingData ->
+                pagingData.map {
+                    it.toUi()
+                }
+            }
+        }
     }
 }

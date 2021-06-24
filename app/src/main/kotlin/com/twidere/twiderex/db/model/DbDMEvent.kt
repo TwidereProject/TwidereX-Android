@@ -26,14 +26,14 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import androidx.room.Relation
 import com.twidere.twiderex.db.CacheDatabase
-import com.twidere.twiderex.db.model.DbDirectMessage.Companion.saveToDb
+import com.twidere.twiderex.db.model.DbDMEvent.Companion.saveToDb
 import com.twidere.twiderex.model.MicroBlogKey
 
 @Entity(
-    tableName = "direct_message",
+    tableName = "dm_event",
     indices = [Index(value = ["accountKey", "conversationKey", "messageKey"], unique = true)],
 )
-data class DbDirectMessage(
+data class DbDMEvent(
     @PrimaryKey
     val _id: String,
     val accountKey: MicroBlogKey,
@@ -48,23 +48,27 @@ data class DbDirectMessage(
     val messageType: String,
     val senderAccountKey: MicroBlogKey,
     val recipientAccountKey: MicroBlogKey,
+    val sendStatus: SendStatus
 ) {
-    val isInComeDM: Boolean
-        get() = accountKey == recipientAccountKey
-
     val conversationUserKey: MicroBlogKey
         get() = if (accountKey == senderAccountKey) recipientAccountKey else senderAccountKey
 
     companion object {
-        suspend fun List<DbDirectMessage>.saveToDb(cacheDatabase: CacheDatabase) {
+        suspend fun List<DbDMEvent>.saveToDb(cacheDatabase: CacheDatabase) {
             cacheDatabase.directMessageDao().insertAll(this)
         }
     }
+
+    enum class SendStatus {
+        PENDING,
+        SUCCESS,
+        FAILED
+    }
 }
 
-data class DbDirectMessageWithMedia(
+data class DbDMEventWithAttachments(
     @Embedded
-    val message: DbDirectMessage,
+    val message: DbDMEvent,
 
     @Relation(parentColumn = "messageKey", entityColumn = "statusKey", entity = DbMedia::class)
     val media: List<DbMedia>,
@@ -76,7 +80,7 @@ data class DbDirectMessageWithMedia(
     val sender: DbUser
 ) {
     companion object {
-        suspend fun List<DbDirectMessageWithMedia>.saveToDb(cacheDatabase: CacheDatabase) {
+        suspend fun List<DbDMEventWithAttachments>.saveToDb(cacheDatabase: CacheDatabase) {
             map {
                 it.message
             }.saveToDb(cacheDatabase)

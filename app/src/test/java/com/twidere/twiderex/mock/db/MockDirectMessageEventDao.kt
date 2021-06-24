@@ -22,22 +22,22 @@ package com.twidere.twiderex.mock.db
 
 import androidx.paging.PagingSource
 import com.twidere.services.twitter.model.User
-import com.twidere.twiderex.db.dao.DirectMessageDao
+import com.twidere.twiderex.db.dao.DirectMessageEventDao
 import com.twidere.twiderex.db.mapper.toDbUser
-import com.twidere.twiderex.db.model.DbDirectMessage
-import com.twidere.twiderex.db.model.DbDirectMessageWithMedia
+import com.twidere.twiderex.db.model.DbDMEvent
+import com.twidere.twiderex.db.model.DbDMEventWithAttachments
 import com.twidere.twiderex.model.MicroBlogKey
 
-class MockDirectMessageDao : DirectMessageDao {
-    val db = mutableListOf<DbDirectMessage>()
+class MockDirectMessageEventDao : DirectMessageEventDao {
+    val db = mutableListOf<DbDMEvent>()
 
-    override suspend fun insertAll(messages: List<DbDirectMessage>) {
+    override suspend fun insertAll(messages: List<DbDMEvent>) {
         db.addAll(messages)
     }
 
-    override suspend fun getAll(accountKey: MicroBlogKey): List<DbDirectMessageWithMedia> {
+    override suspend fun getAll(accountKey: MicroBlogKey): List<DbDMEventWithAttachments> {
         return db.map {
-            DbDirectMessageWithMedia(
+            DbDMEventWithAttachments(
                 message = it,
                 emptyList(),
                 emptyList(),
@@ -52,18 +52,18 @@ class MockDirectMessageDao : DirectMessageDao {
     override suspend fun find(
         accountKey: MicroBlogKey,
         conversationKey: MicroBlogKey
-    ): List<DbDirectMessageWithMedia> {
+    ): List<DbDMEventWithAttachments> {
         TODO("Not yet implemented")
     }
 
     override fun getPagingSource(
         accountKey: MicroBlogKey,
         conversationKey: MicroBlogKey
-    ): PagingSource<Int, DbDirectMessageWithMedia> {
+    ): PagingSource<Int, DbDMEventWithAttachments> {
         TODO("Not yet implemented")
     }
 
-    override suspend fun delete(data: DbDirectMessage) {
+    override suspend fun delete(data: DbDMEvent) {
         TODO("Not yet implemented")
     }
 

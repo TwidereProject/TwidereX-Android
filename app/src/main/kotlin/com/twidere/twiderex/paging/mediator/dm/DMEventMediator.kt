@@ -23,36 +23,55 @@ package com.twidere.twiderex.paging.mediator.dm
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import androidx.paging.PagingSource
+import androidx.paging.map
 import com.twidere.services.microblog.DirectMessageService
 import com.twidere.twiderex.db.CacheDatabase
-import com.twidere.twiderex.db.model.DbDirectMessageConversationWithMessage
+import com.twidere.twiderex.db.model.DbDMEventWithAttachments
 import com.twidere.twiderex.db.model.DbUser
 import com.twidere.twiderex.defaultLoadCount
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.ui.UiDMEvent
+import com.twidere.twiderex.model.ui.UiDMEvent.Companion.toUi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 @OptIn(ExperimentalPagingApi::class)
-class DirectMessageConversationMediator(
+class DMEventMediator(
+    private val conversationKey: MicroBlogKey,
     database: CacheDatabase,
     service: DirectMessageService,
     accountKey: MicroBlogKey,
     userLookup: suspend (userKey: MicroBlogKey) -> DbUser
-) : BaseDirectMessageMediator<Int, DbDirectMessageConversationWithMessage>(database, service, accountKey, userLookup) {
-    override fun reverse() = false
+) : BaseDirectMessageMediator<Int, DbDMEventWithAttachments>(database, service, accountKey, userLookup) {
+
+    override fun reverse() = true
 
     fun pager(
         config: PagingConfig = PagingConfig(
             pageSize = defaultLoadCount,
             enablePlaceholders = false
         ),
-        pagingSourceFactory: () -> PagingSource<Int, DbDirectMessageConversationWithMessage> = {
-            database.directMessageConversationDao().getPagingSource(accountKey = accountKey)
+        pagingSourceFactory: () -> PagingSource<Int, DbDMEventWithAttachments> = {
+            database.directMessageDao()
+                .getPagingSource(accountKey = accountKey, conversationKey = conversationKey)
         }
-    ): Pager<Int, DbDirectMessageConversationWithMessage> {
+    ): Pager<Int, DbDMEventWithAttachments> {
         return Pager(
             config = config,
             remoteMediator = this,
             pagingSourceFactory = pagingSourceFactory,
         )
+    }
+
+    companion object {
+        fun Pager<Int, DbDMEventWithAttachments>.toUi(): Flow<PagingData<UiDMEvent>> {
+            return this.flow.map { pagingData ->
+                pagingData.map {
+                    it.toUi()
+                }
+            }
+        }
     }
 }

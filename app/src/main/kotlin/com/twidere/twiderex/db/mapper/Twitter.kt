@@ -29,8 +29,8 @@ import com.twidere.services.twitter.model.Trend
 import com.twidere.services.twitter.model.TwitterList
 import com.twidere.services.twitter.model.User
 import com.twidere.services.twitter.model.UserV2
-import com.twidere.twiderex.db.model.DbDirectMessage
-import com.twidere.twiderex.db.model.DbDirectMessageWithMedia
+import com.twidere.twiderex.db.model.DbDMEvent
+import com.twidere.twiderex.db.model.DbDMEventWithAttachments
 import com.twidere.twiderex.db.model.DbList
 import com.twidere.twiderex.db.model.DbMedia
 import com.twidere.twiderex.db.model.DbPagingTimeline
@@ -538,8 +538,8 @@ fun DirectMessageEvent.generateConversationId(accountKey: MicroBlogKey): String 
     }
 }
 
-fun DirectMessageEvent.toDbDirectMessage(accountKey: MicroBlogKey, sender: DbUser): DbDirectMessageWithMedia {
-    val message = DbDirectMessage(
+fun DirectMessageEvent.toDbDirectMessage(accountKey: MicroBlogKey, sender: DbUser): DbDMEventWithAttachments {
+    val message = DbDMEvent(
         _id = UUID.randomUUID().toString(),
         accountKey = accountKey,
         sortId = createdTimestamp?.toLong() ?: 0L,
@@ -550,9 +550,10 @@ fun DirectMessageEvent.toDbDirectMessage(accountKey: MicroBlogKey, sender: DbUse
         createdTimestamp = createdTimestamp?.toLong() ?: 0L,
         messageType = type ?: throw IllegalArgumentException("message type should not be null"),
         senderAccountKey = MicroBlogKey.twitter(messageCreate?.senderId ?: throw IllegalArgumentException("message sender id should not be null")),
-        recipientAccountKey = MicroBlogKey.twitter(messageCreate?.target?.recipientId ?: throw IllegalArgumentException("message recipientId id should not be null"))
+        recipientAccountKey = MicroBlogKey.twitter(messageCreate?.target?.recipientId ?: throw IllegalArgumentException("message recipientId id should not be null")),
+        sendStatus = DbDMEvent.SendStatus.SUCCESS
     )
-    return DbDirectMessageWithMedia(
+    return DbDMEventWithAttachments(
         message = message,
         media = messageCreate?.messageData?.attachment?.media?.let { media ->
             val type = media.type?.let { MediaType.valueOf(it) } ?: MediaType.photo

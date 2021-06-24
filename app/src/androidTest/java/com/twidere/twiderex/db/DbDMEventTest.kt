@@ -36,10 +36,10 @@ import com.twidere.services.twitter.model.PurpleMedia
 import com.twidere.services.twitter.model.User
 import com.twidere.twiderex.db.mapper.toDbDirectMessage
 import com.twidere.twiderex.db.mapper.toDbUser
-import com.twidere.twiderex.db.model.DbDirectMessageConversation
-import com.twidere.twiderex.db.model.DbDirectMessageConversation.Companion.saveToDb
-import com.twidere.twiderex.db.model.DbDirectMessageWithMedia
-import com.twidere.twiderex.db.model.DbDirectMessageWithMedia.Companion.saveToDb
+import com.twidere.twiderex.db.model.DbDMConversation
+import com.twidere.twiderex.db.model.DbDMConversation.Companion.saveToDb
+import com.twidere.twiderex.db.model.DbDMEventWithAttachments
+import com.twidere.twiderex.db.model.DbDMEventWithAttachments.Companion.saveToDb
 import com.twidere.twiderex.model.MicroBlogKey
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
@@ -52,7 +52,7 @@ import org.junit.runner.RunWith
 import java.util.UUID
 
 @RunWith(AndroidJUnit4::class)
-class DbDirectMessageTest {
+class DbDMEventTest {
     private lateinit var cacheDatabase: CacheDatabase
     private val user1AccountKey = MicroBlogKey.twitter("1")
     private val user2AccountKey = MicroBlogKey.twitter("2")
@@ -87,26 +87,26 @@ class DbDirectMessageTest {
         }
     }
 
-    private fun List<DbDirectMessageWithMedia>.toConversation() =
+    private fun List<DbDMEventWithAttachments>.toConversation() =
         groupBy {
             it.message.conversationKey
         }.map {
             it.value.maxByOrNull { msg -> msg.message.sortId }?.message!!
         }.map {
-            DbDirectMessageConversation(
+            DbDMConversation(
                 _id = UUID.randomUUID().toString(),
                 accountKey = it.accountKey,
                 conversationId = it.conversationKey.id,
                 conversationKey = it.conversationKey,
                 conversationAvatar = "",
                 conversationName = it.htmlText,
-                conversationType = DbDirectMessageConversation.Type.ONE_TO_ONE,
+                conversationType = DbDMConversation.Type.ONE_TO_ONE,
                 conversationSubName = ""
             )
         }
 
-    private suspend fun generateDirectMessage(accountKey: MicroBlogKey, senderId: String, recipientId: String): List<DbDirectMessageWithMedia> {
-        val messageList = mutableListOf<DbDirectMessageWithMedia>()
+    private suspend fun generateDirectMessage(accountKey: MicroBlogKey, senderId: String, recipientId: String): List<DbDMEventWithAttachments> {
+        val messageList = mutableListOf<DbDMEventWithAttachments>()
         val count = 5
         for (i in 0 until count) {
             messageList.add(

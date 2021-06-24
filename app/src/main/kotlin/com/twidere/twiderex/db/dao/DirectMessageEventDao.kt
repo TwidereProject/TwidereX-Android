@@ -27,36 +27,36 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
-import com.twidere.twiderex.db.model.DbDirectMessage
-import com.twidere.twiderex.db.model.DbDirectMessageWithMedia
+import com.twidere.twiderex.db.model.DbDMEvent
+import com.twidere.twiderex.db.model.DbDMEventWithAttachments
 import com.twidere.twiderex.model.MicroBlogKey
 
 @Dao
-interface DirectMessageDao {
+interface DirectMessageEventDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAll(messages: List<DbDirectMessage>)
+    suspend fun insertAll(messages: List<DbDMEvent>)
 
     @Transaction
-    @Query("SELECT * FROM direct_message WHERE accountKey == :accountKey ORDER BY sortId DESC")
-    suspend fun getAll(accountKey: MicroBlogKey): List<DbDirectMessageWithMedia>
+    @Query("SELECT * FROM dm_event WHERE accountKey == :accountKey ORDER BY sortId DESC")
+    suspend fun getAll(accountKey: MicroBlogKey): List<DbDMEventWithAttachments>
 
     @Transaction
-    @Query("SELECT * FROM direct_message WHERE accountKey == :accountKey AND conversationKey == :conversationKey ORDER BY sortId DESC")
-    suspend fun find(accountKey: MicroBlogKey, conversationKey: MicroBlogKey): List<DbDirectMessageWithMedia>
+    @Query("SELECT * FROM dm_event WHERE accountKey == :accountKey AND conversationKey == :conversationKey ORDER BY sortId DESC")
+    suspend fun find(accountKey: MicroBlogKey, conversationKey: MicroBlogKey): List<DbDMEventWithAttachments>
 
     @Transaction
-    @Query("SELECT * FROM direct_message WHERE accountKey == :accountKey AND conversationKey == :conversationKey ORDER BY sortId DESC")
+    @Query("SELECT * FROM dm_event WHERE accountKey == :accountKey AND conversationKey == :conversationKey ORDER BY sortId DESC")
     fun getPagingSource(
         accountKey: MicroBlogKey,
         conversationKey: MicroBlogKey
-    ): PagingSource<Int, DbDirectMessageWithMedia>
+    ): PagingSource<Int, DbDMEventWithAttachments>
 
     @Delete
-    suspend fun delete(data: DbDirectMessage)
+    suspend fun delete(data: DbDMEvent)
 
-    @Query("DELETE FROM direct_message WHERE accountKey == :accountKey AND conversationKey == :conversationKey")
+    @Query("DELETE FROM dm_event WHERE accountKey == :accountKey AND conversationKey == :conversationKey")
     suspend fun clearConversation(accountKey: MicroBlogKey, conversationKey: MicroBlogKey)
 
-    @Query("DELETE FROM direct_message WHERE accountKey == :accountKey")
+    @Query("DELETE FROM dm_event WHERE accountKey == :accountKey")
     suspend fun clearAll(accountKey: MicroBlogKey)
 }
