@@ -46,12 +46,12 @@ import com.twidere.twiderex.viewmodel.dm.DMConversationViewModel
 fun DMConversationListScene() {
     val account = LocalActiveAccount.current ?: return
     val navController = LocalNavController.current
-    val viewMode = assistedViewModel<DMConversationViewModel.AssistedFactory, DMConversationViewModel>(
+    val viewModel = assistedViewModel<DMConversationViewModel.AssistedFactory, DMConversationViewModel>(
         account,
     ) {
         it.create(account)
     }
-    val source = viewMode.source.collectAsLazyPagingItems()
+    val source = viewModel.source.collectAsLazyPagingItems()
     TwidereScene {
         InAppNotificationScaffold(
             topBar = {
@@ -87,7 +87,7 @@ fun DMConversationListScene() {
                     LazyUiDMConversationList(
                         items = source,
                         onItemClicked = {
-                            navController.navigate(Route.Messages.Conversation(it.conversationKey))
+                            navController.navigate(Route.Messages.Conversation(it.conversation.conversationKey))
                         }
                     )
                 }

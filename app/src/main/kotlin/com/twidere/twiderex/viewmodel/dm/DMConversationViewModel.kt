@@ -37,6 +37,6 @@ class DMConversationViewModel @AssistedInject constructor(
     }
 
     val source by lazy {
-        repository.dmConversationSource(account)
+        repository.dmConversationListSource(account)
     }
 }

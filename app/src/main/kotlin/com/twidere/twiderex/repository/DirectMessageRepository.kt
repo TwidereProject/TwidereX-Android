@@ -20,6 +20,8 @@
  */
 package com.twidere.twiderex.repository
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.map
 import androidx.paging.PagingData
 import com.twidere.services.microblog.DirectMessageService
 import com.twidere.services.microblog.LookupService
@@ -29,6 +31,8 @@ import com.twidere.twiderex.db.model.DbUser
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiDMConversation
+import com.twidere.twiderex.model.ui.UiDMConversation.Companion.toUi
+import com.twidere.twiderex.model.ui.UiDMConversationWithLatestMessage
 import com.twidere.twiderex.model.ui.UiDMEvent
 import com.twidere.twiderex.paging.mediator.dm.DMConversationMediator
 import com.twidere.twiderex.paging.mediator.dm.DMConversationMediator.Companion.toUi
@@ -39,9 +43,20 @@ import kotlinx.coroutines.flow.Flow
 class DirectMessageRepository(
     private val database: CacheDatabase
 ) {
-    fun dmConversationSource(
+    fun dmConversation(
         account: AccountDetails,
-    ): Flow<PagingData<UiDMConversation>> {
+        conversationKey: MicroBlogKey
+    ): LiveData<UiDMConversation?> {
+        return database.directMessageConversationDao()
+            .findWithConversationKey(
+                accountKey = account.accountKey,
+                conversationKey = conversationKey
+            ).map { it?.toUi() }
+    }
+
+    fun dmConversationListSource(
+        account: AccountDetails,
+    ): Flow<PagingData<UiDMConversationWithLatestMessage>> {
         return DMConversationMediator(
             database = database,
             service = account.service as DirectMessageService,
@@ -52,7 +67,7 @@ class DirectMessageRepository(
         ).pager().toUi()
     }
 
-    fun dmEventSource(
+    fun dmEventListSource(
         account: AccountDetails,
         conversationKey: MicroBlogKey
     ): Flow<PagingData<UiDMEvent>> {

@@ -47,19 +47,19 @@ import com.twidere.twiderex.component.status.ResolvedLink
 import com.twidere.twiderex.component.status.RoundAvatar
 import com.twidere.twiderex.component.status.UserName
 import com.twidere.twiderex.component.status.UserScreenName
-import com.twidere.twiderex.model.ui.UiDMConversation
+import com.twidere.twiderex.model.ui.UiDMConversationWithLatestMessage
 import com.twidere.twiderex.model.ui.UiDMEvent
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun LazyUiDMConversationList(
     modifier: Modifier = Modifier,
-    items: LazyPagingItems<UiDMConversation>,
+    items: LazyPagingItems<UiDMConversationWithLatestMessage>,
     state: LazyListState = rememberLazyListState(),
-    key: ((index: Int) -> Any) = { items.peek(it)?.conversationKey?.hashCode() ?: it },
-    onItemClicked: (UiDMConversation) -> Unit = {},
+    key: ((index: Int) -> Any) = { items.peek(it)?.conversation?.conversationKey?.hashCode() ?: it },
+    onItemClicked: (UiDMConversationWithLatestMessage) -> Unit = {},
     header: LazyListScope.() -> Unit = {},
-    action: @Composable (user: UiDMConversation) -> Unit = {}
+    action: @Composable (user: UiDMConversationWithLatestMessage) -> Unit = {}
 ) {
     LazyUiList(items = items) {
         LazyColumn(
@@ -81,13 +81,13 @@ fun LazyUiDMConversationList(
                         ListItem(
                             modifier = Modifier.weight(1f),
                             icon = {
-                                RoundAvatar(avatar = it.conversationAvatar)
+                                RoundAvatar(avatar = it.conversation.conversationAvatar)
                             },
                             text = {
                                 Row {
-                                    UserName(userName = it.conversationName)
+                                    UserName(userName = it.conversation.conversationName)
                                     Spacer(modifier = Modifier.width(LazyUiDMConversationListDefaults.HorizontalPadding))
-                                    UserScreenName(name = it.conversationSubName)
+                                    UserScreenName(name = it.conversation.conversationSubName)
                                 }
                             },
                             secondaryText = {

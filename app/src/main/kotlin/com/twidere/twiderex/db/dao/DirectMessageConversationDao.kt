@@ -20,6 +20,7 @@
  */
 package com.twidere.twiderex.db.dao
 
+import androidx.lifecycle.LiveData
 import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Delete
@@ -62,6 +63,9 @@ interface DirectMessageConversationDao {
     fun getPagingSource(
         accountKey: MicroBlogKey,
     ): PagingSource<Int, DbDirectMessageConversationWithMessage>
+
+    @Query("SELECT * FROM dm_conversation WHERE accountKey == :accountKey AND conversationKey == :conversationKey")
+    fun findWithConversationKey(accountKey: MicroBlogKey, conversationKey: MicroBlogKey): LiveData<DbDMConversation?>
 
     @Delete
     suspend fun delete(data: DbDMConversation)

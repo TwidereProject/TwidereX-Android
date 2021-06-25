@@ -32,8 +32,8 @@ import com.twidere.twiderex.db.model.DbDirectMessageConversationWithMessage
 import com.twidere.twiderex.db.model.DbUser
 import com.twidere.twiderex.defaultLoadCount
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.ui.UiDMConversation
-import com.twidere.twiderex.model.ui.UiDMConversation.Companion.toUi
+import com.twidere.twiderex.model.ui.UiDMConversationWithLatestMessage
+import com.twidere.twiderex.model.ui.UiDMConversationWithLatestMessage.Companion.toUi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -63,7 +63,7 @@ class DMConversationMediator(
     }
 
     companion object {
-        fun Pager<Int, DbDirectMessageConversationWithMessage>.toUi(): Flow<PagingData<UiDMConversation>> {
+        fun Pager<Int, DbDirectMessageConversationWithMessage>.toUi(): Flow<PagingData<UiDMConversationWithLatestMessage>> {
             return this.flow.map { pagingData ->
                 pagingData.map {
                     it.toUi()

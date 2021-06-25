@@ -21,6 +21,7 @@
 package com.twidere.twiderex.viewmodel.dm
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.liveData
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.repository.DirectMessageRepository
@@ -38,7 +39,13 @@ class DMEventViewModel @AssistedInject constructor(
         fun create(account: AccountDetails, conversationKey: MicroBlogKey): DMEventViewModel
     }
 
+    val conversation by lazy {
+        liveData {
+            emitSource(repository.dmConversation(account, conversationKey))
+        }
+    }
+
     val source by lazy {
-        repository.dmEventSource(account, conversationKey)
+        repository.dmEventListSource(account, conversationKey)
     }
 }

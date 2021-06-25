@@ -23,9 +23,9 @@ package com.twidere.twiderex.scenes.dm
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.res.stringResource
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.paging.compose.collectAsLazyPagingItems
-import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
@@ -40,12 +40,13 @@ import com.twidere.twiderex.viewmodel.dm.DMEventViewModel
 fun DMConversationScene(conversationKey: MicroBlogKey) {
     // val navController = LocalNavController.current
     val account = LocalActiveAccount.current ?: return
-    val viewMode = assistedViewModel<DMEventViewModel.AssistedFactory, DMEventViewModel>(
+    val viewModel = assistedViewModel<DMEventViewModel.AssistedFactory, DMEventViewModel>(
         account, conversationKey
     ) {
         it.create(account, conversationKey)
     }
-    val source = viewMode.source.collectAsLazyPagingItems()
+    val source = viewModel.source.collectAsLazyPagingItems()
+    val conversation by viewModel.conversation.observeAsState()
     TwidereScene {
         InAppNotificationScaffold(
             topBar = {
@@ -54,8 +55,9 @@ fun DMConversationScene(conversationKey: MicroBlogKey) {
                         AppBarNavigationButton()
                     },
                     title = {
-                        // todo DM change to conversation name
-                        Text(text = stringResource(id = R.string.scene_messages_title))
+                        conversation ?.let {
+                            Text(text = it.conversationName)
+                        }
                     },
                 )
             },

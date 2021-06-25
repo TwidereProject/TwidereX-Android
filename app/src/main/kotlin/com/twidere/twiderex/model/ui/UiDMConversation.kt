@@ -23,6 +23,7 @@ package com.twidere.twiderex.model.ui
 import com.twidere.twiderex.db.model.DbDMConversation
 import com.twidere.twiderex.db.model.DbDirectMessageConversationWithMessage
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.ui.UiDMConversation.Companion.toUi
 import com.twidere.twiderex.model.ui.UiDMEvent.Companion.toUi
 
 data class UiDMConversation(
@@ -34,17 +35,27 @@ data class UiDMConversation(
     val conversationName: String,
     val conversationSubName: String,
     val conversationType: DbDMConversation.Type,
+) {
+    companion object {
+        fun DbDMConversation.toUi() = UiDMConversation(
+            accountKey = accountKey,
+            conversationId = conversationId,
+            conversationKey = conversationKey,
+            conversationAvatar = conversationAvatar,
+            conversationName = conversationName,
+            conversationSubName = conversationSubName,
+            conversationType = conversationType,
+        )
+    }
+}
+
+data class UiDMConversationWithLatestMessage(
+    val conversation: UiDMConversation,
     val latestMessage: UiDMEvent
 ) {
     companion object {
-        fun DbDirectMessageConversationWithMessage.toUi() = UiDMConversation(
-            accountKey = conversation.accountKey,
-            conversationId = conversation.conversationId,
-            conversationKey = conversation.conversationKey,
-            conversationAvatar = conversation.conversationAvatar,
-            conversationName = conversation.conversationName,
-            conversationSubName = conversation.conversationSubName,
-            conversationType = conversation.conversationType,
+        fun DbDirectMessageConversationWithMessage.toUi() = UiDMConversationWithLatestMessage(
+            conversation = conversation.toUi(),
             latestMessage = latestMessage.toUi()
         )
     }
