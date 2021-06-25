@@ -21,6 +21,7 @@
 package com.twidere.twiderex.component.foundation
 
 import androidx.annotation.IntRange
+import androidx.compose.animation.core.animate
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
@@ -52,6 +53,9 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.Velocity
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 
 @Stable
 private class TopBarState(
@@ -67,6 +71,17 @@ private class TopBarState(
 
     fun scroll(delta: Float) {
         offset += delta.toInt()
+    }
+
+    suspend fun fixOffset() {
+        val show = offset > -size / 2
+        animate(
+            initialValue = offset.toFloat(),
+            targetValue = if (show) 0f else -size.toFloat(),
+            initialVelocity = 0f
+        ) { v, _ ->
+            offset = v.toInt()
+        }
     }
 
     companion object {
@@ -99,6 +114,17 @@ private class BottomBarState(
 
     fun scroll(delta: Float) {
         offset -= delta.toInt()
+    }
+
+    suspend fun fixOffset() {
+        val show = offset < size / 2
+        animate(
+            initialValue = offset.toFloat(),
+            targetValue = if (show) 0f else size.toFloat(),
+            initialVelocity = 0f
+        ) { v, _ ->
+            offset = v.toInt()
+        }
     }
 
     companion object {
@@ -155,6 +181,7 @@ fun NestedScrollScaffold(
         rememberUpdatedState(newValue = enableBottomBarNestedScroll)
     val enableFloatingActionButtonNestedScrollState =
         rememberUpdatedState(newValue = enableFloatingActionButtonNestedScroll)
+
     val nestedScrollConnection = remember {
         object : NestedScrollConnection {
             override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
@@ -169,6 +196,27 @@ fun NestedScrollScaffold(
                     fabState.scroll(delta)
                 }
                 return Offset.Zero
+            }
+
+            override suspend fun onPostFling(consumed: Velocity, available: Velocity): Velocity {
+                coroutineScope {
+                    if (enableTopBarNestedScrollState.value) {
+                        launch {
+                            topBarState.fixOffset()
+                        }
+                    }
+                    if (enableBottomBarNestedScrollState.value) {
+                        launch {
+                            bottomBarState.fixOffset()
+                        }
+                    }
+                    if (enableFloatingActionButtonNestedScrollState.value) {
+                        launch {
+                            fabState.fixOffset()
+                        }
+                    }
+                }
+                return super.onPostFling(consumed, available)
             }
         }
     }
