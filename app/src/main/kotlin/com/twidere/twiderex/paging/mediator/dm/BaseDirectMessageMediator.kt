@@ -55,15 +55,16 @@ abstract class BaseDirectMessageMediator<Key : Any, Value : Any>(
                 LoadType.APPEND -> if (reverse()) return MediatorResult.Success(endOfPaginationReached = true) else paging
                 LoadType.PREPEND -> if (reverse()) paging else return MediatorResult.Success(endOfPaginationReached = true)
             }
-            val result = service.getDirectMessages(key, 50).map {
+            val result = service.getDirectMessages(key, 50)
+            val events = result.map {
                 if (it is DirectMessageEvent) {
                     it.toDbDirectMessage(accountKey, userLookup.invoke(MicroBlogKey.twitter(it.messageCreate?.senderId ?: "")))
                 } else throw NotImplementedError()
             }
             // save message, media
             database.withTransaction {
-                result.saveToDb(database)
-                result.groupBy { it.message.conversationKey }
+                events.saveToDb(database)
+                events.groupBy { it.message.conversationKey }
                     .map { entry ->
                         val msgWithData = entry.value.first()
                         val chatUser = msgWithData.message.conversationUserKey.let {

@@ -37,8 +37,50 @@ import com.twidere.twiderex.db.dao.TrendDao
 import com.twidere.twiderex.db.dao.TrendHistoryDao
 import com.twidere.twiderex.db.dao.UrlEntityDao
 import com.twidere.twiderex.db.dao.UserDao
+import java.util.ArrayDeque
+import java.util.concurrent.Executor
+import java.util.concurrent.Executors
 
 class MockCacheDatabase : CacheDatabase() {
+    override fun getTransactionExecutor(): Executor {
+        return object : Executor {
+            private var mExecutor = Executors.newSingleThreadExecutor()
+            private val mTasks = ArrayDeque<Runnable>()
+            private var mActive: Runnable? = null
+
+            @Synchronized
+            override fun execute(command: Runnable) {
+                mTasks.offer(
+                    Runnable {
+                        try {
+                            command.run()
+                        } finally {
+                            scheduleNext()
+                        }
+                    }
+                )
+                if (mActive == null) {
+                    scheduleNext()
+                }
+            }
+
+            @Synchronized
+            fun scheduleNext() {
+                if (mTasks.poll().also { mActive = it } != null) {
+                    mExecutor.execute(mActive)
+                }
+            }
+        }
+    }
+    override fun beginTransaction() {
+    }
+
+    override fun setTransactionSuccessful() {
+    }
+
+    override fun endTransaction() {
+    }
+
     override fun statusDao(): StatusDao {
         TODO("Not yet implemented")
     }

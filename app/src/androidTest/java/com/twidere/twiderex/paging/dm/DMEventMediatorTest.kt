@@ -20,37 +20,61 @@
  */
 package com.twidere.twiderex.paging.dm
 
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
 import androidx.paging.PagingConfig
 import androidx.paging.PagingState
-import com.twidere.services.microblog.DirectMessageService
+import androidx.paging.RemoteMediator
+import androidx.room.Room
+import androidx.test.core.app.ApplicationProvider
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.twidere.services.twitter.model.User
+import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.db.mapper.toDbUser
 import com.twidere.twiderex.db.model.DbDirectMessageConversationWithMessage
-import com.twidere.twiderex.mock.MockCenter
+import com.twidere.twiderex.mock.MockDirectMessageService
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.paging.mediator.dm.DMConversationMediator
 import kotlinx.coroutines.runBlocking
+import org.junit.After
 import org.junit.Assert
+import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.junit.MockitoJUnitRunner
+import java.util.concurrent.Executors
 
 /**
  * instead of testing pagination, we should focus on our code logic
  */
 
-@RunWith(MockitoJUnitRunner::class)
+@RunWith(AndroidJUnit4::class)
 class DMEventMediatorTest {
-    private var mockDataBase = MockCenter.mockCacheDatabase()
+    private lateinit var mockDataBase: CacheDatabase
 
-    private var mockService = MockCenter.mockDirectMessageService() as DirectMessageService
+    private var mockService = MockDirectMessageService()
+    @get:Rule
+    val rule = InstantTaskExecutorRule()
 
+    @Before
+    fun setUp() {
+        mockDataBase = Room.inMemoryDatabaseBuilder(ApplicationProvider.getApplicationContext(), CacheDatabase::class.java)
+            .setTransactionExecutor(Executors.newSingleThreadExecutor()).build()
+    }
+
+    @After
+    fun tearDown() {
+        mockDataBase.clearAllTables()
+    }
+
+    @OptIn(ExperimentalPagingApi::class)
     @Test
-    fun load_saveBothConversationAndMessageToDatabaseWhenSuccess() {
+    fun refresh_saveBothConversationAndMessageToDatabaseWhenSuccess() {
         runBlocking {
             assert(mockDataBase.directMessageConversationDao().find(MicroBlogKey.twitter("123")).isEmpty())
             assert(mockDataBase.directMessageDao().getAll(MicroBlogKey.twitter("123")).isEmpty())
+            mockService.add(mockService.generateDirectMessage(20, System.currentTimeMillis().toString(), "123"))
             Assert.assertEquals(0, mockDataBase.listsDao().findAll()?.size)
             val mediator = DMConversationMediator(mockDataBase, mockService, accountKey = MicroBlogKey.twitter("123"),) {
                 User(
@@ -59,10 +83,27 @@ class DMEventMediatorTest {
                 ).toDbUser()
             }
             val pagingState = PagingState<Int, DbDirectMessageConversationWithMessage>(emptyList(), config = PagingConfig(20), anchorPosition = 0, leadingPlaceholderCount = 0)
-            mediator.load(LoadType.REFRESH, pagingState)
+            val result = mediator.load(LoadType.REFRESH, pagingState)
             // when mediator get data from service, it store to database
             assert(mockDataBase.directMessageConversationDao().find(MicroBlogKey.twitter("123")).isNotEmpty())
             assert(mockDataBase.directMessageDao().getAll(MicroBlogKey.twitter("123")).isNotEmpty())
+            assert(result is RemoteMediator.MediatorResult.Success)
+            assert(!(result as RemoteMediator.MediatorResult.Success).endOfPaginationReached)
         }
+    }
+
+    @OptIn(ExperimentalPagingApi::class)
+    @Test
+    fun refresh_LoadReturnsErrorResultWhenErrorOccurs() = runBlocking {
+        mockService.errorMsg = "Throw test failure"
+        val mediator = DMConversationMediator(mockDataBase, mockService, accountKey = MicroBlogKey.twitter("123"),) {
+            User(
+                id = it.id.toLong(),
+                idStr = it.id
+            ).toDbUser()
+        }
+        val pagingState = PagingState<Int, DbDirectMessageConversationWithMessage>(emptyList(), config = PagingConfig(20), anchorPosition = 0, leadingPlaceholderCount = 0)
+        val result = mediator.load(LoadType.REFRESH, pagingState)
+        assert(result is RemoteMediator.MediatorResult.Error)
     }
 }
