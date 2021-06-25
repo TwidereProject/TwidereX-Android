@@ -150,14 +150,15 @@ private fun UiDMEvent.resolveLink(
             )
         }
         entity != null -> {
-            if (!entity.displayUrl.contains("pic.twitter.com")) {
+            if (entity.displayUrl.contains("pic.twitter.com")) {
                 ResolvedLink(
                     expanded = "[Photo]",
                     clickable = false
                 )
             } else {
                 ResolvedLink(
-                    expanded = "[Link]",
+                    expanded = entity.expandedUrl,
+                    display = entity.displayUrl,
                     clickable = false
                 )
             }

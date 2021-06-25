@@ -562,10 +562,10 @@ fun DirectMessageEvent.toDbDirectMessage(accountKey: MicroBlogKey, sender: DbUse
                     _id = UUID.randomUUID().toString(),
                     statusKey = message.messageKey,
                     url = media.url ?: "",
-                    previewUrl = getImage(media.mediaURLHTTPS, "small"),
+                    previewUrl = media.mediaURLHTTPS,
                     type = type,
                     mediaUrl = when (type) {
-                        MediaType.photo -> getImage(media.mediaURLHTTPS, "orig")
+                        MediaType.photo -> media.mediaURLHTTPS
                         MediaType.animated_gif, MediaType.video -> media.videoInfo?.variants?.maxByOrNull {
                             it.bitrate ?: 0L
                         }?.url
@@ -586,7 +586,7 @@ fun DirectMessageEvent.toDbDirectMessage(accountKey: MicroBlogKey, sender: DbUse
                 statusKey = message.messageKey,
                 url = it.url ?: "",
                 expandedUrl = it.expanded_url ?: "",
-                displayUrl = it.expanded_url ?: "",
+                displayUrl = it.display_url ?: "",
                 title = null,
                 description = null,
                 image = null,

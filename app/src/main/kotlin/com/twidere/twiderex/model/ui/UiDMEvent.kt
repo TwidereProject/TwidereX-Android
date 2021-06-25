@@ -45,6 +45,9 @@ data class UiDMEvent(
     val urlEntity: List<UiUrlEntity>,
     val sender: UiUser
 ) {
+    val isInCome: Boolean
+        get() = recipientAccountKey == accountKey
+
     companion object {
         fun DbDMEventWithAttachments.toUi() = UiDMEvent(
             accountKey = message.accountKey,

@@ -44,6 +44,7 @@ import com.twidere.twiderex.scenes.compose.ComposeSearchHashtagScene
 import com.twidere.twiderex.scenes.compose.ComposeSearchUserScene
 import com.twidere.twiderex.scenes.compose.DraftComposeScene
 import com.twidere.twiderex.scenes.dm.DMConversationListScene
+import com.twidere.twiderex.scenes.dm.DMConversationScene
 import com.twidere.twiderex.scenes.lists.ListTimeLineScene
 import com.twidere.twiderex.scenes.lists.ListsAddMembersScene
 import com.twidere.twiderex.scenes.lists.ListsMembersScene
@@ -213,6 +214,7 @@ object Route {
 
     object Messages {
         const val Home = "messages"
+        fun Conversation(conversationKey: MicroBlogKey) = "$Home/conversation/$conversationKey"
     }
 }
 
@@ -686,5 +688,13 @@ fun RouteBuilder.route(constraints: Constraints) {
 
     authorizedScene(Route.Messages.Home) {
         DMConversationListScene()
+    }
+
+    authorizedScene(
+        "${Route.Messages.Home}/conversation/{conversationKey}"
+    ) { backStackEntry ->
+        backStackEntry.path<String>("conversationKey")?.let {
+            DMConversationScene(conversationKey = MicroBlogKey.valueOf(it))
+        }
     }
 }

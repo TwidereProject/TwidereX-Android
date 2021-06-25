@@ -21,35 +21,29 @@
 package com.twidere.twiderex.scenes.dm
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.material.FloatingActionButton
-import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
-import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
-import com.twidere.twiderex.component.lazy.ui.LazyUiDMConversationList
+import com.twidere.twiderex.component.lazy.ui.LazyUiDMEventList
 import com.twidere.twiderex.di.assisted.assistedViewModel
-import com.twidere.twiderex.navigation.Route
+import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.ui.LocalActiveAccount
-import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
-import com.twidere.twiderex.viewmodel.dm.DMConversationViewModel
+import com.twidere.twiderex.viewmodel.dm.DMEventViewModel
 
 @Composable
-fun DMConversationListScene() {
+fun DMConversationScene(conversationKey: MicroBlogKey) {
+    // val navController = LocalNavController.current
     val account = LocalActiveAccount.current ?: return
-    val navController = LocalNavController.current
-    val viewMode = assistedViewModel<DMConversationViewModel.AssistedFactory, DMConversationViewModel>(
-        account,
+    val viewMode = assistedViewModel<DMEventViewModel.AssistedFactory, DMEventViewModel>(
+        account, conversationKey
     ) {
-        it.create(account)
+        it.create(account, conversationKey)
     }
     val source = viewMode.source.collectAsLazyPagingItems()
     TwidereScene {
@@ -60,37 +54,16 @@ fun DMConversationListScene() {
                         AppBarNavigationButton()
                     },
                     title = {
+                        // todo DM change to conversation name
                         Text(text = stringResource(id = R.string.scene_messages_title))
                     },
                 )
             },
-            floatingActionButton = {
-                FloatingActionButton(
-                    onClick = {
-                        // TODO DM create conversations
-                    }
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_add),
-                        contentDescription = stringResource(
-                            id = R.string.scene_lists_icons_create
-                        ),
-                    )
-                }
-            },
         ) {
             Box {
-                SwipeToRefreshLayout(
-                    refreshingState = source.loadState.refresh is LoadState.Loading,
-                    onRefresh = { source.refresh() }
-                ) {
-                    LazyUiDMConversationList(
-                        items = source,
-                        onItemClicked = {
-                            navController.navigate(Route.Messages.Conversation(it.conversationKey))
-                        }
-                    )
-                }
+                LazyUiDMEventList(
+                    items = source,
+                )
             }
         }
     }
