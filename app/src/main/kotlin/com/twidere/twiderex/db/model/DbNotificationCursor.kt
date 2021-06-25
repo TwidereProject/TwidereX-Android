@@ -43,6 +43,7 @@ data class DbNotificationCursor(
     val accountKey: MicroBlogKey,
     val type: NotificationCursorType,
     val value: String,
+    val timestamp: Long,
 )
 
 enum class NotificationCursorType {
