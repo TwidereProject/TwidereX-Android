@@ -55,7 +55,6 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.Velocity
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Stable
@@ -74,16 +73,14 @@ private class TopBarState(
         offset += delta.toInt()
     }
 
-    fun fixOffset(scope: CoroutineScope) {
-        scope.launch {
-            val show = offset > -size / 2
-            animate(
-                initialValue = offset.toFloat(),
-                targetValue = if (show) 0f else -size.toFloat(),
-                initialVelocity = 0f
-            ) { v, _ ->
-                offset = v.toInt()
-            }
+    suspend fun fixOffset() {
+        val show = offset > -size / 2
+        animate(
+            initialValue = offset.toFloat(),
+            targetValue = if (show) 0f else -size.toFloat(),
+            initialVelocity = 0f
+        ) { v, _ ->
+            offset = v.toInt()
         }
     }
 
@@ -119,16 +116,14 @@ private class BottomBarState(
         offset -= delta.toInt()
     }
 
-    fun fixOffset(scope: CoroutineScope) {
+    suspend fun fixOffset() {
         val show = offset < size / 2
-        scope.launch {
-            animate(
-                initialValue = offset.toFloat(),
-                targetValue = if (show) 0f else size.toFloat(),
-                initialVelocity = 0f
-            ) { v, _ ->
-                offset = v.toInt()
-            }
+        animate(
+            initialValue = offset.toFloat(),
+            targetValue = if (show) 0f else size.toFloat(),
+            initialVelocity = 0f
+        ) { v, _ ->
+            offset = v.toInt()
         }
     }
 
@@ -195,15 +190,21 @@ fun NestedScrollScaffold(
         }
 
         if (enableTopBarNestedScrollState.value) {
-            topBarState.fixOffset(this)
+            launch {
+                topBarState.fixOffset()
+            }
         }
 
         if (enableBottomBarNestedScrollState.value) {
-            bottomBarState.fixOffset(this)
+            launch {
+                bottomBarState.fixOffset()
+            }
         }
 
         if (enableFloatingActionButtonNestedScrollState.value) {
-            fabState.fixOffset(this)
+            launch {
+                fabState.fixOffset()
+            }
         }
     }
     val nestedScrollConnection = remember {
