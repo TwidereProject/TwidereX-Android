@@ -21,6 +21,7 @@
 package com.twidere.twiderex.component.foundation
 
 import androidx.annotation.IntRange
+import androidx.compose.animation.core.animate
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
@@ -34,6 +35,7 @@ import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.contentColorFor
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -52,6 +54,9 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.Velocity
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 @Stable
 private class TopBarState(
@@ -67,6 +72,19 @@ private class TopBarState(
 
     fun scroll(delta: Float) {
         offset += delta.toInt()
+    }
+
+    fun fixOffset(scope: CoroutineScope) {
+        scope.launch {
+            val show = offset > -size / 2
+            animate(
+                initialValue = offset.toFloat(),
+                targetValue = if (show) 0f else -size.toFloat(),
+                initialVelocity = 0f
+            ) { v, _ ->
+                offset = v.toInt()
+            }
+        }
     }
 
     companion object {
@@ -99,6 +117,19 @@ private class BottomBarState(
 
     fun scroll(delta: Float) {
         offset -= delta.toInt()
+    }
+
+    fun fixOffset(scope: CoroutineScope) {
+        val show = offset < size / 2
+        scope.launch {
+            animate(
+                initialValue = offset.toFloat(),
+                targetValue = if (show) 0f else size.toFloat(),
+                initialVelocity = 0f
+            ) { v, _ ->
+                offset = v.toInt()
+            }
+        }
     }
 
     companion object {
@@ -155,6 +186,26 @@ fun NestedScrollScaffold(
         rememberUpdatedState(newValue = enableBottomBarNestedScroll)
     val enableFloatingActionButtonNestedScrollState =
         rememberUpdatedState(newValue = enableFloatingActionButtonNestedScroll)
+    var animKey by remember {
+        mutableStateOf(0)
+    }
+    LaunchedEffect(key1 = animKey) {
+        if (animKey == 0) {
+            return@LaunchedEffect
+        }
+
+        if (enableTopBarNestedScrollState.value) {
+            topBarState.fixOffset(this)
+        }
+
+        if (enableBottomBarNestedScrollState.value) {
+            bottomBarState.fixOffset(this)
+        }
+
+        if (enableFloatingActionButtonNestedScrollState.value) {
+            fabState.fixOffset(this)
+        }
+    }
     val nestedScrollConnection = remember {
         object : NestedScrollConnection {
             override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
@@ -169,6 +220,16 @@ fun NestedScrollScaffold(
                     fabState.scroll(delta)
                 }
                 return Offset.Zero
+            }
+
+            override suspend fun onPostFling(consumed: Velocity, available: Velocity): Velocity {
+                if (enableTopBarNestedScrollState.value ||
+                    enableBottomBarNestedScrollState.value ||
+                    enableFloatingActionButtonNestedScrollState.value
+                ) {
+                    animKey++
+                }
+                return super.onPostFling(consumed, available)
             }
         }
     }
