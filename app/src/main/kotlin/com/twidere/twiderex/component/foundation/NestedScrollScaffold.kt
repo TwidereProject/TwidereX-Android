@@ -35,7 +35,6 @@ import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.contentColorFor
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -55,6 +54,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.Velocity
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
 @Stable
@@ -181,32 +181,7 @@ fun NestedScrollScaffold(
         rememberUpdatedState(newValue = enableBottomBarNestedScroll)
     val enableFloatingActionButtonNestedScrollState =
         rememberUpdatedState(newValue = enableFloatingActionButtonNestedScroll)
-    var animKey by remember {
-        mutableStateOf(0)
-    }
-    LaunchedEffect(key1 = animKey) {
-        if (animKey == 0) {
-            return@LaunchedEffect
-        }
 
-        if (enableTopBarNestedScrollState.value) {
-            launch {
-                topBarState.fixOffset()
-            }
-        }
-
-        if (enableBottomBarNestedScrollState.value) {
-            launch {
-                bottomBarState.fixOffset()
-            }
-        }
-
-        if (enableFloatingActionButtonNestedScrollState.value) {
-            launch {
-                fabState.fixOffset()
-            }
-        }
-    }
     val nestedScrollConnection = remember {
         object : NestedScrollConnection {
             override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
@@ -224,11 +199,22 @@ fun NestedScrollScaffold(
             }
 
             override suspend fun onPostFling(consumed: Velocity, available: Velocity): Velocity {
-                if (enableTopBarNestedScrollState.value ||
-                    enableBottomBarNestedScrollState.value ||
-                    enableFloatingActionButtonNestedScrollState.value
-                ) {
-                    animKey++
+                coroutineScope {
+                    if (enableTopBarNestedScrollState.value) {
+                        launch {
+                            topBarState.fixOffset()
+                        }
+                    }
+                    if (enableBottomBarNestedScrollState.value) {
+                        launch {
+                            bottomBarState.fixOffset()
+                        }
+                    }
+                    if (enableFloatingActionButtonNestedScrollState.value) {
+                        launch {
+                            fabState.fixOffset()
+                        }
+                    }
                 }
                 return super.onPostFling(consumed, available)
             }
