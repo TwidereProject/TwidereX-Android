@@ -20,21 +20,59 @@
  */
 package com.twidere.twiderex.scenes.dm
 
+import android.net.Uri
+import androidx.activity.compose.ManagedActivityResultLauncher
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.Divider
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.LocalContentAlpha
+import androidx.compose.material.LocalContentColor
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
+import com.twidere.twiderex.component.foundation.NetworkImage
+import com.twidere.twiderex.component.foundation.TextInput
 import com.twidere.twiderex.component.lazy.ui.LazyUiDMEventList
 import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.dm.DMEventViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 @Composable
 fun DMConversationScene(conversationKey: MicroBlogKey) {
@@ -45,8 +83,17 @@ fun DMConversationScene(conversationKey: MicroBlogKey) {
     ) {
         it.create(account, conversationKey)
     }
+    val scope = rememberCoroutineScope()
+    val filePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetMultipleContents(),
+        onResult = {
+            viewModel.inputImage.postValue(it.first())
+        },
+    )
     val source = viewModel.source.collectAsLazyPagingItems()
     val conversation by viewModel.conversation.observeAsState()
+    val input by viewModel.input.observeAsState(initial = "")
+    val inputImage by viewModel.inputImage.observeAsState()
     TwidereScene {
         InAppNotificationScaffold(
             topBar = {
@@ -62,11 +109,131 @@ fun DMConversationScene(conversationKey: MicroBlogKey) {
                 )
             },
         ) {
-            Box {
-                LazyUiDMEventList(
-                    items = source,
+            Column(modifier = Modifier.fillMaxSize()) {
+                Box(modifier = Modifier.weight(1f)) {
+                    LazyUiDMEventList(
+                        modifier = Modifier.fillMaxSize(),
+                        items = source,
+                    )
+                }
+                Divider(modifier = Modifier.fillMaxWidth())
+                InputPhotoPreview(inputImage) {
+                    viewModel.inputImage.postValue(null)
+                }
+                InputComponent(
+                    modifier = Modifier.fillMaxWidth(),
+                    scope = scope,
+                    filePickerLauncher = filePickerLauncher,
+                    enableSelectPhoto = inputImage == null,
+                    enableSend = input.isNotEmpty() || inputImage != null,
+                    input = input,
+                    onValueChanged = { viewModel.input.postValue(it) }
                 )
             }
         }
     }
+}
+
+@Composable
+fun InputPhotoPreview(inputImage: Uri?, onRemove: () -> Unit) {
+    if (inputImage == null) return
+    Box(modifier = Modifier.padding(InputPhotoPreviewDefaults.ContentPadding)) {
+        Box(
+            modifier = Modifier
+                .heightIn(max = InputPhotoPreviewDefaults.ImageSize)
+                .widthIn(max = InputPhotoPreviewDefaults.ImageSize)
+                // .aspectRatio()
+                .border(
+                    1.dp,
+                    MaterialTheme.colors.onBackground.copy(alpha = 0.33f),
+                    shape = MaterialTheme.shapes.small,
+                )
+                .clip(MaterialTheme.shapes.small),
+        ) {
+            NetworkImage(data = inputImage)
+        }
+        Box(
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .background(
+                    MaterialTheme.colors.onSurface.copy(0.8f),
+                    shape = CircleShape,
+                )
+                .clickable { onRemove() }
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_x),
+                contentDescription = stringResource(id = R.string.common_controls_actions_remove),
+                tint = MaterialTheme.colors.surface,
+                modifier = Modifier.padding(InputPhotoPreviewDefaults.IconPadding)
+            )
+        }
+    }
+}
+
+private object InputPhotoPreviewDefaults {
+    val ContentPadding = PaddingValues(horizontal = 20.dp, vertical = 12.dp)
+    val ImageSize = 172.dp
+    val IconPadding = 6.dp
+}
+
+@OptIn(ExperimentalAnimationApi::class)
+@Composable
+fun InputComponent(
+    modifier: Modifier = Modifier,
+    filePickerLauncher: ManagedActivityResultLauncher<String, MutableList<Uri>>,
+    scope: CoroutineScope,
+    input: String,
+    onValueChanged: (input: String) -> Unit,
+    enableSelectPhoto: Boolean,
+    enableSend: Boolean
+) {
+    Row(
+        modifier = modifier.padding(InputComponentDefaults.ContentPadding),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        AnimatedVisibility(visible = enableSelectPhoto) {
+            IconButton(
+                onClick = {
+                    scope.launch {
+                        filePickerLauncher.launch("image/*")
+                    }
+                }
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_camera),
+                    contentDescription = stringResource(
+                        id = R.string.accessibility_scene_compose_image
+                    )
+                )
+            }
+        }
+        Spacer(modifier = Modifier.width(InputComponentDefaults.ContentSpacing))
+        TextInput(
+            value = input,
+            onValueChange = onValueChanged,
+            modifier = Modifier.weight(1f),
+            maxLines = 3
+        )
+        Spacer(modifier = Modifier.width(InputComponentDefaults.ContentSpacing))
+        IconButton(
+            enabled = enableSend,
+            onClick = {
+                // TODO DM send msg
+            }
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_send),
+                contentDescription = stringResource(
+                    id = R.string.accessibility_scene_compose_send
+                ),
+                tint = if (enableSend) MaterialTheme.colors.primary else LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
+            )
+        }
+    }
+}
+
+private object InputComponentDefaults {
+    val ContentPadding = PaddingValues(horizontal = 4.dp)
+    val ContentSpacing = 10.dp
 }

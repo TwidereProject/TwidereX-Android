@@ -20,6 +20,8 @@
  */
 package com.twidere.twiderex.viewmodel.dm
 
+import android.net.Uri
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
 import com.twidere.twiderex.model.AccountDetails
@@ -48,4 +50,8 @@ class DMEventViewModel @AssistedInject constructor(
     val source by lazy {
         repository.dmEventListSource(account, conversationKey)
     }
+
+    // input
+    val input = MutableLiveData("")
+    val inputImage = MutableLiveData<Uri?>()
 }
