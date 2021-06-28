@@ -282,7 +282,7 @@ private fun ListDeleteConfirmDialog(title: String, onDismissRequest: () -> Unit,
         },
         title = {
             Text(
-                text = stringResource(id = R.string.scene_lists_details_delete_list_confirm, title),
+                text = stringResource(id = R.string.scene_lists_details_delete_list_title, title),
                 style = MaterialTheme.typography.subtitle1
             )
         },
