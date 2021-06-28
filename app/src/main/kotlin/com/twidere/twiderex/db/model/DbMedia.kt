@@ -28,7 +28,7 @@ import com.twidere.twiderex.model.MicroBlogKey
 
 @Entity(
     tableName = "media",
-    indices = [Index(value = ["statusKey", "order"], unique = true)],
+    indices = [Index(value = ["belongToKey", "order"], unique = true)],
 )
 data class DbMedia(
     /**
@@ -36,7 +36,7 @@ data class DbMedia(
      */
     @PrimaryKey
     val _id: String,
-    val statusKey: MicroBlogKey,
+    val belongToKey: MicroBlogKey,
     val url: String?,
     val mediaUrl: String?,
     val previewUrl: String?,

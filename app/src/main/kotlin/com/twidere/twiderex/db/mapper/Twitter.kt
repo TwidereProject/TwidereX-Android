@@ -247,7 +247,7 @@ private fun StatusV2.toDbStatusWithMediaAndUser(
             val type = it.type?.let { MediaType.valueOf(it) } ?: MediaType.photo
             DbMedia(
                 _id = UUID.randomUUID().toString(),
-                statusKey = status.statusKey,
+                belongToKey = status.statusKey,
                 previewUrl = getImage(it.url ?: it.previewImageURL, "small"),
                 mediaUrl = getImage(it.url ?: it.previewImageURL, "orig"),
                 width = it.width ?: 0,
@@ -356,7 +356,7 @@ private fun Status.toDbStatusWithMediaAndUser(
             val type = it.type?.let { MediaType.valueOf(it) } ?: MediaType.photo
             DbMedia(
                 _id = UUID.randomUUID().toString(),
-                statusKey = status.statusKey,
+                belongToKey = status.statusKey,
                 previewUrl = getImage(it.mediaURLHTTPS, "small"),
                 mediaUrl = when (type) {
                     MediaType.photo -> getImage(it.mediaURLHTTPS, "orig")
@@ -560,7 +560,7 @@ fun DirectMessageEvent.toDbDirectMessage(accountKey: MicroBlogKey, sender: DbUse
             listOf(
                 DbMedia(
                     _id = UUID.randomUUID().toString(),
-                    statusKey = message.messageKey,
+                    belongToKey = message.messageKey,
                     url = media.url ?: "",
                     previewUrl = media.mediaURLHTTPS,
                     type = type,

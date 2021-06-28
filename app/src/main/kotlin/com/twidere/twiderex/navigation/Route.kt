@@ -35,6 +35,7 @@ import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.scenes.DraftListScene
 import com.twidere.twiderex.scenes.HomeScene
+import com.twidere.twiderex.scenes.PureMediaScene
 import com.twidere.twiderex.scenes.RawMediaScene
 import com.twidere.twiderex.scenes.SignInScene
 import com.twidere.twiderex.scenes.StatusMediaScene
@@ -133,6 +134,9 @@ object Route {
 
         fun Raw(url: String) =
             "media/raw/${URLEncoder.encode(url, "UTF-8")}"
+
+        fun Pure(belongToKey: MicroBlogKey, selectedIndex: Int = 0) =
+            "media/pure/$belongToKey?selectedIndex=$selectedIndex"
     }
 
     fun Search(keyword: String) = "search/result/${
@@ -500,6 +504,20 @@ fun RouteBuilder.route(constraints: Constraints) {
                     )
                 }
             }
+        }
+    }
+
+    authorizedDialog(
+        "media/pure/{belongToKey}",
+    ) { backStackEntry ->
+        backStackEntry.path<String>("belongToKey")?.let {
+            MicroBlogKey.valueOf(it)
+        }?.let { belongToKey ->
+            val selectedIndex = backStackEntry.query("selectedIndex", 0) ?: 0
+            PureMediaScene(
+                belongToKey = belongToKey,
+                selectedIndex = selectedIndex
+            )
         }
     }
 

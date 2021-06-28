@@ -32,6 +32,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -65,7 +66,9 @@ import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.component.status.UserAvatarDefaults
 import com.twidere.twiderex.model.ui.UiDMEvent
 import com.twidere.twiderex.model.ui.UiMedia
+import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.preferences.proto.DisplayPreferences
+import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.LocalVideoPlayback
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -164,6 +167,7 @@ private object DMEventDefaults {
 
 @Composable
 private fun MessageBody(event: UiDMEvent) {
+    val navController = LocalNavController.current
     Box(
         modifier = Modifier
             .clip(
@@ -183,7 +187,13 @@ private fun MessageBody(event: UiDMEvent) {
             .padding(MessageBodyDefaults.ContentPadding)
     ) {
         Column {
-            MediaMessage(media = event.media.firstOrNull())
+            MediaMessage(
+                media = event.media.firstOrNull(),
+                onClick = {
+                    navController.navigate(Route.Media.Pure(event.messageKey))
+                }
+            )
+            if (event.media.isNotEmpty() && event.htmlText.isNotEmpty()) Spacer(modifier = Modifier.height(MessageBodyDefaults.ContentSpacing))
             val textColor = if (event.isInCome) MaterialTheme.colors.onSurface else MaterialTheme.colors.onPrimary
             CompositionLocalProvider(LocalContentColor provides textColor) {
                 HtmlText(htmlText = event.htmlText, linkResolver = { href -> event.resolveLink(href) })
@@ -196,14 +206,14 @@ private object MessageBodyDefaults {
     val cornerRadius = 8.dp
     val pointCornerRadius = 2.dp
     val ContentPadding = PaddingValues(12.dp)
+    val ContentSpacing = 10.dp
 }
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-private fun MediaMessage(media: UiMedia?) {
+private fun MediaMessage(media: UiMedia?, onClick: (UiMedia) -> Unit) {
     // TODO DM fixme photo with ton.twitter.api needs to be authed
     media?.let { item ->
-        // val navigator = LocalNavigator.current
         val aspectRatio = (item.width.toFloat() / item.height.toFloat()).let {
             if (it.isNaN()) {
                 StatusMediaDefaults.DefaultAspectRatio
@@ -217,9 +227,7 @@ private fun MediaMessage(media: UiMedia?) {
                 modifier = Modifier
                     .heightIn(max = StatusMediaDefaults.DefaultMaxHeight)
                     .aspectRatio(aspectRatio),
-                onClick = {
-                    // todo DM navigate to media scene
-                }
+                onClick = onClick
             )
         }
     }

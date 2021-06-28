@@ -178,7 +178,7 @@ class DbDMEventTest {
             assert(it.media.isNotEmpty())
             assert(it.urlEntity.isNotEmpty())
             it.media.forEach { media ->
-                Assert.assertEquals(it.message.messageKey, media.statusKey)
+                Assert.assertEquals(it.message.messageKey, media.belongToKey)
             }
             it.urlEntity.forEach { url ->
                 Assert.assertEquals(it.message.messageKey, url.statusKey)

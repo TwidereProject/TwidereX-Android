@@ -18,17 +18,25 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.mock.db
+package com.twidere.twiderex.viewmodel
 
-import com.twidere.twiderex.db.dao.MediaDao
-import com.twidere.twiderex.db.model.DbMedia
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.liveData
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.repository.MediaRepository
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 
-class MockMediaDao : MediaDao {
-    override suspend fun insertAll(media: List<DbMedia>) {
+class PureMediaViewModel @AssistedInject constructor(
+    private val mediaRepository: MediaRepository,
+    @Assisted private val belongKey: MicroBlogKey, // statusKey, conversationKey
+) : ViewModel() {
+    @dagger.assisted.AssistedFactory
+    interface AssistedFactory {
+        fun create(belongKey: MicroBlogKey): PureMediaViewModel
     }
 
-    override suspend fun findMediaByBelongToKey(belongToKey: MicroBlogKey): List<DbMedia> {
-        TODO("Not yet implemented")
+    val source = liveData {
+        emit(mediaRepository.findMediaByBelongToKey(belongKey))
     }
 }

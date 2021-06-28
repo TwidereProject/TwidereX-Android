@@ -70,7 +70,7 @@ data class DbDMEventWithAttachments(
     @Embedded
     val message: DbDMEvent,
 
-    @Relation(parentColumn = "messageKey", entityColumn = "statusKey", entity = DbMedia::class)
+    @Relation(parentColumn = "messageKey", entityColumn = "belongToKey", entity = DbMedia::class)
     val media: List<DbMedia>,
 
     @Relation(parentColumn = "messageKey", entityColumn = "statusKey", entity = DbUrlEntity::class)
