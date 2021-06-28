@@ -20,16 +20,34 @@
  */
 package com.twidere.twiderex.component.foundation
 
+import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import coil.ImageLoader
+import coil.bitmap.BitmapPool
+import coil.memory.MemoryCache
+import coil.request.DefaultRequestOptions
+import coil.request.Disposable
+import coil.request.ImageRequest
+import coil.request.ImageResult
+import com.google.accompanist.coil.CoilPainterDefaults
 import com.google.accompanist.coil.rememberCoilPainter
 import com.google.accompanist.imageloading.ImageLoadState
 import com.google.accompanist.imageloading.LoadPainter
+import com.twidere.services.http.authorization.OAuth1Authorization
 import com.twidere.twiderex.R
+import com.twidere.twiderex.model.AccountDetails
+import com.twidere.twiderex.model.PlatformType
+import com.twidere.twiderex.model.cred.OAuthCredentials
+import com.twidere.twiderex.ui.LocalActiveAccount
+import okhttp3.Headers
+import okhttp3.Request
+import java.net.URL
 
 @Composable
 fun NetworkImage(
@@ -41,7 +59,14 @@ fun NetworkImage(
     val painter = if (data is Painter) {
         data
     } else {
-        rememberCoilPainter(request = data, fadeIn = true)
+        rememberCoilPainter(
+            request = data, fadeIn = true,
+            imageLoader = TwidereImageLoader(
+                CoilPainterDefaults.defaultImageLoader(),
+                LocalContext.current,
+                LocalActiveAccount.current
+            )
+        )
     }
     if (painter is LoadPainter<*> && painter.loadState is ImageLoadState.Loading) {
         placeholder?.invoke()
@@ -52,4 +77,61 @@ fun NetworkImage(
         contentScale = contentScale,
         contentDescription = stringResource(id = R.string.accessibility_common_network_image)
     )
+}
+
+private class TwidereImageLoader(
+    private val realImageLoader: ImageLoader,
+    private val context: Context,
+    private val account: AccountDetails?
+) : ImageLoader {
+    override val bitmapPool: BitmapPool
+        get() = realImageLoader.bitmapPool
+    override val defaults: DefaultRequestOptions
+        get() = realImageLoader.defaults
+    override val memoryCache: MemoryCache
+        get() = realImageLoader.memoryCache
+
+    override fun enqueue(request: ImageRequest): Disposable {
+        return realImageLoader.enqueue(handleRequest(request))
+    }
+
+    override suspend fun execute(request: ImageRequest): ImageResult {
+        return realImageLoader.execute(handleRequest(request))
+    }
+
+    override fun newBuilder(): ImageLoader.Builder {
+        return ImageLoader.Builder(context)
+    }
+
+    override fun shutdown() {
+        realImageLoader.shutdown()
+    }
+
+    private fun handleRequest(request: ImageRequest): ImageRequest {
+        val data = request.data
+        // ton.twitter.com must be retrieved via an authenticated
+        return if (data is String &&
+            URL(data).host.equals("ton.twitter.com") &&
+            account?.type == PlatformType.Twitter
+        ) {
+            val auth = (account.credentials as OAuthCredentials).let {
+                OAuth1Authorization(
+                    consumerKey = it.consumer_key,
+                    consumerSecret = it.consumer_secret,
+                    accessToken = it.access_token,
+                    accessSecret = it.access_token_secret,
+                )
+            }
+            request.newBuilder(
+                request.context
+            ).headers(
+                headers = Headers.headersOf(
+                    "Authorization",
+                    auth.getAuthorizationHeader(Request.Builder().url(data).build())
+                )
+            ).build()
+        } else {
+            request
+        }
+    }
 }
