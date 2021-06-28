@@ -125,7 +125,7 @@ fun LazyUiStatusList(
     loadingBetween: List<MicroBlogKey> = emptyList(),
     contentPadding: PaddingValues = PaddingValues(0.dp),
     onLoadBetweenClicked: (current: MicroBlogKey, next: MicroBlogKey) -> Unit = { _, _ -> },
-    key: ((index: Int) -> Any) = { items.peek(it)?.hashCode() ?: it },
+    key: ((index: Int) -> Any) = { items.peek(it)?.statusKey?.hashCode() ?: it },
     header: LazyListScope.() -> Unit = {},
 ) {
     val listState = rememberSaveable(saver = LazyUiStatusListState.Saver) {
