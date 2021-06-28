@@ -236,6 +236,7 @@
     <string name="scene_lists_details_delete_list_confirm">Delete this list: %s</string>
     <string name="scene_lists_details_no_members_found">No Members Found.</string>
     <string name="scene_lists_details_add_members">Add Members</string>
+    <string name="scene_lists_details_delete_list_title">Delete this list</string>
     <string name="scene_lists_modify_create_title">New List</string>
     <string name="scene_lists_modify_edit_title">Edit List</string>
     <string name="scene_lists_modify_name">Name</string>

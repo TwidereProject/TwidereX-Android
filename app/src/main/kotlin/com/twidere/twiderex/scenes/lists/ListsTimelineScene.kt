@@ -30,11 +30,14 @@ import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.LocalContentAlpha
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -280,7 +283,13 @@ private fun ListDeleteConfirmDialog(title: String, onDismissRequest: () -> Unit,
         title = {
             Text(
                 text = stringResource(id = R.string.scene_lists_details_delete_list_confirm, title),
+                style = MaterialTheme.typography.subtitle1
             )
+        },
+        text = {
+            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                Text(text = title, style = MaterialTheme.typography.body2)
+            }
         },
         dismissButton = {
             TextButton(
@@ -301,6 +310,7 @@ private fun ListDeleteConfirmDialog(title: String, onDismissRequest: () -> Unit,
                 Text(text = stringResource(id = R.string.common_controls_actions_yes))
             }
         },
+
     )
 }
 
