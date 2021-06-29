@@ -70,7 +70,7 @@ import javax.inject.Singleton
         DbTrend::class,
         DbTrendHistory::class
     ],
-    version = 16,
+    version = 17,
 )
 @TypeConverters(
     MicroBlogKeyConverter::class,
