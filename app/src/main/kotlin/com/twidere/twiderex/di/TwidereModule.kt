@@ -24,6 +24,7 @@ import androidx.datastore.core.DataStore
 import androidx.work.WorkManager
 import com.twidere.services.nitter.NitterService
 import com.twidere.twiderex.action.ComposeAction
+import com.twidere.twiderex.action.DirectMessageAction
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.preferences.proto.MiscPreferences
@@ -60,4 +61,10 @@ object TwidereModule {
             preferences.data.first().nitterInstance.takeIf { it.isNotEmpty() }?.let { NitterService(it.trimEnd('/')) }
         }
     }
+
+    @Singleton
+    @Provides
+    fun provideDirectMessageQueue(
+        workManager: WorkManager,
+    ): DirectMessageAction = DirectMessageAction(workManager = workManager)
 }

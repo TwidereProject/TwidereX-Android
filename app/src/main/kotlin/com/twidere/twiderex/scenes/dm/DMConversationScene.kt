@@ -40,6 +40,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
@@ -49,6 +50,7 @@ import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberCoroutineScope
@@ -83,7 +85,6 @@ fun DMConversationScene(conversationKey: MicroBlogKey) {
     ) {
         it.create(account, conversationKey)
     }
-    val scope = rememberCoroutineScope()
     val filePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetMultipleContents(),
         onResult = {
@@ -94,6 +95,14 @@ fun DMConversationScene(conversationKey: MicroBlogKey) {
     val conversation by viewModel.conversation.observeAsState()
     val input by viewModel.input.observeAsState(initial = "")
     val inputImage by viewModel.inputImage.observeAsState()
+    val listState = rememberLazyListState()
+    val scope = rememberCoroutineScope()
+    val firstEventKey by viewModel.firstEventKey.observeAsState()
+    if (source.itemCount > 0) {
+        source.peek(0)?.messageKey?.let {
+            viewModel.firstEventKey.postValue(it.toString())
+        }
+    }
     TwidereScene {
         InAppNotificationScaffold(
             topBar = {
@@ -114,6 +123,10 @@ fun DMConversationScene(conversationKey: MicroBlogKey) {
                     LazyUiDMEventList(
                         modifier = Modifier.fillMaxSize(),
                         items = source,
+                        onResend = {
+                            viewModel.sendDraftMessage(it)
+                        },
+                        state = listState
                     )
                 }
                 Divider(modifier = Modifier.fillMaxWidth())
@@ -127,9 +140,19 @@ fun DMConversationScene(conversationKey: MicroBlogKey) {
                     enableSelectPhoto = inputImage == null,
                     enableSend = input.isNotEmpty() || inputImage != null,
                     input = input,
-                    onValueChanged = { viewModel.input.postValue(it) }
+                    onValueChanged = { viewModel.input.postValue(it) },
+                    onSend = { viewModel.sendMessage() }
                 )
             }
+            LaunchedEffect(
+                key1 = firstEventKey,
+                block = {
+                    if (firstEventKey == null || source.itemCount <= 0) return@LaunchedEffect
+                    scope.launch {
+                        listState.scrollToItem(0)
+                    }
+                }
+            )
         }
     }
 }
@@ -186,7 +209,8 @@ fun InputComponent(
     input: String,
     onValueChanged: (input: String) -> Unit,
     enableSelectPhoto: Boolean,
-    enableSend: Boolean
+    enableSend: Boolean,
+    onSend: () -> Unit
 ) {
     Row(
         modifier = modifier.padding(InputComponentDefaults.ContentPadding),
@@ -218,9 +242,7 @@ fun InputComponent(
         Spacer(modifier = Modifier.width(InputComponentDefaults.ContentSpacing))
         IconButton(
             enabled = enableSend,
-            onClick = {
-                // TODO DM send msg
-            }
+            onClick = onSend
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_send),

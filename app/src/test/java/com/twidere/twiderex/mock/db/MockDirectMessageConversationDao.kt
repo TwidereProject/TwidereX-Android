@@ -20,6 +20,7 @@
  */
 package com.twidere.twiderex.mock.db
 
+import androidx.lifecycle.LiveData
 import androidx.paging.PagingSource
 import com.twidere.services.twitter.model.User
 import com.twidere.twiderex.db.dao.DirectMessageConversationDao
@@ -67,6 +68,13 @@ class MockDirectMessageConversationDao : DirectMessageConversationDao {
     }
 
     override fun getPagingSource(accountKey: MicroBlogKey): PagingSource<Int, DbDirectMessageConversationWithMessage> {
+        TODO("Not yet implemented")
+    }
+
+    override fun findWithConversationKey(
+        accountKey: MicroBlogKey,
+        conversationKey: MicroBlogKey
+    ): LiveData<DbDMConversation?> {
         TODO("Not yet implemented")
     }
 

@@ -78,7 +78,8 @@ abstract class BaseDirectMessageMediator<Key : Any, Value : Any>(
                             conversationAvatar = chatUser.profileImage,
                             conversationName = chatUser.name,
                             conversationSubName = chatUser.screenName,
-                            conversationType = DbDMConversation.Type.ONE_TO_ONE
+                            conversationType = DbDMConversation.Type.ONE_TO_ONE,
+                            recipientKey = msgWithData.message.conversationUserKey
                         )
                     }.saveToDb(database)
             }

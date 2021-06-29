@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 17,
-    "identityHash": "d221876633ab92b78c54386b7a4f9352",
+    "identityHash": "eb65658a2f9baca80719d5ef7a9b2547",
     "entities": [
       {
         "tableName": "status",
@@ -900,7 +900,7 @@
       },
       {
         "tableName": "dm_conversation",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` TEXT NOT NULL, `accountKey` TEXT NOT NULL, `conversationId` TEXT NOT NULL, `conversationKey` TEXT NOT NULL, `conversationAvatar` TEXT NOT NULL, `conversationName` TEXT NOT NULL, `conversationSubName` TEXT NOT NULL, `conversationType` TEXT NOT NULL, PRIMARY KEY(`_id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` TEXT NOT NULL, `accountKey` TEXT NOT NULL, `conversationId` TEXT NOT NULL, `conversationKey` TEXT NOT NULL, `conversationAvatar` TEXT NOT NULL, `conversationName` TEXT NOT NULL, `conversationSubName` TEXT NOT NULL, `conversationType` TEXT NOT NULL, `recipientKey` TEXT NOT NULL, PRIMARY KEY(`_id`))",
         "fields": [
           {
             "fieldPath": "_id",
@@ -949,6 +949,12 @@
             "columnName": "conversationType",
             "affinity": "TEXT",
             "notNull": true
+          },
+          {
+            "fieldPath": "recipientKey",
+            "columnName": "recipientKey",
+            "affinity": "TEXT",
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -972,7 +978,7 @@
       },
       {
         "tableName": "dm_event",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` TEXT NOT NULL, `accountKey` TEXT NOT NULL, `sortId` INTEGER NOT NULL, `conversationKey` TEXT NOT NULL, `messageId` TEXT NOT NULL, `messageKey` TEXT NOT NULL, `htmlText` TEXT NOT NULL, `createdTimestamp` INTEGER NOT NULL, `messageType` TEXT NOT NULL, `senderAccountKey` TEXT NOT NULL, `recipientAccountKey` TEXT NOT NULL, `sendStatus` TEXT NOT NULL, PRIMARY KEY(`_id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` TEXT NOT NULL, `accountKey` TEXT NOT NULL, `sortId` INTEGER NOT NULL, `conversationKey` TEXT NOT NULL, `messageId` TEXT NOT NULL, `messageKey` TEXT NOT NULL, `htmlText` TEXT NOT NULL, `originText` TEXT NOT NULL, `createdTimestamp` INTEGER NOT NULL, `messageType` TEXT NOT NULL, `senderAccountKey` TEXT NOT NULL, `recipientAccountKey` TEXT NOT NULL, `sendStatus` TEXT NOT NULL, PRIMARY KEY(`_id`))",
         "fields": [
           {
             "fieldPath": "_id",
@@ -1013,6 +1019,12 @@
           {
             "fieldPath": "htmlText",
             "columnName": "htmlText",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "originText",
+            "columnName": "originText",
             "affinity": "TEXT",
             "notNull": true
           },
@@ -1071,7 +1083,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'd221876633ab92b78c54386b7a4f9352')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'eb65658a2f9baca80719d5ef7a9b2547')"
     ]
   }
 }

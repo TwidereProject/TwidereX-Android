@@ -1,4 +1,4 @@
-{
+{"event": {
   "type": "message_create",
   "id": "1406873583490502662",
   "created_timestamp": "1624259775408",
@@ -67,4 +67,5 @@
       }
     }
   }
+}
 }

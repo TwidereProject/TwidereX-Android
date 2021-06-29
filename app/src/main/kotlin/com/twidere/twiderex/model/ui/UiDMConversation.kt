@@ -35,6 +35,7 @@ data class UiDMConversation(
     val conversationName: String,
     val conversationSubName: String,
     val conversationType: DbDMConversation.Type,
+    val recipientKey: MicroBlogKey,
 ) {
     companion object {
         fun DbDMConversation.toUi() = UiDMConversation(
@@ -45,6 +46,7 @@ data class UiDMConversation(
             conversationName = conversationName,
             conversationSubName = conversationSubName,
             conversationType = conversationType,
+            recipientKey = recipientKey,
         )
     }
 }

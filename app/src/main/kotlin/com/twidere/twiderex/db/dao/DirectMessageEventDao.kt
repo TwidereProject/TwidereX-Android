@@ -45,6 +45,10 @@ interface DirectMessageEventDao {
     suspend fun find(accountKey: MicroBlogKey, conversationKey: MicroBlogKey): List<DbDMEventWithAttachments>
 
     @Transaction
+    @Query("SELECT * FROM dm_event WHERE accountKey == :accountKey AND conversationKey == :conversationKey AND messageKey == :messageKey")
+    suspend fun findWithMessageKey(accountKey: MicroBlogKey, conversationKey: MicroBlogKey, messageKey: MicroBlogKey): DbDMEventWithAttachments?
+
+    @Transaction
     @Query("SELECT * FROM dm_event WHERE accountKey == :accountKey AND conversationKey == :conversationKey ORDER BY sortId DESC")
     fun getPagingSource(
         accountKey: MicroBlogKey,

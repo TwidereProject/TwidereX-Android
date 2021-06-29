@@ -42,6 +42,13 @@ import com.twidere.services.microblog.model.IUser
 import com.twidere.services.microblog.model.Relationship
 import com.twidere.services.twitter.api.TwitterResources
 import com.twidere.services.twitter.api.UploadResources
+import com.twidere.services.twitter.model.Attachment
+import com.twidere.services.twitter.model.DirectMessageEvent
+import com.twidere.services.twitter.model.DirectMessageEventObject
+import com.twidere.services.twitter.model.MessageCreate
+import com.twidere.services.twitter.model.MessageData
+import com.twidere.services.twitter.model.MessageTarget
+import com.twidere.services.twitter.model.PurpleMedia
 import com.twidere.services.twitter.model.StatusV2
 import com.twidere.services.twitter.model.TwitterPaging
 import com.twidere.services.twitter.model.TwitterSearchResponseV1
@@ -613,5 +620,32 @@ class TwitterService(
         resources.destroyMessage(id)
     }
 
-    // TODO send directMessage
+    suspend fun sendDirectMessage(
+        type: String = "message_create",
+        recipientId: String,
+        text: String?,
+        attachmentType: String?, // if set, must set to media
+        mediaId: String?
+    ): DirectMessageEvent? {
+        if (attachmentType != "media") throw NotImplementedError("Currently only media support")
+        return resources.sendMessage(
+            DirectMessageEventObject(
+                event = DirectMessageEvent(
+                    type = type,
+                    messageCreate = MessageCreate(
+                        messageData = MessageData(
+                            text = text,
+                            attachment = mediaId?.let {
+                                Attachment(
+                                    type = attachmentType,
+                                    media = PurpleMedia(id = it.toLong())
+                                )
+                            }
+                        ),
+                        target = MessageTarget(recipientId = recipientId)
+                    )
+                )
+            )
+        ).event
+    }
 }

@@ -57,7 +57,7 @@ import com.twidere.twiderex.navigation.DeepLinks
 import com.twitter.twittertext.Autolink
 import java.util.UUID
 
-private val autolink by lazy {
+val autolink by lazy {
     Autolink().apply {
         setUsernameIncludeSymbol(true)
         hashtagUrlBase = "${DeepLinks.Search}/%23"
@@ -547,6 +547,7 @@ fun DirectMessageEvent.toDbDirectMessage(accountKey: MicroBlogKey, sender: DbUse
         messageId = id ?: throw IllegalArgumentException("message id should not be null"),
         messageKey = MicroBlogKey.twitter("dm-${id ?: throw IllegalArgumentException("message id should not be null")}"),
         htmlText = autolink.autoLink(messageCreate?.messageData?.text ?: ""),
+        originText = messageCreate?.messageData?.text ?: "",
         createdTimestamp = createdTimestamp?.toLong() ?: 0L,
         messageType = type ?: throw IllegalArgumentException("message type should not be null"),
         senderAccountKey = MicroBlogKey.twitter(messageCreate?.senderId ?: throw IllegalArgumentException("message sender id should not be null")),

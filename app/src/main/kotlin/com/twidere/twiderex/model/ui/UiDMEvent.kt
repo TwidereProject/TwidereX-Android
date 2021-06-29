@@ -36,6 +36,7 @@ data class UiDMEvent(
     val messageKey: MicroBlogKey,
     // include hash tag in this parameter
     val htmlText: String,
+    val originText: String,
     val createdTimestamp: Long,
     val messageType: String,
     val senderAccountKey: MicroBlogKey,
@@ -56,6 +57,7 @@ data class UiDMEvent(
             messageId = message.messageId,
             messageKey = message.messageKey,
             htmlText = message.htmlText,
+            originText = message.originText,
             createdTimestamp = message.createdTimestamp,
             messageType = message.messageType,
             senderAccountKey = message.senderAccountKey,

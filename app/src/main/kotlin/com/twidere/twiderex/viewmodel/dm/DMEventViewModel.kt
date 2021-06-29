@@ -24,14 +24,22 @@ import android.net.Uri
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
+import androidx.lifecycle.viewModelScope
+import androidx.paging.cachedIn
+import com.twidere.twiderex.action.DirectMessageAction
 import com.twidere.twiderex.model.AccountDetails
+import com.twidere.twiderex.model.DirectMessageSendData
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.PlatformType
+import com.twidere.twiderex.model.ui.UiDMEvent
 import com.twidere.twiderex.repository.DirectMessageRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import java.util.UUID
 
 class DMEventViewModel @AssistedInject constructor(
     private val repository: DirectMessageRepository,
+    private val sendAction: DirectMessageAction,
     @Assisted private val account: AccountDetails,
     @Assisted private val conversationKey: MicroBlogKey,
 ) : ViewModel() {
@@ -48,10 +56,49 @@ class DMEventViewModel @AssistedInject constructor(
     }
 
     val source by lazy {
-        repository.dmEventListSource(account, conversationKey)
+        repository.dmEventListSource(account, conversationKey).cachedIn(viewModelScope)
     }
 
     // input
     val input = MutableLiveData("")
     val inputImage = MutableLiveData<Uri?>()
+    val firstEventKey = MutableLiveData<String>(null)
+
+    fun sendMessage() {
+        if (input.value.isNullOrEmpty() && inputImage.value == null) return
+        conversation.value?.let {
+            sendAction.send(
+                account.type,
+                data = DirectMessageSendData(
+                    text = input.value,
+                    images = inputImage.value?.toString()?.let { listOf(it) } ?: emptyList(),
+                    recipientUserKey = it.recipientKey,
+                    dratMessageKey = when (account.type) {
+                        PlatformType.Twitter -> MicroBlogKey.twitter(UUID.randomUUID().toString())
+                        PlatformType.StatusNet -> TODO()
+                        PlatformType.Fanfou -> TODO()
+                        PlatformType.Mastodon -> TODO()
+                    },
+                    conversationKey = it.conversationKey,
+                    accountKey = account.accountKey
+                )
+            )
+            input.postValue("")
+            inputImage.postValue(null)
+        }
+    }
+
+    fun sendDraftMessage(event: UiDMEvent) {
+        sendAction.send(
+            account.type,
+            data = DirectMessageSendData(
+                text = event.originText,
+                images = event.media.mapNotNull { it.url },
+                recipientUserKey = event.recipientAccountKey,
+                conversationKey = event.conversationKey,
+                accountKey = account.accountKey,
+                dratMessageKey = event.messageKey
+            )
+        )
+    }
 }

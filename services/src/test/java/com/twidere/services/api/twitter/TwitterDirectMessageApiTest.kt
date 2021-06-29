@@ -41,7 +41,7 @@ class TwitterDirectMessageApiTest {
     @Test
     fun createMessage() = runBlocking {
         val result = dmResources.sendMessage(DirectMessageEventObject())
-        assertEquals("1406873583490502662", result.id)
+        assertEquals("1406873583490502662", result.event?.id)
     }
 
     @Test

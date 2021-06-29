@@ -194,6 +194,8 @@ object Route {
         fun Draft(id: String) = "$twidereXSchema://draft/compose/$id"
 
         fun Compose(composeType: ComposeType, statusKey: MicroBlogKey? = null) = "$twidereXSchema://${Route.Compose(composeType, statusKey)}"
+
+        fun Conversation(conversationKey: MicroBlogKey) = "$twidereXSchema://${Messages.Conversation(conversationKey)}"
     }
 
     fun Status(statusKey: MicroBlogKey) = "status/$statusKey"
@@ -242,6 +244,7 @@ object DeepLinks {
 
     const val Draft = "$twidereXSchema://draft/compose/{draftId}"
     const val Compose = "$twidereXSchema://compose"
+    const val Conversation = "$twidereXSchema://${Route.Messages.Home}/conversation/{conversationKey}"
 
     object Callback {
         object SignIn {
@@ -709,7 +712,10 @@ fun RouteBuilder.route(constraints: Constraints) {
     }
 
     authorizedScene(
-        "${Route.Messages.Home}/conversation/{conversationKey}"
+        "${Route.Messages.Home}/conversation/{conversationKey}",
+        deepLinks = listOf(
+            DeepLinks.Conversation
+        )
     ) { backStackEntry ->
         backStackEntry.path<String>("conversationKey")?.let {
             DMConversationScene(conversationKey = MicroBlogKey.valueOf(it))

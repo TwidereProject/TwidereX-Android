@@ -20,7 +20,6 @@
  */
 package com.twidere.services.twitter.api
 
-import com.twidere.services.twitter.model.DirectMessageEvent
 import com.twidere.services.twitter.model.DirectMessageEventObject
 import com.twidere.services.twitter.model.DirectMessageResponse
 import retrofit2.Response
@@ -32,7 +31,7 @@ import retrofit2.http.Query
 
 interface DirectMessagesResources {
     @POST("/1.1/direct_messages/events/new.json")
-    suspend fun sendMessage(@Body event: DirectMessageEventObject): DirectMessageEvent
+    suspend fun sendMessage(@Body event: DirectMessageEventObject): DirectMessageEventObject
 
     @GET("/1.1/direct_messages/events/list.json")
     suspend fun getMessages(

@@ -23,6 +23,7 @@ package com.twidere.twiderex.component.lazy.ui
 import android.text.format.DateUtils
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -35,6 +36,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
@@ -42,7 +44,9 @@ import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.Icon
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -53,9 +57,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.items
+import com.twidere.twiderex.R
 import com.twidere.twiderex.component.lazy.loadState
 import com.twidere.twiderex.component.placeholder.UiUserPlaceholder
 import com.twidere.twiderex.component.status.HtmlText
@@ -64,6 +70,7 @@ import com.twidere.twiderex.component.status.StatusMediaDefaults
 import com.twidere.twiderex.component.status.StatusMediaPreviewItem
 import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.component.status.UserAvatarDefaults
+import com.twidere.twiderex.db.model.DbDMEvent
 import com.twidere.twiderex.model.ui.UiDMEvent
 import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.navigation.Route
@@ -79,7 +86,7 @@ fun LazyUiDMEventList(
     state: LazyListState = rememberLazyListState(),
     key: ((index: Int) -> Any) = { items.peek(it)?.messageKey?.hashCode() ?: it },
     header: LazyListScope.() -> Unit = {},
-    action: @Composable (user: UiDMEvent) -> Unit = {}
+    onResend: (event: UiDMEvent) -> Unit = {}
 ) {
     LazyUiList(items = items) {
         LazyColumn(
@@ -101,7 +108,7 @@ fun LazyUiDMEventList(
                         if (it.isInCome)
                             DMInComeEvent(it)
                         else
-                            DMOutComeEvent(action, it)
+                            DMOutComeEvent(onResend, it)
                     }
                 } ?: run {
                     LoadingEventPlaceholder()
@@ -119,11 +126,34 @@ private object LazyUiDMEventListDefaults {
 }
 
 @Composable
-private fun DMOutComeEvent(action: @Composable (event: UiDMEvent) -> Unit = {}, event: UiDMEvent) {
+private fun DMOutComeEvent(onResend: (event: UiDMEvent) -> Unit = {}, event: UiDMEvent) {
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
         Column(horizontalAlignment = Alignment.End) {
-            Row(verticalAlignment = Alignment.Bottom) {
-                action.invoke(event)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                when (event.sendStatus) {
+                    DbDMEvent.SendStatus.PENDING -> {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(DMOutComeEventDefaults.Loading.size),
+                            // .padding(DMOutComeEventDefaults.Loading.padding),
+                            strokeWidth = DMOutComeEventDefaults.Loading.width,
+                            color = MaterialTheme.colors.primary
+                        )
+                    }
+                    DbDMEvent.SendStatus.SUCCESS -> {}
+                    DbDMEvent.SendStatus.FAILED -> {
+                        Box(
+                            modifier = Modifier.clickable { onResend(event) }
+                        ) {
+                            // TODO DM localize
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_alert_octagon),
+                                contentDescription = "retry",
+                                tint = MaterialTheme.colors.error,
+                                modifier = Modifier.size(DMOutComeEventDefaults.Error.size)
+                            )
+                        }
+                    }
+                }
                 Spacer(modifier = Modifier.width(DMEventDefaults.ContentSpacing))
                 MessageBody(event)
             }
@@ -134,6 +164,16 @@ private fun DMOutComeEvent(action: @Composable (event: UiDMEvent) -> Unit = {}, 
                 time = event.createdTimestamp
             )
         }
+    }
+}
+
+private object DMOutComeEventDefaults {
+    object Loading {
+        val size = 24.dp
+        val width = 2.dp
+    }
+    object Error {
+        val size = 24.dp
     }
 }
 

@@ -43,6 +43,7 @@ data class DbDMConversation(
     val conversationName: String,
     val conversationSubName: String,
     val conversationType: Type,
+    val recipientKey: MicroBlogKey,
 ) {
     enum class Type {
         ONE_TO_ONE,
