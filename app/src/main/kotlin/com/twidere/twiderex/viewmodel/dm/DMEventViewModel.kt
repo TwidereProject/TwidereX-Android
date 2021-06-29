@@ -71,7 +71,7 @@ class DMEventViewModel @AssistedInject constructor(
                 account.type,
                 data = DirectMessageSendData(
                     text = input.value,
-                    images = inputImage.value?.toString()?.let { listOf(it) } ?: emptyList(),
+                    images = inputImage.value?.toString()?.let { uri -> listOf(uri) } ?: emptyList(),
                     recipientUserKey = it.recipientKey,
                     dratMessageKey = when (account.type) {
                         PlatformType.Twitter -> MicroBlogKey.twitter(UUID.randomUUID().toString())

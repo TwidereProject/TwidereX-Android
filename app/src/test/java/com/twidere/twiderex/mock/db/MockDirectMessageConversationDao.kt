@@ -50,6 +50,7 @@ class MockDirectMessageConversationDao : DirectMessageConversationDao {
                         "",
                         MicroBlogKey.Empty,
                         "",
+                        "",
                         System.currentTimeMillis(),
                         "",
                         accountKey,

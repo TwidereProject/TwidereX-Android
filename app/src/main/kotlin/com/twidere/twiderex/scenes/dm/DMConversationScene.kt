@@ -165,7 +165,6 @@ fun InputPhotoPreview(inputImage: Uri?, onRemove: () -> Unit) {
             modifier = Modifier
                 .heightIn(max = InputPhotoPreviewDefaults.ImageSize)
                 .widthIn(max = InputPhotoPreviewDefaults.ImageSize)
-                // .aspectRatio()
                 .border(
                     1.dp,
                     MaterialTheme.colors.onBackground.copy(alpha = 0.33f),

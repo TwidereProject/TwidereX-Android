@@ -252,7 +252,6 @@ private object MessageBodyDefaults {
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 private fun MediaMessage(media: UiMedia?, onClick: (UiMedia) -> Unit) {
-    // TODO DM fixme photo with ton.twitter.api needs to be authed
     media?.let { item ->
         val aspectRatio = (item.width.toFloat() / item.height.toFloat()).let {
             if (it.isNaN()) {

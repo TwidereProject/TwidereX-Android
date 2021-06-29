@@ -56,6 +56,14 @@ class MockDirectMessageEventDao : DirectMessageEventDao {
         TODO("Not yet implemented")
     }
 
+    override suspend fun findWithMessageKey(
+        accountKey: MicroBlogKey,
+        conversationKey: MicroBlogKey,
+        messageKey: MicroBlogKey
+    ): DbDMEventWithAttachments? {
+        TODO("Not yet implemented")
+    }
+
     override fun getPagingSource(
         accountKey: MicroBlogKey,
         conversationKey: MicroBlogKey
