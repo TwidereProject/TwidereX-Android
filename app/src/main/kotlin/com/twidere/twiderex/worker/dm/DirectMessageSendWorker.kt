@@ -70,7 +70,7 @@ abstract class DirectMessageSendWorker<T : MicroBlogService>(
         }?.let {
             accountRepository.getAccountDetails(it)
         } ?: return Result.failure()
-        val notificationId = sendData.dratMessageKey.hashCode()
+        val notificationId = sendData.draftMessageKey.hashCode()
         @Suppress("UNCHECKED_CAST")
         val service = accountDetails.service as T
         var draftEvent: DbDMEventWithAttachments? = null
@@ -143,7 +143,7 @@ abstract class DirectMessageSendWorker<T : MicroBlogService>(
             cacheDatabase.directMessageDao().findWithMessageKey(
                 account.accountKey,
                 sendData.conversationKey,
-                sendData.dratMessageKey
+                sendData.draftMessageKey
             )?.also {
                 cacheDatabase.directMessageDao().insertAll(
                     listOf(it.message.copy(sendStatus = DbDMEvent.SendStatus.PENDING))
@@ -161,8 +161,8 @@ abstract class DirectMessageSendWorker<T : MicroBlogService>(
                     accountKey = account.accountKey,
                     sortId = createTimeStamp,
                     conversationKey = sendData.conversationKey,
-                    messageId = sendData.dratMessageKey.id,
-                    messageKey = sendData.dratMessageKey,
+                    messageId = sendData.draftMessageKey.id,
+                    messageKey = sendData.draftMessageKey,
                     htmlText = autoLink(sendData.text ?: ""),
                     originText = sendData.text ?: "",
                     createdTimestamp = createTimeStamp,
@@ -177,7 +177,7 @@ abstract class DirectMessageSendWorker<T : MicroBlogService>(
                     val imageSize = getImageSize(uri.path)
                     DbMedia(
                         _id = UUID.randomUUID().toString(),
-                        belongToKey = sendData.dratMessageKey,
+                        belongToKey = sendData.draftMessageKey,
                         url = uri.toString(),
                         mediaUrl = uri.toString(),
                         previewUrl = uri.toString(),
@@ -193,7 +193,7 @@ abstract class DirectMessageSendWorker<T : MicroBlogService>(
             cacheDatabase.directMessageDao().findWithMessageKey(
                 account.accountKey,
                 sendData.conversationKey,
-                sendData.dratMessageKey
+                sendData.draftMessageKey
             )
         }
     }

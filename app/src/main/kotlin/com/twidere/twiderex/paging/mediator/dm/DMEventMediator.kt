@@ -26,10 +26,9 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.PagingSource
 import androidx.paging.map
-import com.twidere.services.microblog.DirectMessageService
+import com.twidere.services.microblog.model.IDirectMessage
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.db.model.DbDMEventWithAttachments
-import com.twidere.twiderex.db.model.DbUser
 import com.twidere.twiderex.defaultLoadCount
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiDMEvent
@@ -41,10 +40,9 @@ import kotlinx.coroutines.flow.map
 class DMEventMediator(
     private val conversationKey: MicroBlogKey,
     database: CacheDatabase,
-    service: DirectMessageService,
     accountKey: MicroBlogKey,
-    userLookup: suspend (userKey: MicroBlogKey) -> DbUser
-) : BaseDirectMessageMediator<Int, DbDMEventWithAttachments>(database, service, accountKey, userLookup) {
+    realFetch: suspend (key: String?) -> List<IDirectMessage>
+) : BaseDirectMessageMediator<Int, DbDMEventWithAttachments>(database, accountKey, realFetch) {
 
     override fun reverse() = true
 

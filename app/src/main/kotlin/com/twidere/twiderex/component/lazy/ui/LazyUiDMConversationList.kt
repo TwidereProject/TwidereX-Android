@@ -81,7 +81,12 @@ fun LazyUiDMConversationList(
                         ListItem(
                             modifier = Modifier.weight(1f),
                             icon = {
-                                RoundAvatar(avatar = it.conversation.conversationAvatar)
+                                RoundAvatar(
+                                    avatar = it.conversation.conversationAvatar,
+                                    onClick = {
+                                        onItemClicked(it)
+                                    }
+                                )
                             },
                             text = {
                                 Row {

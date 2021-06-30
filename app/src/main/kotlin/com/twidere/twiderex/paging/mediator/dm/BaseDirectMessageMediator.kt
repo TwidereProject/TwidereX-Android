@@ -24,25 +24,16 @@ import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
-import androidx.room.withTransaction
-import com.twidere.services.microblog.DirectMessageService
+import com.twidere.services.microblog.model.IDirectMessage
 import com.twidere.services.microblog.model.IPaging
-import com.twidere.services.twitter.model.DirectMessageEvent
 import com.twidere.twiderex.db.CacheDatabase
-import com.twidere.twiderex.db.mapper.toDbDirectMessage
-import com.twidere.twiderex.db.model.DbDMConversation
-import com.twidere.twiderex.db.model.DbDMConversation.Companion.saveToDb
-import com.twidere.twiderex.db.model.DbDMEventWithAttachments.Companion.saveToDb
-import com.twidere.twiderex.db.model.DbUser
 import com.twidere.twiderex.model.MicroBlogKey
-import java.util.UUID
 
 @OptIn(ExperimentalPagingApi::class)
 abstract class BaseDirectMessageMediator<Key : Any, Value : Any>(
     protected val database: CacheDatabase,
-    protected val service: DirectMessageService,
     protected val accountKey: MicroBlogKey,
-    protected val userLookup: suspend (userKey: MicroBlogKey) -> DbUser
+    protected val realFetch: suspend (key: String?) -> List<IDirectMessage>
 ) : RemoteMediator<Key, Value>() {
     private var paging: String? = null
     override suspend fun load(
@@ -55,38 +46,8 @@ abstract class BaseDirectMessageMediator<Key : Any, Value : Any>(
                 LoadType.APPEND -> if (reverse()) return MediatorResult.Success(endOfPaginationReached = true) else paging
                 LoadType.PREPEND -> if (reverse()) paging else return MediatorResult.Success(endOfPaginationReached = true)
             }
-            val result = service.getDirectMessages(key, 50)
-            val events = result.map {
-                if (it is DirectMessageEvent) {
-                    it.toDbDirectMessage(accountKey, userLookup.invoke(MicroBlogKey.twitter(it.messageCreate?.senderId ?: "")))
-                } else throw NotImplementedError()
-            }
-            // save message, media
-            database.withTransaction {
-                events.saveToDb(database)
-                events.groupBy { it.message.conversationKey }
-                    .map { entry ->
-                        val msgWithData = entry.value.first()
-                        val chatUser = msgWithData.message.conversationUserKey.let {
-                            userLookup(it)
-                        }
-                        DbDMConversation(
-                            _id = UUID.randomUUID().toString(),
-                            accountKey = accountKey,
-                            conversationId = msgWithData.message.conversationKey.id,
-                            conversationKey = msgWithData.message.conversationKey,
-                            conversationAvatar = chatUser.profileImage,
-                            conversationName = chatUser.name,
-                            conversationSubName = chatUser.screenName,
-                            conversationType = DbDMConversation.Type.ONE_TO_ONE,
-                            recipientKey = msgWithData.message.conversationUserKey
-                        )
-                    }.saveToDb(database)
-            }
-            paging = if (result is IPaging) {
-                result.nextPage
-            } else {
-                null
+            paging = realFetch(key).let {
+                if (it is IPaging) it.nextPage else null
             }
             MediatorResult.Success(endOfPaginationReached = paging == null)
         } catch (e: Throwable) {

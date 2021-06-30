@@ -26,10 +26,9 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.PagingSource
 import androidx.paging.map
-import com.twidere.services.microblog.DirectMessageService
+import com.twidere.services.microblog.model.IDirectMessage
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.db.model.DbDirectMessageConversationWithMessage
-import com.twidere.twiderex.db.model.DbUser
 import com.twidere.twiderex.defaultLoadCount
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiDMConversationWithLatestMessage
@@ -40,10 +39,9 @@ import kotlinx.coroutines.flow.map
 @OptIn(ExperimentalPagingApi::class)
 class DMConversationMediator(
     database: CacheDatabase,
-    service: DirectMessageService,
     accountKey: MicroBlogKey,
-    userLookup: suspend (userKey: MicroBlogKey) -> DbUser
-) : BaseDirectMessageMediator<Int, DbDirectMessageConversationWithMessage>(database, service, accountKey, userLookup) {
+    realFetch: suspend (key: String?) -> List<IDirectMessage>
+) : BaseDirectMessageMediator<Int, DbDirectMessageConversationWithMessage>(database, accountKey, realFetch) {
     override fun reverse() = false
 
     fun pager(

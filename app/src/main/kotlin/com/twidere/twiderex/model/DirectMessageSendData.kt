@@ -29,14 +29,14 @@ data class DirectMessageSendData(
     val recipientUserKey: MicroBlogKey,
     val conversationKey: MicroBlogKey,
     val accountKey: MicroBlogKey,
-    val dratMessageKey: MicroBlogKey,
+    val draftMessageKey: MicroBlogKey,
 )
 
 fun DirectMessageSendData.toWorkData() = workDataOf(
     "text" to text,
     "images" to images.toTypedArray(),
     "recipientUserKey" to recipientUserKey.toString(),
-    "dratMessageKey" to dratMessageKey.toString(),
+    "dratMessageKey" to draftMessageKey.toString(),
     "conversationKey" to conversationKey.toString(),
     "accountKey" to accountKey.toString(),
 )
@@ -45,7 +45,7 @@ fun Data.toDirectMessageSendData() = DirectMessageSendData(
     text = getString("text") ?: "",
     images = getStringArray("images")?.toList() ?: emptyList(),
     recipientUserKey = MicroBlogKey.valueOf(getString("recipientUserKey") ?: ""),
-    dratMessageKey = MicroBlogKey.valueOf(getString("dratMessageKey") ?: ""),
+    draftMessageKey = MicroBlogKey.valueOf(getString("dratMessageKey") ?: ""),
     conversationKey = MicroBlogKey.valueOf(getString("conversationKey") ?: ""),
     accountKey = MicroBlogKey.valueOf(getString("accountKey") ?: ""),
 )

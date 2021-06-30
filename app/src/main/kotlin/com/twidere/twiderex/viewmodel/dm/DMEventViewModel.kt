@@ -73,7 +73,7 @@ class DMEventViewModel @AssistedInject constructor(
                     text = input.value,
                     images = inputImage.value?.toString()?.let { uri -> listOf(uri) } ?: emptyList(),
                     recipientUserKey = it.recipientKey,
-                    dratMessageKey = when (account.type) {
+                    draftMessageKey = when (account.type) {
                         PlatformType.Twitter -> MicroBlogKey.twitter(UUID.randomUUID().toString())
                         PlatformType.StatusNet -> TODO()
                         PlatformType.Fanfou -> TODO()
@@ -97,7 +97,7 @@ class DMEventViewModel @AssistedInject constructor(
                 recipientUserKey = event.recipientAccountKey,
                 conversationKey = event.conversationKey,
                 accountKey = account.accountKey,
-                dratMessageKey = event.messageKey
+                draftMessageKey = event.messageKey
             )
         )
     }
