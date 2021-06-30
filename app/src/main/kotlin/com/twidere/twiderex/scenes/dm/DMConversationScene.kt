@@ -26,6 +26,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -43,11 +44,14 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Divider
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.ListItem
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -60,6 +64,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.AppBar
@@ -70,12 +75,14 @@ import com.twidere.twiderex.component.foundation.TextInput
 import com.twidere.twiderex.component.lazy.ui.LazyUiDMEventList
 import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.ui.UiDMEvent
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.dm.DMEventViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun DMConversationScene(conversationKey: MicroBlogKey) {
     val account = LocalActiveAccount.current ?: return
@@ -97,6 +104,7 @@ fun DMConversationScene(conversationKey: MicroBlogKey) {
     val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()
     val firstEventKey by viewModel.firstEventKey.observeAsState()
+    val pendingActionMessage by viewModel.pendingActionMessage.observeAsState()
     if (source.itemCount > 0) {
         source.peek(0)?.messageKey?.let {
             viewModel.firstEventKey.postValue(it.toString())
@@ -125,7 +133,16 @@ fun DMConversationScene(conversationKey: MicroBlogKey) {
                         onResend = {
                             viewModel.sendDraftMessage(it)
                         },
-                        state = listState
+                        state = listState,
+                        onItemLongClick = {
+                            viewModel.pendingActionMessage.postValue(it)
+                        }
+                    )
+                    MessageActionComponent(
+                        pendingActionMessage = pendingActionMessage,
+                        onDismissRequest = { viewModel.pendingActionMessage.postValue(null) },
+                        onCopyText = {},
+                        onDelete = {}
                     )
                 }
                 Divider(modifier = Modifier.fillMaxWidth())
@@ -154,6 +171,46 @@ fun DMConversationScene(conversationKey: MicroBlogKey) {
             )
         }
     }
+}
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun MessageActionComponent(
+    pendingActionMessage: UiDMEvent?,
+    onDismissRequest: () -> Unit,
+    onCopyText: (message: UiDMEvent) -> Unit,
+    onDelete: (message: UiDMEvent) -> Unit
+) {
+    // TODO DM localize
+    pendingActionMessage?.let {
+        Dialog(onDismissRequest = onDismissRequest) {
+            Surface(shape = MaterialTheme.shapes.medium) {
+                Column(modifier = Modifier.padding(MessageActionComponentDefaults.ContentPadding)) {
+                    ListItem(
+                        modifier = Modifier.clickable {
+                            onCopyText(it)
+                            onDismissRequest()
+                        }
+                    ) {
+                        Text(text = "Copy message text")
+                    }
+
+                    ListItem(
+                        modifier = Modifier.clickable {
+                            onDelete(it)
+                            onDismissRequest()
+                        }
+                    ) {
+                        Text(text = "Delete message for you")
+                    }
+                }
+            }
+        }
+    }
+}
+
+private object MessageActionComponentDefaults {
+    val ContentPadding = PaddingValues(16.dp)
 }
 
 @Composable

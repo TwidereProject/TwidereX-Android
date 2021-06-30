@@ -22,8 +22,10 @@ package com.twidere.twiderex.component.lazy.ui
 
 import android.text.format.DateUtils
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -79,6 +81,7 @@ import com.twidere.twiderex.preferences.proto.DisplayPreferences
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.LocalVideoPlayback
 
+@ExperimentalFoundationApi
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun LazyUiDMEventList(
@@ -87,7 +90,8 @@ fun LazyUiDMEventList(
     state: LazyListState = rememberLazyListState(),
     key: ((index: Int) -> Any) = { items.peek(it)?.messageKey?.hashCode() ?: it },
     header: LazyListScope.() -> Unit = {},
-    onResend: (event: UiDMEvent) -> Unit = {}
+    onResend: (event: UiDMEvent) -> Unit = {},
+    onItemLongClick: (event: UiDMEvent) -> Unit = {}
 ) {
     LazyUiList(items = items) {
         LazyColumn(
@@ -107,9 +111,9 @@ fun LazyUiDMEventList(
                             .padding(LazyUiDMEventListDefaults.ContentPadding)
                     ) {
                         if (it.isInCome)
-                            DMInComeEvent(it)
+                            DMInComeEvent(it, onItemLongClick)
                         else
-                            DMOutComeEvent(onResend, it)
+                            DMOutComeEvent(onResend, it, onItemLongClick)
                     }
                 } ?: run {
                     LoadingEventPlaceholder()
@@ -127,7 +131,7 @@ private object LazyUiDMEventListDefaults {
 }
 
 @Composable
-private fun DMOutComeEvent(onResend: (event: UiDMEvent) -> Unit = {}, event: UiDMEvent) {
+private fun DMOutComeEvent(onResend: (event: UiDMEvent) -> Unit = {}, event: UiDMEvent, onItemLongClick: (event: UiDMEvent) -> Unit) {
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
         Column(horizontalAlignment = Alignment.End) {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -156,7 +160,7 @@ private fun DMOutComeEvent(onResend: (event: UiDMEvent) -> Unit = {}, event: UiD
                     }
                 }
                 Spacer(modifier = Modifier.width(DMEventDefaults.ContentSpacing))
-                MessageBody(event)
+                MessageBody(event, onItemLongClick)
             }
             ChatTime(
                 modifier = Modifier.padding(
@@ -180,13 +184,13 @@ private object DMOutComeEventDefaults {
 }
 
 @Composable
-private fun DMInComeEvent(event: UiDMEvent) {
+private fun DMInComeEvent(event: UiDMEvent, onItemLongClick: (event: UiDMEvent) -> Unit) {
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
         Column {
             Row(verticalAlignment = Alignment.Bottom) {
                 UserAvatar(user = event.sender)
                 Spacer(modifier = Modifier.width(DMEventDefaults.ContentSpacing))
-                MessageBody(event)
+                MessageBody(event, onItemLongClick)
             }
             ChatTime(
                 modifier = Modifier.padding(
@@ -207,11 +211,17 @@ private object DMEventDefaults {
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun MessageBody(event: UiDMEvent) {
+private fun MessageBody(event: UiDMEvent, onItemLongClick: (event: UiDMEvent) -> Unit) {
     val navController = LocalNavController.current
     Box(
         modifier = Modifier
+            .combinedClickable(
+                onLongClick = {
+                    onItemLongClick(event)
+                }
+            ) { }
             .clip(
                 RoundedCornerShape(
                     topStart = MessageBodyDefaults.cornerRadius,

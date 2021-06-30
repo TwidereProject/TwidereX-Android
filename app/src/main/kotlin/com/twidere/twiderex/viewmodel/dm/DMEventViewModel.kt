@@ -39,7 +39,7 @@ import java.util.UUID
 
 class DMEventViewModel @AssistedInject constructor(
     private val repository: DirectMessageRepository,
-    private val sendAction: DirectMessageAction,
+    private val messageAction: DirectMessageAction,
     @Assisted private val account: AccountDetails,
     @Assisted private val conversationKey: MicroBlogKey,
 ) : ViewModel() {
@@ -63,11 +63,12 @@ class DMEventViewModel @AssistedInject constructor(
     val input = MutableLiveData("")
     val inputImage = MutableLiveData<Uri?>()
     val firstEventKey = MutableLiveData<String>(null)
+    val pendingActionMessage = MutableLiveData<UiDMEvent>(null)
 
     fun sendMessage() {
         if (input.value.isNullOrEmpty() && inputImage.value == null) return
         conversation.value?.let {
-            sendAction.send(
+            messageAction.send(
                 account.type,
                 data = DirectMessageSendData(
                     text = input.value,
@@ -89,7 +90,7 @@ class DMEventViewModel @AssistedInject constructor(
     }
 
     fun sendDraftMessage(event: UiDMEvent) {
-        sendAction.send(
+        messageAction.send(
             account.type,
             data = DirectMessageSendData(
                 text = event.originText,
