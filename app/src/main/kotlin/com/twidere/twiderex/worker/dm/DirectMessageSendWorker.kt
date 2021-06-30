@@ -181,7 +181,7 @@ abstract class DirectMessageSendWorker<T : MicroBlogService>(
                         url = uri.toString(),
                         mediaUrl = uri.toString(),
                         previewUrl = uri.toString(),
-                        type = MediaType.photo,
+                        type = getMediaType(uri),
                         width = imageSize[0],
                         height = imageSize[1],
                         altText = "",
@@ -195,6 +195,15 @@ abstract class DirectMessageSendWorker<T : MicroBlogService>(
                 sendData.conversationKey,
                 sendData.dratMessageKey
             )
+        }
+    }
+
+    private fun getMediaType(uri: Uri): MediaType {
+        val type = contentResolver.getType(uri) ?: ""
+        return when {
+            type.startsWith("image") -> MediaType.photo
+            type.startsWith("video") -> MediaType.video
+            else -> MediaType.other
         }
     }
 
