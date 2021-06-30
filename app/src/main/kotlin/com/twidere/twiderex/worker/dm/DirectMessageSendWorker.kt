@@ -47,8 +47,6 @@ import com.twidere.twiderex.model.toDirectMessageSendData
 import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.notification.NotificationChannelSpec
 import com.twidere.twiderex.repository.AccountRepository
-import com.twidere.twiderex.utils.ExifScrambler
-import kotlinx.coroutines.delay
 import java.util.UUID
 
 abstract class DirectMessageSendWorker<T : MicroBlogService>(
@@ -81,20 +79,20 @@ abstract class DirectMessageSendWorker<T : MicroBlogService>(
                 Uri.parse(it)
             }
             draftEvent = getDraft(sendData, images, accountDetails) ?: throw IllegalArgumentException()
-            val exifScrambler = ExifScrambler(context)
+            // val exifScrambler = ExifScrambler(context)
             val mediaIds = arrayListOf<String>()
 
             images.forEach { uri ->
-                val scramblerUri = exifScrambler.removeExifData(uri)
-                val id = uploadImage(uri, scramblerUri, service)
+                // val scramblerUri = exifScrambler.removeExifData(uri)
+                // TODO FIXME 2020/6/30 Twitter DM throws bad media error after remove exif data from images
+                //
+                val id = uploadImage(uri, uri, service)
                 id?.let { mediaIds.add(it) }
-                exifScrambler.deleteCacheFile(scramblerUri)
+                // exifScrambler.deleteCacheFile(scramblerUri)
             }
-            delay(20000)
-            throw Error()
-            // val dbEvent = sendMessage(service, sendData, mediaIds)
-            // updateDb(draftEvent, dbEvent)
-            // Result.success()
+            val dbEvent = sendMessage(service, sendData, mediaIds)
+            updateDb(draftEvent, dbEvent)
+            Result.success()
         } catch (e: Throwable) {
             e.printStackTrace()
             draftEvent?.let {

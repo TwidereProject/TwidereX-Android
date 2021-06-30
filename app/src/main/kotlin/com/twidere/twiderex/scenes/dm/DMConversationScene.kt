@@ -78,7 +78,6 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun DMConversationScene(conversationKey: MicroBlogKey) {
-    // val navController = LocalNavController.current
     val account = LocalActiveAccount.current ?: return
     val viewModel = assistedViewModel<DMEventViewModel.AssistedFactory, DMEventViewModel>(
         account, conversationKey
@@ -86,9 +85,9 @@ fun DMConversationScene(conversationKey: MicroBlogKey) {
         it.create(account, conversationKey)
     }
     val filePickerLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetMultipleContents(),
+        contract = ActivityResultContracts.OpenDocument(),
         onResult = {
-            viewModel.inputImage.postValue(it.first())
+            viewModel.inputImage.postValue(it)
         },
     )
     val source = viewModel.source.collectAsLazyPagingItems()
@@ -203,7 +202,7 @@ private object InputPhotoPreviewDefaults {
 @Composable
 fun InputComponent(
     modifier: Modifier = Modifier,
-    filePickerLauncher: ManagedActivityResultLauncher<String, MutableList<Uri>>,
+    filePickerLauncher: ManagedActivityResultLauncher<Array<String>, Uri>,
     scope: CoroutineScope,
     input: String,
     onValueChanged: (input: String) -> Unit,
@@ -219,7 +218,7 @@ fun InputComponent(
             IconButton(
                 onClick = {
                     scope.launch {
-                        filePickerLauncher.launch("image/*")
+                        filePickerLauncher.launch(arrayOf("image/*"))
                     }
                 }
             ) {

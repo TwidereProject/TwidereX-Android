@@ -21,6 +21,7 @@
 package com.twidere.twiderex.component.foundation
 
 import android.content.Context
+import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -84,6 +85,7 @@ private class TwidereImageLoader(
     private val context: Context,
     private val account: AccountDetails?
 ) : ImageLoader {
+    private val twitterTonApiHost = "ton.twitter.com"
     override val bitmapPool: BitmapPool
         get() = realImageLoader.bitmapPool
     override val defaults: DefaultRequestOptions
@@ -108,12 +110,10 @@ private class TwidereImageLoader(
     }
 
     private fun handleRequest(request: ImageRequest): ImageRequest {
-        val data = request.data
+        var data = request.data
         // ton.twitter.com must be retrieved via an authenticated
-        return if (data is String &&
-            URL(data).host.equals("ton.twitter.com") &&
-            account?.type == PlatformType.Twitter
-        ) {
+        if (data is String) data = Uri.parse(data)
+        return if (data is Uri && twitterTonApiHost == data.host && account?.type == PlatformType.Twitter) {
             val auth = (account.credentials as OAuthCredentials).let {
                 OAuth1Authorization(
                     consumerKey = it.consumer_key,
@@ -127,11 +127,13 @@ private class TwidereImageLoader(
             ).headers(
                 headers = Headers.headersOf(
                     "Authorization",
-                    auth.getAuthorizationHeader(Request.Builder().url(data).build())
+                    auth.getAuthorizationHeader(Request.Builder().url(URL(data.toString())).build())
                 )
             ).build()
         } else {
-            request
+            request.newBuilder(request.context)
+                .data(data)
+                .build()
         }
     }
 }

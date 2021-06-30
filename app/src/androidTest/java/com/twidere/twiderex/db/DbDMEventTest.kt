@@ -101,7 +101,8 @@ class DbDMEventTest {
                 conversationAvatar = "",
                 conversationName = it.htmlText,
                 conversationType = DbDMConversation.Type.ONE_TO_ONE,
-                conversationSubName = ""
+                conversationSubName = "",
+                recipientKey = it.conversationUserKey,
             )
         }
 
