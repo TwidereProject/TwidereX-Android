@@ -21,6 +21,8 @@
 package com.twidere.twiderex.viewmodel.dm
 
 import androidx.lifecycle.ViewModel
+import com.twidere.services.microblog.DirectMessageService
+import com.twidere.services.microblog.LookupService
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.repository.DirectMessageRepository
 import dagger.assisted.Assisted
@@ -37,6 +39,10 @@ class DMConversationViewModel @AssistedInject constructor(
     }
 
     val source by lazy {
-        repository.dmConversationListSource(account)
+        repository.dmConversationListSource(
+            accountKey = account.accountKey,
+            service = account.service as DirectMessageService,
+            lookupService = account.service as LookupService
+        )
     }
 }

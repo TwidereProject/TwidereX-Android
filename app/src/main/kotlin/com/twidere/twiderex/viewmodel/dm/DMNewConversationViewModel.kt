@@ -74,7 +74,11 @@ class DMNewConversationViewModel @AssistedInject constructor(
     fun createNewConversation(receiver: UiUser, onResult: (key: MicroBlogKey?) -> Unit) {
         viewModelScope.launch {
             kotlin.runCatching {
-                dmRepository.createNewConversation(receiver, account)
+                dmRepository.createNewConversation(
+                    receiver = receiver,
+                    accountKey = account.accountKey,
+                    platformType = account.type
+                )
             }.onSuccess {
                 onResult(it)
             }.onFailure {

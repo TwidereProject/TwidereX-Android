@@ -58,6 +58,9 @@ interface DirectMessageEventDao {
     @Delete
     suspend fun delete(data: DbDMEvent)
 
+    @Query("SELECT COUNT(*) FROM dm_event  WHERE accountKey == :accountKey AND conversationKey == :conversationKey")
+    fun getMessageCount(accountKey: MicroBlogKey, conversationKey: MicroBlogKey): Long
+
     @Query("DELETE FROM dm_event WHERE accountKey == :accountKey AND conversationKey == :conversationKey")
     suspend fun clearConversation(accountKey: MicroBlogKey, conversationKey: MicroBlogKey)
 

@@ -75,6 +75,10 @@ class MockDirectMessageEventDao : DirectMessageEventDao {
         TODO("Not yet implemented")
     }
 
+    override fun getMessageCount(accountKey: MicroBlogKey, conversationKey: MicroBlogKey): Long {
+        TODO("Not yet implemented")
+    }
+
     override suspend fun clearConversation(
         accountKey: MicroBlogKey,
         conversationKey: MicroBlogKey

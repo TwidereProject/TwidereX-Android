@@ -30,6 +30,8 @@ import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkerParameters
+import com.twidere.services.microblog.DirectMessageService
+import com.twidere.services.microblog.LookupService
 import com.twidere.twiderex.R
 import com.twidere.twiderex.model.ui.UiDMConversationWithLatestMessage
 import com.twidere.twiderex.navigation.Route
@@ -59,7 +61,11 @@ class DirectMessageFetchWorker @AssistedInject constructor(
     override suspend fun doWork(): Result {
         return try {
             accountRepository.activeAccount.value?.let { account ->
-                val result = repository.checkNewMessages(account)
+                val result = repository.checkNewMessages(
+                    accountKey = account.accountKey,
+                    service = account.service as DirectMessageService,
+                    lookupService = account.service as LookupService
+                )
                 // TODO DM localize
                 result.forEach {
                     notification(it)

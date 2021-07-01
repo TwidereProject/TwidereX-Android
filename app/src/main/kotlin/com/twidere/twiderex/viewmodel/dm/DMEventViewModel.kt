@@ -26,6 +26,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
+import com.twidere.services.microblog.DirectMessageService
+import com.twidere.services.microblog.LookupService
 import com.twidere.twiderex.action.DirectMessageAction
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.DirectMessageSendData
@@ -51,12 +53,22 @@ class DMEventViewModel @AssistedInject constructor(
 
     val conversation by lazy {
         liveData {
-            emitSource(repository.dmConversation(account, conversationKey))
+            emitSource(
+                repository.dmConversation(
+                    accountKey = account.accountKey,
+                    conversationKey = conversationKey
+                )
+            )
         }
     }
 
     val source by lazy {
-        repository.dmEventListSource(account, conversationKey).cachedIn(viewModelScope)
+        repository.dmEventListSource(
+            accountKey = account.accountKey,
+            conversationKey = conversationKey,
+            service = account.service as DirectMessageService,
+            lookupService = account.service as LookupService
+        ).cachedIn(viewModelScope)
     }
 
     // input
@@ -102,4 +114,5 @@ class DMEventViewModel @AssistedInject constructor(
             )
         )
     }
+    // todo use action to delete event
 }

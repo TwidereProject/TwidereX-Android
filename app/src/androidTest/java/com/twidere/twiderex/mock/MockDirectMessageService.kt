@@ -87,7 +87,7 @@ class MockDirectMessageService : DirectMessageService, MicroBlogService {
     override suspend fun getDirectMessages(cursor: String?, count: Int?): List<IDirectMessage> {
         return if (errorMsg == null) TwitterPaging(
             data = dataList,
-            nextPage = UUID.randomUUID().toString()
+            nextPage = if (cursor == null) UUID.randomUUID().toString() else null
         ) else throw TwitterApiException(errorMsg) // generateDirectMessage(count ?: 50, senderId = System.currentTimeMillis().toString(), recipientId = UUID.randomUUID().toString())
     }
 
@@ -96,6 +96,8 @@ class MockDirectMessageService : DirectMessageService, MicroBlogService {
     }
 
     override suspend fun destroyDirectMessage(id: String) {
-        TODO("Not yet implemented")
+        dataList.removeIf {
+            (it as DirectMessageEvent).id == id
+        }
     }
 }
