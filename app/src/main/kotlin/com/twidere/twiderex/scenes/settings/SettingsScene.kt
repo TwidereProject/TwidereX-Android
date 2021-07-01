@@ -74,6 +74,11 @@ fun SettingsScene() {
                     painterResource(id = R.drawable.ic_triangle_square_circle),
                     route = Route.Settings.Misc,
                 ),
+                SettingItem(
+                    stringResource(id = R.string.scene_settings_misc_title),
+                    painterResource(id = R.drawable.ic_triangle_square_circle),
+                    route = Route.Settings.Notification,
+                ),
                 // TODO
 //                SettingItem(
 //                    "Layout",

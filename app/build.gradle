@@ -172,7 +172,7 @@ dependencies {
 
     implementation libs.bundles.paging
     implementation libs.bundles.activity
-    implementation libs.dataStore
+    implementation libs.bundles.datastore
 
     implementation libs.bundles.hilt.base
     kapt libs.bundles.hilt.compiler
