@@ -29,9 +29,7 @@ import androidx.paging.RemoteMediator
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.twidere.services.twitter.model.User
 import com.twidere.twiderex.db.CacheDatabase
-import com.twidere.twiderex.db.mapper.toDbUser
 import com.twidere.twiderex.db.model.DbDirectMessageConversationWithMessage
 import com.twidere.twiderex.mock.MockDirectMessageService
 import com.twidere.twiderex.model.MicroBlogKey
@@ -70,23 +68,15 @@ class DMEventMediatorTest {
 
     @OptIn(ExperimentalPagingApi::class)
     @Test
-    fun refresh_saveBothConversationAndMessageToDatabaseWhenSuccess() {
+    fun refresh_LoadReturnsSuccessResultWhenSuccess() {
         runBlocking {
-            assert(mockDataBase.directMessageConversationDao().find(MicroBlogKey.twitter("123")).isEmpty())
-            assert(mockDataBase.directMessageDao().getAll(MicroBlogKey.twitter("123")).isEmpty())
             mockService.add(mockService.generateDirectMessage(20, System.currentTimeMillis().toString(), "123"))
             Assert.assertEquals(0, mockDataBase.listsDao().findAll()?.size)
-            val mediator = DMConversationMediator(mockDataBase, mockService, accountKey = MicroBlogKey.twitter("123"),) {
-                User(
-                    id = it.id.toLong(),
-                    idStr = it.id
-                ).toDbUser()
+            val mediator = DMConversationMediator(mockDataBase, accountKey = MicroBlogKey.twitter("123")) {
+                mockService.getDirectMessages(it, 50)
             }
             val pagingState = PagingState<Int, DbDirectMessageConversationWithMessage>(emptyList(), config = PagingConfig(20), anchorPosition = 0, leadingPlaceholderCount = 0)
             val result = mediator.load(LoadType.REFRESH, pagingState)
-            // when mediator get data from service, it store to database
-            assert(mockDataBase.directMessageConversationDao().find(MicroBlogKey.twitter("123")).isNotEmpty())
-            assert(mockDataBase.directMessageDao().getAll(MicroBlogKey.twitter("123")).isNotEmpty())
             assert(result is RemoteMediator.MediatorResult.Success)
             assert(!(result as RemoteMediator.MediatorResult.Success).endOfPaginationReached)
         }
@@ -96,11 +86,8 @@ class DMEventMediatorTest {
     @Test
     fun refresh_LoadReturnsErrorResultWhenErrorOccurs() = runBlocking {
         mockService.errorMsg = "Throw test failure"
-        val mediator = DMConversationMediator(mockDataBase, mockService, accountKey = MicroBlogKey.twitter("123"),) {
-            User(
-                id = it.id.toLong(),
-                idStr = it.id
-            ).toDbUser()
+        val mediator = DMConversationMediator(mockDataBase, accountKey = MicroBlogKey.twitter("123"),) {
+            mockService.getDirectMessages(it, 50)
         }
         val pagingState = PagingState<Int, DbDirectMessageConversationWithMessage>(emptyList(), config = PagingConfig(20), anchorPosition = 0, leadingPlaceholderCount = 0)
         val result = mediator.load(LoadType.REFRESH, pagingState)

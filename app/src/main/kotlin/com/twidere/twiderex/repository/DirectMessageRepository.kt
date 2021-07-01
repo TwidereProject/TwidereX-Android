@@ -37,11 +37,13 @@ import com.twidere.twiderex.db.model.DbDMEventWithAttachments.Companion.saveToDb
 import com.twidere.twiderex.db.model.DbUser
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.ui.UiDMConversation
 import com.twidere.twiderex.model.ui.UiDMConversation.Companion.toUi
 import com.twidere.twiderex.model.ui.UiDMConversationWithLatestMessage
 import com.twidere.twiderex.model.ui.UiDMConversationWithLatestMessage.Companion.toUi
 import com.twidere.twiderex.model.ui.UiDMEvent
+import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.paging.mediator.dm.DMConversationMediator
 import com.twidere.twiderex.paging.mediator.dm.DMConversationMediator.Companion.toUi
 import com.twidere.twiderex.paging.mediator.dm.DMEventMediator
@@ -57,7 +59,7 @@ class DirectMessageRepository(
         conversationKey: MicroBlogKey
     ): LiveData<UiDMConversation?> {
         return database.directMessageConversationDao()
-            .findWithConversationKey(
+            .findWithConversationKeyLiveData(
                 accountKey = account.accountKey,
                 conversationKey = conversationKey
             ).map { it?.toUi() }
@@ -87,6 +89,39 @@ class DirectMessageRepository(
                 fetchEventAndSaveToDataBase(key, account)
             }
         ).pager().toUi()
+    }
+
+    suspend fun createNewConversation(receiver: UiUser, account: AccountDetails): MicroBlogKey {
+        val conversationId = "${account.accountKey.id}-${receiver.id}"
+        val conversationKey = when (account.type) {
+            PlatformType.Twitter -> MicroBlogKey.twitter(conversationId)
+            PlatformType.StatusNet -> TODO()
+            PlatformType.Fanfou -> TODO()
+            PlatformType.Mastodon -> TODO()
+        }
+        return database.withTransaction {
+            database.directMessageConversationDao()
+                .findWithConversationKey(account.accountKey, conversationKey)
+                ?.conversationKey
+                ?: let {
+                    database.directMessageConversationDao().insertAll(
+                        listOf(
+                            DbDMConversation(
+                                _id = UUID.randomUUID().toString(),
+                                accountKey = account.accountKey,
+                                conversationId = conversationId,
+                                conversationKey = conversationKey,
+                                conversationAvatar = receiver.profileImage.toString(),
+                                conversationName = receiver.displayName,
+                                conversationSubName = receiver.screenName,
+                                conversationType = DbDMConversation.Type.ONE_TO_ONE,
+                                recipientKey = receiver.userKey
+                            )
+                        )
+                    )
+                    conversationKey
+                }
+        }
     }
 
     suspend fun checkNewMessages(account: AccountDetails): List<UiDMConversationWithLatestMessage> {

@@ -67,7 +67,7 @@ fun DMConversationListScene() {
             floatingActionButton = {
                 FloatingActionButton(
                     onClick = {
-                        // TODO DM create conversations
+                        navController.navigate(Route.Messages.NewConversation)
                     }
                 ) {
                     Icon(

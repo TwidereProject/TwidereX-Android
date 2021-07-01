@@ -72,10 +72,17 @@ class MockDirectMessageConversationDao : DirectMessageConversationDao {
         TODO("Not yet implemented")
     }
 
-    override fun findWithConversationKey(
+    override fun findWithConversationKeyLiveData(
         accountKey: MicroBlogKey,
         conversationKey: MicroBlogKey
     ): LiveData<DbDMConversation?> {
+        TODO("Not yet implemented")
+    }
+
+    override fun findWithConversationKey(
+        accountKey: MicroBlogKey,
+        conversationKey: MicroBlogKey
+    ): DbDMConversation? {
         TODO("Not yet implemented")
     }
 

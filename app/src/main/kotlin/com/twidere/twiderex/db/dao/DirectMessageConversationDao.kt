@@ -65,7 +65,10 @@ interface DirectMessageConversationDao {
     ): PagingSource<Int, DbDirectMessageConversationWithMessage>
 
     @Query("SELECT * FROM dm_conversation WHERE accountKey == :accountKey AND conversationKey == :conversationKey")
-    fun findWithConversationKey(accountKey: MicroBlogKey, conversationKey: MicroBlogKey): LiveData<DbDMConversation?>
+    fun findWithConversationKeyLiveData(accountKey: MicroBlogKey, conversationKey: MicroBlogKey): LiveData<DbDMConversation?>
+
+    @Query("SELECT * FROM dm_conversation WHERE accountKey == :accountKey AND conversationKey == :conversationKey")
+    fun findWithConversationKey(accountKey: MicroBlogKey, conversationKey: MicroBlogKey): DbDMConversation?
 
     @Delete
     suspend fun delete(data: DbDMConversation)
