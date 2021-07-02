@@ -32,7 +32,7 @@ import com.twidere.twiderex.repository.ListsRepository
 import com.twidere.twiderex.viewmodel.ViewModelTestBase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestCoroutineDispatcher
@@ -83,7 +83,7 @@ class ListsViewModelTest : ViewModelTestBase() {
     @Test
     fun source_containsAllLists(): Unit = runBlocking(Dispatchers.Main) {
         // check the source
-        viewModel.source.collectLatest {
+        viewModel.source.first().let {
             val sourceItems = it.collectDataForTest()
             Assert.assertEquals(2, sourceItems.size)
         }
@@ -92,7 +92,7 @@ class ListsViewModelTest : ViewModelTestBase() {
     @Test
     fun ownerSource_containsOwnedLists(): Unit = runBlocking(Dispatchers.Main) {
         // make sure ownerSource only emit data which isOwner() returns true
-        viewModel.ownerSource.collectLatest {
+        viewModel.ownerSource.first().let {
             val ownerItems = it.collectDataForTest()
             Assert.assertEquals(1, ownerItems.size)
             Assert.assertEquals("owner", ownerItems[0].title)
@@ -102,7 +102,7 @@ class ListsViewModelTest : ViewModelTestBase() {
     @Test
     fun subscribeSource_containsSubscribedLists(): Unit = runBlocking(Dispatchers.Main) {
         // make sure ownerSource only emit data which isOwner() returns true
-        viewModel.subscribedSource.collectLatest {
+        viewModel.subscribedSource.first().let {
             val subscribeItems = it.collectDataForTest()
             Assert.assertEquals(1, subscribeItems.size)
             Assert.assertEquals("subscribe", subscribeItems[0].title)
