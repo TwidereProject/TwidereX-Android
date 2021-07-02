@@ -35,15 +35,14 @@ browser = "1.3.0"
 
 [libraries]
 # androidx test
-androidx-test-core = {module = "androidx.test:core", version.ref = "androidx_test"}
-androidx-test-runner = {module = "androidx.test:runner", version.ref = "androidx_test"}
-androidx-test-ext-junit = {module = "androidx.test.ext:junit", version.ref = "extJUnitVersion"}
-androidx-test-espresso = {module = "androidx.test.espresso:espresso-core", version.ref = "espressoVersion"}
+androidx-test-core = { module = "androidx.test:core", version.ref = "androidx_test" }
+androidx-test-runner = { module = "androidx.test:runner", version.ref = "androidx_test" }
+androidx-test-ext-junit = { module = "androidx.test.ext:junit", version.ref = "extJUnitVersion" }
+androidx-test-espresso = { module = "androidx.test.espresso:espresso-core", version.ref = "espressoVersion" }
 
 mockito-core-test = 'org.mockito:mockito-core:3.11.2'
 mockito-kotlin-test = 'org.mockito.kotlin:mockito-kotlin:3.2.0'
 android-test-core = 'androidx.arch.core:core-testing:2.1.0'
-
 
 # Compose
 compose-ui-base = { module = "androidx.compose.ui:ui", version.ref = "compose" }
@@ -92,7 +91,7 @@ activity-ktx = { module = "androidx.activity:activity-ktx", version.ref = "andro
 activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx_activity" }
 
 # Androidx exifinterface
-exifinterface = { module = "androidx.exifinterface:exifinterface", version.ref ="androidx_exifinterface"}
+exifinterface = { module = "androidx.exifinterface:exifinterface", version.ref = "androidx_exifinterface" }
 
 # DataStore
 dataStore = { module = "androidx.datastore:datastore", version.ref = "dataStore" }
@@ -104,8 +103,8 @@ work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "w
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx_serialization" }
 
 # Kotlinx Coroutines
-kotlinx-coroutines-core = {module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlin-coroutines"}
-kotlinx-coroutines-test = {module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlin-coroutines"}
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlin-coroutines" }
+kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlin-coroutines" }
 
 # Retrofit
 retrofit-base = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit2" }
@@ -140,12 +139,10 @@ androidx-test = [
     "androidx-test-ext-junit",
     "androidx-test-espresso",
 ]
-
 mockito-test = [
     "mockito-core-test",
     "mockito-kotlin-test"
 ]
-
 compose = [
     "compose-ui-base",
     "compose-ui-tooling",
@@ -158,7 +155,7 @@ compose = [
 ]
 paging = [
     "paging-runtime",
-#     "paging-compose",
+    #    "paging-compose",
 ]
 lifecycle = [
     "lifecycle-runtime-ktx",
