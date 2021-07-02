@@ -146,7 +146,11 @@ fun HomeScene() {
     ApplyNotification(scaffoldState.snackbarHostState)
     TwidereScene(
         navigationBarColorProvider = {
-            MaterialTheme.colors.surface.withElevation()
+            if (tabPosition == AppearancePreferences.TabPosition.Bottom) {
+                MaterialTheme.colors.surface.withElevation()
+            } else {
+                MaterialTheme.colors.surface
+            }
         },
     ) {
         NestedScrollScaffold(
