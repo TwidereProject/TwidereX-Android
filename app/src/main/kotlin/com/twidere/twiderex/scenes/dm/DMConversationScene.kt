@@ -20,6 +20,9 @@
  */
 package com.twidere.twiderex.scenes.dm
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.net.Uri
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -61,6 +64,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -91,6 +95,7 @@ fun DMConversationScene(conversationKey: MicroBlogKey) {
     ) {
         it.create(account, conversationKey)
     }
+    val clipboardManager = LocalContext.current.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager?
     val filePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocument(),
         onResult = {
@@ -141,8 +146,13 @@ fun DMConversationScene(conversationKey: MicroBlogKey) {
                     MessageActionComponent(
                         pendingActionMessage = pendingActionMessage,
                         onDismissRequest = { viewModel.pendingActionMessage.postValue(null) },
-                        onCopyText = {},
-                        onDelete = {}
+                        onCopyText = { event ->
+                            // TODO DM localize
+                            clipboardManager?.setPrimaryClip(ClipData.newPlainText("message text", event.originText))
+                        },
+                        onDelete = {
+                            viewModel.deleteMessage(it)
+                        }
                     )
                 }
                 Divider(modifier = Modifier.fillMaxWidth())

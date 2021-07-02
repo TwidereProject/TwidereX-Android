@@ -21,8 +21,10 @@
 package com.twidere.twiderex.action
 
 import androidx.work.WorkManager
+import com.twidere.twiderex.model.DirectMessageDeleteData
 import com.twidere.twiderex.model.DirectMessageSendData
 import com.twidere.twiderex.model.PlatformType
+import com.twidere.twiderex.worker.dm.DirectMessageDeleteWorker
 import com.twidere.twiderex.worker.dm.TwitterDirectMessageSendWorker
 
 class DirectMessageAction(
@@ -40,6 +42,15 @@ class DirectMessageAction(
             PlatformType.Fanfou -> TODO()
             PlatformType.Mastodon -> TODO()
         }
+        workManager
+            .beginWith(worker)
+            .enqueue()
+    }
+
+    fun delete(
+        data: DirectMessageDeleteData
+    ) {
+        val worker = DirectMessageDeleteWorker.createWorker(deleteData = data)
         workManager
             .beginWith(worker)
             .enqueue()

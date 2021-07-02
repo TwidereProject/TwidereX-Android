@@ -28,6 +28,7 @@ import com.twidere.services.microblog.DirectMessageService
 import com.twidere.services.microblog.LookupService
 import com.twidere.services.microblog.model.IDirectMessage
 import com.twidere.services.twitter.model.DirectMessageEvent
+import com.twidere.services.twitter.model.exceptions.TwitterApiException
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.db.mapper.toDbDirectMessage
 import com.twidere.twiderex.db.mapper.toDbUser
@@ -163,7 +164,12 @@ class DirectMessageRepository(
             messageKey
         )?.let {
             database.directMessageDao().delete(it.message)
-            service.destroyDirectMessage(messageId)
+            try {
+                service.destroyDirectMessage(messageId)
+            } catch (e: TwitterApiException) {
+                // code 34 means this message not exists on server, ignore this error, continue delete it form db
+                if (e.errors?.first()?.code != 34) throw e
+            }
             // if conversation is empty, delete conversation too
             if (database.directMessageDao().getMessageCount(accountKey, conversationKey) == 0L) {
                 val conversation = database.directMessageConversationDao().findWithConversationKey(accountKey, conversationKey)

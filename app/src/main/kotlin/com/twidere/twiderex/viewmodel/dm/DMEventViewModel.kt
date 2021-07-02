@@ -30,6 +30,7 @@ import com.twidere.services.microblog.DirectMessageService
 import com.twidere.services.microblog.LookupService
 import com.twidere.twiderex.action.DirectMessageAction
 import com.twidere.twiderex.model.AccountDetails
+import com.twidere.twiderex.model.DirectMessageDeleteData
 import com.twidere.twiderex.model.DirectMessageSendData
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.PlatformType
@@ -114,5 +115,15 @@ class DMEventViewModel @AssistedInject constructor(
             )
         )
     }
-    // todo use action to delete event
+
+    fun deleteMessage(event: UiDMEvent) {
+        messageAction.delete(
+            data = DirectMessageDeleteData(
+                messageId = event.messageId,
+                messageKey = event.messageKey,
+                conversationKey = event.conversationKey,
+                accountKey = account.accountKey
+            )
+        )
+    }
 }

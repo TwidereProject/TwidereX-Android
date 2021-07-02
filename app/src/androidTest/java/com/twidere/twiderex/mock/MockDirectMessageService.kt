@@ -96,7 +96,7 @@ class MockDirectMessageService : DirectMessageService, MicroBlogService {
     }
 
     override suspend fun destroyDirectMessage(id: String) {
-        dataList.removeIf {
+        dataList.removeAll {
             (it as DirectMessageEvent).id == id
         }
     }

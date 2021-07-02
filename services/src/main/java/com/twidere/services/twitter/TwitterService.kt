@@ -22,7 +22,6 @@ package com.twidere.services.twitter
 
 import com.twidere.services.http.AuthorizationInterceptor
 import com.twidere.services.http.Errors
-import com.twidere.services.http.MicroBlogHttpException
 import com.twidere.services.http.authorization.OAuth1Authorization
 import com.twidere.services.http.retrofit
 import com.twidere.services.microblog.DirectMessageService
@@ -110,8 +109,6 @@ class TwitterService(
                         }.let {
                             throw it
                         }
-                    } ?: run {
-                        throw MicroBlogHttpException(httpCode = response.code)
                     }
                 }
                 response
