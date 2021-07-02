@@ -99,6 +99,11 @@ class TwitterConversationMediator(
                 count = defaultLoadCount,
                 max_id = nextPage
             )
+        }.let {
+            BasicSearchResponse(
+                nextPage = it.nextPage,
+                status = buildConversation(it.status)
+            )
         }
     }
 
