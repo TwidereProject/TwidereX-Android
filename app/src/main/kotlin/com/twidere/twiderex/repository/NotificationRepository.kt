@@ -43,42 +43,39 @@ class NotificationRepository(
                 val notifications = service.notificationTimeline()
                     .map { it.toDbStatusWithReference(account.accountKey) }
                     .map { it.toUi(account.accountKey) }
-                val currentCursor = findCursor(account.accountKey, NotificationCursorType.General)
-                if (notifications.any()) {
-                    addCursor(
-                        accountKey = account.accountKey,
-                        type = NotificationCursorType.General,
-                        value = notifications.first().statusId
-                    )
-                }
-                if (currentCursor != null) {
-                    notifications.takeWhile { it.statusId != currentCursor.value }
-                } else {
-                    emptyList()
-                }
+                takeActivities(account, NotificationCursorType.General, notifications)
             }
             else -> {
                 if (service is TimelineService) {
                     val mentions = service.mentionsTimeline()
                         .map { it.toDbStatusWithReference(account.accountKey) }
                         .map { it.toUi(account.accountKey) }
-                    val currentCursor = findCursor(account.accountKey, NotificationCursorType.Mentions)
-                    if (mentions.any()) {
-                        addCursor(
-                            accountKey = account.accountKey,
-                            type = NotificationCursorType.Mentions,
-                            value = mentions.first().statusId,
-                        )
-                    }
-                    if (currentCursor != null) {
-                        mentions.takeWhile { it.statusId != currentCursor.value }
-                    } else {
-                        emptyList()
-                    }
+                    takeActivities(account, NotificationCursorType.Mentions, mentions)
                 } else {
                     emptyList()
                 }
             }
+        }
+    }
+
+    private suspend fun takeActivities(
+        account: AccountDetails,
+        type: NotificationCursorType,
+        notifications: List<UiStatus>
+    ): List<UiStatus> {
+        val currentCursor = findCursor(account.accountKey, type)
+        if (notifications.any() && (currentCursor == null || currentCursor.timestamp < notifications.first().timestamp)) {
+            addCursor(
+                accountKey = account.accountKey,
+                type = type,
+                value = notifications.first().statusId,
+                timestamp = notifications.first().timestamp,
+            )
+        }
+        return if (currentCursor != null) {
+            notifications.takeWhile { it.statusId != currentCursor.value }
+        } else {
+            emptyList()
         }
     }
 
@@ -90,10 +87,11 @@ class NotificationRepository(
         type = type,
     )
 
-    suspend fun addCursor(
+    private suspend fun addCursor(
         accountKey: MicroBlogKey,
         type: NotificationCursorType,
         value: String,
+        timestamp: Long,
     ) {
         database.notificationCursorDao()
             .add(
@@ -102,7 +100,25 @@ class NotificationRepository(
                     accountKey = accountKey,
                     type = type,
                     value = value,
+                    timestamp = timestamp,
                 )
             )
+    }
+
+    suspend fun addCursorIfNeeded(
+        accountKey: MicroBlogKey,
+        type: NotificationCursorType,
+        statusId: String,
+        timestamp: Long
+    ) {
+        val current = findCursor(accountKey = accountKey, type = type)
+        if (current == null || current.timestamp < timestamp) {
+            addCursor(
+                accountKey,
+                type,
+                statusId,
+                timestamp
+            )
+        }
     }
 }

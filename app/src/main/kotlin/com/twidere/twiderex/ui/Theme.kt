@@ -20,7 +20,6 @@
  */
 package com.twidere.twiderex.ui
 
-import android.os.Build
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -31,11 +30,13 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Colors
+import androidx.compose.material.LocalElevationOverlay
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Typography
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -68,13 +69,22 @@ fun TwidereTheme(
     content: @Composable () -> Unit,
 ) {
     val colors = provideThemeColors(darkTheme)
+    val pureDark = LocalAppearancePreferences.current.isDarkModePureBlack
     val typography = provideTypography()
-    MaterialTheme(
-        colors = colors,
-        typography = typography,
-        shapes = shapes,
-        content = content,
-    )
+    CompositionLocalProvider(
+        *if (pureDark && darkTheme) {
+            arrayOf(LocalElevationOverlay provides null)
+        } else {
+            emptyArray()
+        }
+    ) {
+        MaterialTheme(
+            colors = colors,
+            typography = typography,
+            shapes = shapes,
+            content = content,
+        )
+    }
 }
 
 @Composable
@@ -82,6 +92,12 @@ fun TwidereDialog(
     requireDarkTheme: Boolean = false,
     extendViewIntoStatusBar: Boolean = false,
     extendViewIntoNavigationBar: Boolean = false,
+    statusBarColorProvider: @Composable () -> Color = {
+        MaterialTheme.colors.surface.withElevation()
+    },
+    navigationBarColorProvider: @Composable () -> Color = {
+        MaterialTheme.colors.surface
+    },
     content: @Composable () -> Unit,
 ) {
     val currentDarkTheme = isDarkTheme(requireDarkTheme = false)
@@ -96,6 +112,8 @@ fun TwidereDialog(
         requireDarkTheme,
         extendViewIntoStatusBar,
         extendViewIntoNavigationBar,
+        statusBarColorProvider,
+        navigationBarColorProvider,
         content,
     )
 }
@@ -105,6 +123,12 @@ fun TwidereScene(
     requireDarkTheme: Boolean = false,
     extendViewIntoStatusBar: Boolean = false,
     extendViewIntoNavigationBar: Boolean = false,
+    statusBarColorProvider: @Composable () -> Color = {
+        MaterialTheme.colors.surface.withElevation()
+    },
+    navigationBarColorProvider: @Composable () -> Color = {
+        MaterialTheme.colors.surface
+    },
     content: @Composable () -> Unit,
 ) {
     val darkTheme = isDarkTheme(requireDarkTheme)
@@ -114,8 +138,8 @@ fun TwidereScene(
             windowInsetsController.isAppearanceLightStatusBars = !darkTheme
             windowInsetsController.isAppearanceLightNavigationBars = !darkTheme
         }
-        val navigationBarColor = navigationBarColor(darkTheme)
-        val statusBarColor = statusBarColor()
+        val statusBarColor = statusBarColorProvider.invoke()
+        val navigationBarColor = navigationBarColorProvider.invoke()
         Box {
             val actual = provideSystemInsets(
                 extendViewIntoNavigationBar,
@@ -138,7 +162,6 @@ fun TwidereScene(
                                         LayoutDirection.Ltr -> it.right.toDp()
                                         LayoutDirection.Rtl -> it.left.toDp()
                                     },
-
                                 )
                             }
                         }
@@ -193,28 +216,6 @@ fun TwidereScene(
                 }.align(Alignment.BottomCenter)
             )
         }
-    }
-}
-
-@Composable
-fun navigationBarColor(darkTheme: Boolean): Color {
-    return if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O_MR1) {
-        Color.Black
-    } else {
-        if (darkTheme) {
-            Color.Black
-        } else {
-            Color(0xFFF1F1F1)
-        }
-    }
-}
-
-@Composable
-fun statusBarColor(): Color {
-    return if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-        Color.Black
-    } else {
-        MaterialTheme.colors.surface.withElevation()
     }
 }
 
@@ -358,12 +359,23 @@ private fun provideTypography(): Typography {
 @Composable
 private fun provideThemeColors(darkTheme: Boolean): Colors {
     val primaryColor by animateColorAsState(targetValue = currentPrimaryColor())
+    val pureDark = LocalAppearancePreferences.current.isDarkModePureBlack
     val target = if (darkTheme) {
-        darkColors(
-            primary = primaryColor,
-            primaryVariant = primaryColor,
-            secondary = primaryColor,
-        )
+        if (pureDark) {
+            darkColors(
+                primary = primaryColor,
+                primaryVariant = primaryColor,
+                secondary = primaryColor,
+                background = Color.Black,
+                surface = Color.Black,
+            )
+        } else {
+            darkColors(
+                primary = primaryColor,
+                primaryVariant = primaryColor,
+                secondary = primaryColor,
+            )
+        }
     } else {
         lightColors(
             primary = primaryColor,

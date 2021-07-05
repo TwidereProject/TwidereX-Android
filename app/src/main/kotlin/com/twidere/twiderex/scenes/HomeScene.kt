@@ -144,7 +144,15 @@ fun HomeScene() {
         }
     }
     ApplyNotification(scaffoldState.snackbarHostState)
-    TwidereScene {
+    TwidereScene(
+        navigationBarColorProvider = {
+            if (tabPosition == AppearancePreferences.TabPosition.Bottom) {
+                MaterialTheme.colors.surface.withElevation()
+            } else {
+                MaterialTheme.colors.surface
+            }
+        },
+    ) {
         NestedScrollScaffold(
             scaffoldState = scaffoldState,
             enableBottomBarNestedScroll = hideTab,
@@ -317,18 +325,25 @@ fun HomeBottomNavigation(
     selectedItem: Int,
     onItemSelected: (Int) -> Unit,
 ) {
-    BottomNavigation(
-        backgroundColor = MaterialTheme.colors.surface.withElevation(),
-        modifier = modifier
-    ) {
-        items.forEachIndexed { index, item ->
-            BottomNavigationItem(
-                selectedContentColor = MaterialTheme.colors.primary,
-                unselectedContentColor = mediumEmphasisContentContentColor,
-                icon = { Icon(painter = item.icon(), contentDescription = item.name()) },
-                selected = selectedItem == index,
-                onClick = { onItemSelected.invoke(index) }
-            )
+    val pureDark = LocalAppearancePreferences.current.isDarkModePureBlack
+    val isLight = MaterialTheme.colors.isLight
+    Column {
+        if (pureDark && !isLight) {
+            Divider()
+        }
+        BottomNavigation(
+            backgroundColor = MaterialTheme.colors.surface.withElevation(),
+            modifier = modifier
+        ) {
+            items.forEachIndexed { index, item ->
+                BottomNavigationItem(
+                    selectedContentColor = MaterialTheme.colors.primary,
+                    unselectedContentColor = mediumEmphasisContentContentColor,
+                    icon = { Icon(painter = item.icon(), contentDescription = item.name()) },
+                    selected = selectedItem == index,
+                    onClick = { onItemSelected.invoke(index) }
+                )
+            }
         }
     }
 }

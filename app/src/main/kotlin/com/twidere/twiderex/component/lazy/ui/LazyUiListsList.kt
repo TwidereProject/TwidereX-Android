@@ -209,12 +209,10 @@ private fun LazyUiListItem(uiList: UiList, onItemClicked: (UiList) -> Unit = {})
 @Composable
 private fun LazyUiListTitleItem(title: String, divider: Boolean = false) {
     DividerListItem(divider = divider) {
-        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.disabled) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.overline,
-            )
-        }
+        Text(
+            text = title,
+            style = MaterialTheme.typography.button,
+        )
     }
 }
 

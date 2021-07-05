@@ -629,12 +629,19 @@ fun ColumnScope.StatusBody(
                 )
                 .clip(MaterialTheme.shapes.medium)
         ) {
-            StatusQuote(quote = quote)
+            MaterialTheme(
+                shapes = StatusBodyDefaults.QuoteShape,
+            ) {
+                StatusQuote(quote = quote)
+            }
         }
     }
 }
 
 object StatusBodyDefaults {
+    val QuoteShape
+        @Composable
+        get() = MaterialTheme.shapes.copy(medium = RoundedCornerShape(8.dp))
     val LinkPreviewSpacing = 10.dp
     val PlaceSpacing = 10.dp
     val QuoteSpacing = 10.dp
@@ -758,7 +765,12 @@ fun StatusQuote(quote: UiStatus) {
 }
 
 object StatusQuoteDefaults {
-    val ContentPadding = PaddingValues(8.dp)
+    val ContentPadding = PaddingValues(
+        top = 8.dp,
+        bottom = 12.dp,
+        start = 12.dp,
+        end = 12.dp,
+    )
     val AvatarSpacing = 8.dp
     val NameSpacing = 4.dp
     val TextSpacing = 4.dp

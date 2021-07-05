@@ -224,6 +224,10 @@ private fun StatusV2.toDbStatusWithMediaAndUser(
             quoteCount = publicMetrics?.quoteCount
         ),
         previewCard = entities?.urls?.firstOrNull()
+            ?.takeUnless { url ->
+                referencedTweets?.firstOrNull { it.type == ReferencedTweetType.quoted }
+                    ?.id?.let { id -> url.expandedURL?.endsWith(id) == true } == true
+            }
             ?.takeUnless { url -> url.displayURL?.contains("pic.twitter.com") == true }
             ?.let {
                 it.expandedURL?.let { url ->

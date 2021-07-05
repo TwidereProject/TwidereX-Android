@@ -76,7 +76,7 @@ import javax.inject.Singleton
         DbDMConversation::class,
         DbDMEvent::class
     ],
-    version = 17,
+    version = 18,
 )
 @TypeConverters(
     MicroBlogKeyConverter::class,

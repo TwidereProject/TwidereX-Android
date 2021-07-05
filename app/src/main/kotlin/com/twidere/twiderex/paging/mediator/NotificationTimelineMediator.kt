@@ -46,10 +46,11 @@ class NotificationTimelineMediator(
         list: List<IStatus>
     ): List<DbPagingTimelineWithStatus> {
         if (data.any()) {
-            notificationRepository.addCursor(
+            notificationRepository.addCursorIfNeeded(
                 accountKey,
                 NotificationCursorType.General,
                 data.first().status.status.data.statusId,
+                data.first().status.status.data.timestamp,
             )
         }
         return super.transform(data, list)
