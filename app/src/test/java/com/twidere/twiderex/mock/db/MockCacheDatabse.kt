@@ -24,6 +24,8 @@ import androidx.room.DatabaseConfiguration
 import androidx.room.InvalidationTracker
 import androidx.sqlite.db.SupportSQLiteOpenHelper
 import com.twidere.twiderex.db.CacheDatabase
+import com.twidere.twiderex.db.dao.DirectMessageConversationDao
+import com.twidere.twiderex.db.dao.DirectMessageEventDao
 import com.twidere.twiderex.db.dao.ListsDao
 import com.twidere.twiderex.db.dao.MediaDao
 import com.twidere.twiderex.db.dao.NotificationCursorDao
@@ -35,18 +37,62 @@ import com.twidere.twiderex.db.dao.TrendDao
 import com.twidere.twiderex.db.dao.TrendHistoryDao
 import com.twidere.twiderex.db.dao.UrlEntityDao
 import com.twidere.twiderex.db.dao.UserDao
+import java.util.ArrayDeque
+import java.util.concurrent.Executor
+import java.util.concurrent.Executors
 
 class MockCacheDatabase : CacheDatabase() {
+    override fun getTransactionExecutor(): Executor {
+        return object : Executor {
+            private var mExecutor = Executors.newSingleThreadExecutor()
+            private val mTasks = ArrayDeque<Runnable>()
+            private var mActive: Runnable? = null
+
+            @Synchronized
+            override fun execute(command: Runnable) {
+                mTasks.offer(
+                    Runnable {
+                        try {
+                            command.run()
+                        } finally {
+                            scheduleNext()
+                        }
+                    }
+                )
+                if (mActive == null) {
+                    scheduleNext()
+                }
+            }
+
+            @Synchronized
+            fun scheduleNext() {
+                if (mTasks.poll().also { mActive = it } != null) {
+                    mExecutor.execute(mActive)
+                }
+            }
+        }
+    }
+    override fun beginTransaction() {
+    }
+
+    override fun setTransactionSuccessful() {
+    }
+
+    override fun endTransaction() {
+    }
+
     override fun statusDao(): StatusDao {
         TODO("Not yet implemented")
     }
 
+    private val mediaDao = MockMediaDao()
     override fun mediaDao(): MediaDao {
-        TODO("Not yet implemented")
+        return mediaDao
     }
 
+    private val userDao = MockUserDao()
     override fun userDao(): UserDao {
-        TODO("Not yet implemented")
+        return userDao
     }
 
     override fun reactionDao(): ReactionDao {
@@ -57,8 +103,9 @@ class MockCacheDatabase : CacheDatabase() {
         TODO("Not yet implemented")
     }
 
+    private val urlEntityDao = MockUrlEntityDao()
     override fun urlEntityDao(): UrlEntityDao {
-        TODO("Not yet implemented")
+        return urlEntityDao
     }
 
     override fun statusReferenceDao(): StatusReferenceDao {
@@ -82,6 +129,16 @@ class MockCacheDatabase : CacheDatabase() {
     private val trendHistoryDao = MockTrendHistoryDao()
     override fun trendHistoryDao(): TrendHistoryDao {
         return trendHistoryDao
+    }
+
+    private val conversationDao = MockDirectMessageConversationDao()
+    override fun directMessageConversationDao(): DirectMessageConversationDao {
+        return conversationDao
+    }
+
+    private val dmDao = MockDirectMessageEventDao()
+    override fun directMessageDao(): DirectMessageEventDao {
+        return dmDao
     }
 
     override fun createOpenHelper(config: DatabaseConfiguration?): SupportSQLiteOpenHelper {

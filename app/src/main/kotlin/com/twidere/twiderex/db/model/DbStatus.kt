@@ -106,7 +106,7 @@ data class DbMastodonStatusExtra(
 data class DbStatusWithMediaAndUser(
     @Embedded
     val data: DbStatusV2,
-    @Relation(parentColumn = "statusKey", entityColumn = "statusKey")
+    @Relation(parentColumn = "statusKey", entityColumn = "belongToKey")
     val media: List<DbMedia>,
     @Relation(parentColumn = "userKey", entityColumn = "userKey")
     val user: DbUser,

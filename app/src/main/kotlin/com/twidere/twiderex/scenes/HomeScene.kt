@@ -446,6 +446,17 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
                 exit = shrinkVertically() + fadeOut(),
             ) {
                 LazyColumn {
+                    if (account?.type == PlatformType.Twitter) {
+                        item {
+                            DrawerMenuItem(
+                                onClick = {
+                                    navController.navigate(Route.Messages.Home)
+                                },
+                                title = R.string.scene_messages_title,
+                                icon = R.drawable.ic_mail,
+                            )
+                        }
+                    }
                     item {
                         DrawerMenuItem(
                             onClick = {

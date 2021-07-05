@@ -23,10 +23,15 @@ package com.twidere.twiderex.db.dao
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
+import androidx.room.Query
 import com.twidere.twiderex.db.model.DbMedia
+import com.twidere.twiderex.model.MicroBlogKey
 
 @Dao
 interface MediaDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(media: List<DbMedia>)
+
+    @Query("SELECT * FROM media Where belongToKey == :belongToKey")
+    suspend fun findMediaByBelongToKey(belongToKey: MicroBlogKey): List<DbMedia>
 }

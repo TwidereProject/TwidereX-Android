@@ -35,6 +35,10 @@
                 android:name="com.twidere.twiderex.notification.NotificationChannelInitializer"
                 android:value="androidx.startup" />
             <meta-data
+                android:name="com.twidere.twiderex.worker.dm.DirectMessageInitializer"
+                android:value="androidx.startup"
+                tools:node="remove"/>
+            <meta-data
                 android:name="com.twidere.twiderex.notification.NotificationInitializer"
                 android:value="androidx.startup"
                 tools:node="remove" />
