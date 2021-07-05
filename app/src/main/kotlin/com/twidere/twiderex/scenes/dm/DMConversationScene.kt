@@ -29,7 +29,6 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -64,12 +63,15 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.google.accompanist.insets.ExperimentalAnimatedInsets
+import com.google.accompanist.insets.rememberImeNestedScrollConnection
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
@@ -86,7 +88,7 @@ import com.twidere.twiderex.viewmodel.dm.DMEventViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalAnimatedInsets ::class)
 @Composable
 fun DMConversationScene(conversationKey: MicroBlogKey) {
     val account = LocalActiveAccount.current ?: return
@@ -131,7 +133,13 @@ fun DMConversationScene(conversationKey: MicroBlogKey) {
                 )
             },
         ) {
-            Column(modifier = Modifier.fillMaxSize()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .nestedScroll(
+                        rememberImeNestedScrollConnection()
+                    )
+            ) {
                 Box(modifier = Modifier.weight(1f)) {
                     LazyUiDMEventList(
                         modifier = Modifier.fillMaxSize(),
