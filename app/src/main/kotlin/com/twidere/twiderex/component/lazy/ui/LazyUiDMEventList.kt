@@ -48,7 +48,9 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Icon
+import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -62,6 +64,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.items
@@ -248,8 +251,18 @@ private fun MessageBody(event: UiDMEvent, onItemLongClick: (event: UiDMEvent) ->
             )
             if (event.media.isNotEmpty() && event.htmlText.isNotEmpty()) Spacer(modifier = Modifier.height(MessageBodyDefaults.ContentSpacing))
             val textColor = if (event.isInCome) MaterialTheme.colors.onSurface else MaterialTheme.colors.onPrimary
+            val textStyle = MaterialTheme.typography.body1.copy(textColor)
+            val linkStyle = textStyle.copy(
+                color = if (event.isInCome) MaterialTheme.colors.primary else MaterialTheme.colors.onPrimary,
+                textDecoration = TextDecoration.Underline
+            )
             CompositionLocalProvider(LocalContentColor provides textColor) {
-                HtmlText(htmlText = event.htmlText, linkResolver = { href -> event.resolveLink(href) })
+                HtmlText(
+                    htmlText = event.htmlText,
+                    textStyle = textStyle,
+                    linkStyle = linkStyle,
+                    linkResolver = { href -> event.resolveLink(href) }
+                )
             }
         }
     }
@@ -297,7 +310,9 @@ private fun ChatTime(modifier: Modifier = Modifier, time: Long) {
             DateUtils.FORMAT_ABBREV_ALL
         ).toString()
     }
-    Text(modifier = modifier, text = timeString, style = MaterialTheme.typography.overline)
+    CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+        Text(modifier = modifier, text = timeString, style = MaterialTheme.typography.caption)
+    }
 }
 
 @Composable

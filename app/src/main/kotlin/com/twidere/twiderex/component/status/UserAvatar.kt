@@ -23,9 +23,7 @@ package com.twidere.twiderex.component.status
 import androidx.compose.animation.core.animateInt
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
@@ -34,18 +32,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.R
-import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.preferences.LocalDisplayPreferences
 import com.twidere.twiderex.preferences.proto.DisplayPreferences
-import moe.tlaster.placeholder.Placeholder
 
 @Composable
 fun UserAvatar(
@@ -59,34 +54,14 @@ fun UserAvatar(
     Box(
         contentAlignment = Alignment.BottomEnd
     ) {
-        Box(
-            modifier = modifier
-                .let {
-                    if (withPlatformIcon) {
-                        it.padding(bottom = 4.dp, end = 4.dp)
-                    } else {
-                        it
-                    }
-                }
-                .withAvatarClip()
-                .clipToBounds()
-        ) {
-            NetworkImage(
-                data = user.profileImage,
-                modifier = Modifier
-                    .clickable(
-                        onClick = {
-                            onClick?.invoke() ?: run {
-                                navigator.user(user)
-                            }
-                        }
-                    )
-                    .size(size),
-                placeholder = {
-                    Placeholder(modifier = Modifier.size(size))
-                },
-            )
-        }
+        RoundAvatar(
+            modifier = modifier,
+            avatar = user.profileImage,
+            size = size,
+            onClick = {
+                onClick?.invoke() ?: run { navigator.user(user) }
+            }
+        )
         if (withPlatformIcon) {
             val icon = when (user.platformType) {
                 PlatformType.Twitter -> painterResource(id = R.drawable.ic_twitter_badge)

@@ -25,7 +25,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.unit.Dp
@@ -42,33 +41,29 @@ fun RoundAvatar(
     onClick: (() -> Unit)? = null,
 ) {
     Box(
-        contentAlignment = Alignment.BottomEnd
-    ) {
-        Box(
-            modifier = modifier
-                .let {
-                    if (withPlatformIcon) {
-                        it.padding(bottom = 4.dp, end = 4.dp)
-                    } else {
-                        it
-                    }
+        modifier = modifier
+            .let {
+                if (withPlatformIcon) {
+                    it.padding(bottom = 4.dp, end = 4.dp)
+                } else {
+                    it
                 }
-                .withAvatarClip()
-                .clipToBounds()
-        ) {
-            NetworkImage(
-                data = avatar,
-                modifier = Modifier
-                    .clickable(
-                        onClick = {
-                            onClick?.invoke()
-                        }
-                    )
-                    .size(size),
-                placeholder = {
-                    Placeholder(modifier = Modifier.size(size))
-                },
-            )
-        }
+            }
+            .withAvatarClip()
+            .clipToBounds()
+    ) {
+        NetworkImage(
+            data = avatar,
+            modifier = Modifier
+                .clickable(
+                    onClick = {
+                        onClick?.invoke()
+                    }
+                )
+                .size(size),
+            placeholder = {
+                Placeholder(modifier = Modifier.size(size))
+            },
+        )
     }
 }

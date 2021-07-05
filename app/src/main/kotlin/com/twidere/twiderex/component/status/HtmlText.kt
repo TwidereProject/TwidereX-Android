@@ -66,11 +66,14 @@ data class ResolvedLink(
     val clickable: Boolean = true,
 )
 
+@OptIn(ExperimentalUnitApi::class)
 @Composable
 fun HtmlText(
     modifier: Modifier = Modifier,
     htmlText: String,
     maxLines: Int = Int.MAX_VALUE,
+    textStyle: TextStyle = MaterialTheme.typography.body1.copy(color = LocalContentColor.current.copy(alpha = LocalContentAlpha.current), letterSpacing = TextUnit(0.25f, TextUnitType.Sp)),
+    linkStyle: TextStyle = textStyle.copy(MaterialTheme.colors.primary),
     linkResolver: (href: String) -> ResolvedLink = { ResolvedLink(it) },
 ) {
     val navigator = LocalNavigator.current
@@ -79,6 +82,8 @@ fun HtmlText(
         htmlText = htmlText,
         linkResolver = linkResolver,
         maxLines = maxLines,
+        textStyle = textStyle,
+        linkStyle = linkStyle,
         onLinkClicked = {
             navigator.openLink(it)
         },
@@ -91,12 +96,16 @@ private fun RenderContent(
     modifier: Modifier = Modifier,
     htmlText: String,
     maxLines: Int = Int.MAX_VALUE,
+    textStyle: TextStyle,
+    linkStyle: TextStyle,
     linkResolver: (href: String) -> ResolvedLink = { ResolvedLink(it) },
     onLinkClicked: (String) -> Unit = {},
 ) {
     val value = renderContentAnnotatedString(
         htmlText = htmlText,
         linkResolver = linkResolver,
+        textStyle = textStyle,
+        linkStyle = linkStyle
     )
     val layoutResult = remember { mutableStateOf<TextLayoutResult?>(null) }
     if (value.text.isNotEmpty() && value.text.isNotBlank()) {
@@ -152,11 +161,10 @@ private fun RenderContent(
 @Composable
 fun renderContentAnnotatedString(
     htmlText: String,
+    textStyle: TextStyle = MaterialTheme.typography.body1.copy(color = LocalContentColor.current.copy(alpha = LocalContentAlpha.current), letterSpacing = TextUnit(0.25f, TextUnitType.Sp)),
+    linkStyle: TextStyle = textStyle.copy(MaterialTheme.colors.primary),
     linkResolver: (href: String) -> ResolvedLink,
 ): AnnotatedString {
-    val textColor = LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
-    val textStyle = MaterialTheme.typography.body1.copy(color = textColor, letterSpacing = TextUnit(0.25f, TextUnitType.Sp))
-    val linkStyle = textStyle.copy(MaterialTheme.colors.primary)
     val styleData = remember(textStyle, linkStyle) {
         StyleData(
             textStyle = textStyle,

@@ -118,6 +118,7 @@ fun DMConversationScene(conversationKey: MicroBlogKey) {
         }
     }
     val copyText = stringResource(id = R.string.scene_messages_action_copy_text)
+    val nestImeScrollState = rememberImeNestedScrollConnection()
     TwidereScene {
         InAppNotificationScaffold(
             topBar = {
@@ -137,7 +138,7 @@ fun DMConversationScene(conversationKey: MicroBlogKey) {
                 modifier = Modifier
                     .fillMaxSize()
                     .nestedScroll(
-                        rememberImeNestedScrollConnection()
+                        nestImeScrollState
                     )
             ) {
                 Box(modifier = Modifier.weight(1f)) {
@@ -211,7 +212,6 @@ fun MessageActionComponent(
                     ) {
                         Text(text = stringResource(id = R.string.scene_messages_action_copy_text))
                     }
-
                     ListItem(
                         modifier = Modifier.clickable {
                             onDelete(it)
@@ -309,7 +309,7 @@ fun InputComponent(
             value = input,
             onValueChange = onValueChanged,
             modifier = Modifier.weight(1f),
-            maxLines = 3
+            maxLines = 3,
         )
         Spacer(modifier = Modifier.width(InputComponentDefaults.ContentSpacing))
         IconButton(
