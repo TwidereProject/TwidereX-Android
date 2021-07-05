@@ -91,7 +91,7 @@ class DMEventViewModel @AssistedInject constructor(
                         PlatformType.Twitter -> MicroBlogKey.twitter(UUID.randomUUID().toString())
                         PlatformType.StatusNet -> TODO()
                         PlatformType.Fanfou -> TODO()
-                        PlatformType.Mastodon -> TODO()
+                        PlatformType.Mastodon -> MicroBlogKey.Empty
                     },
                     conversationKey = it.conversationKey,
                     accountKey = account.accountKey

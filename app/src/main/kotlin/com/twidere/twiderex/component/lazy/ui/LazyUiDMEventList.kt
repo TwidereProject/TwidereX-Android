@@ -45,6 +45,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
@@ -146,6 +147,7 @@ private fun DMOutComeEvent(onResend: (event: UiDMEvent) -> Unit = {}, event: UiD
                     DbDMEvent.SendStatus.FAILED -> {
                         Box(
                             modifier = Modifier
+                                .clip(shape = CircleShape)
                                 .clickable { onResend(event) }
                                 .padding(DMOutComeEventDefaults.Error.ContentPadding)
                         ) {
@@ -216,11 +218,6 @@ private fun MessageBody(event: UiDMEvent, onItemLongClick: (event: UiDMEvent) ->
     val navController = LocalNavController.current
     Box(
         modifier = Modifier
-            .combinedClickable(
-                onLongClick = {
-                    onItemLongClick(event)
-                }
-            ) { }
             .clip(
                 RoundedCornerShape(
                     topStart = MessageBodyDefaults.cornerRadius,
@@ -229,6 +226,11 @@ private fun MessageBody(event: UiDMEvent, onItemLongClick: (event: UiDMEvent) ->
                     bottomEnd = if (event.isInCome) MessageBodyDefaults.cornerRadius else MessageBodyDefaults.pointCornerRadius
                 )
             )
+            .combinedClickable(
+                onLongClick = {
+                    onItemLongClick(event)
+                }
+            ) { }
             .background(
                 if (event.isInCome)
                     MaterialTheme.colors.primary.copy(alpha = 0.15f)

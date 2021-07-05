@@ -34,17 +34,14 @@ class DirectMessageAction(
         platformType: PlatformType,
         data: DirectMessageSendData,
     ) {
-        val worker = when (platformType) {
-            PlatformType.Twitter -> TwitterDirectMessageSendWorker.create(
+        if (platformType == PlatformType.Twitter) {
+            val worker = TwitterDirectMessageSendWorker.create(
                 data = data,
             )
-            PlatformType.StatusNet -> TODO()
-            PlatformType.Fanfou -> TODO()
-            PlatformType.Mastodon -> TODO()
+            workManager
+                .beginWith(worker)
+                .enqueue()
         }
-        workManager
-            .beginWith(worker)
-            .enqueue()
     }
 
     fun delete(

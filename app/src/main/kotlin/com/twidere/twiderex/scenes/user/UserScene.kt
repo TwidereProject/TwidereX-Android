@@ -20,7 +20,6 @@
  */
 package com.twidere.twiderex.scenes.user
 
-import androidx.compose.foundation.layout.Row
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
@@ -39,6 +38,7 @@ import com.twidere.twiderex.component.status.UserName
 import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalNavController
@@ -75,7 +75,7 @@ fun UserScene(
                         AppBarNavigationButton()
                     },
                     actions = {
-                        Row {
+                        if (account.type == PlatformType.Twitter && user?.platformType == PlatformType.Twitter) {
                             user?.let {
                                 if (userKey != account.accountKey) {
                                     IconButton(

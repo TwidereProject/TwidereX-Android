@@ -100,13 +100,10 @@ class DirectMessageRepository(
         accountKey: MicroBlogKey,
         platformType: PlatformType
     ): MicroBlogKey {
+        if (platformType != PlatformType.Twitter) throw Error()
         val conversationId = "${accountKey.id}-${receiver.id}"
-        val conversationKey = when (platformType) {
-            PlatformType.Twitter -> MicroBlogKey.twitter(conversationId)
-            PlatformType.StatusNet -> TODO()
-            PlatformType.Fanfou -> TODO()
-            PlatformType.Mastodon -> TODO()
-        }
+        val conversationKey = MicroBlogKey.twitter(conversationId)
+
         return database.withTransaction {
             database.directMessageConversationDao()
                 .findWithConversationKey(accountKey, conversationKey)
