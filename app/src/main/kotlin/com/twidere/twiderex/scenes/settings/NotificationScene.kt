@@ -37,6 +37,8 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.ColoredSwitch
@@ -67,7 +69,7 @@ fun NotificationScene() {
             topBar = {
                 AppBar(
                     title = {
-                        Text(text = "Notification")
+                        Text(text = stringResource(id = R.string.scene_notification_title))
                     },
                     navigationIcon = {
                         AppBarNavigationButton()
@@ -84,7 +86,7 @@ fun NotificationScene() {
                             viewModel.setEnabled(!notificationEnabled)
                         },
                         text = {
-                            Text(text = "Show Notifications")
+                            Text(text = stringResource(id = R.string.scene_settings_notification_notification_switch))
                         },
                         trailing = {
                             ColoredSwitch(
@@ -100,7 +102,7 @@ fun NotificationScene() {
                     )
                 }
                 ItemHeader {
-                    Text(text = "Accounts")
+                    Text(text = stringResource(id = R.string.scene_settings_notification_accounts))
                 }
                 val navController = LocalNavController.current
                 LazyColumn {
