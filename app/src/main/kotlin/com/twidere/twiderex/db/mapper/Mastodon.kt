@@ -247,7 +247,7 @@ private fun Status.toDbStatusWithMediaAndUser(
         media = (mediaAttachments ?: emptyList()).mapIndexed { index, it ->
             DbMedia(
                 _id = UUID.randomUUID().toString(),
-                statusKey = status.statusKey,
+                belongToKey = status.statusKey,
                 previewUrl = it.previewURL,
                 mediaUrl = it.url,
                 width = it.meta?.original?.width ?: 0,

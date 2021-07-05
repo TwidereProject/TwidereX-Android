@@ -23,6 +23,8 @@ package com.twidere.twiderex.db
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import com.twidere.twiderex.db.dao.DirectMessageConversationDao
+import com.twidere.twiderex.db.dao.DirectMessageEventDao
 import com.twidere.twiderex.db.dao.ListsDao
 import com.twidere.twiderex.db.dao.MediaDao
 import com.twidere.twiderex.db.dao.NotificationCursorDao
@@ -34,6 +36,8 @@ import com.twidere.twiderex.db.dao.TrendDao
 import com.twidere.twiderex.db.dao.TrendHistoryDao
 import com.twidere.twiderex.db.dao.UrlEntityDao
 import com.twidere.twiderex.db.dao.UserDao
+import com.twidere.twiderex.db.model.DbDMConversation
+import com.twidere.twiderex.db.model.DbDMEvent
 import com.twidere.twiderex.db.model.DbList
 import com.twidere.twiderex.db.model.DbMedia
 import com.twidere.twiderex.db.model.DbNotificationCursor
@@ -68,9 +72,11 @@ import javax.inject.Singleton
         DbList::class,
         DbNotificationCursor::class,
         DbTrend::class,
-        DbTrendHistory::class
+        DbTrendHistory::class,
+        DbDMConversation::class,
+        DbDMEvent::class
     ],
-    version = 17,
+    version = 18,
 )
 @TypeConverters(
     MicroBlogKeyConverter::class,
@@ -94,4 +100,6 @@ abstract class CacheDatabase : RoomDatabase() {
     abstract fun notificationCursorDao(): NotificationCursorDao
     abstract fun trendDao(): TrendDao
     abstract fun trendHistoryDao(): TrendHistoryDao
+    abstract fun directMessageConversationDao(): DirectMessageConversationDao
+    abstract fun directMessageDao(): DirectMessageEventDao
 }

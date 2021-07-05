@@ -22,9 +22,9 @@ package com.twidere.services.twitter
 
 import com.twidere.services.http.AuthorizationInterceptor
 import com.twidere.services.http.Errors
-import com.twidere.services.http.MicroBlogHttpException
 import com.twidere.services.http.authorization.OAuth1Authorization
 import com.twidere.services.http.retrofit
+import com.twidere.services.microblog.DirectMessageService
 import com.twidere.services.microblog.DownloadMediaService
 import com.twidere.services.microblog.ListsService
 import com.twidere.services.microblog.LookupService
@@ -41,6 +41,13 @@ import com.twidere.services.microblog.model.IUser
 import com.twidere.services.microblog.model.Relationship
 import com.twidere.services.twitter.api.TwitterResources
 import com.twidere.services.twitter.api.UploadResources
+import com.twidere.services.twitter.model.Attachment
+import com.twidere.services.twitter.model.DirectMessageEvent
+import com.twidere.services.twitter.model.DirectMessageEventObject
+import com.twidere.services.twitter.model.MessageCreate
+import com.twidere.services.twitter.model.MessageData
+import com.twidere.services.twitter.model.MessageTarget
+import com.twidere.services.twitter.model.PurpleMedia
 import com.twidere.services.twitter.model.StatusV2
 import com.twidere.services.twitter.model.TwitterPaging
 import com.twidere.services.twitter.model.TwitterSearchResponseV1
@@ -81,7 +88,8 @@ class TwitterService(
     StatusService,
     DownloadMediaService,
     ListsService,
-    TrendService {
+    TrendService,
+    DirectMessageService {
     private val resources by lazy {
         resources ?: retrofit(
             TWITTER_BASE_URL,
@@ -101,8 +109,6 @@ class TwitterService(
                         }.let {
                             throw it
                         }
-                    } ?: run {
-                        throw MicroBlogHttpException(httpCode = response.code)
                     }
                 }
                 response
@@ -594,4 +600,49 @@ class TwitterService(
             list.subList(0, it.coerceIn(0, list.size))
         } ?: list
     } ?: emptyList()
+
+    override suspend fun getDirectMessages(cursor: String?, count: Int?) = resources.getMessages(
+        cursor,
+        count
+    ).let {
+        TwitterPaging(
+            data = it.events ?: emptyList(),
+            nextPage = it.nextCursor
+        )
+    }
+
+    override suspend fun showDirectMessage(id: String) = resources.showMessage(id).event
+
+    override suspend fun destroyDirectMessage(id: String) {
+        resources.destroyMessage(id)
+    }
+
+    suspend fun sendDirectMessage(
+        type: String = "message_create",
+        recipientId: String,
+        text: String?,
+        attachmentType: String?, // if set, must set to media
+        mediaId: String?
+    ): DirectMessageEvent? {
+        if (attachmentType != "media") throw NotImplementedError("Currently only media support")
+        return resources.sendMessage(
+            DirectMessageEventObject(
+                event = DirectMessageEvent(
+                    type = type,
+                    messageCreate = MessageCreate(
+                        messageData = MessageData(
+                            text = text,
+                            attachment = mediaId?.let {
+                                Attachment(
+                                    type = attachmentType,
+                                    media = PurpleMedia(id = it.toLong())
+                                )
+                            }
+                        ),
+                        target = MessageTarget(recipientId = recipientId)
+                    )
+                )
+            )
+        ).event
+    }
 }

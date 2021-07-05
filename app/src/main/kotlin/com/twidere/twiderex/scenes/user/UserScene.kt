@@ -20,11 +20,16 @@
  */
 package com.twidere.twiderex.scenes.user
 
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.twidere.twiderex.R
 import com.twidere.twiderex.component.UserComponent
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
@@ -33,8 +38,12 @@ import com.twidere.twiderex.component.status.UserName
 import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.PlatformType
+import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.ui.LocalActiveAccount
+import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
+import com.twidere.twiderex.viewmodel.dm.DMNewConversationViewModel
 import com.twidere.twiderex.viewmodel.user.UserViewModel
 
 @Composable
@@ -48,7 +57,14 @@ fun UserScene(
     ) {
         it.create(account, userKey)
     }
+
+    val conversationViewModel = assistedViewModel<DMNewConversationViewModel.AssistedFactory, DMNewConversationViewModel>(
+        account,
+    ) {
+        it.create(account)
+    }
     val user by viewModel.user.observeAsState(initial = null)
+    val navController = LocalNavController.current
     TwidereScene {
         InAppNotificationScaffold(
             // TODO: Show top bar with actions
@@ -59,6 +75,32 @@ fun UserScene(
                         AppBarNavigationButton()
                     },
                     actions = {
+                        if (account.type == PlatformType.Twitter && user?.platformType == PlatformType.Twitter) {
+                            user?.let {
+                                if (userKey != account.accountKey) {
+                                    IconButton(
+                                        onClick = {
+                                            conversationViewModel.createNewConversation(
+                                                it,
+                                                onResult = { conversationKey ->
+                                                    conversationKey?.let {
+                                                        navController.navigate(Route.Messages.Conversation(it))
+                                                    }
+                                                }
+                                            )
+                                        }
+                                    ) {
+                                        Icon(
+                                            painter = painterResource(id = R.drawable.ic_mail),
+                                            contentDescription = stringResource(
+                                                id = R.string.scene_messages_title
+                                            ),
+                                            tint = MaterialTheme.colors.onSurface
+                                        )
+                                    }
+                                }
+                            }
+                        }
                     },
                     elevation = 0.dp,
                     title = {

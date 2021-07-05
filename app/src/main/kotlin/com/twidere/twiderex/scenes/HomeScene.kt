@@ -146,7 +146,11 @@ fun HomeScene() {
     ApplyNotification(scaffoldState.snackbarHostState)
     TwidereScene(
         navigationBarColorProvider = {
-            MaterialTheme.colors.surface.withElevation()
+            if (tabPosition == AppearancePreferences.TabPosition.Bottom) {
+                MaterialTheme.colors.surface.withElevation()
+            } else {
+                MaterialTheme.colors.surface
+            }
         },
     ) {
         NestedScrollScaffold(
@@ -442,6 +446,17 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
                 exit = shrinkVertically() + fadeOut(),
             ) {
                 LazyColumn {
+                    if (account?.type == PlatformType.Twitter) {
+                        item {
+                            DrawerMenuItem(
+                                onClick = {
+                                    navController.navigate(Route.Messages.Home)
+                                },
+                                title = R.string.scene_messages_title,
+                                icon = R.drawable.ic_mail,
+                            )
+                        }
+                    }
                     item {
                         DrawerMenuItem(
                             onClick = {
