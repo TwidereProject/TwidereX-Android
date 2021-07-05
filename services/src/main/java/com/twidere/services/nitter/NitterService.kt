@@ -22,6 +22,7 @@ package com.twidere.services.nitter
 
 import com.twidere.services.http.MicroBlogHttpException
 import com.twidere.services.nitter.model.ConversationTimeline
+import com.twidere.services.nitter.model.TweetNotFound
 import com.twidere.services.utils.await
 import moe.tlaster.hson.Hson
 import okhttp3.OkHttpClient
@@ -62,6 +63,12 @@ class NitterService(
             .await()
             .body
             ?.string()
+            ?.also {
+                val notFound = Hson.deserializeKData<TweetNotFound>(it)
+                if (!notFound.notFound.isNullOrEmpty()) {
+                    throw TweetNotFoundException()
+                }
+            }
             ?.let {
                 Hson.deserializeKData(it)
             }
