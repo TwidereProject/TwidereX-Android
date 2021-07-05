@@ -46,6 +46,7 @@ import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.toDirectMessageSendData
 import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.notification.NotificationChannelSpec
+import com.twidere.twiderex.notification.notificationChannelId
 import com.twidere.twiderex.repository.AccountRepository
 import java.util.UUID
 
@@ -109,7 +110,12 @@ abstract class DirectMessageSendWorker<T : MicroBlogService>(
                     PendingIntent.FLAG_MUTABLE
                 )
             val builder = NotificationCompat
-                .Builder(applicationContext, NotificationChannelSpec.BackgroundProgresses.id)
+                .Builder(
+                    applicationContext,
+                    accountDetails.accountKey.notificationChannelId(
+                        NotificationChannelSpec.ContentMessages.id
+                    )
+                )
                 .setContentTitle(applicationContext.getString(R.string.common_alerts_failed_to_send_message_title))
                 .setSmallIcon(R.drawable.ic_notification)
                 .setCategory(NotificationCompat.CATEGORY_SOCIAL)

@@ -141,6 +141,8 @@
     <string name="common_notification_channel_background_progresses_name">Background progresses</string>
     <string name="common_notification_channel_content_interactions_name">Interactions</string>
     <string name="common_notification_channel_content_interactions_description">Interactions like mentions and retweets</string>
+    <string name="common_notification_channel_content_messages_name">Messages</string>
+    <string name="common_notification_channel_content_messages_description">Direct messages</string>
     <string name="scene_drawer_sign_in">Sign in</string>
     <string name="scene_drawer_manage_accounts">Manage accounts</string>
     <string name="scene_manage_accounts_title">Accounts</string>

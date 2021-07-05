@@ -47,4 +47,13 @@ enum class NotificationChannelSpec(
         descriptionRes = R.string.common_notification_channel_content_interactions_description,
         importance = NotificationManagerCompat.IMPORTANCE_HIGH, showBadge = true, grouped = true
     ),
+
+    ContentMessages(
+        "content_messages",
+        R.string.common_notification_channel_content_messages_name,
+        descriptionRes = R.string.common_notification_channel_content_messages_description,
+        importance = NotificationManagerCompat.IMPORTANCE_HIGH,
+        showBadge = true,
+        grouped = true
+    )
 }

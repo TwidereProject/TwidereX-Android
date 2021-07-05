@@ -33,9 +33,11 @@ import androidx.work.WorkerParameters
 import com.twidere.services.microblog.DirectMessageService
 import com.twidere.services.microblog.LookupService
 import com.twidere.twiderex.R
+import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.ui.UiDMConversationWithLatestMessage
 import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.notification.NotificationChannelSpec
+import com.twidere.twiderex.notification.notificationChannelId
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.DirectMessageRepository
 import dagger.assisted.Assisted
@@ -67,7 +69,7 @@ class DirectMessageFetchWorker @AssistedInject constructor(
                     lookupService = account.service as LookupService
                 )
                 result.forEach {
-                    notification(it)
+                    notification(account = account, message = it)
                 }
             } ?: throw Error()
             Result.success()
@@ -77,9 +79,9 @@ class DirectMessageFetchWorker @AssistedInject constructor(
         }
     }
 
-    private fun notification(it: UiDMConversationWithLatestMessage) {
+    private fun notification(account: AccountDetails, message: UiDMConversationWithLatestMessage) {
         val intent =
-            Intent(Intent.ACTION_VIEW, Uri.parse(Route.DeepLink.Conversation(it.conversation.conversationKey)))
+            Intent(Intent.ACTION_VIEW, Uri.parse(Route.DeepLink.Conversation(message.conversation.conversationKey)))
         val pendingIntent =
             PendingIntent.getActivity(
                 applicationContext,
@@ -88,7 +90,12 @@ class DirectMessageFetchWorker @AssistedInject constructor(
                 PendingIntent.FLAG_MUTABLE
             )
         val builder = NotificationCompat
-            .Builder(applicationContext, NotificationChannelSpec.BackgroundProgresses.id)
+            .Builder(
+                applicationContext,
+                account.accountKey.notificationChannelId(
+                    NotificationChannelSpec.ContentMessages.id
+                )
+            )
             .setContentTitle(applicationContext.getString(R.string.common_notification_messages_title))
             .setSmallIcon(R.drawable.ic_notification)
             .setCategory(NotificationCompat.CATEGORY_SOCIAL)
@@ -96,8 +103,8 @@ class DirectMessageFetchWorker @AssistedInject constructor(
             .setOngoing(false)
             .setSilent(false)
             .setAutoCancel(true)
-            .setContentText(applicationContext.getString(R.string.common_notification_messages_content, it.latestMessage.sender.displayName))
+            .setContentText(applicationContext.getString(R.string.common_notification_messages_content, message.latestMessage.sender.displayName))
             .setContentIntent(pendingIntent)
-        notificationManagerCompat.notify(it.latestMessage.messageKey.hashCode(), builder.build())
+        notificationManagerCompat.notify(message.latestMessage.messageKey.hashCode(), builder.build())
     }
 }
