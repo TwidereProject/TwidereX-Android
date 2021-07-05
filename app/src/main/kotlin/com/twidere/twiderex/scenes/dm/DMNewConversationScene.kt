@@ -82,9 +82,8 @@ fun DMNewConversationScene() {
                                 icon = Icons.Default.Close
                             )
                         },
-                        // TODO DM Localize
                         title = {
-                            Text(text = "Find People")
+                            Text(text = stringResource(id = R.string.scene_messages_new_conversation_title))
                         },
                         elevation = 0.dp
                     )
@@ -129,12 +128,11 @@ fun SearchInput(modifier: Modifier = Modifier, input: String, onValueChanged: (v
             )
         )
         Spacer(modifier = Modifier.width(SearchInputDefaults.ContentSpacing))
-        // TODO DM localize
         TextInput(
             value = input,
             onValueChange = onValueChanged, modifier = Modifier.weight(1f),
             placeholder = {
-                Text(text = "Search people")
+                Text(text = stringResource(id = R.string.scene_messages_new_conversation_search))
             },
             maxLines = 1
         )

@@ -61,6 +61,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.items
@@ -146,13 +147,13 @@ private fun DMOutComeEvent(onResend: (event: UiDMEvent) -> Unit = {}, event: UiD
                     DbDMEvent.SendStatus.SUCCESS -> {}
                     DbDMEvent.SendStatus.FAILED -> {
                         Box(
-                            modifier = Modifier.clickable { onResend(event) }
+                            modifier = Modifier
+                                .clickable { onResend(event) }
                                 .padding(DMOutComeEventDefaults.Error.ContentPadding)
                         ) {
-                            // TODO DM localize
                             Icon(
                                 painter = painterResource(id = R.drawable.ic_alert),
-                                contentDescription = "Send Message Failed",
+                                contentDescription = stringResource(id = R.string.scene_messages_icon_failed),
                                 tint = Color.Unspecified,
                                 modifier = Modifier.size(DMOutComeEventDefaults.Error.size)
                             )

@@ -108,10 +108,9 @@ abstract class DirectMessageSendWorker<T : MicroBlogService>(
                     intent,
                     PendingIntent.FLAG_MUTABLE
                 )
-            // TODO DM localize
             val builder = NotificationCompat
                 .Builder(applicationContext, NotificationChannelSpec.BackgroundProgresses.id)
-                .setContentTitle(applicationContext.getString(R.string.common_alerts_tweet_sending_title))
+                .setContentTitle(applicationContext.getString(R.string.common_alerts_failed_to_send_message_title))
                 .setSmallIcon(R.drawable.ic_notification)
                 .setCategory(NotificationCompat.CATEGORY_SOCIAL)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
@@ -119,7 +118,7 @@ abstract class DirectMessageSendWorker<T : MicroBlogService>(
                 .setProgress(0, 0, false)
                 .setSilent(false)
                 .setAutoCancel(true)
-                .setContentTitle("Failed to send message")
+                .setContentTitle(applicationContext.getString(R.string.common_alerts_failed_to_send_message_message))
                 .setContentText(sendData.text)
                 .setContentIntent(pendingIntent)
             notificationManagerCompat.notify(notificationId, builder.build())

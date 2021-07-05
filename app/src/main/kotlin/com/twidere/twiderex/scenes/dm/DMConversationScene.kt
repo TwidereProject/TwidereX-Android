@@ -115,6 +115,7 @@ fun DMConversationScene(conversationKey: MicroBlogKey) {
             viewModel.firstEventKey.postValue(it.toString())
         }
     }
+    val copyText = stringResource(id = R.string.scene_messages_action_copy_text)
     TwidereScene {
         InAppNotificationScaffold(
             topBar = {
@@ -147,8 +148,7 @@ fun DMConversationScene(conversationKey: MicroBlogKey) {
                         pendingActionMessage = pendingActionMessage,
                         onDismissRequest = { viewModel.pendingActionMessage.postValue(null) },
                         onCopyText = { event ->
-                            // TODO DM localize
-                            clipboardManager?.setPrimaryClip(ClipData.newPlainText("message text", event.originText))
+                            clipboardManager?.setPrimaryClip(ClipData.newPlainText(copyText, event.originText))
                         },
                         onDelete = {
                             viewModel.deleteMessage(it)
@@ -191,7 +191,6 @@ fun MessageActionComponent(
     onCopyText: (message: UiDMEvent) -> Unit,
     onDelete: (message: UiDMEvent) -> Unit
 ) {
-    // TODO DM localize
     pendingActionMessage?.let {
         Dialog(onDismissRequest = onDismissRequest) {
             Surface(shape = MaterialTheme.shapes.medium) {
@@ -202,7 +201,7 @@ fun MessageActionComponent(
                             onDismissRequest()
                         }
                     ) {
-                        Text(text = "Copy message text")
+                        Text(text = stringResource(id = R.string.scene_messages_action_copy_text))
                     }
 
                     ListItem(
@@ -211,7 +210,7 @@ fun MessageActionComponent(
                             onDismissRequest()
                         }
                     ) {
-                        Text(text = "Delete message for you")
+                        Text(text = stringResource(id = R.string.scene_messages_action_delete))
                     }
                 }
             }

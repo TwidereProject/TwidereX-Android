@@ -20,6 +20,7 @@
  */
 package com.twidere.twiderex.component.lazy.ui
 
+import android.content.Context
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -37,9 +38,11 @@ import androidx.compose.material.ListItem
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.items
+import com.twidere.twiderex.R
 import com.twidere.twiderex.component.lazy.loadState
 import com.twidere.twiderex.component.placeholder.UiUserPlaceholder
 import com.twidere.twiderex.component.status.HtmlText
@@ -61,6 +64,7 @@ fun LazyUiDMConversationList(
     header: LazyListScope.() -> Unit = {},
     action: @Composable (user: UiDMConversationWithLatestMessage) -> Unit = {}
 ) {
+    val context = LocalContext.current
     LazyUiList(items = items) {
         LazyColumn(
             modifier = modifier,
@@ -99,7 +103,7 @@ fun LazyUiDMConversationList(
                                 HtmlText(
                                     htmlText = it.latestMessage.htmlText,
                                     maxLines = 1,
-                                    linkResolver = { href -> it.latestMessage.resolveLink(href) },
+                                    linkResolver = { href -> it.latestMessage.resolveLink(href, context) },
 
                                 )
                             },
@@ -143,8 +147,8 @@ private fun LoadingUserPlaceholder() {
 
 private fun UiDMEvent.resolveLink(
     href: String,
+    context: Context
 ): ResolvedLink {
-    // Todo DM String localize
     val entity = urlEntity.firstOrNull { it.url == href }
     val media = media.firstOrNull { it.url == href }
     return when {
@@ -157,7 +161,7 @@ private fun UiDMEvent.resolveLink(
         entity != null -> {
             if (entity.displayUrl.contains("pic.twitter.com")) {
                 ResolvedLink(
-                    expanded = "[Photo]",
+                    expanded = context.getString(R.string.scene_messages_expanded_photo),
                     clickable = false
                 )
             } else {

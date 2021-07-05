@@ -66,7 +66,6 @@ class DirectMessageFetchWorker @AssistedInject constructor(
                     service = account.service as DirectMessageService,
                     lookupService = account.service as LookupService
                 )
-                // TODO DM localize
                 result.forEach {
                     notification(it)
                 }
@@ -88,17 +87,16 @@ class DirectMessageFetchWorker @AssistedInject constructor(
                 intent,
                 PendingIntent.FLAG_MUTABLE
             )
-        // TODO DM localize
         val builder = NotificationCompat
             .Builder(applicationContext, NotificationChannelSpec.BackgroundProgresses.id)
-            .setContentTitle("New direct message")
+            .setContentTitle(applicationContext.getString(R.string.common_notification_messages_title))
             .setSmallIcon(R.drawable.ic_notification)
             .setCategory(NotificationCompat.CATEGORY_SOCIAL)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setOngoing(false)
             .setSilent(false)
             .setAutoCancel(true)
-            .setContentText("${it.latestMessage.sender.displayName} send you a message")
+            .setContentText(applicationContext.getString(R.string.common_notification_messages_content, it.latestMessage.sender.displayName))
             .setContentIntent(pendingIntent)
         notificationManagerCompat.notify(it.latestMessage.messageKey.hashCode(), builder.build())
     }

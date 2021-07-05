@@ -60,6 +60,8 @@
     <string name="common_alerts_failed_to_login_mastodon_server_message">Server URL is incorrect.</string>
     <string name="common_alerts_failed_to_login_timeout_title">Failed to Login</string>
     <string name="common_alerts_failed_to_login_timeout_message">Connection timeout.</string>
+    <string name="common_alerts_failed_to_send_message_title">Sending message</string>
+    <string name="common_alerts_failed_to_send_message_message">Failed to send message</string>
     <string name="common_notification_own_poll">Your poll has ended</string>
     <string name="common_notification_poll">A poll you have voted in has ended</string>
     <string name="common_notification_reblog">%s boosted your toot</string>
@@ -68,6 +70,8 @@
     <string name="common_notification_favourite">%s favourited your toot</string>
     <string name="common_notification_follow">%s followed you</string>
     <string name="common_notification_mentions">%s mentions you</string>
+    <string name="common_notification_messages_title">New direct message</string>
+    <string name="common_notification_messages_content">%s sent you a message</string>
     <string name="common_controls_actions_add">Add</string>
     <string name="common_controls_actions_remove">Remove</string>
     <string name="common_controls_actions_edit">Edit</string>
@@ -152,10 +156,16 @@
     <string name="scene_notification_title">Notification</string>
     <string name="scene_notification_tabs_all">All</string>
     <string name="scene_messages_title">Messages</string>
+    <string name="scene_messages_expanded_photo">[Photo]</string>
+    <string name="scene_messages_action_copy_text">Copy message text</string>
+    <string name="scene_messages_action_delete">Delete message for you</string>
+    <string name="scene_messages_new_conversation_title">Find people</string>
+    <string name="scene_messages_new_conversation_search">Search people</string>
+    <string name="scene_messages_icon_failed">Send message failed</string>
     <string name="scene_likes_title">Likes</string>
     <string name="scene_bookmark_title">Bookmark</string>
     <string name="scene_trends_title">Trends</string>
-    <string name="scene_trends_world_wide">Trends - WorldWide</string>
+    <string name="scene_trends_world_wide">Trends - Worldwide</string>
     <string name="scene_trends_now">Trending Now</string>
     <string name="scene_trends_accounts">%d people talking</string>
     <string name="scene_status_title">Tweet</string>
@@ -236,6 +246,7 @@
     <string name="scene_lists_details_delete_list_confirm">Delete this list: %s</string>
     <string name="scene_lists_details_no_members_found">No Members Found.</string>
     <string name="scene_lists_details_add_members">Add Members</string>
+    <string name="scene_lists_details_delete_list_title">Delete this list</string>
     <string name="scene_lists_modify_create_title">New List</string>
     <string name="scene_lists_modify_edit_title">Edit List</string>
     <string name="scene_lists_modify_name">Name</string>
@@ -261,6 +272,7 @@
     <string name="scene_settings_appearance_theme_auto">Auto</string>
     <string name="scene_settings_appearance_theme_light">Light</string>
     <string name="scene_settings_appearance_theme_dark">Dark</string>
+    <string name="scene_settings_appearance_AMOLED_optimized_mode">AMOLED optimized mode</string>
     <string name="scene_settings_appearance_scrolling_timeline_tab_bar">Hide tab bar when scrolling</string>
     <string name="scene_settings_appearance_scrolling_timeline_app_bar">Hide app bar when scrolling</string>
     <string name="scene_settings_appearance_scrolling_timeline_fab">Hide FAB when scrolling</string>
