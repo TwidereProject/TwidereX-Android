@@ -69,7 +69,7 @@ fun NotificationScene() {
             topBar = {
                 AppBar(
                     title = {
-                        Text(text = stringResource(id = R.string.scene_notification_title))
+                        Text(text = stringResource(id = R.string.scene_settings_notification_title))
                     },
                     navigationIcon = {
                         AppBarNavigationButton()

@@ -65,7 +65,7 @@ fun SettingsScene() {
                     route = Route.Settings.Display,
                 ),
                 SettingItem(
-                    stringResource(id = R.string.scene_notification_title),
+                    stringResource(id = R.string.scene_settings_notification_title),
                     painterResource(id = R.drawable.ic_settings_notification),
                     route = Route.Settings.Notification,
                 ),
