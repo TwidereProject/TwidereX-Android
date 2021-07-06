@@ -23,6 +23,7 @@ package com.twidere.twiderex.extensions
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import androidx.core.content.ContextCompat
 
 fun Context.checkAllSelfPermissionsGranted(vararg permissions: String): Boolean {
@@ -41,6 +42,21 @@ fun Context.shareText(content: String) {
             type = "text/plain"
         }.let {
             Intent.createChooser(it, null)
+        }
+    )
+}
+
+fun Context.shareMedia(uri: Uri, mimeType: String, fromOutsideOfActivity: Boolean = false) {
+    startActivity(
+        Intent().apply {
+            action = Intent.ACTION_SEND
+            putExtra(Intent.EXTRA_STREAM, uri)
+            type = mimeType
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }.let {
+            Intent.createChooser(it, null).apply {
+                if (fromOutsideOfActivity) addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
         }
     )
 }

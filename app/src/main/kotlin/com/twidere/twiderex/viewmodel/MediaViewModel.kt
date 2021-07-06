@@ -20,6 +20,7 @@
  */
 package com.twidere.twiderex.viewmodel
 
+import android.content.Context
 import android.net.Uri
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -27,13 +28,16 @@ import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import androidx.work.WorkManager
 import com.twidere.services.microblog.LookupService
+import com.twidere.twiderex.R
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.StatusRepository
+import com.twidere.twiderex.utils.FileProviderHelper
 import com.twidere.twiderex.utils.notify
 import com.twidere.twiderex.worker.DownloadMediaWorker
+import com.twidere.twiderex.worker.ShareMediaWorker
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.launch
@@ -55,6 +59,25 @@ class MediaViewModel @AssistedInject constructor(
             )
         }?.let {
             workManager.enqueue(it)
+        }
+    }
+
+    fun shareMedia(currentMedia: UiMedia, target: String, context: Context) {
+        val uri = FileProviderHelper.getUriFromMedia(target, context)
+        inAppNotification.show(R.string.common_alerts_media_sharing_title)
+        currentMedia.mediaUrl?.let {
+            DownloadMediaWorker.create(
+                accountKey = account.accountKey,
+                source = it,
+                target = uri
+            )
+        }?.let {
+            workManager.beginWith(it)
+                .then(
+                    ShareMediaWorker.create(
+                        target = uri
+                    )
+                ).enqueue()
         }
     }
 
