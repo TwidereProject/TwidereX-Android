@@ -27,9 +27,11 @@ import androidx.datastore.core.Serializer
 import com.twidere.twiderex.preferences.proto.AppearancePreferences
 import com.twidere.twiderex.preferences.proto.DisplayPreferences
 import com.twidere.twiderex.preferences.proto.MiscPreferences
+import com.twidere.twiderex.preferences.proto.NotificationPreferences
 import com.twidere.twiderex.preferences.serializer.AppearancePreferencesSerializer
 import com.twidere.twiderex.preferences.serializer.DisplayPreferencesSerializer
 import com.twidere.twiderex.preferences.serializer.MiscPreferencesSerializer
+import com.twidere.twiderex.preferences.serializer.NotificationPreferencesSerializer
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -53,6 +55,11 @@ object PreferenceModule {
     @Provides
     fun provideMisc(@ApplicationContext context: Context): DataStore<MiscPreferences> =
         context.createDataStore("misc.pb", MiscPreferencesSerializer)
+
+    @Singleton
+    @Provides
+    fun provideNotification(@ApplicationContext context: Context): DataStore<NotificationPreferences> =
+        context.createDataStore("notification.pb", NotificationPreferencesSerializer)
 }
 
 inline fun <reified T> Context.createDataStore(

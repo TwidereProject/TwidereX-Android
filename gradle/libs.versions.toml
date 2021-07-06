@@ -18,7 +18,7 @@ paging_compose = "1.0.0-alpha10"
 ktlint = "0.41.0"
 protobuf = "3.17.3"
 work = "2.7.0-alpha04"
-dataStore = "1.0.0-rc01"
+datastore = "1.0.0-rc01"
 exoplayer = "2.14.1"
 androidx_test = "1.4.0"
 extJUnitVersion = "1.1.3-rc01"
@@ -94,7 +94,8 @@ activity-compose = { module = "androidx.activity:activity-compose", version.ref 
 exifinterface = { module = "androidx.exifinterface:exifinterface", version.ref = "androidx_exifinterface" }
 
 # DataStore
-dataStore = { module = "androidx.datastore:datastore", version.ref = "dataStore" }
+datastore-main = { module = "androidx.datastore:datastore", version.ref = "datastore" }
+datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
 
 # WorkManager
 work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "work" }
@@ -194,4 +195,8 @@ okhttp = [
 retrofit = [
     "retrofit-base",
     "retrofit-converter-scalars",
+]
+datastore = [
+    "datastore-main",
+    "datastore-preferences"
 ]

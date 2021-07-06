@@ -61,9 +61,11 @@ import com.twidere.twiderex.scenes.search.SearchInputScene
 import com.twidere.twiderex.scenes.search.SearchScene
 import com.twidere.twiderex.scenes.settings.AboutScene
 import com.twidere.twiderex.scenes.settings.AccountManagementScene
+import com.twidere.twiderex.scenes.settings.AccountNotificationScene
 import com.twidere.twiderex.scenes.settings.AppearanceScene
 import com.twidere.twiderex.scenes.settings.DisplayScene
 import com.twidere.twiderex.scenes.settings.MiscScene
+import com.twidere.twiderex.scenes.settings.NotificationScene
 import com.twidere.twiderex.scenes.settings.SettingsScene
 import com.twidere.twiderex.scenes.settings.StorageScene
 import com.twidere.twiderex.scenes.twitter.TwitterSignInScene
@@ -185,6 +187,8 @@ object Route {
         const val About = "settings/about"
         const val AccountManagement = "settings/accountmanagement"
         const val Misc = "settings/misc"
+        const val Notification = "settings/notification"
+        fun AccountNotification(accountKey: MicroBlogKey) = "settings/notification/$accountKey"
     }
 
     object DeepLink {
@@ -632,6 +636,18 @@ fun RouteBuilder.route(constraints: Constraints) {
 
     scene(Route.Settings.Misc) {
         MiscScene()
+    }
+
+    scene(Route.Settings.Notification) {
+        NotificationScene()
+    }
+
+    scene("settings/notification/{accountKey}") {
+        it.path<String>("accountKey", null)?.let {
+            MicroBlogKey.valueOf(it)
+        }?.let {
+            AccountNotificationScene(it)
+        }
     }
 
     scene(Route.Settings.About) {

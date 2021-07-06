@@ -20,18 +20,21 @@
  */
 package com.twidere.twiderex.di
 
+import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.work.WorkManager
 import com.twidere.services.nitter.NitterService
 import com.twidere.twiderex.action.ComposeAction
 import com.twidere.twiderex.action.DirectMessageAction
 import com.twidere.twiderex.db.CacheDatabase
+import com.twidere.twiderex.model.AccountPreferences
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.preferences.proto.MiscPreferences
 import com.twidere.twiderex.utils.PlatformResolver
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -58,7 +61,8 @@ object TwidereModule {
     @Provides
     fun provideNitterService(preferences: DataStore<MiscPreferences>): NitterService? {
         return runBlocking {
-            preferences.data.first().nitterInstance.takeIf { it.isNotEmpty() }?.let { NitterService(it.trimEnd('/')) }
+            preferences.data.first().nitterInstance.takeIf { it.isNotEmpty() }
+                ?.let { NitterService(it.trimEnd('/')) }
         }
     }
 
@@ -67,4 +71,8 @@ object TwidereModule {
     fun provideDirectMessageQueue(
         workManager: WorkManager,
     ): DirectMessageAction = DirectMessageAction(workManager = workManager)
+
+    @Provides
+    fun provideAccountPreferencesFactory(@ApplicationContext context: Context): AccountPreferences.Factory =
+        AccountPreferences.Factory(context)
 }

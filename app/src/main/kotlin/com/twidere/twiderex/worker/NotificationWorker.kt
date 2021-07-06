@@ -29,6 +29,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.text.HtmlCompat
+import androidx.datastore.core.DataStore
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
@@ -44,11 +45,13 @@ import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.navigation.DeepLinks
 import com.twidere.twiderex.notification.NotificationChannelSpec
 import com.twidere.twiderex.notification.notificationChannelId
+import com.twidere.twiderex.preferences.proto.NotificationPreferences
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.NotificationRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 
@@ -59,23 +62,31 @@ class NotificationWorker @AssistedInject constructor(
     private val repository: NotificationRepository,
     private val accountRepository: AccountRepository,
     private val notificationManagerCompat: NotificationManagerCompat,
+    private val notificationPreferences: DataStore<NotificationPreferences>,
 ) : CoroutineWorker(appContext, params) {
     override suspend fun doWork(): Result = coroutineScope {
-        accountRepository.getAccounts().map { accountRepository.getAccountDetails(it) }
-            .map { account ->
-                launch {
-                    val activities = try {
-                        repository.activities(account)
-                    } catch (e: Throwable) {
-                        // Ignore any exception cause there's no needs ot handle it
-                        emptyList()
-                    }
-                    activities.forEach { status ->
-                        notify(account, status)
-                    }
+        if (!notificationPreferences.data.first().enableNotification) {
+            Result.success()
+        } else {
+            accountRepository.getAccounts().map { accountRepository.getAccountDetails(it) }
+                .filter {
+                    accountRepository.getAccountPreferences(it.accountKey).isNotificationEnabled.first()
                 }
-            }.joinAll()
-        Result.success()
+                .map { account ->
+                    launch {
+                        val activities = try {
+                            repository.activities(account)
+                        } catch (e: Throwable) {
+                            // Ignore any exception cause there's no needs ot handle it
+                            emptyList()
+                        }
+                        activities.forEach { status ->
+                            notify(account, status)
+                        }
+                    }
+                }.joinAll()
+            Result.success()
+        }
     }
 
     private suspend fun notify(account: AccountDetails, status: UiStatus) {

@@ -25,6 +25,7 @@ import android.accounts.AccountManager
 import android.os.Build
 import androidx.lifecycle.MutableLiveData
 import com.twidere.twiderex.model.AccountDetails
+import com.twidere.twiderex.model.AccountPreferences
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.cred.CredentialsType
@@ -49,7 +50,10 @@ private const val ACCOUNT_USER_DATA_LAST_ACTIVE = "last_active"
 @Singleton
 class AccountRepository @Inject constructor(
     private val manager: AccountManager,
+    private val accountPreferencesFactory: AccountPreferences.Factory,
 ) {
+    private val preferencesCache = linkedMapOf<MicroBlogKey, AccountPreferences>()
+
     val activeAccount =
         MutableLiveData<AccountDetails?>(if (hasAccount()) getCurrentAccount() else null)
 
@@ -61,6 +65,12 @@ class AccountRepository @Inject constructor(
 
     fun getAccounts(): List<Account> {
         return manager.getAccountsByType(ACCOUNT_TYPE).toList()
+    }
+
+    fun getAccountPreferences(accountKey: MicroBlogKey): AccountPreferences {
+        return preferencesCache.getOrPut(accountKey) {
+            accountPreferencesFactory.create(accountKey)
+        }
     }
 
     fun hasAccount(): Boolean {
@@ -158,6 +168,7 @@ class AccountRepository @Inject constructor(
                 getAccountDetails(it)
             }
             activeAccount.value = getCurrentAccount()
+            preferencesCache.remove(detail.accountKey)
         }
     }
 }
