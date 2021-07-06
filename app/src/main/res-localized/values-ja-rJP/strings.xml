@@ -99,6 +99,7 @@
     <string name="common_controls_profile_dashboard_followers">フォロワー</string>
     <string name="common_controls_profile_dashboard_listed">リスト</string>
     <string name="common_controls_ios_photo_library">フォトライブラリ</string>
+    <string name="common_notification_channel_content_messages_name">メッセージ</string>
     <string name="scene_drawer_sign_in">サインイン</string>
     <string name="scene_drawer_manage_accounts">アカウントを管理</string>
     <string name="scene_manage_accounts_title">アカウント</string>
@@ -195,6 +196,7 @@
     <string name="scene_settings_display_media_automatic">自動</string>
     <string name="scene_settings_display_media_always">常に</string>
     <string name="scene_settings_display_media_off">オフ</string>
+    <string name="scene_settings_notification_accounts">アカウント</string>
     <string name="scene_settings_about_title">情報</string>
     <string name="scene_settings_about_license">ライセンス</string>
     <string name="accessibility_common_back">戻る</string>
