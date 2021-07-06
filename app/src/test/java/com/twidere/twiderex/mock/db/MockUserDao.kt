@@ -20,16 +20,16 @@
  */
 package com.twidere.twiderex.mock.db
 
-import androidx.lifecycle.LiveData
 import com.twidere.twiderex.db.dao.UserDao
 import com.twidere.twiderex.db.model.DbUser
 import com.twidere.twiderex.model.MicroBlogKey
+import kotlinx.coroutines.flow.Flow
 
 class MockUserDao : UserDao {
     override suspend fun insertAll(user: List<DbUser>) {
     }
 
-    override fun findWithUserKeyLiveData(userKey: MicroBlogKey): LiveData<DbUser?> {
+    override fun findWithUserKeyFlow(userKey: MicroBlogKey): Flow<DbUser?> {
         TODO("Not yet implemented")
     }
 

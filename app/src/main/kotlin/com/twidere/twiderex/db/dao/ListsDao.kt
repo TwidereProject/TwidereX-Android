@@ -20,7 +20,6 @@
  */
 package com.twidere.twiderex.db.dao
 
-import androidx.lifecycle.LiveData
 import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Delete
@@ -31,6 +30,7 @@ import androidx.room.Transaction
 import androidx.room.Update
 import com.twidere.twiderex.db.model.DbList
 import com.twidere.twiderex.model.MicroBlogKey
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ListsDao {
@@ -41,7 +41,7 @@ interface ListsDao {
     suspend fun findWithListKey(listKey: MicroBlogKey, accountKey: MicroBlogKey): DbList?
 
     @Query("SELECT * FROM lists WHERE listKey == :listKey AND accountKey == :accountKey")
-    fun findWithListKeyWithLiveData(listKey: MicroBlogKey, accountKey: MicroBlogKey): LiveData<DbList?>
+    fun findWithListKeyWithFlow(listKey: MicroBlogKey, accountKey: MicroBlogKey): Flow<DbList?>
 
     @Query("SELECT * FROM lists")
     suspend fun findAll(): List<DbList>?

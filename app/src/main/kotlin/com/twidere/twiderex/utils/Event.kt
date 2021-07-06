@@ -23,7 +23,7 @@ package com.twidere.twiderex.utils
 import androidx.lifecycle.Observer
 
 /**
- * Used as a wrapper for data that is exposed via a LiveData that represents an event.
+ * Used as a wrapper for data that is exposed via a Flow that represents an event.
  */
 open class Event<out T>(private val content: T) {
 

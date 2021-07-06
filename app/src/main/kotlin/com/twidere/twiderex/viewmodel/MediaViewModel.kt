@@ -21,9 +21,7 @@
 package com.twidere.twiderex.viewmodel
 
 import android.net.Uri
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import androidx.work.WorkManager
 import com.twidere.services.microblog.LookupService
@@ -36,6 +34,7 @@ import com.twidere.twiderex.utils.notify
 import com.twidere.twiderex.worker.DownloadMediaWorker
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
 class MediaViewModel @AssistedInject constructor(
@@ -63,13 +62,11 @@ class MediaViewModel @AssistedInject constructor(
         fun create(account: AccountDetails, statusKey: MicroBlogKey): MediaViewModel
     }
 
-    val loading = MutableLiveData(false)
-    val status = liveData {
-        emitSource(
-            repository.loadStatus(
-                statusKey = statusKey,
-                accountKey = account.accountKey,
-            )
+    val loading = MutableStateFlow(false)
+    val status by lazy {
+        repository.loadStatus(
+            statusKey = statusKey,
+            accountKey = account.accountKey,
         )
     }
 

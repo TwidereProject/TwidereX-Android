@@ -20,9 +20,6 @@
  */
 package com.twidere.twiderex.viewmodel.lists
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
@@ -36,6 +33,7 @@ import com.twidere.twiderex.repository.ListsRepository
 import com.twidere.twiderex.utils.notify
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
@@ -68,23 +66,23 @@ class ListsViewModel @AssistedInject constructor(
 abstract class ListsOperatorViewModel(
     protected val inAppNotification: InAppNotification,
 ) : ViewModel() {
-    val modifySuccess = MutableLiveData(false)
-    val loading = MutableLiveData(false)
+    val modifySuccess = MutableStateFlow(false)
+    val loading = MutableStateFlow(false)
 
     protected fun loadingRequest(onResult: (success: Boolean, list: UiList?) -> Unit, request: suspend () -> UiList?) {
-        loading.postValue(true)
+        loading.value = true
         viewModelScope.launch {
             runCatching {
                 val result = request()
-                modifySuccess.postValue(true)
+                modifySuccess.value = true
                 onResult(true, result)
             }.onFailure {
                 it.notify(inAppNotification)
-                modifySuccess.postValue(false)
+                modifySuccess.value = false
                 onResult(false, null)
-                loading.postValue(false)
+                loading.value = false
             }.onSuccess {
-                loading.postValue(false)
+                loading.value = false
             }
         }
     }
@@ -133,9 +131,9 @@ class ListsModifyViewModel @AssistedInject constructor(
         listsRepository.findListWithListKey(account = account, listKey = listKey)
     }
 
-    val editName = MutableLiveData<String>()
-    var editDesc = MutableLiveData<String>()
-    var editPrivate = MutableLiveData<Boolean>()
+    val editName = MutableStateFlow("")
+    var editDesc = MutableStateFlow("")
+    var editPrivate = MutableStateFlow(false)
 
     fun editList(
         listId: String = listKey.id,

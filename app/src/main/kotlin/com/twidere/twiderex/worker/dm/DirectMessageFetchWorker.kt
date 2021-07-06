@@ -43,6 +43,7 @@ import com.twidere.twiderex.repository.DirectMessageRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import java.util.concurrent.TimeUnit
 
 @HiltWorker
@@ -63,7 +64,7 @@ class DirectMessageFetchWorker @AssistedInject constructor(
 
     override suspend fun doWork(): Result {
         return try {
-            accountRepository.activeAccount.value?.takeIf {
+            accountRepository.activeAccount.firstOrNull()?.takeIf {
                 accountRepository.getAccountPreferences(it.accountKey).isNotificationEnabled.first()
             }?.let { account ->
                 val result = repository.checkNewMessages(

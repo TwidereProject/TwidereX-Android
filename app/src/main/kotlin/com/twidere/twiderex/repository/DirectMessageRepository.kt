@@ -20,8 +20,6 @@
  */
 package com.twidere.twiderex.repository
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.map
 import androidx.paging.PagingData
 import androidx.room.withTransaction
 import com.twidere.services.microblog.DirectMessageService
@@ -49,6 +47,7 @@ import com.twidere.twiderex.paging.mediator.dm.DMConversationMediator.Companion.
 import com.twidere.twiderex.paging.mediator.dm.DMEventMediator
 import com.twidere.twiderex.paging.mediator.dm.DMEventMediator.Companion.toUi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import java.util.UUID
 
 class DirectMessageRepository(
@@ -57,9 +56,9 @@ class DirectMessageRepository(
     fun dmConversation(
         accountKey: MicroBlogKey,
         conversationKey: MicroBlogKey
-    ): LiveData<UiDMConversation?> {
+    ): Flow<UiDMConversation?> {
         return database.directMessageConversationDao()
-            .findWithConversationKeyLiveData(
+            .findWithConversationKeyFlow(
                 accountKey = accountKey,
                 conversationKey = conversationKey
             ).map { it?.toUi() }
