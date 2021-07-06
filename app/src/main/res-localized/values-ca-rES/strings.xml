@@ -132,6 +132,7 @@
     <string name="common_countable_photo_multiple">%s fotos</string>
     <string name="common_notification_channel_content_interactions_name">Interaccions</string>
     <string name="common_notification_channel_content_interactions_description">Interaccions com mencions i repiulades</string>
+    <string name="common_notification_channel_content_messages_name">Missatges</string>
     <string name="scene_drawer_sign_in">Iniciar sessió</string>
     <string name="scene_drawer_manage_accounts">Gestiona els comptes</string>
     <string name="scene_manage_accounts_title">Comptes</string>
@@ -147,6 +148,7 @@
     <string name="scene_notification_title">Notificació</string>
     <string name="scene_notification_tabs_all">Tot</string>
     <string name="scene_messages_title">Missatges</string>
+    <string name="scene_messages_new_conversation_search">Cerca persones</string>
     <string name="scene_likes_title">M\'agrada</string>
     <string name="scene_bookmark_title">Marcador</string>
     <string name="scene_trends_title">Tendències</string>
@@ -270,6 +272,8 @@
     <string name="scene_settings_display_media_always">Sempre</string>
     <string name="scene_settings_display_media_off">Desactivada</string>
     <string name="scene_settings_display_url_preview">Previsualització d\'Url</string>
+    <string name="scene_settings_notification_title">Notificació</string>
+    <string name="scene_settings_notification_accounts">Comptes</string>
     <string name="scene_settings_misc_nitter_dialog_usage_project_button">URL del projecte</string>
     <string name="scene_settings_about_title">Quant a</string>
     <string name="scene_settings_about_license">Llicència</string>

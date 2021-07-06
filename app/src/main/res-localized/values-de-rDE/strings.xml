@@ -93,6 +93,7 @@
     <string name="common_controls_profile_dashboard_followers">Follower</string>
     <string name="common_controls_profile_dashboard_listed">Listet</string>
     <string name="common_controls_ios_photo_library">Fo­to­ga­le­rie</string>
+    <string name="common_notification_channel_content_messages_name">Nachrichten</string>
     <string name="scene_drawer_sign_in">Einloggen</string>
     <string name="scene_drawer_manage_accounts">Konten verwalten</string>
     <string name="scene_manage_accounts_title">Konten</string>
@@ -189,6 +190,7 @@
     <string name="scene_settings_display_media_automatic">Automatisch</string>
     <string name="scene_settings_display_media_always">Immer</string>
     <string name="scene_settings_display_media_off">Aus</string>
+    <string name="scene_settings_notification_accounts">Konten</string>
     <string name="scene_settings_about_title">Über</string>
     <string name="scene_settings_about_license">Lizenz</string>
     <string name="accessibility_common_network_image">Netzwerkbild</string>

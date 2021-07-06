@@ -93,6 +93,7 @@
     <string name="common_controls_profile_dashboard_followers">跟隨者</string>
     <string name="common_controls_profile_dashboard_listed">列表</string>
     <string name="common_controls_ios_photo_library">照片庫</string>
+    <string name="common_notification_channel_content_messages_name">訊息</string>
     <string name="scene_drawer_sign_in">登入</string>
     <string name="scene_drawer_manage_accounts">管理帳號</string>
     <string name="scene_manage_accounts_title">帳號</string>
@@ -191,6 +192,7 @@
     <string name="scene_settings_display_media_automatic">自動</string>
     <string name="scene_settings_display_media_always">一直顯示</string>
     <string name="scene_settings_display_media_off">關閉</string>
+    <string name="scene_settings_notification_accounts">帳號</string>
     <string name="scene_settings_about_title">關於</string>
     <string name="scene_settings_about_license">授權協議</string>
     <string name="accessibility_common_network_image">網路圖片</string>
