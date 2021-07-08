@@ -50,18 +50,18 @@ fun rememberReorderableColumnState(
 class ReorderableColumnState(
     private val onReorder: (oldIndex: Int, newIndex: Int) -> Unit,
 ) {
-    private var reordering by mutableStateOf(false)
-    private var draggingItemIndex: Int = -1
-    private var newTargetIndex by mutableStateOf(-1)
-    private var offsetY by mutableStateOf(0f)
-    private var childSizes = arrayListOf<IntSize>()
+    internal var reordering by mutableStateOf(false)
+    internal var draggingItemIndex: Int = -1
+    internal var newTargetIndex by mutableStateOf(-1)
+    internal var offsetY by mutableStateOf(0f)
+    internal var childSizes = arrayListOf<IntSize>()
 
-    private fun start(index: Int) {
+    internal fun start(index: Int) {
         draggingItemIndex = index
         reordering = true
     }
 
-    private fun drag(y: Float) {
+    internal fun drag(y: Float) {
         offsetY += y
         if (offsetY.roundToInt() == 0) {
             return
@@ -88,14 +88,14 @@ class ReorderableColumnState(
             }
     }
 
-    private fun cancel() {
+    internal fun cancel() {
         reordering = false
         draggingItemIndex = -1
         newTargetIndex = -1
         offsetY = 0f
     }
 
-    private fun drop() {
+    internal fun drop() {
         if (offsetY.roundToInt() == 0) {
             return
         }
