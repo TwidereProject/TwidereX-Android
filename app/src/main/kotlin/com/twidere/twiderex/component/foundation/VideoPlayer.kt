@@ -42,7 +42,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
@@ -58,6 +57,7 @@ import com.twidere.twiderex.R
 import com.twidere.twiderex.component.status.UserAvatarDefaults
 import com.twidere.twiderex.preferences.proto.DisplayPreferences
 import com.twidere.twiderex.ui.LocalIsActiveNetworkMetered
+import com.twidere.twiderex.ui.LocalStandardLifecycleOwner
 import com.twidere.twiderex.ui.LocalVideoPlayback
 import com.twidere.twiderex.utils.video.CacheDataSourceFactory
 import com.twidere.twiderex.utils.video.VideoPool
@@ -84,7 +84,7 @@ fun VideoPlayer(
     }
     var autoPlay by remember(url) { mutableStateOf(playInitial) }
     val context = LocalContext.current
-    val lifecycle = LocalLifecycleOwner.current.lifecycle
+    val lifecycle = LocalStandardLifecycleOwner.current.lifecycle
 
     Box {
         if (playInitial) {
@@ -126,11 +126,28 @@ fun VideoPlayer(
                     customControl.player = player
                 }
             }
-
+            var isStart by remember {
+                mutableStateOf(true)
+            }
             DisposableEffect(Unit) {
+                val observer = object : LifecycleObserver {
+                    @OnLifecycleEvent(Lifecycle.Event.ON_START)
+                    fun onStart() {
+                        isStart = true
+                        player.playWhenReady = autoPlay
+                    }
+                    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
+                    fun onStop() {
+                        isStart = false
+                        updateState()
+                        player.playWhenReady = false
+                    }
+                }
+                lifecycle.addObserver(observer)
                 onDispose {
                     updateState()
                     player.release()
+                    lifecycle.removeObserver(observer)
                 }
             }
 
@@ -138,28 +155,17 @@ fun VideoPlayer(
                 modifier = modifier,
                 factory = { context ->
                     StyledPlayerView(context).also { playerView ->
-                        playerView.videoSurfaceView?.let {
-                            if (it is SurfaceView) it.setZOrderMediaOverlay(zOrderMediaOverlay)
-                        }
+                        (playerView.videoSurfaceView as? SurfaceView)?.setZOrderMediaOverlay(zOrderMediaOverlay)
                         playerView.useController = showControls
-                        lifecycle.addObserver(object : LifecycleObserver {
-                            @OnLifecycleEvent(Lifecycle.Event.ON_START)
-                            fun onStart() {
-                                playerView.onResume()
-                                player.playWhenReady = autoPlay
-                            }
-
-                            @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
-                            fun onStop() {
-                                updateState()
-                                playerView.onPause()
-                                player.playWhenReady = false
-                            }
-                        })
                     }
                 }
             ) {
                 it.player = player
+                if (isStart) {
+                    it.onResume()
+                } else {
+                    it.onPause()
+                }
             }
         }
         if ((shouldShowThumb || !playing) && thumb != null) {
