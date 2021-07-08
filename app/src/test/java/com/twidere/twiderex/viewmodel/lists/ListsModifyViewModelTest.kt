@@ -29,8 +29,11 @@ import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.notification.NotificationEvent
 import com.twidere.twiderex.repository.ListsRepository
 import com.twidere.twiderex.viewmodel.ViewModelTestBase
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert
 import org.junit.Rule
@@ -62,6 +65,8 @@ class ListsModifyViewModelTest : ViewModelTestBase() {
     private var errorNotification: NotificationEvent? = null
 
     private lateinit var modifyViewModel: ListsModifyViewModel
+
+    private val scope = CoroutineScope(Dispatchers.Main)
 
     @Test
     fun updateList_successExpectTrue(): Unit = runBlocking(Dispatchers.Main) {
@@ -176,7 +181,11 @@ class ListsModifyViewModelTest : ViewModelTestBase() {
         whenever(mockAccount.accountKey).thenReturn(MicroBlogKey.twitter("123"))
         errorNotification = null
         mockSuccessObserver.onChanged(false)
-        modifyViewModel.loading.observeForever(mockLoadingObserver)
+        scope.launch {
+            modifyViewModel.loading.collect {
+                mockLoadingObserver.onChanged(it)
+            }
+        }
     }
 
     private fun verifySuccessAndLoadingBefore(loadingObserver: Observer<Boolean>, successObserver: Observer<Boolean>) {
@@ -186,7 +195,7 @@ class ListsModifyViewModelTest : ViewModelTestBase() {
 
     private fun verifySuccessAndLoadingAfter(loadingObserver: Observer<Boolean>, successObserver: Observer<Boolean>, success: Boolean) {
         verify(loadingObserver, times(1)).onChanged(true)
-        verify(loadingObserver, times(2)).onChanged(false)
+        verify(loadingObserver, times(1)).onChanged(false)
         verify(successObserver, if (success) times(1) else times(2)).onChanged(success)
     }
 }
