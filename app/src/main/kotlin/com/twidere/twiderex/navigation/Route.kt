@@ -47,11 +47,16 @@ import com.twidere.twiderex.scenes.compose.DraftComposeScene
 import com.twidere.twiderex.scenes.dm.DMConversationListScene
 import com.twidere.twiderex.scenes.dm.DMConversationScene
 import com.twidere.twiderex.scenes.dm.DMNewConversationScene
+import com.twidere.twiderex.scenes.home.HomeTimelineScene
+import com.twidere.twiderex.scenes.home.MastodonNotificationScene
+import com.twidere.twiderex.scenes.home.MeScene
+import com.twidere.twiderex.scenes.home.MentionScene
 import com.twidere.twiderex.scenes.lists.ListTimeLineScene
 import com.twidere.twiderex.scenes.lists.ListsAddMembersScene
 import com.twidere.twiderex.scenes.lists.ListsMembersScene
 import com.twidere.twiderex.scenes.lists.ListsScene
 import com.twidere.twiderex.scenes.lists.ListsSubscribersScene
+import com.twidere.twiderex.scenes.lists.platform.MastodonListsCreateDialog
 import com.twidere.twiderex.scenes.lists.platform.TwitterListsCreateScene
 import com.twidere.twiderex.scenes.lists.platform.TwitterListsEditScene
 import com.twidere.twiderex.scenes.mastodon.MastodonHashtagScene
@@ -64,6 +69,7 @@ import com.twidere.twiderex.scenes.settings.AccountManagementScene
 import com.twidere.twiderex.scenes.settings.AccountNotificationScene
 import com.twidere.twiderex.scenes.settings.AppearanceScene
 import com.twidere.twiderex.scenes.settings.DisplayScene
+import com.twidere.twiderex.scenes.settings.LayoutScene
 import com.twidere.twiderex.scenes.settings.MiscScene
 import com.twidere.twiderex.scenes.settings.NotificationScene
 import com.twidere.twiderex.scenes.settings.SettingsScene
@@ -77,6 +83,7 @@ import com.twidere.twiderex.scenes.user.UserScene
 import com.twidere.twiderex.twitterHosts
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalActiveAccountViewModel
+import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.utils.LocalPlatformResolver
 import com.twidere.twiderex.viewmodel.compose.ComposeType
@@ -95,6 +102,11 @@ const val twidereXSchema = "twiderex"
 
 object Route {
     const val Home = "home"
+
+    const val HomeTimeline = "HomeTimeline"
+    const val Notification = "Notification"
+    const val Mentions = "Mentions"
+    const val Me = "Me"
 
     object Draft {
         const val List = "draft/list"
@@ -142,23 +154,26 @@ object Route {
             "media/pure/$belongToKey?selectedIndex=$selectedIndex"
     }
 
-    fun Search(keyword: String) = "search/result/${
-    URLEncoder.encode(
-        keyword,
-        "UTF-8"
-    )
-    }"
-
-    fun SearchInput(keyword: String? = null): String {
-        if (keyword == null) {
-            return "search/input"
-        }
-        return "search/input?keyword=${
+    object Search {
+        const val Home = "search"
+        fun Search(keyword: String) = "$Home/result/${
         URLEncoder.encode(
             keyword,
             "UTF-8"
         )
         }"
+
+        fun SearchInput(keyword: String? = null): String {
+            if (keyword == null) {
+                return "$Home/input"
+            }
+            return "$Home/input?keyword=${
+            URLEncoder.encode(
+                keyword,
+                "UTF-8"
+            )
+            }"
+        }
     }
 
     fun Compose(composeType: ComposeType, statusKey: MicroBlogKey? = null) =
@@ -188,6 +203,7 @@ object Route {
         const val AccountManagement = "settings/accountmanagement"
         const val Misc = "settings/misc"
         const val Notification = "settings/notification"
+        const val Layout = "settings/layout"
         fun AccountNotification(accountKey: MicroBlogKey) = "settings/notification/$accountKey"
     }
 
@@ -207,6 +223,7 @@ object Route {
 
     object Mastodon {
         fun Hashtag(keyword: String) = "mastodon/hashtag/$keyword"
+        const val Notification = "mastodon/notification"
 
         object Compose {
             const val Hashtag = "mastodon/compose/hashtag"
@@ -215,6 +232,7 @@ object Route {
 
     object Lists {
         const val Home = "lists"
+        const val MastodonCreateDialog = "$Home/mastodon/create"
         const val TwitterCreate = "$Home/twitter/create"
         fun TwitterEdit(listKey: MicroBlogKey) = "$Home/twitter/edit/$listKey"
         fun Timeline(listKey: MicroBlogKey) = "$Home/timeline/$listKey"
@@ -367,6 +385,22 @@ fun RouteBuilder.route(constraints: Constraints) {
         deepLinks = twitterHosts.map { "$it/*" }
     ) {
         HomeScene()
+    }
+
+    authorizedScene(Route.Mastodon.Notification) {
+        MastodonNotificationScene()
+    }
+
+    authorizedScene(Route.Me) {
+        MeScene()
+    }
+
+    authorizedScene(Route.Mentions) {
+        MentionScene()
+    }
+
+    authorizedScene(Route.HomeTimeline) {
+        HomeTimelineScene()
     }
 
     scene(
@@ -642,6 +676,10 @@ fun RouteBuilder.route(constraints: Constraints) {
         NotificationScene()
     }
 
+    authorizedScene(Route.Settings.Layout) {
+        LayoutScene()
+    }
+
     scene("settings/notification/{accountKey}") {
         it.path<String>("accountKey", null)?.let {
             MicroBlogKey.valueOf(it)
@@ -679,6 +717,11 @@ fun RouteBuilder.route(constraints: Constraints) {
 
     authorizedScene(Route.Lists.Home) {
         ListsScene()
+    }
+
+    authorizedDialog(Route.Lists.MastodonCreateDialog) {
+        val navController = LocalNavController.current
+        MastodonListsCreateDialog(onDismissRequest = { navController.goBack() })
     }
 
     authorizedScene(Route.Lists.TwitterCreate) {

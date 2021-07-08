@@ -109,12 +109,12 @@ class Navigator(
     }
 
     override fun search(keyword: String) {
-        navController.navigate(Route.Search(keyword), NavOptions(popUpTo = PopUpTo(Route.Home)))
+        navController.navigate(Route.Search.Search(keyword), NavOptions(popUpTo = PopUpTo(Route.Home)))
     }
 
     override fun searchInput(initial: String?) {
         navController.navigate(
-            Route.SearchInput(initial),
+            Route.Search.SearchInput(initial),
             NavOptions(popUpTo = PopUpTo(Route.Home))
         )
     }

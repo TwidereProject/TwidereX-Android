@@ -20,39 +20,40 @@
  */
 package com.twidere.twiderex.scenes.home
 
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.material.FabPosition
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.unit.dp
-import com.twidere.twiderex.component.lazy.LazyListController
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import com.twidere.twiderex.R
+import com.twidere.twiderex.navigation.Route
+import com.twidere.twiderex.scenes.lists.ListsSceneContent
+import com.twidere.twiderex.scenes.lists.ListsSceneFab
 
-abstract class HomeNavigationItem {
-
+class ListsNavigationItem : HomeNavigationItem() {
     @Composable
-    abstract fun name(): String
-
-    abstract val route: String
-
-    @Composable
-    abstract fun icon(): Painter
-    open val withAppBar = true
-    open val lazyListController = LazyListController()
-
-    @Composable
-    abstract fun Content()
-
-    @Composable
-    open fun Fab() {
-        // implement this method to apply FloatingActionButton
-        // FIXME: 2021/6/17 Workaround for Scaffold#256 which will filter out fab when size == 0
-        Spacer(modifier = Modifier.sizeIn(minWidth = 1.dp, minHeight = 1.dp))
+    override fun name(): String {
+        return stringResource(id = R.string.scene_lists_title)
     }
 
-    open val floatingActionButtonPosition = FabPosition.End
+    override val route: String
+        get() = Route.Lists.Home
 
-    // offset to hide fab when scroll timeline
-    open val fabSize = 0.dp
+    @Composable
+    override fun icon(): Painter {
+        return painterResource(id = R.drawable.ic_lists)
+    }
+
+    @Composable
+    override fun Fab() {
+        ListsSceneFab()
+    }
+
+    override val floatingActionButtonPosition: FabPosition
+        get() = FabPosition.Center
+
+    @Composable
+    override fun Content() {
+        ListsSceneContent()
+    }
 }

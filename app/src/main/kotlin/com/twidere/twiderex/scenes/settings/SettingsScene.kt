@@ -79,12 +79,11 @@ fun SettingsScene() {
                     painterResource(id = R.drawable.ic_triangle_square_circle),
                     route = Route.Settings.Misc,
                 ),
-                // TODO
-//                SettingItem(
-//                    "Layout",
-//                    painterResource(id = R.drawable.ic_layout_sidebar),
-//                    route = "",
-//                ),
+                SettingItem(
+                    "Layout",
+                    painterResource(id = R.drawable.ic_layout_sidebar),
+                    route = Route.Settings.Layout,
+                ),
 //                SettingItem(
 //                    "Web Browser",
 //                    painterResource(id = R.drawable.ic_browser),

@@ -22,8 +22,6 @@ package com.twidere.twiderex.component.foundation
 
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
@@ -137,8 +135,7 @@ fun <T> ReorderableColumn(
     itemContent: @Composable (T) -> Unit,
 ) {
     Layout(
-        modifier = modifier
-            .verticalScroll(rememberScrollState()),
+        modifier = modifier,
         content = {
             data.forEachIndexed { index, item ->
                 Box(

@@ -20,19 +20,26 @@
  */
 package com.twidere.twiderex.scenes.home
 
-import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.UserComponent
+import com.twidere.twiderex.component.foundation.AppBar
+import com.twidere.twiderex.component.foundation.AppBarNavigationButton
+import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
+import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.ui.LocalActiveAccount
+import com.twidere.twiderex.ui.TwidereScene
 
 class MeItem : HomeNavigationItem() {
 
     @Composable
     override fun name(): String = stringResource(R.string.scene_profile_title)
+    override val route: String
+        get() = Route.Me
 
     @Composable
     override fun icon(): Painter = painterResource(id = R.drawable.ic_user)
@@ -42,11 +49,34 @@ class MeItem : HomeNavigationItem() {
 
     @Composable
     override fun Content() {
-        val account = LocalActiveAccount.current
-        account?.toUi()?.let { user ->
-            Scaffold {
-                UserComponent(userKey = user.userKey)
+        MeSceneContent()
+    }
+}
+
+@Composable
+fun MeScene() {
+    TwidereScene {
+        InAppNotificationScaffold(
+            topBar = {
+                AppBar(
+                    title = {
+                        Text(text = stringResource(id = R.string.scene_profile_title))
+                    },
+                    navigationIcon = {
+                        AppBarNavigationButton()
+                    }
+                )
             }
+        ) {
+            MeSceneContent()
         }
+    }
+}
+
+@Composable
+fun MeSceneContent() {
+    val account = LocalActiveAccount.current
+    account?.toUi()?.let { user ->
+        UserComponent(userKey = user.userKey)
     }
 }
