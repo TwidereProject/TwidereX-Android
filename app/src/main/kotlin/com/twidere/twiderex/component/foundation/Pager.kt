@@ -70,6 +70,9 @@ fun rememberPagerState(
     maxPage: Int = 0,
 ): PagerState {
     return rememberSaveable(
+        currentPage,
+        minPage,
+        maxPage,
         saver = PagerState.Saver(),
     ) {
         PagerState(currentPage, minPage, maxPage)
