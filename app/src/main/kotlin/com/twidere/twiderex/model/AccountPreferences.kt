@@ -26,7 +26,9 @@ import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStoreFile
+import com.twidere.twiderex.scenes.home.HomeMenus
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -40,10 +42,31 @@ class AccountPreferences(
         get() = dataStore.data.map { preferences ->
             preferences[isNotificationEnabledKey] ?: true
         }
+    val homeMenuOrder
+        get() = dataStore.data.map { preferences ->
+            if (!preferences.contains(homeMenuOrderKey) || !preferences.contains(visibleHomeMenuKey)) {
+                HomeMenus.values().map { it to it.showDefault }.toMap()
+            } else {
+                val order = preferences[homeMenuOrderKey].orEmpty().split(",")
+                val visible = preferences[visibleHomeMenuKey].orEmpty().split(",")
+                order.map { HomeMenus.valueOf(it) }.map { it to visible.contains(it.name) }.toMap()
+            }
+        }
 
     suspend fun setIsNotificationEnabled(value: Boolean) {
         dataStore.edit {
             it[isNotificationEnabledKey] = value
+        }
+    }
+
+    private val homeMenuOrderKey = stringPreferencesKey("homeMenuOrder")
+    private val visibleHomeMenuKey = stringPreferencesKey("visibleHomeMenu")
+    suspend fun setHomeMenuOrder(
+        data: Map<HomeMenus, Boolean>,
+    ) {
+        dataStore.edit {
+            it[homeMenuOrderKey] = data.keys.map { it.name }.joinToString(",")
+            it[visibleHomeMenuKey] = data.filter { it.value }.map { it.key.name }.joinToString(",")
         }
     }
 

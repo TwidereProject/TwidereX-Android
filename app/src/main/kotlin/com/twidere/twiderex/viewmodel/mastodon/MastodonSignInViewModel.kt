@@ -27,7 +27,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.twidere.services.mastodon.MastodonOAuthService
 import com.twidere.twiderex.db.mapper.toDbUser
-import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.cred.CredentialsType
@@ -95,16 +94,14 @@ class MastodonSignInViewModel @AssistedInject constructor(
                             }
                         } else {
                             repository.addAccount(
-                                AccountDetails(
-                                    account = Account(displayKey.toString(), ACCOUNT_TYPE),
-                                    type = PlatformType.Mastodon,
-                                    accountKey = internalKey,
-                                    credentials_type = CredentialsType.OAuth2,
-                                    credentials_json = credentials_json,
-                                    extras_json = "",
-                                    user = user.toDbUser(accountKey = internalKey).toAmUser(),
-                                    lastActive = System.currentTimeMillis()
-                                )
+                                account = Account(displayKey.toString(), ACCOUNT_TYPE),
+                                type = PlatformType.Mastodon,
+                                accountKey = internalKey,
+                                credentials_type = CredentialsType.OAuth2,
+                                credentials_json = credentials_json,
+                                extras_json = "",
+                                user = user.toDbUser(accountKey = internalKey).toAmUser(),
+                                lastActive = System.currentTimeMillis()
                             )
                         }
                         finished.invoke(true)

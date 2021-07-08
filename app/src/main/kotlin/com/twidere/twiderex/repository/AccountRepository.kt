@@ -26,6 +26,7 @@ import android.os.Build
 import androidx.lifecycle.MutableLiveData
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.AccountPreferences
+import com.twidere.twiderex.model.AmUser
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.cred.CredentialsType
@@ -67,12 +68,6 @@ class AccountRepository @Inject constructor(
         return manager.getAccountsByType(ACCOUNT_TYPE).toList()
     }
 
-    fun getAccountPreferences(accountKey: MicroBlogKey): AccountPreferences {
-        return preferencesCache.getOrPut(accountKey) {
-            accountPreferencesFactory.create(accountKey)
-        }
-    }
-
     fun hasAccount(): Boolean {
         return getAccounts().isNotEmpty()
     }
@@ -98,8 +93,28 @@ class AccountRepository @Inject constructor(
             .map { getAccountDetails(it) }.maxByOrNull { it.lastActive }
     }
 
-    fun addAccount(detail: AccountDetails) {
-        manager.addAccountExplicitly(detail.account, null, null)
+    fun addAccount(
+        account: Account,
+        type: PlatformType,
+        accountKey: MicroBlogKey,
+        credentials_type: CredentialsType,
+        credentials_json: String,
+        extras_json: String,
+        user: AmUser,
+        lastActive: Long,
+    ) {
+        manager.addAccountExplicitly(account, null, null)
+        val detail = AccountDetails(
+            account = account,
+            type = type,
+            accountKey = accountKey,
+            credentials_type = credentials_type,
+            credentials_json = credentials_json,
+            extras_json = extras_json,
+            user = user,
+            lastActive = lastActive,
+            preferences = getAccountPreferences(accountKey)
+        )
         updateAccount(detail)
         setCurrentAccount(detail)
         accounts.postValue(
@@ -126,8 +141,15 @@ class AccountRepository @Inject constructor(
             extras_json = manager.getUserData(account, ACCOUNT_USER_DATA_EXTRAS),
             user = manager.getUserData(account, ACCOUNT_USER_DATA_USER).fromJson(),
             lastActive = manager.getUserData(account, ACCOUNT_USER_DATA_LAST_ACTIVE)?.toLongOrNull()
-                ?: 0
+                ?: 0,
+            preferences = getAccountPreferences(getAccountKey(account))
         )
+    }
+
+    private fun getAccountPreferences(accountKey: MicroBlogKey): AccountPreferences {
+        return preferencesCache.getOrPut(accountKey) {
+            accountPreferencesFactory.create(accountKey)
+        }
     }
 
     private fun getAccountKey(account: Account): MicroBlogKey =

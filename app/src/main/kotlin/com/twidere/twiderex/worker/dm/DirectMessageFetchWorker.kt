@@ -64,7 +64,7 @@ class DirectMessageFetchWorker @AssistedInject constructor(
     override suspend fun doWork(): Result {
         return try {
             accountRepository.activeAccount.value?.takeIf {
-                accountRepository.getAccountPreferences(it.accountKey).isNotificationEnabled.first()
+                it.preferences.isNotificationEnabled.first()
             }?.let { account ->
                 val result = repository.checkNewMessages(
                     accountKey = account.accountKey,

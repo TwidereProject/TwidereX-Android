@@ -33,8 +33,12 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.lifecycle.flowWithLifecycle
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
@@ -61,19 +65,19 @@ fun LayoutScene() {
         )
     }
     val user = viewModel.user
-    val menus = remember(account.type) {
-        HomeMenus.values().filter { it.supportedPlatformType.contains(account.type) }.groupBy {
-            it.showDefault
+    val menuOrder by account.preferences.homeMenuOrder.flowWithLifecycle(LocalLifecycleOwner.current.lifecycle)
+        .collectAsState(
+            initial = HomeMenus.values().map { it to it.showDefault }.toMap()
+        )
+    val menus =
+        menuOrder.filter { it.key.supportedPlatformType.contains(account.type) }.toList().groupBy {
+            it.second
         }.map {
             listOf(
-                if (it.key) {
-                    "Tabbar actions"
-                } else {
-                    "Sidebar actions"
-                }
-            ) + it.value
+                it.key
+            ) + it.value.map { it.first }
         }.flatten()
-    }
+    val menuState = rememberUpdatedState(newValue = menus)
     TwidereScene {
         InAppNotificationScaffold(
             topBar = {
@@ -113,13 +117,24 @@ fun LayoutScene() {
                 )
                 ReorderableColumn(
                     data = menus,
-                    state = rememberReorderableColumnState { _, _ ->
+                    state = rememberReorderableColumnState { oldIndex, newIndex ->
+                        viewModel.updateHomeMenu(
+                            oldIndex,
+                            newIndex,
+                            menuState.value,
+                        )
                     }
                 ) {
                     when (it) {
-                        is String -> {
+                        is Boolean -> {
                             ItemHeader {
-                                Text(text = it)
+                                Text(
+                                    text = if (it) {
+                                        "Tabbar actions"
+                                    } else {
+                                        "Sidebar actions"
+                                    }
+                                )
                             }
                         }
                         is HomeMenus -> {

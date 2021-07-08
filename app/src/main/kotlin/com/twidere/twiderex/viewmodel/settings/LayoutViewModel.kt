@@ -21,13 +21,29 @@
 package com.twidere.twiderex.viewmodel.settings
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.twidere.twiderex.model.AccountDetails
+import com.twidere.twiderex.scenes.home.HomeMenus
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.launch
 
 class LayoutViewModel @AssistedInject constructor(
     @Assisted private val account: AccountDetails,
 ) : ViewModel() {
+    fun updateHomeMenu(oldIndex: Int, newIndex: Int, menus: List<Any>) = viewModelScope.launch {
+        menus.toMutableList().let { list ->
+            list.add(newIndex, list.removeAt(oldIndex))
+            list.indexOf(false).let { index ->
+                list.subList(0, index).filterIsInstance<HomeMenus>()
+                    .map { it to true } + list.subList(index, list.size)
+                    .filterIsInstance<HomeMenus>().map { it to false }
+            }.toMap().let {
+                account.preferences.setHomeMenuOrder(it)
+            }
+        }
+    }
+
     @dagger.assisted.AssistedFactory
     interface AssistedFactory {
         fun create(
