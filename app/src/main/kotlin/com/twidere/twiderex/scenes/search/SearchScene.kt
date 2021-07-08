@@ -122,7 +122,7 @@ fun SearchScene(keyword: String) {
                                             modifier = Modifier
                                                 .clickable(
                                                     onClick = {
-                                                        navigator.searchInput(keyword)
+                                                        navigator.goBack()
                                                     },
                                                     indication = null,
                                                     interactionSource = remember { MutableInteractionSource() }

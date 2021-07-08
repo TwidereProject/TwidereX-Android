@@ -64,6 +64,10 @@ import com.twidere.twiderex.scenes.mastodon.MastodonSignInScene
 import com.twidere.twiderex.scenes.mastodon.MastodonWebSignInScene
 import com.twidere.twiderex.scenes.search.SearchInputScene
 import com.twidere.twiderex.scenes.search.SearchScene
+import com.twidere.twiderex.scenes.search.fadeCreateTransition
+import com.twidere.twiderex.scenes.search.fadeDestroyTransition
+import com.twidere.twiderex.scenes.search.fadePauseTransition
+import com.twidere.twiderex.scenes.search.fadeResumeTransition
 import com.twidere.twiderex.scenes.settings.AboutScene
 import com.twidere.twiderex.scenes.settings.AccountManagementScene
 import com.twidere.twiderex.scenes.settings.AccountNotificationScene
@@ -574,8 +578,18 @@ fun RouteBuilder.route(constraints: Constraints) {
         }
     }
 
+    authorizedScene(Route.Search.Home) {
+        com.twidere.twiderex.scenes.home.SearchScene()
+    }
+
     authorizedScene(
         "search/input",
+        navTransition = NavTransition(
+            createTransition = fadeCreateTransition,
+            destroyTransition = fadeDestroyTransition,
+            pauseTransition = fadePauseTransition,
+            resumeTransition = fadeResumeTransition,
+        ),
     ) { backStackEntry ->
         SearchInputScene(
             backStackEntry.query<String>("keyword")?.let { URLDecoder.decode(it, "UTF-8") }
@@ -586,7 +600,13 @@ fun RouteBuilder.route(constraints: Constraints) {
         "search/result/{keyword}",
         deepLinks = twitterHosts.map {
             "$it/search?q={keyword}"
-        } + "${DeepLinks.Search}/{keyword}"
+        } + "${DeepLinks.Search}/{keyword}",
+        navTransition = NavTransition(
+            createTransition = fadeCreateTransition,
+            destroyTransition = fadeDestroyTransition,
+            pauseTransition = fadePauseTransition,
+            resumeTransition = fadeResumeTransition,
+        ),
     ) { backStackEntry ->
         backStackEntry.path<String>("keyword")?.takeIf { it.isNotEmpty() }?.let {
             SearchScene(keyword = URLDecoder.decode(it, "UTF-8"))
