@@ -55,7 +55,6 @@ import com.twidere.twiderex.ui.LocalActiveAccountViewModel
 import com.twidere.twiderex.ui.LocalActivity
 import com.twidere.twiderex.ui.LocalApplication
 import com.twidere.twiderex.ui.LocalIsActiveNetworkMetered
-import com.twidere.twiderex.ui.LocalStandardLifecycleOwner
 import com.twidere.twiderex.ui.LocalWindow
 import com.twidere.twiderex.ui.LocalWindowInsetsController
 import com.twidere.twiderex.utils.CustomTabSignInChannel
@@ -133,7 +132,6 @@ class TwidereXActivity : ComponentActivity() {
                 LocalActiveAccountViewModel provides accountViewModel,
                 LocalIsActiveNetworkMetered provides isActiveNetworkMetered,
                 LocalPlatformResolver provides platformResolver,
-                LocalStandardLifecycleOwner provides this
             ) {
                 ProvidePreferences(
                     preferencesHolder,

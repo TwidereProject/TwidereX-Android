@@ -26,7 +26,6 @@ import android.view.Window
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.core.view.WindowInsetsControllerCompat
-import androidx.lifecycle.LifecycleOwner
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.preferences.proto.DisplayPreferences
 import com.twidere.twiderex.viewmodel.ActiveAccountViewModel
@@ -43,4 +42,3 @@ val LocalApplication = staticCompositionLocalOf<Application> { error("No Applica
 val LocalActivity = staticCompositionLocalOf<Activity> { error("NoActivity") }
 val LocalVideoPlayback = compositionLocalOf { DisplayPreferences.AutoPlayback.Auto }
 val LocalIsActiveNetworkMetered = compositionLocalOf { false }
-val LocalStandardLifecycleOwner = staticCompositionLocalOf<LifecycleOwner> { error("No LocalNormalLifeCycleOwner") }
