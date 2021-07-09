@@ -126,11 +126,28 @@ fun VideoPlayer(
                     customControl.player = player
                 }
             }
-
+            var isResume by remember {
+                mutableStateOf(true)
+            }
             DisposableEffect(Unit) {
+                val observer = object : LifecycleObserver {
+                    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
+                    fun onResume() {
+                        isResume = true
+                        player.playWhenReady = autoPlay
+                    }
+                    @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
+                    fun onPause() {
+                        isResume = false
+                        updateState()
+                        player.playWhenReady = false
+                    }
+                }
+                lifecycle.addObserver(observer)
                 onDispose {
                     updateState()
                     player.release()
+                    lifecycle.removeObserver(observer)
                 }
             }
 
@@ -138,28 +155,17 @@ fun VideoPlayer(
                 modifier = modifier,
                 factory = { context ->
                     StyledPlayerView(context).also { playerView ->
-                        playerView.videoSurfaceView?.let {
-                            if (it is SurfaceView) it.setZOrderMediaOverlay(zOrderMediaOverlay)
-                        }
+                        (playerView.videoSurfaceView as? SurfaceView)?.setZOrderMediaOverlay(zOrderMediaOverlay)
                         playerView.useController = showControls
-                        lifecycle.addObserver(object : LifecycleObserver {
-                            @OnLifecycleEvent(Lifecycle.Event.ON_START)
-                            fun onStart() {
-                                playerView.onResume()
-                                player.playWhenReady = autoPlay
-                            }
-
-                            @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
-                            fun onStop() {
-                                updateState()
-                                playerView.onPause()
-                                player.playWhenReady = false
-                            }
-                        })
                     }
                 }
             ) {
                 it.player = player
+                if (isResume) {
+                    it.onResume()
+                } else {
+                    it.onPause()
+                }
             }
         }
         if ((shouldShowThumb || !playing) && thumb != null) {
