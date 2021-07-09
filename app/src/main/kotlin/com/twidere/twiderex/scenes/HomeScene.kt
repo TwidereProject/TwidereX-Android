@@ -113,11 +113,11 @@ fun HomeScene() {
     val hideAppBar = LocalAppearancePreferences.current.hideAppBarWhenScroll
     val menuOrder by account.preferences.homeMenuOrder.flowWithLifecycle(LocalLifecycleOwner.current.lifecycle)
         .collectAsState(
-            initial = HomeMenus.values().map { it to it.showDefault }.toMap()
+            initial = HomeMenus.values().map { it to it.showDefault }
         )
     val menus = remember(menuOrder) {
-        menuOrder.filter { it.value && it.key.supportedPlatformType.contains(account.type) }
-            .map { it.key }
+        menuOrder.filter { it.second && it.first.supportedPlatformType.contains(account.type) }
+            .map { it.first }
     }
     val pagerState = rememberPagerState(
         maxPage = menus.lastIndex
@@ -439,15 +439,15 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
                 val menuOrder by account.preferences.homeMenuOrder.flowWithLifecycle(
                     LocalLifecycleOwner.current.lifecycle
                 ).collectAsState(
-                    initial = HomeMenus.values().map { it to it.showDefault }.toMap()
+                    initial = HomeMenus.values().map { it to it.showDefault }
                 )
                 LazyColumn {
                     items(
                         menuOrder.filter {
-                            !it.value && it.key.supportedPlatformType.contains(
+                            !it.second && it.first.supportedPlatformType.contains(
                                 account.type
                             )
-                        }.map { it.key }
+                        }.map { it.first }
                     ) {
                         DrawerMenuItem(
                             onClick = {

@@ -38,7 +38,7 @@ class LayoutViewModel @AssistedInject constructor(
                 list.subList(0, index).filterIsInstance<HomeMenus>()
                     .map { it to true } + list.subList(index, list.size)
                     .filterIsInstance<HomeMenus>().map { it to false }
-            }.toMap().let {
+            }.let {
                 account.preferences.setHomeMenuOrder(it)
             }
         }

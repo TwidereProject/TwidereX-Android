@@ -67,10 +67,10 @@ fun LayoutScene() {
     val user = viewModel.user
     val menuOrder by account.preferences.homeMenuOrder.flowWithLifecycle(LocalLifecycleOwner.current.lifecycle)
         .collectAsState(
-            initial = HomeMenus.values().map { it to it.showDefault }.toMap()
+            initial = HomeMenus.values().map { it to it.showDefault }
         )
     val menus =
-        menuOrder.filter { it.key.supportedPlatformType.contains(account.type) }.toList().groupBy {
+        menuOrder.filter { it.first.supportedPlatformType.contains(account.type) }.groupBy {
             it.second
         }.map {
             listOf(

@@ -45,11 +45,16 @@ class AccountPreferences(
     val homeMenuOrder
         get() = dataStore.data.map { preferences ->
             if (!preferences.contains(homeMenuOrderKey) || !preferences.contains(visibleHomeMenuKey)) {
-                HomeMenus.values().map { it to it.showDefault }.toMap()
+                HomeMenus.values().map { it to it.showDefault }
             } else {
-                val order = preferences[homeMenuOrderKey].orEmpty().split(",")
+                val order = preferences[homeMenuOrderKey].orEmpty()
+                    .split(",")
+                    .withIndex()
+                    .associate { HomeMenus.valueOf(it.value) to it.index }
                 val visible = preferences[visibleHomeMenuKey].orEmpty().split(",")
-                order.map { HomeMenus.valueOf(it) }.map { it to visible.contains(it.name) }.toMap()
+                HomeMenus.values().sortedBy {
+                    order[it]
+                }.map { it to visible.contains(it.name) }
             }
         }
 
@@ -62,11 +67,13 @@ class AccountPreferences(
     private val homeMenuOrderKey = stringPreferencesKey("homeMenuOrder")
     private val visibleHomeMenuKey = stringPreferencesKey("visibleHomeMenu")
     suspend fun setHomeMenuOrder(
-        data: Map<HomeMenus, Boolean>,
+        data: List<Pair<HomeMenus, Boolean>>,
     ) {
         dataStore.edit {
-            it[homeMenuOrderKey] = data.keys.map { it.name }.joinToString(",")
-            it[visibleHomeMenuKey] = data.filter { it.value }.map { it.key.name }.joinToString(",")
+            it[visibleHomeMenuKey] = data.filter { it.second }.joinToString(",") { it.first.name }
+        }
+        dataStore.edit {
+            it[homeMenuOrderKey] = data.joinToString(",") { it.first.name }
         }
     }
 
