@@ -918,9 +918,6 @@ private fun ComposeInput(
                     value = text,
                     onValueChange = { viewModel.setText(it) },
                     autoFocus = autoFocus,
-                    onClicked = {
-                        // TODO: scroll lazyColumn
-                    },
                     placeholder = {
                         CompositionLocalProvider(LocalContentAlpha.provides(ContentAlpha.medium)) {
                             Text(text = stringResource(id = R.string.scene_compose_placeholder))
