@@ -27,6 +27,7 @@ import com.twidere.twiderex.scenes.home.HomeMenus
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.launch
+import kotlin.math.min
 
 class LayoutViewModel @AssistedInject constructor(
     @Assisted private val account: AccountDetails,
@@ -34,7 +35,8 @@ class LayoutViewModel @AssistedInject constructor(
     fun updateHomeMenu(oldIndex: Int, newIndex: Int, menus: List<Any>) = viewModelScope.launch {
         menus.toMutableList().let { list ->
             list.add(newIndex, list.removeAt(oldIndex))
-            list.indexOf(false).let { index ->
+            list.remove(true)
+            list.indexOf(false).let { min(it, 5) }.let { index ->
                 list.subList(0, index).filterIsInstance<HomeMenus>()
                     .map { it to true } + list.subList(index, list.size)
                     .filterIsInstance<HomeMenus>().map { it to false }

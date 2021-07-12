@@ -80,6 +80,7 @@ import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarDefaults
 import com.twidere.twiderex.component.foundation.ApplyNotification
 import com.twidere.twiderex.component.foundation.IconTabsComponent
+import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.NestedScrollScaffold
 import com.twidere.twiderex.component.foundation.Pager
 import com.twidere.twiderex.component.foundation.PagerState
@@ -101,6 +102,7 @@ import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.ui.mediumEmphasisContentContentColor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlin.math.max
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
@@ -120,7 +122,7 @@ fun HomeScene() {
             .map { it.first }
     }
     val pagerState = rememberPagerState(
-        maxPage = menus.lastIndex
+        maxPage = max(menus.lastIndex, 0)
     )
     val scaffoldState = rememberScaffoldState()
     if (scaffoldState.drawerState.isOpen) {
@@ -140,58 +142,76 @@ fun HomeScene() {
             }
         },
     ) {
-        NestedScrollScaffold(
-            scaffoldState = scaffoldState,
-            enableBottomBarNestedScroll = hideTab,
-            bottomBar = {
-                if (tabPosition == AppearancePreferences.TabPosition.Bottom) {
-                    HomeBottomNavigation(
-                        items = menus,
-                        selectedItem = pagerState.currentPage,
-                    ) {
-                        if (pagerState.currentPage == it) {
-                            scope.launch {
-                                menus[it].item.lazyListController.scrollToTop()
+        if (!menus.any()) {
+            InAppNotificationScaffold(
+                scaffoldState = scaffoldState,
+                topBar = {
+                    AppBar(
+                        backgroundColor = MaterialTheme.colors.surface.withElevation(),
+                        navigationIcon = {
+                            MenuAvatar(scaffoldState)
+                        },
+                    )
+                },
+                drawerContent = {
+                    HomeDrawer(scaffoldState = scaffoldState)
+                }
+            ) {
+            }
+        } else {
+            NestedScrollScaffold(
+                scaffoldState = scaffoldState,
+                enableBottomBarNestedScroll = hideTab,
+                bottomBar = {
+                    if (tabPosition == AppearancePreferences.TabPosition.Bottom) {
+                        HomeBottomNavigation(
+                            items = menus,
+                            selectedItem = pagerState.currentPage,
+                        ) {
+                            if (pagerState.currentPage == it) {
+                                scope.launch {
+                                    menus[it].item.lazyListController.scrollToTop()
+                                }
                             }
-                        }
-                        scope.launch {
-                            pagerState.selectPage {
-                                pagerState.currentPage = it
+                            scope.launch {
+                                pagerState.selectPage {
+                                    pagerState.currentPage = it
+                                }
                             }
                         }
                     }
-                }
-            },
-            drawerContent = {
-                HomeDrawer(scaffoldState)
-            },
-            floatingActionButton = {
-                Crossfade(pagerState.currentPage) {
-                    menus[it].item.Fab()
-                }
-            },
-            floatingActionButtonPosition = menus[pagerState.currentPage].item.floatingActionButtonPosition,
-            enableFloatingActionButtonNestedScroll = hideFab,
-            topBar = {
-                HomeAppBar(
-                    tabPosition = tabPosition,
-                    menus = menus,
-                    pagerState = pagerState,
-                    scaffoldState = scaffoldState,
-                    scope = scope,
-                )
-            },
-            enableTopBarNestedScroll = hideAppBar
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(it)
+                },
+                drawerContent = {
+                    HomeDrawer(scaffoldState)
+                },
+                floatingActionButton = {
+                    Crossfade(pagerState.currentPage) {
+                        menus[it].item.Fab()
+                    }
+                },
+                floatingActionButtonPosition = menus[pagerState.currentPage].item.floatingActionButtonPosition,
+                enableFloatingActionButtonNestedScroll = hideFab,
+                topBar = {
+                    HomeAppBar(
+                        tabPosition = tabPosition,
+                        menus = menus,
+                        pagerState = pagerState,
+                        scaffoldState = scaffoldState,
+                        scope = scope,
+                    )
+                },
+                enableTopBarNestedScroll = hideAppBar
             ) {
-                Pager(
-                    state = pagerState,
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(it)
                 ) {
-                    menus[page].item.Content()
+                    Pager(
+                        state = pagerState,
+                    ) {
+                        menus[page].item.Content()
+                    }
                 }
             }
         }

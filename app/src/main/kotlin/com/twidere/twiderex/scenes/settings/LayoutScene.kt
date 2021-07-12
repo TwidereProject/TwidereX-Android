@@ -76,7 +76,19 @@ fun LayoutScene() {
             listOf(
                 it.key
             ) + it.value.map { it.first }
-        }.flatten()
+        }.flatten().let {
+            if (it.firstOrNull() != true) {
+                listOf(true) + it
+            } else {
+                it
+            }
+        }.let {
+            if (!it.contains(false)) {
+                it + false
+            } else {
+                it
+            }
+        }
     val menuState = rememberUpdatedState(newValue = menus)
     TwidereScene {
         InAppNotificationScaffold(
