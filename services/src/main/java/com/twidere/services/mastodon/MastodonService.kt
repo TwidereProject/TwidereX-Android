@@ -378,6 +378,7 @@ class MastodonService(
         userId: String,
         screenName: String
     ) {
+        // FIXME: 2021/7/12 API exception 'Record not found' should be 'You need to follow this user first'
         resources.addMember(listId, PostAccounts(listOf(userId)))
     }
 
