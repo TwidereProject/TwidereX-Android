@@ -30,6 +30,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.twidere.services.microblog.DirectMessageService
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
@@ -89,6 +90,7 @@ fun DMConversationListSceneContent(
     lazyListController: LazyListController? = null
 ) {
     val account = LocalActiveAccount.current ?: return
+    if (account.service !is DirectMessageService) return
     val navController = LocalNavController.current
     val viewModel =
         assistedViewModel<DMConversationViewModel.AssistedFactory, DMConversationViewModel>(
