@@ -72,7 +72,7 @@ fun HtmlText(
     modifier: Modifier = Modifier,
     htmlText: String,
     maxLines: Int = Int.MAX_VALUE,
-    textStyle: TextStyle = MaterialTheme.typography.body1.copy(color = LocalContentColor.current.copy(alpha = LocalContentAlpha.current), letterSpacing = TextUnit(0.25f, TextUnitType.Sp)),
+    textStyle: TextStyle = LocalTextStyle.current.copy(color = LocalContentColor.current.copy(alpha = LocalContentAlpha.current)),
     linkStyle: TextStyle = textStyle.copy(MaterialTheme.colors.primary),
     linkResolver: (href: String) -> ResolvedLink = { ResolvedLink(it) },
 ) {
