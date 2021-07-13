@@ -20,27 +20,34 @@
  */
 package com.twidere.twiderex.scenes.settings
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Card
+import androidx.compose.material.ContentAlpha
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.ListItem
+import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.res.painterResource
 import androidx.lifecycle.flowWithLifecycle
+import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
@@ -139,14 +146,12 @@ fun LayoutScene() {
                         )
                     },
                     dragingContent = {
-                        LaunchedEffect(Unit) {
-                        }
                         Card {
-                            LayoutItemContent(it = it)
+                            LayoutItemContent(it = it, viewModel = viewModel, menus = menus)
                         }
                     }
                 ) {
-                    LayoutItemContent(it)
+                    LayoutItemContent(it = it, viewModel = viewModel, menus = menus)
                 }
             }
         }
@@ -155,7 +160,14 @@ fun LayoutScene() {
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-private fun LayoutItemContent(it: Any) {
+private fun LayoutItemContent(
+    it: Any,
+    viewModel: LayoutViewModel,
+    menus: List<Any>,
+) {
+    val current = menus.indexOf(it)
+    val falseIndex = menus.indexOf(false)
+    val visible = current < falseIndex
     when (it) {
         is Boolean -> {
             ItemHeader {
@@ -174,14 +186,48 @@ private fun LayoutItemContent(it: Any) {
                     Text(text = it.item.name())
                 },
                 icon = {
-                    Icon(
-                        it.item.icon(),
-                        contentDescription = null,
-                        tint = MaterialTheme.colors.primary,
-                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        IconButton(
+                            onClick = {
+                                if (visible) {
+                                    viewModel.removeMenu(
+                                        current,
+                                        menus
+                                    )
+                                } else {
+                                    viewModel.addMenu(
+                                        current,
+                                        menus
+                                    )
+                                }
+                            }
+                        ) {
+                            Image(
+                                painter = painterResource(
+                                    id = if (visible) {
+                                        R.drawable.ic_delete_colored
+                                    } else {
+                                        R.drawable.ic_add_colored
+                                    }
+                                ),
+                                contentDescription = null,
+                            )
+                        }
+                        Icon(
+                            it.item.icon(),
+                            contentDescription = null,
+                            tint = MaterialTheme.colors.primary,
+                        )
+                    }
                 },
                 trailing = {
-                    Icon(Icons.Default.Menu, contentDescription = null)
+                    CompositionLocalProvider(
+                        LocalContentAlpha provides ContentAlpha.medium
+                    ) {
+                        Icon(Icons.Default.Menu, contentDescription = null)
+                    }
                 }
             )
         }

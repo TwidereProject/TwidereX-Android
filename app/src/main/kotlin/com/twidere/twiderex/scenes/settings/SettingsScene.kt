@@ -65,6 +65,11 @@ fun SettingsScene() {
                     route = Route.Settings.Display,
                 ),
                 SettingItem(
+                    "Layout",
+                    painterResource(id = R.drawable.ic_layout_sidebar),
+                    route = Route.Settings.Layout,
+                ),
+                SettingItem(
                     stringResource(id = R.string.scene_settings_notification_title),
                     painterResource(id = R.drawable.ic_settings_notification),
                     route = Route.Settings.Notification,
@@ -79,16 +84,6 @@ fun SettingsScene() {
                     painterResource(id = R.drawable.ic_triangle_square_circle),
                     route = Route.Settings.Misc,
                 ),
-                SettingItem(
-                    "Layout",
-                    painterResource(id = R.drawable.ic_layout_sidebar),
-                    route = Route.Settings.Layout,
-                ),
-//                SettingItem(
-//                    "Web Browser",
-//                    painterResource(id = R.drawable.ic_browser),
-//                    route = "",
-//                ),
             ),
             stringResource(id = R.string.scene_settings_section_header_about) to listOf(
                 SettingItem(

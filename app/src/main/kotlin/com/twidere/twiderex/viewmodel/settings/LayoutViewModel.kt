@@ -29,6 +29,8 @@ import dagger.assisted.AssistedInject
 import kotlinx.coroutines.launch
 import kotlin.math.min
 
+private const val MaxMenuCount = 5
+
 class LayoutViewModel @AssistedInject constructor(
     @Assisted private val account: AccountDetails,
 ) : ViewModel() {
@@ -36,7 +38,7 @@ class LayoutViewModel @AssistedInject constructor(
         menus.toMutableList().let { list ->
             list.add(newIndex, list.removeAt(oldIndex))
             list.remove(true)
-            list.indexOf(false).let { min(it, 5) }.let { index ->
+            list.indexOf(false).let { min(it, MaxMenuCount) }.let { index ->
                 list.subList(0, index).filterIsInstance<HomeMenus>()
                     .map { it to true } + list.subList(index, list.size)
                     .filterIsInstance<HomeMenus>().map { it to false }
@@ -44,6 +46,30 @@ class LayoutViewModel @AssistedInject constructor(
                 account.preferences.setHomeMenuOrder(it)
             }
         }
+    }
+
+    fun removeMenu(current: Int, menus: List<Any>) {
+        val newIndex = menus.indexOf(false)
+        updateHomeMenu(
+            oldIndex = current,
+            newIndex = newIndex,
+            menus = menus,
+        )
+    }
+
+    fun addMenu(current: Int, menus: List<Any>) {
+        val newIndex = menus.indexOf(false).let {
+            if (it == MaxMenuCount + 1) {
+                it - 1
+            } else {
+                it
+            }
+        }
+        updateHomeMenu(
+            oldIndex = current,
+            newIndex = newIndex,
+            menus = menus,
+        )
     }
 
     @dagger.assisted.AssistedFactory
