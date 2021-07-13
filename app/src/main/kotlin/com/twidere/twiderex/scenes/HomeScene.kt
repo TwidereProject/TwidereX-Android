@@ -22,7 +22,6 @@ package com.twidere.twiderex.scenes
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.Crossfade
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.animateFloat
@@ -184,9 +183,7 @@ fun HomeScene() {
                     HomeDrawer(scaffoldState)
                 },
                 floatingActionButton = {
-                    Crossfade(pagerState.currentPage) {
-                        menus[it].item.Fab()
-                    }
+                    menus[pagerState.currentPage].item.Fab()
                 },
                 floatingActionButtonPosition = menus[pagerState.currentPage].item.floatingActionButtonPosition,
                 enableFloatingActionButtonNestedScroll = hideFab,
