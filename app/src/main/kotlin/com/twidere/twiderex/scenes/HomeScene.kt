@@ -102,7 +102,6 @@ import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.ui.mediumEmphasisContentContentColor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import kotlin.math.max
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
@@ -122,7 +121,7 @@ fun HomeScene() {
             .map { it.first }
     }
     val pagerState = rememberPagerState(
-        maxPage = max(menus.lastIndex, 0)
+        pageCount = menus.size,
     )
     val scaffoldState = rememberScaffoldState()
     if (scaffoldState.drawerState.isOpen) {

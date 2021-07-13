@@ -103,7 +103,7 @@ fun MastodonNotificationSceneContent(
             MentionItem(),
         )
     }
-    val pagerState = rememberPagerState(maxPage = tabs.lastIndex)
+    val pagerState = rememberPagerState(pageCount = tabs.size)
     LaunchedEffect(pagerState.currentPage) {
         // FIXME: 2021/5/17 A little bit dirty
         setLazyListController?.invoke(tabs[pagerState.currentPage].lazyListController)
