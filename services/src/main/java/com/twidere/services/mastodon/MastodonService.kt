@@ -21,6 +21,7 @@
 package com.twidere.services.mastodon
 
 import com.twidere.services.http.AuthorizationInterceptor
+import com.twidere.services.http.MicroBlogHttpException
 import com.twidere.services.http.authorization.BearerAuthorization
 import com.twidere.services.http.retrofit
 import com.twidere.services.mastodon.api.MastodonResources
@@ -56,6 +57,7 @@ import com.twidere.services.microblog.model.IStatus
 import com.twidere.services.microblog.model.IUser
 import com.twidere.services.microblog.model.Relationship
 import com.twidere.services.utils.await
+import com.twidere.services.utils.decodeJson
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -79,7 +81,19 @@ class MastodonService(
     private val resources by lazy {
         resources ?: retrofit(
             "https://$host",
-            BearerAuthorization(accessToken)
+            BearerAuthorization(accessToken),
+            { chain ->
+                val response = chain.proceed(chain.request())
+                if (response.code != 200) {
+                    response.body?.string()?.takeIf {
+                        it.isNotEmpty()
+                    }?.let { content ->
+                        throw content.decodeJson<MastodonException>()
+                    } ?: throw MicroBlogHttpException(response.code)
+                } else {
+                    response
+                }
+            }
         )
     }
 
@@ -239,7 +253,12 @@ class MastodonService(
         )
     }
 
-    override suspend fun searchUsers(query: String, page: Int?, count: Int, following: Boolean): List<IUser> {
+    override suspend fun searchUsers(
+        query: String,
+        page: Int?,
+        count: Int,
+        following: Boolean
+    ): List<IUser> {
         return resources.searchV2(
             query = query,
             type = SearchType.accounts,
@@ -359,13 +378,8 @@ class MastodonService(
         userId: String,
         screenName: String
     ) {
+        // FIXME: 2021/7/12 API exception 'Record not found' should be 'You need to follow this user first'
         resources.addMember(listId, PostAccounts(listOf(userId)))
-            .errorBody()?.let {
-                if (it.string().contains("Record not found", true))
-                    "You need to follow this user first" else it.string()
-            }?.let {
-                throw MastodonException(it)
-            }
     }
 
     override suspend fun removeMember(
@@ -374,11 +388,6 @@ class MastodonService(
         screenName: String
     ) {
         resources.removeMember(listId, PostAccounts(listOf(userId)))
-            .errorBody()?.let {
-                it.string()
-            }?.let {
-                throw MastodonException(it)
-            }
     }
 
     override suspend fun listSubscribers(
