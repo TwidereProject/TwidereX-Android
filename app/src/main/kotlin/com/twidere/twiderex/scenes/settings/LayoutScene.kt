@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.Card
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.ListItem
@@ -33,6 +34,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberUpdatedState
@@ -88,7 +90,7 @@ fun LayoutScene() {
             } else {
                 it
             }
-        }
+        } as List<Any>
     val menuState = rememberUpdatedState(newValue = menus)
     TwidereScene {
         InAppNotificationScaffold(
@@ -135,40 +137,53 @@ fun LayoutScene() {
                             newIndex,
                             menuState.value,
                         )
+                    },
+                    dragingContent = {
+                        LaunchedEffect(Unit) {
+                        }
+                        Card {
+                            LayoutItemContent(it = it)
+                        }
                     }
                 ) {
-                    when (it) {
-                        is Boolean -> {
-                            ItemHeader {
-                                Text(
-                                    text = if (it) {
-                                        "Tabbar actions"
-                                    } else {
-                                        "Sidebar actions"
-                                    }
-                                )
-                            }
-                        }
-                        is HomeMenus -> {
-                            ListItem(
-                                text = {
-                                    Text(text = it.item.name())
-                                },
-                                icon = {
-                                    Icon(
-                                        it.item.icon(),
-                                        contentDescription = null,
-                                        tint = MaterialTheme.colors.primary,
-                                    )
-                                },
-                                trailing = {
-                                    Icon(Icons.Default.Menu, contentDescription = null)
-                                }
-                            )
-                        }
-                    }
+                    LayoutItemContent(it)
                 }
             }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+private fun LayoutItemContent(it: Any) {
+    when (it) {
+        is Boolean -> {
+            ItemHeader {
+                Text(
+                    text = if (it) {
+                        "Tabbar actions"
+                    } else {
+                        "Sidebar actions"
+                    }
+                )
+            }
+        }
+        is HomeMenus -> {
+            ListItem(
+                text = {
+                    Text(text = it.item.name())
+                },
+                icon = {
+                    Icon(
+                        it.item.icon(),
+                        contentDescription = null,
+                        tint = MaterialTheme.colors.primary,
+                    )
+                },
+                trailing = {
+                    Icon(Icons.Default.Menu, contentDescription = null)
+                }
+            )
         }
     }
 }
