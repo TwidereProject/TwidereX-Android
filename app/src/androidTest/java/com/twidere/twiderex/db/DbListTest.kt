@@ -21,7 +21,6 @@
 package com.twidere.twiderex.db
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.lifecycle.Observer
 import androidx.paging.PagingSource
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
@@ -32,7 +31,6 @@ import com.twidere.services.twitter.model.TwitterList
 import com.twidere.services.twitter.model.User
 import com.twidere.twiderex.db.dao.ListsDao
 import com.twidere.twiderex.db.mapper.toDbList
-import com.twidere.twiderex.db.model.DbList
 import com.twidere.twiderex.model.MicroBlogKey
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.runBlocking
@@ -120,12 +118,12 @@ class DbListTest {
     fun findDbListWithListKeyWithFlow_AutoUpdateAfterDbUpdate() {
         runBlocking {
             val source = listsDao.findWithListKeyWithFlow(MicroBlogKey.twitter("0"), twitterAccountKey)
-            val observer = Observer<DbList?> { }
-            val data = source.firstOrNull()
+            var data = source.firstOrNull()
             Assert.assertEquals("description 0", data?.description)
             data?.let {
                 listsDao.update(listOf(it.copy(description = "Update 0")))
             }
+            data = source.firstOrNull()
             Assert.assertEquals("Update 0", data?.description)
         }
     }
