@@ -84,7 +84,7 @@ class MastodonService(
             BearerAuthorization(accessToken),
             { chain ->
                 val response = chain.proceed(chain.request())
-                if (response.code != 200) {
+                if (!response.isSuccessful) {
                     response.body?.string()?.takeIf {
                         it.isNotEmpty()
                     }?.let { content ->
