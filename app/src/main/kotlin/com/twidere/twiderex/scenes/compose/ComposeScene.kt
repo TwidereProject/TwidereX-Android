@@ -266,8 +266,9 @@ private fun ComposeBody(
                         }
                     },
                     actions = {
+                        val canSend by viewModel.canSend.observeAsState(initial = false)
                         IconButton(
-                            enabled = textFieldValue.text.isNotEmpty(),
+                            enabled = canSend,
                             onClick = {
                                 viewModel.compose()
                                 navController.popBackStack()
