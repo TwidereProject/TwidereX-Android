@@ -273,6 +273,7 @@ open class ComposeViewModel @AssistedInject constructor(
     val contentWarningTextFieldValue = MutableStateFlow(TextFieldValue())
     val textFieldValue = MutableStateFlow(TextFieldValue())
     val images = MutableStateFlow<List<Uri>>(emptyList())
+    val canSend = textFieldValue.zip(images) { text, imgs -> text.text.isNotEmpty() || !imgs.isNullOrEmpty() }
     val canSaveDraft =
         textFieldValue.zip(images) { text, imgs -> text.text.isNotEmpty() || !imgs.isNullOrEmpty() }
     val locationEnabled = MutableStateFlow(false)

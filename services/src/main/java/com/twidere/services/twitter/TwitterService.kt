@@ -22,6 +22,7 @@ package com.twidere.services.twitter
 
 import com.twidere.services.http.AuthorizationInterceptor
 import com.twidere.services.http.Errors
+import com.twidere.services.http.MicroBlogHttpException
 import com.twidere.services.http.authorization.OAuth1Authorization
 import com.twidere.services.http.retrofit
 import com.twidere.services.microblog.DirectMessageService
@@ -96,7 +97,7 @@ class TwitterService(
             createOAuth1Authorization(),
             { chain ->
                 val response = chain.proceed(chain.request())
-                if (response.code != 200) {
+                if (!response.isSuccessful) {
                     response.body?.string()?.takeIf {
                         it.isNotEmpty()
                     }?.let { content ->
@@ -109,9 +110,10 @@ class TwitterService(
                         }.let {
                             throw it
                         }
-                    }
+                    } ?: throw MicroBlogHttpException(response.code)
+                } else {
+                    response
                 }
-                response
             }
         )
     }

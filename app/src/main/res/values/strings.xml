@@ -25,6 +25,7 @@
     <string name="common_alerts_media_saved_title">Media saved</string>
     <string name="common_alerts_media_save_fail_title">Failed to save media</string>
     <string name="common_alerts_media_save_fail_message">Please try again</string>
+    <string name="common_alerts_media_sharing_title">Media will be shared after download is completed</string>
     <string name="common_alerts_photo_saved_title">Photo Saved</string>
     <string name="common_alerts_photo_save_fail_title">Failed to Save Photo</string>
     <string name="common_alerts_photo_save_fail_message">Please try again</string>
@@ -85,6 +86,7 @@
     <string name="common_controls_actions_sign_in">Sign in</string>
     <string name="common_controls_actions_preview">Preview</string>
     <string name="common_controls_actions_open_in_safari">Open in Safari</string>
+    <string name="common_controls_actions_share_media">Share media</string>
     <string name="common_controls_timeline_load_more">Load More</string>
     <string name="common_controls_status_actions_copy_text">Copy text</string>
     <string name="common_controls_status_actions_quote">Quote</string>

@@ -22,6 +22,8 @@ package com.twidere.twiderex.scenes.compose
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -80,12 +82,16 @@ fun ComposeSearchHashtagScene() {
                                 placeholder = {
                                     Text(text = stringResource(id = R.string.scene_compose_hashtag_search_search_placeholder))
                                 },
-                                onImeActionPerformed = { _, _ ->
-                                    navController.goBackWith("#$text")
-                                },
                                 autoFocus = true,
-                                imeAction = ImeAction.Done,
                                 alignment = Alignment.CenterStart,
+                                keyboardActions = KeyboardActions(
+                                    onDone = {
+                                        navController.goBackWith("#$text")
+                                    }
+                                ),
+                                keyboardOptions = KeyboardOptions(
+                                    imeAction = ImeAction.Done,
+                                )
                             )
                         }
                     },

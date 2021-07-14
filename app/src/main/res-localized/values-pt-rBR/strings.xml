@@ -95,6 +95,7 @@
     <string name="common_controls_status_poll_total_vote">%s voto</string>
     <string name="common_controls_status_poll_total_people">%s pessoas</string>
     <string name="common_controls_status_poll_total_votes">%s votos</string>
+    <string name="common_controls_status_thread_show">Mostrar esta thread</string>
     <string name="common_controls_friendship_actions_follow">Seguir</string>
     <string name="common_controls_friendship_actions_unfollow">Deixar de seguir</string>
     <string name="common_controls_friendship_actions_following">Seguindo</string>
@@ -135,6 +136,7 @@
     <string name="common_notification_channel_background_progresses_name">Progressos em segundo plano</string>
     <string name="common_notification_channel_content_interactions_name">Interações</string>
     <string name="common_notification_channel_content_interactions_description">Interações como menções e retweets</string>
+    <string name="common_notification_channel_content_messages_name">Mensagens</string>
     <string name="scene_drawer_sign_in">Entrar</string>
     <string name="scene_drawer_manage_accounts">Gerenciar contas</string>
     <string name="scene_manage_accounts_title">Contas</string>
@@ -150,10 +152,15 @@
     <string name="scene_notification_title">Notificação</string>
     <string name="scene_notification_tabs_all">Tudo</string>
     <string name="scene_messages_title">Mensagens</string>
+    <string name="scene_messages_new_conversation_search">Buscar pessoas</string>
     <string name="scene_likes_title">Curtidas</string>
     <string name="scene_bookmark_title">Favorito</string>
     <string name="scene_trends_title">Trends</string>
+    <string name="scene_trends_world_wide">Trends - Mundial</string>
+    <string name="scene_trends_now">Tendências Agora</string>
+    <string name="scene_trends_accounts">%d pessoas falando</string>
     <string name="scene_status_title">Tweet</string>
+    <string name="scene_status_title_mastodon">Toot</string>
     <string name="scene_status_reply_single">1 Resposta</string>
     <string name="scene_status_reply_mutiple">%d Respostas</string>
     <string name="scene_status_quote_single">1 Citação</string>
@@ -169,6 +176,8 @@
     <string name="scene_search_tabs_media">Mídia</string>
     <string name="scene_search_tabs_users">Usuários</string>
     <string name="scene_search_tabs_hashtag">Hashtag</string>
+    <string name="scene_search_show_more">Mostrar mais</string>
+    <string name="scene_search_show_less">Mostrar menos</string>
     <string name="scene_profile_title">Eu</string>
     <string name="scene_profile_hide_reply">Ocultar resposta</string>
     <string name="scene_profile_permission_denied_profile_blocked_title">Permissão Negada</string>
@@ -253,6 +262,7 @@
     <string name="scene_settings_appearance_theme_auto">Automático</string>
     <string name="scene_settings_appearance_theme_light">Claro</string>
     <string name="scene_settings_appearance_theme_dark">Escuro</string>
+    <string name="scene_settings_appearance_AMOLED_optimized_mode">Modo otimizado para AMOLED</string>
     <string name="scene_settings_appearance_scrolling_timeline_tab_bar">Ocultar barra de aba ao rolar</string>
     <string name="scene_settings_appearance_scrolling_timeline_app_bar">Ocultar barra do aplicativo ao rolar</string>
     <string name="scene_settings_appearance_scrolling_timeline_fab">Ocultar FAB ao rolar</string>
@@ -274,6 +284,8 @@
     <string name="scene_settings_display_media_always">Sempre</string>
     <string name="scene_settings_display_media_off">Desligado</string>
     <string name="scene_settings_display_url_preview">Pré-visualizações do Url</string>
+    <string name="scene_settings_notification_title">Notificação</string>
+    <string name="scene_settings_notification_accounts">Contas</string>
     <string name="scene_settings_storage_title">Armazenamento</string>
     <string name="scene_settings_storage_search_title">Limpar histórico de busca</string>
     <string name="scene_settings_storage_media_title">Limpar cache de mídia</string>
@@ -329,6 +341,7 @@
     <string name="accessibility_scene_compose_add_mention">Adicionar menção</string>
     <string name="accessibility_scene_compose_image">Adicionar imagem</string>
     <string name="accessibility_scene_compose_draft">Rascunho aberto</string>
+    <string name="accessibility_scene_compose_thread">Modo thread</string>
     <string name="accessibility_scene_manage_accounts_add">Adicionar</string>
     <string name="accessibility_scene_settings_display_font_size">Tamanho da Fonte</string>
 </resources>

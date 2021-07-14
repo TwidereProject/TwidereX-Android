@@ -48,7 +48,7 @@ abstract class TimelineViewModel(
         maxStatusKey: MicroBlogKey,
         sinceStatueKey: MicroBlogKey,
     ) = viewModelScope.launch {
-        pagingMediator.loadBetween(defaultLoadCount, maxStatusKey = maxStatusKey, sinceStatueKey = sinceStatueKey)
+        pagingMediator.loadBetween(defaultLoadCount, maxStatusKey = maxStatusKey, sinceStatusKey = sinceStatueKey)
     }
 
     fun restoreScrollState(): TimelineScrollState {

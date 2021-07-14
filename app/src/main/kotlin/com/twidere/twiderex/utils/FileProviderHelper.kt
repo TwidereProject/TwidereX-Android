@@ -18,17 +18,24 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.services.mastodon.model.exceptions
+package com.twidere.twiderex.utils
 
-import com.twidere.services.http.MicroBlogException
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import android.content.Context
+import android.net.Uri
+import androidx.core.content.FileProvider
+import java.io.File
 
-@Serializable
-data class MastodonException(
-    @SerialName("error")
-    val error: String? = null,
-) : MicroBlogException() {
-    override val microBlogErrorMessage: String?
-        get() = error
+object FileProviderHelper {
+    private const val providerName = "com.twidere.twiderex.fileprovider"
+    private const val shareDir = "shares/"
+
+    fun getUriFromMedia(mediaFileName: String, context: Context): Uri {
+        val shareDir = File(context.externalCacheDir, shareDir).apply {
+            if (!exists()) mkdirs()
+        }
+        val file = File(shareDir, mediaFileName).apply {
+            if (!exists()) createNewFile()
+        }
+        return FileProvider.getUriForFile(context, providerName, file)
+    }
 }

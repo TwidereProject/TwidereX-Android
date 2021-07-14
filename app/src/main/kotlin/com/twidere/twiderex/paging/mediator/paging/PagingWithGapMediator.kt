@@ -85,26 +85,23 @@ abstract class PagingWithGapMediator(
         return loadBetween(
             pageSize = state.config.pageSize,
             maxStatusKey = maxStatusKey,
-            sinceStatueKey = sinceStatueKey
+            sinceStatusKey = sinceStatueKey
         )
     }
 
     suspend fun loadBetween(
         pageSize: Int,
         maxStatusKey: MicroBlogKey? = null,
-        sinceStatueKey: MicroBlogKey? = null,
+        sinceStatusKey: MicroBlogKey? = null,
     ): MediatorResult {
-        if (maxStatusKey != null && sinceStatueKey != null) {
+        if (maxStatusKey != null && sinceStatusKey != null) {
             _loadingBetween.value = _loadingBetween.value + maxStatusKey
         }
         try {
             val max_id = withContext(Dispatchers.IO) {
                 maxStatusKey?.let { database.statusDao().findWithStatusKey(it)?.statusId }
             }
-            val since_id = withContext(Dispatchers.IO) {
-                sinceStatueKey?.let { database.statusDao().findWithStatusKey(it)?.statusId }
-            }
-            val result = loadBetweenImpl(pageSize, max_id = max_id, since_id = since_id).let { list ->
+            val result = loadBetweenImpl(pageSize, max_id = max_id, since_id = null).let { list ->
                 list.map {
                     it.toDbPagingTimeline(accountKey, pagingKey)
                 }.let {
@@ -118,8 +115,12 @@ abstract class PagingWithGapMediator(
                         database.pagingTimelineDao().insertAll(listOf(it))
                     }
                 }
-                if (sinceStatueKey != null) {
-                    result.lastOrNull()?.timeline?.isGap = result.size >= pageSize - 1
+                if (sinceStatusKey != null) {
+                    result.lastOrNull()?.let {
+                        database.pagingTimelineDao().findWithStatusKey(it.timeline.statusKey, accountKey = accountKey)
+                    }.let {
+                        result.lastOrNull()?.timeline?.isGap = it == null
+                    }
                 }
                 result.saveToDb(database)
             }
@@ -129,7 +130,7 @@ abstract class PagingWithGapMediator(
         } catch (e: Throwable) {
             return MediatorResult.Error(e)
         } finally {
-            if (maxStatusKey != null && sinceStatueKey != null) {
+            if (maxStatusKey != null && sinceStatusKey != null) {
                 _loadingBetween.value = _loadingBetween.value - maxStatusKey
             }
         }

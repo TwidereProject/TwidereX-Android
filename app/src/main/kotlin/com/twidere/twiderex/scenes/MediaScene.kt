@@ -296,6 +296,7 @@ private fun StatusMediaInfo(
     viewModel: MediaViewModel,
     currentMedia: UiMedia
 ) {
+    val context = LocalContext.current
     Column(
         modifier = Modifier
             .padding(StatusMediaInfoDefaults.ContentPadding),
@@ -340,6 +341,22 @@ private fun StatusMediaInfo(
                 ) {
                     Text(
                         text = stringResource(id = R.string.common_controls_actions_save),
+                    )
+                }
+                DropdownMenuItem(
+                    onClick = {
+                        callback.invoke()
+                        currentMedia.fileName?.let {
+                            viewModel.shareMedia(
+                                currentMedia = currentMedia,
+                                target = it,
+                                context = context
+                            )
+                        }
+                    }
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.common_controls_actions_share_media),
                     )
                 }
             }
