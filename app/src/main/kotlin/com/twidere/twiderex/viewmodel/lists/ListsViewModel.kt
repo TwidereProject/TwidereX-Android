@@ -34,6 +34,7 @@ import com.twidere.twiderex.utils.notify
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
@@ -129,6 +130,16 @@ class ListsModifyViewModel @AssistedInject constructor(
 
     val source by lazy {
         listsRepository.findListWithListKey(account = account, listKey = listKey)
+    }
+
+    init {
+        viewModelScope.launch {
+            source.firstOrNull()?.let {
+                editName.value = it.title
+                editDesc.value = it.descriptions
+                editPrivate.value = it.isPrivate
+            }
+        }
     }
 
     val editName = MutableStateFlow("")
