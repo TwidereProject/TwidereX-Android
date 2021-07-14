@@ -1209,7 +1209,7 @@ private fun ComposeActions(
 //            IconButton(onClick = {}) {
 //                Icon(painter = painterResource(id = R.drawable.ic_gif))
 //            }
-            if (account.type == PlatformType.Mastodon) {
+            if (account.type == PlatformType.Mastodon || account.type == PlatformType.Twitter) {
                 IconButton(
                     onClick = {
                         scope.launch {
