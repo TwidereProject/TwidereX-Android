@@ -24,6 +24,8 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -96,15 +98,19 @@ fun SearchInputScene(initial: String? = null) {
                                 placeholder = {
                                     Text(text = stringResource(id = R.string.scene_search_search_bar_placeholder))
                                 },
-                                onImeActionPerformed = { _, _ ->
-                                    if (textFieldValue.text.isNotEmpty()) {
-                                        viewModel.addOrUpgrade(textFieldValue.text)
-                                        navigator.search(textFieldValue.text)
-                                    }
-                                },
                                 autoFocus = true,
-                                imeAction = ImeAction.Search,
                                 alignment = Alignment.CenterStart,
+                                keyboardOptions = KeyboardOptions(
+                                    imeAction = ImeAction.Search,
+                                ),
+                                keyboardActions = KeyboardActions(
+                                    onSearch = {
+                                        if (textFieldValue.text.isNotEmpty()) {
+                                            viewModel.addOrUpgrade(textFieldValue.text)
+                                            navigator.search(textFieldValue.text)
+                                        }
+                                    }
+                                )
                             )
                         }
                     },

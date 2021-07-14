@@ -53,6 +53,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.BottomSheetScaffoldState
@@ -100,6 +101,7 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.coerceAtLeast
 import androidx.compose.ui.unit.dp
@@ -919,14 +921,14 @@ private fun ComposeInput(
                     value = text,
                     onValueChange = { viewModel.setText(it) },
                     autoFocus = autoFocus,
-                    onClicked = {
-                        // TODO: scroll lazyColumn
-                    },
                     placeholder = {
                         CompositionLocalProvider(LocalContentAlpha.provides(ContentAlpha.medium)) {
                             Text(text = stringResource(id = R.string.scene_compose_placeholder))
                         }
-                    }
+                    },
+                    keyboardOptions = KeyboardOptions(
+                        capitalization = KeyboardCapitalization.Sentences,
+                    )
                 )
 
                 val voteState by viewModel.voteState.observeAsState(initial = null)
@@ -973,7 +975,10 @@ private fun ColumnScope.MastodonContentWarningInput(viewModel: ComposeViewModel)
                         ) {
                             Text(text = stringResource(id = R.string.scene_compose_cw_placeholder))
                         }
-                    }
+                    },
+                    keyboardOptions = KeyboardOptions(
+                        capitalization = KeyboardCapitalization.Sentences,
+                    )
                 )
             }
             Spacer(modifier = Modifier.height(MastodonContentWarningInputDefaults.ContentPadding))
