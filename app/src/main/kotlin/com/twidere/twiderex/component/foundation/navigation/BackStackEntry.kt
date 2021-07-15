@@ -20,6 +20,9 @@
  */
 package moe.tlaster.precompose.navigation
 
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LifecycleRegistry
 import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
 import moe.tlaster.precompose.navigation.route.ComposeRoute
@@ -30,9 +33,43 @@ class BackStackEntry internal constructor(
     val pathMap: Map<String, String>,
     val queryString: QueryString? = null,
     internal val viewModel: NavControllerViewModel,
-) : ViewModelStoreOwner {
+) : ViewModelStoreOwner, LifecycleOwner {
+    private var destroyAfterTransition = false
+
     override fun getViewModelStore(): ViewModelStore {
         return viewModel.get(id = id)
+    }
+
+    private val lifecycleRegistry by lazy {
+        LifecycleRegistry(this)
+    }
+
+    override fun getLifecycle(): Lifecycle {
+        return lifecycleRegistry
+    }
+
+    fun active() {
+        lifecycleRegistry.currentState = Lifecycle.State.RESUMED
+    }
+
+    fun inActive() {
+        if (lifecycleRegistry.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
+            lifecycleRegistry.currentState = Lifecycle.State.STARTED
+        }
+        if (destroyAfterTransition) {
+            destroy()
+        }
+    }
+
+    fun destroy() {
+        if (lifecycleRegistry.currentState.isAtLeast(Lifecycle.State.RESUMED) ||
+            lifecycleRegistry.currentState == Lifecycle.State.INITIALIZED
+        ) {
+            destroyAfterTransition = true
+        } else {
+            lifecycleRegistry.currentState = Lifecycle.State.DESTROYED
+            viewModelStore.clear()
+        }
     }
 }
 

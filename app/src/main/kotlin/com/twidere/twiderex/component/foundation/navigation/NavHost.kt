@@ -21,18 +21,12 @@
 package moe.tlaster.precompose.navigation
 
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
-import androidx.compose.animation.Crossfade
-import androidx.compose.foundation.gestures.forEachGesture
-import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.pointer.consumeAllChanges
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import moe.tlaster.precompose.navigation.transition.AnimatedRoute
@@ -93,45 +87,62 @@ fun NavHost(
             navTransition = navTransition,
             manager = manager,
         ) { routeStack ->
-            LaunchedEffect(routeStack) {
-                routeStack.onActive()
+            // LaunchedEffect(routeStack) {
+            //     routeStack.onActive()
+            // }
+            // DisposableEffect(routeStack) {
+            //     onDispose {
+            //         routeStack.onInActive()
+            //     }
+            // }
+            LaunchedEffect(routeStack.currentEntry) {
+                routeStack.currentEntry?.active()
             }
-            DisposableEffect(routeStack) {
+            DisposableEffect(routeStack.currentEntry) {
                 onDispose {
-                    routeStack.onInActive()
+                    routeStack.currentEntry?.inActive()
                 }
             }
-            CompositionLocalProvider(
-                LocalLifecycleOwner provides routeStack,
-            ) {
-                stateHolder.SaveableStateProvider(routeStack.id) {
+            routeStack.stacks.forEach {
+                stateHolder.SaveableStateProvider(it.id) {
                     CompositionLocalProvider(
-                        LocalViewModelStoreOwner provides routeStack.scene
+                        LocalViewModelStoreOwner provides it,
+                        LocalLifecycleOwner provides it,
                     ) {
-                        routeStack.scene.route.content.invoke(routeStack.scene)
-                    }
-                    Crossfade(targetState = routeStack.currentDialogStack) {
-                        it?.let { backStackEntry ->
-                            CompositionLocalProvider(
-                                LocalViewModelStoreOwner provides backStackEntry
-                            ) {
-                                Box(
-                                    modifier = Modifier
-                                        .pointerInput(Unit) {
-                                            forEachGesture {
-                                                awaitPointerEventScope {
-                                                    awaitPointerEvent().changes.forEach { it.consumeAllChanges() }
-                                                }
-                                            }
-                                        }
-                                ) {
-                                    backStackEntry.route.content.invoke(backStackEntry)
-                                }
-                            }
-                        }
+                        it.route.content.invoke(it)
                     }
                 }
             }
+            // stateHolder.SaveableStateProvider(routeStack.id) {
+            //     CompositionLocalProvider(
+            //         LocalViewModelStoreOwner provides routeStack.scene,
+            //         LocalLifecycleOwner provides routeStack,
+            //     ) {
+            //         routeStack.scene.route.content.invoke(routeStack.scene)
+            //     }
+            // }
+            //
+            // Crossfade(targetState = routeStack.currentDialogStack) {
+            //     it?.let { backStackEntry ->
+            //         CompositionLocalProvider(
+            //             LocalViewModelStoreOwner provides backStackEntry,
+            //             LocalLifecycleOwner provides backStackEntry,
+            //         ) {
+            //             Box(
+            //                 modifier = Modifier
+            //                     .pointerInput(Unit) {
+            //                         forEachGesture {
+            //                             awaitPointerEventScope {
+            //                                 awaitPointerEvent().changes.forEach { it.consumeAllChanges() }
+            //                             }
+            //                         }
+            //                     }
+            //             ) {
+            //                 backStackEntry.route.content.invoke(backStackEntry)
+            //             }
+            //         }
+            //     }
+            // }
         }
     }
 }
