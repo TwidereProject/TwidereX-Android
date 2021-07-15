@@ -41,10 +41,12 @@ import com.google.accompanist.coil.rememberCoilPainter
 import com.google.accompanist.imageloading.ImageLoadState
 import com.google.accompanist.imageloading.LoadPainter
 import com.twidere.services.http.authorization.OAuth1Authorization
+import com.twidere.services.proxy.ProxyConfig
 import com.twidere.twiderex.R
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.cred.OAuthCredentials
+import com.twidere.twiderex.preferences.LocalProxyConfig
 import com.twidere.twiderex.ui.LocalActiveAccount
 import okhttp3.Headers
 import okhttp3.Request
@@ -57,13 +59,14 @@ fun NetworkImage(
     contentScale: ContentScale = ContentScale.Crop,
     placeholder: @Composable (() -> Unit)? = null,
 ) {
+    val proxyConfig = LocalProxyConfig.current
     val painter = if (data is Painter) {
         data
     } else {
         rememberCoilPainter(
             request = data, fadeIn = true,
             imageLoader = TwidereImageLoader(
-                CoilPainterDefaults.defaultImageLoader(),
+                buildRealImageLoader(proxyConfig),
                 LocalContext.current,
                 LocalActiveAccount.current
             )
@@ -78,6 +81,20 @@ fun NetworkImage(
         contentScale = contentScale,
         contentDescription = stringResource(id = R.string.accessibility_common_network_image)
     )
+}
+
+@Composable
+fun buildRealImageLoader(proxyConfig: ProxyConfig): ImageLoader {
+    return if (proxyConfig.enable &&
+        proxyConfig.server.isNotEmpty()
+    ) {
+        CoilPainterDefaults.defaultImageLoader()
+            .newBuilder()
+            .callFactory(proxyConfig.generateProxyClientBuilder().build())
+            .build()
+    } else {
+        CoilPainterDefaults.defaultImageLoader()
+    }
 }
 
 private class TwidereImageLoader(

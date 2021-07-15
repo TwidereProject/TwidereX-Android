@@ -56,8 +56,12 @@ import com.twidere.services.microblog.model.ISearchResponse
 import com.twidere.services.microblog.model.IStatus
 import com.twidere.services.microblog.model.IUser
 import com.twidere.services.microblog.model.Relationship
+import com.twidere.services.proxy.ProxyService
 import com.twidere.services.utils.await
 import com.twidere.services.utils.decodeJson
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -78,8 +82,19 @@ class MastodonService(
     DownloadMediaService,
     ListsService,
     TrendService {
-    private val resources by lazy {
-        resources ?: retrofit(
+    private lateinit var resources: MastodonResources
+
+    init {
+        updateResources(resources)
+        MainScope().launch {
+            ProxyService.proxyConfig.collect {
+                updateResources(resources)
+            }
+        }
+    }
+
+    private fun updateResources(resources: MastodonResources?) {
+        this.resources = resources ?: retrofit(
             "https://$host",
             BearerAuthorization(accessToken),
             { chain ->

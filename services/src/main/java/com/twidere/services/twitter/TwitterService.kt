@@ -40,6 +40,7 @@ import com.twidere.services.microblog.model.ISearchResponse
 import com.twidere.services.microblog.model.IStatus
 import com.twidere.services.microblog.model.IUser
 import com.twidere.services.microblog.model.Relationship
+import com.twidere.services.proxy.ProxyService
 import com.twidere.services.twitter.api.TwitterResources
 import com.twidere.services.twitter.api.UploadResources
 import com.twidere.services.twitter.model.Attachment
@@ -67,6 +68,9 @@ import com.twidere.services.utils.Base64
 import com.twidere.services.utils.await
 import com.twidere.services.utils.copyToInLength
 import com.twidere.services.utils.decodeJson
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.io.ByteArrayOutputStream
@@ -91,8 +95,21 @@ class TwitterService(
     ListsService,
     TrendService,
     DirectMessageService {
-    private val resources by lazy {
-        resources ?: retrofit(
+    private lateinit var resources: TwitterResources
+
+    private lateinit var uploadResources: UploadResources
+
+    init {
+        updateResources(resources)
+        MainScope().launch {
+            ProxyService.proxyConfig.collect {
+                updateResources(resources)
+            }
+        }
+    }
+
+    private fun updateResources(resources: TwitterResources? = null) {
+        this.resources = resources ?: retrofit(
             TWITTER_BASE_URL,
             createOAuth1Authorization(),
             { chain ->
@@ -116,9 +133,7 @@ class TwitterService(
                 }
             }
         )
-    }
-    private val uploadResources by lazy {
-        retrofit<UploadResources>(
+        this.uploadResources = retrofit<UploadResources>(
             UPLOAD_TWITTER_BASE_URL,
             createOAuth1Authorization(),
         )
