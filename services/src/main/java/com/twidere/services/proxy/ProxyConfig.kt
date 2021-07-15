@@ -52,30 +52,32 @@ data class ProxyConfig(
                         port
                     )
                     builder.proxy(Proxy(Proxy.Type.HTTP, address))
-                    builder.proxyAuthenticator { _, response ->
-                        val b = response.request.newBuilder()
-                        if (response.code == 407) {
-                            if (!userName.isNullOrEmpty() &&
-                                !password.isNullOrEmpty()
-                            ) {
-                                val credential = Credentials.basic(
-                                    userName,
-                                    password
-                                )
-                                b.header("Proxy-Authorization", credential)
+                        .proxyAuthenticator { _, response ->
+                            val b = response.request.newBuilder()
+                            if (response.code == 407) {
+                                if (userName.isNotEmpty() &&
+                                    password.isNotEmpty()
+                                ) {
+                                    val credential = Credentials.basic(
+                                        userName,
+                                        password
+                                    )
+                                    b.header("Proxy-Authorization", credential)
+                                }
                             }
+                            b.build()
                         }
-                        b.build()
-                    }
-                    builder
                 }
                 Type.REVERSE -> {
-                    // TODO REVERSE PROXY
-                    builder
+                    builder.addInterceptor(ReverseProxyInterceptor(server, userName, password))
                 }
             }
         } else {
             builder
         }
     }
+
+    /**
+     * Intercept and replace proxy patterns to real URL
+     */
 }
