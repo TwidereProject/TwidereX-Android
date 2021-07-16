@@ -97,7 +97,7 @@ fun LazyUiListsList(
             if (listType == ListType.All || listType == ListType.Owned) {
                 items(
                     ownerItems,
-                    key = { ownerItems.peek(it)?.listKey?.hashCode() ?: it }
+                    key = { it.listKey.hashCode() }
                 ) {
                     if (it != null) {
                         LazyUiListItem(
@@ -126,7 +126,7 @@ fun LazyUiListsList(
             if (listType == ListType.All || listType == ListType.Subscribed) {
                 items(
                     subscribedItems,
-                    key = { subscribedItems.peek(it)?.listKey?.hashCode() ?: it }
+                    key = { it.listKey.hashCode() }
                 ) {
                     if (it != null) {
                         LazyUiListItem(
