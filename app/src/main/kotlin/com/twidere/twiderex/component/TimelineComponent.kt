@@ -27,6 +27,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
@@ -47,7 +48,7 @@ fun TimelineComponent(
     contentPadding: PaddingValues = PaddingValues(0.dp),
     lazyListController: LazyListController? = null,
 ) {
-    val items = viewModel.source.collectAsLazyPagingItems()
+    val items by rememberUpdatedState(newValue = viewModel.source.collectAsLazyPagingItems())
     val loadingBetween by viewModel.loadingBetween.observeAsState(initial = listOf())
     SwipeToRefreshLayout(
         refreshingState = items.loadState.refresh is LoadState.Loading,
