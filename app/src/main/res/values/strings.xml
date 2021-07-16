@@ -316,6 +316,17 @@
     <string name="scene_settings_misc_nitter_dialog_usage_title">Using Third-party data provider in</string>
     <string name="scene_settings_misc_nitter_dialog_usage_content">- Twitter status threading</string>
     <string name="scene_settings_misc_nitter_dialog_usage_project_button">Project URL</string>
+    <string name="scene_settings_misc_proxy_title">Proxy settings</string>
+    <string name="scene_settings_misc_proxy_enable_title">Proxy</string>
+    <string name="scene_settings_misc_proxy_enable_description">Use proxy for all network requests</string>
+    <string name="scene_settings_misc_proxy_type_title">Proxy type</string>
+    <string name="scene_settings_misc_proxy_type_http">HTTP</string>
+    <string name="scene_settings_misc_proxy_type_reverse">Reverse</string>
+    <string name="scene_settings_misc_proxy_server">Server</string>
+    <string name="scene_settings_misc_proxy_port_title">Port</string>
+    <string name="scene_settings_misc_proxy_port_error">Proxy server port must be numbers</string>
+    <string name="scene_settings_misc_proxy_username">Username</string>
+    <string name="scene_settings_misc_proxy_password">Password</string>
     <string name="scene_settings_about_title">About</string>
     <string name="scene_settings_about_license">License</string>
     <string name="scene_settings_about_description">Next generation of Twidere for Android 5.0+. \nStill in early stage.</string>

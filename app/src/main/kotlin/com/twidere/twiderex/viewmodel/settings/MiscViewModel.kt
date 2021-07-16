@@ -24,6 +24,7 @@ import androidx.datastore.core.DataStore
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.twidere.twiderex.R
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.preferences.proto.MiscPreferences
 import dagger.assisted.AssistedInject
@@ -131,7 +132,7 @@ class MiscViewModel @AssistedInject constructor(
         try {
             proxyPort.value = value.toInt()
         } catch (e: NumberFormatException) {
-            inAppNotification.show("Proxy server port must be numbers")
+            inAppNotification.show(R.string.scene_settings_misc_proxy_port_error)
             return
         }
         viewModelScope.launch {

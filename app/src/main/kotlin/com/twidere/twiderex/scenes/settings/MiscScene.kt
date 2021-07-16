@@ -20,7 +20,6 @@
  */
 package com.twidere.twiderex.scenes.settings
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -157,10 +156,8 @@ fun ColumnScope.ProxyPreference(
     val proxyUserName by viewModel.proxyUserName.observeAsState("")
     val proxyPassword by viewModel.proxyPassword.observeAsState("")
 
-    // todo PROXY localize
     ItemHeader {
-
-        Text(text = "Proxy settings")
+        Text(text = stringResource(id = R.string.scene_settings_misc_proxy_title))
     }
     switchItem(
         value = useProxy,
@@ -168,26 +165,27 @@ fun ColumnScope.ProxyPreference(
             viewModel.setUseProxy(it)
         },
         describe = {
-            Text(text = "Use proxy for all network requests")
+            Text(text = stringResource(id = R.string.scene_settings_misc_proxy_enable_description))
         }
     ) {
-        Text(text = "Proxy")
+        Text(text = stringResource(id = R.string.scene_settings_misc_proxy_enable_title))
     }
     ItemProxy(
         enable = useProxy,
-        title = "Proxy type",
+        title = stringResource(id = R.string.scene_settings_misc_proxy_type_title),
         content = proxyTypeValue(type = proxyType),
         onClick = {
             showProxyTypeDialog.value = true
         }
     )
 
+    val serverTitle = stringResource(id = R.string.scene_settings_misc_proxy_server)
     ItemProxy(
         enable = useProxy,
-        title = "Server",
+        title = serverTitle,
         content = proxyServer,
         onClick = {
-            inputTitle.value = "server"
+            inputTitle.value = serverTitle
             inputValue.value = proxyServer
             inputChanged.value = {
                 viewModel.setProxyServer(it)
@@ -196,12 +194,13 @@ fun ColumnScope.ProxyPreference(
         }
     )
 
+    val portTitle = stringResource(id = R.string.scene_settings_misc_proxy_port_title)
     ItemProxy(
         enable = useProxy,
-        title = "Port",
+        title = portTitle,
         content = proxyPort?.toString() ?: "",
         onClick = {
-            inputTitle.value = "Port"
+            inputTitle.value = portTitle
             inputValue.value = proxyPort?.toString() ?: ""
             inputChanged.value = {
                 viewModel.setProxyPort(it)
@@ -210,12 +209,13 @@ fun ColumnScope.ProxyPreference(
         }
     )
 
+    val userNameTitle = stringResource(id = R.string.scene_settings_misc_proxy_username)
     ItemProxy(
         enable = useProxy,
-        title = "Username",
+        title = userNameTitle,
         content = proxyUserName,
         onClick = {
-            inputTitle.value = "UserName"
+            inputTitle.value = userNameTitle
             inputValue.value = proxyUserName
             inputChanged.value = {
                 viewModel.setProxyUserName(it)
@@ -223,12 +223,14 @@ fun ColumnScope.ProxyPreference(
             showProxyInputDialog.value = true
         }
     )
+
+    val passwordTitle = stringResource(id = R.string.scene_settings_misc_proxy_password)
     ItemProxy(
         enable = useProxy,
-        title = "Password",
+        title = passwordTitle,
         content = proxyPassword,
         onClick = {
-            inputTitle.value = "Password"
+            inputTitle.value = passwordTitle
             inputValue.value = proxyPassword
             inputChanged.value = {
                 viewModel.setProxyPassword(it)
@@ -241,9 +243,9 @@ fun ColumnScope.ProxyPreference(
 @Composable
 fun proxyTypeValue(type: MiscPreferences.ProxyType): String {
     return when (type) {
-        MiscPreferences.ProxyType.HTTP -> "HTTP"
-        MiscPreferences.ProxyType.REVERSE -> "Reverse"
-        MiscPreferences.ProxyType.UNRECOGNIZED -> "UnKnow"
+        MiscPreferences.ProxyType.HTTP -> stringResource(id = R.string.scene_settings_misc_proxy_type_http)
+        MiscPreferences.ProxyType.REVERSE -> stringResource(id = R.string.scene_settings_misc_proxy_type_reverse)
+        else -> stringResource(id = R.string.scene_settings_misc_proxy_type_http)
     }
 }
 
@@ -402,18 +404,19 @@ fun NitterInformationDialog(
     )
 }
 
-@SuppressLint("UnrememberedMutableState")
 @Composable
 fun ProxyTypeSelectDialog(
     onDismissRequest: () -> Unit,
     onSelect: (value: MiscPreferences.ProxyType) -> Unit,
     value: MiscPreferences.ProxyType
 ) {
-    var selected by mutableStateOf(value)
+    var selected by remember {
+        mutableStateOf(value)
+    }
     AlertDialog(
         onDismissRequest = onDismissRequest,
         title = {
-            Text(text = "Proxy type")
+            Text(text = stringResource(id = R.string.scene_settings_misc_proxy_type_title))
         },
         text = {
             Column {
@@ -474,7 +477,8 @@ fun ProxyInputDialog(
             TextField(
                 value = input,
                 onValueChange = { input = it },
-                modifier = Modifier.focusRequester(focusRequester)
+                modifier = Modifier
+                    .focusRequester(focusRequester)
                     .fillMaxWidth(),
                 colors = TextFieldDefaults.textFieldColors(
                     backgroundColor = Color.Transparent
