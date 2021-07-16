@@ -59,7 +59,7 @@ fun LazyUiDMConversationList(
     modifier: Modifier = Modifier,
     items: LazyPagingItems<UiDMConversationWithLatestMessage>,
     state: LazyListState = rememberLazyListState(),
-    key: ((index: Int) -> Any) = { items.peek(it)?.conversation?.conversationKey?.hashCode() ?: it },
+    key: ((item: UiDMConversationWithLatestMessage) -> Any) = { it.conversation.conversationKey.hashCode() },
     onItemClicked: (UiDMConversationWithLatestMessage) -> Unit = {},
     header: LazyListScope.() -> Unit = {},
     action: @Composable (user: UiDMConversationWithLatestMessage) -> Unit = {}

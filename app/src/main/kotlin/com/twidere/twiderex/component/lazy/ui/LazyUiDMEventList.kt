@@ -91,7 +91,7 @@ fun LazyUiDMEventList(
     modifier: Modifier = Modifier,
     items: LazyPagingItems<UiDMEvent>,
     state: LazyListState = rememberLazyListState(),
-    key: ((index: Int) -> Any) = { items.peek(it)?.messageKey?.hashCode() ?: it },
+    key: ((item: UiDMEvent) -> Any) = { it.messageKey.hashCode() },
     header: LazyListScope.() -> Unit = {},
     onResend: (event: UiDMEvent) -> Unit = {},
     onItemLongClick: (event: UiDMEvent) -> Unit = {}
