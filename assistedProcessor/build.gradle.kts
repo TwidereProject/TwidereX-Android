@@ -8,7 +8,7 @@ repositories {
 }
 
 dependencies {
-    implementation(libs.ksp.symbol.processing.api)
+    kspApi()
 }
 
 sourceSets.main {
