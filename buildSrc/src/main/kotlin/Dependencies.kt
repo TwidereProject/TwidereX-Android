@@ -151,7 +151,7 @@ fun DependencyHandlerScope.lifecycle() {
     implementation("androidx.lifecycle:lifecycle-livedata-ktx", Versions.lifecycle)
     // implementation("androidx.lifecycle:lifecycle-viewmodel-savedstate", Versions.lifecycle)
     implementation("androidx.lifecycle:lifecycle-common-java8", Versions.lifecycle)
-    // implementation("androidx.lifecycle:lifecycle-viewmodel-compose", Versions.lifecycle_compose)
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose", Versions.lifecycle_compose)
 }
 
 fun DependencyHandlerScope.android() {
@@ -197,9 +197,9 @@ fun DependencyHandlerScope.mockito() {
 }
 
 fun DependencyHandlerScope.androidTest() {
-    androidTestImplementation("androidx.arch.core:core-testing:2.1.0")
-    implementation("androidx.test:core", Versions.androidx_test)
-    implementation("androidx.test:runner", Versions.androidx_test)
-    implementation("androidx.test.ext:junit", Versions.extJUnitVersion)
-    implementation("androidx.test.espresso:espresso-core", Versions.espressoVersion)
+    testImplementation("androidx.arch.core:core-testing:2.1.0")
+    androidTestImplementation("androidx.test:core", Versions.androidx_test)
+    androidTestImplementation("androidx.test:runner", Versions.androidx_test)
+    androidTestImplementation("androidx.test.ext:junit", Versions.extJUnitVersion)
+    androidTestImplementation("androidx.test.espresso:espresso-core", Versions.espressoVersion)
 }
