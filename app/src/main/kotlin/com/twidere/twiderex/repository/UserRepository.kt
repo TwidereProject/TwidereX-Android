@@ -20,8 +20,6 @@
  */
 package com.twidere.twiderex.repository
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.map
 import com.twidere.services.microblog.LookupService
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.db.mapper.toDbUser
@@ -30,6 +28,8 @@ import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.toAmUser
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.model.ui.UiUser.Companion.toUi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 class UserRepository(
     private val database: CacheDatabase,
@@ -51,8 +51,8 @@ class UserRepository(
         return lookupService.lookupUsersByName(name = name).map { it.toDbUser(accountKey).toUi() }
     }
 
-    fun getUserLiveData(userKey: MicroBlogKey): LiveData<UiUser?> {
-        return database.userDao().findWithUserKeyLiveData(userKey = userKey).map {
+    fun getUserFlow(userKey: MicroBlogKey): Flow<UiUser?> {
+        return database.userDao().findWithUserKeyFlow(userKey = userKey).map {
             it?.toUi()
         }
     }

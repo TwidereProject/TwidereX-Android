@@ -54,7 +54,6 @@ compose-animation = { module = "androidx.compose.animation:animation", version.r
 compose-material-base = { module = "androidx.compose.material:material", version.ref = "compose" }
 compose-material-icons-core = { module = "androidx.compose.material:material-icons-core", version.ref = "compose" }
 compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "compose" }
-compose-runtime_livedata = { module = "androidx.compose.runtime:runtime-livedata", version.ref = "compose" }
 constraintLayout = { module = "androidx.constraintlayout:constraintlayout-compose", version.ref = "constraint_layout" }
 
 # Paging
@@ -64,7 +63,6 @@ paging-compose = { module = "androidx.paging:paging-compose", version.ref = "pag
 # Lifecycle
 lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycle_base" }
 lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycle_base" }
-lifecycle-livedata-ktx = { module = "androidx.lifecycle:lifecycle-livedata-ktx", version.ref = "lifecycle_base" }
 lifecycle-viewmodel-savedstate = { module = "androidx.lifecycle:lifecycle-viewmodel-savedstate", version.ref = "lifecycle_base" }
 lifecycle-common-java8 = { module = "androidx.lifecycle:lifecycle-common-java8", version.ref = "lifecycle_base" }
 lifecycle-viewmodel-compose_compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle_compose" }
@@ -153,7 +151,6 @@ compose = [
     "compose-material-base",
     "compose-material-icons-core",
     "compose-material-icons-extended",
-    "compose-runtime_livedata",
 ]
 paging = [
     "paging-runtime",
@@ -162,7 +159,6 @@ paging = [
 lifecycle = [
     "lifecycle-runtime-ktx",
     "lifecycle-viewmodel-ktx",
-    "lifecycle-livedata-ktx",
     "lifecycle-viewmodel-savedstate",
     "lifecycle-common-java8",
     "lifecycle-viewmodel-compose_compose",

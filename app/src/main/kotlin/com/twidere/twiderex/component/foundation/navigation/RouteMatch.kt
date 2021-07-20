@@ -27,8 +27,9 @@ internal class RouteMatch {
     var matches = false
     var route: ComposeRoute? = null
     var vars = arrayListOf<String>()
+    var keys = arrayListOf<String>()
     var pathMap = linkedMapOf<String, String>()
-    fun key(keys: List<String>) {
+    fun key() {
         val size = min(keys.size, vars.size)
         for (i in 0 until size) {
             pathMap[keys[i]] = vars[i]

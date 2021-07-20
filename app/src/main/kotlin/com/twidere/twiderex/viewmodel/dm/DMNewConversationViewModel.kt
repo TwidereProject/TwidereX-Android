@@ -20,9 +20,7 @@
  */
 package com.twidere.twiderex.viewmodel.dm
 
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
@@ -37,6 +35,7 @@ import com.twidere.twiderex.repository.DirectMessageRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -51,10 +50,10 @@ class DMNewConversationViewModel @AssistedInject constructor(
         fun create(account: AccountDetails): DMNewConversationViewModel
     }
 
-    val input = MutableLiveData("")
+    val input = MutableStateFlow("")
 
     @OptIn(FlowPreview::class)
-    val sourceFlow = input.asFlow().debounce(666L).map {
+    val sourceFlow = input.debounce(666L).map {
         it.takeIf { it.isNotEmpty() }?.let {
             Pager(
                 config = PagingConfig(

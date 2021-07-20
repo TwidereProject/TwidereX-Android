@@ -20,18 +20,18 @@
  */
 package com.twidere.twiderex.utils
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.liveData
 import com.twidere.services.mastodon.MastodonService
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.ui.UiEmoji
 import com.twidere.twiderex.model.ui.UiEmoji.Companion.toUi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 
 object MastodonEmojiCache {
-    private val items = hashMapOf<String, LiveData<List<UiEmoji>>>()
-    fun get(account: AccountDetails): LiveData<List<UiEmoji>> {
+    private val items = hashMapOf<String, Flow<List<UiEmoji>>>()
+    fun get(account: AccountDetails): Flow<List<UiEmoji>> {
         return items.getOrPut(account.accountKey.host) {
-            liveData {
+            flow {
                 account.service.let {
                     it as MastodonService
                 }.let {

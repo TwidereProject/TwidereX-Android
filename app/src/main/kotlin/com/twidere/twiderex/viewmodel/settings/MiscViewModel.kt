@@ -21,7 +21,6 @@
 package com.twidere.twiderex.viewmodel.settings
 
 import androidx.datastore.core.DataStore
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.twidere.twiderex.R
@@ -45,7 +44,7 @@ class MiscViewModel @AssistedInject constructor(
     }
 
     val nitter by lazy {
-        MutableLiveData("")
+        MutableStateFlow("")
     }
 
     val useProxy by lazy {

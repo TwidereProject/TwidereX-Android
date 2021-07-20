@@ -20,13 +20,13 @@
  */
 package com.twidere.twiderex.db.dao
 
-import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.twidere.twiderex.db.model.DbDraft
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface DraftDao {
@@ -34,7 +34,7 @@ interface DraftDao {
     suspend fun insertAll(vararg draft: DbDraft)
 
     @Query("SELECT * FROM draft")
-    fun getAll(): LiveData<List<DbDraft>>
+    fun getAll(): Flow<List<DbDraft>>
 
     @Query("SELECT * FROM draft WHERE _id == :id")
     suspend fun get(id: String): DbDraft?
@@ -43,5 +43,5 @@ interface DraftDao {
     suspend fun remove(draft: DbDraft)
 
     @Query("SELECT COUNT(*) FROM draft")
-    fun getDraftCount(): LiveData<Long>
+    fun getDraftCount(): Flow<Long>
 }

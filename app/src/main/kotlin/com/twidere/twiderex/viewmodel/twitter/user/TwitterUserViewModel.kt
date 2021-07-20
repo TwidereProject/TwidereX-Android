@@ -20,9 +20,7 @@
  */
 package com.twidere.twiderex.viewmodel.twitter.user
 
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.liveData
 import com.twidere.services.microblog.LookupService
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.notification.InAppNotification
@@ -30,6 +28,8 @@ import com.twidere.twiderex.repository.UserRepository
 import com.twidere.twiderex.utils.notify
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flow
 
 class TwitterUserViewModel @AssistedInject constructor(
     private val repository: UserRepository,
@@ -46,9 +46,9 @@ class TwitterUserViewModel @AssistedInject constructor(
         ): TwitterUserViewModel
     }
 
-    val error = MutableLiveData<Throwable>(null)
+    val error = MutableStateFlow<Throwable?>(null)
 
-    val user = liveData {
+    val user = flow {
         runCatching {
             repository.lookupUserByName(
                 screenName,
@@ -60,7 +60,7 @@ class TwitterUserViewModel @AssistedInject constructor(
         }.onFailure {
             it.notify(inAppNotification)
             emit(null)
-            error.postValue(it)
+            error.value = it
         }
     }
 }

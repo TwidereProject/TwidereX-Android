@@ -29,8 +29,11 @@ import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.notification.NotificationEvent
 import com.twidere.twiderex.repository.ListsRepository
 import com.twidere.twiderex.viewmodel.ViewModelTestBase
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert
 import org.junit.Rule
@@ -63,6 +66,8 @@ class ListsCreateViewModelTest : ViewModelTestBase() {
 
     private lateinit var createViewModel: ListsCreateViewModel
 
+    private val scope = CoroutineScope(Dispatchers.Main)
+
     override fun setUp() {
         super.setUp()
         mockRepository = ListsRepository(MockCenter.mockCacheDatabase())
@@ -81,7 +86,11 @@ class ListsCreateViewModelTest : ViewModelTestBase() {
         whenever(mockAccount.accountKey).thenReturn(MicroBlogKey.twitter("123"))
         errorNotification = null
         mockSuccessObserver.onChanged(false)
-        createViewModel.loading.observeForever(mockLoadingObserver)
+        scope.launch {
+            createViewModel.loading.collect {
+                mockLoadingObserver.onChanged(it)
+            }
+        }
     }
 
     @Test
@@ -104,14 +113,21 @@ class ListsCreateViewModelTest : ViewModelTestBase() {
         Assert.assertNotNull(errorNotification)
     }
 
-    private fun verifySuccessAndLoadingBefore(loadingObserver: Observer<Boolean>, successObserver: Observer<Boolean>) {
+    private fun verifySuccessAndLoadingBefore(
+        loadingObserver: Observer<Boolean>,
+        successObserver: Observer<Boolean>
+    ) {
         verify(loadingObserver, times(1)).onChanged(false)
         verify(successObserver).onChanged(false)
     }
 
-    private fun verifySuccessAndLoadingAfter(loadingObserver: Observer<Boolean>, successObserver: Observer<Boolean>, success: Boolean) {
+    private fun verifySuccessAndLoadingAfter(
+        loadingObserver: Observer<Boolean>,
+        successObserver: Observer<Boolean>,
+        success: Boolean
+    ) {
         verify(loadingObserver, times(1)).onChanged(true)
-        verify(loadingObserver, times(2)).onChanged(false)
+        verify(loadingObserver, times(1)).onChanged(false)
         verify(successObserver, if (success) times(1) else times(2)).onChanged(success)
     }
 }

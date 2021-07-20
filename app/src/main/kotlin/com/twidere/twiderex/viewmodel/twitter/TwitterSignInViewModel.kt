@@ -21,7 +21,6 @@
 package com.twidere.twiderex.viewmodel.twitter
 
 import android.accounts.Account
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.twidere.services.http.MicroBlogException
@@ -44,6 +43,7 @@ import com.twidere.twiderex.utils.json
 import com.twidere.twiderex.utils.notify
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
@@ -69,8 +69,8 @@ class TwitterSignInViewModel @AssistedInject constructor(
         ): TwitterSignInViewModel
     }
 
-    val success = MutableLiveData(false)
-    val loading = MutableLiveData(false)
+    val success = MutableStateFlow(false)
+    val loading = MutableStateFlow(false)
 
     init {
         viewModelScope.launch {
@@ -80,7 +80,7 @@ class TwitterSignInViewModel @AssistedInject constructor(
     }
 
     private suspend fun beginOAuth(): Boolean {
-        loading.postValue(true)
+        loading.value = true
         try {
             val service = TwitterOAuthService(
                 consumerKey,
@@ -156,7 +156,7 @@ class TwitterSignInViewModel @AssistedInject constructor(
         } catch (e: HttpException) {
             e.message?.let { inAppNotification.show(it) }
         }
-        loading.postValue(false)
+        loading.value = false
         return false
     }
 
@@ -165,6 +165,6 @@ class TwitterSignInViewModel @AssistedInject constructor(
     }
 
     fun cancel() {
-        loading.postValue(false)
+        loading.value = false
     }
 }

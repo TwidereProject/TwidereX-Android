@@ -20,7 +20,6 @@
  */
 package com.twidere.twiderex.db.dao
 
-import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -31,6 +30,7 @@ import androidx.room.Update
 import com.twidere.twiderex.db.model.DbStatusV2
 import com.twidere.twiderex.db.model.DbStatusWithReference
 import com.twidere.twiderex.model.MicroBlogKey
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface StatusDao {
@@ -49,7 +49,7 @@ interface StatusDao {
 
     @Transaction
     @Query("SELECT * FROM status WHERE statusKey == :key")
-    fun findWithStatusKeyWithReferenceLiveData(key: MicroBlogKey): LiveData<DbStatusWithReference?>
+    fun findWithStatusKeyWithReferenceFlow(key: MicroBlogKey): Flow<DbStatusWithReference?>
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
     suspend fun update(status: List<DbStatusV2>)
