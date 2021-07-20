@@ -35,11 +35,13 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import org.junit.Assert
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -72,7 +74,11 @@ class ListsModifyViewModelTest : ViewModelTestBase() {
     fun updateList_successExpectTrue(): Unit = runBlocking(Dispatchers.Main) {
         verifySuccessAndLoadingBefore(mockLoadingObserver, mockSuccessObserver)
         async {
-            modifyViewModel.editList(listId = "123", title = "title", private = false) { success, _ ->
+            modifyViewModel.editList(
+                listId = "123",
+                title = "title",
+                private = false
+            ) { success, _ ->
                 mockSuccessObserver.onChanged(success)
             }
         }.await()
@@ -84,7 +90,11 @@ class ListsModifyViewModelTest : ViewModelTestBase() {
         verifySuccessAndLoadingBefore(mockLoadingObserver, mockSuccessObserver)
         Assert.assertNull(errorNotification)
         async {
-            modifyViewModel.editList(listId = "error", title = "name", private = false) { success, _ ->
+            modifyViewModel.editList(
+                listId = "error",
+                title = "name",
+                private = false
+            ) { success, _ ->
                 mockSuccessObserver.onChanged(success)
             }
         }.await()
@@ -152,17 +162,18 @@ class ListsModifyViewModelTest : ViewModelTestBase() {
     }
 
     @Test
-    fun unsubscribeList_failedExpectFalseAndShowNotification(): Unit = runBlocking(Dispatchers.Main) {
-        verifySuccessAndLoadingBefore(mockLoadingObserver, mockSuccessObserver)
-        Assert.assertNull(errorNotification)
-        async {
-            modifyViewModel.unsubscribeList(MicroBlogKey.twitter("error")) { success, _ ->
-                mockSuccessObserver.onChanged(success)
-            }
-        }.await()
-        verifySuccessAndLoadingAfter(mockLoadingObserver, mockSuccessObserver, false)
-        Assert.assertNotNull(errorNotification)
-    }
+    fun unsubscribeList_failedExpectFalseAndShowNotification(): Unit =
+        runBlocking(Dispatchers.Main) {
+            verifySuccessAndLoadingBefore(mockLoadingObserver, mockSuccessObserver)
+            Assert.assertNull(errorNotification)
+            async {
+                modifyViewModel.unsubscribeList(MicroBlogKey.twitter("error")) { success, _ ->
+                    mockSuccessObserver.onChanged(success)
+                }
+            }.await()
+            verifySuccessAndLoadingAfter(mockLoadingObserver, mockSuccessObserver, false)
+            Assert.assertNotNull(errorNotification)
+        }
 
     override fun setUp() {
         super.setUp()
@@ -177,23 +188,32 @@ class ListsModifyViewModelTest : ViewModelTestBase() {
             errorNotification = it.getArgument(0) as NotificationEvent
             Unit
         }
-        whenever(mockAccount.service).thenReturn(MockCenter.mockListsService())
-        whenever(mockAccount.accountKey).thenReturn(MicroBlogKey.twitter("123"))
+        doReturn(MockCenter.mockListsService()).whenever(mockAccount).service
+        doReturn(MicroBlogKey.twitter("123")).whenever(mockAccount).accountKey
         errorNotification = null
         mockSuccessObserver.onChanged(false)
         scope.launch {
-            modifyViewModel.loading.collect {
-                mockLoadingObserver.onChanged(it)
+            withContext(Dispatchers.Main) {
+                modifyViewModel.loading.collect {
+                    mockLoadingObserver.onChanged(it)
+                }
             }
         }
     }
 
-    private fun verifySuccessAndLoadingBefore(loadingObserver: Observer<Boolean>, successObserver: Observer<Boolean>) {
+    private fun verifySuccessAndLoadingBefore(
+        loadingObserver: Observer<Boolean>,
+        successObserver: Observer<Boolean>
+    ) {
         verify(loadingObserver, times(1)).onChanged(false)
         verify(successObserver).onChanged(false)
     }
 
-    private fun verifySuccessAndLoadingAfter(loadingObserver: Observer<Boolean>, successObserver: Observer<Boolean>, success: Boolean) {
+    private fun verifySuccessAndLoadingAfter(
+        loadingObserver: Observer<Boolean>,
+        successObserver: Observer<Boolean>,
+        success: Boolean
+    ) {
         verify(loadingObserver, times(1)).onChanged(true)
         verify(loadingObserver, times(1)).onChanged(false)
         verify(successObserver, if (success) times(1) else times(2)).onChanged(success)
