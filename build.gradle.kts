@@ -7,7 +7,7 @@ buildscript {
         google()
     }
     dependencies {
-        classpath(kotlin("gradle-plugin", version = Versions.kotlin))
+        classpath(kotlin("gradle-plugin", version = Versions.Kotlin.lang))
         classpath("com.android.tools.build:gradle:${Versions.agp}")
     }
 }
@@ -17,7 +17,7 @@ allprojects {
 
     tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
         kotlinOptions {
-            jvmTarget = Lang.jvmTarget
+            jvmTarget = Versions.Java.jvmTarget
             allWarningsAsErrors = true
             freeCompilerArgs = listOf(
                 "-Xopt-in=kotlin.RequiresOptIn",

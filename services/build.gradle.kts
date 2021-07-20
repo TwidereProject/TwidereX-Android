@@ -1,11 +1,11 @@
 plugins {
     kotlin("jvm")
-    kotlin("plugin.serialization").version(Versions.kotlin)
+    kotlin("plugin.serialization").version(Versions.Kotlin.lang)
 }
 
 java {
-    sourceCompatibility = Lang.java
-    targetCompatibility = Lang.java
+    sourceCompatibility = Versions.Java.java
+    targetCompatibility = Versions.Java.java
 }
 
 tasks.test {

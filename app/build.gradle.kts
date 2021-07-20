@@ -28,7 +28,7 @@ plugins {
     kotlin("android")
     kotlin("kapt")
     id("com.google.protobuf").version("0.8.17")
-    kotlin("plugin.serialization").version(Versions.kotlin)
+    kotlin("plugin.serialization").version(Versions.Kotlin.lang)
     id("com.google.devtools.ksp").version(Versions.ksp)
 }
 
@@ -135,8 +135,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = Lang.java
-        targetCompatibility = Lang.java
+        sourceCompatibility = Versions.Java.java
+        targetCompatibility = Versions.Java.java
     }
     buildFeatures {
         compose = true
