@@ -31,20 +31,21 @@ import com.twidere.twiderex.repository.ListsRepository
 import com.twidere.twiderex.viewmodel.ViewModelTestBase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import org.junit.Assert
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 class ListsModifyViewModelTest : ViewModelTestBase() {
     @get:Rule
@@ -55,8 +56,10 @@ class ListsModifyViewModelTest : ViewModelTestBase() {
     @Mock
     private lateinit var mockAppNotification: InAppNotification
 
-    @Mock
-    private lateinit var mockAccount: AccountDetails
+    private val mockAccount: AccountDetails = mock {
+        on { service }.doReturn(MockCenter.mockListsService())
+        on { accountKey }.doReturn(MicroBlogKey.twitter("123"))
+    }
 
     @Mock
     private lateinit var mockSuccessObserver: Observer<Boolean>
@@ -73,15 +76,16 @@ class ListsModifyViewModelTest : ViewModelTestBase() {
     @Test
     fun updateList_successExpectTrue(): Unit = runBlocking(Dispatchers.Main) {
         verifySuccessAndLoadingBefore(mockLoadingObserver, mockSuccessObserver)
-        async {
+        suspendCoroutine<Boolean> {
             modifyViewModel.editList(
                 listId = "123",
                 title = "title",
                 private = false
             ) { success, _ ->
                 mockSuccessObserver.onChanged(success)
+                it.resume(success)
             }
-        }.await()
+        }
         verifySuccessAndLoadingAfter(mockLoadingObserver, mockSuccessObserver, true)
     }
 
@@ -89,15 +93,16 @@ class ListsModifyViewModelTest : ViewModelTestBase() {
     fun updateList_failedExpectFalseAndShowNotification(): Unit = runBlocking(Dispatchers.Main) {
         verifySuccessAndLoadingBefore(mockLoadingObserver, mockSuccessObserver)
         Assert.assertNull(errorNotification)
-        async {
+        suspendCoroutine<Boolean> {
             modifyViewModel.editList(
                 listId = "error",
                 title = "name",
                 private = false
             ) { success, _ ->
                 mockSuccessObserver.onChanged(success)
+                it.resume(success)
             }
-        }.await()
+        }
         verifySuccessAndLoadingAfter(mockLoadingObserver, mockSuccessObserver, false)
         Assert.assertNotNull(errorNotification)
     }
@@ -105,11 +110,12 @@ class ListsModifyViewModelTest : ViewModelTestBase() {
     @Test
     fun deleteList_successExpectTrue(): Unit = runBlocking(Dispatchers.Main) {
         verifySuccessAndLoadingBefore(mockLoadingObserver, mockSuccessObserver)
-        async {
+        suspendCoroutine<Boolean> {
             modifyViewModel.deleteList(listId = "123", MicroBlogKey.Empty) { success, _ ->
                 mockSuccessObserver.onChanged(success)
+                it.resume(success)
             }
-        }.await()
+        }
         verifySuccessAndLoadingAfter(mockLoadingObserver, mockSuccessObserver, true)
     }
 
@@ -117,11 +123,12 @@ class ListsModifyViewModelTest : ViewModelTestBase() {
     fun deleteList_failedExpectFalseAndShowNotification(): Unit = runBlocking(Dispatchers.Main) {
         verifySuccessAndLoadingBefore(mockLoadingObserver, mockSuccessObserver)
         Assert.assertNull(errorNotification)
-        async {
+        suspendCoroutine<Boolean> {
             modifyViewModel.deleteList(listId = "error", MicroBlogKey.Empty) { success, _ ->
                 mockSuccessObserver.onChanged(success)
+                it.resume(success)
             }
-        }.await()
+        }
         verifySuccessAndLoadingAfter(mockLoadingObserver, mockSuccessObserver, false)
         Assert.assertNotNull(errorNotification)
     }
@@ -129,11 +136,12 @@ class ListsModifyViewModelTest : ViewModelTestBase() {
     @Test
     fun subscribeList_successExpectTrue(): Unit = runBlocking(Dispatchers.Main) {
         verifySuccessAndLoadingBefore(mockLoadingObserver, mockSuccessObserver)
-        async {
+        suspendCoroutine<Boolean> {
             modifyViewModel.subscribeList(MicroBlogKey.twitter("123")) { success, _ ->
                 mockSuccessObserver.onChanged(success)
+                it.resume(success)
             }
-        }.await()
+        }
         verifySuccessAndLoadingAfter(mockLoadingObserver, mockSuccessObserver, true)
     }
 
@@ -141,11 +149,12 @@ class ListsModifyViewModelTest : ViewModelTestBase() {
     fun subscribeList_failedExpectFalseAndShowNotification(): Unit = runBlocking(Dispatchers.Main) {
         verifySuccessAndLoadingBefore(mockLoadingObserver, mockSuccessObserver)
         Assert.assertNull(errorNotification)
-        async {
+        suspendCoroutine<Boolean> {
             modifyViewModel.subscribeList(MicroBlogKey.twitter("error")) { success, _ ->
                 mockSuccessObserver.onChanged(success)
+                it.resume(success)
             }
-        }.await()
+        }
         verifySuccessAndLoadingAfter(mockLoadingObserver, mockSuccessObserver, false)
         Assert.assertNotNull(errorNotification)
     }
@@ -153,11 +162,12 @@ class ListsModifyViewModelTest : ViewModelTestBase() {
     @Test
     fun unsubscribeList_successExpectTrue(): Unit = runBlocking(Dispatchers.Main) {
         verifySuccessAndLoadingBefore(mockLoadingObserver, mockSuccessObserver)
-        async {
+        suspendCoroutine<Boolean> {
             modifyViewModel.unsubscribeList(MicroBlogKey.twitter("123")) { success, _ ->
                 mockSuccessObserver.onChanged(success)
+                it.resume(success)
             }
-        }.await()
+        }
         verifySuccessAndLoadingAfter(mockLoadingObserver, mockSuccessObserver, true)
     }
 
@@ -166,11 +176,12 @@ class ListsModifyViewModelTest : ViewModelTestBase() {
         runBlocking(Dispatchers.Main) {
             verifySuccessAndLoadingBefore(mockLoadingObserver, mockSuccessObserver)
             Assert.assertNull(errorNotification)
-            async {
+            suspendCoroutine<Boolean> {
                 modifyViewModel.unsubscribeList(MicroBlogKey.twitter("error")) { success, _ ->
                     mockSuccessObserver.onChanged(success)
+                    it.resume(success)
                 }
-            }.await()
+            }
             verifySuccessAndLoadingAfter(mockLoadingObserver, mockSuccessObserver, false)
             Assert.assertNotNull(errorNotification)
         }
@@ -188,15 +199,11 @@ class ListsModifyViewModelTest : ViewModelTestBase() {
             errorNotification = it.getArgument(0) as NotificationEvent
             Unit
         }
-        doReturn(MockCenter.mockListsService()).whenever(mockAccount).service
-        doReturn(MicroBlogKey.twitter("123")).whenever(mockAccount).accountKey
         errorNotification = null
         mockSuccessObserver.onChanged(false)
         scope.launch {
-            withContext(Dispatchers.Main) {
-                modifyViewModel.loading.collect {
-                    mockLoadingObserver.onChanged(it)
-                }
+            modifyViewModel.loading.collect {
+                mockLoadingObserver.onChanged(it)
             }
         }
     }
