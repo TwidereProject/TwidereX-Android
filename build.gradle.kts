@@ -28,9 +28,9 @@ allprojects {
     spotless {
         kotlin {
             target("**/*.kt")
-            targetExclude("$buildDir/**/*.kt", "bin/**/*.kt")
+            targetExclude("$buildDir/**/*.kt", "bin/**/*.kt", "buildSrc/**/*.kt")
             ktlint(Versions.ktlint)
-            // licenseHeaderFile(rootProject.file("spotless/license.kt"))
+            licenseHeaderFile(rootProject.file("spotless/license"))
         }
         kotlinGradle {
             target("*.gradle.kts")
@@ -39,7 +39,7 @@ allprojects {
         java {
             target("**/*.java")
             targetExclude("$buildDir/**/*.java", "bin/**/*.java")
-            // licenseHeaderFile(rootProject.file("spotless/license.kt"))
+            licenseHeaderFile(rootProject.file("spotless/license"))
         }
     }
 }
