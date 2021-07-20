@@ -21,6 +21,7 @@
 package com.twidere.twiderex.di
 
 import android.content.Context
+import com.twidere.twiderex.http.TwidereServiceInitializer
 import com.twidere.twiderex.notification.NotificationChannelInitializer
 import com.twidere.twiderex.notification.NotificationInitializer
 import com.twidere.twiderex.worker.dm.DirectMessageInitializer
@@ -45,4 +46,5 @@ interface InitializerEntryPoint {
     fun inject(initializer: NotificationChannelInitializer)
     fun inject(initializer: NotificationInitializer)
     fun inject(initializer: DirectMessageInitializer)
+    fun inject(initializer: TwidereServiceInitializer)
 }

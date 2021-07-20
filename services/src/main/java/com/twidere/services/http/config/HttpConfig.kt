@@ -18,14 +18,17 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.services.proxy
+package com.twidere.services.http.config
 
-import kotlinx.coroutines.flow.MutableStateFlow
+import com.twidere.services.proxy.ProxyConfig
+import okhttp3.OkHttpClient
 
-object ProxyService {
-    val proxyConfig = MutableStateFlow(ProxyConfig())
-
-    fun updateProxyConfig(proxyConfig: ProxyConfig) {
-        this.proxyConfig.value = proxyConfig
+data class HttpConfig(
+    val proxyConfig: ProxyConfig = ProxyConfig()
+) {
+    fun createHttpClientBuilder(): OkHttpClient.Builder {
+        return OkHttpClient.Builder().let {
+            proxyConfig.proxy(it)
+        }
     }
 }

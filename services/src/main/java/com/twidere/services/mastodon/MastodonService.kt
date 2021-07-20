@@ -21,9 +21,8 @@
 package com.twidere.services.mastodon
 
 import com.twidere.services.http.AuthorizationInterceptor
-import com.twidere.services.http.MicroBlogHttpException
+import com.twidere.services.http.HttpClientFactory
 import com.twidere.services.http.authorization.BearerAuthorization
-import com.twidere.services.http.retrofit
 import com.twidere.services.mastodon.api.MastodonResources
 import com.twidere.services.mastodon.model.Context
 import com.twidere.services.mastodon.model.Emoji
@@ -56,14 +55,8 @@ import com.twidere.services.microblog.model.ISearchResponse
 import com.twidere.services.microblog.model.IStatus
 import com.twidere.services.microblog.model.IUser
 import com.twidere.services.microblog.model.Relationship
-import com.twidere.services.proxy.ProxyService
 import com.twidere.services.utils.await
-import com.twidere.services.utils.decodeJson
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
 import okhttp3.MultipartBody
-import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.InputStream
@@ -71,7 +64,7 @@ import java.io.InputStream
 class MastodonService(
     private val host: String,
     private val accessToken: String,
-    resources: MastodonResources? = null
+    private val httpClientFactory: HttpClientFactory
 ) : MicroBlogService,
     TimelineService,
     LookupService,
@@ -82,35 +75,12 @@ class MastodonService(
     DownloadMediaService,
     ListsService,
     TrendService {
-    private lateinit var resources: MastodonResources
-
-    init {
-        updateResources(resources)
-        MainScope().launch {
-            ProxyService.proxyConfig.collect {
-                updateResources(resources)
-            }
-        }
-    }
-
-    private fun updateResources(resources: MastodonResources?) {
-        this.resources = resources ?: retrofit(
-            "https://$host",
-            BearerAuthorization(accessToken),
-            { chain ->
-                val response = chain.proceed(chain.request())
-                if (!response.isSuccessful) {
-                    response.body?.string()?.takeIf {
-                        it.isNotEmpty()
-                    }?.let { content ->
-                        throw content.decodeJson<MastodonException>()
-                    } ?: throw MicroBlogHttpException(response.code)
-                } else {
-                    response
-                }
-            }
-        )
-    }
+    private val resources: MastodonResources get() = httpClientFactory.createResources(
+        clazz = MastodonResources::class.java,
+        baseUrl = "https://$host",
+        authorization = BearerAuthorization(accessToken),
+        useCache = true
+    )
 
     override suspend fun homeTimeline(
         count: Int,
@@ -336,8 +306,7 @@ class MastodonService(
     suspend fun emojis(): List<Emoji> = resources.emojis()
 
     override suspend fun download(target: String): InputStream {
-        return OkHttpClient
-            .Builder()
+        return httpClientFactory.createHttpClientBuilder()
             .addInterceptor(AuthorizationInterceptor(BearerAuthorization(accessToken)))
             .build()
             .newCall(

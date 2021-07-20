@@ -42,12 +42,12 @@ import coil.request.ImageRequest
 import coil.request.ImageResult
 import coil.util.CoilUtils
 import com.twidere.services.http.authorization.OAuth1Authorization
-import com.twidere.services.proxy.ProxyConfig
+import com.twidere.services.http.config.HttpConfig
 import com.twidere.twiderex.R
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.cred.OAuthCredentials
-import com.twidere.twiderex.preferences.LocalProxyConfig
+import com.twidere.twiderex.preferences.LocalHttpConfig
 import com.twidere.twiderex.ui.LocalActiveAccount
 import okhttp3.Headers
 import okhttp3.Request
@@ -61,14 +61,14 @@ fun NetworkImage(
     contentScale: ContentScale = ContentScale.Crop,
     placeholder: @Composable (() -> Unit)? = null,
 ) {
-    val proxyConfig = LocalProxyConfig.current
+    val httpConfig = LocalHttpConfig.current
     val painter = if (data is Painter) {
         data
     } else {
         rememberImagePainter(
             data = data,
             imageLoader = TwidereImageLoader(
-                buildRealImageLoader(proxyConfig),
+                buildRealImageLoader(httpConfig),
                 LocalContext.current,
                 LocalActiveAccount.current
             ),
@@ -89,14 +89,14 @@ fun NetworkImage(
 }
 
 @Composable
-fun buildRealImageLoader(proxyConfig: ProxyConfig): ImageLoader {
-    return if (proxyConfig.enable &&
-        proxyConfig.server.isNotEmpty()
+fun buildRealImageLoader(httpConfig: HttpConfig): ImageLoader {
+    return if (httpConfig.proxyConfig.enable &&
+        httpConfig.proxyConfig.server.isNotEmpty()
     ) {
         LocalImageLoader.current
             .newBuilder()
             .callFactory(
-                proxyConfig.generateProxyClientBuilder()
+                httpConfig.createHttpClientBuilder()
                     .cache(CoilUtils.createDefaultCache(LocalContext.current))
                     .build()
             )

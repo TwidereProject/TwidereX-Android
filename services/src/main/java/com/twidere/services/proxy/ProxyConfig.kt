@@ -39,8 +39,7 @@ data class ProxyConfig(
         REVERSE
     }
 
-    fun generateProxyClientBuilder(): OkHttpClient.Builder {
-        val builder = OkHttpClient.Builder()
+    fun proxy(builder: OkHttpClient.Builder): OkHttpClient.Builder {
         return if (enable) {
             when (type) {
                 Type.HTTP -> {

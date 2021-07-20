@@ -26,8 +26,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.datastore.core.DataStore
+import com.twidere.services.http.config.HttpConfig
 import com.twidere.services.proxy.ProxyConfig
-import com.twidere.services.proxy.ProxyService
 import com.twidere.twiderex.preferences.proto.AppearancePreferences
 import com.twidere.twiderex.preferences.proto.DisplayPreferences
 import com.twidere.twiderex.preferences.proto.MiscPreferences
@@ -37,7 +37,7 @@ import javax.inject.Inject
 
 val LocalAppearancePreferences = compositionLocalOf<AppearancePreferences> { error("No AppearancePreferences") }
 val LocalDisplayPreferences = compositionLocalOf<DisplayPreferences> { error("No DisplayPreferences") }
-val LocalProxyConfig = compositionLocalOf<ProxyConfig> { error("No Proxy preferences") }
+val LocalHttpConfig = compositionLocalOf<HttpConfig> { error("No Http config preferences") }
 data class PreferencesHolder @Inject constructor(
     val appearancePreferences: DataStore<AppearancePreferences>,
     val displayPreferences: DataStore<DisplayPreferences>,
@@ -58,25 +58,27 @@ fun ProvidePreferences(
     val proxyConfig by holder.miscPreferences
         .data
         .map {
-            ProxyConfig(
-                enable = it.useProxy,
-                server = it.proxyServer,
-                port = it.proxyPort,
-                userName = it.proxyUserName,
-                password = it.proxyPassword,
-                type = when (it.proxyType) {
-                    MiscPreferences.ProxyType.REVERSE -> ProxyConfig.Type.REVERSE
-                    else -> ProxyConfig.Type.HTTP
-                }
-            ).apply { ProxyService.updateProxyConfig(this) }
+            HttpConfig(
+                proxyConfig = ProxyConfig(
+                    enable = it.useProxy,
+                    server = it.proxyServer,
+                    port = it.proxyPort,
+                    userName = it.proxyUserName,
+                    password = it.proxyPassword,
+                    type = when (it.proxyType) {
+                        MiscPreferences.ProxyType.REVERSE -> ProxyConfig.Type.REVERSE
+                        else -> ProxyConfig.Type.HTTP
+                    }
+                )
+            )
         }
-        .collectAsState(initial = ProxyConfig())
+        .collectAsState(initial = HttpConfig())
 
     CompositionLocalProvider(
         LocalAppearancePreferences provides appearances,
         LocalDisplayPreferences provides display,
         LocalVideoPlayback provides display.autoPlayback,
-        LocalProxyConfig provides proxyConfig
+        LocalHttpConfig provides proxyConfig
     ) {
         content.invoke()
     }
