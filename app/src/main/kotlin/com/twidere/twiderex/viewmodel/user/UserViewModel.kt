@@ -20,7 +20,6 @@
  */
 package com.twidere.twiderex.viewmodel.user
 
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.twidere.services.microblog.LookupService
@@ -33,6 +32,7 @@ import com.twidere.twiderex.repository.UserRepository
 import com.twidere.twiderex.utils.notify
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
 class UserViewModel @AssistedInject constructor(
@@ -54,14 +54,14 @@ class UserViewModel @AssistedInject constructor(
         account.service as RelationshipService
     }
 
-    val refreshing = MutableLiveData(false)
-    val loadingRelationship = MutableLiveData(false)
-    val user = repository.getUserLiveData(userKey)
-    val relationship = MutableLiveData<IRelationship>()
+    val refreshing = MutableStateFlow(false)
+    val loadingRelationship = MutableStateFlow(false)
+    val user = repository.getUserFlow(userKey)
+    val relationship = MutableStateFlow<IRelationship?>(null)
     val isMe = userKey == account.accountKey
 
     fun refresh() = viewModelScope.launch {
-        refreshing.postValue(true)
+        refreshing.value = true
         runCatching {
             repository.lookupUserById(
                 userKey.id,
@@ -71,42 +71,42 @@ class UserViewModel @AssistedInject constructor(
         }.onFailure {
             it.notify(inAppNotification)
         }
-        refreshing.postValue(false)
+        refreshing.value = false
     }
 
     fun follow() = viewModelScope.launch {
-        loadingRelationship.postValue(true)
+        loadingRelationship.value = true
         runCatching {
             relationshipService.follow(userKey.id)
         }.onSuccess {
             loadRelationShip()
         }.onFailure {
-            loadingRelationship.postValue(false)
+            loadingRelationship.value = false
             it.notify(inAppNotification)
         }
     }
 
     fun unfollow() = viewModelScope.launch {
-        loadingRelationship.postValue(true)
+        loadingRelationship.value = true
         runCatching {
             relationshipService.unfollow(userKey.id)
         }.onSuccess {
             loadRelationShip()
         }.onFailure {
-            loadingRelationship.postValue(false)
+            loadingRelationship.value = false
             it.notify(inAppNotification)
         }
     }
 
     private fun loadRelationShip() = viewModelScope.launch {
-        loadingRelationship.postValue(true)
+        loadingRelationship.value = true
         try {
             relationshipService.showRelationship(userKey.id).let {
-                relationship.postValue(it)
+                relationship.value = it
             }
         } catch (e: Exception) {
         }
-        loadingRelationship.postValue(false)
+        loadingRelationship.value = false
     }
 
     init {

@@ -61,7 +61,6 @@ fun DependencyHandlerScope.compose() {
     implementation("androidx.compose.material:material", Versions.compose)
     implementation("androidx.compose.material:material-icons-core", Versions.compose)
     implementation("androidx.compose.material:material-icons-extended", Versions.compose)
-    implementation("androidx.compose.runtime:runtime-livedata", Versions.compose)
     implementation("androidx.constraintlayout:constraintlayout-compose", Versions.constraintLayout)
 }
 
@@ -97,7 +96,6 @@ fun DependencyHandlerScope.room() {
 fun DependencyHandlerScope.lifecycle() {
     implementation("androidx.lifecycle:lifecycle-runtime-ktx", Versions.lifecycle)
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx", Versions.lifecycle)
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx", Versions.lifecycle)
     // implementation("androidx.lifecycle:lifecycle-viewmodel-savedstate", Versions.lifecycle)
     implementation("androidx.lifecycle:lifecycle-common-java8", Versions.lifecycle)
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose", Versions.lifecycle_compose)

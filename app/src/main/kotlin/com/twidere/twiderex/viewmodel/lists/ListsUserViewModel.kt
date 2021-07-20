@@ -21,7 +21,6 @@
 package com.twidere.twiderex.viewmodel.lists
 
 import androidx.compose.runtime.mutableStateMapOf
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
@@ -36,6 +35,7 @@ import com.twidere.twiderex.viewmodel.user.UserListViewModel
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
 class ListsUserViewModel @AssistedInject constructor(
@@ -89,12 +89,12 @@ class ListsAddMemberViewModel @AssistedInject constructor(
         fun create(account: AccountDetails, listId: String): ListsAddMemberViewModel
     }
 
-    val loading = MutableLiveData<Boolean>(false)
+    val loading = MutableStateFlow(false)
     val pendingMap = mutableStateMapOf<MicroBlogKey, UiUser>()
 
     fun addToOrRemove(user: UiUser) {
         if (pendingMap[user.userKey] == null) {
-            loading.postValue(true)
+            loading.value = true
             loadingRequest {
                 listsUsersRepository.addMember(
                     listId = listId,
@@ -120,15 +120,15 @@ class ListsAddMemberViewModel @AssistedInject constructor(
     }
 
     private fun loadingRequest(request: suspend () -> Unit) {
-        loading.postValue(true)
+        loading.value = true
         viewModelScope.launch {
             runCatching {
                 request()
             }.onFailure {
                 it.notify(inAppNotification)
-                loading.postValue(false)
+                loading.value = false
             }.onSuccess {
-                loading.postValue(false)
+                loading.value = false
             }
         }
     }

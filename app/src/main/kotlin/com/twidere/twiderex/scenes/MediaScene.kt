@@ -54,7 +54,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -94,6 +93,7 @@ import com.twidere.twiderex.component.status.UserName
 import com.twidere.twiderex.component.status.UserScreenName
 import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.extensions.hideControls
+import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.extensions.setOnSystemBarsVisibilityChangeListener
 import com.twidere.twiderex.extensions.showControls
 import com.twidere.twiderex.model.MediaType
@@ -117,7 +117,7 @@ fun StatusMediaScene(statusKey: MicroBlogKey, selectedIndex: Int) {
     val viewModel = assistedViewModel<MediaViewModel.AssistedFactory, MediaViewModel> {
         it.create(account, statusKey)
     }
-    val status by viewModel.status.observeAsState()
+    val status by viewModel.status.observeAsState(null)
     val loading by viewModel.loading.observeAsState(initial = false)
     TwidereDialog(
         requireDarkTheme = true,

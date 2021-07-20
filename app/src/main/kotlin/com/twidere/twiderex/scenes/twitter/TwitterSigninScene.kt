@@ -25,11 +25,11 @@ import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.platform.LocalContext
 import com.twidere.twiderex.component.foundation.SignInScaffold
 import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.utils.CustomTabSignInChannel
 import com.twidere.twiderex.viewmodel.twitter.TwitterSignInViewModel

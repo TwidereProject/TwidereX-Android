@@ -20,7 +20,6 @@
  */
 package com.twidere.twiderex.paging.mediator.paging
 
-import androidx.lifecycle.MutableLiveData
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
 import androidx.paging.PagingState
@@ -32,6 +31,8 @@ import com.twidere.twiderex.db.model.DbPagingTimelineWithStatus
 import com.twidere.twiderex.db.model.saveToDb
 import com.twidere.twiderex.model.MicroBlogKey
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalPagingApi::class)
@@ -39,7 +40,10 @@ abstract class PagingWithGapMediator(
     accountKey: MicroBlogKey,
     database: CacheDatabase,
 ) : PagingMediator(accountKey = accountKey, database = database) {
-    val loadingBetween = MutableLiveData(listOf<MicroBlogKey>())
+
+    private val _loadingBetween = MutableStateFlow(listOf<MicroBlogKey>())
+    val loadingBetween
+        get() = _loadingBetween.asSharedFlow()
 
     override suspend fun initialize(): InitializeAction {
         return InitializeAction.SKIP_INITIAL_REFRESH
@@ -91,7 +95,7 @@ abstract class PagingWithGapMediator(
         sinceStatusKey: MicroBlogKey? = null,
     ): MediatorResult {
         if (maxStatusKey != null && sinceStatusKey != null) {
-            loadingBetween.postValue((loadingBetween.value ?: listOf()) + maxStatusKey)
+            _loadingBetween.value = _loadingBetween.value + maxStatusKey
         }
         try {
             val max_id = withContext(Dispatchers.IO) {
@@ -127,7 +131,7 @@ abstract class PagingWithGapMediator(
             return MediatorResult.Error(e)
         } finally {
             if (maxStatusKey != null && sinceStatusKey != null) {
-                loadingBetween.postValue((loadingBetween.value ?: listOf()) - maxStatusKey)
+                _loadingBetween.value = _loadingBetween.value - maxStatusKey
             }
         }
     }
