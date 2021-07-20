@@ -204,14 +204,14 @@ dependencies {
     androidTest()
 }
 
-tasks.create("generateTranslation") {
+tasks.register("generateTranslation") {
     val localizationFolder = File(rootDir, "localization")
     val appJson = File(localizationFolder, "app.json")
     val target = project.file("src/main/res/values/strings.xml")
     generateLocalization(appJson, target)
 }
 
-tasks.create("generateTranslationFromZip") {
+tasks.register("generateTranslationFromZip") {
     val zip = File(rootProject.buildDir, "Twidere X (translations).zip")
     val unzipTarget = File(rootProject.buildDir, "translation").apply {
         mkdirs()
