@@ -20,11 +20,6 @@
  */
 package com.twidere.services.proxy
 
-import okhttp3.Credentials
-import okhttp3.OkHttpClient
-import java.net.InetSocketAddress
-import java.net.Proxy
-
 data class ProxyConfig(
     val enable: Boolean = false,
     val server: String = "",
@@ -38,45 +33,4 @@ data class ProxyConfig(
         HTTP,
         REVERSE
     }
-
-    fun proxy(builder: OkHttpClient.Builder): OkHttpClient.Builder {
-        return if (enable) {
-            when (type) {
-                Type.HTTP -> {
-                    if (port !in (0..65535)) {
-                        return builder
-                    }
-                    val address = InetSocketAddress.createUnresolved(
-                        server,
-                        port
-                    )
-                    builder.proxy(Proxy(Proxy.Type.HTTP, address))
-                        .proxyAuthenticator { _, response ->
-                            val b = response.request.newBuilder()
-                            if (response.code == 407) {
-                                if (userName.isNotEmpty() &&
-                                    password.isNotEmpty()
-                                ) {
-                                    val credential = Credentials.basic(
-                                        userName,
-                                        password
-                                    )
-                                    b.header("Proxy-Authorization", credential)
-                                }
-                            }
-                            b.build()
-                        }
-                }
-                Type.REVERSE -> {
-                    builder.addInterceptor(ReverseProxyInterceptor(server, userName, password))
-                }
-            }
-        } else {
-            builder
-        }
-    }
-
-    /**
-     * Intercept and replace proxy patterns to real URL
-     */
 }

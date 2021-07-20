@@ -21,14 +21,7 @@
 package com.twidere.services.http.config
 
 import com.twidere.services.proxy.ProxyConfig
-import okhttp3.OkHttpClient
 
 data class HttpConfig(
     val proxyConfig: ProxyConfig = ProxyConfig()
-) {
-    fun createHttpClientBuilder(): OkHttpClient.Builder {
-        return OkHttpClient.Builder().let {
-            proxyConfig.proxy(it)
-        }
-    }
-}
+)

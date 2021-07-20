@@ -27,6 +27,7 @@ import com.twidere.services.nitter.NitterService
 import com.twidere.twiderex.action.ComposeAction
 import com.twidere.twiderex.action.DirectMessageAction
 import com.twidere.twiderex.db.CacheDatabase
+import com.twidere.twiderex.http.TwidereServiceFactory
 import com.twidere.twiderex.model.AccountPreferences
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.preferences.proto.MiscPreferences
@@ -62,7 +63,7 @@ object TwidereModule {
     fun provideNitterService(preferences: DataStore<MiscPreferences>): NitterService? {
         return runBlocking {
             preferences.data.first().nitterInstance.takeIf { it.isNotEmpty() }
-                ?.let { NitterService(it.trimEnd('/')) }
+                ?.let { NitterService(it.trimEnd('/'), TwidereServiceFactory.createHttpClientFactory()) }
         }
     }
 

@@ -196,7 +196,7 @@ class HttpConfigClientFactory(private val configProvider: HttpConfigProvider) : 
             .create(clazz)
     }
 
-    data class CacheIdentifier(
+    private data class CacheIdentifier(
         val config: HttpConfig,
         val baseUrl: String
     ) {
