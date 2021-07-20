@@ -198,6 +198,7 @@ fun DependencyHandlerScope.mockito() {
 
 fun DependencyHandlerScope.androidTest() {
     testImplementation("androidx.arch.core:core-testing:2.1.0")
+    androidTestImplementation("androidx.arch.core:core-testing:2.1.0")
     androidTestImplementation("androidx.test:core", Versions.androidx_test)
     androidTestImplementation("androidx.test:runner", Versions.androidx_test)
     androidTestImplementation("androidx.test.ext:junit", Versions.extJUnitVersion)
