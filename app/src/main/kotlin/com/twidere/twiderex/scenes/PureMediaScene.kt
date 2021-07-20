@@ -41,7 +41,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -64,6 +63,7 @@ import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.extensions.hideControls
+import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.extensions.setOnSystemBarsVisibilityChangeListener
 import com.twidere.twiderex.extensions.showControls
 import com.twidere.twiderex.model.MediaType
@@ -83,7 +83,7 @@ fun PureMediaScene(belongToKey: MicroBlogKey, selectedIndex: Int) {
     val viewModel = assistedViewModel<PureMediaViewModel.AssistedFactory, PureMediaViewModel> {
         it.create(belongToKey)
     }
-    val source by viewModel.source.observeAsState()
+    val source by viewModel.source.observeAsState(null)
     TwidereDialog(
         requireDarkTheme = true,
         extendViewIntoStatusBar = true,

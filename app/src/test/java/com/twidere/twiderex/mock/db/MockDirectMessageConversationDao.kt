@@ -20,7 +20,6 @@
  */
 package com.twidere.twiderex.mock.db
 
-import androidx.lifecycle.LiveData
 import androidx.paging.PagingSource
 import com.twidere.services.twitter.model.User
 import com.twidere.twiderex.db.dao.DirectMessageConversationDao
@@ -30,6 +29,7 @@ import com.twidere.twiderex.db.model.DbDMEvent
 import com.twidere.twiderex.db.model.DbDMEventWithAttachments
 import com.twidere.twiderex.db.model.DbDirectMessageConversationWithMessage
 import com.twidere.twiderex.model.MicroBlogKey
+import kotlinx.coroutines.flow.Flow
 
 class MockDirectMessageConversationDao : DirectMessageConversationDao {
     val db = mutableListOf<DbDMConversation>()
@@ -72,10 +72,10 @@ class MockDirectMessageConversationDao : DirectMessageConversationDao {
         TODO("Not yet implemented")
     }
 
-    override fun findWithConversationKeyLiveData(
+    override fun findWithConversationKeyFlow(
         accountKey: MicroBlogKey,
         conversationKey: MicroBlogKey
-    ): LiveData<DbDMConversation?> {
+    ): Flow<DbDMConversation?> {
         TODO("Not yet implemented")
     }
 

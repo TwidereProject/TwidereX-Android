@@ -20,7 +20,6 @@
  */
 package com.twidere.twiderex.db.dao
 
-import androidx.lifecycle.LiveData
 import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Delete
@@ -31,6 +30,7 @@ import androidx.room.Transaction
 import com.twidere.twiderex.db.model.DbDMConversation
 import com.twidere.twiderex.db.model.DbDirectMessageConversationWithMessage
 import com.twidere.twiderex.model.MicroBlogKey
+import kotlinx.coroutines.flow.Flow
 import org.jetbrains.annotations.TestOnly
 
 @Dao
@@ -65,7 +65,7 @@ interface DirectMessageConversationDao {
     ): PagingSource<Int, DbDirectMessageConversationWithMessage>
 
     @Query("SELECT * FROM dm_conversation WHERE accountKey == :accountKey AND conversationKey == :conversationKey")
-    fun findWithConversationKeyLiveData(accountKey: MicroBlogKey, conversationKey: MicroBlogKey): LiveData<DbDMConversation?>
+    fun findWithConversationKeyFlow(accountKey: MicroBlogKey, conversationKey: MicroBlogKey): Flow<DbDMConversation?>
 
     @Query("SELECT * FROM dm_conversation WHERE accountKey == :accountKey AND conversationKey == :conversationKey")
     fun findWithConversationKey(accountKey: MicroBlogKey, conversationKey: MicroBlogKey): DbDMConversation?
