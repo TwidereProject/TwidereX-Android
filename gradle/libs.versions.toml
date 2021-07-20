@@ -126,7 +126,8 @@ twittertext = "com.twitter.twittertext:twitter-text:3.1.0"
 jsoup = "org.jsoup:jsoup:1.13.1"
 leakcanary = "com.squareup.leakcanary:leakcanary-android:2.7"
 protobuf-javalite = { module = "com.google.protobuf:protobuf-javalite", version.ref = "protobuf" }
-exoplayer = { module = "com.google.android.exoplayer:exoplayer", version.ref = "exoplayer" }
+exoplayer-core = { module = "com.google.android.exoplayer:exoplayer", version.ref = "exoplayer" }
+exoplayer-okhttp = { module = "com.google.android.exoplayer:extension-okhttp", version.ref = "exoplayer" }
 startup = { module = "androidx.startup:startup-runtime", version.ref = "startup" }
 vectordrawable = "androidx.vectordrawable:vectordrawable:1.1.0"
 hson = { module = "com.github.Tlaster:Hson", version.ref = "hson" }
@@ -195,4 +196,8 @@ retrofit = [
 datastore = [
     "datastore-main",
     "datastore-preferences"
+]
+exoplayer = [
+    "exoplayer-core",
+    "exoplayer-okhttp"
 ]

@@ -201,7 +201,7 @@ dependencies {
 
     implementation libs.protobuf.javalite
 
-    implementation libs.exoplayer
+    implementation libs.bundles.exoplayer
 
     implementation libs.constraintLayout
 
