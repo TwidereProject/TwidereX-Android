@@ -186,6 +186,7 @@ dependencies {
 
     implementation libs.startup
 
+    implementation libs.coil
     implementation libs.bundles.accompanist
 
     implementation libs.zoomable

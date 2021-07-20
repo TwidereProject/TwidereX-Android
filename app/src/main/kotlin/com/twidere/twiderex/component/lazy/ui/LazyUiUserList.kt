@@ -56,7 +56,7 @@ fun LazyUiUserList(
     modifier: Modifier = Modifier,
     items: LazyPagingItems<UiUser>,
     state: LazyListState = rememberLazyListState(),
-    key: ((index: Int) -> Any) = { items.peek(it)?.userKey?.hashCode() ?: it },
+    key: ((item: UiUser) -> Any) = { it.userKey.hashCode() },
     onItemClicked: (UiUser) -> Unit = {},
     header: LazyListScope.() -> Unit = {},
     action: @Composable (user: UiUser) -> Unit = {}

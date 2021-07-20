@@ -400,6 +400,9 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
                                 UserAvatar(
                                     user = user,
                                     withPlatformIcon = true,
+                                    onClick = {
+                                        activeAccountViewModel.setActiveAccount(it)
+                                    }
                                 )
                             },
                             text = {

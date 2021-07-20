@@ -30,16 +30,16 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import coil.ImageLoader
+import coil.annotation.ExperimentalCoilApi
 import coil.bitmap.BitmapPool
+import coil.compose.ImagePainter
+import coil.compose.LocalImageLoader
+import coil.compose.rememberImagePainter
 import coil.memory.MemoryCache
 import coil.request.DefaultRequestOptions
 import coil.request.Disposable
 import coil.request.ImageRequest
 import coil.request.ImageResult
-import com.google.accompanist.coil.CoilPainterDefaults
-import com.google.accompanist.coil.rememberCoilPainter
-import com.google.accompanist.imageloading.ImageLoadState
-import com.google.accompanist.imageloading.LoadPainter
 import com.twidere.services.http.authorization.OAuth1Authorization
 import com.twidere.twiderex.R
 import com.twidere.twiderex.model.AccountDetails
@@ -50,6 +50,7 @@ import okhttp3.Headers
 import okhttp3.Request
 import java.net.URL
 
+@OptIn(ExperimentalCoilApi::class)
 @Composable
 fun NetworkImage(
     data: Any,
@@ -60,16 +61,19 @@ fun NetworkImage(
     val painter = if (data is Painter) {
         data
     } else {
-        rememberCoilPainter(
-            request = data, fadeIn = true,
+        rememberImagePainter(
+            data = data,
             imageLoader = TwidereImageLoader(
-                CoilPainterDefaults.defaultImageLoader(),
+                LocalImageLoader.current,
                 LocalContext.current,
                 LocalActiveAccount.current
-            )
+            ),
+            builder = {
+                crossfade(true)
+            },
         )
     }
-    if (painter is LoadPainter<*> && painter.loadState is ImageLoadState.Loading) {
+    if (painter is ImagePainter && painter.state is ImagePainter.State.Loading) {
         placeholder?.invoke()
     }
     Image(
