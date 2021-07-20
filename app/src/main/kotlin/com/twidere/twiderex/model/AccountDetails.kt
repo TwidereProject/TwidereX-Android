@@ -21,7 +21,6 @@
 package com.twidere.twiderex.model
 
 import android.accounts.Account
-import com.twidere.services.microblog.MicroBlogService
 import com.twidere.twiderex.http.TwidereServiceFactory
 import com.twidere.twiderex.model.adapter.AndroidAccountSerializer
 import com.twidere.twiderex.model.cred.BasicCredentials
@@ -59,29 +58,7 @@ data class AccountDetails(
             CredentialsType.OAuth2 -> credentials_json.fromJson<OAuth2Credentials>()
         }
 
-    val service by lazy<MicroBlogService> {
-        // when (type) {
-        //     PlatformType.Twitter -> {
-        //         credentials.let {
-        //             it as OAuthCredentials
-        //         }.let {
-        //             TwitterService(
-        //                 consumer_key = it.consumer_key,
-        //                 consumer_secret = it.consumer_secret,
-        //                 access_token = it.access_token,
-        //                 access_token_secret = it.access_token_secret,
-        //             )
-        //         }
-        //     }
-        //     PlatformType.StatusNet -> TODO()
-        //     PlatformType.Fanfou -> TODO()
-        //     PlatformType.Mastodon ->
-        //         credentials.let {
-        //             it as OAuth2Credentials
-        //         }.let {
-        //             MastodonService(accountKey.host, it.access_token)
-        //         }
-        // }
+    val service by lazy {
         TwidereServiceFactory.createApiService(
             type = type,
             credentials = credentials,
