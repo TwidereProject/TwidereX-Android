@@ -128,6 +128,7 @@
     <string name="common_countable_photo_single">%s foto</string>
     <string name="common_countable_photo_multiple">%s fotos</string>
     <string name="common_notification_channel_background_progresses_name">Progresos en segundo plano</string>
+    <string name="common_notification_channel_content_messages_name">Mensajes</string>
     <string name="scene_drawer_sign_in">Iniciar sesión</string>
     <string name="scene_drawer_manage_accounts">Administrar cuentas</string>
     <string name="scene_manage_accounts_title">Cuentas</string>
@@ -143,6 +144,7 @@
     <string name="scene_notification_title">Notificación</string>
     <string name="scene_notification_tabs_all">Todo</string>
     <string name="scene_messages_title">Mensajes</string>
+    <string name="scene_messages_new_conversation_search">Buscar personas</string>
     <string name="scene_likes_title">Me gusta</string>
     <string name="scene_bookmark_title">Marcador</string>
     <string name="scene_trends_title">Tendencias</string>
@@ -263,6 +265,8 @@
     <string name="scene_settings_display_media_always">Siempre</string>
     <string name="scene_settings_display_media_off">Desactivado</string>
     <string name="scene_settings_display_url_preview">URL de previsualización</string>
+    <string name="scene_settings_notification_title">Notificación</string>
+    <string name="scene_settings_notification_accounts">Cuentas</string>
     <string name="scene_settings_storage_title">Almacenamiento</string>
     <string name="scene_settings_storage_search_title">Limpiar historial de búsqueda</string>
     <string name="scene_settings_storage_media_title">Limpiar caché multimedia</string>

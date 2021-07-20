@@ -35,6 +35,7 @@ import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.scenes.DraftListScene
 import com.twidere.twiderex.scenes.HomeScene
+import com.twidere.twiderex.scenes.PureMediaScene
 import com.twidere.twiderex.scenes.RawMediaScene
 import com.twidere.twiderex.scenes.SignInScene
 import com.twidere.twiderex.scenes.StatusMediaScene
@@ -43,6 +44,9 @@ import com.twidere.twiderex.scenes.compose.ComposeScene
 import com.twidere.twiderex.scenes.compose.ComposeSearchHashtagScene
 import com.twidere.twiderex.scenes.compose.ComposeSearchUserScene
 import com.twidere.twiderex.scenes.compose.DraftComposeScene
+import com.twidere.twiderex.scenes.dm.DMConversationListScene
+import com.twidere.twiderex.scenes.dm.DMConversationScene
+import com.twidere.twiderex.scenes.dm.DMNewConversationScene
 import com.twidere.twiderex.scenes.lists.ListTimeLineScene
 import com.twidere.twiderex.scenes.lists.ListsAddMembersScene
 import com.twidere.twiderex.scenes.lists.ListsMembersScene
@@ -57,9 +61,11 @@ import com.twidere.twiderex.scenes.search.SearchInputScene
 import com.twidere.twiderex.scenes.search.SearchScene
 import com.twidere.twiderex.scenes.settings.AboutScene
 import com.twidere.twiderex.scenes.settings.AccountManagementScene
+import com.twidere.twiderex.scenes.settings.AccountNotificationScene
 import com.twidere.twiderex.scenes.settings.AppearanceScene
 import com.twidere.twiderex.scenes.settings.DisplayScene
 import com.twidere.twiderex.scenes.settings.MiscScene
+import com.twidere.twiderex.scenes.settings.NotificationScene
 import com.twidere.twiderex.scenes.settings.SettingsScene
 import com.twidere.twiderex.scenes.settings.StorageScene
 import com.twidere.twiderex.scenes.twitter.TwitterSignInScene
@@ -131,6 +137,9 @@ object Route {
 
         fun Raw(url: String) =
             "media/raw/${URLEncoder.encode(url, "UTF-8")}"
+
+        fun Pure(belongToKey: MicroBlogKey, selectedIndex: Int = 0) =
+            "media/pure/$belongToKey?selectedIndex=$selectedIndex"
     }
 
     fun Search(keyword: String) = "search/result/${
@@ -178,6 +187,8 @@ object Route {
         const val About = "settings/about"
         const val AccountManagement = "settings/accountmanagement"
         const val Misc = "settings/misc"
+        const val Notification = "settings/notification"
+        fun AccountNotification(accountKey: MicroBlogKey) = "settings/notification/$accountKey"
     }
 
     object DeepLink {
@@ -188,6 +199,8 @@ object Route {
         fun Draft(id: String) = "$twidereXSchema://draft/compose/$id"
 
         fun Compose(composeType: ComposeType, statusKey: MicroBlogKey? = null) = "$twidereXSchema://${Route.Compose(composeType, statusKey)}"
+
+        fun Conversation(conversationKey: MicroBlogKey) = "$twidereXSchema://${Messages.Conversation(conversationKey)}"
     }
 
     fun Status(statusKey: MicroBlogKey) = "status/$statusKey"
@@ -208,6 +221,12 @@ object Route {
         fun Members(listKey: MicroBlogKey, owned: Boolean) = "$Home/members/$listKey?owned=$owned"
         fun Subscribers(listKey: MicroBlogKey) = "$Home/subscribers/$listKey"
         fun AddMembers(listKey: MicroBlogKey) = "$Home/members/$listKey/add"
+    }
+
+    object Messages {
+        const val Home = "messages"
+        fun Conversation(conversationKey: MicroBlogKey) = "$Home/conversation/$conversationKey"
+        const val NewConversation = "$Home/new/conversation"
     }
 }
 
@@ -231,6 +250,14 @@ object DeepLinks {
 
     const val Draft = "$twidereXSchema://draft/compose/{draftId}"
     const val Compose = "$twidereXSchema://compose"
+    const val Conversation = "$twidereXSchema://${Route.Messages.Home}/conversation/{conversationKey}"
+
+    object Callback {
+        object SignIn {
+            const val Mastodon = "$twidereXSchema://auth/callback/mastodon"
+            const val Twitter = "$twidereXSchema://auth/callback/twitter"
+        }
+    }
 }
 
 fun RouteBuilder.authorizedScene(
@@ -490,6 +517,20 @@ fun RouteBuilder.route(constraints: Constraints) {
     }
 
     authorizedDialog(
+        "media/pure/{belongToKey}",
+    ) { backStackEntry ->
+        backStackEntry.path<String>("belongToKey")?.let {
+            MicroBlogKey.valueOf(it)
+        }?.let { belongToKey ->
+            val selectedIndex = backStackEntry.query("selectedIndex", 0) ?: 0
+            PureMediaScene(
+                belongToKey = belongToKey,
+                selectedIndex = selectedIndex
+            )
+        }
+    }
+
+    authorizedDialog(
         "media/raw/{url}",
     ) { backStackEntry ->
         backStackEntry.path<String>("url")?.let {
@@ -597,6 +638,18 @@ fun RouteBuilder.route(constraints: Constraints) {
         MiscScene()
     }
 
+    scene(Route.Settings.Notification) {
+        NotificationScene()
+    }
+
+    scene("settings/notification/{accountKey}") {
+        it.path<String>("accountKey", null)?.let {
+            MicroBlogKey.valueOf(it)
+        }?.let {
+            AccountNotificationScene(it)
+        }
+    }
+
     scene(Route.Settings.About) {
         AboutScene()
     }
@@ -669,6 +722,25 @@ fun RouteBuilder.route(constraints: Constraints) {
     ) { backStackEntry ->
         backStackEntry.path<String>("listKey")?.let {
             ListsAddMembersScene(listKey = MicroBlogKey.valueOf(it))
+        }
+    }
+
+    authorizedScene(Route.Messages.Home) {
+        DMConversationListScene()
+    }
+
+    authorizedScene(Route.Messages.NewConversation) {
+        DMNewConversationScene()
+    }
+
+    authorizedScene(
+        "${Route.Messages.Home}/conversation/{conversationKey}",
+        deepLinks = listOf(
+            DeepLinks.Conversation
+        )
+    ) { backStackEntry ->
+        backStackEntry.path<String>("conversationKey")?.let {
+            DMConversationScene(conversationKey = MicroBlogKey.valueOf(it))
         }
     }
 }

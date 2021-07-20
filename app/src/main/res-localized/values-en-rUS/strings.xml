@@ -136,6 +136,7 @@
     <string name="common_notification_channel_background_progresses_name">Background progresses</string>
     <string name="common_notification_channel_content_interactions_name">Interactions</string>
     <string name="common_notification_channel_content_interactions_description">Interactions like mentions and retweets</string>
+    <string name="common_notification_channel_content_messages_name">Messages</string>
     <string name="scene_drawer_sign_in">Sign in</string>
     <string name="scene_drawer_manage_accounts">Manage accounts</string>
     <string name="scene_manage_accounts_title">Accounts</string>
@@ -151,6 +152,7 @@
     <string name="scene_notification_title">Notification</string>
     <string name="scene_notification_tabs_all">All</string>
     <string name="scene_messages_title">Messages</string>
+    <string name="scene_messages_new_conversation_search">Search people</string>
     <string name="scene_likes_title">Likes</string>
     <string name="scene_bookmark_title">Bookmark</string>
     <string name="scene_trends_title">Trends</string>
@@ -260,6 +262,7 @@
     <string name="scene_settings_appearance_theme_auto">Auto</string>
     <string name="scene_settings_appearance_theme_light">Light</string>
     <string name="scene_settings_appearance_theme_dark">Dark</string>
+    <string name="scene_settings_appearance_AMOLED_optimized_mode">AMOLED optimized mode</string>
     <string name="scene_settings_appearance_scrolling_timeline_tab_bar">Hide tab bar when scrolling</string>
     <string name="scene_settings_appearance_scrolling_timeline_app_bar">Hide app bar when scrolling</string>
     <string name="scene_settings_appearance_scrolling_timeline_fab">Hide FAB when scrolling</string>
@@ -281,6 +284,8 @@
     <string name="scene_settings_display_media_always">Always</string>
     <string name="scene_settings_display_media_off">Off</string>
     <string name="scene_settings_display_url_preview">Url previews</string>
+    <string name="scene_settings_notification_title">Notification</string>
+    <string name="scene_settings_notification_accounts">Accounts</string>
     <string name="scene_settings_storage_title">Storage</string>
     <string name="scene_settings_storage_search_title">Clear search history</string>
     <string name="scene_settings_storage_media_title">Clear media cache</string>

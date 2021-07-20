@@ -20,6 +20,7 @@
  */
 package com.twidere.twiderex.db.mapper
 
+import com.twidere.services.twitter.model.DirectMessageEvent
 import com.twidere.services.twitter.model.ReferencedTweetType
 import com.twidere.services.twitter.model.ReplySettings
 import com.twidere.services.twitter.model.Status
@@ -28,6 +29,8 @@ import com.twidere.services.twitter.model.Trend
 import com.twidere.services.twitter.model.TwitterList
 import com.twidere.services.twitter.model.User
 import com.twidere.services.twitter.model.UserV2
+import com.twidere.twiderex.db.model.DbDMEvent
+import com.twidere.twiderex.db.model.DbDMEventWithAttachments
 import com.twidere.twiderex.db.model.DbList
 import com.twidere.twiderex.db.model.DbMedia
 import com.twidere.twiderex.db.model.DbPagingTimeline
@@ -54,7 +57,7 @@ import com.twidere.twiderex.navigation.DeepLinks
 import com.twitter.twittertext.Autolink
 import java.util.UUID
 
-private val autolink by lazy {
+val autolink by lazy {
     Autolink().apply {
         setUsernameIncludeSymbol(true)
         hashtagUrlBase = "${DeepLinks.Search}/%23"
@@ -221,6 +224,10 @@ private fun StatusV2.toDbStatusWithMediaAndUser(
             quoteCount = publicMetrics?.quoteCount
         ),
         previewCard = entities?.urls?.firstOrNull()
+            ?.takeUnless { url ->
+                referencedTweets?.firstOrNull { it.type == ReferencedTweetType.quoted }
+                    ?.id?.let { id -> url.expandedURL?.endsWith(id) == true } == true
+            }
             ?.takeUnless { url -> url.displayURL?.contains("pic.twitter.com") == true }
             ?.let {
                 it.expandedURL?.let { url ->
@@ -244,7 +251,7 @@ private fun StatusV2.toDbStatusWithMediaAndUser(
             val type = it.type?.let { MediaType.valueOf(it) } ?: MediaType.photo
             DbMedia(
                 _id = UUID.randomUUID().toString(),
-                statusKey = status.statusKey,
+                belongToKey = status.statusKey,
                 previewUrl = getImage(it.url ?: it.previewImageURL, "small"),
                 mediaUrl = getImage(it.url ?: it.previewImageURL, "orig"),
                 width = it.width ?: 0,
@@ -353,7 +360,7 @@ private fun Status.toDbStatusWithMediaAndUser(
             val type = it.type?.let { MediaType.valueOf(it) } ?: MediaType.photo
             DbMedia(
                 _id = UUID.randomUUID().toString(),
-                statusKey = status.statusKey,
+                belongToKey = status.statusKey,
                 previewUrl = getImage(it.mediaURLHTTPS, "small"),
                 mediaUrl = when (type) {
                     MediaType.photo -> getImage(it.mediaURLHTTPS, "orig")
@@ -526,3 +533,70 @@ fun Trend.toDbTrend(accountKey: MicroBlogKey) = DbTrendWithHistory(
     ),
     history = emptyList()
 )
+
+fun DirectMessageEvent.generateConversationId(accountKey: MicroBlogKey): String {
+    return if (accountKey.id == messageCreate?.senderId) {
+        "${messageCreate?.senderId}-${messageCreate?.target?.recipientId}"
+    } else {
+        "${messageCreate?.target?.recipientId}-${messageCreate?.senderId}"
+    }
+}
+
+fun DirectMessageEvent.toDbDirectMessage(accountKey: MicroBlogKey, sender: DbUser): DbDMEventWithAttachments {
+    val message = DbDMEvent(
+        _id = UUID.randomUUID().toString(),
+        accountKey = accountKey,
+        sortId = createdTimestamp?.toLong() ?: 0L,
+        conversationKey = MicroBlogKey.twitter(generateConversationId(accountKey)),
+        messageId = id ?: throw IllegalArgumentException("message id should not be null"),
+        messageKey = MicroBlogKey.twitter("dm-${id ?: throw IllegalArgumentException("message id should not be null")}"),
+        htmlText = autolink.autoLink(messageCreate?.messageData?.text ?: ""),
+        originText = messageCreate?.messageData?.text ?: "",
+        createdTimestamp = createdTimestamp?.toLong() ?: 0L,
+        messageType = type ?: throw IllegalArgumentException("message type should not be null"),
+        senderAccountKey = MicroBlogKey.twitter(messageCreate?.senderId ?: throw IllegalArgumentException("message sender id should not be null")),
+        recipientAccountKey = MicroBlogKey.twitter(messageCreate?.target?.recipientId ?: throw IllegalArgumentException("message recipientId id should not be null")),
+        sendStatus = DbDMEvent.SendStatus.SUCCESS
+    )
+    return DbDMEventWithAttachments(
+        message = message,
+        media = messageCreate?.messageData?.attachment?.media?.let { media ->
+            val type = media.type?.let { MediaType.valueOf(it) } ?: MediaType.photo
+            listOf(
+                DbMedia(
+                    _id = UUID.randomUUID().toString(),
+                    belongToKey = message.messageKey,
+                    url = media.url ?: "",
+                    previewUrl = media.mediaURLHTTPS,
+                    type = type,
+                    mediaUrl = when (type) {
+                        MediaType.photo -> media.mediaURLHTTPS
+                        MediaType.animated_gif, MediaType.video -> media.videoInfo?.variants?.maxByOrNull {
+                            it.bitrate ?: 0L
+                        }?.url
+                        MediaType.audio -> media.mediaURLHTTPS
+                        MediaType.other -> media.mediaURLHTTPS
+                    },
+                    width = media.sizes?.large?.w ?: 0,
+                    height = media.sizes?.large?.h ?: 0,
+                    pageUrl = media.expandedURL,
+                    altText = media.displayURL ?: "",
+                    order = 0,
+                )
+            )
+        } ?: emptyList(),
+        urlEntity = messageCreate?.messageData?.entities?.urls?.map {
+            DbUrlEntity(
+                _id = UUID.randomUUID().toString(),
+                statusKey = message.messageKey,
+                url = it.url ?: "",
+                expandedUrl = it.expanded_url ?: "",
+                displayUrl = it.display_url ?: "",
+                title = null,
+                description = null,
+                image = null,
+            )
+        } ?: emptyList(),
+        sender = sender
+    )
+}

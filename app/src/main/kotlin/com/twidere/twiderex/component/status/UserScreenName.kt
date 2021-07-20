@@ -41,11 +41,16 @@ import com.twidere.twiderex.model.ui.UiUser
 
 @Composable
 fun UserScreenName(user: UiUser) {
+    UserScreenName(name = user.displayScreenName)
+}
+
+@Composable
+fun UserScreenName(name: String) {
     CompositionLocalProvider(
         LocalContentAlpha provides ContentAlpha.medium
     ) {
         Text(
-            text = user.displayScreenName,
+            text = name,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
         )
@@ -71,8 +76,47 @@ fun UserName(
     onTextLayout: (TextLayoutResult) -> Unit = {},
     style: TextStyle = LocalTextStyle.current
 ) {
+    UserName(
+        userName = user.name.takeIf { it.isNotEmpty() } ?: user.screenName,
+        modifier = modifier,
+        color = color,
+        fontSize = fontSize,
+        fontStyle = fontStyle,
+        fontWeight = fontWeight,
+        fontFamily = fontFamily,
+        letterSpacing = letterSpacing,
+        textDecoration = textDecoration,
+        textAlign = textAlign,
+        lineHeight = lineHeight,
+        overflow = overflow,
+        softWrap = softWrap,
+        maxLines = maxLines,
+        onTextLayout = onTextLayout,
+        style = style,
+    )
+}
+
+@Composable
+fun UserName(
+    userName: String,
+    modifier: Modifier = Modifier,
+    color: Color = Color.Unspecified,
+    fontSize: TextUnit = TextUnit.Unspecified,
+    fontStyle: FontStyle? = null,
+    fontWeight: FontWeight? = null,
+    fontFamily: FontFamily? = null,
+    letterSpacing: TextUnit = TextUnit.Unspecified,
+    textDecoration: TextDecoration? = null,
+    textAlign: TextAlign? = null,
+    lineHeight: TextUnit = TextUnit.Unspecified,
+    overflow: TextOverflow = TextOverflow.Ellipsis,
+    softWrap: Boolean = true,
+    maxLines: Int = 1,
+    onTextLayout: (TextLayoutResult) -> Unit = {},
+    style: TextStyle = LocalTextStyle.current
+) {
     Text(
-        text = user.name.takeIf { it.isNotEmpty() } ?: user.screenName,
+        text = userName,
         modifier = modifier,
         color = color,
         fontSize = fontSize,

@@ -1,0 +1,7 @@
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="common_alerts_block_user_success_title">%s a été bloqué(e)</string>
+    <string name="common_alerts_failed_to_block_user_title">Échec du blocage de %s</string>
+    <string name="common_alerts_failed_to_block_user_message">Merci de réessayer</string>
+    <string name="common_alerts_unblock_user_success_title">%s a été débloqué(e)</string>
+    <string name="common_alerts_failed_to_unblock_user_message">Merci de réessayer</string>
+</resources>

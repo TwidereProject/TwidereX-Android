@@ -31,11 +31,13 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Colors
+import androidx.compose.material.LocalElevationOverlay
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Typography
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -45,10 +47,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.LayoutDirection
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import com.google.accompanist.insets.HorizontalSide
 import com.google.accompanist.insets.Insets
@@ -68,13 +67,22 @@ fun TwidereTheme(
     content: @Composable () -> Unit,
 ) {
     val colors = provideThemeColors(darkTheme)
+    val pureDark = LocalAppearancePreferences.current.isDarkModePureBlack
     val typography = provideTypography()
-    MaterialTheme(
-        colors = colors,
-        typography = typography,
-        shapes = shapes,
-        content = content,
-    )
+    CompositionLocalProvider(
+        *if (pureDark && darkTheme) {
+            arrayOf(LocalElevationOverlay provides null)
+        } else {
+            emptyArray()
+        }
+    ) {
+        MaterialTheme(
+            colors = colors,
+            typography = typography,
+            shapes = shapes,
+            content = content,
+        )
+    }
 }
 
 @Composable
@@ -82,6 +90,12 @@ fun TwidereDialog(
     requireDarkTheme: Boolean = false,
     extendViewIntoStatusBar: Boolean = false,
     extendViewIntoNavigationBar: Boolean = false,
+    statusBarColorProvider: @Composable () -> Color = {
+        MaterialTheme.colors.surface.withElevation()
+    },
+    navigationBarColorProvider: @Composable () -> Color = {
+        MaterialTheme.colors.surface
+    },
     content: @Composable () -> Unit,
 ) {
     val currentDarkTheme = isDarkTheme(requireDarkTheme = false)
@@ -96,6 +110,8 @@ fun TwidereDialog(
         requireDarkTheme,
         extendViewIntoStatusBar,
         extendViewIntoNavigationBar,
+        statusBarColorProvider,
+        navigationBarColorProvider,
         content,
     )
 }
@@ -105,6 +121,12 @@ fun TwidereScene(
     requireDarkTheme: Boolean = false,
     extendViewIntoStatusBar: Boolean = false,
     extendViewIntoNavigationBar: Boolean = false,
+    statusBarColorProvider: @Composable () -> Color = {
+        MaterialTheme.colors.surface.withElevation()
+    },
+    navigationBarColorProvider: @Composable () -> Color = {
+        MaterialTheme.colors.surface
+    },
     content: @Composable () -> Unit,
 ) {
     val darkTheme = isDarkTheme(requireDarkTheme)
@@ -114,8 +136,15 @@ fun TwidereScene(
             windowInsetsController.isAppearanceLightStatusBars = !darkTheme
             windowInsetsController.isAppearanceLightNavigationBars = !darkTheme
         }
-        val navigationBarColor = navigationBarColor(darkTheme)
-        val statusBarColor = statusBarColor()
+        val statusBarColor = statusBarColorProvider.invoke()
+        val navigationBarColor = navigationBarColorProvider.invoke().let {
+            val surface = MaterialTheme.colors.surface
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O && !darkTheme && it == surface) {
+                MaterialTheme.colors.onSurface
+            } else {
+                it
+            }
+        }
         Box {
             val actual = provideSystemInsets(
                 extendViewIntoNavigationBar,
@@ -138,7 +167,6 @@ fun TwidereScene(
                                         LayoutDirection.Ltr -> it.right.toDp()
                                         LayoutDirection.Rtl -> it.left.toDp()
                                     },
-
                                 )
                             }
                         }
@@ -193,28 +221,6 @@ fun TwidereScene(
                 }.align(Alignment.BottomCenter)
             )
         }
-    }
-}
-
-@Composable
-fun navigationBarColor(darkTheme: Boolean): Color {
-    return if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O_MR1) {
-        Color.Black
-    } else {
-        if (darkTheme) {
-            Color.Black
-        } else {
-            Color(0xFFF1F1F1)
-        }
-    }
-}
-
-@Composable
-fun statusBarColor(): Color {
-    return if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-        Color.Black
-    } else {
-        MaterialTheme.colors.surface.withElevation()
     }
 }
 
@@ -282,88 +288,84 @@ private fun provideTypography(): Typography {
     val display = LocalDisplayPreferences.current
     val useSystemFontSize = display.useSystemFontSize
     val fontScale = display.fontScale
+    val baseTypography = Typography()
+    // classical text rendering (like the old twidere)
+    // .let {
+    //     it.copy(
+    //         body1 = it.body1.copy(fontSize = 14.sp, letterSpacing = 0.sp),
+    //         body2 = it.body2.copy(letterSpacing = 0.sp),
+    //         caption = it.caption.copy(letterSpacing = 0.sp),
+    //     )
+    // }
     return if (useSystemFontSize) {
-        Typography()
+        baseTypography
     } else {
-        Typography(
-            h1 = TextStyle(
-                fontWeight = FontWeight.Light,
-                fontSize = 96.sp * fontScale,
-                letterSpacing = (-1.5).sp
-            ),
-            h2 = TextStyle(
-                fontWeight = FontWeight.Light,
-                fontSize = 60.sp * fontScale,
-                letterSpacing = (-0.5).sp
-            ),
-            h3 = TextStyle(
-                fontWeight = FontWeight.Normal,
-                fontSize = 48.sp * fontScale,
-                letterSpacing = 0.sp
-            ),
-            h4 = TextStyle(
-                fontWeight = FontWeight.Normal,
-                fontSize = 34.sp * fontScale,
-                letterSpacing = 0.25.sp
-            ),
-            h5 = TextStyle(
-                fontWeight = FontWeight.Normal,
-                fontSize = 24.sp * fontScale,
-                letterSpacing = 0.sp
-            ),
-            h6 = TextStyle(
-                fontWeight = FontWeight.Medium,
-                fontSize = 20.sp * fontScale,
-                letterSpacing = 0.15.sp
-            ),
-            subtitle1 = TextStyle(
-                fontWeight = FontWeight.Normal,
-                fontSize = 16.sp * fontScale,
-                letterSpacing = 0.15.sp
-            ),
-            subtitle2 = TextStyle(
-                fontWeight = FontWeight.Medium,
-                fontSize = 14.sp * fontScale,
-                letterSpacing = 0.1.sp
-            ),
-            body1 = TextStyle(
-                fontWeight = FontWeight.Normal,
-                fontSize = 16.sp * fontScale,
-                letterSpacing = 0.5.sp
-            ),
-            body2 = TextStyle(
-                fontWeight = FontWeight.Normal,
-                fontSize = 14.sp * fontScale,
-                letterSpacing = 0.25.sp
-            ),
-            button = TextStyle(
-                fontWeight = FontWeight.Medium,
-                fontSize = 14.sp * fontScale,
-                letterSpacing = 1.25.sp
-            ),
-            caption = TextStyle(
-                fontWeight = FontWeight.Normal,
-                fontSize = 12.sp * fontScale,
-                letterSpacing = 0.4.sp
-            ),
-            overline = TextStyle(
-                fontWeight = FontWeight.Normal,
-                fontSize = 10.sp * fontScale,
-                letterSpacing = 1.5.sp
+        baseTypography.let {
+            it.copy(
+                h1 = it.h1.copy(
+                    fontSize = it.h1.fontSize * fontScale,
+                ),
+                h2 = it.h2.copy(
+                    fontSize = it.h2.fontSize * fontScale,
+                ),
+                h3 = it.h3.copy(
+                    fontSize = it.h3.fontSize * fontScale,
+                ),
+                h4 = it.h4.copy(
+                    fontSize = it.h4.fontSize * fontScale,
+                ),
+                h5 = it.h5.copy(
+                    fontSize = it.h5.fontSize * fontScale,
+                ),
+                h6 = it.h6.copy(
+                    fontSize = it.h6.fontSize * fontScale,
+                ),
+                subtitle1 = it.subtitle1.copy(
+                    fontSize = it.subtitle1.fontSize * fontScale,
+                ),
+                subtitle2 = it.subtitle2.copy(
+                    fontSize = it.subtitle2.fontSize * fontScale,
+                ),
+                body1 = it.body1.copy(
+                    fontSize = it.body1.fontSize * fontScale,
+                ),
+                body2 = it.body2.copy(
+                    fontSize = it.body2.fontSize * fontScale,
+                ),
+                button = it.button.copy(
+                    fontSize = it.button.fontSize * fontScale,
+                ),
+                caption = it.caption.copy(
+                    fontSize = it.caption.fontSize * fontScale,
+                ),
+                overline = it.overline.copy(
+                    fontSize = it.overline.fontSize * fontScale,
+                ),
             )
-        )
+        }
     }
 }
 
 @Composable
 private fun provideThemeColors(darkTheme: Boolean): Colors {
     val primaryColor by animateColorAsState(targetValue = currentPrimaryColor())
+    val pureDark = LocalAppearancePreferences.current.isDarkModePureBlack
     val target = if (darkTheme) {
-        darkColors(
-            primary = primaryColor,
-            primaryVariant = primaryColor,
-            secondary = primaryColor,
-        )
+        if (pureDark) {
+            darkColors(
+                primary = primaryColor,
+                primaryVariant = primaryColor,
+                secondary = primaryColor,
+                background = Color.Black,
+                surface = Color.Black,
+            )
+        } else {
+            darkColors(
+                primary = primaryColor,
+                primaryVariant = primaryColor,
+                secondary = primaryColor,
+            )
+        }
     } else {
         lightColors(
             primary = primaryColor,

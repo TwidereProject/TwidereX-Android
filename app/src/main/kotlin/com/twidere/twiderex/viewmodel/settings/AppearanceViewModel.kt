@@ -71,4 +71,10 @@ class AppearanceViewModel @AssistedInject constructor(
             it.toBuilder().setHideAppBarWhenScroll(hide).build()
         }
     }
+
+    fun setIsDarkModePureBlack(value: Boolean) = viewModelScope.launch {
+        appearancePreferences.updateData {
+            it.toBuilder().setIsDarkModePureBlack(value).build()
+        }
+    }
 }

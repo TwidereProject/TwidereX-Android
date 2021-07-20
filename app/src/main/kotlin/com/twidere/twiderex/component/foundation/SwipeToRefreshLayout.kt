@@ -39,10 +39,12 @@ import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -78,6 +80,7 @@ private fun rememberSwipeToRefreshState(
     onRefresh: () -> Unit,
 ): SwipeToRefreshState {
     // Avoid creating a new instance every invocation
+    val currentOnRefresh = rememberUpdatedState(newValue = onRefresh)
     val saver = remember(
         scope,
         initialValue,
@@ -97,7 +100,7 @@ private fun rememberSwipeToRefreshState(
                     initialOffset = initialOffset,
                     maxOffset = maxOffset,
                     minOffset = minOffset,
-                    onRefresh = onRefresh,
+                    onRefresh = currentOnRefresh,
                 )
             }
         )
@@ -111,7 +114,7 @@ private fun rememberSwipeToRefreshState(
             initialOffset = initialOffset,
             maxOffset = maxOffset,
             minOffset = minOffset,
-            onRefresh = onRefresh,
+            onRefresh = currentOnRefresh,
         )
     }
 }
@@ -123,7 +126,7 @@ private class SwipeToRefreshState(
     private val initialOffset: Float,
     private val minOffset: Float,
     private val maxOffset: Float,
-    private val onRefresh: () -> Unit,
+    private val onRefresh: State<() -> Unit>,
 ) : NestedScrollConnection {
 
     var value: Boolean by mutableStateOf(initialValue)
@@ -188,7 +191,7 @@ private class SwipeToRefreshState(
             offsetValue >= 0 -> {
                 if (!value) {
                     value = true
-                    onRefresh.invoke()
+                    onRefresh.value.invoke()
                 }
                 _offset.animateTo(minOffset)
             }

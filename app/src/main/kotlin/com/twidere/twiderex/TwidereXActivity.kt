@@ -21,11 +21,11 @@
 package com.twidere.twiderex
 
 import android.content.Intent
-import android.graphics.Color
 import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
+import android.net.Uri
 import android.os.Bundle
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
@@ -38,6 +38,7 @@ import androidx.core.net.ConnectivityManagerCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.insets.ExperimentalAnimatedInsets
 import com.google.accompanist.insets.ProvideWindowInsets
@@ -56,6 +57,7 @@ import com.twidere.twiderex.ui.LocalApplication
 import com.twidere.twiderex.ui.LocalIsActiveNetworkMetered
 import com.twidere.twiderex.ui.LocalWindow
 import com.twidere.twiderex.ui.LocalWindowInsetsController
+import com.twidere.twiderex.utils.CustomTabSignInChannel
 import com.twidere.twiderex.utils.LocalPlatformResolver
 import com.twidere.twiderex.utils.PlatformResolver
 import com.twidere.twiderex.viewmodel.ActiveAccountViewModel
@@ -113,9 +115,6 @@ class TwidereXActivity : ComponentActivity() {
         )
         WindowCompat.setDecorFitsSystemWindows(window, false)
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-        // set Color.TRANSPARENT is not fully transparent
-        window.navigationBarColor = Color.parseColor("#01FFFFFF")
-        window.statusBarColor = Color.TRANSPARENT
         setContent {
             val windowInsetsControllerCompat =
                 remember { WindowInsetsControllerCompat(window, window.decorView) }
@@ -152,13 +151,23 @@ class TwidereXActivity : ComponentActivity() {
             }
         }
         intent.data?.let {
+            onDeeplink(it)
+        }
+    }
+
+    private fun onDeeplink(it: Uri) {
+        if (CustomTabSignInChannel.canHandle(it)) {
+            lifecycleScope.launchWhenResumed {
+                CustomTabSignInChannel.send(it)
+            }
+        } else {
             navController.navigate(it.toString())
         }
     }
 
     override fun onNewIntent(intent: Intent?) {
         intent?.data?.let {
-            navController.navigate(it.toString())
+            onDeeplink(it)
         }
     }
 
@@ -173,5 +182,12 @@ class TwidereXActivity : ComponentActivity() {
     override fun onStop() {
         super.onStop()
         connectivityManager.unregisterNetworkCallback(networkCallback)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        lifecycleScope.launchWhenResumed {
+            CustomTabSignInChannel.onClose()
+        }
     }
 }

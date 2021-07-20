@@ -32,5 +32,18 @@ data class TwitterUploadResponse(
     val mediaIDString: String? = null,
 
     @SerialName("expires_after_secs")
-    val expiresAfterSecs: Long? = null
+    val expiresAfterSecs: Long? = null,
+
+    @SerialName("processing_info")
+    val processingInfo: TwitterUploadProcessInfo? = null
+)
+
+@Serializable
+data class TwitterUploadProcessInfo(
+    @SerialName("check_after_secs")
+    val checkAfterSecs: Int? = null,
+    @SerialName("progress_percent")
+    val progressPercent: Int? = null,
+    @SerialName("state")
+    val state: String? = null
 )

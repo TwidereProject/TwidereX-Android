@@ -24,10 +24,9 @@ import android.net.Uri
 import androidx.compose.runtime.Composable
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.WebComponent
+import com.twidere.twiderex.navigation.DeepLinks
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
-
-val MASTODON_CALLBACK_URL = "https://org.mariotaku.twidere/auth/callback/mastodon"
 
 @Composable
 fun MastodonWebSignInScene(target: String) {
@@ -37,7 +36,7 @@ fun MastodonWebSignInScene(target: String) {
             WebComponent(
                 url = target,
                 onPageStarted = { _, url ->
-                    if (url.startsWith(MASTODON_CALLBACK_URL)) {
+                    if (url.startsWith(DeepLinks.Callback.SignIn.Mastodon)) {
                         val uri = Uri.parse(url)
                         uri.getQueryParameter("code")?.takeIf {
                             it.isNotEmpty()
