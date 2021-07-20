@@ -21,12 +21,12 @@
 package com.twidere.twiderex.viewmodel.settings
 
 import androidx.datastore.core.DataStore
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.twidere.twiderex.preferences.proto.MiscPreferences
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
@@ -40,7 +40,7 @@ class MiscViewModel @AssistedInject constructor(
     }
 
     val nitter by lazy {
-        MutableLiveData("")
+        MutableStateFlow("")
     }
 
     init {

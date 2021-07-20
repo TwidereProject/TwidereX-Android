@@ -20,7 +20,6 @@
  */
 package com.twidere.twiderex.db.dao
 
-import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -28,6 +27,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.twidere.twiderex.db.model.DbSearch
 import com.twidere.twiderex.model.MicroBlogKey
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface SearchDao {
@@ -35,13 +35,13 @@ interface SearchDao {
     suspend fun insertAll(search: List<DbSearch>)
 
     @Query("SELECT * FROM search where accountKey == :accountKey ORDER BY lastActive DESC")
-    fun getAll(accountKey: MicroBlogKey): LiveData<List<DbSearch>>
+    fun getAll(accountKey: MicroBlogKey): Flow<List<DbSearch>>
 
     @Query("SELECT * FROM search where saved == 0 AND accountKey == :accountKey ORDER BY lastActive DESC")
-    fun getAllHistory(accountKey: MicroBlogKey): LiveData<List<DbSearch>>
+    fun getAllHistory(accountKey: MicroBlogKey): Flow<List<DbSearch>>
 
     @Query("SELECT * FROM search where saved == 1 AND accountKey == :accountKey ORDER BY lastActive DESC")
-    fun getAllSaved(accountKey: MicroBlogKey): LiveData<List<DbSearch>>
+    fun getAllSaved(accountKey: MicroBlogKey): Flow<List<DbSearch>>
 
     @Query("SELECT * FROM search WHERE content == :content AND accountKey == :accountKey")
     suspend fun get(content: String, accountKey: MicroBlogKey): DbSearch?

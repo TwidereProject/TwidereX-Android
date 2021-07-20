@@ -22,7 +22,6 @@ package com.twidere.twiderex.viewmodel.mastodon
 
 import android.accounts.Account
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.twidere.services.mastodon.MastodonOAuthService
@@ -38,6 +37,7 @@ import com.twidere.twiderex.repository.ACCOUNT_TYPE
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.utils.json
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
 class MastodonSignInViewModel @AssistedInject constructor(
@@ -50,8 +50,8 @@ class MastodonSignInViewModel @AssistedInject constructor(
         fun create(): MastodonSignInViewModel
     }
 
-    val loading = MutableLiveData(false)
-    val host = MutableLiveData(TextFieldValue())
+    val loading = MutableStateFlow(false)
+    val host = MutableStateFlow(TextFieldValue())
     fun setHost(value: TextFieldValue) {
         host.value = value
     }
@@ -61,7 +61,7 @@ class MastodonSignInViewModel @AssistedInject constructor(
         codeProvider: suspend (url: String) -> String?,
         finished: (success: Boolean) -> Unit,
     ) = viewModelScope.launch {
-        loading.postValue(true)
+        loading.value = true
         runCatching {
             val service = MastodonOAuthService(
                 host = "https://$host",
@@ -111,7 +111,7 @@ class MastodonSignInViewModel @AssistedInject constructor(
         }.onFailure {
             inAppNotification.show(it.message.toString())
         }
-        loading.postValue(false)
+        loading.value = false
         finished.invoke(false)
     }
 }

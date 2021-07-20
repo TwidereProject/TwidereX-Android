@@ -20,8 +20,6 @@
  */
 package com.twidere.twiderex.repository
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.map
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.PagingData
 import androidx.room.withTransaction
@@ -43,6 +41,7 @@ import com.twidere.twiderex.paging.mediator.paging.pager
 import com.twidere.twiderex.paging.mediator.status.MastodonStatusContextMediator
 import com.twidere.twiderex.paging.mediator.status.TwitterConversationMediator
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 class StatusRepository(
     private val database: CacheDatabase,
@@ -51,8 +50,8 @@ class StatusRepository(
     fun loadStatus(
         statusKey: MicroBlogKey,
         accountKey: MicroBlogKey
-    ): LiveData<UiStatus?> {
-        return database.statusDao().findWithStatusKeyWithReferenceLiveData(statusKey).map {
+    ): Flow<UiStatus?> {
+        return database.statusDao().findWithStatusKeyWithReferenceFlow(statusKey).map {
             it?.toUi(accountKey)
         }
     }

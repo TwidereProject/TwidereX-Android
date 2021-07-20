@@ -73,7 +73,7 @@ class NotificationRepository(
             )
         }
         return if (currentCursor != null) {
-            notifications.takeWhile { it.statusId != currentCursor.value }
+            notifications.takeWhile { it.statusId != currentCursor.value && it.timestamp > currentCursor.timestamp }
         } else {
             emptyList()
         }

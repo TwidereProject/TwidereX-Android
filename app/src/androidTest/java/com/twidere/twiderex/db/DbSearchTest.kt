@@ -21,13 +21,13 @@
 package com.twidere.twiderex.db
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.lifecycle.Observer
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.twidere.twiderex.db.dao.SearchDao
 import com.twidere.twiderex.db.model.DbSearch
 import com.twidere.twiderex.model.MicroBlogKey
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert
@@ -92,20 +92,17 @@ class DbSearchTest {
     @Test
     fun getAll_returnResultByAccountKey() = runBlocking {
         val result = searchDao.getAll(twitterAccountKey)
-        val observer = Observer<List<DbSearch>?> { }
-        result.observeForever(observer)
-        Assert.assertEquals(twitterSearchCount, result.value?.size)
-        result.value?.forEach {
+        val value = result.firstOrNull()
+        Assert.assertEquals(twitterSearchCount, value?.size)
+        value?.forEach {
             assert(it.content.startsWith("twitter"))
         } ?: assert(false)
     }
 
     @Test
     fun getAllHistory_returnResultsMatchAccountKeyAndNotSaved() = runBlocking {
-        val result = searchDao.getAllHistory(mastodonAccountKey)
-        val observer = Observer<List<DbSearch>?> { }
-        result.observeForever(observer)
-        result.value?.forEach {
+        val result = searchDao.getAllHistory(mastodonAccountKey).firstOrNull()
+        result?.forEach {
             assert(it.content.startsWith("mastodon"))
             assert(!it.saved)
         } ?: assert(false)
@@ -113,10 +110,8 @@ class DbSearchTest {
 
     @Test
     fun getAllSaved_returnResultsMatchAccountKeyAndSaved() = runBlocking {
-        val result = searchDao.getAllSaved(twitterAccountKey)
-        val observer = Observer<List<DbSearch>?> { }
-        result.observeForever(observer)
-        result.value?.forEach {
+        val result = searchDao.getAllSaved(twitterAccountKey).firstOrNull()
+        result?.forEach {
             assert(it.content.startsWith("twitter"))
             assert(it.saved)
         } ?: assert(false)
@@ -141,16 +136,13 @@ class DbSearchTest {
     @Test
     fun clearHistory_deleteSearchNotSaved() = runBlocking {
         searchDao.clear()
-        val twitterResult = searchDao.getAll(twitterAccountKey)
-        val mastodonResult = searchDao.getAll(mastodonAccountKey)
-        val observer = Observer<List<DbSearch>?> { }
-        twitterResult.observeForever(observer)
-        mastodonResult.observeForever(observer)
-        twitterResult.value?.forEach {
+        val twitterResult = searchDao.getAll(twitterAccountKey).firstOrNull()
+        val mastodonResult = searchDao.getAll(mastodonAccountKey).firstOrNull()
+        twitterResult?.forEach {
             assert(it.saved)
         } ?: assert(false)
 
-        mastodonResult.value?.forEach {
+        mastodonResult?.forEach {
             assert(it.saved)
         } ?: assert(false)
     }

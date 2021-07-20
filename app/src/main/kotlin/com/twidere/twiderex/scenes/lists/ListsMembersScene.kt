@@ -95,8 +95,8 @@ fun ListsMembersScene(
                 if (owned) FloatingActionButton(
                     onClick = {
                         scope.launch {
-                            val result = navController.navigateForResult(Route.Lists.AddMembers(listKey = listKey)) as List<*>
-                            if (result.isNotEmpty()) source.refresh()
+                            val result = navController.navigateForResult(Route.Lists.AddMembers(listKey = listKey)) as? List<*>?
+                            if (result != null && result.isNotEmpty()) source.refresh()
                         }
                     }
                 ) {

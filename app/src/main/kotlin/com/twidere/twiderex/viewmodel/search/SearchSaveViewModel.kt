@@ -20,13 +20,13 @@
  */
 package com.twidere.twiderex.viewmodel.search
 
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.repository.SearchRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
 class SearchSaveViewModel @AssistedInject constructor(
@@ -40,26 +40,26 @@ class SearchSaveViewModel @AssistedInject constructor(
         fun create(account: AccountDetails, content: String): SearchSaveViewModel
     }
 
-    val loading = MutableLiveData(false)
+    val loading = MutableStateFlow(false)
 
-    val isSaved = MutableLiveData(false)
+    val isSaved = MutableStateFlow(false)
 
     init {
         viewModelScope.launch {
-            isSaved.postValue(repository.get(content, account.accountKey)?.saved ?: false)
+            isSaved.value = repository.get(content, account.accountKey)?.saved ?: false
         }
     }
 
     fun save() {
         viewModelScope.launch {
-            loading.postValue(true)
+            loading.value = true
             try {
                 repository.addOrUpgrade(content = content, accountKey = account.accountKey, saved = true)
-                isSaved.postValue(true)
+                isSaved.value = true
             } catch (e: Exception) {
-                isSaved.postValue(false)
+                isSaved.value = false
             } finally {
-                loading.postValue(false)
+                loading.value = false
             }
         }
     }

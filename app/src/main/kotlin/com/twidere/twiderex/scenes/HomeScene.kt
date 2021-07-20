@@ -63,7 +63,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -92,6 +91,7 @@ import com.twidere.twiderex.component.lazy.divider
 import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.component.status.UserName
 import com.twidere.twiderex.component.status.UserScreenName
+import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.navigation.Route
@@ -439,6 +439,9 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
                                 UserAvatar(
                                     user = user,
                                     withPlatformIcon = true,
+                                    onClick = {
+                                        activeAccountViewModel.setActiveAccount(it)
+                                    }
                                 )
                             },
                             text = {

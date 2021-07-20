@@ -20,7 +20,6 @@
  */
 package com.twidere.twiderex.component.foundation
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.text.BasicTextField
@@ -28,8 +27,9 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.LocalContentAlpha
-import androidx.compose.material.LocalContentColor
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material.LocalTextStyle
+import androidx.compose.material.TextFieldColors
+import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -42,48 +42,37 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.platform.SoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.input.VisualTransformation
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun TextInput(
-    modifier: Modifier = Modifier,
-    autoFocus: Boolean = false,
-    textStyle: TextStyle = MaterialTheme.typography.body1,
-    color: Color = Color.Unspecified,
-    placeholder: @Composable (() -> Unit)? = null,
-    keyboardType: KeyboardType = KeyboardType.Text,
-    maxLines: Int = Int.MAX_VALUE,
-    alignment: Alignment = Alignment.TopStart,
-    imeAction: ImeAction = ImeAction.Default,
-    onImeActionPerformed: (ImeAction, SoftwareKeyboardController?) -> Unit = { _, _ -> },
     value: String,
     onValueChange: (String) -> Unit,
-    onClicked: (() -> Unit)? = null,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    readOnly: Boolean = false,
+    textStyle: TextStyle = LocalTextStyle.current,
+    autoFocus: Boolean = false,
+    placeholder: @Composable (() -> Unit)? = null,
+    isError: Boolean = false,
+    alignment: Alignment = Alignment.TopStart,
+    visualTransformation: VisualTransformation = VisualTransformation.None,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    keyboardActions: KeyboardActions = KeyboardActions(),
+    singleLine: Boolean = false,
+    maxLines: Int = Int.MAX_VALUE,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    colors: TextFieldColors = TextFieldDefaults.textFieldColors(),
 ) {
-
     var textFieldValueState by remember { mutableStateOf(TextFieldValue(text = value)) }
     val textFieldValue = textFieldValueState.copy(text = value)
-
     TextInput(
-        autoFocus = autoFocus,
-        modifier = modifier,
-        textStyle = textStyle,
-        color = color,
-        placeholder = placeholder,
-        keyboardType = keyboardType,
-        maxLines = maxLines,
-        alignment = alignment,
-        imeAction = imeAction,
-        onImeActionPerformed = onImeActionPerformed,
         value = textFieldValue,
         onValueChange = {
             textFieldValueState = it
@@ -91,82 +80,107 @@ fun TextInput(
                 onValueChange(it.text)
             }
         },
-        onClicked = onClicked,
+        modifier = modifier,
+        enabled = enabled,
+        readOnly = readOnly,
+        textStyle = textStyle,
+        autoFocus = autoFocus,
+        placeholder = placeholder,
+        isError = isError,
+        alignment = alignment,
+        visualTransformation = visualTransformation,
+        keyboardOptions = keyboardOptions,
+        keyboardActions = keyboardActions,
+        singleLine = singleLine,
+        maxLines = maxLines,
+        interactionSource = interactionSource,
+        colors = colors,
     )
 }
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun TextInput(
-    modifier: Modifier = Modifier,
-    autoFocus: Boolean = false,
-    textStyle: TextStyle = MaterialTheme.typography.body1,
-    color: Color = Color.Unspecified,
-    placeholder: @Composable (() -> Unit)? = null,
-    keyboardType: KeyboardType = KeyboardType.Text,
-    maxLines: Int = Int.MAX_VALUE,
-    alignment: Alignment = Alignment.TopStart,
-    imeAction: ImeAction = ImeAction.Default,
-    onImeActionPerformed: (ImeAction, SoftwareKeyboardController?) -> Unit = { _, _ -> },
     value: TextFieldValue,
     onValueChange: (TextFieldValue) -> Unit,
-    onClicked: (() -> Unit)? = null,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    readOnly: Boolean = false,
+    textStyle: TextStyle = LocalTextStyle.current,
+    autoFocus: Boolean = false,
+    placeholder: @Composable (() -> Unit)? = null,
+    isError: Boolean = false,
+    alignment: Alignment = Alignment.TopStart,
+    visualTransformation: VisualTransformation = VisualTransformation.None,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    keyboardActions: KeyboardActions = KeyboardActions(),
+    singleLine: Boolean = false,
+    maxLines: Int = Int.MAX_VALUE,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    colors: TextFieldColors = TextFieldDefaults.textFieldColors(),
 ) {
+    val textColor = textStyle.color.takeOrElse {
+        colors.textColor(enabled).value
+    }
+    val mergedTextStyle = textStyle.merge(TextStyle(color = textColor))
     val focusRequester = remember { FocusRequester() }
     val keyboardController = LocalSoftwareKeyboardController.current
-    val interactionSource = remember { MutableInteractionSource() }
-    val textColor = color.takeOrElse {
-        LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
-    }
     LaunchedEffect(autoFocus) {
         if (autoFocus) {
             focusRequester.requestFocus()
             keyboardController?.show()
         }
     }
-    Box(
+
+    val transformedText = remember(value.annotatedString, visualTransformation) {
+        visualTransformation.filter(value.annotatedString)
+    }.text
+    val decoratedPlaceholder: @Composable (() -> Unit)? =
+        if (placeholder != null && transformedText.isEmpty()) {
+            @Composable {
+                CompositionLocalProvider(
+                    LocalContentAlpha provides ContentAlpha.medium,
+                ) {
+                    placeholder.invoke()
+                }
+            }
+        } else null
+
+    BasicTextField(
+        value = value,
         modifier = modifier
-            .focusRequester(focusRequester)
-            .clickable(interactionSource = interactionSource, indication = null) {
-                onClicked?.invoke()
-                focusRequester.requestFocus()
-                // TODO(b/163109449): Showing and hiding keyboard should be handled by BaseTextField.
-                //  The requestFocus() call here should be enough to trigger the software keyboard.
-                //  Investiate why this is needed here. If it is really needed, instead of doing
-                //  this in the onClick callback, we should move this logic to the focusObserver
-                //  so that it can show or hide the keyboard based on the focus state.
-                keyboardController?.show()
-            },
+            .focusRequester(focusRequester),
+        onValueChange = onValueChange,
+        enabled = enabled,
+        readOnly = readOnly,
+        textStyle = mergedTextStyle,
+        cursorBrush = SolidColor(colors.cursorColor(isError).value),
+        visualTransformation = visualTransformation,
+        keyboardOptions = keyboardOptions,
+        keyboardActions = keyboardActions,
+        interactionSource = interactionSource,
+        singleLine = singleLine,
+        maxLines = maxLines,
+        decorationBox = @Composable { coreTextField ->
+            TextFieldLayout(
+                textField = coreTextField,
+                placeholder = decoratedPlaceholder,
+                alignment = alignment,
+            )
+        }
+    )
+}
+
+@Composable
+private fun TextFieldLayout(
+    textField: @Composable () -> Unit,
+    placeholder: @Composable (() -> Unit)?,
+    alignment: Alignment,
+) {
+    Box(
         contentAlignment = alignment,
     ) {
-        BasicTextField(
-            maxLines = maxLines,
-            keyboardOptions = KeyboardOptions(
-                keyboardType = keyboardType,
-                imeAction = imeAction,
-            ),
-            keyboardActions =
-            KeyboardActions(
-                onDone = { onImeActionPerformed.invoke(ImeAction.Done, keyboardController) },
-                onGo = { onImeActionPerformed.invoke(ImeAction.Go, keyboardController) },
-                onNext = { onImeActionPerformed.invoke(ImeAction.Next, keyboardController) },
-                onPrevious = { onImeActionPerformed.invoke(ImeAction.Previous, keyboardController) },
-                onSearch = { onImeActionPerformed.invoke(ImeAction.Search, keyboardController) },
-                onSend = { onImeActionPerformed.invoke(ImeAction.Send, keyboardController) }
-            ),
-            cursorBrush = SolidColor(MaterialTheme.colors.primary),
-            textStyle = textStyle.copy(color = textColor),
-            value = value,
-            onValueChange = {
-                onValueChange(it)
-            },
-        )
-        if (value.text.isEmpty()) {
-            CompositionLocalProvider(
-                LocalContentAlpha provides ContentAlpha.medium
-            ) {
-                placeholder?.invoke()
-            }
-        }
+        textField.invoke()
+        placeholder?.invoke()
     }
 }

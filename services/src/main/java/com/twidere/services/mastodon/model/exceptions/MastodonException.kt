@@ -21,5 +21,14 @@
 package com.twidere.services.mastodon.model.exceptions
 
 import com.twidere.services.http.MicroBlogException
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-class MastodonException(override val microBlogErrorMessage: String?) : MicroBlogException()
+@Serializable
+data class MastodonException(
+    @SerialName("error")
+    val error: String? = null,
+) : MicroBlogException() {
+    override val microBlogErrorMessage: String?
+        get() = error
+}

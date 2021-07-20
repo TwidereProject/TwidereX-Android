@@ -21,15 +21,12 @@
 package com.twidere.twiderex.viewmodel.settings
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
-import androidx.lifecycle.liveData
-import androidx.lifecycle.map
-import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.repository.AccountRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class AccountNotificationViewModel @AssistedInject constructor(
@@ -51,20 +48,14 @@ class AccountNotificationViewModel @AssistedInject constructor(
     }
 
     val preferences by lazy {
-        accountRepository.accounts.map {
-            it.firstOrNull { it.accountKey == accountKey }
-        }.map {
-            it?.preferences
-        }
+        accountRepository.getAccountPreferences(accountKey)
     }
 
     val isNotificationEnabled by lazy {
-        preferences.switchMap {
-            it?.isNotificationEnabled?.asLiveData() ?: liveData { emit(false) }
-        }
+        preferences.isNotificationEnabled
     }
 
     fun setIsNotificationEnabled(value: Boolean) = viewModelScope.launch {
-        preferences.value?.setIsNotificationEnabled(value)
+        preferences.setIsNotificationEnabled(value)
     }
 }
