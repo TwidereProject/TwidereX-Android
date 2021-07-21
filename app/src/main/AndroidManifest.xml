@@ -42,6 +42,10 @@
                 android:name="com.twidere.twiderex.notification.NotificationInitializer"
                 android:value="androidx.startup"
                 tools:node="remove" />
+            <meta-data
+                android:name="com.twidere.twiderex.http.TwidereServiceInitializer"
+                android:value="androidx.startup"
+                tools:node="remove" />
         </provider>
         <provider
             android:name="androidx.core.content.FileProvider"

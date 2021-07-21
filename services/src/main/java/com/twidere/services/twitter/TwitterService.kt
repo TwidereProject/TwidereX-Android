@@ -22,9 +22,8 @@ package com.twidere.services.twitter
 
 import com.twidere.services.http.AuthorizationInterceptor
 import com.twidere.services.http.Errors
-import com.twidere.services.http.MicroBlogHttpException
+import com.twidere.services.http.HttpClientFactory
 import com.twidere.services.http.authorization.OAuth1Authorization
-import com.twidere.services.http.retrofit
 import com.twidere.services.microblog.DirectMessageService
 import com.twidere.services.microblog.DownloadMediaService
 import com.twidere.services.microblog.ListsService
@@ -66,8 +65,6 @@ import com.twidere.services.twitter.model.fields.UserFields
 import com.twidere.services.utils.Base64
 import com.twidere.services.utils.await
 import com.twidere.services.utils.copyToInLength
-import com.twidere.services.utils.decodeJson
-import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
@@ -80,7 +77,7 @@ class TwitterService(
     private val consumer_secret: String,
     private val access_token: String,
     private val access_token_secret: String,
-    resources: TwitterResources? = null
+    private val httpClientFactory: HttpClientFactory
 ) : MicroBlogService,
     TimelineService,
     LookupService,
@@ -91,38 +88,21 @@ class TwitterService(
     ListsService,
     TrendService,
     DirectMessageService {
-    private val resources by lazy {
-        resources ?: retrofit(
-            TWITTER_BASE_URL,
-            createOAuth1Authorization(),
-            { chain ->
-                val response = chain.proceed(chain.request())
-                if (response.code != 200) {
-                    response.body?.string()?.takeIf {
-                        it.isNotEmpty()
-                    }?.let { content ->
-                        content.decodeJson<TwitterApiException>().takeIf {
-                            it.microBlogErrorMessage != null
-                        }.let {
-                            it ?: run {
-                                content.decodeJson<TwitterApiExceptionV2>()
-                            }
-                        }.let {
-                            throw it
-                        }
-                    } ?: throw MicroBlogHttpException(response.code)
-                } else {
-                    response
-                }
-            }
+    private val resources: TwitterResources
+        get() = httpClientFactory.createResources(
+            clazz = TwitterResources::class.java,
+            baseUrl = TWITTER_BASE_URL,
+            authorization = createOAuth1Authorization(),
+            useCache = true,
         )
-    }
-    private val uploadResources by lazy {
-        retrofit<UploadResources>(
-            UPLOAD_TWITTER_BASE_URL,
-            createOAuth1Authorization(),
+
+    private val uploadResources: UploadResources
+        get() = httpClientFactory.createResources(
+            clazz = UploadResources::class.java,
+            baseUrl = UPLOAD_TWITTER_BASE_URL,
+            authorization = createOAuth1Authorization(),
+            useCache = true
         )
-    }
 
     private fun createOAuth1Authorization() = OAuth1Authorization(
         consumer_key,
@@ -481,8 +461,7 @@ class TwitterService(
     }
 
     override suspend fun download(target: String): InputStream {
-        return OkHttpClient
-            .Builder()
+        return httpClientFactory.createHttpClientBuilder()
             .addInterceptor(AuthorizationInterceptor(createOAuth1Authorization()))
             .build()
             .newCall(

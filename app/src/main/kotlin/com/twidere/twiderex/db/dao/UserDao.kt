@@ -20,7 +20,6 @@
  */
 package com.twidere.twiderex.db.dao
 
-import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -28,6 +27,7 @@ import androidx.room.Query
 import androidx.room.Update
 import com.twidere.twiderex.db.model.DbUser
 import com.twidere.twiderex.model.MicroBlogKey
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface UserDao {
@@ -35,7 +35,7 @@ interface UserDao {
     suspend fun insertAll(user: List<DbUser>)
 
     @Query("SELECT * FROM user WHERE userKey == :userKey")
-    fun findWithUserKeyLiveData(userKey: MicroBlogKey): LiveData<DbUser?>
+    fun findWithUserKeyFlow(userKey: MicroBlogKey): Flow<DbUser?>
 
     @Query("SELECT * FROM user WHERE userKey == :userKey")
     suspend fun findWithUserKey(userKey: MicroBlogKey): DbUser?

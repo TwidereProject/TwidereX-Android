@@ -21,10 +21,7 @@
 package com.twidere.twiderex.model
 
 import android.accounts.Account
-import com.twidere.services.mastodon.MastodonService
-import com.twidere.services.microblog.MicroBlogService
-import com.twidere.services.twitter.TwitterService
-import com.twidere.twiderex.model.adapter.AndroidAccountSerializer
+import com.twidere.twiderex.http.TwidereServiceFactory
 import com.twidere.twiderex.model.cred.BasicCredentials
 import com.twidere.twiderex.model.cred.Credentials
 import com.twidere.twiderex.model.cred.CredentialsType
@@ -33,23 +30,18 @@ import com.twidere.twiderex.model.cred.OAuth2Credentials
 import com.twidere.twiderex.model.cred.OAuthCredentials
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.utils.fromJson
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 
-@Serializable
 data class AccountDetails(
-    @Serializable(with = AndroidAccountSerializer::class)
     val account: Account,
     val type: PlatformType,
     // Note that UserKey that being used in AccountDetails is idStr@domain, not screenName@domain
     val accountKey: MicroBlogKey,
     val credentials_type: CredentialsType,
-    @SerialName("credentials")
     var credentials_json: String,
-    @SerialName("extras")
     val extras_json: String,
     var user: AmUser,
     var lastActive: Long,
+    val preferences: AccountPreferences,
 ) {
     val credentials: Credentials
         get() = when (credentials_type) {
@@ -60,29 +52,12 @@ data class AccountDetails(
             CredentialsType.OAuth2 -> credentials_json.fromJson<OAuth2Credentials>()
         }
 
-    val service by lazy<MicroBlogService> {
-        when (type) {
-            PlatformType.Twitter -> {
-                credentials.let {
-                    it as OAuthCredentials
-                }.let {
-                    TwitterService(
-                        consumer_key = it.consumer_key,
-                        consumer_secret = it.consumer_secret,
-                        access_token = it.access_token,
-                        access_token_secret = it.access_token_secret,
-                    )
-                }
-            }
-            PlatformType.StatusNet -> TODO()
-            PlatformType.Fanfou -> TODO()
-            PlatformType.Mastodon ->
-                credentials.let {
-                    it as OAuth2Credentials
-                }.let {
-                    MastodonService(accountKey.host, it.access_token)
-                }
-        }
+    val service by lazy {
+        TwidereServiceFactory.createApiService(
+            type = type,
+            credentials = credentials,
+            host = accountKey.host
+        )
     }
 
     val listType: ListType

@@ -20,9 +20,9 @@
  */
 package com.twidere.services.mastodon
 
+import com.twidere.services.http.HttpClientFactory
 import com.twidere.services.http.authorization.BearerAuthorization
 import com.twidere.services.http.authorization.EmptyAuthorization
-import com.twidere.services.http.retrofit
 import com.twidere.services.mastodon.api.MastodonOAuthResources
 import com.twidere.services.mastodon.model.CreateApplicationResponse
 import com.twidere.services.mastodon.model.MastodonAuthScope
@@ -32,6 +32,7 @@ class MastodonOAuthService(
     private val client_name: String,
     private val website: String? = null,
     private val redirect_uri: String = "urn:ietf:wg:oauth:2.0:oob",
+    private val httpClientFactory: HttpClientFactory,
     private val scopes: List<MastodonAuthScope> = listOf(
         MastodonAuthScope.read,
         MastodonAuthScope.write,
@@ -39,8 +40,9 @@ class MastodonOAuthService(
         MastodonAuthScope.push,
     ),
 ) {
-    private val resources by lazy {
-        retrofit<MastodonOAuthResources>(
+    private val resources: MastodonOAuthResources by lazy {
+        httpClientFactory.createResources(
+            MastodonOAuthResources::class.java,
             host,
             EmptyAuthorization()
         )
@@ -71,7 +73,8 @@ class MastodonOAuthService(
         )
 
     suspend fun verifyCredentials(accessToken: String) =
-        retrofit<MastodonOAuthResources>(
+        httpClientFactory.createResources<MastodonOAuthResources>(
+            MastodonOAuthResources::class.java,
             host,
             BearerAuthorization(accessToken)
         ).verifyCredentials()

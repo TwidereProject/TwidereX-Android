@@ -21,11 +21,11 @@
 package com.twidere.twiderex.viewmodel
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.liveData
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.repository.MediaRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.flow.flow
 
 class PureMediaViewModel @AssistedInject constructor(
     private val mediaRepository: MediaRepository,
@@ -36,7 +36,7 @@ class PureMediaViewModel @AssistedInject constructor(
         fun create(belongKey: MicroBlogKey): PureMediaViewModel
     }
 
-    val source = liveData {
+    val source = flow {
         emit(mediaRepository.findMediaByBelongToKey(belongKey))
     }
 }

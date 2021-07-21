@@ -20,7 +20,6 @@
  */
 package com.twidere.twiderex.scenes.home
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
@@ -41,7 +40,6 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -52,12 +50,17 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.items
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.AppBar
+import com.twidere.twiderex.component.foundation.AppBarNavigationButton
+import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.component.trend.MastodonTrendItem
 import com.twidere.twiderex.component.trend.TwitterTrendItem
 import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.model.PlatformType
+import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.ui.LocalActiveAccount
+import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.search.SearchInputViewModel
 import com.twidere.twiderex.viewmodel.trend.TrendViewModel
 
@@ -65,6 +68,8 @@ class SearchItem : HomeNavigationItem() {
 
     @Composable
     override fun name(): String = stringResource(R.string.scene_search_title)
+    override val route: String
+        get() = Route.Search.Home
 
     @Composable
     override fun icon(): Painter = painterResource(id = R.drawable.ic_search)
@@ -72,162 +77,187 @@ class SearchItem : HomeNavigationItem() {
     override val withAppBar: Boolean
         get() = false
 
-    @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
     @Composable
     override fun Content() {
-        val account = LocalActiveAccount.current ?: return
-        val viewModel =
-            assistedViewModel<SearchInputViewModel.AssistedFactory, SearchInputViewModel>(
-                account
-            ) {
-                it.create(account = account)
-            }
-        val trendViewModel = assistedViewModel<TrendViewModel.AssistedFactory, TrendViewModel>(
-            account
-        ) {
-            it.create(account = account)
-        }
-        val source by viewModel.savedSource.observeAsState(initial = emptyList())
-        val trends = trendViewModel.source.collectAsLazyPagingItems()
-        val navigator = LocalNavigator.current
-        val searchCount = 3
-        val expandSearch by viewModel.expandSearch.observeAsState(false)
-        Scaffold(
+        SearchSceneContent()
+    }
+}
+
+@Composable
+fun SearchScene() {
+    TwidereScene {
+        InAppNotificationScaffold(
             topBar = {
                 AppBar(
                     title = {
-                        ProvideTextStyle(value = MaterialTheme.typography.body1) {
-                            Row(
-                                modifier = Modifier.clickable(
-                                    onClick = {
-                                        navigator.searchInput()
-                                    },
-                                    indication = null,
-                                    interactionSource = remember { MutableInteractionSource() }
-                                )
-                            ) {
-                                CompositionLocalProvider(
-                                    LocalContentAlpha provides ContentAlpha.medium
-                                ) {
-                                    Text(
-                                        modifier = Modifier
-                                            .weight(1F)
-                                            .align(Alignment.CenterVertically),
-                                        text = stringResource(id = R.string.scene_search_search_bar_placeholder),
-                                    )
-                                }
-                                IconButton(
-                                    onClick = {
-                                        navigator.searchInput()
-                                    }
-                                ) {
-                                    Icon(
-                                        painter = painterResource(id = R.drawable.ic_search),
-                                        contentDescription = stringResource(
-                                            id = R.string.scene_search_title
-                                        )
-                                    )
-                                }
-                            }
-                        }
+                        Text(text = stringResource(id = R.string.scene_search_title))
+                    },
+                    navigationIcon = {
+                        AppBarNavigationButton()
                     }
                 )
             }
         ) {
-            LazyColumn {
-                item {
-                    if (source.isNotEmpty()) ListItem {
-                        Text(
-                            text = stringResource(id = R.string.scene_search_saved_search),
-                            style = MaterialTheme.typography.button
-                        )
-                    }
-                }
-                items(items = source.filterIndexed { index, _ -> index < searchCount || expandSearch }) {
-                    ListItem(
-                        modifier = Modifier.clickable(
-                            onClick = {
-                                viewModel.addOrUpgrade(it.content)
-                                navigator.search(it.content)
+            SearchSceneContent()
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun SearchSceneContent() {
+    val account = LocalActiveAccount.current ?: return
+    val viewModel =
+        assistedViewModel<SearchInputViewModel.AssistedFactory, SearchInputViewModel>(
+            account
+        ) {
+            it.create(account = account)
+        }
+    val trendViewModel = assistedViewModel<TrendViewModel.AssistedFactory, TrendViewModel>(
+        account
+    ) {
+        it.create(account = account)
+    }
+    val source by viewModel.savedSource.observeAsState(initial = emptyList())
+    val trends = trendViewModel.source.collectAsLazyPagingItems()
+    val navigator = LocalNavigator.current
+    val searchCount = 3
+    val expandSearch by viewModel.expandSearch.observeAsState(false)
+    Scaffold(
+        topBar = {
+            AppBar(
+                title = {
+                    ProvideTextStyle(value = MaterialTheme.typography.body1) {
+                        Row(
+                            modifier = Modifier.clickable(
+                                onClick = {
+                                    navigator.searchInput()
+                                },
+                                indication = null,
+                                interactionSource = remember { MutableInteractionSource() }
+                            )
+                        ) {
+                            CompositionLocalProvider(
+                                LocalContentAlpha provides ContentAlpha.medium
+                            ) {
+                                Text(
+                                    modifier = Modifier
+                                        .weight(1F)
+                                        .align(Alignment.CenterVertically),
+                                    text = stringResource(id = R.string.scene_search_search_bar_placeholder),
+                                )
                             }
-                        ),
-                        trailing = {
                             IconButton(
                                 onClick = {
-                                    viewModel.remove(it)
+                                    navigator.searchInput()
                                 }
                             ) {
                                 Icon(
-                                    painter = painterResource(id = R.drawable.ic_trash_can),
+                                    painter = painterResource(id = R.drawable.ic_search),
                                     contentDescription = stringResource(
-                                        id = R.string.common_controls_actions_remove
+                                        id = R.string.scene_search_title
                                     )
                                 )
                             }
-                        },
-                        text = {
-                            Text(
-                                text = it.content,
-                                style = MaterialTheme.typography.subtitle1
-                            )
-                        },
-                    )
-                }
-                item {
-                    if (source.size > searchCount) ListItem(
-                        modifier = Modifier.clickable {
-                            viewModel.expandSearch.value = !expandSearch
                         }
-                    ) {
-                        Text(
-                            text = if (expandSearch) stringResource(id = R.string.scene_search_show_less) else stringResource(id = R.string.scene_search_show_more),
-                            style = MaterialTheme.typography.subtitle1,
-                            color = MaterialTheme.colors.primary
-                        )
                     }
                 }
-                if (trends.itemCount > 0) {
-                    item {
-                        Column {
-                            Divider()
-                            ListItem {
-                                when (account.type) {
-                                    PlatformType.Twitter ->
-                                        Text(
-                                            text = stringResource(id = R.string.scene_trends_world_wide),
-                                            style = MaterialTheme.typography.button
-                                        )
-                                    PlatformType.StatusNet -> TODO()
-                                    PlatformType.Fanfou -> TODO()
-                                    PlatformType.Mastodon ->
-                                        Text(
-                                            text = stringResource(id = R.string.scene_trends_world_wide),
-                                            style = MaterialTheme.typography.button
-                                        )
-                                }
+            )
+        }
+    ) {
+        LazyColumn {
+            item {
+                if (source.isNotEmpty()) ListItem {
+                    Text(
+                        text = stringResource(id = R.string.scene_search_saved_search),
+                        style = MaterialTheme.typography.button
+                    )
+                }
+            }
+            items(items = source.filterIndexed { index, _ -> index < searchCount || expandSearch }) {
+                ListItem(
+                    modifier = Modifier.clickable(
+                        onClick = {
+                            viewModel.addOrUpgrade(it.content)
+                            navigator.search(it.content)
+                        }
+                    ),
+                    trailing = {
+                        IconButton(
+                            onClick = {
+                                viewModel.remove(it)
+                            }
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_trash_can),
+                                contentDescription = stringResource(
+                                    id = R.string.common_controls_actions_remove
+                                )
+                            )
+                        }
+                    },
+                    text = {
+                        Text(
+                            text = it.content,
+                            style = MaterialTheme.typography.subtitle1
+                        )
+                    },
+                )
+            }
+            item {
+                if (source.size > searchCount) ListItem(
+                    modifier = Modifier.clickable {
+                        viewModel.expandSearch.value = !expandSearch
+                    }
+                ) {
+                    Text(
+                        text = if (expandSearch) stringResource(id = R.string.scene_search_show_less) else stringResource(id = R.string.scene_search_show_more),
+                        style = MaterialTheme.typography.subtitle1,
+                        color = MaterialTheme.colors.primary
+                    )
+                }
+            }
+            if (trends.itemCount > 0) {
+                item {
+                    Column {
+                        Divider()
+                        ListItem {
+                            when (account.type) {
+                                PlatformType.Twitter ->
+                                    Text(
+                                        text = stringResource(id = R.string.scene_trends_world_wide),
+                                        style = MaterialTheme.typography.button
+                                    )
+                                PlatformType.StatusNet -> TODO()
+                                PlatformType.Fanfou -> TODO()
+                                PlatformType.Mastodon ->
+                                    Text(
+                                        text = stringResource(id = R.string.scene_trends_world_wide),
+                                        style = MaterialTheme.typography.button
+                                    )
                             }
                         }
                     }
                 }
-                items(trends) {
-                    it?.let { trend ->
-                        when (account.type) {
-                            PlatformType.Twitter -> TwitterTrendItem(
-                                trend = it,
-                                onClick = {
-                                    viewModel.addOrUpgrade(trend.query)
-                                    navigator.search(trend.query)
-                                }
-                            )
-                            PlatformType.StatusNet -> TODO()
-                            PlatformType.Fanfou -> TODO()
-                            PlatformType.Mastodon -> MastodonTrendItem(
-                                trend = it,
-                                onClick = {
-                                    navigator.hashtag(it.query)
-                                }
-                            )
-                        }
+            }
+            items(trends) {
+                it?.let { trend ->
+                    when (account.type) {
+                        PlatformType.Twitter -> TwitterTrendItem(
+                            trend = it,
+                            onClick = {
+                                viewModel.addOrUpgrade(trend.query)
+                                navigator.search(trend.query)
+                            }
+                        )
+                        PlatformType.StatusNet -> TODO()
+                        PlatformType.Fanfou -> TODO()
+                        PlatformType.Mastodon -> MastodonTrendItem(
+                            trend = it,
+                            onClick = {
+                                navigator.hashtag(it.query)
+                            }
+                        )
                     }
                 }
             }

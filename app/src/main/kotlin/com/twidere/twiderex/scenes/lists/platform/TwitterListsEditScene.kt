@@ -32,7 +32,6 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.window.Dialog
 import com.twidere.twiderex.R
@@ -42,6 +41,7 @@ import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.LoadingProgress
 import com.twidere.twiderex.component.lists.TwitterListsModifyComponent
 import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalNavController
@@ -60,7 +60,7 @@ fun TwitterListsEditScene(
         it.create(account, listKey)
     }
     val loading by listsEditViewModel.loading.observeAsState(initial = false)
-    val source by listsEditViewModel.source.observeAsState()
+    val source by listsEditViewModel.source.observeAsState(null)
     source?.let { uiList ->
         TwidereScene {
             val name by listsEditViewModel.editName.observeAsState(uiList.title)

@@ -58,7 +58,6 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -78,6 +77,7 @@ import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.foundation.TextInput
 import com.twidere.twiderex.component.lazy.ui.LazyUiDMEventList
 import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiDMEvent
 import com.twidere.twiderex.ui.LocalActiveAccount
@@ -99,20 +99,20 @@ fun DMConversationScene(conversationKey: MicroBlogKey) {
     val filePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocument(),
         onResult = {
-            viewModel.inputImage.postValue(it)
+            viewModel.inputImage.value = it
         },
     )
     val source = viewModel.source.collectAsLazyPagingItems()
-    val conversation by viewModel.conversation.observeAsState()
+    val conversation by viewModel.conversation.observeAsState(null)
     val input by viewModel.input.observeAsState(initial = "")
-    val inputImage by viewModel.inputImage.observeAsState()
+    val inputImage by viewModel.inputImage.observeAsState(null)
     val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()
-    val firstEventKey by viewModel.firstEventKey.observeAsState()
-    val pendingActionMessage by viewModel.pendingActionMessage.observeAsState()
+    val firstEventKey by viewModel.firstEventKey.observeAsState(null)
+    val pendingActionMessage by viewModel.pendingActionMessage.observeAsState(null)
     if (source.itemCount > 0) {
         source.peek(0)?.messageKey?.let {
-            viewModel.firstEventKey.postValue(it.toString())
+            viewModel.firstEventKey.value = it.toString()
         }
     }
     val copyText = stringResource(id = R.string.scene_messages_action_copy_text)
@@ -144,12 +144,12 @@ fun DMConversationScene(conversationKey: MicroBlogKey) {
                         },
                         state = listState,
                         onItemLongClick = {
-                            viewModel.pendingActionMessage.postValue(it)
+                            viewModel.pendingActionMessage.value = it
                         }
                     )
                     MessageActionComponent(
                         pendingActionMessage = pendingActionMessage,
-                        onDismissRequest = { viewModel.pendingActionMessage.postValue(null) },
+                        onDismissRequest = { viewModel.pendingActionMessage.value = null },
                         onCopyText = { event ->
                             clipboardManager?.setPrimaryClip(ClipData.newPlainText(copyText, event.originText))
                         },
@@ -160,7 +160,7 @@ fun DMConversationScene(conversationKey: MicroBlogKey) {
                 }
                 Divider(modifier = Modifier.fillMaxWidth())
                 InputPhotoPreview(inputImage) {
-                    viewModel.inputImage.postValue(null)
+                    viewModel.inputImage.value = null
                 }
                 InputComponent(
                     modifier = Modifier.fillMaxWidth(),
@@ -169,7 +169,7 @@ fun DMConversationScene(conversationKey: MicroBlogKey) {
                     enableSelectPhoto = inputImage == null,
                     enableSend = input.isNotEmpty() || inputImage != null,
                     input = input,
-                    onValueChanged = { viewModel.input.postValue(it) },
+                    onValueChanged = { viewModel.input.value = it },
                     onSend = { viewModel.sendMessage() }
                 )
             }

@@ -23,14 +23,16 @@ package com.twidere.twiderex.repository
 import android.accounts.Account
 import android.accounts.AccountManager
 import android.os.Build
-import androidx.lifecycle.MutableLiveData
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.AccountPreferences
+import com.twidere.twiderex.model.AmUser
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.cred.CredentialsType
 import com.twidere.twiderex.utils.fromJson
 import com.twidere.twiderex.utils.json
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -53,24 +55,23 @@ class AccountRepository @Inject constructor(
     private val accountPreferencesFactory: AccountPreferences.Factory,
 ) {
     private val preferencesCache = linkedMapOf<MicroBlogKey, AccountPreferences>()
+    private val _activeAccount =
+        MutableStateFlow(if (hasAccount()) getCurrentAccount() else null)
 
-    val activeAccount =
-        MutableLiveData<AccountDetails?>(if (hasAccount()) getCurrentAccount() else null)
+    val activeAccount
+        get() = _activeAccount.asSharedFlow()
 
-    val accounts = MutableLiveData(
+    private val _accounts = MutableStateFlow(
         getAccounts().map {
             getAccountDetails(it)
         }
     )
 
+    val accounts
+        get() = _accounts.asSharedFlow()
+
     fun getAccounts(): List<Account> {
         return manager.getAccountsByType(ACCOUNT_TYPE).toList()
-    }
-
-    fun getAccountPreferences(accountKey: MicroBlogKey): AccountPreferences {
-        return preferencesCache.getOrPut(accountKey) {
-            accountPreferencesFactory.create(accountKey)
-        }
     }
 
     fun hasAccount(): Boolean {
@@ -90,7 +91,7 @@ class AccountRepository @Inject constructor(
     fun setCurrentAccount(detail: AccountDetails) {
         detail.lastActive = System.currentTimeMillis()
         updateAccount(detail)
-        activeAccount.value = detail
+        _activeAccount.value = detail
     }
 
     private fun getCurrentAccount(): AccountDetails? {
@@ -98,15 +99,33 @@ class AccountRepository @Inject constructor(
             .map { getAccountDetails(it) }.maxByOrNull { it.lastActive }
     }
 
-    fun addAccount(detail: AccountDetails) {
-        manager.addAccountExplicitly(detail.account, null, null)
+    fun addAccount(
+        account: Account,
+        type: PlatformType,
+        accountKey: MicroBlogKey,
+        credentials_type: CredentialsType,
+        credentials_json: String,
+        extras_json: String,
+        user: AmUser,
+        lastActive: Long,
+    ) {
+        manager.addAccountExplicitly(account, null, null)
+        val detail = AccountDetails(
+            account = account,
+            type = type,
+            accountKey = accountKey,
+            credentials_type = credentials_type,
+            credentials_json = credentials_json,
+            extras_json = extras_json,
+            user = user,
+            lastActive = lastActive,
+            preferences = getAccountPreferences(accountKey)
+        )
         updateAccount(detail)
         setCurrentAccount(detail)
-        accounts.postValue(
-            getAccounts().map {
-                getAccountDetails(it)
-            }
-        )
+        _accounts.value = getAccounts().map {
+            getAccountDetails(it)
+        }
     }
 
     fun getAccountDetails(
@@ -126,8 +145,15 @@ class AccountRepository @Inject constructor(
             extras_json = manager.getUserData(account, ACCOUNT_USER_DATA_EXTRAS),
             user = manager.getUserData(account, ACCOUNT_USER_DATA_USER).fromJson(),
             lastActive = manager.getUserData(account, ACCOUNT_USER_DATA_LAST_ACTIVE)?.toLongOrNull()
-                ?: 0
+                ?: 0,
+            preferences = getAccountPreferences(getAccountKey(account))
         )
+    }
+
+    fun getAccountPreferences(accountKey: MicroBlogKey): AccountPreferences {
+        return preferencesCache.getOrPut(accountKey) {
+            accountPreferencesFactory.create(accountKey)
+        }
     }
 
     private fun getAccountKey(account: Account): MicroBlogKey =
@@ -153,22 +179,24 @@ class AccountRepository @Inject constructor(
             ACCOUNT_USER_DATA_LAST_ACTIVE,
             detail.lastActive.toString()
         )
-        activeAccount.value = getCurrentAccount()
-        accounts.postValue(
-            getAccounts().map {
-                getAccountDetails(it)
-            }
-        )
+        _activeAccount.value = getCurrentAccount()
+        _accounts.value = getAccounts().map {
+            getAccountDetails(it)
+        }
     }
 
     fun delete(detail: AccountDetails) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
             manager.removeAccountExplicitly(detail.account)
-            accounts.value = getAccounts().map {
+            _accounts.value = getAccounts().map {
                 getAccountDetails(it)
             }
-            activeAccount.value = getCurrentAccount()
+            _activeAccount.value = getCurrentAccount()
             preferencesCache.remove(detail.accountKey)
         }
+    }
+
+    fun getFirstByType(type: PlatformType): AccountDetails? {
+        return _accounts.value.sortedByDescending { it.lastActive }.firstOrNull { it.type == type }
     }
 }

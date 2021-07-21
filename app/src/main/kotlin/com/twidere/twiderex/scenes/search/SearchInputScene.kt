@@ -24,6 +24,8 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -35,12 +37,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.History
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.GraphicsLayerScope
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
@@ -53,9 +55,23 @@ import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.TextInput
 import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.search.SearchInputViewModel
+
+val fadeCreateTransition: GraphicsLayerScope.(factor: Float) -> Unit = { factor ->
+    alpha = factor
+}
+val fadeDestroyTransition: GraphicsLayerScope.(factor: Float) -> Unit = { factor ->
+    alpha = factor
+}
+val fadePauseTransition: GraphicsLayerScope.(factor: Float) -> Unit = { factor ->
+    alpha = factor
+}
+val fadeResumeTransition: GraphicsLayerScope.(factor: Float) -> Unit = { factor ->
+    alpha = factor
+}
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
@@ -96,15 +112,19 @@ fun SearchInputScene(initial: String? = null) {
                                 placeholder = {
                                     Text(text = stringResource(id = R.string.scene_search_search_bar_placeholder))
                                 },
-                                onImeActionPerformed = { _, _ ->
-                                    if (textFieldValue.text.isNotEmpty()) {
-                                        viewModel.addOrUpgrade(textFieldValue.text)
-                                        navigator.search(textFieldValue.text)
-                                    }
-                                },
                                 autoFocus = true,
-                                imeAction = ImeAction.Search,
                                 alignment = Alignment.CenterStart,
+                                keyboardOptions = KeyboardOptions(
+                                    imeAction = ImeAction.Search,
+                                ),
+                                keyboardActions = KeyboardActions(
+                                    onSearch = {
+                                        if (textFieldValue.text.isNotEmpty()) {
+                                            viewModel.addOrUpgrade(textFieldValue.text)
+                                            navigator.search(textFieldValue.text)
+                                        }
+                                    }
+                                )
                             )
                         }
                     },

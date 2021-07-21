@@ -20,20 +20,28 @@
  */
 package com.twidere.twiderex.scenes.home
 
-import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.TimelineComponent
+import com.twidere.twiderex.component.foundation.AppBar
+import com.twidere.twiderex.component.foundation.AppBarNavigationButton
+import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
+import com.twidere.twiderex.component.lazy.LazyListController
 import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.ui.LocalActiveAccount
+import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.timeline.MentionsTimelineViewModel
 
 class MentionItem : HomeNavigationItem() {
     @Composable
     override fun name(): String = stringResource(R.string.scene_mentions_title)
+    override val route: String
+        get() = Route.Mentions
 
     @Composable
     override fun icon(): Painter = painterResource(id = R.drawable.ic_message_circle)
@@ -47,11 +55,46 @@ class MentionItem : HomeNavigationItem() {
             ) {
                 it.create(account)
             }
-        Scaffold {
-            TimelineComponent(
-                viewModel = viewModel,
-                lazyListController = lazyListController,
-            )
+        TimelineComponent(
+            viewModel = viewModel,
+            lazyListController = lazyListController,
+        )
+    }
+}
+
+@Composable
+fun MentionScene() {
+    TwidereScene {
+        InAppNotificationScaffold(
+            topBar = {
+                AppBar(
+                    title = {
+                        Text(text = stringResource(id = R.string.scene_mentions_title))
+                    },
+                    navigationIcon = {
+                        AppBarNavigationButton()
+                    }
+                )
+            }
+        ) {
+            MentionSceneContent()
         }
     }
+}
+
+@Composable
+fun MentionSceneContent(
+    lazyListController: LazyListController? = null
+) {
+    val account = LocalActiveAccount.current ?: return
+    val viewModel =
+        assistedViewModel<MentionsTimelineViewModel.AssistedFactory, MentionsTimelineViewModel>(
+            account
+        ) {
+            it.create(account)
+        }
+    TimelineComponent(
+        viewModel = viewModel,
+        lazyListController = lazyListController,
+    )
 }

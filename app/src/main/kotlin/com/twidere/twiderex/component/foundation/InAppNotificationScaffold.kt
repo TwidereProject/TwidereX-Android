@@ -42,7 +42,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -61,7 +60,7 @@ fun ApplyNotification(
     snackbarHostState: SnackbarHostState
 ) {
     val inAppNotification = LocalInAppNotification.current
-    val notification by inAppNotification.observeAsState()
+    val notification by inAppNotification.observeAsState(null)
     val event = notification?.getContentIfNotHandled()
     val message = event?.getMessage()
     val actionMessage = event?.let {

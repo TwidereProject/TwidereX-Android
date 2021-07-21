@@ -36,7 +36,6 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -51,6 +50,7 @@ import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.TextInput
 import com.twidere.twiderex.component.lazy.ui.LazyUiUserList
 import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.ui.LocalActiveAccount
@@ -90,7 +90,7 @@ fun DMNewConversationScene() {
                     SearchInput(
                         modifier = Modifier.fillMaxWidth(),
                         input = keyWord,
-                        onValueChanged = { viewModel.input.postValue(it) },
+                        onValueChanged = { viewModel.input.value = it },
                     )
                     Divider()
                 }

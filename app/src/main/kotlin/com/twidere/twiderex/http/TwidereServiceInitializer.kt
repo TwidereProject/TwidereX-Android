@@ -18,21 +18,26 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.extensions
+package com.twidere.twiderex.http
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
+import android.content.Context
+import androidx.startup.Initializer
+import com.twidere.twiderex.di.InitializerEntryPoint
+import javax.inject.Inject
 
-fun <T, K, R> LiveData<T>.combineWith(
-    liveData: LiveData<K>,
-    block: (T?, K?) -> R
-): LiveData<R> {
-    val result = MediatorLiveData<R>()
-    result.addSource(this) {
-        result.value = block(this.value, liveData.value)
+class TwidereserviceInitializerHolder
+
+class TwidereServiceInitializer : Initializer<TwidereserviceInitializerHolder> {
+    @Inject
+    lateinit var configProvider: TwidereHttpConfigProvider
+
+    override fun create(context: Context): TwidereserviceInitializerHolder {
+        InitializerEntryPoint.resolve(context).inject(this)
+        TwidereServiceFactory.initiate(configProvider)
+        return TwidereserviceInitializerHolder()
     }
-    result.addSource(liveData) {
-        result.value = block(this.value, liveData.value)
+
+    override fun dependencies(): MutableList<Class<out Initializer<*>>> {
+        return mutableListOf()
     }
-    return result
 }

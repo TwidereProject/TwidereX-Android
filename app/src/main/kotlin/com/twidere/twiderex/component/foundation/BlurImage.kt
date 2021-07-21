@@ -47,14 +47,15 @@ import androidx.core.graphics.drawable.toDrawable
 import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat
 import coil.ImageLoader
 import coil.bitmap.BitmapPool
+import coil.compose.rememberImagePainter
 import coil.memory.MemoryCache
 import coil.request.DefaultRequestOptions
 import coil.request.Disposable
 import coil.request.ImageRequest
 import coil.request.ImageResult
 import coil.request.SuccessResult
-import com.google.accompanist.coil.CoilPainterDefaults
-import com.google.accompanist.coil.rememberCoilPainter
+import com.twidere.twiderex.http.TwidereNetworkImageLoader
+import com.twidere.twiderex.ui.LocalActiveAccount
 
 @Composable
 fun BlurImage(
@@ -98,13 +99,18 @@ fun NetworkBlurImage(
     placeholder: @Composable (() -> Unit)? = null,
 ) {
     val context = LocalContext.current
-    val painter = rememberCoilPainter(
-        request = data,
+    val accountDetails = LocalActiveAccount.current
+    val painter = rememberImagePainter(
+        data = data,
         imageLoader = BlurImageLoader(
             context,
             blurRadius,
             bitmapScale,
-            CoilPainterDefaults.defaultImageLoader()
+            TwidereNetworkImageLoader(
+                realImageLoader = buildRealImageLoader(),
+                context = context,
+                account = accountDetails
+            )
         )
     )
     NetworkImage(

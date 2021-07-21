@@ -53,6 +53,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.BottomSheetScaffoldState
@@ -81,7 +82,6 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -100,6 +100,7 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.coerceAtLeast
 import androidx.compose.ui.unit.dp
@@ -120,6 +121,7 @@ import com.twidere.twiderex.component.status.UserName
 import com.twidere.twiderex.component.status.UserScreenName
 import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.extensions.icon
+import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.extensions.stringName
 import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.model.AccountDetails
@@ -155,7 +157,7 @@ fun DraftComposeScene(
         assistedViewModel<DraftItemViewModel.AssistedFactory, DraftItemViewModel> {
             it.create(draftId = draftId)
         }
-    val data by draftItemViewModel.draft.observeAsState()
+    val data by draftItemViewModel.draft.observeAsState(null)
     data?.let { draft ->
         val viewModel =
             assistedViewModel<DraftComposeViewModel.AssistedFactory, DraftComposeViewModel> {
@@ -191,9 +193,9 @@ private fun ComposeBody(
     account: AccountDetails,
 ) {
     val composeType = viewModel.composeType
-    val status by viewModel.status.observeAsState()
+    val status by viewModel.status.observeAsState(null)
     val images by viewModel.images.observeAsState(initial = emptyList())
-    val location by viewModel.location.observeAsState()
+    val location by viewModel.location.observeAsState(null)
     val locationEnabled by viewModel.locationEnabled.observeAsState(initial = false)
     val navController = LocalNavController.current
     val textFieldValue by viewModel.textFieldValue.observeAsState(initial = TextFieldValue())
@@ -266,8 +268,9 @@ private fun ComposeBody(
                         }
                     },
                     actions = {
+                        val canSend by viewModel.canSend.observeAsState(initial = false)
                         IconButton(
-                            enabled = textFieldValue.text.isNotEmpty(),
+                            enabled = canSend,
                             onClick = {
                                 viewModel.compose()
                                 navController.popBackStack()
@@ -918,14 +921,14 @@ private fun ComposeInput(
                     value = text,
                     onValueChange = { viewModel.setText(it) },
                     autoFocus = autoFocus,
-                    onClicked = {
-                        // TODO: scroll lazyColumn
-                    },
                     placeholder = {
                         CompositionLocalProvider(LocalContentAlpha.provides(ContentAlpha.medium)) {
                             Text(text = stringResource(id = R.string.scene_compose_placeholder))
                         }
-                    }
+                    },
+                    keyboardOptions = KeyboardOptions(
+                        capitalization = KeyboardCapitalization.Sentences,
+                    )
                 )
 
                 val voteState by viewModel.voteState.observeAsState(initial = null)
@@ -972,7 +975,10 @@ private fun ColumnScope.MastodonContentWarningInput(viewModel: ComposeViewModel)
                         ) {
                             Text(text = stringResource(id = R.string.scene_compose_cw_placeholder))
                         }
-                    }
+                    },
+                    keyboardOptions = KeyboardOptions(
+                        capitalization = KeyboardCapitalization.Sentences,
+                    )
                 )
             }
             Spacer(modifier = Modifier.height(MastodonContentWarningInputDefaults.ContentPadding))
