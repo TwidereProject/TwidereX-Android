@@ -107,7 +107,6 @@ class RouteProcessor(
                         val path = declaration.parameters.joinToString("/") { parameter ->
                             val name = parameter.name?.getShortName() ?: "_"
                             "{$name}"
-
                         }
                         val pathWithParameter =
                             declaration.parameters.joinToString("/") { parameter ->
@@ -115,8 +114,8 @@ class RouteProcessor(
                                 "\${URLEncoder.encode($name, \"UTF-8\")}"
                             }
 
-                        outputStream.appendLine("${indent}const val $pathName = \"$parentPath/${pathName}/$path\"")
-                        outputStream.appendLine("${indent}fun ${pathName}($parameterStr) = \"$parentPath/${pathName}/$pathWithParameter\"")
+                        outputStream.appendLine("${indent}const val $pathName = \"$parentPath/$pathName/$path\"")
+                        outputStream.appendLine("${indent}fun $pathName($parameterStr) = \"$parentPath/$pathName/$pathWithParameter\"")
                     }
                     is KSPropertyDeclaration -> {
                         outputStream.appendLine("${indent}const val $pathName = \"$parentPath/${pathName}\"")
