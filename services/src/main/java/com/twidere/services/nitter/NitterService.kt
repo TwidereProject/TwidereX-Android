@@ -20,16 +20,17 @@
  */
 package com.twidere.services.nitter
 
+import com.twidere.services.http.HttpClientFactory
 import com.twidere.services.http.MicroBlogHttpException
 import com.twidere.services.nitter.model.ConversationTimeline
 import com.twidere.services.nitter.model.TweetNotFound
 import com.twidere.services.utils.await
 import moe.tlaster.hson.Hson
-import okhttp3.OkHttpClient
 import okhttp3.Request
 
 class NitterService(
     private val host: String,
+    private val httpClientFactory: HttpClientFactory,
 ) {
     suspend fun conversation(
         screenName: String,
@@ -43,8 +44,7 @@ class NitterService(
                 it
             }
         }
-        return OkHttpClient
-            .Builder()
+        return httpClientFactory.createHttpClientBuilder()
             .addNetworkInterceptor {
                 it.proceed(it.request()).also {
                     if (it.code != 200) {

@@ -26,6 +26,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.twidere.services.mastodon.MastodonOAuthService
 import com.twidere.twiderex.db.mapper.toDbUser
+import com.twidere.twiderex.http.TwidereServiceFactory
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.cred.CredentialsType
@@ -68,6 +69,7 @@ class MastodonSignInViewModel @AssistedInject constructor(
                 client_name = "Twidere X",
                 website = "https://github.com/TwidereProject/TwidereX-Android",
                 redirect_uri = DeepLinks.Callback.SignIn.Mastodon,
+                httpClientFactory = TwidereServiceFactory.createHttpClientFactory()
             )
             val application = service.createApplication()
             val target = service.getWebOAuthUrl(application)

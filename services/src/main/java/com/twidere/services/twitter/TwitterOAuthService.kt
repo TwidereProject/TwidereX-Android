@@ -20,8 +20,8 @@
  */
 package com.twidere.services.twitter
 
+import com.twidere.services.http.HttpClientFactory
 import com.twidere.services.http.authorization.OAuth1Authorization
-import com.twidere.services.http.retrofit
 import com.twidere.services.twitter.api.TwitterOAuthResources
 import com.twidere.services.twitter.model.AccessToken
 import com.twidere.services.twitter.model.OAuthToken
@@ -30,11 +30,13 @@ import com.twidere.services.utils.queryString
 class TwitterOAuthService(
     private val consumerKey: String,
     private val consumerSecret: String,
+    private val httpClientFactory: HttpClientFactory,
 ) {
     suspend fun getOAuthToken(
         callback: String = "oob"
     ): OAuthToken {
-        return retrofit<TwitterOAuthResources>(
+        return httpClientFactory.createResources<TwitterOAuthResources>(
+            TwitterOAuthResources::class.java,
             TWITTER_BASE_URL,
             OAuth1Authorization(
                 consumerKey,
@@ -44,7 +46,8 @@ class TwitterOAuthService(
     }
 
     suspend fun getAccessToken(pinCode: String, token: OAuthToken): AccessToken {
-        return retrofit<TwitterOAuthResources>(
+        return httpClientFactory.createResources<TwitterOAuthResources>(
+            TwitterOAuthResources::class.java,
             TWITTER_BASE_URL,
             OAuth1Authorization(
                 consumerKey,
