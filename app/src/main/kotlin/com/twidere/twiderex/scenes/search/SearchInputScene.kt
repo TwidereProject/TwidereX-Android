@@ -42,6 +42,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.GraphicsLayerScope
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
@@ -58,6 +59,19 @@ import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.search.SearchInputViewModel
+
+val fadeCreateTransition: GraphicsLayerScope.(factor: Float) -> Unit = { factor ->
+    alpha = factor
+}
+val fadeDestroyTransition: GraphicsLayerScope.(factor: Float) -> Unit = { factor ->
+    alpha = factor
+}
+val fadePauseTransition: GraphicsLayerScope.(factor: Float) -> Unit = { factor ->
+    alpha = factor
+}
+val fadeResumeTransition: GraphicsLayerScope.(factor: Float) -> Unit = { factor ->
+    alpha = factor
+}
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable

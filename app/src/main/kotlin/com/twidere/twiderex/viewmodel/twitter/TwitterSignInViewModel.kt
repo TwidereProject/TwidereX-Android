@@ -29,7 +29,6 @@ import com.twidere.services.twitter.TwitterService
 import com.twidere.twiderex.BuildConfig
 import com.twidere.twiderex.db.mapper.toDbUser
 import com.twidere.twiderex.http.TwidereServiceFactory
-import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.cred.CredentialsType
@@ -133,16 +132,14 @@ class TwitterSignInViewModel @AssistedInject constructor(
                             }
                         } else {
                             repository.addAccount(
-                                AccountDetails(
-                                    account = Account(displayKey.toString(), ACCOUNT_TYPE),
-                                    type = PlatformType.Twitter,
-                                    accountKey = internalKey,
-                                    credentials_type = CredentialsType.OAuth,
-                                    credentials_json = credentials_json,
-                                    extras_json = "",
-                                    user = user.toDbUser().toAmUser(),
-                                    lastActive = System.currentTimeMillis()
-                                )
+                                account = Account(displayKey.toString(), ACCOUNT_TYPE),
+                                type = PlatformType.Twitter,
+                                accountKey = internalKey,
+                                credentials_type = CredentialsType.OAuth,
+                                credentials_json = credentials_json,
+                                extras_json = "",
+                                user = user.toDbUser().toAmUser(),
+                                lastActive = System.currentTimeMillis()
                             )
                         }
                         return true

@@ -70,7 +70,7 @@ class NotificationWorker @AssistedInject constructor(
         } else {
             accountRepository.getAccounts().map { accountRepository.getAccountDetails(it) }
                 .filter {
-                    accountRepository.getAccountPreferences(it.accountKey).isNotificationEnabled.first()
+                    it.preferences.isNotificationEnabled.first()
                 }
                 .map { account ->
                     launch {

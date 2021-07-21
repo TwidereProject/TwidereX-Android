@@ -37,7 +37,6 @@ import com.twidere.twiderex.navigation.twidereXSchema
 import com.twidere.twiderex.viewmodel.compose.ComposeType
 import moe.tlaster.precompose.navigation.NavController
 import moe.tlaster.precompose.navigation.NavOptions
-import moe.tlaster.precompose.navigation.PopUpTo
 
 val LocalNavigator = staticCompositionLocalOf<INavigator> { error("No Navigator") }
 
@@ -109,13 +108,12 @@ class Navigator(
     }
 
     override fun search(keyword: String) {
-        navController.navigate(Route.Search(keyword), NavOptions(popUpTo = PopUpTo(Route.Home)))
+        navController.navigate(Route.Search.Search(keyword))
     }
 
     override fun searchInput(initial: String?) {
         navController.navigate(
-            Route.SearchInput(initial),
-            NavOptions(popUpTo = PopUpTo(Route.Home))
+            Route.Search.SearchInput(initial),
         )
     }
 
