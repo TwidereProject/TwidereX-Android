@@ -35,6 +35,8 @@ import com.google.devtools.ksp.symbol.KSPropertyDeclaration
 import com.google.devtools.ksp.visitor.KSEmptyVisitor
 import java.io.OutputStream
 
+private val StandardIndent = "    "
+
 class RouteProcessor(
     private val codeGenerator: CodeGenerator,
 ) : SymbolProcessor {
@@ -81,7 +83,7 @@ class RouteProcessor(
             declarations: List<KSDeclaration>,
             outputStream: OutputStream,
             parentPath: String = "",
-            indent: String = "    ",
+            indent: String = StandardIndent,
         ) {
             declarations.forEach { declaration ->
                 val pathName = declaration.simpleName.getShortName()
@@ -92,7 +94,7 @@ class RouteProcessor(
                             declaration.declarations.toList(),
                             outputStream,
                             "$parentPath/$pathName",
-                            indent + indent,
+                            indent + StandardIndent,
                         )
                         outputStream.appendLine("$indent}")
                     }
