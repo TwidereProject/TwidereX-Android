@@ -65,7 +65,7 @@ fun SettingsScene() {
                     route = Route.Settings.Display,
                 ),
                 SettingItem(
-                    "Layout",
+                    stringResource(id = R.string.scene_settings_layout_title),
                     painterResource(id = R.drawable.ic_layout_sidebar),
                     route = Route.Settings.Layout,
                 ),

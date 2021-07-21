@@ -233,6 +233,11 @@
     <string name="scene_sign_in_twitter_options_twitter_api_v2_access_is_required">Twitter API v2 access is required.</string>
     <string name="scene_authentication_title">Authentication</string>
     <string name="scene_likes_title">Likes</string>
+    <string name="scene_settings_layout_title">Layout</string>
+    <string name="scene_settings_layout_actions_tabbar">Tabbar actions</string>
+    <string name="scene_settings_layout_actions_drawer">Drawer actions</string>
+    <string name="scene_settings_layout_desc_title">Custom Layout</string>
+    <string name="scene_settings_layout_desc_content">Choose and arrange up to 5 actions that will appear on the tabbar (The local and federal timelines will only be displayed in Mastodon.)</string>
     <string name="scene_settings_notification_notification_switch">Show Notification</string>
     <string name="scene_settings_notification_accounts">Accounts</string>
     <string name="scene_settings_notification_title">Notification</string>

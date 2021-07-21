@@ -46,6 +46,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.flowWithLifecycle
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.AppBar
@@ -107,7 +108,7 @@ fun LayoutScene() {
                         AppBarNavigationButton()
                     },
                     title = {
-                        Text(text = "Layout")
+                        Text(text = stringResource(id = R.string.scene_settings_layout_title))
                     }
                 )
             }
@@ -130,10 +131,10 @@ fun LayoutScene() {
                 }
                 ListItem(
                     text = {
-                        Text(text = "Custom Layout")
+                        Text(text = stringResource(id = R.string.scene_settings_layout_desc_title))
                     },
                     secondaryText = {
-                        Text(text = "Choose and arrange up to 5 actions that will appear on the tabbar (The local and federal timelines will only be displayed in Mastodon.")
+                        Text(text = stringResource(id = R.string.scene_settings_layout_desc_content))
                     }
                 )
                 ReorderableColumn(
@@ -173,9 +174,9 @@ private fun LayoutItemContent(
             ItemHeader {
                 Text(
                     text = if (it) {
-                        "Tabbar actions"
+                        stringResource(id = R.string.scene_settings_layout_actions_tabbar)
                     } else {
-                        "Sidebar actions"
+                        stringResource(id = R.string.scene_settings_layout_actions_drawer)
                     }
                 )
             }
