@@ -28,6 +28,7 @@ import com.twidere.services.twitter.TwitterOAuthService
 import com.twidere.services.twitter.TwitterService
 import com.twidere.twiderex.BuildConfig
 import com.twidere.twiderex.db.mapper.toDbUser
+import com.twidere.twiderex.http.TwidereServiceFactory
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.PlatformType
@@ -81,7 +82,11 @@ class TwitterSignInViewModel @AssistedInject constructor(
     private suspend fun beginOAuth(): Boolean {
         loading.value = true
         try {
-            val service = TwitterOAuthService(consumerKey, consumerSecret)
+            val service = TwitterOAuthService(
+                consumerKey,
+                consumerSecret,
+                TwidereServiceFactory.createHttpClientFactory()
+            )
             val token = service.getOAuthToken(
                 if (isBuiltInKey()) {
                     DeepLinks.Callback.SignIn.Twitter
@@ -96,12 +101,17 @@ class TwitterSignInViewModel @AssistedInject constructor(
             }
             if (!pinCode.isNullOrBlank()) {
                 val accessToken = service.getAccessToken(pinCode, token)
-                val user = TwitterService(
-                    consumer_key = consumerKey,
-                    consumer_secret = consumerSecret,
-                    access_token = accessToken.oauth_token,
-                    access_token_secret = accessToken.oauth_token_secret,
-                ).verifyCredentials()
+                val user = (
+                    TwidereServiceFactory.createApiService(
+                        type = PlatformType.Twitter,
+                        credentials = OAuthCredentials(
+                            consumer_key = consumerKey,
+                            consumer_secret = consumerSecret,
+                            access_token = accessToken.oauth_token,
+                            access_token_secret = accessToken.oauth_token_secret
+                        ),
+                    ) as TwitterService
+                    ).verifyCredentials()
                 if (user != null) {
                     val name = user.screenName
                     val id = user.idStr

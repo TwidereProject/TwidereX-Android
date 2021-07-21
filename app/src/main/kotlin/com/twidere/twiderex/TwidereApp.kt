@@ -24,6 +24,7 @@ import android.app.Application
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.startup.AppInitializer
 import androidx.work.Configuration
+import com.twidere.twiderex.http.TwidereServiceInitializer
 import com.twidere.twiderex.notification.NotificationInitializer
 import com.twidere.twiderex.worker.dm.DirectMessageInitializer
 import dagger.hilt.android.HiltAndroidApp
@@ -46,6 +47,7 @@ class TwidereApp : Application(), Configuration.Provider {
             .apply {
                 initializeComponent(NotificationInitializer::class.java)
                 initializeComponent(DirectMessageInitializer::class.java)
+                initializeComponent(TwidereServiceInitializer::class.java)
             }
     }
 }

@@ -111,6 +111,7 @@ fun DependencyHandlerScope.android() {
     implementation("androidx.vectordrawable:vectordrawable:1.1.0")
     implementation("androidx.exifinterface:exifinterface", Versions.androidx_exifinterface)
     implementation("com.google.android.exoplayer:exoplayer", Versions.exoplayer)
+    implementation("com.google.android.exoplayer:extension-okhttp", Versions.exoplayer)
     implementation("androidx.browser:browser", Versions.browser)
     implementation("com.squareup.leakcanary:leakcanary-android:2.7")
 }

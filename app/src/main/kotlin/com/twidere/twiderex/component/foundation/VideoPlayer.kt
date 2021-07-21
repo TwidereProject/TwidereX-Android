@@ -51,11 +51,16 @@ import androidx.lifecycle.OnLifecycleEvent
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SimpleExoPlayer
+import com.google.android.exoplayer2.ext.okhttp.OkHttpDataSource
+import com.google.android.exoplayer2.source.DefaultMediaSourceFactory
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.ui.PlayerControlView
 import com.google.android.exoplayer2.ui.StyledPlayerView
+import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.status.UserAvatarDefaults
+import com.twidere.twiderex.http.TwidereServiceFactory
+import com.twidere.twiderex.preferences.LocalHttpConfig
 import com.twidere.twiderex.preferences.proto.DisplayPreferences
 import com.twidere.twiderex.ui.LocalIsActiveNetworkMetered
 import com.twidere.twiderex.ui.LocalVideoPlayback
@@ -85,35 +90,55 @@ fun VideoPlayer(
     var autoPlay by remember(url) { mutableStateOf(playInitial) }
     val context = LocalContext.current
     val lifecycle = LocalLifecycleOwner.current.lifecycle
+    val httpConfig = LocalHttpConfig.current
 
     Box {
         if (playInitial) {
             val player = remember(url) {
-                SimpleExoPlayer.Builder(context).build().apply {
-                    repeatMode = Player.REPEAT_MODE_ALL
-                    playWhenReady = autoPlay
-                    addListener(object : Player.Listener {
-                        override fun onPlaybackStateChanged(state: Int) {
-                            shouldShowThumb = state != Player.STATE_READY
+                SimpleExoPlayer.Builder(context)
+                    .apply {
+                        if (httpConfig.proxyConfig.enable) {
+                            // replace DataSource
+                            OkHttpDataSource.Factory(
+                                TwidereServiceFactory
+                                    .createHttpClientFactory()
+                                    .createHttpClientBuilder()
+                                    .build()
+                            )
+                                .let {
+                                    DefaultDataSourceFactory(context, it)
+                                }.let {
+                                    DefaultMediaSourceFactory(it)
+                                }.let {
+                                    setMediaSourceFactory(it)
+                                }
                         }
-
-                        override fun onIsPlayingChanged(isPlaying: Boolean) {
-                            playing = isPlaying
-                        }
-                    })
-
-                    setVolume(volume)
-                    ProgressiveMediaSource.Factory(
-                        CacheDataSourceFactory(
-                            context,
-                            5 * 1024 * 1024,
-                        )
-                    ).createMediaSource(MediaItem.fromUri(url)).also {
-                        setMediaSource(it)
                     }
-                    prepare()
-                    seekTo(VideoPool.get(url))
-                }
+                    .build().apply {
+                        repeatMode = Player.REPEAT_MODE_ALL
+                        playWhenReady = autoPlay
+                        addListener(object : Player.Listener {
+                            override fun onPlaybackStateChanged(state: Int) {
+                                shouldShowThumb = state != Player.STATE_READY
+                            }
+
+                            override fun onIsPlayingChanged(isPlaying: Boolean) {
+                                playing = isPlaying
+                            }
+                        })
+
+                        setVolume(volume)
+                        ProgressiveMediaSource.Factory(
+                            CacheDataSourceFactory(
+                                context,
+                                5 * 1024 * 1024,
+                            )
+                        ).createMediaSource(MediaItem.fromUri(url)).also {
+                            setMediaSource(it)
+                        }
+                        prepare()
+                        seekTo(VideoPool.get(url))
+                    }
             }
 
             fun updateState() {
