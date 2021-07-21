@@ -97,25 +97,67 @@ class RouteProcessor(
                         outputStream.appendLine("$indent}")
                     }
                     is KSFunctionDeclaration -> {
-                        val parameterStr = declaration.parameters.map { parameter ->
-                            val name = parameter.name?.getShortName() ?: "_"
-                            val type =
-                                parameter.type.resolve().declaration.qualifiedName?.asString()
+                        val parameterStr = declaration.parameters
+                            .joinToString(", ") { parameter ->
+                                val name = parameter.name?.getShortName() ?: "_"
+                                val type = parameter.type.resolve()
+                                    .declaration.qualifiedName?.asString()
+                                    .let {
+                                        if (parameter.type.resolve().isMarkedNullable) {
+                                            "$it? = null"
+                                        } else {
+                                            it
+                                        }
+                                    }
                                     ?: "<ERROR>"
-                            "$name: $type"
-                        }.joinToString(", ")
-                        val path = declaration.parameters.joinToString("/") { parameter ->
-                            val name = parameter.name?.getShortName() ?: "_"
-                            "{$name}"
-                        }
-                        val pathWithParameter =
-                            declaration.parameters.joinToString("/") { parameter ->
+                                "$name: $type"
+                            }
+                        val query = declaration.parameters
+                            .filter { it.type.resolve().isMarkedNullable }
+                            .joinToString("&") { parameter ->
+                                val name = parameter.name?.getShortName() ?: "_"
+                                "$name=\$$name"
+                            }
+                            .let {
+                                if (it.isNotEmpty()) {
+                                    "?$it"
+                                } else {
+                                    it
+                                }
+                            }
+                        val path = declaration.parameters
+                            .filter { !it.type.resolve().isMarkedNullable }
+                            .joinToString("/") { parameter ->
+                                val name = parameter.name?.getShortName() ?: "_"
+                                "{$name}"
+                            }
+                            .let {
+                                if (it.isNotEmpty()) {
+                                    "/$it"
+                                } else {
+                                    it
+                                }
+                            }
+                        val pathWithParameter = declaration.parameters
+                            .filter { !it.type.resolve().isMarkedNullable }
+                            .joinToString("/") { parameter ->
                                 val name = parameter.name?.getShortName() ?: "_"
                                 "\${URLEncoder.encode($name, \"UTF-8\")}"
                             }
+                            .let {
+                                if (it.isNotEmpty()) {
+                                    "/$it"
+                                } else {
+                                    it
+                                }
+                            }
 
-                        outputStream.appendLine("${indent}const val $pathName = \"$parentPath/$pathName/$path\"")
-                        outputStream.appendLine("${indent}fun $pathName($parameterStr) = \"$parentPath/$pathName/$pathWithParameter\"")
+                        outputStream.appendLine(
+                            "${indent}const val $pathName = \"$parentPath/$pathName$path\""
+                        )
+                        outputStream.appendLine(
+                            "${indent}fun $pathName($parameterStr) = \"$parentPath/$pathName$pathWithParameter${query}\""
+                        )
                     }
                     is KSPropertyDeclaration -> {
                         outputStream.appendLine("${indent}const val $pathName = \"$parentPath/${pathName}\"")

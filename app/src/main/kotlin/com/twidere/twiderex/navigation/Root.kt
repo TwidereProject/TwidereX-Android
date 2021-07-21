@@ -53,10 +53,10 @@ interface Root {
     interface Search {
         val Home: String
         fun Search(keyword: String)
-        fun SearchInput(keyword: String? = null)
+        fun SearchInput(keyword: String?)
     }
 
-    fun Compose(composeType: ComposeType, statusKey: MicroBlogKey? = null)
+    fun Compose(composeType: ComposeType, statusKey: MicroBlogKey?)
 
     interface Compose {
         interface Search {
@@ -86,7 +86,7 @@ interface Root {
             val Status: String
         }
         fun Draft(id: String): String
-        fun Compose(composeType: ComposeType, statusKey: MicroBlogKey? = null)
+        fun Compose(composeType: ComposeType, statusKey: MicroBlogKey?)
         fun Conversation(conversationKey: MicroBlogKey)
     }
 
