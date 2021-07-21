@@ -20,4 +20,6 @@
  */
 package com.twidere.route.processor
 
+@Retention(AnnotationRetention.SOURCE)
+@Target(AnnotationTarget.CLASS)
 annotation class AppRoute
