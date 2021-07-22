@@ -127,6 +127,14 @@ android {
             srcDirs("src/${it.name}/kotlin")
         }
     }
+    applicationVariants.all {
+        val variantName = name
+        sourceSets {
+            getByName("main") {
+                java.srcDir(File("build/generated/ksp/$variantName/kotlin"))
+            }
+        }
+    }
     sourceSets {
         findByName("androidTest")?.let {
             it.assets {

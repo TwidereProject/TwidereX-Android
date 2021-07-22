@@ -56,9 +56,8 @@ interface Root {
         fun SearchInput(keyword: String?)
     }
 
-    fun Compose(composeType: ComposeType, statusKey: MicroBlogKey?)
-
     interface Compose {
+        fun Home(composeType: ComposeType, statusKey: MicroBlogKey?)
         interface Search {
             val User: String
         }

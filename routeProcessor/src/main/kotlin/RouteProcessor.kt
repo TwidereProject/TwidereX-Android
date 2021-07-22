@@ -24,8 +24,6 @@ import com.google.devtools.ksp.processing.CodeGenerator
 import com.google.devtools.ksp.processing.Dependencies
 import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.processing.SymbolProcessor
-import com.google.devtools.ksp.processing.SymbolProcessorEnvironment
-import com.google.devtools.ksp.processing.SymbolProcessorProvider
 import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSDeclaration
@@ -34,8 +32,6 @@ import com.google.devtools.ksp.symbol.KSNode
 import com.google.devtools.ksp.symbol.KSPropertyDeclaration
 import com.google.devtools.ksp.visitor.KSEmptyVisitor
 import java.io.OutputStream
-
-private val StandardIndent = "    "
 
 class RouteProcessor(
     private val codeGenerator: CodeGenerator,
@@ -53,118 +49,88 @@ class RouteProcessor(
             if (node !is KSClassDeclaration) {
                 return
             }
+
+            val route = generateRoute(declaration = node)
+            if (route !is NestedRouteDefinition) {
+                return
+            }
+
             val packageName = node.packageName.asString()
-            val className = "${node.qualifiedName?.getShortName()}Route"
+            val routeClassName = "${node.qualifiedName?.getShortName()}Route"
+            val definitionClassName = "${node.qualifiedName?.getShortName()}RouteDefinition"
+            val dependencies = Dependencies(
+                true,
+                *(data.mapNotNull { it.containingFile } + listOfNotNull(node.containingFile)).toTypedArray()
+            )
+            generateFile(
+                dependencies,
+                packageName,
+                routeClassName,
+                route.copy(name = routeClassName).generateRoute()
+            )
+            generateFile(
+                dependencies,
+                packageName,
+                definitionClassName,
+                route.copy(name = definitionClassName).generateDefinition()
+            )
+        }
+
+        private fun generateFile(
+            dependencies: Dependencies,
+            packageName: String,
+            className: String,
+            content: String
+        ) {
             codeGenerator.createNewFile(
-                Dependencies(
-                    true,
-                    *(data.mapNotNull { it.containingFile } + listOfNotNull(node.containingFile)).toTypedArray()
-                ),
+                dependencies,
                 packageName,
                 className
             ).use { outputStream ->
                 outputStream.appendLine("package $packageName")
                 outputStream.appendLine()
-                outputStream.appendLine("import java.net.URLEncoder")
-                outputStream.appendLine()
-                outputStream.appendLine("public object $className {")
-
-                generateRoute(
-                    node.declarations.toList(),
-                    outputStream,
-                    parentPath = "",
-                )
-
-                outputStream.appendLine("}")
+                outputStream.appendLine(content)
             }
         }
 
         private fun generateRoute(
-            declarations: List<KSDeclaration>,
-            outputStream: OutputStream,
-            parentPath: String = "",
-            indent: String = StandardIndent,
-        ) {
-            declarations.forEach { declaration ->
-                val pathName = declaration.simpleName.getShortName()
-                when (declaration) {
-                    is KSClassDeclaration -> {
-                        outputStream.appendLine("${indent}object $pathName {")
-                        generateRoute(
-                            declaration.declarations.toList(),
-                            outputStream,
-                            "$parentPath/$pathName",
-                            indent + StandardIndent,
+            declaration: KSDeclaration,
+            parent: RouteDefinition? = null
+        ): RouteDefinition {
+            val name = declaration.simpleName.getShortName()
+            return when (declaration) {
+                is KSClassDeclaration -> {
+                    NestedRouteDefinition(
+                        name = name,
+                        parent = parent,
+                    ).also { nestedRouteDefinition ->
+                        nestedRouteDefinition.childRoute.addAll(
+                            declaration.declarations.map {
+                                generateRoute(it, nestedRouteDefinition)
+                            }
                         )
-                        outputStream.appendLine("$indent}")
-                    }
-                    is KSFunctionDeclaration -> {
-                        val parameterStr = declaration.parameters
-                            .joinToString(", ") { parameter ->
-                                val name = parameter.name?.getShortName() ?: "_"
-                                val type = parameter.type.resolve()
-                                    .declaration.qualifiedName?.asString()
-                                    .let {
-                                        if (parameter.type.resolve().isMarkedNullable) {
-                                            "$it? = null"
-                                        } else {
-                                            it
-                                        }
-                                    }
-                                    ?: "<ERROR>"
-                                "$name: $type"
-                            }
-                        val query = declaration.parameters
-                            .filter { it.type.resolve().isMarkedNullable }
-                            .joinToString("&") { parameter ->
-                                val name = parameter.name?.getShortName() ?: "_"
-                                "$name=\$$name"
-                            }
-                            .let {
-                                if (it.isNotEmpty()) {
-                                    "?$it"
-                                } else {
-                                    it
-                                }
-                            }
-                        val path = declaration.parameters
-                            .filter { !it.type.resolve().isMarkedNullable }
-                            .joinToString("/") { parameter ->
-                                val name = parameter.name?.getShortName() ?: "_"
-                                "{$name}"
-                            }
-                            .let {
-                                if (it.isNotEmpty()) {
-                                    "/$it"
-                                } else {
-                                    it
-                                }
-                            }
-                        val pathWithParameter = declaration.parameters
-                            .filter { !it.type.resolve().isMarkedNullable }
-                            .joinToString("/") { parameter ->
-                                val name = parameter.name?.getShortName() ?: "_"
-                                "\${URLEncoder.encode($name, \"UTF-8\")}"
-                            }
-                            .let {
-                                if (it.isNotEmpty()) {
-                                    "/$it"
-                                } else {
-                                    it
-                                }
-                            }
-
-                        outputStream.appendLine(
-                            "${indent}const val $pathName = \"$parentPath/$pathName$path\""
-                        )
-                        outputStream.appendLine(
-                            "${indent}fun $pathName($parameterStr) = \"$parentPath/$pathName$pathWithParameter${query}\""
-                        )
-                    }
-                    is KSPropertyDeclaration -> {
-                        outputStream.appendLine("${indent}const val $pathName = \"$parentPath/${pathName}\"")
                     }
                 }
+                is KSPropertyDeclaration -> {
+                    ConstRouteDefinition(name, parent)
+                }
+                is KSFunctionDeclaration -> {
+                    FunctionRouteDefinition(
+                        name = name,
+                        parent = parent,
+                        parameters = declaration.parameters.map {
+                            val parameterName = it.name?.getShortName() ?: "_"
+                            val parameterType = it.type.resolve()
+                            RouteParameter(
+                                name = parameterName,
+                                type = parameterType.declaration.qualifiedName?.asString()
+                                    ?: "<ERROR>",
+                                isNullable = parameterType.isMarkedNullable,
+                            )
+                        },
+                    )
+                }
+                else -> throw NotImplementedError()
             }
         }
     }
@@ -172,10 +138,4 @@ class RouteProcessor(
 
 private fun OutputStream.appendLine(str: String = "") {
     this.write("$str${System.lineSeparator()}".toByteArray())
-}
-
-class RouteProcessorProvider : SymbolProcessorProvider {
-    override fun create(environment: SymbolProcessorEnvironment): SymbolProcessor {
-        return RouteProcessor(environment.codeGenerator)
-    }
 }

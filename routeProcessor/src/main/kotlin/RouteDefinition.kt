@@ -1,0 +1,151 @@
+/*
+ *  Twidere X
+ *
+ *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
+ * 
+ *  This file is part of Twidere X.
+ * 
+ *  Twidere X is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ * 
+ *  Twidere X is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ * 
+ *  You should have received a copy of the GNU General Public License
+ *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
+ */
+package com.twidere.route.processor
+
+private const val StandardIndent = "    "
+
+internal interface RouteDefinition {
+    val name: String
+    val parent: RouteDefinition?
+    fun generateDefinition(): String
+    fun generateRoute(): String
+}
+
+internal fun RouteDefinition.parents(): List<RouteDefinition> {
+    val list = arrayListOf<RouteDefinition>()
+    var p = parent
+    while (p != null) {
+        list.add(0, p)
+        p = p.parent
+    }
+    return list
+}
+
+internal val RouteDefinition.parentPath
+    get() = parents().joinToString("/") { it.name }
+
+internal val RouteDefinition.indent
+    get() = parents().joinToString("") { StandardIndent }
+
+internal data class NestedRouteDefinition(
+    override val name: String,
+    override val parent: RouteDefinition? = null,
+    val childRoute: ArrayList<RouteDefinition> = arrayListOf(),
+) : RouteDefinition {
+    override fun generateDefinition(): String {
+        return "${indent}object $name {${System.lineSeparator()}" +
+            childRoute.joinToString(System.lineSeparator()) { it.generateDefinition() } +
+            System.lineSeparator() +
+            "$indent}"
+    }
+
+    override fun generateRoute(): String {
+        return "${indent}object $name {${System.lineSeparator()}" +
+            childRoute.joinToString(System.lineSeparator()) { it.generateRoute() } +
+            System.lineSeparator() +
+            "$indent}"
+    }
+}
+
+internal data class ConstRouteDefinition(
+    override val name: String,
+    override val parent: RouteDefinition? = null,
+) : RouteDefinition {
+    override fun generateDefinition(): String {
+        return "${indent}const val $name = \"$parentPath/${name}\""
+    }
+
+    override fun generateRoute(): String {
+        return "${indent}const val $name = \"$parentPath/${name}\""
+    }
+}
+
+internal data class FunctionRouteDefinition(
+    override val name: String,
+    override val parent: RouteDefinition? = null,
+    val parameters: List<RouteParameter>,
+) : RouteDefinition {
+    override fun generateDefinition(): String {
+        val path = parameters
+            .filter { !it.isNullable }
+            .joinToString("/") { parameter ->
+                "{${parameter.name}}"
+            }
+            .let {
+                if (it.isNotEmpty()) {
+                    "/$it"
+                } else {
+                    it
+                }
+            }
+        return "${indent}const val $name = \"$parentPath/$name$path\""
+    }
+
+    override fun generateRoute(): String {
+        val query = parameters
+            .filter { it.isNullable }
+            .joinToString("&") { parameter ->
+                val name = parameter.name
+                "$name=\$$name"
+            }
+            .let {
+                if (it.isNotEmpty()) {
+                    "?$it"
+                } else {
+                    it
+                }
+            }
+        val parameterStr = parameters
+            .joinToString(", ") { parameter ->
+                val name = parameter.name
+                val type = parameter.type
+                    .let {
+                        if (parameter.isNullable) {
+                            "$it? = null"
+                        } else {
+                            it
+                        }
+                    }
+                "$name: $type"
+            }
+        val pathWithParameter = parameters
+            .filter { !it.isNullable }
+            .joinToString("/") { parameter ->
+                val name = parameter.name
+                "\${$name}"
+            }
+            .let {
+                if (it.isNotEmpty()) {
+                    "/$it"
+                } else {
+                    it
+                }
+            }
+
+        return "${indent}fun $name($parameterStr) = \"$parentPath/$name$pathWithParameter${query}\""
+    }
+}
+
+internal data class RouteParameter(
+    val name: String,
+    val type: String,
+    val isNullable: Boolean = false,
+)
