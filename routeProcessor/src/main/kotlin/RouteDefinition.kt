@@ -105,7 +105,11 @@ internal data class FunctionRouteDefinition(
             .filter { it.isNullable }
             .joinToString("&") { parameter ->
                 val name = parameter.name
-                "$name=\$$name"
+                if (parameter.type == "kotlin.String") {
+                    "$name=${encode(name)}"
+                } else {
+                    "$name=\$$name"
+                }
             }
             .let {
                 if (it.isNotEmpty()) {
@@ -131,7 +135,11 @@ internal data class FunctionRouteDefinition(
             .filter { !it.isNullable }
             .joinToString("/") { parameter ->
                 val name = parameter.name
-                "\${$name}"
+                if (parameter.type == "kotlin.String") {
+                    encode(name)
+                } else {
+                    "\${$name}"
+                }
             }
             .let {
                 if (it.isNotEmpty()) {
@@ -143,6 +151,8 @@ internal data class FunctionRouteDefinition(
 
         return "${indent}override fun $name($parameterStr) = \"$parentPath/$name$pathWithParameter${query}\""
     }
+
+    private fun encode(value: String) = "\${java.net.URLEncoder.encode($value, \"UTF-8\")}"
 }
 
 internal data class RouteParameter(
