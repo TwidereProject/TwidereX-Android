@@ -34,40 +34,40 @@ interface Root {
 
     interface Draft {
         val List: String
-        fun Compose(draftId: String)
+        fun Compose(draftId: String): String
     }
 
     interface SignIn {
         val General: String
-        fun Twitter(consumerKey: String, consumerSecret: String)
+        fun Twitter(consumerKey: String, consumerSecret: String): String
         val Mastodon: String
         interface Web {
-            fun Twitter(url: String)
+            fun Twitter(url: String): String
         }
     }
-    fun User(userKey: MicroBlogKey)
+    fun User(userKey: MicroBlogKey): String
 
     interface Media {
-        fun Status(statusKey: MicroBlogKey, selectedIndex: Int?)
-        fun Raw(url: String)
-        fun Pure(belongToKey: MicroBlogKey, selectedIndex: Int?)
+        fun Status(statusKey: MicroBlogKey, selectedIndex: Int?): String
+        fun Raw(url: String): String
+        fun Pure(belongToKey: MicroBlogKey, selectedIndex: Int?): String
     }
 
     interface Search {
         val Home: String
-        fun Result(keyword: String)
-        fun Input(keyword: String?)
+        fun Result(keyword: String): String
+        fun Input(keyword: String?): String
     }
 
     interface Compose {
-        fun Home(composeType: ComposeType?, statusKey: MicroBlogKey?)
+        fun Home(composeType: ComposeType?, statusKey: MicroBlogKey?): String
         interface Search {
             val User: String
         }
     }
 
-    fun Following(userKey: MicroBlogKey)
-    fun Followers(userKey: MicroBlogKey)
+    fun Following(userKey: MicroBlogKey): String
+    fun Followers(userKey: MicroBlogKey): String
 
     interface Settings {
         val Home: String
@@ -79,7 +79,7 @@ interface Root {
         val Misc: String
         val Notification: String
         val Layout: String
-        fun AccountNotification(accountKey: MicroBlogKey)
+        fun AccountNotification(accountKey: MicroBlogKey): String
     }
 
     interface DeepLink {
@@ -88,14 +88,14 @@ interface Root {
             val Status: String
         }
         fun Draft(id: String): String
-        fun Compose(composeType: ComposeType, statusKey: MicroBlogKey?)
-        fun Conversation(conversationKey: MicroBlogKey)
+        fun Compose(composeType: ComposeType, statusKey: MicroBlogKey?): String
+        fun Conversation(conversationKey: MicroBlogKey): String
     }
 
-    fun Status(statusKey: MicroBlogKey)
+    fun Status(statusKey: MicroBlogKey): String
 
     interface Mastodon {
-        fun Hashtag(keyword: String)
+        fun Hashtag(keyword: String): String
         val Notification: String
 
         interface Compose {
@@ -107,16 +107,16 @@ interface Root {
         val Home: String
         val MastodonCreateDialog: String
         val TwitterCreate: String
-        fun TwitterEdit(listKey: MicroBlogKey)
-        fun Timeline(listKey: MicroBlogKey)
-        fun Members(listKey: MicroBlogKey, owned: Boolean?)
-        fun Subscribers(listKey: MicroBlogKey)
-        fun AddMembers(listKey: MicroBlogKey)
+        fun TwitterEdit(listKey: MicroBlogKey): String
+        fun Timeline(listKey: MicroBlogKey): String
+        fun Members(listKey: MicroBlogKey, owned: Boolean?): String
+        fun Subscribers(listKey: MicroBlogKey): String
+        fun AddMembers(listKey: MicroBlogKey): String
     }
 
     interface Messages {
         val Home: String
-        fun Conversation(conversationKey: MicroBlogKey)
+        fun Conversation(conversationKey: MicroBlogKey): String
         val NewConversation: String
     }
 }

@@ -103,6 +103,7 @@ class RouteProcessor(
                     NestedRouteDefinition(
                         name = name,
                         parent = parent,
+                        fullName = declaration.qualifiedName?.asString() ?: "<ERROR>"
                     ).also { nestedRouteDefinition ->
                         nestedRouteDefinition.childRoute.addAll(
                             declaration.declarations.map {

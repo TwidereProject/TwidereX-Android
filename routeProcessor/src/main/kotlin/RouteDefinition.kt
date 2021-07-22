@@ -48,6 +48,7 @@ internal val RouteDefinition.indent
 internal data class NestedRouteDefinition(
     override val name: String,
     override val parent: RouteDefinition? = null,
+    val fullName: String,
     val childRoute: ArrayList<RouteDefinition> = arrayListOf(),
 ) : RouteDefinition {
     override fun generateDefinition(): String {
@@ -58,7 +59,7 @@ internal data class NestedRouteDefinition(
     }
 
     override fun generateRoute(): String {
-        return "${indent}object $name {${System.lineSeparator()}" +
+        return "${indent}object $name: $fullName {${System.lineSeparator()}" +
             childRoute.joinToString(System.lineSeparator()) { it.generateRoute() } +
             System.lineSeparator() +
             "$indent}"
@@ -74,7 +75,7 @@ internal data class ConstRouteDefinition(
     }
 
     override fun generateRoute(): String {
-        return "${indent}const val $name = \"$parentPath/${name}\""
+        return "${indent}override val $name = \"$parentPath/${name}\""
     }
 }
 
@@ -119,7 +120,7 @@ internal data class FunctionRouteDefinition(
                 val type = parameter.type
                     .let {
                         if (parameter.isNullable) {
-                            "$it? = null"
+                            "$it?"
                         } else {
                             it
                         }
@@ -140,7 +141,7 @@ internal data class FunctionRouteDefinition(
                 }
             }
 
-        return "${indent}fun $name($parameterStr) = \"$parentPath/$name$pathWithParameter${query}\""
+        return "${indent}override fun $name($parameterStr) = \"$parentPath/$name$pathWithParameter${query}\""
     }
 }
 
