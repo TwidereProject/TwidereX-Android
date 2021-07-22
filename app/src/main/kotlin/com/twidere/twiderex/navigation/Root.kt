@@ -41,23 +41,26 @@ interface Root {
         val General: String
         fun Twitter(consumerKey: String, consumerSecret: String)
         val Mastodon: String
+        interface Web {
+            fun Twitter(url: String)
+        }
     }
     fun User(userKey: MicroBlogKey)
 
     interface Media {
-        fun Status(statusKey: MicroBlogKey, selectedIndex: Int)
+        fun Status(statusKey: MicroBlogKey, selectedIndex: Int?)
         fun Raw(url: String)
-        fun Pure(belongToKey: MicroBlogKey, selectedIndex: Int)
+        fun Pure(belongToKey: MicroBlogKey, selectedIndex: Int?)
     }
 
     interface Search {
         val Home: String
-        fun Search(keyword: String)
-        fun SearchInput(keyword: String?)
+        fun Result(keyword: String)
+        fun Input(keyword: String?)
     }
 
     interface Compose {
-        fun Home(composeType: ComposeType, statusKey: MicroBlogKey?)
+        fun Home(composeType: ComposeType?, statusKey: MicroBlogKey?)
         interface Search {
             val User: String
         }
@@ -106,7 +109,7 @@ interface Root {
         val TwitterCreate: String
         fun TwitterEdit(listKey: MicroBlogKey)
         fun Timeline(listKey: MicroBlogKey)
-        fun Members(listKey: MicroBlogKey, owned: Boolean)
+        fun Members(listKey: MicroBlogKey, owned: Boolean?)
         fun Subscribers(listKey: MicroBlogKey)
         fun AddMembers(listKey: MicroBlogKey)
     }

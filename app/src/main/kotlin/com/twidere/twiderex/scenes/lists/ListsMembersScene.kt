@@ -56,7 +56,7 @@ import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.extensions.refreshOrRetry
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.navigation.Route
+import com.twidere.twiderex.navigation.RootRoute
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
@@ -95,7 +95,7 @@ fun ListsMembersScene(
                 if (owned) FloatingActionButton(
                     onClick = {
                         scope.launch {
-                            val result = navController.navigateForResult(Route.Lists.AddMembers(listKey = listKey)) as? List<*>?
+                            val result = navController.navigateForResult(RootRoute.Lists.AddMembers(listKey = listKey)) as? List<*>?
                             if (result != null && result.isNotEmpty()) source.refresh()
                         }
                     }

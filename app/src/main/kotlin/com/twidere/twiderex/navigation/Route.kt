@@ -61,7 +61,6 @@ import com.twidere.twiderex.scenes.lists.platform.TwitterListsCreateScene
 import com.twidere.twiderex.scenes.lists.platform.TwitterListsEditScene
 import com.twidere.twiderex.scenes.mastodon.MastodonHashtagScene
 import com.twidere.twiderex.scenes.mastodon.MastodonSignInScene
-import com.twidere.twiderex.scenes.mastodon.MastodonWebSignInScene
 import com.twidere.twiderex.scenes.search.SearchInputScene
 import com.twidere.twiderex.scenes.search.SearchScene
 import com.twidere.twiderex.scenes.search.fadeCreateTransition
@@ -99,158 +98,9 @@ import moe.tlaster.precompose.navigation.transition.NavTransition
 import moe.tlaster.precompose.navigation.transition.fadeScaleCreateTransition
 import moe.tlaster.precompose.navigation.transition.fadeScaleDestroyTransition
 import java.net.URLDecoder
-import java.net.URLEncoder
 
-const val initialRoute = Route.Home
+const val initialRoute = RootRouteDefinition.Home
 const val twidereXSchema = "twiderex"
-
-object Route {
-    const val Home = "home"
-
-    const val HomeTimeline = "HomeTimeline"
-    const val Notification = "Notification"
-    const val Mentions = "Mentions"
-    const val Me = "Me"
-
-    object Draft {
-        const val List = "draft/list"
-        fun Compose(draftId: String) = "draft/compose/$draftId"
-    }
-
-    object SignIn {
-        val Default by lazy {
-            General
-        }
-        const val General = "signin/general"
-        fun Twitter(consumerKey: String, consumerSecret: String) =
-            "signin/twitter?consumerKey=$consumerKey&consumerSecret=$consumerSecret"
-
-        const val Mastodon = "signin/mastodon"
-
-        object Web {
-            fun Twitter(target: String) = "signin/twitter/web/${
-            URLEncoder.encode(
-                target,
-                "UTF-8"
-            )
-            }"
-
-            fun Mastodon(target: String) = "signin/mastodon/web/${
-            URLEncoder.encode(
-                target,
-                "UTF-8"
-            )
-            }"
-        }
-    }
-
-    fun User(userKey: MicroBlogKey) =
-        "user/$userKey"
-
-    object Media {
-        fun Status(statusKey: MicroBlogKey, selectedIndex: Int = 0) =
-            "media/status/$statusKey?selectedIndex=$selectedIndex"
-
-        fun Raw(url: String) =
-            "media/raw/${URLEncoder.encode(url, "UTF-8")}"
-
-        fun Pure(belongToKey: MicroBlogKey, selectedIndex: Int = 0) =
-            "media/pure/$belongToKey?selectedIndex=$selectedIndex"
-    }
-
-    object Search {
-        const val Home = "search"
-        fun Search(keyword: String) = "$Home/result/${
-        URLEncoder.encode(
-            keyword,
-            "UTF-8"
-        )
-        }"
-
-        fun SearchInput(keyword: String? = null): String {
-            if (keyword == null) {
-                return "$Home/input"
-            }
-            return "$Home/input?keyword=${
-            URLEncoder.encode(
-                keyword,
-                "UTF-8"
-            )
-            }"
-        }
-    }
-
-    fun Compose(composeType: ComposeType, statusKey: MicroBlogKey? = null) =
-        "compose?composeType=${composeType.name}${
-        if (statusKey != null) {
-            "&statusKey=$statusKey"
-        } else {
-            ""
-        }
-        }"
-
-    object Compose {
-        object Search {
-            const val User = "compose/search/user"
-        }
-    }
-
-    fun Following(userKey: MicroBlogKey) = "following/$userKey"
-    fun Followers(userKey: MicroBlogKey) = "followers/$userKey"
-
-    object Settings {
-        const val Home = "settings"
-        const val Appearance = "settings/appearance"
-        const val Display = "settings/display"
-        const val Storage = "settings/storage"
-        const val About = "settings/about"
-        const val AccountManagement = "settings/accountmanagement"
-        const val Misc = "settings/misc"
-        const val Notification = "settings/notification"
-        const val Layout = "settings/layout"
-        fun AccountNotification(accountKey: MicroBlogKey) = "settings/notification/$accountKey"
-    }
-
-    object DeepLink {
-        object Twitter {
-            const val User = "deeplink/twitter/user/{screenName}"
-            const val Status = "deeplink/twitter/status/{statusId}"
-        }
-        fun Draft(id: String) = "$twidereXSchema://draft/compose/$id"
-
-        fun Compose(composeType: ComposeType, statusKey: MicroBlogKey? = null) = "$twidereXSchema://${Route.Compose(composeType, statusKey)}"
-
-        fun Conversation(conversationKey: MicroBlogKey) = "$twidereXSchema://${Messages.Conversation(conversationKey)}"
-    }
-
-    fun Status(statusKey: MicroBlogKey) = "status/$statusKey"
-
-    object Mastodon {
-        fun Hashtag(keyword: String) = "mastodon/hashtag/$keyword"
-        const val Notification = "mastodon/notification"
-
-        object Compose {
-            const val Hashtag = "mastodon/compose/hashtag"
-        }
-    }
-
-    object Lists {
-        const val Home = "lists"
-        const val MastodonCreateDialog = "$Home/mastodon/create"
-        const val TwitterCreate = "$Home/twitter/create"
-        fun TwitterEdit(listKey: MicroBlogKey) = "$Home/twitter/edit/$listKey"
-        fun Timeline(listKey: MicroBlogKey) = "$Home/timeline/$listKey"
-        fun Members(listKey: MicroBlogKey, owned: Boolean) = "$Home/members/$listKey?owned=$owned"
-        fun Subscribers(listKey: MicroBlogKey) = "$Home/subscribers/$listKey"
-        fun AddMembers(listKey: MicroBlogKey) = "$Home/members/$listKey/add"
-    }
-
-    object Messages {
-        const val Home = "messages"
-        fun Conversation(conversationKey: MicroBlogKey) = "$Home/conversation/$conversationKey"
-        const val NewConversation = "$Home/new/conversation"
-    }
-}
 
 object DeepLinks {
     object Twitter {
@@ -272,7 +122,7 @@ object DeepLinks {
 
     const val Draft = "$twidereXSchema://draft/compose/{draftId}"
     const val Compose = "$twidereXSchema://compose"
-    const val Conversation = "$twidereXSchema://${Route.Messages.Home}/conversation/{conversationKey}"
+    const val Conversation = "$twidereXSchema://${RootRouteDefinition.Messages.Home}/conversation/{conversationKey}"
 
     object Callback {
         object SignIn {
@@ -385,30 +235,30 @@ fun RequirePlatformAccount(
 
 fun RouteBuilder.route(constraints: Constraints) {
     authorizedScene(
-        Route.Home,
+        RootRouteDefinition.Home,
         deepLinks = twitterHosts.map { "$it/*" }
     ) {
         HomeScene()
     }
 
-    authorizedScene(Route.Mastodon.Notification) {
+    authorizedScene(RootRouteDefinition.Mastodon.Notification) {
         MastodonNotificationScene()
     }
 
-    authorizedScene(Route.Me) {
+    authorizedScene(RootRouteDefinition.Me) {
         MeScene()
     }
 
-    authorizedScene(Route.Mentions) {
+    authorizedScene(RootRouteDefinition.Mentions) {
         MentionScene()
     }
 
-    authorizedScene(Route.HomeTimeline) {
+    authorizedScene(RootRouteDefinition.HomeTimeline) {
         HomeTimelineScene()
     }
 
     scene(
-        Route.SignIn.General,
+        RootRouteDefinition.SignIn.General,
         deepLinks = listOf(
             DeepLinks.SignIn
         ),
@@ -417,37 +267,37 @@ fun RouteBuilder.route(constraints: Constraints) {
     }
 
     scene(
-        "signin/twitter",
+        RootRouteDefinition.SignIn.Twitter,
     ) { backStackEntry ->
-        val consumerKey = backStackEntry.query<String>("consumerKey")
-        val consumerSecret = backStackEntry.query<String>("consumerSecret")
+        val consumerKey = backStackEntry.path<String>("consumerKey")
+        val consumerSecret = backStackEntry.path<String>("consumerSecret")
         if (consumerKey != null && consumerSecret != null) {
             TwitterSignInScene(consumerKey = consumerKey, consumerSecret = consumerSecret)
         }
     }
 
-    scene(Route.SignIn.Mastodon) {
+    scene(RootRouteDefinition.SignIn.Mastodon) {
         MastodonSignInScene()
     }
 
     scene(
-        "signin/twitter/web/{target}",
+        RootRouteDefinition.SignIn.Web.Twitter,
     ) { backStackEntry ->
         backStackEntry.path<String>("target")?.let {
             TwitterWebSignInScene(target = URLDecoder.decode(it, "UTF-8"))
         }
     }
 
-    scene(
-        "signin/mastodon/web/{target}",
-    ) { backStackEntry ->
-        backStackEntry.path<String>("target")?.let {
-            MastodonWebSignInScene(target = URLDecoder.decode(it, "UTF-8"))
-        }
-    }
+    // scene(
+    //     "signin/mastodon/web/{target}",
+    // ) { backStackEntry ->
+    //     backStackEntry.path<String>("target")?.let {
+    //         MastodonWebSignInScene(target = URLDecoder.decode(it, "UTF-8"))
+    //     }
+    // }
 
     authorizedScene(
-        Route.DeepLink.Twitter.User,
+        RootRouteDefinition.DeepLink.Twitter.User,
         deepLinks = twitterHosts.map {
             "$it/{screenName}"
         } + "${DeepLinks.Twitter.User}/{screenName}"
@@ -467,7 +317,7 @@ fun RouteBuilder.route(constraints: Constraints) {
     }
 
     authorizedScene(
-        "user/{userKey}",
+        RootRouteDefinition.User,
         deepLinks = listOf(
             "${DeepLinks.User}/{userKey}"
         )
@@ -484,7 +334,7 @@ fun RouteBuilder.route(constraints: Constraints) {
     }
 
     authorizedScene(
-        "mastodon/hashtag/{keyword}",
+        RootRouteDefinition.Mastodon.Hashtag,
         deepLinks = listOf(
             "${DeepLinks.Mastodon.Hashtag}/{keyword}"
         )
@@ -495,7 +345,7 @@ fun RouteBuilder.route(constraints: Constraints) {
     }
 
     authorizedScene(
-        "status/{statusKey}",
+        RootRouteDefinition.Status,
         deepLinks = listOf(
             DeepLinks.Status,
         )
@@ -512,7 +362,7 @@ fun RouteBuilder.route(constraints: Constraints) {
     }
 
     authorizedScene(
-        Route.DeepLink.Twitter.Status,
+        RootRouteDefinition.DeepLink.Twitter.Status,
         deepLinks = twitterHosts.map {
             "$it/{screenName}/status/{statusId:[0-9]+}"
         } + listOf(
@@ -537,7 +387,7 @@ fun RouteBuilder.route(constraints: Constraints) {
     }
 
     authorizedDialog(
-        "media/status/{statusKey}",
+        RootRouteDefinition.Media.Status,
     ) { backStackEntry ->
         backStackEntry.path<String>("statusKey")?.let {
             MicroBlogKey.valueOf(it)
@@ -555,7 +405,7 @@ fun RouteBuilder.route(constraints: Constraints) {
     }
 
     authorizedDialog(
-        "media/pure/{belongToKey}",
+        RootRouteDefinition.Media.Pure,
     ) { backStackEntry ->
         backStackEntry.path<String>("belongToKey")?.let {
             MicroBlogKey.valueOf(it)
@@ -569,7 +419,7 @@ fun RouteBuilder.route(constraints: Constraints) {
     }
 
     authorizedDialog(
-        "media/raw/{url}",
+        RootRouteDefinition.Media.Raw,
     ) { backStackEntry ->
         backStackEntry.path<String>("url")?.let {
             URLDecoder.decode(it, "UTF-8")
@@ -578,12 +428,12 @@ fun RouteBuilder.route(constraints: Constraints) {
         }
     }
 
-    authorizedScene(Route.Search.Home) {
+    authorizedScene(RootRouteDefinition.Search.Home) {
         com.twidere.twiderex.scenes.home.SearchScene()
     }
 
     authorizedScene(
-        "search/input",
+        RootRouteDefinition.Search.Input,
         navTransition = NavTransition(
             createTransition = fadeCreateTransition,
             destroyTransition = fadeDestroyTransition,
@@ -597,7 +447,7 @@ fun RouteBuilder.route(constraints: Constraints) {
     }
 
     authorizedScene(
-        "search/result/{keyword}",
+        RootRouteDefinition.Search.Result,
         deepLinks = twitterHosts.map {
             "$it/search?q={keyword}"
         } + "${DeepLinks.Search}/{keyword}",
@@ -614,7 +464,7 @@ fun RouteBuilder.route(constraints: Constraints) {
     }
 
     authorizedScene(
-        "compose",
+        RootRouteDefinition.Compose.Home,
         navTransition = NavTransition(
             createTransition = {
                 translationY = constraints.maxHeight * (1 - it)
@@ -649,7 +499,7 @@ fun RouteBuilder.route(constraints: Constraints) {
     }
 
     authorizedScene(
-        "followers/{userKey}",
+        RootRouteDefinition.Followers,
     ) { backStackEntry ->
         backStackEntry.path<String>("userKey")?.let {
             MicroBlogKey.valueOf(it)
@@ -659,7 +509,7 @@ fun RouteBuilder.route(constraints: Constraints) {
     }
 
     authorizedScene(
-        "following/{userKey}",
+        RootRouteDefinition.Following,
     ) { backStackEntry ->
         backStackEntry.path<String>("userKey")?.let {
             MicroBlogKey.valueOf(it)
@@ -668,39 +518,41 @@ fun RouteBuilder.route(constraints: Constraints) {
         }
     }
 
-    scene(Route.Settings.Home) {
+    scene(RootRouteDefinition.Settings.Home) {
         SettingsScene()
     }
 
-    scene(Route.Settings.Appearance) {
+    scene(RootRouteDefinition.Settings.Appearance) {
         AppearanceScene()
     }
 
-    scene(Route.Settings.Display) {
+    scene(RootRouteDefinition.Settings.Display) {
         DisplayScene()
     }
 
-    scene(Route.Settings.Storage) {
+    scene(RootRouteDefinition.Settings.Storage) {
         StorageScene()
     }
 
-    scene(Route.Settings.AccountManagement) {
+    scene(RootRouteDefinition.Settings.AccountManagement) {
         AccountManagementScene()
     }
 
-    scene(Route.Settings.Misc) {
+    scene(RootRouteDefinition.Settings.Misc) {
         MiscScene()
     }
 
-    scene(Route.Settings.Notification) {
+    scene(RootRouteDefinition.Settings.Notification) {
         NotificationScene()
     }
 
-    authorizedScene(Route.Settings.Layout) {
+    authorizedScene(RootRouteDefinition.Settings.Layout) {
         LayoutScene()
     }
 
-    scene("settings/notification/{accountKey}") {
+    scene(
+        RootRouteDefinition.Settings.AccountNotification
+    ) {
         it.path<String>("accountKey", null)?.let {
             MicroBlogKey.valueOf(it)
         }?.let {
@@ -708,16 +560,16 @@ fun RouteBuilder.route(constraints: Constraints) {
         }
     }
 
-    scene(Route.Settings.About) {
+    scene(RootRouteDefinition.Settings.About) {
         AboutScene()
     }
 
-    scene(Route.Draft.List) {
+    scene(RootRouteDefinition.Draft.List) {
         DraftListScene()
     }
 
     scene(
-        "draft/compose/{draftId}",
+        RootRouteDefinition.Draft.Compose,
         deepLinks = listOf(
             DeepLinks.Draft,
         )
@@ -727,29 +579,29 @@ fun RouteBuilder.route(constraints: Constraints) {
         }
     }
 
-    authorizedScene(Route.Compose.Search.User) {
+    authorizedScene(RootRouteDefinition.Compose.Search.User) {
         ComposeSearchUserScene()
     }
 
-    authorizedScene(Route.Mastodon.Compose.Hashtag) {
+    authorizedScene(RootRouteDefinition.Mastodon.Compose.Hashtag) {
         ComposeSearchHashtagScene()
     }
 
-    authorizedScene(Route.Lists.Home) {
+    authorizedScene(RootRouteDefinition.Lists.Home) {
         ListsScene()
     }
 
-    authorizedDialog(Route.Lists.MastodonCreateDialog) {
+    authorizedDialog(RootRouteDefinition.Lists.MastodonCreateDialog) {
         val navController = LocalNavController.current
         MastodonListsCreateDialog(onDismissRequest = { navController.goBack() })
     }
 
-    authorizedScene(Route.Lists.TwitterCreate) {
+    authorizedScene(RootRouteDefinition.Lists.TwitterCreate) {
         TwitterListsCreateScene()
     }
 
     authorizedScene(
-        "${Route.Lists.Home}/twitter/edit/{listKey}"
+        RootRouteDefinition.Lists.TwitterEdit,
     ) { backStackEntry ->
         backStackEntry.path<String>("listKey")?.let {
             TwitterListsEditScene(listKey = MicroBlogKey.valueOf(it))
@@ -757,7 +609,7 @@ fun RouteBuilder.route(constraints: Constraints) {
     }
 
     authorizedScene(
-        "${Route.Lists.Home}/timeline/{listKey}"
+        RootRouteDefinition.Lists.Timeline,
     ) { backStackEntry ->
         backStackEntry.path<String>("listKey")?.let {
             ListTimeLineScene(listKey = MicroBlogKey.valueOf(it))
@@ -765,7 +617,7 @@ fun RouteBuilder.route(constraints: Constraints) {
     }
 
     authorizedScene(
-        "${Route.Lists.Home}/members/{listKey}"
+        RootRouteDefinition.Lists.Members,
     ) { backStackEntry ->
         backStackEntry.path<String>("listKey")?.let {
             ListsMembersScene(listKey = MicroBlogKey.valueOf(it), backStackEntry.query<Boolean>("owned") ?: false)
@@ -773,7 +625,7 @@ fun RouteBuilder.route(constraints: Constraints) {
     }
 
     authorizedScene(
-        "${Route.Lists.Home}/subscribers/{listKey}"
+        RootRouteDefinition.Lists.Subscribers,
     ) { backStackEntry ->
         backStackEntry.path<String>("listKey")?.let {
             ListsSubscribersScene(listKey = MicroBlogKey.valueOf(it))
@@ -781,23 +633,23 @@ fun RouteBuilder.route(constraints: Constraints) {
     }
 
     authorizedScene(
-        "${Route.Lists.Home}/members/{listKey}/add"
+        RootRouteDefinition.Lists.AddMembers,
     ) { backStackEntry ->
         backStackEntry.path<String>("listKey")?.let {
             ListsAddMembersScene(listKey = MicroBlogKey.valueOf(it))
         }
     }
 
-    authorizedScene(Route.Messages.Home) {
+    authorizedScene(RootRouteDefinition.Messages.Home) {
         DMConversationListScene()
     }
 
-    authorizedScene(Route.Messages.NewConversation) {
+    authorizedScene(RootRouteDefinition.Messages.NewConversation) {
         DMNewConversationScene()
     }
 
     authorizedScene(
-        "${Route.Messages.Home}/conversation/{conversationKey}",
+        RootRouteDefinition.Messages.Conversation,
         deepLinks = listOf(
             DeepLinks.Conversation
         )

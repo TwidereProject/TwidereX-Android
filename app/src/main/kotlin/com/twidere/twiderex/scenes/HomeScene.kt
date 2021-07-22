@@ -94,7 +94,7 @@ import com.twidere.twiderex.component.status.UserScreenName
 import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.model.ui.UiUser
-import com.twidere.twiderex.navigation.Route
+import com.twidere.twiderex.navigation.RootRoute
 import com.twidere.twiderex.preferences.LocalAppearancePreferences
 import com.twidere.twiderex.preferences.proto.AppearancePreferences
 import com.twidere.twiderex.scenes.home.HomeMenus
@@ -459,7 +459,7 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
                         ListItem(
                             modifier = Modifier.clickable(
                                 onClick = {
-                                    navController.navigate(Route.SignIn.Default)
+                                    navController.navigate(RootRoute.SignIn.General)
                                 }
                             ),
                             text = {
@@ -472,7 +472,7 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
                         ListItem(
                             modifier = Modifier.clickable(
                                 onClick = {
-                                    navController.navigate(Route.Settings.AccountManagement)
+                                    navController.navigate(RootRoute.Settings.AccountManagement)
                                 }
                             ),
                             text = {
@@ -519,7 +519,7 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
                 onClick = {
                     scope.launch {
                         scaffoldState.drawerState.close()
-                        navController.navigate(Route.Settings.Home)
+                        navController.navigate(RootRoute.Settings.Home)
                     }
                 }
             ),

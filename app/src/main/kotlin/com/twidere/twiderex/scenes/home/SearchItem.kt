@@ -58,7 +58,7 @@ import com.twidere.twiderex.component.trend.TwitterTrendItem
 import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.model.PlatformType
-import com.twidere.twiderex.navigation.Route
+import com.twidere.twiderex.navigation.RootRoute
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.search.SearchInputViewModel
@@ -69,7 +69,7 @@ class SearchItem : HomeNavigationItem() {
     @Composable
     override fun name(): String = stringResource(R.string.scene_search_title)
     override val route: String
-        get() = Route.Search.Home
+        get() = RootRoute.Search.Home
 
     @Composable
     override fun icon(): Painter = painterResource(id = R.drawable.ic_search)

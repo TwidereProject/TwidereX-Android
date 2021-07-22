@@ -52,7 +52,7 @@ import com.twidere.twiderex.component.lazy.ui.LazyUiUserList
 import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.model.ui.UiUser
-import com.twidere.twiderex.navigation.Route
+import com.twidere.twiderex.navigation.RootRoute
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
@@ -105,8 +105,8 @@ fun DMNewConversationScene() {
                             onResult = { key ->
                                 key?.let {
                                     navController.navigate(
-                                        Route.Messages.Conversation(it),
-                                        NavOptions(popUpTo = PopUpTo(Route.Messages.Home))
+                                        RootRoute.Messages.Conversation(it),
+                                        NavOptions(popUpTo = PopUpTo(RootRoute.Messages.Home))
                                     )
                                 }
                             }

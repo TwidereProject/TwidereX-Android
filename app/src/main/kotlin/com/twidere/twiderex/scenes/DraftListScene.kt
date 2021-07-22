@@ -48,7 +48,7 @@ import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.lazy.LazyListController
 import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.extensions.observeAsState
-import com.twidere.twiderex.navigation.Route
+import com.twidere.twiderex.navigation.RootRoute
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.DraftViewModel
@@ -112,7 +112,7 @@ fun DraftListSceneContent(
                         ) {
                             DropdownMenuItem(
                                 onClick = {
-                                    navController.navigate(Route.Draft.Compose(it._id))
+                                    navController.navigate(RootRoute.Draft.Compose(it._id))
                                 }
                             ) {
                                 Text(text = stringResource(id = R.string.scene_drafts_actions_edit_draft))
