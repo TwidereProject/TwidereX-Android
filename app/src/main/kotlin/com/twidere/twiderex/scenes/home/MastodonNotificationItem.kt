@@ -38,7 +38,7 @@ import com.twidere.twiderex.component.foundation.Pager
 import com.twidere.twiderex.component.foundation.TextTabsComponent
 import com.twidere.twiderex.component.foundation.rememberPagerState
 import com.twidere.twiderex.component.lazy.LazyListController
-import com.twidere.twiderex.navigation.Route
+import com.twidere.twiderex.navigation.RootRoute
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.TwidereScene
 import kotlinx.coroutines.launch
@@ -50,7 +50,7 @@ class MastodonNotificationItem : HomeNavigationItem() {
     }
 
     override val route: String
-        get() = Route.Mastodon.Notification
+        get() = RootRoute.Mastodon.Notification
 
     @Composable
     override fun icon(): Painter {

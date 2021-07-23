@@ -32,7 +32,7 @@ import com.twidere.twiderex.component.foundation.LoadingProgress
 import com.twidere.twiderex.component.lists.MastodonListsModifyComponent
 import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.extensions.observeAsState
-import com.twidere.twiderex.navigation.Route
+import com.twidere.twiderex.navigation.RootRoute
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.viewmodel.lists.ListsCreateViewModel
@@ -59,7 +59,7 @@ fun MastodonListsCreateDialog(onDismissRequest: () -> Unit) {
             if (success) {
                 list?.apply {
                     navController.navigate(
-                        Route.Lists.Timeline(listKey),
+                        RootRoute.Lists.Timeline(listKey),
                     )
                 }
             }

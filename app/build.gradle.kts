@@ -175,6 +175,7 @@ protobuf {
 
 // TODO: workaround for https://github.com/google/ksp/issues/518
 evaluationDependsOn(":assistedProcessor")
+evaluationDependsOn(":routeProcessor")
 
 dependencies {
     android()
@@ -182,6 +183,8 @@ dependencies {
     kotlinCoroutines()
     implementation(projects.services)
     ksp(projects.assistedProcessor)
+    implementation(projects.routeProcessor)
+    ksp(projects.routeProcessor)
     compose()
     paging()
     datastore()

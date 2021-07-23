@@ -39,7 +39,7 @@ import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
 import com.twidere.twiderex.component.lazy.LazyListController
 import com.twidere.twiderex.component.lazy.ui.LazyUiDMConversationList
 import com.twidere.twiderex.di.assisted.assistedViewModel
-import com.twidere.twiderex.navigation.Route
+import com.twidere.twiderex.navigation.RootRoute
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
@@ -73,7 +73,7 @@ fun DMConversationListSceneFab() {
     val navController = LocalNavController.current
     FloatingActionButton(
         onClick = {
-            navController.navigate(Route.Messages.NewConversation)
+            navController.navigate(RootRoute.Messages.NewConversation)
         }
     ) {
         Icon(
@@ -111,7 +111,7 @@ fun DMConversationListSceneContent(
             items = source,
             state = listState,
             onItemClicked = {
-                navController.navigate(Route.Messages.Conversation(it.conversation.conversationKey))
+                navController.navigate(RootRoute.Messages.Conversation(it.conversation.conversationKey))
             }
         )
     }

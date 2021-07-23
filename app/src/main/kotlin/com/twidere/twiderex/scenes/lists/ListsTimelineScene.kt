@@ -64,7 +64,7 @@ import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.PlatformType
-import com.twidere.twiderex.navigation.Route
+import com.twidere.twiderex.navigation.RootRoute
 import com.twidere.twiderex.scenes.lists.platform.MastodonListsEditDialog
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalNavController
@@ -160,7 +160,7 @@ fun ListTimeLineScene(
                                     onClick = {
                                         menuExpand = false
                                         navController.navigate(
-                                            Route.Lists.Members(
+                                            RootRoute.Lists.Members(
                                                 listKey,
                                                 uiList.isOwner(account.user.userId)
                                             )
@@ -175,7 +175,7 @@ fun ListTimeLineScene(
                                         onClick = {
                                             menuExpand = false
                                             navController.navigate(
-                                                Route.Lists.Subscribers(
+                                                RootRoute.Lists.Subscribers(
                                                     listKey
                                                 )
                                             )
@@ -190,7 +190,7 @@ fun ListTimeLineScene(
                                         onClick = {
                                             menuExpand = false
                                             when (account.type) {
-                                                PlatformType.Twitter -> navController.navigate(Route.Lists.TwitterEdit(listKey = listKey))
+                                                PlatformType.Twitter -> navController.navigate(RootRoute.Lists.TwitterEdit(listKey = listKey))
                                                 PlatformType.StatusNet -> TODO()
                                                 PlatformType.Fanfou -> TODO()
                                                 PlatformType.Mastodon -> showEditDialog = true
