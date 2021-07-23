@@ -108,6 +108,7 @@ fun DependencyHandlerScope.android() {
     activity()
     implementation("androidx.startup:startup-runtime", Versions.startup)
     implementation("io.coil-kt:coil-compose", Versions.coil)
+    implementation("io.coil-kt:coil-gif", Versions.coil)
     implementation("androidx.vectordrawable:vectordrawable:1.1.0")
     implementation("androidx.exifinterface:exifinterface", Versions.androidx_exifinterface)
     implementation("com.google.android.exoplayer:exoplayer", Versions.exoplayer)
