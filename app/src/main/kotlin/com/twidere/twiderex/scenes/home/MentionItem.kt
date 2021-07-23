@@ -32,7 +32,7 @@ import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.lazy.LazyListController
 import com.twidere.twiderex.di.assisted.assistedViewModel
-import com.twidere.twiderex.navigation.Route
+import com.twidere.twiderex.navigation.RootRoute
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.timeline.MentionsTimelineViewModel
@@ -41,7 +41,7 @@ class MentionItem : HomeNavigationItem() {
     @Composable
     override fun name(): String = stringResource(R.string.scene_mentions_title)
     override val route: String
-        get() = Route.Mentions
+        get() = RootRoute.Mentions
 
     @Composable
     override fun icon(): Painter = painterResource(id = R.drawable.ic_message_circle)

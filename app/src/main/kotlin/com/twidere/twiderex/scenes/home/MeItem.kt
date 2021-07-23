@@ -30,7 +30,7 @@ import com.twidere.twiderex.component.UserComponent
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
-import com.twidere.twiderex.navigation.Route
+import com.twidere.twiderex.navigation.RootRoute
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.TwidereScene
 
@@ -39,7 +39,7 @@ class MeItem : HomeNavigationItem() {
     @Composable
     override fun name(): String = stringResource(R.string.scene_profile_title)
     override val route: String
-        get() = Route.Me
+        get() = RootRoute.Me
 
     @Composable
     override fun icon(): Painter = painterResource(id = R.drawable.ic_user)

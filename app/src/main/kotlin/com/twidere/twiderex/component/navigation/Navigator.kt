@@ -32,7 +32,7 @@ import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.model.ui.UiUser
-import com.twidere.twiderex.navigation.Route
+import com.twidere.twiderex.navigation.RootRoute
 import com.twidere.twiderex.navigation.twidereXSchema
 import com.twidere.twiderex.viewmodel.compose.ComposeType
 import moe.tlaster.precompose.navigation.NavController
@@ -60,7 +60,6 @@ interface INavigator {
 
     fun openLink(it: String, deepLink: Boolean = true) {}
     suspend fun twitterSignInWeb(target: String): String = ""
-    suspend fun mastodonSignInWeb(target: String): String = ""
     fun searchInput(initial: String? = null) {}
     fun hashtag(name: String) {}
     fun goBack() {}
@@ -71,7 +70,7 @@ class Navigator(
     private val context: Context,
 ) : INavigator {
     override fun user(user: UiUser, navOptions: NavOptions?) {
-        navController.navigate(Route.User(user.userKey), navOptions)
+        navController.navigate(RootRoute.User(user.userKey), navOptions)
     }
 
     override fun status(status: UiStatus, navOptions: NavOptions?) {
@@ -93,7 +92,7 @@ class Navigator(
         }
         if (statusKey != null) {
             navController.navigate(
-                Route.Status(statusKey),
+                RootRoute.Status(statusKey),
                 navOptions
             )
         }
@@ -104,16 +103,16 @@ class Navigator(
         selectedIndex: Int,
         navOptions: NavOptions?
     ) {
-        navController.navigate(Route.Media.Status(statusKey, selectedIndex), navOptions)
+        navController.navigate(RootRoute.Media.Status(statusKey, selectedIndex), navOptions)
     }
 
     override fun search(keyword: String) {
-        navController.navigate(Route.Search.Search(keyword))
+        navController.navigate(RootRoute.Search.Result(keyword))
     }
 
     override fun searchInput(initial: String?) {
         navController.navigate(
-            Route.Search.SearchInput(initial),
+            RootRoute.Search.Input(initial),
         )
     }
 
@@ -122,7 +121,7 @@ class Navigator(
         statusKey: MicroBlogKey?,
         navOptions: NavOptions?
     ) {
-        navController.navigate(Route.Compose(composeType, statusKey))
+        navController.navigate(RootRoute.Compose.Home(composeType, statusKey))
     }
 
     override fun openLink(it: String, deepLink: Boolean) {
@@ -145,20 +144,12 @@ class Navigator(
         CookieManager.getInstance().removeAllCookies {
         }
         return navController.navigateForResult(
-            Route.SignIn.Web.Twitter(target)
-        ).toString()
-    }
-
-    override suspend fun mastodonSignInWeb(target: String): String {
-        CookieManager.getInstance().removeAllCookies {
-        }
-        return navController.navigateForResult(
-            Route.SignIn.Web.Mastodon(target)
+            RootRoute.SignIn.Web.Twitter(target)
         ).toString()
     }
 
     override fun hashtag(name: String) {
-        navController.navigate(Route.Mastodon.Hashtag(name))
+        navController.navigate(RootRoute.Mastodon.Hashtag(name))
     }
 
     override fun goBack() {
