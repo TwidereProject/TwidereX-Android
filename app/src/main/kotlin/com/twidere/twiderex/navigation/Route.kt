@@ -102,36 +102,6 @@ import java.net.URLDecoder
 const val initialRoute = RootRouteDefinition.Home
 const val twidereXSchema = "twiderex"
 
-object DeepLinks {
-    object Twitter {
-        const val User = "$twidereXSchema://twitter/user"
-        const val Status = "$twidereXSchema://twitter/status/{statusId}"
-        fun Status(id: String) = "$twidereXSchema://twitter/status/$id"
-    }
-
-    object Mastodon {
-        const val Hashtag = "$twidereXSchema://mastodon/hashtag"
-    }
-
-    const val User = "$twidereXSchema://user"
-    fun User(userKey: MicroBlogKey) = "$twidereXSchema://user/$userKey"
-    const val Status = "$twidereXSchema://status/{statusKey}"
-    fun Status(statusKey: MicroBlogKey) = "$twidereXSchema://status/$statusKey"
-    const val Search = "$twidereXSchema://search"
-    const val SignIn = "$twidereXSchema://signin"
-
-    const val Draft = "$twidereXSchema://draft/compose/{draftId}"
-    const val Compose = "$twidereXSchema://compose"
-    const val Conversation = "$twidereXSchema://${RootRouteDefinition.Messages.Home}/conversation/{conversationKey}"
-
-    object Callback {
-        object SignIn {
-            const val Mastodon = "$twidereXSchema://auth/callback/mastodon"
-            const val Twitter = "$twidereXSchema://auth/callback/twitter"
-        }
-    }
-}
-
 fun RouteBuilder.authorizedScene(
     route: String,
     deepLinks: List<String> = emptyList(),
@@ -260,7 +230,7 @@ fun RouteBuilder.route(constraints: Constraints) {
     scene(
         RootRouteDefinition.SignIn.General,
         deepLinks = listOf(
-            DeepLinks.SignIn
+            RootDeepLinksRouteDefinition.SignIn
         ),
     ) {
         SignInScene()
@@ -300,7 +270,7 @@ fun RouteBuilder.route(constraints: Constraints) {
         RootRouteDefinition.DeepLink.Twitter.User,
         deepLinks = twitterHosts.map {
             "$it/{screenName}"
-        } + "${DeepLinks.Twitter.User}/{screenName}"
+        } + RootDeepLinksRouteDefinition.Twitter.User
     ) { backStackEntry ->
         backStackEntry.path<String>("screenName")?.let { screenName ->
             val navigator = LocalNavigator.current
@@ -319,7 +289,7 @@ fun RouteBuilder.route(constraints: Constraints) {
     authorizedScene(
         RootRouteDefinition.User,
         deepLinks = listOf(
-            "${DeepLinks.User}/{userKey}"
+            RootDeepLinksRouteDefinition.User
         )
     ) { backStackEntry ->
         backStackEntry.path<String>("userKey")?.let {
@@ -336,7 +306,7 @@ fun RouteBuilder.route(constraints: Constraints) {
     authorizedScene(
         RootRouteDefinition.Mastodon.Hashtag,
         deepLinks = listOf(
-            "${DeepLinks.Mastodon.Hashtag}/{keyword}"
+            RootDeepLinksRouteDefinition.Mastodon.Hashtag
         )
     ) { backStackEntry ->
         backStackEntry.path<String>("keyword")?.let {
@@ -347,7 +317,7 @@ fun RouteBuilder.route(constraints: Constraints) {
     authorizedScene(
         RootRouteDefinition.Status,
         deepLinks = listOf(
-            DeepLinks.Status,
+            RootDeepLinksRouteDefinition.Status,
         )
     ) { backStackEntry ->
         backStackEntry.path<String>("statusKey")?.let {
@@ -366,7 +336,7 @@ fun RouteBuilder.route(constraints: Constraints) {
         deepLinks = twitterHosts.map {
             "$it/{screenName}/status/{statusId:[0-9]+}"
         } + listOf(
-            DeepLinks.Twitter.Status
+            RootDeepLinksRouteDefinition.Twitter.Status
         )
     ) { backStackEntry ->
         backStackEntry.path<String>("statusId")?.let { statusId ->
@@ -450,7 +420,7 @@ fun RouteBuilder.route(constraints: Constraints) {
         RootRouteDefinition.Search.Result,
         deepLinks = twitterHosts.map {
             "$it/search?q={keyword}"
-        } + "${DeepLinks.Search}/{keyword}",
+        } + RootDeepLinksRouteDefinition.Search,
         navTransition = NavTransition(
             createTransition = fadeCreateTransition,
             destroyTransition = fadeDestroyTransition,
@@ -478,7 +448,7 @@ fun RouteBuilder.route(constraints: Constraints) {
             resumeTransition = fadeScaleCreateTransition,
         ),
         deepLinks = listOf(
-            DeepLinks.Compose
+            RootDeepLinksRouteDefinition.Compose
         )
     ) { backStackEntry ->
         val type = backStackEntry.query<String>("composeType")?.let {
@@ -571,7 +541,7 @@ fun RouteBuilder.route(constraints: Constraints) {
     scene(
         RootRouteDefinition.Draft.Compose,
         deepLinks = listOf(
-            DeepLinks.Draft,
+            RootDeepLinksRouteDefinition.Draft,
         )
     ) { backStackEntry ->
         backStackEntry.path<String>("draftId")?.let {
@@ -651,7 +621,7 @@ fun RouteBuilder.route(constraints: Constraints) {
     authorizedScene(
         RootRouteDefinition.Messages.Conversation,
         deepLinks = listOf(
-            DeepLinks.Conversation
+            RootDeepLinksRouteDefinition.Conversation
         )
     ) { backStackEntry ->
         backStackEntry.path<String>("conversationKey")?.let {

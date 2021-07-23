@@ -34,7 +34,7 @@ import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.cred.CredentialsType
 import com.twidere.twiderex.model.cred.OAuthCredentials
 import com.twidere.twiderex.model.toAmUser
-import com.twidere.twiderex.navigation.DeepLinks
+import com.twidere.twiderex.navigation.RootDeepLinksRoute
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.ACCOUNT_TYPE
 import com.twidere.twiderex.repository.AccountRepository
@@ -88,7 +88,7 @@ class TwitterSignInViewModel @AssistedInject constructor(
             )
             val token = service.getOAuthToken(
                 if (isBuiltInKey()) {
-                    DeepLinks.Callback.SignIn.Twitter
+                    RootDeepLinksRoute.Callback.SignIn.Twitter
                 } else {
                     "oob"
                 }

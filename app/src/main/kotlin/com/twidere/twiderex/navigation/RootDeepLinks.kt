@@ -18,14 +18,37 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.route.processor
+package com.twidere.twiderex.navigation
 
-import com.google.devtools.ksp.processing.SymbolProcessor
-import com.google.devtools.ksp.processing.SymbolProcessorEnvironment
-import com.google.devtools.ksp.processing.SymbolProcessorProvider
+import com.twidere.route.processor.AppRoute
+import com.twidere.twiderex.model.MicroBlogKey
 
-class RouteProcessorProvider : SymbolProcessorProvider {
-    override fun create(environment: SymbolProcessorEnvironment): SymbolProcessor {
-        return RouteProcessor(environment.codeGenerator, environment.logger)
+@AppRoute(
+    prefix = "$twidereXSchema://"
+)
+interface RootDeepLinks {
+    interface Twitter {
+        fun User(screenName: String): String
+        fun Status(id: String): String
+    }
+
+    interface Mastodon {
+        fun Hashtag(keyword: String): String
+    }
+
+    fun User(userKey: MicroBlogKey): String
+    fun Status(statusKey: MicroBlogKey): String
+    fun Search(keyword: String): String
+    val SignIn: String
+
+    val Draft: String
+    val Compose: String
+    val Conversation: String
+
+    interface Callback {
+        interface SignIn {
+            val Mastodon: String
+            val Twitter: String
+        }
     }
 }

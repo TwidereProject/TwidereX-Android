@@ -40,14 +40,41 @@ internal fun RouteDefinition.parents(): List<RouteDefinition> {
 }
 
 internal val RouteDefinition.parentPath
-    get() = parents().joinToString("/") { it.name }
+    get() = parents()
+        .joinToString("/") { it.name }
 
 internal val RouteDefinition.indent
-    get() = parents().joinToString("") { StandardIndent }
+    get() = parents()
+        .filter { it !is PrefixRouteDefinition }
+        .joinToString("") { StandardIndent }
+
+internal data class PrefixRouteDefinition(
+    val prefix: String,
+    val child: NestedRouteDefinition,
+    val routeClassName: String,
+    val definitionClassName: String,
+) : RouteDefinition {
+    override val name: String
+        get() = prefix
+    override val parent: RouteDefinition?
+        get() = null
+
+    init {
+        child.parent = this
+    }
+
+    override fun generateDefinition(): String {
+        return child.copy(name = definitionClassName).generateDefinition()
+    }
+
+    override fun generateRoute(): String {
+        return child.copy(name = routeClassName).generateRoute()
+    }
+}
 
 internal data class NestedRouteDefinition(
     override val name: String,
-    override val parent: RouteDefinition? = null,
+    override var parent: RouteDefinition? = null,
     val fullName: String,
     val childRoute: ArrayList<RouteDefinition> = arrayListOf(),
 ) : RouteDefinition {

@@ -50,7 +50,7 @@ import com.twidere.twiderex.model.MastodonStatusType
 import com.twidere.twiderex.model.MediaType
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.PlatformType
-import com.twidere.twiderex.navigation.DeepLinks
+import com.twidere.twiderex.navigation.RootDeepLinksRoute
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import org.jsoup.nodes.Node
@@ -411,7 +411,7 @@ private fun replaceMention(mentions: List<Mention>, node: Node, accountKey: Micr
         if (id != null) {
             node.attr(
                 "href",
-                DeepLinks.User + "/" + MicroBlogKey(id, accountKey.host)
+                RootDeepLinksRoute.User(MicroBlogKey(id, accountKey.host))
             )
         }
     } else {
@@ -431,7 +431,7 @@ private fun replaceHashTag(node: Node) {
     ) {
         node.attr(
             "href",
-            DeepLinks.Mastodon.Hashtag + "/" + node.text().trimStart('#')
+            RootDeepLinksRoute.Mastodon.Hashtag(node.text().trimStart('#'))
         )
     } else {
         node.childNodes().forEach { replaceHashTag(it) }

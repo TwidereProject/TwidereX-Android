@@ -22,9 +22,11 @@ package com.twidere.route.processor
 
 import com.google.devtools.ksp.processing.CodeGenerator
 import com.google.devtools.ksp.processing.Dependencies
+import com.google.devtools.ksp.processing.KSPLogger
 import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.processing.SymbolProcessor
 import com.google.devtools.ksp.symbol.KSAnnotated
+import com.google.devtools.ksp.symbol.KSAnnotation
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSDeclaration
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
@@ -33,12 +35,16 @@ import com.google.devtools.ksp.symbol.KSPropertyDeclaration
 import com.google.devtools.ksp.visitor.KSEmptyVisitor
 import java.io.OutputStream
 
-class RouteProcessor(
+internal class RouteProcessor(
     private val codeGenerator: CodeGenerator,
+    private val logger: KSPLogger,
 ) : SymbolProcessor {
     override fun process(resolver: Resolver): List<KSAnnotated> {
         val routeSymbol = resolver
-            .getSymbolsWithAnnotation("com.twidere.route.processor.AppRoute")
+            .getSymbolsWithAnnotation(
+                AppRoute::class.qualifiedName
+                    ?: throw CloneNotSupportedException("Can not get qualifiedName for AppRoute")
+            )
             .filterIsInstance<KSClassDeclaration>()
         routeSymbol.forEach { it.accept(RouteVisitor(), routeSymbol.toList()) }
         return emptyList()
@@ -50,14 +56,30 @@ class RouteProcessor(
                 return
             }
 
-            val route = generateRoute(declaration = node)
-            if (route !is NestedRouteDefinition) {
-                return
-            }
+            val annotation = node.annotations
+                .firstOrNull { it.annotationType.resolve().declaration.qualifiedName?.asString() == AppRoute::class.qualifiedName }
+                ?: return
 
-            val packageName = node.packageName.asString()
-            val routeClassName = "${node.qualifiedName?.getShortName()}Route"
-            val definitionClassName = "${node.qualifiedName?.getShortName()}RouteDefinition"
+            val prefix = annotation.getStringValue(AppRoute::prefix.name) ?: ""
+            val packageName = annotation.getStringValue(AppRoute::packageName.name)
+                ?: node.packageName.asString()
+            val routeClassName = annotation.getStringValue(AppRoute::routeClassName.name)
+                ?: "${node.qualifiedName?.getShortName()}Route"
+            val definitionClassName = annotation.getStringValue(AppRoute::definitionClassName.name)
+                ?: "${node.qualifiedName?.getShortName()}RouteDefinition"
+
+            val route = generateRoute(declaration = node)
+                .takeIf {
+                    it is NestedRouteDefinition
+                }?.let {
+                    PrefixRouteDefinition(
+                        prefix = prefix,
+                        child = it as NestedRouteDefinition,
+                        routeClassName = routeClassName,
+                        definitionClassName = definitionClassName,
+                    )
+                } ?: return
+
             val dependencies = Dependencies(
                 true,
                 *(data.mapNotNull { it.containingFile } + listOfNotNull(node.containingFile)).toTypedArray()
@@ -66,13 +88,13 @@ class RouteProcessor(
                 dependencies,
                 packageName,
                 routeClassName,
-                route.copy(name = routeClassName).generateRoute()
+                route.generateRoute()
             )
             generateFile(
                 dependencies,
                 packageName,
                 definitionClassName,
-                route.copy(name = definitionClassName).generateDefinition()
+                route.generateDefinition()
             )
         }
 
@@ -140,3 +162,7 @@ class RouteProcessor(
 private fun OutputStream.appendLine(str: String = "") {
     this.write("$str${System.lineSeparator()}".toByteArray())
 }
+
+private fun KSAnnotation.getStringValue(name: String): String? = arguments
+    .firstOrNull { it.name?.asString() == name }
+    ?.let { it.value as? String? }.takeIf { !it.isNullOrEmpty() }

@@ -53,16 +53,16 @@ import com.twidere.twiderex.model.MediaType
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.ui.ListsMode
-import com.twidere.twiderex.navigation.DeepLinks
+import com.twidere.twiderex.navigation.RootDeepLinksRouteDefinition
 import com.twitter.twittertext.Autolink
 import java.util.UUID
 
 val autolink by lazy {
     Autolink().apply {
         setUsernameIncludeSymbol(true)
-        hashtagUrlBase = "${DeepLinks.Search}/%23"
-        cashtagUrlBase = "${DeepLinks.Search}/%24"
-        usernameUrlBase = "${DeepLinks.Twitter.User}/"
+        hashtagUrlBase = "${RootDeepLinksRouteDefinition.Search}/%23"
+        cashtagUrlBase = "${RootDeepLinksRouteDefinition.Search}/%24"
+        usernameUrlBase = "${RootDeepLinksRouteDefinition.Twitter.User}/"
     }
 }
 
