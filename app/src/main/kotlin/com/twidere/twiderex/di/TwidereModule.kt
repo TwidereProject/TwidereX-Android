@@ -21,6 +21,7 @@
 package com.twidere.twiderex.di
 
 import android.content.Context
+import androidx.core.app.NotificationManagerCompat
 import androidx.datastore.core.DataStore
 import androidx.work.WorkManager
 import com.twidere.services.nitter.NitterService
@@ -30,6 +31,7 @@ import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.http.TwidereServiceFactory
 import com.twidere.twiderex.model.AccountPreferences
 import com.twidere.twiderex.notification.InAppNotification
+import com.twidere.twiderex.notification.android.AndroidNotificationManager
 import com.twidere.twiderex.preferences.proto.MiscPreferences
 import com.twidere.twiderex.utils.PlatformResolver
 import dagger.Module
@@ -76,4 +78,10 @@ object TwidereModule {
     @Provides
     fun provideAccountPreferencesFactory(@ApplicationContext context: Context): AccountPreferences.Factory =
         AccountPreferences.Factory(context)
+
+    @Provides
+    fun provideAppNotificationManager(@ApplicationContext context: Context, notificationManagerCompat: NotificationManagerCompat) = AndroidNotificationManager(
+        context = context,
+        notificationManagerCompat = notificationManagerCompat
+    )
 }
