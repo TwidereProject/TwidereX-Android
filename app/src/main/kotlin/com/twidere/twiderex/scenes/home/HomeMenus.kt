@@ -21,6 +21,9 @@
 package com.twidere.twiderex.scenes.home
 
 import com.twidere.twiderex.model.PlatformType
+import com.twidere.twiderex.scenes.home.mastodon.FederatedTimelineItem
+import com.twidere.twiderex.scenes.home.mastodon.LocalTimelineItem
+import com.twidere.twiderex.scenes.home.mastodon.MastodonNotificationItem
 
 enum class HomeMenus(
     val item: HomeNavigationItem,
@@ -56,6 +59,16 @@ enum class HomeMenus(
         item = DMConversationListItem(),
         showDefault = false,
         supportedPlatformType = listOf(PlatformType.Twitter),
+    ),
+    FederatedTimeline(
+        item = FederatedTimelineItem(),
+        showDefault = false,
+        supportedPlatformType = listOf(PlatformType.Mastodon),
+    ),
+    LocalTimeline(
+        item = LocalTimelineItem(),
+        showDefault = false,
+        supportedPlatformType = listOf(PlatformType.Mastodon),
     ),
     Draft(
         item = DraftNavigationItem(),

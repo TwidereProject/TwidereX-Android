@@ -48,9 +48,11 @@ import com.twidere.twiderex.scenes.dm.DMConversationListScene
 import com.twidere.twiderex.scenes.dm.DMConversationScene
 import com.twidere.twiderex.scenes.dm.DMNewConversationScene
 import com.twidere.twiderex.scenes.home.HomeTimelineScene
-import com.twidere.twiderex.scenes.home.MastodonNotificationScene
 import com.twidere.twiderex.scenes.home.MeScene
 import com.twidere.twiderex.scenes.home.MentionScene
+import com.twidere.twiderex.scenes.home.mastodon.FederatedTimelineScene
+import com.twidere.twiderex.scenes.home.mastodon.LocalTimelineScene
+import com.twidere.twiderex.scenes.home.mastodon.MastodonNotificationScene
 import com.twidere.twiderex.scenes.lists.ListTimeLineScene
 import com.twidere.twiderex.scenes.lists.ListsAddMembersScene
 import com.twidere.twiderex.scenes.lists.ListsMembersScene
@@ -213,6 +215,14 @@ fun RouteBuilder.route(constraints: Constraints) {
 
     authorizedScene(RootRouteDefinition.Mastodon.Notification) {
         MastodonNotificationScene()
+    }
+
+    authorizedScene(RootRouteDefinition.Mastodon.FederatedTimeline) {
+        FederatedTimelineScene()
+    }
+
+    authorizedScene(RootRouteDefinition.Mastodon.LocalTimeline) {
+        LocalTimelineScene()
     }
 
     authorizedScene(RootRouteDefinition.Me) {

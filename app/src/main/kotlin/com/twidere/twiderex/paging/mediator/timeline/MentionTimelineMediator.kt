@@ -18,9 +18,9 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.paging.mediator
+package com.twidere.twiderex.paging.mediator.timeline
 
-import com.twidere.services.microblog.NotificationService
+import com.twidere.services.microblog.TimelineService
 import com.twidere.services.microblog.model.IStatus
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.db.model.DbPagingTimelineWithStatus
@@ -29,8 +29,8 @@ import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.paging.mediator.paging.PagingWithGapMediator
 import com.twidere.twiderex.repository.NotificationRepository
 
-class NotificationTimelineMediator(
-    private val service: NotificationService,
+class MentionTimelineMediator(
+    private val service: TimelineService,
     private val notificationRepository: NotificationRepository,
     accountKey: MicroBlogKey,
     database: CacheDatabase,
@@ -39,7 +39,7 @@ class NotificationTimelineMediator(
         pageSize: Int,
         max_id: String?,
         since_id: String?
-    ) = service.notificationTimeline(count = pageSize, max_id = max_id, since_id = since_id)
+    ) = service.mentionsTimeline(pageSize, max_id = max_id, since_id = since_id)
 
     override suspend fun transform(
         data: List<DbPagingTimelineWithStatus>,
@@ -48,7 +48,7 @@ class NotificationTimelineMediator(
         if (data.any()) {
             notificationRepository.addCursorIfNeeded(
                 accountKey,
-                NotificationCursorType.General,
+                NotificationCursorType.Mentions,
                 data.first().status.status.data.statusId,
                 data.first().status.status.data.timestamp,
             )
@@ -56,5 +56,5 @@ class NotificationTimelineMediator(
         return super.transform(data, list)
     }
 
-    override val pagingKey: String = "notification:$accountKey"
+    override val pagingKey: String = "mentions:$accountKey"
 }

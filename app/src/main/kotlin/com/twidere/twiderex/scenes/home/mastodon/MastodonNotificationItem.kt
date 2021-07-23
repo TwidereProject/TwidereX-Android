@@ -18,7 +18,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.scenes.home
+package com.twidere.twiderex.scenes.home.mastodon
 
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
@@ -39,6 +39,9 @@ import com.twidere.twiderex.component.foundation.TextTabsComponent
 import com.twidere.twiderex.component.foundation.rememberPagerState
 import com.twidere.twiderex.component.lazy.LazyListController
 import com.twidere.twiderex.navigation.RootRoute
+import com.twidere.twiderex.scenes.home.AllNotificationItem
+import com.twidere.twiderex.scenes.home.HomeNavigationItem
+import com.twidere.twiderex.scenes.home.MentionItem
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.TwidereScene
 import kotlinx.coroutines.launch

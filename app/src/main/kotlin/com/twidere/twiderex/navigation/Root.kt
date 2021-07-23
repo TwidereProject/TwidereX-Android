@@ -97,6 +97,8 @@ interface Root {
     interface Mastodon {
         fun Hashtag(keyword: String): String
         val Notification: String
+        val FederatedTimeline: String
+        val LocalTimeline: String
 
         interface Compose {
             val Hashtag: String
