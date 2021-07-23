@@ -291,8 +291,9 @@ fun Account.toDbUser(
     return DbUser(
         _id = UUID.randomUUID().toString(),
         userId = this.id ?: throw IllegalArgumentException("mastodon user.id should not be null"),
-        name = displayName
-            ?: throw IllegalArgumentException("mastodon user.displayName should not be null"),
+        name = displayName?.let {
+            generateHtmlContentWithEmoji(it, emojis ?: emptyList())
+        } ?: throw IllegalArgumentException("mastodon user.displayName should not be null"),
         screenName = username
             ?: throw IllegalArgumentException("mastodon user.username should not be null"),
         userKey = MicroBlogKey(
