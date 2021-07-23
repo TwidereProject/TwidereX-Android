@@ -281,7 +281,7 @@ private fun ComposeBody(
                                 contentDescription = stringResource(
                                     id = if (enableThreadMode) R.string.accessibility_scene_compose_thread else R.string.accessibility_scene_compose_send
                                 ),
-                                tint = if (textFieldValue.text.isNotEmpty()) MaterialTheme.colors.primary else LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
+                                tint = if (canSend) MaterialTheme.colors.primary else LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
                             )
                         }
                     }
