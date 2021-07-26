@@ -21,7 +21,7 @@ object Versions {
     const val retrofit2 = "2.9.0"
     const val hson = "0.1.4"
     const val compose = "1.0.0-rc02"
-    const val constraintLayout = "1.0.0-alpha07"
+    const val constraintLayout = "1.0.0-beta01"
     const val paging = "3.1.0-alpha03"
     const val paging_compose = "1.0.0-alpha12"
     const val activity = "1.3.0-rc02"
