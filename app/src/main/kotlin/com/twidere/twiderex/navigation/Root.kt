@@ -42,7 +42,7 @@ interface Root {
         fun Twitter(consumerKey: String, consumerSecret: String): String
         val Mastodon: String
         interface Web {
-            fun Twitter(url: String): String
+            fun Twitter(target: String): String
         }
     }
     fun User(userKey: MicroBlogKey): String
