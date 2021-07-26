@@ -21,12 +21,12 @@
 package com.twidere.twiderex.scenes.home.mastodon
 
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.List
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import com.twidere.services.mastodon.MastodonService
+import com.twidere.twiderex.R
 import com.twidere.twiderex.component.TimelineComponent
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
@@ -42,7 +42,7 @@ import com.twidere.twiderex.viewmodel.timeline.mastodon.LocalTimelineViewModel
 class LocalTimelineItem : HomeNavigationItem() {
     @Composable
     override fun name(): String {
-        return "Local"
+        return stringResource(id = R.string.scene_local_title)
     }
 
     override val route: String
@@ -50,7 +50,7 @@ class LocalTimelineItem : HomeNavigationItem() {
 
     @Composable
     override fun icon(): Painter {
-        return rememberVectorPainter(Icons.Default.List)
+        return painterResource(id = R.drawable.ic_users)
     }
 
     @Composable

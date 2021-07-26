@@ -60,13 +60,13 @@ enum class HomeMenus(
         showDefault = false,
         supportedPlatformType = listOf(PlatformType.Twitter),
     ),
-    FederatedTimeline(
-        item = FederatedTimelineItem(),
+    LocalTimeline(
+        item = LocalTimelineItem(),
         showDefault = false,
         supportedPlatformType = listOf(PlatformType.Mastodon),
     ),
-    LocalTimeline(
-        item = LocalTimelineItem(),
+    FederatedTimeline(
+        item = FederatedTimelineItem(),
         showDefault = false,
         supportedPlatformType = listOf(PlatformType.Mastodon),
     ),
