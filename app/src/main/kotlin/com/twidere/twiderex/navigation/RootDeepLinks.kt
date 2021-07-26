@@ -24,13 +24,17 @@ import com.twidere.route.processor.AppRoute
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.viewmodel.compose.ComposeType
 
+/**
+ * if deeplink has the same parameters with route in Root.kt,
+ * make it's name the same to route parameters in Root.kt too
+ */
 @AppRoute(
     prefix = "$twidereXSchema://"
 )
 interface RootDeepLinks {
     interface Twitter {
         fun User(screenName: String): String
-        fun Status(id: String): String
+        fun Status(statusId: String): String
     }
 
     interface Mastodon {
@@ -42,7 +46,7 @@ interface RootDeepLinks {
     fun Search(keyword: String): String
     val SignIn: String
 
-    fun Draft(id: String): String
+    fun Draft(draftId: String): String
     fun Compose(composeType: ComposeType, statusKey: MicroBlogKey?): String
     fun Conversation(conversationKey: MicroBlogKey): String
 

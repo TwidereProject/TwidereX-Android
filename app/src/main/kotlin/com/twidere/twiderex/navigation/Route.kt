@@ -205,6 +205,9 @@ fun RequirePlatformAccount(
     }
 }
 
+/**
+ * Note: Path/Query key must be exactly the same as function's parameter's name in Root/RootDeepLinks
+ */
 fun RouteBuilder.route(constraints: Constraints) {
     authorizedScene(
         RootRouteDefinition.Home,
