@@ -277,10 +277,10 @@ fun RouteBuilder.route(constraints: Constraints) {
     // }
 
     authorizedScene(
-        RootRouteDefinition.DeepLink.Twitter.User,
+        RootDeepLinksRouteDefinition.Twitter.User,
         deepLinks = twitterHosts.map {
             "$it/{screenName}"
-        } + RootDeepLinksRouteDefinition.Twitter.User
+        }
     ) { backStackEntry ->
         backStackEntry.path<String>("screenName")?.let { screenName ->
             val navigator = LocalNavigator.current
@@ -342,12 +342,10 @@ fun RouteBuilder.route(constraints: Constraints) {
     }
 
     authorizedScene(
-        RootRouteDefinition.DeepLink.Twitter.Status,
+        RootDeepLinksRouteDefinition.Twitter.Status,
         deepLinks = twitterHosts.map {
             "$it/{screenName}/status/{statusId:[0-9]+}"
-        } + listOf(
-            RootDeepLinksRouteDefinition.Twitter.Status
-        )
+        }
     ) { backStackEntry ->
         backStackEntry.path<String>("statusId")?.let { statusId ->
             val navigator = LocalNavigator.current
