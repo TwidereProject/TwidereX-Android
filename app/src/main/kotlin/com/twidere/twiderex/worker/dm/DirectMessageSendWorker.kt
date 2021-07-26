@@ -20,14 +20,10 @@
  */
 package com.twidere.twiderex.worker.dm
 
-import android.app.PendingIntent
 import android.content.ContentResolver
 import android.content.Context
-import android.content.Intent
 import android.graphics.BitmapFactory
 import android.net.Uri
-import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
 import androidx.room.withTransaction
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
@@ -45,6 +41,8 @@ import com.twidere.twiderex.model.MediaType
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.toDirectMessageSendData
 import com.twidere.twiderex.navigation.RootRoute
+import com.twidere.twiderex.notification.AppNotification
+import com.twidere.twiderex.notification.AppNotificationManager
 import com.twidere.twiderex.notification.NotificationChannelSpec
 import com.twidere.twiderex.notification.notificationChannelId
 import com.twidere.twiderex.repository.AccountRepository
@@ -56,7 +54,7 @@ abstract class DirectMessageSendWorker<T : MicroBlogService>(
     protected val cacheDatabase: CacheDatabase,
     protected val contentResolver: ContentResolver,
     private val accountRepository: AccountRepository,
-    private val notificationManagerCompat: NotificationManagerCompat,
+    private val notificationManager: AppNotificationManager,
 ) : CoroutineWorker(
     context,
     workerParams
@@ -100,34 +98,16 @@ abstract class DirectMessageSendWorker<T : MicroBlogService>(
                 cacheDatabase.directMessageDao()
                     .insertAll(listOf(draftEvent.message.copy(sendStatus = DbDMEvent.SendStatus.FAILED)))
             }
-            val intent =
-                Intent(Intent.ACTION_VIEW, Uri.parse(RootRoute.DeepLink.Conversation(sendData.conversationKey)))
-            val pendingIntent =
-                PendingIntent.getActivity(
-                    applicationContext,
-                    0,
-                    intent,
-                    PendingIntent.FLAG_MUTABLE
-                )
-            val builder = NotificationCompat
+            val builder = AppNotification
                 .Builder(
-                    applicationContext,
                     accountDetails.accountKey.notificationChannelId(
                         NotificationChannelSpec.ContentMessages.id
                     )
                 )
-                .setContentTitle(applicationContext.getString(R.string.common_alerts_failed_to_send_message_title))
-                .setSmallIcon(R.drawable.ic_notification)
-                .setCategory(NotificationCompat.CATEGORY_SOCIAL)
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                .setOngoing(false)
-                .setProgress(0, 0, false)
-                .setSilent(false)
-                .setAutoCancel(true)
                 .setContentTitle(applicationContext.getString(R.string.common_alerts_failed_to_send_message_message))
                 .setContentText(sendData.text)
-                .setContentIntent(pendingIntent)
-            notificationManagerCompat.notify(notificationId, builder.build())
+                .setDeepLink(RootRoute.DeepLink.Conversation(sendData.conversationKey))
+            notificationManager.notify(notificationId, builder.build())
             Result.failure()
         }
     }

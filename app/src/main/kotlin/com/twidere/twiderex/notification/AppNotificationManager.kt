@@ -31,27 +31,32 @@ interface AppNotificationManager {
 
 open class AppNotification(
     val channelId: String,
-    val title: String,
+    val title: CharSequence? = null,
     val content: CharSequence? = null,
     val largeIcon: Bitmap? = null,
     val deepLink: String? = null,
-    val onGoing: Boolean = false,
+    val ongoing: Boolean = false,
     val progress: Int = 0,
     val progressMax: Int = 0,
     val progressIndeterminate: Boolean = false,
     val silent: Boolean = false,
 ) {
-    class Builder(private var channelId: String, private var title: String) {
+    class Builder(private var channelId: String) {
+        private var title: CharSequence? = null
         private var content: CharSequence? = null
         private var largeIcon: Bitmap? = null
         private var deepLink: String? = null
-        private var onGoing: Boolean = false
+        private var ongoing: Boolean = false
         private var progress: Int = 0
         private var progressMax: Int = 0
         private var progressIndeterminate: Boolean = false
         private var silent: Boolean = false
 
-        fun setContent(content: CharSequence) = this.apply {
+        fun setContentTitle(title: CharSequence?) = this.apply {
+            this.title = title
+        }
+
+        fun setContentText(content: CharSequence?) = this.apply {
             this.content = content
         }
 
@@ -63,8 +68,8 @@ open class AppNotification(
             this.deepLink = deepLink
         }
 
-        fun setOnGoing(onGoing: Boolean) = this.apply {
-            this.onGoing = onGoing
+        fun setOngoing(ongoing: Boolean) = this.apply {
+            this.ongoing = ongoing
         }
 
         fun setSilent(silent: Boolean) = this.apply {
@@ -83,7 +88,7 @@ open class AppNotification(
             content = content,
             largeIcon = largeIcon,
             deepLink = deepLink,
-            onGoing = onGoing,
+            ongoing = ongoing,
             progress = progress,
             progressMax = progressMax,
             progressIndeterminate = progressIndeterminate,

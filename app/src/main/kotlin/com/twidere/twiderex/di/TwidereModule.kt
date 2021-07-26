@@ -30,6 +30,7 @@ import com.twidere.twiderex.action.DirectMessageAction
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.http.TwidereServiceFactory
 import com.twidere.twiderex.model.AccountPreferences
+import com.twidere.twiderex.notification.AppNotificationManager
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.notification.android.AndroidNotificationManager
 import com.twidere.twiderex.preferences.proto.MiscPreferences
@@ -80,7 +81,7 @@ object TwidereModule {
         AccountPreferences.Factory(context)
 
     @Provides
-    fun provideAppNotificationManager(@ApplicationContext context: Context, notificationManagerCompat: NotificationManagerCompat) = AndroidNotificationManager(
+    fun provideAppNotificationManager(@ApplicationContext context: Context, notificationManagerCompat: NotificationManagerCompat): AppNotificationManager = AndroidNotificationManager(
         context = context,
         notificationManagerCompat = notificationManagerCompat
     )

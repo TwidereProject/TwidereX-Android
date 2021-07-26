@@ -50,7 +50,7 @@ class AndroidNotificationManager(
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setAutoCancel(true)
             .setContentTitle(appNotification.title)
-            .setOngoing(appNotification.onGoing)
+            .setOngoing(appNotification.ongoing)
             .setSilent(appNotification.silent)
             .setProgress(appNotification.progressMax, appNotification.progress, appNotification.progressIndeterminate)
         appNotification.content?.let {
@@ -84,6 +84,7 @@ class AndroidNotificationManager(
         duration: Long,
         durationTimeUnit: TimeUnit
     ) {
+        notify(notificationId, appNotification)
         scope.launch {
             delay(durationTimeUnit.toMillis(duration))
             notificationManagerCompat.cancel(notificationId)

@@ -23,7 +23,6 @@ package com.twidere.twiderex.worker.dm
 import android.content.ContentResolver
 import android.content.Context
 import android.net.Uri
-import androidx.core.app.NotificationManagerCompat
 import androidx.hilt.work.HiltWorker
 import androidx.work.Data
 import androidx.work.OneTimeWorkRequestBuilder
@@ -39,6 +38,7 @@ import com.twidere.twiderex.db.model.DbUser
 import com.twidere.twiderex.model.DirectMessageSendData
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.toWorkData
+import com.twidere.twiderex.notification.AppNotificationManager
 import com.twidere.twiderex.repository.AccountRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -48,7 +48,7 @@ class TwitterDirectMessageSendWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted workerParams: WorkerParameters,
     accountRepository: AccountRepository,
-    notificationManagerCompat: NotificationManagerCompat,
+    notificationManager: AppNotificationManager,
     contentResolver: ContentResolver,
     cacheDatabase: CacheDatabase,
 ) : DirectMessageSendWorker<TwitterService>(
@@ -57,7 +57,7 @@ class TwitterDirectMessageSendWorker @AssistedInject constructor(
     cacheDatabase,
     contentResolver,
     accountRepository,
-    notificationManagerCompat
+    notificationManager
 ) {
     companion object {
         fun create(
