@@ -18,35 +18,34 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.viewmodel.timeline
+package com.twidere.twiderex.viewmodel.timeline.mastodon
 
 import android.content.SharedPreferences
-import com.twidere.services.microblog.NotificationService
+import com.twidere.services.mastodon.MastodonService
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.model.AccountDetails
-import com.twidere.twiderex.paging.mediator.paging.PagingWithGapMediator
-import com.twidere.twiderex.paging.mediator.timeline.NotificationTimelineMediator
-import com.twidere.twiderex.repository.NotificationRepository
+import com.twidere.twiderex.paging.mediator.timeline.mastodon.LocalTimelineMediator
+import com.twidere.twiderex.viewmodel.timeline.TimelineViewModel
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 
-class NotificationTimelineViewModel @AssistedInject constructor(
+class LocalTimelineViewModel @AssistedInject constructor(
     preferences: SharedPreferences,
     database: CacheDatabase,
-    notificationRepository: NotificationRepository,
-    @Assisted private val account: AccountDetails
+    @Assisted account: AccountDetails,
 ) : TimelineViewModel(preferences) {
     @dagger.assisted.AssistedFactory
     interface AssistedFactory {
-        fun create(account: AccountDetails): NotificationTimelineViewModel
+        fun create(account: AccountDetails): LocalTimelineViewModel
     }
 
-    override val pagingMediator: PagingWithGapMediator =
-        NotificationTimelineMediator(
-            service = account.service as NotificationService,
-            accountKey = account.accountKey,
-            database = database,
-            notificationRepository = notificationRepository,
+    override val pagingMediator by lazy {
+        LocalTimelineMediator(
+            account.service as MastodonService,
+            account.accountKey,
+            database,
         )
-    override val savedStateKey: String = "${account.accountKey}_notification"
+    }
+
+    override val savedStateKey = "${account.accountKey}_local"
 }

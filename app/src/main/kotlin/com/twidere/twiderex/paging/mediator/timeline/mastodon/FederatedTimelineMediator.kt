@@ -18,28 +18,19 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.paging.mediator
+package com.twidere.twiderex.paging.mediator.timeline.mastodon
 
 import com.twidere.services.mastodon.MastodonService
-import com.twidere.services.microblog.model.IStatus
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.paging.SinceMaxPagination
-import com.twidere.twiderex.paging.mediator.paging.MaxIdPagingMediator
+import com.twidere.twiderex.paging.mediator.paging.PagingWithGapMediator
 
-class MastodonHashtagTimelineMediator(
-    private val keyword: String,
+class FederatedTimelineMediator(
     private val service: MastodonService,
     accountKey: MicroBlogKey,
     database: CacheDatabase,
-) : MaxIdPagingMediator(accountKey, database) {
-    override suspend fun load(pageSize: Int, paging: SinceMaxPagination?): List<IStatus> {
-        return service.hashtagTimeline(
-            query = keyword,
-            count = pageSize,
-            max_id = paging?.maxId,
-        )
-    }
-
-    override val pagingKey = "timeline:hashtag:$keyword"
+) : PagingWithGapMediator(accountKey, database) {
+    override val pagingKey: String = "federated:$accountKey"
+    override suspend fun loadBetweenImpl(pageSize: Int, max_id: String?, since_id: String?) =
+        service.federatedTimeline(pageSize, max_id = max_id, since_id = since_id)
 }
