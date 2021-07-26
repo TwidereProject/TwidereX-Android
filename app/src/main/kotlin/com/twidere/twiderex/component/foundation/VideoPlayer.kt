@@ -75,6 +75,7 @@ fun VideoPlayer(
     customControl: PlayerControlView? = null,
     showControls: Boolean = customControl == null,
     zOrderMediaOverlay: Boolean = false,
+    keepScreenOn: Boolean = false,
     thumb: @Composable (() -> Unit)? = null,
 ) {
     var playing by remember { mutableStateOf(false) }
@@ -182,6 +183,7 @@ fun VideoPlayer(
                     StyledPlayerView(context).also { playerView ->
                         (playerView.videoSurfaceView as? SurfaceView)?.setZOrderMediaOverlay(zOrderMediaOverlay)
                         playerView.useController = showControls
+                        playerView.keepScreenOn = keepScreenOn
                     }
                 }
             ) {

@@ -48,7 +48,7 @@ import com.twidere.twiderex.component.status.UserName
 import com.twidere.twiderex.component.status.UserScreenName
 import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.extensions.observeAsState
-import com.twidere.twiderex.navigation.Route
+import com.twidere.twiderex.navigation.RootRoute
 import com.twidere.twiderex.ui.LocalActiveAccountViewModel
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
@@ -111,7 +111,7 @@ fun NotificationScene() {
                         ListItem(
                             modifier = Modifier.clickable(
                                 onClick = {
-                                    navController.navigate(Route.Settings.AccountNotification(it.accountKey))
+                                    navController.navigate(RootRoute.Settings.AccountNotification(it.accountKey))
                                 },
                                 enabled = notificationEnabled,
                             ),

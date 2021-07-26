@@ -25,7 +25,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.twidere.twiderex.R
-import com.twidere.twiderex.navigation.Route
+import com.twidere.twiderex.navigation.RootRoute
 import com.twidere.twiderex.scenes.dm.DMConversationListSceneContent
 import com.twidere.twiderex.scenes.dm.DMConversationListSceneFab
 
@@ -36,7 +36,7 @@ class DMConversationListItem : HomeNavigationItem() {
     }
 
     override val route: String
-        get() = Route.Messages.Home
+        get() = RootRoute.Messages.Home
 
     @Composable
     override fun icon(): Painter {

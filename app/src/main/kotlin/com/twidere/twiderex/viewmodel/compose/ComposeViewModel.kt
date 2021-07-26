@@ -59,10 +59,10 @@ import com.twitter.twittertext.Extractor
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.zip
 import java.util.UUID
 
 enum class ComposeType {
@@ -273,9 +273,9 @@ open class ComposeViewModel @AssistedInject constructor(
     val contentWarningTextFieldValue = MutableStateFlow(TextFieldValue())
     val textFieldValue = MutableStateFlow(TextFieldValue())
     val images = MutableStateFlow<List<Uri>>(emptyList())
-    val canSend = textFieldValue.zip(images) { text, imgs -> text.text.isNotEmpty() || !imgs.isNullOrEmpty() }
+    val canSend = textFieldValue.combine(images) { text, imgs -> text.text.isNotEmpty() || !imgs.isNullOrEmpty() }
     val canSaveDraft =
-        textFieldValue.zip(images) { text, imgs -> text.text.isNotEmpty() || !imgs.isNullOrEmpty() }
+        textFieldValue.combine(images) { text, imgs -> text.text.isNotEmpty() || !imgs.isNullOrEmpty() }
     val locationEnabled = MutableStateFlow(false)
     val enableThreadMode = MutableStateFlow(composeType == ComposeType.Thread)
     val status = flow {

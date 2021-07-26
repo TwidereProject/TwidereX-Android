@@ -445,7 +445,8 @@ fun MediaView(
                             url = data.url,
                             customControl = customControl,
                             showControls = false,
-                            zOrderMediaOverlay = true
+                            zOrderMediaOverlay = true,
+                            keepScreenOn = true
                         )
                     }
                 MediaType.other -> Unit

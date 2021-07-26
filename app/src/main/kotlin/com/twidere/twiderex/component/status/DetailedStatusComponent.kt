@@ -45,7 +45,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.FormattedTime
@@ -107,10 +106,12 @@ fun DetailedStatusComponent(
                         ) {
                             FormattedTime(time = status.timestamp)
                             Spacer(modifier = Modifier.width(DetailedStatusDefaults.TimestampSpacing))
-                            Text(
-                                text = status.source,
+                            HtmlText(
+                                htmlText = status.source,
                                 maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
+                                linkResolver = {
+                                    ResolvedLink(null)
+                                }
                             )
                         }
 

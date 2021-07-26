@@ -128,7 +128,7 @@ import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.ui.UiEmoji
-import com.twidere.twiderex.navigation.Route
+import com.twidere.twiderex.navigation.RootRoute
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.Orange
@@ -281,7 +281,7 @@ private fun ComposeBody(
                                 contentDescription = stringResource(
                                     id = if (enableThreadMode) R.string.accessibility_scene_compose_thread else R.string.accessibility_scene_compose_send
                                 ),
-                                tint = if (textFieldValue.text.isNotEmpty()) MaterialTheme.colors.primary else LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
+                                tint = if (canSend) MaterialTheme.colors.primary else LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
                             )
                         }
                     }
@@ -1219,7 +1219,7 @@ private fun ComposeActions(
                 IconButton(
                     onClick = {
                         scope.launch {
-                            val result = navController.navigateForResult(Route.Compose.Search.User)
+                            val result = navController.navigateForResult(RootRoute.Compose.Search.User)
                                 ?.toString()
                             if (!result.isNullOrEmpty()) {
                                 viewModel.insertText("$result ")
@@ -1240,7 +1240,7 @@ private fun ComposeActions(
                     onClick = {
                         scope.launch {
                             val result =
-                                navController.navigateForResult(Route.Mastodon.Compose.Hashtag)
+                                navController.navigateForResult(RootRoute.Mastodon.Compose.Hashtag)
                                     ?.toString()
                             if (!result.isNullOrEmpty()) {
                                 viewModel.insertText("$result ")
@@ -1295,7 +1295,7 @@ private fun ComposeActions(
             if (draftCount.value > 0) {
                 IconButton(
                     onClick = {
-                        navController.navigate(Route.Draft.List)
+                        navController.navigate(RootRoute.Draft.List)
                     }
                 ) {
                     Box {
