@@ -22,6 +22,7 @@ package com.twidere.twiderex.navigation
 
 import com.twidere.route.processor.AppRoute
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.viewmodel.compose.ComposeType
 
 @AppRoute(
     prefix = "$twidereXSchema://"
@@ -41,9 +42,9 @@ interface RootDeepLinks {
     fun Search(keyword: String): String
     val SignIn: String
 
-    val Draft: String
-    val Compose: String
-    val Conversation: String
+    fun Draft(id: String): String
+    fun Compose(composeType: ComposeType, statusKey: MicroBlogKey?): String
+    fun Conversation(conversationKey: MicroBlogKey): String
 
     interface Callback {
         interface SignIn {

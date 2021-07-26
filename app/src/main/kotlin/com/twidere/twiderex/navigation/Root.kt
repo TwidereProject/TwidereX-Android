@@ -82,16 +82,6 @@ interface Root {
         fun AccountNotification(accountKey: MicroBlogKey): String
     }
 
-    interface DeepLink {
-        interface Twitter {
-            val User: String
-            val Status: String
-        }
-        fun Draft(id: String): String
-        fun Compose(composeType: ComposeType, statusKey: MicroBlogKey?): String
-        fun Conversation(conversationKey: MicroBlogKey): String
-    }
-
     fun Status(statusKey: MicroBlogKey): String
 
     interface Mastodon {

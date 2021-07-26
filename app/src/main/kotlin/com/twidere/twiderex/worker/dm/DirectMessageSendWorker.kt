@@ -44,7 +44,7 @@ import com.twidere.twiderex.model.DirectMessageSendData
 import com.twidere.twiderex.model.MediaType
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.toDirectMessageSendData
-import com.twidere.twiderex.navigation.RootRoute
+import com.twidere.twiderex.navigation.RootDeepLinksRoute
 import com.twidere.twiderex.notification.NotificationChannelSpec
 import com.twidere.twiderex.notification.notificationChannelId
 import com.twidere.twiderex.repository.AccountRepository
@@ -101,7 +101,7 @@ abstract class DirectMessageSendWorker<T : MicroBlogService>(
                     .insertAll(listOf(draftEvent.message.copy(sendStatus = DbDMEvent.SendStatus.FAILED)))
             }
             val intent =
-                Intent(Intent.ACTION_VIEW, Uri.parse(RootRoute.DeepLink.Conversation(sendData.conversationKey)))
+                Intent(Intent.ACTION_VIEW, Uri.parse(RootDeepLinksRoute.Conversation(sendData.conversationKey)))
             val pendingIntent =
                 PendingIntent.getActivity(
                     applicationContext,
