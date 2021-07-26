@@ -188,6 +188,7 @@
     <string name="scene_lists_modify_name">Name</string>
     <string name="scene_lists_modify_create_title">New List</string>
     <string name="scene_lists_modify_description">Description</string>
+    <string name="scene_local_title">Local</string>
     <string name="scene_lists_users_add_search">Search people</string>
     <string name="scene_lists_users_add_title">Add Member</string>
     <string name="scene_lists_users_menu_actions_add">Add</string>
@@ -205,6 +206,7 @@
     <string name="scene_search_title">Search</string>
     <string name="scene_search_show_more">Show more</string>
     <string name="scene_search_saved_search">Saved Search</string>
+    <string name="scene_federated_title">Federated</string>
     <string name="scene_lists_details_no_members_found">No Members Found.</string>
     <string name="scene_lists_details_tabs_subscriber">Subscribers</string>
     <string name="scene_lists_details_tabs_members">List Members</string>

@@ -40,7 +40,7 @@ import com.twidere.twiderex.model.DirectMessageSendData
 import com.twidere.twiderex.model.MediaType
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.toDirectMessageSendData
-import com.twidere.twiderex.navigation.RootRoute
+import com.twidere.twiderex.navigation.RootDeepLinksRoute
 import com.twidere.twiderex.notification.AppNotification
 import com.twidere.twiderex.notification.AppNotificationManager
 import com.twidere.twiderex.notification.NotificationChannelSpec
@@ -106,7 +106,7 @@ abstract class DirectMessageSendWorker<T : MicroBlogService>(
                 )
                 .setContentTitle(applicationContext.getString(R.string.common_alerts_failed_to_send_message_message))
                 .setContentText(sendData.text)
-                .setDeepLink(RootRoute.DeepLink.Conversation(sendData.conversationKey))
+                .setDeepLink(RootDeepLinksRoute.Conversation(sendData.conversationKey))
             notificationManager.notify(notificationId, builder.build())
             Result.failure()
         }

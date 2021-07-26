@@ -30,7 +30,7 @@ import com.twidere.services.microblog.LookupService
 import com.twidere.twiderex.R
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.ui.UiDMConversationWithLatestMessage
-import com.twidere.twiderex.navigation.RootRoute
+import com.twidere.twiderex.navigation.RootDeepLinksRoute
 import com.twidere.twiderex.notification.AppNotification
 import com.twidere.twiderex.notification.AppNotificationManager
 import com.twidere.twiderex.notification.NotificationChannelSpec
@@ -89,7 +89,7 @@ class DirectMessageFetchWorker @AssistedInject constructor(
             )
             .setContentTitle(applicationContext.getString(R.string.common_notification_messages_title))
             .setContentText(applicationContext.getString(R.string.common_notification_messages_content, message.latestMessage.sender.displayName))
-            .setDeepLink(RootRoute.DeepLink.Conversation(message.conversation.conversationKey))
+            .setDeepLink(RootDeepLinksRoute.Conversation(message.conversation.conversationKey))
         notificationManager.notify(message.latestMessage.messageKey.hashCode(), builder.build())
     }
 }

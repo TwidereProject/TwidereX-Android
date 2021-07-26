@@ -391,4 +391,31 @@ class MastodonService(
     }
 
     override suspend fun trends(locationId: String, limit: Int?) = resources.trends(limit)
+
+    suspend fun localTimeline(
+        count: Int,
+        since_id: String?,
+        max_id: String?
+    ): List<IStatus> {
+        return resources.publicTimeline(
+            since_id = since_id,
+            max_id = max_id,
+            limit = count,
+            local = true
+        )
+    }
+
+    suspend fun federatedTimeline(
+        count: Int,
+        since_id: String?,
+        max_id: String?
+    ): List<IStatus> {
+        return resources.publicTimeline(
+            since_id = since_id,
+            max_id = max_id,
+            limit = count,
+            local = false,
+            remote = false,
+        )
+    }
 }

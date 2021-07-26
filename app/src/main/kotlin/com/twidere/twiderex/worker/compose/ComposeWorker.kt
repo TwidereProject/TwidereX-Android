@@ -31,7 +31,7 @@ import com.twidere.twiderex.model.ComposeData
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.toComposeData
 import com.twidere.twiderex.model.ui.UiStatus
-import com.twidere.twiderex.navigation.RootRoute
+import com.twidere.twiderex.navigation.RootDeepLinksRoute
 import com.twidere.twiderex.notification.AppNotification
 import com.twidere.twiderex.notification.AppNotificationManager
 import com.twidere.twiderex.notification.NotificationChannelSpec
@@ -98,7 +98,7 @@ abstract class ComposeWorker<T : MicroBlogService>(
                 applicationContext.startActivity(
                     Intent(
                         Intent.ACTION_VIEW,
-                        Uri.parse(RootRoute.DeepLink.Compose(ComposeType.Thread, status.statusKey))
+                        Uri.parse(RootDeepLinksRoute.Compose(ComposeType.Thread, status.statusKey))
                     ).apply {
                         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                     }
@@ -112,7 +112,7 @@ abstract class ComposeWorker<T : MicroBlogService>(
                 .setSilent(false)
                 .setContentTitle(applicationContext.getString(R.string.common_alerts_tweet_fail_title))
                 .setContentText(composeData.content)
-                .setDeepLink(RootRoute.DeepLink.Draft(composeData.draftId))
+                .setDeepLink(RootDeepLinksRoute.Draft(composeData.draftId))
             notificationManager.notify(notificationId, builder.build())
             Result.failure()
         }

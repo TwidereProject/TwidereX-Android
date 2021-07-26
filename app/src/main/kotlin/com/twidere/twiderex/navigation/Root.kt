@@ -82,21 +82,13 @@ interface Root {
         fun AccountNotification(accountKey: MicroBlogKey): String
     }
 
-    interface DeepLink {
-        interface Twitter {
-            val User: String
-            val Status: String
-        }
-        fun Draft(id: String): String
-        fun Compose(composeType: ComposeType, statusKey: MicroBlogKey?): String
-        fun Conversation(conversationKey: MicroBlogKey): String
-    }
-
     fun Status(statusKey: MicroBlogKey): String
 
     interface Mastodon {
         fun Hashtag(keyword: String): String
         val Notification: String
+        val FederatedTimeline: String
+        val LocalTimeline: String
 
         interface Compose {
             val Hashtag: String

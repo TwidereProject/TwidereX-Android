@@ -29,9 +29,9 @@ import com.twidere.twiderex.extensions.toUi
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiStatus
-import com.twidere.twiderex.paging.mediator.MastodonHashtagTimelineMediator
 import com.twidere.twiderex.paging.mediator.list.ListsTimelineMediator
 import com.twidere.twiderex.paging.mediator.paging.pager
+import com.twidere.twiderex.paging.mediator.timeline.MastodonHashtagTimelineMediator
 import com.twidere.twiderex.paging.mediator.user.UserFavouriteMediator
 import com.twidere.twiderex.paging.mediator.user.UserStatusMediator
 import kotlinx.coroutines.flow.Flow

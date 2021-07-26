@@ -18,32 +18,19 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.viewmodel.timeline
+package com.twidere.twiderex.paging.mediator.timeline.mastodon
 
-import android.content.SharedPreferences
-import com.twidere.services.microblog.TimelineService
+import com.twidere.services.mastodon.MastodonService
 import com.twidere.twiderex.db.CacheDatabase
-import com.twidere.twiderex.model.AccountDetails
+import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.paging.mediator.paging.PagingWithGapMediator
-import com.twidere.twiderex.paging.mediator.timeline.HomeTimelineMediator
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedInject
 
-class HomeTimelineViewModel @AssistedInject constructor(
-    preferences: SharedPreferences,
+class LocalTimelineMediator(
+    private val service: MastodonService,
+    accountKey: MicroBlogKey,
     database: CacheDatabase,
-    @Assisted account: AccountDetails,
-) : TimelineViewModel(preferences) {
-    @dagger.assisted.AssistedFactory
-    interface AssistedFactory {
-        fun create(account: AccountDetails): HomeTimelineViewModel
-    }
-
-    override val pagingMediator: PagingWithGapMediator =
-        HomeTimelineMediator(
-            account.service as TimelineService,
-            account.accountKey,
-            database,
-        )
-    override val savedStateKey: String = "${account.accountKey}_home"
+) : PagingWithGapMediator(accountKey, database) {
+    override val pagingKey: String = "local:$accountKey"
+    override suspend fun loadBetweenImpl(pageSize: Int, max_id: String?, since_id: String?) =
+        service.localTimeline(pageSize, max_id = max_id, since_id = since_id)
 }
