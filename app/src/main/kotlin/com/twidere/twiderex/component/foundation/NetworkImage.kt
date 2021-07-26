@@ -20,6 +20,7 @@
  */
 package com.twidere.twiderex.component.foundation
 
+import android.os.Build
 import androidx.compose.foundation.Image
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -32,6 +33,8 @@ import coil.annotation.ExperimentalCoilApi
 import coil.compose.ImagePainter
 import coil.compose.LocalImageLoader
 import coil.compose.rememberImagePainter
+import coil.decode.GifDecoder
+import coil.decode.ImageDecoderDecoder
 import coil.util.CoilUtils
 import com.twidere.twiderex.R
 import com.twidere.twiderex.http.TwidereNetworkImageLoader
@@ -75,20 +78,31 @@ fun NetworkImage(
 
 @Composable
 fun buildRealImageLoader(): ImageLoader {
+    val context = LocalContext.current
     val httpConfig = LocalHttpConfig.current
-    return if (httpConfig.proxyConfig.enable &&
-        httpConfig.proxyConfig.server.isNotEmpty()
-    ) {
-        LocalImageLoader.current
-            .newBuilder()
-            .callFactory(
-                TwidereServiceFactory.createHttpClientFactory()
-                    .createHttpClientBuilder()
-                    .cache(CoilUtils.createDefaultCache(LocalContext.current))
-                    .build()
-            )
-            .build()
-    } else {
-        LocalImageLoader.current
-    }
+    return (
+        if (httpConfig.proxyConfig.enable &&
+            httpConfig.proxyConfig.server.isNotEmpty()
+        ) {
+            LocalImageLoader.current
+                .newBuilder()
+                .callFactory(
+                    TwidereServiceFactory.createHttpClientFactory()
+                        .createHttpClientBuilder()
+                        .cache(CoilUtils.createDefaultCache(context))
+                        .build()
+                )
+                .build()
+        } else {
+            LocalImageLoader.current
+        }
+        ).newBuilder()
+        .componentRegistry {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                add(ImageDecoderDecoder(context))
+            } else {
+                add(GifDecoder())
+            }
+        }
+        .build()
 }

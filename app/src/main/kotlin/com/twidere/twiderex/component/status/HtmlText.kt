@@ -35,6 +35,7 @@ import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.consumeDownChange
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.AnnotatedString
@@ -43,10 +44,14 @@ import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.ExperimentalUnitApi
 import androidx.compose.ui.unit.TextUnit
-import androidx.compose.ui.unit.TextUnitType
 import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.navigation.LocalNavigator
 import kotlinx.coroutines.coroutineScope
@@ -72,6 +77,17 @@ fun HtmlText(
     modifier: Modifier = Modifier,
     htmlText: String,
     maxLines: Int = Int.MAX_VALUE,
+    color: Color = Color.Unspecified,
+    fontSize: TextUnit = TextUnit.Unspecified,
+    fontStyle: FontStyle? = null,
+    fontWeight: FontWeight? = null,
+    fontFamily: FontFamily? = null,
+    letterSpacing: TextUnit = TextUnit.Unspecified,
+    textDecoration: TextDecoration? = null,
+    textAlign: TextAlign? = null,
+    lineHeight: TextUnit = TextUnit.Unspecified,
+    overflow: TextOverflow = TextOverflow.Ellipsis,
+    softWrap: Boolean = true,
     textStyle: TextStyle = LocalTextStyle.current.copy(color = LocalContentColor.current.copy(alpha = LocalContentAlpha.current)),
     linkStyle: TextStyle = textStyle.copy(MaterialTheme.colors.primary),
     linkResolver: (href: String) -> ResolvedLink = { ResolvedLink(it) },
@@ -87,6 +103,17 @@ fun HtmlText(
         onLinkClicked = {
             navigator.openLink(it)
         },
+        color = color,
+        fontSize = fontSize,
+        fontStyle = fontStyle,
+        fontWeight = fontWeight,
+        fontFamily = fontFamily,
+        letterSpacing = letterSpacing,
+        textDecoration = textDecoration,
+        textAlign = textAlign,
+        lineHeight = lineHeight,
+        overflow = overflow,
+        softWrap = softWrap,
     )
 }
 
@@ -95,11 +122,22 @@ fun HtmlText(
 private fun RenderContent(
     modifier: Modifier = Modifier,
     htmlText: String,
-    maxLines: Int = Int.MAX_VALUE,
     textStyle: TextStyle,
     linkStyle: TextStyle,
     linkResolver: (href: String) -> ResolvedLink = { ResolvedLink(it) },
     onLinkClicked: (String) -> Unit = {},
+    maxLines: Int = Int.MAX_VALUE,
+    color: Color = Color.Unspecified,
+    fontSize: TextUnit = TextUnit.Unspecified,
+    fontStyle: FontStyle? = null,
+    fontWeight: FontWeight? = null,
+    fontFamily: FontFamily? = null,
+    letterSpacing: TextUnit = TextUnit.Unspecified,
+    textDecoration: TextDecoration? = null,
+    textAlign: TextAlign? = null,
+    lineHeight: TextUnit = TextUnit.Unspecified,
+    overflow: TextOverflow = TextOverflow.Clip,
+    softWrap: Boolean = true,
 ) {
     val value = renderContentAnnotatedString(
         htmlText = htmlText,
@@ -133,8 +171,18 @@ private fun RenderContent(
                     }
                 }
             },
-            overflow = TextOverflow.Ellipsis,
             maxLines = maxLines,
+            color = color,
+            fontSize = fontSize,
+            fontStyle = fontStyle,
+            fontWeight = fontWeight,
+            fontFamily = fontFamily,
+            letterSpacing = letterSpacing,
+            textDecoration = textDecoration,
+            textAlign = textAlign,
+            lineHeight = lineHeight,
+            overflow = overflow,
+            softWrap = softWrap,
             text = value,
             onTextLayout = {
                 layoutResult.value = it
@@ -161,7 +209,7 @@ private fun RenderContent(
 @Composable
 fun renderContentAnnotatedString(
     htmlText: String,
-    textStyle: TextStyle = MaterialTheme.typography.body1.copy(color = LocalContentColor.current.copy(alpha = LocalContentAlpha.current), letterSpacing = TextUnit(0.25f, TextUnitType.Sp)),
+    textStyle: TextStyle = LocalTextStyle.current.copy(color = LocalContentColor.current.copy(alpha = LocalContentAlpha.current)),
     linkStyle: TextStyle = textStyle.copy(MaterialTheme.colors.primary),
     linkResolver: (href: String) -> ResolvedLink,
 ): AnnotatedString {
