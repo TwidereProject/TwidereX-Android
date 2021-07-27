@@ -22,4 +22,4 @@ package com.twidere.twiderex.extensions
 
 import androidx.work.ListenableWorker
 
-internal fun Boolean.toWorkResult() = if (this) ListenableWorker.Result.success() else ListenableWorker.Result.success()
+internal fun Boolean.toWorkResult() = if (this) ListenableWorker.Result.success() else ListenableWorker.Result.failure()
