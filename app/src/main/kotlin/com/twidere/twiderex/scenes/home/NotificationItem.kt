@@ -20,7 +20,7 @@
  */
 package com.twidere.twiderex.scenes.home
 
-import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
@@ -28,31 +28,69 @@ import androidx.compose.ui.res.stringResource
 import com.twidere.services.microblog.NotificationService
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.TimelineComponent
+import com.twidere.twiderex.component.foundation.AppBar
+import com.twidere.twiderex.component.foundation.AppBarNavigationButton
+import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
+import com.twidere.twiderex.component.lazy.LazyListController
 import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.navigation.RootRoute
 import com.twidere.twiderex.ui.LocalActiveAccount
+import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.timeline.NotificationTimelineViewModel
 
 class NotificationItem : HomeNavigationItem() {
     @Composable
-    override fun name(): String = stringResource(R.string.scene_mentions_title)
+    override fun name(): String = stringResource(R.string.scene_notification_title)
+    override val route: String
+        get() = RootRoute.Notification
 
     @Composable
     override fun icon(): Painter = painterResource(id = R.drawable.ic_message_circle)
 
     @Composable
     override fun Content() {
-        val account = LocalActiveAccount.current ?: return
-        if (account.service !is NotificationService) {
-            return
-        }
-        val viewModel =
-            assistedViewModel<NotificationTimelineViewModel.AssistedFactory, NotificationTimelineViewModel>(
-                account
-            ) {
-                it.create(account)
+        NotificationContent(
+            lazyListController = lazyListController,
+        )
+    }
+}
+
+@Composable
+fun NotificationScene() {
+    TwidereScene {
+        InAppNotificationScaffold(
+            topBar = {
+                AppBar(
+                    title = {
+                        Text(text = stringResource(id = R.string.scene_mentions_title))
+                    },
+                    navigationIcon = {
+                        AppBarNavigationButton()
+                    }
+                )
             }
-        Scaffold {
-            TimelineComponent(viewModel = viewModel)
+        ) {
+            NotificationContent()
         }
     }
+}
+
+@Composable
+fun NotificationContent(
+    lazyListController: LazyListController? = null
+) {
+    val account = LocalActiveAccount.current ?: return
+    if (account.service !is NotificationService) {
+        return
+    }
+    val viewModel =
+        assistedViewModel<NotificationTimelineViewModel.AssistedFactory, NotificationTimelineViewModel>(
+            account
+        ) {
+            it.create(account)
+        }
+    TimelineComponent(
+        viewModel = viewModel,
+        lazyListController = lazyListController,
+    )
 }

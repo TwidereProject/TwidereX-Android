@@ -210,7 +210,7 @@ fun AppearanceScene() {
                         )
                     }
                 )
-                val isLightTheme = MaterialTheme.colors.isLight
+                val isLightTheme = appearance.theme == AppearancePreferences.Theme.Light
                 AnimatedVisibility(visible = !isLightTheme) {
                     switchItem(
                         value = appearance.isDarkModePureBlack,

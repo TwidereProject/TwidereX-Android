@@ -20,12 +20,12 @@
  */
 package com.twidere.twiderex.mock.db
 
-import androidx.lifecycle.LiveData
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.twidere.twiderex.db.dao.ListsDao
 import com.twidere.twiderex.db.model.DbList
 import com.twidere.twiderex.model.MicroBlogKey
+import kotlinx.coroutines.flow.Flow
 
 class MockListsDao : ListsDao {
     private val fakeDatabase = mutableListOf<DbList>()
@@ -41,10 +41,10 @@ class MockListsDao : ListsDao {
         }
     }
 
-    override fun findWithListKeyWithLiveData(
+    override fun findWithListKeyWithFlow(
         listKey: MicroBlogKey,
         accountKey: MicroBlogKey
-    ): LiveData<DbList?> {
+    ): Flow<DbList?> {
         TODO("Not yet implemented")
     }
 

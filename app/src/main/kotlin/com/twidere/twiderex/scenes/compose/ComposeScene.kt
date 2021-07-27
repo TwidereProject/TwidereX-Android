@@ -82,7 +82,6 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -122,13 +121,14 @@ import com.twidere.twiderex.component.status.UserName
 import com.twidere.twiderex.component.status.UserScreenName
 import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.extensions.icon
+import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.extensions.stringName
 import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.ui.UiEmoji
-import com.twidere.twiderex.navigation.Route
+import com.twidere.twiderex.navigation.RootRoute
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.Orange
@@ -157,7 +157,7 @@ fun DraftComposeScene(
         assistedViewModel<DraftItemViewModel.AssistedFactory, DraftItemViewModel> {
             it.create(draftId = draftId)
         }
-    val data by draftItemViewModel.draft.observeAsState()
+    val data by draftItemViewModel.draft.observeAsState(null)
     data?.let { draft ->
         val viewModel =
             assistedViewModel<DraftComposeViewModel.AssistedFactory, DraftComposeViewModel> {
@@ -193,9 +193,9 @@ private fun ComposeBody(
     account: AccountDetails,
 ) {
     val composeType = viewModel.composeType
-    val status by viewModel.status.observeAsState()
+    val status by viewModel.status.observeAsState(null)
     val images by viewModel.images.observeAsState(initial = emptyList())
-    val location by viewModel.location.observeAsState()
+    val location by viewModel.location.observeAsState(null)
     val locationEnabled by viewModel.locationEnabled.observeAsState(initial = false)
     val navController = LocalNavController.current
     val textFieldValue by viewModel.textFieldValue.observeAsState(initial = TextFieldValue())
@@ -281,7 +281,7 @@ private fun ComposeBody(
                                 contentDescription = stringResource(
                                     id = if (enableThreadMode) R.string.accessibility_scene_compose_thread else R.string.accessibility_scene_compose_send
                                 ),
-                                tint = if (textFieldValue.text.isNotEmpty()) MaterialTheme.colors.primary else LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
+                                tint = if (canSend) MaterialTheme.colors.primary else LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
                             )
                         }
                     }
@@ -1219,7 +1219,7 @@ private fun ComposeActions(
                 IconButton(
                     onClick = {
                         scope.launch {
-                            val result = navController.navigateForResult(Route.Compose.Search.User)
+                            val result = navController.navigateForResult(RootRoute.Compose.Search.User)
                                 ?.toString()
                             if (!result.isNullOrEmpty()) {
                                 viewModel.insertText("$result ")
@@ -1240,7 +1240,7 @@ private fun ComposeActions(
                     onClick = {
                         scope.launch {
                             val result =
-                                navController.navigateForResult(Route.Mastodon.Compose.Hashtag)
+                                navController.navigateForResult(RootRoute.Mastodon.Compose.Hashtag)
                                     ?.toString()
                             if (!result.isNullOrEmpty()) {
                                 viewModel.insertText("$result ")
@@ -1295,7 +1295,7 @@ private fun ComposeActions(
             if (draftCount.value > 0) {
                 IconButton(
                     onClick = {
-                        navController.navigate(Route.Draft.List)
+                        navController.navigate(RootRoute.Draft.List)
                     }
                 ) {
                     Box {

@@ -32,12 +32,10 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.remember
 import androidx.core.net.ConnectivityManagerCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.insets.ExperimentalAnimatedInsets
@@ -46,6 +44,7 @@ import com.twidere.twiderex.action.LocalStatusActions
 import com.twidere.twiderex.action.StatusActions
 import com.twidere.twiderex.component.foundation.LocalInAppNotification
 import com.twidere.twiderex.di.assisted.ProvideAssistedFactory
+import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.navigation.Router
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.preferences.PreferencesHolder
@@ -62,6 +61,7 @@ import com.twidere.twiderex.utils.LocalPlatformResolver
 import com.twidere.twiderex.utils.PlatformResolver
 import com.twidere.twiderex.viewmodel.ActiveAccountViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.MutableStateFlow
 import moe.tlaster.precompose.navigation.NavController
 import javax.inject.Inject
 
@@ -71,17 +71,15 @@ class TwidereXActivity : ComponentActivity() {
     private val navController by lazy {
         NavController()
     }
-    private val isActiveNetworkMetered = MutableLiveData(false)
+    private val isActiveNetworkMetered = MutableStateFlow(false)
     private val networkCallback by lazy {
         object : ConnectivityManager.NetworkCallback() {
             override fun onCapabilitiesChanged(
                 network: Network,
                 networkCapabilities: NetworkCapabilities
             ) {
-                isActiveNetworkMetered.postValue(
-                    ConnectivityManagerCompat.isActiveNetworkMetered(
-                        connectivityManager
-                    )
+                isActiveNetworkMetered.value = ConnectivityManagerCompat.isActiveNetworkMetered(
+                    connectivityManager
                 )
             }
         }
@@ -108,18 +106,17 @@ class TwidereXActivity : ComponentActivity() {
     @OptIn(ExperimentalAnimatedInsets::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        isActiveNetworkMetered.postValue(
-            ConnectivityManagerCompat.isActiveNetworkMetered(
-                connectivityManager
-            )
+        isActiveNetworkMetered.value = ConnectivityManagerCompat.isActiveNetworkMetered(
+            connectivityManager
         )
+
         WindowCompat.setDecorFitsSystemWindows(window, false)
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
         setContent {
             val windowInsetsControllerCompat =
                 remember { WindowInsetsControllerCompat(window, window.decorView) }
             val accountViewModel = viewModel<ActiveAccountViewModel>()
-            val account by accountViewModel.account.observeAsState()
+            val account by accountViewModel.account.observeAsState(null)
             val isActiveNetworkMetered by isActiveNetworkMetered.observeAsState(initial = false)
             CompositionLocalProvider(
                 LocalInAppNotification provides inAppNotification,

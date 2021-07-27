@@ -34,7 +34,7 @@ import com.twidere.twiderex.model.ComposeData
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.toComposeData
 import com.twidere.twiderex.model.ui.UiStatus
-import com.twidere.twiderex.navigation.Route
+import com.twidere.twiderex.navigation.RootDeepLinksRoute
 import com.twidere.twiderex.notification.NotificationChannelSpec
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.utils.ExifScrambler
@@ -103,7 +103,7 @@ abstract class ComposeWorker<T : MicroBlogService>(
                 applicationContext.startActivity(
                     Intent(
                         Intent.ACTION_VIEW,
-                        Uri.parse(Route.DeepLink.Compose(ComposeType.Thread, status.statusKey))
+                        Uri.parse(RootDeepLinksRoute.Compose(ComposeType.Thread, status.statusKey))
                     ).apply {
                         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                     }
@@ -113,7 +113,7 @@ abstract class ComposeWorker<T : MicroBlogService>(
         } catch (e: Throwable) {
             e.printStackTrace()
             val intent =
-                Intent(Intent.ACTION_VIEW, Uri.parse(Route.DeepLink.Draft(composeData.draftId)))
+                Intent(Intent.ACTION_VIEW, Uri.parse(RootDeepLinksRoute.Draft(composeData.draftId)))
             val pendingIntent =
                 PendingIntent.getActivity(
                     applicationContext,

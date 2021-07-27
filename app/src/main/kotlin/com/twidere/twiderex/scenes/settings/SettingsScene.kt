@@ -38,7 +38,7 @@ import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
-import com.twidere.twiderex.navigation.Route
+import com.twidere.twiderex.navigation.RootRoute
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
 
@@ -57,45 +57,39 @@ fun SettingsScene() {
                 SettingItem(
                     stringResource(id = R.string.scene_settings_appearance_title),
                     painterResource(id = R.drawable.ic_shirt),
-                    route = Route.Settings.Appearance,
+                    route = RootRoute.Settings.Appearance,
                 ),
                 SettingItem(
                     stringResource(id = R.string.scene_settings_display_title),
                     painterResource(id = R.drawable.ic_template),
-                    route = Route.Settings.Display,
+                    route = RootRoute.Settings.Display,
+                ),
+                SettingItem(
+                    stringResource(id = R.string.scene_settings_layout_title),
+                    painterResource(id = R.drawable.ic_layout_sidebar),
+                    route = RootRoute.Settings.Layout,
                 ),
                 SettingItem(
                     stringResource(id = R.string.scene_settings_notification_title),
                     painterResource(id = R.drawable.ic_settings_notification),
-                    route = Route.Settings.Notification,
+                    route = RootRoute.Settings.Notification,
                 ),
                 SettingItem(
                     stringResource(id = R.string.scene_settings_storage_title),
                     painterResource(id = R.drawable.ic_database),
-                    route = Route.Settings.Storage,
+                    route = RootRoute.Settings.Storage,
                 ),
                 SettingItem(
                     stringResource(id = R.string.scene_settings_misc_title),
                     painterResource(id = R.drawable.ic_triangle_square_circle),
-                    route = Route.Settings.Misc,
+                    route = RootRoute.Settings.Misc,
                 ),
-                // TODO
-//                SettingItem(
-//                    "Layout",
-//                    painterResource(id = R.drawable.ic_layout_sidebar),
-//                    route = "",
-//                ),
-//                SettingItem(
-//                    "Web Browser",
-//                    painterResource(id = R.drawable.ic_browser),
-//                    route = "",
-//                ),
             ),
             stringResource(id = R.string.scene_settings_section_header_about) to listOf(
                 SettingItem(
                     stringResource(id = R.string.scene_settings_about_title),
                     painterResource(id = R.drawable.ic_info_circle),
-                    route = Route.Settings.About,
+                    route = RootRoute.Settings.About,
                 ),
             )
         )

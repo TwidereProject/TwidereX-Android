@@ -80,7 +80,7 @@ import com.twidere.twiderex.component.status.UserAvatarDefaults
 import com.twidere.twiderex.db.model.DbDMEvent
 import com.twidere.twiderex.model.ui.UiDMEvent
 import com.twidere.twiderex.model.ui.UiMedia
-import com.twidere.twiderex.navigation.Route
+import com.twidere.twiderex.navigation.RootRoute
 import com.twidere.twiderex.preferences.proto.DisplayPreferences
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.LocalVideoPlayback
@@ -91,7 +91,7 @@ fun LazyUiDMEventList(
     modifier: Modifier = Modifier,
     items: LazyPagingItems<UiDMEvent>,
     state: LazyListState = rememberLazyListState(),
-    key: ((index: Int) -> Any) = { items.peek(it)?.messageKey?.hashCode() ?: it },
+    key: ((item: UiDMEvent) -> Any) = { it.messageKey.hashCode() },
     header: LazyListScope.() -> Unit = {},
     onResend: (event: UiDMEvent) -> Unit = {},
     onItemLongClick: (event: UiDMEvent) -> Unit = {}
@@ -246,7 +246,7 @@ private fun MessageBody(event: UiDMEvent, onItemLongClick: (event: UiDMEvent) ->
             MediaMessage(
                 media = event.media.firstOrNull(),
                 onClick = {
-                    navController.navigate(Route.Media.Pure(event.messageKey))
+                    navController.navigate(RootRoute.Media.Pure(event.messageKey, null))
                 }
             )
             if (event.media.isNotEmpty() && event.htmlText.isNotEmpty()) Spacer(modifier = Modifier.height(MessageBodyDefaults.ContentSpacing))

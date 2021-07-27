@@ -62,7 +62,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -100,11 +99,12 @@ import com.twidere.twiderex.component.status.UserScreenName
 import com.twidere.twiderex.component.status.withAvatarClip
 import com.twidere.twiderex.db.model.TwitterUrlEntity
 import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.ui.UiUser
-import com.twidere.twiderex.navigation.Route
+import com.twidere.twiderex.navigation.RootRoute
 import com.twidere.twiderex.navigation.twidereXSchema
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalNavController
@@ -400,7 +400,7 @@ val maxBannerSize = 200.dp
 fun UserInfo(
     viewModel: UserViewModel,
 ) {
-    val user by viewModel.user.observeAsState()
+    val user by viewModel.user.observeAsState(initial = null)
     val navController = LocalNavController.current
     Box(
         modifier = Modifier
@@ -441,7 +441,7 @@ fun UserInfo(
                         size = UserInfoDefaults.AvatarSize
                     ) {
                         if (user.profileImage is String) {
-                            navController.navigate(Route.Media.Raw(user.profileImage))
+                            navController.navigate(RootRoute.Media.Raw(user.profileImage))
                         }
                     }
                 }
@@ -702,7 +702,7 @@ private fun UserBanner(
             .heightIn(max = maxBannerSize)
             .clickable(
                 onClick = {
-                    navController.navigate(Route.Media.Raw(bannerUrl))
+                    navController.navigate(RootRoute.Media.Raw(bannerUrl))
                 },
                 indication = null,
                 interactionSource = remember { MutableInteractionSource() },
@@ -730,7 +730,7 @@ fun UserMetrics(
             modifier = Modifier
                 .weight(1f)
                 .clickable {
-                    navController.navigate(Route.Following(user.userKey))
+                    navController.navigate(RootRoute.Following(user.userKey))
                 },
             primaryText = user.friendsCount.toString(),
             secondaryText = stringResource(id = R.string.common_controls_profile_dashboard_following),
@@ -742,7 +742,7 @@ fun UserMetrics(
             modifier = Modifier
                 .weight(1f)
                 .clickable {
-                    navController.navigate(Route.Followers(user.userKey))
+                    navController.navigate(RootRoute.Followers(user.userKey))
                 },
             primaryText = user.followersCount.toString(),
             secondaryText = stringResource(id = R.string.common_controls_profile_dashboard_followers),

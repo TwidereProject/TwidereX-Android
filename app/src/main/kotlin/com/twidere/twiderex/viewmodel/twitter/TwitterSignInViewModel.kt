@@ -21,7 +21,6 @@
 package com.twidere.twiderex.viewmodel.twitter
 
 import android.accounts.Account
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.twidere.services.http.MicroBlogException
@@ -29,13 +28,13 @@ import com.twidere.services.twitter.TwitterOAuthService
 import com.twidere.services.twitter.TwitterService
 import com.twidere.twiderex.BuildConfig
 import com.twidere.twiderex.db.mapper.toDbUser
-import com.twidere.twiderex.model.AccountDetails
+import com.twidere.twiderex.http.TwidereServiceFactory
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.cred.CredentialsType
 import com.twidere.twiderex.model.cred.OAuthCredentials
 import com.twidere.twiderex.model.toAmUser
-import com.twidere.twiderex.navigation.DeepLinks
+import com.twidere.twiderex.navigation.RootDeepLinksRoute
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.ACCOUNT_TYPE
 import com.twidere.twiderex.repository.AccountRepository
@@ -43,6 +42,7 @@ import com.twidere.twiderex.utils.json
 import com.twidere.twiderex.utils.notify
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
@@ -68,8 +68,8 @@ class TwitterSignInViewModel @AssistedInject constructor(
         ): TwitterSignInViewModel
     }
 
-    val success = MutableLiveData(false)
-    val loading = MutableLiveData(false)
+    val success = MutableStateFlow(false)
+    val loading = MutableStateFlow(false)
 
     init {
         viewModelScope.launch {
@@ -79,12 +79,16 @@ class TwitterSignInViewModel @AssistedInject constructor(
     }
 
     private suspend fun beginOAuth(): Boolean {
-        loading.postValue(true)
+        loading.value = true
         try {
-            val service = TwitterOAuthService(consumerKey, consumerSecret)
+            val service = TwitterOAuthService(
+                consumerKey,
+                consumerSecret,
+                TwidereServiceFactory.createHttpClientFactory()
+            )
             val token = service.getOAuthToken(
                 if (isBuiltInKey()) {
-                    DeepLinks.Callback.SignIn.Twitter
+                    RootDeepLinksRoute.Callback.SignIn.Twitter
                 } else {
                     "oob"
                 }
@@ -96,12 +100,17 @@ class TwitterSignInViewModel @AssistedInject constructor(
             }
             if (!pinCode.isNullOrBlank()) {
                 val accessToken = service.getAccessToken(pinCode, token)
-                val user = TwitterService(
-                    consumer_key = consumerKey,
-                    consumer_secret = consumerSecret,
-                    access_token = accessToken.oauth_token,
-                    access_token_secret = accessToken.oauth_token_secret,
-                ).verifyCredentials()
+                val user = (
+                    TwidereServiceFactory.createApiService(
+                        type = PlatformType.Twitter,
+                        credentials = OAuthCredentials(
+                            consumer_key = consumerKey,
+                            consumer_secret = consumerSecret,
+                            access_token = accessToken.oauth_token,
+                            access_token_secret = accessToken.oauth_token_secret
+                        ),
+                    ) as TwitterService
+                    ).verifyCredentials()
                 if (user != null) {
                     val name = user.screenName
                     val id = user.idStr
@@ -123,16 +132,14 @@ class TwitterSignInViewModel @AssistedInject constructor(
                             }
                         } else {
                             repository.addAccount(
-                                AccountDetails(
-                                    account = Account(displayKey.toString(), ACCOUNT_TYPE),
-                                    type = PlatformType.Twitter,
-                                    accountKey = internalKey,
-                                    credentials_type = CredentialsType.OAuth,
-                                    credentials_json = credentials_json,
-                                    extras_json = "",
-                                    user = user.toDbUser().toAmUser(),
-                                    lastActive = System.currentTimeMillis()
-                                )
+                                account = Account(displayKey.toString(), ACCOUNT_TYPE),
+                                type = PlatformType.Twitter,
+                                accountKey = internalKey,
+                                credentials_type = CredentialsType.OAuth,
+                                credentials_json = credentials_json,
+                                extras_json = "",
+                                user = user.toDbUser().toAmUser(),
+                                lastActive = System.currentTimeMillis()
                             )
                         }
                         return true
@@ -146,7 +153,7 @@ class TwitterSignInViewModel @AssistedInject constructor(
         } catch (e: HttpException) {
             e.message?.let { inAppNotification.show(it) }
         }
-        loading.postValue(false)
+        loading.value = false
         return false
     }
 
@@ -155,6 +162,6 @@ class TwitterSignInViewModel @AssistedInject constructor(
     }
 
     fun cancel() {
-        loading.postValue(false)
+        loading.value = false
     }
 }

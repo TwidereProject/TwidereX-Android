@@ -20,23 +20,26 @@
  */
 package com.twidere.twiderex.scenes.dm
 
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.twidere.services.microblog.DirectMessageService
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
+import com.twidere.twiderex.component.lazy.LazyListController
 import com.twidere.twiderex.component.lazy.ui.LazyUiDMConversationList
 import com.twidere.twiderex.di.assisted.assistedViewModel
-import com.twidere.twiderex.navigation.Route
+import com.twidere.twiderex.navigation.RootRoute
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
@@ -44,14 +47,6 @@ import com.twidere.twiderex.viewmodel.dm.DMConversationViewModel
 
 @Composable
 fun DMConversationListScene() {
-    val account = LocalActiveAccount.current ?: return
-    val navController = LocalNavController.current
-    val viewModel = assistedViewModel<DMConversationViewModel.AssistedFactory, DMConversationViewModel>(
-        account,
-    ) {
-        it.create(account)
-    }
-    val source = viewModel.source.collectAsLazyPagingItems()
     TwidereScene {
         InAppNotificationScaffold(
             topBar = {
@@ -65,33 +60,59 @@ fun DMConversationListScene() {
                 )
             },
             floatingActionButton = {
-                FloatingActionButton(
-                    onClick = {
-                        navController.navigate(Route.Messages.NewConversation)
-                    }
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_add),
-                        contentDescription = stringResource(
-                            id = R.string.scene_lists_icons_create
-                        ),
-                    )
-                }
+                DMConversationListSceneFab()
             },
         ) {
-            Box {
-                SwipeToRefreshLayout(
-                    refreshingState = source.loadState.refresh is LoadState.Loading,
-                    onRefresh = { source.refresh() }
-                ) {
-                    LazyUiDMConversationList(
-                        items = source,
-                        onItemClicked = {
-                            navController.navigate(Route.Messages.Conversation(it.conversation.conversationKey))
-                        }
-                    )
-                }
-            }
+            DMConversationListSceneContent()
         }
+    }
+}
+
+@Composable
+fun DMConversationListSceneFab() {
+    val navController = LocalNavController.current
+    FloatingActionButton(
+        onClick = {
+            navController.navigate(RootRoute.Messages.NewConversation)
+        }
+    ) {
+        Icon(
+            painter = painterResource(id = R.drawable.ic_add),
+            contentDescription = stringResource(
+                id = R.string.scene_lists_icons_create
+            ),
+        )
+    }
+}
+
+@Composable
+fun DMConversationListSceneContent(
+    lazyListController: LazyListController? = null
+) {
+    val account = LocalActiveAccount.current ?: return
+    if (account.service !is DirectMessageService) return
+    val navController = LocalNavController.current
+    val viewModel =
+        assistedViewModel<DMConversationViewModel.AssistedFactory, DMConversationViewModel>(
+            account,
+        ) {
+            it.create(account)
+        }
+    val source = viewModel.source.collectAsLazyPagingItems()
+    val listState = rememberLazyListState()
+    LaunchedEffect(lazyListController) {
+        lazyListController?.listState = listState
+    }
+    SwipeToRefreshLayout(
+        refreshingState = source.loadState.refresh is LoadState.Loading,
+        onRefresh = { source.refresh() }
+    ) {
+        LazyUiDMConversationList(
+            items = source,
+            state = listState,
+            onItemClicked = {
+                navController.navigate(RootRoute.Messages.Conversation(it.conversation.conversationKey))
+            }
+        )
     }
 }

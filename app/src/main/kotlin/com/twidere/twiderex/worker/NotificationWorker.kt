@@ -42,7 +42,7 @@ import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MastodonStatusType
 import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.ui.UiStatus
-import com.twidere.twiderex.navigation.DeepLinks
+import com.twidere.twiderex.navigation.RootDeepLinksRoute
 import com.twidere.twiderex.notification.NotificationChannelSpec
 import com.twidere.twiderex.notification.notificationChannelId
 import com.twidere.twiderex.preferences.proto.NotificationPreferences
@@ -70,7 +70,7 @@ class NotificationWorker @AssistedInject constructor(
         } else {
             accountRepository.getAccounts().map { accountRepository.getAccountDetails(it) }
                 .filter {
-                    accountRepository.getAccountPreferences(it.accountKey).isNotificationEnabled.first()
+                    it.preferences.isNotificationEnabled.first()
                 }
                 .map { account ->
                     launch {
@@ -111,7 +111,7 @@ class NotificationWorker @AssistedInject constructor(
                         status.user.displayName
                     ),
                     htmlContent = status.htmlText,
-                    deepLink = DeepLinks.Twitter.Status(status.statusId),
+                    deepLink = RootDeepLinksRoute.Twitter.Status(status.statusId),
                     profileImage = status.user.profileImage,
                 )
             }
@@ -180,7 +180,7 @@ class NotificationWorker @AssistedInject constructor(
                         R.string.common_notification_follow,
                         actualStatus.user.displayName
                     ),
-                    deepLink = DeepLinks.User(actualStatus.user.userKey),
+                    deepLink = RootDeepLinksRoute.User(actualStatus.user.userKey),
                     profileImage = actualStatus.user.profileImage,
                 )
             }
@@ -190,7 +190,7 @@ class NotificationWorker @AssistedInject constructor(
                         R.string.common_notification_follow_request,
                         actualStatus.user.displayName
                     ),
-                    deepLink = DeepLinks.User(actualStatus.user.userKey)
+                    deepLink = RootDeepLinksRoute.User(actualStatus.user.userKey)
                 )
             }
             MastodonStatusType.NotificationMention -> {
@@ -200,7 +200,7 @@ class NotificationWorker @AssistedInject constructor(
                         actualStatus.user.displayName
                     ),
                     htmlContent = actualStatus.htmlText,
-                    deepLink = DeepLinks.Status(actualStatus.statusKey),
+                    deepLink = RootDeepLinksRoute.Status(actualStatus.statusKey),
                     profileImage = actualStatus.user.profileImage,
                 )
             }
@@ -210,7 +210,7 @@ class NotificationWorker @AssistedInject constructor(
                         R.string.common_notification_reblog,
                         actualStatus.user.displayName
                     ),
-                    deepLink = DeepLinks.Status(actualStatus.statusKey),
+                    deepLink = RootDeepLinksRoute.Status(actualStatus.statusKey),
                     profileImage = actualStatus.user.profileImage,
                 )
             }
@@ -220,7 +220,7 @@ class NotificationWorker @AssistedInject constructor(
                         R.string.common_notification_favourite,
                         actualStatus.user.displayName
                     ),
-                    deepLink = DeepLinks.Status(actualStatus.statusKey),
+                    deepLink = RootDeepLinksRoute.Status(actualStatus.statusKey),
                     profileImage = actualStatus.user.profileImage,
                 )
             }
@@ -229,7 +229,7 @@ class NotificationWorker @AssistedInject constructor(
                     title = applicationContext.getString(
                         R.string.common_notification_poll,
                     ),
-                    deepLink = DeepLinks.Status(actualStatus.statusKey),
+                    deepLink = RootDeepLinksRoute.Status(actualStatus.statusKey),
                     profileImage = actualStatus.user.profileImage,
                 )
             }

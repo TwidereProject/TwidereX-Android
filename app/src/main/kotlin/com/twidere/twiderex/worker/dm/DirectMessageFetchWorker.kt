@@ -35,7 +35,7 @@ import com.twidere.services.microblog.LookupService
 import com.twidere.twiderex.R
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.ui.UiDMConversationWithLatestMessage
-import com.twidere.twiderex.navigation.Route
+import com.twidere.twiderex.navigation.RootDeepLinksRoute
 import com.twidere.twiderex.notification.NotificationChannelSpec
 import com.twidere.twiderex.notification.notificationChannelId
 import com.twidere.twiderex.repository.AccountRepository
@@ -43,6 +43,7 @@ import com.twidere.twiderex.repository.DirectMessageRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import java.util.concurrent.TimeUnit
 
 @HiltWorker
@@ -63,7 +64,7 @@ class DirectMessageFetchWorker @AssistedInject constructor(
 
     override suspend fun doWork(): Result {
         return try {
-            accountRepository.activeAccount.value?.takeIf {
+            accountRepository.activeAccount.firstOrNull()?.takeIf {
                 accountRepository.getAccountPreferences(it.accountKey).isNotificationEnabled.first()
             }?.let { account ->
                 val result = repository.checkNewMessages(
@@ -84,7 +85,7 @@ class DirectMessageFetchWorker @AssistedInject constructor(
 
     private fun notification(account: AccountDetails, message: UiDMConversationWithLatestMessage) {
         val intent =
-            Intent(Intent.ACTION_VIEW, Uri.parse(Route.DeepLink.Conversation(message.conversation.conversationKey)))
+            Intent(Intent.ACTION_VIEW, Uri.parse(RootDeepLinksRoute.Conversation(message.conversation.conversationKey)))
         val pendingIntent =
             PendingIntent.getActivity(
                 applicationContext,

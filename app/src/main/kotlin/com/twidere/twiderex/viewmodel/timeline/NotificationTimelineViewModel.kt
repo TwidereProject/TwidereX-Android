@@ -24,8 +24,8 @@ import android.content.SharedPreferences
 import com.twidere.services.microblog.NotificationService
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.model.AccountDetails
-import com.twidere.twiderex.paging.mediator.NotificationTimelineMediator
 import com.twidere.twiderex.paging.mediator.paging.PagingWithGapMediator
+import com.twidere.twiderex.paging.mediator.timeline.NotificationTimelineMediator
 import com.twidere.twiderex.repository.NotificationRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject

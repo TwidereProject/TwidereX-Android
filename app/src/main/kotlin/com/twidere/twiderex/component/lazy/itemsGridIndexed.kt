@@ -79,7 +79,7 @@ fun <T : Any> LazyListScope.itemsPagingGridIndexed(
         data.retry()
     }
     itemsGridIndexed((0 until data.itemCount).toList(), rowSize = rowSize, spacing = spacing, padding = padding) { _, index ->
-        itemContent.invoke(this, index, data.getAsState(index = index).value)
+        itemContent.invoke(this, index, data[index])
     }
     loadState(data.loadState.append) {
         data.retry()

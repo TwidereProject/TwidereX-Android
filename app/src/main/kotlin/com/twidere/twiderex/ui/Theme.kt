@@ -20,6 +20,7 @@
  */
 package com.twidere.twiderex.ui
 
+import android.os.Build
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -136,7 +137,14 @@ fun TwidereScene(
             windowInsetsController.isAppearanceLightNavigationBars = !darkTheme
         }
         val statusBarColor = statusBarColorProvider.invoke()
-        val navigationBarColor = navigationBarColorProvider.invoke()
+        val navigationBarColor = navigationBarColorProvider.invoke().let {
+            val surface = MaterialTheme.colors.surface
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O && !darkTheme && it == surface) {
+                MaterialTheme.colors.onSurface
+            } else {
+                it
+            }
+        }
         Box {
             val actual = provideSystemInsets(
                 extendViewIntoNavigationBar,

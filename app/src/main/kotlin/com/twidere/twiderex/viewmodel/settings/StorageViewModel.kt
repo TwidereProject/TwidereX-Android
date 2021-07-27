@@ -20,11 +20,11 @@
  */
 package com.twidere.twiderex.viewmodel.settings
 
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.twidere.twiderex.repository.CacheRepository
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
 class StorageViewModel @AssistedInject constructor(
@@ -36,24 +36,24 @@ class StorageViewModel @AssistedInject constructor(
         fun create(): StorageViewModel
     }
 
-    val loading = MutableLiveData(false)
+    val loading = MutableStateFlow(false)
 
     fun clearDatabaseCache() = viewModelScope.launch {
-        loading.postValue(true)
+        loading.value = true
         repository.clearDatabaseCache()
-        loading.postValue(false)
+        loading.value = false
     }
 
     fun clearImageCache() = viewModelScope.launch {
-        loading.postValue(true)
+        loading.value = true
         repository.clearImageCache()
         repository.clearCacheDir()
-        loading.postValue(false)
+        loading.value = false
     }
 
     fun clearSearchHistory() = viewModelScope.launch {
-        loading.postValue(true)
+        loading.value = true
         repository.clearSearchHistory()
-        loading.postValue(false)
+        loading.value = false
     }
 }
