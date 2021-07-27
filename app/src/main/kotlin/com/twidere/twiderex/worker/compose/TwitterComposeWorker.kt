@@ -23,7 +23,6 @@ package com.twidere.twiderex.worker.compose
 import android.content.ContentResolver
 import android.content.Context
 import android.net.Uri
-import androidx.core.app.NotificationManagerCompat
 import androidx.hilt.work.HiltWorker
 import androidx.work.Data
 import androidx.work.OneTimeWorkRequestBuilder
@@ -38,6 +37,7 @@ import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.toWorkData
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.model.ui.UiStatus.Companion.toUi
+import com.twidere.twiderex.notification.AppNotificationManager
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.StatusRepository
 import com.twidere.twiderex.viewmodel.compose.ComposeType
@@ -49,7 +49,7 @@ class TwitterComposeWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted workerParams: WorkerParameters,
     accountRepository: AccountRepository,
-    notificationManagerCompat: NotificationManagerCompat,
+    notificationManager: AppNotificationManager,
     private val statusRepository: StatusRepository,
     private val contentResolver: ContentResolver,
     private val cacheDatabase: CacheDatabase,
@@ -57,7 +57,7 @@ class TwitterComposeWorker @AssistedInject constructor(
     context,
     workerParams,
     accountRepository,
-    notificationManagerCompat
+    notificationManager
 ) {
     companion object {
         fun create(

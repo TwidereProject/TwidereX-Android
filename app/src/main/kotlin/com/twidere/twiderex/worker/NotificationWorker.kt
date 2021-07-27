@@ -20,13 +20,7 @@
  */
 package com.twidere.twiderex.worker
 
-import android.app.PendingIntent
 import android.content.Context
-import android.content.Intent
-import android.net.Uri
-import android.os.Build
-import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.text.HtmlCompat
 import androidx.datastore.core.DataStore
@@ -43,6 +37,8 @@ import com.twidere.twiderex.model.MastodonStatusType
 import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.navigation.RootDeepLinksRoute
+import com.twidere.twiderex.notification.AppNotification
+import com.twidere.twiderex.notification.AppNotificationManager
 import com.twidere.twiderex.notification.NotificationChannelSpec
 import com.twidere.twiderex.notification.notificationChannelId
 import com.twidere.twiderex.preferences.proto.NotificationPreferences
@@ -61,7 +57,7 @@ class NotificationWorker @AssistedInject constructor(
     @Assisted params: WorkerParameters,
     private val repository: NotificationRepository,
     private val accountRepository: AccountRepository,
-    private val notificationManagerCompat: NotificationManagerCompat,
+    private val notificationManager: AppNotificationManager,
     private val notificationPreferences: DataStore<NotificationPreferences>,
 ) : CoroutineWorker(appContext, params) {
     override suspend fun doWork(): Result = coroutineScope {
@@ -91,17 +87,12 @@ class NotificationWorker @AssistedInject constructor(
 
     private suspend fun notify(account: AccountDetails, status: UiStatus) {
         val notificationId = "${account.accountKey}_${status.statusKey}"
-        val builder = NotificationCompat
+        val builder = AppNotification
             .Builder(
-                applicationContext,
                 account.accountKey.notificationChannelId(
                     NotificationChannelSpec.ContentInteractions.id
                 )
             )
-            .setSmallIcon(R.drawable.ic_notification)
-            .setCategory(NotificationCompat.CATEGORY_SOCIAL)
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-            .setAutoCancel(true)
 
         val notificationData = when (status.platformType) {
             PlatformType.Twitter -> {
@@ -132,24 +123,9 @@ class NotificationWorker @AssistedInject constructor(
                 )
                 builder
                     .setContentText(html)
-                    .setStyle(
-                        NotificationCompat.BigTextStyle()
-                            .bigText(html)
-                    )
             }
             if (notificationData.deepLink != null) {
-                builder.setContentIntent(
-                    PendingIntent.getActivity(
-                        applicationContext,
-                        0,
-                        Intent(Intent.ACTION_VIEW, Uri.parse(notificationData.deepLink)),
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                            PendingIntent.FLAG_IMMUTABLE
-                        } else {
-                            PendingIntent.FLAG_UPDATE_CURRENT
-                        },
-                    )
-                )
+                builder.setDeepLink(notificationData.deepLink)
             }
             if (notificationData.profileImage != null) {
                 val result = Coil.execute(
@@ -161,7 +137,7 @@ class NotificationWorker @AssistedInject constructor(
                     builder.setLargeIcon(result.drawable.toBitmap())
                 }
             }
-            notificationManagerCompat.notify(notificationId.hashCode(), builder.build())
+            notificationManager.notify(notificationId.hashCode(), builder.build())
         }
     }
 

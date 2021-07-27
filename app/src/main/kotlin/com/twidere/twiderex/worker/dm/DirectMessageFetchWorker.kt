@@ -20,12 +20,7 @@
  */
 package com.twidere.twiderex.worker.dm
 
-import android.app.PendingIntent
 import android.content.Context
-import android.content.Intent
-import android.net.Uri
-import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.PeriodicWorkRequestBuilder
@@ -36,6 +31,8 @@ import com.twidere.twiderex.R
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.ui.UiDMConversationWithLatestMessage
 import com.twidere.twiderex.navigation.RootDeepLinksRoute
+import com.twidere.twiderex.notification.AppNotification
+import com.twidere.twiderex.notification.AppNotificationManager
 import com.twidere.twiderex.notification.NotificationChannelSpec
 import com.twidere.twiderex.notification.notificationChannelId
 import com.twidere.twiderex.repository.AccountRepository
@@ -52,7 +49,7 @@ class DirectMessageFetchWorker @AssistedInject constructor(
     @Assisted workerParams: WorkerParameters,
     private val repository: DirectMessageRepository,
     private val accountRepository: AccountRepository,
-    private val notificationManagerCompat: NotificationManagerCompat,
+    private val notificationManager: AppNotificationManager,
 ) : CoroutineWorker(
     context,
     workerParams
@@ -84,31 +81,15 @@ class DirectMessageFetchWorker @AssistedInject constructor(
     }
 
     private fun notification(account: AccountDetails, message: UiDMConversationWithLatestMessage) {
-        val intent =
-            Intent(Intent.ACTION_VIEW, Uri.parse(RootDeepLinksRoute.Conversation(message.conversation.conversationKey)))
-        val pendingIntent =
-            PendingIntent.getActivity(
-                applicationContext,
-                0,
-                intent,
-                PendingIntent.FLAG_MUTABLE
-            )
-        val builder = NotificationCompat
+        val builder = AppNotification
             .Builder(
-                applicationContext,
                 account.accountKey.notificationChannelId(
                     NotificationChannelSpec.ContentMessages.id
                 )
             )
             .setContentTitle(applicationContext.getString(R.string.common_notification_messages_title))
-            .setSmallIcon(R.drawable.ic_notification)
-            .setCategory(NotificationCompat.CATEGORY_SOCIAL)
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-            .setOngoing(false)
-            .setSilent(false)
-            .setAutoCancel(true)
             .setContentText(applicationContext.getString(R.string.common_notification_messages_content, message.latestMessage.sender.displayName))
-            .setContentIntent(pendingIntent)
-        notificationManagerCompat.notify(message.latestMessage.messageKey.hashCode(), builder.build())
+            .setDeepLink(RootDeepLinksRoute.Conversation(message.conversation.conversationKey))
+        notificationManager.notify(message.latestMessage.messageKey.hashCode(), builder.build())
     }
 }
