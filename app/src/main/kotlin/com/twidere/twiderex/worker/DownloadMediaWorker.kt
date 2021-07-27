@@ -28,11 +28,8 @@ import androidx.work.CoroutineWorker
 import androidx.work.Data
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkerParameters
-import com.twidere.services.microblog.DownloadMediaService
-import com.twidere.twiderex.R
+import com.twidere.twiderex.jobs.common.DownloadMediaJob
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.notification.InAppNotification
-import com.twidere.twiderex.repository.AccountRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 
@@ -41,8 +38,7 @@ class DownloadMediaWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted workerParams: WorkerParameters,
     private val contentResolver: ContentResolver,
-    private val accountRepository: AccountRepository,
-    private val inAppNotification: InAppNotification,
+    private val downloadMediaJob: DownloadMediaJob,
 ) : CoroutineWorker(context, workerParams) {
 
     companion object {
@@ -62,24 +58,19 @@ class DownloadMediaWorker @AssistedInject constructor(
     }
 
     override suspend fun doWork(): Result {
-        val target = inputData.getString("target")?.let { Uri.parse(it) } ?: return Result.failure()
+        val target = inputData.getString("target") ?: return Result.failure()
         val source = inputData.getString("source") ?: return Result.failure()
-        val accountDetails = inputData.getString("accountKey")?.let {
+        val accountKey = inputData.getString("accountKey")?.let {
             MicroBlogKey.valueOf(it)
-        }?.let {
-            accountRepository.findByAccountKey(accountKey = it)
-        }?.let {
-            accountRepository.getAccountDetails(it)
         } ?: return Result.failure()
-        val service = accountDetails.service
-        if (service !is DownloadMediaService) {
-            return Result.failure()
+        return downloadMediaJob.execute(
+            target = target,
+            source = source,
+            accountKey = accountKey
+        ) {
+            contentResolver.openOutputStream(Uri.parse(it))
+        }.let {
+            if (it) Result.success() else Result.failure()
         }
-        contentResolver.openOutputStream(target)?.use {
-            service.download(target = source).copyTo(it)
-        } ?: return Result.failure()
-
-        inAppNotification.show(R.string.common_controls_actions_save)
-        return Result.success()
     }
 }
