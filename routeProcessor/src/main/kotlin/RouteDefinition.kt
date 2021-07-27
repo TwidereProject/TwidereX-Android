@@ -133,7 +133,7 @@ internal data class FunctionRouteDefinition(
             .joinToString("&") { parameter ->
                 val name = parameter.name
                 if (parameter.type == "kotlin.String") {
-                    "$name=${encode(name)}"
+                    "$name=${encodeNullable(name)}"
                 } else {
                     "$name=\$$name"
                 }
@@ -180,6 +180,7 @@ internal data class FunctionRouteDefinition(
     }
 
     private fun encode(value: String) = "\${java.net.URLEncoder.encode($value, \"UTF-8\")}"
+    private fun encodeNullable(value: String) = "\${java.net.URLEncoder.encode(if($value == null) \"\" else $value, \"UTF-8\")}"
 }
 
 internal data class RouteParameter(

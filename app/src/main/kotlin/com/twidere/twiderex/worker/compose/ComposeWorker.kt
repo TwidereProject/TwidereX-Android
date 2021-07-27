@@ -20,12 +20,9 @@
  */
 package com.twidere.twiderex.worker.compose
 
-import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.twidere.services.microblog.MicroBlogService
@@ -35,6 +32,8 @@ import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.toComposeData
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.navigation.RootDeepLinksRoute
+import com.twidere.twiderex.notification.AppNotification
+import com.twidere.twiderex.notification.AppNotificationManager
 import com.twidere.twiderex.notification.NotificationChannelSpec
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.utils.ExifScrambler
@@ -45,18 +44,15 @@ abstract class ComposeWorker<T : MicroBlogService>(
     protected val context: Context,
     workerParams: WorkerParameters,
     private val accountRepository: AccountRepository,
-    private val notificationManagerCompat: NotificationManagerCompat,
+    private val notificationManager: AppNotificationManager,
 ) : CoroutineWorker(context, workerParams) {
 
     override suspend fun doWork(): Result {
-        val builder = NotificationCompat
-            .Builder(applicationContext, NotificationChannelSpec.BackgroundProgresses.id)
+        val builder = AppNotification
+            .Builder(NotificationChannelSpec.BackgroundProgresses.id)
             .setContentTitle(applicationContext.getString(R.string.common_alerts_tweet_sending_title))
-            .setSmallIcon(R.drawable.ic_notification)
             .setOngoing(true)
             .setSilent(true)
-            .setCategory(NotificationCompat.CATEGORY_SOCIAL)
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setProgress(100, 0, false)
         val composeData = inputData.toComposeData()
         val accountDetails = inputData.getString("accountKey")?.let {
@@ -69,7 +65,7 @@ abstract class ComposeWorker<T : MicroBlogService>(
         val notificationId = composeData.draftId.hashCode()
         @Suppress("UNCHECKED_CAST")
         val service = accountDetails.service as T
-        notificationManagerCompat.notify(notificationId, builder.build())
+        notificationManager.notify(notificationId, builder.build())
 
         return try {
             val exifScrambler = ExifScrambler(context)
@@ -86,18 +82,17 @@ abstract class ComposeWorker<T : MicroBlogService>(
                     (99f * index.toFloat() / composeData.images.size.toFloat()).roundToInt(),
                     false
                 )
-                notificationManagerCompat.notify(notificationId, builder.build())
+                notificationManager.notify(notificationId, builder.build())
                 exifScrambler.deleteCacheFile(scramblerUri)
             }
             builder.setProgress(100, 99, false)
-            notificationManagerCompat.notify(notificationId, builder.build())
-            // TODO insert status into database
+            notificationManager.notify(notificationId, builder.build())
             val status = compose(service, composeData, mediaIds)
             builder.setOngoing(false)
                 .setProgress(0, 0, false)
                 .setSilent(false)
                 .setContentTitle(applicationContext.getString(R.string.common_alerts_tweet_sent_title))
-            notificationManagerCompat.notify(notificationId, builder.build())
+            notificationManager.notifyTransient(notificationId, builder.build())
             if (composeData.isThreadMode) {
                 // open compose scene in thread mode
                 applicationContext.startActivity(
@@ -112,23 +107,13 @@ abstract class ComposeWorker<T : MicroBlogService>(
             Result.success()
         } catch (e: Throwable) {
             e.printStackTrace()
-            val intent =
-                Intent(Intent.ACTION_VIEW, Uri.parse(RootDeepLinksRoute.Draft(composeData.draftId)))
-            val pendingIntent =
-                PendingIntent.getActivity(
-                    applicationContext,
-                    0,
-                    intent,
-                    PendingIntent.FLAG_MUTABLE
-                )
             builder.setOngoing(false)
                 .setProgress(0, 0, false)
                 .setSilent(false)
-                .setAutoCancel(true)
                 .setContentTitle(applicationContext.getString(R.string.common_alerts_tweet_fail_title))
                 .setContentText(composeData.content)
-                .setContentIntent(pendingIntent)
-            notificationManagerCompat.notify(notificationId, builder.build())
+                .setDeepLink(RootDeepLinksRoute.Draft(composeData.draftId))
+            notificationManager.notify(notificationId, builder.build())
             Result.failure()
         }
     }
