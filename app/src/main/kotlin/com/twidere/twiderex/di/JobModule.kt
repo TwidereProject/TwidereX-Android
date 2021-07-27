@@ -20,16 +20,21 @@
  */
 package com.twidere.twiderex.di
 
+import android.content.Context
 import com.twidere.twiderex.jobs.common.DownloadMediaJob
+import com.twidere.twiderex.jobs.common.NotificationJob
 import com.twidere.twiderex.jobs.common.ShareMediaJob
 import com.twidere.twiderex.jobs.database.DeleteDbStatusJob
 import com.twidere.twiderex.jobs.status.DeleteStatusJob
+import com.twidere.twiderex.notification.AppNotificationManager
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.AccountRepository
+import com.twidere.twiderex.repository.NotificationRepository
 import com.twidere.twiderex.repository.StatusRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 
 @Module
@@ -64,5 +69,17 @@ object JobModule {
         accountRepository = accountRepository,
         statusRepository = statusRepository,
         inAppNotification = inAppNotification
+    )
+    @Provides
+    fun provideNotificationJob(
+        @ApplicationContext context: Context,
+        accountRepository: AccountRepository,
+        repository: NotificationRepository,
+        notificationManager: AppNotificationManager
+    ): NotificationJob = NotificationJob(
+        applicationContext = context,
+        repository = repository,
+        accountRepository = accountRepository,
+        notificationManager = notificationManager
     )
 }
