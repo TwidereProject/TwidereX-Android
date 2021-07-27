@@ -31,6 +31,7 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import moe.tlaster.precompose.navigation.transition.AnimatedDialogRoute
 import moe.tlaster.precompose.navigation.transition.AnimatedRoute
+import moe.tlaster.precompose.navigation.transition.DialogTransition
 import moe.tlaster.precompose.navigation.transition.NavTransition
 
 /**
@@ -52,6 +53,7 @@ fun NavHost(
     navController: NavController,
     initialRoute: String,
     navTransition: NavTransition = remember { NavTransition() },
+    dialogTransition: DialogTransition = remember { DialogTransition() },
     builder: RouteBuilder.() -> Unit,
 ) {
     val stateHolder = rememberSaveableStateHolder()
@@ -109,7 +111,7 @@ fun NavHost(
             }
             AnimatedDialogRoute(
                 stack = routeStack,
-                navTransition = navTransition,
+                dialogTransition = dialogTransition,
             ) {
                 stateHolder.SaveableStateProvider(it.id) {
                     CompositionLocalProvider(

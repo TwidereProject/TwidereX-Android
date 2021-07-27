@@ -43,7 +43,7 @@ internal fun AnimatedDialogRoute(
     stack: RouteStack,
     modifier: Modifier = Modifier,
     animationSpec: FiniteAnimationSpec<Float> = tween(),
-    navTransition: NavTransition = remember { NavTransition() },
+    dialogTransition: DialogTransition = remember { DialogTransition() },
     content: @Composable (BackStackEntry) -> Unit
 ) {
 
@@ -92,17 +92,15 @@ internal fun AnimatedDialogRoute(
                 Box(
                     Modifier.graphicsLayer {
                         when (value) {
-                            AnimateType.Create -> navTransition.createTransition.invoke(
+                            AnimateType.Create -> dialogTransition.createTransition.invoke(
                                 this,
                                 factor
                             )
-                            AnimateType.Destroy -> navTransition.destroyTransition.invoke(
+                            AnimateType.Destroy -> dialogTransition.destroyTransition.invoke(
                                 this,
                                 factor
                             )
                             else -> Unit
-                            // AnimateType.Pause -> actualNavTransition.pauseTransition.invoke(this, factor)
-                            // AnimateType.Resume -> actualNavTransition.resumeTransition.invoke(this, factor)
                         }
                     }
                 ) {
