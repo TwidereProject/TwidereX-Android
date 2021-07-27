@@ -18,10 +18,9 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.worker.status
+package com.twidere.twiderex.model
 
 import androidx.work.workDataOf
-import com.twidere.twiderex.model.MicroBlogKey
 
 data class StatusResult(
     val statusKey: MicroBlogKey,

@@ -26,6 +26,10 @@ import com.twidere.twiderex.jobs.common.NotificationJob
 import com.twidere.twiderex.jobs.common.ShareMediaJob
 import com.twidere.twiderex.jobs.database.DeleteDbStatusJob
 import com.twidere.twiderex.jobs.status.DeleteStatusJob
+import com.twidere.twiderex.jobs.status.LikeStatusJob
+import com.twidere.twiderex.jobs.status.RetweetStatusJob
+import com.twidere.twiderex.jobs.status.UnRetweetStatusJob
+import com.twidere.twiderex.jobs.status.UnlikeStatusJob
 import com.twidere.twiderex.notification.AppNotificationManager
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.AccountRepository
@@ -70,6 +74,7 @@ object JobModule {
         statusRepository = statusRepository,
         inAppNotification = inAppNotification
     )
+
     @Provides
     fun provideNotificationJob(
         @ApplicationContext context: Context,
@@ -81,5 +86,49 @@ object JobModule {
         repository = repository,
         accountRepository = accountRepository,
         notificationManager = notificationManager
+    )
+
+    @Provides
+    fun provideLikeStatusJob(
+        accountRepository: AccountRepository,
+        statusRepository: StatusRepository,
+        inAppNotification: InAppNotification,
+    ): LikeStatusJob = LikeStatusJob(
+        accountRepository = accountRepository,
+        statusRepository = statusRepository,
+        inAppNotification = inAppNotification,
+    )
+
+    @Provides
+    fun provideRetweetStatusJob(
+        accountRepository: AccountRepository,
+        statusRepository: StatusRepository,
+        inAppNotification: InAppNotification,
+    ): RetweetStatusJob = RetweetStatusJob(
+        accountRepository = accountRepository,
+        statusRepository = statusRepository,
+        inAppNotification = inAppNotification,
+    )
+
+    @Provides
+    fun provideUnlikeStatusJob(
+        accountRepository: AccountRepository,
+        statusRepository: StatusRepository,
+        inAppNotification: InAppNotification,
+    ): UnlikeStatusJob = UnlikeStatusJob(
+        accountRepository = accountRepository,
+        statusRepository = statusRepository,
+        inAppNotification = inAppNotification,
+    )
+
+    @Provides
+    fun provideUnRetweetStatusJob(
+        accountRepository: AccountRepository,
+        statusRepository: StatusRepository,
+        inAppNotification: InAppNotification,
+    ): UnRetweetStatusJob = UnRetweetStatusJob(
+        accountRepository = accountRepository,
+        statusRepository = statusRepository,
+        inAppNotification = inAppNotification,
     )
 }
