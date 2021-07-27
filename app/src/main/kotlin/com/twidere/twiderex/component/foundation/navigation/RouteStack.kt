@@ -31,6 +31,7 @@ internal class RouteStack(
     val stacks: SnapshotStateList<BackStackEntry> = mutableStateListOf(),
     val navTransition: NavTransition? = null,
 ) {
+    private var destroyAfterTransition = false
     val currentEntry: BackStackEntry?
         get() = stacks.lastOrNull()
 
@@ -49,6 +50,13 @@ internal class RouteStack(
 
     fun onInActive() {
         currentEntry?.inActive()
+        if (destroyAfterTransition) {
+            onDestroyed()
+        }
+    }
+
+    fun destroyAfterTransition() {
+        destroyAfterTransition = true
     }
 
     fun onDestroyed() {

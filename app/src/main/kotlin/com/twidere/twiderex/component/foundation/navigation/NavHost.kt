@@ -87,20 +87,23 @@ fun NavHost(
             navTransition = navTransition,
             manager = manager,
         ) { routeStack ->
-            // LaunchedEffect(routeStack) {
-            //     routeStack.onActive()
-            // }
-            // DisposableEffect(routeStack) {
-            //     onDispose {
-            //         routeStack.onInActive()
-            //     }
-            // }
-            LaunchedEffect(routeStack.currentEntry) {
-                routeStack.currentEntry?.active()
+            LaunchedEffect(routeStack) {
+                routeStack.onActive()
             }
-            DisposableEffect(routeStack.currentEntry) {
+            DisposableEffect(routeStack) {
                 onDispose {
-                    routeStack.currentEntry?.inActive()
+                    routeStack.onInActive()
+                }
+            }
+            val currentEntry = routeStack.currentEntry
+            if (currentEntry != null) {
+                LaunchedEffect(currentEntry) {
+                    currentEntry.active()
+                }
+                DisposableEffect(currentEntry) {
+                    onDispose {
+                        currentEntry.inActive()
+                    }
                 }
             }
             routeStack.stacks.forEach {
@@ -113,36 +116,6 @@ fun NavHost(
                     }
                 }
             }
-            // stateHolder.SaveableStateProvider(routeStack.id) {
-            //     CompositionLocalProvider(
-            //         LocalViewModelStoreOwner provides routeStack.scene,
-            //         LocalLifecycleOwner provides routeStack,
-            //     ) {
-            //         routeStack.scene.route.content.invoke(routeStack.scene)
-            //     }
-            // }
-            //
-            // Crossfade(targetState = routeStack.currentDialogStack) {
-            //     it?.let { backStackEntry ->
-            //         CompositionLocalProvider(
-            //             LocalViewModelStoreOwner provides backStackEntry,
-            //             LocalLifecycleOwner provides backStackEntry,
-            //         ) {
-            //             Box(
-            //                 modifier = Modifier
-            //                     .pointerInput(Unit) {
-            //                         forEachGesture {
-            //                             awaitPointerEventScope {
-            //                                 awaitPointerEvent().changes.forEach { it.consumeAllChanges() }
-            //                             }
-            //                         }
-            //                     }
-            //             ) {
-            //                 backStackEntry.route.content.invoke(backStackEntry)
-            //             }
-            //         }
-            //     }
-            // }
         }
     }
 }

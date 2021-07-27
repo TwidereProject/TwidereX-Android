@@ -108,7 +108,7 @@ internal class RouteStackManager(
         checkNotNull(matchResult) { "RouteStackManager: navigate target $path not found" }
         require(matchResult.route is ComposeRoute) { "RouteStackManager: navigate target $path is not ComposeRoute" }
         if (options != null && matchResult.route is SceneRoute && options.launchSingleTop) {
-            _backStacks.firstOrNull { it.hasRoute(matchResult.route.route)  }?.let {
+            _backStacks.firstOrNull { it.hasRoute(matchResult.route.route) }?.let {
                 _backStacks.remove(it)
                 _backStacks.add(it)
             }
@@ -166,7 +166,7 @@ internal class RouteStackManager(
                 val stack = _backStacks.removeLast()
                 val entry = stack.currentEntry
                 stateHolder.removeState(stack.id)
-                stack.onDestroyed()
+                stack.destroyAfterTransition()
                 entry
             }
             else -> {
