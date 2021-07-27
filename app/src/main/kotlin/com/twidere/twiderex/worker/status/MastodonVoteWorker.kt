@@ -26,13 +26,9 @@ import androidx.work.CoroutineWorker
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
-import com.twidere.services.mastodon.MastodonService
+import com.twidere.twiderex.extensions.toWorkResult
+import com.twidere.twiderex.jobs.status.MastodonVoteJob
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.PlatformType
-import com.twidere.twiderex.notification.InAppNotification
-import com.twidere.twiderex.repository.AccountRepository
-import com.twidere.twiderex.repository.StatusRepository
-import com.twidere.twiderex.utils.notify
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 
@@ -40,9 +36,7 @@ import dagger.assisted.AssistedInject
 class MastodonVoteWorker @AssistedInject constructor(
     @Assisted appContext: Context,
     @Assisted params: WorkerParameters,
-    private val accountRepository: AccountRepository,
-    private val statusRepository: StatusRepository,
-    private val inAppNotification: InAppNotification,
+    private val mastodonVoteJob: MastodonVoteJob
 ) : CoroutineWorker(appContext, params) {
 
     companion object {
@@ -68,46 +62,13 @@ class MastodonVoteWorker @AssistedInject constructor(
         val accountKey = inputData.getString("accountKey")?.let {
             MicroBlogKey.valueOf(it)
         } ?: return Result.failure()
-        val status = inputData.getString("statusKey")?.let {
+        val statusKey = inputData.getString("statusKey")?.let {
             MicroBlogKey.valueOf(it)
-        }?.let {
-            statusRepository.loadFromCache(it, accountKey = accountKey)
         } ?: return Result.failure()
-        if (status.mastodonExtra?.poll == null || status.platformType != PlatformType.Mastodon) {
-            return Result.success()
-        }
-        val service = accountRepository.findByAccountKey(accountKey)?.let {
-            accountRepository.getAccountDetails(it)
-        }?.let {
-            it.service as? MastodonService
-        } ?: return Result.failure()
-
-        val pollId = status.mastodonExtra.poll.id ?: return Result.failure()
-        val originPoll = status.mastodonExtra.poll
-        statusRepository.updateStatus(statusKey = status.statusKey) {
-            it.mastodonExtra = status.mastodonExtra.copy(
-                poll = status.mastodonExtra.poll.copy(
-                    voted = true,
-                    ownVotes = votes
-                )
-            )
-        }
-        return try {
-            val newPoll = service.vote(pollId, votes)
-            statusRepository.updateStatus(statusKey = status.statusKey) {
-                it.mastodonExtra = status.mastodonExtra.copy(
-                    poll = newPoll
-                )
-            }
-            Result.success()
-        } catch (e: Throwable) {
-            statusRepository.updateStatus(statusKey = status.statusKey) {
-                it.mastodonExtra = status.mastodonExtra.copy(
-                    poll = originPoll
-                )
-            }
-            e.notify(inAppNotification)
-            Result.failure()
-        }
+        return mastodonVoteJob.execute(
+            votes = votes,
+            accountKey = accountKey,
+            statusKey = statusKey
+        ).toWorkResult()
     }
 }

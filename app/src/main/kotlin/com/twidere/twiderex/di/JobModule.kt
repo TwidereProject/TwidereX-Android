@@ -27,6 +27,7 @@ import com.twidere.twiderex.jobs.common.ShareMediaJob
 import com.twidere.twiderex.jobs.database.DeleteDbStatusJob
 import com.twidere.twiderex.jobs.status.DeleteStatusJob
 import com.twidere.twiderex.jobs.status.LikeStatusJob
+import com.twidere.twiderex.jobs.status.MastodonVoteJob
 import com.twidere.twiderex.jobs.status.RetweetStatusJob
 import com.twidere.twiderex.jobs.status.UnRetweetStatusJob
 import com.twidere.twiderex.jobs.status.UnlikeStatusJob
@@ -127,6 +128,17 @@ object JobModule {
         statusRepository: StatusRepository,
         inAppNotification: InAppNotification,
     ): UnRetweetStatusJob = UnRetweetStatusJob(
+        accountRepository = accountRepository,
+        statusRepository = statusRepository,
+        inAppNotification = inAppNotification,
+    )
+
+    @Provides
+    fun provideMastodonVoteJob(
+        accountRepository: AccountRepository,
+        statusRepository: StatusRepository,
+        inAppNotification: InAppNotification,
+    ): MastodonVoteJob = MastodonVoteJob(
         accountRepository = accountRepository,
         statusRepository = statusRepository,
         inAppNotification = inAppNotification,
