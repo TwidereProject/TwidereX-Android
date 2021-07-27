@@ -28,6 +28,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.Data
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkerParameters
+import com.twidere.twiderex.extensions.toWorkResult
 import com.twidere.twiderex.jobs.common.DownloadMediaJob
 import com.twidere.twiderex.model.MicroBlogKey
 import dagger.assisted.Assisted
@@ -69,8 +70,6 @@ class DownloadMediaWorker @AssistedInject constructor(
             accountKey = accountKey
         ) {
             contentResolver.openOutputStream(Uri.parse(it))
-        }.let {
-            if (it) Result.success() else Result.failure()
-        }
+        }.toWorkResult()
     }
 }

@@ -23,6 +23,7 @@ package com.twidere.twiderex.di
 import com.twidere.twiderex.jobs.common.DownloadMediaJob
 import com.twidere.twiderex.jobs.common.ShareMediaJob
 import com.twidere.twiderex.jobs.database.DeleteDbStatusJob
+import com.twidere.twiderex.jobs.status.DeleteStatusJob
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.StatusRepository
@@ -52,5 +53,16 @@ object JobModule {
         statusRepository: StatusRepository
     ): DeleteDbStatusJob = DeleteDbStatusJob(
         statusRepository = statusRepository
+    )
+
+    @Provides
+    fun provideDeleteStatusJob(
+        accountRepository: AccountRepository,
+        inAppNotification: InAppNotification,
+        statusRepository: StatusRepository
+    ): DeleteStatusJob = DeleteStatusJob(
+        accountRepository = accountRepository,
+        statusRepository = statusRepository,
+        inAppNotification = inAppNotification
     )
 }

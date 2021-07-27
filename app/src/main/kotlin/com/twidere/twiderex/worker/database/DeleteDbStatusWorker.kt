@@ -26,6 +26,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
+import com.twidere.twiderex.extensions.toWorkResult
 import com.twidere.twiderex.jobs.database.DeleteDbStatusJob
 import com.twidere.twiderex.model.MicroBlogKey
 import dagger.assisted.Assisted
@@ -54,8 +55,6 @@ class DeleteDbStatusWorker @AssistedInject constructor(
             MicroBlogKey.valueOf(it)
         } ?: return Result.failure()
         return deleteDbStatusJob.execute(statusKey)
-            .let {
-                if (it) Result.success() else Result.failure()
-            }
+            .toWorkResult()
     }
 }

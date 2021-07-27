@@ -29,6 +29,7 @@ import androidx.work.Data
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkerParameters
 import com.twidere.twiderex.extensions.shareMedia
+import com.twidere.twiderex.extensions.toWorkResult
 import com.twidere.twiderex.jobs.common.ShareMediaJob
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -68,8 +69,6 @@ class ShareMediaWorker @AssistedInject constructor(
                     true
                 } ?: false
             }
-        }.let {
-            if (it) Result.success() else Result.failure()
-        }
+        }.toWorkResult()
     }
 }
