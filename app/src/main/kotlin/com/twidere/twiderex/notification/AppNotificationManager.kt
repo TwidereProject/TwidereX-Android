@@ -29,7 +29,7 @@ interface AppNotificationManager {
     fun notifyTransient(notificationId: Int, appNotification: AppNotification, duration: Long = 5, durationTimeUnit: TimeUnit = TimeUnit.SECONDS)
 }
 
-open class AppNotification(
+class AppNotification(
     val channelId: String,
     val title: CharSequence? = null,
     val content: CharSequence? = null,
