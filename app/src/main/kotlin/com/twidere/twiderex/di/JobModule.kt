@@ -20,11 +20,18 @@
  */
 package com.twidere.twiderex.di
 
+import android.content.ContentResolver
 import android.content.Context
+import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.jobs.common.DownloadMediaJob
 import com.twidere.twiderex.jobs.common.NotificationJob
 import com.twidere.twiderex.jobs.common.ShareMediaJob
 import com.twidere.twiderex.jobs.database.DeleteDbStatusJob
+import com.twidere.twiderex.jobs.dm.DirectMessageDeleteJob
+import com.twidere.twiderex.jobs.dm.DirectMessageFetchJob
+import com.twidere.twiderex.jobs.dm.TwitterDirectMessageSendJob
+import com.twidere.twiderex.jobs.draft.RemoveDraftJob
+import com.twidere.twiderex.jobs.draft.SaveDraftJob
 import com.twidere.twiderex.jobs.status.DeleteStatusJob
 import com.twidere.twiderex.jobs.status.LikeStatusJob
 import com.twidere.twiderex.jobs.status.MastodonVoteJob
@@ -34,6 +41,8 @@ import com.twidere.twiderex.jobs.status.UnlikeStatusJob
 import com.twidere.twiderex.notification.AppNotificationManager
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.AccountRepository
+import com.twidere.twiderex.repository.DirectMessageRepository
+import com.twidere.twiderex.repository.DraftRepository
 import com.twidere.twiderex.repository.NotificationRepository
 import com.twidere.twiderex.repository.StatusRepository
 import dagger.Module
@@ -93,54 +102,107 @@ object JobModule {
     fun provideLikeStatusJob(
         accountRepository: AccountRepository,
         statusRepository: StatusRepository,
-        inAppNotification: InAppNotification,
+        inAppNotification: InAppNotification
     ): LikeStatusJob = LikeStatusJob(
         accountRepository = accountRepository,
         statusRepository = statusRepository,
-        inAppNotification = inAppNotification,
+        inAppNotification = inAppNotification
     )
 
     @Provides
     fun provideRetweetStatusJob(
         accountRepository: AccountRepository,
         statusRepository: StatusRepository,
-        inAppNotification: InAppNotification,
+        inAppNotification: InAppNotification
     ): RetweetStatusJob = RetweetStatusJob(
         accountRepository = accountRepository,
         statusRepository = statusRepository,
-        inAppNotification = inAppNotification,
+        inAppNotification = inAppNotification
     )
 
     @Provides
     fun provideUnlikeStatusJob(
         accountRepository: AccountRepository,
         statusRepository: StatusRepository,
-        inAppNotification: InAppNotification,
+        inAppNotification: InAppNotification
     ): UnlikeStatusJob = UnlikeStatusJob(
         accountRepository = accountRepository,
         statusRepository = statusRepository,
-        inAppNotification = inAppNotification,
+        inAppNotification = inAppNotification
     )
 
     @Provides
     fun provideUnRetweetStatusJob(
         accountRepository: AccountRepository,
         statusRepository: StatusRepository,
-        inAppNotification: InAppNotification,
+        inAppNotification: InAppNotification
     ): UnRetweetStatusJob = UnRetweetStatusJob(
         accountRepository = accountRepository,
         statusRepository = statusRepository,
-        inAppNotification = inAppNotification,
+        inAppNotification = inAppNotification
     )
 
     @Provides
     fun provideMastodonVoteJob(
         accountRepository: AccountRepository,
         statusRepository: StatusRepository,
-        inAppNotification: InAppNotification,
+        inAppNotification: InAppNotification
     ): MastodonVoteJob = MastodonVoteJob(
         accountRepository = accountRepository,
         statusRepository = statusRepository,
-        inAppNotification = inAppNotification,
+        inAppNotification = inAppNotification
+    )
+
+    @Provides
+    fun provideRemoveDraftJob(
+        repository: DraftRepository
+    ): RemoveDraftJob = RemoveDraftJob(
+        repository = repository,
+    )
+
+    @Provides
+    fun provideSaveDraftJob(
+        repository: DraftRepository,
+        inAppNotification: InAppNotification
+    ): SaveDraftJob = SaveDraftJob(
+        repository = repository,
+        inAppNotification = inAppNotification
+    )
+
+    @Provides
+    fun provideDirectMessageDeleteJob(
+        repository: DirectMessageRepository,
+        accountRepository: AccountRepository
+    ): DirectMessageDeleteJob = DirectMessageDeleteJob(
+        repository = repository,
+        accountRepository = accountRepository
+    )
+
+    @Provides
+    fun provideDirectMessageFetchJob(
+        @ApplicationContext context: Context,
+        repository: DirectMessageRepository,
+        accountRepository: AccountRepository,
+        notificationManager: AppNotificationManager,
+    ): DirectMessageFetchJob = DirectMessageFetchJob(
+        applicationContext = context,
+        repository = repository,
+        accountRepository = accountRepository,
+        notificationManager = notificationManager
+    )
+
+    @Provides
+    fun provideTwitterDirectMessageSendJob(
+        @ApplicationContext context: Context,
+        accountRepository: AccountRepository,
+        notificationManager: AppNotificationManager,
+        contentResolver: ContentResolver,
+        cacheDatabase: CacheDatabase,
+    ): TwitterDirectMessageSendJob = TwitterDirectMessageSendJob(
+        context = context,
+        accountRepository = accountRepository,
+        notificationManager = notificationManager,
+        contentResolver = contentResolver,
+        cacheDatabase = cacheDatabase
     )
 }

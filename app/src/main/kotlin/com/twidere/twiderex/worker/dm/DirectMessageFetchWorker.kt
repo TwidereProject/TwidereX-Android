@@ -25,31 +25,17 @@ import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkerParameters
-import com.twidere.services.microblog.DirectMessageService
-import com.twidere.services.microblog.LookupService
-import com.twidere.twiderex.R
-import com.twidere.twiderex.model.AccountDetails
-import com.twidere.twiderex.model.ui.UiDMConversationWithLatestMessage
-import com.twidere.twiderex.navigation.RootDeepLinksRoute
-import com.twidere.twiderex.notification.AppNotification
-import com.twidere.twiderex.notification.AppNotificationManager
-import com.twidere.twiderex.notification.NotificationChannelSpec
-import com.twidere.twiderex.notification.notificationChannelId
-import com.twidere.twiderex.repository.AccountRepository
-import com.twidere.twiderex.repository.DirectMessageRepository
+import com.twidere.twiderex.extensions.toWorkResult
+import com.twidere.twiderex.jobs.dm.DirectMessageFetchJob
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.firstOrNull
 import java.util.concurrent.TimeUnit
 
 @HiltWorker
 class DirectMessageFetchWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted workerParams: WorkerParameters,
-    private val repository: DirectMessageRepository,
-    private val accountRepository: AccountRepository,
-    private val notificationManager: AppNotificationManager,
+    private val directMessageFetchJob: DirectMessageFetchJob
 ) : CoroutineWorker(
     context,
     workerParams
@@ -60,36 +46,6 @@ class DirectMessageFetchWorker @AssistedInject constructor(
     }
 
     override suspend fun doWork(): Result {
-        return try {
-            accountRepository.activeAccount.firstOrNull()?.takeIf {
-                accountRepository.getAccountPreferences(it.accountKey).isNotificationEnabled.first()
-            }?.let { account ->
-                val result = repository.checkNewMessages(
-                    accountKey = account.accountKey,
-                    service = account.service as DirectMessageService,
-                    lookupService = account.service as LookupService
-                )
-                result.forEach {
-                    notification(account = account, message = it)
-                }
-            } ?: throw Error()
-            Result.success()
-        } catch (e: Throwable) {
-            e.printStackTrace()
-            Result.failure()
-        }
-    }
-
-    private fun notification(account: AccountDetails, message: UiDMConversationWithLatestMessage) {
-        val builder = AppNotification
-            .Builder(
-                account.accountKey.notificationChannelId(
-                    NotificationChannelSpec.ContentMessages.id
-                )
-            )
-            .setContentTitle(applicationContext.getString(R.string.common_notification_messages_title))
-            .setContentText(applicationContext.getString(R.string.common_notification_messages_content, message.latestMessage.sender.displayName))
-            .setDeepLink(RootDeepLinksRoute.Conversation(message.conversation.conversationKey))
-        notificationManager.notify(message.latestMessage.messageKey.hashCode(), builder.build())
+        return directMessageFetchJob.execute().toWorkResult()
     }
 }
