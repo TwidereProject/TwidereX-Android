@@ -29,6 +29,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
+import moe.tlaster.precompose.navigation.transition.AnimatedDialogRoute
 import moe.tlaster.precompose.navigation.transition.AnimatedRoute
 import moe.tlaster.precompose.navigation.transition.NavTransition
 
@@ -106,7 +107,10 @@ fun NavHost(
                     }
                 }
             }
-            routeStack.stacks.forEach {
+            AnimatedDialogRoute(
+                stack = routeStack,
+                navTransition = navTransition,
+            ) {
                 stateHolder.SaveableStateProvider(it.id) {
                     CompositionLocalProvider(
                         LocalViewModelStoreOwner provides it,
