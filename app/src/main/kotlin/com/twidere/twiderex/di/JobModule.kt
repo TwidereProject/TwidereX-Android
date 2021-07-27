@@ -20,12 +20,13 @@
  */
 package com.twidere.twiderex.di
 
-import android.content.ContentResolver
 import android.content.Context
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.jobs.common.DownloadMediaJob
 import com.twidere.twiderex.jobs.common.NotificationJob
 import com.twidere.twiderex.jobs.common.ShareMediaJob
+import com.twidere.twiderex.jobs.compose.MastodonComposeJob
+import com.twidere.twiderex.jobs.compose.TwitterComposeJob
 import com.twidere.twiderex.jobs.database.DeleteDbStatusJob
 import com.twidere.twiderex.jobs.dm.DirectMessageDeleteJob
 import com.twidere.twiderex.jobs.dm.DirectMessageFetchJob
@@ -38,6 +39,9 @@ import com.twidere.twiderex.jobs.status.MastodonVoteJob
 import com.twidere.twiderex.jobs.status.RetweetStatusJob
 import com.twidere.twiderex.jobs.status.UnRetweetStatusJob
 import com.twidere.twiderex.jobs.status.UnlikeStatusJob
+import com.twidere.twiderex.kmp.ExifScrambler
+import com.twidere.twiderex.kmp.FileResolver
+import com.twidere.twiderex.kmp.RemoteNavigator
 import com.twidere.twiderex.notification.AppNotificationManager
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.AccountRepository
@@ -196,13 +200,53 @@ object JobModule {
         @ApplicationContext context: Context,
         accountRepository: AccountRepository,
         notificationManager: AppNotificationManager,
-        contentResolver: ContentResolver,
+        fileResolver: FileResolver,
         cacheDatabase: CacheDatabase,
     ): TwitterDirectMessageSendJob = TwitterDirectMessageSendJob(
         context = context,
         accountRepository = accountRepository,
         notificationManager = notificationManager,
-        contentResolver = contentResolver,
+        fileResolver = fileResolver,
         cacheDatabase = cacheDatabase
+    )
+
+    @Provides
+    fun provideTwitterComposeJob(
+        @ApplicationContext context: Context,
+        accountRepository: AccountRepository,
+        notificationManager: AppNotificationManager,
+        fileResolver: FileResolver,
+        cacheDatabase: CacheDatabase,
+        exifScrambler: ExifScrambler,
+        statusRepository: StatusRepository,
+        remoteNavigator: RemoteNavigator
+    ): TwitterComposeJob = TwitterComposeJob(
+        context = context,
+        accountRepository = accountRepository,
+        notificationManager = notificationManager,
+        fileResolver = fileResolver,
+        cacheDatabase = cacheDatabase,
+        exifScrambler = exifScrambler,
+        statusRepository = statusRepository,
+        remoteNavigator = remoteNavigator
+    )
+
+    @Provides
+    fun provideMastodonComposeJob(
+        @ApplicationContext context: Context,
+        accountRepository: AccountRepository,
+        notificationManager: AppNotificationManager,
+        fileResolver: FileResolver,
+        cacheDatabase: CacheDatabase,
+        exifScrambler: ExifScrambler,
+        remoteNavigator: RemoteNavigator
+    ): MastodonComposeJob = MastodonComposeJob(
+        context = context,
+        accountRepository = accountRepository,
+        notificationManager = notificationManager,
+        fileResolver = fileResolver,
+        cacheDatabase = cacheDatabase,
+        exifScrambler = exifScrambler,
+        remoteNavigator = remoteNavigator
     )
 }

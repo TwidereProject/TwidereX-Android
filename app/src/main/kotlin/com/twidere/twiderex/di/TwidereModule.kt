@@ -20,6 +20,7 @@
  */
 package com.twidere.twiderex.di
 
+import android.content.ContentResolver
 import android.content.Context
 import androidx.core.app.NotificationManagerCompat
 import androidx.datastore.core.DataStore
@@ -29,10 +30,16 @@ import com.twidere.twiderex.action.ComposeAction
 import com.twidere.twiderex.action.DirectMessageAction
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.http.TwidereServiceFactory
+import com.twidere.twiderex.kmp.ExifScrambler
+import com.twidere.twiderex.kmp.FileResolver
+import com.twidere.twiderex.kmp.RemoteNavigator
+import com.twidere.twiderex.kmp.android.AndroidExifScrambler
+import com.twidere.twiderex.kmp.android.AndroidFileResolver
+import com.twidere.twiderex.kmp.android.AndroidNotificationManager
+import com.twidere.twiderex.kmp.android.AndroidRemoteNavigator
 import com.twidere.twiderex.model.AccountPreferences
 import com.twidere.twiderex.notification.AppNotificationManager
 import com.twidere.twiderex.notification.InAppNotification
-import com.twidere.twiderex.notification.android.AndroidNotificationManager
 import com.twidere.twiderex.preferences.proto.MiscPreferences
 import com.twidere.twiderex.utils.PlatformResolver
 import dagger.Module
@@ -84,5 +91,20 @@ object TwidereModule {
     fun provideAppNotificationManager(@ApplicationContext context: Context, notificationManagerCompat: NotificationManagerCompat): AppNotificationManager = AndroidNotificationManager(
         context = context,
         notificationManagerCompat = notificationManagerCompat
+    )
+
+    @Provides
+    fun provideExifScrambler(@ApplicationContext context: Context): ExifScrambler = AndroidExifScrambler(
+        context = context
+    )
+
+    @Provides
+    fun provideFileResolver(contentResolver: ContentResolver): FileResolver = AndroidFileResolver(
+        contentResolver = contentResolver
+    )
+
+    @Provides
+    fun provideRemoteNavigator(@ApplicationContext context: Context): RemoteNavigator = AndroidRemoteNavigator(
+        context = context
     )
 }

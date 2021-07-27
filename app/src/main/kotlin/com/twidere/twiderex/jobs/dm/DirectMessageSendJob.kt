@@ -20,10 +20,8 @@
  */
 package com.twidere.twiderex.jobs.dm
 
-import android.content.ContentResolver
 import android.content.Context
 import android.graphics.BitmapFactory
-import android.net.Uri
 import androidx.room.withTransaction
 import com.twidere.services.microblog.MicroBlogService
 import com.twidere.twiderex.R
@@ -33,6 +31,7 @@ import com.twidere.twiderex.db.model.DbDMEvent.Companion.saveToDb
 import com.twidere.twiderex.db.model.DbDMEventWithAttachments
 import com.twidere.twiderex.db.model.DbDMEventWithAttachments.Companion.saveToDb
 import com.twidere.twiderex.db.model.DbMedia
+import com.twidere.twiderex.kmp.FileResolver
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.DirectMessageSendData
 import com.twidere.twiderex.model.MediaType
@@ -43,6 +42,7 @@ import com.twidere.twiderex.notification.AppNotificationManager
 import com.twidere.twiderex.notification.NotificationChannelSpec
 import com.twidere.twiderex.notification.notificationChannelId
 import com.twidere.twiderex.repository.AccountRepository
+import java.net.URI
 import java.util.UUID
 
 abstract class DirectMessageSendJob<T : MicroBlogService>(
@@ -50,7 +50,7 @@ abstract class DirectMessageSendJob<T : MicroBlogService>(
     protected val cacheDatabase: CacheDatabase,
     private val accountRepository: AccountRepository,
     private val notificationManager: AppNotificationManager,
-    protected val contentResolver: ContentResolver,
+    protected val fileResolver: FileResolver,
 ) {
     suspend fun execute(sendData: DirectMessageSendData, accountKey: MicroBlogKey): Boolean {
         val accountDetails = accountKey.let {
@@ -67,9 +67,7 @@ abstract class DirectMessageSendJob<T : MicroBlogService>(
         }
         var draftEvent: DbDMEventWithAttachments? = null
         return try {
-            val images = sendData.images.map {
-                Uri.parse(it)
-            }
+            val images = sendData.images
             draftEvent = getDraft(sendData, images, accountDetails) ?: throw IllegalArgumentException()
             // val exifScrambler = ExifScrambler(context)
             val mediaIds = arrayListOf<String>()
@@ -116,7 +114,7 @@ abstract class DirectMessageSendJob<T : MicroBlogService>(
         }
     }
 
-    private suspend fun getDraft(sendData: DirectMessageSendData, images: List<Uri>, account: AccountDetails): DbDMEventWithAttachments? {
+    private suspend fun getDraft(sendData: DirectMessageSendData, images: List<String>, account: AccountDetails): DbDMEventWithAttachments? {
         return cacheDatabase.withTransaction {
             cacheDatabase.directMessageDao().findWithMessageKey(
                 account.accountKey,
@@ -130,7 +128,7 @@ abstract class DirectMessageSendJob<T : MicroBlogService>(
         } ?: saveDraft(sendData, images, account)
     }
 
-    private suspend fun saveDraft(sendData: DirectMessageSendData, images: List<Uri>, account: AccountDetails): DbDMEventWithAttachments? {
+    private suspend fun saveDraft(sendData: DirectMessageSendData, images: List<String>, account: AccountDetails): DbDMEventWithAttachments? {
         return cacheDatabase.withTransaction {
             val createTimeStamp = System.currentTimeMillis()
             listOf(
@@ -152,7 +150,7 @@ abstract class DirectMessageSendJob<T : MicroBlogService>(
             ).saveToDb(cacheDatabase)
             cacheDatabase.mediaDao().insertAll(
                 images.mapIndexed { index, uri ->
-                    val imageSize = getImageSize(uri.path)
+                    val imageSize = getImageSize(URI.create(uri).path)
                     DbMedia(
                         _id = UUID.randomUUID().toString(),
                         belongToKey = sendData.draftMessageKey,
@@ -176,8 +174,8 @@ abstract class DirectMessageSendJob<T : MicroBlogService>(
         }
     }
 
-    private fun getMediaType(uri: Uri): MediaType {
-        val type = contentResolver.getType(uri) ?: ""
+    private fun getMediaType(uri: String): MediaType {
+        val type = fileResolver.getMimeType(uri) ?: ""
         return when {
             type.startsWith("image") -> MediaType.photo
             type.startsWith("video") -> MediaType.video
@@ -204,8 +202,8 @@ abstract class DirectMessageSendJob<T : MicroBlogService>(
     ): DbDMEventWithAttachments
 
     protected abstract suspend fun uploadImage(
-        originUri: Uri,
-        scramblerUri: Uri,
+        originUri: String,
+        scramblerUri: String,
         service: T
     ): String?
 

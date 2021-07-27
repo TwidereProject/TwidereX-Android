@@ -20,9 +20,7 @@
  */
 package com.twidere.twiderex.jobs.dm
 
-import android.content.ContentResolver
 import android.content.Context
-import android.net.Uri
 import com.twidere.services.microblog.LookupService
 import com.twidere.services.twitter.TwitterService
 import com.twidere.twiderex.db.CacheDatabase
@@ -31,6 +29,7 @@ import com.twidere.twiderex.db.mapper.toDbDirectMessage
 import com.twidere.twiderex.db.mapper.toDbUser
 import com.twidere.twiderex.db.model.DbDMEventWithAttachments
 import com.twidere.twiderex.db.model.DbUser
+import com.twidere.twiderex.kmp.FileResolver
 import com.twidere.twiderex.model.DirectMessageSendData
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.notification.AppNotificationManager
@@ -40,10 +39,10 @@ class TwitterDirectMessageSendJob(
     context: Context,
     accountRepository: AccountRepository,
     notificationManager: AppNotificationManager,
-    contentResolver: ContentResolver,
+    fileResolver: FileResolver,
     cacheDatabase: CacheDatabase,
 ) : DirectMessageSendJob<TwitterService>(
-    context, cacheDatabase, accountRepository, notificationManager, contentResolver
+    context, cacheDatabase, accountRepository, notificationManager, fileResolver
 ) {
 
     override suspend fun sendMessage(
@@ -70,13 +69,13 @@ class TwitterDirectMessageSendJob(
     }
 
     override suspend fun uploadImage(
-        originUri: Uri,
-        scramblerUri: Uri,
+        originUri: String,
+        scramblerUri: String,
         service: TwitterService
     ): String? {
-        val type = contentResolver.getType(originUri)
-        val size = contentResolver.openFileDescriptor(scramblerUri, "r")?.statSize
-        return contentResolver.openInputStream(scramblerUri)?.use {
+        val type = fileResolver.getMimeType(originUri)
+        val size = fileResolver.getFileSize(originUri)
+        return fileResolver.openInputStream(scramblerUri)?.use {
             service.uploadFile(
                 it,
                 type ?: "image/*",
