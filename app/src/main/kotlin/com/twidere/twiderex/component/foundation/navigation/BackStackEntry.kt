@@ -82,19 +82,19 @@ inline fun <reified T> BackStackEntry.query(name: String, default: T? = null): T
     return queryString?.query(name, default)
 }
 
-inline fun <reified T> BackStackEntry.queryList(name: String): List<T> {
+inline fun <reified T> BackStackEntry.queryList(name: String): List<T?> {
     val value = queryString?.map?.get(name) ?: return emptyList()
     return value.map { convertValue(it) }
 }
 
-inline fun <reified T> convertValue(value: String): T {
+inline fun <reified T> convertValue(value: String): T? {
     return when (T::class) {
-        Int::class -> value.toInt()
-        Long::class -> value.toLong()
+        Int::class -> value.toIntOrNull()
+        Long::class -> value.toLongOrNull()
         String::class -> value
-        Boolean::class -> value.toBoolean()
-        Float::class -> value.toFloat()
-        Double::class -> value.toDouble()
+        Boolean::class -> value.toBooleanStrictOrNull()
+        Float::class -> value.toFloatOrNull()
+        Double::class -> value.toDoubleOrNull()
         else -> throw NotImplementedError()
     } as T
 }
