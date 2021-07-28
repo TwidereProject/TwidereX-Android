@@ -30,15 +30,36 @@ import android.os.Bundle
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
+import androidx.compose.material.darkColors
+import androidx.compose.material.lightColors
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.core.net.ConnectivityManagerCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.google.accompanist.insets.ExperimentalAnimatedInsets
 import com.google.accompanist.insets.ProvideWindowInsets
 import com.twidere.twiderex.action.LocalStatusActions
 import com.twidere.twiderex.action.StatusActions
@@ -103,7 +124,7 @@ class TwidereXActivity : ComponentActivity() {
     @Inject
     lateinit var platformResolver: PlatformResolver
 
-    @OptIn(ExperimentalAnimatedInsets::class)
+    @OptIn(ExperimentalAnimationApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         isActiveNetworkMetered.value = ConnectivityManagerCompat.isActiveNetworkMetered(
@@ -113,42 +134,83 @@ class TwidereXActivity : ComponentActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
         setContent {
-            val windowInsetsControllerCompat =
-                remember { WindowInsetsControllerCompat(window, window.decorView) }
-            val accountViewModel = viewModel<ActiveAccountViewModel>()
-            val account by accountViewModel.account.observeAsState(null)
-            val isActiveNetworkMetered by isActiveNetworkMetered.observeAsState(initial = false)
-            CompositionLocalProvider(
-                LocalInAppNotification provides inAppNotification,
-                LocalWindow provides window,
-                LocalWindowInsetsController provides windowInsetsControllerCompat,
-                LocalActiveAccount provides account,
-                LocalApplication provides application,
-                LocalStatusActions provides statusActions,
-                LocalActivity provides this,
-                LocalActiveAccountViewModel provides accountViewModel,
-                LocalIsActiveNetworkMetered provides isActiveNetworkMetered,
-                LocalPlatformResolver provides platformResolver,
+            var showSplash by rememberSaveable { mutableStateOf(true) }
+            LaunchedEffect(Unit) {
+                preferencesHolder.warmup()
+                showSplash = false
+            }
+            App()
+            AnimatedVisibility(
+                visible = showSplash,
+                enter = fadeIn(),
+                exit = fadeOut(),
             ) {
-                ProvidePreferences(
-                    preferencesHolder,
-                ) {
-                    ProvideAssistedFactory(
-                        viewModelHolder.factory,
-                    ) {
-                        ProvideWindowInsets(
-                            windowInsetsAnimationsEnabled = true
-                        ) {
-                            Router(
-                                navController = navController
-                            )
-                        }
-                    }
-                }
+                Splash()
             }
         }
         intent.data?.let {
             onDeeplink(it)
+        }
+    }
+
+    @Composable
+    private fun Splash() {
+        MaterialTheme(
+            colors = if (isSystemInDarkTheme()) {
+                darkColors()
+            } else {
+                lightColors()
+            }
+        ) {
+            Scaffold {
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center,
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_login_logo),
+                        contentDescription = stringResource(id = R.string.accessibility_common_logo_twidere)
+                    )
+                }
+            }
+        }
+    }
+
+    @Composable
+    private fun App() {
+        val windowInsetsControllerCompat =
+            remember { WindowInsetsControllerCompat(window, window.decorView) }
+        val accountViewModel = viewModel<ActiveAccountViewModel>()
+        val account by accountViewModel.account.observeAsState(null)
+        val isActiveNetworkMetered by isActiveNetworkMetered.observeAsState(initial = false)
+        CompositionLocalProvider(
+            LocalInAppNotification provides inAppNotification,
+            LocalWindow provides window,
+            LocalWindowInsetsController provides windowInsetsControllerCompat,
+            LocalActiveAccount provides account,
+            LocalApplication provides application,
+            LocalStatusActions provides statusActions,
+            LocalActivity provides this,
+            LocalActiveAccountViewModel provides accountViewModel,
+            LocalIsActiveNetworkMetered provides isActiveNetworkMetered,
+            LocalPlatformResolver provides platformResolver,
+        ) {
+            ProvidePreferences(
+                preferencesHolder,
+            ) {
+                ProvideAssistedFactory(
+                    viewModelHolder.factory,
+                ) {
+                    ProvideWindowInsets(
+                        windowInsetsAnimationsEnabled = true
+                    ) {
+                        Router(
+                            navController = navController
+                        )
+                    }
+                }
+            }
         }
     }
 
