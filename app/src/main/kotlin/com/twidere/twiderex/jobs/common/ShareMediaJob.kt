@@ -32,6 +32,7 @@ class ShareMediaJob(
             remoteNavigator.shareMedia(
                 filePath = target,
                 mimeType = type,
+                fromBackground = true
             )
             true
         } ?: throw Error("Unresolved file:$target")
