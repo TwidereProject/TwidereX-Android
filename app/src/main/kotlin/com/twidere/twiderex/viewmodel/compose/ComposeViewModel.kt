@@ -246,8 +246,8 @@ open class ComposeViewModel @AssistedInject constructor(
     val loadingReplyUser = MutableStateFlow(false)
 
     val replyToUser = replyToUserName.map {
-        loadingReplyUser.value = true
         if (it.isNotEmpty()) {
+            loadingReplyUser.value = true
             try {
                 userRepository.lookupUsersByName(
                     it,
