@@ -52,21 +52,18 @@ abstract class DirectMessageSendJob<T : MicroBlogService>(
     private val notificationManager: AppNotificationManager,
     protected val fileResolver: FileResolver,
 ) {
-    suspend fun execute(sendData: DirectMessageSendData, accountKey: MicroBlogKey): Boolean {
+    suspend fun execute(sendData: DirectMessageSendData, accountKey: MicroBlogKey) {
         val accountDetails = accountKey.let {
             accountRepository.findByAccountKey(accountKey = it)
         }?.let {
             accountRepository.getAccountDetails(it)
-        } ?: return false
+        } ?: throw Error("can't find any account matches:$accountKey")
         val notificationId = sendData.draftMessageKey.hashCode()
         @Suppress("UNCHECKED_CAST")
-        val service = try {
-            accountDetails.service as T
-        } catch (e: ClassCastException) {
-            return false
-        }
+        val service = accountDetails.service as T
+
         var draftEvent: DbDMEventWithAttachments? = null
-        return try {
+        try {
             val images = sendData.images
             draftEvent = getDraft(sendData, images, accountDetails) ?: throw IllegalArgumentException()
             // val exifScrambler = ExifScrambler(context)
@@ -82,7 +79,6 @@ abstract class DirectMessageSendJob<T : MicroBlogService>(
             }
             val dbEvent = sendMessage(service, sendData, mediaIds)
             updateDb(draftEvent, dbEvent)
-            true
         } catch (e: Throwable) {
             e.printStackTrace()
             draftEvent?.let {
@@ -99,7 +95,7 @@ abstract class DirectMessageSendJob<T : MicroBlogService>(
                 .setContentText(sendData.text)
                 .setDeepLink(RootDeepLinksRoute.Conversation(sendData.conversationKey))
             notificationManager.notify(notificationId, builder.build())
-            false
+            throw e
         }
     }
 

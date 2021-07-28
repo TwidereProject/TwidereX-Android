@@ -26,7 +26,6 @@ import androidx.work.CoroutineWorker
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
-import com.twidere.twiderex.extensions.toWorkResult
 import com.twidere.twiderex.jobs.draft.RemoveDraftJob
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -50,8 +49,14 @@ class RemoveDraftWorker @AssistedInject constructor(
 
     override suspend fun doWork(): Result {
         val draftId = inputData.getString("draftId") ?: return Result.failure()
-        return removeDraftJob.execute(
-            draftId = draftId
-        ).toWorkResult()
+        return try {
+            removeDraftJob.execute(
+                draftId = draftId
+            )
+            Result.success()
+        } catch (e: Throwable) {
+            e.printStackTrace()
+            Result.failure()
+        }
     }
 }

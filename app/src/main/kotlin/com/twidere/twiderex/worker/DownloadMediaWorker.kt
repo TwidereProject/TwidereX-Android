@@ -20,7 +20,6 @@
  */
 package com.twidere.twiderex.worker
 
-import android.content.ContentResolver
 import android.content.Context
 import android.net.Uri
 import androidx.hilt.work.HiltWorker
@@ -28,7 +27,6 @@ import androidx.work.CoroutineWorker
 import androidx.work.Data
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkerParameters
-import com.twidere.twiderex.extensions.toWorkResult
 import com.twidere.twiderex.jobs.common.DownloadMediaJob
 import com.twidere.twiderex.model.MicroBlogKey
 import dagger.assisted.Assisted
@@ -38,7 +36,6 @@ import dagger.assisted.AssistedInject
 class DownloadMediaWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted workerParams: WorkerParameters,
-    private val contentResolver: ContentResolver,
     private val downloadMediaJob: DownloadMediaJob,
 ) : CoroutineWorker(context, workerParams) {
 
@@ -64,12 +61,16 @@ class DownloadMediaWorker @AssistedInject constructor(
         val accountKey = inputData.getString("accountKey")?.let {
             MicroBlogKey.valueOf(it)
         } ?: return Result.failure()
-        return downloadMediaJob.execute(
-            target = target,
-            source = source,
-            accountKey = accountKey
-        ) {
-            contentResolver.openOutputStream(Uri.parse(it))
-        }.toWorkResult()
+        return try {
+            downloadMediaJob.execute(
+                target = target,
+                source = source,
+                accountKey = accountKey
+            )
+            Result.success()
+        } catch (e: Throwable) {
+            e.printStackTrace()
+            Result.failure()
+        }
     }
 }

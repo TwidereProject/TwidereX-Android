@@ -60,15 +60,23 @@ import dagger.hilt.components.SingletonComponent
 object JobModule {
 
     @Provides
-    fun provideShareMediaJob(): ShareMediaJob = ShareMediaJob()
+    fun provideShareMediaJob(
+        fileResolver: FileResolver,
+        remoteNavigator: RemoteNavigator
+    ): ShareMediaJob = ShareMediaJob(
+        fileResolver = fileResolver,
+        remoteNavigator = remoteNavigator
+    )
 
     @Provides
     fun provideDownloadMediaJob(
         accountRepository: AccountRepository,
-        inAppNotification: InAppNotification
+        inAppNotification: InAppNotification,
+        fileResolver: FileResolver,
     ): DownloadMediaJob = DownloadMediaJob(
         accountRepository = accountRepository,
-        inAppNotification = inAppNotification
+        inAppNotification = inAppNotification,
+        fileResolver = fileResolver
     )
 
     @Provides

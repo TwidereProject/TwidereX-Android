@@ -23,7 +23,6 @@ package com.twidere.twiderex.worker.dm
 import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.twidere.twiderex.extensions.toWorkResult
 import com.twidere.twiderex.jobs.dm.DirectMessageSendJob
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.toDirectMessageSendData
@@ -42,9 +41,15 @@ abstract class DirectMessageSendWorker(
         val accountKey = inputData.getString("accountKey")?.let {
             MicroBlogKey.valueOf(it)
         } ?: return Result.failure()
-        return directMessageSendJob.execute(
-            sendData = sendData,
-            accountKey = accountKey
-        ).toWorkResult()
+        return try {
+            directMessageSendJob.execute(
+                sendData = sendData,
+                accountKey = accountKey
+            )
+            Result.success()
+        } catch (e: Throwable) {
+            e.printStackTrace()
+            Result.failure()
+        }
     }
 }

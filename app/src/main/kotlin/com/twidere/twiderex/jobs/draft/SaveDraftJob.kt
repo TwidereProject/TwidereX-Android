@@ -29,8 +29,8 @@ class SaveDraftJob(
     private val repository: DraftRepository,
     private val inAppNotification: InAppNotification,
 ) {
-    suspend fun execute(data: ComposeData): Boolean {
-        return with(data) {
+    suspend fun execute(data: ComposeData) {
+        with(data) {
             try {
                 repository.addOrUpgrade(
                     content,
@@ -43,7 +43,7 @@ class SaveDraftJob(
                 true
             } catch (e: Throwable) {
                 e.notify(inAppNotification)
-                false
+                throw e
             }
         }
     }

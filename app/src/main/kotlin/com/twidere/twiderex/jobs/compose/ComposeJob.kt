@@ -43,7 +43,7 @@ abstract class ComposeJob<T : MicroBlogService>(
     private val exifScrambler: ExifScrambler,
     private val remoteNavigator: RemoteNavigator,
 ) {
-    suspend fun execute(composeData: ComposeData, accountKey: MicroBlogKey): Boolean {
+    suspend fun execute(composeData: ComposeData, accountKey: MicroBlogKey) {
         val builder = AppNotification
             .Builder(NotificationChannelSpec.BackgroundProgresses.id)
             .setContentTitle(applicationContext.getString(R.string.common_alerts_tweet_sending_title))
@@ -54,17 +54,13 @@ abstract class ComposeJob<T : MicroBlogService>(
             accountRepository.findByAccountKey(accountKey = it)
         }?.let {
             accountRepository.getAccountDetails(it)
-        } ?: return false
+        } ?: throw Error("Can't find any account matches:$$accountKey")
         val notificationId = composeData.draftId.hashCode()
         @Suppress("UNCHECKED_CAST")
-        val service = try {
-            accountDetails.service as T
-        } catch (e: ClassCastException) {
-            return false
-        }
+        val service = accountDetails.service as T
         notificationManager.notify(notificationId, builder.build())
 
-        return try {
+        try {
             val mediaIds = arrayListOf<String>()
             val images = composeData.images
             images.forEachIndexed { index, uri ->
@@ -94,7 +90,6 @@ abstract class ComposeJob<T : MicroBlogService>(
                     fromBackground = true
                 )
             }
-            true
         } catch (e: Throwable) {
             e.printStackTrace()
             builder.setOngoing(false)
@@ -104,7 +99,7 @@ abstract class ComposeJob<T : MicroBlogService>(
                 .setContentText(composeData.content)
                 .setDeepLink(RootDeepLinksRoute.Draft(composeData.draftId))
             notificationManager.notify(notificationId, builder.build())
-            false
+            throw e
         }
     }
 

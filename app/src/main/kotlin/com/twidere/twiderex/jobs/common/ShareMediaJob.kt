@@ -20,8 +20,20 @@
  */
 package com.twidere.twiderex.jobs.common
 
-class ShareMediaJob {
-    fun execute(target: String, shareMedia: (target: String) -> Boolean): Boolean {
-        return shareMedia(target)
+import com.twidere.twiderex.kmp.FileResolver
+import com.twidere.twiderex.kmp.RemoteNavigator
+
+class ShareMediaJob(
+    private val fileResolver: FileResolver,
+    private val remoteNavigator: RemoteNavigator
+) {
+    fun execute(target: String) {
+        fileResolver.getMimeType(target)?.let { type ->
+            remoteNavigator.shareMedia(
+                filePath = target,
+                mimeType = type,
+            )
+            true
+        } ?: throw Error("Unresolved file:$target")
     }
 }

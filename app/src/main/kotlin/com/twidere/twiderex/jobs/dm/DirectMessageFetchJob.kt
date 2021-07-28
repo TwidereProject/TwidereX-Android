@@ -42,24 +42,18 @@ class DirectMessageFetchJob(
     private val accountRepository: AccountRepository,
     private val notificationManager: AppNotificationManager,
 ) {
-    suspend fun execute(): Boolean {
-        return try {
-            accountRepository.activeAccount.firstOrNull()?.takeIf {
-                accountRepository.getAccountPreferences(it.accountKey).isNotificationEnabled.first()
-            }?.let { account ->
-                val result = repository.checkNewMessages(
-                    accountKey = account.accountKey,
-                    service = account.service as DirectMessageService,
-                    lookupService = account.service as LookupService
-                )
-                result.forEach {
-                    notification(account = account, message = it)
-                }
-            } ?: throw Error()
-            true
-        } catch (e: Throwable) {
-            e.printStackTrace()
-            false
+    suspend fun execute() {
+        accountRepository.activeAccount.firstOrNull()?.takeIf {
+            accountRepository.getAccountPreferences(it.accountKey).isNotificationEnabled.first()
+        }?.let { account ->
+            val result = repository.checkNewMessages(
+                accountKey = account.accountKey,
+                service = account.service as DirectMessageService,
+                lookupService = account.service as LookupService
+            )
+            result.forEach {
+                notification(account = account, message = it)
+            }
         }
     }
 

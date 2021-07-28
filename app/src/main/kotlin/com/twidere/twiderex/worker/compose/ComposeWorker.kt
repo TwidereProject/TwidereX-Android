@@ -24,7 +24,6 @@ import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.twidere.services.microblog.MicroBlogService
-import com.twidere.twiderex.extensions.toWorkResult
 import com.twidere.twiderex.jobs.compose.ComposeJob
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.toComposeData
@@ -40,9 +39,15 @@ abstract class ComposeWorker<T : MicroBlogService>(
         val accountKey = inputData.getString("accountKey")?.let {
             MicroBlogKey.valueOf(it)
         } ?: return Result.failure()
-        return composeJob.execute(
-            composeData = composeData,
-            accountKey = accountKey
-        ).toWorkResult()
+        return try {
+            composeJob.execute(
+                composeData = composeData,
+                accountKey = accountKey
+            )
+            Result.success()
+        } catch (e: Throwable) {
+            e.printStackTrace()
+            Result.failure()
+        }
     }
 }

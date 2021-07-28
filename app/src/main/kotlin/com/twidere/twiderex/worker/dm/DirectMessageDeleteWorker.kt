@@ -25,7 +25,6 @@ import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkerParameters
-import com.twidere.twiderex.extensions.toWorkResult
 import com.twidere.twiderex.jobs.dm.DirectMessageDeleteJob
 import com.twidere.twiderex.model.DirectMessageDeleteData
 import com.twidere.twiderex.model.MicroBlogKey
@@ -56,9 +55,15 @@ class DirectMessageDeleteWorker @AssistedInject constructor(
         val accountKey = inputData.getString("accountKey")?.let {
             MicroBlogKey.valueOf(it)
         } ?: return Result.failure()
-        return deleteJob.execute(
-            deleteData = deleteData,
-            accountKey = accountKey
-        ).toWorkResult()
+        return try {
+            deleteJob.execute(
+                deleteData = deleteData,
+                accountKey = accountKey
+            )
+            Result.success()
+        } catch (e: Throwable) {
+            e.printStackTrace()
+            Result.failure()
+        }
     }
 }

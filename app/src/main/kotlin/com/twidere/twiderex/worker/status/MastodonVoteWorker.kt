@@ -26,7 +26,6 @@ import androidx.work.CoroutineWorker
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
-import com.twidere.twiderex.extensions.toWorkResult
 import com.twidere.twiderex.jobs.status.MastodonVoteJob
 import com.twidere.twiderex.model.MicroBlogKey
 import dagger.assisted.Assisted
@@ -65,10 +64,16 @@ class MastodonVoteWorker @AssistedInject constructor(
         val statusKey = inputData.getString("statusKey")?.let {
             MicroBlogKey.valueOf(it)
         } ?: return Result.failure()
-        return mastodonVoteJob.execute(
-            votes = votes,
-            accountKey = accountKey,
-            statusKey = statusKey
-        ).toWorkResult()
+        return try {
+            mastodonVoteJob.execute(
+                votes = votes,
+                accountKey = accountKey,
+                statusKey = statusKey
+            )
+            Result.success()
+        } catch (e: Throwable) {
+            e.printStackTrace()
+            Result.failure()
+        }
     }
 }

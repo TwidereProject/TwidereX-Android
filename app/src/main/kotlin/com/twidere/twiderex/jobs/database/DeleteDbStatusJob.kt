@@ -26,12 +26,7 @@ import com.twidere.twiderex.repository.StatusRepository
 class DeleteDbStatusJob(
     private val statusRepository: StatusRepository
 ) {
-    suspend fun execute(statusKey: MicroBlogKey): Boolean {
-        try {
-            statusRepository.removeStatus(statusKey)
-        } catch (e: Exception) {
-            return false
-        }
-        return true
+    suspend fun execute(statusKey: MicroBlogKey) {
+        statusRepository.removeStatus(statusKey)
     }
 }

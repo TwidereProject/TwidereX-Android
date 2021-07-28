@@ -36,7 +36,6 @@ abstract class StatusJob(
     private val statusRepository: StatusRepository,
     private val inAppNotification: InAppNotification,
 ) {
-    @Throws
     suspend fun execute(accountKey: MicroBlogKey, statusKey: MicroBlogKey): StatusResult {
         val status = statusKey.let {
             statusRepository.loadFromCache(it, accountKey = accountKey)

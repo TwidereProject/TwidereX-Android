@@ -39,7 +39,7 @@ import com.twidere.twiderex.notification.NotificationChannelSpec
 import com.twidere.twiderex.notification.notificationChannelId
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.NotificationRepository
-import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
@@ -50,17 +50,14 @@ class NotificationJob(
     private val accountRepository: AccountRepository,
     private val notificationManager: AppNotificationManager,
 ) {
-    val scope = MainScope()
-    suspend fun execute(enableNotification: Boolean): Boolean {
-        return if (!enableNotification) {
-            true
-        } else {
+    suspend fun execute(enableNotification: Boolean) = coroutineScope {
+        if (!enableNotification) {
             accountRepository.getAccounts().map { accountRepository.getAccountDetails(it) }
                 .filter {
                     it.preferences.isNotificationEnabled.first()
                 }
                 .map { account ->
-                    scope.launch {
+                    launch {
                         val activities = try {
                             repository.activities(account)
                         } catch (e: Throwable) {
@@ -72,7 +69,6 @@ class NotificationJob(
                         }
                     }
                 }.joinAll()
-            true
         }
     }
 

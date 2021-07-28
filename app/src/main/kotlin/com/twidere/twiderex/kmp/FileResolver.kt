@@ -21,6 +21,7 @@
 package com.twidere.twiderex.kmp
 
 import java.io.InputStream
+import java.io.OutputStream
 
 interface FileResolver {
     fun getMimeType(file: String): String?
@@ -28,4 +29,6 @@ interface FileResolver {
     fun getFileSize(file: String): Long?
 
     fun openInputStream(file: String): InputStream?
+
+    fun openOutputStream(file: String): OutputStream?
 }

@@ -25,7 +25,6 @@ import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkerParameters
-import com.twidere.twiderex.extensions.toWorkResult
 import com.twidere.twiderex.jobs.dm.DirectMessageFetchJob
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -46,6 +45,11 @@ class DirectMessageFetchWorker @AssistedInject constructor(
     }
 
     override suspend fun doWork(): Result {
-        return directMessageFetchJob.execute().toWorkResult()
+        try {
+            directMessageFetchJob.execute()
+        } catch (e: Throwable) {
+            // no need to handle this error
+        }
+        return Result.success()
     }
 }

@@ -25,12 +25,10 @@ import androidx.datastore.core.DataStore
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.twidere.twiderex.extensions.toWorkResult
 import com.twidere.twiderex.jobs.common.NotificationJob
 import com.twidere.twiderex.preferences.proto.NotificationPreferences
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.first
 
 @HiltWorker
@@ -41,8 +39,13 @@ class NotificationWorker @AssistedInject constructor(
     private val notificationJob: NotificationJob
 
 ) : CoroutineWorker(appContext, params) {
-    override suspend fun doWork(): Result = coroutineScope {
-        notificationJob.execute(notificationPreferences.data.first().enableNotification)
-            .toWorkResult()
+    override suspend fun doWork(): Result {
+        return try {
+            notificationJob.execute(notificationPreferences.data.first().enableNotification)
+            Result.success()
+        } catch (e: Throwable) {
+            e.printStackTrace()
+            Result.failure()
+        }
     }
 }

@@ -25,12 +25,7 @@ import com.twidere.twiderex.repository.DraftRepository
 class RemoveDraftJob(
     private val repository: DraftRepository,
 ) {
-    suspend fun execute(draftId: String): Boolean {
-        return try {
-            repository.remove(draftId = draftId)
-            true
-        } catch (e: Throwable) {
-            false
-        }
+    suspend fun execute(draftId: String) {
+        repository.remove(draftId = draftId)
     }
 }

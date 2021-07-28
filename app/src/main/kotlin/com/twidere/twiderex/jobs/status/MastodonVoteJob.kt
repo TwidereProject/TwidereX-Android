@@ -33,18 +33,18 @@ class MastodonVoteJob(
     private val statusRepository: StatusRepository,
     private val inAppNotification: InAppNotification,
 ) {
-    suspend fun execute(votes: List<Int>, accountKey: MicroBlogKey, statusKey: MicroBlogKey): Boolean {
-        val status = statusRepository.loadFromCache(statusKey, accountKey = accountKey) ?: return false
+    suspend fun execute(votes: List<Int>, accountKey: MicroBlogKey, statusKey: MicroBlogKey) {
+        val status = statusRepository.loadFromCache(statusKey, accountKey = accountKey) ?: throw Error("Can't find any status matches:$statusKey")
         if (status.mastodonExtra?.poll == null || status.platformType != PlatformType.Mastodon) {
-            return true
+            throw Error()
         }
         val service = accountRepository.findByAccountKey(accountKey)?.let {
             accountRepository.getAccountDetails(it)
         }?.let {
             it.service as? MastodonService
-        } ?: return false
+        } ?: throw Error()
 
-        val pollId = status.mastodonExtra.poll.id ?: return false
+        val pollId = status.mastodonExtra.poll.id ?: throw Error("Poll id is null")
         val originPoll = status.mastodonExtra.poll
         statusRepository.updateStatus(statusKey = status.statusKey) {
             it.mastodonExtra = status.mastodonExtra.copy(
@@ -54,14 +54,13 @@ class MastodonVoteJob(
                 )
             )
         }
-        return try {
+        try {
             val newPoll = service.vote(pollId, votes)
             statusRepository.updateStatus(statusKey = status.statusKey) {
                 it.mastodonExtra = status.mastodonExtra.copy(
                     poll = newPoll
                 )
             }
-            true
         } catch (e: Throwable) {
             statusRepository.updateStatus(statusKey = status.statusKey) {
                 it.mastodonExtra = status.mastodonExtra.copy(
@@ -69,7 +68,7 @@ class MastodonVoteJob(
                 )
             }
             e.notify(inAppNotification)
-            false
+            throw e
         }
     }
 }

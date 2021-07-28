@@ -25,7 +25,6 @@ import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkerParameters
-import com.twidere.twiderex.extensions.toWorkResult
 import com.twidere.twiderex.jobs.draft.SaveDraftJob
 import com.twidere.twiderex.model.ComposeData
 import com.twidere.twiderex.model.toComposeData
@@ -48,6 +47,12 @@ class SaveDraftWorker @AssistedInject constructor(
 
     override suspend fun doWork(): Result {
         val data = inputData.toComposeData()
-        return saveDraftJob.execute(data = data).toWorkResult()
+        return try {
+            saveDraftJob.execute(data = data)
+            Result.success()
+        } catch (e: Throwable) {
+            e.printStackTrace()
+            Result.failure()
+        }
     }
 }

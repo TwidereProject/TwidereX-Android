@@ -22,35 +22,33 @@ package com.twidere.twiderex.jobs.common
 
 import com.twidere.services.microblog.DownloadMediaService
 import com.twidere.twiderex.R
+import com.twidere.twiderex.kmp.FileResolver
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.AccountRepository
-import java.io.OutputStream
 
 class DownloadMediaJob(
     private val accountRepository: AccountRepository,
     private val inAppNotification: InAppNotification,
+    private val fileResolver: FileResolver,
 ) {
     suspend fun execute(
         target: String,
         source: String,
         accountKey: MicroBlogKey,
-        openOutputStream: (target: String) -> OutputStream?
-    ): Boolean {
+    ) {
         val accountDetails = accountKey.let {
             accountRepository.findByAccountKey(accountKey = it)
         }?.let {
             accountRepository.getAccountDetails(it)
-        } ?: return false
+        } ?: throw Error("Can't find any account matches:$$accountKey")
         val service = accountDetails.service
         if (service !is DownloadMediaService) {
-            return false
+            throw Error("Service must be DownloadMediaService")
         }
-        openOutputStream(target)?.use {
+        fileResolver.openOutputStream(target)?.use {
             service.download(target = source).copyTo(it)
-        } ?: return false
-
+        } ?: throw Error("Download failed")
         inAppNotification.show(R.string.common_controls_actions_save)
-        return true
     }
 }

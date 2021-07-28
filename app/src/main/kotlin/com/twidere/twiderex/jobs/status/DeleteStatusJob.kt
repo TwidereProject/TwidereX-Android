@@ -20,7 +20,6 @@
  */
 package com.twidere.twiderex.jobs.status
 
-import com.twidere.services.http.MicroBlogException
 import com.twidere.services.microblog.StatusService
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.notification.InAppNotification
@@ -36,24 +35,20 @@ class DeleteStatusJob(
     suspend fun execute(
         accountKey: MicroBlogKey,
         statusKey: MicroBlogKey
-    ): Boolean {
+    ) {
         val status = statusKey.let {
             statusRepository.loadFromCache(it, accountKey = accountKey)
-        } ?: return false
+        } ?: throw Error("Can't find any status matches:$statusKey")
         val service = accountRepository.findByAccountKey(accountKey)?.let {
             accountRepository.getAccountDetails(it)
         }?.let {
             it.service as? StatusService
-        } ?: return false
-        return try {
+        } ?: throw Error()
+        try {
             service.delete(status.statusId)
-            true
-        } catch (e: MicroBlogException) {
-            e.notify(inAppNotification)
-            false
         } catch (e: Throwable) {
             e.notify(inAppNotification)
-            false
+            throw e
         }
     }
 }

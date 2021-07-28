@@ -24,6 +24,7 @@ import android.content.ContentResolver
 import android.net.Uri
 import com.twidere.twiderex.kmp.FileResolver
 import java.io.InputStream
+import java.io.OutputStream
 
 class AndroidFileResolver(private val contentResolver: ContentResolver) : FileResolver {
     override fun getMimeType(file: String): String? {
@@ -36,5 +37,9 @@ class AndroidFileResolver(private val contentResolver: ContentResolver) : FileRe
 
     override fun openInputStream(file: String): InputStream? {
         return contentResolver.openInputStream(Uri.parse(file))
+    }
+
+    override fun openOutputStream(file: String): OutputStream? {
+        return contentResolver.openOutputStream(Uri.parse(file))
     }
 }
