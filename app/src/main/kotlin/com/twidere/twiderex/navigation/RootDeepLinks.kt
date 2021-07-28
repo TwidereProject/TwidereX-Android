@@ -29,7 +29,7 @@ import com.twidere.twiderex.viewmodel.compose.ComposeType
  * make it's name the same to route parameters in Root.kt too
  */
 @AppRoute(
-    prefix = "$twidereXSchema://"
+    schema = twidereXSchema
 )
 interface RootDeepLinks {
     interface Twitter {
