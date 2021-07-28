@@ -23,7 +23,7 @@ package com.twidere.route.processor
 @Retention(AnnotationRetention.SOURCE)
 @Target(AnnotationTarget.CLASS)
 annotation class AppRoute(
-    val prefix: String = "",
+    val schema: String = "",
     val packageName: String = "",
     val routeClassName: String = "",
     val definitionClassName: String = "",
