@@ -21,6 +21,7 @@
 package com.twidere.route.processor
 
 private const val StandardIndent = "    "
+private const val RouteDivider = "/"
 
 internal interface RouteDefinition {
     val name: String
@@ -41,7 +42,7 @@ internal fun RouteDefinition.parents(): List<RouteDefinition> {
 
 internal val RouteDefinition.parentPath
     get() = parents()
-        .joinToString("/") { it.name }
+        .joinToString(RouteDivider) { it.name }
 
 internal val RouteDefinition.indent
     get() = parents()
@@ -49,13 +50,13 @@ internal val RouteDefinition.indent
         .joinToString("") { StandardIndent }
 
 internal data class PrefixRouteDefinition(
-    val prefix: String,
+    val schema: String,
     val child: NestedRouteDefinition,
     val routeClassName: String,
     val definitionClassName: String,
 ) : RouteDefinition {
     override val name: String
-        get() = prefix
+        get() = if (schema.isEmpty()) "" else "$schema:$RouteDivider"
     override val parent: RouteDefinition?
         get() = null
 
@@ -98,11 +99,11 @@ internal data class ConstRouteDefinition(
     override val parent: RouteDefinition? = null,
 ) : RouteDefinition {
     override fun generateDefinition(): String {
-        return "${indent}const val $name = \"$parentPath/${name}\""
+        return "${indent}const val $name = \"$parentPath$RouteDivider${name}\""
     }
 
     override fun generateRoute(): String {
-        return "${indent}override val $name = \"$parentPath/${name}\""
+        return "${indent}override val $name = \"$parentPath$RouteDivider${name}\""
     }
 }
 
@@ -114,17 +115,17 @@ internal data class FunctionRouteDefinition(
     override fun generateDefinition(): String {
         val path = parameters
             .filter { !it.isNullable }
-            .joinToString("/") { parameter ->
+            .joinToString(RouteDivider) { parameter ->
                 "{${parameter.name}}"
             }
             .let {
                 if (it.isNotEmpty()) {
-                    "/$it"
+                    "$RouteDivider$it"
                 } else {
                     it
                 }
             }
-        return "${indent}const val $name = \"$parentPath/$name$path\""
+        return "${indent}const val $name = \"$parentPath$RouteDivider$name$path\""
     }
 
     override fun generateRoute(): String {
@@ -133,7 +134,7 @@ internal data class FunctionRouteDefinition(
             .joinToString("&") { parameter ->
                 val name = parameter.name
                 if (parameter.type == "kotlin.String") {
-                    "$name=${encode(name)}"
+                    "$name=${encodeNullable(name)}"
                 } else {
                     "$name=\$$name"
                 }
@@ -160,7 +161,7 @@ internal data class FunctionRouteDefinition(
             }
         val pathWithParameter = parameters
             .filter { !it.isNullable }
-            .joinToString("/") { parameter ->
+            .joinToString(RouteDivider) { parameter ->
                 val name = parameter.name
                 if (parameter.type == "kotlin.String") {
                     encode(name)
@@ -170,16 +171,17 @@ internal data class FunctionRouteDefinition(
             }
             .let {
                 if (it.isNotEmpty()) {
-                    "/$it"
+                    "$RouteDivider$it"
                 } else {
                     it
                 }
             }
 
-        return "${indent}override fun $name($parameterStr) = \"$parentPath/$name$pathWithParameter${query}\""
+        return "${indent}override fun $name($parameterStr) = \"$parentPath$RouteDivider$name$pathWithParameter${query}\""
     }
 
     private fun encode(value: String) = "\${java.net.URLEncoder.encode($value, \"UTF-8\")}"
+    private fun encodeNullable(value: String) = "\${java.net.URLEncoder.encode(if($value == null) \"\" else $value, \"UTF-8\")}"
 }
 
 internal data class RouteParameter(

@@ -26,14 +26,9 @@ import androidx.work.CoroutineWorker
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
-import com.twidere.services.http.MicroBlogException
-import com.twidere.services.microblog.StatusService
+import com.twidere.twiderex.jobs.status.DeleteStatusJob
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiStatus
-import com.twidere.twiderex.notification.InAppNotification
-import com.twidere.twiderex.repository.AccountRepository
-import com.twidere.twiderex.repository.StatusRepository
-import com.twidere.twiderex.utils.notify
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 
@@ -41,9 +36,7 @@ import dagger.assisted.AssistedInject
 class DeleteStatusWorker @AssistedInject constructor(
     @Assisted appContext: Context,
     @Assisted params: WorkerParameters,
-    private val accountRepository: AccountRepository,
-    private val statusRepository: StatusRepository,
-    private val inAppNotification: InAppNotification,
+    private val deleteStatusJob: DeleteStatusJob
 ) : CoroutineWorker(appContext, params) {
     companion object {
         fun create(
@@ -63,24 +56,17 @@ class DeleteStatusWorker @AssistedInject constructor(
         val accountKey = inputData.getString("accountKey")?.let {
             MicroBlogKey.valueOf(it)
         } ?: return Result.failure()
-        val status = inputData.getString("statusKey")?.let {
+        val statusKey = inputData.getString("statusKey")?.let {
             MicroBlogKey.valueOf(it)
-        }?.let {
-            statusRepository.loadFromCache(it, accountKey = accountKey)
-        } ?: return Result.failure()
-        val service = accountRepository.findByAccountKey(accountKey)?.let {
-            accountRepository.getAccountDetails(it)
-        }?.let {
-            it.service as? StatusService
         } ?: return Result.failure()
         return try {
-            service.delete(status.statusId)
+            deleteStatusJob.execute(
+                accountKey = accountKey,
+                statusKey = statusKey
+            )
             Result.success()
-        } catch (e: MicroBlogException) {
-            e.notify(inAppNotification)
-            Result.failure()
         } catch (e: Throwable) {
-            e.notify(inAppNotification)
+            e.printStackTrace()
             Result.failure()
         }
     }

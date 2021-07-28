@@ -18,7 +18,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.utils
+package com.twidere.twiderex.kmp.android
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -26,19 +26,21 @@ import android.graphics.BitmapFactory
 import android.net.Uri
 import androidx.core.net.toUri
 import androidx.exifinterface.media.ExifInterface
+import com.twidere.twiderex.kmp.ExifScrambler
 import java.io.File
 import java.util.UUID
 
-class ExifScrambler(private val context: Context) {
-    fun removeExifData(uri: Uri, compress: Int = 100): Uri {
+class AndroidExifScrambler(private val context: Context) : ExifScrambler {
+    override fun removeExifData(file: String, compress: Int): String {
         // first get input stream
+        val uri = Uri.parse(file)
         val contentResolver = context.contentResolver
         contentResolver.openInputStream(uri)?.use { input ->
             // decode to bitmap because bitmap won't store exif meta data
             val bitmap = try {
                 BitmapFactory.decodeStream(input)
             } catch (oom: OutOfMemoryError) {
-                return uri
+                return file
             }
             // create an cache image
             val mimeType = contentResolver.getType(uri) ?: ""
@@ -74,13 +76,13 @@ class ExifScrambler(private val context: Context) {
                     }
                 }
             }
-            return imageCache.toUri()
+            return imageCache.toUri().toString()
         }
-        return uri
+        return uri.toString()
     }
 
-    fun deleteCacheFile(uri: Uri) {
-        uri.path?.let {
+    override fun deleteCacheFile(file: String) {
+        Uri.parse(file).path?.let {
             File(it)
         }?.apply {
             if (exists()) delete()

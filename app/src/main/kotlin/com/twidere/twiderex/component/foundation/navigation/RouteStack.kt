@@ -23,69 +23,50 @@ package moe.tlaster.precompose.navigation
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.LifecycleRegistry
 import moe.tlaster.precompose.navigation.transition.NavTransition
 
 @Stable
 internal class RouteStack(
     val id: Long,
-    val scene: BackStackEntry,
-    val dialogStack: SnapshotStateList<BackStackEntry> = mutableStateListOf(),
+    val stacks: SnapshotStateList<BackStackEntry> = mutableStateListOf(),
     val navTransition: NavTransition? = null,
-) : LifecycleOwner {
+) {
     private var destroyAfterTransition = false
-    val currentEntry: BackStackEntry
-        get() = if (dialogStack.any()) {
-            dialogStack.last()
-        } else {
-            scene
-        }
-    val currentDialogStack: BackStackEntry?
-        get() = dialogStack.lastOrNull()
-
-    private val lifecycleRegistry by lazy {
-        LifecycleRegistry(this)
-    }
+    val currentEntry: BackStackEntry?
+        get() = stacks.lastOrNull()
 
     val canGoBack: Boolean
-        get() = dialogStack.isNotEmpty()
+        get() = stacks.size > 1
 
     fun goBack(): BackStackEntry {
-        return dialogStack.removeLast().apply {
-            viewModelStore.clear()
+        return stacks.removeLast().also {
+            it.destroy()
         }
     }
 
     fun onActive() {
-        lifecycleRegistry.currentState = Lifecycle.State.RESUMED
+        currentEntry?.active()
     }
 
     fun onInActive() {
-        if (lifecycleRegistry.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
-            lifecycleRegistry.currentState = Lifecycle.State.STARTED
-        }
+        currentEntry?.inActive()
         if (destroyAfterTransition) {
             onDestroyed()
         }
     }
 
-    fun onDestroyed() {
-        if (lifecycleRegistry.currentState.isAtLeast(Lifecycle.State.RESUMED) ||
-            lifecycleRegistry.currentState == Lifecycle.State.INITIALIZED
-        ) {
-            destroyAfterTransition = true
-        } else {
-            lifecycleRegistry.currentState = Lifecycle.State.DESTROYED
-            dialogStack.forEach {
-                it.viewModelStore.clear()
-            }
-            scene.viewModelStore.clear()
-        }
+    fun destroyAfterTransition() {
+        destroyAfterTransition = true
     }
 
-    override fun getLifecycle(): Lifecycle {
-        return lifecycleRegistry
+    fun onDestroyed() {
+        stacks.forEach {
+            it.destroy()
+        }
+        stacks.clear()
+    }
+
+    fun hasRoute(route: String): Boolean {
+        return stacks.any { it.route.route == route }
     }
 }

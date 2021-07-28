@@ -32,6 +32,10 @@ import com.twidere.twiderex.preferences.proto.AppearancePreferences
 import com.twidere.twiderex.preferences.proto.DisplayPreferences
 import com.twidere.twiderex.preferences.proto.MiscPreferences
 import com.twidere.twiderex.ui.LocalVideoPlayback
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
@@ -42,7 +46,15 @@ data class PreferencesHolder @Inject constructor(
     val appearancePreferences: DataStore<AppearancePreferences>,
     val displayPreferences: DataStore<DisplayPreferences>,
     val miscPreferences: DataStore<MiscPreferences>
-)
+) {
+    suspend fun warmup() = coroutineScope {
+        awaitAll(
+            async { appearancePreferences.data.firstOrNull() },
+            async { displayPreferences.data.firstOrNull() },
+            async { miscPreferences.data.firstOrNull() },
+        )
+    }
+}
 
 @Composable
 fun ProvidePreferences(

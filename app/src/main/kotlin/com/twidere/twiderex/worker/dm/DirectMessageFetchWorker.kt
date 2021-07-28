@@ -20,39 +20,21 @@
  */
 package com.twidere.twiderex.worker.dm
 
-import android.app.PendingIntent
 import android.content.Context
-import android.content.Intent
-import android.net.Uri
-import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkerParameters
-import com.twidere.services.microblog.DirectMessageService
-import com.twidere.services.microblog.LookupService
-import com.twidere.twiderex.R
-import com.twidere.twiderex.model.AccountDetails
-import com.twidere.twiderex.model.ui.UiDMConversationWithLatestMessage
-import com.twidere.twiderex.navigation.RootRoute
-import com.twidere.twiderex.notification.NotificationChannelSpec
-import com.twidere.twiderex.notification.notificationChannelId
-import com.twidere.twiderex.repository.AccountRepository
-import com.twidere.twiderex.repository.DirectMessageRepository
+import com.twidere.twiderex.jobs.dm.DirectMessageFetchJob
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.firstOrNull
 import java.util.concurrent.TimeUnit
 
 @HiltWorker
 class DirectMessageFetchWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted workerParams: WorkerParameters,
-    private val repository: DirectMessageRepository,
-    private val accountRepository: AccountRepository,
-    private val notificationManagerCompat: NotificationManagerCompat,
+    private val directMessageFetchJob: DirectMessageFetchJob
 ) : CoroutineWorker(
     context,
     workerParams
@@ -63,52 +45,11 @@ class DirectMessageFetchWorker @AssistedInject constructor(
     }
 
     override suspend fun doWork(): Result {
-        return try {
-            accountRepository.activeAccount.firstOrNull()?.takeIf {
-                accountRepository.getAccountPreferences(it.accountKey).isNotificationEnabled.first()
-            }?.let { account ->
-                val result = repository.checkNewMessages(
-                    accountKey = account.accountKey,
-                    service = account.service as DirectMessageService,
-                    lookupService = account.service as LookupService
-                )
-                result.forEach {
-                    notification(account = account, message = it)
-                }
-            } ?: throw Error()
-            Result.success()
+        try {
+            directMessageFetchJob.execute()
         } catch (e: Throwable) {
-            e.printStackTrace()
-            Result.failure()
+            // no need to handle this error
         }
-    }
-
-    private fun notification(account: AccountDetails, message: UiDMConversationWithLatestMessage) {
-        val intent =
-            Intent(Intent.ACTION_VIEW, Uri.parse(RootRoute.DeepLink.Conversation(message.conversation.conversationKey)))
-        val pendingIntent =
-            PendingIntent.getActivity(
-                applicationContext,
-                0,
-                intent,
-                PendingIntent.FLAG_MUTABLE
-            )
-        val builder = NotificationCompat
-            .Builder(
-                applicationContext,
-                account.accountKey.notificationChannelId(
-                    NotificationChannelSpec.ContentMessages.id
-                )
-            )
-            .setContentTitle(applicationContext.getString(R.string.common_notification_messages_title))
-            .setSmallIcon(R.drawable.ic_notification)
-            .setCategory(NotificationCompat.CATEGORY_SOCIAL)
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-            .setOngoing(false)
-            .setSilent(false)
-            .setAutoCancel(true)
-            .setContentText(applicationContext.getString(R.string.common_notification_messages_content, message.latestMessage.sender.displayName))
-            .setContentIntent(pendingIntent)
-        notificationManagerCompat.notify(message.latestMessage.messageKey.hashCode(), builder.build())
+        return Result.success()
     }
 }

@@ -20,27 +20,16 @@
  */
 package com.twidere.twiderex.worker.compose
 
-import android.content.ContentResolver
 import android.content.Context
-import android.net.Uri
-import androidx.core.app.NotificationManagerCompat
 import androidx.hilt.work.HiltWorker
 import androidx.work.Data
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkerParameters
-import androidx.work.hasKeyWithValueOfType
 import com.twidere.services.twitter.TwitterService
-import com.twidere.twiderex.db.CacheDatabase
-import com.twidere.twiderex.db.mapper.toDbStatusWithReference
-import com.twidere.twiderex.db.model.saveToDb
+import com.twidere.twiderex.jobs.compose.TwitterComposeJob
 import com.twidere.twiderex.model.ComposeData
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.toWorkData
-import com.twidere.twiderex.model.ui.UiStatus
-import com.twidere.twiderex.model.ui.UiStatus.Companion.toUi
-import com.twidere.twiderex.repository.AccountRepository
-import com.twidere.twiderex.repository.StatusRepository
-import com.twidere.twiderex.viewmodel.compose.ComposeType
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 
@@ -48,16 +37,11 @@ import dagger.assisted.AssistedInject
 class TwitterComposeWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted workerParams: WorkerParameters,
-    accountRepository: AccountRepository,
-    notificationManagerCompat: NotificationManagerCompat,
-    private val statusRepository: StatusRepository,
-    private val contentResolver: ContentResolver,
-    private val cacheDatabase: CacheDatabase,
+    twitterComposeJob: TwitterComposeJob,
 ) : ComposeWorker<TwitterService>(
     context,
     workerParams,
-    accountRepository,
-    notificationManagerCompat
+    twitterComposeJob
 ) {
     companion object {
         fun create(
@@ -73,59 +57,5 @@ class TwitterComposeWorker @AssistedInject constructor(
                     .build()
             )
             .build()
-    }
-
-    override suspend fun compose(
-        service: TwitterService,
-        composeData: ComposeData,
-        mediaIds: ArrayList<String>
-    ): UiStatus {
-        val accountKey = inputData.getString("accountKey")?.let {
-            MicroBlogKey.valueOf(it)
-        } ?: throw Error()
-        val lat = inputData.takeIf {
-            it.hasKeyWithValueOfType<Double>("lat")
-        }?.getDouble("lat", 0.0)
-        val long = inputData.takeIf {
-            it.hasKeyWithValueOfType<Double>("long")
-        }?.getDouble("long", 0.0)
-        val content = composeData.content.let {
-            if (composeData.composeType == ComposeType.Quote && composeData.statusKey != null) {
-                val status = statusRepository.loadFromCache(
-                    composeData.statusKey,
-                    accountKey = accountKey
-                )
-                it + " ${status?.generateShareLink()}"
-            } else {
-                it
-            }
-        }
-        val result = service.update(
-            content,
-            media_ids = mediaIds,
-            in_reply_to_status_id = if (composeData.composeType == ComposeType.Reply || composeData.composeType == ComposeType.Thread) composeData.statusKey?.id else null,
-            repost_status_id = if (composeData.composeType == ComposeType.Quote) composeData.statusKey?.id else null,
-            lat = lat,
-            long = long,
-            exclude_reply_user_ids = composeData.excludedReplyUserIds
-        ).toDbStatusWithReference(accountKey)
-        listOf(result).saveToDb(cacheDatabase)
-        return result.toUi(accountKey)
-    }
-
-    override suspend fun uploadImage(
-        originUri: Uri,
-        scramblerUri: Uri,
-        service: TwitterService
-    ): String {
-        val type = contentResolver.getType(originUri)
-        val size = contentResolver.openFileDescriptor(scramblerUri, "r")?.statSize
-        return contentResolver.openInputStream(scramblerUri)?.use {
-            service.uploadFile(
-                it,
-                type ?: "image/*",
-                size ?: it.available().toLong()
-            )
-        } ?: throw Error()
     }
 }

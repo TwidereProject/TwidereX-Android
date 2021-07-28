@@ -60,7 +60,7 @@ internal class RouteProcessor(
                 .firstOrNull { it.annotationType.resolve().declaration.qualifiedName?.asString() == AppRoute::class.qualifiedName }
                 ?: return
 
-            val prefix = annotation.getStringValue(AppRoute::prefix.name) ?: ""
+            val schema = annotation.getStringValue(AppRoute::schema.name) ?: ""
             val packageName = annotation.getStringValue(AppRoute::packageName.name)
                 ?: node.packageName.asString()
             val routeClassName = annotation.getStringValue(AppRoute::routeClassName.name)
@@ -73,7 +73,7 @@ internal class RouteProcessor(
                     it is NestedRouteDefinition
                 }?.let {
                     PrefixRouteDefinition(
-                        prefix = prefix,
+                        schema = schema,
                         child = it as NestedRouteDefinition,
                         routeClassName = routeClassName,
                         definitionClassName = definitionClassName,

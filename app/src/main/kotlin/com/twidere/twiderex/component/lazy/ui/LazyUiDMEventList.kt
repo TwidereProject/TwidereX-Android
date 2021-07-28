@@ -246,7 +246,7 @@ private fun MessageBody(event: UiDMEvent, onItemLongClick: (event: UiDMEvent) ->
             MediaMessage(
                 media = event.media.firstOrNull(),
                 onClick = {
-                    navController.navigate(RootRoute.Media.Pure(event.messageKey, null))
+                    navController.navigate(RootRoute.Media.Pure(event.messageKey, 0))
                 }
             )
             if (event.media.isNotEmpty() && event.htmlText.isNotEmpty()) Spacer(modifier = Modifier.height(MessageBodyDefaults.ContentSpacing))

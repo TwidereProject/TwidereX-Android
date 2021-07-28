@@ -48,6 +48,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.FormattedTime
+import com.twidere.twiderex.extensions.humanizedCount
 import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.ui.UiStatus
 
@@ -205,7 +206,7 @@ private fun StatusStatistics(
             contentDescription = contentDescription,
         )
         Spacer(modifier = Modifier.width(StatusStatisticsDefaults.IconSpacing))
-        Text(text = count.toString())
+        Text(text = count.humanizedCount())
     }
 }
 

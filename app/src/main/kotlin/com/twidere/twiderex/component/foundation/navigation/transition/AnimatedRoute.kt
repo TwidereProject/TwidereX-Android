@@ -59,8 +59,8 @@ internal fun AnimatedRoute(
             .takeIf {
                 it >= 0 ||
                     // Workaround for navOptions
-                    targetState.lifecycle.currentState == Lifecycle.State.INITIALIZED &&
-                    previousState.lifecycle.currentState == Lifecycle.State.RESUMED
+                    targetState.currentEntry?.lifecycle?.currentState == Lifecycle.State.INITIALIZED &&
+                    previousState.currentEntry?.lifecycle?.currentState == Lifecycle.State.RESUMED
             } ?: Int.MAX_VALUE
         val actualNavTransition = run {
             if (indexOfNew >= indexOfOld) targetState else previousState
@@ -118,14 +118,14 @@ internal fun AnimatedRoute(
     }
 }
 
-private enum class AnimateType {
+internal enum class AnimateType {
     Create,
     Destroy,
     Pause,
     Resume,
 }
 
-private data class AnimatedRouteItem<T>(
+internal data class AnimatedRouteItem<T>(
     val key: T,
     val animateType: AnimateType,
     val content: @Composable () -> Unit

@@ -20,26 +20,14 @@
  */
 package com.twidere.twiderex.worker.dm
 
-import android.content.ContentResolver
 import android.content.Context
-import android.net.Uri
-import androidx.core.app.NotificationManagerCompat
 import androidx.hilt.work.HiltWorker
 import androidx.work.Data
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkerParameters
-import com.twidere.services.microblog.LookupService
-import com.twidere.services.twitter.TwitterService
-import com.twidere.twiderex.db.CacheDatabase
-import com.twidere.twiderex.db.mapper.autolink
-import com.twidere.twiderex.db.mapper.toDbDirectMessage
-import com.twidere.twiderex.db.mapper.toDbUser
-import com.twidere.twiderex.db.model.DbDMEventWithAttachments
-import com.twidere.twiderex.db.model.DbUser
+import com.twidere.twiderex.jobs.dm.TwitterDirectMessageSendJob
 import com.twidere.twiderex.model.DirectMessageSendData
-import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.toWorkData
-import com.twidere.twiderex.repository.AccountRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 
@@ -47,17 +35,11 @@ import dagger.assisted.AssistedInject
 class TwitterDirectMessageSendWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted workerParams: WorkerParameters,
-    accountRepository: AccountRepository,
-    notificationManagerCompat: NotificationManagerCompat,
-    contentResolver: ContentResolver,
-    cacheDatabase: CacheDatabase,
-) : DirectMessageSendWorker<TwitterService>(
+    twitterDirectMessageSendJob: TwitterDirectMessageSendJob
+) : DirectMessageSendWorker(
     context,
     workerParams,
-    cacheDatabase,
-    contentResolver,
-    accountRepository,
-    notificationManagerCompat
+    twitterDirectMessageSendJob
 ) {
     companion object {
         fun create(
@@ -69,48 +51,5 @@ class TwitterDirectMessageSendWorker @AssistedInject constructor(
                     .build()
             )
             .build()
-    }
-
-    override suspend fun sendMessage(
-        service: TwitterService,
-        sendData: DirectMessageSendData,
-        mediaIds: ArrayList<String>
-    ): DbDMEventWithAttachments = service.sendDirectMessage(
-        recipientId = sendData.recipientUserKey.id,
-        text = sendData.text,
-        attachmentType = "media",
-        mediaId = mediaIds.firstOrNull()
-    )?.toDbDirectMessage(
-        accountKey = sendData.accountKey,
-        sender = lookUpUser(cacheDatabase, sendData.accountKey, service)
-    ) ?: throw Error()
-
-    private suspend fun lookUpUser(database: CacheDatabase, userKey: MicroBlogKey, service: TwitterService): DbUser {
-        return database.userDao().findWithUserKey(userKey) ?: let {
-            val user = (service as LookupService).lookupUser(userKey.id)
-                .toDbUser(userKey)
-            database.userDao().insertAll(listOf(user))
-            user
-        }
-    }
-
-    override suspend fun uploadImage(
-        originUri: Uri,
-        scramblerUri: Uri,
-        service: TwitterService
-    ): String? {
-        val type = contentResolver.getType(originUri)
-        val size = contentResolver.openFileDescriptor(scramblerUri, "r")?.statSize
-        return contentResolver.openInputStream(scramblerUri)?.use {
-            service.uploadFile(
-                it,
-                type ?: "image/*",
-                size ?: it.available().toLong()
-            )
-        } ?: throw Error()
-    }
-
-    override suspend fun autoLink(text: String): String {
-        return autolink.autoLink(text)
     }
 }

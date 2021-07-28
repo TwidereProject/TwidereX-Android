@@ -25,12 +25,10 @@ import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkerParameters
+import com.twidere.twiderex.jobs.draft.SaveDraftJob
 import com.twidere.twiderex.model.ComposeData
 import com.twidere.twiderex.model.toComposeData
 import com.twidere.twiderex.model.toWorkData
-import com.twidere.twiderex.notification.InAppNotification
-import com.twidere.twiderex.repository.DraftRepository
-import com.twidere.twiderex.utils.notify
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 
@@ -38,8 +36,7 @@ import dagger.assisted.AssistedInject
 class SaveDraftWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted workerParams: WorkerParameters,
-    private val repository: DraftRepository,
-    private val inAppNotification: InAppNotification,
+    private val saveDraftJob: SaveDraftJob
 ) : CoroutineWorker(context, workerParams) {
 
     companion object {
@@ -50,21 +47,12 @@ class SaveDraftWorker @AssistedInject constructor(
 
     override suspend fun doWork(): Result {
         val data = inputData.toComposeData()
-        with(data) {
-            return try {
-                repository.addOrUpgrade(
-                    content,
-                    images,
-                    composeType = composeType,
-                    statusKey = statusKey,
-                    draftId = draftId,
-                    excludedReplyUserIds = excludedReplyUserIds,
-                )
-                Result.success()
-            } catch (e: Throwable) {
-                e.notify(inAppNotification)
-                Result.failure()
-            }
+        return try {
+            saveDraftJob.execute(data = data)
+            Result.success()
+        } catch (e: Throwable) {
+            e.printStackTrace()
+            Result.failure()
         }
     }
 }

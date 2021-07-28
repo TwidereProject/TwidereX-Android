@@ -28,7 +28,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.Data
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkerParameters
-import com.twidere.twiderex.extensions.shareMedia
+import com.twidere.twiderex.jobs.common.ShareMediaJob
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 
@@ -36,6 +36,7 @@ import dagger.assisted.AssistedInject
 class ShareMediaWorker @AssistedInject constructor(
     @Assisted private val context: Context,
     @Assisted workerParams: WorkerParameters,
+    private val shareMediaJob: ShareMediaJob,
     private val contentResolver: ContentResolver,
 ) : CoroutineWorker(context, workerParams) {
 
@@ -52,14 +53,15 @@ class ShareMediaWorker @AssistedInject constructor(
     }
 
     override suspend fun doWork(): Result {
-        val target = inputData.getString("target")?.let { Uri.parse(it) } ?: return Result.failure()
-        contentResolver.getType(target)?.let {
-            context.shareMedia(
-                uri = target,
-                mimeType = it,
-                fromOutsideOfActivity = true
+        val target = inputData.getString("target") ?: return Result.failure()
+        return try {
+            shareMediaJob.execute(
+                target
             )
+            Result.success()
+        } catch (e: Throwable) {
+            e.printStackTrace()
+            Result.failure()
         }
-        return Result.success()
     }
 }

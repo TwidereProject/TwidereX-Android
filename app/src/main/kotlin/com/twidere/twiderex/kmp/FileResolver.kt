@@ -18,25 +18,17 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.worker.status
+package com.twidere.twiderex.kmp
 
-import androidx.work.workDataOf
-import com.twidere.twiderex.model.MicroBlogKey
+import java.io.InputStream
+import java.io.OutputStream
 
-data class StatusResult(
-    val statusKey: MicroBlogKey,
-    val accountKey: MicroBlogKey,
-    val retweeted: Boolean? = null,
-    val liked: Boolean? = null,
-    val retweetCount: Long? = null,
-    val likeCount: Long? = null,
-) {
-    fun toWorkData() = workDataOf(
-        "statusKey" to statusKey.toString(),
-        "accountKey" to accountKey.toString(),
-        "liked" to liked,
-        "retweeted" to retweeted,
-        "retweetCount" to retweetCount,
-        "likeCount" to likeCount,
-    )
+interface FileResolver {
+    fun getMimeType(file: String): String?
+
+    fun getFileSize(file: String): Long?
+
+    fun openInputStream(file: String): InputStream?
+
+    fun openOutputStream(file: String): OutputStream?
 }

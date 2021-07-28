@@ -23,14 +23,7 @@ package com.twidere.twiderex.worker.status
 import android.content.Context
 import androidx.hilt.work.HiltWorker
 import androidx.work.WorkerParameters
-import com.twidere.services.microblog.StatusService
-import com.twidere.twiderex.db.mapper.toDbStatusWithReference
-import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.ui.UiStatus
-import com.twidere.twiderex.model.ui.UiStatus.Companion.toUi
-import com.twidere.twiderex.notification.InAppNotification
-import com.twidere.twiderex.repository.AccountRepository
-import com.twidere.twiderex.repository.StatusRepository
+import com.twidere.twiderex.jobs.status.UnRetweetStatusJob
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 
@@ -38,34 +31,5 @@ import dagger.assisted.AssistedInject
 class UnRetweetWorker @AssistedInject constructor(
     @Assisted appContext: Context,
     @Assisted params: WorkerParameters,
-    accountRepository: AccountRepository,
-    statusRepository: StatusRepository,
-    inAppNotification: InAppNotification,
-) : StatusWorker(appContext, params, accountRepository, statusRepository, inAppNotification) {
-    override suspend fun doWork(
-        accountKey: MicroBlogKey,
-        service: StatusService,
-        status: UiStatus
-    ): StatusResult {
-        val newStatus = service.unRetweet(status.statusId)
-            .toDbStatusWithReference(accountKey = accountKey)
-            .toUi(accountKey = accountKey).let {
-                it.retweet ?: it
-            }
-        return StatusResult(
-            statusKey = newStatus.statusKey,
-            accountKey = accountKey,
-            retweeted = false,
-            retweetCount = newStatus.retweetCount,
-            likeCount = newStatus.likeCount,
-        )
-    }
-    override fun fallback(
-        accountKey: MicroBlogKey,
-        status: UiStatus,
-    ) = StatusResult(
-        accountKey = accountKey,
-        statusKey = status.statusKey,
-        retweeted = true,
-    )
-}
+    unRetweetStatusJob: UnRetweetStatusJob
+) : StatusWorker(appContext, params, unRetweetStatusJob)
