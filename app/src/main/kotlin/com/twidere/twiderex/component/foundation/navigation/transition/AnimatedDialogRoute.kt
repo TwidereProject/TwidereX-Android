@@ -35,48 +35,52 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.lifecycle.Lifecycle
+import moe.tlaster.precompose.navigation.BackStackEntry
 import moe.tlaster.precompose.navigation.RouteStack
-import moe.tlaster.precompose.navigation.RouteStackManager
 
 @Composable
-internal fun AnimatedRoute(
-    targetState: RouteStack,
+internal fun AnimatedDialogRoute(
+    stack: RouteStack,
     modifier: Modifier = Modifier,
-    manager: RouteStackManager,
     animationSpec: FiniteAnimationSpec<Float> = tween(),
-    navTransition: NavTransition = remember { NavTransition() },
-    content: @Composable (RouteStack) -> Unit
+    dialogTransition: DialogTransition = remember { DialogTransition() },
+    content: @Composable (BackStackEntry) -> Unit
 ) {
-    val items = remember { mutableStateListOf<AnimatedRouteItem<RouteStack>>() }
+
+    val items = remember { mutableStateListOf<AnimatedRouteItem<BackStackEntry>>() }
+    val stacks = stack.stacks
+    val targetState = remember(stack.stacks.size) {
+        stack.currentEntry
+    }
     val transitionState = remember { MutableTransitionState(targetState) }
     val targetChanged = (targetState != transitionState.targetState)
     val previousState = transitionState.targetState
     transitionState.targetState = targetState
-    val transition = updateTransition(transitionState)
+    val transition = updateTransition(transitionState, label = "AnimatedDialogRouteTransition")
+
     if (targetChanged || items.isEmpty()) {
-        val indexOfNew = manager.indexOf(targetState).takeIf { it >= 0 } ?: Int.MAX_VALUE
-        val indexOfOld = manager.indexOf(previousState)
+        val indexOfNew = stacks.indexOf(targetState).takeIf { it >= 0 } ?: Int.MAX_VALUE
+        val indexOfOld = stacks.indexOf(previousState)
             .takeIf {
                 it >= 0 ||
                     // Workaround for navOptions
-                    targetState.currentEntry?.lifecycle?.currentState == Lifecycle.State.INITIALIZED &&
-                    previousState.currentEntry?.lifecycle?.currentState == Lifecycle.State.RESUMED
+                    targetState?.lifecycle?.currentState == Lifecycle.State.INITIALIZED &&
+                    previousState?.lifecycle?.currentState == Lifecycle.State.RESUMED
             } ?: Int.MAX_VALUE
-        val actualNavTransition = run {
-            if (indexOfNew >= indexOfOld) targetState else previousState
-        }.navTransition ?: navTransition
         // Only manipulate the list when the state is changed, or in the first run.
         val keys = items.map {
             val type = if (indexOfNew >= indexOfOld) AnimateType.Pause else AnimateType.Destroy
             it.key to type
         }.toMap().run {
-            if (!containsKey(targetState)) {
-                toMutableMap().also {
-                    val type = if (indexOfNew >= indexOfOld) AnimateType.Create else AnimateType.Resume
+            toMutableMap().also {
+                val type = if (indexOfNew >= indexOfOld) {
+                    AnimateType.Create
+                } else {
+                    AnimateType.Resume
+                }
+                if (targetState != null) {
                     it[targetState] = type
                 }
-            } else {
-                this
             }
         }
         items.clear()
@@ -88,10 +92,15 @@ internal fun AnimatedRoute(
                 Box(
                     Modifier.graphicsLayer {
                         when (value) {
-                            AnimateType.Create -> actualNavTransition.createTransition.invoke(this, factor)
-                            AnimateType.Destroy -> actualNavTransition.destroyTransition.invoke(this, factor)
-                            AnimateType.Pause -> actualNavTransition.pauseTransition.invoke(this, factor)
-                            AnimateType.Resume -> actualNavTransition.resumeTransition.invoke(this, factor)
+                            AnimateType.Create -> dialogTransition.createTransition.invoke(
+                                this,
+                                factor
+                            )
+                            AnimateType.Destroy -> dialogTransition.destroyTransition.invoke(
+                                this,
+                                factor
+                            )
+                            else -> Unit
                         }
                     }
                 ) {
@@ -101,7 +110,7 @@ internal fun AnimatedRoute(
         }.sortByDescending { it.animateType }
     } else if (transitionState.currentState == transitionState.targetState) {
         // Remove all the intermediate items from the list once the animation is finished.
-        items.removeAll { it.key != transitionState.targetState }
+        items.removeAll { it.animateType == AnimateType.Destroy }
     }
 
     Box(modifier) {
@@ -109,24 +118,12 @@ internal fun AnimatedRoute(
             val item = items[index]
             key(item.key) {
                 Box(
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier
+                        .fillMaxSize()
                 ) {
-                    item.content()
+                    item.content.invoke()
                 }
             }
         }
     }
 }
-
-internal enum class AnimateType {
-    Create,
-    Destroy,
-    Pause,
-    Resume,
-}
-
-internal data class AnimatedRouteItem<T>(
-    val key: T,
-    val animateType: AnimateType,
-    val content: @Composable () -> Unit
-)

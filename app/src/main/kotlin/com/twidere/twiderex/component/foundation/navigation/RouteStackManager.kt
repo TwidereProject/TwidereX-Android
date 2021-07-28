@@ -108,7 +108,7 @@ internal class RouteStackManager(
         checkNotNull(matchResult) { "RouteStackManager: navigate target $path not found" }
         require(matchResult.route is ComposeRoute) { "RouteStackManager: navigate target $path is not ComposeRoute" }
         if (options != null && matchResult.route is SceneRoute && options.launchSingleTop) {
-            _backStacks.firstOrNull { it.scene.route.route == matchResult.route.route }?.let {
+            _backStacks.firstOrNull { it.hasRoute(matchResult.route.route) }?.let {
                 _backStacks.remove(it)
                 _backStacks.add(it)
             }
@@ -127,19 +127,19 @@ internal class RouteStackManager(
                     _backStacks.add(
                         RouteStack(
                             id = routeStackId++,
-                            scene = entry,
+                            stacks = mutableStateListOf(entry),
                             navTransition = matchResult.route.navTransition,
                         )
                     )
                 }
                 is DialogRoute -> {
-                    currentStack?.dialogStack?.add(entry)
+                    currentStack?.stacks?.add(entry)
                 }
             }
         }
 
         if (options?.popUpTo != null && matchResult.route is SceneRoute) {
-            val index = _backStacks.indexOfLast { it.scene.route.route == options.popUpTo.route }
+            val index = _backStacks.indexOfLast { it.hasRoute(options.popUpTo.route) }
             if (index != -1 && index != _backStacks.lastIndex) {
                 _backStacks.removeRange(
                     if (options.popUpTo.inclusive) index else index + 1,
@@ -164,9 +164,10 @@ internal class RouteStackManager(
             }
             _backStacks.size > 1 -> {
                 val stack = _backStacks.removeLast()
+                val entry = stack.currentEntry
                 stateHolder.removeState(stack.id)
-                stack.onDestroyed()
-                stack.scene
+                stack.destroyAfterTransition()
+                entry
             }
             else -> {
                 null
