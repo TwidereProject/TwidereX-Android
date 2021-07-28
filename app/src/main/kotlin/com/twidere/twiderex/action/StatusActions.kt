@@ -23,13 +23,13 @@ package com.twidere.twiderex.action
 import androidx.compose.runtime.compositionLocalOf
 import androidx.work.WorkManager
 import com.twidere.twiderex.model.AccountDetails
+import com.twidere.twiderex.model.StatusResult
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.worker.database.DeleteDbStatusWorker
 import com.twidere.twiderex.worker.status.DeleteStatusWorker
 import com.twidere.twiderex.worker.status.LikeWorker
 import com.twidere.twiderex.worker.status.MastodonVoteWorker
 import com.twidere.twiderex.worker.status.RetweetWorker
-import com.twidere.twiderex.worker.status.StatusResult
 import com.twidere.twiderex.worker.status.StatusWorker
 import com.twidere.twiderex.worker.status.UnLikeWorker
 import com.twidere.twiderex.worker.status.UnRetweetWorker

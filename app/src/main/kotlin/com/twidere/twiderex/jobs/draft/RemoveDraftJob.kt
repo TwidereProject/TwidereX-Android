@@ -18,18 +18,14 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.worker.status
+package com.twidere.twiderex.jobs.draft
 
-import android.content.Context
-import androidx.hilt.work.HiltWorker
-import androidx.work.WorkerParameters
-import com.twidere.twiderex.jobs.status.UnRetweetStatusJob
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedInject
+import com.twidere.twiderex.repository.DraftRepository
 
-@HiltWorker
-class UnRetweetWorker @AssistedInject constructor(
-    @Assisted appContext: Context,
-    @Assisted params: WorkerParameters,
-    unRetweetStatusJob: UnRetweetStatusJob
-) : StatusWorker(appContext, params, unRetweetStatusJob)
+class RemoveDraftJob(
+    private val repository: DraftRepository,
+) {
+    suspend fun execute(draftId: String) {
+        repository.remove(draftId = draftId)
+    }
+}

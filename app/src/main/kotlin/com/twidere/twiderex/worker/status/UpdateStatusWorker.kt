@@ -30,6 +30,7 @@ import androidx.work.setInputMerger
 import com.twidere.twiderex.extensions.getNullableBoolean
 import com.twidere.twiderex.extensions.getNullableLong
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.StatusResult
 import com.twidere.twiderex.repository.ReactionRepository
 import com.twidere.twiderex.repository.StatusRepository
 import dagger.assisted.Assisted

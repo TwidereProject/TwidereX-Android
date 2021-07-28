@@ -18,18 +18,24 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.worker.status
+package com.twidere.twiderex.model
 
-import android.content.Context
-import androidx.hilt.work.HiltWorker
-import androidx.work.WorkerParameters
-import com.twidere.twiderex.jobs.status.UnRetweetStatusJob
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedInject
+import androidx.work.workDataOf
 
-@HiltWorker
-class UnRetweetWorker @AssistedInject constructor(
-    @Assisted appContext: Context,
-    @Assisted params: WorkerParameters,
-    unRetweetStatusJob: UnRetweetStatusJob
-) : StatusWorker(appContext, params, unRetweetStatusJob)
+data class StatusResult(
+    val statusKey: MicroBlogKey,
+    val accountKey: MicroBlogKey,
+    val retweeted: Boolean? = null,
+    val liked: Boolean? = null,
+    val retweetCount: Long? = null,
+    val likeCount: Long? = null,
+) {
+    fun toWorkData() = workDataOf(
+        "statusKey" to statusKey.toString(),
+        "accountKey" to accountKey.toString(),
+        "liked" to liked,
+        "retweeted" to retweeted,
+        "retweetCount" to retweetCount,
+        "likeCount" to likeCount,
+    )
+}
