@@ -27,21 +27,15 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.twidere.twiderex.R
-import com.twidere.twiderex.extensions.isDarkTheme
 
 @Composable
 fun LoginLogo(
     modifier: Modifier = Modifier,
 ) {
-    val resource = if (isDarkTheme()) {
-        painterResource(id = R.drawable.ic_login_logo_dark)
-    } else {
-        painterResource(id = R.drawable.ic_login_logo)
-    }
     Image(
         modifier = modifier,
         contentScale = ContentScale.FillWidth,
-        painter = resource,
+        painter = painterResource(id = R.drawable.ic_login_logo),
         contentDescription = stringResource(id = R.string.accessibility_common_logo_twidere)
     )
 }
