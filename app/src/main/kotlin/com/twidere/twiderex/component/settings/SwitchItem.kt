@@ -33,7 +33,7 @@ import com.twidere.twiderex.component.foundation.ColoredSwitch
 fun ColumnScope.switchItem(
     value: Boolean,
     onChanged: (Boolean) -> Unit,
-    describe: @Composable () -> Unit = {},
+    describe: @Composable (() -> Unit)? = null,
     title: @Composable () -> Unit,
 ) {
     ListItem(
