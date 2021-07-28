@@ -40,6 +40,7 @@ import com.twidere.twiderex.utils.json
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import java.net.URI
 
 class MastodonSignInViewModel @AssistedInject constructor(
     private val repository: AccountRepository,
@@ -63,9 +64,12 @@ class MastodonSignInViewModel @AssistedInject constructor(
         finished: (success: Boolean) -> Unit,
     ) = viewModelScope.launch {
         loading.value = true
+        val realHost = runCatching {
+            URI.create(host)
+        }.getOrNull()?.takeIf { !it.scheme.isNullOrEmpty() }?.toString() ?: "https://$host"
         runCatching {
             val service = MastodonOAuthService(
-                host = "https://$host",
+                host = realHost,
                 client_name = "Twidere X",
                 website = "https://github.com/TwidereProject/TwidereX-Android",
                 redirect_uri = RootDeepLinksRoute.Callback.SignIn.Mastodon,
