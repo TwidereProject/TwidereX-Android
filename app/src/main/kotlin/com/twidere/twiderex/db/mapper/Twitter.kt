@@ -60,10 +60,17 @@ import java.util.UUID
 val autolink by lazy {
     Autolink().apply {
         setUsernameIncludeSymbol(true)
-        hashtagUrlBase = "${RootDeepLinksRouteDefinition.Search}/%23"
-        cashtagUrlBase = "${RootDeepLinksRouteDefinition.Search}/%24"
-        usernameUrlBase = "${RootDeepLinksRouteDefinition.Twitter.User}/"
+        hashtagUrlBase = "${generateDeepLinkBase(RootDeepLinksRouteDefinition.Search)}/%23"
+        cashtagUrlBase = "${generateDeepLinkBase(RootDeepLinksRouteDefinition.Search)}/%24"
+        usernameUrlBase = "${generateDeepLinkBase(RootDeepLinksRouteDefinition.Twitter.User)}/"
     }
+}
+
+private fun generateDeepLinkBase(deeplink: String): String {
+    return deeplink.substring(
+        0,
+        deeplink.indexOf("/{")
+    )
 }
 
 fun StatusV2.toDbPagingTimeline(

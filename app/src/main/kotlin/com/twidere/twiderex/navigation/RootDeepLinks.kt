@@ -47,7 +47,7 @@ interface RootDeepLinks {
     val SignIn: String
 
     fun Draft(draftId: String): String
-    fun Compose(composeType: ComposeType, statusKey: MicroBlogKey?): String
+    fun Compose(composeType: ComposeType?, statusKey: MicroBlogKey?): String
     fun Conversation(conversationKey: MicroBlogKey): String
 
     interface Callback {
