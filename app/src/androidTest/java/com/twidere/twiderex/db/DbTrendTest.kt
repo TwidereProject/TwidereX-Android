@@ -37,6 +37,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.util.concurrent.Executors
 
 typealias TwitterTrend = com.twidere.services.twitter.model.Trend
 typealias MastodonTrend = com.twidere.services.mastodon.model.Trend
@@ -57,7 +58,7 @@ class DbTrendTest {
     @Before
     fun setUp() {
         cacheDatabase = Room.inMemoryDatabaseBuilder(ApplicationProvider.getApplicationContext(), CacheDatabase::class.java)
-            .build()
+            .setTransactionExecutor(Executors.newSingleThreadExecutor()).build()
         for (i in 0 until twitterTrendCount) {
             trends.add(
                 TwitterTrend(

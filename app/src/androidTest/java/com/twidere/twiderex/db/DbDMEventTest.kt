@@ -50,6 +50,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.UUID
+import java.util.concurrent.Executors
 
 @RunWith(AndroidJUnit4::class)
 class DbDMEventTest {
@@ -64,7 +65,7 @@ class DbDMEventTest {
     @Before
     fun setUp() {
         cacheDatabase = Room.inMemoryDatabaseBuilder(ApplicationProvider.getApplicationContext(), CacheDatabase::class.java)
-            .build()
+            .setTransactionExecutor(Executors.newSingleThreadExecutor()).build()
         runBlocking {
             for (i in 0 until conversationCount) {
                 generateDirectMessage(
