@@ -40,6 +40,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.util.concurrent.Executors
 
 @RunWith(AndroidJUnit4::class)
 class DbListTest {
@@ -56,7 +57,7 @@ class DbListTest {
     @Before
     fun setUp() {
         cacheDatabase = Room.inMemoryDatabaseBuilder(ApplicationProvider.getApplicationContext(), CacheDatabase::class.java)
-            .build()
+            .setTransactionExecutor(Executors.newSingleThreadExecutor()).build()
         listsDao = cacheDatabase.listsDao()
         for (i in 0 until twitterCount) {
             val ownerId = if (i % 2 == 0) twitterAccountKey.id else "789"

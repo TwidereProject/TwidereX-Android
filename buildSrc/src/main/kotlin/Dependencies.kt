@@ -66,7 +66,7 @@ fun DependencyHandlerScope.compose() {
 
 fun DependencyHandlerScope.paging() {
     implementation("androidx.paging:paging-common", Versions.paging)
-    // implementation("androidx.paging:paging-compose", Versions.paging_compose)
+    implementation("androidx.paging:paging-compose", Versions.paging_compose)
 }
 
 fun DependencyHandlerScope.activity() {
@@ -89,6 +89,7 @@ fun DependencyHandlerScope.hilt() {
 fun DependencyHandlerScope.room() {
     implementation("androidx.room:room-runtime", Versions.room)
     implementation("androidx.room:room-ktx", Versions.room)
+    implementation("androidx.room:room-paging", Versions.room)
     kapt("androidx.room:room-compiler", Versions.room)
     androidTestImplementation("androidx.room:room-testing", Versions.room)
 }
