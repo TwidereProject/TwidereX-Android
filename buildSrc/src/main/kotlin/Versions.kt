@@ -4,7 +4,7 @@ object Versions {
     object Kotlin {
         const val lang = "1.5.10"
         const val coroutines = "1.5.0"
-        const val serialization = "1.2.1"
+        const val serialization = "1.2.2"
     }
 
     object Java {
@@ -12,9 +12,9 @@ object Versions {
         val java = JavaVersion.VERSION_11
     }
 
-    const val ksp = "1.5.10-1.0.0-beta02"
+    const val ksp = "${Kotlin.lang}-1.0.0-beta02"
     const val agp = "7.0.0"
-    const val spotless = "5.12.5"
+    const val spotless = "5.14.2"
     const val ktlint = "0.41.0"
     const val hilt = "2.37"
     const val okhttp = "4.9.1"
@@ -39,7 +39,7 @@ object Versions {
     const val coil = "1.3.0"
     const val accompanist = "0.15.0"
     const val androidx_exifinterface = "1.3.2"
-    const val exoplayer = "2.14.1"
+    const val exoplayer = "2.14.2"
     const val browser = "1.3.0"
     const val protobuf = "3.17.3"
     const val androidx_test = "1.4.0"
