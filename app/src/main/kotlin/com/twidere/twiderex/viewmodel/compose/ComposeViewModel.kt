@@ -33,6 +33,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.work.WorkManager
 import com.twidere.services.mastodon.model.Emoji
 import com.twidere.services.mastodon.model.Visibility
@@ -59,10 +60,12 @@ import com.twitter.twittertext.Extractor
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import java.util.UUID
 
 enum class ComposeType {
@@ -263,7 +266,14 @@ open class ComposeViewModel @AssistedInject constructor(
         } else {
             emptyList()
         }
-    }
+        // return a stateFlow to emit latest state
+        // WhileSubscribed will unsubscribe upstream flow when there is no subscribers
+        // official suggest use 5s as stop timeout
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5000),
+        emptyList()
+    )
 
     val voteState = MutableStateFlow<VoteState?>(null)
     val isInVoteMode = MutableStateFlow(false)
