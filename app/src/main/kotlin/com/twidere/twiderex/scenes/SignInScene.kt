@@ -241,7 +241,8 @@ private fun TwitterCustomKeySignIn(
                             }
                         }
                     }
-                }
+                },
+                enabled = apiKey.isNotEmpty() && apiSecret.isNotEmpty()
             ) {
                 Text(text = stringResource(id = R.string.scene_drawer_sign_in))
             }
