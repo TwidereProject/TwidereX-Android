@@ -26,13 +26,15 @@ kotlin {
     }
 }
 
-compose.desktop {
-    application {
-        mainClass = "com.twidere.twiderex.MainKt"
-        nativeDistributions {
-            targetFormats(TargetFormat.Dmg, TargetFormat.Exe, TargetFormat.AppImage)
-            packageName = Package.id
-            packageVersion = Package.versionName.split("-").firstOrNull()
+compose {
+    desktop {
+        application {
+            mainClass = "com.twidere.twiderex.MainKt"
+            nativeDistributions {
+                targetFormats(TargetFormat.Dmg, TargetFormat.Exe, TargetFormat.AppImage)
+                packageName = Package.id
+                packageVersion = Package.versionName.split("-").firstOrNull()
+            }
         }
     }
 }

@@ -20,12 +20,16 @@
  */
 package com.twidere.twiderex
 
-import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.compose.ui.window.singleWindowApplication
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
 
-@ExperimentalComposeUiApi
-fun main() = singleWindowApplication(
-    title = "Twidere X"
-) {
-    App()
+@Composable
+fun App() {
+    MaterialTheme {
+        Scaffold {
+            Text("Twidere X!")
+        }
+    }
 }

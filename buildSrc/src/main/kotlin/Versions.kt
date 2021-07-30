@@ -2,7 +2,7 @@ import org.gradle.api.JavaVersion
 
 object Versions {
     object Kotlin {
-        const val lang = "1.5.10"
+        const val lang = "1.5.21"
         const val coroutines = "1.5.0"
         const val serialization = "1.2.2"
     }
@@ -12,7 +12,7 @@ object Versions {
         val java = JavaVersion.VERSION_11
     }
 
-    const val ksp = "${Kotlin.lang}-1.0.0-beta02"
+    const val ksp = "${Kotlin.lang}-1.0.0-beta06"
     const val agp = "7.0.0"
     const val spotless = "5.14.2"
     const val ktlint = "0.41.0"
