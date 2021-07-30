@@ -115,7 +115,6 @@ fun DependencyHandlerScope.android() {
     implementation("com.google.android.exoplayer:exoplayer", Versions.exoplayer)
     implementation("com.google.android.exoplayer:extension-okhttp", Versions.exoplayer)
     implementation("androidx.browser:browser", Versions.browser)
-    implementation("com.google.android.play:core-ktx", Versions.google_play)
     debugImplementation("com.squareup.leakcanary:leakcanary-android:2.7")
 }
 
