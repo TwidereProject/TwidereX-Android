@@ -36,8 +36,8 @@ import com.twidere.services.twitter.model.exceptions.TwitterApiException
 import com.twidere.services.twitter.model.exceptions.TwitterApiExceptionV2
 import com.twidere.services.utils.DEBUG
 import com.twidere.services.utils.JSON
-import com.twidere.services.utils.decodeJson
 import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.decodeFromString
 import okhttp3.Credentials
 import okhttp3.Interceptor
 import okhttp3.MediaType.Companion.toMediaType
@@ -70,15 +70,17 @@ class HttpConfigClientFactory(private val configProvider: HttpConfigProvider) : 
                         response.body?.string()?.takeIf {
                             it.isNotEmpty()
                         }?.let { content ->
-                            content.decodeJson<TwitterApiException>().takeIf {
-                                it.microBlogErrorMessage != null
+                            runCatching {
+                                JSON.decodeFromString<TwitterApiException>(content)
+                            }.getOrNull()?.takeIf {
+                                !it.microBlogErrorMessage.isNullOrEmpty()
                             }.let {
-                                it ?: run {
-                                    content.decodeJson<TwitterApiExceptionV2>()
-                                }
-                            }.let {
+                                it ?: runCatching {
+                                    JSON.decodeFromString<TwitterApiExceptionV2>(content)
+                                }.getOrNull()
+                            }?.let {
                                 throw it
-                            }
+                            } ?: throw MicroBlogHttpException(response.code)
                         } ?: throw MicroBlogHttpException(response.code)
                     } else {
                         response
@@ -90,7 +92,11 @@ class HttpConfigClientFactory(private val configProvider: HttpConfigProvider) : 
                         response.body?.string()?.takeIf {
                             it.isNotEmpty()
                         }?.let { content ->
-                            throw content.decodeJson<MastodonException>()
+                            runCatching {
+                                JSON.decodeFromString<MastodonException>(content)
+                            }.getOrNull()?.let {
+                                throw it
+                            } ?: throw MicroBlogHttpException(response.code)
                         } ?: throw MicroBlogHttpException(response.code)
                     } else {
                         response
