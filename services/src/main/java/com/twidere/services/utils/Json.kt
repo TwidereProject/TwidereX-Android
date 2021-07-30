@@ -42,6 +42,8 @@ internal inline fun <reified T> String.decodeJson(): T {
     return runCatching {
         JSON.parseToJsonElement(this)
     }.getOrNull()?.let {
-        JSON.decodeFromJsonElement<T>(it)
+        runCatching {
+            JSON.decodeFromJsonElement<T>(it)
+        }.getOrNull()
     } ?: throw MicroBlogJsonException(this)
 }

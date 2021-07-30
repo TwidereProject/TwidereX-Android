@@ -22,6 +22,7 @@ package com.twidere.services
 
 import com.twidere.services.http.MicroBlogException
 import com.twidere.services.utils.decodeJson
+import kotlinx.serialization.Serializable
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
@@ -39,4 +40,16 @@ class JsonTest {
             "".decodeJson<MicroBlogException>()
         }
     }
+
+    @Test
+    fun decodeMismatchType() {
+        assertThrows<MicroBlogException> {
+            "{\"a\": {  }}".decodeJson<DataClass>()
+        }
+    }
 }
+
+@Serializable
+data class DataClass(
+    val a: List<String>,
+)
