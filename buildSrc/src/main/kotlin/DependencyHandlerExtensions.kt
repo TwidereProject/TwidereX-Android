@@ -30,6 +30,11 @@ internal fun DependencyHandler.implementation(
     version: String? = null,
 ) = add("implementation", name, version)
 
+internal fun DependencyHandler.debugImplementation(
+    name: String,
+    version: String? = null,
+) = add("debugImplementation", name, version)
+
 internal fun DependencyHandler.kapt(
     name: String,
     version: String? = null,
