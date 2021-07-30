@@ -41,6 +41,7 @@ object Versions {
     const val androidx_exifinterface = "1.3.2"
     const val exoplayer = "2.14.2"
     const val browser = "1.3.0"
+    const val google_play = "1.8.1"
     const val protobuf = "3.17.3"
     const val androidx_test = "1.4.0"
     const val extJUnitVersion = "1.1.3-rc01"
