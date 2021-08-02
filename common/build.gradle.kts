@@ -26,6 +26,7 @@ kotlin {
                 api(compose.runtime)
                 api(compose.foundation)
                 api(compose.material)
+                api("androidx.paging:paging-common:${Versions.paging}")
             }
         }
         val commonTest by getting
