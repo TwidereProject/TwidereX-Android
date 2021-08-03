@@ -42,7 +42,12 @@ kotlin {
                 implementation(kotlin("test"))
             }
         }
-        val androidMain by getting
+        val androidMain by getting {
+            dependencies {
+                api("androidx.lifecycle:lifecycle-runtime-ktx:2.4.0-alpha01")
+                api("androidx.savedstate:savedstate-ktx:1.1.0")
+            }
+        }
         val androidTest by getting
         val desktopMain by getting
         val desktopTest by getting

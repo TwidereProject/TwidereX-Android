@@ -20,19 +20,19 @@
  */
 package moe.tlaster.precompose.navigation
 
-import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
-import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import moe.tlaster.precompose.navigation.transition.AnimatedDialogRoute
 import moe.tlaster.precompose.navigation.transition.AnimatedRoute
 import moe.tlaster.precompose.navigation.transition.DialogTransition
 import moe.tlaster.precompose.navigation.transition.NavTransition
+import moe.tlaster.precompose.ui.LocalBackDispatcherOwner
+import moe.tlaster.precompose.ui.LocalLifecycleOwner
+import moe.tlaster.precompose.ui.LocalViewModelStoreOwner
 
 /**
  * Provides in place in the Compose hierarchy for self contained navigation to occur.
@@ -70,7 +70,7 @@ fun NavHost(
     val viewModelStoreOwner = checkNotNull(LocalViewModelStoreOwner.current) {
         "NavHost requires a ViewModelStoreOwner to be provided via LocalViewModelStoreOwner"
     }
-    val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
+    val backDispatcher = LocalBackDispatcherOwner.current?.backDispatcher
     DisposableEffect(manager, lifecycleOwner, viewModelStoreOwner, backDispatcher) {
         manager.lifeCycleOwner = lifecycleOwner
         manager.setViewModelStore(viewModelStoreOwner.viewModelStore)

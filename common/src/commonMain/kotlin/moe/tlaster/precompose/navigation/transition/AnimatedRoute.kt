@@ -34,7 +34,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.lifecycle.Lifecycle
+import moe.tlaster.precompose.lifecycle.Lifecycle
 import moe.tlaster.precompose.navigation.RouteStack
 import moe.tlaster.precompose.navigation.RouteStackManager
 
@@ -59,8 +59,8 @@ internal fun AnimatedRoute(
             .takeIf {
                 it >= 0 ||
                     // Workaround for navOptions
-                    targetState.currentEntry?.lifecycle?.currentState == Lifecycle.State.INITIALIZED &&
-                    previousState.currentEntry?.lifecycle?.currentState == Lifecycle.State.RESUMED
+                    targetState.currentEntry?.lifecycle?.currentState == Lifecycle.State.Initialized &&
+                    previousState.currentEntry?.lifecycle?.currentState == Lifecycle.State.Active
             } ?: Int.MAX_VALUE
         val actualNavTransition = run {
             if (indexOfNew >= indexOfOld) targetState else previousState

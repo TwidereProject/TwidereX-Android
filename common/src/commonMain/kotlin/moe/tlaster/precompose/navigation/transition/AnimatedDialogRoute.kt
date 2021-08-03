@@ -34,7 +34,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.lifecycle.Lifecycle
+import moe.tlaster.precompose.lifecycle.Lifecycle
 import moe.tlaster.precompose.navigation.BackStackEntry
 import moe.tlaster.precompose.navigation.RouteStack
 
@@ -64,8 +64,8 @@ internal fun AnimatedDialogRoute(
             .takeIf {
                 it >= 0 ||
                     // Workaround for navOptions
-                    targetState?.lifecycle?.currentState == Lifecycle.State.INITIALIZED &&
-                    previousState?.lifecycle?.currentState == Lifecycle.State.RESUMED
+                    targetState?.lifecycle?.currentState == Lifecycle.State.Initialized &&
+                    previousState?.lifecycle?.currentState == Lifecycle.State.Active
             } ?: Int.MAX_VALUE
         // Only manipulate the list when the state is changed, or in the first run.
         val keys = items.map {

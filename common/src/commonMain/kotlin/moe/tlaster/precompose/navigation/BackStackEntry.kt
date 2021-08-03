@@ -20,12 +20,12 @@
  */
 package moe.tlaster.precompose.navigation
 
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.LifecycleRegistry
-import androidx.lifecycle.ViewModelStore
-import androidx.lifecycle.ViewModelStoreOwner
+import moe.tlaster.precompose.lifecycle.Lifecycle
+import moe.tlaster.precompose.lifecycle.LifecycleOwner
+import moe.tlaster.precompose.lifecycle.LifecycleRegistry
 import moe.tlaster.precompose.navigation.route.ComposeRoute
+import moe.tlaster.precompose.viewmodel.ViewModelStore
+import moe.tlaster.precompose.viewmodel.ViewModelStoreOwner
 
 class BackStackEntry internal constructor(
     val id: Long,
@@ -36,38 +36,32 @@ class BackStackEntry internal constructor(
 ) : ViewModelStoreOwner, LifecycleOwner {
     private var destroyAfterTransition = false
 
-    override fun getViewModelStore(): ViewModelStore {
-        return viewModel.get(id = id)
-    }
+    override val viewModelStore: ViewModelStore
+        get() = viewModel.get(id = id)
 
     private val lifecycleRegistry by lazy {
-        LifecycleRegistry(this)
+        LifecycleRegistry()
     }
 
-    override fun getLifecycle(): Lifecycle {
-        return lifecycleRegistry
-    }
+    override val lifecycle: Lifecycle
+        get() = lifecycleRegistry
 
     fun active() {
-        lifecycleRegistry.currentState = Lifecycle.State.RESUMED
+        lifecycleRegistry.currentState = Lifecycle.State.Active
     }
 
     fun inActive() {
-        if (lifecycleRegistry.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
-            lifecycleRegistry.currentState = Lifecycle.State.STARTED
-        }
+        lifecycleRegistry.currentState = Lifecycle.State.InActive
         if (destroyAfterTransition) {
             destroy()
         }
     }
 
     fun destroy() {
-        if (lifecycleRegistry.currentState.isAtLeast(Lifecycle.State.RESUMED) ||
-            lifecycleRegistry.currentState == Lifecycle.State.INITIALIZED
-        ) {
+        if (lifecycleRegistry.currentState != Lifecycle.State.InActive) {
             destroyAfterTransition = true
         } else {
-            lifecycleRegistry.currentState = Lifecycle.State.DESTROYED
+            lifecycleRegistry.currentState = Lifecycle.State.Destroyed
             viewModelStore.clear()
         }
     }

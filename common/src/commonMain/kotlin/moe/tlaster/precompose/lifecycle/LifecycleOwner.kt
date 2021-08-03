@@ -18,10 +18,8 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package moe.tlaster.precompose.navigation.route
+package moe.tlaster.precompose.lifecycle
 
-internal interface Route {
-    val route: String
-    @Deprecated("store path key in route node in order to match different links in one route")
-    val pathKeys: List<String>
+interface LifecycleOwner {
+    val lifecycle: Lifecycle
 }

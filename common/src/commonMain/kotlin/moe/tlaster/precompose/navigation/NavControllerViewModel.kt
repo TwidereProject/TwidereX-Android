@@ -20,9 +20,9 @@
  */
 package moe.tlaster.precompose.navigation
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelStore
+import moe.tlaster.precompose.viewmodel.ViewModel
+import moe.tlaster.precompose.viewmodel.ViewModelStore
+import moe.tlaster.precompose.viewmodel.getViewModel
 
 internal class NavControllerViewModel : ViewModel() {
     private val viewModelStores = hashMapOf<Long, ViewModelStore>()
@@ -46,15 +46,9 @@ internal class NavControllerViewModel : ViewModel() {
 
     companion object {
         fun create(viewModelStore: ViewModelStore): NavControllerViewModel {
-            return ViewModelProvider(
-                viewModelStore,
-                object : ViewModelProvider.Factory {
-                    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-                        @Suppress("UNCHECKED_CAST")
-                        return NavControllerViewModel() as T
-                    }
-                }
-            ).get(NavControllerViewModel::class.java)
+            return viewModelStore.getViewModel {
+                NavControllerViewModel()
+            }
         }
     }
 }

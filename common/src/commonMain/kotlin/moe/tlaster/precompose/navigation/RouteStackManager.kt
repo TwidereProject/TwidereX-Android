@@ -20,18 +20,18 @@
  */
 package moe.tlaster.precompose.navigation
 
-import androidx.activity.OnBackPressedCallback
-import androidx.activity.OnBackPressedDispatcher
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.saveable.SaveableStateHolder
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.ViewModelStore
+import moe.tlaster.precompose.lifecycle.Lifecycle
+import moe.tlaster.precompose.lifecycle.LifecycleObserver
+import moe.tlaster.precompose.lifecycle.LifecycleOwner
 import moe.tlaster.precompose.navigation.route.ComposeRoute
 import moe.tlaster.precompose.navigation.route.DialogRoute
 import moe.tlaster.precompose.navigation.route.SceneRoute
+import moe.tlaster.precompose.ui.BackDispatcher
+import moe.tlaster.precompose.ui.BackHandler
+import moe.tlaster.precompose.viewmodel.ViewModelStore
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
@@ -40,20 +40,15 @@ import kotlin.coroutines.suspendCoroutine
 internal class RouteStackManager(
     private val stateHolder: SaveableStateHolder,
     private val routeGraph: RouteGraph,
-) : LifecycleEventObserver {
+) : LifecycleObserver, BackHandler {
     // FIXME: 2021/4/1 Temp workaround for deeplink
     private var pendingNavigation: String? = null
     private val _suspendResult = linkedMapOf<BackStackEntry, Continuation<Any?>>()
-    private val backPressCallback: OnBackPressedCallback = object : OnBackPressedCallback(false) {
-        override fun handleOnBackPressed() {
-            goBack()
-        }
-    }
-    var backDispatcher: OnBackPressedDispatcher? = null
+    var backDispatcher: BackDispatcher? = null
         set(value) {
-            backPressCallback.remove()
+            field?.unregister(this)
             field = value
-            value?.addCallback(backPressCallback)
+            value?.register(this)
         }
     private var stackEntryId = Long.MIN_VALUE
     private var routeStackId = Long.MIN_VALUE
@@ -149,13 +144,11 @@ internal class RouteStackManager(
                 _backStacks.removeRange(0, _backStacks.lastIndex)
             }
         }
-        updateBackPressCallback()
     }
 
     fun goBack(result: Any? = null) {
         if (!canGoBack) {
-            updateBackPressCallback()
-            backDispatcher?.onBackPressed()
+            backDispatcher?.onBackPress()
             return
         }
         when {
@@ -177,36 +170,37 @@ internal class RouteStackManager(
         }?.let {
             _suspendResult.remove(it)?.resume(result)
         }
-        updateBackPressCallback()
     }
 
     suspend fun waitingForResult(entry: BackStackEntry): Any? = suspendCoroutine {
         _suspendResult[entry] = it
     }
 
-    private fun updateBackPressCallback() {
-        backPressCallback.isEnabled = canGoBack
-    }
-
-    override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
-        when (event) {
-            Lifecycle.Event.ON_CREATE -> Unit
-            Lifecycle.Event.ON_START -> Unit
-            Lifecycle.Event.ON_RESUME -> currentStack?.onActive()
-            Lifecycle.Event.ON_PAUSE -> currentStack?.onInActive()
-            Lifecycle.Event.ON_STOP -> currentStack?.onInActive()
-            Lifecycle.Event.ON_DESTROY -> {
+    override fun onStateChanged(state: Lifecycle.State) {
+        when (state) {
+            Lifecycle.State.Initialized -> Unit
+            Lifecycle.State.Active -> currentStack?.onActive()
+            Lifecycle.State.InActive -> currentStack?.onInActive()
+            Lifecycle.State.Destroyed -> {
                 _backStacks.forEach {
                     it.onDestroyed()
                 }
                 _backStacks.clear()
             }
-            Lifecycle.Event.ON_ANY -> Unit
         }
     }
 
     internal fun indexOf(stack: RouteStack): Int {
         return _backStacks.indexOf(stack)
+    }
+
+    override fun handleBackPress(): Boolean {
+        return if (canGoBack) {
+            goBack()
+            true
+        } else {
+            false
+        }
     }
 
     fun navigateInitial(initialRoute: String) {
