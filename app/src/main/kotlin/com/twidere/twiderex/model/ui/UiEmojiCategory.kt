@@ -20,22 +20,15 @@
  */
 package com.twidere.twiderex.model.ui
 
-import com.twidere.twiderex.db.model.DbDMConversation
-import com.twidere.twiderex.model.MicroBlogKey
-
-data class UiDMConversation(
-    val accountKey: MicroBlogKey,
-    // conversation
-    val conversationId: String,
-    val conversationKey: MicroBlogKey,
-    val conversationAvatar: String,
-    val conversationName: String,
-    val conversationSubName: String,
-    val conversationType: DbDMConversation.Type,
-    val recipientKey: MicroBlogKey,
+data class UiEmojiCategory(
+    val category: String?,
+    val emoji: List<UiEmoji>
 )
 
-data class UiDMConversationWithLatestMessage(
-    val conversation: UiDMConversation,
-    val latestMessage: UiDMEvent
+data class UiEmoji(
+    val shortcode: String? = null,
+    val url: String? = null,
+    val staticURL: String? = null,
+    val visibleInPicker: Boolean? = null,
+    val category: String? = null
 )

@@ -35,7 +35,6 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.WorkManager
-import com.twidere.services.mastodon.model.Emoji
 import com.twidere.services.mastodon.model.Visibility
 import com.twidere.services.microblog.LookupService
 import com.twidere.twiderex.R
@@ -48,6 +47,7 @@ import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.job.ComposeData
+import com.twidere.twiderex.model.ui.UiEmoji
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.DraftRepository
@@ -478,7 +478,7 @@ open class ComposeViewModel @AssistedInject constructor(
         }
     }
 
-    fun insertEmoji(emoji: Emoji) {
+    fun insertEmoji(emoji: UiEmoji) {
         insertText("${if (textFieldValue.value.selection.start != 0) " " else ""}:${emoji.shortcode}: ")
     }
 }

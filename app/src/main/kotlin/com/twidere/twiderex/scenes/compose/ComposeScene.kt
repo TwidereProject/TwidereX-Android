@@ -127,7 +127,7 @@ import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.PlatformType
-import com.twidere.twiderex.model.ui.UiEmoji
+import com.twidere.twiderex.model.ui.UiEmojiCategory
 import com.twidere.twiderex.navigation.RootRoute
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalNavController
@@ -523,7 +523,7 @@ fun EmojiPanel(
 @ExperimentalFoundationApi
 @Composable
 private fun EmojiList(
-    items: List<UiEmoji>,
+    items: List<UiEmojiCategory>,
     viewModel: ComposeViewModel
 ) {
     BoxWithConstraints(modifier = Modifier.padding(EmojiListDefaults.ContentPadding)) {

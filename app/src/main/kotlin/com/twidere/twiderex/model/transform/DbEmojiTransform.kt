@@ -18,17 +18,23 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.model.ui
+package com.twidere.twiderex.model.transform
 
 import com.twidere.services.mastodon.model.Emoji
+import com.twidere.twiderex.model.ui.UiEmoji
+import com.twidere.twiderex.model.ui.UiEmojiCategory
 
-data class UiEmoji(
-    val category: String?,
-    val emoji: List<Emoji>
-) {
-    companion object {
-        fun List<Emoji>.toUi(): List<UiEmoji> = groupBy({ it.category }, { it }).map {
-            UiEmoji(if (it.key.isNullOrEmpty()) null else it.key, it.value)
+fun List<Emoji>.toUi(): List<UiEmojiCategory> = groupBy({ it.category }, { it }).map {
+    UiEmojiCategory(
+        if (it.key.isNullOrEmpty()) null else it.key,
+        it.value.map { emoji ->
+            UiEmoji(
+                shortcode = emoji.shortcode,
+                url = emoji.url,
+                staticURL = emoji.staticURL,
+                visibleInPicker = emoji.visibleInPicker,
+                category = emoji.category
+            )
         }
-    }
+    )
 }
