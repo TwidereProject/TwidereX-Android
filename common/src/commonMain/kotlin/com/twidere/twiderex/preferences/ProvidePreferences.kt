@@ -28,21 +28,16 @@ import androidx.compose.runtime.getValue
 import androidx.datastore.core.DataStore
 import com.twidere.services.http.config.HttpConfig
 import com.twidere.services.proxy.ProxyConfig
-import com.twidere.twiderex.preferences.proto.AppearancePreferences
-import com.twidere.twiderex.preferences.proto.DisplayPreferences
-import com.twidere.twiderex.preferences.proto.MiscPreferences
-import com.twidere.twiderex.ui.LocalVideoPlayback
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
-import javax.inject.Inject
 
 val LocalAppearancePreferences = compositionLocalOf<AppearancePreferences> { error("No AppearancePreferences") }
 val LocalDisplayPreferences = compositionLocalOf<DisplayPreferences> { error("No DisplayPreferences") }
 val LocalHttpConfig = compositionLocalOf<HttpConfig> { error("No Http config preferences") }
-data class PreferencesHolder @Inject constructor(
+data class PreferencesHolder(
     val appearancePreferences: DataStore<AppearancePreferences>,
     val displayPreferences: DataStore<DisplayPreferences>,
     val miscPreferences: DataStore<MiscPreferences>
@@ -63,10 +58,10 @@ fun ProvidePreferences(
 ) {
     val appearances by holder.appearancePreferences
         .data
-        .collectAsState(initial = AppearancePreferences.getDefaultInstance())
+        .collectAsState(initial = AppearancePreferences())
     val display by holder.displayPreferences
         .data
-        .collectAsState(initial = DisplayPreferences.getDefaultInstance())
+        .collectAsState(initial = DisplayPreferences())
     val proxyConfig by holder.miscPreferences
         .data
         .map {
@@ -89,7 +84,6 @@ fun ProvidePreferences(
     CompositionLocalProvider(
         LocalAppearancePreferences provides appearances,
         LocalDisplayPreferences provides display,
-        LocalVideoPlayback provides display.autoPlayback,
         LocalHttpConfig provides proxyConfig
     ) {
         content.invoke()

@@ -20,26 +20,25 @@
  */
 package com.twidere.twiderex.preferences.serializer
 
-import androidx.datastore.core.CorruptionException
 import androidx.datastore.core.Serializer
-import com.google.protobuf.InvalidProtocolBufferException
-import com.twidere.twiderex.preferences.proto.MiscPreferences
+import com.twidere.twiderex.preferences.AppearancePreferences
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.decodeFromByteArray
+import kotlinx.serialization.encodeToByteArray
+import kotlinx.serialization.protobuf.ProtoBuf
 import java.io.InputStream
 import java.io.OutputStream
 
-object MiscPreferencesSerializer : Serializer<MiscPreferences> {
-    override val defaultValue: MiscPreferences
-        get() = MiscPreferences.getDefaultInstance()
-            .toBuilder()
-            .build()
-
-    override suspend fun readFrom(input: InputStream): MiscPreferences {
-        try {
-            return MiscPreferences.parseFrom(input)
-        } catch (exception: InvalidProtocolBufferException) {
-            throw CorruptionException("Cannot read proto.", exception)
-        }
+@OptIn(ExperimentalSerializationApi::class)
+object AppearancePreferencesSerializer : Serializer<AppearancePreferences> {
+    override suspend fun readFrom(input: InputStream): AppearancePreferences {
+        return ProtoBuf.decodeFromByteArray(input.readAllBytes())
     }
+    override suspend fun writeTo(
+        t: AppearancePreferences,
+        output: OutputStream
+    ) = output.write(ProtoBuf.encodeToByteArray(t))
 
-    override suspend fun writeTo(t: MiscPreferences, output: OutputStream) = t.writeTo(output)
+    override val defaultValue: AppearancePreferences
+        get() = AppearancePreferences()
 }
