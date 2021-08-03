@@ -44,7 +44,7 @@ kotlin {
         }
         val androidMain by getting {
             dependencies {
-                api("androidx.lifecycle:lifecycle-runtime-ktx:2.4.0-alpha01")
+                api("androidx.lifecycle:lifecycle-runtime-ktx:${Versions.lifecycle}")
                 api("androidx.savedstate:savedstate-ktx:1.1.0")
             }
         }
