@@ -3,6 +3,7 @@ import org.jetbrains.compose.compose
 plugins {
     kotlin("multiplatform")
     id("org.jetbrains.compose") version Versions.compose_jb
+    kotlin("plugin.serialization") version Versions.Kotlin.lang
     id("com.android.library")
 }
 
@@ -27,6 +28,10 @@ kotlin {
                 api(compose.foundation)
                 api(compose.material)
                 api("androidx.paging:paging-common:${Versions.paging}")
+                api("androidx.datastore:datastore-core:${Versions.datastore}")
+                api("androidx.datastore:datastore-preferences-core:${Versions.datastore}")
+                api("org.jetbrains.kotlinx:kotlinx-serialization-json:${Versions.Kotlin.serialization}")
+                api("org.jetbrains.kotlinx:kotlinx-serialization-protobuf:${Versions.Kotlin.serialization}")
             }
         }
         val commonTest by getting
