@@ -20,6 +20,9 @@ kotlin {
         compilations.all {
             kotlinOptions.jvmTarget = Versions.Java.jvmTarget
         }
+        testRuns["test"].executionTask.configure {
+            useJUnitPlatform()
+        }
     }
     sourceSets {
         val commonMain by getting {
@@ -34,7 +37,11 @@ kotlin {
                 api("org.jetbrains.kotlinx:kotlinx-serialization-protobuf:${Versions.Kotlin.serialization}")
             }
         }
-        val commonTest by getting
+        val commonTest by getting {
+            dependencies {
+                implementation(kotlin("test"))
+            }
+        }
         val androidMain by getting
         val androidTest by getting
         val desktopMain by getting
