@@ -36,8 +36,8 @@ import com.twidere.twiderex.db.model.DbTrendWithHistory
 import com.twidere.twiderex.db.model.saveToDb
 import com.twidere.twiderex.defaultLoadCount
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.transform.toUi
 import com.twidere.twiderex.model.ui.UiTrend
-import com.twidere.twiderex.model.ui.UiTrend.Companion.toUi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 

@@ -18,15 +18,20 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.repository
+package com.twidere.twiderex.model.transform
 
-import com.twidere.twiderex.db.CacheDatabase
-import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.transform.toUi
+import com.twidere.twiderex.db.model.DbMedia
+import com.twidere.twiderex.model.ui.UiMedia
 
-class MediaRepository(private val database: CacheDatabase) {
-
-    suspend fun findMediaByBelongToKey(
-        belongToKey: MicroBlogKey
-    ) = database.mediaDao().findMediaByBelongToKey(belongToKey).toUi()
+fun List<DbMedia>.toUi() = sortedBy { it.order }.map {
+    UiMedia(
+        url = it.url,
+        mediaUrl = it.mediaUrl,
+        previewUrl = it.previewUrl,
+        type = it.type,
+        width = it.width,
+        height = it.height,
+        pageUrl = it.pageUrl,
+        altText = it.altText,
+    )
 }

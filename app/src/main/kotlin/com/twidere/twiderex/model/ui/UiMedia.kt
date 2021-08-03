@@ -25,7 +25,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.res.painterResource
 import com.twidere.twiderex.R
-import com.twidere.twiderex.db.model.DbMedia
 import com.twidere.twiderex.model.enums.MediaType
 
 @Immutable
@@ -73,18 +72,5 @@ data class UiMedia(
                 altText = "",
             ),
         )
-
-        fun List<DbMedia>.toUi() = sortedBy { it.order }.map {
-            UiMedia(
-                url = it.url,
-                mediaUrl = it.mediaUrl,
-                previewUrl = it.previewUrl,
-                type = it.type,
-                width = it.width,
-                height = it.height,
-                pageUrl = it.pageUrl,
-                altText = it.altText,
-            )
-        }
     }
 }

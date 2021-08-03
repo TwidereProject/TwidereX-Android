@@ -21,7 +21,6 @@
 package com.twidere.twiderex.model.ui
 
 import androidx.compose.runtime.Immutable
-import com.twidere.twiderex.db.model.DbUrlEntity
 
 @Immutable
 data class UiUrlEntity(
@@ -31,11 +30,4 @@ data class UiUrlEntity(
     val title: String?,
     val description: String?,
     val image: String?,
-) {
-    companion object {
-        fun DbUrlEntity.toUi() = UiUrlEntity(
-            url, expandedUrl, displayUrl, title, description, image
-        )
-        fun List<DbUrlEntity>.toUi() = map { it.toUi() }
-    }
-}
+)

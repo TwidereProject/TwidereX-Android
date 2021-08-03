@@ -27,10 +27,8 @@ import com.twidere.twiderex.R
 import com.twidere.twiderex.db.model.DbMastodonUserExtra
 import com.twidere.twiderex.db.model.DbTwitterUserExtra
 import com.twidere.twiderex.db.model.DbUser
-import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.PlatformType
-import com.twidere.twiderex.ui.LocalActiveAccount
 
 @Immutable
 data class UiUser(
@@ -57,14 +55,9 @@ data class UiUser(
 ) {
     val displayName
         get() = name.takeUnless { it.isEmpty() } ?: screenName
-    val displayScreenName: String
-        @Composable
-        get() {
-            return LocalActiveAccount.current?.let { getDisplayScreenName(it) } ?: "@$screenName"
-        }
 
-    fun getDisplayScreenName(accountDetails: AccountDetails): String {
-        return if (accountDetails.accountKey.host.let { it != acct.host }) {
+    fun getDisplayScreenName(host: String?): String {
+        return if (host != null && host != acct.host) {
             "@$screenName@${acct.host}"
         } else {
             "@$screenName"

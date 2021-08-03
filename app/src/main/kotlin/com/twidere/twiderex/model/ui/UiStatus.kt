@@ -34,8 +34,7 @@ import com.twidere.twiderex.db.model.ReferenceType
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.MastodonStatusType
 import com.twidere.twiderex.model.enums.PlatformType
-import com.twidere.twiderex.model.ui.UiMedia.Companion.toUi
-import com.twidere.twiderex.model.ui.UiUrlEntity.Companion.toUi
+import com.twidere.twiderex.model.transform.toUi
 import com.twidere.twiderex.model.ui.UiUser.Companion.toUi
 
 @Immutable

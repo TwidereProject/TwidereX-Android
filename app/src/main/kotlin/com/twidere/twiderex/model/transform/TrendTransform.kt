@@ -18,15 +18,27 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.repository
+package com.twidere.twiderex.model.transform
 
-import com.twidere.twiderex.db.CacheDatabase
-import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.transform.toUi
+import com.twidere.twiderex.db.model.DbTrendHistory
+import com.twidere.twiderex.db.model.DbTrendWithHistory
+import com.twidere.twiderex.model.ui.UiTrend
+import com.twidere.twiderex.model.ui.UiTrendHistory
 
-class MediaRepository(private val database: CacheDatabase) {
+fun DbTrendWithHistory.toUi() = UiTrend(
+    trendKey = trend.trendKey,
+    displayName = trend.displayName,
+    url = trend.url,
+    query = trend.query,
+    volume = trend.volume,
+    history = history.map {
+        it.toUi()
+    }
+)
 
-    suspend fun findMediaByBelongToKey(
-        belongToKey: MicroBlogKey
-    ) = database.mediaDao().findMediaByBelongToKey(belongToKey).toUi()
-}
+fun DbTrendHistory.toUi() = UiTrendHistory(
+    trendKey = trendKey,
+    day = day,
+    uses = uses,
+    accounts = accounts
+)

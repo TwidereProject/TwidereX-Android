@@ -303,7 +303,7 @@ open class ComposeViewModel @AssistedInject constructor(
                                 status.mastodonExtra.mentions.mapNotNull { it.acct }
                                     .filter { it != account.user.screenName }.map { "@$it" }.let {
                                         if (status.user.userKey != account.user.userKey) {
-                                            listOf(status.user.getDisplayScreenName(account)) + it
+                                            listOf(status.user.getDisplayScreenName(account.accountKey.host)) + it
                                         } else {
                                             it
                                         }
