@@ -51,6 +51,8 @@ import com.twidere.twiderex.model.enums.MastodonStatusType
 import com.twidere.twiderex.model.enums.MediaType
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.navigation.RootDeepLinksRoute
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import org.jsoup.nodes.Node
@@ -327,11 +329,13 @@ fun Account.toDbUser(
         } ?: throw IllegalArgumentException("mastodon user.acct should not be null"),
         platformType = PlatformType.Mastodon,
         statusesCount = statusesCount ?: 0L,
-        mastodonExtra = DbMastodonUserExtra(
-            fields = fields ?: emptyList(),
-            bot = bot ?: false,
-            locked = locked ?: false,
-            emoji = emojis ?: emptyList(),
+        extra = Json.encodeToString(
+            DbMastodonUserExtra(
+                fields = fields ?: emptyList(),
+                bot = bot ?: false,
+                locked = locked ?: false,
+                emoji = emojis ?: emptyList(),
+            )
         )
     )
 }

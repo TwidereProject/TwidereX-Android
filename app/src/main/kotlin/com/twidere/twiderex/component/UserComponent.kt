@@ -97,12 +97,12 @@ import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.component.status.UserName
 import com.twidere.twiderex.component.status.UserScreenName
 import com.twidere.twiderex.component.status.withAvatarClip
-import com.twidere.twiderex.db.model.TwitterUrlEntity
 import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.PlatformType
+import com.twidere.twiderex.model.ui.UiUrlEntity
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.navigation.RootRoute
 import com.twidere.twiderex.navigation.twidereXSchema
@@ -558,7 +558,7 @@ fun MastodonUserField(user: UiUser) {
     if (user.platformType != PlatformType.Mastodon || user.mastodonExtra == null) {
         return
     }
-    user.mastodonExtra.fields.forEachIndexed { index, field ->
+    user.mastodonExtra?.fields?.forEachIndexed { index, field ->
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -576,7 +576,7 @@ fun MastodonUserField(user: UiUser) {
                 )
             }
         }
-        if (index != user.mastodonExtra.fields.lastIndex) {
+        if (index != user.mastodonExtra?.fields?.lastIndex) {
             Spacer(modifier = Modifier.height(MastodonUserFieldDefaults.ItemSpacing))
         }
     }
@@ -780,7 +780,7 @@ fun MetricsItem(
 fun UserDescText(
     modifier: Modifier = Modifier,
     htmlDesc: String,
-    url: List<TwitterUrlEntity>,
+    url: List<UiUrlEntity>,
 ) {
     key(
         htmlDesc,

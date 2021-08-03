@@ -55,6 +55,8 @@ import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.ListsMode
 import com.twidere.twiderex.navigation.RootDeepLinksRouteDefinition
 import com.twitter.twittertext.Autolink
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import java.util.UUID
 
 val autolink by lazy {
@@ -439,15 +441,17 @@ fun User.toDbUser(): DbUser {
         platformType = PlatformType.Twitter,
         acct = MicroBlogKey.twitter(screenName ?: ""),
         statusesCount = statusesCount ?: 0,
-        twitterExtra = DbTwitterUserExtra(
-            pinned_tweet_id = null,
-            url = entities?.description?.urls?.map {
-                TwitterUrlEntity(
-                    url = it.url ?: "",
-                    expandedUrl = it.expandedURL ?: "",
-                    displayUrl = it.displayURL ?: "",
-                )
-            } ?: emptyList()
+        extra = Json.encodeToString(
+            DbTwitterUserExtra(
+                pinned_tweet_id = null,
+                url = entities?.description?.urls?.map {
+                    TwitterUrlEntity(
+                        url = it.url ?: "",
+                        expandedUrl = it.expandedURL ?: "",
+                        displayUrl = it.displayURL ?: "",
+                    )
+                } ?: emptyList()
+            )
         )
     )
 }
@@ -477,15 +481,17 @@ fun UserV2.toDbUser(): DbUser {
         acct = MicroBlogKey.twitter(username ?: ""),
         platformType = PlatformType.Twitter,
         statusesCount = publicMetrics?.tweetCount ?: 0,
-        twitterExtra = DbTwitterUserExtra(
-            pinned_tweet_id = pinnedTweetID,
-            url = entities?.description?.urls?.map {
-                TwitterUrlEntity(
-                    url = it.url ?: "",
-                    expandedUrl = it.expandedURL ?: "",
-                    displayUrl = it.displayURL ?: "",
-                )
-            } ?: emptyList()
+        extra = Json.encodeToString(
+            DbTwitterUserExtra(
+                pinned_tweet_id = pinnedTweetID,
+                url = entities?.description?.urls?.map {
+                    TwitterUrlEntity(
+                        url = it.url ?: "",
+                        expandedUrl = it.expandedURL ?: "",
+                        displayUrl = it.displayURL ?: "",
+                    )
+                } ?: emptyList()
+            )
         )
     )
 }
