@@ -29,7 +29,7 @@ import com.twidere.twiderex.db.model.DbTwitterUserExtra
 import com.twidere.twiderex.db.model.DbUser
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.PlatformType
+import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.ui.LocalActiveAccount
 
 @Immutable

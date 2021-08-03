@@ -31,9 +31,9 @@ import com.twidere.twiderex.db.model.DbStatusWithMediaAndUser
 import com.twidere.twiderex.db.model.DbStatusWithReference
 import com.twidere.twiderex.db.model.DbTwitterStatusExtra
 import com.twidere.twiderex.db.model.ReferenceType
-import com.twidere.twiderex.model.MastodonStatusType
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.PlatformType
+import com.twidere.twiderex.model.enums.MastodonStatusType
+import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiMedia.Companion.toUi
 import com.twidere.twiderex.model.ui.UiUrlEntity.Companion.toUi
 import com.twidere.twiderex.model.ui.UiUser.Companion.toUi

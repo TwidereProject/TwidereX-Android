@@ -18,19 +18,11 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.db.model.converter
+package com.twidere.twiderex.model.enums
 
-import androidx.room.TypeConverter
-import com.twidere.twiderex.model.enums.PlatformType
-
-class PlatformTypeConverter {
-    @TypeConverter
-    fun fromPlatformType(platformType: PlatformType?): String? {
-        return platformType?.name
-    }
-
-    @TypeConverter
-    fun fromString(string: String?): PlatformType? {
-        return string?.let { PlatformType.valueOf(it) }
-    }
+enum class PlatformType {
+    Twitter,
+    StatusNet,
+    Fanfou,
+    Mastodon,
 }

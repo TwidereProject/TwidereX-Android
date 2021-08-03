@@ -27,8 +27,8 @@ import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.AccountPreferences
 import com.twidere.twiderex.model.AmUser
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.cred.CredentialsType
+import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.utils.fromJson
 import com.twidere.twiderex.utils.json
 import kotlinx.coroutines.flow.MutableStateFlow

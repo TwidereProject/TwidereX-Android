@@ -71,8 +71,8 @@ import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.db.model.DbMastodonStatusExtra
 import com.twidere.twiderex.db.model.DbPreviewCard
 import com.twidere.twiderex.extensions.icon
-import com.twidere.twiderex.model.MastodonStatusType
-import com.twidere.twiderex.model.PlatformType
+import com.twidere.twiderex.model.enums.MastodonStatusType
+import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.preferences.LocalDisplayPreferences
 import com.twidere.twiderex.ui.LocalActiveAccount

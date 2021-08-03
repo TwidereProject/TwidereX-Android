@@ -28,6 +28,8 @@ import com.twidere.twiderex.model.cred.CredentialsType
 import com.twidere.twiderex.model.cred.EmptyCredentials
 import com.twidere.twiderex.model.cred.OAuth2Credentials
 import com.twidere.twiderex.model.cred.OAuthCredentials
+import com.twidere.twiderex.model.enums.ListType
+import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.utils.fromJson
 

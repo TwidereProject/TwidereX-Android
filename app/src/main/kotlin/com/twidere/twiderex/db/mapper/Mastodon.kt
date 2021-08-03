@@ -46,10 +46,10 @@ import com.twidere.twiderex.db.model.DbTrendWithHistory
 import com.twidere.twiderex.db.model.DbUser
 import com.twidere.twiderex.db.model.ReferenceType
 import com.twidere.twiderex.db.model.toDbStatusReference
-import com.twidere.twiderex.model.MastodonStatusType
-import com.twidere.twiderex.model.MediaType
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.PlatformType
+import com.twidere.twiderex.model.enums.MastodonStatusType
+import com.twidere.twiderex.model.enums.MediaType
+import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.navigation.RootDeepLinksRoute
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element

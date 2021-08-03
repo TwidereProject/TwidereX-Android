@@ -18,11 +18,12 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.model
+package com.twidere.twiderex.model.enums
 
-enum class PlatformType {
-    Twitter,
-    StatusNet,
-    Fanfou,
-    Mastodon,
+enum class MediaType {
+    photo,
+    video,
+    animated_gif,
+    audio,
+    other,
 }

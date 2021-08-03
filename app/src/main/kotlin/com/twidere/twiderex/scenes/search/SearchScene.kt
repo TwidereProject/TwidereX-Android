@@ -62,7 +62,7 @@ import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.extensions.withElevation
-import com.twidere.twiderex.model.PlatformType
+import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.scenes.search.tabs.MastodonSearchHashtagItem
 import com.twidere.twiderex.scenes.search.tabs.SearchTweetsItem
 import com.twidere.twiderex.scenes.search.tabs.SearchUserItem

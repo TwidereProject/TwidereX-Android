@@ -34,7 +34,7 @@ import com.twidere.twiderex.db.model.saveToDb
 import com.twidere.twiderex.extensions.toUi
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.PlatformType
+import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.model.ui.UiStatus.Companion.toUi
 import com.twidere.twiderex.paging.mediator.paging.pager

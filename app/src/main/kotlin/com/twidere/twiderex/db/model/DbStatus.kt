@@ -33,9 +33,9 @@ import com.twidere.services.mastodon.model.Poll
 import com.twidere.services.mastodon.model.Visibility
 import com.twidere.services.twitter.model.ReplySettings
 import com.twidere.twiderex.db.CacheDatabase
-import com.twidere.twiderex.model.MastodonStatusType
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.PlatformType
+import com.twidere.twiderex.model.enums.MastodonStatusType
+import com.twidere.twiderex.model.enums.PlatformType
 import kotlinx.serialization.Serializable
 
 @Entity(

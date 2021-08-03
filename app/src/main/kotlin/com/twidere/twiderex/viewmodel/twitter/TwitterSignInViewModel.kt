@@ -30,9 +30,9 @@ import com.twidere.twiderex.BuildConfig
 import com.twidere.twiderex.db.mapper.toDbUser
 import com.twidere.twiderex.http.TwidereServiceFactory
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.cred.CredentialsType
 import com.twidere.twiderex.model.cred.OAuthCredentials
+import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.toAmUser
 import com.twidere.twiderex.navigation.RootDeepLinksRoute
 import com.twidere.twiderex.notification.InAppNotification

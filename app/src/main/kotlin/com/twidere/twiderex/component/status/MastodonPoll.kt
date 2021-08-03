@@ -71,7 +71,7 @@ import com.twidere.services.mastodon.model.Poll
 import com.twidere.twiderex.R
 import com.twidere.twiderex.action.LocalStatusActions
 import com.twidere.twiderex.extensions.humanizedTimestamp
-import com.twidere.twiderex.model.PlatformType
+import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.ui.LocalActiveAccount
 import kotlin.math.max

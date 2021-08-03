@@ -18,18 +18,15 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.model
+package com.twidere.twiderex.model.job
 
-import kotlinx.serialization.Serializable
+import com.twidere.twiderex.model.MicroBlogKey
 
-@Serializable
-enum class MastodonStatusType {
-    Status,
-    NotificationFollow,
-    NotificationFollowRequest,
-    NotificationMention,
-    NotificationReblog,
-    NotificationFavourite,
-    NotificationPoll,
-    NotificationStatus,
-}
+data class StatusResult(
+    val statusKey: MicroBlogKey,
+    val accountKey: MicroBlogKey,
+    val retweeted: Boolean? = null,
+    val liked: Boolean? = null,
+    val retweetCount: Long? = null,
+    val likeCount: Long? = null,
+)

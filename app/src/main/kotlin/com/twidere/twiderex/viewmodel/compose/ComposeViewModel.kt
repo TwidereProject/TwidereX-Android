@@ -45,9 +45,9 @@ import com.twidere.twiderex.extensions.getCachedLocation
 import com.twidere.twiderex.extensions.getTextAfterSelection
 import com.twidere.twiderex.extensions.getTextBeforeSelection
 import com.twidere.twiderex.model.AccountDetails
-import com.twidere.twiderex.model.ComposeData
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.PlatformType
+import com.twidere.twiderex.model.enums.PlatformType
+import com.twidere.twiderex.model.job.ComposeData
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.DraftRepository

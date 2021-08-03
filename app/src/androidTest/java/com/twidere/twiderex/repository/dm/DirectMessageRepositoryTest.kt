@@ -30,7 +30,7 @@ import com.twidere.twiderex.db.mapper.toDbUser
 import com.twidere.twiderex.mock.MockDirectMessageService
 import com.twidere.twiderex.mock.MockLookUpService
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.PlatformType
+import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiUser.Companion.toUi
 import com.twidere.twiderex.repository.DirectMessageRepository
 import kotlinx.coroutines.runBlocking

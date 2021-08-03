@@ -35,7 +35,7 @@ import com.twidere.twiderex.db.model.DbDMConversation.Companion.saveToDb
 import com.twidere.twiderex.db.model.DbDMEventWithAttachments.Companion.saveToDb
 import com.twidere.twiderex.db.model.DbUser
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.PlatformType
+import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiDMConversation
 import com.twidere.twiderex.model.ui.UiDMConversation.Companion.toUi
 import com.twidere.twiderex.model.ui.UiDMConversationWithLatestMessage
