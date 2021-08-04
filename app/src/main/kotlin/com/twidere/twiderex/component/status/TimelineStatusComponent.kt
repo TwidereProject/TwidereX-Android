@@ -522,7 +522,6 @@ fun statusConstraintSets() = ConstraintSet {
     constrain(statusHeaderRef) {
         top.linkTo(parent.top)
         start.linkTo(parent.start)
-        end.linkTo(parent.end)
     }
     constrain(avatarRef) {
         top.linkTo(statusHeaderRef.bottom)
