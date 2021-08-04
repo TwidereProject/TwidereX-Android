@@ -18,18 +18,8 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.model
+package com.twidere.twiderex.db.model
 
-import kotlinx.serialization.Serializable
-
-@Serializable
-enum class MastodonStatusType {
-    Status,
-    NotificationFollow,
-    NotificationFollowRequest,
-    NotificationMention,
-    NotificationReblog,
-    NotificationFavourite,
-    NotificationPoll,
-    NotificationStatus,
-}
+typealias Html = String
+typealias Json = String
+typealias Timestamp = Long

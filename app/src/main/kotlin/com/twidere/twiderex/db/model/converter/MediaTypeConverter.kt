@@ -21,7 +21,7 @@
 package com.twidere.twiderex.db.model.converter
 
 import androidx.room.TypeConverter
-import com.twidere.twiderex.model.MediaType
+import com.twidere.twiderex.model.enums.MediaType
 
 class MediaTypeConverter {
     @TypeConverter

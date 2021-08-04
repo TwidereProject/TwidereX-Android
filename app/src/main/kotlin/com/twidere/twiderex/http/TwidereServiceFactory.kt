@@ -25,10 +25,10 @@ import com.twidere.services.http.config.HttpConfigClientFactory
 import com.twidere.services.mastodon.MastodonService
 import com.twidere.services.microblog.MicroBlogService
 import com.twidere.services.twitter.TwitterService
-import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.cred.Credentials
 import com.twidere.twiderex.model.cred.OAuth2Credentials
 import com.twidere.twiderex.model.cred.OAuthCredentials
+import com.twidere.twiderex.model.enums.PlatformType
 
 class TwidereServiceFactory(private val configProvider: TwidereHttpConfigProvider) {
 

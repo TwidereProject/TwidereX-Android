@@ -27,6 +27,7 @@ import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.twidere.twiderex.jobs.status.StatusJob
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.transform.toWorkData
 import com.twidere.twiderex.model.ui.UiStatus
 
 abstract class StatusWorker(

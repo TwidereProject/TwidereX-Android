@@ -20,7 +20,7 @@
  */
 package com.twidere.twiderex.scenes.home
 
-import com.twidere.twiderex.model.PlatformType
+import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.scenes.home.mastodon.FederatedTimelineItem
 import com.twidere.twiderex.scenes.home.mastodon.LocalTimelineItem
 import com.twidere.twiderex.scenes.home.mastodon.MastodonNotificationItem

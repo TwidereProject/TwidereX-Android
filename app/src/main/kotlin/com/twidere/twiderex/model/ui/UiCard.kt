@@ -20,15 +20,10 @@
  */
 package com.twidere.twiderex.model.ui
 
-import com.twidere.services.mastodon.model.Emoji
-
-data class UiEmoji(
-    val category: String?,
-    val emoji: List<Emoji>
-) {
-    companion object {
-        fun List<Emoji>.toUi(): List<UiEmoji> = groupBy({ it.category }, { it }).map {
-            UiEmoji(if (it.key.isNullOrEmpty()) null else it.key, it.value)
-        }
-    }
-}
+data class UiCard(
+    val link: String,
+    val displayLink: String?,
+    val title: String?,
+    val description: String?,
+    val image: String?,
+)
