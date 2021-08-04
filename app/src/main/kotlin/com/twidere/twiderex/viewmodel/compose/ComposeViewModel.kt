@@ -35,7 +35,6 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.WorkManager
-import com.twidere.services.mastodon.model.Visibility
 import com.twidere.services.microblog.LookupService
 import com.twidere.twiderex.R
 import com.twidere.twiderex.action.ComposeAction
@@ -45,6 +44,7 @@ import com.twidere.twiderex.extensions.getTextAfterSelection
 import com.twidere.twiderex.extensions.getTextBeforeSelection
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.enums.MastodonVisibility
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.job.ComposeData
 import com.twidere.twiderex.model.ui.UiEmoji
@@ -277,7 +277,7 @@ open class ComposeViewModel @AssistedInject constructor(
 
     val voteState = MutableStateFlow<VoteState?>(null)
     val isInVoteMode = MutableStateFlow(false)
-    val visibility = MutableStateFlow(Visibility.Public)
+    val visibility = MutableStateFlow(MastodonVisibility.Public)
     val isImageSensitive = MutableStateFlow(false)
     val isContentWarningEnabled = MutableStateFlow(false)
     val contentWarningTextFieldValue = MutableStateFlow(TextFieldValue())
@@ -346,7 +346,7 @@ open class ComposeViewModel @AssistedInject constructor(
         enableThreadMode.value = value
     }
 
-    fun setVisibility(value: Visibility) {
+    fun setVisibility(value: MastodonVisibility) {
         visibility.value = value
     }
 

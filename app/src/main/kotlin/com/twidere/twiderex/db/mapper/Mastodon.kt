@@ -44,13 +44,13 @@ import com.twidere.twiderex.db.model.DbTrend
 import com.twidere.twiderex.db.model.DbTrendHistory
 import com.twidere.twiderex.db.model.DbTrendWithHistory
 import com.twidere.twiderex.db.model.DbUser
-import com.twidere.twiderex.db.model.ReferenceType
 import com.twidere.twiderex.db.model.toDbStatusReference
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.MastodonStatusType
 import com.twidere.twiderex.model.enums.MastodonVisibility
 import com.twidere.twiderex.model.enums.MediaType
 import com.twidere.twiderex.model.enums.PlatformType
+import com.twidere.twiderex.model.enums.ReferenceType
 import com.twidere.twiderex.navigation.RootDeepLinksRoute
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json

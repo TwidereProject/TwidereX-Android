@@ -51,8 +51,8 @@ class LikeStatusJob(
             statusKey = newStatus.statusKey,
             accountKey = accountKey,
             liked = true,
-            retweetCount = newStatus.retweetCount,
-            likeCount = newStatus.likeCount,
+            retweetCount = newStatus.metrics.retweet,
+            likeCount = newStatus.metrics.like,
         )
     }
 

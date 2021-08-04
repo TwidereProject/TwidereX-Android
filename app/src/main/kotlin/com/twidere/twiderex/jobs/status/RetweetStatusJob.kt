@@ -51,8 +51,8 @@ class RetweetStatusJob(
             statusKey = newStatus.statusKey,
             accountKey = accountKey,
             retweeted = true,
-            retweetCount = newStatus.retweetCount,
-            likeCount = newStatus.likeCount,
+            retweetCount = newStatus.metrics.retweet,
+            likeCount = newStatus.metrics.like,
         )
     }
     override fun fallback(

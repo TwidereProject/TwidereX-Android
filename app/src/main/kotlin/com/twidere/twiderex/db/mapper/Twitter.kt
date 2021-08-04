@@ -46,12 +46,12 @@ import com.twidere.twiderex.db.model.DbTwitterStatusExtra
 import com.twidere.twiderex.db.model.DbTwitterUserExtra
 import com.twidere.twiderex.db.model.DbUrlEntity
 import com.twidere.twiderex.db.model.DbUser
-import com.twidere.twiderex.db.model.ReferenceType
 import com.twidere.twiderex.db.model.TwitterUrlEntity
 import com.twidere.twiderex.db.model.toDbStatusReference
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.MediaType
 import com.twidere.twiderex.model.enums.PlatformType
+import com.twidere.twiderex.model.enums.ReferenceType
 import com.twidere.twiderex.model.enums.TwitterReplySettings
 import com.twidere.twiderex.model.ui.ListsMode
 import com.twidere.twiderex.navigation.RootDeepLinksRouteDefinition

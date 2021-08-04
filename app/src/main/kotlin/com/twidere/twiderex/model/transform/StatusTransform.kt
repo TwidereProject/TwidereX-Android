@@ -21,17 +21,24 @@
 package com.twidere.twiderex.model.transform
 
 import com.twidere.services.mastodon.model.Mention
+import com.twidere.services.mastodon.model.Poll
 import com.twidere.twiderex.db.model.DbMastodonStatusExtra
 import com.twidere.twiderex.db.model.DbPagingTimelineWithStatus
+import com.twidere.twiderex.db.model.DbPreviewCard
 import com.twidere.twiderex.db.model.DbStatusReaction
 import com.twidere.twiderex.db.model.DbStatusV2
 import com.twidere.twiderex.db.model.DbStatusWithMediaAndUser
 import com.twidere.twiderex.db.model.DbStatusWithReference
 import com.twidere.twiderex.db.model.DbTwitterStatusExtra
-import com.twidere.twiderex.db.model.ReferenceType
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.PlatformType
+import com.twidere.twiderex.model.enums.ReferenceType
+import com.twidere.twiderex.model.ui.Option
+import com.twidere.twiderex.model.ui.StatusMetrics
+import com.twidere.twiderex.model.ui.UiCard
+import com.twidere.twiderex.model.ui.UiGeo
 import com.twidere.twiderex.model.ui.UiMedia
+import com.twidere.twiderex.model.ui.UiPoll
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.model.ui.UiUrlEntity
 import com.twidere.twiderex.model.ui.UiUser
@@ -48,36 +55,55 @@ fun DbStatusV2.toUi(
     reaction: DbStatusReaction?,
     isGap: Boolean,
     referenceStatus: Map<ReferenceType, UiStatus> = emptyMap(),
-) = UiStatus(
-    statusId = statusId,
-    htmlText = htmlText,
-    timestamp = timestamp,
-    retweetCount = retweetCount,
-    likeCount = likeCount,
-    replyCount = replyCount,
-    retweeted = reaction?.retweeted ?: false,
-    liked = reaction?.liked ?: false,
-    placeString = placeString,
-    hasMedia = hasMedia,
-    user = user,
-    media = media,
-    isGap = isGap,
-    source = source,
-    url = url,
-    statusKey = statusKey,
-    rawText = rawText,
-    platformType = platformType,
-    extra = when (platformType) {
+): UiStatus {
+    var poll: UiPoll? = null
+    var sensitive = false
+    var spoilerText: String? = null
+    val extra = when (platformType) {
         PlatformType.Twitter -> Json.decodeFromString<DbTwitterStatusExtra>(extra).toUi()
         PlatformType.StatusNet -> TODO()
         PlatformType.Fanfou -> TODO()
-        PlatformType.Mastodon -> Json.decodeFromString<DbMastodonStatusExtra>(extra).toUi()
-    },
-    referenceStatus = referenceStatus,
-    linkPreview = previewCard,
-    inReplyToStatusId = inReplyToStatusId,
-    inReplyToUserId = inReplyToStatusId
-)
+        PlatformType.Mastodon -> Json.decodeFromString<DbMastodonStatusExtra>(extra).apply {
+            poll = this.poll?.toUi()
+            sensitive = this.sensitive
+            spoilerText = this.spoilerText
+        }.toUi()
+    }
+    return UiStatus(
+        statusId = statusId,
+        htmlText = htmlText,
+        timestamp = timestamp,
+        metrics = StatusMetrics(
+            retweet = retweetCount,
+            like = likeCount,
+            reply = replyCount,
+        ),
+        retweeted = reaction?.retweeted ?: false,
+        liked = reaction?.liked ?: false,
+        geo = UiGeo(
+            name = placeString ?: "",
+            lat = null,
+            long = null
+        ),
+        hasMedia = hasMedia,
+        user = user,
+        media = media,
+        isGap = isGap,
+        source = source,
+        url = url,
+        statusKey = statusKey,
+        rawText = rawText,
+        platformType = platformType,
+        extra = extra,
+        referenceStatus = referenceStatus,
+        card = previewCard?.toUi(),
+        poll = poll,
+        inReplyToStatusId = inReplyToStatusId,
+        inReplyToUserId = inReplyToStatusId,
+        sensitive = sensitive,
+        spoilerText = spoilerText
+    )
+}
 
 fun DbStatusWithMediaAndUser.toUi(
     accountKey: MicroBlogKey,
@@ -146,5 +172,32 @@ fun List<Mention>.toUi() = map {
         username = it.username,
         url = it.url,
         acct = it.acct
+    )
+}
+
+fun DbPreviewCard.toUi() = UiCard(
+    link = link,
+    displayLink = displayLink,
+    title = title,
+    description = desc,
+    image = image
+)
+
+fun Poll.toUi() = id?.let {
+    UiPoll(
+        id = it,
+        options = options?.map { option ->
+            Option(
+                text = option.title ?: "",
+                count = option.votesCount ?: 0
+            )
+        } ?: emptyList(),
+        expired = expired ?: false,
+        expiresAt = expiresAt?.time,
+        multiple = multiple ?: false,
+        voted = voted ?: false,
+        votersCount = votersCount,
+        ownVotes = ownVotes,
+        votesCount = votesCount
     )
 }

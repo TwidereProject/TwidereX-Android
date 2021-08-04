@@ -105,7 +105,6 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.coerceAtLeast
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.insets.LocalWindowInsets
-import com.twidere.services.mastodon.model.Visibility
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.CheckboxItem
@@ -126,6 +125,7 @@ import com.twidere.twiderex.extensions.stringName
 import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.enums.MastodonVisibility
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiEmojiCategory
 import com.twidere.twiderex.navigation.RootRoute
@@ -698,12 +698,12 @@ fun ComposeMastodonVisibility(
     var showDropdown by remember {
         mutableStateOf(false)
     }
-    val visibility by viewModel.visibility.observeAsState(initial = Visibility.Public)
+    val visibility by viewModel.visibility.observeAsState(initial = MastodonVisibility.Public)
     Box(
         modifier = modifier
     ) {
         DropdownMenu(expanded = showDropdown, onDismissRequest = { showDropdown = false }) {
-            Visibility.values().forEach {
+            MastodonVisibility.values().forEach {
                 DropdownMenuItem(
                     onClick = {
                         showDropdown = false

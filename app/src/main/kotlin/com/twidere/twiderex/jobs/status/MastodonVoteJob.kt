@@ -21,6 +21,8 @@
 package com.twidere.twiderex.jobs.status
 
 import com.twidere.services.mastodon.MastodonService
+import com.twidere.services.mastodon.model.Poll
+import com.twidere.twiderex.db.model.DbMastodonStatusExtra
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.notification.InAppNotification
@@ -35,7 +37,7 @@ class MastodonVoteJob(
 ) {
     suspend fun execute(votes: List<Int>, accountKey: MicroBlogKey, statusKey: MicroBlogKey) {
         val status = statusRepository.loadFromCache(statusKey, accountKey = accountKey) ?: throw Error("Can't find any status matches:$statusKey")
-        if (status.mastodonExtra?.poll == null || status.platformType != PlatformType.Mastodon) {
+        if (status.poll == null || status.platformType != PlatformType.Mastodon) {
             throw Error()
         }
         val service = accountRepository.findByAccountKey(accountKey)?.let {
@@ -44,28 +46,35 @@ class MastodonVoteJob(
             it.service as? MastodonService
         } ?: throw Error()
 
-        val pollId = status.mastodonExtra.poll.id ?: throw Error("Poll id is null")
-        val originPoll = status.mastodonExtra.poll
+        val pollId = status.poll.id
+        var originPoll: Poll? = null
         statusRepository.updateStatus(statusKey = status.statusKey) {
-            it.mastodonExtra = status.mastodonExtra.copy(
-                poll = status.mastodonExtra.poll.copy(
-                    voted = true,
-                    ownVotes = votes
+            it.updateExtra<DbMastodonStatusExtra> { extra ->
+                originPoll = extra.poll
+                extra.copy(
+                    poll = extra.poll?.copy(
+                        voted = true,
+                        ownVotes = votes
+                    )
                 )
-            )
+            }
         }
         try {
             val newPoll = service.vote(pollId, votes)
             statusRepository.updateStatus(statusKey = status.statusKey) {
-                it.mastodonExtra = status.mastodonExtra.copy(
-                    poll = newPoll
-                )
+                it.updateExtra<DbMastodonStatusExtra> { extra ->
+                    extra.copy(
+                        poll = newPoll
+                    )
+                }
             }
         } catch (e: Throwable) {
             statusRepository.updateStatus(statusKey = status.statusKey) {
-                it.mastodonExtra = status.mastodonExtra.copy(
-                    poll = originPoll
-                )
+                it.updateExtra<DbMastodonStatusExtra> { extra ->
+                    extra.copy(
+                        poll = originPoll
+                    )
+                }
             }
             e.notify(inAppNotification)
             throw e

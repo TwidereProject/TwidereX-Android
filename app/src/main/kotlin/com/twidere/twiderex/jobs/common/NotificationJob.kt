@@ -27,10 +27,10 @@ import coil.Coil
 import coil.request.ImageRequest
 import coil.request.SuccessResult
 import com.twidere.twiderex.R
-import com.twidere.twiderex.db.model.ReferenceType
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.enums.MastodonStatusType
 import com.twidere.twiderex.model.enums.PlatformType
+import com.twidere.twiderex.model.enums.ReferenceType
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.navigation.RootDeepLinksRoute
 import com.twidere.twiderex.notification.AppNotification

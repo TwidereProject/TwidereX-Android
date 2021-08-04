@@ -81,7 +81,7 @@ fun StatusMediaComponent(
         navigator.media(statusKey = status.statusKey, selectedIndex = index)
     }
     var sensitive by rememberSaveable(status.statusKey.toString()) {
-        mutableStateOf(status.mastodonExtra?.sensitive ?: false)
+        mutableStateOf(status.sensitive)
     }
 
     val aspectRatio = when (media.size) {

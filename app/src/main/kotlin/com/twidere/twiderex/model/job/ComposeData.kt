@@ -20,8 +20,8 @@
  */
 package com.twidere.twiderex.model.job
 
-import com.twidere.services.mastodon.model.Visibility
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.enums.MastodonVisibility
 import com.twidere.twiderex.viewmodel.compose.ComposeType
 import com.twidere.twiderex.viewmodel.compose.VoteExpired
 import java.util.UUID
@@ -38,7 +38,7 @@ data class ComposeData(
     val voteOptions: List<String>? = null,
     val voteExpired: VoteExpired? = null,
     val voteMultiple: Boolean? = null,
-    val visibility: Visibility? = null,
+    val visibility: MastodonVisibility? = null,
     val isSensitive: Boolean? = null,
     val contentWarningText: String? = null,
     val isThreadMode: Boolean = false

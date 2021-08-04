@@ -56,12 +56,12 @@ fun ColumnScope.StatusText(
     showMastodonPoll: Boolean = true
 ) {
     val expandable = status.platformType == PlatformType.Mastodon &&
-        status.mastodonExtra?.spoilerText != null
+        status.spoilerText != null
 
     var expanded by rememberSaveable { mutableStateOf(!expandable) }
 
-    if (expandable && status.mastodonExtra?.spoilerText != null) {
-        Text(text = status.mastodonExtra.spoilerText)
+    if (expandable && status.spoilerText != null) {
+        Text(text = status.spoilerText)
         Spacer(modifier = Modifier.height(StatusTextDefaults.Mastodon.SpoilerSpacing))
         Row(
             modifier = Modifier
@@ -92,7 +92,7 @@ fun ColumnScope.StatusText(
                 },
             )
 
-            if (showMastodonPoll && status.platformType == PlatformType.Mastodon && status.mastodonExtra?.poll != null) {
+            if (showMastodonPoll && status.platformType == PlatformType.Mastodon && status.poll != null) {
                 Spacer(modifier = Modifier.height(StatusTextDefaults.Mastodon.PollSpacing))
                 MastodonPoll(status)
             }

@@ -37,7 +37,10 @@ import com.twidere.twiderex.model.enums.MastodonVisibility
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.enums.TwitterReplySettings
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
 
+private typealias KTJson = kotlinx.serialization.json.Json
 @Entity(
     tableName = "status",
     indices = [Index(value = ["statusKey"], unique = true)],
@@ -69,8 +72,14 @@ data class DbStatusV2(
     val previewCard: DbPreviewCard? = null,
     val inReplyToUserId: String? = null,
     val inReplyToStatusId: String? = null,
-    val extra: Json
-)
+    var extra: Json
+) {
+    inline fun <reified T : DbStatusExtra> updateExtra(update: (T) -> T) {
+        extra = KTJson.encodeToString(update.invoke(KTJson.decodeFromString(extra)))
+    }
+}
+
+interface DbStatusExtra
 
 @Immutable
 @Serializable
@@ -87,7 +96,7 @@ data class DbPreviewCard(
 data class DbTwitterStatusExtra(
     val reply_settings: TwitterReplySettings,
     val quoteCount: Long? = null,
-)
+) : DbStatusExtra
 
 @Immutable
 @Serializable
@@ -100,7 +109,7 @@ data class DbMastodonStatusExtra(
     val poll: Poll?,
     val card: Card?,
     val mentions: List<Mention>?,
-)
+) : DbStatusExtra
 
 data class DbStatusWithMediaAndUser(
     @Embedded

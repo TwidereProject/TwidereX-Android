@@ -22,10 +22,10 @@ package com.twidere.twiderex.model.transform
 
 import androidx.work.Data
 import androidx.work.workDataOf
-import com.twidere.services.mastodon.model.Visibility
 import com.twidere.twiderex.extensions.getNullableBoolean
 import com.twidere.twiderex.extensions.getNullableDouble
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.enums.MastodonVisibility
 import com.twidere.twiderex.model.job.ComposeData
 import com.twidere.twiderex.model.job.DirectMessageDeleteData
 import com.twidere.twiderex.model.job.DirectMessageSendData
@@ -72,7 +72,7 @@ fun Data.toComposeData() = ComposeData(
     voteOptions = getStringArray("voteOptions")?.toList(),
     voteExpired = getString("voteExpired")?.let { VoteExpired.valueOf(it) },
     voteMultiple = getNullableBoolean("voteMultiple"),
-    visibility = getString("visibility")?.let { Visibility.valueOf(it) },
+    visibility = getString("visibility")?.let { MastodonVisibility.valueOf(it) },
     isSensitive = getNullableBoolean("isSensitive"),
     contentWarningText = getString("contentWarningText"),
     isThreadMode = getBoolean("isThreadMode", false),

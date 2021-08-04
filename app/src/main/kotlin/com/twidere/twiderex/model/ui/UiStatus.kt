@@ -24,11 +24,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.res.stringResource
 import com.twidere.twiderex.R
-import com.twidere.twiderex.db.model.DbPreviewCard
-import com.twidere.twiderex.db.model.ReferenceType
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.MastodonStatusType
 import com.twidere.twiderex.model.enums.PlatformType
+import com.twidere.twiderex.model.enums.ReferenceType
 import com.twidere.twiderex.model.ui.mastodon.MastodonStatusExtra
 import com.twidere.twiderex.model.ui.twitter.TwitterStatusExtra
 
@@ -39,12 +38,11 @@ data class UiStatus(
     val htmlText: String,
     val rawText: String,
     val timestamp: Long,
-    val retweetCount: Long,
-    val likeCount: Long,
-    val replyCount: Long,
+    val metrics: StatusMetrics,
+    val sensitive: Boolean,
     val retweeted: Boolean,
     val liked: Boolean,
-    val placeString: String?,
+    val geo: UiGeo,
     val hasMedia: Boolean,
     val user: UiUser,
     val media: List<UiMedia>,
@@ -52,7 +50,9 @@ data class UiStatus(
     val isGap: Boolean,
     val url: List<UiUrlEntity>,
     val platformType: PlatformType,
-    val linkPreview: DbPreviewCard? = null,
+    val spoilerText: String? = null,
+    val card: UiCard? = null,
+    val poll: UiPoll? = null,
     val referenceStatus: Map<ReferenceType, UiStatus> = emptyMap(),
     val inReplyToUserId: String? = null,
     val inReplyToStatusId: String? = null,
@@ -100,12 +100,14 @@ data class UiStatus(
             statusId = "",
             htmlText = stringResource(id = R.string.scene_settings_display_preview_thank_for_using_twidere_x),
             timestamp = System.currentTimeMillis(),
-            retweetCount = 1200,
-            likeCount = 123,
-            replyCount = 1100,
+            metrics = StatusMetrics(
+                retweet = 1200,
+                like = 123,
+                reply = 1100,
+            ),
             retweeted = false,
             liked = false,
-            placeString = null,
+            geo = UiGeo(""),
             hasMedia = true,
             user = UiUser.sample(),
             media = UiMedia.sample(),
@@ -115,8 +117,15 @@ data class UiStatus(
             statusKey = MicroBlogKey.Empty,
             rawText = "",
             platformType = PlatformType.Twitter,
+            sensitive = false
         )
     }
 }
 
 interface StatusExtra
+
+data class StatusMetrics(
+    val like: Long,
+    val reply: Long,
+    val retweet: Long
+)

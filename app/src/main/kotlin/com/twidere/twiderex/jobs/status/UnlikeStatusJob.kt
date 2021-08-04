@@ -51,8 +51,8 @@ class UnlikeStatusJob(
             statusKey = newStatus.statusKey,
             accountKey = accountKey,
             liked = false,
-            retweetCount = newStatus.retweetCount,
-            likeCount = newStatus.likeCount,
+            retweetCount = newStatus.metrics.retweet,
+            likeCount = newStatus.metrics.like,
         )
     }
     override fun fallback(

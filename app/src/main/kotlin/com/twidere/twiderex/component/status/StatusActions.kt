@@ -89,7 +89,7 @@ fun ReplyButton(
             modifier = modifier,
             icon = icon,
             color = LocalContentColor.current,
-            count = data.replyCount,
+            count = data.metrics.reply,
             contentDescription = contentDescription,
             onClick = {
                 action.invoke()
@@ -136,7 +136,7 @@ fun LikeButton(
         StatusActionButtonWithNumbers(
             modifier = modifier,
             icon = icon,
-            count = data.likeCount,
+            count = data.metrics.like,
             color = color,
             contentDescription = contentDescription,
             onClick = {
@@ -217,7 +217,7 @@ fun RetweetButton(
         if (withNumber) {
             StatusActionButtonWithNumbers(
                 icon = icon,
-                count = data.retweetCount,
+                count = data.metrics.retweet,
                 color = color,
                 contentDescription = contentDescription,
                 onClick = {
