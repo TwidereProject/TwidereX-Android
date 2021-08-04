@@ -519,8 +519,14 @@ fun statusConstraintSets() = ConstraintSet {
     val footerRef = createRefFor(StatusContentDefaults.Ref.Footer)
     val lineUpRef = createRefFor(StatusContentDefaults.Ref.LineUp)
     val lineDownRef = createRefFor(StatusContentDefaults.Ref.LineDown)
+    constrain(statusHeaderRef) {
+        top.linkTo(parent.top)
+        start.linkTo(parent.start)
+        end.linkTo(parent.end)
+    }
     constrain(avatarRef) {
         top.linkTo(statusHeaderRef.bottom)
+        start.linkTo(parent.start)
     }
     constrain(contentRef) {
         start.linkTo(avatarRef.end, margin = StatusContentDefaults.AvatarSpacing)
