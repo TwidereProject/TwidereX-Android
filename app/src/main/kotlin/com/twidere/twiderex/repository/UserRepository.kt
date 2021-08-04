@@ -25,7 +25,7 @@ import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.db.mapper.toDbUser
 import com.twidere.twiderex.db.model.DbUser
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.toAmUser
+import com.twidere.twiderex.model.transform.toAmUser
 import com.twidere.twiderex.model.transform.toUi
 import com.twidere.twiderex.model.ui.UiUser
 import kotlinx.coroutines.flow.Flow

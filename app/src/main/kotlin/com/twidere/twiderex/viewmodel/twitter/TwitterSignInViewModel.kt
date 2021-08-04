@@ -33,7 +33,7 @@ import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.cred.CredentialsType
 import com.twidere.twiderex.model.cred.OAuthCredentials
 import com.twidere.twiderex.model.enums.PlatformType
-import com.twidere.twiderex.model.toAmUser
+import com.twidere.twiderex.model.transform.toAmUser
 import com.twidere.twiderex.navigation.RootDeepLinksRoute
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.ACCOUNT_TYPE
