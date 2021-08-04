@@ -29,6 +29,8 @@ import com.twidere.twiderex.model.AmUser
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.cred.CredentialsType
 import com.twidere.twiderex.model.enums.PlatformType
+import com.twidere.twiderex.model.transform.toAndroid
+import com.twidere.twiderex.model.transform.toTwidere
 import com.twidere.twiderex.utils.fromJson
 import com.twidere.twiderex.utils.json
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -111,7 +113,7 @@ class AccountRepository @Inject constructor(
     ) {
         manager.addAccountExplicitly(account, null, null)
         val detail = AccountDetails(
-            account = account,
+            account = account.toTwidere(),
             type = type,
             accountKey = accountKey,
             credentials_type = credentials_type,
@@ -132,7 +134,7 @@ class AccountRepository @Inject constructor(
         account: Account,
     ): AccountDetails {
         return AccountDetails(
-            account = account,
+            account = account.toTwidere(),
             type = PlatformType.valueOf(manager.getUserData(account, ACCOUNT_USER_DATA_TYPE)),
             accountKey = getAccountKey(account),
             credentials_type = CredentialsType.valueOf(
@@ -164,18 +166,19 @@ class AccountRepository @Inject constructor(
     }
 
     fun updateAccount(detail: AccountDetails) {
-        manager.setUserData(detail.account, ACCOUNT_USER_DATA_TYPE, detail.type.name)
-        manager.setUserData(detail.account, ACCOUNT_USER_DATA_KEY, detail.accountKey.toString())
+        val account = detail.account.toAndroid()
+        manager.setUserData(account, ACCOUNT_USER_DATA_TYPE, detail.type.name)
+        manager.setUserData(account, ACCOUNT_USER_DATA_KEY, detail.accountKey.toString())
         manager.setUserData(
-            detail.account,
+            account,
             ACCOUNT_USER_DATA_CREDS_TYPE,
             detail.credentials_type.name
         )
-        manager.setAuthToken(detail.account, ACCOUNT_AUTH_TOKEN_TYPE, detail.credentials_json)
-        manager.setUserData(detail.account, ACCOUNT_USER_DATA_EXTRAS, detail.extras_json)
-        manager.setUserData(detail.account, ACCOUNT_USER_DATA_USER, detail.user.json())
+        manager.setAuthToken(account, ACCOUNT_AUTH_TOKEN_TYPE, detail.credentials_json)
+        manager.setUserData(account, ACCOUNT_USER_DATA_EXTRAS, detail.extras_json)
+        manager.setUserData(account, ACCOUNT_USER_DATA_USER, detail.user.json())
         manager.setUserData(
-            detail.account,
+            account,
             ACCOUNT_USER_DATA_LAST_ACTIVE,
             detail.lastActive.toString()
         )
@@ -187,7 +190,7 @@ class AccountRepository @Inject constructor(
 
     fun delete(detail: AccountDetails) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
-            manager.removeAccountExplicitly(detail.account)
+            manager.removeAccountExplicitly(detail.account.toAndroid())
             _accounts.value = getAccounts().map {
                 getAccountDetails(it)
             }

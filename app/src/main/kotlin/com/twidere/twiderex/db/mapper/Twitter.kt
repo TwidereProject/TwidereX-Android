@@ -55,9 +55,8 @@ import com.twidere.twiderex.model.enums.ReferenceType
 import com.twidere.twiderex.model.enums.TwitterReplySettings
 import com.twidere.twiderex.model.ui.ListsMode
 import com.twidere.twiderex.navigation.RootDeepLinksRouteDefinition
+import com.twidere.twiderex.utils.json
 import com.twitter.twittertext.Autolink
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import java.util.UUID
 
 val autolink by lazy {
@@ -228,12 +227,10 @@ private fun StatusV2.toDbStatusWithMediaAndUser(
             id ?: throw IllegalArgumentException("Status.idStr should not be null")
         ),
         platformType = PlatformType.Twitter,
-        extra = Json.encodeToString(
-            DbTwitterStatusExtra(
-                reply_settings = replySettings.toDbEnums(),
-                quoteCount = publicMetrics?.quoteCount
-            )
-        ),
+        extra = DbTwitterStatusExtra(
+            reply_settings = replySettings.toDbEnums(),
+            quoteCount = publicMetrics?.quoteCount
+        ).json(),
         previewCard = entities?.urls?.firstOrNull()
             ?.takeUnless { url ->
                 referencedTweets?.firstOrNull { it.type == ReferencedTweetType.quoted }
@@ -341,11 +338,9 @@ private fun Status.toDbStatusWithMediaAndUser(
             idStr ?: throw IllegalArgumentException("Status.idStr should not be null")
         ),
         platformType = PlatformType.Twitter,
-        extra = Json.encodeToString(
-            DbTwitterStatusExtra(
-                reply_settings = TwitterReplySettings.Everyone,
-            )
-        ),
+        extra = DbTwitterStatusExtra(
+            reply_settings = TwitterReplySettings.Everyone,
+        ).json(),
         previewCard = entities?.urls?.firstOrNull()
             ?.takeUnless { url -> quotedStatus?.idStr?.let { id -> url.expandedURL?.endsWith(id) == true } == true }
             ?.takeUnless { url -> url.expandedURL?.contains("pic.twitter.com") == true }
@@ -444,18 +439,16 @@ fun User.toDbUser(): DbUser {
         platformType = PlatformType.Twitter,
         acct = MicroBlogKey.twitter(screenName ?: ""),
         statusesCount = statusesCount ?: 0,
-        extra = Json.encodeToString(
-            DbTwitterUserExtra(
-                pinned_tweet_id = null,
-                url = entities?.description?.urls?.map {
-                    TwitterUrlEntity(
-                        url = it.url ?: "",
-                        expandedUrl = it.expandedURL ?: "",
-                        displayUrl = it.displayURL ?: "",
-                    )
-                } ?: emptyList()
-            )
-        )
+        extra = DbTwitterUserExtra(
+            pinned_tweet_id = null,
+            url = entities?.description?.urls?.map {
+                TwitterUrlEntity(
+                    url = it.url ?: "",
+                    expandedUrl = it.expandedURL ?: "",
+                    displayUrl = it.displayURL ?: "",
+                )
+            } ?: emptyList()
+        ).json()
     )
 }
 
@@ -484,18 +477,16 @@ fun UserV2.toDbUser(): DbUser {
         acct = MicroBlogKey.twitter(username ?: ""),
         platformType = PlatformType.Twitter,
         statusesCount = publicMetrics?.tweetCount ?: 0,
-        extra = Json.encodeToString(
-            DbTwitterUserExtra(
-                pinned_tweet_id = pinnedTweetID,
-                url = entities?.description?.urls?.map {
-                    TwitterUrlEntity(
-                        url = it.url ?: "",
-                        expandedUrl = it.expandedURL ?: "",
-                        displayUrl = it.displayURL ?: "",
-                    )
-                } ?: emptyList()
-            )
-        )
+        extra = DbTwitterUserExtra(
+            pinned_tweet_id = pinnedTweetID,
+            url = entities?.description?.urls?.map {
+                TwitterUrlEntity(
+                    url = it.url ?: "",
+                    expandedUrl = it.expandedURL ?: "",
+                    displayUrl = it.displayURL ?: "",
+                )
+            } ?: emptyList()
+        ).json()
     )
 }
 

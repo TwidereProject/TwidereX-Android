@@ -18,12 +18,16 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.model
+package com.twidere.twiderex.model.transform
 
-import kotlinx.serialization.Serializable
+import android.accounts.Account
+import com.twidere.twiderex.model.TwidereAccount
 
-@Serializable
-data class JsonAccount(
-    val name: String,
-    val type: String,
+fun Account.toTwidere() = TwidereAccount(
+    name = name,
+    type = type
+)
+
+fun TwidereAccount.toAndroid() = Account(
+    name, type
 )
