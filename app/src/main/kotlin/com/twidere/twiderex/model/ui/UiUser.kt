@@ -24,17 +24,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.res.painterResource
 import com.twidere.twiderex.R
-import com.twidere.twiderex.db.model.DbMastodonUserExtra
-import com.twidere.twiderex.db.model.DbTwitterUserExtra
-import com.twidere.twiderex.db.model.DbUser
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.PlatformType
-import com.twidere.twiderex.model.transform.toUi
-import com.twidere.twiderex.model.ui.mastodon.Field
 import com.twidere.twiderex.model.ui.mastodon.MastodonUserExtra
 import com.twidere.twiderex.model.ui.twitter.TwitterUserExtra
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.json.Json
 
 @Immutable
 data class UiUser(
@@ -68,11 +61,9 @@ data class UiUser(
             "@$screenName"
         }
     }
-    val twitterExtra: TwitterUserExtra?
-        get() = if (extra is TwitterUserExtra) extra else null
+    val twitterExtra: TwitterUserExtra? = if (extra is TwitterUserExtra) extra else null
 
-    val mastodonExtra: MastodonUserExtra?
-        get() = if (extra is MastodonUserExtra) extra else null
+    val mastodonExtra: MastodonUserExtra? = if (extra is MastodonUserExtra) extra else null
 
     companion object {
         @Composable
@@ -96,60 +87,6 @@ data class UiUser(
             platformType = PlatformType.Twitter,
             acct = MicroBlogKey.twitter("TwidereProject")
         )
-
-        fun DbUser.toUi() =
-            UiUser(
-                id = userId,
-                name = name,
-                screenName = screenName,
-                profileImage = profileImage,
-                profileBackgroundImage = profileBackgroundImage,
-                followersCount = followersCount,
-                friendsCount = friendsCount,
-                listedCount = listedCount,
-                statusesCount = statusesCount,
-                rawDesc = rawDesc,
-                htmlDesc = htmlDesc,
-                website = website,
-                location = location,
-                verified = verified,
-                protected = isProtected,
-                userKey = userKey,
-                platformType = platformType,
-                extra = when (platformType) {
-                    PlatformType.Twitter -> Json.decodeFromString<DbTwitterUserExtra>(extra).let {
-                        TwitterUserExtra(
-                            pinned_tweet_id = it.pinned_tweet_id,
-                            url = it.url.map { url ->
-                                UiUrlEntity(
-                                    url = url.displayUrl,
-                                    expandedUrl = url.expandedUrl,
-                                    displayUrl = url.displayUrl,
-                                    title = null,
-                                    description = null,
-                                    image = null
-                                )
-                            }
-                        )
-                    }
-                    PlatformType.StatusNet -> TODO()
-                    PlatformType.Fanfou -> TODO()
-                    PlatformType.Mastodon -> Json.decodeFromString<DbMastodonUserExtra>(extra).let {
-                        MastodonUserExtra(
-                            emoji = it.emoji.toUi(),
-                            bot = it.bot,
-                            locked = it.locked,
-                            fields = it.fields.map {
-                                Field(
-                                    it.name,
-                                    it.value
-                                )
-                            }
-                        )
-                    }
-                },
-                acct = acct,
-            )
     }
 }
 

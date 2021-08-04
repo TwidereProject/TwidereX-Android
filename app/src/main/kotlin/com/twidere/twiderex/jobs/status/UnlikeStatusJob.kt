@@ -24,8 +24,8 @@ import com.twidere.services.microblog.StatusService
 import com.twidere.twiderex.db.mapper.toDbStatusWithReference
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.job.StatusResult
+import com.twidere.twiderex.model.transform.toUi
 import com.twidere.twiderex.model.ui.UiStatus
-import com.twidere.twiderex.model.ui.UiStatus.Companion.toUi
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.StatusRepository

@@ -18,18 +18,13 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.extensions
+package com.twidere.twiderex.model.enums
 
-import androidx.paging.Pager
-import androidx.paging.map
-import com.twidere.twiderex.db.model.DbPagingTimelineWithStatus
-import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.transform.toUi
-import kotlinx.coroutines.flow.map
+import kotlinx.serialization.Serializable
 
-fun Pager<Int, DbPagingTimelineWithStatus>.toUi(accountKey: MicroBlogKey) =
-    this.flow.map { pagingData ->
-        pagingData.map {
-            it.toUi(accountKey = accountKey)
-        }
-    }
+@Serializable
+enum class TwitterReplySettings {
+    Everyone,
+    MentionedUsers,
+    FollowingUsers,
+}

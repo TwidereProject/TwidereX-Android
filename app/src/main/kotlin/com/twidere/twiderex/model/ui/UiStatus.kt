@@ -24,18 +24,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.res.stringResource
 import com.twidere.twiderex.R
-import com.twidere.twiderex.db.model.DbMastodonStatusExtra
-import com.twidere.twiderex.db.model.DbPagingTimelineWithStatus
 import com.twidere.twiderex.db.model.DbPreviewCard
-import com.twidere.twiderex.db.model.DbStatusWithMediaAndUser
-import com.twidere.twiderex.db.model.DbStatusWithReference
-import com.twidere.twiderex.db.model.DbTwitterStatusExtra
 import com.twidere.twiderex.db.model.ReferenceType
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.MastodonStatusType
 import com.twidere.twiderex.model.enums.PlatformType
-import com.twidere.twiderex.model.transform.toUi
-import com.twidere.twiderex.model.ui.UiUser.Companion.toUi
+import com.twidere.twiderex.model.ui.mastodon.MastodonStatusExtra
+import com.twidere.twiderex.model.ui.twitter.TwitterStatusExtra
 
 @Immutable
 data class UiStatus(
@@ -57,13 +52,16 @@ data class UiStatus(
     val isGap: Boolean,
     val url: List<UiUrlEntity>,
     val platformType: PlatformType,
-    val mastodonExtra: DbMastodonStatusExtra? = null,
-    val twitterExtra: DbTwitterStatusExtra? = null,
     val linkPreview: DbPreviewCard? = null,
     val referenceStatus: Map<ReferenceType, UiStatus> = emptyMap(),
     val inReplyToUserId: String? = null,
     val inReplyToStatusId: String? = null,
+    val extra: StatusExtra? = null
 ) {
+    val mastodonExtra: MastodonStatusExtra? = if (extra is MastodonStatusExtra) extra else null
+
+    val twitterExtra: TwitterStatusExtra? = if (extra is TwitterStatusExtra) extra else null
+
     val retweet: UiStatus? by lazy {
         if (platformType == PlatformType.Mastodon && mastodonExtra != null && mastodonExtra.type != MastodonStatusType.Status) {
             referenceStatus[ReferenceType.MastodonNotification]
@@ -118,108 +116,7 @@ data class UiStatus(
             rawText = "",
             platformType = PlatformType.Twitter,
         )
-
-        fun DbStatusWithMediaAndUser.toUi(
-            accountKey: MicroBlogKey,
-        ): UiStatus {
-            val reaction = reactions.firstOrNull { it.accountKey == accountKey }
-            return UiStatus(
-                statusId = data.statusId,
-                htmlText = data.htmlText,
-                timestamp = data.timestamp,
-                retweetCount = data.retweetCount,
-                likeCount = data.likeCount,
-                replyCount = data.replyCount,
-                retweeted = reaction?.retweeted ?: false,
-                liked = reaction?.liked ?: false,
-                placeString = data.placeString,
-                hasMedia = data.hasMedia,
-                user = user.toUi(),
-                media = media.toUi(),
-                isGap = false,
-                source = data.source,
-                url = url.toUi(),
-                statusKey = data.statusKey,
-                rawText = data.rawText,
-                platformType = data.platformType,
-                mastodonExtra = data.mastodonExtra,
-                twitterExtra = data.twitterExtra,
-                linkPreview = data.previewCard,
-                inReplyToStatusId = data.inReplyToStatusId,
-                inReplyToUserId = data.inReplyToStatusId
-            )
-        }
-
-        fun DbStatusWithReference.toUi(
-            accountKey: MicroBlogKey,
-        ) = with(status) {
-            val reaction = reactions.firstOrNull { it.accountKey == accountKey }
-            UiStatus(
-                statusId = data.statusId,
-                htmlText = data.htmlText,
-                timestamp = data.timestamp,
-                retweetCount = data.retweetCount,
-                likeCount = data.likeCount,
-                replyCount = data.replyCount,
-                retweeted = reaction?.retweeted ?: false,
-                liked = reaction?.liked ?: false,
-                placeString = data.placeString,
-                hasMedia = data.hasMedia,
-                user = user.toUi(),
-                media = media.toUi(),
-                isGap = false,
-                source = data.source,
-                url = url.toUi(),
-                statusKey = data.statusKey,
-                rawText = data.rawText,
-                platformType = data.platformType,
-                mastodonExtra = data.mastodonExtra,
-                twitterExtra = data.twitterExtra,
-                referenceStatus = references.map {
-                    it.reference.referenceType to it.status.toUi(
-                        accountKey = accountKey
-                    )
-                }.toMap(),
-                linkPreview = data.previewCard,
-                inReplyToUserId = data.inReplyToUserId,
-                inReplyToStatusId = data.inReplyToStatusId
-            )
-        }
-
-        fun DbPagingTimelineWithStatus.toUi(
-            accountKey: MicroBlogKey,
-        ) = with(status.status) {
-            val reaction = reactions.firstOrNull { it.accountKey == accountKey }
-            UiStatus(
-                statusId = data.statusId,
-                htmlText = data.htmlText,
-                timestamp = data.timestamp,
-                retweetCount = data.retweetCount,
-                likeCount = data.likeCount,
-                replyCount = data.replyCount,
-                retweeted = reaction?.retweeted ?: false,
-                liked = reaction?.liked ?: false,
-                placeString = data.placeString,
-                hasMedia = data.hasMedia,
-                user = user.toUi(),
-                media = media.toUi(),
-                isGap = timeline.isGap,
-                source = data.source,
-                url = url.toUi(),
-                statusKey = data.statusKey,
-                rawText = data.rawText,
-                platformType = data.platformType,
-                mastodonExtra = data.mastodonExtra,
-                twitterExtra = data.twitterExtra,
-                referenceStatus = status.references.map {
-                    it.reference.referenceType to it.status.toUi(
-                        accountKey = accountKey
-                    )
-                }.toMap(),
-                linkPreview = data.previewCard,
-                inReplyToUserId = data.inReplyToUserId,
-                inReplyToStatusId = data.inReplyToStatusId
-            )
-        }
     }
 }
+
+interface StatusExtra

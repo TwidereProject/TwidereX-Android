@@ -26,7 +26,6 @@ import com.twidere.twiderex.db.model.DbDirectMessageConversationWithMessage
 import com.twidere.twiderex.model.ui.UiDMConversation
 import com.twidere.twiderex.model.ui.UiDMConversationWithLatestMessage
 import com.twidere.twiderex.model.ui.UiDMEvent
-import com.twidere.twiderex.model.ui.UiUser.Companion.toUi
 
 fun DbDMConversation.toUi() = UiDMConversation(
     accountKey = accountKey,

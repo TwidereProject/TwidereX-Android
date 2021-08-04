@@ -33,3 +33,11 @@ enum class MastodonStatusType {
     NotificationPoll,
     NotificationStatus,
 }
+
+@Serializable
+enum class MastodonVisibility {
+    Public,
+    Unlisted,
+    Private,
+    Direct;
+}

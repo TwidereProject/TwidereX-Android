@@ -18,18 +18,23 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.extensions
+package com.twidere.twiderex.model.ui.mastodon
 
-import androidx.paging.Pager
-import androidx.paging.map
-import com.twidere.twiderex.db.model.DbPagingTimelineWithStatus
-import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.transform.toUi
-import kotlinx.coroutines.flow.map
+import com.twidere.twiderex.model.enums.MastodonStatusType
+import com.twidere.twiderex.model.enums.MastodonVisibility
+import com.twidere.twiderex.model.ui.StatusExtra
+import com.twidere.twiderex.model.ui.UiEmojiCategory
 
-fun Pager<Int, DbPagingTimelineWithStatus>.toUi(accountKey: MicroBlogKey) =
-    this.flow.map { pagingData ->
-        pagingData.map {
-            it.toUi(accountKey = accountKey)
-        }
-    }
+data class MastodonStatusExtra(
+    val type: MastodonStatusType,
+    val emoji: List<UiEmojiCategory>,
+    val visibility: MastodonVisibility,
+    val mentions: List<MastodonMention>?,
+) : StatusExtra
+
+data class MastodonMention(
+    val id: String? = null,
+    val username: String? = null,
+    val url: String? = null,
+    val acct: String? = null
+)

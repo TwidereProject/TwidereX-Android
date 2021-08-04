@@ -30,12 +30,12 @@ import com.twidere.services.mastodon.model.Card
 import com.twidere.services.mastodon.model.Emoji
 import com.twidere.services.mastodon.model.Mention
 import com.twidere.services.mastodon.model.Poll
-import com.twidere.services.mastodon.model.Visibility
-import com.twidere.services.twitter.model.ReplySettings
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.MastodonStatusType
+import com.twidere.twiderex.model.enums.MastodonVisibility
 import com.twidere.twiderex.model.enums.PlatformType
+import com.twidere.twiderex.model.enums.TwitterReplySettings
 import kotlinx.serialization.Serializable
 
 @Entity(
@@ -66,11 +66,10 @@ data class DbStatusV2(
     val lang: String?,
     val is_possibly_sensitive: Boolean,
     val platformType: PlatformType,
-    var mastodonExtra: DbMastodonStatusExtra? = null,
-    val twitterExtra: DbTwitterStatusExtra? = null,
     val previewCard: DbPreviewCard? = null,
     val inReplyToUserId: String? = null,
-    val inReplyToStatusId: String? = null
+    val inReplyToStatusId: String? = null,
+    val extra: Json
 )
 
 @Immutable
@@ -86,7 +85,7 @@ data class DbPreviewCard(
 @Immutable
 @Serializable
 data class DbTwitterStatusExtra(
-    val reply_settings: ReplySettings,
+    val reply_settings: TwitterReplySettings,
     val quoteCount: Long? = null,
 )
 
@@ -95,7 +94,7 @@ data class DbTwitterStatusExtra(
 data class DbMastodonStatusExtra(
     val type: MastodonStatusType,
     val emoji: List<Emoji>,
-    val visibility: Visibility,
+    val visibility: MastodonVisibility,
     val sensitive: Boolean,
     val spoilerText: String?,
     val poll: Poll?,
