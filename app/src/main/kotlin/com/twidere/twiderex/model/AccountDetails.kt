@@ -31,6 +31,7 @@ import com.twidere.twiderex.model.cred.OAuthCredentials
 import com.twidere.twiderex.model.enums.ListType
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiUser
+import com.twidere.twiderex.model.ui.UserMetrics
 import com.twidere.twiderex.utils.fromJson
 
 data class AccountDetails(
@@ -77,9 +78,12 @@ data class AccountDetails(
             screenName = screenName,
             profileImage = profileImage,
             profileBackgroundImage = profileBackgroundImage,
-            followersCount = followersCount,
-            friendsCount = friendsCount,
-            listedCount = listedCount,
+            metrics = UserMetrics(
+                fans = followersCount,
+                follow = friendsCount,
+                listed = listedCount,
+                status = 0
+            ),
             rawDesc = desc,
             htmlDesc = desc,
             website = website,
@@ -89,7 +93,6 @@ data class AccountDetails(
             userKey = userKey,
             platformType = type,
             acct = userKey.copy(id = screenName),
-            statusesCount = 0
         )
     }
 }

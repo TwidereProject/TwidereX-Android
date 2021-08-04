@@ -38,10 +38,7 @@ data class UiUser(
     val screenName: String,
     val profileImage: Any,
     val profileBackgroundImage: String?,
-    val followersCount: Long,
-    val friendsCount: Long,
-    val statusesCount: Long,
-    val listedCount: Long,
+    val metrics: UserMetrics,
     val rawDesc: String,
     val htmlDesc: String,
     val website: String?,
@@ -73,10 +70,12 @@ data class UiUser(
             screenName = "TwidereProject",
             profileImage = painterResource(id = R.drawable.ic_profile_image_twidere),
             profileBackgroundImage = null,
-            followersCount = 0,
-            friendsCount = 0,
-            listedCount = 0,
-            statusesCount = 0,
+            metrics = UserMetrics(
+                fans = 0,
+                follow = 0,
+                status = 0,
+                listed = 0
+            ),
             rawDesc = "",
             htmlDesc = "",
             website = null,
@@ -91,3 +90,10 @@ data class UiUser(
 }
 
 interface UserExtra
+
+data class UserMetrics(
+    val fans: Long,
+    val follow: Long,
+    val status: Long,
+    val listed: Long
+)

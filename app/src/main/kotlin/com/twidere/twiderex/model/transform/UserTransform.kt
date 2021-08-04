@@ -26,6 +26,7 @@ import com.twidere.twiderex.db.model.DbUser
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiUrlEntity
 import com.twidere.twiderex.model.ui.UiUser
+import com.twidere.twiderex.model.ui.UserMetrics
 import com.twidere.twiderex.model.ui.mastodon.Field
 import com.twidere.twiderex.model.ui.mastodon.MastodonUserExtra
 import com.twidere.twiderex.model.ui.twitter.TwitterUserExtra
@@ -39,10 +40,12 @@ fun DbUser.toUi() =
         screenName = screenName,
         profileImage = profileImage,
         profileBackgroundImage = profileBackgroundImage,
-        followersCount = followersCount,
-        friendsCount = friendsCount,
-        listedCount = listedCount,
-        statusesCount = statusesCount,
+        metrics = UserMetrics(
+            fans = followersCount,
+            follow = friendsCount,
+            listed = listedCount,
+            status = statusesCount,
+        ),
         rawDesc = rawDesc,
         htmlDesc = htmlDesc,
         website = website,
