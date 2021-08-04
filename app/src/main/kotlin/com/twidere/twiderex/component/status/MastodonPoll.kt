@@ -77,7 +77,7 @@ import com.twidere.twiderex.ui.LocalActiveAccount
 import kotlin.math.max
 
 private val UiPoll.canVote: Boolean
-    get() = voted &&
+    get() = !voted &&
         !expired &&
         expiresAt?.let { it > System.currentTimeMillis() } ?: true // some instance allows expires time == null
 

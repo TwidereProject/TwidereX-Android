@@ -28,6 +28,8 @@ import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.StatusRepository
+import com.twidere.twiderex.utils.fromJson
+import com.twidere.twiderex.utils.json
 import com.twidere.twiderex.utils.notify
 
 class MastodonVoteJob(
@@ -49,32 +51,29 @@ class MastodonVoteJob(
         val pollId = status.poll.id
         var originPoll: Poll? = null
         statusRepository.updateStatus(statusKey = status.statusKey) {
-            it.updateExtra<DbMastodonStatusExtra> { extra ->
-                originPoll = extra.poll
-                extra.copy(
-                    poll = extra.poll?.copy(
-                        voted = true,
-                        ownVotes = votes
+            it.extra = it.extra.fromJson<DbMastodonStatusExtra>()
+                .let { extra ->
+                    originPoll = extra.poll
+                    extra.copy(
+                        poll = extra.poll?.copy(
+                            voted = true,
+                            ownVotes = votes
+                        )
                     )
-                )
-            }
+                }.json()
         }
         try {
             val newPoll = service.vote(pollId, votes)
             statusRepository.updateStatus(statusKey = status.statusKey) {
-                it.updateExtra<DbMastodonStatusExtra> { extra ->
-                    extra.copy(
-                        poll = newPoll
-                    )
-                }
+                it.extra = it.extra.fromJson<DbMastodonStatusExtra>().copy(
+                    poll = newPoll
+                ).json()
             }
         } catch (e: Throwable) {
             statusRepository.updateStatus(statusKey = status.statusKey) {
-                it.updateExtra<DbMastodonStatusExtra> { extra ->
-                    extra.copy(
-                        poll = originPoll
-                    )
-                }
+                it.extra = it.extra.fromJson<DbMastodonStatusExtra>().copy(
+                    poll = originPoll
+                ).json()
             }
             e.notify(inAppNotification)
             throw e

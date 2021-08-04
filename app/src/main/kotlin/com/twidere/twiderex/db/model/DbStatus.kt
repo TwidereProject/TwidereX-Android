@@ -37,10 +37,7 @@ import com.twidere.twiderex.model.enums.MastodonVisibility
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.enums.TwitterReplySettings
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.encodeToString
 
-private typealias KTJson = kotlinx.serialization.json.Json
 @Entity(
     tableName = "status",
     indices = [Index(value = ["statusKey"], unique = true)],
@@ -73,11 +70,7 @@ data class DbStatusV2(
     val inReplyToUserId: String? = null,
     val inReplyToStatusId: String? = null,
     var extra: Json
-) {
-    inline fun <reified T : DbStatusExtra> updateExtra(update: (T) -> T) {
-        extra = KTJson.encodeToString(update.invoke(KTJson.decodeFromString(extra)))
-    }
-}
+)
 
 interface DbStatusExtra
 
