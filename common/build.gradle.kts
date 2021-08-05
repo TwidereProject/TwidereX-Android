@@ -36,6 +36,7 @@ kotlin {
                 api("androidx.datastore:datastore-preferences-core:${Versions.datastore}")
                 api("org.jetbrains.kotlinx:kotlinx-serialization-json:${Versions.Kotlin.serialization}")
                 api("org.jetbrains.kotlinx:kotlinx-serialization-protobuf:${Versions.Kotlin.serialization}")
+                api("io.insert-koin:koin-core:${Versions.koin}")
             }
         }
         val commonTest by getting {
