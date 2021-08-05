@@ -26,9 +26,9 @@ import androidx.work.CoroutineWorker
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkerParameters
 import com.twidere.twiderex.jobs.draft.SaveDraftJob
-import com.twidere.twiderex.model.ComposeData
-import com.twidere.twiderex.model.toComposeData
-import com.twidere.twiderex.model.toWorkData
+import com.twidere.twiderex.model.job.ComposeData
+import com.twidere.twiderex.model.transform.toComposeData
+import com.twidere.twiderex.model.transform.toWorkData
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 

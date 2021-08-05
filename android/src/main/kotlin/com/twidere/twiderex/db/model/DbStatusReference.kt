@@ -27,6 +27,7 @@ import androidx.room.PrimaryKey
 import androidx.room.Relation
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.enums.ReferenceType
 import java.util.UUID
 
 @Entity(
@@ -81,13 +82,6 @@ fun DbStatusWithMediaAndUser?.toDbStatusReference(
             status = this,
         )
     }
-}
-
-enum class ReferenceType {
-    Retweet,
-    Reply,
-    Quote,
-    MastodonNotification,
 }
 
 data class DbStatusWithReference(

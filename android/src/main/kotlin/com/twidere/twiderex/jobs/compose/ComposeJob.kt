@@ -25,8 +25,8 @@ import com.twidere.services.microblog.MicroBlogService
 import com.twidere.twiderex.R
 import com.twidere.twiderex.kmp.ExifScrambler
 import com.twidere.twiderex.kmp.RemoteNavigator
-import com.twidere.twiderex.model.ComposeData
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.job.ComposeData
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.navigation.RootDeepLinksRoute
 import com.twidere.twiderex.notification.AppNotification

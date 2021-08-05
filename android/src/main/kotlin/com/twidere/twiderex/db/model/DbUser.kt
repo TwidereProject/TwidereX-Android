@@ -25,7 +25,7 @@ import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.PlatformType
+import com.twidere.twiderex.model.enums.PlatformType
 import kotlinx.serialization.Serializable
 
 @Entity(
@@ -56,8 +56,7 @@ data class DbUser(
     val isProtected: Boolean,
     val platformType: PlatformType,
     val statusesCount: Long,
-    val twitterExtra: DbTwitterUserExtra? = null,
-    val mastodonExtra: DbMastodonUserExtra? = null,
+    val extra: Json
 )
 
 @Immutable
