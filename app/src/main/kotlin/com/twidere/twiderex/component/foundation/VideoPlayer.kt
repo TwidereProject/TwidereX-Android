@@ -132,7 +132,7 @@ fun VideoPlayer(
                         ProgressiveMediaSource.Factory(
                             CacheDataSourceFactory(
                                 context,
-                                5 * 1024 * 1024,
+                                5L * 1024L * 1024L,
                             )
                         ).createMediaSource(MediaItem.fromUri(url)).also {
                             setMediaSource(it)
