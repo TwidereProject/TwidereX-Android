@@ -61,7 +61,6 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -71,11 +70,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.flowWithLifecycle
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.UserMetrics
 import com.twidere.twiderex.component.foundation.AppBar
@@ -115,10 +112,9 @@ fun HomeScene() {
     val hideTab = LocalAppearancePreferences.current.hideTabBarWhenScroll
     val hideFab = LocalAppearancePreferences.current.hideFabWhenScroll
     val hideAppBar = LocalAppearancePreferences.current.hideAppBarWhenScroll
-    val menuOrder by account.preferences.homeMenuOrder.flowWithLifecycle(LocalLifecycleOwner.current.lifecycle)
-        .collectAsState(
-            initial = HomeMenus.values().map { it to it.showDefault }
-        )
+    val menuOrder by account.preferences.homeMenuOrder.observeAsState(
+        initial = HomeMenus.values().map { it to it.showDefault }
+    )
     val menus = remember(menuOrder) {
         menuOrder.filter { it.second && it.first.supportedPlatformType.contains(account.type) }
             .map { it.first }
@@ -487,9 +483,7 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
                 enter = fadeIn() + expandVertically(),
                 exit = shrinkVertically() + fadeOut(),
             ) {
-                val menuOrder by account.preferences.homeMenuOrder.flowWithLifecycle(
-                    LocalLifecycleOwner.current.lifecycle
-                ).collectAsState(
+                val menuOrder by account.preferences.homeMenuOrder.observeAsState(
                     initial = HomeMenus.values().map { it to it.showDefault }
                 )
                 LazyColumn {
