@@ -26,8 +26,8 @@ import androidx.work.Data
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkerParameters
 import com.twidere.twiderex.jobs.dm.TwitterDirectMessageSendJob
-import com.twidere.twiderex.model.DirectMessageSendData
-import com.twidere.twiderex.model.toWorkData
+import com.twidere.twiderex.model.job.DirectMessageSendData
+import com.twidere.twiderex.model.transform.toWorkData
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 

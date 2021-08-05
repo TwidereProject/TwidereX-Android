@@ -21,6 +21,7 @@
 package com.twidere.twiderex
 
 import android.app.Application
+import android.content.Context
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.startup.AppInitializer
 import androidx.work.Configuration
@@ -42,6 +43,11 @@ class TwidereApp : Application(), Configuration.Provider {
 
     override fun onCreate() {
         super.onCreate()
+        // Note:Installs with missing splits are now blocked on devices which have Play Protect active or run on Android 10.
+        // But there are still some custom roms allows missing splits which causes resources not found exception
+        if (MissingSplitsCheckerImpl().requiredSplits(this)) {
+            return
+        }
         // manually setup NotificationInitializer since it require HiltWorkerFactory
         AppInitializer.getInstance(this)
             .apply {
@@ -49,5 +55,9 @@ class TwidereApp : Application(), Configuration.Provider {
                 initializeComponent(DirectMessageInitializer::class.java)
                 initializeComponent(TwidereServiceInitializer::class.java)
             }
+    }
+
+    interface MissingSplitsChecker {
+        fun requiredSplits(context: Context): Boolean
     }
 }

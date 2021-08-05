@@ -22,14 +22,14 @@ package com.twidere.twiderex.utils
 
 import com.twidere.services.mastodon.MastodonService
 import com.twidere.twiderex.model.AccountDetails
-import com.twidere.twiderex.model.ui.UiEmoji
-import com.twidere.twiderex.model.ui.UiEmoji.Companion.toUi
+import com.twidere.twiderex.model.transform.toUi
+import com.twidere.twiderex.model.ui.UiEmojiCategory
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
 object MastodonEmojiCache {
-    private val items = hashMapOf<String, Flow<List<UiEmoji>>>()
-    fun get(account: AccountDetails): Flow<List<UiEmoji>> {
+    private val items = hashMapOf<String, Flow<List<UiEmojiCategory>>>()
+    fun get(account: AccountDetails): Flow<List<UiEmojiCategory>> {
         return items.getOrPut(account.accountKey.host) {
             flow {
                 account.service.let {

@@ -44,10 +44,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.lifecycle.flowWithLifecycle
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
@@ -75,10 +73,9 @@ fun LayoutScene() {
         )
     }
     val user = viewModel.user
-    val menuOrder by account.preferences.homeMenuOrder.flowWithLifecycle(LocalLifecycleOwner.current.lifecycle)
-        .collectAsState(
-            initial = HomeMenus.values().map { it to it.showDefault }
-        )
+    val menuOrder by account.preferences.homeMenuOrder.collectAsState(
+        initial = HomeMenus.values().map { it to it.showDefault }
+    )
     val menus =
         menuOrder.filter { it.first.supportedPlatformType.contains(account.type) }.groupBy {
             it.second

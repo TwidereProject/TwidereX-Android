@@ -33,9 +33,9 @@ import com.twidere.twiderex.db.model.DbDMEventWithAttachments.Companion.saveToDb
 import com.twidere.twiderex.db.model.DbMedia
 import com.twidere.twiderex.kmp.FileResolver
 import com.twidere.twiderex.model.AccountDetails
-import com.twidere.twiderex.model.DirectMessageSendData
-import com.twidere.twiderex.model.MediaType
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.enums.MediaType
+import com.twidere.twiderex.model.job.DirectMessageSendData
 import com.twidere.twiderex.navigation.RootDeepLinksRoute
 import com.twidere.twiderex.notification.AppNotification
 import com.twidere.twiderex.notification.AppNotificationManager

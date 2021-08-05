@@ -96,8 +96,8 @@ import com.twidere.twiderex.extensions.hideControls
 import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.extensions.setOnSystemBarsVisibilityChangeListener
 import com.twidere.twiderex.extensions.showControls
-import com.twidere.twiderex.model.MediaType
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.enums.MediaType
 import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.preferences.proto.DisplayPreferences

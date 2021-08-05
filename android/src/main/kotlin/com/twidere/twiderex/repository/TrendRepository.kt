@@ -25,7 +25,6 @@ import com.twidere.services.microblog.TrendService
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.ui.UiTrend
-import com.twidere.twiderex.model.ui.UiTrend.Companion.toUi
 import com.twidere.twiderex.paging.mediator.trend.TrendMediator
 import com.twidere.twiderex.paging.mediator.trend.TrendMediator.Companion.toUi
 import kotlinx.coroutines.flow.Flow

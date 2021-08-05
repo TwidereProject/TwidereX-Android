@@ -199,6 +199,7 @@ dependencies {
         googleImplementation(platform("com.google.firebase:firebase-bom:26.1.0"))
         googleImplementation("com.google.firebase:firebase-analytics-ktx")
         googleImplementation("com.google.firebase:firebase-crashlytics-ktx")
+        googleImplementation("com.google.android.play:core-ktx:1.8.1")
         // END Non-FOSS component
     }
 

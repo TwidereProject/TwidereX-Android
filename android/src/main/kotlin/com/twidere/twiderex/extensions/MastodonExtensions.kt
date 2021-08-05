@@ -24,25 +24,25 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import com.twidere.services.mastodon.model.Visibility
 import com.twidere.twiderex.R
+import com.twidere.twiderex.model.enums.MastodonVisibility
 
 @Composable
-fun Visibility.icon(): Painter {
+fun MastodonVisibility.icon(): Painter {
     return when (this) {
-        Visibility.Public -> painterResource(id = R.drawable.ic_globe)
-        Visibility.Unlisted -> painterResource(id = R.drawable.ic_lock_open)
-        Visibility.Private -> painterResource(id = R.drawable.ic_lock)
-        Visibility.Direct -> painterResource(id = R.drawable.ic_mail)
+        MastodonVisibility.Public -> painterResource(id = R.drawable.ic_globe)
+        MastodonVisibility.Unlisted -> painterResource(id = R.drawable.ic_lock_open)
+        MastodonVisibility.Private -> painterResource(id = R.drawable.ic_lock)
+        MastodonVisibility.Direct -> painterResource(id = R.drawable.ic_mail)
     }
 }
 
 @Composable
-fun Visibility.stringName(): String {
+fun MastodonVisibility.stringName(): String {
     return when (this) {
-        Visibility.Public -> stringResource(id = R.string.scene_compose_visibility_public)
-        Visibility.Unlisted -> stringResource(id = R.string.scene_compose_visibility_unlisted)
-        Visibility.Private -> stringResource(id = R.string.scene_compose_visibility_private)
-        Visibility.Direct -> stringResource(id = R.string.scene_compose_visibility_direct)
+        MastodonVisibility.Public -> stringResource(id = R.string.scene_compose_visibility_public)
+        MastodonVisibility.Unlisted -> stringResource(id = R.string.scene_compose_visibility_unlisted)
+        MastodonVisibility.Private -> stringResource(id = R.string.scene_compose_visibility_private)
+        MastodonVisibility.Direct -> stringResource(id = R.string.scene_compose_visibility_direct)
     }
 }

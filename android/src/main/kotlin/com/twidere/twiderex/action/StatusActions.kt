@@ -23,7 +23,7 @@ package com.twidere.twiderex.action
 import androidx.compose.runtime.compositionLocalOf
 import androidx.work.WorkManager
 import com.twidere.twiderex.model.AccountDetails
-import com.twidere.twiderex.model.StatusResult
+import com.twidere.twiderex.model.job.StatusResult
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.worker.database.DeleteDbStatusWorker
 import com.twidere.twiderex.worker.status.DeleteStatusWorker

@@ -25,6 +25,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.datastore.core.DataStore
 import com.twidere.services.http.config.HttpConfig
 import com.twidere.services.proxy.ProxyConfig
@@ -39,9 +40,12 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
-val LocalAppearancePreferences = compositionLocalOf<AppearancePreferences> { error("No AppearancePreferences") }
-val LocalDisplayPreferences = compositionLocalOf<DisplayPreferences> { error("No DisplayPreferences") }
+val LocalAppearancePreferences =
+    compositionLocalOf<AppearancePreferences> { error("No AppearancePreferences") }
+val LocalDisplayPreferences =
+    compositionLocalOf<DisplayPreferences> { error("No DisplayPreferences") }
 val LocalHttpConfig = compositionLocalOf<HttpConfig> { error("No Http config preferences") }
+
 data class PreferencesHolder @Inject constructor(
     val appearancePreferences: DataStore<AppearancePreferences>,
     val displayPreferences: DataStore<DisplayPreferences>,
@@ -67,24 +71,26 @@ fun ProvidePreferences(
     val display by holder.displayPreferences
         .data
         .collectAsState(initial = DisplayPreferences.getDefaultInstance())
-    val proxyConfig by holder.miscPreferences
-        .data
-        .map {
-            HttpConfig(
-                proxyConfig = ProxyConfig(
-                    enable = it.useProxy,
-                    server = it.proxyServer,
-                    port = it.proxyPort,
-                    userName = it.proxyUserName,
-                    password = it.proxyPassword,
-                    type = when (it.proxyType) {
-                        MiscPreferences.ProxyType.REVERSE -> ProxyConfig.Type.REVERSE
-                        else -> ProxyConfig.Type.HTTP
-                    }
+    val proxyConfigFlow = remember(holder.miscPreferences.data) {
+        holder.miscPreferences
+            .data
+            .map {
+                HttpConfig(
+                    proxyConfig = ProxyConfig(
+                        enable = it.useProxy,
+                        server = it.proxyServer,
+                        port = it.proxyPort,
+                        userName = it.proxyUserName,
+                        password = it.proxyPassword,
+                        type = when (it.proxyType) {
+                            MiscPreferences.ProxyType.REVERSE -> ProxyConfig.Type.REVERSE
+                            else -> ProxyConfig.Type.HTTP
+                        }
+                    )
                 )
-            )
-        }
-        .collectAsState(initial = HttpConfig())
+            }
+    }
+    val proxyConfig by proxyConfigFlow.collectAsState(initial = HttpConfig())
 
     CompositionLocalProvider(
         LocalAppearancePreferences provides appearances,

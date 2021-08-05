@@ -31,8 +31,8 @@ import coil.request.ImageRequest
 import coil.request.ImageResult
 import com.twidere.services.http.authorization.OAuth1Authorization
 import com.twidere.twiderex.model.AccountDetails
-import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.cred.OAuthCredentials
+import com.twidere.twiderex.model.enums.PlatformType
 import okhttp3.Headers
 import okhttp3.Request
 import java.net.URL

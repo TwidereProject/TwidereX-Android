@@ -28,8 +28,8 @@ import com.twidere.twiderex.db.model.DbNotificationCursor
 import com.twidere.twiderex.db.model.NotificationCursorType
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.transform.toUi
 import com.twidere.twiderex.model.ui.UiStatus
-import com.twidere.twiderex.model.ui.UiStatus.Companion.toUi
 import java.util.UUID
 
 class NotificationRepository(
