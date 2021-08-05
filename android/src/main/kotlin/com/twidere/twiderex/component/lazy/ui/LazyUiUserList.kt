@@ -101,7 +101,7 @@ fun LazyUiUserList(
                                     )
                                     Spacer(modifier = Modifier.width(UiUserListDefaults.HorizontalPadding))
                                     Text(
-                                        text = it.followersCount.toString()
+                                        text = it.metrics.fans.toString()
                                     )
                                 }
                             },

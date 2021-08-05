@@ -23,10 +23,15 @@ package com.twidere.twiderex.extensions
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.flowWithLifecycle
 import kotlinx.coroutines.flow.Flow
 
 @Composable
-fun <T> Flow<T>.observeAsState(initial: T): State<T> =
-    flowWithLifecycle(LocalLifecycleOwner.current.lifecycle).collectAsState(initial = initial)
+fun <T> Flow<T>.observeAsState(initial: T): State<T> {
+    val lifecycleOwner = LocalLifecycleOwner.current
+    return remember(this, lifecycleOwner) {
+        flowWithLifecycle(lifecycleOwner.lifecycle)
+    }.collectAsState(initial = initial)
+}

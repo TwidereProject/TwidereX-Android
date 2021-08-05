@@ -30,8 +30,8 @@ import com.twidere.twiderex.db.mapper.toDbUser
 import com.twidere.twiderex.db.model.DbDMEventWithAttachments
 import com.twidere.twiderex.db.model.DbUser
 import com.twidere.twiderex.kmp.FileResolver
-import com.twidere.twiderex.model.DirectMessageSendData
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.job.DirectMessageSendData
 import com.twidere.twiderex.notification.AppNotificationManager
 import com.twidere.twiderex.repository.AccountRepository
 

@@ -26,9 +26,9 @@ import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.db.mapper.toDbList
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.transform.toUi
 import com.twidere.twiderex.model.ui.ListsMode
 import com.twidere.twiderex.model.ui.UiList
-import com.twidere.twiderex.model.ui.UiList.Companion.toUi
 import com.twidere.twiderex.paging.mediator.list.ListsMediator
 import com.twidere.twiderex.paging.mediator.list.ListsMediator.Companion.toUi
 import kotlinx.coroutines.flow.Flow

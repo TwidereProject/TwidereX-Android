@@ -24,7 +24,7 @@ import com.twidere.services.microblog.StatusService
 import com.twidere.services.twitter.TwitterErrorCodes
 import com.twidere.services.twitter.model.exceptions.TwitterApiException
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.StatusResult
+import com.twidere.twiderex.model.job.StatusResult
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.AccountRepository

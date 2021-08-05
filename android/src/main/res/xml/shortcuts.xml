@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="compose"
+        android:enabled="true"
+        android:icon="@drawable/ic_feather_blue"
+        android:shortcutShortLabel="@string/scene_compose_title_compose"
+        android:shortcutLongLabel="@string/scene_compose_title_compose"
+        android:shortcutDisabledMessage="@string/scene_compose_title_compose"
+        tools:targetApi="n_mr1">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.twidere.twiderex"
+            android:targetClass="com.twidere.twiderex.TwidereXActivity"
+            android:data="twiderex://RootDeepLinks/Compose"/>
+        <categories android:name="android.shortcut.conversation" />
+        <capability-binding android:key="actions.intent.CREATE_MESSAGE" />
+    </shortcut>
+</shortcuts>

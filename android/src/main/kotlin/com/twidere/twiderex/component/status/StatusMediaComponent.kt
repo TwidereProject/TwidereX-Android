@@ -59,8 +59,8 @@ import com.twidere.twiderex.component.foundation.NetworkBlurImage
 import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.foundation.VideoPlayer
 import com.twidere.twiderex.component.navigation.LocalNavigator
-import com.twidere.twiderex.model.MediaType
-import com.twidere.twiderex.model.PlatformType
+import com.twidere.twiderex.model.enums.MediaType
+import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.ui.TwidereTheme
@@ -81,7 +81,7 @@ fun StatusMediaComponent(
         navigator.media(statusKey = status.statusKey, selectedIndex = index)
     }
     var sensitive by rememberSaveable(status.statusKey.toString()) {
-        mutableStateOf(status.mastodonExtra?.sensitive ?: false)
+        mutableStateOf(status.sensitive)
     }
 
     val aspectRatio = when (media.size) {

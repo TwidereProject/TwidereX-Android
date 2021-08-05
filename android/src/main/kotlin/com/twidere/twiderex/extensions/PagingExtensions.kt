@@ -24,7 +24,7 @@ import androidx.paging.Pager
 import androidx.paging.map
 import com.twidere.twiderex.db.model.DbPagingTimelineWithStatus
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.ui.UiStatus.Companion.toUi
+import com.twidere.twiderex.model.transform.toUi
 import kotlinx.coroutines.flow.map
 
 fun Pager<Int, DbPagingTimelineWithStatus>.toUi(accountKey: MicroBlogKey) =

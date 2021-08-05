@@ -115,7 +115,7 @@ fun ComposeSearchUserScene() {
                 LazyUiUserList(
                     items = source,
                     onItemClicked = {
-                        val displayName = it.getDisplayScreenName(accountDetails = account)
+                        val displayName = it.getDisplayScreenName(account.accountKey.host)
                         navController.goBackWith(displayName)
                     },
                     header = {

@@ -128,6 +128,10 @@ class ListsModifyViewModel @AssistedInject constructor(
         fun create(account: AccountDetails, listKey: MicroBlogKey): ListsModifyViewModel
     }
 
+    val editName = MutableStateFlow("")
+    var editDesc = MutableStateFlow("")
+    var editPrivate = MutableStateFlow(false)
+
     val source by lazy {
         listsRepository.findListWithListKey(account = account, listKey = listKey)
     }
@@ -141,10 +145,6 @@ class ListsModifyViewModel @AssistedInject constructor(
             }
         }
     }
-
-    val editName = MutableStateFlow("")
-    var editDesc = MutableStateFlow("")
-    var editPrivate = MutableStateFlow(false)
 
     fun editList(
         listId: String = listKey.id,

@@ -44,13 +44,15 @@ import com.twidere.twiderex.db.model.DbTrend
 import com.twidere.twiderex.db.model.DbTrendHistory
 import com.twidere.twiderex.db.model.DbTrendWithHistory
 import com.twidere.twiderex.db.model.DbUser
-import com.twidere.twiderex.db.model.ReferenceType
 import com.twidere.twiderex.db.model.toDbStatusReference
-import com.twidere.twiderex.model.MastodonStatusType
-import com.twidere.twiderex.model.MediaType
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.PlatformType
+import com.twidere.twiderex.model.enums.MastodonStatusType
+import com.twidere.twiderex.model.enums.MastodonVisibility
+import com.twidere.twiderex.model.enums.MediaType
+import com.twidere.twiderex.model.enums.PlatformType
+import com.twidere.twiderex.model.enums.ReferenceType
 import com.twidere.twiderex.navigation.RootDeepLinksRoute
+import com.twidere.twiderex.utils.json
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import org.jsoup.nodes.Node
@@ -103,16 +105,16 @@ fun Notification.toDbStatusWithReference(
         lang = null,
         is_possibly_sensitive = false,
         platformType = PlatformType.Mastodon,
-        mastodonExtra = DbMastodonStatusExtra(
+        extra = DbMastodonStatusExtra(
             type = this.type.toDbType(),
             emoji = emptyList(),
-            visibility = Visibility.Public,
+            visibility = MastodonVisibility.Public,
             sensitive = false,
             spoilerText = null,
             poll = null,
             card = null,
             mentions = null,
-        ),
+        ).json(),
         inReplyToStatusId = null,
         inReplyToUserId = null,
     )
@@ -220,16 +222,16 @@ private fun Status.toDbStatusWithMediaAndUser(
         ),
         is_possibly_sensitive = sensitive ?: false,
         platformType = PlatformType.Mastodon,
-        mastodonExtra = DbMastodonStatusExtra(
+        extra = DbMastodonStatusExtra(
             type = MastodonStatusType.Status,
             emoji = emojis ?: emptyList(),
-            visibility = visibility ?: Visibility.Public,
+            visibility = visibility.toDbEnums(),
             sensitive = sensitive ?: false,
             spoilerText = spoilerText?.takeIf { it.isNotEmpty() },
             poll = poll,
             card = card,
             mentions = mentions,
-        ),
+        ).json(),
         previewCard = card?.url?.let { url ->
             DbPreviewCard(
                 link = url,
@@ -327,12 +329,12 @@ fun Account.toDbUser(
         } ?: throw IllegalArgumentException("mastodon user.acct should not be null"),
         platformType = PlatformType.Mastodon,
         statusesCount = statusesCount ?: 0L,
-        mastodonExtra = DbMastodonUserExtra(
+        extra = DbMastodonUserExtra(
             fields = fields ?: emptyList(),
             bot = bot ?: false,
             locked = locked ?: false,
             emoji = emojis ?: emptyList(),
-        )
+        ).json()
     )
 }
 
@@ -437,4 +439,11 @@ private fun replaceHashTag(node: Node) {
     } else {
         node.childNodes().forEach { replaceHashTag(it) }
     }
+}
+
+private fun Visibility?.toDbEnums() = when (this) {
+    Visibility.Unlisted -> MastodonVisibility.Unlisted
+    Visibility.Private -> MastodonVisibility.Private
+    Visibility.Direct -> MastodonVisibility.Direct
+    Visibility.Public, null -> MastodonVisibility.Public
 }
