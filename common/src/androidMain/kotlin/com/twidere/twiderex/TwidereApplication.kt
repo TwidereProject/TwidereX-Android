@@ -20,28 +20,19 @@
  */
 package com.twidere.twiderex
 
-import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.compose.ui.window.Window
-import androidx.compose.ui.window.application
+import android.app.Application
 import com.twidere.twiderex.di.setupModules
+import org.koin.android.ext.koin.androidContext
+import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
-import org.koin.core.context.stopKoin
 
-@ExperimentalComposeUiApi
-fun main() {
-    startKoin {
-        printLogger()
-        setupModules()
-    }
-    application {
-        Window(
-            onCloseRequest = {
-                stopKoin()
-                exitApplication()
-            },
-            title = "Twidere X"
-        ) {
-            App()
+abstract class TwidereApplication : Application() {
+    override fun onCreate() {
+        super.onCreate()
+        startKoin {
+            androidLogger()
+            androidContext(this@TwidereApplication)
+            setupModules()
         }
     }
 }
