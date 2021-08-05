@@ -44,7 +44,11 @@ kotlin {
                 implementation(kotlin("test"))
             }
         }
-        val androidMain by getting
+        val androidMain by getting {
+            dependencies {
+                api("io.insert-koin:koin-android:${Versions.koin}")
+            }
+        }
         val androidTest by getting
         val desktopMain by getting
         val desktopTest by getting
