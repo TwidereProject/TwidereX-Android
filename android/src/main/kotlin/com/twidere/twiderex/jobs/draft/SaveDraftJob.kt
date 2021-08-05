@@ -20,7 +20,7 @@
  */
 package com.twidere.twiderex.jobs.draft
 
-import com.twidere.twiderex.model.ComposeData
+import com.twidere.twiderex.model.job.ComposeData
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.DraftRepository
 import com.twidere.twiderex.utils.notify

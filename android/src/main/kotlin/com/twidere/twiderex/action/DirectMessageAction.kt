@@ -21,9 +21,9 @@
 package com.twidere.twiderex.action
 
 import androidx.work.WorkManager
-import com.twidere.twiderex.model.DirectMessageDeleteData
-import com.twidere.twiderex.model.DirectMessageSendData
-import com.twidere.twiderex.model.PlatformType
+import com.twidere.twiderex.model.enums.PlatformType
+import com.twidere.twiderex.model.job.DirectMessageDeleteData
+import com.twidere.twiderex.model.job.DirectMessageSendData
 import com.twidere.twiderex.worker.dm.DirectMessageDeleteWorker
 import com.twidere.twiderex.worker.dm.TwitterDirectMessageSendWorker
 

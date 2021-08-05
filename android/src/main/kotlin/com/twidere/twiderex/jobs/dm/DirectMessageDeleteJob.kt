@@ -21,8 +21,8 @@
 package com.twidere.twiderex.jobs.dm
 
 import com.twidere.services.microblog.DirectMessageService
-import com.twidere.twiderex.model.DirectMessageDeleteData
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.job.DirectMessageDeleteData
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.DirectMessageRepository
 

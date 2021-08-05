@@ -46,14 +46,16 @@ import com.twidere.twiderex.db.model.DbTwitterStatusExtra
 import com.twidere.twiderex.db.model.DbTwitterUserExtra
 import com.twidere.twiderex.db.model.DbUrlEntity
 import com.twidere.twiderex.db.model.DbUser
-import com.twidere.twiderex.db.model.ReferenceType
 import com.twidere.twiderex.db.model.TwitterUrlEntity
 import com.twidere.twiderex.db.model.toDbStatusReference
-import com.twidere.twiderex.model.MediaType
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.PlatformType
+import com.twidere.twiderex.model.enums.MediaType
+import com.twidere.twiderex.model.enums.PlatformType
+import com.twidere.twiderex.model.enums.ReferenceType
+import com.twidere.twiderex.model.enums.TwitterReplySettings
 import com.twidere.twiderex.model.ui.ListsMode
 import com.twidere.twiderex.navigation.RootDeepLinksRouteDefinition
+import com.twidere.twiderex.utils.json
 import com.twitter.twittertext.Autolink
 import java.util.UUID
 
@@ -225,11 +227,10 @@ private fun StatusV2.toDbStatusWithMediaAndUser(
             id ?: throw IllegalArgumentException("Status.idStr should not be null")
         ),
         platformType = PlatformType.Twitter,
-        mastodonExtra = null,
-        twitterExtra = DbTwitterStatusExtra(
-            reply_settings = replySettings ?: ReplySettings.Everyone,
+        extra = DbTwitterStatusExtra(
+            reply_settings = replySettings.toDbEnums(),
             quoteCount = publicMetrics?.quoteCount
-        ),
+        ).json(),
         previewCard = entities?.urls?.firstOrNull()
             ?.takeUnless { url ->
                 referencedTweets?.firstOrNull { it.type == ReferencedTweetType.quoted }
@@ -337,10 +338,9 @@ private fun Status.toDbStatusWithMediaAndUser(
             idStr ?: throw IllegalArgumentException("Status.idStr should not be null")
         ),
         platformType = PlatformType.Twitter,
-        mastodonExtra = null,
-        twitterExtra = DbTwitterStatusExtra(
-            reply_settings = ReplySettings.Everyone,
-        ),
+        extra = DbTwitterStatusExtra(
+            reply_settings = TwitterReplySettings.Everyone,
+        ).json(),
         previewCard = entities?.urls?.firstOrNull()
             ?.takeUnless { url -> quotedStatus?.idStr?.let { id -> url.expandedURL?.endsWith(id) == true } == true }
             ?.takeUnless { url -> url.expandedURL?.contains("pic.twitter.com") == true }
@@ -439,7 +439,7 @@ fun User.toDbUser(): DbUser {
         platformType = PlatformType.Twitter,
         acct = MicroBlogKey.twitter(screenName ?: ""),
         statusesCount = statusesCount ?: 0,
-        twitterExtra = DbTwitterUserExtra(
+        extra = DbTwitterUserExtra(
             pinned_tweet_id = null,
             url = entities?.description?.urls?.map {
                 TwitterUrlEntity(
@@ -448,7 +448,7 @@ fun User.toDbUser(): DbUser {
                     displayUrl = it.displayURL ?: "",
                 )
             } ?: emptyList()
-        )
+        ).json()
     )
 }
 
@@ -477,7 +477,7 @@ fun UserV2.toDbUser(): DbUser {
         acct = MicroBlogKey.twitter(username ?: ""),
         platformType = PlatformType.Twitter,
         statusesCount = publicMetrics?.tweetCount ?: 0,
-        twitterExtra = DbTwitterUserExtra(
+        extra = DbTwitterUserExtra(
             pinned_tweet_id = pinnedTweetID,
             url = entities?.description?.urls?.map {
                 TwitterUrlEntity(
@@ -486,7 +486,7 @@ fun UserV2.toDbUser(): DbUser {
                     displayUrl = it.displayURL ?: "",
                 )
             } ?: emptyList()
-        )
+        ).json()
     )
 }
 
@@ -606,4 +606,10 @@ fun DirectMessageEvent.toDbDirectMessage(accountKey: MicroBlogKey, sender: DbUse
         } ?: emptyList(),
         sender = sender
     )
+}
+
+private fun ReplySettings?.toDbEnums() = when (this) {
+    ReplySettings.MentionedUsers -> TwitterReplySettings.MentionedUsers
+    ReplySettings.FollowingUsers -> TwitterReplySettings.FollowingUsers
+    ReplySettings.Everyone, null -> TwitterReplySettings.Everyone
 }

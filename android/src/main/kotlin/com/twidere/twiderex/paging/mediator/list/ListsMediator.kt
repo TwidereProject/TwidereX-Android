@@ -35,8 +35,8 @@ import com.twidere.twiderex.db.mapper.toDbList
 import com.twidere.twiderex.db.model.DbList
 import com.twidere.twiderex.defaultLoadCount
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.transform.toUi
 import com.twidere.twiderex.model.ui.UiList
-import com.twidere.twiderex.model.ui.UiList.Companion.toUi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 

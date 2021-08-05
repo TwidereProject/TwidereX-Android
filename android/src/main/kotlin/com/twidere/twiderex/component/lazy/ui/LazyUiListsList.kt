@@ -54,7 +54,7 @@ import androidx.paging.compose.items
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.lazy.loadState
 import com.twidere.twiderex.component.status.StatusDivider
-import com.twidere.twiderex.model.ListType
+import com.twidere.twiderex.model.enums.ListType
 import com.twidere.twiderex.model.ui.UiList
 import moe.tlaster.placeholder.TextPlaceHolder
 import java.util.Locale

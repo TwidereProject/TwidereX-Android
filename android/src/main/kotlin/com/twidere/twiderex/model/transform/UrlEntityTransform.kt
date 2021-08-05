@@ -18,12 +18,12 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.model
+package com.twidere.twiderex.model.transform
 
-enum class MediaType {
-    photo,
-    video,
-    animated_gif,
-    audio,
-    other,
-}
+import com.twidere.twiderex.db.model.DbUrlEntity
+import com.twidere.twiderex.model.ui.UiUrlEntity
+
+fun DbUrlEntity.toUi() = UiUrlEntity(
+    url, expandedUrl, displayUrl, title, description, image
+)
+fun List<DbUrlEntity>.toUi() = map { it.toUi() }

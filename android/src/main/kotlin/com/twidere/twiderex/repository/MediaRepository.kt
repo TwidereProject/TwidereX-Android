@@ -22,7 +22,7 @@ package com.twidere.twiderex.repository
 
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.ui.UiMedia.Companion.toUi
+import com.twidere.twiderex.model.transform.toUi
 
 class MediaRepository(private val database: CacheDatabase) {
 

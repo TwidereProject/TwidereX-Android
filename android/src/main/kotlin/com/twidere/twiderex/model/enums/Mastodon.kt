@@ -18,12 +18,26 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.model
+package com.twidere.twiderex.model.enums
 
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class JsonAccount(
-    val name: String,
-    val type: String,
-)
+enum class MastodonStatusType {
+    Status,
+    NotificationFollow,
+    NotificationFollowRequest,
+    NotificationMention,
+    NotificationReblog,
+    NotificationFavourite,
+    NotificationPoll,
+    NotificationStatus,
+}
+
+@Serializable
+enum class MastodonVisibility {
+    Public,
+    Unlisted,
+    Private,
+    Direct;
+}

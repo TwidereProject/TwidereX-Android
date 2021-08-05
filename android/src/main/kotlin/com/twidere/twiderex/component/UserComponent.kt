@@ -97,12 +97,12 @@ import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.component.status.UserName
 import com.twidere.twiderex.component.status.UserScreenName
 import com.twidere.twiderex.component.status.withAvatarClip
-import com.twidere.twiderex.db.model.TwitterUrlEntity
 import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.PlatformType
+import com.twidere.twiderex.model.enums.PlatformType
+import com.twidere.twiderex.model.ui.UiUrlEntity
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.navigation.RootRoute
 import com.twidere.twiderex.navigation.twidereXSchema
@@ -275,15 +275,15 @@ private fun UserStatusTimelineFilter(
         Spacer(modifier = Modifier.width(UserStatusTimelineFilterDefaults.StartSpacing))
         Text(
             modifier = Modifier.weight(1f),
-            text = if (user.statusesCount > 1) {
+            text = if (user.metrics.status > 1) {
                 stringResource(
                     id = R.string.common_countable_tweet_single,
-                    user.statusesCount
+                    user.metrics.status
                 )
             } else {
                 stringResource(
                     id = R.string.common_countable_tweet_multiple,
-                    user.statusesCount
+                    user.metrics.status
                 )
             }
         )
@@ -732,7 +732,7 @@ fun UserMetrics(
                 .clickable {
                     navController.navigate(RootRoute.Following(user.userKey))
                 },
-            primaryText = user.friendsCount.toString(),
+            primaryText = user.metrics.follow.toString(),
             secondaryText = stringResource(id = R.string.common_controls_profile_dashboard_following),
         )
         HorizontalDivider(
@@ -744,7 +744,7 @@ fun UserMetrics(
                 .clickable {
                     navController.navigate(RootRoute.Followers(user.userKey))
                 },
-            primaryText = user.followersCount.toString(),
+            primaryText = user.metrics.fans.toString(),
             secondaryText = stringResource(id = R.string.common_controls_profile_dashboard_followers),
         )
         if (user.platformType == PlatformType.Twitter) {
@@ -754,7 +754,7 @@ fun UserMetrics(
             MetricsItem(
                 modifier = Modifier
                     .weight(1f),
-                primaryText = user.listedCount.toString(),
+                primaryText = user.metrics.listed.toString(),
                 secondaryText = stringResource(id = R.string.common_controls_profile_dashboard_listed),
             )
         }
@@ -780,7 +780,7 @@ fun MetricsItem(
 fun UserDescText(
     modifier: Modifier = Modifier,
     htmlDesc: String,
-    url: List<TwitterUrlEntity>,
+    url: List<UiUrlEntity>,
 ) {
     key(
         htmlDesc,

@@ -18,28 +18,15 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.model
+package com.twidere.twiderex.model.job
 
-import androidx.work.Data
-import androidx.work.workDataOf
+import com.twidere.twiderex.model.MicroBlogKey
 
-data class DirectMessageDeleteData(
-    val messageId: String,
+data class DirectMessageSendData(
+    val text: String?,
+    val images: List<String>,
+    val recipientUserKey: MicroBlogKey,
     val conversationKey: MicroBlogKey,
-    val messageKey: MicroBlogKey,
     val accountKey: MicroBlogKey,
-)
-
-fun DirectMessageDeleteData.toWorkData() = workDataOf(
-    "accountKey" to accountKey.toString(),
-    "conversationKey" to conversationKey.toString(),
-    "messageKey" to messageKey.toString(),
-    "messageId" to messageId,
-)
-
-fun Data.toDirectMessageDeleteData() = DirectMessageDeleteData(
-    messageId = getString("messageId") ?: "",
-    accountKey = MicroBlogKey.valueOf(getString("accountKey") ?: ""),
-    conversationKey = MicroBlogKey.valueOf(getString("conversationKey") ?: ""),
-    messageKey = MicroBlogKey.valueOf(getString("messageKey") ?: ""),
+    val draftMessageKey: MicroBlogKey,
 )

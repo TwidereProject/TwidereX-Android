@@ -27,9 +27,9 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkerParameters
 import com.twidere.services.mastodon.MastodonService
 import com.twidere.twiderex.jobs.compose.MastodonComposeJob
-import com.twidere.twiderex.model.ComposeData
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.toWorkData
+import com.twidere.twiderex.model.job.ComposeData
+import com.twidere.twiderex.model.transform.toWorkData
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 

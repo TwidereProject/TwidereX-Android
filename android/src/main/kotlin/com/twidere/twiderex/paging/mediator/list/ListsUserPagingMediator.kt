@@ -28,8 +28,8 @@ import com.twidere.services.microblog.model.IPaging
 import com.twidere.services.microblog.model.IUser
 import com.twidere.twiderex.db.mapper.toDbUser
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.transform.toUi
 import com.twidere.twiderex.model.ui.UiUser
-import com.twidere.twiderex.model.ui.UiUser.Companion.toUi
 import com.twidere.twiderex.paging.crud.MemoryCachePagingMediator
 import com.twidere.twiderex.paging.crud.PagingMemoryCache
 

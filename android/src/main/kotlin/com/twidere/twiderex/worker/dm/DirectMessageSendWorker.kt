@@ -25,7 +25,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.twidere.twiderex.jobs.dm.DirectMessageSendJob
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.toDirectMessageSendData
+import com.twidere.twiderex.model.transform.toDirectMessageSendData
 
 abstract class DirectMessageSendWorker(
     context: Context,

@@ -18,24 +18,12 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.model
+package com.twidere.twiderex.model.ui
 
-import androidx.work.workDataOf
-
-data class StatusResult(
-    val statusKey: MicroBlogKey,
-    val accountKey: MicroBlogKey,
-    val retweeted: Boolean? = null,
-    val liked: Boolean? = null,
-    val retweetCount: Long? = null,
-    val likeCount: Long? = null,
-) {
-    fun toWorkData() = workDataOf(
-        "statusKey" to statusKey.toString(),
-        "accountKey" to accountKey.toString(),
-        "liked" to liked,
-        "retweeted" to retweeted,
-        "retweetCount" to retweetCount,
-        "likeCount" to likeCount,
-    )
-}
+data class UiCard(
+    val link: String,
+    val displayLink: String?,
+    val title: String?,
+    val description: String?,
+    val image: String?,
+)

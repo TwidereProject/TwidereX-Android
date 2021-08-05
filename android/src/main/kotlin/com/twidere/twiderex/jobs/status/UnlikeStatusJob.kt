@@ -23,9 +23,9 @@ package com.twidere.twiderex.jobs.status
 import com.twidere.services.microblog.StatusService
 import com.twidere.twiderex.db.mapper.toDbStatusWithReference
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.StatusResult
+import com.twidere.twiderex.model.job.StatusResult
+import com.twidere.twiderex.model.transform.toUi
 import com.twidere.twiderex.model.ui.UiStatus
-import com.twidere.twiderex.model.ui.UiStatus.Companion.toUi
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.StatusRepository
@@ -51,8 +51,8 @@ class UnlikeStatusJob(
             statusKey = newStatus.statusKey,
             accountKey = accountKey,
             liked = false,
-            retweetCount = newStatus.retweetCount,
-            likeCount = newStatus.likeCount,
+            retweetCount = newStatus.metrics.retweet,
+            likeCount = newStatus.metrics.like,
         )
     }
     override fun fallback(
