@@ -21,11 +21,25 @@
 package com.twidere.twiderex
 
 import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.compose.ui.window.singleWindowApplication
+import androidx.compose.ui.window.Window
+import androidx.compose.ui.window.application
+import org.koin.core.context.startKoin
+import org.koin.core.context.stopKoin
 
 @ExperimentalComposeUiApi
-fun main() = singleWindowApplication(
-    title = "Twidere X"
-) {
-    App()
+fun main() {
+    startKoin {
+        printLogger()
+    }
+    application {
+        Window(
+            onCloseRequest = {
+                stopKoin()
+                exitApplication()
+            },
+            title = "Twidere X"
+        ) {
+            App()
+        }
+    }
 }
