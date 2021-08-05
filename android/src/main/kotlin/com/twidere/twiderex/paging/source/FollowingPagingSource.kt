@@ -26,8 +26,8 @@ import com.twidere.services.microblog.RelationshipService
 import com.twidere.services.microblog.model.IPaging
 import com.twidere.twiderex.db.mapper.toDbUser
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.transform.toUi
 import com.twidere.twiderex.model.ui.UiUser
-import com.twidere.twiderex.model.ui.UiUser.Companion.toUi
 
 class FollowingPagingSource(
     private val userKey: MicroBlogKey,

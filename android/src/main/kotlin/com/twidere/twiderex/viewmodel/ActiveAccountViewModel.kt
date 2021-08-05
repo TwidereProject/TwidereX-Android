@@ -22,7 +22,7 @@ package com.twidere.twiderex.viewmodel
 
 import androidx.lifecycle.ViewModel
 import com.twidere.twiderex.model.AccountDetails
-import com.twidere.twiderex.model.PlatformType
+import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.repository.AccountRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject

@@ -37,10 +37,11 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import com.twidere.twiderex.model.ui.UiUser
+import com.twidere.twiderex.ui.LocalActiveAccount
 
 @Composable
 fun UserScreenName(user: UiUser) {
-    UserScreenName(name = user.displayScreenName)
+    UserScreenName(name = user.getDisplayScreenName(LocalActiveAccount.current?.accountKey?.host))
 }
 
 @Composable

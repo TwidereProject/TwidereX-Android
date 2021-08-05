@@ -20,7 +20,6 @@
  */
 package com.twidere.twiderex.model
 
-import com.twidere.twiderex.db.model.DbUser
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -40,21 +39,3 @@ data class AmUser(
     val verified: Boolean,
     val isProtected: Boolean,
 )
-
-fun DbUser.toAmUser() =
-    AmUser(
-        userId = userId,
-        name = name,
-        userKey = userKey,
-        screenName = screenName,
-        profileImage = profileImage,
-        profileBackgroundImage = profileBackgroundImage,
-        followersCount = followersCount,
-        friendsCount = friendsCount,
-        listedCount = listedCount,
-        desc = rawDesc,
-        website = website,
-        location = location,
-        verified = verified,
-        isProtected = isProtected,
-    )

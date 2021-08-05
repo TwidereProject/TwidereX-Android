@@ -25,8 +25,8 @@ import com.twidere.twiderex.db.mapper.toDbUser
 import com.twidere.twiderex.mock.MockCenter
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.transform.toUi
 import com.twidere.twiderex.model.ui.UiUser
-import com.twidere.twiderex.model.ui.UiUser.Companion.toUi
 import com.twidere.twiderex.paging.crud.PagingMemoryCache
 import kotlinx.coroutines.runBlocking
 import org.junit.After

@@ -18,10 +18,13 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.model
+package com.twidere.twiderex.model.job
 
-enum class ListType {
-    All, // both owned and subscribed
-    Owned,
-    Subscribed
-}
+import com.twidere.twiderex.model.MicroBlogKey
+
+data class DirectMessageDeleteData(
+    val messageId: String,
+    val conversationKey: MicroBlogKey,
+    val messageKey: MicroBlogKey,
+    val accountKey: MicroBlogKey,
+)

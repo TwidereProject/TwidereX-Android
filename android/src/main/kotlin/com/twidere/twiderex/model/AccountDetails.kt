@@ -20,7 +20,6 @@
  */
 package com.twidere.twiderex.model
 
-import android.accounts.Account
 import com.twidere.twiderex.http.TwidereServiceFactory
 import com.twidere.twiderex.model.cred.BasicCredentials
 import com.twidere.twiderex.model.cred.Credentials
@@ -28,11 +27,14 @@ import com.twidere.twiderex.model.cred.CredentialsType
 import com.twidere.twiderex.model.cred.EmptyCredentials
 import com.twidere.twiderex.model.cred.OAuth2Credentials
 import com.twidere.twiderex.model.cred.OAuthCredentials
+import com.twidere.twiderex.model.enums.ListType
+import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiUser
+import com.twidere.twiderex.model.ui.UserMetrics
 import com.twidere.twiderex.utils.fromJson
 
 data class AccountDetails(
-    val account: Account,
+    val account: TwidereAccount,
     val type: PlatformType,
     // Note that UserKey that being used in AccountDetails is idStr@domain, not screenName@domain
     val accountKey: MicroBlogKey,
@@ -75,9 +77,12 @@ data class AccountDetails(
             screenName = screenName,
             profileImage = profileImage,
             profileBackgroundImage = profileBackgroundImage,
-            followersCount = followersCount,
-            friendsCount = friendsCount,
-            listedCount = listedCount,
+            metrics = UserMetrics(
+                fans = followersCount,
+                follow = friendsCount,
+                listed = listedCount,
+                status = 0
+            ),
             rawDesc = desc,
             htmlDesc = desc,
             website = website,
@@ -87,7 +92,6 @@ data class AccountDetails(
             userKey = userKey,
             platformType = type,
             acct = userKey.copy(id = screenName),
-            statusesCount = 0
         )
     }
 }

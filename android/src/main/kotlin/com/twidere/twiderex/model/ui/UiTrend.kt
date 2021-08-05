@@ -20,10 +20,7 @@
  */
 package com.twidere.twiderex.model.ui
 
-import com.twidere.twiderex.db.model.DbTrendHistory
-import com.twidere.twiderex.db.model.DbTrendWithHistory
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.ui.UiTrendHistory.Companion.toUi
 
 data class UiTrend(
     val trendKey: MicroBlogKey,
@@ -39,19 +36,6 @@ data class UiTrend(
 
     val dailyUses: Long
         get() = if (sortedHistory.isNotEmpty()) sortedHistory[0].uses else 0L
-
-    companion object {
-        fun DbTrendWithHistory.toUi() = UiTrend(
-            trendKey = trend.trendKey,
-            displayName = trend.displayName,
-            url = trend.url,
-            query = trend.query,
-            volume = trend.volume,
-            history = history.map {
-                it.toUi()
-            }
-        )
-    }
 }
 
 data class UiTrendHistory(
@@ -59,13 +43,4 @@ data class UiTrendHistory(
     val day: Long,
     val uses: Long,
     val accounts: Long
-) {
-    companion object {
-        fun DbTrendHistory.toUi() = UiTrendHistory(
-            trendKey = trendKey,
-            day = day,
-            uses = uses,
-            accounts = accounts
-        )
-    }
-}
+)

@@ -68,12 +68,12 @@ import androidx.constraintlayout.compose.Dimension
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.HumanizedTime
 import com.twidere.twiderex.component.navigation.LocalNavigator
-import com.twidere.twiderex.db.model.DbMastodonStatusExtra
-import com.twidere.twiderex.db.model.DbPreviewCard
 import com.twidere.twiderex.extensions.icon
-import com.twidere.twiderex.model.MastodonStatusType
-import com.twidere.twiderex.model.PlatformType
+import com.twidere.twiderex.model.enums.MastodonStatusType
+import com.twidere.twiderex.model.enums.PlatformType
+import com.twidere.twiderex.model.ui.UiCard
 import com.twidere.twiderex.model.ui.UiStatus
+import com.twidere.twiderex.model.ui.mastodon.MastodonStatusExtra
 import com.twidere.twiderex.preferences.LocalDisplayPreferences
 import com.twidere.twiderex.ui.LocalActiveAccount
 
@@ -240,7 +240,7 @@ private object StatusHeaderDefaults {
 
 @Composable
 private fun MastodonStatusHeader(
-    mastodonExtra: DbMastodonStatusExtra,
+    mastodonExtra: MastodonStatusExtra,
     data: UiStatus
 ) {
     when (mastodonExtra.type) {
@@ -519,8 +519,13 @@ fun statusConstraintSets() = ConstraintSet {
     val footerRef = createRefFor(StatusContentDefaults.Ref.Footer)
     val lineUpRef = createRefFor(StatusContentDefaults.Ref.LineUp)
     val lineDownRef = createRefFor(StatusContentDefaults.Ref.LineDown)
+    constrain(statusHeaderRef) {
+        top.linkTo(parent.top)
+        start.linkTo(parent.start)
+    }
     constrain(avatarRef) {
         top.linkTo(statusHeaderRef.bottom)
+        start.linkTo(parent.start)
     }
     constrain(contentRef) {
         start.linkTo(avatarRef.end, margin = StatusContentDefaults.AvatarSpacing)
@@ -594,13 +599,13 @@ fun ColumnScope.StatusBody(
     StatusBodyMedia(status)
 
     if (LocalDisplayPreferences.current.urlPreview && !status.media.any()) {
-        status.linkPreview?.let {
+        status.card?.let {
             Spacer(modifier = Modifier.height(StatusBodyDefaults.LinkPreviewSpacing))
             StatusLinkPreview(it)
         }
     }
 
-    if (!status.placeString.isNullOrEmpty() && type == StatusContentType.Normal) {
+    if (status.geo.name.isNotEmpty() && type == StatusContentType.Normal) {
         Spacer(modifier = Modifier.height(StatusBodyDefaults.PlaceSpacing))
         CompositionLocalProvider(
             LocalContentAlpha provides ContentAlpha.disabled
@@ -614,7 +619,7 @@ fun ColumnScope.StatusBody(
                     contentDescription = stringResource(id = R.string.accessibility_common_status_location)
                 )
                 Box(modifier = Modifier.width(StatusBodyDefaults.PlaceSpacing))
-                Text(text = status.placeString)
+                Text(text = status.geo.name)
             }
         }
     }
@@ -648,7 +653,7 @@ object StatusBodyDefaults {
 }
 
 @Composable
-private fun StatusLinkPreview(card: DbPreviewCard) {
+private fun StatusLinkPreview(card: UiCard) {
     val navigator = LocalNavigator.current
     LinkPreview(
         modifier = Modifier
@@ -659,7 +664,7 @@ private fun StatusLinkPreview(card: DbPreviewCard) {
         link = card.displayLink ?: card.link,
         title = card.title?.trim(),
         image = card.image,
-        desc = card.desc?.trim(),
+        desc = card.description?.trim(),
         maxLines = 5,
     )
 }

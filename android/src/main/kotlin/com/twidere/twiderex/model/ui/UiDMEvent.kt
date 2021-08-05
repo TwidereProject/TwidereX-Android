@@ -21,11 +21,7 @@
 package com.twidere.twiderex.model.ui
 
 import com.twidere.twiderex.db.model.DbDMEvent
-import com.twidere.twiderex.db.model.DbDMEventWithAttachments
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.ui.UiMedia.Companion.toUi
-import com.twidere.twiderex.model.ui.UiUrlEntity.Companion.toUi
-import com.twidere.twiderex.model.ui.UiUser.Companion.toUi
 
 data class UiDMEvent(
     val accountKey: MicroBlogKey,
@@ -48,24 +44,4 @@ data class UiDMEvent(
 ) {
     val isInCome: Boolean
         get() = recipientAccountKey == accountKey
-
-    companion object {
-        fun DbDMEventWithAttachments.toUi() = UiDMEvent(
-            accountKey = message.accountKey,
-            sortId = message.sortId,
-            conversationKey = message.conversationKey,
-            messageId = message.messageId,
-            messageKey = message.messageKey,
-            htmlText = message.htmlText,
-            originText = message.originText,
-            createdTimestamp = message.createdTimestamp,
-            messageType = message.messageType,
-            senderAccountKey = message.senderAccountKey,
-            recipientAccountKey = message.recipientAccountKey,
-            sendStatus = message.sendStatus,
-            media = media.toUi(),
-            urlEntity = urlEntity.toUi(),
-            sender = sender.toUi()
-        )
-    }
 }
