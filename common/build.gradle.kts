@@ -36,14 +36,21 @@ kotlin {
                 api("androidx.datastore:datastore-preferences-core:${Versions.datastore}")
                 api("org.jetbrains.kotlinx:kotlinx-serialization-json:${Versions.Kotlin.serialization}")
                 api("org.jetbrains.kotlinx:kotlinx-serialization-protobuf:${Versions.Kotlin.serialization}")
+                api("io.insert-koin:koin-core:${Versions.koin}")
             }
         }
         val commonTest by getting {
             dependencies {
                 implementation(kotlin("test"))
+                implementation("io.insert-koin:koin-test:${Versions.koin}")
             }
         }
-        val androidMain by getting
+        val androidMain by getting {
+            dependencies {
+                api("io.insert-koin:koin-android:${Versions.koin}")
+                api("io.insert-koin:koin-androidx-workmanager:${Versions.koin}")
+            }
+        }
         val androidTest by getting
         val desktopMain by getting
         val desktopTest by getting
