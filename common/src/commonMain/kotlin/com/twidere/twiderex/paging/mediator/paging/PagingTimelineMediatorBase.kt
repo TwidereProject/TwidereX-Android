@@ -23,13 +23,12 @@ package com.twidere.twiderex.paging.mediator.paging
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
 import androidx.paging.PagingState
-import androidx.room.withTransaction
 import com.twidere.services.microblog.model.IStatus
+import com.twidere.twiderex.dataprovider.toPagingTimeline
 import com.twidere.twiderex.db.CacheDatabase
-import com.twidere.twiderex.db.mapper.toDbPagingTimeline
-import com.twidere.twiderex.db.model.DbPagingTimelineWithStatus
-import com.twidere.twiderex.db.model.saveToDb
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.paging.PagingTimeLineWithStatus
+import com.twidere.twiderex.model.paging.saveToDb
 import com.twidere.twiderex.paging.IPagination
 import com.twidere.twiderex.paging.IPagingList
 
@@ -42,7 +41,7 @@ abstract class PagingTimelineMediatorBase<T : IPagination>(
 
     override suspend fun load(
         loadType: LoadType,
-        state: PagingState<Int, DbPagingTimelineWithStatus>
+        state: PagingState<Int, PagingTimeLineWithStatus>
     ): MediatorResult {
         try {
             val key = when (loadType) {
@@ -61,9 +60,9 @@ abstract class PagingTimelineMediatorBase<T : IPagination>(
             val last = state.lastItemOrNull()
             val result = load(pageSize, key).let { list ->
                 list.map { status ->
-                    status.toDbPagingTimeline(accountKey, pagingKey)
+                    status.toPagingTimeline(accountKey, pagingKey)
                 }.filter {
-                    last?.status?.status?.data?.statusKey != it.status.status.data.statusKey
+                    last?.status?.statusKey != it.status.statusKey
                 }.let {
                     transform(state, it, list)
                 }.also {
@@ -92,19 +91,19 @@ abstract class PagingTimelineMediatorBase<T : IPagination>(
 
     protected abstract fun provideNextPage(
         raw: List<IStatus>,
-        result: List<DbPagingTimelineWithStatus>
+        result: List<PagingTimeLineWithStatus>
     ): T
 
     protected open fun transform(
-        state: PagingState<Int, DbPagingTimelineWithStatus>,
-        data: List<DbPagingTimelineWithStatus>,
+        state: PagingState<Int, PagingTimeLineWithStatus>,
+        data: List<PagingTimeLineWithStatus>,
         list: List<IStatus>
-    ): List<DbPagingTimelineWithStatus> {
+    ): List<PagingTimeLineWithStatus> {
         return data
     }
 
     protected open fun hasMore(
-        result: List<DbPagingTimelineWithStatus>,
+        result: List<PagingTimeLineWithStatus>,
         pageSize: Int
     ) = result.isNotEmpty()
 

@@ -20,4 +20,10 @@
  */
 package com.twidere.twiderex.db.dao
 
-interface DirectMessageConversationDao
+import androidx.paging.PagingSource
+import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.ui.UiDMConversationWithLatestMessage
+
+interface DirectMessageConversationDao {
+    fun getPagingSource(accountKey: MicroBlogKey): PagingSource<Int, UiDMConversationWithLatestMessage>
+}

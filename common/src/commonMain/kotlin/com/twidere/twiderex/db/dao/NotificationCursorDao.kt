@@ -20,5 +20,12 @@
  */
 package com.twidere.twiderex.db.dao
 
+import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.enums.NotificationCursorType
+import com.twidere.twiderex.model.paging.NotificationCursor
+
 // TODO OPERATION
-interface NotificationCursorDao
+interface NotificationCursorDao {
+    suspend fun find(accountKey: MicroBlogKey, type: NotificationCursorType): NotificationCursor?
+    suspend fun add(notificationCursor: NotificationCursor)
+}

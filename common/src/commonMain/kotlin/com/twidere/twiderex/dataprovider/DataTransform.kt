@@ -20,8 +20,18 @@
  */
 package com.twidere.twiderex.dataprovider
 
+import com.twidere.services.microblog.model.INotification
+import com.twidere.services.microblog.model.IStatus
 import com.twidere.services.microblog.model.IUser
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.paging.PagingTimeLineWithStatus
+import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.model.ui.UiUser
 
 expect fun IUser.toUi(accountKey: MicroBlogKey): UiUser
+
+expect fun IStatus.toUi(accountKey: MicroBlogKey): UiStatus
+
+expect fun INotification.toUi(accountKey: MicroBlogKey): UiStatus
+
+expect fun IStatus.toPagingTimeline(accountKey: MicroBlogKey, pagingKey: String): PagingTimeLineWithStatus

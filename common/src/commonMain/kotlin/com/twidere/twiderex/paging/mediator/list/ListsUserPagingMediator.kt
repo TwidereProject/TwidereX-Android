@@ -26,9 +26,8 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.twidere.services.microblog.model.IPaging
 import com.twidere.services.microblog.model.IUser
-import com.twidere.twiderex.db.mapper.toDbUser
+import com.twidere.twiderex.dataprovider.toUi
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.transform.toUi
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.paging.crud.MemoryCachePagingMediator
 import com.twidere.twiderex.paging.crud.PagingMemoryCache
@@ -46,7 +45,7 @@ abstract class ListsUserPagingMediator(
         return try {
             val result = loadUsers(key, state.config.pageSize)
             val users = result.map {
-                it.toDbUser(userKey).toUi()
+                it.toUi(userKey)
             }
             val nextKey = if (result is IPaging && users.isNotEmpty()) {
                 result.nextPage

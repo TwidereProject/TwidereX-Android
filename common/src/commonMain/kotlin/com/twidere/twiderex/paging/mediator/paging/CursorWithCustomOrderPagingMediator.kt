@@ -23,8 +23,8 @@ package com.twidere.twiderex.paging.mediator.paging
 import androidx.paging.PagingState
 import com.twidere.services.microblog.model.IStatus
 import com.twidere.twiderex.db.CacheDatabase
-import com.twidere.twiderex.db.model.DbPagingTimelineWithStatus
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.paging.PagingTimeLineWithStatus
 import com.twidere.twiderex.paging.ArrayListCompat
 import com.twidere.twiderex.paging.IPagination
 
@@ -48,7 +48,7 @@ abstract class CursorWithCustomOrderPagingMediator(
 ) {
     override fun provideNextPage(
         raw: List<IStatus>,
-        result: List<DbPagingTimelineWithStatus>
+        result: List<PagingTimeLineWithStatus>
     ): CursorWithCustomOrderPagination {
         return if (raw is CursorWithCustomOrderPagingResult<*>) {
             CursorWithCustomOrderPagination(
@@ -57,25 +57,25 @@ abstract class CursorWithCustomOrderPagingMediator(
             )
         } else {
             CursorWithCustomOrderPagination(
-                cursor = result.lastOrNull()?.status?.status?.data?.statusId,
+                cursor = result.lastOrNull()?.status?.statusId,
                 nextOrder = (result.lastOrNull()?.timeline?.sortId ?: 0) - result.size
             )
         }
     }
 
     override fun transform(
-        state: PagingState<Int, DbPagingTimelineWithStatus>,
-        data: List<DbPagingTimelineWithStatus>,
+        state: PagingState<Int, PagingTimeLineWithStatus>,
+        data: List<PagingTimeLineWithStatus>,
         list: List<IStatus>
-    ): List<DbPagingTimelineWithStatus> {
+    ): List<PagingTimeLineWithStatus> {
         val lastId = if (list is CursorWithCustomOrderPagingResult<*>) {
             list.nextOrder
         } else {
             state.lastItemOrNull()?.timeline?.sortId ?: 0
         }
-        return data.mapIndexed { index, dbPagingTimelineWithStatus ->
-            dbPagingTimelineWithStatus.copy(
-                timeline = dbPagingTimelineWithStatus.timeline.copy(
+        return data.mapIndexed { index, pagingTimelineWithStatus ->
+            pagingTimelineWithStatus.copy(
+                timeline = pagingTimelineWithStatus.timeline.copy(
                     sortId = lastId - index
                 )
             )

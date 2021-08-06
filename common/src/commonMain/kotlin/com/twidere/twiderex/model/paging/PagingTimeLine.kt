@@ -18,13 +18,42 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.db.dao
+package com.twidere.twiderex.model.paging
 
+import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiStatus
 
-// TODO OPERATION
-interface StatusDao {
-    suspend fun findWithStatusKey(it: MicroBlogKey): UiStatus
-    suspend fun insertAll(it: List<UiStatus>)
+data class PagingTimeLine(
+    val accountKey: MicroBlogKey,
+    val pagingKey: String,
+    val statusKey: MicroBlogKey,
+    val timestamp: Long,
+    val sortId: Long,
+    var isGap: Boolean,
+    var status: UiStatus
+)
+
+data class PagingTimeLineWithStatus(
+    val timeline: PagingTimeLine,
+    val status: UiStatus,
+)
+
+enum class UserTimelineType {
+    Status,
+    Media,
+    Favourite
+}
+
+fun UserTimelineType.pagingKey(accountKey: MicroBlogKey) = "user:$accountKey:$this"
+
+suspend fun List<PagingTimeLineWithStatus>.saveToDb(
+    database: CacheDatabase,
+) {
+    this.map { it.status }.let {
+        database.statusDao().insertAll(it)
+    }
+    this.map { it.timeline }.let {
+        database.pagingTimelineDao().insertAll(it)
+    }
 }

@@ -18,35 +18,22 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.paging.mediator.user
+package com.twidere.twiderex.paging.mediator.paging
 
-import androidx.paging.ExperimentalPagingApi
-import com.twidere.services.microblog.TimelineService
 import com.twidere.services.microblog.model.IStatus
 import com.twidere.twiderex.db.CacheDatabase
-import com.twidere.twiderex.db.model.UserTimelineType
-import com.twidere.twiderex.db.model.pagingKey
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.paging.PagingTimeLineWithStatus
 import com.twidere.twiderex.paging.SinceMaxPagination
-import com.twidere.twiderex.paging.mediator.paging.MaxIdPagingMediator
 
-@OptIn(ExperimentalPagingApi::class)
-class UserStatusMediator(
-    private val userKey: MicroBlogKey,
-    database: CacheDatabase,
+abstract class MaxIdPagingMediator(
     accountKey: MicroBlogKey,
-    private val service: TimelineService,
-    private val exclude_replies: Boolean = false,
-) : MaxIdPagingMediator(accountKey, database) {
-    override val pagingKey: String
-        get() = UserTimelineType.Status.pagingKey(userKey) + ":exclude_replies=$exclude_replies"
-
-    override suspend fun load(pageSize: Int, paging: SinceMaxPagination?): List<IStatus> {
-        return service.userTimeline(
-            user_id = userKey.id,
-            count = pageSize,
-            max_id = paging?.maxId,
-            exclude_replies = exclude_replies,
-        )
+    database: CacheDatabase,
+) : PagingTimelineMediatorBase<SinceMaxPagination>(accountKey, database) {
+    override fun provideNextPage(
+        raw: List<IStatus>,
+        result: List<PagingTimeLineWithStatus>
+    ): SinceMaxPagination {
+        return SinceMaxPagination(maxId = result.lastOrNull()?.status?.statusId)
     }
 }

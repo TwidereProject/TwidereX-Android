@@ -18,44 +18,51 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.paging.mediator.dm
+package com.twidere.twiderex.paging.mediator.list
 
 import androidx.paging.ExperimentalPagingApi
+import androidx.paging.LoadType
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.PagingSource
-import androidx.paging.map
-import com.twidere.services.microblog.model.IDirectMessage
+import androidx.paging.PagingState
+import androidx.paging.RemoteMediator
+import com.twidere.services.microblog.ListsService
 import com.twidere.twiderex.db.CacheDatabase
-import com.twidere.twiderex.db.model.DbDMEventWithAttachments
 import com.twidere.twiderex.defaultLoadCount
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.transform.toUi
-import com.twidere.twiderex.model.ui.UiDMEvent
+import com.twidere.twiderex.model.ui.UiList
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 
 @OptIn(ExperimentalPagingApi::class)
-class DMEventMediator(
-    private val conversationKey: MicroBlogKey,
-    database: CacheDatabase,
-    accountKey: MicroBlogKey,
-    realFetch: suspend (key: String?) -> List<IDirectMessage>
-) : BaseDirectMessageMediator<Int, DbDMEventWithAttachments>(database, accountKey, realFetch) {
+class ListsMediator(
+    private val database: CacheDatabase,
+    private val service: ListsService,
+    private val accountKey: MicroBlogKey
+) : RemoteMediator<Int, UiList>() {
 
-    override fun reverse() = true
+    override suspend fun load(loadType: LoadType, state: PagingState<Int, UiList>): MediatorResult {
+        return try {
+            if (loadType == LoadType.REFRESH) {
+                val lists = service.lists()
+                database.listsDao().saveLists(accountKey = accountKey, lists = lists)
+            }
+            MediatorResult.Success(endOfPaginationReached = true)
+        } catch (e: Throwable) {
+            MediatorResult.Error(e)
+        }
+    }
 
     fun pager(
         config: PagingConfig = PagingConfig(
             pageSize = defaultLoadCount,
             enablePlaceholders = false
         ),
-        pagingSourceFactory: () -> PagingSource<Int, DbDMEventWithAttachments> = {
-            database.directMessageDao()
-                .getPagingSource(accountKey = accountKey, conversationKey = conversationKey)
+        pagingSourceFactory: () -> PagingSource<Int, UiList> = {
+            database.listsDao().getPagingSource(accountKey = accountKey)
         }
-    ): Pager<Int, DbDMEventWithAttachments> {
+    ): Pager<Int, UiList> {
         return Pager(
             config = config,
             remoteMediator = this,
@@ -64,12 +71,8 @@ class DMEventMediator(
     }
 
     companion object {
-        fun Pager<Int, DbDMEventWithAttachments>.toUi(): Flow<PagingData<UiDMEvent>> {
-            return this.flow.map { pagingData ->
-                pagingData.map {
-                    it.toUi()
-                }
-            }
+        fun Pager<Int, UiList>.toUi(): Flow<PagingData<UiList>> {
+            return this.flow
         }
     }
 }

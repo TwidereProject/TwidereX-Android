@@ -20,4 +20,19 @@
  */
 package com.twidere.twiderex.db.dao
 
-interface PagingTimelineDao
+import androidx.paging.PagingSource
+import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.paging.PagingTimeLine
+import com.twidere.twiderex.model.paging.PagingTimeLineWithStatus
+
+interface PagingTimelineDao {
+    fun getPagingSource(
+        pagingKey: String,
+        accountKey: MicroBlogKey
+    ): PagingSource<Int, PagingTimeLineWithStatus>
+
+    suspend fun clearAll(pagingKey: String, accountKey: MicroBlogKey)
+    suspend fun getLatest(pagingKey: String, accountKey: MicroBlogKey): PagingTimeLineWithStatus?
+    suspend fun findWithStatusKey(maxStatusKey: MicroBlogKey, accountKey: MicroBlogKey): PagingTimeLine?
+    suspend fun insertAll(listOf: List<PagingTimeLine>)
+}

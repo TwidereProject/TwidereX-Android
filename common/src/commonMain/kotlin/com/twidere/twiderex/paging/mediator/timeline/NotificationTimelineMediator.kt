@@ -23,9 +23,9 @@ package com.twidere.twiderex.paging.mediator.timeline
 import com.twidere.services.microblog.NotificationService
 import com.twidere.services.microblog.model.IStatus
 import com.twidere.twiderex.db.CacheDatabase
-import com.twidere.twiderex.db.model.DbPagingTimelineWithStatus
-import com.twidere.twiderex.db.model.NotificationCursorType
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.enums.NotificationCursorType
+import com.twidere.twiderex.model.paging.PagingTimeLineWithStatus
 import com.twidere.twiderex.paging.mediator.paging.PagingWithGapMediator
 import com.twidere.twiderex.repository.NotificationRepository
 
@@ -42,15 +42,15 @@ class NotificationTimelineMediator(
     ) = service.notificationTimeline(count = pageSize, max_id = max_id, since_id = since_id)
 
     override suspend fun transform(
-        data: List<DbPagingTimelineWithStatus>,
+        data: List<PagingTimeLineWithStatus>,
         list: List<IStatus>
-    ): List<DbPagingTimelineWithStatus> {
+    ): List<PagingTimeLineWithStatus> {
         if (data.any()) {
             notificationRepository.addCursorIfNeeded(
                 accountKey,
                 NotificationCursorType.General,
-                data.first().status.status.data.statusId,
-                data.first().status.status.data.timestamp,
+                data.first().status.statusId,
+                data.first().status.timestamp,
             )
         }
         return super.transform(data, list)

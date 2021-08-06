@@ -23,8 +23,8 @@ package com.twidere.twiderex.paging.mediator.search
 import com.twidere.services.microblog.SearchService
 import com.twidere.services.microblog.model.IStatus
 import com.twidere.twiderex.db.CacheDatabase
-import com.twidere.twiderex.db.model.DbPagingTimelineWithStatus
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.paging.PagingTimeLineWithStatus
 import com.twidere.twiderex.paging.CursorPagination
 import com.twidere.twiderex.paging.mediator.paging.CursorPagingMediator
 import com.twidere.twiderex.paging.mediator.paging.CursorPagingResult
@@ -41,7 +41,7 @@ class SearchStatusMediator(
         return CursorPagingResult(result.status, result.nextPage)
     }
 
-    override fun hasMore(result: List<DbPagingTimelineWithStatus>, pageSize: Int): Boolean {
+    override fun hasMore(result: List<PagingTimeLineWithStatus>, pageSize: Int): Boolean {
         return result.size == pageSize
     }
 }

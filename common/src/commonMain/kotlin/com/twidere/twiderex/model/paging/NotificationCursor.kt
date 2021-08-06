@@ -18,22 +18,14 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.paging.mediator.paging
-
-import com.twidere.services.microblog.model.IStatus
-import com.twidere.twiderex.db.CacheDatabase
-import com.twidere.twiderex.db.model.DbPagingTimelineWithStatus
+package com.twidere.twiderex.model.paging
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.paging.SinceMaxPagination
+import com.twidere.twiderex.model.enums.NotificationCursorType
 
-abstract class MaxIdPagingMediator(
-    accountKey: MicroBlogKey,
-    database: CacheDatabase,
-) : PagingTimelineMediatorBase<SinceMaxPagination>(accountKey, database) {
-    override fun provideNextPage(
-        raw: List<IStatus>,
-        result: List<DbPagingTimelineWithStatus>
-    ): SinceMaxPagination {
-        return SinceMaxPagination(maxId = result.lastOrNull()?.status?.status?.data?.statusId)
-    }
-}
+data class NotificationCursor(
+    val _id: String,
+    val accountKey: MicroBlogKey,
+    val type: NotificationCursorType,
+    val value: String,
+    val timestamp: Long,
+)

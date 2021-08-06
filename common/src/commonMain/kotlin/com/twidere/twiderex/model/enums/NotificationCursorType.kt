@@ -18,19 +18,10 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.db.dao
+package com.twidere.twiderex.model.enums
 
-import androidx.paging.PagingSource
-import com.twidere.services.microblog.model.IListModel
-import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.ui.UiList
-
-// TODO OPERATION
-interface ListsDao {
-    // Todo implement
-    //  database.listsDao().clearAll(accountKey)
-    //        database.listsDao().insertAll(lists)
-    fun saveLists(accountKey: MicroBlogKey, lists: List<IListModel>)
-
-    fun getPagingSource(accountKey: MicroBlogKey): PagingSource<Int, UiList>
+enum class NotificationCursorType {
+    General,
+    Mentions,
+    Follower,
 }

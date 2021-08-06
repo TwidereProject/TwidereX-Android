@@ -25,11 +25,11 @@ import com.twidere.services.mastodon.model.MastodonPaging
 import com.twidere.services.microblog.TimelineService
 import com.twidere.services.microblog.model.IStatus
 import com.twidere.twiderex.db.CacheDatabase
-import com.twidere.twiderex.db.model.DbPagingTimelineWithStatus
-import com.twidere.twiderex.db.model.UserTimelineType
-import com.twidere.twiderex.db.model.pagingKey
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.PlatformType
+import com.twidere.twiderex.model.paging.PagingTimeLineWithStatus
+import com.twidere.twiderex.model.paging.UserTimelineType
+import com.twidere.twiderex.model.paging.pagingKey
 import com.twidere.twiderex.paging.mediator.paging.CursorWithCustomOrderPagination
 import com.twidere.twiderex.paging.mediator.paging.CursorWithCustomOrderPagingMediator
 import com.twidere.twiderex.paging.mediator.paging.CursorWithCustomOrderPagingResult
@@ -65,7 +65,7 @@ class UserFavouriteMediator(
         }
     }
 
-    override fun hasMore(result: List<DbPagingTimelineWithStatus>, pageSize: Int): Boolean {
+    override fun hasMore(result: List<PagingTimeLineWithStatus>, pageSize: Int): Boolean {
         return if (platformType == PlatformType.Mastodon) {
             result.size == pageSize
         } else {

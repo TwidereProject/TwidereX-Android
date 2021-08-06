@@ -20,15 +20,14 @@
  */
 package com.twidere.twiderex.repository
 
+import com.twidere.services.microblog.MicroBlogService
 import com.twidere.services.microblog.NotificationService
 import com.twidere.services.microblog.TimelineService
+import com.twidere.twiderex.dataprovider.toUi
 import com.twidere.twiderex.db.CacheDatabase
-import com.twidere.twiderex.db.mapper.toDbStatusWithReference
-import com.twidere.twiderex.db.model.DbNotificationCursor
-import com.twidere.twiderex.db.model.NotificationCursorType
-import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.transform.toUi
+import com.twidere.twiderex.model.enums.NotificationCursorType
+import com.twidere.twiderex.model.paging.NotificationCursor
 import com.twidere.twiderex.model.ui.UiStatus
 import java.util.UUID
 
@@ -36,21 +35,22 @@ class NotificationRepository(
     private val database: CacheDatabase,
 ) {
     suspend fun activities(
-        account: AccountDetails,
+        accountKey: MicroBlogKey,
+        service: MicroBlogService
     ): List<UiStatus> {
-        return when (val service = account.service) {
+        return when (service) {
             is NotificationService -> {
                 val notifications = service.notificationTimeline()
-                    .map { it.toDbStatusWithReference(account.accountKey) }
-                    .map { it.toUi(account.accountKey) }
-                takeActivities(account, NotificationCursorType.General, notifications)
+                    .map {
+                        it.toUi(accountKey)
+                    }
+                takeActivities(accountKey, NotificationCursorType.General, notifications)
             }
             else -> {
                 if (service is TimelineService) {
                     val mentions = service.mentionsTimeline()
-                        .map { it.toDbStatusWithReference(account.accountKey) }
-                        .map { it.toUi(account.accountKey) }
-                    takeActivities(account, NotificationCursorType.Mentions, mentions)
+                        .map { it.toUi(accountKey) }
+                    takeActivities(accountKey, NotificationCursorType.Mentions, mentions)
                 } else {
                     emptyList()
                 }
@@ -59,14 +59,14 @@ class NotificationRepository(
     }
 
     private suspend fun takeActivities(
-        account: AccountDetails,
+        accountKey: MicroBlogKey,
         type: NotificationCursorType,
         notifications: List<UiStatus>
     ): List<UiStatus> {
-        val currentCursor = findCursor(account.accountKey, type)
+        val currentCursor = findCursor(accountKey, type)
         if (notifications.any() && (currentCursor == null || currentCursor.timestamp < notifications.first().timestamp)) {
             addCursor(
-                accountKey = account.accountKey,
+                accountKey = accountKey,
                 type = type,
                 value = notifications.first().statusId,
                 timestamp = notifications.first().timestamp,
@@ -95,7 +95,7 @@ class NotificationRepository(
     ) {
         database.notificationCursorDao()
             .add(
-                DbNotificationCursor(
+                NotificationCursor(
                     _id = UUID.randomUUID().toString(),
                     accountKey = accountKey,
                     type = type,

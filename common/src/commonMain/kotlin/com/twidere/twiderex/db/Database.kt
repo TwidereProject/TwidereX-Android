@@ -22,4 +22,5 @@ package com.twidere.twiderex.db
 
 interface Database {
     suspend fun clearAllTables()
+    fun <R> withTransaction(block: suspend () -> R): R
 }

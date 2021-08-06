@@ -23,13 +23,12 @@ package com.twidere.twiderex.paging.mediator.paging
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
 import androidx.paging.PagingState
-import androidx.room.withTransaction
 import com.twidere.services.microblog.model.IStatus
+import com.twidere.twiderex.dataprovider.toPagingTimeline
 import com.twidere.twiderex.db.CacheDatabase
-import com.twidere.twiderex.db.mapper.toDbPagingTimeline
-import com.twidere.twiderex.db.model.DbPagingTimelineWithStatus
-import com.twidere.twiderex.db.model.saveToDb
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.paging.PagingTimeLineWithStatus
+import com.twidere.twiderex.model.paging.saveToDb
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -51,7 +50,7 @@ abstract class PagingWithGapMediator(
 
     override suspend fun load(
         loadType: LoadType,
-        state: PagingState<Int, DbPagingTimelineWithStatus>
+        state: PagingState<Int, PagingTimeLineWithStatus>
     ): MediatorResult {
         val maxStatusKey = when (loadType) {
             LoadType.APPEND -> {
@@ -59,7 +58,7 @@ abstract class PagingWithGapMediator(
                     ?: return MediatorResult.Success(
                         endOfPaginationReached = true
                     )
-                lastItem.status.status.data.statusKey
+                lastItem.status.statusKey
             }
             LoadType.PREPEND -> {
                 return MediatorResult.Success(endOfPaginationReached = true)
@@ -78,7 +77,7 @@ abstract class PagingWithGapMediator(
             LoadType.REFRESH -> {
                 withContext(Dispatchers.IO) {
                     database.pagingTimelineDao()
-                        .getLatest(pagingKey, accountKey)?.status?.status?.data?.statusKey
+                        .getLatest(pagingKey, accountKey)?.status?.statusKey
                 }
             }
         }
@@ -103,7 +102,7 @@ abstract class PagingWithGapMediator(
             }
             val result = loadBetweenImpl(pageSize, max_id = max_id, since_id = null).let { list ->
                 list.map {
-                    it.toDbPagingTimeline(accountKey, pagingKey)
+                    it.toPagingTimeline(accountKey, pagingKey)
                 }.let {
                     transform(it, list)
                 }
@@ -117,7 +116,7 @@ abstract class PagingWithGapMediator(
                 }
                 if (sinceStatusKey != null) {
                     result.lastOrNull()?.let {
-                        database.pagingTimelineDao().findWithStatusKey(it.timeline.statusKey, accountKey = accountKey)
+                        database.pagingTimelineDao().findWithStatusKey(it.status.statusKey, accountKey = accountKey)
                     }.let {
                         result.lastOrNull()?.timeline?.isGap = it == null
                     }
@@ -137,9 +136,9 @@ abstract class PagingWithGapMediator(
     }
 
     protected open suspend fun transform(
-        data: List<DbPagingTimelineWithStatus>,
+        data: List<PagingTimeLineWithStatus>,
         list: List<IStatus>
-    ): List<DbPagingTimelineWithStatus> {
+    ): List<PagingTimeLineWithStatus> {
         return data
     }
 

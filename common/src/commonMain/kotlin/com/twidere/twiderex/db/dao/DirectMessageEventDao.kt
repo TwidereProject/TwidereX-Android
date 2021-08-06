@@ -20,5 +20,14 @@
  */
 package com.twidere.twiderex.db.dao
 
+import androidx.paging.PagingSource
+import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.ui.UiDMEvent
+
 // TODO OPERATION
-interface DirectMessageEventDao
+interface DirectMessageEventDao {
+    fun getPagingSource(
+        accountKey: MicroBlogKey,
+        conversationKey: MicroBlogKey
+    ): PagingSource<Int, UiDMEvent>
+}

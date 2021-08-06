@@ -23,8 +23,8 @@ package com.twidere.twiderex.paging.mediator.status
 import com.twidere.services.mastodon.MastodonService
 import com.twidere.services.microblog.model.IStatus
 import com.twidere.twiderex.db.CacheDatabase
-import com.twidere.twiderex.db.model.DbPagingTimelineWithStatus
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.paging.PagingTimeLineWithStatus
 import com.twidere.twiderex.paging.mediator.paging.CursorWithCustomOrderPagination
 import com.twidere.twiderex.paging.mediator.paging.CursorWithCustomOrderPagingMediator
 import com.twidere.twiderex.paging.mediator.paging.CursorWithCustomOrderPagingResult
@@ -50,7 +50,7 @@ class MastodonStatusContextMediator(
 
     override val pagingKey: String = "status:$statusKey"
 
-    override fun hasMore(result: List<DbPagingTimelineWithStatus>, pageSize: Int): Boolean {
+    override fun hasMore(result: List<PagingTimeLineWithStatus>, pageSize: Int): Boolean {
         return false
     }
 }

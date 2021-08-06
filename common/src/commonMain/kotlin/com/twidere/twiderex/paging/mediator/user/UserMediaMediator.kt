@@ -25,11 +25,11 @@ import androidx.paging.PagingState
 import com.twidere.services.microblog.TimelineService
 import com.twidere.services.microblog.model.IStatus
 import com.twidere.twiderex.db.CacheDatabase
-import com.twidere.twiderex.db.model.DbPagingTimelineWithStatus
-import com.twidere.twiderex.db.model.UserTimelineType
-import com.twidere.twiderex.db.model.pagingKey
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.ReferenceType
+import com.twidere.twiderex.model.paging.PagingTimeLineWithStatus
+import com.twidere.twiderex.model.paging.UserTimelineType
+import com.twidere.twiderex.model.paging.pagingKey
 import com.twidere.twiderex.paging.PagingList
 import com.twidere.twiderex.paging.SinceMaxPagination
 import com.twidere.twiderex.paging.mediator.paging.MaxIdPagingMediator
@@ -55,7 +55,7 @@ class UserMediaMediator(
 
     override fun provideNextPage(
         raw: List<IStatus>,
-        result: List<DbPagingTimelineWithStatus>
+        result: List<PagingTimeLineWithStatus>
     ): SinceMaxPagination {
         if (result is PagingList<*, *>) {
             return result.nextPage as SinceMaxPagination
@@ -64,17 +64,17 @@ class UserMediaMediator(
     }
 
     override fun transform(
-        state: PagingState<Int, DbPagingTimelineWithStatus>,
-        data: List<DbPagingTimelineWithStatus>,
+        state: PagingState<Int, PagingTimeLineWithStatus>,
+        data: List<PagingTimeLineWithStatus>,
         list: List<IStatus>,
-    ): List<DbPagingTimelineWithStatus> {
+    ): List<PagingTimeLineWithStatus> {
         return PagingList(
             data.filter {
-                val content = it.status.status
-                !it.status.references.any { it.reference.referenceType == ReferenceType.Retweet } &&
-                    content.data.hasMedia && content.user.userKey == userKey
+                val content = it.status
+                !it.status.referenceStatus.any { reference -> reference.key == ReferenceType.Retweet } &&
+                    content.hasMedia && content.user.userKey == userKey
             },
-            SinceMaxPagination(maxId = data.lastOrNull()?.status?.status?.data?.statusId)
+            SinceMaxPagination(maxId = data.lastOrNull()?.status?.statusId)
         )
     }
 }

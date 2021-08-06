@@ -28,18 +28,12 @@ import androidx.paging.PagingData
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
-import androidx.paging.map
 import com.twidere.services.microblog.TrendService
 import com.twidere.twiderex.db.CacheDatabase
-import com.twidere.twiderex.db.mapper.toDbTrend
-import com.twidere.twiderex.db.model.DbTrendWithHistory
-import com.twidere.twiderex.db.model.saveToDb
 import com.twidere.twiderex.defaultLoadCount
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.transform.toUi
 import com.twidere.twiderex.model.ui.UiTrend
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 
 @OptIn(ExperimentalPagingApi::class)
 class TrendMediator(
@@ -47,16 +41,16 @@ class TrendMediator(
     private val service: TrendService,
     private val accountKey: MicroBlogKey,
     private val locationId: String
-) : RemoteMediator<Int, DbTrendWithHistory>() {
+) : RemoteMediator<Int, UiTrend>() {
 
     override suspend fun load(
         loadType: LoadType,
-        state: PagingState<Int, DbTrendWithHistory>
+        state: PagingState<Int, UiTrend>
     ): MediatorResult {
         return try {
             if (loadType == LoadType.REFRESH) {
-                val lists = service.trends(locationId).map { it.toDbTrend(accountKey) }
-                saveLists(lists)
+                val lists = service.trends(locationId)
+                database.trendDao().saveTrend(accountKey = accountKey, trends = lists)
             }
             MediatorResult.Success(endOfPaginationReached = true)
         } catch (e: Throwable) {
@@ -69,10 +63,10 @@ class TrendMediator(
             pageSize = defaultLoadCount,
             enablePlaceholders = false
         ),
-        pagingSourceFactory: () -> PagingSource<Int, DbTrendWithHistory> = {
+        pagingSourceFactory: () -> PagingSource<Int, UiTrend> = {
             database.trendDao().getPagingSource(accountKey = accountKey)
         }
-    ): Pager<Int, DbTrendWithHistory> {
+    ): Pager<Int, UiTrend> {
         return Pager(
             config = config,
             remoteMediator = this,
@@ -80,18 +74,9 @@ class TrendMediator(
         )
     }
 
-    private suspend fun saveLists(lists: List<DbTrendWithHistory>) {
-        database.trendDao().clearAll(accountKey)
-        lists.saveToDb(database)
-    }
-
     companion object {
-        fun Pager<Int, DbTrendWithHistory>.toUi(): Flow<PagingData<UiTrend>> {
-            return this.flow.map { pagingData ->
-                pagingData.map {
-                    it.toUi()
-                }
-            }
+        fun Pager<Int, UiTrend>.toUi(): Flow<PagingData<UiTrend>> {
+            return this.flow
         }
     }
 }
