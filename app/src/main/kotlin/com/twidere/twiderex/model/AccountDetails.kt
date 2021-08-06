@@ -70,6 +70,8 @@ data class AccountDetails(
             PlatformType.Mastodon -> ListType.Owned
         }
 
+    val supportDirectMessage = type == PlatformType.Twitter
+
     fun toUi() = with(user) {
         UiUser(
             id = userId,
