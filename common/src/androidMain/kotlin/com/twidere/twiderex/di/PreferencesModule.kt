@@ -20,6 +20,14 @@
  */
 package com.twidere.twiderex.di
 
-fun setupModules() {
-    preferencesModule()
+import android.content.Context
+import com.twidere.twiderex.di.ext.get
+import java.io.File
+
+internal actual fun createDataStoreFile(name: String): File {
+    val context = get<Context>()
+    return File(
+        context.applicationContext.filesDir,
+        "datastore/$name"
+    )
 }

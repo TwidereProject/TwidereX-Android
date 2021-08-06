@@ -26,36 +26,19 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.datastore.core.DataStore
 import com.twidere.services.http.config.HttpConfig
 import com.twidere.services.proxy.ProxyConfig
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.flow.firstOrNull
+import com.twidere.twiderex.di.PreferencesHolder
 import kotlinx.coroutines.flow.map
 
-val LocalAppearancePreferences =
+internal val LocalAppearancePreferences =
     compositionLocalOf<AppearancePreferences> { error("No AppearancePreferences") }
-val LocalDisplayPreferences =
+internal val LocalDisplayPreferences =
     compositionLocalOf<DisplayPreferences> { error("No DisplayPreferences") }
-val LocalHttpConfig = compositionLocalOf<HttpConfig> { error("No Http config preferences") }
-data class PreferencesHolder(
-    val appearancePreferences: DataStore<AppearancePreferences>,
-    val displayPreferences: DataStore<DisplayPreferences>,
-    val miscPreferences: DataStore<MiscPreferences>
-) {
-    suspend fun warmup() = coroutineScope {
-        awaitAll(
-            async { appearancePreferences.data.firstOrNull() },
-            async { displayPreferences.data.firstOrNull() },
-            async { miscPreferences.data.firstOrNull() },
-        )
-    }
-}
+internal val LocalHttpConfig = compositionLocalOf<HttpConfig> { error("No Http config preferences") }
 
 @Composable
-fun ProvidePreferences(
+internal fun ProvidePreferences(
     holder: PreferencesHolder,
     content: @Composable () -> Unit,
 ) {
