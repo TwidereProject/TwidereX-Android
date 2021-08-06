@@ -24,14 +24,14 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.twidere.services.microblog.model.IPaging
 import com.twidere.services.microblog.model.IUser
-import com.twidere.twiderex.db.mapper.toDbUser
+import com.twidere.twiderex.dataprovider.toUi
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.transform.toUi
 import com.twidere.twiderex.model.ui.UiUser
 
 abstract class UserPagingSource(
     protected val userKey: MicroBlogKey,
 ) : PagingSource<String, UiUser>() {
+
     override fun getRefreshKey(state: PagingState<String, UiUser>): String? {
         return null
     }
@@ -40,7 +40,7 @@ abstract class UserPagingSource(
         return try {
             val result = loadUsers(params)
             val users = result.map {
-                it.toDbUser(userKey).toUi()
+                it.toUi(userKey)
             }
             val nextPage = if (result is IPaging && users.isNotEmpty()) {
                 result.nextPage

@@ -22,36 +22,35 @@ package com.twidere.twiderex.paging.source
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.twidere.services.microblog.RelationshipService
-import com.twidere.services.microblog.model.IPaging
-import com.twidere.twiderex.db.mapper.toDbUser
+import com.twidere.services.microblog.SearchService
+import com.twidere.twiderex.dataprovider.toUi
+import com.twidere.twiderex.defaultLoadCount
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.transform.toUi
 import com.twidere.twiderex.model.ui.UiUser
 
-class FollowersPagingSource(
-    private val userKey: MicroBlogKey,
-    private val service: RelationshipService
-) : PagingSource<String, UiUser>() {
-    override suspend fun load(params: LoadParams<String>): LoadResult<String, UiUser> {
+class SearchUserPagingSource(
+    private val accountKey: MicroBlogKey,
+    private val query: String,
+    private val service: SearchService,
+    private val following: Boolean = false
+) : PagingSource<Int, UiUser>() {
+    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, UiUser> {
         return try {
-            val page = params.key
-            val result = service.followers(userKey.id, nextPage = page)
-            val users = result.map {
-                it.toDbUser(userKey).toUi()
+            val page = params.key ?: 0
+            val result = service.searchUsers(query, page = page, count = defaultLoadCount, following = following).map {
+                it.toUi(accountKey)
             }
-            val nextPage = if (result is IPaging) {
-                result.nextPage
-            } else {
-                null
-            }
-            LoadResult.Page(data = users, prevKey = null, nextKey = nextPage)
+            LoadResult.Page(
+                data = result,
+                prevKey = null,
+                nextKey = if (result.size == defaultLoadCount) page + 1 else null
+            )
         } catch (e: Exception) {
             LoadResult.Error(e)
         }
     }
 
-    override fun getRefreshKey(state: PagingState<String, UiUser>): String? {
+    override fun getRefreshKey(state: PagingState<Int, UiUser>): Int? {
         return null
     }
 }

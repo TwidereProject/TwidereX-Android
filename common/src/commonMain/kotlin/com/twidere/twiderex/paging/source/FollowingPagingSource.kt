@@ -24,9 +24,8 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.twidere.services.microblog.RelationshipService
 import com.twidere.services.microblog.model.IPaging
-import com.twidere.twiderex.db.mapper.toDbUser
+import com.twidere.twiderex.dataprovider.toUi
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.transform.toUi
 import com.twidere.twiderex.model.ui.UiUser
 
 class FollowingPagingSource(
@@ -38,7 +37,7 @@ class FollowingPagingSource(
             val page = params.key
             val result = service.following(userKey.id, nextPage = page)
             val users = result.map {
-                it.toDbUser(userKey).toUi()
+                it.toUi(userKey)
             }
             val nextPage = if (result is IPaging) {
                 result.nextPage
