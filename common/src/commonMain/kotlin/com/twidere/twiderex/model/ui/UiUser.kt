@@ -22,8 +22,6 @@ package com.twidere.twiderex.model.ui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
-import androidx.compose.ui.res.painterResource
-import com.twidere.twiderex.R
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.mastodon.MastodonUserExtra
@@ -68,7 +66,7 @@ data class UiUser(
             id = "",
             name = "Twidere",
             screenName = "TwidereProject",
-            profileImage = painterResource(id = R.drawable.ic_profile_image_twidere),
+            profileImage = "", // painterResource(id = R.drawable.ic_profile_image_twidere),
             profileBackgroundImage = null,
             metrics = UserMetrics(
                 fans = 0,

@@ -20,7 +20,6 @@
  */
 package com.twidere.twiderex.model.ui
 
-import com.twidere.twiderex.db.model.DbDMConversation
 import com.twidere.twiderex.model.MicroBlogKey
 
 data class UiDMConversation(
@@ -31,9 +30,14 @@ data class UiDMConversation(
     val conversationAvatar: String,
     val conversationName: String,
     val conversationSubName: String,
-    val conversationType: DbDMConversation.Type,
+    val conversationType: Type,
     val recipientKey: MicroBlogKey,
-)
+) {
+    enum class Type {
+        ONE_TO_ONE,
+        GROUP
+    }
+}
 
 data class UiDMConversationWithLatestMessage(
     val conversation: UiDMConversation,

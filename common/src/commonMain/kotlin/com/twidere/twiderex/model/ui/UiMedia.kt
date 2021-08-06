@@ -23,8 +23,6 @@ package com.twidere.twiderex.model.ui
 import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
-import androidx.compose.ui.res.painterResource
-import com.twidere.twiderex.R
 import com.twidere.twiderex.model.enums.MediaType
 
 @Immutable
@@ -64,10 +62,10 @@ data class UiMedia(
             UiMedia(
                 url = null,
                 mediaUrl = null,
-                previewUrl = painterResource(id = R.drawable.featured_graphics),
+                previewUrl = "", // painterResource(id = R.drawable.featured_graphics),
                 type = MediaType.photo,
-                width = painterResource(id = R.drawable.featured_graphics).intrinsicSize.width.toLong(),
-                height = painterResource(id = R.drawable.featured_graphics).intrinsicSize.height.toLong(),
+                width = 0, // painterResource(id = R.drawable.featured_graphics).intrinsicSize.width.toLong(),
+                height = 0, // painterResource(id = R.drawable.featured_graphics).intrinsicSize.height.toLong(),
                 pageUrl = null,
                 altText = "",
             ),

@@ -20,7 +20,6 @@
  */
 package com.twidere.twiderex.model.ui
 
-import com.twidere.twiderex.db.model.DbDMEvent
 import com.twidere.twiderex.model.MicroBlogKey
 
 data class UiDMEvent(
@@ -37,11 +36,17 @@ data class UiDMEvent(
     val messageType: String,
     val senderAccountKey: MicroBlogKey,
     val recipientAccountKey: MicroBlogKey,
-    val sendStatus: DbDMEvent.SendStatus,
+    val sendStatus: SendStatus,
     val media: List<UiMedia>,
     val urlEntity: List<UiUrlEntity>,
     val sender: UiUser
 ) {
     val isInCome: Boolean
         get() = recipientAccountKey == accountKey
+
+    enum class SendStatus {
+        PENDING,
+        SUCCESS,
+        FAILED
+    }
 }

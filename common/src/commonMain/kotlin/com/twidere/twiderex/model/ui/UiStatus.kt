@@ -22,8 +22,6 @@ package com.twidere.twiderex.model.ui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
-import androidx.compose.ui.res.stringResource
-import com.twidere.twiderex.R
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.MastodonStatusType
 import com.twidere.twiderex.model.enums.PlatformType
@@ -98,7 +96,7 @@ data class UiStatus(
         @Composable
         fun sample() = UiStatus(
             statusId = "",
-            htmlText = stringResource(id = R.string.scene_settings_display_preview_thank_for_using_twidere_x),
+            htmlText = "", // stringResource(id = R.string.scene_settings_display_preview_thank_for_using_twidere_x),
             timestamp = System.currentTimeMillis(),
             metrics = StatusMetrics(
                 retweet = 1200,

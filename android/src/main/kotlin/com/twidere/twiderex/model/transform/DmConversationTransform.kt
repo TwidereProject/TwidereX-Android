@@ -21,6 +21,7 @@
 package com.twidere.twiderex.model.transform
 
 import com.twidere.twiderex.db.model.DbDMConversation
+import com.twidere.twiderex.db.model.DbDMEvent
 import com.twidere.twiderex.db.model.DbDMEventWithAttachments
 import com.twidere.twiderex.db.model.DbDirectMessageConversationWithMessage
 import com.twidere.twiderex.model.ui.UiDMConversation
@@ -34,7 +35,10 @@ fun DbDMConversation.toUi() = UiDMConversation(
     conversationAvatar = conversationAvatar,
     conversationName = conversationName,
     conversationSubName = conversationSubName,
-    conversationType = conversationType,
+    conversationType = when (conversationType) {
+        DbDMConversation.Type.ONE_TO_ONE -> UiDMConversation.Type.ONE_TO_ONE
+        DbDMConversation.Type.GROUP -> UiDMConversation.Type.GROUP
+    },
     recipientKey = recipientKey,
 )
 
@@ -55,7 +59,11 @@ fun DbDMEventWithAttachments.toUi() = UiDMEvent(
     messageType = message.messageType,
     senderAccountKey = message.senderAccountKey,
     recipientAccountKey = message.recipientAccountKey,
-    sendStatus = message.sendStatus,
+    sendStatus = when (message.sendStatus) {
+        DbDMEvent.SendStatus.PENDING -> UiDMEvent.SendStatus.PENDING
+        DbDMEvent.SendStatus.SUCCESS -> UiDMEvent.SendStatus.SUCCESS
+        DbDMEvent.SendStatus.FAILED -> UiDMEvent.SendStatus.FAILED
+    },
     media = media.toUi(),
     urlEntity = urlEntity.toUi(),
     sender = sender.toUi()
