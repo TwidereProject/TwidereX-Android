@@ -24,7 +24,7 @@ import com.twidere.twiderex.db.dao.DraftDao
 import com.twidere.twiderex.db.dao.SearchDao
 
 internal class AndroidAppDatabase : AppDatabase {
-    override fun clearAllTables() {
+    override suspend fun clearAllTables() {
         TODO("Not yet implemented")
     }
 

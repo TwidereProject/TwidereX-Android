@@ -21,7 +21,7 @@
 package com.twidere.twiderex.db
 
 internal class DesktopCacheDatabaseImpl : Database {
-    override fun clearAllTables() {
+    override suspend fun clearAllTables() {
         TODO("Not yet implemented")
     }
 }

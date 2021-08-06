@@ -20,5 +20,10 @@
  */
 package com.twidere.twiderex.db.dao
 
+import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.ui.UiMedia
+
 // TODO OPERATION
-interface MediaDao
+interface MediaDao {
+    suspend fun findMediaByBelongToKey(belongToKey: MicroBlogKey): List<UiMedia>
+}

@@ -32,7 +32,7 @@ internal class DesktopAppDatabaseImpl : AppDatabase {
         TODO("Not yet implemented")
     }
 
-    override fun clearAllTables() {
+    override suspend fun clearAllTables() {
         TODO("Not yet implemented")
     }
 }

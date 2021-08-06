@@ -18,15 +18,10 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.repository
+package com.twidere.twiderex.cache
 
-import com.twidere.twiderex.db.CacheDatabase
-import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.transform.toUi
-
-class MediaRepository(private val database: CacheDatabase) {
-
-    suspend fun findMediaByBelongToKey(
-        belongToKey: MicroBlogKey
-    ) = database.mediaDao().findMediaByBelongToKey(belongToKey).toUi()
+actual class MediaCache {
+    actual fun clear() {
+        TODO("Not yet implemented")
+    }
 }

@@ -18,8 +18,12 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.db
+package com.twidere.twiderex.repository
+import com.twidere.twiderex.dataprovider.DataProvider
+import com.twidere.twiderex.model.MicroBlogKey
 
-interface Database {
-    suspend fun clearAllTables()
+class MediaRepository(private val provider: DataProvider = DataProvider.create()) {
+    suspend fun findMediaByBelongToKey(
+        belongToKey: MicroBlogKey
+    ) = provider.cacheDatabase.mediaDao().findMediaByBelongToKey(belongToKey)
 }

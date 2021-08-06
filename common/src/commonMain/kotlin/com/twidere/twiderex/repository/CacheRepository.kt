@@ -29,7 +29,7 @@ import okhttp3.Cache
 import java.io.File
 
 class CacheRepository(
-    private val dataProvider: DataProvider,
+    private val dataProvider: DataProvider = DataProvider.create(),
     private val cache: Cache,
     private val mediaCache: MediaCache,
     private val cacheDirs: List<File>,

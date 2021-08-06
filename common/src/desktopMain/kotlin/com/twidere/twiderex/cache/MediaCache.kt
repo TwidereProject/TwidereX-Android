@@ -18,8 +18,10 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.db
+package com.twidere.twiderex.cache
 
-interface Database {
-    suspend fun clearAllTables()
+actual class MediaCache {
+    actual fun clear() {
+        TODO("Not yet implemented")
+    }
 }
