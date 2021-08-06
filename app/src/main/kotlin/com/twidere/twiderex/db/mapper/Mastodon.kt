@@ -192,7 +192,7 @@ private fun Status.toDbStatusWithMediaAndUser(
     val status = DbStatusV2(
         _id = UUID.randomUUID().toString(),
         statusId = id ?: throw IllegalArgumentException("mastodon Status.idStr should not be null"),
-        rawText = content ?: "",
+        rawText = content?.let { Jsoup.parse(it).wholeText() } ?: "",
         htmlText = content?.let {
             generateHtmlContentWithEmoji(
                 content = it,
