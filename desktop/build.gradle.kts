@@ -31,7 +31,7 @@ compose {
         application {
             mainClass = "com.twidere.twiderex.MainKt"
             nativeDistributions {
-                targetFormats(TargetFormat.Dmg, TargetFormat.Exe, TargetFormat.AppImage)
+                targetFormats(TargetFormat.Dmg, TargetFormat.Exe, TargetFormat.Deb)
                 packageName = Package.id
                 packageVersion = Package.versionName.split("-").firstOrNull()
             }
