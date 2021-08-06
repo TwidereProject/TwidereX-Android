@@ -47,6 +47,7 @@ kotlin {
         val androidMain by getting {
             dependencies {
                 api("io.insert-koin:koin-android:${Versions.koin}")
+                api("io.insert-koin:koin-androidx-workmanager:${Versions.koin}")
             }
         }
         val androidTest by getting
