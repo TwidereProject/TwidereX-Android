@@ -42,6 +42,8 @@ kotlin {
         val commonTest by getting {
             dependencies {
                 implementation(kotlin("test"))
+                implementation("io.insert-koin:koin-test:${Versions.koin}")
+                implementation("io.insert-koin:koin-test-junit5:${Versions.koin}")
             }
         }
         val androidMain by getting {
