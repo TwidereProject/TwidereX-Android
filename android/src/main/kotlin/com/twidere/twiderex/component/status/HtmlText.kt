@@ -31,6 +31,7 @@ import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,6 +39,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.consumeDownChange
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.PlaceholderVerticalAlign
@@ -51,6 +53,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.ExperimentalUnitApi
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.TextUnit
 import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.navigation.LocalNavigator
@@ -59,6 +62,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import org.jsoup.nodes.Node
 import org.jsoup.nodes.TextNode
+import java.text.Bidi
 
 private const val TAG_URL = "url"
 
@@ -92,29 +96,40 @@ fun HtmlText(
     linkStyle: TextStyle = textStyle.copy(MaterialTheme.colors.primary),
     linkResolver: (href: String) -> ResolvedLink = { ResolvedLink(it) },
 ) {
-    val navigator = LocalNavigator.current
-    RenderContent(
-        modifier = modifier,
-        htmlText = htmlText,
-        linkResolver = linkResolver,
-        maxLines = maxLines,
-        textStyle = textStyle,
-        linkStyle = linkStyle,
-        onLinkClicked = {
-            navigator.openLink(it)
-        },
-        color = color,
-        fontSize = fontSize,
-        fontStyle = fontStyle,
-        fontWeight = fontWeight,
-        fontFamily = fontFamily,
-        letterSpacing = letterSpacing,
-        textDecoration = textDecoration,
-        textAlign = textAlign,
-        lineHeight = lineHeight,
-        overflow = overflow,
-        softWrap = softWrap,
-    )
+    val bidi = remember(htmlText) {
+        Bidi(htmlText, Bidi.DIRECTION_DEFAULT_LEFT_TO_RIGHT)
+    }
+    CompositionLocalProvider(
+        LocalLayoutDirection provides if (bidi.baseIsLeftToRight()) {
+            LayoutDirection.Ltr
+        } else {
+            LayoutDirection.Rtl
+        }
+    ) {
+        val navigator = LocalNavigator.current
+        RenderContent(
+            modifier = modifier,
+            htmlText = htmlText,
+            linkResolver = linkResolver,
+            maxLines = maxLines,
+            textStyle = textStyle,
+            linkStyle = linkStyle,
+            onLinkClicked = {
+                navigator.openLink(it)
+            },
+            color = color,
+            fontSize = fontSize,
+            fontStyle = fontStyle,
+            fontWeight = fontWeight,
+            fontFamily = fontFamily,
+            letterSpacing = letterSpacing,
+            textDecoration = textDecoration,
+            textAlign = textAlign,
+            lineHeight = lineHeight,
+            overflow = overflow,
+            softWrap = softWrap,
+        )
+    }
 }
 
 @OptIn(ExperimentalUnitApi::class)
