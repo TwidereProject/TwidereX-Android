@@ -20,7 +20,6 @@
  */
 package com.twidere.twiderex
 
-import android.app.Application
 import android.content.Context
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.startup.AppInitializer
@@ -32,7 +31,7 @@ import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
 
 @HiltAndroidApp
-class TwidereApp : Application(), Configuration.Provider {
+class TwidereApp : TwidereApplication(), Configuration.Provider {
     @Inject
     lateinit var workerFactory: HiltWorkerFactory
 
