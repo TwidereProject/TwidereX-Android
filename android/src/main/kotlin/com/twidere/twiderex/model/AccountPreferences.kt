@@ -32,10 +32,12 @@ import com.twidere.twiderex.scenes.home.HomeMenus
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.map
 
 class AccountPreferences(
     private val dataStore: DataStore<Preferences>,
+    private val scope: CoroutineScope,
 ) {
     private val isNotificationEnabledKey = booleanPreferencesKey("isNotificationEnabled")
     val isNotificationEnabled
@@ -64,6 +66,12 @@ class AccountPreferences(
         }
     }
 
+    fun close() {
+        // cancel scope will remove file from activeFiles in Datastore
+        // prevent crashes caused by multiple DataStores active for the same file
+        scope.cancel()
+    }
+
     private val homeMenuOrderKey = stringPreferencesKey("homeMenuOrder")
     private val visibleHomeMenuKey = stringPreferencesKey("visibleHomeMenu")
     suspend fun setHomeMenuOrder(
@@ -85,14 +93,18 @@ class AccountPreferences(
         private fun createAccountPreferences(
             context: Context,
             accountKey: MicroBlogKey,
-        ) = AccountPreferences(
-            dataStore = PreferenceDataStoreFactory.create(
-                corruptionHandler = null,
-                migrations = listOf(),
-                scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
-            ) {
-                context.applicationContext.preferencesDataStoreFile(accountKey.toString())
-            },
-        )
+        ): AccountPreferences {
+            val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+            return AccountPreferences(
+                dataStore = PreferenceDataStoreFactory.create(
+                    corruptionHandler = null,
+                    migrations = listOf(),
+                    scope = scope
+                ) {
+                    context.applicationContext.preferencesDataStoreFile(accountKey.toString())
+                },
+                scope = scope
+            )
+        }
     }
 }
