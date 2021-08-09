@@ -18,24 +18,33 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex
+package com.twidere.twiderex.di
 
-import android.app.Application
-import com.twidere.twiderex.di.setupModules
+import android.content.Context
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.components.SingletonComponent
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
-import org.koin.core.KoinExperimentalAPI
+import org.koin.core.Koin
 import org.koin.core.context.startKoin
+import org.koin.mp.KoinPlatformTools
+import javax.inject.Singleton
 
-abstract class TwidereApplication : Application() {
-    @OptIn(KoinExperimentalAPI::class)
-    override fun onCreate() {
-        super.onCreate()
+@Deprecated("Use koin directly")
+@Module
+@InstallIn(SingletonComponent::class)
+object KoinModule {
+    @Singleton
+    @Provides
+    fun getKoin(@ApplicationContext context: Context): Koin {
         startKoin {
             androidLogger()
-            androidContext(this@TwidereApplication)
-            // workManagerFactory()
+            androidContext(context)
             setupModules()
         }
+        return KoinPlatformTools.defaultContext().get()
     }
 }
