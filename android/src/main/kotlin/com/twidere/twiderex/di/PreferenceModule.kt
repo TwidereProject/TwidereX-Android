@@ -20,57 +20,40 @@
  */
 package com.twidere.twiderex.di
 
-import android.content.Context
 import androidx.datastore.core.DataStore
-import androidx.datastore.core.DataStoreFactory
-import androidx.datastore.core.Serializer
-import com.twidere.twiderex.preferences.proto.AppearancePreferences
-import com.twidere.twiderex.preferences.proto.DisplayPreferences
-import com.twidere.twiderex.preferences.proto.MiscPreferences
-import com.twidere.twiderex.preferences.proto.NotificationPreferences
-import com.twidere.twiderex.preferences.serializer.AppearancePreferencesSerializer
-import com.twidere.twiderex.preferences.serializer.DisplayPreferencesSerializer
-import com.twidere.twiderex.preferences.serializer.MiscPreferencesSerializer
-import com.twidere.twiderex.preferences.serializer.NotificationPreferencesSerializer
+import com.twidere.twiderex.preferences.PreferencesHolder
+import com.twidere.twiderex.preferences.model.AppearancePreferences
+import com.twidere.twiderex.preferences.model.DisplayPreferences
+import com.twidere.twiderex.preferences.model.MiscPreferences
+import com.twidere.twiderex.preferences.model.NotificationPreferences
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import java.io.File
+import org.koin.core.Koin
 import javax.inject.Singleton
 
+@Deprecated("Use koin directly")
 @Module
 @InstallIn(SingletonComponent::class)
 object PreferenceModule {
     @Singleton
     @Provides
-    fun provideAppearances(@ApplicationContext context: Context): DataStore<AppearancePreferences> =
-        context.createDataStore("appearances.pb", AppearancePreferencesSerializer)
-    @Singleton
-    @Provides
-    fun provideDisplay(@ApplicationContext context: Context): DataStore<DisplayPreferences> =
-        context.createDataStore("display.pb", DisplayPreferencesSerializer)
-    @Singleton
-    @Provides
-    fun provideMisc(@ApplicationContext context: Context): DataStore<MiscPreferences> =
-        context.createDataStore("misc.pb", MiscPreferencesSerializer)
+    fun provideAppearances(koin: Koin): DataStore<AppearancePreferences> =
+        koin.get<PreferencesHolder>().appearancePreferences
 
     @Singleton
     @Provides
-    fun provideNotification(@ApplicationContext context: Context): DataStore<NotificationPreferences> =
-        context.createDataStore("notification.pb", NotificationPreferencesSerializer)
+    fun provideDisplay(koin: Koin): DataStore<DisplayPreferences> =
+        koin.get<PreferencesHolder>().displayPreferences
+
+    @Singleton
+    @Provides
+    fun provideMisc(koin: Koin): DataStore<MiscPreferences> =
+        koin.get<PreferencesHolder>().miscPreferences
+
+    @Singleton
+    @Provides
+    fun provideNotification(koin: Koin): DataStore<NotificationPreferences> =
+        koin.get<PreferencesHolder>().notificationPreferences
 }
-
-inline fun <reified T> Context.createDataStore(
-    name: String,
-    serializer: Serializer<T>,
-) = DataStoreFactory.create(
-    serializer,
-    produceFile = {
-        File(
-            applicationContext.filesDir,
-            "datastore/$name"
-        )
-    },
-)
