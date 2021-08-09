@@ -22,7 +22,7 @@ jobs:
           java-version: 11
 
       - name: Build with Gradle
-        run: ./gradlew :desktop:spotlessCheck :desktop:lint :desktop:build
+        run: ./gradlew :desktop:spotlessCheck :desktop:build
 
       - name: Upload build reports
         uses: actions/upload-artifact@v2
