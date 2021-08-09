@@ -182,6 +182,7 @@ dependencies {
     kotlinSerialization()
     kotlinCoroutines()
     implementation(projects.services)
+    implementation(projects.common)
     ksp(projects.assistedProcessor)
     implementation(projects.routeProcessor)
     ksp(projects.routeProcessor)
