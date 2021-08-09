@@ -35,4 +35,8 @@ internal class AndroidCacheDatabase : AppDatabase {
     override suspend fun clearAllTables() {
         TODO("Not yet implemented")
     }
+
+    override fun <R> withTransaction(block: suspend () -> R): R {
+        TODO("Not yet implemented")
+    }
 }

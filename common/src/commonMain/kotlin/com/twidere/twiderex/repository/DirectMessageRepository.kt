@@ -21,22 +21,15 @@
 package com.twidere.twiderex.repository
 
 import androidx.paging.PagingData
-import androidx.room.withTransaction
 import com.twidere.services.microblog.DirectMessageService
 import com.twidere.services.microblog.LookupService
 import com.twidere.services.microblog.model.IDirectMessage
 import com.twidere.services.twitter.model.DirectMessageEvent
 import com.twidere.services.twitter.model.exceptions.TwitterApiException
+import com.twidere.twiderex.dataprovider.toUi
 import com.twidere.twiderex.db.CacheDatabase
-import com.twidere.twiderex.db.mapper.toDbDirectMessage
-import com.twidere.twiderex.db.mapper.toDbUser
-import com.twidere.twiderex.db.model.DbDMConversation
-import com.twidere.twiderex.db.model.DbDMConversation.Companion.saveToDb
-import com.twidere.twiderex.db.model.DbDMEventWithAttachments.Companion.saveToDb
-import com.twidere.twiderex.db.model.DbUser
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.PlatformType
-import com.twidere.twiderex.model.transform.toUi
 import com.twidere.twiderex.model.ui.UiDMConversation
 import com.twidere.twiderex.model.ui.UiDMConversationWithLatestMessage
 import com.twidere.twiderex.model.ui.UiDMEvent
@@ -46,8 +39,6 @@ import com.twidere.twiderex.paging.mediator.dm.DMConversationMediator.Companion.
 import com.twidere.twiderex.paging.mediator.dm.DMEventMediator
 import com.twidere.twiderex.paging.mediator.dm.DMEventMediator.Companion.toUi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
-import java.util.UUID
 
 class DirectMessageRepository(
     private val database: CacheDatabase
@@ -60,7 +51,7 @@ class DirectMessageRepository(
             .findWithConversationKeyFlow(
                 accountKey = accountKey,
                 conversationKey = conversationKey
-            ).map { it?.toUi() }
+            )
     }
 
     fun dmConversationListSource(
@@ -109,15 +100,14 @@ class DirectMessageRepository(
                 ?: let {
                     database.directMessageConversationDao().insertAll(
                         listOf(
-                            DbDMConversation(
-                                _id = UUID.randomUUID().toString(),
+                            UiDMConversation(
                                 accountKey = accountKey,
                                 conversationId = conversationId,
                                 conversationKey = conversationKey,
                                 conversationAvatar = receiver.profileImage.toString(),
                                 conversationName = receiver.displayName,
                                 conversationSubName = receiver.screenName,
-                                conversationType = DbDMConversation.Type.ONE_TO_ONE,
+                                conversationType = UiDMConversation.Type.ONE_TO_ONE,
                                 recipientKey = receiver.userKey
                             )
                         )
@@ -136,13 +126,11 @@ class DirectMessageRepository(
                 val needDrop = con.latestMessage.sender.userKey == accountKey ||
                     oldConversation.find {
                     // self send message or same received message
-                    it.latestMessage.message.messageKey == con.latestMessage.message.messageKey
+                    it.latestMessage.messageKey == con.latestMessage.messageKey
                 }?.let { true } ?: false
                 needDrop
             }
             newConversation
-        }.map {
-            it.toUi()
         }
     }
 
@@ -158,7 +146,7 @@ class DirectMessageRepository(
             conversationKey,
             messageKey
         )?.let {
-            database.directMessageDao().delete(it.message)
+            database.directMessageDao().delete(it)
             try {
                 service.destroyDirectMessage(messageId)
             } catch (e: TwitterApiException) {
@@ -179,38 +167,38 @@ class DirectMessageRepository(
         val result = service.getDirectMessages(key, 50)
         val events = result.map {
             if (it is DirectMessageEvent) {
-                it.toDbDirectMessage(accountKey, lookupUser(accountKey, MicroBlogKey.twitter(it.messageCreate?.senderId ?: ""), lookupService))
+                it.toUi(accountKey, lookupUser(accountKey, MicroBlogKey.twitter(it.messageCreate?.senderId ?: ""), lookupService))
             } else throw NotImplementedError()
         }
         // save message, media
         database.withTransaction {
-            events.saveToDb(database)
-            events.groupBy { it.message.conversationKey }
+            database.directMessageDao().insertAll(events)
+            events.groupBy { it.conversationKey }
                 .map { entry ->
                     val msgWithData = entry.value.first()
-                    val chatUser = msgWithData.message.conversationUserKey.let {
-                        lookupUser(accountKey, it, lookupService)
-                    }
-                    DbDMConversation(
-                        _id = UUID.randomUUID().toString(),
+                    val chatUser =
+                        lookupUser(accountKey, msgWithData.conversationUserKey, lookupService)
+                    UiDMConversation(
                         accountKey = accountKey,
-                        conversationId = msgWithData.message.conversationKey.id,
-                        conversationKey = msgWithData.message.conversationKey,
-                        conversationAvatar = chatUser.profileImage,
+                        conversationId = msgWithData.conversationKey.id,
+                        conversationKey = msgWithData.conversationKey,
+                        conversationAvatar = chatUser.profileImage.toString(),
                         conversationName = chatUser.name,
                         conversationSubName = chatUser.screenName,
-                        conversationType = DbDMConversation.Type.ONE_TO_ONE,
-                        recipientKey = msgWithData.message.conversationUserKey
+                        conversationType = UiDMConversation.Type.ONE_TO_ONE,
+                        recipientKey = msgWithData.conversationUserKey
                     )
-                }.saveToDb(database)
+                }.let {
+                    database.directMessageConversationDao().insertAll(it)
+                }
         }
         return result
     }
 
-    private suspend fun lookupUser(accountKey: MicroBlogKey, userKey: MicroBlogKey, service: LookupService): DbUser {
+    private suspend fun lookupUser(accountKey: MicroBlogKey, userKey: MicroBlogKey, service: LookupService): UiUser {
         return database.userDao().findWithUserKey(userKey) ?: let {
             val user = service.lookupUser(userKey.id)
-                .toDbUser(accountKey)
+                .toUi(accountKey)
             database.userDao().insertAll(listOf(user))
             user
         }

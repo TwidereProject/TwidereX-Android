@@ -28,6 +28,10 @@ internal class AndroidAppDatabase : AppDatabase {
         TODO("Not yet implemented")
     }
 
+    override fun <R> withTransaction(block: suspend () -> R): R {
+        TODO("Not yet implemented")
+    }
+
     override fun draftDao(): DraftDao {
         TODO("Not yet implemented")
     }

@@ -20,14 +20,16 @@
  */
 package com.twidere.twiderex.model.ui
 
-import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.MediaType
+import java.net.URI
 
 @Immutable
 data class UiMedia(
     val url: String?,
+    val belongToKey: MicroBlogKey,
     val mediaUrl: String?,
     val previewUrl: Any?,
     val type: MediaType,
@@ -44,15 +46,23 @@ data class UiMedia(
             val start = it.indexOf("?format=")
             val end = it.indexOf("&name=")
             val ext = it.substring(start + "?format=".length, end)
-            Uri.parse(it).lastPathSegment + ".$ext"
+            it.lastPathSegment() + ".$ext"
         }
     }
 
     private fun String.takeIfFileName(): String? {
-        return let {
-            Uri.parse(it)
-        }?.lastPathSegment?.takeIf {
+        return lastPathSegment().takeIf {
             it.contains(".")
+        }
+    }
+
+    private fun String.lastPathSegment(): String {
+        return try {
+            URI.create(this).path.let {
+                it.substring(it.lastIndexOf("/") + 1)
+            }
+        } catch (e: Throwable) {
+            ""
         }
     }
 
@@ -61,6 +71,7 @@ data class UiMedia(
         fun sample() = listOf(
             UiMedia(
                 url = null,
+                belongToKey = MicroBlogKey.Empty,
                 mediaUrl = null,
                 previewUrl = "", // painterResource(id = R.drawable.featured_graphics),
                 type = MediaType.photo,

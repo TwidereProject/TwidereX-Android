@@ -25,6 +25,6 @@ import com.twidere.twiderex.model.ui.UiStatus
 
 // TODO OPERATION
 interface StatusDao {
-    suspend fun findWithStatusKey(it: MicroBlogKey): UiStatus
+    suspend fun findWithStatusKey(it: MicroBlogKey): UiStatus?
     suspend fun insertAll(it: List<UiStatus>)
 }

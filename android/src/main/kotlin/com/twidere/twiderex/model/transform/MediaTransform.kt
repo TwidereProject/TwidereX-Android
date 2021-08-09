@@ -26,6 +26,7 @@ import com.twidere.twiderex.model.ui.UiMedia
 fun List<DbMedia>.toUi() = sortedBy { it.order }.map {
     UiMedia(
         url = it.url,
+        belongToKey = it.belongToKey,
         mediaUrl = it.mediaUrl,
         previewUrl = it.previewUrl,
         type = it.type,

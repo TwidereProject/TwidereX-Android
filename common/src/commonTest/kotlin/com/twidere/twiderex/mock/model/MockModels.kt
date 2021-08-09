@@ -18,25 +18,22 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.db
+package com.twidere.twiderex.mock.model
 
-import com.twidere.twiderex.db.dao.DraftDao
-import com.twidere.twiderex.db.dao.SearchDao
+import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.enums.MediaType
+import com.twidere.twiderex.model.ui.UiMedia
+import org.jetbrains.annotations.TestOnly
 
-internal class DesktopAppDatabaseImpl : AppDatabase {
-    override fun draftDao(): DraftDao {
-        TODO("Not yet implemented")
-    }
-
-    override fun searchDao(): SearchDao {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun clearAllTables() {
-        TODO("Not yet implemented")
-    }
-
-    override fun <R> withTransaction(block: suspend () -> R): R {
-        TODO("Not yet implemented")
-    }
-}
+@TestOnly
+internal fun UiMedia.Companion.mock(url: String, belongToKey: MicroBlogKey) = UiMedia(
+    url = url,
+    belongToKey = belongToKey,
+    mediaUrl = url,
+    previewUrl = url,
+    type = MediaType.photo,
+    width = 100,
+    height = 100,
+    pageUrl = "",
+    altText = ""
+)

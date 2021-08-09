@@ -18,25 +18,24 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.db
+package com.twidere.twiderex.repository
 
-import com.twidere.twiderex.db.dao.DraftDao
-import com.twidere.twiderex.db.dao.SearchDao
+import com.twidere.twiderex.mock.db.MockMediaDao
+import com.twidere.twiderex.mock.model.mock
+import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.ui.UiMedia
+import kotlinx.coroutines.runBlocking
+import org.junit.Test
 
-internal class DesktopAppDatabaseImpl : AppDatabase {
-    override fun draftDao(): DraftDao {
-        TODO("Not yet implemented")
-    }
-
-    override fun searchDao(): SearchDao {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun clearAllTables() {
-        TODO("Not yet implemented")
-    }
-
-    override fun <R> withTransaction(block: suspend () -> R): R {
-        TODO("Not yet implemented")
+internal class MediaRepositoryTest {
+    @Test
+    fun findMediasWithBelongToKey() = runBlocking {
+        val repository = MediaRepository(
+            MockMediaDao(
+                listOf(UiMedia.mock("test", MicroBlogKey.twitter("account")))
+            )
+        )
+        val result = repository.findMediaByBelongToKey(MicroBlogKey.twitter("account"))
+        assert(result.isNotEmpty())
     }
 }

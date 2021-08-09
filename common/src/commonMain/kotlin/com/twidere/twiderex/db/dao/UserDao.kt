@@ -19,5 +19,12 @@
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
 package com.twidere.twiderex.db.dao
+
+import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.ui.UiUser
+
 // TODO OPERATION
-interface UserDao
+interface UserDao {
+    suspend fun findWithUserKey(userKey: MicroBlogKey): UiUser?
+    suspend fun insertAll(listOf: List<UiUser>)
+}

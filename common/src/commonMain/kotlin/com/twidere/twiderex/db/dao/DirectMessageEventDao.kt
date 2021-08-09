@@ -30,4 +30,14 @@ interface DirectMessageEventDao {
         accountKey: MicroBlogKey,
         conversationKey: MicroBlogKey
     ): PagingSource<Int, UiDMEvent>
+
+    suspend fun findWithMessageKey(
+        accountKey: MicroBlogKey,
+        conversationKey: MicroBlogKey,
+        messageKey: MicroBlogKey
+    ): UiDMEvent?
+
+    suspend fun delete(message: UiDMEvent)
+    suspend fun getMessageCount(accountKey: MicroBlogKey, conversationKey: MicroBlogKey): Long
+    suspend fun insertAll(events: List<UiDMEvent>)
 }

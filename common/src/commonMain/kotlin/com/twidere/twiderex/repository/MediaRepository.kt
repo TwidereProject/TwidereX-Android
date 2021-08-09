@@ -19,11 +19,11 @@
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
 package com.twidere.twiderex.repository
-import com.twidere.twiderex.db.CacheDatabase
+import com.twidere.twiderex.db.dao.MediaDao
 import com.twidere.twiderex.model.MicroBlogKey
 
-class MediaRepository(private val cacheDatabase: CacheDatabase) {
+class MediaRepository(private val mediaDao: MediaDao) {
     suspend fun findMediaByBelongToKey(
         belongToKey: MicroBlogKey
-    ) = cacheDatabase.mediaDao().findMediaByBelongToKey(belongToKey)
+    ) = mediaDao.findMediaByBelongToKey(belongToKey)
 }

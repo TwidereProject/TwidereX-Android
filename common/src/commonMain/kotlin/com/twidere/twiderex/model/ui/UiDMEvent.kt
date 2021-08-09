@@ -44,6 +44,9 @@ data class UiDMEvent(
     val isInCome: Boolean
         get() = recipientAccountKey == accountKey
 
+    val conversationUserKey: MicroBlogKey
+        get() = if (accountKey == senderAccountKey) recipientAccountKey else senderAccountKey
+
     enum class SendStatus {
         PENDING,
         SUCCESS,

@@ -43,6 +43,7 @@ kotlin {
             dependencies {
                 implementation(kotlin("test"))
                 implementation("io.insert-koin:koin-test:${Versions.koin}")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:${Versions.Kotlin.coroutines}")
             }
         }
         val androidMain by getting {

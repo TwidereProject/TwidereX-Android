@@ -30,12 +30,22 @@ import com.twidere.twiderex.model.ui.UiDMEvent
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.model.ui.UiUser
 
-expect fun IUser.toUi(accountKey: MicroBlogKey): UiUser
+actual fun IUser.toUi(accountKey: MicroBlogKey): UiUser {
+    TODO("Not yet implemented")
+}
 
-expect fun IStatus.toUi(accountKey: MicroBlogKey): UiStatus
+actual fun IStatus.toUi(accountKey: MicroBlogKey): UiStatus {
+    TODO("Not yet implemented")
+}
 
-expect fun INotification.toUi(accountKey: MicroBlogKey): UiStatus
+actual fun INotification.toUi(accountKey: MicroBlogKey): UiStatus {
+    TODO("Not yet implemented")
+}
 
-expect fun IStatus.toPagingTimeline(accountKey: MicroBlogKey, pagingKey: String): PagingTimeLineWithStatus
+actual fun IStatus.toPagingTimeline(accountKey: MicroBlogKey, pagingKey: String): PagingTimeLineWithStatus {
+    TODO("Not yet implemented")
+}
 
-expect fun DirectMessageEvent.toUi(accountKey: MicroBlogKey, sender: UiUser): UiDMEvent
+actual fun DirectMessageEvent.toUi(accountKey: MicroBlogKey, sender: UiUser): UiDMEvent {
+    TODO("Not yet implemented")
+}

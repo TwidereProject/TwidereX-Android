@@ -42,7 +42,7 @@ class CacheRepository(
 
     suspend fun clearImageCache() = coroutineScope {
         mediaCache.clear()
-        cache.directory().deleteRecursively()
+        cache.directory.deleteRecursively()
     }
 
     suspend fun clearCacheDir() = coroutineScope {
