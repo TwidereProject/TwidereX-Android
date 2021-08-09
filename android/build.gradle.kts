@@ -28,6 +28,7 @@ plugins {
     kotlin("android")
     kotlin("kapt")
     id("com.google.protobuf").version("0.8.17")
+    id("org.jetbrains.compose").version(Versions.compose_jb)
     kotlin("plugin.serialization").version(Versions.Kotlin.lang)
     id("com.google.devtools.ksp").version(Versions.ksp)
 }
