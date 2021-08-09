@@ -35,7 +35,7 @@ object DisplayPreferencesSerializer : Serializer<DisplayPreferences> {
         get() = DisplayPreferences()
 
     override suspend fun readFrom(input: InputStream): DisplayPreferences {
-        return ProtoBuf.decodeFromByteArray(input.readAllBytes())
+        return ProtoBuf.decodeFromByteArray(input.readBytes())
     }
 
     override suspend fun writeTo(t: DisplayPreferences, output: OutputStream) =

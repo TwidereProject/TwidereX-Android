@@ -22,18 +22,20 @@ package com.twidere.twiderex.preferences.serializer
 
 import androidx.datastore.core.Serializer
 import com.twidere.twiderex.preferences.MiscPreferences
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.decodeFromByteArray
 import kotlinx.serialization.encodeToByteArray
 import kotlinx.serialization.protobuf.ProtoBuf
 import java.io.InputStream
 import java.io.OutputStream
 
+@OptIn(ExperimentalSerializationApi::class)
 object MiscPreferencesSerializer : Serializer<MiscPreferences> {
     override val defaultValue: MiscPreferences
         get() = MiscPreferences()
 
     override suspend fun readFrom(input: InputStream): MiscPreferences {
-        return ProtoBuf.decodeFromByteArray(input.readAllBytes())
+        return ProtoBuf.decodeFromByteArray(input.readBytes())
     }
 
     override suspend fun writeTo(t: MiscPreferences, output: OutputStream) =

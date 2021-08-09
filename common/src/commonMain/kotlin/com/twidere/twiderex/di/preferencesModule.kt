@@ -35,6 +35,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.firstOrNull
+import org.koin.core.scope.Scope
 import org.koin.dsl.module
 import java.io.File
 
@@ -65,7 +66,7 @@ internal data class PreferencesHolder(
     }
 }
 
-internal inline fun <reified T : Any> createDataStore(
+internal inline fun <reified T : Any> Scope.createDataStore(
     name: String,
     serializer: Serializer<T>,
 ) = DataStoreFactory.create(
@@ -75,4 +76,4 @@ internal inline fun <reified T : Any> createDataStore(
     },
 )
 
-internal expect fun createDataStoreFile(name: String): File
+internal expect fun Scope.createDataStoreFile(name: String): File

@@ -20,11 +20,14 @@
  */
 package com.twidere.twiderex.di
 
+import android.content.Context
+import org.koin.core.scope.Scope
 import java.io.File
 
-internal actual fun createDataStoreFile(name: String): File {
+internal actual fun Scope.createDataStoreFile(name: String): File {
+    val context = get<Context>()
     return File(
-        File(System.getProperty("user.home")),
+        context.applicationContext.filesDir,
         "datastore/$name"
     )
 }

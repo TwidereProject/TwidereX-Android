@@ -35,7 +35,7 @@ object NotificationPreferencesSerializer : Serializer<NotificationPreferences> {
         get() = NotificationPreferences()
 
     override suspend fun readFrom(input: InputStream): NotificationPreferences {
-        return ProtoBuf.decodeFromByteArray(input.readAllBytes())
+        return ProtoBuf.decodeFromByteArray(input.readBytes())
     }
 
     override suspend fun writeTo(t: NotificationPreferences, output: OutputStream) =

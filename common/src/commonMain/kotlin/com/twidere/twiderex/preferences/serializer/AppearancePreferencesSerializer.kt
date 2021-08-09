@@ -32,7 +32,7 @@ import java.io.OutputStream
 @OptIn(ExperimentalSerializationApi::class)
 object AppearancePreferencesSerializer : Serializer<AppearancePreferences> {
     override suspend fun readFrom(input: InputStream): AppearancePreferences {
-        return ProtoBuf.decodeFromByteArray(input.readAllBytes())
+        return ProtoBuf.decodeFromByteArray(input.readBytes())
     }
     override suspend fun writeTo(
         t: AppearancePreferences,
