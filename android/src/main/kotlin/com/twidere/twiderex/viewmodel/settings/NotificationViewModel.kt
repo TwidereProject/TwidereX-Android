@@ -23,7 +23,7 @@ package com.twidere.twiderex.viewmodel.settings
 import androidx.datastore.core.DataStore
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.twidere.twiderex.preferences.proto.NotificationPreferences
+import com.twidere.twiderex.preferences.model.NotificationPreferences
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -41,9 +41,7 @@ class NotificationViewModel @AssistedInject constructor(
 
     fun setEnabled(value: Boolean) = viewModelScope.launch {
         notification.updateData {
-            it.toBuilder()
-                .setEnableNotification(value)
-                .build()
+            it.copy(enableNotification = value)
         }
     }
 }

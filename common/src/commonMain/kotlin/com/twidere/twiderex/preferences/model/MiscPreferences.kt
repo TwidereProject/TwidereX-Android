@@ -18,30 +18,23 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.preferences
+package com.twidere.twiderex.preferences.model
 
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class AppearancePreferences(
-    val primaryColorIndex: Int = 0,
-    val tapPosition: TabPosition = TabPosition.Bottom,
-    val theme: Theme = Theme.Auto,
-    val hideTabBarWhenScroll: Boolean = false,
-    val hideFabWhenScroll: Boolean = false,
-    val hideAppBarWhenScroll: Boolean = false,
-    val isDarkModePureBlack: Boolean = false,
+data class MiscPreferences(
+    val nitterInstance: String = "",
+    val useProxy: Boolean = false,
+    val proxyType: ProxyType = ProxyType.HTTP,
+    val proxyServer: String = "",
+    val proxyPort: Int = 0,
+    val proxyUserName: String = "",
+    val proxyPassword: String = "",
 ) {
     @Serializable
-    enum class TabPosition {
-        Top,
-        Bottom,
-    }
-
-    @Serializable
-    enum class Theme {
-        Auto,
-        Light,
-        Dark,
+    enum class ProxyType {
+        HTTP,
+        REVERSE,
     }
 }

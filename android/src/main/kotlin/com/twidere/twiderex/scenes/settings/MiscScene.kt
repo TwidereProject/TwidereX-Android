@@ -64,7 +64,7 @@ import com.twidere.twiderex.component.settings.RadioItem
 import com.twidere.twiderex.component.settings.switchItem
 import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.extensions.observeAsState
-import com.twidere.twiderex.preferences.proto.MiscPreferences
+import com.twidere.twiderex.preferences.model.MiscPreferences
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.settings.MiscViewModel
 

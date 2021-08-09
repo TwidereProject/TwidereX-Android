@@ -24,7 +24,6 @@ import androidx.compose.animation.core.animateInt
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -40,7 +39,7 @@ import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.preferences.LocalDisplayPreferences
-import com.twidere.twiderex.preferences.proto.DisplayPreferences
+import com.twidere.twiderex.preferences.model.DisplayPreferences
 
 @Composable
 fun UserAvatar(
@@ -84,7 +83,7 @@ fun Modifier.withAvatarClip(): Modifier {
         val percent by transition.animateInt {
             when (it) {
                 DisplayPreferences.AvatarStyle.Round -> 50
-                DisplayPreferences.AvatarStyle.Square, DisplayPreferences.AvatarStyle.UNRECOGNIZED, null -> 10
+                DisplayPreferences.AvatarStyle.Square -> 10
             }
         }
         this.clip(RoundedCornerShape(percent = percent))

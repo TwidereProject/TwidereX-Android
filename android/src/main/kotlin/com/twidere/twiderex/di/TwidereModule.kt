@@ -40,7 +40,7 @@ import com.twidere.twiderex.kmp.android.AndroidRemoteNavigator
 import com.twidere.twiderex.model.AccountPreferences
 import com.twidere.twiderex.notification.AppNotificationManager
 import com.twidere.twiderex.notification.InAppNotification
-import com.twidere.twiderex.preferences.proto.MiscPreferences
+import com.twidere.twiderex.preferences.model.MiscPreferences
 import com.twidere.twiderex.utils.PlatformResolver
 import dagger.Module
 import dagger.Provides

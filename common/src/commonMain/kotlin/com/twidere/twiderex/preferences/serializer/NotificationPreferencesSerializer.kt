@@ -21,7 +21,7 @@
 package com.twidere.twiderex.preferences.serializer
 
 import androidx.datastore.core.Serializer
-import com.twidere.twiderex.preferences.NotificationPreferences
+import com.twidere.twiderex.preferences.model.NotificationPreferences
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.decodeFromByteArray
 import kotlinx.serialization.encodeToByteArray

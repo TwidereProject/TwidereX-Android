@@ -28,17 +28,19 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import com.twidere.services.http.config.HttpConfig
 import com.twidere.services.proxy.ProxyConfig
-import com.twidere.twiderex.di.PreferencesHolder
+import com.twidere.twiderex.preferences.model.AppearancePreferences
+import com.twidere.twiderex.preferences.model.DisplayPreferences
+import com.twidere.twiderex.preferences.model.MiscPreferences
 import kotlinx.coroutines.flow.map
 
-internal val LocalAppearancePreferences =
+val LocalAppearancePreferences =
     compositionLocalOf<AppearancePreferences> { error("No AppearancePreferences") }
-internal val LocalDisplayPreferences =
+val LocalDisplayPreferences =
     compositionLocalOf<DisplayPreferences> { error("No DisplayPreferences") }
-internal val LocalHttpConfig = compositionLocalOf<HttpConfig> { error("No Http config preferences") }
+val LocalHttpConfig = compositionLocalOf<HttpConfig> { error("No Http config preferences") }
 
 @Composable
-internal fun ProvidePreferences(
+fun ProvidePreferences(
     holder: PreferencesHolder,
     content: @Composable () -> Unit,
 ) {

@@ -18,11 +18,30 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.preferences
+package com.twidere.twiderex.preferences.model
 
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class NotificationPreferences(
-    val enableNotification: Boolean = true,
-)
+data class AppearancePreferences(
+    val primaryColorIndex: Int = 0,
+    val tabPosition: TabPosition = TabPosition.Bottom,
+    val theme: Theme = Theme.Auto,
+    val hideTabBarWhenScroll: Boolean = false,
+    val hideFabWhenScroll: Boolean = false,
+    val hideAppBarWhenScroll: Boolean = false,
+    val isDarkModePureBlack: Boolean = false,
+) {
+    @Serializable
+    enum class TabPosition {
+        Top,
+        Bottom,
+    }
+
+    @Serializable
+    enum class Theme {
+        Auto,
+        Light,
+        Dark,
+    }
+}

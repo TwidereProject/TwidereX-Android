@@ -43,7 +43,7 @@ import com.twidere.twiderex.component.placeholder.UiImagePlaceholder
 import com.twidere.twiderex.component.status.StatusMediaPreviewItem
 import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.model.ui.UiStatus
-import com.twidere.twiderex.preferences.proto.DisplayPreferences
+import com.twidere.twiderex.preferences.model.DisplayPreferences
 import com.twidere.twiderex.ui.LocalVideoPlayback
 
 @Composable

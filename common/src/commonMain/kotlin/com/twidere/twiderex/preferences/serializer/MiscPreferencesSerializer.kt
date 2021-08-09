@@ -21,7 +21,7 @@
 package com.twidere.twiderex.preferences.serializer
 
 import androidx.datastore.core.Serializer
-import com.twidere.twiderex.preferences.MiscPreferences
+import com.twidere.twiderex.preferences.model.MiscPreferences
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.decodeFromByteArray
 import kotlinx.serialization.encodeToByteArray

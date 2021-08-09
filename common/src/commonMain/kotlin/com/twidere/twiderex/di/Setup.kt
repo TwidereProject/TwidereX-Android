@@ -20,6 +20,8 @@
  */
 package com.twidere.twiderex.di
 
-fun setupModules() {
-    preferencesModule()
+import org.koin.core.KoinApplication
+
+fun KoinApplication.setupModules() {
+    modules(preferencesModule)
 }

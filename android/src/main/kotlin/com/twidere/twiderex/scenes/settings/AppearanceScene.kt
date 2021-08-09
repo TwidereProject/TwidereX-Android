@@ -67,7 +67,7 @@ import com.twidere.twiderex.component.status.UserAvatarDefaults
 import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.extensions.isDarkTheme
 import com.twidere.twiderex.preferences.LocalAppearancePreferences
-import com.twidere.twiderex.preferences.proto.AppearancePreferences
+import com.twidere.twiderex.preferences.model.AppearancePreferences
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.ui.primaryColors
 import com.twidere.twiderex.viewmodel.settings.AppearanceViewModel
@@ -134,7 +134,7 @@ fun AppearanceScene() {
                         AppearancePreferences.TabPosition.Top,
                         AppearancePreferences.TabPosition.Bottom,
                     ),
-                    value = appearance.tapPosition,
+                    value = appearance.tabPosition,
                     onChanged = {
                         viewModel.setTabPosition(it)
                     },

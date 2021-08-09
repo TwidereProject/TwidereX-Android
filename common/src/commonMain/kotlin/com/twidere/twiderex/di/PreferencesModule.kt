@@ -20,48 +20,30 @@
  */
 package com.twidere.twiderex.di
 
-import androidx.datastore.core.DataStore
 import androidx.datastore.core.DataStoreFactory
 import androidx.datastore.core.Serializer
-import com.twidere.twiderex.preferences.AppearancePreferences
-import com.twidere.twiderex.preferences.DisplayPreferences
-import com.twidere.twiderex.preferences.MiscPreferences
-import com.twidere.twiderex.preferences.NotificationPreferences
+import com.twidere.twiderex.preferences.PreferencesHolder
 import com.twidere.twiderex.preferences.serializer.AppearancePreferencesSerializer
 import com.twidere.twiderex.preferences.serializer.DisplayPreferencesSerializer
 import com.twidere.twiderex.preferences.serializer.MiscPreferencesSerializer
 import com.twidere.twiderex.preferences.serializer.NotificationPreferencesSerializer
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.flow.firstOrNull
 import org.koin.core.scope.Scope
 import org.koin.dsl.module
 import java.io.File
 
-internal fun preferencesModule() = module {
+internal val preferencesModule = module {
     single {
         PreferencesHolder(
-            appearancePreferences = createDataStore("appearances.pb", AppearancePreferencesSerializer),
+            appearancePreferences = createDataStore(
+                "appearances.pb",
+                AppearancePreferencesSerializer
+            ),
             displayPreferences = createDataStore("display.pb", DisplayPreferencesSerializer),
             miscPreferences = createDataStore("misc.pb", MiscPreferencesSerializer),
-            notificationPreferences = createDataStore("notification.pb", NotificationPreferencesSerializer),
-        )
-    }
-}
-
-internal data class PreferencesHolder(
-    val appearancePreferences: DataStore<AppearancePreferences>,
-    val displayPreferences: DataStore<DisplayPreferences>,
-    val miscPreferences: DataStore<MiscPreferences>,
-    val notificationPreferences: DataStore<NotificationPreferences>,
-) {
-    suspend fun warmup() = coroutineScope {
-        awaitAll(
-            async { appearancePreferences.data.firstOrNull() },
-            async { displayPreferences.data.firstOrNull() },
-            async { miscPreferences.data.firstOrNull() },
-            async { notificationPreferences.data.firstOrNull() },
+            notificationPreferences = createDataStore(
+                "notification.pb",
+                NotificationPreferencesSerializer
+            ),
         )
     }
 }
