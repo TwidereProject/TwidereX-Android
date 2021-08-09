@@ -26,6 +26,6 @@ import java.io.File
 internal actual fun Scope.createDataStoreFile(name: String): File {
     return File(
         File(System.getProperty("user.home")),
-        "datastore/$name"
+        "TwidereX/datastore/$name"
     )
 }
