@@ -61,7 +61,7 @@ import com.twidere.twiderex.R
 import com.twidere.twiderex.component.status.UserAvatarDefaults
 import com.twidere.twiderex.http.TwidereServiceFactory
 import com.twidere.twiderex.preferences.LocalHttpConfig
-import com.twidere.twiderex.preferences.proto.DisplayPreferences
+import com.twidere.twiderex.preferences.model.DisplayPreferences
 import com.twidere.twiderex.ui.LocalIsActiveNetworkMetered
 import com.twidere.twiderex.ui.LocalVideoPlayback
 import com.twidere.twiderex.utils.video.CacheDataSourceFactory
@@ -86,7 +86,6 @@ fun VideoPlayer(
         DisplayPreferences.AutoPlayback.Auto -> !isActiveNetworkMetered
         DisplayPreferences.AutoPlayback.Always -> true
         DisplayPreferences.AutoPlayback.Off -> false
-        DisplayPreferences.AutoPlayback.UNRECOGNIZED -> true
     }
     var autoPlay by remember(url) { mutableStateOf(playInitial) }
     val context = LocalContext.current

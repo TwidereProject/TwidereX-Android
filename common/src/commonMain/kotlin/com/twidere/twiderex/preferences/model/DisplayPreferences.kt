@@ -18,12 +18,28 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.di
+package com.twidere.twiderex.preferences.model
 
-import org.koin.core.KoinApplication
+import kotlinx.serialization.Serializable
 
-fun KoinApplication.setupModules() {
-    modules(twidereModules)
-    modules(preferencesModule)
-    modules(repositoryModules)
+@Serializable
+data class DisplayPreferences(
+    val useSystemFontSize: Boolean = true,
+    val fontScale: Float = 1f,
+    val avatarStyle: AvatarStyle = AvatarStyle.Round,
+    val mediaPreview: Boolean = true,
+    val autoPlayback: AutoPlayback = AutoPlayback.Auto,
+    val urlPreview: Boolean = false,
+) {
+    @Serializable
+    enum class AvatarStyle {
+        Round,
+        Square,
+    }
+    @Serializable
+    enum class AutoPlayback {
+        Auto,
+        Always,
+        Off,
+    }
 }

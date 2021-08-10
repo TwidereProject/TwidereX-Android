@@ -80,7 +80,7 @@ import com.twidere.twiderex.component.status.UserAvatarDefaults
 import com.twidere.twiderex.model.ui.UiDMEvent
 import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.navigation.RootRoute
-import com.twidere.twiderex.preferences.proto.DisplayPreferences
+import com.twidere.twiderex.preferences.model.DisplayPreferences
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.LocalVideoPlayback
 

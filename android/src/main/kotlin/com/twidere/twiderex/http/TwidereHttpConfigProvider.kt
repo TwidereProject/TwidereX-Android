@@ -24,7 +24,7 @@ import androidx.datastore.core.DataStore
 import com.twidere.services.http.HttpConfigProvider
 import com.twidere.services.http.config.HttpConfig
 import com.twidere.services.proxy.ProxyConfig
-import com.twidere.twiderex.preferences.proto.MiscPreferences
+import com.twidere.twiderex.preferences.model.MiscPreferences
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking

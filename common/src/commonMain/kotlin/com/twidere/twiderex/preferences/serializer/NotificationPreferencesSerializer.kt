@@ -20,30 +20,24 @@
  */
 package com.twidere.twiderex.preferences.serializer
 
-import androidx.datastore.core.CorruptionException
 import androidx.datastore.core.Serializer
-import com.google.protobuf.InvalidProtocolBufferException
-import com.twidere.twiderex.preferences.proto.DisplayPreferences
+import com.twidere.twiderex.preferences.model.NotificationPreferences
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.decodeFromByteArray
+import kotlinx.serialization.encodeToByteArray
+import kotlinx.serialization.protobuf.ProtoBuf
 import java.io.InputStream
 import java.io.OutputStream
 
-object DisplayPreferencesSerializer : Serializer<DisplayPreferences> {
-    override val defaultValue: DisplayPreferences
-        get() = DisplayPreferences
-            .getDefaultInstance()
-            .toBuilder()
-            .setMediaPreview(true)
-            .setUseSystemFontSize(true)
-            .setFontScale(1F)
-            .build()
+@OptIn(ExperimentalSerializationApi::class)
+object NotificationPreferencesSerializer : Serializer<NotificationPreferences> {
+    override val defaultValue: NotificationPreferences
+        get() = NotificationPreferences()
 
-    override suspend fun readFrom(input: InputStream): DisplayPreferences {
-        try {
-            return DisplayPreferences.parseFrom(input)
-        } catch (exception: InvalidProtocolBufferException) {
-            throw CorruptionException("Cannot read proto.", exception)
-        }
+    override suspend fun readFrom(input: InputStream): NotificationPreferences {
+        return ProtoBuf.decodeFromByteArray(input.readBytes())
     }
 
-    override suspend fun writeTo(t: DisplayPreferences, output: OutputStream) = t.writeTo(output)
+    override suspend fun writeTo(t: NotificationPreferences, output: OutputStream) =
+        output.write(ProtoBuf.encodeToByteArray(t))
 }
