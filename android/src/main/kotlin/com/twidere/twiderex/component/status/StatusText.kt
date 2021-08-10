@@ -29,6 +29,7 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Icon
@@ -85,13 +86,13 @@ fun ColumnScope.StatusText(
     AnimatedVisibility(visible = expanded) {
         Column {
             HtmlText(
+                modifier = Modifier.fillMaxWidth(),
                 htmlText = status.htmlText,
                 maxLines = maxLines,
                 linkResolver = { href ->
                     status.resolveLink(href)
                 },
             )
-
             if (showMastodonPoll && status.platformType == PlatformType.Mastodon && status.poll != null) {
                 Spacer(modifier = Modifier.height(StatusTextDefaults.Mastodon.PollSpacing))
                 MastodonPoll(status)

@@ -63,6 +63,7 @@ import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.ParallaxLayout
 import com.twidere.twiderex.component.foundation.rememberParallaxLayoutState
 import com.twidere.twiderex.component.navigation.LocalNavigator
+import com.twidere.twiderex.navigation.RootDeepLinksRoute
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
 
@@ -192,7 +193,7 @@ private fun AboutContent() {
             Row {
                 IconButton(
                     onClick = {
-                        navController.navigate("deeplink/twitter/user/TwidereProject")
+                        navController.navigate(RootDeepLinksRoute.Twitter.User("TwidereProject"))
                     }
                 ) {
                     Icon(

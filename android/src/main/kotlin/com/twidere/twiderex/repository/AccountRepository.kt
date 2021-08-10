@@ -195,7 +195,7 @@ class AccountRepository @Inject constructor(
                 getAccountDetails(it)
             }
             _activeAccount.value = getCurrentAccount()
-            preferencesCache.remove(detail.accountKey)
+            preferencesCache.remove(detail.accountKey)?.close()
         }
     }
 
