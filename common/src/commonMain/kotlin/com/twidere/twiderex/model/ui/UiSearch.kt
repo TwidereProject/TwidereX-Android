@@ -18,28 +18,13 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.model.job
+package com.twidere.twiderex.model.ui
 
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.enums.ComposeType
-import com.twidere.twiderex.model.enums.MastodonVisibility
-import com.twidere.twiderex.viewmodel.compose.VoteExpired
-import java.util.UUID
 
-data class ComposeData(
+data class UiSearch(
     val content: String,
-    val images: List<String>,
-    val composeType: ComposeType,
-    val statusKey: MicroBlogKey? = null,
-    val lat: Double? = null,
-    val long: Double? = null,
-    val draftId: String = UUID.randomUUID().toString(),
-    val excludedReplyUserIds: List<String>? = null,
-    val voteOptions: List<String>? = null,
-    val voteExpired: VoteExpired? = null,
-    val voteMultiple: Boolean? = null,
-    val visibility: MastodonVisibility? = null,
-    val isSensitive: Boolean? = null,
-    val contentWarningText: String? = null,
-    val isThreadMode: Boolean = false
+    val lastActive: Long,
+    val saved: Boolean,
+    val accountKey: MicroBlogKey
 )

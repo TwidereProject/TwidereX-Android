@@ -22,15 +22,21 @@ package com.twidere.twiderex.paging.mediator.paging
 
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
+import androidx.paging.Pager
+import androidx.paging.PagingData
 import androidx.paging.PagingState
+import androidx.paging.map
 import com.twidere.services.microblog.model.IStatus
 import com.twidere.twiderex.dataprovider.toPagingTimeline
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.paging.PagingTimeLineWithStatus
 import com.twidere.twiderex.model.paging.saveToDb
+import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.paging.IPagination
 import com.twidere.twiderex.paging.IPagingList
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 @OptIn(ExperimentalPagingApi::class)
 abstract class PagingTimelineMediatorBase<T : IPagination>(
@@ -115,4 +121,10 @@ abstract class PagingTimelineMediatorBase<T : IPagination>(
         pageSize: Int,
         paging: T?
     ): List<IStatus>
+}
+
+fun Pager<Int, PagingTimeLineWithStatus>.toUi(accountKey: MicroBlogKey): Flow<PagingData<UiStatus>> {
+    return flow.map { pagingData ->
+        pagingData.map { it.status }
+    }
 }

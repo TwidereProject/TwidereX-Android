@@ -35,4 +35,5 @@ interface PagingTimelineDao {
     suspend fun getLatest(pagingKey: String, accountKey: MicroBlogKey): PagingTimeLineWithStatus?
     suspend fun findWithStatusKey(maxStatusKey: MicroBlogKey, accountKey: MicroBlogKey): PagingTimeLine?
     suspend fun insertAll(listOf: List<PagingTimeLine>)
+    suspend fun delete(statusKey: MicroBlogKey)
 }

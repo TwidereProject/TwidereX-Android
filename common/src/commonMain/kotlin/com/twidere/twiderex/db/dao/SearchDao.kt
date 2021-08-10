@@ -20,7 +20,22 @@
  */
 package com.twidere.twiderex.db.dao
 
-// TODO OPERATION
+import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.ui.UiSearch
+import kotlinx.coroutines.flow.Flow
+
 interface SearchDao {
-    fun clear()
+    suspend fun insertAll(search: List<UiSearch>)
+
+    fun getAll(accountKey: MicroBlogKey): Flow<List<UiSearch>>
+
+    fun getAllHistory(accountKey: MicroBlogKey): Flow<List<UiSearch>>
+
+    fun getAllSaved(accountKey: MicroBlogKey): Flow<List<UiSearch>>
+
+    suspend fun get(content: String, accountKey: MicroBlogKey): UiSearch?
+
+    suspend fun remove(search: UiSearch)
+
+    suspend fun clear()
 }

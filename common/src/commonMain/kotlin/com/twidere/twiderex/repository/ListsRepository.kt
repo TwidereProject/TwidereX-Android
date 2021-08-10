@@ -22,76 +22,72 @@ package com.twidere.twiderex.repository
 
 import androidx.paging.PagingData
 import com.twidere.services.microblog.ListsService
+import com.twidere.twiderex.dataprovider.toUi
 import com.twidere.twiderex.db.CacheDatabase
-import com.twidere.twiderex.db.mapper.toDbList
-import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.transform.toUi
 import com.twidere.twiderex.model.ui.ListsMode
 import com.twidere.twiderex.model.ui.UiList
 import com.twidere.twiderex.paging.mediator.list.ListsMediator
 import com.twidere.twiderex.paging.mediator.list.ListsMediator.Companion.toUi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 
 class ListsRepository(private val database: CacheDatabase) {
 
-    fun findListWithListKey(account: AccountDetails, listKey: MicroBlogKey): Flow<UiList?> {
-        return database.listsDao().findWithListKeyWithFlow(listKey = listKey, accountKey = account.accountKey)
-            .map {
-                it?.toUi()
-            }
+    fun findListWithListKey(accountKey: MicroBlogKey, listKey: MicroBlogKey): Flow<UiList?> {
+        return database.listsDao().findWithListKeyWithFlow(listKey = listKey, accountKey = accountKey)
     }
 
-    fun fetchLists(account: AccountDetails): Flow<PagingData<UiList>> {
+    fun fetchLists(accountKey: MicroBlogKey, service: ListsService): Flow<PagingData<UiList>> {
         val mediator = ListsMediator(
             database = database,
-            accountKey = account.accountKey,
-            service = account.service as ListsService,
+            accountKey = accountKey,
+            service = service,
         )
         return mediator.pager().toUi()
     }
 
     suspend fun createLists(
-        account: AccountDetails,
+        accountKey: MicroBlogKey,
+        service: ListsService,
         title: String,
         description: String? = null,
         mode: String? = null,
         replyPolicy: String? = null
     ): UiList {
-        val result = (account.service as ListsService).createList(
+        val result = service.createList(
             name = title,
             description = description,
             mode = mode,
             repliesPolicy = replyPolicy
-        ).toDbList(account.accountKey)
+        ).toUi(accountKey)
         // save to db
         database.listsDao().insertAll(listOf(result))
-        return result.toUi()
+        return result
     }
 
     suspend fun updateLists(
-        account: AccountDetails,
+        accountKey: MicroBlogKey,
+        service: ListsService,
         listId: String,
         title: String? = null,
         description: String? = null,
         mode: String? = null,
         replyPolicy: String? = null
     ): UiList {
-        val result = (account.service as ListsService).updateList(
+        val result = service.updateList(
             listId = listId,
             name = title,
             description = description,
             mode = mode,
             repliesPolicy = replyPolicy
-        ).toDbList(account.accountKey)
+        ).toUi(accountKey)
         val originSource = database.listsDao().findWithListKey(result.listKey, result.accountKey)
         originSource?.let {
             database.listsDao().update(
                 listOf(
                     it.copy(
                         title = result.title,
-                        description = result.description,
+                        descriptions = result.descriptions,
                         mode = result.mode,
                         isFollowed = result.isFollowed,
                         replyPolicy = result.replyPolicy,
@@ -100,45 +96,48 @@ class ListsRepository(private val database: CacheDatabase) {
                 )
             )
         }
-        return result.toUi()
+        return result
     }
 
     suspend fun deleteLists(
-        account: AccountDetails,
+        accountKey: MicroBlogKey,
+        service: ListsService,
         listKey: MicroBlogKey,
         listId: String
     ): UiList? {
-        (account.service as ListsService).destroyList(listId)
-        val deleteItem = database.listsDao().findWithListKey(listKey, account.accountKey)
+        service.destroyList(listId)
+        val deleteItem = database.listsDao().findWithListKey(listKey, accountKey)
         deleteItem?.let {
             database.listsDao().delete(listOf(deleteItem))
         }
-        return deleteItem?.toUi()
+        return deleteItem
     }
 
     suspend fun unsubscribeLists(
-        account: AccountDetails,
+        accountKey: MicroBlogKey,
+        service: ListsService,
         listKey: MicroBlogKey
     ): UiList? {
-        (account.service as ListsService).unsubscribeList(listId = listKey.id)
-        val updateItem = database.listsDao().findWithListKey(listKey, account.accountKey)
+        service.unsubscribeList(listId = listKey.id)
+        val updateItem = database.listsDao().findWithListKey(listKey, accountKey)
         updateItem?.let {
             database.listsDao().update(listOf(updateItem.copy(isFollowed = false)))
         }
-        return updateItem?.toUi()
+        return updateItem
     }
 
     suspend fun subscribeLists(
-        account: AccountDetails,
+        accountKey: MicroBlogKey,
+        service: ListsService,
         listKey: MicroBlogKey
     ): UiList {
-        val result = (account.service as ListsService)
+        val result = service
             .subscribeList(listId = listKey.id)
-            .toDbList(accountKey = account.accountKey)
-        val updateItem = database.listsDao().findWithListKey(listKey, account.accountKey)
+            .toUi(accountKey = accountKey)
+        val updateItem = database.listsDao().findWithListKey(listKey, accountKey)
         updateItem?.let {
             database.listsDao().update(listOf(updateItem.copy(isFollowed = true)))
         } ?: database.listsDao().insertAll(listOf(result))
-        return result.toUi()
+        return result
     }
 }

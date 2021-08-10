@@ -18,7 +18,18 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.db.dao
+package com.twidere.twiderex.repository
 
-// TODO OPERATION
-interface UrlEntityDao
+import com.twidere.twiderex.model.ui.UiUser
+
+expect class AccountUpdateRepository {
+    fun updateAccount(user: UiUser)
+    // accountRepository.findByAccountKey(user.userKey)?.let {
+    //             accountRepository.getAccountDetails(it)
+    //         }?.let { details ->
+    //             user.let {
+    //                 details.user = it.toAmUser()
+    //                 accountRepository.updateAccount(details)
+    //             }
+    //         }
+}

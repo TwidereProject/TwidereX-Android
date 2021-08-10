@@ -28,10 +28,7 @@ import com.twidere.twiderex.db.dao.NotificationCursorDao
 import com.twidere.twiderex.db.dao.PagingTimelineDao
 import com.twidere.twiderex.db.dao.ReactionDao
 import com.twidere.twiderex.db.dao.StatusDao
-import com.twidere.twiderex.db.dao.StatusReferenceDao
 import com.twidere.twiderex.db.dao.TrendDao
-import com.twidere.twiderex.db.dao.TrendHistoryDao
-import com.twidere.twiderex.db.dao.UrlEntityDao
 import com.twidere.twiderex.db.dao.UserDao
 
 interface CacheDatabase : Database {
@@ -40,12 +37,9 @@ interface CacheDatabase : Database {
     fun userDao(): UserDao
     fun reactionDao(): ReactionDao
     fun pagingTimelineDao(): PagingTimelineDao
-    fun urlEntityDao(): UrlEntityDao
-    fun statusReferenceDao(): StatusReferenceDao
     fun listsDao(): ListsDao
     fun notificationCursorDao(): NotificationCursorDao
     fun trendDao(): TrendDao
-    fun trendHistoryDao(): TrendHistoryDao
     fun directMessageConversationDao(): DirectMessageConversationDao
     fun directMessageDao(): DirectMessageEventDao
 }

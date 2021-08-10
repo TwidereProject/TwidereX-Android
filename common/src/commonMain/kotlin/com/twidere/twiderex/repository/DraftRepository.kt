@@ -21,13 +21,11 @@
 package com.twidere.twiderex.repository
 
 import com.twidere.twiderex.db.AppDatabase
-import com.twidere.twiderex.db.model.DbDraft
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.viewmodel.compose.ComposeType
+import com.twidere.twiderex.model.enums.ComposeType
+import com.twidere.twiderex.model.ui.UiDraft
 import java.util.UUID
-import javax.inject.Singleton
 
-@Singleton
 class DraftRepository(
     private val database: AppDatabase
 ) {
@@ -47,8 +45,8 @@ class DraftRepository(
         draftId: String = UUID.randomUUID().toString(),
         excludedReplyUserIds: List<String>? = null,
     ) {
-        DbDraft(
-            _id = draftId,
+        UiDraft(
+            draftId = draftId,
             content = content,
             composeType = composeType,
             media = media,
@@ -56,11 +54,11 @@ class DraftRepository(
             createdAt = System.currentTimeMillis(),
             excludedReplyUserIds = excludedReplyUserIds
         ).let {
-            database.draftDao().insertAll(it)
+            database.draftDao().insert(it)
         }
     }
 
-    suspend fun get(draftId: String): DbDraft? {
+    suspend fun get(draftId: String): UiDraft? {
         return database.draftDao().get(draftId)
     }
 
@@ -70,7 +68,7 @@ class DraftRepository(
         }
     }
 
-    suspend fun remove(draft: DbDraft) {
+    suspend fun remove(draft: UiDraft) {
         database.draftDao().remove(draft)
     }
 }

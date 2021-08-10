@@ -18,7 +18,17 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.db.dao
+package com.twidere.twiderex.model.ui
 
-// TODO OPERATION
-interface TrendHistoryDao
+import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.enums.ComposeType
+
+data class UiDraft(
+    val draftId: String,
+    val content: String,
+    val media: List<String>,
+    val createdAt: Long,
+    val composeType: ComposeType,
+    val statusKey: MicroBlogKey?,
+    val excludedReplyUserIds: List<String>?,
+)

@@ -25,12 +25,12 @@ import androidx.paging.PagingData
 import com.twidere.services.mastodon.MastodonService
 import com.twidere.services.microblog.TimelineService
 import com.twidere.twiderex.db.CacheDatabase
-import com.twidere.twiderex.extensions.toUi
-import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.paging.mediator.list.ListsTimelineMediator
 import com.twidere.twiderex.paging.mediator.paging.pager
+import com.twidere.twiderex.paging.mediator.paging.toUi
 import com.twidere.twiderex.paging.mediator.timeline.MastodonHashtagTimelineMediator
 import com.twidere.twiderex.paging.mediator.user.UserFavouriteMediator
 import com.twidere.twiderex.paging.mediator.user.UserStatusMediator
@@ -42,54 +42,59 @@ class TimelineRepository(
 ) {
     fun favouriteTimeline(
         userKey: MicroBlogKey,
-        account: AccountDetails,
+        accountKey: MicroBlogKey,
+        platformType: PlatformType,
+        service: TimelineService,
     ): Flow<PagingData<UiStatus>> {
         val mediator = UserFavouriteMediator(
             userKey = userKey,
-            platformType = account.type,
+            platformType = platformType,
             database = database,
-            accountKey = account.accountKey,
-            service = account.service as TimelineService,
+            accountKey = accountKey,
+            service = service,
         )
-        return mediator.pager().toUi(accountKey = account.accountKey)
+        return mediator.pager().toUi(accountKey = accountKey)
     }
 
     fun userTimeline(
         userKey: MicroBlogKey,
-        account: AccountDetails,
+        accountKey: MicroBlogKey,
+        service: TimelineService,
         exclude_replies: Boolean,
     ): Flow<PagingData<UiStatus>> {
         return UserStatusMediator(
             userKey = userKey,
             database = database,
-            accountKey = account.accountKey,
-            service = account.service as TimelineService,
+            accountKey = accountKey,
+            service = service,
             exclude_replies = exclude_replies,
-        ).pager().toUi(accountKey = account.accountKey)
+        ).pager().toUi(accountKey = accountKey)
     }
 
     fun listTimeline(
-        account: AccountDetails,
+        accountKey: MicroBlogKey,
+        service: TimelineService,
         listKey: MicroBlogKey,
     ): Flow<PagingData<UiStatus>> {
         return ListsTimelineMediator(
-            accountKey = account.accountKey,
+            accountKey = accountKey,
             database = database,
             listKey = listKey,
-            service = account.service as TimelineService
-        ).pager().toUi(accountKey = account.accountKey)
+            service = service
+        ).pager().toUi(accountKey = accountKey)
     }
 
     fun mastodonHashtagTimeline(
         keyword: String,
-        account: AccountDetails
+        accountKey: MicroBlogKey,
+        service: MastodonService,
     ): Flow<PagingData<UiStatus>> {
         val mediator = MastodonHashtagTimelineMediator(
             keyword = keyword,
-            service = account.service as MastodonService,
-            accountKey = account.accountKey,
+            service = service,
+            accountKey = accountKey,
             database = database
         )
-        return mediator.pager().toUi(accountKey = account.accountKey)
+        return mediator.pager().toUi(accountKey = accountKey)
     }
 }

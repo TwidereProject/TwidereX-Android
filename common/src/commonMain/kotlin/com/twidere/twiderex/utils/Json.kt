@@ -18,7 +18,22 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.db.dao
+package com.twidere.twiderex.utils
 
-// TODO OPERATION
-interface StatusReferenceDao
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+
+private val JSON by lazy {
+    Json {
+        ignoreUnknownKeys = true
+        isLenient = true
+        coerceInputValues = true
+    }
+}
+
+internal inline fun <reified T> T.json(): String =
+    JSON.encodeToString<T>(this)
+
+internal inline fun <reified T> String.fromJson() =
+    JSON.decodeFromString<T>(this)

@@ -22,9 +22,11 @@ package com.twidere.twiderex.db.dao
 
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiUser
+import kotlinx.coroutines.flow.Flow
 
 // TODO OPERATION
 interface UserDao {
     suspend fun findWithUserKey(userKey: MicroBlogKey): UiUser?
     suspend fun insertAll(listOf: List<UiUser>)
+    fun findWithUserKeyFlow(userKey: MicroBlogKey): Flow<UiUser?>
 }

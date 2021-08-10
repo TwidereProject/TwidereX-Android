@@ -21,51 +21,38 @@
 package com.twidere.twiderex.repository
 
 import com.twidere.services.microblog.LookupService
+import com.twidere.twiderex.dataprovider.toUi
 import com.twidere.twiderex.db.CacheDatabase
-import com.twidere.twiderex.db.mapper.toDbUser
-import com.twidere.twiderex.db.model.DbUser
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.transform.toAmUser
-import com.twidere.twiderex.model.transform.toUi
 import com.twidere.twiderex.model.ui.UiUser
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 
 class UserRepository(
     private val database: CacheDatabase,
-    private val accountRepository: AccountRepository,
+    private val accountRepository: AccountUpdateRepository,
 ) {
     suspend fun lookupUserByName(name: String, accountKey: MicroBlogKey, lookupService: LookupService): UiUser {
-        val user = lookupService.lookupUserByName(name).toDbUser(accountKey)
-        saveUser(user)
-        return user.toUi()
+        return lookupService.lookupUserByName(name).toUi(accountKey).also {
+            saveUser(it)
+        }
     }
 
     suspend fun lookupUserById(id: String, accountKey: MicroBlogKey, lookupService: LookupService): UiUser {
-        val user = lookupService.lookupUser(id).toDbUser(accountKey)
+        val user = lookupService.lookupUser(id).toUi(accountKey)
         saveUser(user)
-        return user.toUi()
+        return user
     }
 
     suspend fun lookupUsersByName(name: List<String>, accountKey: MicroBlogKey, lookupService: LookupService): List<UiUser> {
-        return lookupService.lookupUsersByName(name = name).map { it.toDbUser(accountKey).toUi() }
+        return lookupService.lookupUsersByName(name = name).map { it.toUi(accountKey) }
     }
 
     fun getUserFlow(userKey: MicroBlogKey): Flow<UiUser?> {
-        return database.userDao().findWithUserKeyFlow(userKey = userKey).map {
-            it?.toUi()
-        }
+        return database.userDao().findWithUserKeyFlow(userKey = userKey)
     }
 
-    private suspend fun saveUser(user: DbUser) {
+    private suspend fun saveUser(user: UiUser) {
         database.userDao().insertAll(listOf(user))
-        accountRepository.findByAccountKey(user.userKey)?.let {
-            accountRepository.getAccountDetails(it)
-        }?.let { details ->
-            user.let {
-                details.user = it.toAmUser()
-                accountRepository.updateAccount(details)
-            }
-        }
+        accountRepository.updateAccount(user)
     }
 }

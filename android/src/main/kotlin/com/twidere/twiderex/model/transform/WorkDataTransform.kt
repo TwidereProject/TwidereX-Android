@@ -25,12 +25,12 @@ import androidx.work.workDataOf
 import com.twidere.twiderex.extensions.getNullableBoolean
 import com.twidere.twiderex.extensions.getNullableDouble
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.enums.ComposeType
 import com.twidere.twiderex.model.enums.MastodonVisibility
 import com.twidere.twiderex.model.job.ComposeData
 import com.twidere.twiderex.model.job.DirectMessageDeleteData
 import com.twidere.twiderex.model.job.DirectMessageSendData
 import com.twidere.twiderex.model.job.StatusResult
-import com.twidere.twiderex.viewmodel.compose.ComposeType
 import com.twidere.twiderex.viewmodel.compose.VoteExpired
 
 fun StatusResult.toWorkData() = workDataOf(

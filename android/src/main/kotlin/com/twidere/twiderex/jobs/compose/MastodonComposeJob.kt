@@ -32,13 +32,13 @@ import com.twidere.twiderex.kmp.ExifScrambler
 import com.twidere.twiderex.kmp.FileResolver
 import com.twidere.twiderex.kmp.RemoteNavigator
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.enums.ComposeType
 import com.twidere.twiderex.model.enums.MastodonVisibility
 import com.twidere.twiderex.model.job.ComposeData
 import com.twidere.twiderex.model.transform.toUi
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.notification.AppNotificationManager
 import com.twidere.twiderex.repository.AccountRepository
-import com.twidere.twiderex.viewmodel.compose.ComposeType
 import java.io.File
 import java.net.URI
 

@@ -22,7 +22,7 @@ package com.twidere.twiderex.navigation
 
 import com.twidere.route.processor.AppRoute
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.viewmodel.compose.ComposeType
+import com.twidere.twiderex.model.enums.ComposeType
 
 @AppRoute
 interface Root {

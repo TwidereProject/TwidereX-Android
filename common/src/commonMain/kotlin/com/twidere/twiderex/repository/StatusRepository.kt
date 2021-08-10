@@ -22,26 +22,21 @@ package com.twidere.twiderex.repository
 
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.PagingData
-import androidx.room.withTransaction
 import com.twidere.services.mastodon.MastodonService
 import com.twidere.services.microblog.LookupService
+import com.twidere.services.microblog.MicroBlogService
 import com.twidere.services.nitter.NitterService
 import com.twidere.services.twitter.TwitterService
+import com.twidere.twiderex.dataprovider.toUi
 import com.twidere.twiderex.db.CacheDatabase
-import com.twidere.twiderex.db.mapper.toDbStatusWithReference
-import com.twidere.twiderex.db.model.DbStatusV2
-import com.twidere.twiderex.db.model.saveToDb
-import com.twidere.twiderex.extensions.toUi
-import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.PlatformType
-import com.twidere.twiderex.model.transform.toUi
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.paging.mediator.paging.pager
+import com.twidere.twiderex.paging.mediator.paging.toUi
 import com.twidere.twiderex.paging.mediator.status.MastodonStatusContextMediator
 import com.twidere.twiderex.paging.mediator.status.TwitterConversationMediator
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 
 class StatusRepository(
     private val database: CacheDatabase,
@@ -51,21 +46,16 @@ class StatusRepository(
         statusKey: MicroBlogKey,
         accountKey: MicroBlogKey
     ): Flow<UiStatus?> {
-        return database.statusDao().findWithStatusKeyWithReferenceFlow(statusKey).map {
-            it?.toUi(accountKey)
-        }
+        return database.statusDao().findWithStatusKeyWithReferenceFlow(statusKey, accountKey)
     }
 
     suspend fun loadFromCache(statusKey: MicroBlogKey, accountKey: MicroBlogKey): UiStatus? {
-        return database.statusDao().findWithStatusKeyWithReference(statusKey).let {
-            it?.toUi(accountKey)
-        }
+        return database.statusDao().findWithStatusKeyWithReference(statusKey, accountKey)
     }
 
-    suspend fun updateStatus(statusKey: MicroBlogKey, action: (DbStatusV2) -> Unit) {
+    suspend fun updateStatus(statusKey: MicroBlogKey, action: (UiStatus) -> UiStatus) {
         database.statusDao().findWithStatusKey(statusKey)?.let {
-            action.invoke(it)
-            database.statusDao().insertAll(listOf(it))
+            database.statusDao().insertAll(listOf(action.invoke(it)))
         }
     }
 
@@ -73,7 +63,8 @@ class StatusRepository(
         database.withTransaction {
             database.statusDao().delete(statusKey)
             database.pagingTimelineDao().delete(statusKey)
-            database.statusReferenceDao().delete(statusKey)
+            // TODO hide by implementation of statusDao
+            // database.statusReferenceDao().delete(statusKey)
         }
     }
 
@@ -82,34 +73,38 @@ class StatusRepository(
         accountKey: MicroBlogKey,
         lookupService: LookupService
     ) {
-        listOf(
-            lookupService.lookupStatus(id).toDbStatusWithReference(accountKey = accountKey)
-        ).saveToDb(database)
+        database.statusDao().insertAll(
+            listOf(
+                lookupService.lookupStatus(id).toUi(accountKey = accountKey)
+            )
+        )
     }
 
     @OptIn(ExperimentalPagingApi::class)
     fun conversation(
         statusKey: MicroBlogKey,
-        account: AccountDetails,
+        platformType: PlatformType,
+        service: MicroBlogService,
+        accountKey: MicroBlogKey
     ): Flow<PagingData<UiStatus>> {
         // TODO: remove usage of `when`
-        val remoteMediator = when (account.type) {
+        val remoteMediator = when (platformType) {
             PlatformType.Twitter -> TwitterConversationMediator(
-                service = account.service as TwitterService,
+                service = service as TwitterService,
                 nitterService = nitterService,
                 statusKey = statusKey,
-                accountKey = account.accountKey,
+                accountKey = accountKey,
                 database = database,
             )
             PlatformType.StatusNet -> TODO()
             PlatformType.Fanfou -> TODO()
             PlatformType.Mastodon -> MastodonStatusContextMediator(
-                service = account.service as MastodonService,
+                service = service as MastodonService,
                 statusKey = statusKey,
-                accountKey = account.accountKey,
+                accountKey = accountKey,
                 database = database,
             )
         }
-        return remoteMediator.pager().toUi(accountKey = account.accountKey)
+        return remoteMediator.pager().toUi(accountKey = accountKey)
     }
 }

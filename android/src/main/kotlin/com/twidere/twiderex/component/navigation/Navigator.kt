@@ -27,6 +27,7 @@ import android.net.Uri
 import android.webkit.CookieManager
 import androidx.compose.runtime.staticCompositionLocalOf
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.enums.ComposeType
 import com.twidere.twiderex.model.enums.MastodonStatusType
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.enums.ReferenceType
@@ -34,7 +35,6 @@ import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.navigation.RootRoute
 import com.twidere.twiderex.navigation.twidereXSchema
-import com.twidere.twiderex.viewmodel.compose.ComposeType
 import moe.tlaster.precompose.navigation.NavController
 import moe.tlaster.precompose.navigation.NavOptions
 

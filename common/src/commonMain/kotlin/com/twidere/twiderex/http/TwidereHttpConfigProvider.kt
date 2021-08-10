@@ -28,9 +28,8 @@ import com.twidere.twiderex.preferences.model.MiscPreferences
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
-import javax.inject.Inject
 
-class TwidereHttpConfigProvider @Inject constructor(
+class TwidereHttpConfigProvider(
     private val miscPreferences: DataStore<MiscPreferences>
 ) : HttpConfigProvider {
     override fun provideConfig(): HttpConfig {

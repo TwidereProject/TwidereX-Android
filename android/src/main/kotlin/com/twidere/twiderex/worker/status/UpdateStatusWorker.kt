@@ -66,14 +66,7 @@ class UpdateStatusWorker @AssistedInject constructor(
         val retweeted = inputData.getNullableBoolean("retweeted")
         val retweetCount = inputData.getNullableLong("retweetCount")
         val likeCount = inputData.getNullableLong("likeCount")
-        repository.updateReaction(accountKey = accountKey, statusKey = statusKey) {
-            if (liked != null) {
-                it.liked = liked
-            }
-            if (retweeted != null) {
-                it.retweeted = retweeted
-            }
-        }
+        repository.updateReaction(accountKey = accountKey, statusKey = statusKey, liked = liked, retweeted = retweeted)
         statusRepository.updateStatus(statusKey = statusKey) {
             if (retweetCount != null) {
                 it.retweetCount = retweetCount

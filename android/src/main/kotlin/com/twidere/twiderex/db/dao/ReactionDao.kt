@@ -34,4 +34,10 @@ interface ReactionDao {
 
     @Query("SELECT * FROM status_reactions WHERE statusKey == :statusKey AND accountKey == :accountKey")
     suspend fun findWithStatusKey(statusKey: MicroBlogKey, accountKey: MicroBlogKey): DbStatusReaction?
+    suspend fun updateReaction(
+        statusKey: MicroBlogKey,
+        accountKey: MicroBlogKey,
+        liked: Boolean?,
+        retweeted: Boolean?
+    )
 }

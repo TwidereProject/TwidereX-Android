@@ -20,30 +20,28 @@
  */
 package com.twidere.twiderex.repository
 
+import androidx.paging.PagingData
+import com.twidere.services.microblog.TrendService
 import com.twidere.twiderex.db.CacheDatabase
-import com.twidere.twiderex.db.model.DbStatusReaction
 import com.twidere.twiderex.model.MicroBlogKey
-import java.util.UUID
+import com.twidere.twiderex.model.ui.UiTrend
+import com.twidere.twiderex.paging.mediator.trend.TrendMediator
+import com.twidere.twiderex.paging.mediator.trend.TrendMediator.Companion.toUi
+import kotlinx.coroutines.flow.Flow
 
-class ReactionRepository(
-    private val database: CacheDatabase,
-) {
-    suspend fun updateReaction(
+class TrendRepository(private val database: CacheDatabase) {
+    private val worldWideId = "1"
+
+    fun trendsSource(
         accountKey: MicroBlogKey,
-        statusKey: MicroBlogKey,
-        action: (DbStatusReaction) -> Unit,
-    ) {
-        database.reactionDao().findWithStatusKey(statusKey, accountKey).let {
-            it ?: DbStatusReaction(
-                _id = UUID.randomUUID().toString(),
-                statusKey = statusKey,
-                accountKey = accountKey,
-                liked = false,
-                retweeted = false,
-            )
-        }.let {
-            action.invoke(it)
-            database.reactionDao().insertAll(listOf(it))
-        }
+        service: TrendService,
+        locationId: String = worldWideId
+    ): Flow<PagingData<UiTrend>> {
+        return TrendMediator(
+            database = database,
+            service = service,
+            accountKey = accountKey,
+            locationId = locationId
+        ).pager().toUi()
     }
 }

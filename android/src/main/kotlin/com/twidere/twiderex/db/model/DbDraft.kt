@@ -23,7 +23,7 @@ package com.twidere.twiderex.db.model
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.viewmodel.compose.ComposeType
+import com.twidere.twiderex.model.enums.ComposeType
 
 @Entity(
     tableName = "draft",

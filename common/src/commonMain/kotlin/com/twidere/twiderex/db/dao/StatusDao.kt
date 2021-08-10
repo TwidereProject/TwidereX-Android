@@ -22,9 +22,17 @@ package com.twidere.twiderex.db.dao
 
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiStatus
+import kotlinx.coroutines.flow.Flow
 
 // TODO OPERATION
 interface StatusDao {
     suspend fun findWithStatusKey(it: MicroBlogKey): UiStatus?
     suspend fun insertAll(it: List<UiStatus>)
+    fun findWithStatusKeyWithReferenceFlow(
+        statusKey: MicroBlogKey,
+        accountKey: MicroBlogKey
+    ): Flow<UiStatus?>
+
+    suspend fun findWithStatusKeyWithReference(statusKey: MicroBlogKey, accountKey: MicroBlogKey): UiStatus?
+    suspend fun delete(statusKey: MicroBlogKey)
 }

@@ -18,15 +18,11 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.db.dao
+package com.twidere.twiderex.model.enums
 
-import com.twidere.twiderex.model.MicroBlogKey
-
-interface ReactionDao {
-    suspend fun updateAction(
-        statusKey: MicroBlogKey,
-        accountKey: MicroBlogKey,
-        liked: Boolean?,
-        retweet: Boolean?
-    )
+enum class ComposeType {
+    New,
+    Reply,
+    Quote,
+    Thread,
 }

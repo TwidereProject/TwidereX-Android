@@ -21,9 +21,8 @@
 package com.twidere.twiderex.repository
 
 import com.twidere.twiderex.db.AppDatabase
-import com.twidere.twiderex.db.model.DbSearch
 import com.twidere.twiderex.model.MicroBlogKey
-import java.util.UUID
+import com.twidere.twiderex.model.ui.UiSearch
 
 class SearchRepository(
     private val database: AppDatabase
@@ -42,8 +41,7 @@ class SearchRepository(
                 lastActive = System.currentTimeMillis(),
                 saved = if (it.saved) it.saved else saved
             )
-        } ?: DbSearch(
-            _id = UUID.randomUUID().toString(),
+        } ?: UiSearch(
             content = content,
             lastActive = System.currentTimeMillis(),
             saved = false,
@@ -54,11 +52,11 @@ class SearchRepository(
         )
     }
 
-    suspend fun remove(item: DbSearch) {
+    suspend fun remove(item: UiSearch) {
         database.searchDao().remove(item)
     }
 
-    suspend fun get(content: String, accountKey: MicroBlogKey): DbSearch? {
+    suspend fun get(content: String, accountKey: MicroBlogKey): UiSearch? {
         return database.searchDao().get(content, accountKey)
     }
 }
