@@ -26,7 +26,7 @@ import moe.tlaster.precompose.viewmodel.ViewModelStoreOwner
 
 val LocalLifecycleOwner = compositionLocalOf<LifecycleOwner?> { null }
 
-val LocalViewModelStoreOwner = compositionLocalOf<ViewModelStoreOwner?> { null }
+val LocalViewModelStoreOwner = compositionLocalOf<ViewModelStoreOwner> { noLocalProvidedFor("ViewModelStoreOwner") }
 
 private fun noLocalProvidedFor(name: String): Nothing {
     error("CompositionLocal $name not present")
