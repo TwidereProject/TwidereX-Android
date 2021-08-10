@@ -20,44 +20,41 @@
  */
 package com.twidere.twiderex.repository
 
-import com.twidere.twiderex.cache.MediaCache
-import com.twidere.twiderex.dataprovider.DataProvider
+import com.twidere.twiderex.cache.AppCacheHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import okhttp3.Cache
-import java.io.File
 
 class CacheRepository(
-    private val dataProvider: DataProvider = DataProvider.create(),
-    private val cache: Cache,
-    private val mediaCache: MediaCache,
-    private val cacheDirs: List<File>,
+    private val appCache: AppCacheHandler,
 ) {
     suspend fun clearDatabaseCache() = coroutineScope {
         launch(Dispatchers.IO) {
-            dataProvider.cacheDatabase.clearAllTables()
+            appCache.clearDatabaseCaches()
+            // cacheDatabase.clearAllTables()
         }
     }
 
     suspend fun clearImageCache() = coroutineScope {
-        mediaCache.clear()
-        cache.directory.deleteRecursively()
+        appCache.clearMediaCaches()
+        // cache.directory.deleteRecursively()
     }
 
     suspend fun clearCacheDir() = coroutineScope {
         launch(Dispatchers.IO) {
-            cacheDirs.forEach {
-                it.listFiles()?.forEach { file ->
-                    file.deleteRecursively()
-                }
-            }
+            appCache.clearFileCaches()
+            // cacheDirs.forEach {
+            //     it.listFiles()?.forEach { file ->
+            //         file.deleteRecursively()
+            //     }
+            // }
         }
     }
 
     suspend fun clearSearchHistory() = coroutineScope {
         launch(Dispatchers.IO) {
-            dataProvider.appDatabase.searchDao().clear()
+            appCache.clearSearchHistories()
+            // appDatabase.searchDao().clear()
         }
     }
 }

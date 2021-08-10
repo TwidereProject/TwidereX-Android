@@ -20,6 +20,7 @@
  */
 package com.twidere.twiderex.dataprovider
 
+import com.twidere.twiderex.cache.AppCacheHandler
 import com.twidere.twiderex.db.AppDatabase
 import com.twidere.twiderex.db.CacheDatabase
 
@@ -32,4 +33,6 @@ expect class DataProvider {
     val appDatabase: AppDatabase
 
     val cacheDatabase: CacheDatabase
+
+    val appCacheHandler: AppCacheHandler
 }

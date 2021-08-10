@@ -20,8 +20,12 @@
  */
 package com.twidere.twiderex.cache
 
-actual class MediaCache {
-    actual fun clear() {
-        TODO("Not yet implemented")
-    }
+interface AppCacheHandler {
+    fun clearMediaCaches()
+
+    fun clearFileCaches()
+
+    fun clearDatabaseCaches()
+
+    fun clearSearchHistories()
 }

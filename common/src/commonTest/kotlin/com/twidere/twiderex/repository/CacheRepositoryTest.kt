@@ -18,10 +18,26 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.cache
+package com.twidere.twiderex.repository
 
-actual class MediaCache {
-    actual fun clear() {
-        TODO("Not yet implemented")
+import com.twidere.twiderex.mock.cache.MockAppCacheHandler
+import kotlinx.coroutines.runBlocking
+import org.junit.Test
+
+class CacheRepositoryTest {
+    @Test
+    fun clearAllCachesSuccess() = runBlocking {
+        val handler = MockAppCacheHandler(
+            mediaCache = mutableListOf("media"),
+            fileCache = mutableListOf("file"),
+            database = mutableListOf("database"),
+            searchHistories = mutableListOf("search"),
+        )
+        val repository = CacheRepository(handler)
+        repository.clearCacheDir()
+        repository.clearDatabaseCache()
+        repository.clearImageCache()
+        repository.clearSearchHistory()
+        assert(handler.isCacheCleared())
     }
 }

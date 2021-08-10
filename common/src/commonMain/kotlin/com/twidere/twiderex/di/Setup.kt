@@ -20,5 +20,22 @@
  */
 package com.twidere.twiderex.di
 
+import com.twidere.twiderex.dataprovider.DataProvider
+import com.twidere.twiderex.repository.CacheRepository
+import com.twidere.twiderex.repository.MediaRepository
+import org.koin.dsl.module
+
+val twidereModules = module {
+    single { DataProvider.create() }
+    single { get<DataProvider>().appCacheHandler }
+    single { get<DataProvider>().cacheDatabase }
+    single { get<DataProvider>().appDatabase }
+}
+
+val repositoryModules = module {
+    factory { MediaRepository(get<DataProvider>().cacheDatabase.mediaDao()) }
+    factory { CacheRepository(get()) }
+}
+
 fun setupModules() {
 }

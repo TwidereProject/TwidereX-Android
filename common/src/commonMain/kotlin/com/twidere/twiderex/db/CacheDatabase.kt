@@ -35,17 +35,17 @@ import com.twidere.twiderex.db.dao.UrlEntityDao
 import com.twidere.twiderex.db.dao.UserDao
 
 interface CacheDatabase : Database {
-    abstract fun statusDao(): StatusDao
-    abstract fun mediaDao(): MediaDao
-    abstract fun userDao(): UserDao
-    abstract fun reactionDao(): ReactionDao
-    abstract fun pagingTimelineDao(): PagingTimelineDao
-    abstract fun urlEntityDao(): UrlEntityDao
-    abstract fun statusReferenceDao(): StatusReferenceDao
-    abstract fun listsDao(): ListsDao
-    abstract fun notificationCursorDao(): NotificationCursorDao
-    abstract fun trendDao(): TrendDao
-    abstract fun trendHistoryDao(): TrendHistoryDao
-    abstract fun directMessageConversationDao(): DirectMessageConversationDao
-    abstract fun directMessageDao(): DirectMessageEventDao
+    fun statusDao(): StatusDao
+    fun mediaDao(): MediaDao
+    fun userDao(): UserDao
+    fun reactionDao(): ReactionDao
+    fun pagingTimelineDao(): PagingTimelineDao
+    fun urlEntityDao(): UrlEntityDao
+    fun statusReferenceDao(): StatusReferenceDao
+    fun listsDao(): ListsDao
+    fun notificationCursorDao(): NotificationCursorDao
+    fun trendDao(): TrendDao
+    fun trendHistoryDao(): TrendHistoryDao
+    fun directMessageConversationDao(): DirectMessageConversationDao
+    fun directMessageDao(): DirectMessageEventDao
 }

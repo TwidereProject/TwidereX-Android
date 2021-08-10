@@ -18,8 +18,31 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.cache
+package com.twidere.twiderex.mock.cache
 
-expect class MediaCache {
-    fun clear()
+import com.twidere.twiderex.cache.AppCacheHandler
+
+internal class MockAppCacheHandler(
+    private val mediaCache: MutableList<Any>,
+    private val fileCache: MutableList<Any>,
+    private val database: MutableList<Any>,
+    private val searchHistories: MutableList<Any>
+) : AppCacheHandler {
+    override fun clearMediaCaches() {
+        mediaCache.clear()
+    }
+
+    override fun clearFileCaches() {
+        fileCache.clear()
+    }
+
+    override fun clearDatabaseCaches() {
+        database.clear()
+    }
+
+    override fun clearSearchHistories() {
+        searchHistories.clear()
+    }
+
+    fun isCacheCleared() = mediaCache.isEmpty() && fileCache.isEmpty() && database.isEmpty() && searchHistories.isEmpty()
 }
