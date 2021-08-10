@@ -1,0 +1,32 @@
+name: Desktop CI
+
+on:
+  push:
+    paths-ignore:
+      - '**.md'
+  pull_request:
+    paths-ignore:
+      - '**.md'
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+
+      - name: Build with Gradle
+        run: ./gradlew :desktop:spotlessCheck :desktop:build
+
+      - name: Upload build reports
+        uses: actions/upload-artifact@v2
+        with:
+          name: build-reports
+          path: '**/build/reports'
+          

@@ -84,6 +84,7 @@ import com.twidere.twiderex.viewmodel.ActiveAccountViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.MutableStateFlow
 import moe.tlaster.precompose.navigation.NavController
+import org.koin.android.ext.android.inject
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -112,8 +113,7 @@ class TwidereXActivity : ComponentActivity() {
     @Inject
     lateinit var statusActions: StatusActions
 
-    @Inject
-    lateinit var preferencesHolder: PreferencesHolder
+    val preferencesHolder: PreferencesHolder by inject()
 
     @Inject
     lateinit var inAppNotification: InAppNotification

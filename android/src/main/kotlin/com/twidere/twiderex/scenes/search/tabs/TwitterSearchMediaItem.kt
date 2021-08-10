@@ -30,7 +30,7 @@ import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
 import com.twidere.twiderex.component.lazy.ui.LazyUiStatusImageList
 import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.extensions.refreshOrRetry
-import com.twidere.twiderex.preferences.proto.DisplayPreferences
+import com.twidere.twiderex.preferences.model.DisplayPreferences
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalVideoPlayback
 import com.twidere.twiderex.viewmodel.twitter.search.TwitterSearchMediaViewModel

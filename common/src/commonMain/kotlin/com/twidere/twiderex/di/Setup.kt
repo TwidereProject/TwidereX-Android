@@ -18,30 +18,10 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex
+package com.twidere.twiderex.di
 
-import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.compose.ui.window.Window
-import androidx.compose.ui.window.application
-import com.twidere.twiderex.di.setupModules
-import org.koin.core.context.startKoin
-import org.koin.core.context.stopKoin
+import org.koin.core.KoinApplication
 
-@ExperimentalComposeUiApi
-fun main() {
-    startKoin {
-        printLogger()
-        setupModules()
-    }
-    application {
-        Window(
-            onCloseRequest = {
-                stopKoin()
-                exitApplication()
-            },
-            title = "Twidere X"
-        ) {
-            App()
-        }
-    }
+fun KoinApplication.setupModules() {
+    modules(preferencesModule)
 }

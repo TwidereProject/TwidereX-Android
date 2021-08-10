@@ -25,13 +25,13 @@ jobs:
         run: yes | /usr/local/lib/android/sdk/tools/bin/sdkmanager --licenses
 
       - name: Build with Gradle
-        run: ./gradlew spotlessCheck lint build
+        run: ./gradlew :android:spotlessCheck :android:lint :android:build
 
       - name: Upload build reports
         uses: actions/upload-artifact@v2
         with:
           name: build-reports
-          path: ./app/build/reports
+          path: '**/build/reports'
           
   unit-test:
     runs-on: ubuntu-latest
@@ -49,7 +49,7 @@ jobs:
         run: yes | /usr/local/lib/android/sdk/tools/bin/sdkmanager --licenses
 
       - name: Build with Gradle
-        run: ./gradlew test
+        run: ./gradlew :android:test
 
       - name: Upload test results
         if: always()
@@ -91,7 +91,7 @@ jobs:
         run: (while sleep 3; do echo "y"; done) | /Users/runner/Library/Android/sdk/cmdline-tools/latest/bin/sdkmanager --licenses
 
       - name: Build tests
-        run: ./gradlew assembleAndroidTest
+        run: ./gradlew :android:assembleAndroidTest
 
       - name: Run tests
         uses: reactivecircus/android-emulator-runner@v2
@@ -102,7 +102,7 @@ jobs:
           target: ${{ matrix.target }}
           script: |
             adb logcat > logcat.txt &
-            ./gradlew connectedCheck
+            ./gradlew :android:connectedCheck
 
       - name: Upload logs
         if: always()
@@ -145,7 +145,7 @@ jobs:
         run: ./.github/apply_signing.sh
 
       - name: Build with Gradle
-        run: ./gradlew assembleRelease bundleRelease
+        run: ./gradlew :android:assembleRelease :android:bundleRelease
 
       - name: Check if is prelease
         if: startsWith(github.ref, 'refs/tags/')

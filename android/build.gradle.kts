@@ -1,7 +1,3 @@
-import com.google.protobuf.gradle.builtins
-import com.google.protobuf.gradle.generateProtoTasks
-import com.google.protobuf.gradle.protobuf
-import com.google.protobuf.gradle.protoc
 import org.gradle.kotlin.dsl.support.unzipTo
 import org.json.JSONObject
 import java.util.Properties
@@ -27,7 +23,7 @@ plugins {
     id("com.android.application")
     kotlin("android")
     kotlin("kapt")
-    id("com.google.protobuf").version("0.8.17")
+    id("org.jetbrains.compose").version(Versions.compose_jb)
     kotlin("plugin.serialization").version(Versions.Kotlin.lang)
     id("com.google.devtools.ksp").version(Versions.ksp)
 }
@@ -158,21 +154,6 @@ android {
     }
 }
 
-protobuf {
-    protoc {
-        artifact = "com.google.protobuf:protoc:${Versions.protobuf}"
-    }
-    generateProtoTasks {
-        all().forEach {
-            it.builtins {
-                create("java") {
-                    option("lite")
-                }
-            }
-        }
-    }
-}
-
 // TODO: workaround for https://github.com/google/ksp/issues/518
 evaluationDependsOn(":assistedProcessor")
 evaluationDependsOn(":routeProcessor")
@@ -182,6 +163,7 @@ dependencies {
     kotlinSerialization()
     kotlinCoroutines()
     implementation(projects.services)
+    implementation(projects.common)
     ksp(projects.assistedProcessor)
     implementation(projects.routeProcessor)
     ksp(projects.routeProcessor)

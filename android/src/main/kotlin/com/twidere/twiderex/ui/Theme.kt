@@ -59,7 +59,7 @@ import com.google.accompanist.insets.statusBarsHeight
 import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.preferences.LocalAppearancePreferences
 import com.twidere.twiderex.preferences.LocalDisplayPreferences
-import com.twidere.twiderex.preferences.proto.AppearancePreferences
+import com.twidere.twiderex.preferences.model.AppearancePreferences
 
 @Composable
 fun TwidereTheme(

@@ -27,7 +27,7 @@ import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.core.view.WindowInsetsControllerCompat
 import com.twidere.twiderex.model.AccountDetails
-import com.twidere.twiderex.preferences.proto.DisplayPreferences
+import com.twidere.twiderex.preferences.model.DisplayPreferences
 import com.twidere.twiderex.viewmodel.ActiveAccountViewModel
 import moe.tlaster.precompose.navigation.NavController
 

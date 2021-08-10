@@ -18,42 +18,30 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.di
+package com.twidere.twiderex.preferences
 
 import androidx.datastore.core.DataStore
-import com.twidere.twiderex.preferences.PreferencesHolder
 import com.twidere.twiderex.preferences.model.AppearancePreferences
 import com.twidere.twiderex.preferences.model.DisplayPreferences
 import com.twidere.twiderex.preferences.model.MiscPreferences
 import com.twidere.twiderex.preferences.model.NotificationPreferences
-import dagger.Module
-import dagger.Provides
-import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
-import org.koin.core.Koin
-import javax.inject.Singleton
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.firstOrNull
 
-@Deprecated("Use koin directly")
-@Module
-@InstallIn(SingletonComponent::class)
-object PreferenceModule {
-    @Singleton
-    @Provides
-    fun provideAppearances(koin: Koin): DataStore<AppearancePreferences> =
-        koin.get<PreferencesHolder>().appearancePreferences
-
-    @Singleton
-    @Provides
-    fun provideDisplay(koin: Koin): DataStore<DisplayPreferences> =
-        koin.get<PreferencesHolder>().displayPreferences
-
-    @Singleton
-    @Provides
-    fun provideMisc(koin: Koin): DataStore<MiscPreferences> =
-        koin.get<PreferencesHolder>().miscPreferences
-
-    @Singleton
-    @Provides
-    fun provideNotification(koin: Koin): DataStore<NotificationPreferences> =
-        koin.get<PreferencesHolder>().notificationPreferences
+data class PreferencesHolder(
+    val appearancePreferences: DataStore<AppearancePreferences>,
+    val displayPreferences: DataStore<DisplayPreferences>,
+    val miscPreferences: DataStore<MiscPreferences>,
+    val notificationPreferences: DataStore<NotificationPreferences>,
+) {
+    suspend fun warmup() = coroutineScope {
+        awaitAll(
+            async { appearancePreferences.data.firstOrNull() },
+            async { displayPreferences.data.firstOrNull() },
+            async { miscPreferences.data.firstOrNull() },
+            async { notificationPreferences.data.firstOrNull() },
+        )
+    }
 }

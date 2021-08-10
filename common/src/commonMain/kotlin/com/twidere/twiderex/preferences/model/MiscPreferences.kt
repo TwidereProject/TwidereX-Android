@@ -18,30 +18,23 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex
+package com.twidere.twiderex.preferences.model
 
-import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.compose.ui.window.Window
-import androidx.compose.ui.window.application
-import com.twidere.twiderex.di.setupModules
-import org.koin.core.context.startKoin
-import org.koin.core.context.stopKoin
+import kotlinx.serialization.Serializable
 
-@ExperimentalComposeUiApi
-fun main() {
-    startKoin {
-        printLogger()
-        setupModules()
-    }
-    application {
-        Window(
-            onCloseRequest = {
-                stopKoin()
-                exitApplication()
-            },
-            title = "Twidere X"
-        ) {
-            App()
-        }
+@Serializable
+data class MiscPreferences(
+    val nitterInstance: String = "",
+    val useProxy: Boolean = false,
+    val proxyType: ProxyType = ProxyType.HTTP,
+    val proxyServer: String = "",
+    val proxyPort: Int = 0,
+    val proxyUserName: String = "",
+    val proxyPassword: String = "",
+) {
+    @Serializable
+    enum class ProxyType {
+        HTTP,
+        REVERSE,
     }
 }

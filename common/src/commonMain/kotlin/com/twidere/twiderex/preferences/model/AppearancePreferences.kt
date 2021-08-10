@@ -18,30 +18,30 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex
+package com.twidere.twiderex.preferences.model
 
-import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.compose.ui.window.Window
-import androidx.compose.ui.window.application
-import com.twidere.twiderex.di.setupModules
-import org.koin.core.context.startKoin
-import org.koin.core.context.stopKoin
+import kotlinx.serialization.Serializable
 
-@ExperimentalComposeUiApi
-fun main() {
-    startKoin {
-        printLogger()
-        setupModules()
+@Serializable
+data class AppearancePreferences(
+    val primaryColorIndex: Int = 0,
+    val tabPosition: TabPosition = TabPosition.Bottom,
+    val theme: Theme = Theme.Auto,
+    val hideTabBarWhenScroll: Boolean = false,
+    val hideFabWhenScroll: Boolean = false,
+    val hideAppBarWhenScroll: Boolean = false,
+    val isDarkModePureBlack: Boolean = false,
+) {
+    @Serializable
+    enum class TabPosition {
+        Top,
+        Bottom,
     }
-    application {
-        Window(
-            onCloseRequest = {
-                stopKoin()
-                exitApplication()
-            },
-            title = "Twidere X"
-        ) {
-            App()
-        }
+
+    @Serializable
+    enum class Theme {
+        Auto,
+        Light,
+        Dark,
     }
 }

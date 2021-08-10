@@ -26,39 +26,18 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.datastore.core.DataStore
 import com.twidere.services.http.config.HttpConfig
 import com.twidere.services.proxy.ProxyConfig
-import com.twidere.twiderex.preferences.proto.AppearancePreferences
-import com.twidere.twiderex.preferences.proto.DisplayPreferences
-import com.twidere.twiderex.preferences.proto.MiscPreferences
-import com.twidere.twiderex.ui.LocalVideoPlayback
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.flow.firstOrNull
+import com.twidere.twiderex.preferences.model.AppearancePreferences
+import com.twidere.twiderex.preferences.model.DisplayPreferences
+import com.twidere.twiderex.preferences.model.MiscPreferences
 import kotlinx.coroutines.flow.map
-import javax.inject.Inject
 
 val LocalAppearancePreferences =
     compositionLocalOf<AppearancePreferences> { error("No AppearancePreferences") }
 val LocalDisplayPreferences =
     compositionLocalOf<DisplayPreferences> { error("No DisplayPreferences") }
 val LocalHttpConfig = compositionLocalOf<HttpConfig> { error("No Http config preferences") }
-
-data class PreferencesHolder @Inject constructor(
-    val appearancePreferences: DataStore<AppearancePreferences>,
-    val displayPreferences: DataStore<DisplayPreferences>,
-    val miscPreferences: DataStore<MiscPreferences>
-) {
-    suspend fun warmup() = coroutineScope {
-        awaitAll(
-            async { appearancePreferences.data.firstOrNull() },
-            async { displayPreferences.data.firstOrNull() },
-            async { miscPreferences.data.firstOrNull() },
-        )
-    }
-}
 
 @Composable
 fun ProvidePreferences(
@@ -67,10 +46,10 @@ fun ProvidePreferences(
 ) {
     val appearances by holder.appearancePreferences
         .data
-        .collectAsState(initial = AppearancePreferences.getDefaultInstance())
+        .collectAsState(initial = AppearancePreferences())
     val display by holder.displayPreferences
         .data
-        .collectAsState(initial = DisplayPreferences.getDefaultInstance())
+        .collectAsState(initial = DisplayPreferences())
     val proxyConfigFlow = remember(holder.miscPreferences.data) {
         holder.miscPreferences
             .data
@@ -95,7 +74,6 @@ fun ProvidePreferences(
     CompositionLocalProvider(
         LocalAppearancePreferences provides appearances,
         LocalDisplayPreferences provides display,
-        LocalVideoPlayback provides display.autoPlayback,
         LocalHttpConfig provides proxyConfig
     ) {
         content.invoke()
