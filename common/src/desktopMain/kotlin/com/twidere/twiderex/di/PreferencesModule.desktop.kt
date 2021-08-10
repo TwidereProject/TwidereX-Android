@@ -20,8 +20,12 @@
  */
 package com.twidere.twiderex.di
 
-import org.koin.core.KoinApplication
+import org.koin.core.scope.Scope
+import java.io.File
 
-fun KoinApplication.setupModules() {
-    modules(preferencesModule)
+internal actual fun Scope.createDataStoreFile(name: String): File {
+    return File(
+        File(System.getProperty("user.home")),
+        "TwidereX/datastore/$name"
+    )
 }

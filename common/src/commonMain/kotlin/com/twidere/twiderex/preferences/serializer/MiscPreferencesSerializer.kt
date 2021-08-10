@@ -20,27 +20,24 @@
  */
 package com.twidere.twiderex.preferences.serializer
 
-import androidx.datastore.core.CorruptionException
 import androidx.datastore.core.Serializer
-import com.google.protobuf.InvalidProtocolBufferException
-import com.twidere.twiderex.preferences.proto.NotificationPreferences
+import com.twidere.twiderex.preferences.model.MiscPreferences
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.decodeFromByteArray
+import kotlinx.serialization.encodeToByteArray
+import kotlinx.serialization.protobuf.ProtoBuf
 import java.io.InputStream
 import java.io.OutputStream
 
-object NotificationPreferencesSerializer : Serializer<NotificationPreferences> {
-    override val defaultValue: NotificationPreferences
-        get() = NotificationPreferences.getDefaultInstance()
-            .toBuilder()
-            .setEnableNotification(true)
-            .build()
+@OptIn(ExperimentalSerializationApi::class)
+object MiscPreferencesSerializer : Serializer<MiscPreferences> {
+    override val defaultValue: MiscPreferences
+        get() = MiscPreferences()
 
-    override suspend fun readFrom(input: InputStream): NotificationPreferences {
-        try {
-            return NotificationPreferences.parseFrom(input)
-        } catch (exception: InvalidProtocolBufferException) {
-            throw CorruptionException("Cannot read proto.", exception)
-        }
+    override suspend fun readFrom(input: InputStream): MiscPreferences {
+        return ProtoBuf.decodeFromByteArray(input.readBytes())
     }
 
-    override suspend fun writeTo(t: NotificationPreferences, output: OutputStream) = t.writeTo(output)
+    override suspend fun writeTo(t: MiscPreferences, output: OutputStream) =
+        output.write(ProtoBuf.encodeToByteArray(t))
 }

@@ -20,8 +20,14 @@
  */
 package com.twidere.twiderex.di
 
-import org.koin.core.KoinApplication
+import android.content.Context
+import org.koin.core.scope.Scope
+import java.io.File
 
-fun KoinApplication.setupModules() {
-    modules(preferencesModule)
+internal actual fun Scope.createDataStoreFile(name: String): File {
+    val context = get<Context>()
+    return File(
+        context.applicationContext.filesDir,
+        "datastore/$name"
+    )
 }

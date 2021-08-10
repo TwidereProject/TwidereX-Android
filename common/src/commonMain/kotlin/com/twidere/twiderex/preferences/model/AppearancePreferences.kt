@@ -18,10 +18,30 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.di
+package com.twidere.twiderex.preferences.model
 
-import org.koin.core.KoinApplication
+import kotlinx.serialization.Serializable
 
-fun KoinApplication.setupModules() {
-    modules(preferencesModule)
+@Serializable
+data class AppearancePreferences(
+    val primaryColorIndex: Int = 0,
+    val tabPosition: TabPosition = TabPosition.Bottom,
+    val theme: Theme = Theme.Auto,
+    val hideTabBarWhenScroll: Boolean = false,
+    val hideFabWhenScroll: Boolean = false,
+    val hideAppBarWhenScroll: Boolean = false,
+    val isDarkModePureBlack: Boolean = false,
+) {
+    @Serializable
+    enum class TabPosition {
+        Top,
+        Bottom,
+    }
+
+    @Serializable
+    enum class Theme {
+        Auto,
+        Light,
+        Dark,
+    }
 }

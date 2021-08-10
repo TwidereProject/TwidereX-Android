@@ -93,7 +93,7 @@ import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.navigation.RootRoute
 import com.twidere.twiderex.preferences.LocalAppearancePreferences
-import com.twidere.twiderex.preferences.proto.AppearancePreferences
+import com.twidere.twiderex.preferences.model.AppearancePreferences
 import com.twidere.twiderex.scenes.home.HomeMenus
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalActiveAccountViewModel
@@ -108,7 +108,7 @@ import kotlinx.coroutines.launch
 fun HomeScene() {
     val account = LocalActiveAccount.current ?: return
     val scope = rememberCoroutineScope()
-    val tabPosition = LocalAppearancePreferences.current.tapPosition
+    val tabPosition = LocalAppearancePreferences.current.tabPosition
     val hideTab = LocalAppearancePreferences.current.hideTabBarWhenScroll
     val hideFab = LocalAppearancePreferences.current.hideFabWhenScroll
     val hideAppBar = LocalAppearancePreferences.current.hideAppBarWhenScroll

@@ -26,7 +26,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.twidere.twiderex.preferences.LocalAppearancePreferences
-import com.twidere.twiderex.preferences.proto.AppearancePreferences
+import com.twidere.twiderex.preferences.model.AppearancePreferences
 
 @Composable
 inline fun <reified VM : ViewModel> viewModel(

@@ -25,13 +25,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.twidere.twiderex.R
 import com.twidere.twiderex.notification.InAppNotification
-import com.twidere.twiderex.preferences.proto.MiscPreferences
+import com.twidere.twiderex.preferences.model.MiscPreferences
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import java.lang.NumberFormatException
 
 @OptIn(FlowPreview::class)
 class MiscViewModel @AssistedInject constructor(
@@ -87,9 +86,7 @@ class MiscViewModel @AssistedInject constructor(
         nitter.value = value
         viewModelScope.launch {
             miscPreferences.updateData {
-                it.toBuilder()
-                    .setNitterInstance(value)
-                    .build()
+                it.copy(nitterInstance = value)
             }
         }
     }
@@ -98,9 +95,7 @@ class MiscViewModel @AssistedInject constructor(
         useProxy.value = value
         viewModelScope.launch {
             miscPreferences.updateData {
-                it.toBuilder()
-                    .setUseProxy(value)
-                    .build()
+                it.copy(useProxy = value)
             }
         }
     }
@@ -109,9 +104,7 @@ class MiscViewModel @AssistedInject constructor(
         proxyType.value = MiscPreferences.ProxyType.valueOf(value)
         viewModelScope.launch {
             miscPreferences.updateData {
-                it.toBuilder()
-                    .setProxyType(proxyType.value)
-                    .build()
+                it.copy(proxyType = proxyType.value)
             }
         }
     }
@@ -120,9 +113,7 @@ class MiscViewModel @AssistedInject constructor(
         proxyServer.value = value
         viewModelScope.launch {
             miscPreferences.updateData {
-                it.toBuilder()
-                    .setProxyServer(value)
-                    .build()
+                it.copy(proxyServer = value)
             }
         }
     }
@@ -136,9 +127,7 @@ class MiscViewModel @AssistedInject constructor(
         }
         viewModelScope.launch {
             miscPreferences.updateData {
-                it.toBuilder()
-                    .setProxyPort(value.toInt())
-                    .build()
+                it.copy(proxyPort = value.toInt())
             }
         }
     }
@@ -147,9 +136,7 @@ class MiscViewModel @AssistedInject constructor(
         proxyUserName.value = value
         viewModelScope.launch {
             miscPreferences.updateData {
-                it.toBuilder()
-                    .setProxyUserName(value)
-                    .build()
+                it.copy(proxyUserName = value)
             }
         }
     }
@@ -158,9 +145,7 @@ class MiscViewModel @AssistedInject constructor(
         proxyPassword.value = value
         viewModelScope.launch {
             miscPreferences.updateData {
-                it.toBuilder()
-                    .setProxyPassword(value)
-                    .build()
+                it.copy(proxyPassword = value)
             }
         }
     }

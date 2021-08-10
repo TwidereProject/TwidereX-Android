@@ -23,7 +23,7 @@ package com.twidere.twiderex.viewmodel.settings
 import androidx.datastore.core.DataStore
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.twidere.twiderex.preferences.proto.DisplayPreferences
+import com.twidere.twiderex.preferences.model.DisplayPreferences
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.launch
 
@@ -38,37 +38,37 @@ class DisplayViewModel @AssistedInject constructor(
 
     fun setUseSystemFontSize(value: Boolean) = viewModelScope.launch {
         displayPreferences.updateData {
-            it.toBuilder().setUseSystemFontSize(value).build()
+            it.copy(useSystemFontSize = value)
         }
     }
 
     fun setAvatarStyle(value: DisplayPreferences.AvatarStyle) = viewModelScope.launch {
         displayPreferences.updateData {
-            it.toBuilder().setAvatarStyle(value).build()
+            it.copy(avatarStyle = value)
         }
     }
 
     fun setMediaPreview(value: Boolean) = viewModelScope.launch {
         displayPreferences.updateData {
-            it.toBuilder().setMediaPreview(value).build()
+            it.copy(mediaPreview = value)
         }
     }
 
     fun setUrlPreview(value: Boolean) = viewModelScope.launch {
         displayPreferences.updateData {
-            it.toBuilder().setUrlPreview(value).build()
+            it.copy(urlPreview = value)
         }
     }
 
     fun setAutoPlayback(value: DisplayPreferences.AutoPlayback) = viewModelScope.launch {
         displayPreferences.updateData {
-            it.toBuilder().setAutoPlayback(value).build()
+            it.copy(autoPlayback = value)
         }
     }
 
     fun commitFontScale(value: Float) = viewModelScope.launch {
         displayPreferences.updateData {
-            it.toBuilder().setFontScale(value).build()
+            it.copy(fontScale = value)
         }
     }
 }

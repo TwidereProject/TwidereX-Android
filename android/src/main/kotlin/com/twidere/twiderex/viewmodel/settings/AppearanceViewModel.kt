@@ -23,7 +23,7 @@ package com.twidere.twiderex.viewmodel.settings
 import androidx.datastore.core.DataStore
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.twidere.twiderex.preferences.proto.AppearancePreferences
+import com.twidere.twiderex.preferences.model.AppearancePreferences
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.launch
 
@@ -38,43 +38,43 @@ class AppearanceViewModel @AssistedInject constructor(
 
     fun setPrimaryColorIndex(index: Int) = viewModelScope.launch {
         appearancePreferences.updateData {
-            it.toBuilder().setPrimaryColorIndex(index).build()
+            it.copy(primaryColorIndex = index)
         }
     }
 
     fun setTabPosition(position: AppearancePreferences.TabPosition) = viewModelScope.launch {
         appearancePreferences.updateData {
-            it.toBuilder().setTapPosition(position).build()
+            it.copy(tabPosition = position)
         }
     }
 
     fun setTheme(theme: AppearancePreferences.Theme) = viewModelScope.launch {
         appearancePreferences.updateData {
-            it.toBuilder().setTheme(theme).build()
+            it.copy(theme = theme)
         }
     }
 
     fun setHideTabBarWhenScrolling(hide: Boolean) = viewModelScope.launch {
         appearancePreferences.updateData {
-            it.toBuilder().setHideTabBarWhenScroll(hide).build()
+            it.copy(hideTabBarWhenScroll = hide)
         }
     }
 
     fun setHideFabWhenScrolling(hide: Boolean) = viewModelScope.launch {
         appearancePreferences.updateData {
-            it.toBuilder().setHideFabWhenScroll(hide).build()
+            it.copy(hideFabWhenScroll = hide)
         }
     }
 
     fun setHideAppBarWhenScrolling(hide: Boolean) = viewModelScope.launch {
         appearancePreferences.updateData {
-            it.toBuilder().setHideAppBarWhenScroll(hide).build()
+            it.copy(hideAppBarWhenScroll = hide)
         }
     }
 
     fun setIsDarkModePureBlack(value: Boolean) = viewModelScope.launch {
         appearancePreferences.updateData {
-            it.toBuilder().setIsDarkModePureBlack(value).build()
+            it.copy(isDarkModePureBlack = value)
         }
     }
 }

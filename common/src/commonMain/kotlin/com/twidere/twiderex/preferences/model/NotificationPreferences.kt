@@ -18,10 +18,11 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.di
+package com.twidere.twiderex.preferences.model
 
-import org.koin.core.KoinApplication
+import kotlinx.serialization.Serializable
 
-fun KoinApplication.setupModules() {
-    modules(preferencesModule)
-}
+@Serializable
+data class NotificationPreferences(
+    val enableNotification: Boolean = true,
+)

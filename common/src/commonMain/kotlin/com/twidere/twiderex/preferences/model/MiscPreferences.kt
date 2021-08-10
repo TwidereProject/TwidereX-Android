@@ -18,10 +18,23 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.di
+package com.twidere.twiderex.preferences.model
 
-import org.koin.core.KoinApplication
+import kotlinx.serialization.Serializable
 
-fun KoinApplication.setupModules() {
-    modules(preferencesModule)
+@Serializable
+data class MiscPreferences(
+    val nitterInstance: String = "",
+    val useProxy: Boolean = false,
+    val proxyType: ProxyType = ProxyType.HTTP,
+    val proxyServer: String = "",
+    val proxyPort: Int = 0,
+    val proxyUserName: String = "",
+    val proxyPassword: String = "",
+) {
+    @Serializable
+    enum class ProxyType {
+        HTTP,
+        REVERSE,
+    }
 }
