@@ -41,6 +41,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.boundsInWindow
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
@@ -92,7 +94,6 @@ fun VideoPlayer(
     val context = LocalContext.current
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     val httpConfig = LocalHttpConfig.current
-
     Box {
         if (playInitial) {
             val player = remember(url) {
@@ -177,8 +178,23 @@ fun VideoPlayer(
                 }
             }
 
+            var isInScreen by remember {
+                mutableStateOf(false)
+            }
+
             AndroidView(
-                modifier = modifier,
+                modifier = modifier.onGloballyPositioned { coordinates ->
+                    coordinates.boundsInWindow().run {
+                        if (isInScreen && top <= 0 && bottom <= 0) {
+                            isInScreen = false
+                            updateState()
+                            player.playWhenReady = false
+                        } else if (!isInScreen && top > 0 && bottom > 0) {
+                            isInScreen = true
+                            player.playWhenReady = autoPlay
+                        }
+                    }
+                },
                 factory = { context ->
                     StyledPlayerView(context).also { playerView ->
                         (playerView.videoSurfaceView as? SurfaceView)?.setZOrderMediaOverlay(zOrderMediaOverlay)
@@ -188,7 +204,7 @@ fun VideoPlayer(
                 }
             ) {
                 it.player = player
-                if (isResume) {
+                if (isResume && isInScreen) {
                     it.onResume()
                 } else {
                     it.onPause()
