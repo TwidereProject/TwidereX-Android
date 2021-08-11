@@ -26,7 +26,7 @@ import com.twidere.services.microblog.LookupService
 import com.twidere.services.microblog.model.IDirectMessage
 import com.twidere.services.twitter.model.DirectMessageEvent
 import com.twidere.services.twitter.model.exceptions.TwitterApiException
-import com.twidere.twiderex.dataprovider.toUi
+import com.twidere.twiderex.dataprovider.mapper.toUi
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.PlatformType

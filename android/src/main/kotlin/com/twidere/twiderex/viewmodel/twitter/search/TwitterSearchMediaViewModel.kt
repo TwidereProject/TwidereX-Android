@@ -28,7 +28,6 @@ import androidx.paging.map
 import com.twidere.services.twitter.TwitterService
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.model.AccountDetails
-import com.twidere.twiderex.model.transform.toUi
 import com.twidere.twiderex.paging.mediator.paging.pager
 import com.twidere.twiderex.paging.mediator.search.SearchMediaMediator
 import dagger.assisted.Assisted

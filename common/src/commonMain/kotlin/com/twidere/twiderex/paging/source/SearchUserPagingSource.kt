@@ -23,7 +23,7 @@ package com.twidere.twiderex.paging.source
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.twidere.services.microblog.SearchService
-import com.twidere.twiderex.dataprovider.toUi
+import com.twidere.twiderex.dataprovider.mapper.toUi
 import com.twidere.twiderex.defaultLoadCount
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiUser

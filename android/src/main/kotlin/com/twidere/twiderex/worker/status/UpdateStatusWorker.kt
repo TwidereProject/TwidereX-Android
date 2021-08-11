@@ -27,11 +27,11 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.OverwritingInputMerger
 import androidx.work.WorkerParameters
 import androidx.work.setInputMerger
+import com.twidere.twiderex.db.transform.toWorkData
 import com.twidere.twiderex.extensions.getNullableBoolean
 import com.twidere.twiderex.extensions.getNullableLong
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.job.StatusResult
-import com.twidere.twiderex.model.transform.toWorkData
 import com.twidere.twiderex.repository.ReactionRepository
 import com.twidere.twiderex.repository.StatusRepository
 import dagger.assisted.Assisted

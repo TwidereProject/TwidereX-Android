@@ -18,21 +18,22 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.model.transform
+package com.twidere.twiderex.db.transform
 
-import com.twidere.twiderex.db.model.DbList
-import com.twidere.twiderex.model.ui.UiList
+import com.twidere.twiderex.db.model.DbMedia
+import com.twidere.twiderex.model.ui.UiMedia
 
-fun DbList.toUi() =
-    UiList(
-        id = listId,
-        ownerId = ownerId,
-        listKey = listKey,
-        accountKey = accountKey,
-        title = title,
-        descriptions = description,
-        mode = mode,
-        replyPolicy = replyPolicy,
-        isFollowed = isFollowed,
-        allowToSubscribe = allowToSubscribe,
+fun List<DbMedia>.toUi() = sortedBy { it.order }.map {
+    UiMedia(
+        url = it.url,
+        belongToKey = it.belongToKey,
+        mediaUrl = it.mediaUrl,
+        previewUrl = it.previewUrl,
+        type = it.type,
+        width = it.width,
+        height = it.height,
+        pageUrl = it.pageUrl,
+        altText = it.altText,
+        order = it.order,
     )
+}

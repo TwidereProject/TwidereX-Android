@@ -27,7 +27,7 @@ import com.twidere.services.microblog.LookupService
 import com.twidere.services.microblog.MicroBlogService
 import com.twidere.services.nitter.NitterService
 import com.twidere.services.twitter.TwitterService
-import com.twidere.twiderex.dataprovider.toUi
+import com.twidere.twiderex.dataprovider.mapper.toUi
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.PlatformType

@@ -25,11 +25,11 @@ import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkerParameters
+import com.twidere.twiderex.db.transform.toDirectMessageDeleteData
+import com.twidere.twiderex.db.transform.toWorkData
 import com.twidere.twiderex.jobs.dm.DirectMessageDeleteJob
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.job.DirectMessageDeleteData
-import com.twidere.twiderex.model.transform.toDirectMessageDeleteData
-import com.twidere.twiderex.model.transform.toWorkData
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 

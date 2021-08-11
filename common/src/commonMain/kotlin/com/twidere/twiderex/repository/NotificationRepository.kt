@@ -23,7 +23,7 @@ package com.twidere.twiderex.repository
 import com.twidere.services.microblog.MicroBlogService
 import com.twidere.services.microblog.NotificationService
 import com.twidere.services.microblog.TimelineService
-import com.twidere.twiderex.dataprovider.toUi
+import com.twidere.twiderex.dataprovider.mapper.toUi
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.NotificationCursorType

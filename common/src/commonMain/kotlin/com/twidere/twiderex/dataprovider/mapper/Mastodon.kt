@@ -18,7 +18,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.db.mapper
+package com.twidere.twiderex.dataprovider.mapper
 
 import com.twidere.services.mastodon.model.Account
 import com.twidere.services.mastodon.model.Emoji
@@ -29,109 +29,104 @@ import com.twidere.services.mastodon.model.NotificationTypes
 import com.twidere.services.mastodon.model.Status
 import com.twidere.services.mastodon.model.Trend
 import com.twidere.services.mastodon.model.Visibility
-import com.twidere.twiderex.db.model.DbList
-import com.twidere.twiderex.db.model.DbMastodonStatusExtra
-import com.twidere.twiderex.db.model.DbMastodonUserExtra
-import com.twidere.twiderex.db.model.DbMedia
-import com.twidere.twiderex.db.model.DbPagingTimeline
-import com.twidere.twiderex.db.model.DbPagingTimelineWithStatus
-import com.twidere.twiderex.db.model.DbPreviewCard
-import com.twidere.twiderex.db.model.DbStatusReaction
-import com.twidere.twiderex.db.model.DbStatusV2
-import com.twidere.twiderex.db.model.DbStatusWithMediaAndUser
-import com.twidere.twiderex.db.model.DbStatusWithReference
-import com.twidere.twiderex.db.model.DbTrend
-import com.twidere.twiderex.db.model.DbTrendHistory
-import com.twidere.twiderex.db.model.DbTrendWithHistory
-import com.twidere.twiderex.db.model.DbUser
-import com.twidere.twiderex.db.model.toDbStatusReference
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.MastodonStatusType
 import com.twidere.twiderex.model.enums.MastodonVisibility
 import com.twidere.twiderex.model.enums.MediaType
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.enums.ReferenceType
+import com.twidere.twiderex.model.paging.PagingTimeLine
+import com.twidere.twiderex.model.paging.PagingTimeLineWithStatus
+import com.twidere.twiderex.model.ui.Option
+import com.twidere.twiderex.model.ui.StatusMetrics
+import com.twidere.twiderex.model.ui.UiCard
+import com.twidere.twiderex.model.ui.UiGeo
+import com.twidere.twiderex.model.ui.UiList
+import com.twidere.twiderex.model.ui.UiMedia
+import com.twidere.twiderex.model.ui.UiPoll
+import com.twidere.twiderex.model.ui.UiStatus
+import com.twidere.twiderex.model.ui.UiTrend
+import com.twidere.twiderex.model.ui.UiTrendHistory
+import com.twidere.twiderex.model.ui.UiUser
+import com.twidere.twiderex.model.ui.UserMetrics
+import com.twidere.twiderex.model.ui.mastodon.Field
+import com.twidere.twiderex.model.ui.mastodon.MastodonMention
+import com.twidere.twiderex.model.ui.mastodon.MastodonStatusExtra
+import com.twidere.twiderex.model.ui.mastodon.MastodonUserExtra
 import com.twidere.twiderex.navigation.RootDeepLinksRoute
-import com.twidere.twiderex.utils.json
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import org.jsoup.nodes.Node
-import java.util.UUID
 import java.util.regex.Pattern
 
-fun Notification.toDbPagingTimeline(
+fun Notification.toPagingTimeline(
     accountKey: MicroBlogKey,
     pagingKey: String,
-): DbPagingTimelineWithStatus {
-    val status = this.toDbStatusWithReference(accountKey = accountKey)
-    return DbPagingTimelineWithStatus(
-        timeline = DbPagingTimeline(
-            _id = UUID.randomUUID().toString(),
+): PagingTimeLineWithStatus {
+    val status = this.toUiStatus(accountKey = accountKey)
+    return PagingTimeLineWithStatus(
+        timeline = PagingTimeLine(
             accountKey = accountKey,
             timestamp = createdAt?.time ?: 0,
             isGap = false,
-            statusKey = status.status.data.statusKey,
+            statusKey = status.statusKey,
             pagingKey = pagingKey,
-            sortId = status.status.data.timestamp
+            sortId = status.timestamp
         ),
         status = status,
     )
 }
 
-fun Notification.toDbStatusWithReference(
+fun Notification.toUiStatus(
     accountKey: MicroBlogKey,
-): DbStatusWithReference {
-    val user = this.account?.toDbUser(accountKey = accountKey)
+    isGap: Boolean = false
+): UiStatus {
+    val user = this.account?.toUiUser(accountKey = accountKey)
         ?: throw IllegalArgumentException("mastodon Notification.user should not be null")
-    val relatedStatus = this.status?.toDbStatusWithMediaAndUser(accountKey = accountKey)
-    val status = DbStatusV2(
-        _id = UUID.randomUUID().toString(),
+    val relatedStatus = this.status?.toUiStatus(accountKey = accountKey)
+    val statusKey = accountKey.copy(
+        id = id
+            ?: throw IllegalArgumentException("mastodon Notification.id should not be null"),
+    )
+    return UiStatus(
         statusId = id
             ?: throw IllegalArgumentException("mastodon Notification.id should not be null"),
-        statusKey = accountKey.copy(
-            id = id
-                ?: throw IllegalArgumentException("mastodon Notification.id should not be null"),
-        ),
+        statusKey = statusKey,
         htmlText = "",
         rawText = "",
         timestamp = this.createdAt?.time ?: 0,
-        retweetCount = 0,
-        likeCount = 0,
-        replyCount = 0,
-        placeString = null,
+        metrics = StatusMetrics(
+            retweet = 0,
+            like = 0,
+            reply = 0
+        ),
+        geo = UiGeo(
+            name = ""
+        ),
         source = "",
         hasMedia = false,
-        userKey = user.userKey,
-        lang = null,
-        is_possibly_sensitive = false,
+        user = user,
+        sensitive = false,
         platformType = PlatformType.Mastodon,
-        extra = DbMastodonStatusExtra(
+        extra = MastodonStatusExtra(
             type = this.type.toDbType(),
             emoji = emptyList(),
             visibility = MastodonVisibility.Public,
-            sensitive = false,
-            spoilerText = null,
-            poll = null,
-            card = null,
             mentions = null,
-        ).json(),
+        ),
+        spoilerText = null,
+        poll = null,
+        card = null,
         inReplyToStatusId = null,
         inReplyToUserId = null,
-    )
-    return DbStatusWithReference(
-        status = DbStatusWithMediaAndUser(
-            data = status,
-            media = emptyList(),
-            user = user,
-            reactions = emptyList(),
-            url = emptyList(),
-        ),
-        references = listOfNotNull(
-            relatedStatus.toDbStatusReference(
-                status.statusKey,
-                ReferenceType.MastodonNotification
-            ),
-        ),
+        media = emptyList(),
+        url = emptyList(),
+        liked = false,
+        retweeted = false,
+        referenceStatus = mutableMapOf<ReferenceType, UiStatus>().apply {
+            relatedStatus?.let { this[ReferenceType.MastodonNotification] = it }
+        },
+        isGap = isGap
     )
 }
 
@@ -148,49 +143,39 @@ private fun NotificationTypes?.toDbType(): MastodonStatusType {
     }
 }
 
-fun Status.toDbPagingTimeline(
+fun Status.toPagingTimeline(
     accountKey: MicroBlogKey,
     pagingKey: String,
-): DbPagingTimelineWithStatus {
-    val status = this.toDbStatusWithReference(accountKey = accountKey)
+): PagingTimeLineWithStatus {
+    val status = this.toUiStatus(accountKey = accountKey, false)
 
-    return DbPagingTimelineWithStatus(
-        timeline = DbPagingTimeline(
-            _id = UUID.randomUUID().toString(),
+    return PagingTimeLineWithStatus(
+        timeline = PagingTimeLine(
             accountKey = accountKey,
-            timestamp = status.status.data.timestamp,
+            timestamp = status.timestamp,
             isGap = false,
-            statusKey = status.status.data.statusKey,
+            statusKey = status.statusKey,
             pagingKey = pagingKey,
-            sortId = status.status.data.timestamp
+            sortId = status.timestamp
         ),
         status = status,
     )
 }
 
-fun Status.toDbStatusWithReference(
+internal fun Status.toUiStatus(
     accountKey: MicroBlogKey,
-): DbStatusWithReference {
-    val status = this.toDbStatusWithMediaAndUser(accountKey)
-    val retweet = this.reblog?.toDbStatusWithMediaAndUser(
+    isGap: Boolean = false
+): UiStatus {
+    val retweet = this.reblog?.toUiStatus(
         accountKey
     )
-
-    return DbStatusWithReference(
-        status = status,
-        references = listOfNotNull(
-            retweet.toDbStatusReference(status.data.statusKey, ReferenceType.Retweet),
-        ),
-    )
-}
-
-private fun Status.toDbStatusWithMediaAndUser(
-    accountKey: MicroBlogKey
-): DbStatusWithMediaAndUser {
-    val user = account?.toDbUser(accountKey = accountKey)
+    val user = account?.toUiUser(accountKey = accountKey)
         ?: throw IllegalArgumentException("mastodon Status.user should not be null")
-    val status = DbStatusV2(
-        _id = UUID.randomUUID().toString(),
+    val statusKey = MicroBlogKey(
+        id ?: throw IllegalArgumentException("mastodon Status.idStr should not be null"),
+        host = user.userKey.host,
+    )
+    return UiStatus(
         statusId = id ?: throw IllegalArgumentException("mastodon Status.idStr should not be null"),
         rawText = content?.let { Jsoup.parse(it).wholeText() } ?: "",
         htmlText = content?.let {
@@ -208,48 +193,66 @@ private fun Status.toDbStatusWithMediaAndUser(
             generateWithHashtag(content = it)
         } ?: "",
         timestamp = createdAt?.time ?: 0,
-        retweetCount = reblogsCount ?: 0,
-        likeCount = favouritesCount ?: 0,
-        replyCount = repliesCount ?: 0,
-        placeString = "",
+        metrics = StatusMetrics(
+            retweet = reblogsCount ?: 0,
+            like = favouritesCount ?: 0,
+            reply = repliesCount ?: 0,
+        ),
+        geo = UiGeo(
+            name = ""
+        ),
         hasMedia = !mediaAttachments.isNullOrEmpty(),
         source = application?.name ?: "",
-        userKey = user.userKey,
-        lang = null,
-        statusKey = MicroBlogKey(
-            id ?: throw IllegalArgumentException("mastodon Status.idStr should not be null"),
-            host = user.userKey.host,
-        ),
-        is_possibly_sensitive = sensitive ?: false,
+        user = user,
+        statusKey = statusKey,
+        sensitive = sensitive ?: false,
         platformType = PlatformType.Mastodon,
-        extra = DbMastodonStatusExtra(
+        spoilerText = spoilerText?.takeIf { it.isNotEmpty() },
+        poll = poll?.let {
+            UiPoll(
+                id = it.id ?: "",
+                options = it.options?.map { option ->
+                    Option(
+                        text = option.title ?: "",
+                        count = option.votesCount ?: 0
+                    )
+                } ?: emptyList(),
+                expiresAt = it.expiresAt?.time,
+                expired = it.expired ?: false,
+                multiple = it.multiple ?: false,
+                voted = it.voted ?: false,
+                votesCount = it.votesCount ?: 0,
+                votersCount = it.votersCount ?: 0,
+                ownVotes = it.ownVotes
+            )
+        },
+        extra = MastodonStatusExtra(
             type = MastodonStatusType.Status,
-            emoji = emojis ?: emptyList(),
-            visibility = visibility.toDbEnums(),
-            sensitive = sensitive ?: false,
-            spoilerText = spoilerText?.takeIf { it.isNotEmpty() },
-            poll = poll,
-            card = card,
-            mentions = mentions,
-        ).json(),
-        previewCard = card?.url?.let { url ->
-            DbPreviewCard(
+            emoji = emojis?.toUi() ?: emptyList(),
+            visibility = visibility.toMastodonVisibility(),
+            mentions = mentions?.map {
+                MastodonMention(
+                    id = it.id,
+                    username = it.username,
+                    url = it.url,
+                    acct = it.acct
+                )
+            },
+        ),
+        card = card?.url?.let { url ->
+            UiCard(
                 link = url,
                 displayLink = card?.url,
                 title = card?.title,
-                desc = card?.description?.takeIf { it.isNotEmpty() && it.isNotBlank() },
+                description = card?.description?.takeIf { it.isNotEmpty() && it.isNotBlank() },
                 image = card?.image,
             )
         },
         inReplyToUserId = inReplyToAccountID,
-        inReplyToStatusId = inReplyToID
-    )
-    return DbStatusWithMediaAndUser(
-        data = status,
+        inReplyToStatusId = inReplyToID,
         media = (mediaAttachments ?: emptyList()).mapIndexed { index, it ->
-            DbMedia(
-                _id = UUID.randomUUID().toString(),
-                belongToKey = status.statusKey,
+            UiMedia(
+                belongToKey = statusKey,
                 previewUrl = it.previewURL,
                 mediaUrl = it.url,
                 width = it.meta?.original?.width ?: 0,
@@ -269,30 +272,21 @@ private fun Status.toDbStatusWithMediaAndUser(
                 order = index,
             )
         },
-        user = user,
-        reactions = if (favourited == true || reblogged == true) {
-            listOf(
-                DbStatusReaction(
-                    _id = UUID.randomUUID().toString(),
-                    statusKey = status.statusKey,
-                    accountKey = accountKey,
-                    liked = favourited == true,
-                    retweeted = reblogged == true,
-                ),
-            )
-        } else {
-            emptyList()
+        liked = favourited == true,
+        retweeted = reblogged == true,
+        referenceStatus = mutableMapOf<ReferenceType, UiStatus>().apply {
+            retweet?.let { this[ReferenceType.Retweet] = it }
         },
-        url = emptyList(),
+        isGap = isGap,
+        url = emptyList()
     )
 }
 
-fun Account.toDbUser(
+internal fun Account.toUiUser(
     accountKey: MicroBlogKey
-): DbUser {
-    return DbUser(
-        _id = UUID.randomUUID().toString(),
-        userId = this.id ?: throw IllegalArgumentException("mastodon user.id should not be null"),
+): UiUser {
+    return UiUser(
+        id = this.id ?: throw IllegalArgumentException("mastodon user.id should not be null"),
         name = displayName?.let {
             generateHtmlContentWithEmoji(it, emojis ?: emptyList())
         } ?: throw IllegalArgumentException("mastodon user.displayName should not be null"),
@@ -304,9 +298,13 @@ fun Account.toDbUser(
         ),
         profileImage = avatar ?: avatarStatic ?: "",
         profileBackgroundImage = header ?: headerStatic ?: "",
-        followersCount = followersCount ?: 0,
-        friendsCount = followingCount ?: 0,
-        listedCount = 0,
+        metrics = UserMetrics(
+            fans = followersCount ?: 0,
+            follow = followingCount ?: 0,
+            listed = 0,
+            status = statusesCount ?: 0L,
+        ),
+
         rawDesc = note ?: "",
         htmlDesc = note?.let {
             generateHtmlContentWithEmoji(
@@ -319,7 +317,7 @@ fun Account.toDbUser(
         website = null,
         location = null,
         verified = false,
-        isProtected = false,
+        protected = false,
         acct = acct?.let { MicroBlogKey.valueOf(it) }?.let {
             if (it.host.isEmpty()) {
                 it.copy(host = accountKey.host)
@@ -328,23 +326,26 @@ fun Account.toDbUser(
             }
         } ?: throw IllegalArgumentException("mastodon user.acct should not be null"),
         platformType = PlatformType.Mastodon,
-        statusesCount = statusesCount ?: 0L,
-        extra = DbMastodonUserExtra(
-            fields = fields ?: emptyList(),
+        extra = MastodonUserExtra(
+            fields = fields?.map { field ->
+                Field(
+                    field.name,
+                    field.value
+                )
+            } ?: emptyList(),
             bot = bot ?: false,
             locked = locked ?: false,
-            emoji = emojis ?: emptyList(),
-        ).json()
+            emoji = emojis?.toUi() ?: emptyList(),
+        )
     )
 }
 
-fun MastodonList.toDbList(accountKey: MicroBlogKey): DbList {
-    return DbList(
-        _id = UUID.randomUUID().toString(),
+fun MastodonList.toUiList(accountKey: MicroBlogKey): UiList {
+    return UiList(
         ownerId = accountKey.id,
-        listId = id ?: throw IllegalArgumentException("list.idStr should not be null"),
+        id = id ?: throw IllegalArgumentException("list.idStr should not be null"),
         title = title ?: "",
-        description = "",
+        descriptions = "",
         mode = "",
         replyPolicy = repliesPolicy ?: "",
         accountKey = accountKey,
@@ -357,25 +358,19 @@ fun MastodonList.toDbList(accountKey: MicroBlogKey): DbList {
     )
 }
 
-fun Trend.toDbTrend(accountKey: MicroBlogKey): DbTrendWithHistory {
-    return DbTrendWithHistory(
-        trend = DbTrend(
-            _id = UUID.randomUUID().toString(),
-            trendKey = MicroBlogKey("$name:$url", accountKey.host),
-            accountKey = accountKey,
-            displayName = name ?: "",
-            query = name ?: "",
-            url = url ?: "",
-            volume = 0
-        ),
+fun Trend.toUiTrend(accountKey: MicroBlogKey): UiTrend {
+    return UiTrend(
+        trendKey = MicroBlogKey("$name:$url", accountKey.host),
+        displayName = name ?: "",
+        query = name ?: "",
+        url = url ?: "",
+        volume = 0,
         history = history?.map {
-            DbTrendHistory(
-                _id = UUID.randomUUID().toString(),
+            UiTrendHistory(
                 trendKey = MicroBlogKey("$name:$url", accountKey.host),
                 day = it.day?.toLong() ?: 0L,
                 uses = it.uses?.toLong() ?: 0L,
                 accounts = it.accounts?.toLong() ?: 0L,
-                accountKey = accountKey
             )
         } ?: emptyList()
     )
@@ -441,7 +436,7 @@ private fun replaceHashTag(node: Node) {
     }
 }
 
-private fun Visibility?.toDbEnums() = when (this) {
+private fun Visibility?.toMastodonVisibility() = when (this) {
     Visibility.Unlisted -> MastodonVisibility.Unlisted
     Visibility.Private -> MastodonVisibility.Private
     Visibility.Direct -> MastodonVisibility.Direct

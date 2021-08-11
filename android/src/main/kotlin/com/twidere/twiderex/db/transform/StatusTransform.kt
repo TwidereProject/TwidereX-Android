@@ -18,7 +18,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.model.transform
+package com.twidere.twiderex.db.transform
 
 import com.twidere.services.mastodon.model.Mention
 import com.twidere.services.mastodon.model.Poll

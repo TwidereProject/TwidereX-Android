@@ -22,7 +22,7 @@ package com.twidere.twiderex.repository
 
 import androidx.paging.PagingData
 import com.twidere.services.microblog.ListsService
-import com.twidere.twiderex.dataprovider.toUi
+import com.twidere.twiderex.dataprovider.mapper.toUi
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.ListsMode

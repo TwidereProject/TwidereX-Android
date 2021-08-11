@@ -18,16 +18,12 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.model.transform
+package com.twidere.twiderex.db.transform
 
-import android.accounts.Account
-import com.twidere.twiderex.model.TwidereAccount
+import com.twidere.twiderex.db.model.DbUrlEntity
+import com.twidere.twiderex.model.ui.UiUrlEntity
 
-fun Account.toTwidere() = TwidereAccount(
-    name = name,
-    type = type
+fun DbUrlEntity.toUi() = UiUrlEntity(
+    url, expandedUrl, displayUrl, title, description, image
 )
-
-fun TwidereAccount.toAndroid() = Account(
-    name, type
-)
+fun List<DbUrlEntity>.toUi() = map { it.toUi() }

@@ -18,27 +18,21 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.model.transform
+package com.twidere.twiderex.db.transform
 
-import com.twidere.twiderex.db.model.DbTrendHistory
-import com.twidere.twiderex.db.model.DbTrendWithHistory
-import com.twidere.twiderex.model.ui.UiTrend
-import com.twidere.twiderex.model.ui.UiTrendHistory
+import com.twidere.twiderex.db.model.DbList
+import com.twidere.twiderex.model.ui.UiList
 
-fun DbTrendWithHistory.toUi() = UiTrend(
-    trendKey = trend.trendKey,
-    displayName = trend.displayName,
-    url = trend.url,
-    query = trend.query,
-    volume = trend.volume,
-    history = history.map {
-        it.toUi()
-    }
-)
-
-fun DbTrendHistory.toUi() = UiTrendHistory(
-    trendKey = trendKey,
-    day = day,
-    uses = uses,
-    accounts = accounts
-)
+fun DbList.toUi() =
+    UiList(
+        id = listId,
+        ownerId = ownerId,
+        listKey = listKey,
+        accountKey = accountKey,
+        title = title,
+        descriptions = description,
+        mode = mode,
+        replyPolicy = replyPolicy,
+        isFollowed = isFollowed,
+        allowToSubscribe = allowToSubscribe,
+    )

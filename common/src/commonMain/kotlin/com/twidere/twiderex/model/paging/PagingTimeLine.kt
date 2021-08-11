@@ -31,7 +31,6 @@ data class PagingTimeLine(
     val timestamp: Long,
     val sortId: Long,
     var isGap: Boolean,
-    var status: UiStatus
 )
 
 data class PagingTimeLineWithStatus(

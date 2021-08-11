@@ -18,21 +18,27 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.model.transform
+package com.twidere.twiderex.db.transform
 
-import com.twidere.twiderex.db.model.DbMedia
-import com.twidere.twiderex.model.ui.UiMedia
+import com.twidere.twiderex.db.model.DbTrendHistory
+import com.twidere.twiderex.db.model.DbTrendWithHistory
+import com.twidere.twiderex.model.ui.UiTrend
+import com.twidere.twiderex.model.ui.UiTrendHistory
 
-fun List<DbMedia>.toUi() = sortedBy { it.order }.map {
-    UiMedia(
-        url = it.url,
-        belongToKey = it.belongToKey,
-        mediaUrl = it.mediaUrl,
-        previewUrl = it.previewUrl,
-        type = it.type,
-        width = it.width,
-        height = it.height,
-        pageUrl = it.pageUrl,
-        altText = it.altText,
-    )
-}
+fun DbTrendWithHistory.toUi() = UiTrend(
+    trendKey = trend.trendKey,
+    displayName = trend.displayName,
+    url = trend.url,
+    query = trend.query,
+    volume = trend.volume,
+    history = history.map {
+        it.toUi()
+    }
+)
+
+fun DbTrendHistory.toUi() = UiTrendHistory(
+    trendKey = trendKey,
+    day = day,
+    uses = uses,
+    accounts = accounts
+)

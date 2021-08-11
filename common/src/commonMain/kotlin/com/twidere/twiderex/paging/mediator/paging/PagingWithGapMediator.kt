@@ -24,7 +24,7 @@ import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
 import androidx.paging.PagingState
 import com.twidere.services.microblog.model.IStatus
-import com.twidere.twiderex.dataprovider.toPagingTimeline
+import com.twidere.twiderex.dataprovider.mapper.toPagingTimeline
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.paging.PagingTimeLineWithStatus

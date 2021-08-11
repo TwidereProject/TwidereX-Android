@@ -24,7 +24,7 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.twidere.services.microblog.RelationshipService
 import com.twidere.services.microblog.model.IPaging
-import com.twidere.twiderex.dataprovider.toUi
+import com.twidere.twiderex.dataprovider.mapper.toUi
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiUser
 

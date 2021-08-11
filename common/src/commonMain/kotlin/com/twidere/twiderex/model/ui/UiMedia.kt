@@ -37,6 +37,7 @@ data class UiMedia(
     val height: Long,
     val pageUrl: String?,
     val altText: String,
+    val order: Int,
 ) {
     val fileName: String?
         get() = mediaUrl?.takeIfFileName() ?: url?.takeIfFileName() ?: findFileName()
@@ -79,6 +80,7 @@ data class UiMedia(
                 height = 0, // painterResource(id = R.drawable.featured_graphics).intrinsicSize.height.toLong(),
                 pageUrl = null,
                 altText = "",
+                order = 0,
             ),
         )
     }

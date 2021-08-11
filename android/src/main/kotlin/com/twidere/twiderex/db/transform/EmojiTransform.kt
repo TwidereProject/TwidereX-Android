@@ -18,12 +18,23 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.model.transform
+package com.twidere.twiderex.db.transform
 
-import com.twidere.twiderex.db.model.DbUrlEntity
-import com.twidere.twiderex.model.ui.UiUrlEntity
+import com.twidere.services.mastodon.model.Emoji
+import com.twidere.twiderex.model.ui.UiEmoji
+import com.twidere.twiderex.model.ui.UiEmojiCategory
 
-fun DbUrlEntity.toUi() = UiUrlEntity(
-    url, expandedUrl, displayUrl, title, description, image
-)
-fun List<DbUrlEntity>.toUi() = map { it.toUi() }
+fun List<Emoji>.toUi(): List<UiEmojiCategory> = groupBy({ it.category }, { it }).map {
+    UiEmojiCategory(
+        if (it.key.isNullOrEmpty()) null else it.key,
+        it.value.map { emoji ->
+            UiEmoji(
+                shortcode = emoji.shortcode,
+                url = emoji.url,
+                staticURL = emoji.staticURL,
+                visibleInPicker = emoji.visibleInPicker,
+                category = emoji.category
+            )
+        }
+    )
+}

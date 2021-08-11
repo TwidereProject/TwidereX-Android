@@ -37,6 +37,8 @@ kotlin {
                 api("org.jetbrains.kotlinx:kotlinx-serialization-json:${Versions.Kotlin.serialization}")
                 api("org.jetbrains.kotlinx:kotlinx-serialization-protobuf:${Versions.Kotlin.serialization}")
                 api("io.insert-koin:koin-core:${Versions.koin}")
+                implementation("com.twitter.twittertext:twitter-text:3.1.0")
+                implementation("org.jsoup:jsoup:1.13.1")
             }
         }
         val commonTest by getting {

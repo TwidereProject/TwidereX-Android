@@ -27,11 +27,10 @@ import androidx.paging.PagingData
 import androidx.paging.PagingState
 import androidx.paging.map
 import com.twidere.services.microblog.model.IStatus
-import com.twidere.twiderex.dataprovider.toPagingTimeline
+import com.twidere.twiderex.dataprovider.mapper.toPagingTimeline
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.paging.PagingTimeLineWithStatus
-import com.twidere.twiderex.model.paging.saveToDb
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.paging.IPagination
 import com.twidere.twiderex.paging.IPagingList
