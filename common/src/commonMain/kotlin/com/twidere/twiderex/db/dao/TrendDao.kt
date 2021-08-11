@@ -21,13 +21,12 @@
 package com.twidere.twiderex.db.dao
 
 import androidx.paging.PagingSource
-import com.twidere.services.microblog.model.ITrend
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiTrend
 
 // TODO OPERATION
 interface TrendDao {
-    // Todo clear/add , just like listDao
-    fun saveTrend(accountKey: MicroBlogKey, trends: List<ITrend>)
+    fun insertAll(trends: List<UiTrend>)
     fun getPagingSource(accountKey: MicroBlogKey): PagingSource<Int, UiTrend>
+    suspend fun clear()
 }

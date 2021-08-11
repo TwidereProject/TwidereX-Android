@@ -29,6 +29,7 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
 import com.twidere.services.microblog.TrendService
+import com.twidere.twiderex.dataprovider.toUi
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.defaultLoadCount
 import com.twidere.twiderex.model.MicroBlogKey
@@ -50,7 +51,10 @@ class TrendMediator(
         return try {
             if (loadType == LoadType.REFRESH) {
                 val lists = service.trends(locationId)
-                database.trendDao().saveTrend(accountKey = accountKey, trends = lists)
+                database.withTransaction {
+                    database.trendDao().clear()
+                    database.trendDao().insertAll(lists.map { it.toUi(accountKey) })
+                }
             }
             MediatorResult.Success(endOfPaginationReached = true)
         } catch (e: Throwable) {

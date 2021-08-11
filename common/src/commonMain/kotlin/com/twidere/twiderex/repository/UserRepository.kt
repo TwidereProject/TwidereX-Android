@@ -38,9 +38,9 @@ class UserRepository(
     }
 
     suspend fun lookupUserById(id: String, accountKey: MicroBlogKey, lookupService: LookupService): UiUser {
-        val user = lookupService.lookupUser(id).toUi(accountKey)
-        saveUser(user)
-        return user
+        return lookupService.lookupUser(id).toUi(accountKey).also {
+            saveUser(it)
+        }
     }
 
     suspend fun lookupUsersByName(name: List<String>, accountKey: MicroBlogKey, lookupService: LookupService): List<UiUser> {

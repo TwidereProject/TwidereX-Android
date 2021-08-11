@@ -29,6 +29,7 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
 import com.twidere.services.microblog.ListsService
+import com.twidere.twiderex.dataprovider.toUi
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.defaultLoadCount
 import com.twidere.twiderex.model.MicroBlogKey
@@ -45,8 +46,8 @@ class ListsMediator(
     override suspend fun load(loadType: LoadType, state: PagingState<Int, UiList>): MediatorResult {
         return try {
             if (loadType == LoadType.REFRESH) {
-                val lists = service.lists()
-                database.listsDao().saveLists(accountKey = accountKey, lists = lists)
+                val lists = service.lists().map { it.toUi(accountKey) }
+                database.listsDao().insertAll(lists)
             }
             MediatorResult.Success(endOfPaginationReached = true)
         } catch (e: Throwable) {

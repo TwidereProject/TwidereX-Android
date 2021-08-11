@@ -21,22 +21,17 @@
 package com.twidere.twiderex.db.dao
 
 import androidx.paging.PagingSource
-import com.twidere.services.microblog.model.IListModel
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiList
 import kotlinx.coroutines.flow.Flow
 
 // TODO OPERATION
 interface ListsDao {
-    // Todo implement
-    //  database.listsDao().clearAll(accountKey)
-    //        database.listsDao().insertAll(lists)
-    fun saveLists(accountKey: MicroBlogKey, lists: List<IListModel>)
-
     fun getPagingSource(accountKey: MicroBlogKey): PagingSource<Int, UiList>
     fun findWithListKeyWithFlow(listKey: MicroBlogKey, accountKey: MicroBlogKey): Flow<UiList?>
     suspend fun insertAll(listOf: List<UiList>)
     suspend fun findWithListKey(listKey: MicroBlogKey, accountKey: MicroBlogKey): UiList?
     suspend fun update(listOf: List<UiList>)
     suspend fun delete(listOf: List<UiList>)
+    suspend fun clearAll(accountKey: MicroBlogKey)
 }
