@@ -23,13 +23,13 @@ package com.twidere.twiderex.paging.lists
 import androidx.paging.LoadType
 import androidx.paging.PagingConfig
 import androidx.paging.PagingState
-import com.twidere.services.microblog.ListsService
-import com.twidere.twiderex.db.model.DbList
-import com.twidere.twiderex.mock.MockCenter
+import com.twidere.twiderex.mock.db.MockCacheDatabase
+import com.twidere.twiderex.mock.paging.collectDataForTest
+import com.twidere.twiderex.mock.service.MockListsService
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.ui.UiList
 import com.twidere.twiderex.paging.mediator.list.ListsMediator
 import kotlinx.coroutines.runBlocking
-import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.junit.MockitoJUnitRunner
@@ -40,19 +40,20 @@ import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
 class ListsMediatorTest {
-    private var mockDataBase = MockCenter.mockCacheDatabase()
+    private var mockDataBase = MockCacheDatabase()
 
-    private var mockService = MockCenter.mockListsService() as ListsService
+    private var mockService = MockListsService()
 
     @Test
     fun load_saveToDatabaseWhenSuccess() {
         runBlocking {
-            Assert.assertEquals(0, mockDataBase.listsDao().findAll()?.size)
+            val accountKey = MicroBlogKey.twitter("123")
+            assert(mockDataBase.listsDao().getPagingSource(accountKey).collectDataForTest().isEmpty())
             val mediator = ListsMediator(mockDataBase, mockService, accountKey = MicroBlogKey.twitter("123"))
-            val pagingState = PagingState<Int, DbList>(emptyList(), config = PagingConfig(20), anchorPosition = 0, leadingPlaceholderCount = 0)
+            val pagingState = PagingState<Int, UiList>(emptyList(), config = PagingConfig(20), anchorPosition = 0, leadingPlaceholderCount = 0)
             mediator.load(LoadType.REFRESH, pagingState)
-            // when mediator get data from service, it store to database
-            assert(mockDataBase.listsDao().findAll()?.isNotEmpty() == true)
+            // when mediator get data from service, it store to database\
+            assert(mockDataBase.listsDao().getPagingSource(accountKey).collectDataForTest().isNotEmpty())
         }
     }
 }

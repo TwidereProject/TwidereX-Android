@@ -30,7 +30,9 @@ import com.twidere.twiderex.db.dao.PagingTimelineDao
 import com.twidere.twiderex.db.dao.StatusDao
 import com.twidere.twiderex.db.dao.TrendDao
 import com.twidere.twiderex.db.dao.UserDao
+import com.twidere.twiderex.mock.db.dao.MockListsDao
 import com.twidere.twiderex.mock.db.dao.MockMediaDao
+import com.twidere.twiderex.mock.db.dao.MockTrendDao
 import org.jetbrains.annotations.TestOnly
 
 internal class MockCacheDatabase @TestOnly constructor() : CacheDatabase {
@@ -50,16 +52,18 @@ internal class MockCacheDatabase @TestOnly constructor() : CacheDatabase {
         TODO("Not yet implemented")
     }
 
+    private val listsDao = MockListsDao()
     override fun listsDao(): ListsDao {
-        TODO("Not yet implemented")
+        return listsDao
     }
 
     override fun notificationCursorDao(): NotificationCursorDao {
         TODO("Not yet implemented")
     }
 
+    private val trendDao = MockTrendDao()
     override fun trendDao(): TrendDao {
-        TODO("Not yet implemented")
+        return trendDao
     }
 
     override fun directMessageConversationDao(): DirectMessageConversationDao {
