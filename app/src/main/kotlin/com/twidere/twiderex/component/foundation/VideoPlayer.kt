@@ -37,6 +37,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -68,6 +69,9 @@ import com.twidere.twiderex.ui.LocalIsActiveNetworkMetered
 import com.twidere.twiderex.ui.LocalVideoPlayback
 import com.twidere.twiderex.utils.video.CacheDataSourceFactory
 import com.twidere.twiderex.utils.video.VideoPool
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun VideoPlayer(
@@ -78,6 +82,7 @@ fun VideoPlayer(
     showControls: Boolean = customControl == null,
     zOrderMediaOverlay: Boolean = false,
     keepScreenOn: Boolean = false,
+    isListItem: Boolean = true,
     thumb: @Composable (() -> Unit)? = null,
 ) {
     var playing by remember { mutableStateOf(false) }
@@ -174,24 +179,41 @@ fun VideoPlayer(
                 onDispose {
                     updateState()
                     player.release()
+                    VideoPool.removeRect(url)
                     lifecycle.removeObserver(observer)
                 }
             }
 
-            var isInScreen by remember {
+            var middleLine = 0.0f
+            val composableScope = rememberCoroutineScope()
+
+            var isMostCenter by remember(url) {
                 mutableStateOf(false)
             }
-
+            var debounceJob: Job? = null
             AndroidView(
                 modifier = modifier.onGloballyPositioned { coordinates ->
+                    if (middleLine == 0.0f) {
+                        var rootCoordinates = coordinates
+                        while (rootCoordinates.parentCoordinates != null) {
+                            rootCoordinates = rootCoordinates.parentCoordinates!!
+                        }
+                        rootCoordinates.boundsInWindow().run {
+                            middleLine = (top + bottom) / 2
+                        }
+                    }
                     coordinates.boundsInWindow().run {
-                        if (isInScreen && top <= 0 && bottom <= 0) {
-                            isInScreen = false
-                            updateState()
-                            player.playWhenReady = false
-                        } else if (!isInScreen && top > 0 && bottom > 0) {
-                            isInScreen = true
-                            player.playWhenReady = autoPlay
+                        VideoPool.setRect(url, this)
+                        if (!isMostCenter && VideoPool.containsMiddleLine(url, middleLine)) {
+                            debounceJob?.cancel()
+                            debounceJob = composableScope.launch {
+                                delay(VideoPool.DEBOUNCE_DELAY)
+                                if (VideoPool.containsMiddleLine(url, middleLine)) {
+                                    isMostCenter = true
+                                }
+                            }
+                        } else if (isMostCenter && !VideoPool.isMostCenter(url, middleLine)) {
+                            isMostCenter = false
                         }
                     }
                 },
@@ -204,9 +226,15 @@ fun VideoPlayer(
                 }
             ) {
                 it.player = player
-                if (isResume && isInScreen) {
+                if (isResume && isMostCenter) {
+                    if (isListItem) {
+                        player.playWhenReady = autoPlay
+                    }
                     it.onResume()
                 } else {
+                    if (isListItem) {
+                        player.playWhenReady = false
+                    }
                     it.onPause()
                 }
             }

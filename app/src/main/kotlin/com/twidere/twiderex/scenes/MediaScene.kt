@@ -446,7 +446,8 @@ fun MediaView(
                             customControl = customControl,
                             showControls = false,
                             zOrderMediaOverlay = true,
-                            keepScreenOn = true
+                            keepScreenOn = true,
+                            isListItem = false
                         )
                     }
                 MediaType.other -> Unit
