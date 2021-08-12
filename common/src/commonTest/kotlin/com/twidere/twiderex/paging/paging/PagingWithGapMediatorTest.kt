@@ -25,8 +25,8 @@ import androidx.paging.LoadType
 import androidx.paging.PagingConfig
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
-import com.twidere.services.microblog.model.IPaging
 import com.twidere.services.microblog.model.IStatus
+import com.twidere.twiderex.dataprovider.mapper.toPagingTimeline
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.mock.db.MockCacheDatabase
 import com.twidere.twiderex.mock.model.mockIStatus
@@ -34,21 +34,24 @@ import com.twidere.twiderex.mock.model.toIPaging
 import com.twidere.twiderex.mock.paging.collectDataForTest
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.paging.PagingTimeLineWithStatus
-import com.twidere.twiderex.paging.IPagination
-import com.twidere.twiderex.paging.mediator.paging.PagingTimelineMediatorBase
+import com.twidere.twiderex.model.paging.saveToDb
+import com.twidere.twiderex.paging.mediator.paging.PagingWithGapMediator
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import kotlin.test.assertEquals
 
-internal class PagingTimelineMediatorBaseTest {
+internal class PagingWithGapMediatorTest {
     @ExperimentalPagingApi
     @Test
     fun refresh_whenReturnedSuccessSaveResultToDatabase() = runBlocking {
         val accountKey = MicroBlogKey.twitter("test")
         val database = MockCacheDatabase()
-        val mediator = MockPagingTimelineMediatorBase(
+        val pagingKey = "Mock Test"
+        val mediator = MockPagingGapMediator(
             accountKey = accountKey,
-            database = database
+            database = database,
+            statusId = System.currentTimeMillis().toString(),
+            pagingKey = pagingKey
         )
         assert(database.pagingTimelineDao().getPagingSource(mediator.pagingKey, accountKey).collectDataForTest().isEmpty())
         val pagingState = PagingState<Int, PagingTimeLineWithStatus>(emptyList(), config = PagingConfig(20), anchorPosition = 0, leadingPlaceholderCount = 0)
@@ -58,65 +61,63 @@ internal class PagingTimelineMediatorBaseTest {
         assert(!(result as RemoteMediator.MediatorResult.Success).endOfPaginationReached)
     }
 
-    @OptIn(ExperimentalPagingApi::class)
+    @ExperimentalPagingApi
     @Test
-    fun refresh_SaveTransformedDataIfTransformed() = runBlocking {
+    fun refresh_whenReturnedResultNotInDatabaseIsGapShouldBeTrue() = runBlocking {
         val accountKey = MicroBlogKey.twitter("test")
+        val pagingKey = "Mock Paging Key"
         val database = MockCacheDatabase()
-        val mediator = MockTransformPagingTimelineMediatorBase(
+        val sinceId = "sinceId"
+        listOf(mockIStatus(sinceId).toPagingTimeline(accountKey, pagingKey)).saveToDb(database)
+        val mediator = MockPagingGapMediator(
             accountKey = accountKey,
-            database = database
+            database = database,
+            statusId = "newId",
+            pagingKey = pagingKey
         )
-        assert(database.pagingTimelineDao().getPagingSource(mediator.pagingKey, accountKey).collectDataForTest().isEmpty())
         val pagingState = PagingState<Int, PagingTimeLineWithStatus>(emptyList(), config = PagingConfig(20), anchorPosition = 0, leadingPlaceholderCount = 0)
-        val result = mediator.load(LoadType.REFRESH, pagingState)
-        val timelines = database.pagingTimelineDao().getPagingSource(mediator.pagingKey, accountKey).collectDataForTest()
-        assertEquals("transformed text", timelines.first().status.rawText)
-        assert(result is RemoteMediator.MediatorResult.Success)
-        assert(!(result as RemoteMediator.MediatorResult.Success).endOfPaginationReached)
+        mediator.load(LoadType.REFRESH, pagingState)
+        val result = database.pagingTimelineDao().getLatest(pagingKey, accountKey)
+        assertEquals(true, result?.timeline?.isGap)
+        assertEquals(true, result?.status?.isGap)
+    }
+
+    @ExperimentalPagingApi
+    @Test
+    fun refresh_whenReturnedResultInDatabaseIsGapShouldBeFalse() = runBlocking {
+        val accountKey = MicroBlogKey.twitter("test")
+        val pagingKey = "Mock Paging Key"
+        val database = MockCacheDatabase()
+        val sinceId = "sinceId"
+        listOf(mockIStatus(sinceId).toPagingTimeline(accountKey, pagingKey)).saveToDb(database)
+        val mediator = MockPagingGapMediator(
+            accountKey = accountKey,
+            database = database,
+            statusId = sinceId,
+            pagingKey = pagingKey
+        )
+        val pagingState = PagingState<Int, PagingTimeLineWithStatus>(emptyList(), config = PagingConfig(20), anchorPosition = 0, leadingPlaceholderCount = 0)
+        mediator.load(LoadType.REFRESH, pagingState)
+        val result = database.pagingTimelineDao().getLatest(pagingKey, accountKey)
+        assertEquals(false, result?.timeline?.isGap)
+        assertEquals(false, result?.status?.isGap)
     }
 }
 
-internal open class MockPagingTimelineMediatorBase(
+internal class MockPagingGapMediator(
     accountKey: MicroBlogKey,
-    database: CacheDatabase
-) : PagingTimelineMediatorBase<MockPagingTimelineMediatorBase.MockPagination>(accountKey = accountKey, database = database) {
-    class MockPagination(
-        val nextKey: String?
-    ) : IPagination
-
+    database: CacheDatabase,
+    private val statusId: String,
     override val pagingKey: String
-        get() = "Mock paging key"
-
-    override fun provideNextPage(
-        raw: List<IStatus>,
-        result: List<PagingTimeLineWithStatus>
-    ): MockPagination {
-        return if (raw is IPaging) {
-            MockPagination(raw.nextPage)
-        } else {
-            MockPagination(null)
-        }
-    }
-
-    override suspend fun load(pageSize: Int, paging: MockPagination?): List<IStatus> {
-        return listOf(mockIStatus()).toIPaging()
-    }
-}
-
-internal class MockTransformPagingTimelineMediatorBase(
-    accountKey: MicroBlogKey,
-    database: CacheDatabase
-) : MockPagingTimelineMediatorBase(
-    accountKey = accountKey, database = database
+) : PagingWithGapMediator(
+    accountKey = accountKey,
+    database = database
 ) {
-    override fun transform(
-        state: PagingState<Int, PagingTimeLineWithStatus>,
-        data: List<PagingTimeLineWithStatus>,
-        list: List<IStatus>
-    ): List<PagingTimeLineWithStatus> {
-        return data.map {
-            it.copy(status = it.status.copy(rawText = "transformed text"))
-        }
+    override suspend fun loadBetweenImpl(
+        pageSize: Int,
+        max_id: String?,
+        since_id: String?
+    ): List<IStatus> {
+        return listOf(mockIStatus(statusId)).toIPaging()
     }
 }

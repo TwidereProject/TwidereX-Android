@@ -42,7 +42,7 @@ internal class MockPagingTimelineDao @TestOnly constructor(private val statusDao
                 if (it.accountKey != accountKey) null else {
                     runBlocking {
                         statusDao.findWithStatusKey(it.statusKey, accountKey = accountKey)?.let { status ->
-                            PagingTimeLineWithStatus(timeline = it, status = status)
+                            PagingTimeLineWithStatus(timeline = it, status = status.copy(isGap = it.isGap))
                         }
                     }
                 }
@@ -62,7 +62,7 @@ internal class MockPagingTimelineDao @TestOnly constructor(private val statusDao
     ): PagingTimeLineWithStatus? {
         return fakeDb[pagingKey]?.maxByOrNull { it.timestamp }?.let {
             statusDao.findWithStatusKey(it.statusKey, accountKey = accountKey)?.let { status ->
-                PagingTimeLineWithStatus(timeline = it, status = status)
+                PagingTimeLineWithStatus(timeline = it, status = status.copy(isGap = it.isGap))
             }
         }
     }

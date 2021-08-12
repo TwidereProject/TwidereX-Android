@@ -29,13 +29,13 @@ import com.twidere.services.microblog.model.IUser
 import com.twidere.services.twitter.model.StatusV2
 import com.twidere.services.twitter.model.TwitterList
 import com.twidere.services.twitter.model.TwitterPaging
-import com.twidere.services.twitter.model.User
 import com.twidere.services.twitter.model.UserV2
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.MediaType
 import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.model.ui.UiSearch
 import org.jetbrains.annotations.TestOnly
+import java.util.Date
 import java.util.UUID
 
 @TestOnly
@@ -66,11 +66,9 @@ internal fun <T> List<T>.toIPaging(nextPaging: String? = UUID.randomUUID().toStr
 )
 
 @TestOnly
-internal fun mockIUser(): IUser {
-    val id = System.currentTimeMillis()
-    return User(
+internal fun mockIUser(id: String = System.currentTimeMillis().toString()): IUser {
+    return UserV2(
         id = id,
-        idStr = id.toString(),
     )
 }
 
@@ -79,6 +77,7 @@ internal fun mockITrend(): ITrend {
     return Trend(
         name = "trend timestamp:${System.currentTimeMillis()}",
         url = "https://trend",
+
         history = mutableListOf(
             TrendHistory(
                 accounts = "1",
@@ -102,15 +101,17 @@ internal fun mockIListModel(
         name = name,
         mode = mode,
         description = description,
+        createdAt = Date().apply { time = System.currentTimeMillis() }
     )
 }
 
 @TestOnly
-internal fun mockIStatus(): IStatus {
+internal fun mockIStatus(id: String = System.currentTimeMillis().toString()): IStatus {
     val authorId = System.currentTimeMillis().toString()
     return StatusV2(
-        id = System.currentTimeMillis().toString(),
+        id = id,
         authorID = authorId,
+        createdAt = Date().apply { time = System.currentTimeMillis() }
     ).apply {
         user = UserV2(
             id = authorId,
