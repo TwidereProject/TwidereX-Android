@@ -20,37 +20,17 @@
  */
 package com.twidere.twiderex.paging.source
 
-import androidx.paging.PagingSource
-import androidx.paging.PagingState
 import com.twidere.services.microblog.RelationshipService
-import com.twidere.services.microblog.model.IPaging
-import com.twidere.twiderex.dataprovider.mapper.toUi
+import com.twidere.services.microblog.model.IUser
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.ui.UiUser
 
 class FollowersPagingSource(
-    private val userKey: MicroBlogKey,
+    userKey: MicroBlogKey,
     private val service: RelationshipService
-) : PagingSource<String, UiUser>() {
-    override suspend fun load(params: LoadParams<String>): LoadResult<String, UiUser> {
-        return try {
-            val page = params.key
-            val result = service.followers(userKey.id, nextPage = page)
-            val users = result.map {
-                it.toUi(userKey)
-            }
-            val nextPage = if (result is IPaging) {
-                result.nextPage
-            } else {
-                null
-            }
-            LoadResult.Page(data = users, prevKey = null, nextKey = nextPage)
-        } catch (e: Exception) {
-            LoadResult.Error(e)
-        }
-    }
+) : UserPagingSource(userKey = userKey) {
 
-    override fun getRefreshKey(state: PagingState<String, UiUser>): String? {
-        return null
+    override suspend fun loadUsers(params: LoadParams<String>): List<IUser> {
+        val page = params.key
+        return service.followers(userKey.id, nextPage = page)
     }
 }

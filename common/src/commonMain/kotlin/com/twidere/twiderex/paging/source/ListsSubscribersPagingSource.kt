@@ -20,21 +20,16 @@
  */
 package com.twidere.twiderex.paging.source
 
-import androidx.paging.PagingState
 import com.twidere.services.microblog.ListsService
 import com.twidere.services.microblog.model.IUser
 import com.twidere.twiderex.defaultLoadCount
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.ui.UiUser
 
 class ListsSubscribersPagingSource(
     userKey: MicroBlogKey,
     private val service: ListsService,
     private val listId: String,
 ) : UserPagingSource(userKey) {
-    override fun getRefreshKey(state: PagingState<String, UiUser>): String? {
-        return null
-    }
 
     override suspend fun loadUsers(params: LoadParams<String>): List<IUser> {
         return service.listSubscribers(listId = listId, count = defaultLoadCount, params.key)

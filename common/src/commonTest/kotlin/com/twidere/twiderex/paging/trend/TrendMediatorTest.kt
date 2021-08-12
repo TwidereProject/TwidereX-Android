@@ -20,9 +20,11 @@
  */
 package com.twidere.twiderex.paging.trend
 
+import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
 import androidx.paging.PagingConfig
 import androidx.paging.PagingState
+import androidx.paging.RemoteMediator
 import com.twidere.twiderex.MainThreadTestBase
 import com.twidere.twiderex.mock.db.MockCacheDatabase
 import com.twidere.twiderex.mock.paging.collectDataForTest
@@ -33,28 +35,40 @@ import com.twidere.twiderex.paging.mediator.trend.TrendMediator
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.mockito.junit.MockitoJUnitRunner
 
 /**
  * instead of testing pagination, we should focus on our code logic
  */
 
-@RunWith(MockitoJUnitRunner::class)
 internal class TrendMediatorTest : MainThreadTestBase() {
     private var mockDataBase = MockCacheDatabase()
 
     private var mockService = MockTrendService()
 
+    @OptIn(ExperimentalPagingApi::class)
     @Test
     fun load_saveToDatabaseWhenSuccess() = runBlocking(Dispatchers.Main) {
         val accountKey = MicroBlogKey.twitter("123")
         assert(mockDataBase.trendDao().getPagingSource(accountKey).collectDataForTest().isEmpty())
         val mediator = TrendMediator(mockDataBase, mockService, accountKey = accountKey, "1")
         val pagingState = PagingState<Int, UiTrend>(emptyList(), config = PagingConfig(20), anchorPosition = 0, leadingPlaceholderCount = 0)
-        mediator.load(LoadType.REFRESH, pagingState)
+        val result = mediator.load(LoadType.REFRESH, pagingState)
 
         // when mediator get data from service, it store to database
         assert(mockDataBase.trendDao().getPagingSource(accountKey).collectDataForTest().isNotEmpty())
+        assert(result is RemoteMediator.MediatorResult.Success)
+        assert((result as RemoteMediator.MediatorResult.Success).endOfPaginationReached)
+    }
+
+    @OptIn(ExperimentalPagingApi::class)
+    @Test
+    fun refresh_LoadReturnsErrorResultWhenErrorOccurs() = runBlocking(Dispatchers.Main) {
+        val accountKey = MicroBlogKey.twitter("123")
+        mockService.errorMsg = "throw test error"
+        assert(mockDataBase.trendDao().getPagingSource(accountKey).collectDataForTest().isEmpty())
+        val mediator = TrendMediator(mockDataBase, mockService, accountKey = accountKey, "1")
+        val pagingState = PagingState<Int, UiTrend>(emptyList(), config = PagingConfig(20), anchorPosition = 0, leadingPlaceholderCount = 0)
+        val result = mediator.load(LoadType.REFRESH, pagingState)
+        assert(result is RemoteMediator.MediatorResult.Error)
     }
 }

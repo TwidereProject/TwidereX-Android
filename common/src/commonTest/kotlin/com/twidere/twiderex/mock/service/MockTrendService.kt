@@ -20,37 +20,25 @@
  */
 package com.twidere.twiderex.mock.service
 
-import com.twidere.services.mastodon.model.Trend
-import com.twidere.services.mastodon.model.TrendHistory
 import com.twidere.services.microblog.MicroBlogService
 import com.twidere.services.microblog.TrendService
 import com.twidere.services.microblog.model.ITrend
-import java.lang.IllegalArgumentException
+import com.twidere.twiderex.mock.model.mockITrend
+import com.twidere.twiderex.mock.model.toIPaging
 
-class MockTrendService : TrendService, MicroBlogService {
-
+internal class MockTrendService : TrendService, MicroBlogService, ErrorService() {
     override suspend fun trends(locationId: String, limit: Int?): List<ITrend> {
-
+        checkError()
         return if (locationId == "error")
             throw IllegalArgumentException("service error")
         else {
-            val list = mutableListOf<Trend>()
+            val list = mutableListOf<ITrend>()
             for (i in 0 until (limit ?: 1)) {
                 list.add(
-                    Trend(
-                        name = "trend $i timestamp:${System.currentTimeMillis()}",
-                        url = "https://trend",
-                        history = mutableListOf(
-                            TrendHistory(
-                                accounts = "1",
-                                uses = "1",
-                                day = System.currentTimeMillis().toString()
-                            )
-                        )
-                    )
+                    mockITrend()
                 )
             }
-            list
+            list.toIPaging()
         }
     }
 }

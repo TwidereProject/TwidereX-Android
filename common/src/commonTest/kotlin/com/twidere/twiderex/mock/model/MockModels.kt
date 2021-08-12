@@ -20,11 +20,20 @@
  */
 package com.twidere.twiderex.mock.model
 
+import com.twidere.services.mastodon.model.Trend
+import com.twidere.services.mastodon.model.TrendHistory
+import com.twidere.services.microblog.model.IListModel
+import com.twidere.services.microblog.model.ITrend
+import com.twidere.services.microblog.model.IUser
+import com.twidere.services.twitter.model.TwitterList
+import com.twidere.services.twitter.model.TwitterPaging
+import com.twidere.services.twitter.model.User
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.MediaType
 import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.model.ui.UiSearch
 import org.jetbrains.annotations.TestOnly
+import java.util.UUID
 
 @TestOnly
 internal fun mockUiMedia(url: String = "", belongToKey: MicroBlogKey = MicroBlogKey.Empty) = UiMedia(
@@ -47,3 +56,48 @@ internal fun mockUiSearch(content: String = "", accountKey: MicroBlogKey = Micro
     saved = saved,
     accountKey = accountKey
 )
+
+internal fun <T> List<T>.toIPaging(nextPaging: String? = UUID.randomUUID().toString()) = TwitterPaging(
+    data = this,
+    nextPage = nextPaging
+)
+
+@TestOnly
+internal fun mockIUser(): IUser {
+    val id = System.currentTimeMillis()
+    return User(
+        id = id,
+        idStr = id.toString(),
+    )
+}
+
+@TestOnly
+internal fun mockITrend(): ITrend {
+    return Trend(
+        name = "trend timestamp:${System.currentTimeMillis()}",
+        url = "https://trend",
+        history = mutableListOf(
+            TrendHistory(
+                accounts = "1",
+                uses = "1",
+                day = System.currentTimeMillis().toString()
+            )
+        )
+    )
+}
+
+@TestOnly
+internal fun mockIListModel(
+    name: String = "",
+    mode: String? = null,
+    description: String? = "",
+): IListModel {
+    val id = System.currentTimeMillis()
+    return TwitterList(
+        id = id,
+        idStr = id.toString(),
+        name = name,
+        mode = mode,
+        description = description,
+    )
+}
