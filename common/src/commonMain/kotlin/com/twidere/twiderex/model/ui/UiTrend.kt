@@ -23,6 +23,7 @@ package com.twidere.twiderex.model.ui
 import com.twidere.twiderex.model.MicroBlogKey
 
 data class UiTrend(
+    val accountKey: MicroBlogKey,
     val trendKey: MicroBlogKey,
     val displayName: String,
     val url: String,

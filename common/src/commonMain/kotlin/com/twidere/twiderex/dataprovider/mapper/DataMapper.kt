@@ -100,7 +100,7 @@ fun IListModel.toUi(accountKey: MicroBlogKey) = when (this) {
 }
 
 fun ITrend.toUi(accountKey: MicroBlogKey) = when (this) {
-    is TwitterTrend -> this.toUiTrend()
+    is TwitterTrend -> this.toUiTrend(accountKey)
     is MastodonTrend -> this.toUiTrend(accountKey)
     else -> throw NotImplementedError()
 }

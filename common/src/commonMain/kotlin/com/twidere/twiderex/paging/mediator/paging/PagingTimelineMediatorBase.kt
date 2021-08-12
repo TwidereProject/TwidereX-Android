@@ -25,12 +25,14 @@ import androidx.paging.LoadType
 import androidx.paging.Pager
 import androidx.paging.PagingData
 import androidx.paging.PagingState
+import androidx.paging.filter
 import androidx.paging.map
 import com.twidere.services.microblog.model.IStatus
 import com.twidere.twiderex.dataprovider.mapper.toPagingTimeline
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.paging.PagingTimeLineWithStatus
+import com.twidere.twiderex.model.paging.saveToDb
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.paging.IPagination
 import com.twidere.twiderex.paging.IPagingList
@@ -124,6 +126,7 @@ abstract class PagingTimelineMediatorBase<T : IPagination>(
 
 fun Pager<Int, PagingTimeLineWithStatus>.toUi(accountKey: MicroBlogKey): Flow<PagingData<UiStatus>> {
     return flow.map { pagingData ->
-        pagingData.map { it.status }
+        pagingData.filter { it.timeline.accountKey == accountKey }
+            .map { it.status }
     }
 }

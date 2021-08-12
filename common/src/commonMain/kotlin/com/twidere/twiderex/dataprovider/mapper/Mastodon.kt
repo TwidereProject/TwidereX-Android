@@ -53,7 +53,7 @@ import com.twidere.twiderex.model.ui.mastodon.Field
 import com.twidere.twiderex.model.ui.mastodon.MastodonMention
 import com.twidere.twiderex.model.ui.mastodon.MastodonStatusExtra
 import com.twidere.twiderex.model.ui.mastodon.MastodonUserExtra
-import com.twidere.twiderex.navigation.RootDeepLinksRoute
+// import com.twidere.twiderex.navigation.RootDeepLinksRoute
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import org.jsoup.nodes.Node
@@ -360,6 +360,7 @@ fun MastodonList.toUiList(accountKey: MicroBlogKey): UiList {
 
 fun Trend.toUiTrend(accountKey: MicroBlogKey): UiTrend {
     return UiTrend(
+        accountKey = accountKey,
         trendKey = MicroBlogKey("$name:$url", accountKey.host),
         displayName = name ?: "",
         query = name ?: "",
@@ -409,7 +410,8 @@ private fun replaceMention(mentions: List<Mention>, node: Node, accountKey: Micr
         if (id != null) {
             node.attr(
                 "href",
-                RootDeepLinksRoute.User(MicroBlogKey(id, accountKey.host))
+                // TODO migrate Route
+                // RootDeepLinksRoute.User(MicroBlogKey(id, accountKey.host))
             )
         }
     } else {
@@ -429,7 +431,8 @@ private fun replaceHashTag(node: Node) {
     ) {
         node.attr(
             "href",
-            RootDeepLinksRoute.Mastodon.Hashtag(node.text().trimStart('#'))
+            // TODO migrate Route
+            // RootDeepLinksRoute.Mastodon.Hashtag(node.text().trimStart('#'))
         )
     } else {
         node.childNodes().forEach { replaceHashTag(it) }

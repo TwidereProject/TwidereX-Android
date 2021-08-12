@@ -50,15 +50,16 @@ import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.model.ui.UserMetrics
 import com.twidere.twiderex.model.ui.twitter.TwitterStatusExtra
 import com.twidere.twiderex.model.ui.twitter.TwitterUserExtra
-import com.twidere.twiderex.navigation.RootDeepLinksRouteDefinition
+// import com.twidere.twiderex.navigation.RootDeepLinksRouteDefinition
 import com.twitter.twittertext.Autolink
 
 val autolink by lazy {
     Autolink().apply {
         setUsernameIncludeSymbol(true)
-        hashtagUrlBase = "${generateDeepLinkBase(RootDeepLinksRouteDefinition.Search)}/%23"
-        cashtagUrlBase = "${generateDeepLinkBase(RootDeepLinksRouteDefinition.Search)}/%24"
-        usernameUrlBase = "${generateDeepLinkBase(RootDeepLinksRouteDefinition.Twitter.User)}/"
+        // TODO migrate Route
+        hashtagUrlBase = "" // "${generateDeepLinkBase(RootDeepLinksRouteDefinition.Search)}/%23"
+        cashtagUrlBase = "" // "${generateDeepLinkBase(RootDeepLinksRouteDefinition.Search)}/%24"
+        usernameUrlBase = "" // "${generateDeepLinkBase(RootDeepLinksRouteDefinition.Twitter.User)}/"
     }
 }
 
@@ -441,7 +442,8 @@ internal fun TwitterList.toUiList(accountKey: MicroBlogKey) = UiList(
     allowToSubscribe = mode != ListsMode.PRIVATE.value
 )
 
-internal fun Trend.toUiTrend() = UiTrend(
+internal fun Trend.toUiTrend(accountKey: MicroBlogKey) = UiTrend(
+    accountKey = accountKey,
     trendKey = MicroBlogKey.twitter("$name:$url"),
     displayName = name ?: "",
     query = name ?: "",

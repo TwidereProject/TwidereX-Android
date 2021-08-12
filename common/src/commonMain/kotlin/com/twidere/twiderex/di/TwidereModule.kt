@@ -25,7 +25,7 @@ import org.koin.dsl.module
 
 internal val twidereModules = module {
     single { DataProvider.create() }
-    single { get<DataProvider>().appCacheHandler }
+    single { get<DataProvider>().fileCacheHandler }
     single { get<DataProvider>().cacheDatabase }
     single { get<DataProvider>().appDatabase }
 }

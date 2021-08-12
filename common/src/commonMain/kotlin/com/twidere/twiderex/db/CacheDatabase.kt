@@ -26,7 +26,6 @@ import com.twidere.twiderex.db.dao.ListsDao
 import com.twidere.twiderex.db.dao.MediaDao
 import com.twidere.twiderex.db.dao.NotificationCursorDao
 import com.twidere.twiderex.db.dao.PagingTimelineDao
-import com.twidere.twiderex.db.dao.ReactionDao
 import com.twidere.twiderex.db.dao.StatusDao
 import com.twidere.twiderex.db.dao.TrendDao
 import com.twidere.twiderex.db.dao.UserDao
@@ -35,7 +34,6 @@ interface CacheDatabase : Database {
     fun statusDao(): StatusDao
     fun mediaDao(): MediaDao
     fun userDao(): UserDao
-    fun reactionDao(): ReactionDao
     fun pagingTimelineDao(): PagingTimelineDao
     fun listsDao(): ListsDao
     fun notificationCursorDao(): NotificationCursorDao

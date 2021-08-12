@@ -27,5 +27,5 @@ import org.koin.dsl.module
 
 internal val repositoryModules = module {
     factory { MediaRepository(get<DataProvider>().cacheDatabase.mediaDao()) }
-    factory { CacheRepository(get()) }
+    factory { CacheRepository(get(), get(), get()) }
 }

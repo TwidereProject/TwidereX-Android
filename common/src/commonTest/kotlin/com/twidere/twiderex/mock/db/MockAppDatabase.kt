@@ -18,25 +18,34 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.db
+package com.twidere.twiderex.mock.db
 
+import com.twidere.twiderex.db.AppDatabase
 import com.twidere.twiderex.db.dao.DraftDao
 import com.twidere.twiderex.db.dao.SearchDao
+import com.twidere.twiderex.mock.db.dao.MockSearchDao
+import org.jetbrains.annotations.TestOnly
 
-internal class DesktopAppDatabaseImpl : AppDatabase {
+internal class MockAppDatabase @TestOnly constructor() : AppDatabase {
     override fun draftDao(): DraftDao {
         TODO("Not yet implemented")
     }
 
+    private val searchDao = MockSearchDao()
     override fun searchDao(): SearchDao {
-        TODO("Not yet implemented")
+        return searchDao
     }
 
+    private var cleared = false
     override suspend fun clearAllTables() {
-        TODO("Not yet implemented")
+        cleared = true
     }
 
-    override fun <R> withTransaction(block: suspend () -> R): R {
-        TODO("Not yet implemented")
+    fun isAllTablesCleared(): Boolean {
+        return cleared
+    }
+
+    override suspend fun <R> withTransaction(block: suspend () -> R): R {
+        return block.invoke()
     }
 }

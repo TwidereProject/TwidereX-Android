@@ -18,14 +18,12 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.cache
+package com.twidere.twiderex.repository
 
-interface AppCacheHandler {
-    fun clearMediaCaches()
+import com.twidere.twiderex.model.ui.UiUser
 
-    fun clearFileCaches()
-
-    fun clearDatabaseCaches()
-
-    fun clearSearchHistories()
+actual class AccountUpdateRepository {
+    actual fun updateAccount(user: UiUser) {
+        TODO("NOT IMPLEMENT YET")
+    }
 }

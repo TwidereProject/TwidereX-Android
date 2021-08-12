@@ -18,25 +18,21 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.db
+package com.twidere.twiderex.mock.db.dao
 
-import com.twidere.twiderex.db.dao.DraftDao
-import com.twidere.twiderex.db.dao.SearchDao
+import com.twidere.twiderex.db.dao.MediaDao
+import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.ui.UiMedia
+import org.jetbrains.annotations.TestOnly
 
-internal class AndroidCacheDatabase : AppDatabase {
-    override fun draftDao(): DraftDao {
-        TODO("Not yet implemented")
+internal class MockMediaDao @TestOnly constructor() : MediaDao {
+    private var initData: List<UiMedia> = emptyList()
+    fun initData(initData: List<UiMedia>) {
+        this.initData = initData
     }
-
-    override fun searchDao(): SearchDao {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun clearAllTables() {
-        TODO("Not yet implemented")
-    }
-
-    override fun <R> withTransaction(block: suspend () -> R): R {
-        TODO("Not yet implemented")
+    override suspend fun findMediaByBelongToKey(belongToKey: MicroBlogKey): List<UiMedia> {
+        return initData.filter {
+            it.belongToKey == belongToKey
+        }
     }
 }

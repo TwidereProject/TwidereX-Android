@@ -18,17 +18,21 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.mock.db
+package com.twidere.twiderex.mock.cache
 
-import com.twidere.twiderex.db.dao.MediaDao
-import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.ui.UiMedia
-import org.jetbrains.annotations.TestOnly
+import com.twidere.twiderex.cache.FileCacheHandler
 
-internal class MockMediaDao @TestOnly constructor(private val initData: List<UiMedia> = emptyList()) : MediaDao {
-    override suspend fun findMediaByBelongToKey(belongToKey: MicroBlogKey): List<UiMedia> {
-        return initData.filter {
-            it.belongToKey == belongToKey
-        }
+internal class MockFileCacheHandler(
+    private val mediaCache: MutableList<Any>,
+    private val fileCache: MutableList<Any>,
+) : FileCacheHandler {
+    override fun clearMediaCaches() {
+        mediaCache.clear()
     }
+
+    override fun clearFileCaches() {
+        fileCache.clear()
+    }
+
+    fun isCacheCleared() = mediaCache.isEmpty() && fileCache.isEmpty()
 }

@@ -20,24 +20,39 @@
  */
 package com.twidere.twiderex.repository
 
-import com.twidere.twiderex.mock.cache.MockAppCacheHandler
+import com.twidere.twiderex.mock.cache.MockFileCacheHandler
+import com.twidere.twiderex.mock.db.MockAppDatabase
+import com.twidere.twiderex.mock.db.MockCacheDatabase
+import com.twidere.twiderex.mock.model.mockUiSearch
+import com.twidere.twiderex.model.MicroBlogKey
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 
 class CacheRepositoryTest {
     @Test
     fun clearAllCachesSuccess() = runBlocking {
-        val handler = MockAppCacheHandler(
+        val handler = MockFileCacheHandler(
             mediaCache = mutableListOf("media"),
             fileCache = mutableListOf("file"),
-            database = mutableListOf("database"),
-            searchHistories = mutableListOf("search"),
         )
-        val repository = CacheRepository(handler)
+        val cacheDatabase = MockCacheDatabase()
+        val appDatabase = MockAppDatabase()
+        val repository = CacheRepository(handler, cacheDatabase, appDatabase)
+        appDatabase.searchDao().insertAll(listOf(mockUiSearch(accountKey = MicroBlogKey.twitter("1"))))
+        val list = appDatabase.searchDao().getAll(MicroBlogKey.twitter("1")).first()
+        assert(list.isNotEmpty())
+        assert(!handler.isCacheCleared())
+        assert(!cacheDatabase.isAllTablesCleared())
+
         repository.clearCacheDir()
         repository.clearDatabaseCache()
         repository.clearImageCache()
         repository.clearSearchHistory()
+
         assert(handler.isCacheCleared())
+        assert(cacheDatabase.isAllTablesCleared())
+        assert(appDatabase.searchDao().getAll(MicroBlogKey.twitter("1")).firstOrNull().isNullOrEmpty())
     }
 }

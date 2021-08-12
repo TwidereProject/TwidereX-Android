@@ -23,10 +23,11 @@ package com.twidere.twiderex.mock.model
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.MediaType
 import com.twidere.twiderex.model.ui.UiMedia
+import com.twidere.twiderex.model.ui.UiSearch
 import org.jetbrains.annotations.TestOnly
 
 @TestOnly
-internal fun UiMedia.Companion.mock(url: String, belongToKey: MicroBlogKey) = UiMedia(
+internal fun mockUiMedia(url: String = "", belongToKey: MicroBlogKey = MicroBlogKey.Empty) = UiMedia(
     url = url,
     belongToKey = belongToKey,
     mediaUrl = url,
@@ -36,5 +37,13 @@ internal fun UiMedia.Companion.mock(url: String, belongToKey: MicroBlogKey) = Ui
     height = 100,
     pageUrl = "",
     altText = "",
-    order = index
+    order = 0
+)
+
+@TestOnly
+internal fun mockUiSearch(content: String = "", accountKey: MicroBlogKey = MicroBlogKey.Empty, saved: Boolean = false) = UiSearch(
+    content = content,
+    lastActive = System.currentTimeMillis(),
+    saved = saved,
+    accountKey = accountKey
 )

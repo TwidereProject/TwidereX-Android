@@ -32,7 +32,7 @@ class ReactionRepository(
         liked: Boolean? = null,
         retweet: Boolean? = null,
     ) {
-        database.reactionDao().updateAction(
+        database.statusDao().updateAction(
             statusKey = statusKey,
             accountKey = accountKey,
             liked = liked,

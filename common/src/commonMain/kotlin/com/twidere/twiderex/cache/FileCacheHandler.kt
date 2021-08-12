@@ -18,15 +18,10 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.db.dao
+package com.twidere.twiderex.cache
 
-import com.twidere.twiderex.model.MicroBlogKey
+interface FileCacheHandler {
+    fun clearMediaCaches()
 
-interface ReactionDao {
-    suspend fun updateAction(
-        statusKey: MicroBlogKey,
-        accountKey: MicroBlogKey,
-        liked: Boolean?,
-        retweet: Boolean?
-    )
+    fun clearFileCaches()
 }

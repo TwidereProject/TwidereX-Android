@@ -20,10 +20,9 @@
  */
 package com.twidere.twiderex.repository
 
-import com.twidere.twiderex.mock.db.MockMediaDao
-import com.twidere.twiderex.mock.model.mock
+import com.twidere.twiderex.mock.db.dao.MockMediaDao
+import com.twidere.twiderex.mock.model.mockUiMedia
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.ui.UiMedia
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 
@@ -31,9 +30,9 @@ internal class MediaRepositoryTest {
     @Test
     fun findMediasWithBelongToKey() = runBlocking {
         val repository = MediaRepository(
-            MockMediaDao(
-                listOf(UiMedia.mock("test", MicroBlogKey.twitter("account")))
-            )
+            MockMediaDao().apply {
+                initData(listOf(mockUiMedia("test", MicroBlogKey.twitter("account"))))
+            }
         )
         val result = repository.findMediaByBelongToKey(MicroBlogKey.twitter("account"))
         assert(result.isNotEmpty())

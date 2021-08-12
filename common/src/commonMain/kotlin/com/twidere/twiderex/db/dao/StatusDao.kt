@@ -35,4 +35,10 @@ interface StatusDao {
 
     suspend fun findWithStatusKeyWithReference(statusKey: MicroBlogKey, accountKey: MicroBlogKey): UiStatus?
     suspend fun delete(statusKey: MicroBlogKey)
+    suspend fun updateAction(
+        statusKey: MicroBlogKey,
+        accountKey: MicroBlogKey,
+        liked: Boolean?,
+        retweet: Boolean?
+    )
 }
