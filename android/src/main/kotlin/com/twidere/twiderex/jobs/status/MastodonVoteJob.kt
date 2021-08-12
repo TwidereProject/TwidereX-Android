@@ -50,7 +50,7 @@ class MastodonVoteJob(
 
         val pollId = status.poll.id
         var originPoll: Poll? = null
-        statusRepository.updateStatus(statusKey = status.statusKey) {
+        statusRepository.updateStatus(statusKey = status.statusKey, accountKey = accountKey) {
             it.extra = it.extra.fromJson<DbMastodonStatusExtra>()
                 .let { extra ->
                     originPoll = extra.poll
@@ -64,13 +64,13 @@ class MastodonVoteJob(
         }
         try {
             val newPoll = service.vote(pollId, votes)
-            statusRepository.updateStatus(statusKey = status.statusKey) {
+            statusRepository.updateStatus(statusKey = status.statusKey, accountKey = accountKey) {
                 it.extra = it.extra.fromJson<DbMastodonStatusExtra>().copy(
                     poll = newPoll
                 ).json()
             }
         } catch (e: Throwable) {
-            statusRepository.updateStatus(statusKey = status.statusKey) {
+            statusRepository.updateStatus(statusKey = status.statusKey, accountKey = accountKey) {
                 it.extra = it.extra.fromJson<DbMastodonStatusExtra>().copy(
                     poll = originPoll
                 ).json()

@@ -23,11 +23,14 @@ package com.twidere.twiderex.mock.model
 import com.twidere.services.mastodon.model.Trend
 import com.twidere.services.mastodon.model.TrendHistory
 import com.twidere.services.microblog.model.IListModel
+import com.twidere.services.microblog.model.IStatus
 import com.twidere.services.microblog.model.ITrend
 import com.twidere.services.microblog.model.IUser
+import com.twidere.services.twitter.model.StatusV2
 import com.twidere.services.twitter.model.TwitterList
 import com.twidere.services.twitter.model.TwitterPaging
 import com.twidere.services.twitter.model.User
+import com.twidere.services.twitter.model.UserV2
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.MediaType
 import com.twidere.twiderex.model.ui.UiMedia
@@ -100,4 +103,17 @@ internal fun mockIListModel(
         mode = mode,
         description = description,
     )
+}
+
+@TestOnly
+internal fun mockIStatus(): IStatus {
+    val authorId = System.currentTimeMillis().toString()
+    return StatusV2(
+        id = System.currentTimeMillis().toString(),
+        authorID = authorId,
+    ).apply {
+        user = UserV2(
+            id = authorId,
+        )
+    }
 }

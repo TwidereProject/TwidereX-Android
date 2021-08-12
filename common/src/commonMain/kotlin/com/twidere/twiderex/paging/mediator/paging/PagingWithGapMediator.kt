@@ -98,7 +98,7 @@ abstract class PagingWithGapMediator(
         }
         try {
             val max_id = withContext(Dispatchers.IO) {
-                maxStatusKey?.let { database.statusDao().findWithStatusKey(it)?.statusId }
+                maxStatusKey?.let { database.statusDao().findWithStatusKey(it, accountKey)?.statusId }
             }
             val result = loadBetweenImpl(pageSize, max_id = max_id, since_id = null).let { list ->
                 list.map {

@@ -46,15 +46,15 @@ class StatusRepository(
         statusKey: MicroBlogKey,
         accountKey: MicroBlogKey
     ): Flow<UiStatus?> {
-        return database.statusDao().findWithStatusKeyWithReferenceFlow(statusKey, accountKey)
+        return database.statusDao().findWithStatusKeyWithFlow(statusKey, accountKey)
     }
 
     suspend fun loadFromCache(statusKey: MicroBlogKey, accountKey: MicroBlogKey): UiStatus? {
-        return database.statusDao().findWithStatusKeyWithReference(statusKey, accountKey)
+        return database.statusDao().findWithStatusKey(statusKey, accountKey)
     }
 
-    suspend fun updateStatus(statusKey: MicroBlogKey, action: (UiStatus) -> UiStatus) {
-        database.statusDao().findWithStatusKey(statusKey)?.let {
+    suspend fun updateStatus(statusKey: MicroBlogKey, accountKey: MicroBlogKey, action: (UiStatus) -> UiStatus) {
+        database.statusDao().findWithStatusKey(statusKey, accountKey = accountKey)?.let {
             database.statusDao().insertAll(listOf(action.invoke(it)))
         }
     }
