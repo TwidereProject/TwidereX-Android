@@ -24,14 +24,12 @@ import com.twidere.services.microblog.TimelineService
 import com.twidere.services.microblog.model.IStatus
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.enums.NotificationCursorType
 import com.twidere.twiderex.model.paging.PagingTimeLineWithStatus
 import com.twidere.twiderex.paging.mediator.paging.PagingWithGapMediator
-import com.twidere.twiderex.repository.NotificationRepository
 
 class MentionTimelineMediator(
     private val service: TimelineService,
-    private val notificationRepository: NotificationRepository,
+    private val addCursorIfNeed: suspend (PagingTimeLineWithStatus, accountKey: MicroBlogKey) -> Unit,
     accountKey: MicroBlogKey,
     database: CacheDatabase,
 ) : PagingWithGapMediator(accountKey, database) {
@@ -46,11 +44,9 @@ class MentionTimelineMediator(
         list: List<IStatus>
     ): List<PagingTimeLineWithStatus> {
         if (data.any()) {
-            notificationRepository.addCursorIfNeeded(
+            addCursorIfNeed(
+                data.first(),
                 accountKey,
-                NotificationCursorType.Mentions,
-                data.first().status.statusId,
-                data.first().status.timestamp,
             )
         }
         return super.transform(data, list)

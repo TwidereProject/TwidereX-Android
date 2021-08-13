@@ -20,14 +20,21 @@
  */
 package com.twidere.twiderex.mock.model
 
+import com.twidere.services.mastodon.model.Account
+import com.twidere.services.mastodon.model.Notification
+import com.twidere.services.mastodon.model.NotificationTypes
+import com.twidere.services.mastodon.model.Status
 import com.twidere.services.mastodon.model.Trend
 import com.twidere.services.mastodon.model.TrendHistory
 import com.twidere.services.microblog.model.IDirectMessage
 import com.twidere.services.microblog.model.IListModel
+import com.twidere.services.microblog.model.INotification
 import com.twidere.services.microblog.model.IStatus
 import com.twidere.services.microblog.model.ITrend
 import com.twidere.services.microblog.model.IUser
+import com.twidere.services.twitter.model.AttachmentsV2
 import com.twidere.services.twitter.model.DirectMessageEvent
+import com.twidere.services.twitter.model.MediaV2
 import com.twidere.services.twitter.model.MessageCreate
 import com.twidere.services.twitter.model.MessageData
 import com.twidere.services.twitter.model.MessageTarget
@@ -111,17 +118,43 @@ internal fun mockIListModel(
 }
 
 @TestOnly
-internal fun mockIStatus(id: String = System.currentTimeMillis().toString()): IStatus {
-    val authorId = System.currentTimeMillis().toString()
+internal fun mockIStatus(
+    id: String = System.currentTimeMillis().toString(),
+    hasMedia: Boolean = false,
+    authorId: String = System.currentTimeMillis().toString()
+): IStatus {
     return StatusV2(
         id = id,
         authorID = authorId,
-        createdAt = Date().apply { time = System.currentTimeMillis() }
+        createdAt = Date().apply { time = System.currentTimeMillis() },
+        attachments = if (hasMedia) AttachmentsV2(mediaKeys = listOf("mediaKey")).apply {
+            media = listOf(MediaV2(url = "mediaUrl"))
+        } else null
     ).apply {
         user = UserV2(
             id = authorId,
         )
     }
+}
+
+@TestOnly
+internal fun mockINotification(id: String = System.currentTimeMillis().toString()): INotification {
+    val account = Account(
+        id = System.currentTimeMillis().toString(),
+        username = "",
+        displayName = "",
+        acct = ""
+    )
+    return Notification(
+        id = id,
+        type = NotificationTypes.status,
+        createdAt = Date().apply { time = System.currentTimeMillis() },
+        account = account,
+        status = Status(
+            id = id,
+            account = account
+        )
+    )
 }
 
 @TestOnly

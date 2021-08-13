@@ -24,6 +24,7 @@ import android.content.SharedPreferences
 import com.twidere.services.microblog.NotificationService
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.model.AccountDetails
+import com.twidere.twiderex.model.enums.NotificationCursorType
 import com.twidere.twiderex.paging.mediator.paging.PagingWithGapMediator
 import com.twidere.twiderex.paging.mediator.timeline.NotificationTimelineMediator
 import com.twidere.twiderex.repository.NotificationRepository
@@ -46,7 +47,14 @@ class NotificationTimelineViewModel @AssistedInject constructor(
             service = account.service as NotificationService,
             accountKey = account.accountKey,
             database = database,
-            notificationRepository = notificationRepository,
+            addCursorIfNeed = { data, accountKey ->
+                notificationRepository.addCursorIfNeeded(
+                    accountKey,
+                    NotificationCursorType.General,
+                    data.status.statusId,
+                    data.status.timestamp
+                )
+            }
         )
     override val savedStateKey: String = "${account.accountKey}_notification"
 }
