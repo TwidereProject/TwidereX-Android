@@ -22,10 +22,15 @@ package com.twidere.twiderex.mock.model
 
 import com.twidere.services.mastodon.model.Trend
 import com.twidere.services.mastodon.model.TrendHistory
+import com.twidere.services.microblog.model.IDirectMessage
 import com.twidere.services.microblog.model.IListModel
 import com.twidere.services.microblog.model.IStatus
 import com.twidere.services.microblog.model.ITrend
 import com.twidere.services.microblog.model.IUser
+import com.twidere.services.twitter.model.DirectMessageEvent
+import com.twidere.services.twitter.model.MessageCreate
+import com.twidere.services.twitter.model.MessageData
+import com.twidere.services.twitter.model.MessageTarget
 import com.twidere.services.twitter.model.StatusV2
 import com.twidere.services.twitter.model.TwitterList
 import com.twidere.services.twitter.model.TwitterPaging
@@ -117,4 +122,20 @@ internal fun mockIStatus(id: String = System.currentTimeMillis().toString()): IS
             id = authorId,
         )
     }
+}
+
+@TestOnly
+internal fun mockIDirectMessage(id: String = System.currentTimeMillis().toString(), accountId: String, inCome: Boolean = true): IDirectMessage {
+    return DirectMessageEvent(
+        createdTimestamp = System.currentTimeMillis().toString(),
+        id = id,
+        type = "message_create",
+        messageCreate = MessageCreate(
+            messageData = MessageData(text = "mock message"),
+            senderId = if (inCome)UUID.randomUUID().toString() else accountId,
+            target = MessageTarget(
+                recipientId = if (inCome) accountId else UUID.randomUUID().toString()
+            )
+        )
+    )
 }

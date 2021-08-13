@@ -30,6 +30,8 @@ import com.twidere.twiderex.db.dao.PagingTimelineDao
 import com.twidere.twiderex.db.dao.StatusDao
 import com.twidere.twiderex.db.dao.TrendDao
 import com.twidere.twiderex.db.dao.UserDao
+import com.twidere.twiderex.mock.db.dao.MockDirectMessageConversationDao
+import com.twidere.twiderex.mock.db.dao.MockDirectMessageEventDao
 import com.twidere.twiderex.mock.db.dao.MockListsDao
 import com.twidere.twiderex.mock.db.dao.MockMediaDao
 import com.twidere.twiderex.mock.db.dao.MockPagingTimelineDao
@@ -70,12 +72,14 @@ internal class MockCacheDatabase @TestOnly constructor() : CacheDatabase {
         return trendDao
     }
 
-    override fun directMessageConversationDao(): DirectMessageConversationDao {
-        TODO("Not yet implemented")
+    private val dmDao = MockDirectMessageEventDao()
+    override fun directMessageDao(): DirectMessageEventDao {
+        return dmDao
     }
 
-    override fun directMessageDao(): DirectMessageEventDao {
-        TODO("Not yet implemented")
+    private val conversationDao = MockDirectMessageConversationDao(dmDao)
+    override fun directMessageConversationDao(): DirectMessageConversationDao {
+        return conversationDao
     }
 
     private var cleared = false

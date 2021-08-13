@@ -40,5 +40,5 @@ interface DirectMessageConversationDao {
 
     suspend fun insertAll(listOf: List<UiDMConversation>)
     suspend fun find(accountKey: MicroBlogKey): List<UiDMConversationWithLatestMessage>
-    suspend fun delete(it: UiDMConversation)
+    suspend fun delete(conversation: UiDMConversation)
 }
