@@ -23,12 +23,14 @@ package com.twidere.twiderex.mock.db
 import com.twidere.twiderex.db.AppDatabase
 import com.twidere.twiderex.db.dao.DraftDao
 import com.twidere.twiderex.db.dao.SearchDao
+import com.twidere.twiderex.mock.db.dao.MockDraftDao
 import com.twidere.twiderex.mock.db.dao.MockSearchDao
 import org.jetbrains.annotations.TestOnly
 
 internal class MockAppDatabase @TestOnly constructor() : AppDatabase {
+    private val draftDao = MockDraftDao()
     override fun draftDao(): DraftDao {
-        TODO("Not yet implemented")
+        return draftDao
     }
 
     private val searchDao = MockSearchDao()

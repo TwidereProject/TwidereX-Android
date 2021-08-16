@@ -20,30 +20,34 @@
  */
 package com.twidere.twiderex.mock.db.dao
 
-import com.twidere.twiderex.db.dao.UserDao
-import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.ui.UiUser
+import com.twidere.twiderex.db.dao.DraftDao
+import com.twidere.twiderex.model.ui.UiDraft
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import org.jetbrains.annotations.TestOnly
 
-internal class MockUserDao @TestOnly constructor() : UserDao {
-    private val fakeDb = mutableMapOf<String, UiUser>()
-    override suspend fun findWithUserKey(userKey: MicroBlogKey): UiUser? {
-        return fakeDb[userKey.toString()]
-    }
-
-    override suspend fun insertAll(listOf: List<UiUser>) {
-        listOf.map {
-            fakeDb[it.userKey.toString()] = it
-        }
-    }
-
-    override fun findWithUserKeyFlow(userKey: MicroBlogKey): Flow<UiUser?> {
+class MockDraftDao : DraftDao {
+    private val fakeDb = mutableMapOf<String, UiDraft>()
+    override fun getAll(): Flow<List<UiDraft>> {
         return flow {
-            emit(findWithUserKey(userKey))
+            emit(fakeDb.values.toList())
         }
     }
 
-    val datas get() = fakeDb.values.toList()
+    override fun getDraftCount(): Flow<Long> {
+        return flow {
+            emit(fakeDb.keys.size.toLong())
+        }
+    }
+
+    override suspend fun insert(it: UiDraft) {
+        fakeDb[it.draftId] = it
+    }
+
+    override suspend fun get(draftId: String): UiDraft? {
+        return fakeDb[draftId]
+    }
+
+    override suspend fun remove(draft: UiDraft) {
+        fakeDb.remove(draft.draftId)
+    }
 }
