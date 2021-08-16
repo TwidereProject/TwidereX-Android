@@ -73,9 +73,8 @@ internal class MockListsDao @TestOnly constructor() : ListsDao {
                 if (it.isNullOrEmpty()) {
                     fakeDb[list.accountKey] = mutableListOf(list)
                 } else {
-                    it.map { origin ->
-                        if (origin.listKey == list.listKey) list else origin
-                    }
+                    it.removeAll { origin -> origin.listKey == list.listKey }
+                    it.add(list)
                 }
             }
         }
@@ -83,13 +82,7 @@ internal class MockListsDao @TestOnly constructor() : ListsDao {
 
     override suspend fun delete(listOf: List<UiList>) {
         listOf.forEach { list ->
-            fakeDb[list.accountKey].let {
-                if (!it.isNullOrEmpty()) {
-                    it.mapNotNull { origin ->
-                        if (origin.listKey == list.listKey) null else origin
-                    }
-                }
-            }
+            fakeDb[list.accountKey]?.removeAll { it.listKey == list.listKey }
         }
     }
 

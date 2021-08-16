@@ -24,8 +24,9 @@ import com.twidere.twiderex.db.dao.DraftDao
 import com.twidere.twiderex.model.ui.UiDraft
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import org.jetbrains.annotations.TestOnly
 
-class MockDraftDao : DraftDao {
+internal class MockDraftDao @TestOnly constructor() : DraftDao {
     private val fakeDb = mutableMapOf<String, UiDraft>()
     override fun getAll(): Flow<List<UiDraft>> {
         return flow {

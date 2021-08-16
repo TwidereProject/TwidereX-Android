@@ -28,7 +28,7 @@ import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import kotlin.test.assertEquals
 
-class DraftRepositoryTest {
+internal class DraftRepositoryTest {
     @Test
     fun sourceAndSourceCountWillUpdateAfterAddOrUpgrade() = runBlocking {
         val repo = DraftRepository(MockAppDatabase())
