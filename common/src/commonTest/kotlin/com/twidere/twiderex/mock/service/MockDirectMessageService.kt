@@ -27,7 +27,7 @@ import com.twidere.twiderex.mock.model.toIPaging
 import com.twidere.twiderex.model.MicroBlogKey
 import org.jetbrains.annotations.TestOnly
 
-internal class MockDirectMessageService @TestOnly constructor(private val accountKey: MicroBlogKey) : DirectMessageService,
+internal class MockDirectMessageService @TestOnly constructor(private val accountKey: MicroBlogKey, var messages: List<IDirectMessage>? = null) : DirectMessageService,
     ErrorService() {
     private val deletedMessageId = mutableListOf<String>()
 
@@ -40,11 +40,15 @@ internal class MockDirectMessageService @TestOnly constructor(private val accoun
 
     override suspend fun getDirectMessages(cursor: String?, count: Int?): List<IDirectMessage> {
         checkError()
-        val list = mutableListOf<IDirectMessage>()
-        for (i in 0 until (count ?: 1)) {
-            list.add(mockIDirectMessage(accountId = accountKey.id, inCome = i % 2 == 0))
-        }
-        return list.toIPaging()
+        return (
+            messages ?: let {
+                val list = mutableListOf<IDirectMessage>()
+                for (i in 0 until (count ?: 1)) {
+                    list.add(mockIDirectMessage(accountId = accountKey.id, inCome = i % 2 == 0))
+                }
+                list
+            }
+            ).toIPaging()
     }
 
     override suspend fun showDirectMessage(id: String): IDirectMessage? {

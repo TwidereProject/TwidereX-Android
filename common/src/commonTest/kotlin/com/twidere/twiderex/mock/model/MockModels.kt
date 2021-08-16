@@ -78,9 +78,10 @@ internal fun <T> List<T>.toIPaging(nextPaging: String? = UUID.randomUUID().toStr
 )
 
 @TestOnly
-internal fun mockIUser(id: String = System.currentTimeMillis().toString()): IUser {
+internal fun mockIUser(id: String = UUID.randomUUID().toString(), name: String = ""): IUser {
     return UserV2(
         id = id,
+        name = name
     )
 }
 
@@ -119,9 +120,9 @@ internal fun mockIListModel(
 
 @TestOnly
 internal fun mockIStatus(
-    id: String = System.currentTimeMillis().toString(),
+    id: String = UUID.randomUUID().toString(),
     hasMedia: Boolean = false,
-    authorId: String = System.currentTimeMillis().toString()
+    authorId: String = UUID.randomUUID().toString()
 ): IStatus {
     return StatusV2(
         id = id,
@@ -138,9 +139,9 @@ internal fun mockIStatus(
 }
 
 @TestOnly
-internal fun mockINotification(id: String = System.currentTimeMillis().toString()): INotification {
+internal fun mockINotification(id: String = UUID.randomUUID().toString()): INotification {
     val account = Account(
-        id = System.currentTimeMillis().toString(),
+        id = UUID.randomUUID().toString(),
         username = "",
         displayName = "",
         acct = ""
@@ -158,16 +159,16 @@ internal fun mockINotification(id: String = System.currentTimeMillis().toString(
 }
 
 @TestOnly
-internal fun mockIDirectMessage(id: String = System.currentTimeMillis().toString(), accountId: String, inCome: Boolean = true): IDirectMessage {
+internal fun mockIDirectMessage(id: String = UUID.randomUUID().toString(), accountId: String, otherUserID: String = UUID.randomUUID().toString(), inCome: Boolean = true): IDirectMessage {
     return DirectMessageEvent(
         createdTimestamp = System.currentTimeMillis().toString(),
         id = id,
         type = "message_create",
         messageCreate = MessageCreate(
             messageData = MessageData(text = "mock message"),
-            senderId = if (inCome)UUID.randomUUID().toString() else accountId,
+            senderId = if (inCome) otherUserID else accountId,
             target = MessageTarget(
-                recipientId = if (inCome) accountId else UUID.randomUUID().toString()
+                recipientId = if (inCome) accountId else otherUserID
             )
         )
     )

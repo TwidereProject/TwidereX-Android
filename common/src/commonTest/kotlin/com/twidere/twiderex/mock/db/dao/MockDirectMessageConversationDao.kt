@@ -63,6 +63,7 @@ internal class MockDirectMessageConversationDao @TestOnly constructor(private va
                 if (it.isNullOrEmpty()) {
                     fakeDb[con.accountKey] = mutableListOf(con)
                 } else {
+                    it.removeAll { it.conversationKey == con.conversationKey }
                     it.add(con)
                 }
             }
