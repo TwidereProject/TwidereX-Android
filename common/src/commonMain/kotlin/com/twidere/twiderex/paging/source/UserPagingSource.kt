@@ -48,7 +48,7 @@ abstract class UserPagingSource(
                 null
             }
             LoadResult.Page(data = users, prevKey = null, nextKey = nextPage)
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             LoadResult.Error(e)
         }
     }

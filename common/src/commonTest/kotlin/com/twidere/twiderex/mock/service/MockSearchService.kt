@@ -30,7 +30,7 @@ import com.twidere.twiderex.mock.model.toIPaging
 import org.jetbrains.annotations.TestOnly
 import java.util.UUID
 
-internal class MockSearchService @TestOnly constructor() : SearchService, ErrorService() {
+internal class MockSearchService @TestOnly constructor(var searchUser: List<IUser>? = null) : SearchService, ErrorService() {
     override suspend fun searchTweets(
         query: String,
         count: Int,
@@ -63,11 +63,15 @@ internal class MockSearchService @TestOnly constructor() : SearchService, ErrorS
         following: Boolean
     ): List<IUser> {
         checkError()
-        val list = mutableListOf<IUser>()
-        for (i in 0 until count) {
-            list.add(mockIUser())
-        }
-        return list.toIPaging()
+        return (
+            searchUser ?: let {
+                val list = mutableListOf<IUser>()
+                for (i in 0 until count) {
+                    list.add(mockIUser())
+                }
+                list
+            }
+            ).toIPaging()
     }
 }
 

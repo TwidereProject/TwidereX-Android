@@ -25,9 +25,11 @@ import com.twidere.services.microblog.MicroBlogService
 import com.twidere.services.microblog.model.IListModel
 import com.twidere.services.microblog.model.IUser
 import com.twidere.services.twitter.model.TwitterList
+import com.twidere.twiderex.dataprovider.mapper.toUi
 import com.twidere.twiderex.mock.model.mockIListModel
 import com.twidere.twiderex.mock.model.mockIUser
 import com.twidere.twiderex.mock.model.toIPaging
+import com.twidere.twiderex.model.MicroBlogKey
 
 internal class MockListsService : ListsService, MicroBlogService, ErrorService() {
 
@@ -103,15 +105,22 @@ internal class MockListsService : ListsService, MicroBlogService, ErrorService()
         // do nothing
     }
 
+    private val subscribers = mutableListOf<String>()
     override suspend fun listSubscribers(listId: String, count: Int, cursor: String?): List<IUser> {
         checkError()
         val list = mutableListOf<IUser>()
         for (i in 0 until count) {
             list.add(
-                mockIUser()
+                mockIUser().also {
+                    subscribers.add(it.toUi(MicroBlogKey.twitter("123")).id)
+                }
             )
         }
         return list.toIPaging()
+    }
+
+    fun isSubscribers(userId: String): Boolean {
+        return subscribers.contains(userId)
     }
 
     override suspend fun unsubscribeList(listId: String): IListModel {
