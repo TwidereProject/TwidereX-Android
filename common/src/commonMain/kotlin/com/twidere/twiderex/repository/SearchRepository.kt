@@ -44,7 +44,7 @@ class SearchRepository(
         } ?: UiSearch(
             content = content,
             lastActive = System.currentTimeMillis(),
-            saved = false,
+            saved = saved,
             accountKey = accountKey
         )
         database.searchDao().insertAll(

@@ -30,7 +30,7 @@ import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
-class NotificationRepositoryTest {
+internal class NotificationRepositoryTest {
 
     @Test
     fun notification_AddLatestNotificationCursorAfterSuccess() = runBlocking {
