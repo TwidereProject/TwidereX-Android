@@ -34,6 +34,7 @@ import com.twidere.twiderex.mock.db.dao.MockDirectMessageConversationDao
 import com.twidere.twiderex.mock.db.dao.MockDirectMessageEventDao
 import com.twidere.twiderex.mock.db.dao.MockListsDao
 import com.twidere.twiderex.mock.db.dao.MockMediaDao
+import com.twidere.twiderex.mock.db.dao.MockNotificationCursorDao
 import com.twidere.twiderex.mock.db.dao.MockPagingTimelineDao
 import com.twidere.twiderex.mock.db.dao.MockStatusDao
 import com.twidere.twiderex.mock.db.dao.MockTrendDao
@@ -65,8 +66,9 @@ internal class MockCacheDatabase @TestOnly constructor() : CacheDatabase {
         return listsDao
     }
 
+    private val notificationCursorDao = MockNotificationCursorDao()
     override fun notificationCursorDao(): NotificationCursorDao {
-        TODO("Not yet implemented")
+        return notificationCursorDao
     }
 
     private val trendDao = MockTrendDao()

@@ -20,13 +20,14 @@
  */
 package com.twidere.twiderex.mock.service
 
+import com.twidere.services.microblog.MicroBlogService
 import com.twidere.services.microblog.TimelineService
 import com.twidere.services.microblog.model.IStatus
 import com.twidere.twiderex.mock.model.mockIStatus
 import com.twidere.twiderex.mock.model.toIPaging
 import org.jetbrains.annotations.TestOnly
 
-internal class MockTimelineService @TestOnly constructor() : TimelineService, ErrorService() {
+internal class MockTimelineService @TestOnly constructor() : TimelineService, MicroBlogService, ErrorService() {
     override suspend fun favorites(
         user_id: String,
         count: Int,

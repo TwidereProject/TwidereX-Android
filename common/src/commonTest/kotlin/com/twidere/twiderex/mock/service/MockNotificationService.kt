@@ -20,13 +20,14 @@
  */
 package com.twidere.twiderex.mock.service
 
+import com.twidere.services.microblog.MicroBlogService
 import com.twidere.services.microblog.NotificationService
 import com.twidere.services.microblog.model.INotification
 import com.twidere.twiderex.mock.model.mockINotification
 import com.twidere.twiderex.mock.model.toIPaging
 import org.jetbrains.annotations.TestOnly
 
-internal class MockNotificationService @TestOnly constructor() : NotificationService, ErrorService() {
+internal class MockNotificationService @TestOnly constructor() : NotificationService, ErrorService(), MicroBlogService {
     override suspend fun notificationTimeline(
         count: Int,
         since_id: String?,
