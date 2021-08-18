@@ -22,8 +22,8 @@ package com.twidere.twiderex.jobs.compose
 
 import android.content.Context
 import com.twidere.services.twitter.TwitterService
+import com.twidere.twiderex.dataprovider.mapper.toUi
 import com.twidere.twiderex.db.CacheDatabase
-import com.twidere.twiderex.db.mapper.toDbStatusWithReference
 import com.twidere.twiderex.kmp.ExifScrambler
 import com.twidere.twiderex.kmp.FileResolver
 import com.twidere.twiderex.kmp.RemoteNavigator
@@ -78,9 +78,9 @@ class TwitterComposeJob constructor(
             lat = lat,
             long = long,
             exclude_reply_user_ids = composeData.excludedReplyUserIds
-        ).toDbStatusWithReference(accountKey)
-        listOf(result).saveToDb(cacheDatabase)
-        return result.toUi(accountKey)
+        ).toUi(accountKey)
+        cacheDatabase.statusDao().insertAll(listOf(result))
+        return result
     }
 
     override suspend fun uploadImage(

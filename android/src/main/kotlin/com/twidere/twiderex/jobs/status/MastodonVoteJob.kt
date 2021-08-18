@@ -51,29 +51,35 @@ class MastodonVoteJob(
         val pollId = status.poll.id
         var originPoll: Poll? = null
         statusRepository.updateStatus(statusKey = status.statusKey, accountKey = accountKey) {
-            it.extra = it.extra.fromJson<DbMastodonStatusExtra>()
-                .let { extra ->
-                    originPoll = extra.poll
-                    extra.copy(
-                        poll = extra.poll?.copy(
-                            voted = true,
-                            ownVotes = votes
+            it.copy(
+                extra = it.extra.fromJson<DbMastodonStatusExtra>()
+                    .let { extra ->
+                        originPoll = extra.poll
+                        extra.copy(
+                            poll = extra.poll?.copy(
+                                voted = true,
+                                ownVotes = votes
+                            )
                         )
-                    )
-                }.json()
+                    }.json()
+            )
         }
         try {
             val newPoll = service.vote(pollId, votes)
             statusRepository.updateStatus(statusKey = status.statusKey, accountKey = accountKey) {
-                it.extra = it.extra.fromJson<DbMastodonStatusExtra>().copy(
-                    poll = newPoll
-                ).json()
+                it.copy(
+                    extra = it.extra.fromJson<DbMastodonStatusExtra>().copy(
+                        poll = newPoll
+                    ).json()
+                )
             }
         } catch (e: Throwable) {
             statusRepository.updateStatus(statusKey = status.statusKey, accountKey = accountKey) {
-                it.extra = it.extra.fromJson<DbMastodonStatusExtra>().copy(
-                    poll = originPoll
-                ).json()
+                it.copy(
+                    extra = it.extra.fromJson<DbMastodonStatusExtra>().copy(
+                        poll = originPoll
+                    ).json()
+                )
             }
             e.notify(inAppNotification)
             throw e

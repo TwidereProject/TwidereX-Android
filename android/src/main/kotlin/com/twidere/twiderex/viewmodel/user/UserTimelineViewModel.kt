@@ -23,6 +23,7 @@ package com.twidere.twiderex.viewmodel.user
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
+import com.twidere.services.microblog.TimelineService
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.repository.TimelineRepository
@@ -48,7 +49,8 @@ class UserTimelineViewModel @AssistedInject constructor(
     val source by lazy {
         repository.userTimeline(
             userKey = userKey,
-            account = account,
+            accountKey = account.accountKey,
+            service = account.service as TimelineService,
             exclude_replies = exclude_replies,
         ).cachedIn(viewModelScope)
     }

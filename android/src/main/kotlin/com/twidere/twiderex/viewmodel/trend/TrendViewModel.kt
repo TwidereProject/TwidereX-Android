@@ -21,6 +21,7 @@
 package com.twidere.twiderex.viewmodel.trend
 
 import androidx.lifecycle.ViewModel
+import com.twidere.services.microblog.TrendService
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.repository.TrendRepository
 import dagger.assisted.Assisted
@@ -37,6 +38,9 @@ class TrendViewModel @AssistedInject constructor(
     }
 
     val source by lazy {
-        repository.trendsSource(account)
+        repository.trendsSource(
+            accountKey = account.accountKey,
+            service = account.service as TrendService
+        )
     }
 }

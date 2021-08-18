@@ -23,6 +23,7 @@ package com.twidere.twiderex.viewmodel.mastodon
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
+import com.twidere.services.mastodon.MastodonService
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.repository.TimelineRepository
 import dagger.assisted.Assisted
@@ -45,7 +46,8 @@ class MastodonHashtagViewModel @AssistedInject constructor(
     val source by lazy {
         repository.mastodonHashtagTimeline(
             keyword = keyword,
-            account = account,
+            accountKey = account.accountKey,
+            service = account.service as MastodonService
         ).cachedIn(viewModelScope)
     }
 }

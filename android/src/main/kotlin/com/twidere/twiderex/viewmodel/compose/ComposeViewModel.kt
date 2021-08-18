@@ -294,14 +294,18 @@ open class ComposeViewModel @AssistedInject constructor(
                             composeType == ComposeType.Reply
                         ) {
                             val mentions =
-                                status.mastodonExtra.mentions.mapNotNull { it.acct }
-                                    .filter { it != account.user.screenName }.map { "@$it" }.let {
+                                status.mastodonExtra?.mentions?.mapNotNull { it.acct }
+                                    ?.filter { it != account.user.screenName }
+                                    ?.map { "@$it" }
+                                    ?.let {
                                         if (status.user.userKey != account.user.userKey) {
                                             listOf(status.user.getDisplayScreenName(account.accountKey.host)) + it
                                         } else {
                                             it
                                         }
-                                    }.distinctBy { it }.takeIf { it.any() }
+                                    }
+                                    ?.distinctBy { it }
+                                    ?.takeIf { it.any() }
                                     ?.joinToString(" ", postfix = " ") { it }
                             if (mentions != null) {
                                 setText(

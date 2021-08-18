@@ -59,7 +59,10 @@ class NotificationJob(
                 .map { account ->
                     launch {
                         val activities = try {
-                            repository.activities(account)
+                            repository.activities(
+                                accountKey = account.accountKey,
+                                service = account.service
+                            )
                         } catch (e: Throwable) {
                             // Ignore any exception cause there's no needs ot handle it
                             emptyList()
