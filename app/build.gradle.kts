@@ -3,6 +3,7 @@ import com.google.protobuf.gradle.generateProtoTasks
 import com.google.protobuf.gradle.protobuf
 import com.google.protobuf.gradle.protoc
 import org.gradle.kotlin.dsl.support.unzipTo
+import org.jetbrains.kotlin.gradle.internal.ensureParentDirsCreated
 import org.json.JSONObject
 import java.util.Properties
 
@@ -217,11 +218,9 @@ tasks.register("generateTranslation") {
 
 tasks.register("generateTranslationFromZip") {
     val zip = File(rootProject.buildDir, "Twidere X (translations).zip")
-    val unzipTarget = File(rootProject.buildDir, "translation").apply {
-        mkdirs()
-    }
+    val unzipTarget = rootProject.buildDir
     unzipTo(unzipTarget, zip)
-    unzipTarget.listFiles()?.forEach { file ->
+    File(unzipTarget, "translation").listFiles()?.forEach { file ->
         val source = File(file, "app.json")
         val target = project.file(
             "src/main/res-localized" + "/values-" + file.name.split('_')
@@ -238,6 +237,8 @@ fun generateLocalization(appJson: File, target: File) {
         it.value.isNotEmpty() && it.value.isNotBlank()
     }
     if (result.isNotEmpty()) {
+        target.ensureParentDirsCreated()
+        target.createNewFile()
         val xml =
             """<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">""" + System.lineSeparator() +
                 result.map {
