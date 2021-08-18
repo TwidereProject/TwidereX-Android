@@ -32,26 +32,22 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.liveData
-import androidx.lifecycle.map
-import androidx.lifecycle.switchMap
+import androidx.lifecycle.viewModelScope
 import androidx.work.WorkManager
-import com.twidere.services.mastodon.model.Emoji
-import com.twidere.services.mastodon.model.Visibility
 import com.twidere.services.microblog.LookupService
 import com.twidere.twiderex.R
 import com.twidere.twiderex.action.ComposeAction
 import com.twidere.twiderex.db.model.DbDraft
-import com.twidere.twiderex.extensions.combineWith
 import com.twidere.twiderex.extensions.getCachedLocation
 import com.twidere.twiderex.extensions.getTextAfterSelection
 import com.twidere.twiderex.extensions.getTextBeforeSelection
 import com.twidere.twiderex.model.AccountDetails
-import com.twidere.twiderex.model.ComposeData
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.PlatformType
+import com.twidere.twiderex.model.enums.MastodonVisibility
+import com.twidere.twiderex.model.enums.PlatformType
+import com.twidere.twiderex.model.job.ComposeData
+import com.twidere.twiderex.model.ui.UiEmoji
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.DraftRepository
@@ -63,6 +59,13 @@ import com.twidere.twiderex.worker.draft.SaveDraftWorker
 import com.twitter.twittertext.Extractor
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import java.util.UUID
 
 enum class ComposeType {
@@ -77,7 +80,7 @@ class DraftItemViewModel @AssistedInject constructor(
     @Assisted private val draftId: String,
 ) : ViewModel() {
 
-    val draft = liveData {
+    val draft = flow {
         repository.get(draftId)?.let {
             emit(it)
         }
@@ -119,7 +122,7 @@ class DraftComposeViewModel @AssistedInject constructor(
     init {
         setText(TextFieldValue(draft.content))
         putImages(draft.media.map { Uri.parse(it) })
-        excludedReplyUserIds.postValue(draft.excludedReplyUserIds ?: emptyList())
+        excludedReplyUserIds.value = draft.excludedReplyUserIds ?: emptyList()
     }
 
     @dagger.assisted.AssistedFactory
@@ -132,7 +135,7 @@ class DraftComposeViewModel @AssistedInject constructor(
 }
 
 class VoteOption {
-    val text = MutableLiveData("")
+    val text = MutableStateFlow("")
     fun setText(value: String) {
         text.value = value
     }
@@ -162,9 +165,9 @@ enum class VoteExpired(val value: Long) {
 }
 
 class VoteState {
-    val options = MutableLiveData(arrayListOf(VoteOption(), VoteOption()))
-    val expired = MutableLiveData(VoteExpired.Day_1)
-    val multiple = MutableLiveData(false)
+    val options = MutableStateFlow(arrayListOf(VoteOption(), VoteOption()))
+    val expired = MutableStateFlow(VoteExpired.Day_1)
+    val multiple = MutableStateFlow(false)
 
     fun setMultiple(value: Boolean) {
         multiple.value = value
@@ -175,7 +178,7 @@ class VoteState {
     }
 
     fun setOption(value: String, index: Int) {
-        options.value?.let {
+        options.value.let {
             it[index].setText(value)
             if (index == it.lastIndex && it.size < 4 && value.isNotEmpty()) {
                 it.add(VoteOption())
@@ -222,12 +225,12 @@ open class ComposeViewModel @AssistedInject constructor(
         draftRepository.sourceCount
     }
 
-    val location = MutableLiveData<Location?>()
-    val excludedReplyUserIds = MutableLiveData<List<String>>(emptyList())
+    val location = MutableStateFlow<Location?>(null)
+    val excludedReplyUserIds = MutableStateFlow<List<String>>(emptyList())
 
-    val replyToUserName = liveData {
+    val replyToUserName = flow {
         if (account.type == PlatformType.Twitter && composeType == ComposeType.Reply && statusKey != null) {
-            emitSource(
+            emitAll(
                 status.map {
                     it?.let { status ->
                         Extractor().extractMentionedScreennames(
@@ -243,52 +246,55 @@ open class ComposeViewModel @AssistedInject constructor(
         }
     }
 
-    val loadingReplyUser = MutableLiveData(false)
+    val loadingReplyUser = MutableStateFlow(false)
 
-    val replyToUser = liveData {
-        emitSource(
-            replyToUserName.switchMap {
-                liveData {
-                    if (it.isNotEmpty()) {
-                        loadingReplyUser.postValue(true)
-                        runCatching {
-                            userRepository.lookupUsersByName(
-                                it,
-                                accountKey = account.accountKey,
-                                lookupService = account.service as LookupService,
-                            )
-                        }.onFailure {
-                            it.notify(inAppNotification)
-                        }.onSuccess {
-                            emit(it)
-                        }
-                        loadingReplyUser.postValue(false)
-                    }
-                }
-            },
-        )
-    }
+    val replyToUser = replyToUserName.map {
+        if (it.isNotEmpty()) {
+            loadingReplyUser.value = true
+            try {
+                userRepository.lookupUsersByName(
+                    it,
+                    accountKey = account.accountKey,
+                    lookupService = account.service as LookupService,
+                )
+            } catch (e: Throwable) {
+                e.notify(inAppNotification)
+                emptyList()
+            } finally {
+                loadingReplyUser.value = false
+            }
+        } else {
+            emptyList()
+        }
+        // return a stateFlow to emit latest state
+        // WhileSubscribed will unsubscribe upstream flow when there is no subscribers
+        // official suggest use 5s as stop timeout
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5000),
+        emptyList()
+    )
 
-    val voteState = MutableLiveData<VoteState?>(null)
-    val isInVoteMode = MutableLiveData(false)
-    val visibility = MutableLiveData(Visibility.Public)
-    val isImageSensitive = MutableLiveData(false)
-    val isContentWarningEnabled = MutableLiveData(false)
-    val contentWarningTextFieldValue = MutableLiveData(TextFieldValue())
-    val textFieldValue = MutableLiveData(TextFieldValue())
-    val images = MutableLiveData<List<Uri>>(emptyList())
-    val canSend = textFieldValue.combineWith(images) { text, imgs -> !text?.text.isNullOrEmpty() || !imgs.isNullOrEmpty() }
+    val voteState = MutableStateFlow<VoteState?>(null)
+    val isInVoteMode = MutableStateFlow(false)
+    val visibility = MutableStateFlow(MastodonVisibility.Public)
+    val isImageSensitive = MutableStateFlow(false)
+    val isContentWarningEnabled = MutableStateFlow(false)
+    val contentWarningTextFieldValue = MutableStateFlow(TextFieldValue())
+    val textFieldValue = MutableStateFlow(TextFieldValue())
+    val images = MutableStateFlow<List<Uri>>(emptyList())
+    val canSend = textFieldValue.combine(images) { text, imgs -> text.text.isNotEmpty() || !imgs.isNullOrEmpty() }
     val canSaveDraft =
-        textFieldValue.combineWith(images) { text, imgs -> !text?.text.isNullOrEmpty() || !imgs.isNullOrEmpty() }
-    val locationEnabled = MutableLiveData(false)
-    val enableThreadMode = MutableLiveData(composeType == ComposeType.Thread)
-    val status = liveData {
+        textFieldValue.combine(images) { text, imgs -> text.text.isNotEmpty() || !imgs.isNullOrEmpty() }
+    val locationEnabled = MutableStateFlow(false)
+    val enableThreadMode = MutableStateFlow(composeType == ComposeType.Thread)
+    val status = flow {
         statusKey?.let { statusKey ->
-            emitSource(
+            emitAll(
                 repository.loadStatus(statusKey, accountKey = account.accountKey)
                     .map { status ->
                         if (status != null &&
-                            textFieldValue.value?.text.isNullOrEmpty() &&
+                            textFieldValue.value.text.isEmpty() &&
                             status.platformType == PlatformType.Mastodon &&
                             status.mastodonExtra?.mentions != null &&
                             composeType == ComposeType.Reply
@@ -297,7 +303,7 @@ open class ComposeViewModel @AssistedInject constructor(
                                 status.mastodonExtra.mentions.mapNotNull { it.acct }
                                     .filter { it != account.user.screenName }.map { "@$it" }.let {
                                         if (status.user.userKey != account.user.userKey) {
-                                            listOf(status.user.getDisplayScreenName(account)) + it
+                                            listOf(status.user.getDisplayScreenName(account.accountKey.host)) + it
                                         } else {
                                             it
                                         }
@@ -340,7 +346,7 @@ open class ComposeViewModel @AssistedInject constructor(
         enableThreadMode.value = value
     }
 
-    fun setVisibility(value: Visibility) {
+    fun setVisibility(value: MastodonVisibility) {
         visibility.value = value
     }
 
@@ -354,7 +360,7 @@ open class ComposeViewModel @AssistedInject constructor(
     }
 
     fun compose() {
-        textFieldValue.value?.text?.let {
+        textFieldValue.value.text.let {
             composeAction.commit(
                 account.accountKey,
                 account.type,
@@ -364,7 +370,7 @@ open class ComposeViewModel @AssistedInject constructor(
     }
 
     fun saveDraft() {
-        textFieldValue.value?.text?.let { text ->
+        textFieldValue.value.text.let { text ->
             workManager
                 .beginWith(
                     SaveDraftWorker.create(
@@ -378,26 +384,26 @@ open class ComposeViewModel @AssistedInject constructor(
     private fun buildComposeData(text: String) = ComposeData(
         content = text,
         draftId = draftId,
-        images = images.value?.map { it.toString() } ?: emptyList(),
+        images = images.value.map { it.toString() },
         composeType = composeType,
         statusKey = statusKey,
         lat = location.value?.latitude,
         long = location.value?.longitude,
         excludedReplyUserIds = excludedReplyUserIds.value,
-        voteOptions = voteState.value?.options?.value?.map { it.text.value.toString() },
+        voteOptions = voteState.value?.options?.value?.map { it.text.value },
         voteExpired = voteState.value?.expired?.value,
         voteMultiple = voteState.value?.multiple?.value,
         visibility = visibility.value,
         isSensitive = isImageSensitive.value,
-        contentWarningText = contentWarningTextFieldValue.value?.text,
-        isThreadMode = enableThreadMode.value ?: false,
+        contentWarningText = contentWarningTextFieldValue.value.text,
+        isThreadMode = enableThreadMode.value,
     )
 
     fun putImages(value: List<Uri>) {
-        images.value?.let {
+        images.value.let {
             value + it
-        }?.take(imageLimit)?.let {
-            images.postValue(it)
+        }.take(imageLimit).let {
+            images.value = it
         }
     }
 
@@ -411,24 +417,24 @@ open class ComposeViewModel @AssistedInject constructor(
 
     @RequiresPermission(anyOf = [permission.ACCESS_COARSE_LOCATION, permission.ACCESS_FINE_LOCATION])
     fun trackingLocation() {
-        locationEnabled.postValue(true)
+        locationEnabled.value = true
         val criteria = Criteria()
         criteria.accuracy = Criteria.ACCURACY_FINE
         val provider = locationManager.getBestProvider(criteria, true) ?: return
         locationManager.requestLocationUpdates(provider, 0, 0f, this)
         locationManager.getCachedLocation()?.let {
-            location.postValue(it)
+            location.value = it
         }
     }
 
     fun disableLocation() {
-        location.postValue(null)
-        locationEnabled.postValue(false)
+        location.value = null
+        locationEnabled.value = false
         locationManager.removeUpdates(this)
     }
 
     override fun onLocationChanged(location: Location) {
-        this.location.postValue(location)
+        this.location.value = location
     }
 
     // compatibility fix for Api < 22
@@ -436,33 +442,33 @@ open class ComposeViewModel @AssistedInject constructor(
     }
 
     override fun onCleared() {
-        if (locationEnabled.value == true) {
+        if (locationEnabled.value) {
             locationManager.removeUpdates(this)
         }
     }
 
     fun removeImage(item: Uri) {
-        images.value?.let {
+        images.value.let {
             it - item
-        }?.let {
-            images.postValue(it)
+        }.let {
+            images.value = it
         }
     }
 
     fun excludeReplyUser(user: UiUser) {
-        excludedReplyUserIds.value?.let {
-            excludedReplyUserIds.postValue(it + user.id)
+        excludedReplyUserIds.value.let {
+            excludedReplyUserIds.value = it + user.id
         }
     }
 
     fun includeReplyUser(user: UiUser) {
-        excludedReplyUserIds.value?.let {
-            excludedReplyUserIds.postValue(it - user.id)
+        excludedReplyUserIds.value.let {
+            excludedReplyUserIds.value = it - user.id
         }
     }
 
     fun insertText(result: String) {
-        textFieldValue.value?.let {
+        textFieldValue.value.let {
             setText(
                 it.copy(
                     text = "${it.getTextBeforeSelection()}${result}${it.getTextAfterSelection()}",
@@ -472,9 +478,7 @@ open class ComposeViewModel @AssistedInject constructor(
         }
     }
 
-    fun insertEmoji(emoji: Emoji) {
-        textFieldValue.value?.let { textFieldValue ->
-            insertText("${if (textFieldValue.selection.start != 0) " " else ""}:${emoji.shortcode}: ")
-        }
+    fun insertEmoji(emoji: UiEmoji) {
+        insertText("${if (textFieldValue.value.selection.start != 0) " " else ""}:${emoji.shortcode}: ")
     }
 }

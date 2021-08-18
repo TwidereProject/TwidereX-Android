@@ -21,23 +21,24 @@
 package com.twidere.twiderex.viewmodel.dm
 
 import android.net.Uri
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
 import com.twidere.services.microblog.DirectMessageService
 import com.twidere.services.microblog.LookupService
 import com.twidere.twiderex.action.DirectMessageAction
 import com.twidere.twiderex.model.AccountDetails
-import com.twidere.twiderex.model.DirectMessageDeleteData
-import com.twidere.twiderex.model.DirectMessageSendData
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.PlatformType
+import com.twidere.twiderex.model.enums.PlatformType
+import com.twidere.twiderex.model.job.DirectMessageDeleteData
+import com.twidere.twiderex.model.job.DirectMessageSendData
 import com.twidere.twiderex.model.ui.UiDMEvent
 import com.twidere.twiderex.repository.DirectMessageRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.launch
 import java.util.UUID
 
 class DMEventViewModel @AssistedInject constructor(
@@ -53,14 +54,10 @@ class DMEventViewModel @AssistedInject constructor(
     }
 
     val conversation by lazy {
-        liveData {
-            emitSource(
-                repository.dmConversation(
-                    accountKey = account.accountKey,
-                    conversationKey = conversationKey
-                )
-            )
-        }
+        repository.dmConversation(
+            accountKey = account.accountKey,
+            conversationKey = conversationKey
+        )
     }
 
     val source by lazy {
@@ -73,32 +70,37 @@ class DMEventViewModel @AssistedInject constructor(
     }
 
     // input
-    val input = MutableLiveData("")
-    val inputImage = MutableLiveData<Uri?>()
-    val firstEventKey = MutableLiveData<String>(null)
-    val pendingActionMessage = MutableLiveData<UiDMEvent>(null)
+    val input = MutableStateFlow("")
+    val inputImage = MutableStateFlow<Uri?>(null)
+    val firstEventKey = MutableStateFlow<String?>(null)
+    val pendingActionMessage = MutableStateFlow<UiDMEvent?>(null)
 
     fun sendMessage() {
-        if (input.value.isNullOrEmpty() && inputImage.value == null) return
-        conversation.value?.let {
-            messageAction.send(
-                account.type,
-                data = DirectMessageSendData(
-                    text = input.value,
-                    images = inputImage.value?.toString()?.let { uri -> listOf(uri) } ?: emptyList(),
-                    recipientUserKey = it.recipientKey,
-                    draftMessageKey = when (account.type) {
-                        PlatformType.Twitter -> MicroBlogKey.twitter(UUID.randomUUID().toString())
-                        PlatformType.StatusNet -> TODO()
-                        PlatformType.Fanfou -> TODO()
-                        PlatformType.Mastodon -> MicroBlogKey.Empty
-                    },
-                    conversationKey = it.conversationKey,
-                    accountKey = account.accountKey
+        if (input.value.isEmpty() && inputImage.value == null) return
+        viewModelScope.launch {
+            conversation.firstOrNull()?.let {
+                messageAction.send(
+                    account.type,
+                    data = DirectMessageSendData(
+                        text = input.value,
+                        images = inputImage.value?.toString()?.let { uri -> listOf(uri) }
+                            ?: emptyList(),
+                        recipientUserKey = it.recipientKey,
+                        draftMessageKey = when (account.type) {
+                            PlatformType.Twitter -> MicroBlogKey.twitter(
+                                UUID.randomUUID().toString()
+                            )
+                            PlatformType.StatusNet -> TODO()
+                            PlatformType.Fanfou -> TODO()
+                            PlatformType.Mastodon -> MicroBlogKey.Empty
+                        },
+                        conversationKey = it.conversationKey,
+                        accountKey = account.accountKey
+                    )
                 )
-            )
-            input.postValue("")
-            inputImage.postValue(null)
+                input.value = ""
+                inputImage.value = null
+            }
         }
     }
 

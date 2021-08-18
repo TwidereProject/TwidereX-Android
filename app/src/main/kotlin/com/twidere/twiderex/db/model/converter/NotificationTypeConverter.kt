@@ -21,7 +21,7 @@
 package com.twidere.twiderex.db.model.converter
 
 import androidx.room.TypeConverter
-import com.twidere.twiderex.model.MastodonStatusType
+import com.twidere.twiderex.model.enums.MastodonStatusType
 
 class NotificationTypeConverter {
     @TypeConverter

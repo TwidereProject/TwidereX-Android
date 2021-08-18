@@ -27,8 +27,8 @@ import androidx.room.Query
 import androidx.room.Transaction
 import com.twidere.twiderex.db.model.DbStatusReference
 import com.twidere.twiderex.db.model.DbStatusReferenceWithStatus
-import com.twidere.twiderex.db.model.ReferenceType
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.enums.ReferenceType
 
 @Dao
 interface StatusReferenceDao {

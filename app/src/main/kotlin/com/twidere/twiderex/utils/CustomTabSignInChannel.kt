@@ -21,7 +21,7 @@
 package com.twidere.twiderex.utils
 
 import android.net.Uri
-import com.twidere.twiderex.navigation.DeepLinks
+import com.twidere.twiderex.navigation.RootDeepLinksRoute
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 
@@ -37,8 +37,8 @@ object CustomTabSignInChannel {
     }
 
     fun canHandle(uri: Uri): Boolean {
-        return uri.toString().startsWith(DeepLinks.Callback.SignIn.Mastodon) ||
-            uri.toString().startsWith(DeepLinks.Callback.SignIn.Twitter)
+        return uri.toString().startsWith(RootDeepLinksRoute.Callback.SignIn.Mastodon) ||
+            uri.toString().startsWith(RootDeepLinksRoute.Callback.SignIn.Twitter)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)

@@ -26,24 +26,62 @@ import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStoreFile
+import com.twidere.twiderex.scenes.home.HomeMenus
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.map
 
 class AccountPreferences(
     private val dataStore: DataStore<Preferences>,
+    private val scope: CoroutineScope,
 ) {
     private val isNotificationEnabledKey = booleanPreferencesKey("isNotificationEnabled")
     val isNotificationEnabled
         get() = dataStore.data.map { preferences ->
             preferences[isNotificationEnabledKey] ?: true
         }
+    val homeMenuOrder
+        get() = dataStore.data.map { preferences ->
+            if (!preferences.contains(homeMenuOrderKey) || !preferences.contains(visibleHomeMenuKey)) {
+                HomeMenus.values().map { it to it.showDefault }
+            } else {
+                val order = preferences[homeMenuOrderKey].orEmpty()
+                    .split(",")
+                    .withIndex()
+                    .associate { HomeMenus.valueOf(it.value) to it.index }
+                val visible = preferences[visibleHomeMenuKey].orEmpty().split(",")
+                HomeMenus.values().sortedBy {
+                    order[it]
+                }.map { it to visible.contains(it.name) }
+            }
+        }
 
     suspend fun setIsNotificationEnabled(value: Boolean) {
         dataStore.edit {
             it[isNotificationEnabledKey] = value
+        }
+    }
+
+    fun close() {
+        // cancel scope will remove file from activeFiles in Datastore
+        // prevent crashes caused by multiple DataStores active for the same file
+        scope.cancel()
+    }
+
+    private val homeMenuOrderKey = stringPreferencesKey("homeMenuOrder")
+    private val visibleHomeMenuKey = stringPreferencesKey("visibleHomeMenu")
+    suspend fun setHomeMenuOrder(
+        data: List<Pair<HomeMenus, Boolean>>,
+    ) {
+        dataStore.edit {
+            it[visibleHomeMenuKey] = data.filter { it.second }.joinToString(",") { it.first.name }
+        }
+        dataStore.edit {
+            it[homeMenuOrderKey] = data.joinToString(",") { it.first.name }
         }
     }
 
@@ -55,14 +93,18 @@ class AccountPreferences(
         private fun createAccountPreferences(
             context: Context,
             accountKey: MicroBlogKey,
-        ) = AccountPreferences(
-            dataStore = PreferenceDataStoreFactory.create(
-                corruptionHandler = null,
-                migrations = listOf(),
-                scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
-            ) {
-                context.applicationContext.preferencesDataStoreFile(accountKey.toString())
-            },
-        )
+        ): AccountPreferences {
+            val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+            return AccountPreferences(
+                dataStore = PreferenceDataStoreFactory.create(
+                    corruptionHandler = null,
+                    migrations = listOf(),
+                    scope = scope
+                ) {
+                    context.applicationContext.preferencesDataStoreFile(accountKey.toString())
+                },
+                scope = scope
+            )
+        }
     }
 }

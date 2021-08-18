@@ -22,6 +22,7 @@ package com.twidere.twiderex.scenes.home
 
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.sizeIn
+import androidx.compose.material.FabPosition
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
@@ -32,6 +33,8 @@ abstract class HomeNavigationItem {
 
     @Composable
     abstract fun name(): String
+
+    abstract val route: String
 
     @Composable
     abstract fun icon(): Painter
@@ -47,6 +50,8 @@ abstract class HomeNavigationItem {
         // FIXME: 2021/6/17 Workaround for Scaffold#256 which will filter out fab when size == 0
         Spacer(modifier = Modifier.sizeIn(minWidth = 1.dp, minHeight = 1.dp))
     }
+
+    open val floatingActionButtonPosition = FabPosition.End
 
     // offset to hide fab when scroll timeline
     open val fabSize = 0.dp

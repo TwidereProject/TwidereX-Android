@@ -22,7 +22,7 @@ package com.twidere.twiderex.component
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import com.twidere.twiderex.navigation.Route
+import com.twidere.twiderex.navigation.RootRoute
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalActivity
 import com.twidere.twiderex.ui.LocalNavController
@@ -36,7 +36,7 @@ fun RequireAuthorization(
         val navController = LocalNavController.current
         val activity = LocalActivity.current
         LaunchedEffect(Unit) {
-            val result = navController.navigateForResult(Route.SignIn.Default)
+            val result = navController.navigateForResult(RootRoute.SignIn.General)
             if (result == null) {
                 activity.finish()
             }

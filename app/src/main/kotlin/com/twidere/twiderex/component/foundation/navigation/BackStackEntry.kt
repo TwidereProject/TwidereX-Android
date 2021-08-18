@@ -20,6 +20,9 @@
  */
 package moe.tlaster.precompose.navigation
 
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LifecycleRegistry
 import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
 import moe.tlaster.precompose.navigation.route.ComposeRoute
@@ -30,9 +33,43 @@ class BackStackEntry internal constructor(
     val pathMap: Map<String, String>,
     val queryString: QueryString? = null,
     internal val viewModel: NavControllerViewModel,
-) : ViewModelStoreOwner {
+) : ViewModelStoreOwner, LifecycleOwner {
+    private var destroyAfterTransition = false
+
     override fun getViewModelStore(): ViewModelStore {
         return viewModel.get(id = id)
+    }
+
+    private val lifecycleRegistry by lazy {
+        LifecycleRegistry(this)
+    }
+
+    override fun getLifecycle(): Lifecycle {
+        return lifecycleRegistry
+    }
+
+    fun active() {
+        lifecycleRegistry.currentState = Lifecycle.State.RESUMED
+    }
+
+    fun inActive() {
+        if (lifecycleRegistry.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
+            lifecycleRegistry.currentState = Lifecycle.State.STARTED
+        }
+        if (destroyAfterTransition) {
+            destroy()
+        }
+    }
+
+    fun destroy() {
+        if (lifecycleRegistry.currentState.isAtLeast(Lifecycle.State.RESUMED) ||
+            lifecycleRegistry.currentState == Lifecycle.State.INITIALIZED
+        ) {
+            destroyAfterTransition = true
+        } else {
+            lifecycleRegistry.currentState = Lifecycle.State.DESTROYED
+            viewModelStore.clear()
+        }
     }
 }
 
@@ -45,19 +82,19 @@ inline fun <reified T> BackStackEntry.query(name: String, default: T? = null): T
     return queryString?.query(name, default)
 }
 
-inline fun <reified T> BackStackEntry.queryList(name: String): List<T> {
+inline fun <reified T> BackStackEntry.queryList(name: String): List<T?> {
     val value = queryString?.map?.get(name) ?: return emptyList()
     return value.map { convertValue(it) }
 }
 
-inline fun <reified T> convertValue(value: String): T {
+inline fun <reified T> convertValue(value: String): T? {
     return when (T::class) {
-        Int::class -> value.toInt()
-        Long::class -> value.toLong()
+        Int::class -> value.toIntOrNull()
+        Long::class -> value.toLongOrNull()
         String::class -> value
-        Boolean::class -> value.toBoolean()
-        Float::class -> value.toFloat()
-        Double::class -> value.toDouble()
+        Boolean::class -> value.toBooleanStrictOrNull()
+        Float::class -> value.toFloatOrNull()
+        Double::class -> value.toDoubleOrNull()
         else -> throw NotImplementedError()
     } as T
 }

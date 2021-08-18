@@ -58,7 +58,6 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -78,6 +77,7 @@ import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.foundation.TextInput
 import com.twidere.twiderex.component.lazy.ui.LazyUiDMEventList
 import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiDMEvent
 import com.twidere.twiderex.ui.LocalActiveAccount
@@ -95,27 +95,7 @@ fun DMConversationScene(conversationKey: MicroBlogKey) {
     ) {
         it.create(account, conversationKey)
     }
-    val clipboardManager = LocalContext.current.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager?
-    val filePickerLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.OpenDocument(),
-        onResult = {
-            viewModel.inputImage.postValue(it)
-        },
-    )
-    val source = viewModel.source.collectAsLazyPagingItems()
-    val conversation by viewModel.conversation.observeAsState()
-    val input by viewModel.input.observeAsState(initial = "")
-    val inputImage by viewModel.inputImage.observeAsState()
-    val listState = rememberLazyListState()
-    val scope = rememberCoroutineScope()
-    val firstEventKey by viewModel.firstEventKey.observeAsState()
-    val pendingActionMessage by viewModel.pendingActionMessage.observeAsState()
-    if (source.itemCount > 0) {
-        source.peek(0)?.messageKey?.let {
-            viewModel.firstEventKey.postValue(it.toString())
-        }
-    }
-    val copyText = stringResource(id = R.string.scene_messages_action_copy_text)
+    val conversation by viewModel.conversation.observeAsState(null)
     TwidereScene {
         InAppNotificationScaffold(
             topBar = {
@@ -131,59 +111,89 @@ fun DMConversationScene(conversationKey: MicroBlogKey) {
                 )
             },
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-            ) {
-                Box(modifier = Modifier.weight(1f)) {
-                    LazyUiDMEventList(
-                        modifier = Modifier.fillMaxSize(),
-                        items = source,
-                        onResend = {
-                            viewModel.sendDraftMessage(it)
-                        },
-                        state = listState,
-                        onItemLongClick = {
-                            viewModel.pendingActionMessage.postValue(it)
-                        }
-                    )
-                    MessageActionComponent(
-                        pendingActionMessage = pendingActionMessage,
-                        onDismissRequest = { viewModel.pendingActionMessage.postValue(null) },
-                        onCopyText = { event ->
-                            clipboardManager?.setPrimaryClip(ClipData.newPlainText(copyText, event.originText))
-                        },
-                        onDelete = {
-                            viewModel.deleteMessage(it)
-                        }
-                    )
-                }
-                Divider(modifier = Modifier.fillMaxWidth())
-                InputPhotoPreview(inputImage) {
-                    viewModel.inputImage.postValue(null)
-                }
-                InputComponent(
-                    modifier = Modifier.fillMaxWidth(),
-                    scope = scope,
-                    filePickerLauncher = filePickerLauncher,
-                    enableSelectPhoto = inputImage == null,
-                    enableSend = input.isNotEmpty() || inputImage != null,
-                    input = input,
-                    onValueChanged = { viewModel.input.postValue(it) },
-                    onSend = { viewModel.sendMessage() }
-                )
+            if (!account.supportDirectMessage) {
+                Text(text = stringResource(id = R.string.scene_messages_error_not_supported))
+            } else {
+                // user might enter this page by notifications after switch platform
+                NormalContent(viewModel)
             }
-            LaunchedEffect(
-                key1 = firstEventKey,
-                block = {
-                    if (firstEventKey == null || source.itemCount <= 0) return@LaunchedEffect
-                    scope.launch {
-                        listState.scrollToItem(0)
-                    }
+        }
+    }
+}
+
+@Composable
+fun NormalContent(viewModel: DMEventViewModel) {
+    val clipboardManager = LocalContext.current.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager?
+    val filePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocument(),
+        onResult = {
+            viewModel.inputImage.value = it
+        },
+    )
+    val copyText = stringResource(id = R.string.scene_messages_action_copy_text)
+    val source = viewModel.source.collectAsLazyPagingItems()
+    val input by viewModel.input.observeAsState(initial = "")
+    val inputImage by viewModel.inputImage.observeAsState(null)
+    val listState = rememberLazyListState()
+    val scope = rememberCoroutineScope()
+    val firstEventKey by viewModel.firstEventKey.observeAsState(null)
+    val pendingActionMessage by viewModel.pendingActionMessage.observeAsState(null)
+    if (source.itemCount > 0) {
+        source.peek(0)?.messageKey?.let {
+            viewModel.firstEventKey.value = it.toString()
+        }
+    }
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
+        Box(modifier = Modifier.weight(1f)) {
+            LazyUiDMEventList(
+                modifier = Modifier.fillMaxSize(),
+                items = source,
+                onResend = {
+                    viewModel.sendDraftMessage(it)
+                },
+                state = listState,
+                onItemLongClick = {
+                    viewModel.pendingActionMessage.value = it
+                }
+            )
+            MessageActionComponent(
+                pendingActionMessage = pendingActionMessage,
+                onDismissRequest = { viewModel.pendingActionMessage.value = null },
+                onCopyText = { event ->
+                    clipboardManager?.setPrimaryClip(ClipData.newPlainText(copyText, event.originText))
+                },
+                onDelete = {
+                    viewModel.deleteMessage(it)
                 }
             )
         }
+        Divider(modifier = Modifier.fillMaxWidth())
+        InputPhotoPreview(inputImage) {
+            viewModel.inputImage.value = null
+        }
+        InputComponent(
+            modifier = Modifier.fillMaxWidth(),
+            scope = scope,
+            filePickerLauncher = filePickerLauncher,
+            enableSelectPhoto = inputImage == null,
+            enableSend = input.isNotEmpty() || inputImage != null,
+            input = input,
+            onValueChanged = { viewModel.input.value = it },
+            onSend = { viewModel.sendMessage() }
+        )
     }
+    LaunchedEffect(
+        key1 = firstEventKey,
+        block = {
+            if (firstEventKey == null || source.itemCount <= 0) return@LaunchedEffect
+            scope.launch {
+                listState.scrollToItem(0)
+            }
+        }
+    )
 }
 
 @OptIn(ExperimentalMaterialApi::class)

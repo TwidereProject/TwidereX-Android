@@ -41,7 +41,7 @@ inline fun <reified AF, reified VM : ViewModel> assistedViewModel(
             null
         },
         factory = object : ViewModelProvider.Factory {
-            override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 @Suppress("UNCHECKED_CAST")
                 return factory?.let { creator?.invoke(it) } as T
             }

@@ -25,13 +25,11 @@ import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkerParameters
-import com.twidere.services.microblog.DirectMessageService
-import com.twidere.twiderex.model.DirectMessageDeleteData
+import com.twidere.twiderex.jobs.dm.DirectMessageDeleteJob
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.toDirectMessageDeleteData
-import com.twidere.twiderex.model.toWorkData
-import com.twidere.twiderex.repository.AccountRepository
-import com.twidere.twiderex.repository.DirectMessageRepository
+import com.twidere.twiderex.model.job.DirectMessageDeleteData
+import com.twidere.twiderex.model.transform.toDirectMessageDeleteData
+import com.twidere.twiderex.model.transform.toWorkData
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 
@@ -39,8 +37,7 @@ import dagger.assisted.AssistedInject
 class DirectMessageDeleteWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted workerParams: WorkerParameters,
-    private val repository: DirectMessageRepository,
-    private val accountRepository: AccountRepository,
+    private val deleteJob: DirectMessageDeleteJob
 ) : CoroutineWorker(
     context,
     workerParams
@@ -54,21 +51,14 @@ class DirectMessageDeleteWorker @AssistedInject constructor(
     }
 
     override suspend fun doWork(): Result {
+        val deleteData = inputData.toDirectMessageDeleteData()
+        val accountKey = inputData.getString("accountKey")?.let {
+            MicroBlogKey.valueOf(it)
+        } ?: return Result.failure()
         return try {
-            val deleteData = inputData.toDirectMessageDeleteData()
-            val accountDetails = inputData.getString("accountKey")?.let {
-                MicroBlogKey.valueOf(it)
-            }?.let {
-                accountRepository.findByAccountKey(accountKey = it)
-            }?.let {
-                accountRepository.getAccountDetails(it)
-            } ?: return Result.failure()
-            repository.deleteMessage(
-                accountKey = deleteData.accountKey,
-                conversationKey = deleteData.conversationKey,
-                messageId = deleteData.messageId,
-                messageKey = deleteData.messageKey,
-                service = accountDetails.service as DirectMessageService
+            deleteJob.execute(
+                deleteData = deleteData,
+                accountKey = accountKey
             )
             Result.success()
         } catch (e: Throwable) {

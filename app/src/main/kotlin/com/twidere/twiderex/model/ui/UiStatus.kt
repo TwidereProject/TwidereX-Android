@@ -24,19 +24,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.res.stringResource
 import com.twidere.twiderex.R
-import com.twidere.twiderex.db.model.DbMastodonStatusExtra
-import com.twidere.twiderex.db.model.DbPagingTimelineWithStatus
-import com.twidere.twiderex.db.model.DbPreviewCard
-import com.twidere.twiderex.db.model.DbStatusWithMediaAndUser
-import com.twidere.twiderex.db.model.DbStatusWithReference
-import com.twidere.twiderex.db.model.DbTwitterStatusExtra
-import com.twidere.twiderex.db.model.ReferenceType
-import com.twidere.twiderex.model.MastodonStatusType
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.PlatformType
-import com.twidere.twiderex.model.ui.UiMedia.Companion.toUi
-import com.twidere.twiderex.model.ui.UiUrlEntity.Companion.toUi
-import com.twidere.twiderex.model.ui.UiUser.Companion.toUi
+import com.twidere.twiderex.model.enums.MastodonStatusType
+import com.twidere.twiderex.model.enums.PlatformType
+import com.twidere.twiderex.model.enums.ReferenceType
+import com.twidere.twiderex.model.ui.mastodon.MastodonStatusExtra
+import com.twidere.twiderex.model.ui.twitter.TwitterStatusExtra
 
 @Immutable
 data class UiStatus(
@@ -45,12 +38,11 @@ data class UiStatus(
     val htmlText: String,
     val rawText: String,
     val timestamp: Long,
-    val retweetCount: Long,
-    val likeCount: Long,
-    val replyCount: Long,
+    val metrics: StatusMetrics,
+    val sensitive: Boolean,
     val retweeted: Boolean,
     val liked: Boolean,
-    val placeString: String?,
+    val geo: UiGeo,
     val hasMedia: Boolean,
     val user: UiUser,
     val media: List<UiMedia>,
@@ -58,13 +50,18 @@ data class UiStatus(
     val isGap: Boolean,
     val url: List<UiUrlEntity>,
     val platformType: PlatformType,
-    val mastodonExtra: DbMastodonStatusExtra? = null,
-    val twitterExtra: DbTwitterStatusExtra? = null,
-    val linkPreview: DbPreviewCard? = null,
+    val spoilerText: String? = null,
+    val card: UiCard? = null,
+    val poll: UiPoll? = null,
     val referenceStatus: Map<ReferenceType, UiStatus> = emptyMap(),
     val inReplyToUserId: String? = null,
     val inReplyToStatusId: String? = null,
+    val extra: StatusExtra? = null
 ) {
+    val mastodonExtra: MastodonStatusExtra? = if (extra is MastodonStatusExtra) extra else null
+
+    val twitterExtra: TwitterStatusExtra? = if (extra is TwitterStatusExtra) extra else null
+
     val retweet: UiStatus? by lazy {
         if (platformType == PlatformType.Mastodon && mastodonExtra != null && mastodonExtra.type != MastodonStatusType.Status) {
             referenceStatus[ReferenceType.MastodonNotification]
@@ -103,12 +100,14 @@ data class UiStatus(
             statusId = "",
             htmlText = stringResource(id = R.string.scene_settings_display_preview_thank_for_using_twidere_x),
             timestamp = System.currentTimeMillis(),
-            retweetCount = 1200,
-            likeCount = 123,
-            replyCount = 1100,
+            metrics = StatusMetrics(
+                retweet = 1200,
+                like = 123,
+                reply = 1100,
+            ),
             retweeted = false,
             liked = false,
-            placeString = null,
+            geo = UiGeo(""),
             hasMedia = true,
             user = UiUser.sample(),
             media = UiMedia.sample(),
@@ -118,109 +117,15 @@ data class UiStatus(
             statusKey = MicroBlogKey.Empty,
             rawText = "",
             platformType = PlatformType.Twitter,
+            sensitive = false
         )
-
-        fun DbStatusWithMediaAndUser.toUi(
-            accountKey: MicroBlogKey,
-        ): UiStatus {
-            val reaction = reactions.firstOrNull { it.accountKey == accountKey }
-            return UiStatus(
-                statusId = data.statusId,
-                htmlText = data.htmlText,
-                timestamp = data.timestamp,
-                retweetCount = data.retweetCount,
-                likeCount = data.likeCount,
-                replyCount = data.replyCount,
-                retweeted = reaction?.retweeted ?: false,
-                liked = reaction?.liked ?: false,
-                placeString = data.placeString,
-                hasMedia = data.hasMedia,
-                user = user.toUi(),
-                media = media.toUi(),
-                isGap = false,
-                source = data.source,
-                url = url.toUi(),
-                statusKey = data.statusKey,
-                rawText = data.rawText,
-                platformType = data.platformType,
-                mastodonExtra = data.mastodonExtra,
-                twitterExtra = data.twitterExtra,
-                linkPreview = data.previewCard,
-                inReplyToStatusId = data.inReplyToStatusId,
-                inReplyToUserId = data.inReplyToStatusId
-            )
-        }
-
-        fun DbStatusWithReference.toUi(
-            accountKey: MicroBlogKey,
-        ) = with(status) {
-            val reaction = reactions.firstOrNull { it.accountKey == accountKey }
-            UiStatus(
-                statusId = data.statusId,
-                htmlText = data.htmlText,
-                timestamp = data.timestamp,
-                retweetCount = data.retweetCount,
-                likeCount = data.likeCount,
-                replyCount = data.replyCount,
-                retweeted = reaction?.retweeted ?: false,
-                liked = reaction?.liked ?: false,
-                placeString = data.placeString,
-                hasMedia = data.hasMedia,
-                user = user.toUi(),
-                media = media.toUi(),
-                isGap = false,
-                source = data.source,
-                url = url.toUi(),
-                statusKey = data.statusKey,
-                rawText = data.rawText,
-                platformType = data.platformType,
-                mastodonExtra = data.mastodonExtra,
-                twitterExtra = data.twitterExtra,
-                referenceStatus = references.map {
-                    it.reference.referenceType to it.status.toUi(
-                        accountKey = accountKey
-                    )
-                }.toMap(),
-                linkPreview = data.previewCard,
-                inReplyToUserId = data.inReplyToUserId,
-                inReplyToStatusId = data.inReplyToStatusId
-            )
-        }
-
-        fun DbPagingTimelineWithStatus.toUi(
-            accountKey: MicroBlogKey,
-        ) = with(status.status) {
-            val reaction = reactions.firstOrNull { it.accountKey == accountKey }
-            UiStatus(
-                statusId = data.statusId,
-                htmlText = data.htmlText,
-                timestamp = data.timestamp,
-                retweetCount = data.retweetCount,
-                likeCount = data.likeCount,
-                replyCount = data.replyCount,
-                retweeted = reaction?.retweeted ?: false,
-                liked = reaction?.liked ?: false,
-                placeString = data.placeString,
-                hasMedia = data.hasMedia,
-                user = user.toUi(),
-                media = media.toUi(),
-                isGap = timeline.isGap,
-                source = data.source,
-                url = url.toUi(),
-                statusKey = data.statusKey,
-                rawText = data.rawText,
-                platformType = data.platformType,
-                mastodonExtra = data.mastodonExtra,
-                twitterExtra = data.twitterExtra,
-                referenceStatus = status.references.map {
-                    it.reference.referenceType to it.status.toUi(
-                        accountKey = accountKey
-                    )
-                }.toMap(),
-                linkPreview = data.previewCard,
-                inReplyToUserId = data.inReplyToUserId,
-                inReplyToStatusId = data.inReplyToStatusId
-            )
-        }
     }
 }
+
+interface StatusExtra
+
+data class StatusMetrics(
+    val like: Long,
+    val reply: Long,
+    val retweet: Long
+)

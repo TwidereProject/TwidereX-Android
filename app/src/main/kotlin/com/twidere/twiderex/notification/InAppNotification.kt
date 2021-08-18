@@ -24,14 +24,17 @@ import android.content.Context
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
-import androidx.lifecycle.MutableLiveData
 import com.twidere.twiderex.component.navigation.INavigator
+import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.utils.Event
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 
 interface NotificationEvent {
     @Composable
     fun getMessage(): String
 }
+
 interface NotificationWithActionEvent : NotificationEvent {
     @Composable
     fun getActionMessage(): String
@@ -78,16 +81,24 @@ class StringResWithActionNotificationEvent(
     }
 }
 
-class InAppNotification : MutableLiveData<Event<NotificationEvent?>>() {
+class InAppNotification {
+    private val _source = MutableStateFlow<Event<NotificationEvent?>?>(null)
+    private val source
+        get() = _source.asSharedFlow()
+
     fun show(event: NotificationEvent) {
-        postValue((Event(event)))
+        _source.value = ((Event(event)))
     }
 
     fun show(message: String) {
-        postValue(Event(StringNotificationEvent(message)))
+        _source.value = Event(StringNotificationEvent(message))
     }
 
     fun show(@StringRes messageId: Int) {
-        postValue(Event(StringResNotificationEvent(messageId = messageId)))
+        _source.value = Event(StringResNotificationEvent(messageId = messageId))
     }
+
+    @Composable
+    fun observeAsState(initial: Event<NotificationEvent?>? = null) =
+        source.observeAsState(initial = initial)
 }

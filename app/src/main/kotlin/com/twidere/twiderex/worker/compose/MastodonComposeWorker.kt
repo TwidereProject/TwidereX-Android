@@ -20,40 +20,25 @@
  */
 package com.twidere.twiderex.worker.compose
 
-import android.content.ContentResolver
 import android.content.Context
-import android.net.Uri
-import androidx.core.app.NotificationManagerCompat
 import androidx.hilt.work.HiltWorker
 import androidx.work.Data
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkerParameters
 import com.twidere.services.mastodon.MastodonService
-import com.twidere.services.mastodon.model.PostPoll
-import com.twidere.services.mastodon.model.PostStatus
-import com.twidere.twiderex.db.CacheDatabase
-import com.twidere.twiderex.db.mapper.toDbStatusWithReference
-import com.twidere.twiderex.db.model.saveToDb
-import com.twidere.twiderex.model.ComposeData
+import com.twidere.twiderex.jobs.compose.MastodonComposeJob
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.toWorkData
-import com.twidere.twiderex.model.ui.UiStatus
-import com.twidere.twiderex.model.ui.UiStatus.Companion.toUi
-import com.twidere.twiderex.repository.AccountRepository
-import com.twidere.twiderex.viewmodel.compose.ComposeType
+import com.twidere.twiderex.model.job.ComposeData
+import com.twidere.twiderex.model.transform.toWorkData
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import java.io.File
 
 @HiltWorker
 class MastodonComposeWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted workerParams: WorkerParameters,
-    accountRepository: AccountRepository,
-    notificationManagerCompat: NotificationManagerCompat,
-    private val contentResolver: ContentResolver,
-    private val cacheDatabase: CacheDatabase,
-) : ComposeWorker<MastodonService>(context, workerParams, accountRepository, notificationManagerCompat) {
+    mastodonComposeJob: MastodonComposeJob
+) : ComposeWorker<MastodonService>(context, workerParams, mastodonComposeJob) {
 
     companion object {
         fun create(
@@ -67,48 +52,5 @@ class MastodonComposeWorker @AssistedInject constructor(
                     .build()
             )
             .build()
-    }
-
-    override suspend fun compose(
-        service: MastodonService,
-        composeData: ComposeData,
-        mediaIds: ArrayList<String>
-    ): UiStatus {
-        val accountKey = inputData.getString("accountKey")?.let {
-            MicroBlogKey.valueOf(it)
-        } ?: throw Error()
-        val result = service.compose(
-            PostStatus(
-                status = composeData.content,
-                inReplyToID = if (composeData.composeType == ComposeType.Reply || composeData.composeType == ComposeType.Thread) composeData.statusKey?.id else null,
-                mediaIDS = mediaIds,
-                sensitive = composeData.isSensitive,
-                spoilerText = composeData.contentWarningText,
-                visibility = composeData.visibility,
-                poll = composeData.voteOptions?.let {
-                    PostPoll(
-                        options = composeData.voteOptions,
-                        expiresIn = composeData.voteExpired?.value,
-                        multiple = composeData.voteMultiple
-                    )
-                }
-            )
-        ).toDbStatusWithReference(accountKey)
-        listOf(result).saveToDb(cacheDatabase)
-        return result.toUi(accountKey)
-    }
-
-    override suspend fun uploadImage(
-        originUri: Uri,
-        scramblerUri: Uri,
-        service: MastodonService
-    ): String? {
-        val id = contentResolver.openInputStream(scramblerUri)?.use { input ->
-            service.upload(
-                input,
-                originUri.path?.let { File(it).name }?.takeIf { it.isNotEmpty() } ?: "file"
-            )
-        } ?: throw Error()
-        return id.id
     }
 }

@@ -28,7 +28,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
@@ -38,10 +37,11 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import com.twidere.twiderex.model.ui.UiUser
+import com.twidere.twiderex.ui.LocalActiveAccount
 
 @Composable
 fun UserScreenName(user: UiUser) {
-    UserScreenName(name = user.displayScreenName)
+    UserScreenName(name = user.getDisplayScreenName(LocalActiveAccount.current?.accountKey?.host))
 }
 
 @Composable
@@ -73,7 +73,6 @@ fun UserName(
     overflow: TextOverflow = TextOverflow.Ellipsis,
     softWrap: Boolean = true,
     maxLines: Int = 1,
-    onTextLayout: (TextLayoutResult) -> Unit = {},
     style: TextStyle = LocalTextStyle.current
 ) {
     UserName(
@@ -91,7 +90,6 @@ fun UserName(
         overflow = overflow,
         softWrap = softWrap,
         maxLines = maxLines,
-        onTextLayout = onTextLayout,
         style = style,
     )
 }
@@ -112,11 +110,10 @@ fun UserName(
     overflow: TextOverflow = TextOverflow.Ellipsis,
     softWrap: Boolean = true,
     maxLines: Int = 1,
-    onTextLayout: (TextLayoutResult) -> Unit = {},
     style: TextStyle = LocalTextStyle.current
 ) {
-    Text(
-        text = userName,
+    HtmlText(
+        htmlText = userName,
         modifier = modifier,
         color = color,
         fontSize = fontSize,
@@ -130,7 +127,6 @@ fun UserName(
         overflow = overflow,
         softWrap = softWrap,
         maxLines = maxLines,
-        onTextLayout = onTextLayout,
-        style = style,
+        textStyle = style,
     )
 }

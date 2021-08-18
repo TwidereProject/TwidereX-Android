@@ -45,11 +45,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.FormattedTime
-import com.twidere.twiderex.model.PlatformType
+import com.twidere.twiderex.extensions.humanizedCount
+import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiStatus
 
 @Composable
@@ -84,7 +84,7 @@ fun DetailedStatusComponent(
                     CompositionLocalProvider(
                         LocalContentAlpha provides ContentAlpha.disabled
                     ) {
-                        if (!status.placeString.isNullOrEmpty()) {
+                        if (status.geo.name.isNotEmpty()) {
                             Row(
                                 modifier = Modifier
                                     .align(Alignment.CenterHorizontally)
@@ -96,7 +96,7 @@ fun DetailedStatusComponent(
                                         id = R.string.accessibility_common_status_location
                                     )
                                 )
-                                Text(text = status.placeString)
+                                Text(text = status.geo.name)
                             }
                             Spacer(modifier = Modifier.height(DetailedStatusDefaults.ContentSpacing))
                         }
@@ -107,10 +107,12 @@ fun DetailedStatusComponent(
                         ) {
                             FormattedTime(time = status.timestamp)
                             Spacer(modifier = Modifier.width(DetailedStatusDefaults.TimestampSpacing))
-                            Text(
-                                text = status.source,
+                            HtmlText(
+                                htmlText = status.source,
                                 maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
+                                linkResolver = {
+                                    ResolvedLink(null)
+                                }
                             )
                         }
 
@@ -121,20 +123,20 @@ fun DetailedStatusComponent(
                             horizontalArrangement = Arrangement.Center,
                         ) {
                             StatusStatistics(
-                                count = status.replyCount,
+                                count = status.metrics.reply,
                                 icon = painterResource(id = R.drawable.ic_corner_up_left),
                                 contentDescription = stringResource(
                                     id = R.string.scene_status_reply_mutiple,
-                                    status.replyCount,
+                                    status.metrics.reply,
                                 ),
                             )
                             Spacer(modifier = Modifier.width(DetailedStatusDefaults.StatusStatisticsSpacing))
                             StatusStatistics(
-                                count = status.retweetCount,
+                                count = status.metrics.retweet,
                                 icon = painterResource(id = R.drawable.ic_repeat),
                                 contentDescription = stringResource(
                                     id = R.string.scene_status_retweet_mutiple,
-                                    status.retweetCount,
+                                    status.metrics.retweet,
                                 ),
                             )
                             if (status.platformType == PlatformType.Twitter) {
@@ -147,11 +149,11 @@ fun DetailedStatusComponent(
                             }
                             Spacer(modifier = Modifier.width(DetailedStatusDefaults.StatusStatisticsSpacing))
                             StatusStatistics(
-                                count = status.likeCount,
+                                count = status.metrics.like,
                                 icon = painterResource(id = R.drawable.ic_heart),
                                 contentDescription = stringResource(
                                     id = R.string.scene_status_like_multiple,
-                                    status.likeCount,
+                                    status.metrics.like,
                                 ),
                             )
                         }
@@ -204,7 +206,7 @@ private fun StatusStatistics(
             contentDescription = contentDescription,
         )
         Spacer(modifier = Modifier.width(StatusStatisticsDefaults.IconSpacing))
-        Text(text = count.toString())
+        Text(text = count.humanizedCount())
     }
 }
 

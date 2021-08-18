@@ -64,7 +64,7 @@ import com.twidere.twiderex.action.LocalStatusActions
 import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.extensions.humanizedCount
 import com.twidere.twiderex.extensions.shareText
-import com.twidere.twiderex.model.PlatformType
+import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.viewmodel.compose.ComposeType
@@ -89,7 +89,7 @@ fun ReplyButton(
             modifier = modifier,
             icon = icon,
             color = LocalContentColor.current,
-            count = data.replyCount,
+            count = data.metrics.reply,
             contentDescription = contentDescription,
             onClick = {
                 action.invoke()
@@ -136,7 +136,7 @@ fun LikeButton(
         StatusActionButtonWithNumbers(
             modifier = modifier,
             icon = icon,
-            count = data.likeCount,
+            count = data.metrics.like,
             color = color,
             contentDescription = contentDescription,
             onClick = {
@@ -217,7 +217,7 @@ fun RetweetButton(
         if (withNumber) {
             StatusActionButtonWithNumbers(
                 icon = icon,
-                count = data.retweetCount,
+                count = data.metrics.retweet,
                 color = color,
                 contentDescription = contentDescription,
                 onClick = {

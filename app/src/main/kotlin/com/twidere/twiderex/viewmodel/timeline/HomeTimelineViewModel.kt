@@ -24,8 +24,8 @@ import android.content.SharedPreferences
 import com.twidere.services.microblog.TimelineService
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.model.AccountDetails
-import com.twidere.twiderex.paging.mediator.HomeTimelineMediator
 import com.twidere.twiderex.paging.mediator.paging.PagingWithGapMediator
+import com.twidere.twiderex.paging.mediator.timeline.HomeTimelineMediator
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 

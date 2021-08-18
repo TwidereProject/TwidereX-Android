@@ -23,6 +23,7 @@ package com.twidere.twiderex.scenes
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.ExperimentalMaterialApi
@@ -33,8 +34,8 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -44,20 +45,16 @@ import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
+import com.twidere.twiderex.component.lazy.LazyListController
 import com.twidere.twiderex.di.assisted.assistedViewModel
-import com.twidere.twiderex.navigation.Route
+import com.twidere.twiderex.extensions.observeAsState
+import com.twidere.twiderex.navigation.RootRoute
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.DraftViewModel
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun DraftListScene() {
-    val viewModel = assistedViewModel<DraftViewModel.AssistedFactory, DraftViewModel> {
-        it.create()
-    }
-    val source by viewModel.source.observeAsState(initial = emptyList())
-    val navController = LocalNavController.current
     TwidereScene {
         InAppNotificationScaffold(
             topBar = {
@@ -71,50 +68,69 @@ fun DraftListScene() {
                 )
             }
         ) {
-            LazyColumn {
-                items(items = source, key = { it._id.hashCode() }) {
-                    ListItem(
-                        text = {
-                            Text(text = it.content)
-                        },
-                        trailing = {
-                            var expanded by remember { mutableStateOf(false) }
-                            Box {
-                                IconButton(onClick = { expanded = true }) {
-                                    Icon(
-                                        imageVector = Icons.Default.MoreVert,
-                                        contentDescription = stringResource(
-                                            id = R.string.accessibility_common_more
-                                        )
-                                    )
+            DraftListSceneContent()
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun DraftListSceneContent(
+    lazyListController: LazyListController? = null,
+) {
+    val viewModel = assistedViewModel<DraftViewModel.AssistedFactory, DraftViewModel> {
+        it.create()
+    }
+    val source by viewModel.source.observeAsState(initial = emptyList())
+    val navController = LocalNavController.current
+    val listState = rememberLazyListState()
+    LaunchedEffect(lazyListController) {
+        lazyListController?.listState = listState
+    }
+    LazyColumn(
+        state = listState
+    ) {
+        items(items = source, key = { it._id.hashCode() }) {
+            ListItem(
+                text = {
+                    Text(text = it.content)
+                },
+                trailing = {
+                    var expanded by remember { mutableStateOf(false) }
+                    Box {
+                        IconButton(onClick = { expanded = true }) {
+                            Icon(
+                                imageVector = Icons.Default.MoreVert,
+                                contentDescription = stringResource(
+                                    id = R.string.accessibility_common_more
+                                )
+                            )
+                        }
+                        DropdownMenu(
+                            expanded = expanded,
+                            onDismissRequest = { expanded = false },
+                        ) {
+                            DropdownMenuItem(
+                                onClick = {
+                                    navController.navigate(RootRoute.Draft.Compose(it._id))
                                 }
-                                DropdownMenu(
-                                    expanded = expanded,
-                                    onDismissRequest = { expanded = false },
-                                ) {
-                                    DropdownMenuItem(
-                                        onClick = {
-                                            navController.navigate(Route.Draft.Compose(it._id))
-                                        }
-                                    ) {
-                                        Text(text = stringResource(id = R.string.scene_drafts_actions_edit_draft))
-                                    }
-                                    DropdownMenuItem(
-                                        onClick = {
-                                            viewModel.delete(it)
-                                        }
-                                    ) {
-                                        Text(
-                                            text = stringResource(id = R.string.common_controls_actions_remove),
-                                            color = Color.Red,
-                                        )
-                                    }
+                            ) {
+                                Text(text = stringResource(id = R.string.scene_drafts_actions_edit_draft))
+                            }
+                            DropdownMenuItem(
+                                onClick = {
+                                    viewModel.delete(it)
                                 }
+                            ) {
+                                Text(
+                                    text = stringResource(id = R.string.common_controls_actions_remove),
+                                    color = Color.Red,
+                                )
                             }
                         }
-                    )
+                    }
                 }
-            }
+            )
         }
     }
 }

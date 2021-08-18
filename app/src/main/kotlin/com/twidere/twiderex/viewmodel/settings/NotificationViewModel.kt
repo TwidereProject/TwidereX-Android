@@ -22,11 +22,10 @@ package com.twidere.twiderex.viewmodel.settings
 
 import androidx.datastore.core.DataStore
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
-import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import com.twidere.twiderex.preferences.proto.NotificationPreferences
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class NotificationViewModel @AssistedInject constructor(
@@ -36,7 +35,7 @@ class NotificationViewModel @AssistedInject constructor(
     interface AssistedFactory {
         fun create(): NotificationViewModel
     }
-    val enabled = notification.data.asLiveData().map {
+    val enabled = notification.data.map {
         it.enableNotification
     }
 

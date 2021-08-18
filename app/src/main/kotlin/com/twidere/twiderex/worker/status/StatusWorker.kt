@@ -25,22 +25,15 @@ import androidx.work.CoroutineWorker
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
-import com.twidere.services.microblog.StatusService
-import com.twidere.services.twitter.TwitterErrorCodes
-import com.twidere.services.twitter.model.exceptions.TwitterApiException
+import com.twidere.twiderex.jobs.status.StatusJob
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.transform.toWorkData
 import com.twidere.twiderex.model.ui.UiStatus
-import com.twidere.twiderex.notification.InAppNotification
-import com.twidere.twiderex.repository.AccountRepository
-import com.twidere.twiderex.repository.StatusRepository
-import com.twidere.twiderex.utils.notify
 
 abstract class StatusWorker(
     appContext: Context,
     params: WorkerParameters,
-    private val accountRepository: AccountRepository,
-    private val statusRepository: StatusRepository,
-    private val inAppNotification: InAppNotification,
+    private val statusJob: StatusJob,
 ) : CoroutineWorker(appContext, params) {
     companion object {
         inline fun <reified T : StatusWorker> create(
@@ -60,70 +53,18 @@ abstract class StatusWorker(
         val accountKey = inputData.getString("accountKey")?.let {
             MicroBlogKey.valueOf(it)
         } ?: return Result.failure()
-        val status = inputData.getString("statusKey")?.let {
+        val statusKey = inputData.getString("statusKey")?.let {
             MicroBlogKey.valueOf(it)
-        }?.let {
-            statusRepository.loadFromCache(it, accountKey = accountKey)
-        } ?: return Result.failure()
-        val service = accountRepository.findByAccountKey(accountKey)?.let {
-            accountRepository.getAccountDetails(it)
-        }?.let {
-            it.service as? StatusService
         } ?: return Result.failure()
         return try {
-            val result = doWork(accountKey, service, status)
-            Result.success(
-                result.toWorkData()
-            )
-        } catch (e: TwitterApiException) {
-            e.errors?.firstOrNull()?.let {
-                when (it.code) {
-                    TwitterErrorCodes.AlreadyRetweeted -> {
-                        Result.success(
-                            StatusResult(
-                                accountKey = accountKey,
-                                statusKey = status.statusKey,
-                                retweeted = true,
-                            ).toWorkData()
-                        )
-                    }
-                    TwitterErrorCodes.AlreadyFavorited -> {
-                        Result.success(
-                            StatusResult(
-                                accountKey = accountKey,
-                                statusKey = status.statusKey,
-                                liked = true,
-                            ).toWorkData()
-                        )
-                    }
-                    else -> {
-                        e.notify(inAppNotification)
-                        Result.success(fallback(accountKey, status).toWorkData())
-                    }
-                }
-            } ?: run {
-                e.notify(inAppNotification)
-                Result.success(fallback(accountKey, status).toWorkData())
+            statusJob.execute(
+                accountKey = accountKey,
+                statusKey = statusKey
+            ).let {
+                Result.success(it.toWorkData())
             }
         } catch (e: Throwable) {
-            e.notify(inAppNotification)
-            Result.success(fallback(accountKey, status).toWorkData())
+            Result.failure()
         }
     }
-
-    protected open fun fallback(
-        accountKey: MicroBlogKey,
-        status: UiStatus,
-    ) = StatusResult(
-        accountKey = accountKey,
-        statusKey = status.statusKey,
-        liked = status.liked,
-        retweeted = status.retweeted,
-    )
-
-    protected abstract suspend fun doWork(
-        accountKey: MicroBlogKey,
-        service: StatusService,
-        status: UiStatus,
-    ): StatusResult
 }

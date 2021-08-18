@@ -29,7 +29,7 @@ import com.twidere.twiderex.db.model.DbPagingTimelineWithStatus
 import com.twidere.twiderex.db.model.UserTimelineType
 import com.twidere.twiderex.db.model.pagingKey
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.PlatformType
+import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.paging.mediator.paging.CursorWithCustomOrderPagination
 import com.twidere.twiderex.paging.mediator.paging.CursorWithCustomOrderPagingMediator
 import com.twidere.twiderex.paging.mediator.paging.CursorWithCustomOrderPagingResult

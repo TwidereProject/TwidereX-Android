@@ -21,7 +21,6 @@
 package com.twidere.twiderex.db
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.lifecycle.Observer
 import androidx.paging.PagingSource
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
@@ -32,8 +31,8 @@ import com.twidere.services.twitter.model.TwitterList
 import com.twidere.services.twitter.model.User
 import com.twidere.twiderex.db.dao.ListsDao
 import com.twidere.twiderex.db.mapper.toDbList
-import com.twidere.twiderex.db.model.DbList
 import com.twidere.twiderex.model.MicroBlogKey
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert
@@ -41,6 +40,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.util.concurrent.Executors
 
 @RunWith(AndroidJUnit4::class)
 class DbListTest {
@@ -57,7 +57,7 @@ class DbListTest {
     @Before
     fun setUp() {
         cacheDatabase = Room.inMemoryDatabaseBuilder(ApplicationProvider.getApplicationContext(), CacheDatabase::class.java)
-            .build()
+            .setTransactionExecutor(Executors.newSingleThreadExecutor()).build()
         listsDao = cacheDatabase.listsDao()
         for (i in 0 until twitterCount) {
             val ownerId = if (i % 2 == 0) twitterAccountKey.id else "789"
@@ -116,17 +116,16 @@ class DbListTest {
     }
 
     @Test
-    fun findDbListWithListKeyWithLiveData_AutoUpdateAfterDbUpdate() {
+    fun findDbListWithListKeyWithFlow_AutoUpdateAfterDbUpdate() {
         runBlocking {
-            val source = listsDao.findWithListKeyWithLiveData(MicroBlogKey.twitter("0"), twitterAccountKey)
-            val observer = Observer<DbList?> { }
-            source.observeForever(observer)
-            Assert.assertEquals("description 0", source.value?.description)
-            source.value?.let {
+            val source = listsDao.findWithListKeyWithFlow(MicroBlogKey.twitter("0"), twitterAccountKey)
+            var data = source.firstOrNull()
+            Assert.assertEquals("description 0", data?.description)
+            data?.let {
                 listsDao.update(listOf(it.copy(description = "Update 0")))
             }
-            Assert.assertEquals("Update 0", source.value?.description)
-            source.removeObserver(observer)
+            data = source.firstOrNull()
+            Assert.assertEquals("Update 0", data?.description)
         }
     }
 

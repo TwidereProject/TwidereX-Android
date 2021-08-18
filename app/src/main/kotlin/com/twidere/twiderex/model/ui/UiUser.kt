@@ -24,13 +24,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.res.painterResource
 import com.twidere.twiderex.R
-import com.twidere.twiderex.db.model.DbMastodonUserExtra
-import com.twidere.twiderex.db.model.DbTwitterUserExtra
-import com.twidere.twiderex.db.model.DbUser
-import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.PlatformType
-import com.twidere.twiderex.ui.LocalActiveAccount
+import com.twidere.twiderex.model.enums.PlatformType
+import com.twidere.twiderex.model.ui.mastodon.MastodonUserExtra
+import com.twidere.twiderex.model.ui.twitter.TwitterUserExtra
 
 @Immutable
 data class UiUser(
@@ -41,10 +38,7 @@ data class UiUser(
     val screenName: String,
     val profileImage: Any,
     val profileBackgroundImage: String?,
-    val followersCount: Long,
-    val friendsCount: Long,
-    val statusesCount: Long,
-    val listedCount: Long,
+    val metrics: UserMetrics,
     val rawDesc: String,
     val htmlDesc: String,
     val website: String?,
@@ -52,24 +46,21 @@ data class UiUser(
     val verified: Boolean,
     val protected: Boolean,
     val platformType: PlatformType,
-    val twitterExtra: DbTwitterUserExtra? = null,
-    val mastodonExtra: DbMastodonUserExtra? = null,
+    val extra: UserExtra? = null
 ) {
     val displayName
         get() = name.takeUnless { it.isEmpty() } ?: screenName
-    val displayScreenName: String
-        @Composable
-        get() {
-            return LocalActiveAccount.current?.let { getDisplayScreenName(it) } ?: "@$screenName"
-        }
 
-    fun getDisplayScreenName(accountDetails: AccountDetails): String {
-        return if (accountDetails.accountKey.host.let { it != acct.host }) {
+    fun getDisplayScreenName(host: String?): String {
+        return if (host != null && host != acct.host) {
             "@$screenName@${acct.host}"
         } else {
             "@$screenName"
         }
     }
+    val twitterExtra: TwitterUserExtra? = if (extra is TwitterUserExtra) extra else null
+
+    val mastodonExtra: MastodonUserExtra? = if (extra is MastodonUserExtra) extra else null
 
     companion object {
         @Composable
@@ -79,10 +70,12 @@ data class UiUser(
             screenName = "TwidereProject",
             profileImage = painterResource(id = R.drawable.ic_profile_image_twidere),
             profileBackgroundImage = null,
-            followersCount = 0,
-            friendsCount = 0,
-            listedCount = 0,
-            statusesCount = 0,
+            metrics = UserMetrics(
+                fans = 0,
+                follow = 0,
+                status = 0,
+                listed = 0
+            ),
             rawDesc = "",
             htmlDesc = "",
             website = null,
@@ -93,29 +86,14 @@ data class UiUser(
             platformType = PlatformType.Twitter,
             acct = MicroBlogKey.twitter("TwidereProject")
         )
-
-        fun DbUser.toUi() =
-            UiUser(
-                id = userId,
-                name = name,
-                screenName = screenName,
-                profileImage = profileImage,
-                profileBackgroundImage = profileBackgroundImage,
-                followersCount = followersCount,
-                friendsCount = friendsCount,
-                listedCount = listedCount,
-                statusesCount = statusesCount,
-                rawDesc = rawDesc,
-                htmlDesc = htmlDesc,
-                website = website,
-                location = location,
-                verified = verified,
-                protected = isProtected,
-                userKey = userKey,
-                platformType = platformType,
-                twitterExtra = twitterExtra,
-                mastodonExtra = mastodonExtra,
-                acct = acct,
-            )
     }
 }
+
+interface UserExtra
+
+data class UserMetrics(
+    val fans: Long,
+    val follow: Long,
+    val status: Long,
+    val listed: Long
+)

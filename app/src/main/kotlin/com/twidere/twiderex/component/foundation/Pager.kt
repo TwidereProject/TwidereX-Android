@@ -20,6 +20,7 @@
  */
 package com.twidere.twiderex.component.foundation
 
+import androidx.annotation.IntRange
 import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.awaitHorizontalTouchSlopOrCancellation
@@ -38,7 +39,6 @@ import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.structuralEqualityPolicy
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -65,59 +65,67 @@ import kotlin.math.withSign
 
 @Composable
 fun rememberPagerState(
-    currentPage: Int = 0,
-    minPage: Int = 0,
-    maxPage: Int = 0,
+    @IntRange(from = 0) pageCount: Int,
+    @IntRange(from = 0) initialPage: Int = 0,
 ): PagerState {
     return rememberSaveable(
         saver = PagerState.Saver(),
     ) {
-        PagerState(currentPage, minPage, maxPage)
+        PagerState(pageCount = pageCount, currentPage = initialPage)
+    }.apply {
+        this.pageCount = pageCount
     }
 }
 
 @Stable
 class PagerState(
-    currentPage: Int = 0,
-    minPage: Int = 0,
-    maxPage: Int = 0,
+    @IntRange(from = 0) pageCount: Int,
+    @IntRange(from = 0) currentPage: Int = 0,
 ) {
     private val velocityTracker = VelocityTracker()
+    private var _pageCount by mutableStateOf(pageCount)
+    private var _currentPage by mutableStateOf(currentPage)
 
     companion object {
         fun Saver(): Saver<PagerState, *> = listSaver(
-            save = { listOf(it.currentPage, it.minPage, it.maxPage) },
+            save = { listOf(it.pageCount, it.currentPage) },
             restore = {
                 PagerState(
-                    currentPage = it[0],
-                    minPage = it[1],
-                    maxPage = it[2],
+                    pageCount = it[0],
+                    currentPage = it[1],
                 )
             }
         )
     }
 
-    private var _minPage by mutableStateOf(minPage)
-    var minPage: Int
-        get() = _minPage
-        set(value) {
-            _minPage = value.coerceAtMost(_maxPage)
-            _currentPage = _currentPage.coerceIn(_minPage, _maxPage)
+    internal inline val firstPageIndex: Int
+        get() = 0
+
+    internal inline val lastPageIndex: Int
+        get() = (pageCount - 1).coerceAtLeast(0)
+
+    @get:IntRange(from = 0)
+    var pageCount: Int
+        get() = _pageCount
+        set(@IntRange(from = 0) value) {
+            require(value >= 0) { "pageCount must be >= 0" }
+            _pageCount = value
+            currentPage = currentPage.coerceIn(firstPageIndex, lastPageIndex)
+            // updateLayoutPages(currentPage)
         }
 
-    private var _maxPage by mutableStateOf(maxPage, structuralEqualityPolicy())
-    var maxPage: Int
-        get() = _maxPage
-        set(value) {
-            _maxPage = value.coerceAtLeast(_minPage)
-            _currentPage = _currentPage.coerceIn(_minPage, maxPage)
+    private fun Int.floorMod(other: Int): Int {
+        return when (other) {
+            0 -> this
+            else -> this - this.floorDiv(other) * other
         }
+    }
 
-    private var _currentPage by mutableStateOf(currentPage.coerceIn(minPage, maxPage))
+    @get:IntRange(from = 0)
     var currentPage: Int
         get() = _currentPage
         set(value) {
-            _currentPage = value.coerceIn(minPage, maxPage)
+            _currentPage = value.floorMod(pageCount)
         }
 
     enum class SelectionState { Selected, Undecided }
@@ -144,14 +152,14 @@ class PagerState(
         get() = _currentPageOffset.value
 
     suspend fun snapToOffset(offset: Float) {
-        val max = if (currentPage == minPage) 0f else 1f
-        val min = if (currentPage == maxPage) 0f else -1f
+        val max = if (currentPage == firstPageIndex) 0f else 1f
+        val min = if (currentPage == lastPageIndex) 0f else -1f
         _currentPageOffset.snapTo(offset.coerceIn(min, max))
     }
 
     suspend fun fling(velocity: Float) {
-        if (velocity < 0 && currentPage == maxPage) return
-        if (velocity > 0 && currentPage == minPage) return
+        if (velocity < 0 && currentPage == lastPageIndex) return
+        if (velocity > 0 && currentPage == firstPageIndex) return
         val currentOffset = _currentPageOffset.value
         when {
             currentOffset.sign == velocity.sign &&
@@ -168,9 +176,6 @@ class PagerState(
             }
         }
     }
-
-    override fun toString(): String = "PagerState{minPage=$minPage, maxPage=$maxPage, " +
-        "currentPage=$currentPage, currentPageOffset=$currentPageOffset}"
 
     fun addPosition(uptimeMillis: Long, position: Offset) {
         velocityTracker.addPosition(timeMillis = uptimeMillis, position = position)
@@ -202,8 +207,8 @@ fun Pager(
     var pageSize by remember { mutableStateOf(0) }
     Layout(
         content = {
-            val minPage = (state.currentPage - offscreenLimit).coerceAtLeast(state.minPage)
-            val maxPage = (state.currentPage + offscreenLimit).coerceAtMost(state.maxPage)
+            val minPage = (state.currentPage - offscreenLimit).coerceAtLeast(state.firstPageIndex)
+            val maxPage = (state.currentPage + offscreenLimit).coerceAtMost(state.lastPageIndex)
 
             for (page in minPage..maxPage) {
                 val pageData = PageData(page)
@@ -224,9 +229,9 @@ fun Pager(
                                 selectionState = PagerState.SelectionState.Undecided
                                 val pos = pageSize * currentPageOffset
                                 val max =
-                                    if (currentPage == minPage) 0 else pageSize * offscreenLimit
+                                    if (currentPage == firstPageIndex) 0 else pageSize * offscreenLimit
                                 val min =
-                                    if (currentPage == maxPage) 0 else -pageSize * offscreenLimit
+                                    if (currentPage == lastPageIndex) 0 else -pageSize * offscreenLimit
                                 val newPos =
                                     (pos + dragAmount).coerceIn(min.toFloat(), max.toFloat())
                                 if (newPos != 0f) {

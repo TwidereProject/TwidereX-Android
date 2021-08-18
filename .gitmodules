@@ -1,0 +1,3 @@
+[submodule "localization"]
+	path = localization
+	url = git@github.com:TwidereProject/TwidereX-Localization.git

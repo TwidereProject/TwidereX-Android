@@ -21,18 +21,22 @@
 package com.twidere.twiderex.viewmodel.settings
 
 import androidx.datastore.core.DataStore
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.twidere.twiderex.R
+import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.preferences.proto.MiscPreferences
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import java.lang.NumberFormatException
 
 @OptIn(FlowPreview::class)
 class MiscViewModel @AssistedInject constructor(
-    private val miscPreferences: DataStore<MiscPreferences>
+    private val miscPreferences: DataStore<MiscPreferences>,
+    private val inAppNotification: InAppNotification,
 ) : ViewModel() {
     @dagger.assisted.AssistedFactory
     interface AssistedFactory {
@@ -40,12 +44,42 @@ class MiscViewModel @AssistedInject constructor(
     }
 
     val nitter by lazy {
-        MutableLiveData("")
+        MutableStateFlow("")
+    }
+
+    val useProxy by lazy {
+        MutableStateFlow(false)
+    }
+
+    val proxyType by lazy {
+        MutableStateFlow(MiscPreferences.ProxyType.HTTP)
+    }
+
+    val proxyServer by lazy {
+        MutableStateFlow("")
+    }
+
+    val proxyPort by lazy {
+        MutableStateFlow<Int?>(null)
+    }
+
+    val proxyUserName by lazy {
+        MutableStateFlow("")
+    }
+
+    val proxyPassword by lazy {
+        MutableStateFlow("")
     }
 
     init {
         viewModelScope.launch {
             nitter.value = miscPreferences.data.first().nitterInstance
+            useProxy.value = miscPreferences.data.first().useProxy
+            proxyServer.value = miscPreferences.data.first().proxyServer
+            proxyPort.value = miscPreferences.data.first().proxyPort
+            proxyUserName.value = miscPreferences.data.first().proxyUserName
+            proxyPassword.value = miscPreferences.data.first().proxyPassword
+            proxyType.value = miscPreferences.data.first().proxyType
         }
     }
 
@@ -55,6 +89,77 @@ class MiscViewModel @AssistedInject constructor(
             miscPreferences.updateData {
                 it.toBuilder()
                     .setNitterInstance(value)
+                    .build()
+            }
+        }
+    }
+
+    fun setUseProxy(value: Boolean) {
+        useProxy.value = value
+        viewModelScope.launch {
+            miscPreferences.updateData {
+                it.toBuilder()
+                    .setUseProxy(value)
+                    .build()
+            }
+        }
+    }
+
+    fun setProxyType(value: String) {
+        proxyType.value = MiscPreferences.ProxyType.valueOf(value)
+        viewModelScope.launch {
+            miscPreferences.updateData {
+                it.toBuilder()
+                    .setProxyType(proxyType.value)
+                    .build()
+            }
+        }
+    }
+
+    fun setProxyServer(value: String) {
+        proxyServer.value = value
+        viewModelScope.launch {
+            miscPreferences.updateData {
+                it.toBuilder()
+                    .setProxyServer(value)
+                    .build()
+            }
+        }
+    }
+
+    fun setProxyPort(value: String) {
+        try {
+            proxyPort.value = value.toInt()
+        } catch (e: NumberFormatException) {
+            inAppNotification.show(R.string.scene_settings_misc_proxy_port_error)
+            return
+        }
+        viewModelScope.launch {
+            miscPreferences.updateData {
+                it.toBuilder()
+                    .setProxyPort(value.toInt())
+                    .build()
+            }
+        }
+    }
+
+    fun setProxyUserName(value: String) {
+        proxyUserName.value = value
+        viewModelScope.launch {
+            miscPreferences.updateData {
+                it.toBuilder()
+                    .setProxyUserName(value)
+                    .build()
+            }
+        }
+    }
+
+    fun setProxyPassword(value: String) {
+        proxyPassword.value = value
+        viewModelScope.launch {
+            miscPreferences.updateData {
+                it.toBuilder()
+                    .setProxyPassword(value)
                     .build()
             }
         }

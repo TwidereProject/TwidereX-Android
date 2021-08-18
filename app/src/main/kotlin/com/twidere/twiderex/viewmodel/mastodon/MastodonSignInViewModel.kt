@@ -22,24 +22,25 @@ package com.twidere.twiderex.viewmodel.mastodon
 
 import android.accounts.Account
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.twidere.services.mastodon.MastodonOAuthService
 import com.twidere.twiderex.db.mapper.toDbUser
-import com.twidere.twiderex.model.AccountDetails
+import com.twidere.twiderex.http.TwidereServiceFactory
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.cred.CredentialsType
 import com.twidere.twiderex.model.cred.OAuth2Credentials
-import com.twidere.twiderex.model.toAmUser
-import com.twidere.twiderex.navigation.DeepLinks
+import com.twidere.twiderex.model.enums.PlatformType
+import com.twidere.twiderex.model.transform.toAmUser
+import com.twidere.twiderex.navigation.RootDeepLinksRoute
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.ACCOUNT_TYPE
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.utils.json
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import java.net.URI
 
 class MastodonSignInViewModel @AssistedInject constructor(
     private val repository: AccountRepository,
@@ -51,8 +52,8 @@ class MastodonSignInViewModel @AssistedInject constructor(
         fun create(): MastodonSignInViewModel
     }
 
-    val loading = MutableLiveData(false)
-    val host = MutableLiveData(TextFieldValue())
+    val loading = MutableStateFlow(false)
+    val host = MutableStateFlow(TextFieldValue())
     fun setHost(value: TextFieldValue) {
         host.value = value
     }
@@ -62,13 +63,17 @@ class MastodonSignInViewModel @AssistedInject constructor(
         codeProvider: suspend (url: String) -> String?,
         finished: (success: Boolean) -> Unit,
     ) = viewModelScope.launch {
-        loading.postValue(true)
+        loading.value = true
+        val realHost = runCatching {
+            URI.create(host)
+        }.getOrNull()?.takeIf { !it.scheme.isNullOrEmpty() }?.toString() ?: "https://$host"
         runCatching {
             val service = MastodonOAuthService(
-                host = "https://$host",
+                host = realHost,
                 client_name = "Twidere X",
                 website = "https://github.com/TwidereProject/TwidereX-Android",
-                redirect_uri = DeepLinks.Callback.SignIn.Mastodon,
+                redirect_uri = RootDeepLinksRoute.Callback.SignIn.Mastodon,
+                httpClientFactory = TwidereServiceFactory.createHttpClientFactory()
             )
             val application = service.createApplication()
             val target = service.getWebOAuthUrl(application)
@@ -95,16 +100,14 @@ class MastodonSignInViewModel @AssistedInject constructor(
                             }
                         } else {
                             repository.addAccount(
-                                AccountDetails(
-                                    account = Account(displayKey.toString(), ACCOUNT_TYPE),
-                                    type = PlatformType.Mastodon,
-                                    accountKey = internalKey,
-                                    credentials_type = CredentialsType.OAuth2,
-                                    credentials_json = credentials_json,
-                                    extras_json = "",
-                                    user = user.toDbUser(accountKey = internalKey).toAmUser(),
-                                    lastActive = System.currentTimeMillis()
-                                )
+                                account = Account(displayKey.toString(), ACCOUNT_TYPE),
+                                type = PlatformType.Mastodon,
+                                accountKey = internalKey,
+                                credentials_type = CredentialsType.OAuth2,
+                                credentials_json = credentials_json,
+                                extras_json = "",
+                                user = user.toDbUser(accountKey = internalKey).toAmUser(),
+                                lastActive = System.currentTimeMillis()
                             )
                         }
                         finished.invoke(true)
@@ -114,7 +117,7 @@ class MastodonSignInViewModel @AssistedInject constructor(
         }.onFailure {
             inAppNotification.show(it.message.toString())
         }
-        loading.postValue(false)
+        loading.value = false
         finished.invoke(false)
     }
 }

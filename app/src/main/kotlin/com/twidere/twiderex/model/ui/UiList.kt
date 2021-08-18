@@ -20,7 +20,6 @@
  */
 package com.twidere.twiderex.model.ui
 import androidx.compose.runtime.Immutable
-import com.twidere.twiderex.db.model.DbList
 import com.twidere.twiderex.model.MicroBlogKey
 
 @Immutable
@@ -58,20 +57,6 @@ data class UiList(
             isFollowed = isFollowed,
             allowToSubscribe = true,
         )
-
-        fun DbList.toUi() =
-            UiList(
-                id = listId,
-                ownerId = ownerId,
-                listKey = listKey,
-                accountKey = accountKey,
-                title = title,
-                descriptions = description,
-                mode = mode,
-                replyPolicy = replyPolicy,
-                isFollowed = isFollowed,
-                allowToSubscribe = allowToSubscribe,
-            )
     }
 }
 

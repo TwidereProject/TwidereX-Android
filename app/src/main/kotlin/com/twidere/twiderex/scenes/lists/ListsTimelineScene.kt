@@ -39,7 +39,6 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -61,10 +60,11 @@ import com.twidere.twiderex.component.foundation.LoadingProgress
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
 import com.twidere.twiderex.component.lazy.ui.LazyUiStatusList
 import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.PlatformType
-import com.twidere.twiderex.navigation.Route
+import com.twidere.twiderex.model.enums.PlatformType
+import com.twidere.twiderex.navigation.RootRoute
 import com.twidere.twiderex.scenes.lists.platform.MastodonListsEditDialog
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalNavController
@@ -83,7 +83,7 @@ fun ListTimeLineScene(
     ) {
         it.create(account, listKey)
     }
-    val source by viewModel.source.observeAsState()
+    val source by viewModel.source.observeAsState(initial = null)
     val loading by viewModel.loading.observeAsState(initial = false)
     var showEditDialog by remember {
         mutableStateOf(false)
@@ -160,7 +160,7 @@ fun ListTimeLineScene(
                                     onClick = {
                                         menuExpand = false
                                         navController.navigate(
-                                            Route.Lists.Members(
+                                            RootRoute.Lists.Members(
                                                 listKey,
                                                 uiList.isOwner(account.user.userId)
                                             )
@@ -175,7 +175,7 @@ fun ListTimeLineScene(
                                         onClick = {
                                             menuExpand = false
                                             navController.navigate(
-                                                Route.Lists.Subscribers(
+                                                RootRoute.Lists.Subscribers(
                                                     listKey
                                                 )
                                             )
@@ -190,7 +190,7 @@ fun ListTimeLineScene(
                                         onClick = {
                                             menuExpand = false
                                             when (account.type) {
-                                                PlatformType.Twitter -> navController.navigate(Route.Lists.TwitterEdit(listKey = listKey))
+                                                PlatformType.Twitter -> navController.navigate(RootRoute.Lists.TwitterEdit(listKey = listKey))
                                                 PlatformType.StatusNet -> TODO()
                                                 PlatformType.Fanfou -> TODO()
                                                 PlatformType.Mastodon -> showEditDialog = true

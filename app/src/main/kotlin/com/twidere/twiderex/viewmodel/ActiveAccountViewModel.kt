@@ -21,9 +21,8 @@
 package com.twidere.twiderex.viewmodel
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.liveData
 import com.twidere.twiderex.model.AccountDetails
-import com.twidere.twiderex.model.PlatformType
+import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.repository.AccountRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -41,15 +40,13 @@ class ActiveAccountViewModel @Inject constructor(
     }
 
     fun getTargetPlatformDefault(type: PlatformType): AccountDetails? {
-        return repository.accounts.value?.let {
-            it.sortedByDescending { it.lastActive }.firstOrNull { it.type == type }
-        }
+        return repository.getFirstByType(type)
     }
 
-    val account = liveData {
-        emitSource(repository.activeAccount)
+    val account by lazy {
+        repository.activeAccount
     }
-    val allAccounts = liveData {
-        emitSource(repository.accounts)
+    val allAccounts by lazy {
+        repository.accounts
     }
 }

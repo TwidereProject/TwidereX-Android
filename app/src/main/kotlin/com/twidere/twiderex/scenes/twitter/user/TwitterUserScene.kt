@@ -30,14 +30,14 @@ import androidx.compose.material.icons.filled.Error
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.di.assisted.assistedViewModel
-import com.twidere.twiderex.navigation.Route
+import com.twidere.twiderex.extensions.observeAsState
+import com.twidere.twiderex.navigation.RootDeepLinksRouteDefinition
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.twitter.user.TwitterUserViewModel
@@ -61,7 +61,7 @@ fun TwitterUserScene(screenName: String) {
         user?.let {
             navigator.user(
                 user = it,
-                NavOptions(popUpTo = PopUpTo(Route.DeepLink.Twitter.User, inclusive = true))
+                NavOptions(popUpTo = PopUpTo(RootDeepLinksRouteDefinition.Twitter.User, inclusive = true))
             )
         }
     }

@@ -51,7 +51,7 @@ import com.twidere.twiderex.BuildConfig
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.SignInButton
 import com.twidere.twiderex.component.foundation.SignInScaffold
-import com.twidere.twiderex.navigation.Route
+import com.twidere.twiderex.navigation.RootRoute
 import com.twidere.twiderex.ui.LocalNavController
 import kotlinx.coroutines.launch
 
@@ -77,7 +77,7 @@ private fun MastodonSignIn() {
     SignInButton(
         onClick = {
             scope.launch {
-                navController.navigateForResult(Route.SignIn.Mastodon)
+                navController.navigateForResult(RootRoute.SignIn.Mastodon)
                     ?.let {
                         it as Boolean
                     }?.let {
@@ -139,7 +139,7 @@ private fun TwitterSignIn() {
         onClick = {
             scope.launch {
                 navController.navigateForResult(
-                    Route.SignIn.Twitter(
+                    RootRoute.SignIn.Twitter(
                         BuildConfig.CONSUMERKEY,
                         BuildConfig.CONSUMERSECRET,
                     )
@@ -229,7 +229,7 @@ private fun TwitterCustomKeySignIn(
                 onClick = {
                     scope.launch {
                         navController.navigateForResult(
-                            Route.SignIn.Twitter(
+                            RootRoute.SignIn.Twitter(
                                 apiKey,
                                 apiSecret,
                             )
@@ -241,7 +241,8 @@ private fun TwitterCustomKeySignIn(
                             }
                         }
                     }
-                }
+                },
+                enabled = apiKey.isNotEmpty() && apiSecret.isNotEmpty()
             ) {
                 Text(text = stringResource(id = R.string.scene_drawer_sign_in))
             }
