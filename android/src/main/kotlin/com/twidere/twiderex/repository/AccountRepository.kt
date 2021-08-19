@@ -23,14 +23,14 @@ package com.twidere.twiderex.repository
 import android.accounts.Account
 import android.accounts.AccountManager
 import android.os.Build
-import com.twidere.twiderex.db.transform.toAndroid
-import com.twidere.twiderex.db.transform.toTwidere
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.AccountPreferences
 import com.twidere.twiderex.model.AmUser
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.cred.CredentialsType
 import com.twidere.twiderex.model.enums.PlatformType
+import com.twidere.twiderex.room.db.transform.toAndroid
+import com.twidere.twiderex.room.db.transform.toTwidere
 import com.twidere.twiderex.utils.fromJson
 import com.twidere.twiderex.utils.json
 import kotlinx.coroutines.flow.MutableStateFlow

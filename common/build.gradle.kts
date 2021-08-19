@@ -5,6 +5,7 @@ plugins {
     id("org.jetbrains.compose") version Versions.compose_jb
     kotlin("plugin.serialization") version Versions.Kotlin.lang
     id("com.android.library")
+    kotlin("kapt")
 }
 
 group = Package.group
@@ -54,12 +55,25 @@ kotlin {
             dependencies {
                 api("io.insert-koin:koin-android:${Versions.koin}")
                 api("io.insert-koin:koin-androidx-workmanager:${Versions.koin}")
+                implementation("androidx.room:room-runtime:${Versions.room}")
+                implementation("androidx.room:room-ktx:${Versions.room}")
+                implementation("androidx.room:room-paging:${Versions.room}")
+                kapt("androidx.room:room-compiler:${Versions.room}")
             }
         }
-        val androidTest by getting
+        val androidTest by getting {
+            dependencies {
+                implementation("androidx.room:room-testing:${Versions.room}")
+            }
+        }
+
         val desktopMain by getting
         val desktopTest by getting
     }
+}
+
+fun org.jetbrains.kotlin.gradle.plugin.KotlinDependencyHandler.kapt(dependencyNotation: String) {
+    configurations["kapt"].dependencies.add(project.dependencies.create(dependencyNotation))
 }
 
 android {

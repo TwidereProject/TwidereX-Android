@@ -30,9 +30,9 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.room.Room
 import androidx.work.WorkManager
 import com.twidere.twiderex.db.AppDatabase
-import com.twidere.twiderex.db.AppDatabase_Migration_1_2
-import com.twidere.twiderex.db.AppDatabase_Migration_2_3
-import com.twidere.twiderex.db.CacheDatabase
+import com.twidere.twiderex.room.db.AppDatabase_Migration_1_2
+import com.twidere.twiderex.room.db.AppDatabase_Migration_2_3
+import com.twidere.twiderex.room.db.RoomCacheDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -57,8 +57,8 @@ object AndroidModule {
 
     @Singleton
     @Provides
-    fun provideCacheDatabase(@ApplicationContext context: Context): CacheDatabase =
-        Room.databaseBuilder(context, CacheDatabase::class.java, "twiderex-db")
+    fun provideCacheDatabase(@ApplicationContext context: Context): RoomCacheDatabase =
+        Room.databaseBuilder(context, RoomCacheDatabase::class.java, "twiderex-db")
             .fallbackToDestructiveMigration()
             .build()
 

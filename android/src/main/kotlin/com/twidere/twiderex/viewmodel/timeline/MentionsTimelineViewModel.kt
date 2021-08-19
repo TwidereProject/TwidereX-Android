@@ -22,18 +22,18 @@ package com.twidere.twiderex.viewmodel.timeline
 
 import android.content.SharedPreferences
 import com.twidere.services.microblog.TimelineService
-import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.enums.NotificationCursorType
 import com.twidere.twiderex.paging.mediator.paging.PagingWithGapMediator
 import com.twidere.twiderex.paging.mediator.timeline.MentionTimelineMediator
 import com.twidere.twiderex.repository.NotificationRepository
+import com.twidere.twiderex.room.db.RoomCacheDatabase
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 
 class MentionsTimelineViewModel @AssistedInject constructor(
     preferences: SharedPreferences,
-    database: CacheDatabase,
+    database: RoomCacheDatabase,
     notificationRepository: NotificationRepository,
     @Assisted private val account: AccountDetails
 ) : TimelineViewModel(preferences) {

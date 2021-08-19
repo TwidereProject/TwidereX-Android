@@ -22,16 +22,16 @@ package com.twidere.twiderex.viewmodel.timeline
 
 import android.content.SharedPreferences
 import com.twidere.services.microblog.TimelineService
-import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.paging.mediator.paging.PagingWithGapMediator
 import com.twidere.twiderex.paging.mediator.timeline.HomeTimelineMediator
+import com.twidere.twiderex.room.db.RoomCacheDatabase
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 
 class HomeTimelineViewModel @AssistedInject constructor(
     preferences: SharedPreferences,
-    database: CacheDatabase,
+    database: RoomCacheDatabase,
     @Assisted account: AccountDetails,
 ) : TimelineViewModel(preferences) {
     @dagger.assisted.AssistedFactory

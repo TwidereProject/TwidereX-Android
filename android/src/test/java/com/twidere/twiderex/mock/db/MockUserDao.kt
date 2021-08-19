@@ -21,8 +21,8 @@
 package com.twidere.twiderex.mock.db
 
 import com.twidere.twiderex.db.dao.UserDao
-import com.twidere.twiderex.db.model.DbUser
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.room.db.model.DbUser
 import kotlinx.coroutines.flow.Flow
 
 class MockUserDao : UserDao {

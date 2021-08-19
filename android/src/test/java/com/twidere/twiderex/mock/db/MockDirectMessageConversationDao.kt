@@ -22,16 +22,16 @@ package com.twidere.twiderex.mock.db
 
 import androidx.paging.PagingSource
 import com.twidere.services.twitter.model.User
-import com.twidere.twiderex.db.dao.DirectMessageConversationDao
 import com.twidere.twiderex.db.mapper.toDbUser
-import com.twidere.twiderex.db.model.DbDMConversation
-import com.twidere.twiderex.db.model.DbDMEvent
 import com.twidere.twiderex.db.model.DbDMEventWithAttachments
-import com.twidere.twiderex.db.model.DbDirectMessageConversationWithMessage
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.room.db.dao.RoomDirectMessageConversationDao
+import com.twidere.twiderex.room.db.model.DbDMConversation
+import com.twidere.twiderex.room.db.model.DbDMEvent
+import com.twidere.twiderex.room.db.model.DbDirectMessageConversationWithMessage
 import kotlinx.coroutines.flow.Flow
 
-class MockDirectMessageConversationDao : DirectMessageConversationDao {
+class MockDirectMessageConversationDao : RoomDirectMessageConversationDao {
     val db = mutableListOf<DbDMConversation>()
     override suspend fun insertAll(conversations: List<DbDMConversation>) {
         db.addAll(conversations)

@@ -52,7 +52,7 @@ class TrendMediator(
             if (loadType == LoadType.REFRESH) {
                 val lists = service.trends(locationId)
                 database.withTransaction {
-                    database.trendDao().clear()
+                    database.trendDao().clear(accountKey)
                     database.trendDao().insertAll(lists.map { it.toUi(accountKey) })
                 }
             }

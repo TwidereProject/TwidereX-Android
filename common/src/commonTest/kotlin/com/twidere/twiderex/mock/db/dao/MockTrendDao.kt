@@ -30,7 +30,7 @@ import org.jetbrains.annotations.TestOnly
 class MockTrendDao @TestOnly constructor() : TrendDao {
     private val fakeDb = mutableMapOf<MicroBlogKey, MutableList<UiTrend>>()
 
-    override fun insertAll(trends: List<UiTrend>) {
+    override suspend fun insertAll(trends: List<UiTrend>) {
         trends.forEach { uiTrend ->
             fakeDb[uiTrend.accountKey].let {
                 if (it.isNullOrEmpty()) {
@@ -48,7 +48,7 @@ class MockTrendDao @TestOnly constructor() : TrendDao {
         )
     }
 
-    override suspend fun clear() {
+    override suspend fun clear(accountKey: MicroBlogKey) {
         fakeDb.clear()
     }
 }

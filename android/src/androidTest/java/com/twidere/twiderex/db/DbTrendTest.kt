@@ -27,9 +27,9 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.twidere.services.mastodon.model.TrendHistory
 import com.twidere.twiderex.db.mapper.toDbTrend
-import com.twidere.twiderex.db.model.DbTrendWithHistory
-import com.twidere.twiderex.db.model.saveToDb
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.room.db.RoomCacheDatabase
+import com.twidere.twiderex.room.db.model.DbTrendWithHistory
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert
@@ -44,7 +44,7 @@ typealias MastodonTrend = com.twidere.services.mastodon.model.Trend
 
 @RunWith(AndroidJUnit4::class)
 class DbTrendTest {
-    private lateinit var cacheDatabase: CacheDatabase
+    private lateinit var cacheDatabase: RoomCacheDatabase
     private val twitterAccountKey = MicroBlogKey.twitter("123")
     private val mastodonAccountKey = MicroBlogKey("456", "mastodon.com")
     private val trends = mutableListOf<DbTrendWithHistory>()
@@ -57,7 +57,7 @@ class DbTrendTest {
 
     @Before
     fun setUp() {
-        cacheDatabase = Room.inMemoryDatabaseBuilder(ApplicationProvider.getApplicationContext(), CacheDatabase::class.java)
+        cacheDatabase = Room.inMemoryDatabaseBuilder(ApplicationProvider.getApplicationContext(), RoomCacheDatabase::class.java)
             .setTransactionExecutor(Executors.newSingleThreadExecutor()).build()
         for (i in 0 until twitterTrendCount) {
             trends.add(

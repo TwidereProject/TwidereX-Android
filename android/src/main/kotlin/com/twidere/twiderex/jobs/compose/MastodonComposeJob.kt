@@ -25,7 +25,6 @@ import com.twidere.services.mastodon.MastodonService
 import com.twidere.services.mastodon.model.PostPoll
 import com.twidere.services.mastodon.model.PostStatus
 import com.twidere.services.mastodon.model.Visibility
-import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.db.mapper.toDbStatusWithReference
 import com.twidere.twiderex.kmp.ExifScrambler
 import com.twidere.twiderex.kmp.FileResolver
@@ -37,6 +36,7 @@ import com.twidere.twiderex.model.job.ComposeData
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.notification.AppNotificationManager
 import com.twidere.twiderex.repository.AccountRepository
+import com.twidere.twiderex.room.db.RoomCacheDatabase
 import java.io.File
 import java.net.URI
 
@@ -47,7 +47,7 @@ class MastodonComposeJob(
     exifScrambler: ExifScrambler,
     remoteNavigator: RemoteNavigator,
     private val fileResolver: FileResolver,
-    private val cacheDatabase: CacheDatabase,
+    private val cacheDatabase: RoomCacheDatabase,
 ) : ComposeJob<MastodonService>(
     context,
     accountRepository,

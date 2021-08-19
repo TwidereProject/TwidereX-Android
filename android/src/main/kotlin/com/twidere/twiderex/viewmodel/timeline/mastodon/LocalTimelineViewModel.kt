@@ -22,16 +22,16 @@ package com.twidere.twiderex.viewmodel.timeline.mastodon
 
 import android.content.SharedPreferences
 import com.twidere.services.mastodon.MastodonService
-import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.paging.mediator.timeline.mastodon.LocalTimelineMediator
+import com.twidere.twiderex.room.db.RoomCacheDatabase
 import com.twidere.twiderex.viewmodel.timeline.TimelineViewModel
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 
 class LocalTimelineViewModel @AssistedInject constructor(
     preferences: SharedPreferences,
-    database: CacheDatabase,
+    database: RoomCacheDatabase,
     @Assisted account: AccountDetails,
 ) : TimelineViewModel(preferences) {
     @dagger.assisted.AssistedFactory

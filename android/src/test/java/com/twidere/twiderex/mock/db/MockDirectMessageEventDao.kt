@@ -22,13 +22,13 @@ package com.twidere.twiderex.mock.db
 
 import androidx.paging.PagingSource
 import com.twidere.services.twitter.model.User
-import com.twidere.twiderex.db.dao.DirectMessageEventDao
 import com.twidere.twiderex.db.mapper.toDbUser
-import com.twidere.twiderex.db.model.DbDMEvent
 import com.twidere.twiderex.db.model.DbDMEventWithAttachments
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.room.db.dao.RoomDirectMessageEventDao
+import com.twidere.twiderex.room.db.model.DbDMEvent
 
-class MockDirectMessageEventDao : DirectMessageEventDao {
+class MockDirectMessageEventDao : RoomDirectMessageEventDao {
     val db = mutableListOf<DbDMEvent>()
 
     override suspend fun insertAll(messages: List<DbDMEvent>) {

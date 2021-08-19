@@ -33,7 +33,7 @@ internal class MockStatusDao @TestOnly constructor() : StatusDao {
         return fakeDb[statusKey]
     }
 
-    override suspend fun insertAll(listOf: List<UiStatus>) {
+    override suspend fun insertAll(listOf: List<UiStatus>, accountKey: MicroBlogKey) {
         listOf.forEach { status ->
             fakeDb[status.statusKey] = status
         }

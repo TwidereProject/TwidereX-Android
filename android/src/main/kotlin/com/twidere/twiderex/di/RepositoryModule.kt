@@ -25,7 +25,6 @@ import coil.imageLoader
 import coil.util.CoilUtils
 import com.twidere.services.nitter.NitterService
 import com.twidere.twiderex.db.AppDatabase
-import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.CacheRepository
 import com.twidere.twiderex.repository.DirectMessageRepository
@@ -40,6 +39,7 @@ import com.twidere.twiderex.repository.StatusRepository
 import com.twidere.twiderex.repository.TimelineRepository
 import com.twidere.twiderex.repository.TrendRepository
 import com.twidere.twiderex.repository.UserRepository
+import com.twidere.twiderex.room.db.RoomCacheDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -61,7 +61,7 @@ object RepositoryModule {
 
     @Provides
     fun provideCacheRepository(
-        database: CacheDatabase,
+        database: RoomCacheDatabase,
         appDatabase: AppDatabase,
         @ApplicationContext context: Context,
     ): CacheRepository = CacheRepository(
@@ -74,7 +74,7 @@ object RepositoryModule {
 
     @Provides
     fun provideStatusRepository(
-        database: CacheDatabase,
+        database: RoomCacheDatabase,
         nitterService: NitterService?,
     ): StatusRepository = StatusRepository(
         database = database,
@@ -82,22 +82,22 @@ object RepositoryModule {
     )
 
     @Provides
-    fun provideReactionRepository(database: CacheDatabase): ReactionRepository =
+    fun provideReactionRepository(database: RoomCacheDatabase): ReactionRepository =
         ReactionRepository(database = database)
 
     @Provides
-    fun provideTimelineRepository(database: CacheDatabase): TimelineRepository =
+    fun provideTimelineRepository(database: RoomCacheDatabase): TimelineRepository =
         TimelineRepository(database = database)
 
     @Provides
     fun provideUserRepository(
-        database: CacheDatabase,
+        database: RoomCacheDatabase,
         accountRepository: AccountRepository
     ): UserRepository = UserRepository(database = database, accountRepository = accountRepository)
 
     @Provides
     fun provideListsRepository(
-        database: CacheDatabase
+        database: RoomCacheDatabase
     ) = ListsRepository(database = database)
 
     @Provides
@@ -105,21 +105,21 @@ object RepositoryModule {
 
     @Provides
     fun provideNotificationRepository(
-        database: CacheDatabase,
+        database: RoomCacheDatabase,
     ): NotificationRepository = NotificationRepository(database = database)
 
     @Provides
     fun provideTrendRepository(
-        database: CacheDatabase
+        database: RoomCacheDatabase
     ) = TrendRepository(database = database)
 
     @Provides
     fun provideDirectMessageRepository(
-        database: CacheDatabase
+        database: RoomCacheDatabase
     ) = DirectMessageRepository(database = database)
 
     @Provides
     fun provideDirectMediaRepository(
-        database: CacheDatabase
+        database: RoomCacheDatabase
     ) = MediaRepository(database = database)
 }

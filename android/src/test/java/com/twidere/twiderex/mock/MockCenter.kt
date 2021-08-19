@@ -21,14 +21,14 @@
 package com.twidere.twiderex.mock
 
 import com.twidere.services.microblog.MicroBlogService
-import com.twidere.twiderex.db.CacheDatabase
-import com.twidere.twiderex.mock.db.MockCacheDatabase
+import com.twidere.twiderex.mock.db.MockRoomCacheDatabase
 import com.twidere.twiderex.mock.service.MockListsService
 import com.twidere.twiderex.mock.service.MockTrendService
+import com.twidere.twiderex.room.db.RoomCacheDatabase
 
 object MockCenter {
-    fun mockCacheDatabase(): CacheDatabase {
-        return MockCacheDatabase()
+    fun mockCacheDatabase(): RoomCacheDatabase {
+        return MockRoomCacheDatabase()
     }
 
     fun mockListsService(): MicroBlogService {

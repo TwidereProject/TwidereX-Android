@@ -21,7 +21,6 @@
 package com.twidere.twiderex.utils
 
 import com.twidere.services.mastodon.MastodonService
-import com.twidere.twiderex.db.transform.toUi
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.ui.UiEmojiCategory
 import kotlinx.coroutines.flow.Flow

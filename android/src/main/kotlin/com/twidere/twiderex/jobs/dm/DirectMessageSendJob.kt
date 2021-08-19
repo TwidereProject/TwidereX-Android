@@ -25,12 +25,8 @@ import android.graphics.BitmapFactory
 import androidx.room.withTransaction
 import com.twidere.services.microblog.MicroBlogService
 import com.twidere.twiderex.R
-import com.twidere.twiderex.db.CacheDatabase
-import com.twidere.twiderex.db.model.DbDMEvent
-import com.twidere.twiderex.db.model.DbDMEvent.Companion.saveToDb
 import com.twidere.twiderex.db.model.DbDMEventWithAttachments
 import com.twidere.twiderex.db.model.DbDMEventWithAttachments.Companion.saveToDb
-import com.twidere.twiderex.db.model.DbMedia
 import com.twidere.twiderex.kmp.FileResolver
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
@@ -42,12 +38,16 @@ import com.twidere.twiderex.notification.AppNotificationManager
 import com.twidere.twiderex.notification.NotificationChannelSpec
 import com.twidere.twiderex.notification.notificationChannelId
 import com.twidere.twiderex.repository.AccountRepository
+import com.twidere.twiderex.room.db.RoomCacheDatabase
+import com.twidere.twiderex.room.db.model.DbDMEvent
+import com.twidere.twiderex.room.db.model.DbDMEvent.Companion.saveToDb
+import com.twidere.twiderex.room.db.model.DbMedia
 import java.net.URI
 import java.util.UUID
 
 abstract class DirectMessageSendJob<T : MicroBlogService>(
     private val applicationContext: Context,
-    protected val cacheDatabase: CacheDatabase,
+    protected val cacheDatabase: RoomCacheDatabase,
     private val accountRepository: AccountRepository,
     private val notificationManager: AppNotificationManager,
     protected val fileResolver: FileResolver,

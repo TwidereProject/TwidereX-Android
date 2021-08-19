@@ -21,7 +21,6 @@
 package com.twidere.twiderex.di
 
 import android.content.Context
-import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.jobs.common.DownloadMediaJob
 import com.twidere.twiderex.jobs.common.NotificationJob
 import com.twidere.twiderex.jobs.common.ShareMediaJob
@@ -49,6 +48,7 @@ import com.twidere.twiderex.repository.DirectMessageRepository
 import com.twidere.twiderex.repository.DraftRepository
 import com.twidere.twiderex.repository.NotificationRepository
 import com.twidere.twiderex.repository.StatusRepository
+import com.twidere.twiderex.room.db.RoomCacheDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -209,7 +209,7 @@ object JobModule {
         accountRepository: AccountRepository,
         notificationManager: AppNotificationManager,
         fileResolver: FileResolver,
-        cacheDatabase: CacheDatabase,
+        cacheDatabase: RoomCacheDatabase,
     ): TwitterDirectMessageSendJob = TwitterDirectMessageSendJob(
         context = context,
         accountRepository = accountRepository,
@@ -224,7 +224,7 @@ object JobModule {
         accountRepository: AccountRepository,
         notificationManager: AppNotificationManager,
         fileResolver: FileResolver,
-        cacheDatabase: CacheDatabase,
+        cacheDatabase: RoomCacheDatabase,
         exifScrambler: ExifScrambler,
         statusRepository: StatusRepository,
         remoteNavigator: RemoteNavigator
@@ -245,7 +245,7 @@ object JobModule {
         accountRepository: AccountRepository,
         notificationManager: AppNotificationManager,
         fileResolver: FileResolver,
-        cacheDatabase: CacheDatabase,
+        cacheDatabase: RoomCacheDatabase,
         exifScrambler: ExifScrambler,
         remoteNavigator: RemoteNavigator
     ): MastodonComposeJob = MastodonComposeJob(

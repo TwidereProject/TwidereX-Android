@@ -32,6 +32,7 @@ import com.twidere.services.twitter.model.User
 import com.twidere.twiderex.db.dao.ListsDao
 import com.twidere.twiderex.db.mapper.toDbList
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.room.db.RoomCacheDatabase
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.runBlocking
 import org.junit.After
@@ -45,7 +46,7 @@ import java.util.concurrent.Executors
 @RunWith(AndroidJUnit4::class)
 class DbListTest {
     private lateinit var listsDao: ListsDao
-    private lateinit var cacheDatabase: CacheDatabase
+    private lateinit var cacheDatabase: RoomCacheDatabase
     private val twitterAccountKey = MicroBlogKey.twitter("123")
     private val mastodonAccountKey = MicroBlogKey("456", "mastodon.com")
     private val originData = mutableListOf<IListModel>()
@@ -56,7 +57,7 @@ class DbListTest {
 
     @Before
     fun setUp() {
-        cacheDatabase = Room.inMemoryDatabaseBuilder(ApplicationProvider.getApplicationContext(), CacheDatabase::class.java)
+        cacheDatabase = Room.inMemoryDatabaseBuilder(ApplicationProvider.getApplicationContext(), RoomCacheDatabase::class.java)
             .setTransactionExecutor(Executors.newSingleThreadExecutor()).build()
         listsDao = cacheDatabase.listsDao()
         for (i in 0 until twitterCount) {

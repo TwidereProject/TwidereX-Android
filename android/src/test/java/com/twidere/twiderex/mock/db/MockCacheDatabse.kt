@@ -23,12 +23,7 @@ package com.twidere.twiderex.mock.db
 import androidx.room.DatabaseConfiguration
 import androidx.room.InvalidationTracker
 import androidx.sqlite.db.SupportSQLiteOpenHelper
-import com.twidere.twiderex.db.CacheDatabase
-import com.twidere.twiderex.db.dao.DirectMessageConversationDao
-import com.twidere.twiderex.db.dao.DirectMessageEventDao
 import com.twidere.twiderex.db.dao.ListsDao
-import com.twidere.twiderex.db.dao.MediaDao
-import com.twidere.twiderex.db.dao.NotificationCursorDao
 import com.twidere.twiderex.db.dao.PagingTimelineDao
 import com.twidere.twiderex.db.dao.ReactionDao
 import com.twidere.twiderex.db.dao.StatusDao
@@ -37,11 +32,16 @@ import com.twidere.twiderex.db.dao.TrendDao
 import com.twidere.twiderex.db.dao.TrendHistoryDao
 import com.twidere.twiderex.db.dao.UrlEntityDao
 import com.twidere.twiderex.db.dao.UserDao
+import com.twidere.twiderex.room.db.RoomCacheDatabase
+import com.twidere.twiderex.room.db.dao.RoomDirectMessageConversationDao
+import com.twidere.twiderex.room.db.dao.RoomDirectMessageEventDao
+import com.twidere.twiderex.room.db.dao.RoomMediaDao
+import com.twidere.twiderex.room.db.dao.RoomNotificationCursorDao
 import java.util.ArrayDeque
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 
-class MockCacheDatabase : CacheDatabase() {
+class MockRoomCacheDatabase : RoomCacheDatabase() {
     override fun getTransactionExecutor(): Executor {
         return object : Executor {
             private var mExecutor = Executors.newSingleThreadExecutor()
@@ -86,7 +86,7 @@ class MockCacheDatabase : CacheDatabase() {
     }
 
     private val mediaDao = MockMediaDao()
-    override fun mediaDao(): MediaDao {
+    override fun mediaDao(): RoomMediaDao {
         return mediaDao
     }
 
@@ -117,7 +117,7 @@ class MockCacheDatabase : CacheDatabase() {
         return listsDao
     }
 
-    override fun notificationCursorDao(): NotificationCursorDao {
+    override fun notificationCursorDao(): RoomNotificationCursorDao {
         TODO("Not yet implemented")
     }
 
@@ -132,12 +132,12 @@ class MockCacheDatabase : CacheDatabase() {
     }
 
     private val conversationDao = MockDirectMessageConversationDao()
-    override fun directMessageConversationDao(): DirectMessageConversationDao {
+    override fun directMessageConversationDao(): RoomDirectMessageConversationDao {
         return conversationDao
     }
 
     private val dmDao = MockDirectMessageEventDao()
-    override fun directMessageDao(): DirectMessageEventDao {
+    override fun directMessageDao(): RoomDirectMessageEventDao {
         return dmDao
     }
 

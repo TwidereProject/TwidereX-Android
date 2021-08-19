@@ -26,7 +26,7 @@ import com.twidere.twiderex.model.ui.UiTrend
 
 // TODO OPERATION
 interface TrendDao {
-    fun insertAll(trends: List<UiTrend>)
+    suspend fun insertAll(trends: List<UiTrend>)
     fun getPagingSource(accountKey: MicroBlogKey): PagingSource<Int, UiTrend>
-    suspend fun clear()
+    suspend fun clear(accountKey: MicroBlogKey)
 }

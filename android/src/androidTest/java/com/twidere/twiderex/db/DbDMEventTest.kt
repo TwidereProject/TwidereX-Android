@@ -36,11 +36,12 @@ import com.twidere.services.twitter.model.PurpleMedia
 import com.twidere.services.twitter.model.User
 import com.twidere.twiderex.db.mapper.toDbDirectMessage
 import com.twidere.twiderex.db.mapper.toDbUser
-import com.twidere.twiderex.db.model.DbDMConversation
-import com.twidere.twiderex.db.model.DbDMConversation.Companion.saveToDb
 import com.twidere.twiderex.db.model.DbDMEventWithAttachments
 import com.twidere.twiderex.db.model.DbDMEventWithAttachments.Companion.saveToDb
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.room.db.RoomCacheDatabase
+import com.twidere.twiderex.room.db.model.DbDMConversation
+import com.twidere.twiderex.room.db.model.DbDMConversation.Companion.saveToDb
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.junit.After
@@ -54,7 +55,7 @@ import java.util.concurrent.Executors
 
 @RunWith(AndroidJUnit4::class)
 class DbDMEventTest {
-    private lateinit var cacheDatabase: CacheDatabase
+    private lateinit var cacheDatabase: RoomCacheDatabase
     private val user1AccountKey = MicroBlogKey.twitter("1")
     private val user2AccountKey = MicroBlogKey.twitter("2")
     private val conversationCount = 5
@@ -64,7 +65,7 @@ class DbDMEventTest {
 
     @Before
     fun setUp() {
-        cacheDatabase = Room.inMemoryDatabaseBuilder(ApplicationProvider.getApplicationContext(), CacheDatabase::class.java)
+        cacheDatabase = Room.inMemoryDatabaseBuilder(ApplicationProvider.getApplicationContext(), RoomCacheDatabase::class.java)
             .setTransactionExecutor(Executors.newSingleThreadExecutor()).build()
         runBlocking {
             for (i in 0 until conversationCount) {

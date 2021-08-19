@@ -24,10 +24,10 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.twidere.twiderex.db.dao.TrendDao
 import com.twidere.twiderex.db.dao.TrendHistoryDao
-import com.twidere.twiderex.db.model.DbTrend
 import com.twidere.twiderex.db.model.DbTrendHistory
-import com.twidere.twiderex.db.model.DbTrendWithHistory
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.room.db.model.DbTrend
+import com.twidere.twiderex.room.db.model.DbTrendWithHistory
 
 private val historiesMap = mutableMapOf<MicroBlogKey, MutableList<DbTrendHistory>>()
 class MockTrendDao : TrendDao {

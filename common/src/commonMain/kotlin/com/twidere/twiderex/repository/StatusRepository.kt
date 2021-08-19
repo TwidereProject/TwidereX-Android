@@ -63,8 +63,6 @@ class StatusRepository(
         database.withTransaction {
             database.statusDao().delete(statusKey)
             database.pagingTimelineDao().delete(statusKey)
-            // TODO hide by implementation of statusDao
-            // database.statusReferenceDao().delete(statusKey)
         }
     }
 

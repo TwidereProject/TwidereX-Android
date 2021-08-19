@@ -26,16 +26,16 @@ import androidx.paging.cachedIn
 import androidx.paging.flatMap
 import androidx.paging.map
 import com.twidere.services.twitter.TwitterService
-import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.paging.mediator.paging.pager
 import com.twidere.twiderex.paging.mediator.search.SearchMediaMediator
+import com.twidere.twiderex.room.db.RoomCacheDatabase
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.map
 
 class TwitterSearchMediaViewModel @AssistedInject constructor(
-    val database: CacheDatabase,
+    val database: RoomCacheDatabase,
     @Assisted private val account: AccountDetails,
     @Assisted keyword: String,
 ) : ViewModel() {
