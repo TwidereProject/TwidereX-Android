@@ -39,7 +39,7 @@ For 1.6.0, we're planning to build an experimatal desktop version, this is a big
 
 - Experimatal desktop version.
 - Mute and block support.
-- Optimizing video play for timelien.
+- Optimizing video play for timeline.
 - Bug fixes.
 - UI/UX tweaking.
 - Stability.
