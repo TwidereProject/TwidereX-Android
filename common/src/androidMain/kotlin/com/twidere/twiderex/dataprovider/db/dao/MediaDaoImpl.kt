@@ -22,11 +22,11 @@ package com.twidere.twiderex.dataprovider.db.dao
 
 import com.twidere.twiderex.db.dao.MediaDao
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.room.db.dao.RoomMediaDao
+import com.twidere.twiderex.room.db.RoomCacheDatabase
 import com.twidere.twiderex.room.db.transform.toUi
 
-internal class MediaDaoImpl(private val roomMediaDao: RoomMediaDao) : MediaDao {
-    override suspend fun findMediaByBelongToKey(belongToKey: MicroBlogKey) = roomMediaDao.findMediaByBelongToKey(
+internal class MediaDaoImpl(private val database: RoomCacheDatabase) : MediaDao {
+    override suspend fun findMediaByBelongToKey(belongToKey: MicroBlogKey) = database.mediaDao().findMediaByBelongToKey(
         belongToKey
     ).toUi()
 }

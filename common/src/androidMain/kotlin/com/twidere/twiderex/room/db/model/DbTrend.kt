@@ -26,6 +26,7 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import androidx.room.Relation
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.room.db.RoomCacheDatabase
 
 @Entity(
     tableName = "trends",
@@ -52,4 +53,17 @@ data class DbTrendWithHistory(
         entity = DbTrendHistory::class
     )
     val history: List<DbTrendHistory>,
-)
+) {
+    companion object {
+        suspend fun List<DbTrendWithHistory>.saveToDb(database: RoomCacheDatabase) {
+            map { it.trend }.let {
+                database.trendDao().insertAll(it)
+            }
+            map { it.history }
+                .flatten()
+                .let {
+                    database.trendHistoryDao().insertAll(it)
+                }
+        }
+    }
+}

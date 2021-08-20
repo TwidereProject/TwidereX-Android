@@ -23,22 +23,22 @@ package com.twidere.twiderex.dataprovider.db.dao
 import com.twidere.twiderex.db.dao.UserDao
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiUser
-import com.twidere.twiderex.room.db.dao.RoomUserDao
+import com.twidere.twiderex.room.db.RoomCacheDatabase
 import com.twidere.twiderex.room.db.transform.toDbUser
 import com.twidere.twiderex.room.db.transform.toUi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-internal class UserDaoImpl(private val roomUserDao: RoomUserDao) : UserDao {
+internal class UserDaoImpl(private val database: RoomCacheDatabase) : UserDao {
     override suspend fun findWithUserKey(userKey: MicroBlogKey): UiUser? {
-        return roomUserDao.findWithUserKey(userKey)?.toUi()
+        return database.userDao().findWithUserKey(userKey)?.toUi()
     }
 
     override suspend fun insertAll(listOf: List<UiUser>) {
-        roomUserDao.insertAll(listOf.map { it.toDbUser() })
+        database.userDao().insertAll(listOf.map { it.toDbUser() })
     }
 
     override fun findWithUserKeyFlow(userKey: MicroBlogKey): Flow<UiUser?> {
-        return roomUserDao.findWithUserKeyFlow(userKey).map { it?.toUi() }
+        return database.userDao().findWithUserKeyFlow(userKey).map { it?.toUi() }
     }
 }

@@ -49,8 +49,8 @@ fun UserTimelineType.pagingKey(accountKey: MicroBlogKey) = "user:$accountKey:$th
 suspend fun List<PagingTimeLineWithStatus>.saveToDb(
     database: CacheDatabase,
 ) {
-    this.map { it.status }.let {
-        database.statusDao().insertAll(it)
+    this.groupBy { it.timeline.accountKey }.forEach {
+        database.statusDao().insertAll(it.value.map { it.status }, it.key)
     }
     this.map { it.timeline }.let {
         database.pagingTimelineDao().insertAll(it)

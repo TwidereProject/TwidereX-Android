@@ -35,7 +35,7 @@ internal class ReactionRepositoryTest {
         val accountKey = MicroBlogKey.twitter("test")
         val repo = ReactionRepository(database)
         val status = mockIStatus().toUi(accountKey = accountKey)
-        database.statusDao().insertAll(listOf(status))
+        database.statusDao().insertAll(listOf(status), accountKey)
         assert(!status.liked)
         assert(!status.retweeted)
         repo.updateReaction(

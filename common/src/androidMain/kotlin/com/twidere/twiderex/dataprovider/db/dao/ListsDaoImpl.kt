@@ -24,39 +24,40 @@ import androidx.paging.PagingSource
 import com.twidere.twiderex.db.dao.ListsDao
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiList
-import com.twidere.twiderex.room.db.dao.RoomListsDao
+import com.twidere.twiderex.room.db.RoomCacheDatabase
+import com.twidere.twiderex.room.db.paging.getPagingSource
 import com.twidere.twiderex.room.db.transform.toDbList
 import com.twidere.twiderex.room.db.transform.toUi
 import kotlinx.coroutines.flow.map
 
-internal class ListsDaoImpl(private val roomListsDao: RoomListsDao) : ListsDao {
+internal class ListsDaoImpl(private val database: RoomCacheDatabase) : ListsDao {
     override fun getPagingSource(accountKey: MicroBlogKey): PagingSource<Int, UiList> {
-        TODO("Not yet implemented")
+        return database.listsDao().getPagingSource(cacheDatabase = database, accountKey = accountKey)
     }
 
     override fun findWithListKeyWithFlow(
         listKey: MicroBlogKey,
         accountKey: MicroBlogKey
-    ) = roomListsDao.findWithListKeyWithFlow(listKey, accountKey).map { it?.toUi() }
+    ) = database.listsDao().findWithListKeyWithFlow(listKey, accountKey).map { it?.toUi() }
 
     override suspend fun insertAll(listOf: List<UiList>) {
-        roomListsDao.insertAll(listOf.map { it.toDbList() })
+        database.listsDao().insertAll(listOf.map { it.toDbList() })
     }
 
     override suspend fun findWithListKey(
         listKey: MicroBlogKey,
         accountKey: MicroBlogKey
-    ) = roomListsDao.findWithListKey(listKey, accountKey)?.toUi()
+    ) = database.listsDao().findWithListKey(listKey, accountKey)?.toUi()
 
     override suspend fun update(listOf: List<UiList>) {
-        roomListsDao.update(listOf.map { it.toDbList() })
+        database.listsDao().update(listOf.map { it.toDbList() })
     }
 
     override suspend fun delete(listOf: List<UiList>) {
-        roomListsDao.delete(listOf.map { it.toDbList() })
+        database.listsDao().delete(listOf.map { it.toDbList() })
     }
 
     override suspend fun clearAll(accountKey: MicroBlogKey) {
-        roomListsDao.clearAll(accountKey)
+        database.listsDao().clearAll(accountKey)
     }
 }

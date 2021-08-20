@@ -18,24 +18,19 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.mock
+package com.twidere.twiderex.room.db.model.converter
 
-import com.twidere.services.microblog.MicroBlogService
-import com.twidere.twiderex.mock.db.MockRoomCacheDatabase
-import com.twidere.twiderex.mock.service.MockListsService
-import com.twidere.twiderex.mock.service.MockTrendService
-import com.twidere.twiderex.room.db.RoomCacheDatabase
+import androidx.room.TypeConverter
+import com.twidere.twiderex.model.enums.MastodonVisibility
 
-object MockCenter {
-    fun mockCacheDatabase(): RoomCacheDatabase {
-        return MockRoomCacheDatabase()
+class MastodonVisibilityConverter {
+    @TypeConverter
+    fun fromString(target: MastodonVisibility?): String? {
+        return target?.name
     }
 
-    fun mockListsService(): MicroBlogService {
-        return MockListsService()
-    }
-
-    fun mockTrendService(): MicroBlogService {
-        return MockTrendService()
+    @TypeConverter
+    fun fromMastodonVisibility(string: String?): MastodonVisibility? {
+        return string?.let { MastodonVisibility.valueOf(it) }
     }
 }

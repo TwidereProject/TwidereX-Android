@@ -20,7 +20,6 @@
  */
 package com.twidere.twiderex.room.db.dao
 
-import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -49,11 +48,13 @@ interface RoomDirectMessageEventDao {
     suspend fun findWithMessageKey(accountKey: MicroBlogKey, conversationKey: MicroBlogKey, messageKey: MicroBlogKey): DbDMEventWithAttachments?
 
     @Transaction
-    @Query("SELECT * FROM dm_event WHERE accountKey == :accountKey AND conversationKey == :conversationKey ORDER BY sortId DESC")
-    fun getPagingSource(
+    @Query("SELECT * FROM dm_event WHERE accountKey == :accountKey AND conversationKey == :conversationKey ORDER BY sortId DESC LIMIT :limit OFFSET :offset")
+    fun getPagingList(
         accountKey: MicroBlogKey,
-        conversationKey: MicroBlogKey
-    ): PagingSource<Int, DbDMEventWithAttachments>
+        conversationKey: MicroBlogKey,
+        limit: Int,
+        offset: Int
+    ): List<DbDMEventWithAttachments>
 
     @Delete
     suspend fun delete(data: DbDMEvent)

@@ -24,18 +24,18 @@ import com.twidere.twiderex.db.dao.NotificationCursorDao
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.NotificationCursorType
 import com.twidere.twiderex.model.paging.NotificationCursor
-import com.twidere.twiderex.room.db.dao.RoomNotificationCursorDao
+import com.twidere.twiderex.room.db.RoomCacheDatabase
 import com.twidere.twiderex.room.db.transform.toDb
 import com.twidere.twiderex.room.db.transform.toDbCursor
 import com.twidere.twiderex.room.db.transform.toUi
 
-internal class NotificationCursorDaoImpl(private val roomNotificationCursorDao: RoomNotificationCursorDao) : NotificationCursorDao {
+internal class NotificationCursorDaoImpl(private val database: RoomCacheDatabase) : NotificationCursorDao {
     override suspend fun find(
         accountKey: MicroBlogKey,
         type: NotificationCursorType
-    ) = roomNotificationCursorDao.find(accountKey, type.toDb())?.toUi()
+    ) = database.notificationCursorDao().find(accountKey, type.toDb())?.toUi()
 
     override suspend fun add(notificationCursor: NotificationCursor) {
-        roomNotificationCursorDao.add(notificationCursor.toDbCursor())
+        database.notificationCursorDao().add(notificationCursor.toDbCursor())
     }
 }

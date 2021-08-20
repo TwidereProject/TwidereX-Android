@@ -18,12 +18,19 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.mock.db
+package com.twidere.twiderex.room.db.model.converter
 
-import com.twidere.twiderex.db.dao.UrlEntityDao
-import com.twidere.twiderex.db.model.DbUrlEntity
+import androidx.room.TypeConverter
+import com.twidere.twiderex.model.enums.TwitterReplySettings
 
-class MockUrlEntityDao : UrlEntityDao {
-    override suspend fun insertAll(media: List<DbUrlEntity>) {
+class TwitterReplySettingsConverter {
+    @TypeConverter
+    fun fromString(target: TwitterReplySettings?): String? {
+        return target?.name
+    }
+
+    @TypeConverter
+    fun fromTwitterReplySettings(string: String?): TwitterReplySettings? {
+        return string?.let { TwitterReplySettings.valueOf(it) }
     }
 }

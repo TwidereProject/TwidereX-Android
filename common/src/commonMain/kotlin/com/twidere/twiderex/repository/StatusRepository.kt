@@ -55,7 +55,7 @@ class StatusRepository(
 
     suspend fun updateStatus(statusKey: MicroBlogKey, accountKey: MicroBlogKey, action: (UiStatus) -> UiStatus) {
         database.statusDao().findWithStatusKey(statusKey, accountKey = accountKey)?.let {
-            database.statusDao().insertAll(listOf(action.invoke(it)))
+            database.statusDao().insertAll(listOf(action.invoke(it)), accountKey)
         }
     }
 
@@ -74,7 +74,8 @@ class StatusRepository(
         database.statusDao().insertAll(
             listOf(
                 lookupService.lookupStatus(id).toUi(accountKey = accountKey)
-            )
+            ),
+            accountKey = accountKey
         )
     }
 

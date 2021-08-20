@@ -50,12 +50,14 @@ import com.twidere.twiderex.room.db.model.DbTrendHistory
 import com.twidere.twiderex.room.db.model.DbUrlEntity
 import com.twidere.twiderex.room.db.model.DbUser
 import com.twidere.twiderex.room.db.model.converter.ExtraConverter
+import com.twidere.twiderex.room.db.model.converter.MastodonVisibilityConverter
 import com.twidere.twiderex.room.db.model.converter.MediaTypeConverter
 import com.twidere.twiderex.room.db.model.converter.MicroBlogKeyConverter
 import com.twidere.twiderex.room.db.model.converter.NotificationCursorTypeConverter
 import com.twidere.twiderex.room.db.model.converter.NotificationTypeConverter
 import com.twidere.twiderex.room.db.model.converter.PlatformTypeConverter
 import com.twidere.twiderex.room.db.model.converter.StringListConverter
+import com.twidere.twiderex.room.db.model.converter.TwitterReplySettingsConverter
 import com.twidere.twiderex.room.db.model.converter.UserTimelineTypeConverter
 
 @Database(
@@ -74,7 +76,7 @@ import com.twidere.twiderex.room.db.model.converter.UserTimelineTypeConverter
         DbDMConversation::class,
         DbDMEvent::class
     ],
-    version = 20,
+    version = 21,
 )
 @TypeConverters(
     MicroBlogKeyConverter::class,
@@ -85,6 +87,8 @@ import com.twidere.twiderex.room.db.model.converter.UserTimelineTypeConverter
     NotificationTypeConverter::class,
     ExtraConverter::class,
     NotificationCursorTypeConverter::class,
+    TwitterReplySettingsConverter::class,
+    MastodonVisibilityConverter::class
 )
 abstract class RoomCacheDatabase : RoomDatabase() {
     abstract fun statusDao(): RoomStatusDao

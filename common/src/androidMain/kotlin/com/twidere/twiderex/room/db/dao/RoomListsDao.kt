@@ -20,7 +20,6 @@
  */
 package com.twidere.twiderex.room.db.dao
 
-import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -50,10 +49,12 @@ interface RoomListsDao {
     suspend fun findWithAccountKey(accountKey: MicroBlogKey): List<DbList>?
 
     @Transaction
-    @Query("SELECT * FROM lists WHERE accountKey == :accountKey")
-    fun getPagingSource(
+    @Query("SELECT * FROM lists WHERE accountKey == :accountKey LIMIT :limit OFFSET :offset")
+    fun getPagingList(
         accountKey: MicroBlogKey,
-    ): PagingSource<Int, DbList>
+        limit: Int,
+        offset: Int
+    ): List<DbList>
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
     suspend fun update(lists: List<DbList>)

@@ -45,7 +45,7 @@ class StatusRepositoryTest {
             database = database,
             nitterService = null
         ).let {
-            database.statusDao().insertAll(listOf(status))
+            database.statusDao().insertAll(listOf(status), accountKey)
             it.updateStatus(
                 statusKey = status.statusKey,
                 accountKey = accountKey,

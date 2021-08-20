@@ -61,12 +61,7 @@ kotlin {
                 kapt("androidx.room:room-compiler:${Versions.room}")
             }
         }
-        val androidTest by getting {
-            dependencies {
-                implementation("androidx.room:room-testing:${Versions.room}")
-            }
-        }
-
+        val androidTest by getting
         val desktopMain by getting
         val desktopTest by getting
     }
@@ -82,5 +77,11 @@ android {
     defaultConfig {
         minSdk = AndroidSdk.min
         targetSdk = AndroidSdk.target
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                argument("room.schemaLocation", "$projectDir/schemas")
+            }
+        }
     }
 }

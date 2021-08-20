@@ -20,7 +20,6 @@
  */
 package com.twidere.twiderex.room.db.dao
 
-import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -31,14 +30,12 @@ import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.room.db.model.DbDMConversation
 import com.twidere.twiderex.room.db.model.DbDirectMessageConversationWithMessage
 import kotlinx.coroutines.flow.Flow
-import org.jetbrains.annotations.TestOnly
 
 @Dao
 interface RoomDirectMessageConversationDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(conversations: List<DbDMConversation>)
 
-    @TestOnly
     @Transaction
     @Query(
         """
@@ -50,7 +47,6 @@ interface RoomDirectMessageConversationDao {
     )
     suspend fun find(accountKey: MicroBlogKey): List<DbDirectMessageConversationWithMessage>
 
-    // use join to found latest msg under each conversation, then use relation to found the conversation
     @Transaction
     @Query(
         """
@@ -58,11 +54,14 @@ interface RoomDirectMessageConversationDao {
             JOIN (SELECT conversationKey, max(sortId) as sortId FROM dm_event WHERE accountKey == :accountKey GROUP BY conversationKey) AS table2
             ON table1.conversationKey = table2.conversationKey AND table1.sortId = table2.sortId 
             WHERE table1.accountKey == :accountKey ORDER BY table1.sortId DESC
+            LIMIT :limit OFFSET :offset
         """
     )
-    fun getPagingSource(
+    fun getPagingList(
         accountKey: MicroBlogKey,
-    ): PagingSource<Int, DbDirectMessageConversationWithMessage>
+        limit: Int,
+        offset: Int
+    ): List<DbDirectMessageConversationWithMessage>
 
     @Query("SELECT * FROM dm_conversation WHERE accountKey == :accountKey AND conversationKey == :conversationKey")
     fun findWithConversationKeyFlow(accountKey: MicroBlogKey, conversationKey: MicroBlogKey): Flow<DbDMConversation?>

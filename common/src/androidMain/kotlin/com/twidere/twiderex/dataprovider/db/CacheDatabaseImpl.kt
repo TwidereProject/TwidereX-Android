@@ -37,25 +37,25 @@ internal class CacheDatabaseImpl(private val roomCacheDatabase: RoomCacheDatabas
     private val statusDao = StatusDaoImpl(roomCacheDatabase)
     override fun statusDao() = statusDao
 
-    private val mediaDao = MediaDaoImpl(roomCacheDatabase.mediaDao())
+    private val mediaDao = MediaDaoImpl(roomCacheDatabase)
     override fun mediaDao() = mediaDao
 
-    private val userDao = UserDaoImpl(roomCacheDatabase.userDao())
+    private val userDao = UserDaoImpl(roomCacheDatabase)
     override fun userDao() = userDao
 
-    private val pagingTimelineDao = PagingTimelineDaoImpl(roomCacheDatabase.pagingTimelineDao())
+    private val pagingTimelineDao = PagingTimelineDaoImpl(roomCacheDatabase)
     override fun pagingTimelineDao() = pagingTimelineDao
 
-    private val listsDao = ListsDaoImpl(roomCacheDatabase.listsDao())
+    private val listsDao = ListsDaoImpl(roomCacheDatabase)
     override fun listsDao() = listsDao
 
-    private val notificationCursorDao = NotificationCursorDaoImpl(roomCacheDatabase.notificationCursorDao())
+    private val notificationCursorDao = NotificationCursorDaoImpl(roomCacheDatabase)
     override fun notificationCursorDao() = notificationCursorDao
 
-    private val trendDao = TrendDaoImpl(roomCacheDatabase.trendDao(), roomCacheDatabase.trendHistoryDao())
+    private val trendDao = TrendDaoImpl(roomCacheDatabase)
     override fun trendDao() = trendDao
 
-    private val dmConversationDao = DirectMessageConversationDaoImpl(roomCacheDatabase.directMessageConversationDao())
+    private val dmConversationDao = DirectMessageConversationDaoImpl(roomCacheDatabase)
     override fun directMessageConversationDao() = dmConversationDao
 
     private val dmEventDao = DirectMessageEventDaoImpl(roomCacheDatabase)

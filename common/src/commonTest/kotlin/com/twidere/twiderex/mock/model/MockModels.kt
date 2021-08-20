@@ -51,7 +51,7 @@ import java.util.Date
 import java.util.UUID
 
 @TestOnly
-internal fun mockUiMedia(url: String = "", belongToKey: MicroBlogKey = MicroBlogKey.Empty) = UiMedia(
+fun mockUiMedia(url: String = "", belongToKey: MicroBlogKey = MicroBlogKey.Empty) = UiMedia(
     url = url,
     belongToKey = belongToKey,
     mediaUrl = url,
@@ -65,20 +65,20 @@ internal fun mockUiMedia(url: String = "", belongToKey: MicroBlogKey = MicroBlog
 )
 
 @TestOnly
-internal fun mockUiSearch(content: String = "", accountKey: MicroBlogKey = MicroBlogKey.Empty, saved: Boolean = false) = UiSearch(
+fun mockUiSearch(content: String = "", accountKey: MicroBlogKey = MicroBlogKey.Empty, saved: Boolean = false) = UiSearch(
     content = content,
     lastActive = System.currentTimeMillis(),
     saved = saved,
     accountKey = accountKey
 )
 
-internal fun <T> List<T>.toIPaging(nextPaging: String? = UUID.randomUUID().toString()) = TwitterPaging(
+fun <T> List<T>.toIPaging(nextPaging: String? = UUID.randomUUID().toString()) = TwitterPaging(
     data = this,
     nextPage = nextPaging
 )
 
 @TestOnly
-internal fun mockIUser(id: String = UUID.randomUUID().toString(), name: String = ""): IUser {
+fun mockIUser(id: String = UUID.randomUUID().toString(), name: String = ""): IUser {
     return UserV2(
         id = id,
         name = name
@@ -86,7 +86,7 @@ internal fun mockIUser(id: String = UUID.randomUUID().toString(), name: String =
 }
 
 @TestOnly
-internal fun mockITrend(): ITrend {
+fun mockITrend(): ITrend {
     return Trend(
         name = "trend timestamp:${System.currentTimeMillis()}",
         url = "https://trend",
@@ -102,7 +102,7 @@ internal fun mockITrend(): ITrend {
 }
 
 @TestOnly
-internal fun mockIListModel(
+fun mockIListModel(
     name: String = "",
     mode: String? = null,
     description: String? = "",
@@ -119,7 +119,7 @@ internal fun mockIListModel(
 }
 
 @TestOnly
-internal fun mockIStatus(
+fun mockIStatus(
     id: String = UUID.randomUUID().toString(),
     hasMedia: Boolean = false,
     authorId: String = UUID.randomUUID().toString()
@@ -139,7 +139,7 @@ internal fun mockIStatus(
 }
 
 @TestOnly
-internal fun mockINotification(id: String = UUID.randomUUID().toString()): INotification {
+fun mockINotification(id: String = UUID.randomUUID().toString()): INotification {
     val account = Account(
         id = UUID.randomUUID().toString(),
         username = "",
@@ -159,7 +159,7 @@ internal fun mockINotification(id: String = UUID.randomUUID().toString()): INoti
 }
 
 @TestOnly
-internal fun mockIDirectMessage(id: String = UUID.randomUUID().toString(), accountId: String, otherUserID: String = UUID.randomUUID().toString(), inCome: Boolean = true): IDirectMessage {
+fun mockIDirectMessage(id: String = UUID.randomUUID().toString(), accountId: String, otherUserID: String = UUID.randomUUID().toString(), inCome: Boolean = true): IDirectMessage {
     return DirectMessageEvent(
         createdTimestamp = System.currentTimeMillis().toString(),
         id = id,
