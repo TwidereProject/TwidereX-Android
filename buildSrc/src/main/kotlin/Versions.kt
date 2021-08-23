@@ -12,7 +12,7 @@ object Versions {
         val java = JavaVersion.VERSION_11
     }
 
-    const val ksp = "${Kotlin.lang}-1.0.0-beta06"
+    const val ksp = "${Kotlin.lang}-1.0.0-beta07"
     const val agp = "7.0.1"
     const val spotless = "5.14.2"
     const val ktlint = "0.41.0"
@@ -36,9 +36,9 @@ object Versions {
     const val swiper = "0.6.0"
     const val nestedScrollView = "0.7.0"
     const val startup = "1.1.0"
-    const val coil = "1.3.0"
-    const val accompanist = "0.16.1"
-    const val androidx_exifinterface = "1.3.2"
+    const val coil = "1.3.2"
+    const val accompanist = "0.17.0"
+    const val androidx_exifinterface = "1.3.3"
     const val exoplayer = "2.15.0"
     const val browser = "1.3.0"
     const val protobuf = "3.17.3"
