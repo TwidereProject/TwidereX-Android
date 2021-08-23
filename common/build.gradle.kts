@@ -61,7 +61,17 @@ kotlin {
                 kapt("androidx.room:room-compiler:${Versions.room}")
             }
         }
-        val androidTest by getting
+        val androidAndroidTest by getting {
+            dependencies {
+                implementation(kotlin("test-junit"))
+                implementation("androidx.arch.core:core-testing:2.1.0")
+                implementation("androidx.test:core:${Versions.androidx_test}")
+                implementation("androidx.test:runner:${Versions.androidx_test}")
+                implementation("androidx.test.ext:junit-ktx:${Versions.extJUnitVersion}")
+                implementation("androidx.test.espresso:espresso-core:${Versions.espressoVersion}")
+                implementation("androidx.room:room-testing:${Versions.room}")
+            }
+        }
         val desktopMain by getting
         val desktopTest by getting
     }
@@ -74,14 +84,31 @@ fun org.jetbrains.kotlin.gradle.plugin.KotlinDependencyHandler.kapt(dependencyNo
 android {
     compileSdk = AndroidSdk.compile
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
+    sourceSets["androidTest"].assets.srcDirs("$projectDir/schemas")
     defaultConfig {
         minSdk = AndroidSdk.min
         targetSdk = AndroidSdk.target
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         javaCompileOptions {
             annotationProcessorOptions {
                 argument("room.schemaLocation", "$projectDir/schemas")
             }
+        }
+    }
+
+    packagingOptions {
+        resources {
+            excludes.addAll(
+                listOf(
+                    "META-INF/AL2.0",
+                    "META-INF/LGPL2.1",
+                    "DebugProbesKt.bin",
+                    "win32-x86-64/attach_hotspot_windows.dll",
+                    "win32-x86/attach_hotspot_windows.dll",
+                    "META-INF/licenses/ASM"
+                )
+            )
         }
     }
 }
