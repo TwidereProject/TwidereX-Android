@@ -18,18 +18,17 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.viewmodel
+package com.twidere.twiderex.ext
 
-import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.repository.MediaRepository
-import kotlinx.coroutines.flow.flow
-import moe.tlaster.precompose.viewmodel.ViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
 
-class PureMediaViewModel(
-    private val mediaRepository: MediaRepository,
-    private val belongKey: MicroBlogKey, // statusKey, conversationKey
-) : ViewModel() {
-    val source = flow {
-        emit(mediaRepository.findMediaByBelongToKey(belongKey))
-    }
+fun <T> Flow<T>.asStateIn(
+    scope: CoroutineScope,
+    initialValue: T
+): StateFlow<T> {
+    return stateIn(scope, SharingStarted.Lazily, initialValue)
 }

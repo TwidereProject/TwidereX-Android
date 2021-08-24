@@ -34,11 +34,6 @@ class DraftViewModel @AssistedInject constructor(
     private val notificationManagerCompat: NotificationManagerCompat,
 ) : ViewModel() {
 
-    @dagger.assisted.AssistedFactory
-    interface AssistedFactory {
-        fun create(): DraftViewModel
-    }
-
     fun delete(it: DbDraft) {
         workManager.beginWith(RemoveDraftWorker.create(it._id)).enqueue()
         notificationManagerCompat.cancel(it._id.hashCode())

@@ -23,45 +23,45 @@ package com.twidere.twiderex.viewmodel.user
 import com.twidere.services.microblog.LookupService
 import com.twidere.services.microblog.RelationshipService
 import com.twidere.services.microblog.model.IRelationship
-import com.twidere.twiderex.model.AccountDetails
+import com.twidere.twiderex.ext.asStateIn
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.notification.InAppNotification
+import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.UserRepository
 import com.twidere.twiderex.utils.notify
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.lastOrNull
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class UserViewModel @AssistedInject constructor(
     private val repository: UserRepository,
+    private val accountRepository: AccountRepository,
     private val inAppNotification: InAppNotification,
-    @Assisted private val account: AccountDetails,
     @Assisted private val userKey: MicroBlogKey,
 ) : ViewModel() {
 
-    @dagger.assisted.AssistedFactory
-    interface AssistedFactory {
-        fun create(
-            account: AccountDetails,
-            initialUserKey: MicroBlogKey?,
-        ): UserViewModel
-    }
-
-    private val relationshipService by lazy {
-        account.service as RelationshipService
+    private val account by lazy {
+        accountRepository.activeAccount.asStateIn(viewModelScope, null)
     }
 
     val refreshing = MutableStateFlow(false)
     val loadingRelationship = MutableStateFlow(false)
     val user = repository.getUserFlow(userKey)
     val relationship = MutableStateFlow<IRelationship?>(null)
-    val isMe = userKey == account.accountKey
+    val isMe by lazy {
+        account.map {
+            userKey == it?.accountKey
+        }.asStateIn(viewModelScope, false)
+    }
 
     fun refresh() = viewModelScope.launch {
         refreshing.value = true
+        val account = account.lastOrNull() ?: return@launch
         runCatching {
             repository.lookupUserById(
                 userKey.id,
@@ -76,6 +76,8 @@ class UserViewModel @AssistedInject constructor(
 
     fun follow() = viewModelScope.launch {
         loadingRelationship.value = true
+        val account = account.lastOrNull() ?: return@launch
+        val relationshipService = account.service as? RelationshipService ?: return@launch
         runCatching {
             relationshipService.follow(userKey.id)
         }.onSuccess {
@@ -88,6 +90,8 @@ class UserViewModel @AssistedInject constructor(
 
     fun unfollow() = viewModelScope.launch {
         loadingRelationship.value = true
+        val account = account.lastOrNull() ?: return@launch
+        val relationshipService = account.service as? RelationshipService ?: return@launch
         runCatching {
             relationshipService.unfollow(userKey.id)
         }.onSuccess {
@@ -100,6 +104,8 @@ class UserViewModel @AssistedInject constructor(
 
     private fun loadRelationShip() = viewModelScope.launch {
         loadingRelationship.value = true
+        val account = account.lastOrNull() ?: return@launch
+        val relationshipService = account.service as? RelationshipService ?: return@launch
         try {
             relationshipService.showRelationship(userKey.id).let {
                 relationship.value = it

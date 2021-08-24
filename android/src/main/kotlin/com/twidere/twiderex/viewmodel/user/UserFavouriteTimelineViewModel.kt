@@ -21,29 +21,31 @@
 package com.twidere.twiderex.viewmodel.user
 
 import androidx.paging.cachedIn
-import com.twidere.twiderex.model.AccountDetails
+import com.twidere.twiderex.ext.asStateIn
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.TimelineRepository
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedInject
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flatMapLatest
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
-class UserFavouriteTimelineViewModel @AssistedInject constructor(
+class UserFavouriteTimelineViewModel(
     private val repository: TimelineRepository,
-    @Assisted account: AccountDetails,
-    @Assisted userKey: MicroBlogKey,
+    private val accountRepository: AccountRepository,
+    private val userKey: MicroBlogKey,
 ) : ViewModel() {
-
-    @dagger.assisted.AssistedFactory
-    interface AssistedFactory {
-        fun create(
-            account: AccountDetails,
-            userKey: MicroBlogKey,
-        ): UserFavouriteTimelineViewModel
+    private val account by lazy {
+        accountRepository.activeAccount.asStateIn(viewModelScope, null)
     }
 
     val source by lazy {
-        repository.favouriteTimeline(userKey = userKey, account = account).cachedIn(viewModelScope)
+        account.flatMapLatest {
+            if (it != null) {
+                repository.favouriteTimeline(userKey = userKey, account = it)
+            } else {
+                emptyFlow()
+            }
+        }.cachedIn(viewModelScope)
     }
 }

@@ -21,30 +21,41 @@
 package com.twidere.twiderex.viewmodel
 
 import androidx.paging.cachedIn
-import com.twidere.twiderex.model.AccountDetails
+import com.twidere.twiderex.ext.asStateIn
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.StatusRepository
-import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flatMapLatest
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class StatusViewModel @AssistedInject constructor(
     private val statusRepository: StatusRepository,
-    @Assisted private val account: AccountDetails,
-    @Assisted private val statusKey: MicroBlogKey,
+    private val accountRepository: AccountRepository,
+    private val statusKey: MicroBlogKey,
 ) : ViewModel() {
-    @dagger.assisted.AssistedFactory
-    interface AssistedFactory {
-        fun create(account: AccountDetails, statusKey: MicroBlogKey): StatusViewModel
+    private val account by lazy {
+        accountRepository.activeAccount.asStateIn(viewModelScope, null)
     }
-
     val status by lazy {
-        statusRepository.loadStatus(statusKey = statusKey, accountKey = account.accountKey)
+        account.flatMapLatest {
+            if (it != null) {
+                statusRepository.loadStatus(statusKey = statusKey, accountKey = it.accountKey)
+            } else {
+                emptyFlow()
+            }
+        }.asStateIn(viewModelScope, null)
     }
 
     val source by lazy {
-        statusRepository.conversation(statusKey = statusKey, account = account)
-            .cachedIn(viewModelScope)
+        account.flatMapLatest {
+            if (it != null) {
+                statusRepository.conversation(statusKey = statusKey, account = it)
+            } else {
+                emptyFlow()
+            }
+        }.cachedIn(viewModelScope)
     }
 }

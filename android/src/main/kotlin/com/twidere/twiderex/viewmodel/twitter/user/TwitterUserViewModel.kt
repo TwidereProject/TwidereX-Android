@@ -21,46 +21,46 @@
 package com.twidere.twiderex.viewmodel.twitter.user
 
 import com.twidere.services.microblog.LookupService
-import com.twidere.twiderex.model.AccountDetails
+import com.twidere.twiderex.ext.asStateIn
 import com.twidere.twiderex.notification.InAppNotification
+import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.UserRepository
 import com.twidere.twiderex.utils.notify
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import moe.tlaster.precompose.viewmodel.ViewModel
+import moe.tlaster.precompose.viewmodel.viewModelScope
 
-class TwitterUserViewModel @AssistedInject constructor(
+class TwitterUserViewModel(
     private val repository: UserRepository,
     private val inAppNotification: InAppNotification,
-    @Assisted private val account: AccountDetails,
-    @Assisted private val screenName: String,
+    private val accountRepository: AccountRepository,
+    private val screenName: String,
 ) : ViewModel() {
 
-    @dagger.assisted.AssistedFactory
-    interface AssistedFactory {
-        fun create(
-            account: AccountDetails,
-            screenName: String?,
-        ): TwitterUserViewModel
+    private val account by lazy {
+        accountRepository.activeAccount.asStateIn(viewModelScope, null)
     }
 
     val error = MutableStateFlow<Throwable?>(null)
 
-    val user = flow {
-        runCatching {
-            repository.lookupUserByName(
-                screenName,
-                accountKey = account.accountKey,
-                lookupService = account.service as LookupService,
-            )
-        }.onSuccess {
-            emit(it)
-        }.onFailure {
-            it.notify(inAppNotification)
-            emit(null)
-            error.value = it
+    val user by lazy {
+        account.map {
+            if (it != null) {
+                try {
+                    repository.lookupUserByName(
+                        screenName,
+                        accountKey = it.accountKey,
+                        lookupService = it.service as LookupService,
+                    )
+                } catch (e: Throwable) {
+                    e.notify(inAppNotification)
+                    error.value = e
+                    null
+                }
+            } else {
+                null
+            }
         }
     }
 }

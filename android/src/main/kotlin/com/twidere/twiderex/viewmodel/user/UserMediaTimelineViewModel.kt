@@ -27,58 +27,62 @@ import androidx.paging.flatMap
 import androidx.paging.map
 import com.twidere.services.microblog.TimelineService
 import com.twidere.twiderex.db.CacheDatabase
-import com.twidere.twiderex.model.AccountDetails
+import com.twidere.twiderex.ext.asStateIn
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.transform.toUi
 import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.model.ui.UiStatus
-import com.twidere.twiderex.paging.mediator.paging.PagingMediator
 import com.twidere.twiderex.paging.mediator.paging.pager
 import com.twidere.twiderex.paging.mediator.user.UserMediaMediator
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedInject
+import com.twidere.twiderex.repository.AccountRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
-class UserMediaTimelineViewModel @AssistedInject constructor(
-    database: CacheDatabase,
-    @Assisted account: AccountDetails,
-    @Assisted userKey: MicroBlogKey,
+class UserMediaTimelineViewModel(
+    private val database: CacheDatabase,
+    private val repository: AccountRepository,
+    private val userKey: MicroBlogKey,
 ) : ViewModel() {
-
-    @dagger.assisted.AssistedFactory
-    interface AssistedFactory {
-        fun create(
-            account: AccountDetails,
-            userKey: MicroBlogKey,
-        ): UserMediaTimelineViewModel
+    private val account by lazy {
+        repository.activeAccount.asStateIn(viewModelScope, null)
     }
 
     val source: Flow<PagingData<Pair<UiMedia, UiStatus>>> by lazy {
-        pagingMediator.pager(
-            config = PagingConfig(
-                pageSize = 200,
-                prefetchDistance = 4,
-                enablePlaceholders = false,
-            )
-        ).flow.map { pagingData ->
-            pagingData.map {
-                it.toUi(pagingMediator.accountKey)
-            }
-        }.cachedIn(viewModelScope).map {
-            it.flatMap {
-                it.media.map { media -> media to it }
-            }
+        pagingMediator.flatMapLatest {
+            it?.let { pagingMediator ->
+                pagingMediator.pager(
+                    config = PagingConfig(
+                        pageSize = 200,
+                        prefetchDistance = 4,
+                        enablePlaceholders = false,
+                    )
+                ).flow.map { pagingData ->
+                    pagingData.map {
+                        it.toUi(pagingMediator.accountKey)
+                    }
+                }.cachedIn(viewModelScope).map {
+                    it.flatMap {
+                        it.media.map { media -> media to it }
+                    }
+                }
+            } ?: emptyFlow()
         }
     }
 
-    val pagingMediator: PagingMediator =
-        UserMediaMediator(
-            userKey = userKey,
-            database = database,
-            accountKey = account.accountKey,
-            service = account.service as TimelineService
-        )
+    val pagingMediator by lazy {
+        account.map {
+            it?.let {
+                UserMediaMediator(
+                    userKey = userKey,
+                    database = database,
+                    accountKey = it.accountKey,
+                    service = it.service as TimelineService
+                )
+            }
+        }.asStateIn(viewModelScope, null)
+    }
 }

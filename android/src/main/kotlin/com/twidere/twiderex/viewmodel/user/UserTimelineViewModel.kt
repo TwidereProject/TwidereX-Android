@@ -21,35 +21,43 @@
 package com.twidere.twiderex.viewmodel.user
 
 import androidx.paging.cachedIn
-import com.twidere.twiderex.model.AccountDetails
+import com.twidere.twiderex.ext.asStateIn
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.TimelineRepository
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedInject
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flattenMerge
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
-class UserTimelineViewModel @AssistedInject constructor(
+class UserTimelineViewModel(
     private val repository: TimelineRepository,
-    @Assisted account: AccountDetails,
-    @Assisted userKey: MicroBlogKey,
-    @Assisted exclude_replies: Boolean,
+    private val accountRepository: AccountRepository,
+    userKey: MicroBlogKey,
 ) : ViewModel() {
+    private val _excludeReplies = MutableStateFlow(false)
+    val excludeReplies = _excludeReplies.asStateIn(viewModelScope, false)
+    private val account by lazy {
+        accountRepository.activeAccount.asStateIn(viewModelScope, null)
+    }
 
-    @dagger.assisted.AssistedFactory
-    interface AssistedFactory {
-        fun create(
-            account: AccountDetails,
-            userKey: MicroBlogKey,
-            exclude_replies: Boolean
-        ): UserTimelineViewModel
+    fun setExcludeReplies(value: Boolean) {
+        _excludeReplies.value = value
     }
 
     val source by lazy {
-        repository.userTimeline(
-            userKey = userKey,
-            account = account,
-            exclude_replies = exclude_replies,
-        ).cachedIn(viewModelScope)
+        combine(account, _excludeReplies) { account, excludeReplies ->
+            if (account != null) {
+                repository.userTimeline(
+                    userKey = userKey,
+                    account = account,
+                    exclude_replies = excludeReplies,
+                )
+            } else {
+                emptyFlow()
+            }
+        }.flattenMerge().cachedIn(viewModelScope)
     }
 }
