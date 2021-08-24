@@ -32,12 +32,16 @@ import com.twidere.services.microblog.model.INotification
 import com.twidere.services.microblog.model.IStatus
 import com.twidere.services.microblog.model.ITrend
 import com.twidere.services.microblog.model.IUser
+import com.twidere.services.twitter.model.Attachment
 import com.twidere.services.twitter.model.AttachmentsV2
 import com.twidere.services.twitter.model.DirectMessageEvent
+import com.twidere.services.twitter.model.Entities
+import com.twidere.services.twitter.model.EntitiesURL
 import com.twidere.services.twitter.model.MediaV2
 import com.twidere.services.twitter.model.MessageCreate
 import com.twidere.services.twitter.model.MessageData
 import com.twidere.services.twitter.model.MessageTarget
+import com.twidere.services.twitter.model.PurpleMedia
 import com.twidere.services.twitter.model.StatusV2
 import com.twidere.services.twitter.model.TwitterList
 import com.twidere.services.twitter.model.TwitterPaging
@@ -125,7 +129,7 @@ fun mockIListModel(
     mode: String? = null,
     description: String? = "",
 ): IListModel {
-    val id = System.currentTimeMillis()
+    val id = UUID.randomUUID().hashCode().toLong()
     return TwitterList(
         id = id,
         idStr = id.toString(),
@@ -183,7 +187,22 @@ fun mockIDirectMessage(id: String = UUID.randomUUID().toString(), accountId: Str
         id = id,
         type = "message_create",
         messageCreate = MessageCreate(
-            messageData = MessageData(text = "mock message"),
+            messageData = MessageData(
+                text = "mock message",
+                entities = Entities(
+                    urls = listOf(
+                        EntitiesURL(
+                            display_url = "http://test.com",
+                            url = "http://test.com",
+                            expanded_url = "http://test.com",
+                        )
+                    )
+                ),
+                attachment = Attachment(
+                    type = "media",
+                    media = PurpleMedia()
+                )
+            ),
             senderId = if (inCome) otherUserID else accountId,
             target = MessageTarget(
                 recipientId = if (inCome) accountId else otherUserID

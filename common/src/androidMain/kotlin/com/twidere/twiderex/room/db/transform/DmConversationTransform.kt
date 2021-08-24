@@ -70,7 +70,7 @@ internal fun DbDMEventWithAttachments.toUi() = UiDMEvent(
     sender = sender.toUi()
 )
 
-internal fun UiDMConversation.toDbDMConversation() = DbDMConversation(
+internal fun UiDMConversation.toDbDMConversation(dbId: String = UUID.randomUUID().toString()) = DbDMConversation(
     accountKey = accountKey,
     conversationId = conversationId,
     conversationKey = conversationKey,
@@ -82,12 +82,17 @@ internal fun UiDMConversation.toDbDMConversation() = DbDMConversation(
         UiDMConversation.Type.GROUP -> DbDMConversation.Type.GROUP
     },
     recipientKey = recipientKey,
-    _id = UUID.randomUUID().toString()
+    _id = dbId
 )
 
-internal fun UiDMEvent.toDbMEventWithAttachments() = DbDMEventWithAttachments(
+internal fun UiDMEvent.toDbMEventWithAttachments(
+    dbId: String = UUID.randomUUID().toString(),
+    dbMediaId: String = UUID.randomUUID().toString(),
+    dbUrlId: String = UUID.randomUUID().toString(),
+    dbSenderId: String = UUID.randomUUID().toString(),
+) = DbDMEventWithAttachments(
     message = DbDMEvent(
-        _id = UUID.randomUUID().toString(),
+        _id = dbId,
         accountKey = accountKey,
         sortId = sortId,
         conversationKey = conversationKey,
@@ -105,7 +110,7 @@ internal fun UiDMEvent.toDbMEventWithAttachments() = DbDMEventWithAttachments(
             UiDMEvent.SendStatus.FAILED -> DbDMEvent.SendStatus.FAILED
         },
     ),
-    media = media.toDbMedia(),
-    urlEntity = urlEntity.toDbUrl(messageKey),
-    sender = sender.toDbUser()
+    media = media.toDbMedia(dbId = dbMediaId),
+    urlEntity = urlEntity.toDbUrl(belongToKey = messageKey, dbId = dbUrlId),
+    sender = sender.toDbUser(dbId = dbSenderId)
 )

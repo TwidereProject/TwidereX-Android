@@ -21,11 +21,13 @@
 package com.twidere.twiderex.dataprovider.db.dao
 
 import androidx.paging.PagingSource
+import androidx.room.withTransaction
 import com.twidere.twiderex.db.dao.DirectMessageEventDao
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiDMEvent
 import com.twidere.twiderex.room.db.RoomCacheDatabase
 import com.twidere.twiderex.room.db.model.DbDMEventWithAttachments.Companion.saveToDb
+import com.twidere.twiderex.room.db.paging.getPagingSource
 import com.twidere.twiderex.room.db.transform.toDbMEventWithAttachments
 import com.twidere.twiderex.room.db.transform.toUi
 
@@ -36,7 +38,11 @@ internal class DirectMessageEventDaoImpl(
         accountKey: MicroBlogKey,
         conversationKey: MicroBlogKey
     ): PagingSource<Int, UiDMEvent> {
-        TODO("Not yet implemented")
+        return roomCacheDatabase.directMessageDao().getPagingSource(
+            cacheDatabase = roomCacheDatabase,
+            accountKey = accountKey,
+            conversationKey = conversationKey
+        )
     }
 
     override suspend fun findWithMessageKey(
@@ -46,7 +52,15 @@ internal class DirectMessageEventDaoImpl(
     ) = roomCacheDatabase.directMessageDao().findWithMessageKey(accountKey, conversationKey, messageKey)?.toUi()
 
     override suspend fun delete(message: UiDMEvent) {
-        roomCacheDatabase.directMessageDao().delete(message.toDbMEventWithAttachments().message)
+        roomCacheDatabase.withTransaction {
+            roomCacheDatabase.directMessageDao().findWithMessageKey(
+                accountKey = message.accountKey,
+                conversationKey = message.conversationKey,
+                messageKey = message.messageKey
+            )?.let {
+                roomCacheDatabase.directMessageDao().delete(message.toDbMEventWithAttachments(dbId = it.message._id).message)
+            }
+        }
     }
 
     override suspend fun getMessageCount(

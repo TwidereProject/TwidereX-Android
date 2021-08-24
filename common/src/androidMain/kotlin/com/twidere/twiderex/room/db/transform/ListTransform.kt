@@ -38,7 +38,7 @@ internal fun DbList.toUi() =
         allowToSubscribe = allowToSubscribe,
     )
 
-internal fun UiList.toDbList() =
+internal fun UiList.toDbList(dbId: String = UUID.randomUUID().toString()) =
     DbList(
         listId = id,
         ownerId = ownerId,
@@ -50,5 +50,5 @@ internal fun UiList.toDbList() =
         replyPolicy = replyPolicy,
         isFollowed = isFollowed,
         allowToSubscribe = allowToSubscribe,
-        _id = UUID.randomUUID().toString()
+        _id = dbId
     )

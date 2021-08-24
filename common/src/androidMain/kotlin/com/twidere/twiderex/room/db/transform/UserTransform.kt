@@ -85,9 +85,9 @@ internal fun DbUser.toUi() =
         acct = acct,
     )
 
-internal fun UiUser.toDbUser() =
+internal fun UiUser.toDbUser(dbId: String = UUID.randomUUID().toString()) =
     DbUser(
-        _id = UUID.randomUUID().toString(),
+        _id = dbId,
         name = name,
         screenName = screenName,
         profileImage = profileImage.toString(),

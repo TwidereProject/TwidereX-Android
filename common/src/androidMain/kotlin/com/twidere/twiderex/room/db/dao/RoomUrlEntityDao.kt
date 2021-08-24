@@ -23,10 +23,15 @@ package com.twidere.twiderex.room.db.dao
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.room.db.model.DbUrlEntity
 
 @Dao
 internal interface RoomUrlEntityDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(media: List<DbUrlEntity>)
+
+    @Query("SELECT * FROM url_entity WHERE statusKey == :belongToKey")
+    suspend fun findWithBelongToKey(belongToKey: MicroBlogKey): List<DbUrlEntity>
 }

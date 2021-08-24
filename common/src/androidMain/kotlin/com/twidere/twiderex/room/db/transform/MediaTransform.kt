@@ -39,7 +39,7 @@ internal fun List<DbMedia>.toUi() = sortedBy { it.order }.map {
     )
 }
 
-internal fun List<UiMedia>.toDbMedia() = map {
+internal fun List<UiMedia>.toDbMedia(dbId: String = UUID.randomUUID().toString()) = map {
     DbMedia(
         url = it.url,
         belongToKey = it.belongToKey,
@@ -51,6 +51,6 @@ internal fun List<UiMedia>.toDbMedia() = map {
         pageUrl = it.pageUrl,
         altText = it.altText,
         order = it.order,
-        _id = UUID.randomUUID().toString()
+        _id = dbId
     )
 }

@@ -21,6 +21,7 @@
 package com.twidere.twiderex.dataprovider.db.dao
 
 import androidx.paging.PagingSource
+import androidx.room.withTransaction
 import com.twidere.twiderex.db.dao.ListsDao
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiList
@@ -50,11 +51,27 @@ internal class ListsDaoImpl(private val database: RoomCacheDatabase) : ListsDao 
     ) = database.listsDao().findWithListKey(listKey, accountKey)?.toUi()
 
     override suspend fun update(listOf: List<UiList>) {
-        database.listsDao().update(listOf.map { it.toDbList() })
+        database.withTransaction {
+            listOf.mapNotNull {
+                database.listsDao().findWithListKey(it.listKey, it.accountKey)?.let { dbList ->
+                    it.toDbList(dbId = dbList._id)
+                }
+            }.let {
+                database.listsDao().update(it)
+            }
+        }
     }
 
     override suspend fun delete(listOf: List<UiList>) {
-        database.listsDao().delete(listOf.map { it.toDbList() })
+        database.withTransaction {
+            listOf.mapNotNull {
+                database.listsDao().findWithListKey(it.listKey, it.accountKey)?.let { dbList ->
+                    it.toDbList(dbId = dbList._id)
+                }
+            }.let {
+                database.listsDao().delete(it)
+            }
+        }
     }
 
     override suspend fun clearAll(accountKey: MicroBlogKey) {

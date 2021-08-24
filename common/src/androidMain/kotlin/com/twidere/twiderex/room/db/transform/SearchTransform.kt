@@ -31,8 +31,8 @@ internal fun DbSearch.toUiSearch() = UiSearch(
     accountKey = accountKey
 )
 
-internal fun UiSearch.toDbSearch() = DbSearch(
-    _id = UUID.randomUUID().toString(),
+internal fun UiSearch.toDbSearch(id: String = UUID.randomUUID().toString()) = DbSearch(
+    _id = id,
     content = content,
     lastActive = lastActive,
     saved = saved,
