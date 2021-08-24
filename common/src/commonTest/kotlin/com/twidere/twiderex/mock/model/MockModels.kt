@@ -42,6 +42,8 @@ import com.twidere.services.twitter.model.MessageCreate
 import com.twidere.services.twitter.model.MessageData
 import com.twidere.services.twitter.model.MessageTarget
 import com.twidere.services.twitter.model.PurpleMedia
+import com.twidere.services.twitter.model.ReferencedTweetType
+import com.twidere.services.twitter.model.ReferencedTweetV2
 import com.twidere.services.twitter.model.StatusV2
 import com.twidere.services.twitter.model.TwitterList
 import com.twidere.services.twitter.model.TwitterPaging
@@ -72,7 +74,7 @@ fun mockUiMedia(url: String = "", belongToKey: MicroBlogKey = MicroBlogKey.Empty
 
 @TestOnly
 fun mockUiDraft(
-    draftId: String = "",
+    draftId: String = UUID.randomUUID().toString(),
     content: String = "",
     composeType: ComposeType = ComposeType.New,
     statusKey: MicroBlogKey = MicroBlogKey.twitter(UUID.randomUUID().toString())
@@ -144,15 +146,23 @@ fun mockIListModel(
 fun mockIStatus(
     id: String = UUID.randomUUID().toString(),
     hasMedia: Boolean = false,
-    authorId: String = UUID.randomUUID().toString()
+    authorId: String = UUID.randomUUID().toString(),
+    hasReference: Boolean = false
 ): IStatus {
     return StatusV2(
         id = id,
         authorID = authorId,
         createdAt = Date().apply { time = System.currentTimeMillis() },
         attachments = if (hasMedia) AttachmentsV2(mediaKeys = listOf("mediaKey")).apply {
-            media = listOf(MediaV2(url = "mediaUrl"))
-        } else null
+            media = listOf(MediaV2(url = "mediaUrl", type = "photo"))
+        } else null,
+
+        referencedTweets = if (hasReference) listOf(
+            ReferencedTweetV2(
+                type = ReferencedTweetType.retweeted,
+                id = UUID.randomUUID().toString()
+            ).apply { status = mockIStatus() as StatusV2 }
+        ) else emptyList()
     ).apply {
         user = UserV2(
             id = authorId,

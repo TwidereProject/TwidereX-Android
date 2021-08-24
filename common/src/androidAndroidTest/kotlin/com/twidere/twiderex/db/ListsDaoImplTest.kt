@@ -104,7 +104,6 @@ internal class ListsDaoImplTest : CacheDatabaseDaoTest() {
     @Test
     fun getPagingSource_pagingSourceInvalidateAfterDbUpDate() = runBlocking {
         val cacheDatabase = CacheDatabaseImpl(roomDatabase)
-        cacheDatabase.listsDao().insertAll(insertData)
         var invalidate = false
         cacheDatabase.listsDao().getPagingSource(
             accountKey = accountKey

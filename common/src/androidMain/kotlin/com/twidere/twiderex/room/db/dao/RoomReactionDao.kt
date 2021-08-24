@@ -34,4 +34,7 @@ internal interface RoomReactionDao {
 
     @Query("SELECT * FROM status_reactions WHERE statusKey == :statusKey AND accountKey == :accountKey")
     suspend fun findWithStatusKey(statusKey: MicroBlogKey, accountKey: MicroBlogKey): DbStatusReaction?
+
+    @Query("DELETE FROM status_reactions WHERE statusKey == :statusKey")
+    suspend fun delete(statusKey: MicroBlogKey)
 }

@@ -52,6 +52,7 @@ internal class StatusDaoImpl(
     override suspend fun delete(statusKey: MicroBlogKey) {
         roomCacheDatabase.statusDao().delete(statusKey)
         roomCacheDatabase.statusReferenceDao().delete(statusKey)
+        roomCacheDatabase.reactionDao().delete(statusKey)
     }
 
     override suspend fun updateAction(
