@@ -20,8 +20,8 @@
  */
 package com.twidere.twiderex.viewmodel.settings
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import moe.tlaster.precompose.viewmodel.ViewModel
+import moe.tlaster.precompose.viewmodel.viewModelScope
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.repository.AccountRepository
 import dagger.assisted.Assisted

@@ -20,7 +20,7 @@
  */
 package com.twidere.twiderex.viewmodel.trend
 
-import androidx.lifecycle.ViewModel
+import moe.tlaster.precompose.viewmodel.ViewModel
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.repository.TrendRepository
 import dagger.assisted.Assisted

@@ -20,7 +20,7 @@
  */
 package com.twidere.twiderex.viewmodel.user
 
-import androidx.lifecycle.ViewModel
+import moe.tlaster.precompose.viewmodel.ViewModel
 import androidx.paging.PagingData
 import com.twidere.twiderex.model.ui.UiUser
 import kotlinx.coroutines.flow.Flow

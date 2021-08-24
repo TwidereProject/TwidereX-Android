@@ -20,7 +20,7 @@
  */
 package com.twidere.twiderex.viewmodel.user
 
-import androidx.lifecycle.viewModelScope
+import moe.tlaster.precompose.viewmodel.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn

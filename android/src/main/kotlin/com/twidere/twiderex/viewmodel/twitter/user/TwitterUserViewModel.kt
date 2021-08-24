@@ -20,7 +20,7 @@
  */
 package com.twidere.twiderex.viewmodel.twitter.user
 
-import androidx.lifecycle.ViewModel
+import moe.tlaster.precompose.viewmodel.ViewModel
 import com.twidere.services.microblog.LookupService
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.notification.InAppNotification

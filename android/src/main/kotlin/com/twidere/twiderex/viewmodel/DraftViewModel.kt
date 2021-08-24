@@ -21,7 +21,7 @@
 package com.twidere.twiderex.viewmodel
 
 import androidx.core.app.NotificationManagerCompat
-import androidx.lifecycle.ViewModel
+import moe.tlaster.precompose.viewmodel.ViewModel
 import androidx.work.WorkManager
 import com.twidere.twiderex.db.model.DbDraft
 import com.twidere.twiderex.repository.DraftRepository

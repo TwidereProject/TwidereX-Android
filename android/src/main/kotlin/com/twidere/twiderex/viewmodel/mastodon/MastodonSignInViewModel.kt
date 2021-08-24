@@ -22,8 +22,8 @@ package com.twidere.twiderex.viewmodel.mastodon
 
 import android.accounts.Account
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import moe.tlaster.precompose.viewmodel.ViewModel
+import moe.tlaster.precompose.viewmodel.viewModelScope
 import com.twidere.services.mastodon.MastodonOAuthService
 import com.twidere.twiderex.db.mapper.toDbUser
 import com.twidere.twiderex.http.TwidereServiceFactory

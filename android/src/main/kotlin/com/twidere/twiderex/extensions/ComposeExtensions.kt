@@ -22,16 +22,15 @@ package com.twidere.twiderex.extensions
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.twidere.twiderex.preferences.LocalAppearancePreferences
 import com.twidere.twiderex.preferences.model.AppearancePreferences
+import moe.tlaster.precompose.viewmodel.ViewModel
+import moe.tlaster.precompose.viewmodel.compose.viewModel
 
 @Composable
 inline fun <reified VM : ViewModel> viewModel(
     vararg dependsOn: Any,
-    noinline creator: (() -> VM)? = null,
+    noinline creator: () -> VM,
 ): VM {
     return viewModel(
         key = if (dependsOn.any()) {
@@ -39,11 +38,8 @@ inline fun <reified VM : ViewModel> viewModel(
         } else {
             null
         },
-        factory = object : ViewModelProvider.Factory {
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                @Suppress("UNCHECKED_CAST")
-                return creator?.invoke() as T
-            }
+        creator = {
+            creator.invoke()
         }
     )
 }

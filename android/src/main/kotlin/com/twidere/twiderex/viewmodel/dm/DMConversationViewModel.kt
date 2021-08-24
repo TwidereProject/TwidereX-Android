@@ -20,7 +20,7 @@
  */
 package com.twidere.twiderex.viewmodel.dm
 
-import androidx.lifecycle.ViewModel
+import moe.tlaster.precompose.viewmodel.ViewModel
 import com.twidere.services.microblog.DirectMessageService
 import com.twidere.services.microblog.LookupService
 import com.twidere.twiderex.model.AccountDetails

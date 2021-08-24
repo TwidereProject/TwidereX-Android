@@ -20,8 +20,8 @@
  */
 package com.twidere.twiderex.viewmodel.twitter.search
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import moe.tlaster.precompose.viewmodel.ViewModel
+import moe.tlaster.precompose.viewmodel.viewModelScope
 import androidx.paging.cachedIn
 import androidx.paging.flatMap
 import androidx.paging.map

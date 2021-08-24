@@ -20,8 +20,8 @@
  */
 package com.twidere.twiderex.viewmodel.user
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import moe.tlaster.precompose.viewmodel.ViewModel
+import moe.tlaster.precompose.viewmodel.viewModelScope
 import com.twidere.services.microblog.LookupService
 import com.twidere.services.microblog.RelationshipService
 import com.twidere.services.microblog.model.IRelationship

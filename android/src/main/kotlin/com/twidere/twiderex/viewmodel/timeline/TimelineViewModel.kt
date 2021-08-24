@@ -22,8 +22,8 @@ package com.twidere.twiderex.viewmodel.timeline
 
 import android.content.SharedPreferences
 import androidx.core.content.edit
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import moe.tlaster.precompose.viewmodel.ViewModel
+import moe.tlaster.precompose.viewmodel.viewModelScope
 import androidx.paging.cachedIn
 import com.twidere.twiderex.defaultLoadCount
 import com.twidere.twiderex.extensions.toUi

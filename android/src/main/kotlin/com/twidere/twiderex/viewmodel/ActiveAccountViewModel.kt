@@ -20,15 +20,12 @@
  */
 package com.twidere.twiderex.viewmodel
 
-import androidx.lifecycle.ViewModel
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.repository.AccountRepository
-import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
+import moe.tlaster.precompose.viewmodel.ViewModel
 
-@HiltViewModel
-class ActiveAccountViewModel @Inject constructor(
+class ActiveAccountViewModel(
     private val repository: AccountRepository,
 ) : ViewModel() {
     fun setActiveAccount(it: AccountDetails) {

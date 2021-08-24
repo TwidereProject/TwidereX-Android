@@ -21,8 +21,8 @@
 package com.twidere.twiderex.viewmodel.settings
 
 import androidx.datastore.core.DataStore
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import moe.tlaster.precompose.viewmodel.ViewModel
+import moe.tlaster.precompose.viewmodel.viewModelScope
 import com.twidere.twiderex.preferences.model.AppearancePreferences
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.launch

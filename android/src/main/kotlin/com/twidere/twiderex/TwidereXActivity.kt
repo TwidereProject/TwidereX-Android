@@ -59,7 +59,6 @@ import androidx.core.net.ConnectivityManagerCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.insets.ProvideWindowInsets
 import com.twidere.twiderex.action.LocalStatusActions
 import com.twidere.twiderex.action.StatusActions
@@ -85,6 +84,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.MutableStateFlow
 import moe.tlaster.precompose.navigation.NavController
 import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.getViewModel
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -181,7 +181,7 @@ class TwidereXActivity : ComponentActivity() {
     private fun App() {
         val windowInsetsControllerCompat =
             remember { WindowInsetsControllerCompat(window, window.decorView) }
-        val accountViewModel = viewModel<ActiveAccountViewModel>()
+        val accountViewModel = com.twidere.twiderex.di.ext.getViewModel<ActiveAccountViewModel>()
         val account by accountViewModel.account.observeAsState(null)
         val isActiveNetworkMetered by isActiveNetworkMetered.observeAsState(initial = false)
         CompositionLocalProvider(

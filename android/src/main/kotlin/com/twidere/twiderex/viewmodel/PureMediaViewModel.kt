@@ -20,7 +20,7 @@
  */
 package com.twidere.twiderex.viewmodel
 
-import androidx.lifecycle.ViewModel
+import moe.tlaster.precompose.viewmodel.ViewModel
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.repository.MediaRepository
 import dagger.assisted.Assisted

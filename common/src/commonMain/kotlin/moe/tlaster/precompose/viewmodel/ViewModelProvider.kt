@@ -20,16 +20,16 @@
  */
 package moe.tlaster.precompose.viewmodel
 
-internal inline fun <reified T : ViewModel> ViewModelStore.getViewModel(
-    creator: () -> T,
+inline fun <reified T : ViewModel> ViewModelStore.getViewModel(
+    noinline creator: () -> T,
 ): T {
     val key = T::class.qualifiedName.toString()
     return getViewModel(key, creator)
 }
 
-internal inline fun <reified T : ViewModel> ViewModelStore.getViewModel(
+inline fun <reified T : ViewModel> ViewModelStore.getViewModel(
     key: String,
-    creator: () -> T,
+    noinline creator: () -> T,
 ): T {
     val existing = get(key)
     if (existing != null && existing is T) {

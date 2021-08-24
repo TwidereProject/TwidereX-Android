@@ -21,8 +21,8 @@
 package com.twidere.twiderex.viewmodel.dm
 
 import android.net.Uri
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import moe.tlaster.precompose.viewmodel.ViewModel
+import moe.tlaster.precompose.viewmodel.viewModelScope
 import androidx.paging.cachedIn
 import com.twidere.services.microblog.DirectMessageService
 import com.twidere.services.microblog.LookupService

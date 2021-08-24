@@ -23,9 +23,8 @@ package com.twidere.twiderex.di.assisted
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.staticCompositionLocalOf
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.compose.viewModel
+import moe.tlaster.precompose.viewmodel.ViewModel
+import moe.tlaster.precompose.viewmodel.compose.viewModel
 
 @Composable
 inline fun <reified AF, reified VM : ViewModel> assistedViewModel(
@@ -40,11 +39,8 @@ inline fun <reified AF, reified VM : ViewModel> assistedViewModel(
         } else {
             null
         },
-        factory = object : ViewModelProvider.Factory {
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                @Suppress("UNCHECKED_CAST")
-                return factory?.let { creator?.invoke(it) } as T
-            }
+        creator = {
+            factory?.let { creator?.invoke(it) } as VM
         }
     )
 }
