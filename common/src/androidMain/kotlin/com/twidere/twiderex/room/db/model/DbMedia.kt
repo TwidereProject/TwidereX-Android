@@ -30,7 +30,7 @@ import com.twidere.twiderex.model.enums.MediaType
     tableName = "media",
     indices = [Index(value = ["belongToKey", "order"], unique = true)],
 )
-data class DbMedia(
+internal data class DbMedia(
     /**
      * Id that being used in the database
      */

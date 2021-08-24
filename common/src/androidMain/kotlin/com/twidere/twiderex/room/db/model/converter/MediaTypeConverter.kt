@@ -23,7 +23,7 @@ package com.twidere.twiderex.room.db.model.converter
 import androidx.room.TypeConverter
 import com.twidere.twiderex.model.enums.MediaType
 
-class MediaTypeConverter {
+internal class MediaTypeConverter {
     @TypeConverter
     fun fromMediaType(mediaType: MediaType?): String? {
         return mediaType?.name

@@ -30,7 +30,7 @@ import com.twidere.twiderex.room.db.model.DbTwitterUserExtra
 import com.twidere.twiderex.utils.fromJson
 import com.twidere.twiderex.utils.json
 
-class ExtraConverter {
+internal class ExtraConverter {
     @TypeConverter
     fun fromDbTwitterStatusExtraString(value: String?): DbTwitterStatusExtra? {
         return value?.fromJson()

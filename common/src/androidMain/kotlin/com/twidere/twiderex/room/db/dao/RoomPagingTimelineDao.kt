@@ -31,7 +31,7 @@ import com.twidere.twiderex.room.db.model.DbPagingTimeline
 import com.twidere.twiderex.room.db.model.DbPagingTimelineWithStatus
 
 @Dao
-interface RoomPagingTimelineDao {
+internal interface RoomPagingTimelineDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(timeline: List<DbPagingTimeline>)

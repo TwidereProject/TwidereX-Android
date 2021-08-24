@@ -20,6 +20,6 @@
  */
 package com.twidere.twiderex.room.db.model
 
-typealias Html = String
-typealias Json = String
-typealias Timestamp = Long
+internal typealias Html = String
+internal typealias Json = String
+internal typealias Timestamp = Long

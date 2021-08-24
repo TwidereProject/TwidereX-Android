@@ -37,7 +37,7 @@ import com.twidere.twiderex.utils.fromJson
 import com.twidere.twiderex.utils.json
 import java.util.UUID
 
-fun DbUser.toAmUser() =
+internal fun DbUser.toAmUser() =
     AmUser(
         userId = userId,
         name = name,
@@ -55,7 +55,7 @@ fun DbUser.toAmUser() =
         isProtected = isProtected,
     )
 
-fun DbUser.toUi() =
+internal fun DbUser.toUi() =
     UiUser(
         id = userId,
         name = name,
@@ -85,7 +85,7 @@ fun DbUser.toUi() =
         acct = acct,
     )
 
-fun UiUser.toDbUser() =
+internal fun UiUser.toDbUser() =
     DbUser(
         _id = UUID.randomUUID().toString(),
         name = name,
@@ -141,7 +141,7 @@ fun UiUser.toDbUser() =
         statusesCount = metrics.status
     )
 
-fun DbTwitterUserExtra.toUi() = TwitterUserExtra(
+internal fun DbTwitterUserExtra.toUi() = TwitterUserExtra(
     pinned_tweet_id = pinned_tweet_id,
     url = url.map { url ->
         UiUrlEntity(
@@ -155,7 +155,7 @@ fun DbTwitterUserExtra.toUi() = TwitterUserExtra(
     }
 )
 
-fun DbMastodonUserExtra.toUi() = MastodonUserExtra(
+internal fun DbMastodonUserExtra.toUi() = MastodonUserExtra(
     emoji = emoji.toUi(),
     bot = bot,
     locked = locked,

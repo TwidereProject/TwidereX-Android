@@ -30,7 +30,7 @@ import com.twidere.twiderex.room.db.model.DbUser
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface RoomUserDao {
+internal interface RoomUserDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(user: List<DbUser>)
 

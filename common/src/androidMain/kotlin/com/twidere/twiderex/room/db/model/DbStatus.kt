@@ -40,7 +40,7 @@ import kotlinx.serialization.Serializable
     tableName = "status",
     indices = [Index(value = ["statusKey"], unique = true)],
 )
-data class DbStatusV2(
+internal data class DbStatusV2(
     /**
      * Id that being used in the database
      */
@@ -72,11 +72,11 @@ data class DbStatusV2(
     var extra: Json
 )
 
-interface DbStatusExtra
+internal interface DbStatusExtra
 
 @Immutable
 @Serializable
-data class DbPreviewCard(
+internal data class DbPreviewCard(
     val link: String,
     val displayLink: String?,
     val title: String?,
@@ -86,7 +86,7 @@ data class DbPreviewCard(
 
 @Immutable
 @Serializable
-data class DbPoll(
+internal data class DbPoll(
     val id: String,
     val options: List<DbPollOption>,
     val expiresAt: Long?,
@@ -100,28 +100,28 @@ data class DbPoll(
 
 @Immutable
 @Serializable
-data class DbPollOption(
+internal data class DbPollOption(
     val text: String,
     val count: Long,
 )
 
 @Immutable
 @Serializable
-data class DbTwitterStatusExtra(
+internal data class DbTwitterStatusExtra(
     val reply_settings: TwitterReplySettings,
     val quoteCount: Long? = null,
 ) : DbStatusExtra
 
 @Immutable
 @Serializable
-data class DbMastodonStatusExtra(
+internal data class DbMastodonStatusExtra(
     val type: MastodonStatusType,
     val emoji: List<Emoji>,
     val visibility: MastodonVisibility,
     val mentions: List<Mention>?,
 ) : DbStatusExtra
 
-data class DbStatusWithMediaAndUser(
+internal data class DbStatusWithMediaAndUser(
     @Embedded
     val data: DbStatusV2,
     @Relation(parentColumn = "statusKey", entityColumn = "belongToKey")
@@ -134,7 +134,7 @@ data class DbStatusWithMediaAndUser(
     val url: List<DbUrlEntity>,
 )
 
-suspend fun List<DbStatusWithMediaAndUser>.saveToDb(
+internal suspend fun List<DbStatusWithMediaAndUser>.saveToDb(
     database: RoomCacheDatabase
 ) {
     map { it.user }.let {

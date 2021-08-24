@@ -33,7 +33,7 @@ import java.io.IOException
 import java.util.UUID
 
 @RunWith(AndroidJUnit4::class)
-class RoomAppDatabaseMigrationTest {
+internal class RoomAppDatabaseMigrationTest {
     private val TEST_DB = "migration-test"
 
     @get:Rule

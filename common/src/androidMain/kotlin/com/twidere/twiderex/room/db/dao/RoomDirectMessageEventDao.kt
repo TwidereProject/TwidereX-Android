@@ -31,7 +31,7 @@ import com.twidere.twiderex.room.db.model.DbDMEvent
 import com.twidere.twiderex.room.db.model.DbDMEventWithAttachments
 
 @Dao
-interface RoomDirectMessageEventDao {
+internal interface RoomDirectMessageEventDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(messages: List<DbDMEvent>)
 

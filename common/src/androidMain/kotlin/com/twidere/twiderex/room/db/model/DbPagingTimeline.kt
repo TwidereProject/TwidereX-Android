@@ -36,7 +36,7 @@ import com.twidere.twiderex.model.MicroBlogKey
         )
     ],
 )
-data class DbPagingTimeline(
+internal data class DbPagingTimeline(
     @PrimaryKey
     val _id: String,
     val accountKey: MicroBlogKey,
@@ -47,7 +47,7 @@ data class DbPagingTimeline(
     var isGap: Boolean,
 )
 
-data class DbPagingTimelineWithStatus(
+internal data class DbPagingTimelineWithStatus(
     @Embedded
     val timeline: DbPagingTimeline,
 
@@ -59,10 +59,10 @@ data class DbPagingTimelineWithStatus(
     val status: DbStatusWithReference,
 )
 
-enum class UserTimelineType {
+internal enum class UserTimelineType {
     Status,
     Media,
     Favourite
 }
 
-fun UserTimelineType.pagingKey(accountKey: MicroBlogKey) = "user:$accountKey:$this"
+internal fun UserTimelineType.pagingKey(accountKey: MicroBlogKey) = "user:$accountKey:$this"

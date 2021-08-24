@@ -28,7 +28,7 @@ import com.twidere.twiderex.db.dao.DraftDao
 import com.twidere.twiderex.db.dao.SearchDao
 import com.twidere.twiderex.room.db.RoomAppDatabase
 
-internal class AppDataBaseImpl(private val roomDatabase: RoomAppDatabase) : AppDatabase {
+internal class AppDatabaseImpl(private val roomDatabase: RoomAppDatabase) : AppDatabase {
     private val draftDao = DraftDaoImpl(roomDatabase.draftDao())
     private val searchDao = SearchDaoImpl(roomDatabase.searchDao())
     override fun draftDao(): DraftDao {

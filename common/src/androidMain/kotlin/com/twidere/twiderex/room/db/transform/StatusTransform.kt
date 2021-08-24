@@ -57,7 +57,7 @@ import com.twidere.twiderex.utils.fromJson
 import com.twidere.twiderex.utils.json
 import java.util.UUID
 
-fun DbStatusV2.toUi(
+internal fun DbStatusV2.toUi(
     user: UiUser,
     media: List<UiMedia>,
     url: List<UiUrlEntity>,
@@ -107,7 +107,7 @@ fun DbStatusV2.toUi(
     )
 }
 
-fun DbStatusWithMediaAndUser.toUi(
+internal fun DbStatusWithMediaAndUser.toUi(
     accountKey: MicroBlogKey,
 ): UiStatus {
     val reaction = reactions.firstOrNull { it.accountKey == accountKey }
@@ -120,7 +120,7 @@ fun DbStatusWithMediaAndUser.toUi(
     )
 }
 
-fun DbStatusWithReference.toUi(
+internal fun DbStatusWithReference.toUi(
     accountKey: MicroBlogKey,
 ) = with(status) {
     val reaction = reactions.firstOrNull { it.accountKey == accountKey }
@@ -138,7 +138,7 @@ fun DbStatusWithReference.toUi(
     )
 }
 
-fun UiStatus.toDbStatusWithReference(accountKey: MicroBlogKey) = DbStatusWithReference(
+internal fun UiStatus.toDbStatusWithReference(accountKey: MicroBlogKey) = DbStatusWithReference(
     status = toDbStatusWithMediaAndUser(accountKey),
     references = referenceStatus.map { entry ->
         DbStatusReferenceWithStatus(
@@ -153,7 +153,7 @@ fun UiStatus.toDbStatusWithReference(accountKey: MicroBlogKey) = DbStatusWithRef
     }
 )
 
-fun UiStatus.toDbStatusWithMediaAndUser(accountKey: MicroBlogKey) = DbStatusWithMediaAndUser(
+internal fun UiStatus.toDbStatusWithMediaAndUser(accountKey: MicroBlogKey) = DbStatusWithMediaAndUser(
     data = toDbStatusV2(),
     media = media.toDbMedia(),
     user = user.toDbUser(),
@@ -168,7 +168,7 @@ fun UiStatus.toDbStatusWithMediaAndUser(accountKey: MicroBlogKey) = DbStatusWith
     ),
     url = url.toDbUrl(statusKey)
 )
-fun UiStatus.toDbStatusV2() = DbStatusV2(
+internal fun UiStatus.toDbStatusV2() = DbStatusV2(
     _id = UUID.randomUUID().toString(),
     statusId = statusId,
     htmlText = htmlText,
@@ -252,14 +252,14 @@ private fun DbPoll.toUi() = UiPoll(
     ownVotes = ownVotes
 )
 
-fun DbPagingTimelineWithStatus.toPagingTimeline(accountKey: MicroBlogKey) = with(status) {
+internal fun DbPagingTimelineWithStatus.toPagingTimeline(accountKey: MicroBlogKey) = with(status) {
     PagingTimeLineWithStatus(
         timeline = timeline.toUi(),
         status = status.toUi(accountKey = accountKey)
     )
 }
 
-fun DbPagingTimeline.toUi() = PagingTimeLine(
+internal fun DbPagingTimeline.toUi() = PagingTimeLine(
     accountKey = accountKey,
     pagingKey = pagingKey,
     statusKey = statusKey,
@@ -268,7 +268,7 @@ fun DbPagingTimeline.toUi() = PagingTimeLine(
     isGap = isGap
 )
 
-fun PagingTimeLine.toDbPagingTimeline() = DbPagingTimeline(
+internal fun PagingTimeLine.toDbPagingTimeline() = DbPagingTimeline(
     accountKey = accountKey,
     pagingKey = pagingKey,
     statusKey = statusKey,
@@ -278,7 +278,7 @@ fun PagingTimeLine.toDbPagingTimeline() = DbPagingTimeline(
     _id = UUID.randomUUID().toString()
 )
 
-fun DbPagingTimelineWithStatus.toUi(
+internal fun DbPagingTimelineWithStatus.toUi(
     accountKey: MicroBlogKey,
 ) = with(status.status) {
     val reaction = reactions.firstOrNull { it.accountKey == accountKey }
@@ -296,19 +296,19 @@ fun DbPagingTimelineWithStatus.toUi(
     )
 }
 
-fun DbTwitterStatusExtra.toUi() = TwitterStatusExtra(
+internal fun DbTwitterStatusExtra.toUi() = TwitterStatusExtra(
     reply_settings = reply_settings,
     quoteCount = quoteCount
 )
 
-fun DbMastodonStatusExtra.toUi() = MastodonStatusExtra(
+internal fun DbMastodonStatusExtra.toUi() = MastodonStatusExtra(
     type = type,
     emoji = emoji.toUi(),
     visibility = visibility,
     mentions = mentions?.toUi()
 )
 
-fun List<Mention>.toUi() = map {
+internal fun List<Mention>.toUi() = map {
     MastodonMention(
         id = it.id,
         username = it.username,
@@ -317,7 +317,7 @@ fun List<Mention>.toUi() = map {
     )
 }
 
-fun DbPreviewCard.toUi() = UiCard(
+internal fun DbPreviewCard.toUi() = UiCard(
     link = link,
     displayLink = displayLink,
     title = title,
@@ -325,7 +325,7 @@ fun DbPreviewCard.toUi() = UiCard(
     image = image
 )
 
-fun Poll.toUi() = id?.let {
+internal fun Poll.toUi() = id?.let {
     UiPoll(
         id = it,
         options = options?.map { option ->

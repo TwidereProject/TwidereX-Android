@@ -24,7 +24,7 @@ import androidx.room.TypeConverter
 import com.twidere.twiderex.utils.fromJson
 import com.twidere.twiderex.utils.json
 
-class StringListConverter {
+internal class StringListConverter {
     @TypeConverter
     fun fromString(value: String?): List<String>? {
         return value?.let {

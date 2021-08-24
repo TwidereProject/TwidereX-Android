@@ -32,7 +32,7 @@ import com.twidere.twiderex.room.db.model.DbDirectMessageConversationWithMessage
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface RoomDirectMessageConversationDao {
+internal interface RoomDirectMessageConversationDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(conversations: List<DbDMConversation>)
 

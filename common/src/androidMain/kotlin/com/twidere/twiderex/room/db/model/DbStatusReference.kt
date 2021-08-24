@@ -43,7 +43,7 @@ import java.util.UUID
         ),
     ],
 )
-data class DbStatusReference(
+internal data class DbStatusReference(
     /**
      * Id that being used in the database
      */
@@ -54,7 +54,7 @@ data class DbStatusReference(
     val referenceStatusKey: MicroBlogKey,
 )
 
-data class DbStatusReferenceWithStatus(
+internal data class DbStatusReferenceWithStatus(
     @Embedded
     val reference: DbStatusReference,
     @Relation(
@@ -65,7 +65,7 @@ data class DbStatusReferenceWithStatus(
     val status: DbStatusWithMediaAndUser
 )
 
-fun DbStatusWithMediaAndUser?.toDbStatusReference(
+internal fun DbStatusWithMediaAndUser?.toDbStatusReference(
     statusKey: MicroBlogKey,
     referenceType: ReferenceType,
 ): DbStatusReferenceWithStatus? {
@@ -84,7 +84,7 @@ fun DbStatusWithMediaAndUser?.toDbStatusReference(
     }
 }
 
-data class DbStatusWithReference(
+internal data class DbStatusWithReference(
     @Embedded
     val status: DbStatusWithMediaAndUser,
     @Relation(
@@ -95,7 +95,7 @@ data class DbStatusWithReference(
     val references: List<DbStatusReferenceWithStatus>,
 )
 
-suspend fun List<DbStatusWithReference>.saveToDb(
+internal suspend fun List<DbStatusWithReference>.saveToDb(
     database: RoomCacheDatabase
 ) {
     this.map { it.references.map { it.status } + it.status }

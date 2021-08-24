@@ -29,7 +29,7 @@ import com.twidere.twiderex.model.MicroBlogKey
     tableName = "lists",
     indices = [Index(value = ["accountKey", "listKey"], unique = true)],
 )
-data class DbList(
+internal data class DbList(
     @PrimaryKey
     var _id: String,
     val listId: String,

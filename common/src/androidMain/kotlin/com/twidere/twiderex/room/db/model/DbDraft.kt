@@ -28,7 +28,7 @@ import com.twidere.twiderex.model.enums.ComposeType
 @Entity(
     tableName = "draft",
 )
-data class DbDraft(
+internal data class DbDraft(
     /**
      * Id that being used in the database
      */

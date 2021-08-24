@@ -23,7 +23,7 @@ package com.twidere.twiderex.room.db.model.converter
 import androidx.room.TypeConverter
 import com.twidere.twiderex.model.MicroBlogKey
 
-class MicroBlogKeyConverter {
+internal class MicroBlogKeyConverter {
     @TypeConverter
     fun fromMicroBlogKey(microBlogKey: MicroBlogKey?): String? {
         return microBlogKey?.toString()

@@ -33,7 +33,7 @@ import com.twidere.twiderex.room.db.model.DbDMEvent.Companion.saveToDb
     tableName = "dm_event",
     indices = [Index(value = ["accountKey", "conversationKey", "messageKey"], unique = true)],
 )
-data class DbDMEvent(
+internal data class DbDMEvent(
     @PrimaryKey
     val _id: String,
     val accountKey: MicroBlogKey,
@@ -67,7 +67,7 @@ data class DbDMEvent(
     }
 }
 
-data class DbDMEventWithAttachments(
+internal data class DbDMEventWithAttachments(
     @Embedded
     val message: DbDMEvent,
 

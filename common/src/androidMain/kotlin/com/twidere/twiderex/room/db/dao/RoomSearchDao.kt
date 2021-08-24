@@ -30,7 +30,7 @@ import com.twidere.twiderex.room.db.model.DbSearch
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface RoomSearchDao {
+internal interface RoomSearchDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(search: List<DbSearch>)
 

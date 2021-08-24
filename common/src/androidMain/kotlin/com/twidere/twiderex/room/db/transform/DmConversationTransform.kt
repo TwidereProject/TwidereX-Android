@@ -29,7 +29,7 @@ import com.twidere.twiderex.room.db.model.DbDMEventWithAttachments
 import com.twidere.twiderex.room.db.model.DbDirectMessageConversationWithMessage
 import java.util.UUID
 
-fun DbDMConversation.toUi() = UiDMConversation(
+internal fun DbDMConversation.toUi() = UiDMConversation(
     accountKey = accountKey,
     conversationId = conversationId,
     conversationKey = conversationKey,
@@ -43,12 +43,12 @@ fun DbDMConversation.toUi() = UiDMConversation(
     recipientKey = recipientKey,
 )
 
-fun DbDirectMessageConversationWithMessage.toUi() = UiDMConversationWithLatestMessage(
+internal fun DbDirectMessageConversationWithMessage.toUi() = UiDMConversationWithLatestMessage(
     conversation = conversation.toUi(),
     latestMessage = latestMessage.toUi()
 )
 
-fun DbDMEventWithAttachments.toUi() = UiDMEvent(
+internal fun DbDMEventWithAttachments.toUi() = UiDMEvent(
     accountKey = message.accountKey,
     sortId = message.sortId,
     conversationKey = message.conversationKey,
@@ -70,7 +70,7 @@ fun DbDMEventWithAttachments.toUi() = UiDMEvent(
     sender = sender.toUi()
 )
 
-fun UiDMConversation.toDbDMConversation() = DbDMConversation(
+internal fun UiDMConversation.toDbDMConversation() = DbDMConversation(
     accountKey = accountKey,
     conversationId = conversationId,
     conversationKey = conversationKey,
@@ -85,7 +85,7 @@ fun UiDMConversation.toDbDMConversation() = DbDMConversation(
     _id = UUID.randomUUID().toString()
 )
 
-fun UiDMEvent.toDbMEventWithAttachments() = DbDMEventWithAttachments(
+internal fun UiDMEvent.toDbMEventWithAttachments() = DbDMEventWithAttachments(
     message = DbDMEvent(
         _id = UUID.randomUUID().toString(),
         accountKey = accountKey,

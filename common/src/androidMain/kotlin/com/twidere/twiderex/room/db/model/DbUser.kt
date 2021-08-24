@@ -32,7 +32,7 @@ import kotlinx.serialization.Serializable
     tableName = "user",
     indices = [Index(value = ["userKey"], unique = true)],
 )
-data class DbUser(
+internal data class DbUser(
     /**
      * Id that being used in the database
      */
@@ -61,14 +61,14 @@ data class DbUser(
 
 @Immutable
 @Serializable
-data class DbTwitterUserExtra(
+internal data class DbTwitterUserExtra(
     val pinned_tweet_id: String?,
     val url: List<TwitterUrlEntity>,
 )
 
 @Immutable
 @Serializable
-data class TwitterUrlEntity(
+internal data class TwitterUrlEntity(
     val url: String,
     val expandedUrl: String,
     val displayUrl: String,
@@ -76,7 +76,7 @@ data class TwitterUrlEntity(
 
 @Immutable
 @Serializable
-data class DbMastodonUserExtra(
+internal data class DbMastodonUserExtra(
     val fields: List<com.twidere.services.mastodon.model.Field>,
     val emoji: List<com.twidere.services.mastodon.model.Emoji>,
     val bot: Boolean,

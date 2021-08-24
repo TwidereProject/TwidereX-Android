@@ -24,7 +24,7 @@ import com.twidere.twiderex.model.ui.UiList
 import com.twidere.twiderex.room.db.model.DbList
 import java.util.UUID
 
-fun DbList.toUi() =
+internal fun DbList.toUi() =
     UiList(
         id = listId,
         ownerId = ownerId,
@@ -38,7 +38,7 @@ fun DbList.toUi() =
         allowToSubscribe = allowToSubscribe,
     )
 
-fun UiList.toDbList() =
+internal fun UiList.toDbList() =
     DbList(
         listId = id,
         ownerId = ownerId,

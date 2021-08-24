@@ -32,7 +32,7 @@ import com.twidere.twiderex.room.db.RoomCacheDatabase
     tableName = "dm_conversation",
     indices = [Index(value = ["accountKey", "conversationKey"], unique = true)],
 )
-data class DbDMConversation(
+internal data class DbDMConversation(
     @PrimaryKey
     val _id: String,
     val accountKey: MicroBlogKey,
@@ -57,7 +57,7 @@ data class DbDMConversation(
     }
 }
 
-data class DbDirectMessageConversationWithMessage(
+internal data class DbDirectMessageConversationWithMessage(
     @Relation(parentColumn = "conversationKey", entityColumn = "conversationKey")
     val conversation: DbDMConversation,
 

@@ -28,7 +28,7 @@ import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.room.db.model.DbTrendHistory
 
 @Dao
-interface RoomTrendHistoryDao {
+internal interface RoomTrendHistoryDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(histories: List<DbTrendHistory>)
 
@@ -36,4 +36,9 @@ interface RoomTrendHistoryDao {
     suspend fun clearAll(
         accountKey: MicroBlogKey,
     )
+
+    @Query("SELECT * FROM trend_histories WHERE accountKey == :accountKey")
+    suspend fun getAll(
+        accountKey: MicroBlogKey
+    ): List<DbTrendHistory>
 }

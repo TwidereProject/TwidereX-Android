@@ -23,7 +23,7 @@ package com.twidere.twiderex.room.db.model.converter
 import androidx.room.TypeConverter
 import com.twidere.twiderex.room.db.model.DbNotificationCursorType
 
-class NotificationCursorTypeConverter {
+internal class NotificationCursorTypeConverter {
     @TypeConverter
     fun fromString(value: String?): DbNotificationCursorType? {
         return value?.let { DbNotificationCursorType.valueOf(it) }

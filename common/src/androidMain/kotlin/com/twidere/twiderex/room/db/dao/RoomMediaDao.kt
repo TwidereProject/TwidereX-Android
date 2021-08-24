@@ -28,7 +28,7 @@ import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.room.db.model.DbMedia
 
 @Dao
-interface RoomMediaDao {
+internal interface RoomMediaDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(media: List<DbMedia>)
 

@@ -23,7 +23,7 @@ package com.twidere.twiderex.room.db.model.converter
 import androidx.room.TypeConverter
 import com.twidere.twiderex.model.enums.ComposeType
 
-class ComposeTypeConverter {
+internal class ComposeTypeConverter {
     @TypeConverter
     fun fromString(value: String?): ComposeType? {
         return value?.let { ComposeType.valueOf(it) }

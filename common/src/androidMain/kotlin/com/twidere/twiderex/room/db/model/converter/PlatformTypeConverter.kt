@@ -23,7 +23,7 @@ package com.twidere.twiderex.room.db.model.converter
 import androidx.room.TypeConverter
 import com.twidere.twiderex.model.enums.PlatformType
 
-class PlatformTypeConverter {
+internal class PlatformTypeConverter {
     @TypeConverter
     fun fromPlatformType(platformType: PlatformType?): String? {
         return platformType?.name

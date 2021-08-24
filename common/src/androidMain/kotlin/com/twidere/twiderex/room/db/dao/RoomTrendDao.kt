@@ -30,7 +30,7 @@ import com.twidere.twiderex.room.db.model.DbTrend
 import com.twidere.twiderex.room.db.model.DbTrendWithHistory
 
 @Dao
-interface RoomTrendDao {
+internal interface RoomTrendDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(trends: List<DbTrend>)
 
@@ -50,4 +50,10 @@ interface RoomTrendDao {
     suspend fun clearAll(
         accountKey: MicroBlogKey,
     )
+
+    @Transaction
+    @Query("SELECT * FROM trends WHERE accountKey == :accountKey")
+    fun getAll(
+        accountKey: MicroBlogKey,
+    ): List<DbTrendWithHistory>
 }

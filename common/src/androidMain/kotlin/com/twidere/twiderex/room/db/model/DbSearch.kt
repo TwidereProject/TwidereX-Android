@@ -29,7 +29,7 @@ import com.twidere.twiderex.model.MicroBlogKey
     tableName = "search",
     indices = [Index(value = ["content", "accountKey"], unique = true)],
 )
-data class DbSearch(
+internal data class DbSearch(
     /**
      * Id that being used in the database
      */

@@ -23,7 +23,7 @@ package com.twidere.twiderex.room.db.model.converter
 import androidx.room.TypeConverter
 import com.twidere.twiderex.model.enums.TwitterReplySettings
 
-class TwitterReplySettingsConverter {
+internal class TwitterReplySettingsConverter {
     @TypeConverter
     fun fromString(target: TwitterReplySettings?): String? {
         return target?.name

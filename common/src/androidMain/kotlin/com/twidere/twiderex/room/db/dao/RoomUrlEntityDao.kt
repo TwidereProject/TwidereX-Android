@@ -26,7 +26,7 @@ import androidx.room.OnConflictStrategy
 import com.twidere.twiderex.room.db.model.DbUrlEntity
 
 @Dao
-interface RoomUrlEntityDao {
+internal interface RoomUrlEntityDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(media: List<DbUrlEntity>)
 }

@@ -34,7 +34,7 @@ import com.twidere.twiderex.model.MicroBlogKey
         )
     ],
 )
-data class DbNotificationCursor(
+internal data class DbNotificationCursor(
     /**
      * Id that being used in the database
      */

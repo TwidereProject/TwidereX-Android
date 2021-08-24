@@ -31,7 +31,7 @@ import com.twidere.twiderex.room.db.model.DbStatusReference
 import com.twidere.twiderex.room.db.model.DbStatusReferenceWithStatus
 
 @Dao
-interface RoomStatusReferenceDao {
+internal interface RoomStatusReferenceDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(items: List<DbStatusReference>)
 

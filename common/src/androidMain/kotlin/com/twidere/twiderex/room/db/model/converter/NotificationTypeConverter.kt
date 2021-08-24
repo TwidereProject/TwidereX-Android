@@ -23,7 +23,7 @@ package com.twidere.twiderex.room.db.model.converter
 import androidx.room.TypeConverter
 import com.twidere.twiderex.model.enums.MastodonStatusType
 
-class NotificationTypeConverter {
+internal class NotificationTypeConverter {
     @TypeConverter
     fun fromString(value: String?): MastodonStatusType? {
         return value?.let { MastodonStatusType.valueOf(it) }

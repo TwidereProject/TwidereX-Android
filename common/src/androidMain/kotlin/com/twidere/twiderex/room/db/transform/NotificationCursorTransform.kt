@@ -25,7 +25,7 @@ import com.twidere.twiderex.model.paging.NotificationCursor
 import com.twidere.twiderex.room.db.model.DbNotificationCursor
 import com.twidere.twiderex.room.db.model.DbNotificationCursorType
 
-fun DbNotificationCursor.toUi() = NotificationCursor(
+internal fun DbNotificationCursor.toUi() = NotificationCursor(
     _id = _id,
     accountKey = accountKey,
     type = type.toUi(),
@@ -33,7 +33,7 @@ fun DbNotificationCursor.toUi() = NotificationCursor(
     timestamp = timestamp
 )
 
-fun NotificationCursor.toDbCursor() = DbNotificationCursor(
+internal fun NotificationCursor.toDbCursor() = DbNotificationCursor(
     _id = _id,
     accountKey = accountKey,
     type = type.toDb(),
@@ -41,13 +41,13 @@ fun NotificationCursor.toDbCursor() = DbNotificationCursor(
     timestamp = timestamp
 )
 
-fun DbNotificationCursorType.toUi() = when (this) {
+internal fun DbNotificationCursorType.toUi() = when (this) {
     DbNotificationCursorType.General -> NotificationCursorType.General
     DbNotificationCursorType.Mentions -> NotificationCursorType.Mentions
     DbNotificationCursorType.Follower -> NotificationCursorType.Follower
 }
 
-fun NotificationCursorType.toDb() = when (this) {
+internal fun NotificationCursorType.toDb() = when (this) {
     NotificationCursorType.General -> DbNotificationCursorType.General
     NotificationCursorType.Mentions -> DbNotificationCursorType.Mentions
     NotificationCursorType.Follower -> DbNotificationCursorType.Follower

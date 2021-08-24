@@ -29,7 +29,7 @@ import com.twidere.twiderex.model.MicroBlogKey
     tableName = "status_reactions",
     indices = [Index(value = ["statusKey", "accountKey"], unique = true)],
 )
-data class DbStatusReaction(
+internal data class DbStatusReaction(
     /**
      * Id that being used in the database
      */

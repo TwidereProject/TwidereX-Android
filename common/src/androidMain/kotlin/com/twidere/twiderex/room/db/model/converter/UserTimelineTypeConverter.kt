@@ -23,7 +23,7 @@ package com.twidere.twiderex.room.db.model.converter
 import androidx.room.TypeConverter
 import com.twidere.twiderex.room.db.model.UserTimelineType
 
-class UserTimelineTypeConverter {
+internal class UserTimelineTypeConverter {
     @TypeConverter
     fun fromPlatformType(timelineType: UserTimelineType?): String? {
         return timelineType?.name

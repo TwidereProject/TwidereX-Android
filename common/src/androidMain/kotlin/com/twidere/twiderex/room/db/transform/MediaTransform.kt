@@ -24,7 +24,7 @@ import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.room.db.model.DbMedia
 import java.util.UUID
 
-fun List<DbMedia>.toUi() = sortedBy { it.order }.map {
+internal fun List<DbMedia>.toUi() = sortedBy { it.order }.map {
     UiMedia(
         url = it.url,
         belongToKey = it.belongToKey,
@@ -39,7 +39,7 @@ fun List<DbMedia>.toUi() = sortedBy { it.order }.map {
     )
 }
 
-fun List<UiMedia>.toDbMedia() = map {
+internal fun List<UiMedia>.toDbMedia() = map {
     DbMedia(
         url = it.url,
         belongToKey = it.belongToKey,

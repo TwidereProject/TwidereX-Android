@@ -29,7 +29,7 @@ import com.twidere.twiderex.room.db.model.DbDraft
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface RoomDraftDao {
+internal interface RoomDraftDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(vararg draft: DbDraft)
 

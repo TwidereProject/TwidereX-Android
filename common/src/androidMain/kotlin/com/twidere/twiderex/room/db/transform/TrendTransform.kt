@@ -28,7 +28,7 @@ import com.twidere.twiderex.room.db.model.DbTrendHistory
 import com.twidere.twiderex.room.db.model.DbTrendWithHistory
 import java.util.UUID
 
-fun DbTrendWithHistory.toUi(accountKey: MicroBlogKey) = UiTrend(
+internal fun DbTrendWithHistory.toUi(accountKey: MicroBlogKey) = UiTrend(
     trendKey = trend.trendKey,
     displayName = trend.displayName,
     url = trend.url,
@@ -40,21 +40,21 @@ fun DbTrendWithHistory.toUi(accountKey: MicroBlogKey) = UiTrend(
     accountKey = accountKey
 )
 
-fun DbTrendHistory.toUi() = UiTrendHistory(
+internal fun DbTrendHistory.toUi() = UiTrendHistory(
     trendKey = trendKey,
     day = day,
     uses = uses,
     accounts = accounts
 )
 
-fun List<UiTrend>.toDbTrendWithHistory() = map {
+internal fun List<UiTrend>.toDbTrendWithHistory() = map {
     DbTrendWithHistory(
         trend = it.toDbTrend(),
         history = it.history.map { history -> history.toDbTrendHistory(it.accountKey) }
     )
 }
 
-fun UiTrend.toDbTrend() = DbTrend(
+internal fun UiTrend.toDbTrend() = DbTrend(
     _id = UUID.randomUUID().toString(),
     trendKey = trendKey,
     displayName = displayName,
@@ -64,7 +64,7 @@ fun UiTrend.toDbTrend() = DbTrend(
     accountKey = accountKey
 )
 
-fun UiTrendHistory.toDbTrendHistory(accountKey: MicroBlogKey) = DbTrendHistory(
+internal fun UiTrendHistory.toDbTrendHistory(accountKey: MicroBlogKey) = DbTrendHistory(
     trendKey = trendKey,
     day = day,
     uses = uses,

@@ -45,7 +45,7 @@ import com.twidere.twiderex.room.db.model.converter.StringListConverter
     ComposeTypeConverter::class,
     StringListConverter::class,
 )
-abstract class RoomAppDatabase : RoomDatabase() {
+internal abstract class RoomAppDatabase : RoomDatabase() {
     abstract fun draftDao(): RoomDraftDao
     abstract fun searchDao(): RoomSearchDao
 }

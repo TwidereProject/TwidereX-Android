@@ -29,7 +29,7 @@ import com.twidere.twiderex.model.MicroBlogKey
     tableName = "trend_histories",
     indices = [Index(value = ["trendKey", "day"], unique = true)],
 )
-data class DbTrendHistory(
+internal data class DbTrendHistory(
     @PrimaryKey
     val _id: String,
     val trendKey: MicroBlogKey,

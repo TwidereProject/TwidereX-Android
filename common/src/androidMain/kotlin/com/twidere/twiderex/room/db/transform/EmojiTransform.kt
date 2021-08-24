@@ -24,7 +24,7 @@ import com.twidere.services.mastodon.model.Emoji
 import com.twidere.twiderex.model.ui.UiEmoji
 import com.twidere.twiderex.model.ui.UiEmojiCategory
 
-fun List<Emoji>.toUi(): List<UiEmojiCategory> = groupBy({ it.category }, { it }).map {
+internal fun List<Emoji>.toUi(): List<UiEmojiCategory> = groupBy({ it.category }, { it }).map {
     UiEmojiCategory(
         if (it.key.isNullOrEmpty()) null else it.key,
         it.value.map { emoji ->

@@ -90,7 +90,7 @@ import com.twidere.twiderex.room.db.model.converter.UserTimelineTypeConverter
     TwitterReplySettingsConverter::class,
     MastodonVisibilityConverter::class
 )
-abstract class RoomCacheDatabase : RoomDatabase() {
+internal abstract class RoomCacheDatabase : RoomDatabase() {
     abstract fun statusDao(): RoomStatusDao
     abstract fun mediaDao(): RoomMediaDao
     abstract fun userDao(): RoomUserDao

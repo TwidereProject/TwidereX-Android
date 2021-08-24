@@ -43,7 +43,9 @@ import com.twidere.services.twitter.model.TwitterList
 import com.twidere.services.twitter.model.TwitterPaging
 import com.twidere.services.twitter.model.UserV2
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.enums.ComposeType
 import com.twidere.twiderex.model.enums.MediaType
+import com.twidere.twiderex.model.ui.UiDraft
 import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.model.ui.UiSearch
 import org.jetbrains.annotations.TestOnly
@@ -62,6 +64,22 @@ fun mockUiMedia(url: String = "", belongToKey: MicroBlogKey = MicroBlogKey.Empty
     pageUrl = "",
     altText = "",
     order = 0
+)
+
+@TestOnly
+fun mockUiDraft(
+    draftId: String = "",
+    content: String = "",
+    composeType: ComposeType = ComposeType.New,
+    statusKey: MicroBlogKey = MicroBlogKey.twitter(UUID.randomUUID().toString())
+) = UiDraft(
+    draftId = draftId,
+    content = content,
+    media = emptyList(),
+    createdAt = System.currentTimeMillis(),
+    composeType = composeType,
+    statusKey = statusKey,
+    excludedReplyUserIds = null
 )
 
 @TestOnly

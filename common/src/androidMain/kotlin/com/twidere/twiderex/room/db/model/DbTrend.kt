@@ -32,7 +32,7 @@ import com.twidere.twiderex.room.db.RoomCacheDatabase
     tableName = "trends",
     indices = [Index(value = ["trendKey", "url"], unique = true)],
 )
-data class DbTrend(
+internal data class DbTrend(
     @PrimaryKey
     val _id: String,
     val trendKey: MicroBlogKey,
@@ -43,7 +43,7 @@ data class DbTrend(
     val volume: Long,
 )
 
-data class DbTrendWithHistory(
+internal data class DbTrendWithHistory(
     @Embedded
     val trend: DbTrend,
 

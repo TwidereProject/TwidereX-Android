@@ -29,7 +29,7 @@ import com.twidere.twiderex.room.db.model.DbNotificationCursor
 import com.twidere.twiderex.room.db.model.DbNotificationCursorType
 
 @Dao
-interface RoomNotificationCursorDao {
+internal interface RoomNotificationCursorDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(lists: List<DbNotificationCursor>)
 

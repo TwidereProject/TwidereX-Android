@@ -32,7 +32,7 @@ import com.twidere.twiderex.room.db.model.DbList
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface RoomListsDao {
+internal interface RoomListsDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(lists: List<DbList>)
 

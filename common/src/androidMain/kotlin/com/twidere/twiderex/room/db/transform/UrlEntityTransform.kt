@@ -25,7 +25,7 @@ import com.twidere.twiderex.model.ui.UiUrlEntity
 import com.twidere.twiderex.room.db.model.DbUrlEntity
 import java.util.UUID
 
-fun DbUrlEntity.toUi() = UiUrlEntity(
+internal fun DbUrlEntity.toUi() = UiUrlEntity(
     url = url,
     expandedUrl = expandedUrl,
     displayUrl = displayUrl,
@@ -33,9 +33,9 @@ fun DbUrlEntity.toUi() = UiUrlEntity(
     description = description,
     image = image
 )
-fun List<DbUrlEntity>.toUi() = map { it.toUi() }
+internal fun List<DbUrlEntity>.toUi() = map { it.toUi() }
 
-fun List<UiUrlEntity>.toDbUrl(belongToKey: MicroBlogKey) = map {
+internal fun List<UiUrlEntity>.toDbUrl(belongToKey: MicroBlogKey) = map {
     DbUrlEntity(
         url = it.url,
         _id = UUID.randomUUID().toString(),

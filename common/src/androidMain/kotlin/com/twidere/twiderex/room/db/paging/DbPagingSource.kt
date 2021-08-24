@@ -47,12 +47,16 @@ internal class DbPagingSource<UI : Any>(
     }
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, UI> {
-        val list = loadFromDb(params.key ?: 0, params.loadSize)
-        val nextKey = (params.key ?: 0) + list.size
-        return LoadResult.Page(
-            data = list,
-            prevKey = null,
-            nextKey = nextKey
-        )
+        return try {
+            val list = loadFromDb(params.key ?: 0, params.loadSize)
+            val nextKey = if (list.size < params.loadSize) null else (params.key ?: 0) + list.size
+            LoadResult.Page(
+                data = list,
+                prevKey = null,
+                nextKey = nextKey
+            )
+        } catch (e: Throwable) {
+            LoadResult.Error(e)
+        }
     }
 }

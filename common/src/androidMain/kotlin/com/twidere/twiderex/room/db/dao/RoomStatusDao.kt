@@ -33,7 +33,7 @@ import com.twidere.twiderex.room.db.model.DbStatusWithReference
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface RoomStatusDao {
+internal interface RoomStatusDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(status: List<DbStatusV2>)
 
