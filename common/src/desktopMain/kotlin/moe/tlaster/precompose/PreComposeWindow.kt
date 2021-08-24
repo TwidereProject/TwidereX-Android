@@ -22,13 +22,18 @@ package moe.tlaster.precompose
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.window.FrameWindowScope
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.rememberWindowState
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.distinctUntilChanged
+import moe.tlaster.precompose.lifecycle.Lifecycle
 import moe.tlaster.precompose.lifecycle.LifecycleOwner
 import moe.tlaster.precompose.lifecycle.LifecycleRegistry
 import moe.tlaster.precompose.ui.BackDispatcher
@@ -55,34 +60,53 @@ fun PreComposeWindow(
     onKeyEvent: (KeyEvent) -> Boolean = { false },
     content: @Composable FrameWindowScope.() -> Unit
 ) {
-    Window(
-        onCloseRequest,
-        state,
-        visible,
-        title,
-        icon,
-        undecorated,
-        resizable,
-        enabled,
-        focusable,
-        alwaysOnTop,
-        onPreviewKeyEvent,
-        onKeyEvent,
-        content = {
-            ProvideDesktopCompositionLocals {
-                content.invoke(this)
+    val holder = remember {
+        PreComposeWindowHolder()
+    }
+    LaunchedEffect(Unit) {
+        snapshotFlow { state.isMinimized }
+            .distinctUntilChanged()
+            .collect {
+                holder.lifecycle.currentState = if (it) {
+                    Lifecycle.State.InActive
+                } else {
+                    Lifecycle.State.Active
+                }
             }
-        },
-    )
+    }
+    ProvideDesktopCompositionLocals(
+        holder
+    ) {
+        Window(
+            onCloseRequest = {
+                holder.lifecycle.currentState = Lifecycle.State.Destroyed
+                onCloseRequest.invoke()
+            },
+            state,
+            visible,
+            title,
+            icon,
+            undecorated,
+            resizable,
+            enabled,
+            focusable,
+            alwaysOnTop,
+            onPreviewKeyEvent,
+            onKeyEvent,
+            content = {
+                content.invoke(this)
+            },
+        )
+    }
 }
 
 @Composable
 private fun ProvideDesktopCompositionLocals(
+    holder: PreComposeWindowHolder = remember {
+        PreComposeWindowHolder()
+    },
     content: @Composable () -> Unit,
 ) {
-    val holder = remember {
-        PreComposeWindowHolder()
-    }
     CompositionLocalProvider(
         LocalLifecycleOwner provides holder,
         LocalViewModelStoreOwner provides holder,

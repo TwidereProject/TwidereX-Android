@@ -21,9 +21,9 @@
 package com.twidere.twiderex
 
 import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import com.twidere.twiderex.di.setupModules
+import moe.tlaster.precompose.PreComposeWindow
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
 
@@ -34,7 +34,7 @@ fun main() {
         setupModules()
     }
     application {
-        Window(
+        PreComposeWindow(
             onCloseRequest = {
                 stopKoin()
                 exitApplication()
