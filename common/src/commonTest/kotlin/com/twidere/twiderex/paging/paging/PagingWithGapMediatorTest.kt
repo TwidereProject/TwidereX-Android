@@ -118,6 +118,6 @@ internal class MockPagingGapMediator(
         max_id: String?,
         since_id: String?
     ): List<IStatus> {
-        return listOf(mockIStatus(statusId)).toIPaging()
+        return listOf(mockIStatus(id = statusId)).toIPaging()
     }
 }

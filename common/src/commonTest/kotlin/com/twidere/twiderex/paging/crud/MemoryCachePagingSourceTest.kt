@@ -22,8 +22,8 @@ package com.twidere.twiderex.paging.crud
 
 import androidx.paging.PagingSource
 import kotlinx.coroutines.runBlocking
-import org.junit.Assert
 import org.junit.Test
+import kotlin.test.assertEquals
 
 class MemoryCachePagingSourceTest {
     private val pagingMemoryCache = PagingMemoryCache<String>()
@@ -34,14 +34,14 @@ class MemoryCachePagingSourceTest {
         val source = MemoryCachePagingSource(pagingMemoryCache)
         var result = source.load(PagingSource.LoadParams.Refresh(null, 2, placeholdersEnabled = false)) as PagingSource.LoadResult.Page
         assert(result.data.isNotEmpty())
-        Assert.assertEquals(1, result.nextKey)
+        assertEquals(1, result.nextKey)
 
         result = source.load(PagingSource.LoadParams.Append(result.nextKey!!, 2, placeholdersEnabled = false)) as PagingSource.LoadResult.Page
         assert(result.data.isNotEmpty())
-        Assert.assertEquals(2, result.nextKey)
+        assertEquals(2, result.nextKey)
 
         result = source.load(PagingSource.LoadParams.Append(result.nextKey!!, 2, placeholdersEnabled = false)) as PagingSource.LoadResult.Page
         assert(result.data.isEmpty())
-        Assert.assertEquals(null, result.nextKey)
+        assertEquals(null, result.nextKey)
     }
 }

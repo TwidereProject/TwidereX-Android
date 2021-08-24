@@ -48,7 +48,7 @@ internal class NotificationRepositoryTest {
             service = service
         )
         assert(list.isNotEmpty())
-        assertEquals(list.maxOf { it.timestamp }, repo.findCursor(accountKey, NotificationCursorType.General)?.timestamp)
+        assertEquals(list.first().statusId, repo.findCursor(accountKey, NotificationCursorType.General)?.value)
     }
 
     @Test
@@ -67,6 +67,6 @@ internal class NotificationRepositoryTest {
             service = service
         )
         assert(list.isNotEmpty())
-        assertEquals(list.maxOf { it.timestamp }, repo.findCursor(accountKey, NotificationCursorType.Mentions)?.timestamp)
+        assertEquals(list.first().statusId, repo.findCursor(accountKey, NotificationCursorType.Mentions)?.value)
     }
 }

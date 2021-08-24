@@ -21,13 +21,13 @@
 package com.twidere.twiderex.paging.crud
 
 import org.junit.After
-import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
+import kotlin.test.assertEquals
 
 class PagingMemoryCacheTest {
 
@@ -53,14 +53,14 @@ class PagingMemoryCacheTest {
     fun find() {
         pagingMemoryCache.insert(listOf("1", "2", "3", "4"))
         // check if
-        Assert.assertEquals("3", pagingMemoryCache.find(2, 3)[0])
+        assertEquals("3", pagingMemoryCache.find(2, 3)[0])
 
         // check if index out of bound
-        Assert.assertEquals(4, pagingMemoryCache.find(0, 10).size)
+        assertEquals(4, pagingMemoryCache.find(0, 10).size)
 
         // check if size correct
 
-        Assert.assertEquals(3, pagingMemoryCache.find(0, 3).size)
+        assertEquals(3, pagingMemoryCache.find(0, 3).size)
     }
 
     @Test

@@ -22,6 +22,6 @@ package com.twidere.twiderex.db.base
 
 import com.twidere.twiderex.room.db.RoomAppDatabase
 
-internal open class AppDatabaseDaoTest : BaseDaoTest<RoomAppDatabase>() {
+internal abstract class AppDatabaseDaoTest : BaseDaoTest<RoomAppDatabase>() {
     override fun getDBClass() = RoomAppDatabase::class.java
 }

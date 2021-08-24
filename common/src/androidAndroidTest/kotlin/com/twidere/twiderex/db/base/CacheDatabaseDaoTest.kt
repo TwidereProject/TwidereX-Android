@@ -22,6 +22,6 @@ package com.twidere.twiderex.db.base
 
 import com.twidere.twiderex.room.db.RoomCacheDatabase
 
-internal open class CacheDatabaseDaoTest : BaseDaoTest<RoomCacheDatabase>() {
+internal abstract class CacheDatabaseDaoTest : BaseDaoTest<RoomCacheDatabase>() {
     override fun getDBClass() = RoomCacheDatabase::class.java
 }

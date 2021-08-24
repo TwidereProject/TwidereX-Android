@@ -25,8 +25,8 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import kotlinx.coroutines.runBlocking
-import org.junit.Assert
 import org.junit.Test
+import kotlin.test.assertEquals
 
 class TestMemoryCachePagingMediator(pagingMemoryCache: PagingMemoryCache<String>) : MemoryCachePagingMediator<Int, String>(pagingMemoryCache) {
     override suspend fun load(
@@ -44,9 +44,9 @@ class MemoryCachePagingMediatorTest {
     @Test
     fun load_saveToPagingMemoryCacheAfterSuccess() = runBlocking {
         val mediator = TestMemoryCachePagingMediator(pagingMemoryCache)
-        Assert.assertEquals(0, pagingMemoryCache.size())
+        assertEquals(0, pagingMemoryCache.size())
         val pagingState = PagingState<Int, String>(emptyList(), config = PagingConfig(20), anchorPosition = 0, leadingPlaceholderCount = 0)
         mediator.load(LoadType.REFRESH, pagingState)
-        Assert.assertEquals(2, pagingMemoryCache.size())
+        assertEquals(2, pagingMemoryCache.size())
     }
 }
