@@ -20,8 +20,6 @@
  */
 package com.twidere.twiderex.viewmodel.search
 
-import moe.tlaster.precompose.viewmodel.ViewModel
-import moe.tlaster.precompose.viewmodel.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
@@ -29,6 +27,8 @@ import com.twidere.services.microblog.SearchService
 import com.twidere.twiderex.defaultLoadCount
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.paging.source.SearchUserPagingSource
+import moe.tlaster.precompose.viewmodel.ViewModel
+import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class SearchUserViewModel(
     private val account: AccountDetails,

@@ -21,8 +21,6 @@
 package com.twidere.twiderex.viewmodel.twitter
 
 import android.accounts.Account
-import moe.tlaster.precompose.viewmodel.ViewModel
-import moe.tlaster.precompose.viewmodel.viewModelScope
 import com.twidere.services.http.MicroBlogException
 import com.twidere.services.twitter.TwitterOAuthService
 import com.twidere.services.twitter.TwitterService
@@ -44,6 +42,8 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import moe.tlaster.precompose.viewmodel.ViewModel
+import moe.tlaster.precompose.viewmodel.viewModelScope
 import retrofit2.HttpException
 import java.io.IOException
 

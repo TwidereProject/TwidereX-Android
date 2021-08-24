@@ -20,11 +20,11 @@
  */
 package com.twidere.twiderex.viewmodel.trend
 
-import moe.tlaster.precompose.viewmodel.ViewModel
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.repository.TrendRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import moe.tlaster.precompose.viewmodel.ViewModel
 
 class TrendViewModel @AssistedInject constructor(
     private val repository: TrendRepository,

@@ -22,8 +22,6 @@ package com.twidere.twiderex.viewmodel
 
 import android.content.Context
 import android.net.Uri
-import moe.tlaster.precompose.viewmodel.ViewModel
-import moe.tlaster.precompose.viewmodel.viewModelScope
 import androidx.work.WorkManager
 import com.twidere.services.microblog.LookupService
 import com.twidere.twiderex.R
@@ -40,6 +38,8 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import moe.tlaster.precompose.viewmodel.ViewModel
+import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class MediaViewModel @AssistedInject constructor(
     private val repository: StatusRepository,

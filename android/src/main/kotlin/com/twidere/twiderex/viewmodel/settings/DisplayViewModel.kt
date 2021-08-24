@@ -21,11 +21,11 @@
 package com.twidere.twiderex.viewmodel.settings
 
 import androidx.datastore.core.DataStore
-import moe.tlaster.precompose.viewmodel.ViewModel
-import moe.tlaster.precompose.viewmodel.viewModelScope
 import com.twidere.twiderex.preferences.model.DisplayPreferences
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.launch
+import moe.tlaster.precompose.viewmodel.ViewModel
+import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class DisplayViewModel @AssistedInject constructor(
     private val displayPreferences: DataStore<DisplayPreferences>

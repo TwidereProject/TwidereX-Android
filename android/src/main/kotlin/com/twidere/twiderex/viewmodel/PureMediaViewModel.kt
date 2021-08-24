@@ -20,12 +20,12 @@
  */
 package com.twidere.twiderex.viewmodel
 
-import moe.tlaster.precompose.viewmodel.ViewModel
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.repository.MediaRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.flow
+import moe.tlaster.precompose.viewmodel.ViewModel
 
 class PureMediaViewModel @AssistedInject constructor(
     private val mediaRepository: MediaRepository,

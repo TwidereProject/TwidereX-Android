@@ -22,8 +22,6 @@ package com.twidere.twiderex.viewmodel.timeline
 
 import android.content.SharedPreferences
 import androidx.core.content.edit
-import moe.tlaster.precompose.viewmodel.ViewModel
-import moe.tlaster.precompose.viewmodel.viewModelScope
 import androidx.paging.cachedIn
 import com.twidere.twiderex.defaultLoadCount
 import com.twidere.twiderex.extensions.toUi
@@ -32,6 +30,8 @@ import com.twidere.twiderex.paging.mediator.paging.PagingWithGapMediator
 import com.twidere.twiderex.paging.mediator.paging.pager
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
+import moe.tlaster.precompose.viewmodel.ViewModel
+import moe.tlaster.precompose.viewmodel.viewModelScope
 
 abstract class TimelineViewModel(
     private val preferences: SharedPreferences,

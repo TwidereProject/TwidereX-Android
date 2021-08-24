@@ -20,13 +20,13 @@
  */
 package com.twidere.twiderex.viewmodel.dm
 
-import moe.tlaster.precompose.viewmodel.ViewModel
 import com.twidere.services.microblog.DirectMessageService
 import com.twidere.services.microblog.LookupService
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.repository.DirectMessageRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import moe.tlaster.precompose.viewmodel.ViewModel
 
 class DMConversationViewModel @AssistedInject constructor(
     private val repository: DirectMessageRepository,

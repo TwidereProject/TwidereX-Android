@@ -20,8 +20,6 @@
  */
 package com.twidere.twiderex.viewmodel.twitter.search
 
-import moe.tlaster.precompose.viewmodel.ViewModel
-import moe.tlaster.precompose.viewmodel.viewModelScope
 import androidx.paging.cachedIn
 import androidx.paging.flatMap
 import androidx.paging.map
@@ -34,6 +32,8 @@ import com.twidere.twiderex.paging.mediator.search.SearchMediaMediator
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.map
+import moe.tlaster.precompose.viewmodel.ViewModel
+import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class TwitterSearchMediaViewModel @AssistedInject constructor(
     val database: CacheDatabase,

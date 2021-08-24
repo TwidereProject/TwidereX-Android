@@ -21,8 +21,6 @@
 package com.twidere.twiderex.viewmodel.dm
 
 import android.net.Uri
-import moe.tlaster.precompose.viewmodel.ViewModel
-import moe.tlaster.precompose.viewmodel.viewModelScope
 import androidx.paging.cachedIn
 import com.twidere.services.microblog.DirectMessageService
 import com.twidere.services.microblog.LookupService
@@ -39,6 +37,8 @@ import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
+import moe.tlaster.precompose.viewmodel.ViewModel
+import moe.tlaster.precompose.viewmodel.viewModelScope
 import java.util.UUID
 
 class DMEventViewModel @AssistedInject constructor(

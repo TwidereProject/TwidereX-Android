@@ -20,14 +20,14 @@
  */
 package com.twidere.twiderex.viewmodel
 
-import moe.tlaster.precompose.viewmodel.ViewModel
-import moe.tlaster.precompose.viewmodel.viewModelScope
 import androidx.paging.cachedIn
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.repository.StatusRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import moe.tlaster.precompose.viewmodel.ViewModel
+import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class StatusViewModel @AssistedInject constructor(
     private val statusRepository: StatusRepository,

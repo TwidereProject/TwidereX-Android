@@ -21,8 +21,6 @@
 package com.twidere.twiderex.viewmodel.lists
 
 import androidx.compose.runtime.mutableStateMapOf
-import moe.tlaster.precompose.viewmodel.ViewModel
-import moe.tlaster.precompose.viewmodel.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.twidere.twiderex.model.AccountDetails
@@ -37,6 +35,8 @@ import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import moe.tlaster.precompose.viewmodel.ViewModel
+import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class ListsUserViewModel @AssistedInject constructor(
     private val listsUsersRepository: ListsUsersRepository,

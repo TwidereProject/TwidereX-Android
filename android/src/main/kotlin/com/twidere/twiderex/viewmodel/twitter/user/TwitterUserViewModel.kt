@@ -20,7 +20,6 @@
  */
 package com.twidere.twiderex.viewmodel.twitter.user
 
-import moe.tlaster.precompose.viewmodel.ViewModel
 import com.twidere.services.microblog.LookupService
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.notification.InAppNotification
@@ -30,6 +29,7 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flow
+import moe.tlaster.precompose.viewmodel.ViewModel
 
 class TwitterUserViewModel @AssistedInject constructor(
     private val repository: UserRepository,

@@ -21,8 +21,6 @@
 package com.twidere.twiderex.viewmodel.settings
 
 import androidx.datastore.core.DataStore
-import moe.tlaster.precompose.viewmodel.ViewModel
-import moe.tlaster.precompose.viewmodel.viewModelScope
 import com.twidere.twiderex.R
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.preferences.model.MiscPreferences
@@ -31,6 +29,8 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import moe.tlaster.precompose.viewmodel.ViewModel
+import moe.tlaster.precompose.viewmodel.viewModelScope
 
 @OptIn(FlowPreview::class)
 class MiscViewModel @AssistedInject constructor(

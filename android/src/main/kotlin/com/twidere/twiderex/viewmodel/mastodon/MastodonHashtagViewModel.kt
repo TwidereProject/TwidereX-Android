@@ -20,13 +20,13 @@
  */
 package com.twidere.twiderex.viewmodel.mastodon
 
-import moe.tlaster.precompose.viewmodel.ViewModel
-import moe.tlaster.precompose.viewmodel.viewModelScope
 import androidx.paging.cachedIn
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.repository.TimelineRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import moe.tlaster.precompose.viewmodel.ViewModel
+import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class MastodonHashtagViewModel @AssistedInject constructor(
     private val repository: TimelineRepository,

@@ -20,13 +20,13 @@
  */
 package com.twidere.twiderex.viewmodel.settings
 
-import moe.tlaster.precompose.viewmodel.ViewModel
-import moe.tlaster.precompose.viewmodel.viewModelScope
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.scenes.home.HomeMenus
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.launch
+import moe.tlaster.precompose.viewmodel.ViewModel
+import moe.tlaster.precompose.viewmodel.viewModelScope
 import kotlin.math.min
 
 private const val MaxMenuCount = 5

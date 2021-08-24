@@ -22,8 +22,6 @@ package com.twidere.twiderex.viewmodel.mastodon
 
 import android.accounts.Account
 import androidx.compose.ui.text.input.TextFieldValue
-import moe.tlaster.precompose.viewmodel.ViewModel
-import moe.tlaster.precompose.viewmodel.viewModelScope
 import com.twidere.services.mastodon.MastodonOAuthService
 import com.twidere.twiderex.db.mapper.toDbUser
 import com.twidere.twiderex.http.TwidereServiceFactory
@@ -40,6 +38,8 @@ import com.twidere.twiderex.utils.json
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import moe.tlaster.precompose.viewmodel.ViewModel
+import moe.tlaster.precompose.viewmodel.viewModelScope
 import java.net.URI
 
 class MastodonSignInViewModel @AssistedInject constructor(

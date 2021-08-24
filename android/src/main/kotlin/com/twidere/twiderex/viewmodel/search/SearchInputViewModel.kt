@@ -20,8 +20,6 @@
  */
 package com.twidere.twiderex.viewmodel.search
 
-import moe.tlaster.precompose.viewmodel.ViewModel
-import moe.tlaster.precompose.viewmodel.viewModelScope
 import com.twidere.twiderex.db.model.DbSearch
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.repository.SearchRepository
@@ -29,6 +27,8 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import moe.tlaster.precompose.viewmodel.ViewModel
+import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class SearchInputViewModel @AssistedInject constructor(
     private val repository: SearchRepository,

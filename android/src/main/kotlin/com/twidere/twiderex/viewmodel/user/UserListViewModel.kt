@@ -20,10 +20,10 @@
  */
 package com.twidere.twiderex.viewmodel.user
 
-import moe.tlaster.precompose.viewmodel.ViewModel
 import androidx.paging.PagingData
 import com.twidere.twiderex.model.ui.UiUser
 import kotlinx.coroutines.flow.Flow
+import moe.tlaster.precompose.viewmodel.ViewModel
 
 abstract class UserListViewModel : ViewModel() {
     abstract val source: Flow<PagingData<UiUser>>

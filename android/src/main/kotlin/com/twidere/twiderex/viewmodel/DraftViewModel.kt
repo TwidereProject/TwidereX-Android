@@ -21,12 +21,12 @@
 package com.twidere.twiderex.viewmodel
 
 import androidx.core.app.NotificationManagerCompat
-import moe.tlaster.precompose.viewmodel.ViewModel
 import androidx.work.WorkManager
 import com.twidere.twiderex.db.model.DbDraft
 import com.twidere.twiderex.repository.DraftRepository
 import com.twidere.twiderex.worker.draft.RemoveDraftWorker
 import dagger.assisted.AssistedInject
+import moe.tlaster.precompose.viewmodel.ViewModel
 
 class DraftViewModel @AssistedInject constructor(
     private val repository: DraftRepository,
