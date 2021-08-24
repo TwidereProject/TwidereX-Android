@@ -21,6 +21,7 @@
 package com.twidere.twiderex.dataprovider.db.dao
 
 import androidx.paging.PagingSource
+import androidx.room.withTransaction
 import com.twidere.twiderex.db.dao.DirectMessageConversationDao
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiDMConversation
@@ -55,6 +56,13 @@ internal class DirectMessageConversationDaoImpl(private val database: RoomCacheD
     ) = database.directMessageConversationDao().find(accountKey).map { it.toUi() }
 
     override suspend fun delete(conversation: UiDMConversation) {
-        database.directMessageConversationDao().delete(conversation.toDbDMConversation())
+        database.withTransaction {
+            database.directMessageConversationDao().findWithConversationKey(
+                accountKey = conversation.accountKey,
+                conversationKey = conversation.conversationKey
+            )?.let {
+                database.directMessageConversationDao().delete(it)
+            }
+        }
     }
 }
