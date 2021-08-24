@@ -20,26 +20,19 @@
  */
 package com.twidere.twiderex.db
 
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.paging.PagingSource
-import androidx.room.Room
-import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.twidere.services.mastodon.model.TrendHistory
 import com.twidere.twiderex.dataprovider.db.CacheDatabaseImpl
 import com.twidere.twiderex.dataprovider.mapper.toUi
 import com.twidere.twiderex.dataprovider.mapper.toUiTrend
+import com.twidere.twiderex.db.base.CacheDatabaseDaoTest
 import com.twidere.twiderex.mock.model.mockITrend
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiTrend
-import com.twidere.twiderex.room.db.RoomCacheDatabase
 import kotlinx.coroutines.runBlocking
-import org.junit.After
-import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.util.concurrent.Executors
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 
@@ -47,8 +40,7 @@ typealias TwitterTrend = com.twidere.services.twitter.model.Trend
 typealias MastodonTrend = com.twidere.services.mastodon.model.Trend
 
 @RunWith(AndroidJUnit4::class)
-internal class TrendDaoImplTest {
-    private lateinit var roomDatabase: RoomCacheDatabase
+internal class TrendDaoImplTest : CacheDatabaseDaoTest() {
     private val twitterAccountKey = MicroBlogKey.twitter("123")
     private val mastodonAccountKey = MicroBlogKey("456", "mastodon.com")
     private val trends = mutableListOf<UiTrend>()
@@ -56,13 +48,8 @@ internal class TrendDaoImplTest {
     private val twitterTrendCount = 10
     private val mastodonTrendCount = 10
 
-    @get:Rule
-    val rule = InstantTaskExecutorRule()
-
-    @Before
-    fun setUp() {
-        roomDatabase = Room.inMemoryDatabaseBuilder(ApplicationProvider.getApplicationContext(), RoomCacheDatabase::class.java)
-            .setTransactionExecutor(Executors.newSingleThreadExecutor()).build()
+    override fun setUp() {
+        super.setUp()
         for (i in 0 until twitterTrendCount) {
             trends.add(
                 TwitterTrend(
@@ -86,11 +73,6 @@ internal class TrendDaoImplTest {
                 ).toUiTrend(mastodonAccountKey)
             )
         }
-    }
-
-    @After
-    fun tearDown() {
-        roomDatabase.close()
     }
 
     @Test
