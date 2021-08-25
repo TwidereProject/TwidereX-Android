@@ -23,6 +23,5 @@ package com.twidere.twiderex.di
 import org.koin.core.KoinApplication
 
 fun KoinApplication.setupModules() {
-    modules(twidereModules)
     modules(preferencesModule)
 }
