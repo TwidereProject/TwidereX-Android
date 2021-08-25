@@ -33,14 +33,11 @@ import com.twidere.twiderex.model.ui.UiList
 import com.twidere.twiderex.paging.mediator.list.ListsMediator
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.mockito.junit.MockitoJUnitRunner
 
 /**
  * instead of testing pagination, we should focus on our code logic
  */
 
-@RunWith(MockitoJUnitRunner::class)
 class ListsMediatorTest {
     private var mockDataBase = MockCacheDatabase()
 

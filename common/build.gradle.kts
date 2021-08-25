@@ -51,8 +51,6 @@ kotlin {
                 implementation(kotlin("test"))
                 implementation("io.insert-koin:koin-test:${Versions.koin}")
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:${Versions.Kotlin.coroutines}")
-                implementation("org.mockito:mockito-core:3.11.2")
-                implementation("org.mockito.kotlin:mockito-kotlin:3.2.0")
             }
         }
         val androidMain by getting {

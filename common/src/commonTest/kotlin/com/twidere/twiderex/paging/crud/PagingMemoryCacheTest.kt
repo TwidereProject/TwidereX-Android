@@ -20,34 +20,12 @@
  */
 package com.twidere.twiderex.paging.crud
 
-import org.junit.After
-import org.junit.Before
 import org.junit.Test
-import org.mockito.Mock
-import org.mockito.MockitoAnnotations
-import org.mockito.kotlin.times
-import org.mockito.kotlin.verify
 import kotlin.test.assertEquals
 
 class PagingMemoryCacheTest {
 
-    private lateinit var mocks: AutoCloseable
-
     private val pagingMemoryCache = PagingMemoryCache<String>()
-
-    @Mock
-    private lateinit var mockObserver: OnInvalidateObserver
-
-    @Before
-    fun setUp() {
-        mocks = MockitoAnnotations.openMocks(this)
-        pagingMemoryCache.addWeakObserver(mockObserver)
-    }
-
-    @After
-    fun tearDown() {
-        mocks.close()
-    }
 
     @Test
     fun find() {
@@ -63,55 +41,78 @@ class PagingMemoryCacheTest {
         assertEquals(3, pagingMemoryCache.find(0, 3).size)
     }
 
+    private fun PagingMemoryCache<String>.verifyInvalidate( times: Int, block: () -> Unit) {
+        var invalidateCount = 0
+        val observer = object : OnInvalidateObserver {
+            override fun onInvalidate() {
+                invalidateCount++
+            }
+        }
+        addWeakObserver(observer)
+        block.invoke()
+        val start = System.currentTimeMillis()
+        while (invalidateCount < times && System.currentTimeMillis() - start < 3000) {
+            continue
+        }
+        unRegister(observer)
+        assertEquals(times, invalidateCount)
+    }
+
     @Test
     fun insert_NotifyObserverAfterInsertSuccess() {
-        pagingMemoryCache.insert(listOf("1"))
-        verify(mockObserver, times(1)).onInvalidate()
+        pagingMemoryCache.verifyInvalidate(1) {
+            pagingMemoryCache.insert(listOf("1"))
+        }
     }
 
     @Test
     fun insert_SilenceAfterInsertFailed() {
-        pagingMemoryCache.insert(listOf())
-        verify(mockObserver, times(0)).onInvalidate()
+        pagingMemoryCache.verifyInvalidate(0) {
+            pagingMemoryCache.insert(listOf())
+        }
     }
 
     @Test
     fun update_NotifyObserverAfterDeleteSuccess() {
-        pagingMemoryCache.insert(listOf("1"))
-        pagingMemoryCache.update(
-            "2",
-            object : Comparable<String> {
-                override fun compareTo(other: String): Int {
-                    return if (other == "1") 0 else 1
+        pagingMemoryCache.verifyInvalidate(2) {
+            pagingMemoryCache.insert(listOf("1"))
+            pagingMemoryCache.update(
+                "2",
+                object : Comparable<String> {
+                    override fun compareTo(other: String): Int {
+                        return if (other == "1") 0 else 1
+                    }
                 }
-            }
-        )
-        verify(mockObserver, times(2)).onInvalidate()
+            )
+        }
     }
 
     @Test
     fun update_SilenceAfterUpdateFailed() {
-        pagingMemoryCache.update(
-            "listOf()",
-            object : Comparable<String> {
-                override fun compareTo(other: String): Int {
-                    return 1
+        pagingMemoryCache.verifyInvalidate(0) {
+            pagingMemoryCache.update(
+                "listOf()",
+                object : Comparable<String> {
+                    override fun compareTo(other: String): Int {
+                        return 1
+                    }
                 }
-            }
-        )
-        verify(mockObserver, times(0)).onInvalidate()
+            )
+        }
     }
 
     @Test
     fun delete_NotifyObserverAfterDeleteSuccess() {
-        pagingMemoryCache.insert(listOf("1"))
-        pagingMemoryCache.delete("1")
-        verify(mockObserver, times(2)).onInvalidate()
+        pagingMemoryCache.verifyInvalidate(2) {
+            pagingMemoryCache.insert(listOf("1"))
+            pagingMemoryCache.delete("1")
+        }
     }
 
     @Test
     fun update_SilenceAfterDeleteFailed() {
-        pagingMemoryCache.delete("")
-        verify(mockObserver, times(0)).onInvalidate()
+        pagingMemoryCache.verifyInvalidate(0) {
+            pagingMemoryCache.delete("")
+        }
     }
 }

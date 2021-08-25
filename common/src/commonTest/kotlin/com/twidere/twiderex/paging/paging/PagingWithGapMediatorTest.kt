@@ -36,6 +36,7 @@ import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.paging.PagingTimeLineWithStatus
 import com.twidere.twiderex.model.paging.saveToDb
 import com.twidere.twiderex.paging.mediator.paging.PagingWithGapMediator
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import kotlin.test.assertEquals
@@ -118,6 +119,7 @@ internal class MockPagingGapMediator(
         max_id: String?,
         since_id: String?
     ): List<IStatus> {
+        delay(5)
         return listOf(mockIStatus(id = statusId)).toIPaging()
     }
 }
