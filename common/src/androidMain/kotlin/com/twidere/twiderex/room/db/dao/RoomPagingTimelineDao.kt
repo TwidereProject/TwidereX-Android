@@ -44,7 +44,7 @@ internal interface RoomPagingTimelineDao {
 
     @Transaction
     @Query("SELECT * FROM paging_timeline WHERE pagingKey == :pagingKey AND accountKey == :accountKey ORDER BY sortId DESC LIMIT :limit OFFSET :offset")
-    fun getPagingList(
+    suspend fun getPagingList(
         pagingKey: String,
         accountKey: MicroBlogKey,
         limit: Int,

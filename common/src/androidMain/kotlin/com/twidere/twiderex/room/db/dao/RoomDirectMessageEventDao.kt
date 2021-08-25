@@ -49,7 +49,7 @@ internal interface RoomDirectMessageEventDao {
 
     @Transaction
     @Query("SELECT * FROM dm_event WHERE accountKey == :accountKey AND conversationKey == :conversationKey ORDER BY sortId DESC LIMIT :limit OFFSET :offset")
-    fun getPagingList(
+    suspend fun getPagingList(
         accountKey: MicroBlogKey,
         conversationKey: MicroBlogKey,
         limit: Int,

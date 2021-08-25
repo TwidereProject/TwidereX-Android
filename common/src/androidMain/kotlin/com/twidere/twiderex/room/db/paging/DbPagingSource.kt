@@ -56,6 +56,7 @@ internal class DbPagingSource<UI : Any>(
                 nextKey = nextKey
             )
         } catch (e: Throwable) {
+            e.printStackTrace()
             LoadResult.Error(e)
         }
     }

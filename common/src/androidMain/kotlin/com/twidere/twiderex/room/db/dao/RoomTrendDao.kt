@@ -40,7 +40,7 @@ internal interface RoomTrendDao {
 
     @Transaction
     @Query("SELECT * FROM trends WHERE accountKey == :accountKey LIMIT :limit OFFSET :offset")
-    fun getPagingList(
+    suspend fun getPagingList(
         accountKey: MicroBlogKey,
         limit: Int,
         offset: Int

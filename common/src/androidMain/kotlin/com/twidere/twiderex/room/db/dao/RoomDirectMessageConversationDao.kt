@@ -57,7 +57,7 @@ internal interface RoomDirectMessageConversationDao {
             LIMIT :limit OFFSET :offset
         """
     )
-    fun getPagingList(
+    suspend fun getPagingList(
         accountKey: MicroBlogKey,
         limit: Int,
         offset: Int

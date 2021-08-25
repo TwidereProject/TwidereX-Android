@@ -50,7 +50,7 @@ internal interface RoomListsDao {
 
     @Transaction
     @Query("SELECT * FROM lists WHERE accountKey == :accountKey LIMIT :limit OFFSET :offset")
-    fun getPagingList(
+    suspend fun getPagingList(
         accountKey: MicroBlogKey,
         limit: Int,
         offset: Int
