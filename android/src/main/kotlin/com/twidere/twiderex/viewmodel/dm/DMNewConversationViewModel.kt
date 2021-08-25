@@ -25,59 +25,62 @@ import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
 import com.twidere.services.microblog.SearchService
 import com.twidere.twiderex.defaultLoadCount
-import com.twidere.twiderex.model.AccountDetails
+import com.twidere.twiderex.ext.asStateIn
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.paging.source.SearchUserPagingSource
+import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.DirectMessageRepository
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedInject
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.lastOrNull
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
-class DMNewConversationViewModel @AssistedInject constructor(
+class DMNewConversationViewModel(
     private val dmRepository: DirectMessageRepository,
-    @Assisted private val account: AccountDetails,
+    private val accountRepository: AccountRepository,
 ) : ViewModel() {
-
-    @dagger.assisted.AssistedFactory
-    interface AssistedFactory {
-        fun create(account: AccountDetails): DMNewConversationViewModel
+    private val account by lazy {
+        accountRepository.activeAccount.asStateIn(viewModelScope, null)
     }
 
     val input = MutableStateFlow("")
 
-    @OptIn(FlowPreview::class)
-    val sourceFlow = input.debounce(666L).map {
-        it.takeIf { it.isNotEmpty() }?.let {
-            Pager(
-                config = PagingConfig(
-                    pageSize = defaultLoadCount,
-                    enablePlaceholders = false,
-                )
-            ) {
-                SearchUserPagingSource(
-                    accountKey = account.accountKey,
-                    it,
-                    account.service as SearchService,
-                )
-            }.flow.cachedIn(viewModelScope)
-        }
-    }
+    val sourceFlow = input.debounce(666L).flatMapLatest {
+        it.takeIf { it.isNotEmpty() }?.let { str ->
+            account.flatMapLatest {
+                it?.let { account ->
+                    Pager(
+                        config = PagingConfig(
+                            pageSize = defaultLoadCount,
+                            enablePlaceholders = false,
+                        )
+                    ) {
+                        SearchUserPagingSource(
+                            accountKey = account.accountKey,
+                            str,
+                            account.service as SearchService,
+                        )
+                    }.flow
+                } ?: emptyFlow()
+            }
+        } ?: emptyFlow()
+    }.cachedIn(viewModelScope)
 
     fun createNewConversation(receiver: UiUser, onResult: (key: MicroBlogKey?) -> Unit) {
         viewModelScope.launch {
             kotlin.runCatching {
-                dmRepository.createNewConversation(
-                    receiver = receiver,
-                    accountKey = account.accountKey,
-                    platformType = account.type
-                )
+                account.lastOrNull()?.let { account ->
+                    dmRepository.createNewConversation(
+                        receiver = receiver,
+                        accountKey = account.accountKey,
+                        platformType = account.type
+                    )
+                }
             }.onSuccess {
                 onResult(it)
             }.onFailure {

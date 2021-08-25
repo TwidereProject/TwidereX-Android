@@ -25,7 +25,6 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
@@ -56,19 +55,26 @@ fun TimelineComponent(
         },
         refreshIndicatorPadding = contentPadding
     ) {
-        val lastScrollState = remember {
-            viewModel.restoreScrollState()
-        }
-        val listState = rememberLazyListState(
-            initialFirstVisibleItemIndex = lastScrollState.firstVisibleItemIndex,
-            initialFirstVisibleItemScrollOffset = lastScrollState.firstVisibleItemScrollOffset,
+        val scrollState by viewModel.timelineScrollState.observeAsState(
+            initial = TimelineScrollState.Zero
         )
+        val listState = rememberLazyListState()
+        LaunchedEffect(Unit) {
+            snapshotFlow { scrollState }
+                .distinctUntilChanged()
+                .collect {
+                    listState.scrollToItem(
+                        it.firstVisibleItemIndex,
+                        it.firstVisibleItemScrollOffset
+                    )
+                }
+        }
         if (items.itemCount > 0) {
             LaunchedEffect(lazyListController) {
                 lazyListController?.listState = listState
             }
         }
-        LaunchedEffect(listState) {
+        LaunchedEffect(Unit) {
             snapshotFlow { listState.isScrollInProgress }
                 .distinctUntilChanged()
                 .filter { !it }

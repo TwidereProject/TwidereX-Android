@@ -20,23 +20,30 @@
  */
 package com.twidere.twiderex.viewmodel.trend
 
-import com.twidere.twiderex.model.AccountDetails
+import androidx.paging.cachedIn
+import com.twidere.twiderex.ext.asStateIn
+import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.TrendRepository
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedInject
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flatMapLatest
 import moe.tlaster.precompose.viewmodel.ViewModel
+import moe.tlaster.precompose.viewmodel.viewModelScope
 
-class TrendViewModel @AssistedInject constructor(
+class TrendViewModel(
     private val repository: TrendRepository,
-    @Assisted private val account: AccountDetails,
+    private val accountRepository: AccountRepository,
 ) : ViewModel() {
-
-    @dagger.assisted.AssistedFactory
-    interface AssistedFactory {
-        fun create(account: AccountDetails): TrendViewModel
+    private val account by lazy {
+        accountRepository.activeAccount.asStateIn(viewModelScope, null)
     }
 
     val source by lazy {
-        repository.trendsSource(account)
+        account.flatMapLatest {
+            if (it != null) {
+                repository.trendsSource(it)
+            } else {
+                emptyFlow()
+            }
+        }.cachedIn(viewModelScope)
     }
 }

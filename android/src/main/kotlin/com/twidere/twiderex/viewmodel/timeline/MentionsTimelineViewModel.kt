@@ -20,33 +20,44 @@
  */
 package com.twidere.twiderex.viewmodel.timeline
 
-import android.content.SharedPreferences
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import com.twidere.services.microblog.TimelineService
 import com.twidere.twiderex.db.CacheDatabase
-import com.twidere.twiderex.model.AccountDetails
-import com.twidere.twiderex.paging.mediator.paging.PagingWithGapMediator
+import com.twidere.twiderex.ext.asStateIn
 import com.twidere.twiderex.paging.mediator.timeline.MentionTimelineMediator
+import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.NotificationRepository
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedInject
+import kotlinx.coroutines.flow.map
+import moe.tlaster.precompose.viewmodel.viewModelScope
 
-class MentionsTimelineViewModel @AssistedInject constructor(
-    preferences: SharedPreferences,
+class MentionsTimelineViewModel(
+    dataStore: DataStore<Preferences>,
     database: CacheDatabase,
     notificationRepository: NotificationRepository,
-    @Assisted private val account: AccountDetails
-) : TimelineViewModel(preferences) {
-    @dagger.assisted.AssistedFactory
-    interface AssistedFactory {
-        fun create(account: AccountDetails): MentionsTimelineViewModel
+    private val accountRepository: AccountRepository,
+) : TimelineViewModel(dataStore) {
+    private val account by lazy {
+        accountRepository.activeAccount.asStateIn(viewModelScope, null)
     }
 
-    override val pagingMediator: PagingWithGapMediator =
-        MentionTimelineMediator(
-            service = account.service as TimelineService,
-            accountKey = account.accountKey,
-            database = database,
-            notificationRepository = notificationRepository
-        )
-    override val savedStateKey: String = "${account.accountKey}_mentions"
+    override val pagingMediator = account.map {
+        if (it != null) {
+            MentionTimelineMediator(
+                service = it.service as TimelineService,
+                accountKey = it.accountKey,
+                database = database,
+                notificationRepository = notificationRepository
+            )
+        } else {
+            null
+        }
+    }
+    override val savedStateKey = account.map {
+        if (it != null) {
+            "${it.accountKey}_mentions"
+        } else {
+            null
+        }
+    }
 }

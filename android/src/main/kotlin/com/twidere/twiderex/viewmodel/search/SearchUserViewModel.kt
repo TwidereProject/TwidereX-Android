@@ -25,30 +25,40 @@ import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
 import com.twidere.services.microblog.SearchService
 import com.twidere.twiderex.defaultLoadCount
-import com.twidere.twiderex.model.AccountDetails
+import com.twidere.twiderex.ext.asStateIn
 import com.twidere.twiderex.paging.source.SearchUserPagingSource
+import com.twidere.twiderex.repository.AccountRepository
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flatMapLatest
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class SearchUserViewModel(
-    private val account: AccountDetails,
+    private val accountRepository: AccountRepository,
     keyword: String,
     following: Boolean = false,
 ) : ViewModel() {
+    private val account by lazy {
+        accountRepository.activeAccount.asStateIn(viewModelScope, null)
+    }
 
     val source by lazy {
-        Pager(
-            config = PagingConfig(
-                pageSize = defaultLoadCount,
-                enablePlaceholders = false,
-            )
-        ) {
-            SearchUserPagingSource(
-                accountKey = account.accountKey,
-                keyword,
-                account.service as SearchService,
-                following = following
-            )
-        }.flow.cachedIn(viewModelScope)
+        account.flatMapLatest {
+            it?.let { account ->
+                Pager(
+                    config = PagingConfig(
+                        pageSize = defaultLoadCount,
+                        enablePlaceholders = false,
+                    )
+                ) {
+                    SearchUserPagingSource(
+                        accountKey = account.accountKey,
+                        keyword,
+                        account.service as SearchService,
+                        following = following
+                    )
+                }.flow
+            } ?: emptyFlow()
+        }.cachedIn(viewModelScope)
     }
 }

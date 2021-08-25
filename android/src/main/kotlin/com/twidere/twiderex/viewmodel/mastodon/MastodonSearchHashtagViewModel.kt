@@ -25,26 +25,37 @@ import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
 import com.twidere.services.mastodon.MastodonService
 import com.twidere.twiderex.defaultLoadCount
-import com.twidere.twiderex.model.AccountDetails
+import com.twidere.twiderex.ext.asStateIn
 import com.twidere.twiderex.paging.source.MastodonSearchHashtagPagingSource
+import com.twidere.twiderex.repository.AccountRepository
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flatMapLatest
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class MastodonSearchHashtagViewModel(
-    private val account: AccountDetails,
+    private val accountRepository: AccountRepository,
     keyword: String,
 ) : ViewModel() {
+    private val account by lazy {
+        accountRepository.activeAccount.asStateIn(viewModelScope, null)
+    }
+
     val source by lazy {
-        Pager(
-            config = PagingConfig(
-                pageSize = defaultLoadCount,
-                enablePlaceholders = false,
-            )
-        ) {
-            MastodonSearchHashtagPagingSource(
-                keyword,
-                account.service as MastodonService
-            )
-        }.flow.cachedIn(viewModelScope)
+        account.flatMapLatest {
+            it?.let {
+                Pager(
+                    config = PagingConfig(
+                        pageSize = defaultLoadCount,
+                        enablePlaceholders = false,
+                    )
+                ) {
+                    MastodonSearchHashtagPagingSource(
+                        keyword,
+                        it.service as MastodonService
+                    )
+                }.flow
+            } ?: emptyFlow()
+        }.cachedIn(viewModelScope)
     }
 }

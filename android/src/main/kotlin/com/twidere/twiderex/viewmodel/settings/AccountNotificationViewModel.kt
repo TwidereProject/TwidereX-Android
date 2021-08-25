@@ -20,42 +20,37 @@
  */
 package com.twidere.twiderex.viewmodel.settings
 
-import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.ext.asStateIn
 import com.twidere.twiderex.repository.AccountRepository
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedInject
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.lastOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
-class AccountNotificationViewModel @AssistedInject constructor(
+class AccountNotificationViewModel(
     private val accountRepository: AccountRepository,
-    @Assisted accountKey: MicroBlogKey,
 ) : ViewModel() {
-
-    @dagger.assisted.AssistedFactory
-    interface AssistedFactory {
-        fun create(
-            accountKey: MicroBlogKey,
-        ): AccountNotificationViewModel
-    }
-
     val account by lazy {
-        accountRepository.accounts.map {
-            it.firstOrNull { it.accountKey == accountKey }?.toUi()
-        }
+        accountRepository.activeAccount.asStateIn(viewModelScope, null)
     }
 
     val preferences by lazy {
-        accountRepository.getAccountPreferences(accountKey)
+        account.map {
+            it?.let {
+                accountRepository.getAccountPreferences(it.accountKey)
+            }
+        }.asStateIn(viewModelScope, null)
     }
 
     val isNotificationEnabled by lazy {
-        preferences.isNotificationEnabled
+        preferences.flatMapLatest { it?.isNotificationEnabled ?: flowOf(false) }
+            .asStateIn(viewModelScope, false)
     }
 
     fun setIsNotificationEnabled(value: Boolean) = viewModelScope.launch {
-        preferences.setIsNotificationEnabled(value)
+        preferences.lastOrNull()?.setIsNotificationEnabled(value)
     }
 }

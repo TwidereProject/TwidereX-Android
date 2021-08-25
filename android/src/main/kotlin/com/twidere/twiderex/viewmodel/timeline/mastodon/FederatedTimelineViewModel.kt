@@ -20,32 +20,41 @@
  */
 package com.twidere.twiderex.viewmodel.timeline.mastodon
 
-import android.content.SharedPreferences
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import com.twidere.services.mastodon.MastodonService
 import com.twidere.twiderex.db.CacheDatabase
-import com.twidere.twiderex.model.AccountDetails
+import com.twidere.twiderex.ext.asStateIn
 import com.twidere.twiderex.paging.mediator.timeline.mastodon.FederatedTimelineMediator
+import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.viewmodel.timeline.TimelineViewModel
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedInject
+import kotlinx.coroutines.flow.map
+import moe.tlaster.precompose.viewmodel.viewModelScope
 
-class FederatedTimelineViewModel @AssistedInject constructor(
-    preferences: SharedPreferences,
+class FederatedTimelineViewModel(
+    dataStore: DataStore<Preferences>,
     database: CacheDatabase,
-    @Assisted account: AccountDetails,
-) : TimelineViewModel(preferences) {
-    @dagger.assisted.AssistedFactory
-    interface AssistedFactory {
-        fun create(account: AccountDetails): FederatedTimelineViewModel
+    private val accountRepository: AccountRepository,
+) : TimelineViewModel(dataStore) {
+    private val account by lazy {
+        accountRepository.activeAccount.asStateIn(viewModelScope, null)
     }
 
     override val pagingMediator by lazy {
-        FederatedTimelineMediator(
-            account.service as MastodonService,
-            account.accountKey,
-            database,
-        )
+        account.map {
+            it?.let {
+                FederatedTimelineMediator(
+                    it.service as MastodonService,
+                    it.accountKey,
+                    database,
+                )
+            }
+        }
     }
 
-    override val savedStateKey = "${account.accountKey}_federated"
+    override val savedStateKey = account.map {
+        it?.let {
+            "${it.accountKey}_federated"
+        }
+    }
 }

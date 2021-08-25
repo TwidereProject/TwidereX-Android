@@ -25,34 +25,42 @@ import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
 import com.twidere.services.mastodon.MastodonService
 import com.twidere.twiderex.defaultLoadCount
-import com.twidere.twiderex.model.AccountDetails
+import com.twidere.twiderex.ext.asStateIn
 import com.twidere.twiderex.paging.source.MastodonSearchHashtagPagingSource
-import kotlinx.coroutines.FlowPreview
+import com.twidere.twiderex.repository.AccountRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flatMapLatest
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class MastodonComposeSearchHashtagViewModel(
-    private val account: AccountDetails,
+    private val accountRepository: AccountRepository,
 ) : ViewModel() {
+    private val account by lazy {
+        accountRepository.activeAccount.asStateIn(viewModelScope, null)
+    }
+
     val text = MutableStateFlow("")
 
-    @OptIn(FlowPreview::class)
-    val sourceFlow = text.debounce(666L).map {
-        it.takeIf { it.isNotEmpty() }?.let {
-            Pager(
-                config = PagingConfig(
-                    pageSize = defaultLoadCount,
-                    enablePlaceholders = false,
-                )
-            ) {
-                MastodonSearchHashtagPagingSource(
-                    it,
-                    account.service as MastodonService
-                )
-            }.flow.cachedIn(viewModelScope)
-        }
-    }
+    val source = text.debounce(666L).flatMapLatest {
+        it.takeIf { it.isNotEmpty() }?.let { str ->
+            account.flatMapLatest {
+                it?.let { account ->
+                    Pager(
+                        config = PagingConfig(
+                            pageSize = defaultLoadCount,
+                            enablePlaceholders = false,
+                        )
+                    ) {
+                        MastodonSearchHashtagPagingSource(
+                            str,
+                            account.service as MastodonService
+                        )
+                    }.flow
+                } ?: emptyFlow()
+            }
+        } ?: emptyFlow()
+    }.cachedIn(viewModelScope)
 }

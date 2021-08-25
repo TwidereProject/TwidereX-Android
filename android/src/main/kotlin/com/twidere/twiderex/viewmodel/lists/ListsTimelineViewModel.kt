@@ -21,32 +21,32 @@
 package com.twidere.twiderex.viewmodel.lists
 
 import androidx.paging.cachedIn
-import com.twidere.twiderex.model.AccountDetails
+import com.twidere.twiderex.ext.asStateIn
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.TimelineRepository
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedInject
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flatMapLatest
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
-class ListsTimelineViewModel @AssistedInject constructor(
+class ListsTimelineViewModel(
     repository: TimelineRepository,
-    @Assisted account: AccountDetails,
-    @Assisted listKey: MicroBlogKey,
+    private val accountRepository: AccountRepository,
+    listKey: MicroBlogKey,
 ) : ViewModel() {
-
-    @dagger.assisted.AssistedFactory
-    interface AssistedFactory {
-        fun create(
-            account: AccountDetails,
-            listKey: MicroBlogKey,
-        ): ListsTimelineViewModel
+    private val account by lazy {
+        accountRepository.activeAccount.asStateIn(viewModelScope, null)
     }
 
     val source by lazy {
-        repository.listTimeline(
-            listKey = listKey,
-            account = account,
-        ).cachedIn(viewModelScope)
+        account.flatMapLatest {
+            it?.let {
+                repository.listTimeline(
+                    listKey = listKey,
+                    account = it,
+                )
+            } ?: emptyFlow()
+        }.cachedIn(viewModelScope)
     }
 }

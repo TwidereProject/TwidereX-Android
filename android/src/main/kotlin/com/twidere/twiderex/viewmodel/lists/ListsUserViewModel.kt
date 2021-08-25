@@ -23,38 +23,48 @@ package com.twidere.twiderex.viewmodel.lists
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import com.twidere.twiderex.model.AccountDetails
+import com.twidere.twiderex.ext.asStateIn
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.notification.InAppNotification
+import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.ListsUsersRepository
 import com.twidere.twiderex.utils.notify
 import com.twidere.twiderex.viewmodel.user.UserListViewModel
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.lastOrNull
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
-class ListsUserViewModel @AssistedInject constructor(
+class ListsUserViewModel(
     private val listsUsersRepository: ListsUsersRepository,
-    @Assisted private val account: AccountDetails,
-    @Assisted private val listId: String,
-    @Assisted private val viewMembers: Boolean = true,
+    private val accountRepository: AccountRepository,
+    private val listId: String,
+    private val viewMembers: Boolean = true,
 ) : UserListViewModel() {
-    @dagger.assisted.AssistedFactory
-    interface AssistedFactory {
-        fun create(account: AccountDetails, listId: String, viewMembers: Boolean = true): ListsUserViewModel
+    private val account by lazy {
+        accountRepository.activeAccount.asStateIn(viewModelScope, null)
     }
 
     private val members by lazy {
-        listsUsersRepository.fetchMembers(account = account, listId = listId).cachedIn(viewModelScope)
+        account.flatMapLatest {
+            it?.let { account ->
+                listsUsersRepository.fetchMembers(account = account, listId = listId)
+            } ?: emptyFlow()
+        }.cachedIn(viewModelScope)
     }
 
     private val subscribers by lazy {
-        listsUsersRepository.fetchSubscribers(account = account, listId = listId).cachedIn(viewModelScope)
+        account.flatMapLatest {
+            it?.let { account ->
+                listsUsersRepository.fetchSubscribers(account = account, listId = listId)
+            } ?: emptyFlow()
+        }.cachedIn(viewModelScope)
     }
 
     override val source: Flow<PagingData<UiUser>>
@@ -65,11 +75,13 @@ class ListsUserViewModel @AssistedInject constructor(
     fun removeMember(user: UiUser) {
         try {
             viewModelScope.launch {
-                listsUsersRepository.removeMember(
-                    account = account,
-                    listId = listId,
-                    user = user
-                )
+                account.lastOrNull()?.let { account ->
+                    listsUsersRepository.removeMember(
+                        account = account,
+                        listId = listId,
+                        user = user
+                    )
+                }
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -77,16 +89,14 @@ class ListsUserViewModel @AssistedInject constructor(
     }
 }
 
-class ListsAddMemberViewModel @AssistedInject constructor(
+class ListsAddMemberViewModel(
     private val listsUsersRepository: ListsUsersRepository,
     private val inAppNotification: InAppNotification,
-    @Assisted private val account: AccountDetails,
-    @Assisted private val listId: String,
+    private val accountRepository: AccountRepository,
+    private val listId: String,
 ) : ViewModel() {
-
-    @dagger.assisted.AssistedFactory
-    interface AssistedFactory {
-        fun create(account: AccountDetails, listId: String): ListsAddMemberViewModel
+    private val account by lazy {
+        accountRepository.activeAccount.asStateIn(viewModelScope, null)
     }
 
     val loading = MutableStateFlow(false)
@@ -96,21 +106,25 @@ class ListsAddMemberViewModel @AssistedInject constructor(
         if (pendingMap[user.userKey] == null) {
             loading.value = true
             loadingRequest {
-                listsUsersRepository.addMember(
-                    listId = listId,
-                    user = user,
-                    account = account
-                )
-                pendingMap[user.userKey] = user
+                account.firstOrNull()?.let { account ->
+                    listsUsersRepository.addMember(
+                        listId = listId,
+                        user = user,
+                        account = account
+                    )
+                    pendingMap[user.userKey] = user
+                }
             }
         } else {
             loadingRequest {
-                listsUsersRepository.removeMember(
-                    account = account,
-                    listId = listId,
-                    user = user
-                )
-                pendingMap.remove(user.userKey)
+                account.firstOrNull()?.let { account ->
+                    listsUsersRepository.removeMember(
+                        account = account,
+                        listId = listId,
+                        user = user
+                    )
+                    pendingMap.remove(user.userKey)
+                }
             }
         }
     }

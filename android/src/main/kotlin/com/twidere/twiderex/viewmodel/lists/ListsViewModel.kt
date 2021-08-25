@@ -22,45 +22,58 @@ package com.twidere.twiderex.viewmodel.lists
 
 import androidx.paging.cachedIn
 import androidx.paging.filter
-import com.twidere.twiderex.model.AccountDetails
+import com.twidere.twiderex.ext.asStateIn
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.ListsMode
 import com.twidere.twiderex.model.ui.UiList
 import com.twidere.twiderex.notification.InAppNotification
+import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.ListsRepository
 import com.twidere.twiderex.utils.notify
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.lastOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
-class ListsViewModel @AssistedInject constructor(
+class ListsViewModel(
     private val listsRepository: ListsRepository,
-    @Assisted private val account: AccountDetails,
+    private val accountRepository: AccountRepository,
 ) : ViewModel() {
-    @dagger.assisted.AssistedFactory
-    interface AssistedFactory {
-        fun create(account: AccountDetails): ListsViewModel
+    private val account by lazy {
+        accountRepository.activeAccount.asStateIn(viewModelScope, null)
     }
 
     val source by lazy {
-        listsRepository.fetchLists(account = account).cachedIn(viewModelScope)
+        account.flatMapLatest {
+            it?.let { account ->
+                listsRepository.fetchLists(account = account)
+            } ?: emptyFlow()
+        }.cachedIn(viewModelScope)
     }
 
     val ownerSource by lazy {
-        source.map { pagingData ->
-            pagingData.filter { it.isOwner(account.user.userId) }
-        }
+        account.flatMapLatest {
+            it?.let { account ->
+                source.map {
+                    it.filter { it.isOwner(account.user.userId) }
+                }
+            } ?: emptyFlow()
+        }.cachedIn(viewModelScope)
     }
 
     val subscribedSource by lazy {
-        source.map { pagingData ->
-            pagingData.filter { !it.isOwner(account.user.userId) && it.isFollowed }
-        }
+        account.flatMapLatest {
+            it?.let { account ->
+                source.map { pagingData ->
+                    pagingData.filter { !it.isOwner(account.user.userId) && it.isFollowed }
+                }
+            } ?: emptyFlow()
+        }.cachedIn(viewModelScope)
     }
 }
 
@@ -70,7 +83,10 @@ abstract class ListsOperatorViewModel(
     val modifySuccess = MutableStateFlow(false)
     val loading = MutableStateFlow(false)
 
-    protected fun loadingRequest(onResult: (success: Boolean, list: UiList?) -> Unit, request: suspend () -> UiList?) {
+    protected fun loadingRequest(
+        onResult: (success: Boolean, list: UiList?) -> Unit,
+        request: suspend () -> UiList?
+    ) {
         loading.value = true
         viewModelScope.launch {
             runCatching {
@@ -89,15 +105,14 @@ abstract class ListsOperatorViewModel(
     }
 }
 
-class ListsCreateViewModel @AssistedInject constructor(
+class ListsCreateViewModel(
     inAppNotification: InAppNotification,
     private val listsRepository: ListsRepository,
-    @Assisted private val account: AccountDetails,
-    @Assisted private val onResult: (success: Boolean, list: UiList?) -> Unit
+    private val accountRepository: AccountRepository,
+    private val onResult: (success: Boolean, list: UiList?) -> Unit
 ) : ListsOperatorViewModel(inAppNotification) {
-    @dagger.assisted.AssistedFactory
-    interface AssistedFactory {
-        fun create(account: AccountDetails, onResult: (success: Boolean, list: UiList?) -> Unit): ListsCreateViewModel
+    private val account by lazy {
+        accountRepository.activeAccount.asStateIn(viewModelScope, null)
     }
 
     fun createList(
@@ -106,26 +121,26 @@ class ListsCreateViewModel @AssistedInject constructor(
         private: Boolean = false
     ) {
         loadingRequest(onResult) {
-            listsRepository.createLists(
-                account = account,
-                title = title,
-                description = description,
-                mode = if (private)ListsMode.PRIVATE.value else ListsMode.PUBLIC.value
-            )
+            account.lastOrNull()?.let { account ->
+                listsRepository.createLists(
+                    account = account,
+                    title = title,
+                    description = description,
+                    mode = if (private) ListsMode.PRIVATE.value else ListsMode.PUBLIC.value
+                )
+            }
         }
     }
 }
 
-class ListsModifyViewModel @AssistedInject constructor(
+class ListsModifyViewModel(
     private val listsRepository: ListsRepository,
     inAppNotification: InAppNotification,
-    @Assisted private val account: AccountDetails,
-    @Assisted private val listKey: MicroBlogKey,
+    private val accountRepository: AccountRepository,
+    private val listKey: MicroBlogKey,
 ) : ListsOperatorViewModel(inAppNotification) {
-
-    @dagger.assisted.AssistedFactory
-    interface AssistedFactory {
-        fun create(account: AccountDetails, listKey: MicroBlogKey): ListsModifyViewModel
+    private val account by lazy {
+        accountRepository.activeAccount.asStateIn(viewModelScope, null)
     }
 
     val editName = MutableStateFlow("")
@@ -133,7 +148,11 @@ class ListsModifyViewModel @AssistedInject constructor(
     var editPrivate = MutableStateFlow(false)
 
     val source by lazy {
-        listsRepository.findListWithListKey(account = account, listKey = listKey)
+        account.flatMapLatest {
+            it?.let { account ->
+                listsRepository.findListWithListKey(account = account, listKey = listKey)
+            } ?: emptyFlow()
+        }
     }
 
     init {
@@ -154,13 +173,15 @@ class ListsModifyViewModel @AssistedInject constructor(
         onResult: (success: Boolean, list: UiList?) -> Unit = { _, _ -> }
     ) {
         loadingRequest(onResult) {
-            listsRepository.updateLists(
-                account = account,
-                listId = listId,
-                title = title,
-                description = description,
-                mode = if (private)ListsMode.PRIVATE.value else ListsMode.PUBLIC.value
-            )
+            account.lastOrNull()?.let { account ->
+                listsRepository.updateLists(
+                    account = account,
+                    listId = listId,
+                    title = title,
+                    description = description,
+                    mode = if (private) ListsMode.PRIVATE.value else ListsMode.PUBLIC.value
+                )
+            }
         }
     }
 
@@ -170,11 +191,13 @@ class ListsModifyViewModel @AssistedInject constructor(
         onResult: (success: Boolean, list: UiList?) -> Unit = { _, _ -> }
     ) {
         loadingRequest(onResult) {
-            listsRepository.deleteLists(
-                account = account,
-                listKey = listKey,
-                listId = listId,
-            )
+            account.lastOrNull()?.let { account ->
+                listsRepository.deleteLists(
+                    account = account,
+                    listKey = listKey,
+                    listId = listId,
+                )
+            }
         }
     }
 
@@ -183,10 +206,12 @@ class ListsModifyViewModel @AssistedInject constructor(
         onResult: (success: Boolean, list: UiList?) -> Unit = { _, _ -> }
     ) {
         loadingRequest(onResult) {
-            listsRepository.subscribeLists(
-                account = account,
-                listKey = listKey
-            )
+            account.lastOrNull()?.let { account ->
+                listsRepository.subscribeLists(
+                    account = account,
+                    listKey = listKey
+                )
+            }
         }
     }
 
@@ -195,10 +220,12 @@ class ListsModifyViewModel @AssistedInject constructor(
         onResult: (success: Boolean, list: UiList?) -> Unit = { _, _ -> }
     ) {
         loadingRequest(onResult) {
-            listsRepository.unsubscribeLists(
-                account = account,
-                listKey = listKey
-            )
+            account.lastOrNull()?.let { account ->
+                listsRepository.unsubscribeLists(
+                    account = account,
+                    listKey = listKey
+                )
+            }
         }
     }
 }

@@ -20,48 +20,73 @@
  */
 package com.twidere.twiderex.viewmodel.timeline
 
-import android.content.SharedPreferences
-import androidx.core.content.edit
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.paging.cachedIn
 import com.twidere.twiderex.defaultLoadCount
+import com.twidere.twiderex.ext.asStateIn
 import com.twidere.twiderex.extensions.toUi
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.paging.mediator.paging.PagingWithGapMediator
 import com.twidere.twiderex.paging.mediator.paging.pager
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.lastOrNull
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
 abstract class TimelineViewModel(
-    private val preferences: SharedPreferences,
+    private val dataStore: DataStore<Preferences>
 ) : ViewModel() {
     val source by lazy {
-        pagingMediator.pager().toUi(accountKey = pagingMediator.accountKey).cachedIn(viewModelScope)
+        pagingMediator.flatMapLatest {
+            it?.pager()?.toUi(accountKey = it.accountKey) ?: emptyFlow()
+        }.cachedIn(viewModelScope)
     }
-    abstract val pagingMediator: PagingWithGapMediator
-    abstract val savedStateKey: String
+    abstract val pagingMediator: Flow<PagingWithGapMediator?>
+    abstract val savedStateKey: Flow<String?>
     val loadingBetween: Flow<List<MicroBlogKey>>
-        get() = pagingMediator.loadingBetween
+        get() = pagingMediator.flatMapLatest { it?.loadingBetween ?: emptyFlow() }
+
+    val timelineScrollState by lazy {
+        savedStateKey.flatMapLatest {
+            val firstVisibleItemIndexKey = intPreferencesKey("${it}_firstVisibleItemIndex")
+            val firstVisibleItemScrollOffsetKey =
+                intPreferencesKey("${it}_firstVisibleItemScrollOffset")
+            dataStore.data.map {
+                val firstVisibleItemIndex = it[firstVisibleItemIndexKey] ?: 0
+                val firstVisibleItemScrollOffset = it[firstVisibleItemScrollOffsetKey] ?: 0
+                TimelineScrollState(
+                    firstVisibleItemIndex = firstVisibleItemIndex,
+                    firstVisibleItemScrollOffset = firstVisibleItemScrollOffset,
+                )
+            }
+        }.asStateIn(viewModelScope, TimelineScrollState.Zero)
+    }
 
     fun loadBetween(
         maxStatusKey: MicroBlogKey,
         sinceStatueKey: MicroBlogKey,
     ) = viewModelScope.launch {
-        pagingMediator.loadBetween(defaultLoadCount, maxStatusKey = maxStatusKey, sinceStatusKey = sinceStatueKey)
-    }
-
-    fun restoreScrollState(): TimelineScrollState {
-        return TimelineScrollState(
-            firstVisibleItemIndex = preferences.getInt("${savedStateKey}_firstVisibleItemIndex", 0),
-            firstVisibleItemScrollOffset = preferences.getInt("${savedStateKey}_firstVisibleItemScrollOffset", 0),
+        pagingMediator.lastOrNull()?.loadBetween(
+            defaultLoadCount,
+            maxStatusKey = maxStatusKey,
+            sinceStatusKey = sinceStatueKey
         )
     }
 
-    fun saveScrollState(offset: TimelineScrollState) {
-        preferences.edit {
-            putInt("${savedStateKey}_firstVisibleItemIndex", offset.firstVisibleItemIndex)
-            putInt("${savedStateKey}_firstVisibleItemScrollOffset", offset.firstVisibleItemScrollOffset)
+    fun saveScrollState(offset: TimelineScrollState) = viewModelScope.launch {
+        dataStore.edit {
+            val firstVisibleItemIndexKey = intPreferencesKey("${it}_firstVisibleItemIndex")
+            val firstVisibleItemScrollOffsetKey =
+                intPreferencesKey("${it}_firstVisibleItemScrollOffset")
+            it[firstVisibleItemIndexKey] = offset.firstVisibleItemIndex
+            it[firstVisibleItemScrollOffsetKey] = offset.firstVisibleItemScrollOffset
         }
     }
 }
@@ -69,4 +94,8 @@ abstract class TimelineViewModel(
 data class TimelineScrollState(
     val firstVisibleItemIndex: Int = 0,
     val firstVisibleItemScrollOffset: Int = 0,
-)
+) {
+    companion object {
+        val Zero = TimelineScrollState(0, 0)
+    }
+}

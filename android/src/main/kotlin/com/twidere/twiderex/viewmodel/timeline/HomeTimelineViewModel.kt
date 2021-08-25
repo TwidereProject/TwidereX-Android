@@ -20,30 +20,39 @@
  */
 package com.twidere.twiderex.viewmodel.timeline
 
-import android.content.SharedPreferences
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import com.twidere.services.microblog.TimelineService
 import com.twidere.twiderex.db.CacheDatabase
-import com.twidere.twiderex.model.AccountDetails
-import com.twidere.twiderex.paging.mediator.paging.PagingWithGapMediator
+import com.twidere.twiderex.ext.asStateIn
 import com.twidere.twiderex.paging.mediator.timeline.HomeTimelineMediator
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedInject
+import com.twidere.twiderex.repository.AccountRepository
+import kotlinx.coroutines.flow.map
+import moe.tlaster.precompose.viewmodel.viewModelScope
 
-class HomeTimelineViewModel @AssistedInject constructor(
-    preferences: SharedPreferences,
+class HomeTimelineViewModel(
+    dataStore: DataStore<Preferences>,
     database: CacheDatabase,
-    @Assisted account: AccountDetails,
-) : TimelineViewModel(preferences) {
-    @dagger.assisted.AssistedFactory
-    interface AssistedFactory {
-        fun create(account: AccountDetails): HomeTimelineViewModel
+    private val accountRepository: AccountRepository,
+) : TimelineViewModel(dataStore) {
+    private val account by lazy {
+        accountRepository.activeAccount.asStateIn(viewModelScope, null)
     }
 
-    override val pagingMediator: PagingWithGapMediator =
-        HomeTimelineMediator(
-            account.service as TimelineService,
-            account.accountKey,
-            database,
-        )
-    override val savedStateKey: String = "${account.accountKey}_home"
+    override val pagingMediator = account.map {
+        if (it != null) {
+            HomeTimelineMediator(
+                it.service as TimelineService,
+                it.accountKey,
+                database,
+            )
+        } else {
+            null
+        }
+    }
+    override val savedStateKey = account.map {
+        it?.let {
+            "${it.accountKey}_home"
+        }
+    }
 }

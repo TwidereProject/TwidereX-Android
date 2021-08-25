@@ -24,32 +24,37 @@ import androidx.paging.cachedIn
 import androidx.paging.map
 import com.twidere.services.microblog.SearchService
 import com.twidere.twiderex.db.CacheDatabase
-import com.twidere.twiderex.model.AccountDetails
+import com.twidere.twiderex.ext.asStateIn
 import com.twidere.twiderex.model.transform.toUi
 import com.twidere.twiderex.paging.mediator.paging.pager
 import com.twidere.twiderex.paging.mediator.search.SearchStatusMediator
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedInject
+import com.twidere.twiderex.repository.AccountRepository
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
-class SearchTweetsViewModel @AssistedInject constructor(
+class SearchTweetsViewModel(
     val database: CacheDatabase,
-    @Assisted private val account: AccountDetails,
-    @Assisted keyword: String,
+    private val accountRepository: AccountRepository,
+    keyword: String,
 ) : ViewModel() {
-    @dagger.assisted.AssistedFactory
-    interface AssistedFactory {
-        fun create(account: AccountDetails, keyword: String): SearchTweetsViewModel
-    }
-
-    private val service by lazy {
-        account.service as SearchService
+    private val account by lazy {
+        accountRepository.activeAccount.asStateIn(viewModelScope, null)
     }
 
     val source by lazy {
-        SearchStatusMediator(keyword, database, account.accountKey, service).pager()
-            .flow.map { it.map { it.status.toUi(account.accountKey) } }.cachedIn(viewModelScope)
+        account.flatMapLatest {
+            it?.let { account ->
+                SearchStatusMediator(
+                    keyword,
+                    database,
+                    account.accountKey,
+                    account.service as SearchService
+                ).pager()
+                    .flow.map { it.map { it.status.toUi(account.accountKey) } }
+            } ?: emptyFlow()
+        }.cachedIn(viewModelScope)
     }
 }

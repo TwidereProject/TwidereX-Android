@@ -35,22 +35,16 @@ import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.ACCOUNT_TYPE
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.utils.json
-import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 import java.net.URI
 
-class MastodonSignInViewModel @AssistedInject constructor(
+class MastodonSignInViewModel(
     private val repository: AccountRepository,
     private val inAppNotification: InAppNotification,
 ) : ViewModel() {
-
-    @dagger.assisted.AssistedFactory
-    interface AssistedFactory {
-        fun create(): MastodonSignInViewModel
-    }
 
     val loading = MutableStateFlow(false)
     val host = MutableStateFlow(TextFieldValue())

@@ -36,7 +36,6 @@ import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -46,7 +45,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.paging.LoadState
-import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.twidere.twiderex.R
@@ -70,7 +68,6 @@ import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.lists.ListsAddMemberViewModel
 import com.twidere.twiderex.viewmodel.lists.ListsSearchUserViewModel
-import kotlinx.coroutines.flow.flowOf
 
 @Composable
 fun ListsAddMembersScene(
@@ -97,8 +94,7 @@ fun ListsAddMembersScene(
     }
 
     val keyword by searchViewModel.text.observeAsState(initial = "")
-    val searchSourceState by searchViewModel.sourceFlow.collectAsState(initial = null)
-    val searchSource = searchSourceState?.collectAsLazyPagingItems()
+    val searchSource = searchViewModel.source.collectAsLazyPagingItems()
     TwidereScene {
         InAppNotificationScaffold(
             topBar = {
@@ -150,7 +146,7 @@ fun ListsAddMembersScene(
             Box(modifier = Modifier.fillMaxSize()) {
                 // search result
                 SearchResultsContent(
-                    source = searchSource ?: flowOf(PagingData.from(viewModel.pendingMap.values.toMutableList())).collectAsLazyPagingItems(),
+                    source = searchSource,
                     onAction = {
                         viewModel.addToOrRemove(it)
                     },

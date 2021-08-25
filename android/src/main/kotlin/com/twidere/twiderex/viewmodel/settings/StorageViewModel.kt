@@ -21,21 +21,14 @@
 package com.twidere.twiderex.viewmodel.settings
 
 import com.twidere.twiderex.repository.CacheRepository
-import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
-class StorageViewModel @AssistedInject constructor(
+class StorageViewModel(
     private val repository: CacheRepository,
 ) : ViewModel() {
-
-    @dagger.assisted.AssistedFactory
-    interface AssistedFactory {
-        fun create(): StorageViewModel
-    }
-
     val loading = MutableStateFlow(false)
 
     fun clearDatabaseCache() = viewModelScope.launch {

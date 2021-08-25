@@ -22,19 +22,13 @@ package com.twidere.twiderex.viewmodel.settings
 
 import androidx.datastore.core.DataStore
 import com.twidere.twiderex.preferences.model.AppearancePreferences
-import dagger.assisted.AssistedInject
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
-class AppearanceViewModel @AssistedInject constructor(
+class AppearanceViewModel(
     private val appearancePreferences: DataStore<AppearancePreferences>
 ) : ViewModel() {
-
-    @dagger.assisted.AssistedFactory
-    interface AssistedFactory {
-        fun create(): AppearanceViewModel
-    }
 
     fun setPrimaryColorIndex(index: Int) = viewModelScope.launch {
         appearancePreferences.updateData {

@@ -21,31 +21,31 @@
 package com.twidere.twiderex.viewmodel.mastodon
 
 import androidx.paging.cachedIn
-import com.twidere.twiderex.model.AccountDetails
+import com.twidere.twiderex.ext.asStateIn
+import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.TimelineRepository
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedInject
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flatMapLatest
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
-class MastodonHashtagViewModel @AssistedInject constructor(
+class MastodonHashtagViewModel(
     private val repository: TimelineRepository,
-    @Assisted keyword: String,
-    @Assisted account: AccountDetails,
+    private val accountRepository: AccountRepository,
+    keyword: String,
 ) : ViewModel() {
-
-    @dagger.assisted.AssistedFactory
-    interface AssistedFactory {
-        fun create(
-            keyword: String,
-            account: AccountDetails,
-        ): MastodonHashtagViewModel
+    private val account by lazy {
+        accountRepository.activeAccount.asStateIn(viewModelScope, null)
     }
 
     val source by lazy {
-        repository.mastodonHashtagTimeline(
-            keyword = keyword,
-            account = account,
-        ).cachedIn(viewModelScope)
+        account.flatMapLatest {
+            it?.let {
+                repository.mastodonHashtagTimeline(
+                    keyword = keyword,
+                    account = it,
+                )
+            } ?: emptyFlow()
+        }.cachedIn(viewModelScope)
     }
 }

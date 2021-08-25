@@ -32,7 +32,6 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.res.stringResource
@@ -61,8 +60,7 @@ fun ComposeSearchUserScene() {
         ComposeSearchUserViewModel(account = account)
     }
     val text by viewModel.text.observeAsState(initial = "")
-    val sourceState by viewModel.sourceFlow.collectAsState(initial = null)
-    val source = sourceState?.collectAsLazyPagingItems()
+    val source = viewModel.source.collectAsLazyPagingItems()
     TwidereScene {
         InAppNotificationScaffold(
             topBar = {
@@ -111,18 +109,16 @@ fun ComposeSearchUserScene() {
                 )
             }
         ) {
-            source?.let { source ->
-                LazyUiUserList(
-                    items = source,
-                    onItemClicked = {
-                        val displayName = it.getDisplayScreenName(account.accountKey.host)
-                        navController.goBackWith(displayName)
-                    },
-                    header = {
-                        loadState(source.loadState.refresh)
-                    }
-                )
-            }
+            LazyUiUserList(
+                items = source,
+                onItemClicked = {
+                    val displayName = it.getDisplayScreenName(account.accountKey.host)
+                    navController.goBackWith(displayName)
+                },
+                header = {
+                    loadState(source.loadState.refresh)
+                }
+            )
         }
     }
 }

@@ -22,19 +22,14 @@ package com.twidere.twiderex.viewmodel.settings
 
 import androidx.datastore.core.DataStore
 import com.twidere.twiderex.preferences.model.NotificationPreferences
-import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
-class NotificationViewModel @AssistedInject constructor(
+class NotificationViewModel(
     val notification: DataStore<NotificationPreferences>,
 ) : ViewModel() {
-    @dagger.assisted.AssistedFactory
-    interface AssistedFactory {
-        fun create(): NotificationViewModel
-    }
     val enabled = notification.data.map {
         it.enableNotification
     }

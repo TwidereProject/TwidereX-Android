@@ -25,37 +25,45 @@ import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
 import com.twidere.services.microblog.SearchService
 import com.twidere.twiderex.defaultLoadCount
-import com.twidere.twiderex.model.AccountDetails
+import com.twidere.twiderex.ext.asStateIn
 import com.twidere.twiderex.paging.source.SearchUserPagingSource
-import kotlinx.coroutines.FlowPreview
+import com.twidere.twiderex.repository.AccountRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flatMapLatest
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class ListsSearchUserViewModel(
-    private val account: AccountDetails,
+    private val accountRepository: AccountRepository,
     following: Boolean = false,
 ) : ViewModel() {
+    private val account by lazy {
+        accountRepository.activeAccount.asStateIn(viewModelScope, null)
+    }
+
     val text = MutableStateFlow("")
 
-    @OptIn(FlowPreview::class)
-    val sourceFlow = text.debounce(666L).map {
+    val source = text.debounce(666L).flatMapLatest {
         it.takeIf { it.isNotEmpty() }?.let {
-            Pager(
-                config = PagingConfig(
-                    pageSize = defaultLoadCount,
-                    enablePlaceholders = false,
-                )
-            ) {
-                SearchUserPagingSource(
-                    accountKey = account.accountKey,
-                    it,
-                    account.service as SearchService,
-                    following = following
-                )
-            }.flow.cachedIn(viewModelScope)
-        }
-    }
+            account.flatMapLatest { account ->
+                account?.let { _ ->
+                    Pager(
+                        config = PagingConfig(
+                            pageSize = defaultLoadCount,
+                            enablePlaceholders = false,
+                        )
+                    ) {
+                        SearchUserPagingSource(
+                            accountKey = account.accountKey,
+                            it,
+                            account.service as SearchService,
+                            following = following
+                        )
+                    }.flow
+                } ?: emptyFlow()
+            }
+        } ?: emptyFlow()
+    }.cachedIn(viewModelScope)
 }

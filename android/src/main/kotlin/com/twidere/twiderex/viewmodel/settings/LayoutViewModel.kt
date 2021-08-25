@@ -20,10 +20,12 @@
  */
 package com.twidere.twiderex.viewmodel.settings
 
+import com.twidere.twiderex.ext.asStateIn
 import com.twidere.twiderex.model.AccountDetails
+import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.scenes.home.HomeMenus
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedInject
+import kotlinx.coroutines.flow.lastOrNull
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
@@ -31,9 +33,13 @@ import kotlin.math.min
 
 private const val MaxMenuCount = 5
 
-class LayoutViewModel @AssistedInject constructor(
-    @Assisted private val account: AccountDetails,
+class LayoutViewModel(
+    private val accountRepository: AccountRepository,
 ) : ViewModel() {
+    private val account by lazy {
+        accountRepository.activeAccount.asStateIn(viewModelScope, null)
+    }
+
     fun updateHomeMenu(oldIndex: Int, newIndex: Int, menus: List<Any>) = viewModelScope.launch {
         menus.toMutableList().let { list ->
             list.add(newIndex, list.removeAt(oldIndex))
@@ -43,7 +49,7 @@ class LayoutViewModel @AssistedInject constructor(
                     .map { it to true } + list.subList(index, list.size)
                     .filterIsInstance<HomeMenus>().map { it to false }
             }.let {
-                account.preferences.setHomeMenuOrder(it)
+                account.lastOrNull()?.preferences?.setHomeMenuOrder(it)
             }
         }
     }
@@ -80,6 +86,8 @@ class LayoutViewModel @AssistedInject constructor(
     }
 
     val user by lazy {
-        account.toUi()
+        account.map {
+            it?.toUi()
+        }
     }
 }

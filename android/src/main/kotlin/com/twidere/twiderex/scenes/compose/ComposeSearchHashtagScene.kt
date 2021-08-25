@@ -34,7 +34,6 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -65,8 +64,7 @@ fun ComposeSearchHashtagScene() {
     }
 
     val text by viewModel.text.observeAsState(initial = "")
-    val sourceState by viewModel.sourceFlow.collectAsState(initial = null)
-    val source = sourceState?.collectAsLazyPagingItems()
+    val source = viewModel.source.collectAsLazyPagingItems()
     TwidereScene {
         InAppNotificationScaffold(
             topBar = {
@@ -115,19 +113,17 @@ fun ComposeSearchHashtagScene() {
                 )
             }
         ) {
-            source?.let { source ->
-                LazyColumn {
-                    loadState(source.loadState.refresh)
-                    items(source) {
-                        it?.name?.let { name ->
-                            ListItem(
-                                modifier = Modifier
-                                    .clickable {
-                                        navController.goBackWith("#$name")
-                                    }
-                            ) {
-                                Text(text = name)
-                            }
+            LazyColumn {
+                loadState(source.loadState.refresh)
+                items(source) {
+                    it?.name?.let { name ->
+                        ListItem(
+                            modifier = Modifier
+                                .clickable {
+                                    navController.goBackWith("#$name")
+                                }
+                        ) {
+                            Text(text = name)
                         }
                     }
                 }

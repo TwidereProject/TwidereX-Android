@@ -24,24 +24,16 @@ import androidx.datastore.core.DataStore
 import com.twidere.twiderex.R
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.preferences.model.MiscPreferences
-import dagger.assisted.AssistedInject
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
-@OptIn(FlowPreview::class)
-class MiscViewModel @AssistedInject constructor(
+class MiscViewModel(
     private val miscPreferences: DataStore<MiscPreferences>,
     private val inAppNotification: InAppNotification,
 ) : ViewModel() {
-    @dagger.assisted.AssistedFactory
-    interface AssistedFactory {
-        fun create(): MiscViewModel
-    }
-
     val nitter by lazy {
         MutableStateFlow("")
     }

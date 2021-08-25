@@ -22,20 +22,13 @@ package com.twidere.twiderex.viewmodel.settings
 
 import androidx.datastore.core.DataStore
 import com.twidere.twiderex.preferences.model.DisplayPreferences
-import dagger.assisted.AssistedInject
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
-class DisplayViewModel @AssistedInject constructor(
+class DisplayViewModel(
     private val displayPreferences: DataStore<DisplayPreferences>
 ) : ViewModel() {
-
-    @dagger.assisted.AssistedFactory
-    interface AssistedFactory {
-        fun create(): DisplayViewModel
-    }
-
     fun setUseSystemFontSize(value: Boolean) = viewModelScope.launch {
         displayPreferences.updateData {
             it.copy(useSystemFontSize = value)

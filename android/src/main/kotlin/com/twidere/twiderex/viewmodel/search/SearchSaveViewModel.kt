@@ -20,24 +20,22 @@
  */
 package com.twidere.twiderex.viewmodel.search
 
-import com.twidere.twiderex.model.AccountDetails
+import com.twidere.twiderex.ext.asStateIn
+import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.SearchRepository
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.lastOrNull
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
-class SearchSaveViewModel @AssistedInject constructor(
+class SearchSaveViewModel(
     private val repository: SearchRepository,
-    @Assisted private val account: AccountDetails,
-    @Assisted private val content: String,
+    private val accountRepository: AccountRepository,
+    private val content: String,
 ) : ViewModel() {
-
-    @dagger.assisted.AssistedFactory
-    interface AssistedFactory {
-        fun create(account: AccountDetails, content: String): SearchSaveViewModel
+    private val account by lazy {
+        accountRepository.activeAccount.asStateIn(viewModelScope, null)
     }
 
     val loading = MutableStateFlow(false)
@@ -46,7 +44,9 @@ class SearchSaveViewModel @AssistedInject constructor(
 
     init {
         viewModelScope.launch {
-            isSaved.value = repository.get(content, account.accountKey)?.saved ?: false
+            account.lastOrNull()?.let {
+                isSaved.value = repository.get(content, it.accountKey)?.saved ?: false
+            }
         }
     }
 
@@ -54,8 +54,14 @@ class SearchSaveViewModel @AssistedInject constructor(
         viewModelScope.launch {
             loading.value = true
             try {
-                repository.addOrUpgrade(content = content, accountKey = account.accountKey, saved = true)
-                isSaved.value = true
+                account.lastOrNull()?.let {
+                    repository.addOrUpgrade(
+                        content = content,
+                        accountKey = it.accountKey,
+                        saved = true
+                    )
+                    isSaved.value = true
+                }
             } catch (e: Exception) {
                 isSaved.value = false
             } finally {

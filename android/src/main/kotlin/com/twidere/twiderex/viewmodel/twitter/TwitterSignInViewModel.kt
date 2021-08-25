@@ -38,8 +38,6 @@ import com.twidere.twiderex.repository.ACCOUNT_TYPE
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.utils.json
 import com.twidere.twiderex.utils.notify
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
@@ -47,26 +45,15 @@ import moe.tlaster.precompose.viewmodel.viewModelScope
 import retrofit2.HttpException
 import java.io.IOException
 
-class TwitterSignInViewModel @AssistedInject constructor(
+class TwitterSignInViewModel(
     private val repository: AccountRepository,
     private val inAppNotification: InAppNotification,
-    @Assisted("consumerKey") private val consumerKey: String,
-    @Assisted("consumerSecret") private val consumerSecret: String,
-    @Assisted("oauthVerifierProvider") private val oauthVerifierProvider: suspend (url: String) -> String?,
-    @Assisted("pinCodeProvider") private val pinCodeProvider: suspend (url: String) -> String?,
-    @Assisted private val onResult: (success: Boolean) -> Unit,
+    private val consumerKey: String,
+    private val consumerSecret: String,
+    private val oauthVerifierProvider: suspend (url: String) -> String?,
+    private val pinCodeProvider: suspend (url: String) -> String?,
+    private val onResult: (success: Boolean) -> Unit,
 ) : ViewModel() {
-
-    @dagger.assisted.AssistedFactory
-    interface AssistedFactory {
-        fun create(
-            @Assisted("consumerKey") consumerKey: String,
-            @Assisted("consumerSecret") consumerSecret: String,
-            @Assisted("oauthVerifierProvider") oauthVerifierProvider: suspend (url: String) -> String?,
-            @Assisted("pinCodeProvider") pinCodeProvider: suspend (url: String) -> String?,
-            @Assisted onResult: (success: Boolean) -> Unit,
-        ): TwitterSignInViewModel
-    }
 
     val success = MutableStateFlow(false)
     val loading = MutableStateFlow(false)

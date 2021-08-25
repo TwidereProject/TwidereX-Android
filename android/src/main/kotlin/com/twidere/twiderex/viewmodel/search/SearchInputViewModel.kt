@@ -21,31 +21,39 @@
 package com.twidere.twiderex.viewmodel.search
 
 import com.twidere.twiderex.db.model.DbSearch
-import com.twidere.twiderex.model.AccountDetails
+import com.twidere.twiderex.ext.asStateIn
+import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.SearchRepository
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.lastOrNull
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
-class SearchInputViewModel @AssistedInject constructor(
+class SearchInputViewModel(
     private val repository: SearchRepository,
-    @Assisted private val account: AccountDetails,
+    private val accountRepository: AccountRepository,
 ) : ViewModel() {
-
-    @dagger.assisted.AssistedFactory
-    interface AssistedFactory {
-        fun create(account: AccountDetails): SearchInputViewModel
+    private val account by lazy {
+        accountRepository.activeAccount.asStateIn(viewModelScope, null)
     }
 
     val source by lazy {
-        repository.searchHistory(account.accountKey)
+        account.flatMapLatest {
+            it?.let {
+                repository.searchHistory(it.accountKey)
+            } ?: flowOf(emptyList())
+        }
     }
 
     val savedSource by lazy {
-        repository.savedSearch(account.accountKey)
+        account.flatMapLatest {
+            it?.let {
+                repository.savedSearch(it.accountKey)
+            } ?: flowOf(emptyList())
+        }
     }
 
     val expandSearch = MutableStateFlow(false)
@@ -55,6 +63,8 @@ class SearchInputViewModel @AssistedInject constructor(
     }
 
     fun addOrUpgrade(content: String) = viewModelScope.launch {
-        repository.addOrUpgrade(content, account.accountKey)
+        account.lastOrNull()?.let {
+            repository.addOrUpgrade(content, it.accountKey)
+        }
     }
 }

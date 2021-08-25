@@ -25,48 +25,56 @@ import androidx.paging.cachedIn
 import com.twidere.services.microblog.DirectMessageService
 import com.twidere.services.microblog.LookupService
 import com.twidere.twiderex.action.DirectMessageAction
-import com.twidere.twiderex.model.AccountDetails
+import com.twidere.twiderex.ext.asStateIn
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.job.DirectMessageDeleteData
 import com.twidere.twiderex.model.job.DirectMessageSendData
 import com.twidere.twiderex.model.ui.UiDMEvent
+import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.DirectMessageRepository
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.lastOrNull
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 import java.util.UUID
 
-class DMEventViewModel @AssistedInject constructor(
+class DMEventViewModel(
     private val repository: DirectMessageRepository,
     private val messageAction: DirectMessageAction,
-    @Assisted private val account: AccountDetails,
-    @Assisted private val conversationKey: MicroBlogKey,
+    private val accountRepository: AccountRepository,
+    private val conversationKey: MicroBlogKey,
 ) : ViewModel() {
-
-    @dagger.assisted.AssistedFactory
-    interface AssistedFactory {
-        fun create(account: AccountDetails, conversationKey: MicroBlogKey): DMEventViewModel
+    private val account by lazy {
+        accountRepository.activeAccount.asStateIn(viewModelScope, null)
     }
 
     val conversation by lazy {
-        repository.dmConversation(
-            accountKey = account.accountKey,
-            conversationKey = conversationKey
-        )
+        account.flatMapLatest {
+            it?.let { account ->
+                repository.dmConversation(
+                    accountKey = account.accountKey,
+                    conversationKey = conversationKey
+                )
+            } ?: emptyFlow()
+        }
     }
 
     val source by lazy {
-        repository.dmEventListSource(
-            accountKey = account.accountKey,
-            conversationKey = conversationKey,
-            service = account.service as DirectMessageService,
-            lookupService = account.service as LookupService
-        ).cachedIn(viewModelScope)
+        account.flatMapLatest {
+            it?.let { account ->
+                repository.dmEventListSource(
+                    accountKey = account.accountKey,
+                    conversationKey = conversationKey,
+                    service = account.service as DirectMessageService,
+                    lookupService = account.service as LookupService
+                )
+            } ?: emptyFlow()
+        }.cachedIn(viewModelScope)
     }
 
     // input
@@ -78,54 +86,60 @@ class DMEventViewModel @AssistedInject constructor(
     fun sendMessage() {
         if (input.value.isEmpty() && inputImage.value == null) return
         viewModelScope.launch {
-            conversation.firstOrNull()?.let {
-                messageAction.send(
-                    account.type,
-                    data = DirectMessageSendData(
-                        text = input.value,
-                        images = inputImage.value?.toString()?.let { uri -> listOf(uri) }
-                            ?: emptyList(),
-                        recipientUserKey = it.recipientKey,
-                        draftMessageKey = when (account.type) {
-                            PlatformType.Twitter -> MicroBlogKey.twitter(
-                                UUID.randomUUID().toString()
-                            )
-                            PlatformType.StatusNet -> TODO()
-                            PlatformType.Fanfou -> TODO()
-                            PlatformType.Mastodon -> MicroBlogKey.Empty
-                        },
-                        conversationKey = it.conversationKey,
-                        accountKey = account.accountKey
+            account.lastOrNull()?.let { account ->
+                conversation.firstOrNull()?.let {
+                    messageAction.send(
+                        account.type,
+                        data = DirectMessageSendData(
+                            text = input.value,
+                            images = inputImage.value?.toString()?.let { uri -> listOf(uri) }
+                                ?: emptyList(),
+                            recipientUserKey = it.recipientKey,
+                            draftMessageKey = when (account.type) {
+                                PlatformType.Twitter -> MicroBlogKey.twitter(
+                                    UUID.randomUUID().toString()
+                                )
+                                PlatformType.StatusNet -> TODO()
+                                PlatformType.Fanfou -> TODO()
+                                PlatformType.Mastodon -> MicroBlogKey.Empty
+                            },
+                            conversationKey = it.conversationKey,
+                            accountKey = account.accountKey
+                        )
                     )
-                )
-                input.value = ""
-                inputImage.value = null
+                    input.value = ""
+                    inputImage.value = null
+                }
             }
         }
     }
 
-    fun sendDraftMessage(event: UiDMEvent) {
-        messageAction.send(
-            account.type,
-            data = DirectMessageSendData(
-                text = event.originText,
-                images = event.media.mapNotNull { it.url },
-                recipientUserKey = event.recipientAccountKey,
-                conversationKey = event.conversationKey,
-                accountKey = account.accountKey,
-                draftMessageKey = event.messageKey
+    fun sendDraftMessage(event: UiDMEvent) = viewModelScope.launch {
+        account.lastOrNull()?.let { account ->
+            messageAction.send(
+                account.type,
+                data = DirectMessageSendData(
+                    text = event.originText,
+                    images = event.media.mapNotNull { it.url },
+                    recipientUserKey = event.recipientAccountKey,
+                    conversationKey = event.conversationKey,
+                    accountKey = account.accountKey,
+                    draftMessageKey = event.messageKey
+                )
             )
-        )
+        }
     }
 
-    fun deleteMessage(event: UiDMEvent) {
-        messageAction.delete(
-            data = DirectMessageDeleteData(
-                messageId = event.messageId,
-                messageKey = event.messageKey,
-                conversationKey = event.conversationKey,
-                accountKey = account.accountKey
+    fun deleteMessage(event: UiDMEvent) = viewModelScope.launch {
+        account.lastOrNull()?.let { account ->
+            messageAction.delete(
+                data = DirectMessageDeleteData(
+                    messageId = event.messageId,
+                    messageKey = event.messageKey,
+                    conversationKey = event.conversationKey,
+                    accountKey = account.accountKey
+                )
             )
-        )
+        }
     }
 }
