@@ -175,10 +175,6 @@ protobuf {
     }
 }
 
-// TODO: workaround for https://github.com/google/ksp/issues/518
-evaluationDependsOn(":assistedProcessor")
-evaluationDependsOn(":routeProcessor")
-
 dependencies {
     android()
     kotlinSerialization()
