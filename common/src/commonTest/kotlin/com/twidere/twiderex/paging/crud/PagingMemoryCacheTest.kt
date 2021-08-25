@@ -41,7 +41,7 @@ class PagingMemoryCacheTest {
         assertEquals(3, pagingMemoryCache.find(0, 3).size)
     }
 
-    private fun PagingMemoryCache<String>.verifyInvalidate( times: Int, block: () -> Unit) {
+    private fun PagingMemoryCache<String>.verifyInvalidate(times: Int, block: () -> Unit) {
         var invalidateCount = 0
         val observer = object : OnInvalidateObserver {
             override fun onInvalidate() {
