@@ -20,23 +20,40 @@
  */
 package com.twidere.twiderex.dataprovider
 
+import android.content.Context
+import androidx.room.Room
 import com.twidere.twiderex.cache.FileCacheHandler
+import com.twidere.twiderex.dataprovider.cache.FileCacheHandlerImpl
+import com.twidere.twiderex.dataprovider.db.AppDatabaseImpl
+import com.twidere.twiderex.dataprovider.db.CacheDatabaseImpl
 import com.twidere.twiderex.db.AppDatabase
 import com.twidere.twiderex.db.CacheDatabase
+import com.twidere.twiderex.di.ext.get
+import com.twidere.twiderex.room.db.AppDatabase_Migration_1_2
+import com.twidere.twiderex.room.db.AppDatabase_Migration_2_3
+import com.twidere.twiderex.room.db.RoomAppDatabase
+import com.twidere.twiderex.room.db.RoomCacheDatabase
 
-actual class DataProvider {
+actual class DataProvider private constructor(context: Context) {
     // data provide functions....
     actual companion object Factory {
         actual fun create(): DataProvider {
-            TODO("Not yet implemented")
+            return DataProvider(get())
         }
     }
 
-    actual val appDatabase: AppDatabase
-        get() = TODO("Not yet implemented")
+    private val roomCacheDatabase = Room.databaseBuilder(context, RoomCacheDatabase::class.java, "twiderex-db")
+        .fallbackToDestructiveMigration()
+        .build()
 
-    actual val cacheDatabase: CacheDatabase
-        get() = TODO("Not yet implemented")
-    actual val fileCacheHandler: FileCacheHandler
-        get() = TODO("Not yet implemented")
+    private val roomAppDatabase = Room.databaseBuilder(context, RoomAppDatabase::class.java, "twiderex-draft-db")
+        .addMigrations(AppDatabase_Migration_1_2)
+        .addMigrations(AppDatabase_Migration_2_3)
+        .build()
+
+    actual val appDatabase: AppDatabase = AppDatabaseImpl(roomAppDatabase)
+
+    actual val cacheDatabase: CacheDatabase = CacheDatabaseImpl(roomCacheDatabase)
+
+    actual val fileCacheHandler: FileCacheHandler = FileCacheHandlerImpl(context)
 }

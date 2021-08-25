@@ -59,6 +59,7 @@ kotlin {
                 implementation("androidx.room:room-ktx:${Versions.room}")
                 implementation("androidx.room:room-paging:${Versions.room}")
                 kapt("androidx.room:room-compiler:${Versions.room}")
+                implementation("io.coil-kt:coil-base:${Versions.coil}")
             }
         }
         val androidAndroidTest by getting {

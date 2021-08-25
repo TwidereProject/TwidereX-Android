@@ -23,6 +23,7 @@ package com.twidere.twiderex.jobs.compose
 import android.content.Context
 import com.twidere.services.twitter.TwitterService
 import com.twidere.twiderex.dataprovider.mapper.toUi
+import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.kmp.ExifScrambler
 import com.twidere.twiderex.kmp.FileResolver
 import com.twidere.twiderex.kmp.RemoteNavigator
@@ -33,7 +34,6 @@ import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.notification.AppNotificationManager
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.StatusRepository
-import com.twidere.twiderex.room.db.RoomCacheDatabase
 
 class TwitterComposeJob constructor(
     context: Context,
@@ -43,7 +43,7 @@ class TwitterComposeJob constructor(
     remoteNavigator: RemoteNavigator,
     private val statusRepository: StatusRepository,
     private val fileResolver: FileResolver,
-    private val cacheDatabase: RoomCacheDatabase,
+    private val cacheDatabase: CacheDatabase,
 ) : ComposeJob<TwitterService>(
     context,
     accountRepository,
@@ -79,7 +79,7 @@ class TwitterComposeJob constructor(
             long = long,
             exclude_reply_user_ids = composeData.excludedReplyUserIds
         ).toUi(accountKey)
-        cacheDatabase.statusDao().insertAll(listOf(result))
+        cacheDatabase.statusDao().insertAll(listOf = listOf(result), accountKey = accountKey)
         return result
     }
 

@@ -33,11 +33,11 @@ data class UiMedia(
     val mediaUrl: String?,
     val previewUrl: Any?,
     val type: MediaType,
-    val width: Long,
-    val height: Long,
-    val pageUrl: String?,
-    val altText: String,
-    val order: Int,
+    val width: Long = 0,
+    val height: Long = 0,
+    val pageUrl: String? = "",
+    val altText: String = "",
+    val order: Int = 0,
 ) {
     val fileName: String?
         get() = mediaUrl?.takeIfFileName() ?: url?.takeIfFileName() ?: findFileName()

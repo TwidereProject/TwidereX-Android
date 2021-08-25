@@ -47,8 +47,9 @@ internal class MockCacheDatabase @TestOnly constructor() : CacheDatabase {
         return statusDao
     }
 
+    private val mediaDao = MockMediaDao()
     override fun mediaDao(): MediaDao {
-        return MockMediaDao()
+        return mediaDao
     }
 
     private val userDao = MockUserDao()

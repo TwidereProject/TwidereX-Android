@@ -22,32 +22,27 @@ package com.twidere.twiderex.jobs.dm
 
 import android.content.Context
 import android.graphics.BitmapFactory
-import androidx.room.withTransaction
 import com.twidere.services.microblog.MicroBlogService
 import com.twidere.twiderex.R
-import com.twidere.twiderex.db.model.DbDMEventWithAttachments
-import com.twidere.twiderex.db.model.DbDMEventWithAttachments.Companion.saveToDb
+import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.kmp.FileResolver
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.MediaType
 import com.twidere.twiderex.model.job.DirectMessageSendData
+import com.twidere.twiderex.model.ui.UiDMEvent
+import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.navigation.RootDeepLinksRoute
 import com.twidere.twiderex.notification.AppNotification
 import com.twidere.twiderex.notification.AppNotificationManager
 import com.twidere.twiderex.notification.NotificationChannelSpec
 import com.twidere.twiderex.notification.notificationChannelId
 import com.twidere.twiderex.repository.AccountRepository
-import com.twidere.twiderex.room.db.RoomCacheDatabase
-import com.twidere.twiderex.room.db.model.DbDMEvent
-import com.twidere.twiderex.room.db.model.DbDMEvent.Companion.saveToDb
-import com.twidere.twiderex.room.db.model.DbMedia
 import java.net.URI
-import java.util.UUID
 
 abstract class DirectMessageSendJob<T : MicroBlogService>(
     private val applicationContext: Context,
-    protected val cacheDatabase: RoomCacheDatabase,
+    protected val cacheDatabase: CacheDatabase,
     private val accountRepository: AccountRepository,
     private val notificationManager: AppNotificationManager,
     protected val fileResolver: FileResolver,
@@ -62,7 +57,7 @@ abstract class DirectMessageSendJob<T : MicroBlogService>(
         @Suppress("UNCHECKED_CAST")
         val service = accountDetails.service as T
 
-        var draftEvent: DbDMEventWithAttachments? = null
+        var draftEvent: UiDMEvent? = null
         try {
             val images = sendData.images
             draftEvent = getDraft(sendData, images, accountDetails) ?: throw IllegalArgumentException()
@@ -83,7 +78,7 @@ abstract class DirectMessageSendJob<T : MicroBlogService>(
             e.printStackTrace()
             draftEvent?.let {
                 cacheDatabase.directMessageDao()
-                    .insertAll(listOf(draftEvent.message.copy(sendStatus = DbDMEvent.SendStatus.FAILED)))
+                    .insertAll(listOf(draftEvent.copy(sendStatus = UiDMEvent.SendStatus.FAILED)))
             }
             val builder = AppNotification
                 .Builder(
@@ -99,18 +94,18 @@ abstract class DirectMessageSendJob<T : MicroBlogService>(
         }
     }
 
-    private suspend fun updateDb(draftEvent: DbDMEventWithAttachments?, dbEvent: DbDMEventWithAttachments) {
+    private suspend fun updateDb(draftEvent: UiDMEvent?, dbEvent: UiDMEvent) {
         cacheDatabase.withTransaction {
             draftEvent?.let {
                 cacheDatabase.directMessageDao().delete(
-                    it.message
+                    it
                 )
             }
-            listOf(dbEvent).saveToDb(cacheDatabase)
+            cacheDatabase.directMessageDao().insertAll(listOf(dbEvent))
         }
     }
 
-    private suspend fun getDraft(sendData: DirectMessageSendData, images: List<String>, account: AccountDetails): DbDMEventWithAttachments? {
+    private suspend fun getDraft(sendData: DirectMessageSendData, images: List<String>, account: AccountDetails): UiDMEvent? {
         return cacheDatabase.withTransaction {
             cacheDatabase.directMessageDao().findWithMessageKey(
                 account.accountKey,
@@ -118,18 +113,17 @@ abstract class DirectMessageSendJob<T : MicroBlogService>(
                 sendData.draftMessageKey
             )?.also {
                 cacheDatabase.directMessageDao().insertAll(
-                    listOf(it.message.copy(sendStatus = DbDMEvent.SendStatus.PENDING))
+                    listOf(it.copy(sendStatus = UiDMEvent.SendStatus.PENDING))
                 )
             }
         } ?: saveDraft(sendData, images, account)
     }
 
-    private suspend fun saveDraft(sendData: DirectMessageSendData, images: List<String>, account: AccountDetails): DbDMEventWithAttachments? {
+    private suspend fun saveDraft(sendData: DirectMessageSendData, images: List<String>, account: AccountDetails): UiDMEvent? {
         return cacheDatabase.withTransaction {
             val createTimeStamp = System.currentTimeMillis()
             listOf(
-                DbDMEvent(
-                    _id = UUID.randomUUID().toString(),
+                UiDMEvent(
                     accountKey = account.accountKey,
                     sortId = createTimeStamp,
                     conversationKey = sendData.conversationKey,
@@ -141,27 +135,28 @@ abstract class DirectMessageSendJob<T : MicroBlogService>(
                     messageType = "message_create",
                     senderAccountKey = account.accountKey,
                     recipientAccountKey = sendData.recipientUserKey,
-                    sendStatus = DbDMEvent.SendStatus.PENDING
+                    sendStatus = UiDMEvent.SendStatus.PENDING,
+                    media = images.mapIndexed { index, uri ->
+                        val imageSize = getImageSize(URI.create(uri).path)
+                        UiMedia(
+                            belongToKey = sendData.draftMessageKey,
+                            url = uri,
+                            mediaUrl = uri,
+                            previewUrl = uri,
+                            type = getMediaType(uri),
+                            width = imageSize[0],
+                            height = imageSize[1],
+                            altText = "",
+                            order = index,
+                            pageUrl = null,
+                        )
+                    },
+                    urlEntity = emptyList(),
+                    sender = account.toUi()
                 )
-            ).saveToDb(cacheDatabase)
-            cacheDatabase.mediaDao().insertAll(
-                images.mapIndexed { index, uri ->
-                    val imageSize = getImageSize(URI.create(uri).path)
-                    DbMedia(
-                        _id = UUID.randomUUID().toString(),
-                        belongToKey = sendData.draftMessageKey,
-                        url = uri.toString(),
-                        mediaUrl = uri.toString(),
-                        previewUrl = uri.toString(),
-                        type = getMediaType(uri),
-                        width = imageSize[0],
-                        height = imageSize[1],
-                        altText = "",
-                        order = index,
-                        pageUrl = null,
-                    )
-                }
-            )
+            ).let {
+                cacheDatabase.directMessageDao().insertAll(it)
+            }
             cacheDatabase.directMessageDao().findWithMessageKey(
                 account.accountKey,
                 sendData.conversationKey,
@@ -195,7 +190,7 @@ abstract class DirectMessageSendJob<T : MicroBlogService>(
         service: T,
         sendData: DirectMessageSendData,
         mediaIds: ArrayList<String>
-    ): DbDMEventWithAttachments
+    ): UiDMEvent
 
     protected abstract suspend fun uploadImage(
         originUri: String,

@@ -29,6 +29,7 @@ import com.twidere.services.microblog.model.ITrend
 import com.twidere.services.microblog.model.IUser
 import com.twidere.services.twitter.model.DirectMessageEvent
 import com.twidere.services.twitter.model.TwitterList
+import com.twidere.twiderex.model.AmUser
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiEmoji
 import com.twidere.twiderex.model.ui.UiEmojiCategory
@@ -124,3 +125,21 @@ fun List<Emoji>.toUi(): List<UiEmojiCategory> = groupBy({ it.category }, { it })
         }
     )
 }
+
+fun UiUser.toAmUser() =
+    AmUser(
+        userId = id,
+        name = name,
+        userKey = userKey,
+        screenName = screenName,
+        profileImage = profileImage.toString(),
+        profileBackgroundImage = profileBackgroundImage,
+        followersCount = metrics.fans,
+        friendsCount = metrics.follow,
+        listedCount = metrics.listed,
+        desc = rawDesc,
+        website = website,
+        location = location,
+        verified = verified,
+        isProtected = protected,
+    )

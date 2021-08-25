@@ -27,18 +27,12 @@ import android.content.SharedPreferences
 import android.location.LocationManager
 import android.net.ConnectivityManager
 import androidx.core.app.NotificationManagerCompat
-import androidx.room.Room
 import androidx.work.WorkManager
-import com.twidere.twiderex.db.AppDatabase
-import com.twidere.twiderex.room.db.AppDatabase_Migration_1_2
-import com.twidere.twiderex.room.db.AppDatabase_Migration_2_3
-import com.twidere.twiderex.room.db.RoomCacheDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -54,21 +48,6 @@ object AndroidModule {
     @Provides
     fun provideSharedPreference(@ApplicationContext context: Context): SharedPreferences =
         context.getSharedPreferences("twiderex", Context.MODE_PRIVATE)
-
-    @Singleton
-    @Provides
-    fun provideCacheDatabase(@ApplicationContext context: Context): RoomCacheDatabase =
-        Room.databaseBuilder(context, RoomCacheDatabase::class.java, "twiderex-db")
-            .fallbackToDestructiveMigration()
-            .build()
-
-    @Singleton
-    @Provides
-    fun provideDraftDatabase(@ApplicationContext context: Context): AppDatabase =
-        Room.databaseBuilder(context, AppDatabase::class.java, "twiderex-draft-db")
-            .addMigrations(AppDatabase_Migration_1_2)
-            .addMigrations(AppDatabase_Migration_2_3)
-            .build()
 
     @Provides
     fun provideLocationManager(@ApplicationContext context: Context): LocationManager =

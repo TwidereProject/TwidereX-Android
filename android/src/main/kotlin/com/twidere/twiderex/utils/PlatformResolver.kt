@@ -21,16 +21,16 @@
 package com.twidere.twiderex.utils
 
 import androidx.compose.runtime.staticCompositionLocalOf
+import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.PlatformType
-import com.twidere.twiderex.room.db.RoomCacheDatabase
 import javax.inject.Inject
 
 class PlatformResolver @Inject constructor(
-    private val database: RoomCacheDatabase,
+    private val database: CacheDatabase,
 ) {
-    suspend fun resolveStatus(statusKey: MicroBlogKey): PlatformType? {
-        return database.statusDao().findWithStatusKey(statusKey = statusKey)?.platformType
+    suspend fun resolveStatus(statusKey: MicroBlogKey, accountKey: MicroBlogKey): PlatformType? {
+        return database.statusDao().findWithStatusKey(statusKey = statusKey, accountKey = accountKey)?.platformType
     }
 
     suspend fun resolveUser(userKey: MicroBlogKey): PlatformType? {

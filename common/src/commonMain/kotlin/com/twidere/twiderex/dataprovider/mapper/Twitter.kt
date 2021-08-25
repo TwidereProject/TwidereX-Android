@@ -56,10 +56,10 @@ import com.twitter.twittertext.Autolink
 val autolink by lazy {
     Autolink().apply {
         setUsernameIncludeSymbol(true)
-        // TODO migrate Route
         hashtagUrlBase = "" // "${generateDeepLinkBase(RootDeepLinksRouteDefinition.Search)}/%23"
         cashtagUrlBase = "" // "${generateDeepLinkBase(RootDeepLinksRouteDefinition.Search)}/%24"
         usernameUrlBase = "" // "${generateDeepLinkBase(RootDeepLinksRouteDefinition.Twitter.User)}/"
+        TODO("migrate Route")
     }
 }
 

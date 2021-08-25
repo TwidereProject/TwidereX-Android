@@ -20,7 +20,14 @@
  */
 package com.twidere.twiderex.cache
 
+import okhttp3.Cache
+import java.io.File
+
 interface FileCacheHandler {
+    fun getCache(): Cache
+
+    fun getCacheDirs(): List<File>
+
     fun clearMediaCaches()
 
     fun clearFileCaches()

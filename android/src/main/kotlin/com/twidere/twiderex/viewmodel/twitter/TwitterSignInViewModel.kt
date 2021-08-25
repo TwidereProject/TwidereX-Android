@@ -27,7 +27,8 @@ import com.twidere.services.http.MicroBlogException
 import com.twidere.services.twitter.TwitterOAuthService
 import com.twidere.services.twitter.TwitterService
 import com.twidere.twiderex.BuildConfig
-import com.twidere.twiderex.db.mapper.toDbUser
+import com.twidere.twiderex.dataprovider.mapper.toAmUser
+import com.twidere.twiderex.dataprovider.mapper.toUi
 import com.twidere.twiderex.http.TwidereServiceFactory
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.cred.CredentialsType
@@ -137,7 +138,7 @@ class TwitterSignInViewModel @AssistedInject constructor(
                                 credentials_type = CredentialsType.OAuth,
                                 credentials_json = credentials_json,
                                 extras_json = "",
-                                user = user.toDbUser().toAmUser(),
+                                user = user.toUi(accountKey = internalKey).toAmUser(),
                                 lastActive = System.currentTimeMillis()
                             )
                         }

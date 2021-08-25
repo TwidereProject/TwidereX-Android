@@ -25,5 +25,4 @@ import org.koin.core.KoinApplication
 fun KoinApplication.setupModules() {
     modules(twidereModules)
     modules(preferencesModule)
-    modules(repositoryModules)
 }

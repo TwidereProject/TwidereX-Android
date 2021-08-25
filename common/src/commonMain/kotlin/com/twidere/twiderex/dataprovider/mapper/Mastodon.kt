@@ -26,6 +26,7 @@ import com.twidere.services.mastodon.model.MastodonList
 import com.twidere.services.mastodon.model.Mention
 import com.twidere.services.mastodon.model.Notification
 import com.twidere.services.mastodon.model.NotificationTypes
+import com.twidere.services.mastodon.model.Poll
 import com.twidere.services.mastodon.model.Status
 import com.twidere.services.mastodon.model.Trend
 import com.twidere.services.mastodon.model.Visibility
@@ -208,24 +209,7 @@ internal fun Status.toUiStatus(
         sensitive = sensitive ?: false,
         platformType = PlatformType.Mastodon,
         spoilerText = spoilerText?.takeIf { it.isNotEmpty() },
-        poll = poll?.let {
-            UiPoll(
-                id = it.id ?: "",
-                options = it.options?.map { option ->
-                    Option(
-                        text = option.title ?: "",
-                        count = option.votesCount ?: 0
-                    )
-                } ?: emptyList(),
-                expiresAt = it.expiresAt?.time,
-                expired = it.expired ?: false,
-                multiple = it.multiple ?: false,
-                voted = it.voted ?: false,
-                votesCount = it.votesCount ?: 0,
-                votersCount = it.votersCount ?: 0,
-                ownVotes = it.ownVotes
-            )
-        },
+        poll = poll?.toUi(),
         extra = MastodonStatusExtra(
             type = MastodonStatusType.Status,
             emoji = emojis?.toUi() ?: emptyList(),
@@ -281,6 +265,23 @@ internal fun Status.toUiStatus(
         url = emptyList()
     )
 }
+
+fun Poll.toUi() = UiPoll(
+    id = id ?: "",
+    options = options?.map { option ->
+        Option(
+            text = option.title ?: "",
+            count = option.votesCount ?: 0
+        )
+    } ?: emptyList(),
+    expiresAt = expiresAt?.time,
+    expired = expired ?: false,
+    multiple = multiple ?: false,
+    voted = voted ?: false,
+    votesCount = votesCount ?: 0,
+    votersCount = votersCount ?: 0,
+    ownVotes = ownVotes
+)
 
 internal fun Account.toUiUser(
     accountKey: MicroBlogKey

@@ -157,10 +157,11 @@ fun ProvideStatusPlatform(
     content: @Composable (platformType: PlatformType) -> Unit,
 ) {
     val platformResolver = LocalPlatformResolver.current
+    val account = LocalActiveAccount.current ?: return
     ProvidePlatformType(
         key = statusKey,
         provider = {
-            platformResolver.resolveStatus(statusKey = statusKey)
+            platformResolver.resolveStatus(statusKey = statusKey, account.accountKey)
         },
         content = content
     )

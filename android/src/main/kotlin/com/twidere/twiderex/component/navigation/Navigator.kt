@@ -80,7 +80,7 @@ class Navigator(
             PlatformType.Fanfou -> TODO()
             PlatformType.Mastodon -> {
                 if (status.mastodonExtra != null) {
-                    when (status.mastodonExtra.type) {
+                    when (status.mastodonExtra?.type) {
                         MastodonStatusType.Status -> status.statusKey
                         MastodonStatusType.NotificationFollow, MastodonStatusType.NotificationFollowRequest -> null
                         else -> status.referenceStatus[ReferenceType.MastodonNotification]?.statusKey

@@ -62,7 +62,7 @@ fun ColumnScope.StatusText(
     var expanded by rememberSaveable { mutableStateOf(!expandable) }
 
     if (expandable && status.spoilerText != null) {
-        Text(text = status.spoilerText)
+        Text(text = status.spoilerText ?: "")
         Spacer(modifier = Modifier.height(StatusTextDefaults.Mastodon.SpoilerSpacing))
         Row(
             modifier = Modifier

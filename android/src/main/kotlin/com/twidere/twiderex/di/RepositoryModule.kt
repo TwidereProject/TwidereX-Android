@@ -20,12 +20,11 @@
  */
 package com.twidere.twiderex.di
 
-import android.content.Context
-import coil.imageLoader
-import coil.util.CoilUtils
 import com.twidere.services.nitter.NitterService
+import com.twidere.twiderex.cache.FileCacheHandler
 import com.twidere.twiderex.db.AppDatabase
-import com.twidere.twiderex.repository.AccountRepository
+import com.twidere.twiderex.db.CacheDatabase
+import com.twidere.twiderex.repository.AccountUpdateRepository
 import com.twidere.twiderex.repository.CacheRepository
 import com.twidere.twiderex.repository.DirectMessageRepository
 import com.twidere.twiderex.repository.DraftRepository
@@ -39,17 +38,20 @@ import com.twidere.twiderex.repository.StatusRepository
 import com.twidere.twiderex.repository.TimelineRepository
 import com.twidere.twiderex.repository.TrendRepository
 import com.twidere.twiderex.repository.UserRepository
-import com.twidere.twiderex.room.db.RoomCacheDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
 object RepositoryModule {
+    @Singleton
+    @Provides
+    fun provideAccountUpdateRepository(): AccountUpdateRepository =
+        AccountUpdateRepository()
+
     @Singleton
     @Provides
     fun provideDraftRepository(database: AppDatabase): DraftRepository =
@@ -61,20 +63,18 @@ object RepositoryModule {
 
     @Provides
     fun provideCacheRepository(
-        database: RoomCacheDatabase,
+        database: CacheDatabase,
         appDatabase: AppDatabase,
-        @ApplicationContext context: Context,
+        fileCacheHandler: FileCacheHandler
     ): CacheRepository = CacheRepository(
-        database = database,
-        appDatabase = appDatabase,
-        cache = CoilUtils.createDefaultCache(context),
-        imageLoader = context.imageLoader,
-        cacheDirs = listOf(context.cacheDir, *context.externalCacheDirs),
+        fileCache = fileCacheHandler,
+        cacheDatabase = database,
+        appDatabase = appDatabase
     )
 
     @Provides
     fun provideStatusRepository(
-        database: RoomCacheDatabase,
+        database: CacheDatabase,
         nitterService: NitterService?,
     ): StatusRepository = StatusRepository(
         database = database,
@@ -82,22 +82,22 @@ object RepositoryModule {
     )
 
     @Provides
-    fun provideReactionRepository(database: RoomCacheDatabase): ReactionRepository =
+    fun provideReactionRepository(database: CacheDatabase): ReactionRepository =
         ReactionRepository(database = database)
 
     @Provides
-    fun provideTimelineRepository(database: RoomCacheDatabase): TimelineRepository =
+    fun provideTimelineRepository(database: CacheDatabase): TimelineRepository =
         TimelineRepository(database = database)
 
     @Provides
     fun provideUserRepository(
-        database: RoomCacheDatabase,
-        accountRepository: AccountRepository
+        database: CacheDatabase,
+        accountRepository: AccountUpdateRepository
     ): UserRepository = UserRepository(database = database, accountRepository = accountRepository)
 
     @Provides
     fun provideListsRepository(
-        database: RoomCacheDatabase
+        database: CacheDatabase
     ) = ListsRepository(database = database)
 
     @Provides
@@ -105,21 +105,21 @@ object RepositoryModule {
 
     @Provides
     fun provideNotificationRepository(
-        database: RoomCacheDatabase,
+        database: CacheDatabase,
     ): NotificationRepository = NotificationRepository(database = database)
 
     @Provides
     fun provideTrendRepository(
-        database: RoomCacheDatabase
+        database: CacheDatabase
     ) = TrendRepository(database = database)
 
     @Provides
     fun provideDirectMessageRepository(
-        database: RoomCacheDatabase
+        database: CacheDatabase
     ) = DirectMessageRepository(database = database)
 
     @Provides
     fun provideDirectMediaRepository(
-        database: RoomCacheDatabase
-    ) = MediaRepository(database = database)
+        database: CacheDatabase
+    ) = MediaRepository(database)
 }

@@ -18,14 +18,28 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.di
+package com.twidere.twiderex.dataprovider.cache
 
-import com.twidere.twiderex.dataprovider.DataProvider
-import com.twidere.twiderex.repository.CacheRepository
-import com.twidere.twiderex.repository.MediaRepository
-import org.koin.dsl.module
+import android.content.Context
+import coil.util.CoilUtils
+import com.twidere.twiderex.cache.FileCacheHandler
 
-internal val repositoryModules = module {
-    factory { MediaRepository(get<DataProvider>().cacheDatabase.mediaDao()) }
-    factory { CacheRepository(get(), get(), get()) }
+internal class FileCacheHandlerImpl(context: Context) : FileCacheHandler {
+    private val cache = CoilUtils.createDefaultCache(context)
+    private val cacheDirs = listOf(context.cacheDir, *context.externalCacheDirs)
+    override fun getCache() = cache
+
+    override fun getCacheDirs() = cacheDirs
+
+    override fun clearMediaCaches() {
+        cache.directory.deleteRecursively()
+    }
+
+    override fun clearFileCaches() {
+        cacheDirs.forEach {
+            it.listFiles()?.forEach { file ->
+                file.deleteRecursively()
+            }
+        }
+    }
 }

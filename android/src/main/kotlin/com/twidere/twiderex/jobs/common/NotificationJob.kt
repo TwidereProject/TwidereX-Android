@@ -138,7 +138,7 @@ class NotificationJob(
         if (status.mastodonExtra == null || actualStatus == null) {
             return null
         }
-        return when (status.mastodonExtra.type) {
+        return when (status.mastodonExtra?.type) {
             MastodonStatusType.Status -> null
             MastodonStatusType.NotificationFollow -> {
                 NotificationData(
@@ -200,6 +200,7 @@ class NotificationJob(
                 )
             }
             MastodonStatusType.NotificationStatus -> null
+            else -> null
         }
     }
 }

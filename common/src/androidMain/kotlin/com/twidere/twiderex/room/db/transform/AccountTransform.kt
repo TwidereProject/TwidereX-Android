@@ -23,11 +23,11 @@ package com.twidere.twiderex.room.db.transform
 import android.accounts.Account
 import com.twidere.twiderex.model.TwidereAccount
 
-internal fun Account.toTwidere() = TwidereAccount(
+fun Account.toTwidere() = TwidereAccount(
     name = name,
     type = type
 )
 
-internal fun TwidereAccount.toAndroid() = Account(
+fun TwidereAccount.toAndroid() = Account(
     name, type
 )

@@ -28,6 +28,11 @@ import androidx.work.WorkManager
 import com.twidere.services.nitter.NitterService
 import com.twidere.twiderex.action.ComposeAction
 import com.twidere.twiderex.action.DirectMessageAction
+import com.twidere.twiderex.cache.FileCacheHandler
+import com.twidere.twiderex.dataprovider.DataProvider
+import com.twidere.twiderex.db.AppDatabase
+import com.twidere.twiderex.db.CacheDatabase
+import com.twidere.twiderex.http.TwidereHttpConfigProvider
 import com.twidere.twiderex.http.TwidereServiceFactory
 import com.twidere.twiderex.kmp.ExifScrambler
 import com.twidere.twiderex.kmp.FileResolver
@@ -40,7 +45,6 @@ import com.twidere.twiderex.model.AccountPreferences
 import com.twidere.twiderex.notification.AppNotificationManager
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.preferences.model.MiscPreferences
-import com.twidere.twiderex.room.db.RoomCacheDatabase
 import com.twidere.twiderex.utils.PlatformResolver
 import dagger.Module
 import dagger.Provides
@@ -56,6 +60,22 @@ import javax.inject.Singleton
 object TwidereModule {
     @Singleton
     @Provides
+    fun provideDataProvider(): DataProvider = DataProvider.Factory.create()
+
+    @Singleton
+    @Provides
+    fun provideCacheDatabase(dataProvider: DataProvider): CacheDatabase = dataProvider.cacheDatabase
+
+    @Singleton
+    @Provides
+    fun provideDraftDatabase(dataProvider: DataProvider): AppDatabase = dataProvider.appDatabase
+
+    @Singleton
+    @Provides
+    fun provideFileCacheHandler(dataProvider: DataProvider): FileCacheHandler = dataProvider.fileCacheHandler
+
+    @Singleton
+    @Provides
     fun provideComposeQueue(
         workManager: WorkManager,
     ): ComposeAction = ComposeAction(workManager = workManager)
@@ -66,7 +86,7 @@ object TwidereModule {
 
     @Singleton
     @Provides
-    fun providePlatformResolver(database: RoomCacheDatabase): PlatformResolver =
+    fun providePlatformResolver(database: CacheDatabase): PlatformResolver =
         PlatformResolver(database = database)
 
     @Provides
@@ -107,4 +127,7 @@ object TwidereModule {
     fun provideRemoteNavigator(@ApplicationContext context: Context): RemoteNavigator = AndroidRemoteNavigator(
         context = context
     )
+
+    @Provides
+    fun provideTwidereHttpConfigProvider(miscPreferences: DataStore<MiscPreferences>): TwidereHttpConfigProvider = TwidereHttpConfigProvider(miscPreferences)
 }

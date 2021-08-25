@@ -22,13 +22,12 @@ package com.twidere.twiderex.extensions
 
 import androidx.paging.Pager
 import androidx.paging.map
-import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.room.db.model.DbPagingTimelineWithStatus
+import com.twidere.twiderex.model.paging.PagingTimeLineWithStatus
 import kotlinx.coroutines.flow.map
 
-fun Pager<Int, DbPagingTimelineWithStatus>.toUi(accountKey: MicroBlogKey) =
+fun Pager<Int, PagingTimeLineWithStatus>.toUi() =
     this.flow.map { pagingData ->
         pagingData.map {
-            it.toUi(accountKey = accountKey)
+            it.status
         }
     }

@@ -21,11 +21,21 @@
 package com.twidere.twiderex.mock.cache
 
 import com.twidere.twiderex.cache.FileCacheHandler
+import okhttp3.Cache
+import java.io.File
 
 internal class MockFileCacheHandler(
     private val mediaCache: MutableList<Any>,
     private val fileCache: MutableList<Any>,
 ) : FileCacheHandler {
+    override fun getCache(): Cache {
+        TODO("Not yet implemented")
+    }
+
+    override fun getCacheDirs(): List<File> {
+        TODO("Not yet implemented")
+    }
+
     override fun clearMediaCaches() {
         mediaCache.clear()
     }

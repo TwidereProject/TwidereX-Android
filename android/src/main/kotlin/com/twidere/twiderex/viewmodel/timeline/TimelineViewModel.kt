@@ -38,7 +38,7 @@ abstract class TimelineViewModel(
     private val preferences: SharedPreferences,
 ) : ViewModel() {
     val source by lazy {
-        pagingMediator.pager().toUi(accountKey = pagingMediator.accountKey).cachedIn(viewModelScope)
+        pagingMediator.pager().toUi().cachedIn(viewModelScope)
     }
     abstract val pagingMediator: PagingWithGapMediator
     abstract val savedStateKey: String
