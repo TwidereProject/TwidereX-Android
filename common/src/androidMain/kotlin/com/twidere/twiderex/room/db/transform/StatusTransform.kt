@@ -252,12 +252,12 @@ private fun DbPoll.toUi() = UiPoll(
     ownVotes = ownVotes
 )
 
-internal fun DbPagingTimelineWithStatus.toPagingTimeline(accountKey: MicroBlogKey) = with(status) {
-    PagingTimeLineWithStatus(
-        timeline = timeline.toUi(),
-        status = status.toUi(accountKey = accountKey)
-    )
-}
+internal fun DbPagingTimelineWithStatus.toPagingTimeline(
+    accountKey: MicroBlogKey
+) = PagingTimeLineWithStatus(
+    timeline = timeline.toUi(),
+    status = status.toUi(accountKey = accountKey)
+)
 
 internal fun DbPagingTimeline.toUi() = PagingTimeLine(
     accountKey = accountKey,

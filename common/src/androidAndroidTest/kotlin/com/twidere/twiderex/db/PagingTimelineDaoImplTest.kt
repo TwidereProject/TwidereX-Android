@@ -32,7 +32,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
-internal class PagingDaoImplTest : CacheDatabaseDaoTest() {
+internal class PagingTimelineDaoImplTest : CacheDatabaseDaoTest() {
     private val accountKey = MicroBlogKey.twitter("account")
     private val pagingKey = "pagingKey"
     @Test
@@ -83,6 +83,24 @@ internal class PagingDaoImplTest : CacheDatabaseDaoTest() {
             continue
         }
         assert(invalidate)
+    }
+    @Test
+    fun getLatest_ReturnsResultWithStatusAndReference() = runBlocking {
+        val cacheDatabase = CacheDatabaseImpl(roomDatabase)
+        val originData = listOf(
+            mockIStatus(hasReference = true, hasMedia = true).toPagingTimeline(accountKey, pagingKey),
+        )
+        cacheDatabase.pagingTimelineDao().insertAll(
+            originData.map { it.timeline }
+        )
+        cacheDatabase.statusDao().insertAll(listOf = originData.map { it.status }, accountKey = accountKey)
+        assertEquals(
+            originData.first().status.referenceStatus.values.first().statusKey,
+            cacheDatabase.pagingTimelineDao().getLatest(
+                pagingKey = pagingKey,
+                accountKey = accountKey
+            )?.status?.referenceStatus?.values?.first()?.statusKey,
+        )
     }
 
     @Test
