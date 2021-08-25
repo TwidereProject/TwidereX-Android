@@ -1,3 +1,4 @@
+import Versions.ksp
 import org.jetbrains.compose.compose
 
 plugins {
@@ -6,6 +7,7 @@ plugins {
     kotlin("plugin.serialization") version Versions.Kotlin.lang
     id("com.android.library")
     kotlin("kapt")
+    id("com.google.devtools.ksp").version(Versions.ksp)
 }
 
 group = Package.group
@@ -40,6 +42,8 @@ kotlin {
                 api("io.insert-koin:koin-core:${Versions.koin}")
                 implementation("com.twitter.twittertext:twitter-text:3.1.0")
                 implementation("org.jsoup:jsoup:1.13.1")
+                implementation(projects.routeProcessor)
+                ksp(projects.routeProcessor)
             }
         }
         val commonTest by getting {
@@ -80,6 +84,10 @@ kotlin {
 
 fun org.jetbrains.kotlin.gradle.plugin.KotlinDependencyHandler.kapt(dependencyNotation: String) {
     configurations["kapt"].dependencies.add(project.dependencies.create(dependencyNotation))
+}
+
+fun org.jetbrains.kotlin.gradle.plugin.KotlinDependencyHandler.ksp(dependencyNotation: org.gradle.accessors.dm.RouteProcessorProjectDependency) {
+    configurations["ksp"].dependencies.add(projects.routeProcessor)
 }
 
 android {

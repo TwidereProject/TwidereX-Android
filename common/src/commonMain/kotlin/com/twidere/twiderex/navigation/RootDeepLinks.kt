@@ -28,6 +28,8 @@ import com.twidere.twiderex.model.enums.ComposeType
  * if deeplink has the same parameters with route in Root.kt,
  * make it's name the same to route parameters in Root.kt too
  */
+const val twidereXSchema = "twiderex"
+
 @AppRoute(
     schema = twidereXSchema
 )

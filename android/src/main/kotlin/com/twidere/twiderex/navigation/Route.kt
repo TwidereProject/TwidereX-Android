@@ -102,7 +102,6 @@ import moe.tlaster.precompose.navigation.transition.fadeScaleDestroyTransition
 import java.net.URLDecoder
 
 const val initialRoute = RootRouteDefinition.Home
-const val twidereXSchema = "twiderex"
 
 fun RouteBuilder.authorizedScene(
     route: String,
