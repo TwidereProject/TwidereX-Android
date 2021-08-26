@@ -63,6 +63,18 @@ internal interface RoomDirectMessageConversationDao {
         offset: Int
     ): List<DbDirectMessageConversationWithMessage>
 
+    @Transaction
+    @Query(
+        """
+            SELECT COUNT(*) FROM(
+            SELECT * FROM dm_event AS table1 
+            JOIN (SELECT conversationKey, max(sortId) as sortId FROM dm_event WHERE accountKey == :accountKey GROUP BY conversationKey) AS table2
+            ON table1.conversationKey = table2.conversationKey AND table1.sortId = table2.sortId 
+            WHERE table1.accountKey == :accountKey ORDER BY table1.sortId DESC)
+        """
+    )
+    suspend fun getPagingListCount(accountKey: MicroBlogKey): Int
+
     @Query("SELECT * FROM dm_conversation WHERE accountKey == :accountKey AND conversationKey == :conversationKey")
     fun findWithConversationKeyFlow(accountKey: MicroBlogKey, conversationKey: MicroBlogKey): Flow<DbDMConversation?>
 

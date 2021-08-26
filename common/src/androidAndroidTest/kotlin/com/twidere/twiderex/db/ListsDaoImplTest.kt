@@ -107,8 +107,11 @@ internal class ListsDaoImplTest : CacheDatabaseDaoTest() {
         var invalidate = false
         cacheDatabase.listsDao().getPagingSource(
             accountKey = accountKey
-        ).registerInvalidatedCallback {
-            invalidate = true
+        ).apply {
+            registerInvalidatedCallback {
+                invalidate = true
+            }
+            load(PagingSource.LoadParams.Refresh(key = null, loadSize = 10, placeholdersEnabled = false))
         }
         cacheDatabase.listsDao().insertAll(listOf(mockIListModel().toUi(accountKey)))
         val start = System.currentTimeMillis()
@@ -116,5 +119,13 @@ internal class ListsDaoImplTest : CacheDatabaseDaoTest() {
             continue
         }
         assert(invalidate)
+    }
+
+    @Test
+    fun getPagingListCount_ReturnsCountMatchesQuery() = runBlocking {
+        val cacheDatabase = CacheDatabaseImpl(roomDatabase)
+        cacheDatabase.listsDao().insertAll(insertData + mockIListModel().toUi(MicroBlogKey.twitter("Not included")))
+        assertEquals(insertData.size, roomDatabase.listsDao().getPagingListCount(accountKey))
+        assertEquals(insertData.size, roomDatabase.listsDao().getPagingList(accountKey, limit = insertData.size + 10, offset = 0).size)
     }
 }

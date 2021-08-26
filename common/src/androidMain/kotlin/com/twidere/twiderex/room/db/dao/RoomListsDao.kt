@@ -56,6 +56,12 @@ internal interface RoomListsDao {
         offset: Int
     ): List<DbList>
 
+    @Transaction
+    @Query("SELECT COUNT(*) FROM (SELECT * FROM lists WHERE accountKey == :accountKey)")
+    suspend fun getPagingListCount(
+        accountKey: MicroBlogKey,
+    ): Int
+
     @Update(onConflict = OnConflictStrategy.REPLACE)
     suspend fun update(lists: List<DbList>)
 

@@ -34,7 +34,6 @@ import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import org.junit.runner.RunWith
 import kotlin.test.assertEquals
-import kotlin.test.assertNull
 
 typealias TwitterTrend = com.twidere.services.twitter.model.Trend
 typealias MastodonTrend = com.twidere.services.mastodon.model.Trend
@@ -89,6 +88,14 @@ internal class TrendDaoImplTest : CacheDatabaseDaoTest() {
     }
 
     @Test
+    fun getPagingListCount_ReturnsCountMatchesQuery() = runBlocking {
+        val cacheDatabase = CacheDatabaseImpl(roomDatabase)
+        cacheDatabase.trendDao().insertAll(trends)
+        assertEquals(twitterTrendCount, roomDatabase.trendDao().getPagingListCount(twitterAccountKey))
+        assertEquals(twitterTrendCount, roomDatabase.trendDao().getPagingList(twitterAccountKey, limit = twitterTrendCount + 10, offset = 0).size)
+    }
+
+    @Test
     fun getPagingSource_PagingSourceGenerateCorrectKeyForNext() = runBlocking {
         val cacheDatabase = CacheDatabaseImpl(roomDatabase)
         cacheDatabase.trendDao().insertAll(trends)
@@ -102,12 +109,8 @@ internal class TrendDaoImplTest : CacheDatabaseDaoTest() {
 
         val loadMoreResult = pagingSource.load(params = PagingSource.LoadParams.Append(result.nextKey ?: 0, twitterTrendCount / 2, false))
         assert(loadMoreResult is PagingSource.LoadResult.Page)
-        assertEquals(twitterTrendCount, (loadMoreResult as PagingSource.LoadResult.Page).nextKey)
+        assertEquals(null, (loadMoreResult as PagingSource.LoadResult.Page).nextKey)
         assertEquals(twitterTrendCount / 2, loadMoreResult.data.size)
-
-        val noMoreResult = pagingSource.load(params = PagingSource.LoadParams.Append(loadMoreResult.nextKey ?: 0, twitterTrendCount / 2, false))
-        assert(noMoreResult is PagingSource.LoadResult.Page)
-        assertNull((noMoreResult as PagingSource.LoadResult.Page).nextKey)
     }
 
     @Test
@@ -116,8 +119,11 @@ internal class TrendDaoImplTest : CacheDatabaseDaoTest() {
         val cacheDatabase = CacheDatabaseImpl(roomDatabase)
         cacheDatabase.trendDao().getPagingSource(
             accountKey = twitterAccountKey
-        ).registerInvalidatedCallback {
-            invalidate = true
+        ).apply {
+            registerInvalidatedCallback {
+                invalidate = true
+            }
+            load(PagingSource.LoadParams.Refresh(key = null, loadSize = 10, placeholdersEnabled = false))
         }
         cacheDatabase.trendDao().insertAll(listOf(mockITrend().toUi(twitterAccountKey)))
         val start = System.currentTimeMillis()

@@ -65,6 +65,23 @@ internal class DirectMessageConversationDaoImplTest : CacheDatabaseDaoTest() {
     }
 
     @Test
+    fun getPagingListCount_ReturnsCountMatchesQuery() = runBlocking {
+        val cacheDatabase = CacheDatabaseImpl(roomDatabase)
+        val list = listOf(
+            mockIDirectMessage(accountId = accountKey.id, otherUserID = "other1")
+                .toUi(accountKey, mockIUser(id = "other1").toUi(accountKey)),
+            mockIDirectMessage(accountId = accountKey.id, otherUserID = "other2")
+                .toUi(accountKey, mockIUser(id = "other2").toUi(accountKey)),
+            mockIDirectMessage(accountId = accountKey.id, otherUserID = "other3")
+                .toUi(MicroBlogKey.twitter("Not included"), mockIUser(id = "other3").toUi(MicroBlogKey.twitter("Not included"))),
+        )
+        cacheDatabase.directMessageDao().insertAll(list)
+        cacheDatabase.directMessageConversationDao().insertAll(list.map { it.toConversation() })
+        assertEquals(2, roomDatabase.directMessageConversationDao().getPagingList(accountKey, limit = 20, offset = 0).size)
+        assertEquals(2, roomDatabase.directMessageConversationDao().getPagingListCount(accountKey))
+    }
+
+    @Test
     fun getPagingSource_PagingSourceGenerateCorrectKeyForNext() = runBlocking {
         val cacheDatabase = CacheDatabaseImpl(roomDatabase)
         val list = listOf(
@@ -99,8 +116,11 @@ internal class DirectMessageConversationDaoImplTest : CacheDatabaseDaoTest() {
         var invalidate = false
         cacheDatabase.directMessageConversationDao().getPagingSource(
             accountKey = accountKey,
-        ).registerInvalidatedCallback {
-            invalidate = true
+        ).apply {
+            registerInvalidatedCallback {
+                invalidate = true
+            }
+            load(PagingSource.LoadParams.Refresh(key = null, loadSize = 10, placeholdersEnabled = false))
         }
         cacheDatabase.directMessageConversationDao().insertAll(listOf(conversation))
         val start = System.currentTimeMillis()

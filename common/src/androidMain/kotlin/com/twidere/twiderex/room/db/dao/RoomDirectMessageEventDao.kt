@@ -55,6 +55,12 @@ internal interface RoomDirectMessageEventDao {
         limit: Int,
         offset: Int
     ): List<DbDMEventWithAttachments>
+    @Transaction
+    @Query("SELECT COUNT(*) FROM (SELECT * FROM dm_event WHERE accountKey == :accountKey AND conversationKey == :conversationKey ORDER BY sortId DESC)")
+    suspend fun getPagingListCount(
+        accountKey: MicroBlogKey,
+        conversationKey: MicroBlogKey,
+    ): Int
 
     @Delete
     suspend fun delete(data: DbDMEvent)

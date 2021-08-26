@@ -107,6 +107,21 @@ internal class DirectMessageEventDaoImplTest : CacheDatabaseDaoTest() {
             )
         )
     }
+    @Test
+    fun getPagingListCount_ReturnsCountMatchesQuery() = runBlocking {
+        val cacheDatabase = CacheDatabaseImpl(roomDatabase)
+        val list = listOf(
+            mockIDirectMessage(accountId = accountKey.id, otherUserID = "other1")
+                .toUi(accountKey, mockIUser(id = "other1").toUi(accountKey)),
+            mockIDirectMessage(accountId = accountKey.id, otherUserID = "other1")
+                .toUi(accountKey, mockIUser(id = "other1").toUi(accountKey)),
+            mockIDirectMessage(accountId = accountKey.id, otherUserID = "other3")
+                .toUi(accountKey, mockIUser(id = "other3").toUi(MicroBlogKey.twitter("Not included"))),
+        )
+        cacheDatabase.directMessageDao().insertAll(list)
+        assertEquals(2, roomDatabase.directMessageDao().getPagingList(accountKey, limit = 20, offset = 0, conversationKey = list.first().conversationKey).size)
+        assertEquals(2, roomDatabase.directMessageDao().getPagingListCount(accountKey, conversationKey = list.first().conversationKey))
+    }
 
     @Test
     fun getPagingSource_PagingSourceGenerateCorrectKeyForNext() = runBlocking {
@@ -144,8 +159,11 @@ internal class DirectMessageEventDaoImplTest : CacheDatabaseDaoTest() {
         cacheDatabase.directMessageDao().getPagingSource(
             accountKey = accountKey,
             conversationKey = message.conversationKey
-        ).registerInvalidatedCallback {
-            invalidate = true
+        ).apply {
+            registerInvalidatedCallback {
+                invalidate = true
+            }
+            load(PagingSource.LoadParams.Refresh(key = null, loadSize = 10, placeholdersEnabled = false))
         }
         cacheDatabase.directMessageDao().insertAll(listOf(message))
         val start = System.currentTimeMillis()

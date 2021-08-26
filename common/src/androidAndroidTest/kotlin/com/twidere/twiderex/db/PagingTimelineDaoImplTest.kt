@@ -35,6 +35,23 @@ import kotlin.test.assertNull
 internal class PagingTimelineDaoImplTest : CacheDatabaseDaoTest() {
     private val accountKey = MicroBlogKey.twitter("account")
     private val pagingKey = "pagingKey"
+
+    @Test
+    fun getPagingListCount_ReturnsCountMatchesQuery() = runBlocking {
+        val cacheDatabase = CacheDatabaseImpl(roomDatabase)
+        val originData = listOf(
+            mockIStatus().toPagingTimeline(accountKey, pagingKey),
+            mockIStatus().toPagingTimeline(accountKey, pagingKey),
+            mockIStatus().toPagingTimeline(accountKey, "not included"),
+        )
+        cacheDatabase.pagingTimelineDao().insertAll(
+            originData.map { it.timeline }
+        )
+        cacheDatabase.statusDao().insertAll(listOf = originData.map { it.status }, accountKey = accountKey)
+        assertEquals(2, roomDatabase.pagingTimelineDao().getPagingListCount(accountKey = accountKey, pagingKey = pagingKey))
+        assertEquals(2, roomDatabase.pagingTimelineDao().getPagingList(accountKey = accountKey, pagingKey = pagingKey, limit = 10, offset = 0).size)
+    }
+
     @Test
     fun getPagingSource_PagingSourceGenerateCorrectKeyForNext() = runBlocking {
 
@@ -52,7 +69,7 @@ internal class PagingTimelineDaoImplTest : CacheDatabaseDaoTest() {
             accountKey = accountKey,
             pagingKey = pagingKey
         )
-        val limit = 3
+        val limit = 2
         val result = pagingSource.load(params = PagingSource.LoadParams.Refresh(0, limit, false))
         assert(result is PagingSource.LoadResult.Page)
         assertEquals(limit, (result as PagingSource.LoadResult.Page).nextKey)
@@ -70,8 +87,11 @@ internal class PagingTimelineDaoImplTest : CacheDatabaseDaoTest() {
         cacheDatabase.pagingTimelineDao().getPagingSource(
             accountKey = accountKey,
             pagingKey = pagingKey
-        ).registerInvalidatedCallback {
-            invalidate = true
+        ).apply {
+            registerInvalidatedCallback {
+                invalidate = true
+            }
+            load(PagingSource.LoadParams.Refresh(key = null, loadSize = 10, placeholdersEnabled = false))
         }
         cacheDatabase.pagingTimelineDao().insertAll(
             listOf(

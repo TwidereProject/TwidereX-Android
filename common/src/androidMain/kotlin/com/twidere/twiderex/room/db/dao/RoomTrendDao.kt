@@ -46,6 +46,12 @@ internal interface RoomTrendDao {
         offset: Int
     ): List<DbTrendWithHistory>
 
+    @Transaction
+    @Query("SELECT COUNT(*) FROM (SELECT * FROM trends WHERE accountKey == :accountKey)")
+    suspend fun getPagingListCount(
+        accountKey: MicroBlogKey
+    ): Int
+
     @Query("DELETE FROM trends WHERE accountKey == :accountKey")
     suspend fun clearAll(
         accountKey: MicroBlogKey,

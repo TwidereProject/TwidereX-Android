@@ -20,6 +20,7 @@
  */
 package com.twidere.twiderex.room.db.dao
 
+import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -50,6 +51,20 @@ internal interface RoomPagingTimelineDao {
         limit: Int,
         offset: Int
     ): List<DbPagingTimelineWithStatus>
+
+    @Transaction
+    @Query("SELECT COUNT(*) FROM (SELECT * FROM paging_timeline WHERE pagingKey == :pagingKey AND accountKey == :accountKey ORDER BY sortId DESC)")
+    suspend fun getPagingListCount(
+        pagingKey: String,
+        accountKey: MicroBlogKey,
+    ): Int
+
+    @Transaction
+    @Query("SELECT * FROM paging_timeline WHERE pagingKey == :pagingKey AND accountKey == :accountKey ORDER BY sortId DESC")
+    fun getPagingSourceYeah(
+        pagingKey: String,
+        accountKey: MicroBlogKey,
+    ): PagingSource<Int, DbPagingTimelineWithStatus>
 
     @Transaction
     @Query("SELECT * FROM paging_timeline WHERE pagingKey == :pagingKey AND accountKey == :accountKey ORDER BY timestamp DESC")
