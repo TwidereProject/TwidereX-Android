@@ -62,6 +62,7 @@ import com.twidere.services.twitter.model.fields.PlaceFields
 import com.twidere.services.twitter.model.fields.PollFields
 import com.twidere.services.twitter.model.fields.TweetFields
 import com.twidere.services.twitter.model.fields.UserFields
+import com.twidere.services.twitter.model.request.TwitterReactionRequestBody
 import com.twidere.services.utils.Base64
 import com.twidere.services.utils.await
 import com.twidere.services.utils.copyToInLength
@@ -377,13 +378,40 @@ class TwitterService(
         resources.unfollow(user_id)
     }
 
-    override suspend fun like(id: String) = resources.like(id)
+    override suspend fun like(id: String, userId: String): Boolean {
+        return try {
+            resources.likeV2(userId = userId, body = TwitterReactionRequestBody(tweet_id = id))
+                .data?.liked ?: false
+        } catch (e: TwitterApiExceptionV2) {
+            resources.like(id).favorited ?: false
+        }
+    }
 
-    override suspend fun unlike(id: String) = resources.unlike(id)
+    override suspend fun unlike(id: String, userId: String): Boolean {
+        return try {
+            resources.unlikeV2(userId = userId, tweetId = id).data?.liked ?: false
+        } catch (e: TwitterApiExceptionV2) {
+            resources.unlike(id).favorited ?: false
+        }
+    }
 
-    override suspend fun retweet(id: String) = resources.retweet(id)
+    override suspend fun retweet(id: String, userId: String): Boolean {
+        return try {
+            resources.retweetV2(userId = userId, body = TwitterReactionRequestBody(tweet_id = id))
+                .data?.retweeted ?: false
+        } catch (e: TwitterApiExceptionV2) {
+            resources.retweet(id).retweeted ?: false
+        }
+    }
 
-    override suspend fun unRetweet(id: String) = resources.unretweet(id)
+    override suspend fun unRetweet(id: String, userId: String): Boolean {
+        return try {
+            resources.unRetweetV2(userId = userId, tweetId = id)
+                .data?.retweeted ?: false
+        } catch (e: TwitterApiExceptionV2) {
+            resources.unretweet(id).retweeted ?: false
+        }
+    }
 
     override suspend fun delete(id: String) = resources.destroy(id)
 

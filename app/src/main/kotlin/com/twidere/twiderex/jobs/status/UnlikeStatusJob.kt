@@ -21,10 +21,8 @@
 package com.twidere.twiderex.jobs.status
 
 import com.twidere.services.microblog.StatusService
-import com.twidere.twiderex.db.mapper.toDbStatusWithReference
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.job.StatusResult
-import com.twidere.twiderex.model.transform.toUi
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.AccountRepository
@@ -42,17 +40,13 @@ class UnlikeStatusJob(
         service: StatusService,
         status: UiStatus
     ): StatusResult {
-        val newStatus = service.unlike(status.statusId)
-            .toDbStatusWithReference(accountKey = accountKey)
-            .toUi(accountKey = accountKey).let {
-                it.retweet ?: it
-            }
+        val liked = service.unlike(id = status.statusId, userId = accountKey.id)
         return StatusResult(
-            statusKey = newStatus.statusKey,
+            statusKey = status.statusKey,
             accountKey = accountKey,
-            liked = false,
-            retweetCount = newStatus.metrics.retweet,
-            likeCount = newStatus.metrics.like,
+            liked = liked,
+            retweetCount = status.metrics.retweet,
+            likeCount = if (liked) status.metrics.like else status.metrics.like - 1,
         )
     }
     override fun fallback(

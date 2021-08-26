@@ -18,14 +18,11 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.services.microblog
+package com.twidere.services.twitter.model.request
 
-import com.twidere.services.microblog.model.IStatus
+import kotlinx.serialization.Serializable
 
-interface StatusService {
-    suspend fun like(id: String, userId: String): Boolean
-    suspend fun unlike(id: String, userId: String): Boolean
-    suspend fun retweet(id: String, userId: String): Boolean
-    suspend fun unRetweet(id: String, userId: String): Boolean
-    suspend fun delete(id: String): IStatus
-}
+@Serializable
+data class TwitterReactionRequestBody(
+    val tweet_id: String
+)
