@@ -78,7 +78,8 @@ class TwitterService(
     private val consumer_secret: String,
     private val access_token: String,
     private val access_token_secret: String,
-    private val httpClientFactory: HttpClientFactory
+    private val httpClientFactory: HttpClientFactory,
+    private val accountId: String = ""
 ) : MicroBlogService,
     TimelineService,
     LookupService,
@@ -378,35 +379,35 @@ class TwitterService(
         resources.unfollow(user_id)
     }
 
-    override suspend fun like(id: String, userId: String): Boolean {
+    override suspend fun like(id: String): Boolean {
         return try {
-            resources.likeV2(userId = userId, body = TwitterReactionRequestBody(tweet_id = id))
+            resources.likeV2(userId = accountId, body = TwitterReactionRequestBody(tweet_id = id))
                 .data?.liked ?: false
         } catch (e: TwitterApiExceptionV2) {
             resources.like(id).favorited ?: false
         }
     }
 
-    override suspend fun unlike(id: String, userId: String): Boolean {
+    override suspend fun unlike(id: String): Boolean {
         return try {
-            resources.unlikeV2(userId = userId, tweetId = id).data?.liked ?: false
+            resources.unlikeV2(userId = accountId, tweetId = id).data?.liked ?: false
         } catch (e: TwitterApiExceptionV2) {
             resources.unlike(id).favorited ?: false
         }
     }
 
-    override suspend fun retweet(id: String, userId: String): Boolean {
+    override suspend fun retweet(id: String): Boolean {
         return try {
-            resources.retweetV2(userId = userId, body = TwitterReactionRequestBody(tweet_id = id))
+            resources.retweetV2(userId = accountId, body = TwitterReactionRequestBody(tweet_id = id))
                 .data?.retweeted ?: false
         } catch (e: TwitterApiExceptionV2) {
             resources.retweet(id).retweeted ?: false
         }
     }
 
-    override suspend fun unRetweet(id: String, userId: String): Boolean {
+    override suspend fun unRetweet(id: String): Boolean {
         return try {
-            resources.unRetweetV2(userId = userId, tweetId = id)
+            resources.unRetweetV2(userId = accountId, tweetId = id)
                 .data?.retweeted ?: false
         } catch (e: TwitterApiExceptionV2) {
             resources.unretweet(id).retweeted ?: false

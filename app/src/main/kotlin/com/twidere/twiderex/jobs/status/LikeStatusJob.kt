@@ -40,7 +40,7 @@ class LikeStatusJob(
         service: StatusService,
         status: UiStatus
     ): StatusResult {
-        val liked = service.like(id = status.statusId, userId = accountKey.id)
+        val liked = service.like(id = status.statusId)
         return StatusResult(
             statusKey = status.statusKey,
             accountKey = accountKey,

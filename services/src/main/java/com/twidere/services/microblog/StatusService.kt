@@ -23,9 +23,9 @@ package com.twidere.services.microblog
 import com.twidere.services.microblog.model.IStatus
 
 interface StatusService {
-    suspend fun like(id: String, userId: String): Boolean
-    suspend fun unlike(id: String, userId: String): Boolean
-    suspend fun retweet(id: String, userId: String): Boolean
-    suspend fun unRetweet(id: String, userId: String): Boolean
+    suspend fun like(id: String): Boolean
+    suspend fun unlike(id: String): Boolean
+    suspend fun retweet(id: String): Boolean
+    suspend fun unRetweet(id: String): Boolean
     suspend fun delete(id: String): IStatus
 }

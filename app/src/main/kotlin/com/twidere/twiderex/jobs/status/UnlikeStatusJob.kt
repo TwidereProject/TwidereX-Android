@@ -40,7 +40,7 @@ class UnlikeStatusJob(
         service: StatusService,
         status: UiStatus
     ): StatusResult {
-        val liked = service.unlike(id = status.statusId, userId = accountKey.id)
+        val liked = service.unlike(id = status.statusId)
         return StatusResult(
             statusKey = status.statusKey,
             accountKey = accountKey,

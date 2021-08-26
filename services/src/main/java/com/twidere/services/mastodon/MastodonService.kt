@@ -265,19 +265,19 @@ class MastodonService(
         max_id = max_id,
     )
 
-    override suspend fun like(id: String, userId: String): Boolean {
+    override suspend fun like(id: String): Boolean {
         return resources.favourite(id).favourited ?: false
     }
 
-    override suspend fun unlike(id: String, userId: String): Boolean {
+    override suspend fun unlike(id: String): Boolean {
         return resources.unfavourite(id).favourited ?: false
     }
 
-    override suspend fun retweet(id: String, userId: String): Boolean {
+    override suspend fun retweet(id: String): Boolean {
         return resources.reblog(id).reblogged ?: false
     }
 
-    override suspend fun unRetweet(id: String, userId: String): Boolean {
+    override suspend fun unRetweet(id: String): Boolean {
         return resources.unreblog(id).reblogged ?: false
     }
 

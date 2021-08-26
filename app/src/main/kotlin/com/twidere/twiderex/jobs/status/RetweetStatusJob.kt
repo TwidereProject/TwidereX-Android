@@ -40,7 +40,7 @@ class RetweetStatusJob(
         service: StatusService,
         status: UiStatus
     ): StatusResult {
-        val retweeted = service.retweet(id = status.statusId, userId = accountKey.id)
+        val retweeted = service.retweet(id = status.statusId)
         return StatusResult(
             statusKey = status.statusKey,
             accountKey = accountKey,
