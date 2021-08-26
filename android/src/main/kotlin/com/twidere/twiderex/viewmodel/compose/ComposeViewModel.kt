@@ -28,19 +28,16 @@ import android.location.LocationManager
 import android.net.Uri
 import android.os.Bundle
 import androidx.annotation.RequiresPermission
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.work.WorkManager
 import com.twidere.services.microblog.LookupService
-import com.twidere.twiderex.R
 import com.twidere.twiderex.action.ComposeAction
 import com.twidere.twiderex.db.model.DbDraft
+import com.twidere.twiderex.ext.asStateIn
 import com.twidere.twiderex.extensions.getCachedLocation
 import com.twidere.twiderex.extensions.getTextAfterSelection
 import com.twidere.twiderex.extensions.getTextBeforeSelection
-import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.MastodonVisibility
 import com.twidere.twiderex.model.enums.PlatformType
@@ -48,6 +45,7 @@ import com.twidere.twiderex.model.job.ComposeData
 import com.twidere.twiderex.model.ui.UiEmoji
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.notification.InAppNotification
+import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.DraftRepository
 import com.twidere.twiderex.repository.StatusRepository
 import com.twidere.twiderex.repository.UserRepository
@@ -55,15 +53,15 @@ import com.twidere.twiderex.utils.MastodonEmojiCache
 import com.twidere.twiderex.utils.notify
 import com.twidere.twiderex.worker.draft.SaveDraftWorker
 import com.twitter.twittertext.Extractor
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.lastOrNull
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 import java.util.UUID
@@ -75,9 +73,9 @@ enum class ComposeType {
     Thread,
 }
 
-class DraftItemViewModel @AssistedInject constructor(
+class DraftItemViewModel(
     private val repository: DraftRepository,
-    @Assisted private val draftId: String,
+    private val draftId: String,
 ) : ViewModel() {
 
     val draft = flow {
@@ -85,16 +83,9 @@ class DraftItemViewModel @AssistedInject constructor(
             emit(it)
         }
     }
-
-    @dagger.assisted.AssistedFactory
-    interface AssistedFactory {
-        fun create(
-            draftId: String,
-        ): DraftItemViewModel
-    }
 }
 
-class DraftComposeViewModel @AssistedInject constructor(
+class DraftComposeViewModel(
     draftRepository: DraftRepository,
     locationManager: LocationManager,
     composeAction: ComposeAction,
@@ -102,8 +93,8 @@ class DraftComposeViewModel @AssistedInject constructor(
     userRepository: UserRepository,
     workManager: WorkManager,
     inAppNotification: InAppNotification,
-    @Assisted account: AccountDetails,
-    @Assisted private val draft: DbDraft,
+    accountRepository: AccountRepository,
+    draft: DbDraft,
 ) : ComposeViewModel(
     draftRepository,
     locationManager,
@@ -112,7 +103,7 @@ class DraftComposeViewModel @AssistedInject constructor(
     userRepository,
     workManager,
     inAppNotification,
-    account,
+    accountRepository,
     draft.statusKey,
     draft.composeType,
 ) {
@@ -123,14 +114,6 @@ class DraftComposeViewModel @AssistedInject constructor(
         setText(TextFieldValue(draft.content))
         putImages(draft.media.map { Uri.parse(it) })
         excludedReplyUserIds.value = draft.excludedReplyUserIds ?: emptyList()
-    }
-
-    @dagger.assisted.AssistedFactory
-    interface AssistedFactory {
-        fun create(
-            account: AccountDetails,
-            draft: DbDraft,
-        ): DraftComposeViewModel
     }
 }
 
@@ -148,20 +131,7 @@ enum class VoteExpired(val value: Long) {
     Hour_6(21600),
     Day_1(86400),
     Day_3(259200),
-    Day_7(604800);
-
-    @Composable
-    fun stringName(): String {
-        return when (this) {
-            Min_5 -> stringResource(id = R.string.scene_compose_vote_expiration_5_Min)
-            Min_30 -> stringResource(id = R.string.scene_compose_vote_expiration_30_Min)
-            Hour_1 -> stringResource(id = R.string.scene_compose_vote_expiration_1_Hour)
-            Hour_6 -> stringResource(id = R.string.scene_compose_vote_expiration_6_Hour)
-            Day_1 -> stringResource(id = R.string.scene_compose_vote_expiration_1_Day)
-            Day_3 -> stringResource(id = R.string.scene_compose_vote_expiration_3_Day)
-            Day_7 -> stringResource(id = R.string.scene_compose_vote_expiration_7_Day)
-        }
-    }
+    Day_7(604800),
 }
 
 class VoteState {
@@ -190,7 +160,7 @@ class VoteState {
     }
 }
 
-open class ComposeViewModel @AssistedInject constructor(
+open class ComposeViewModel(
     protected val draftRepository: DraftRepository,
     private val locationManager: LocationManager,
     protected val composeAction: ComposeAction,
@@ -198,27 +168,26 @@ open class ComposeViewModel @AssistedInject constructor(
     private val userRepository: UserRepository,
     private val workManager: WorkManager,
     private val inAppNotification: InAppNotification,
-    @Assisted protected val account: AccountDetails,
-    @Assisted protected val statusKey: MicroBlogKey?,
-    @Assisted val composeType: ComposeType,
+    private val accountRepository: AccountRepository,
+    protected val statusKey: MicroBlogKey?,
+    val composeType: ComposeType,
 ) : ViewModel(), LocationListener {
-    open val draftId: String = UUID.randomUUID().toString()
-
-    @dagger.assisted.AssistedFactory
-    interface AssistedFactory {
-        fun create(
-            account: AccountDetails,
-            statusKey: MicroBlogKey?,
-            composeType: ComposeType
-        ): ComposeViewModel
+    private val account by lazy {
+        accountRepository.activeAccount.asStateIn(viewModelScope, null)
     }
 
+    open val draftId: String = UUID.randomUUID().toString()
+
     val emojis by lazy {
-        if (account.type == PlatformType.Mastodon) {
-            MastodonEmojiCache.get(account)
-        } else {
-            null
-        }
+        account.flatMapLatest {
+            it?.let { account ->
+                if (account.type == PlatformType.Mastodon) {
+                    MastodonEmojiCache.get(account)
+                } else {
+                    emptyFlow()
+                }
+            } ?: emptyFlow()
+        }.asStateIn(viewModelScope, emptyList())
     }
 
     val draftCount by lazy {
@@ -227,53 +196,49 @@ open class ComposeViewModel @AssistedInject constructor(
 
     val location = MutableStateFlow<Location?>(null)
     val excludedReplyUserIds = MutableStateFlow<List<String>>(emptyList())
-
-    val replyToUserName = flow {
-        if (account.type == PlatformType.Twitter && composeType == ComposeType.Reply && statusKey != null) {
-            emitAll(
-                status.map {
-                    it?.let { status ->
-                        Extractor().extractMentionedScreennames(
-                            status.htmlText
-                        ).filter { it != account.user.screenName && it != status.user.screenName }
-                    } ?: run {
-                        emptyList<String>()
-                    }
-                },
-            )
-        } else {
-            emit(emptyList<String>())
-        }
+    val replyToUserName by lazy {
+        combine(account, status) { account, status ->
+            if (account != null && status != null) {
+                if (account.type == PlatformType.Twitter && composeType == ComposeType.Reply && statusKey != null) {
+                    Extractor().extractMentionedScreennames(
+                        status.htmlText
+                    ).filter { it != account.user.screenName && it != status.user.screenName }
+                } else {
+                    emptyList()
+                }
+            } else {
+                emptyList()
+            }
+        }.asStateIn(viewModelScope, emptyList())
     }
 
     val loadingReplyUser = MutableStateFlow(false)
 
-    val replyToUser = replyToUserName.map {
-        if (it.isNotEmpty()) {
-            loadingReplyUser.value = true
-            try {
-                userRepository.lookupUsersByName(
-                    it,
-                    accountKey = account.accountKey,
-                    lookupService = account.service as LookupService,
-                )
-            } catch (e: Throwable) {
-                e.notify(inAppNotification)
+    val replyToUser by lazy {
+        combine(account, replyToUserName) { account, list ->
+            if (account != null) {
+                if (list.isNotEmpty()) {
+                    loadingReplyUser.value = true
+                    try {
+                        userRepository.lookupUsersByName(
+                            list,
+                            accountKey = account.accountKey,
+                            lookupService = account.service as LookupService,
+                        )
+                    } catch (e: Throwable) {
+                        e.notify(inAppNotification)
+                        emptyList()
+                    } finally {
+                        loadingReplyUser.value = false
+                    }
+                } else {
+                    emptyList()
+                }
+            } else {
                 emptyList()
-            } finally {
-                loadingReplyUser.value = false
             }
-        } else {
-            emptyList()
-        }
-        // return a stateFlow to emit latest state
-        // WhileSubscribed will unsubscribe upstream flow when there is no subscribers
-        // official suggest use 5s as stop timeout
-    }.stateIn(
-        viewModelScope,
-        SharingStarted.WhileSubscribed(5000),
-        emptyList()
-    )
+        }.asStateIn(viewModelScope, emptyList())
+    }
 
     val voteState = MutableStateFlow<VoteState?>(null)
     val isInVoteMode = MutableStateFlow(false)
@@ -283,47 +248,53 @@ open class ComposeViewModel @AssistedInject constructor(
     val contentWarningTextFieldValue = MutableStateFlow(TextFieldValue())
     val textFieldValue = MutableStateFlow(TextFieldValue())
     val images = MutableStateFlow<List<Uri>>(emptyList())
-    val canSend = textFieldValue.combine(images) { text, imgs -> text.text.isNotEmpty() || !imgs.isNullOrEmpty() }
-    val canSaveDraft =
-        textFieldValue.combine(images) { text, imgs -> text.text.isNotEmpty() || !imgs.isNullOrEmpty() }
+    val canSend = textFieldValue
+        .combine(images) { text, imgs -> text.text.isNotEmpty() || !imgs.isNullOrEmpty() }
+        .asStateIn(viewModelScope, false)
+    val canSaveDraft = textFieldValue
+        .combine(images) { text, imgs -> text.text.isNotEmpty() || !imgs.isNullOrEmpty() }
+        .asStateIn(viewModelScope, false)
     val locationEnabled = MutableStateFlow(false)
     val enableThreadMode = MutableStateFlow(composeType == ComposeType.Thread)
-    val status = flow {
-        statusKey?.let { statusKey ->
-            emitAll(
-                repository.loadStatus(statusKey, accountKey = account.accountKey)
-                    .map { status ->
-                        if (status != null &&
-                            textFieldValue.value.text.isEmpty() &&
-                            status.platformType == PlatformType.Mastodon &&
-                            status.mastodonExtra?.mentions != null &&
-                            composeType == ComposeType.Reply
-                        ) {
-                            val mentions =
-                                status.mastodonExtra.mentions.mapNotNull { it.acct }
-                                    .filter { it != account.user.screenName }.map { "@$it" }.let {
-                                        if (status.user.userKey != account.user.userKey) {
-                                            listOf(status.user.getDisplayScreenName(account.accountKey.host)) + it
-                                        } else {
-                                            it
-                                        }
-                                    }.distinctBy { it }.takeIf { it.any() }
-                                    ?.joinToString(" ", postfix = " ") { it }
-                            if (mentions != null) {
-                                setText(
-                                    TextFieldValue(
-                                        mentions,
-                                        selection = TextRange(mentions.length)
+    val status by lazy {
+        account.flatMapLatest {
+            if (statusKey != null) {
+                it?.let { account ->
+                    repository.loadStatus(statusKey, accountKey = account.accountKey)
+                        .map { status ->
+                            if (status != null &&
+                                textFieldValue.value.text.isEmpty() &&
+                                status.platformType == PlatformType.Mastodon &&
+                                status.mastodonExtra?.mentions != null &&
+                                composeType == ComposeType.Reply
+                            ) {
+                                val mentions =
+                                    status.mastodonExtra.mentions.mapNotNull { it.acct }
+                                        .filter { it != account.user.screenName }.map { "@$it" }
+                                        .let {
+                                            if (status.user.userKey != account.user.userKey) {
+                                                listOf(status.user.getDisplayScreenName(account.accountKey.host)) + it
+                                            } else {
+                                                it
+                                            }
+                                        }.distinctBy { it }.takeIf { it.any() }
+                                        ?.joinToString(" ", postfix = " ") { it }
+                                if (mentions != null) {
+                                    setText(
+                                        TextFieldValue(
+                                            mentions,
+                                            selection = TextRange(mentions.length)
+                                        )
                                     )
-                                )
+                                }
                             }
+                            status
                         }
-                        status
-                    }
-            )
-        } ?: run {
-            emit(null)
-        }
+                } ?: flowOf(null)
+            } else {
+                flowOf(null)
+            }
+        }.asStateIn(viewModelScope, null)
     }
 
     fun setText(value: TextFieldValue) {
@@ -359,13 +330,16 @@ open class ComposeViewModel @AssistedInject constructor(
         isInVoteMode.value = value
     }
 
-    fun compose() {
-        textFieldValue.value.text.let {
-            composeAction.commit(
-                account.accountKey,
-                account.type,
-                buildComposeData(it)
-            )
+    fun compose() = viewModelScope.launch {
+        val account = account.lastOrNull()
+        if (account != null) {
+            textFieldValue.value.text.let {
+                composeAction.commit(
+                    account.accountKey,
+                    account.type,
+                    buildComposeData(it)
+                )
+            }
         }
     }
 
@@ -399,7 +373,8 @@ open class ComposeViewModel @AssistedInject constructor(
         isThreadMode = enableThreadMode.value,
     )
 
-    fun putImages(value: List<Uri>) {
+    fun putImages(value: List<Uri>) = viewModelScope.launch {
+        val imageLimit = imageLimit.lastOrNull() ?: 4
         images.value.let {
             value + it
         }.take(imageLimit).let {
@@ -407,13 +382,17 @@ open class ComposeViewModel @AssistedInject constructor(
         }
     }
 
-    private val imageLimit: Int
-        get() = when (account.type) {
-            PlatformType.Twitter -> 4
-            PlatformType.StatusNet -> TODO()
-            PlatformType.Fanfou -> TODO()
-            PlatformType.Mastodon -> 4
-        }
+    private val imageLimit by lazy {
+        account.map {
+            when (it?.type) {
+                PlatformType.Twitter -> 4
+                PlatformType.StatusNet -> TODO()
+                PlatformType.Fanfou -> TODO()
+                PlatformType.Mastodon -> 4
+                else -> 4
+            }
+        }.asStateIn(viewModelScope, 4)
+    }
 
     @RequiresPermission(anyOf = [permission.ACCESS_COARSE_LOCATION, permission.ACCESS_FINE_LOCATION])
     fun trackingLocation() {

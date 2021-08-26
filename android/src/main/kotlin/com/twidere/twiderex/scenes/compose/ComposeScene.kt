@@ -281,7 +281,9 @@ private fun ComposeBody(
                                 contentDescription = stringResource(
                                     id = if (enableThreadMode) R.string.accessibility_scene_compose_thread else R.string.accessibility_scene_compose_send
                                 ),
-                                tint = if (canSend) MaterialTheme.colors.primary else LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
+                                tint = if (canSend) MaterialTheme.colors.primary else LocalContentColor.current.copy(
+                                    alpha = LocalContentAlpha.current
+                                )
                             )
                         }
                     }
@@ -476,47 +478,41 @@ fun EmojiPanel(
     viewModel: ComposeViewModel,
     showEmoji: Boolean,
 ) {
-    viewModel.emojis?.let { emojis ->
-        val items by emojis.observeAsState(initial = null)
-        val ime = LocalWindowInsets.current.ime
-        val navigation = LocalWindowInsets.current.navigationBars
-        var height by remember { mutableStateOf(0) }
-        LaunchedEffect(ime) {
-            snapshotFlow { ime.bottom }
-                .distinctUntilChanged()
-                .filter { it > 0 }
-                .collect { height = max(height, it) }
+    val items by viewModel.emojis.observeAsState(initial = emptyList())
+    val ime = LocalWindowInsets.current.ime
+    val navigation = LocalWindowInsets.current.navigationBars
+    var height by remember { mutableStateOf(0) }
+    LaunchedEffect(ime) {
+        snapshotFlow { ime.bottom }
+            .distinctUntilChanged()
+            .filter { it > 0 }
+            .collect { height = max(height, it) }
+    }
+    val targetHeight = with(LocalDensity.current) {
+        height.toDp()
+    }
+    val bottom = with(LocalDensity.current) {
+        ime.bottom.coerceAtLeast(navigation.bottom).toDp()
+    }
+    var visibility by remember { mutableStateOf(false) }
+    LaunchedEffect(showEmoji, bottom) {
+        if (bottom == targetHeight || showEmoji) {
+            visibility = showEmoji
         }
-        val targetHeight = with(LocalDensity.current) {
-            height.toDp()
-        }
-        val bottom = with(LocalDensity.current) {
-            ime.bottom.coerceAtLeast(navigation.bottom).toDp()
-        }
-        var visibility by remember { mutableStateOf(false) }
-        LaunchedEffect(showEmoji, bottom) {
-            if (bottom == targetHeight || showEmoji) {
-                visibility = showEmoji
-            }
-        }
-        Box(
-            modifier = Modifier
-                .height(
-                    height = if (visibility) {
-                        (targetHeight - bottom).coerceAtLeast(0.dp)
-                    } else {
-                        0.dp
-                    }
-                )
-                .fillMaxWidth(),
-            contentAlignment = Alignment.Center,
-        ) {
-            items?.let { items ->
-                EmojiList(items, viewModel)
-            } ?: run {
-                CircularProgressIndicator()
-            }
-        }
+    }
+    Box(
+        modifier = Modifier
+            .height(
+                height = if (visibility) {
+                    (targetHeight - bottom).coerceAtLeast(0.dp)
+                } else {
+                    0.dp
+                }
+            )
+            .fillMaxWidth(),
+        contentAlignment = Alignment.Center,
+    ) {
+        EmojiList(items, viewModel)
     }
 }
 
@@ -1219,8 +1215,9 @@ private fun ComposeActions(
                 IconButton(
                     onClick = {
                         scope.launch {
-                            val result = navController.navigateForResult(RootRoute.Compose.Search.User)
-                                ?.toString()
+                            val result =
+                                navController.navigateForResult(RootRoute.Compose.Search.User)
+                                    ?.toString()
                             if (!result.isNullOrEmpty()) {
                                 viewModel.insertText("$result ")
                             }
@@ -1288,7 +1285,9 @@ private fun ComposeActions(
                 Icon(
                     painter = painterResource(id = R.drawable.ic_thread_mode),
                     contentDescription = stringResource(id = R.string.accessibility_scene_compose_thread),
-                    tint = if (enableThreadMode) MaterialTheme.colors.primary else LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
+                    tint = if (enableThreadMode) MaterialTheme.colors.primary else LocalContentColor.current.copy(
+                        alpha = LocalContentAlpha.current
+                    )
                 )
             }
             Spacer(modifier = Modifier.weight(1f))
@@ -1375,4 +1374,17 @@ private fun ComposeImage(item: Uri, viewModel: ComposeViewModel) {
 
 private object ComposeImageDefaults {
     val ImageSize = 72.dp
+}
+
+@Composable
+fun VoteExpired.stringName(): String {
+    return when (this) {
+        VoteExpired.Min_5 -> stringResource(id = R.string.scene_compose_vote_expiration_5_Min)
+        VoteExpired.Min_30 -> stringResource(id = R.string.scene_compose_vote_expiration_30_Min)
+        VoteExpired.Hour_1 -> stringResource(id = R.string.scene_compose_vote_expiration_1_Hour)
+        VoteExpired.Hour_6 -> stringResource(id = R.string.scene_compose_vote_expiration_6_Hour)
+        VoteExpired.Day_1 -> stringResource(id = R.string.scene_compose_vote_expiration_1_Day)
+        VoteExpired.Day_3 -> stringResource(id = R.string.scene_compose_vote_expiration_3_Day)
+        VoteExpired.Day_7 -> stringResource(id = R.string.scene_compose_vote_expiration_7_Day)
+    }
 }
