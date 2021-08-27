@@ -25,6 +25,8 @@ import androidx.datastore.preferences.core.Preferences
 import com.twidere.services.microblog.NotificationService
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.ext.asStateIn
+import com.twidere.twiderex.model.enums.NotificationCursorType
+import com.twidere.twiderex.paging.mediator.paging.PagingWithGapMediator
 import com.twidere.twiderex.paging.mediator.timeline.NotificationTimelineMediator
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.NotificationRepository
@@ -48,7 +50,14 @@ class NotificationTimelineViewModel(
                     service = it.service as NotificationService,
                     accountKey = it.accountKey,
                     database = database,
-                    notificationRepository = notificationRepository,
+                    addCursorIfNeed = { data, accountKey ->
+                        notificationRepository.addCursorIfNeeded(
+                            accountKey,
+                            NotificationCursorType.General,
+                            data.status.statusId,
+                            data.status.timestamp
+                        )
+                    }
                 )
             } else {
                 null

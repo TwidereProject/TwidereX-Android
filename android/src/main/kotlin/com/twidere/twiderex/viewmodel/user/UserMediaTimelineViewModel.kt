@@ -29,7 +29,6 @@ import com.twidere.services.microblog.TimelineService
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.ext.asStateIn
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.transform.toUi
 import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.paging.mediator.paging.pager
@@ -62,7 +61,7 @@ class UserMediaTimelineViewModel(
                     )
                 ).flow.map { pagingData ->
                     pagingData.map {
-                        it.toUi(pagingMediator.accountKey)
+                        it.status
                     }
                 }.cachedIn(viewModelScope).map {
                     it.flatMap {

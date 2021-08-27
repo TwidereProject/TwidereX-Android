@@ -59,7 +59,10 @@ class NotificationJob(
                 .map { account ->
                     launch {
                         val activities = try {
-                            repository.activities(account)
+                            repository.activities(
+                                accountKey = account.accountKey,
+                                service = account.service
+                            )
                         } catch (e: Throwable) {
                             // Ignore any exception cause there's no needs ot handle it
                             emptyList()
@@ -135,7 +138,7 @@ class NotificationJob(
         if (status.mastodonExtra == null || actualStatus == null) {
             return null
         }
-        return when (status.mastodonExtra.type) {
+        return when (status.mastodonExtra?.type) {
             MastodonStatusType.Status -> null
             MastodonStatusType.NotificationFollow -> {
                 NotificationData(
@@ -197,6 +200,7 @@ class NotificationJob(
                 )
             }
             MastodonStatusType.NotificationStatus -> null
+            else -> null
         }
     }
 }

@@ -125,6 +125,7 @@ import com.twidere.twiderex.extensions.stringName
 import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.enums.ComposeType
 import com.twidere.twiderex.model.enums.MastodonVisibility
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiEmojiCategory
@@ -133,7 +134,6 @@ import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.Orange
 import com.twidere.twiderex.ui.TwidereScene
-import com.twidere.twiderex.viewmodel.compose.ComposeType
 import com.twidere.twiderex.viewmodel.compose.ComposeViewModel
 import com.twidere.twiderex.viewmodel.compose.DraftComposeViewModel
 import com.twidere.twiderex.viewmodel.compose.DraftItemViewModel

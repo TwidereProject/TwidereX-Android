@@ -39,9 +39,11 @@ import com.twidere.twiderex.extensions.getCachedLocation
 import com.twidere.twiderex.extensions.getTextAfterSelection
 import com.twidere.twiderex.extensions.getTextBeforeSelection
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.enums.ComposeType
 import com.twidere.twiderex.model.enums.MastodonVisibility
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.job.ComposeData
+import com.twidere.twiderex.model.ui.UiDraft
 import com.twidere.twiderex.model.ui.UiEmoji
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.notification.InAppNotification
@@ -66,13 +68,6 @@ import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 import java.util.UUID
 
-enum class ComposeType {
-    New,
-    Reply,
-    Quote,
-    Thread,
-}
-
 class DraftItemViewModel(
     private val repository: DraftRepository,
     private val draftId: String,
@@ -94,7 +89,7 @@ class DraftComposeViewModel(
     workManager: WorkManager,
     inAppNotification: InAppNotification,
     accountRepository: AccountRepository,
-    draft: DbDraft,
+    draft: UiDraft,
 ) : ComposeViewModel(
     draftRepository,
     locationManager,
@@ -108,7 +103,7 @@ class DraftComposeViewModel(
     draft.composeType,
 ) {
 
-    override val draftId: String = draft._id
+    override val draftId: String = draft.draftId
 
     init {
         setText(TextFieldValue(draft.content))

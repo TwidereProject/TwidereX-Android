@@ -91,41 +91,42 @@ fun MastodonPoll(status: UiStatus) {
         mutableStateListOf<Int>()
     }
 
-    status.poll.options.forEachIndexed { index, option ->
-        MastodonPollOption(
-            option,
-            index,
-            status.poll,
-            voted = voteState.contains(index),
-            onVote = {
-                if (status.poll.multiple) {
-                    if (voteState.contains(index)) {
-                        voteState.remove(index)
+    status.poll?.let { poll ->
+        poll.options.forEachIndexed { index, option ->
+            MastodonPollOption(
+                option,
+                index,
+                poll,
+                voted = voteState.contains(index),
+                onVote = {
+                    if (poll.multiple) {
+                        if (voteState.contains(index)) {
+                            voteState.remove(index)
+                        } else {
+                            voteState.add(index)
+                        }
                     } else {
-                        voteState.add(index)
-                    }
-                } else {
-                    if (voteState.isEmpty()) {
-                        voteState.add(index)
-                    } else {
-                        voteState.clear()
-                        voteState.add(index)
+                        if (voteState.isEmpty()) {
+                            voteState.add(index)
+                        } else {
+                            voteState.clear()
+                            voteState.add(index)
+                        }
                     }
                 }
+            )
+            if (index != poll.options.lastIndex) {
+                Spacer(modifier = Modifier.height(MastodonPollDefaults.OptionSpacing))
             }
-        )
-        if (index != status.poll.options.lastIndex) {
-            Spacer(modifier = Modifier.height(MastodonPollDefaults.OptionSpacing))
         }
     }
-
     Spacer(modifier = Modifier.height(MastodonPollDefaults.VoteInfoSpacing))
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        val countText = status.poll.votersCount?.let {
+        val countText = status.poll?.votersCount?.let {
             if (it > 1) {
                 stringResource(
                     id = R.string.common_controls_status_poll_total_people,
@@ -137,7 +138,7 @@ fun MastodonPoll(status: UiStatus) {
                     it,
                 )
             }
-        } ?: status.poll.votesCount?.let {
+        } ?: status.poll?.votesCount?.let {
             if (it > 1) {
                 stringResource(
                     id = R.string.common_controls_status_poll_total_votes,
@@ -161,15 +162,15 @@ fun MastodonPoll(status: UiStatus) {
                     Text(text = countText)
                 }
                 Spacer(modifier = Modifier.width(MastodonPollDefaults.VoteTimeSpacing))
-                if (status.poll.expired) {
+                if (status.poll?.expired == true) {
                     Text(text = stringResource(id = R.string.common_controls_status_poll_expired))
                 } else {
-                    Text(text = status.poll.expiresAt?.humanizedTimestamp() ?: "")
+                    Text(text = status.poll?.expiresAt?.humanizedTimestamp() ?: "")
                 }
             }
         }
 
-        if (status.poll.canVote) {
+        if (status.poll?.canVote == true) {
             val statusActions = LocalStatusActions.current
             TextButton(
                 onClick = {

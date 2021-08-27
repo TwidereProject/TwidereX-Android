@@ -25,7 +25,6 @@ import androidx.paging.map
 import com.twidere.services.microblog.SearchService
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.ext.asStateIn
-import com.twidere.twiderex.model.transform.toUi
 import com.twidere.twiderex.paging.mediator.paging.pager
 import com.twidere.twiderex.paging.mediator.search.SearchStatusMediator
 import com.twidere.twiderex.repository.AccountRepository
@@ -52,8 +51,7 @@ class SearchTweetsViewModel(
                     database,
                     account.accountKey,
                     account.service as SearchService
-                ).pager()
-                    .flow.map { it.map { it.status.toUi(account.accountKey) } }
+                ).pager().flow.map { it.map { it.status } }.cachedIn(viewModelScope)
             } ?: emptyFlow()
         }.cachedIn(viewModelScope)
     }

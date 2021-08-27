@@ -23,15 +23,14 @@ package com.twidere.twiderex.jobs.dm
 import android.content.Context
 import com.twidere.services.microblog.LookupService
 import com.twidere.services.twitter.TwitterService
+import com.twidere.twiderex.dataprovider.mapper.autolink
+import com.twidere.twiderex.dataprovider.mapper.toUi
 import com.twidere.twiderex.db.CacheDatabase
-import com.twidere.twiderex.db.mapper.autolink
-import com.twidere.twiderex.db.mapper.toDbDirectMessage
-import com.twidere.twiderex.db.mapper.toDbUser
-import com.twidere.twiderex.db.model.DbDMEventWithAttachments
-import com.twidere.twiderex.db.model.DbUser
 import com.twidere.twiderex.kmp.FileResolver
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.job.DirectMessageSendData
+import com.twidere.twiderex.model.ui.UiDMEvent
+import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.notification.AppNotificationManager
 import com.twidere.twiderex.repository.AccountRepository
 
@@ -49,20 +48,20 @@ class TwitterDirectMessageSendJob(
         service: TwitterService,
         sendData: DirectMessageSendData,
         mediaIds: ArrayList<String>
-    ): DbDMEventWithAttachments = service.sendDirectMessage(
+    ): UiDMEvent = service.sendDirectMessage(
         recipientId = sendData.recipientUserKey.id,
         text = sendData.text,
         attachmentType = "media",
         mediaId = mediaIds.firstOrNull()
-    )?.toDbDirectMessage(
+    )?.toUi(
         accountKey = sendData.accountKey,
         sender = lookUpUser(cacheDatabase, sendData.accountKey, service)
     ) ?: throw Error()
 
-    private suspend fun lookUpUser(database: CacheDatabase, userKey: MicroBlogKey, service: TwitterService): DbUser {
+    private suspend fun lookUpUser(database: CacheDatabase, userKey: MicroBlogKey, service: TwitterService): UiUser {
         return database.userDao().findWithUserKey(userKey) ?: let {
             val user = (service as LookupService).lookupUser(userKey.id)
-                .toDbUser(userKey)
+                .toUi(userKey)
             database.userDao().insertAll(listOf(user))
             user
         }

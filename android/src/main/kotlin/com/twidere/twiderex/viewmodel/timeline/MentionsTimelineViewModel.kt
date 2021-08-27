@@ -25,6 +25,9 @@ import androidx.datastore.preferences.core.Preferences
 import com.twidere.services.microblog.TimelineService
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.ext.asStateIn
+import com.twidere.twiderex.model.AccountDetails
+import com.twidere.twiderex.model.enums.NotificationCursorType
+import com.twidere.twiderex.paging.mediator.paging.PagingWithGapMediator
 import com.twidere.twiderex.paging.mediator.timeline.MentionTimelineMediator
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.NotificationRepository
@@ -47,7 +50,14 @@ class MentionsTimelineViewModel(
                 service = it.service as TimelineService,
                 accountKey = it.accountKey,
                 database = database,
-                notificationRepository = notificationRepository
+                addCursorIfNeed = { data, accountKey ->
+                    notificationRepository.addCursorIfNeeded(
+                        accountKey,
+                        NotificationCursorType.Mentions,
+                        data.status.statusId,
+                        data.status.timestamp,
+                    )
+                }
             )
         } else {
             null

@@ -22,6 +22,7 @@ package com.twidere.twiderex.viewmodel.lists
 
 import androidx.paging.cachedIn
 import com.twidere.twiderex.ext.asStateIn
+import com.twidere.services.microblog.TimelineService
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.TimelineRepository
@@ -44,7 +45,8 @@ class ListsTimelineViewModel(
             it?.let {
                 repository.listTimeline(
                     listKey = listKey,
-                    account = it,
+                    accountKey = it.accountKey,
+                    service = it.service as TimelineService
                 )
             } ?: emptyFlow()
         }.cachedIn(viewModelScope)

@@ -24,6 +24,8 @@ import androidx.compose.runtime.mutableStateMapOf
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.twidere.twiderex.ext.asStateIn
+import com.twidere.services.microblog.ListsService
+import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.notification.InAppNotification
@@ -54,7 +56,11 @@ class ListsUserViewModel(
     private val members by lazy {
         account.flatMapLatest {
             it?.let { account ->
-                listsUsersRepository.fetchMembers(account = account, listId = listId)
+                listsUsersRepository.fetchMembers(
+                    accountKey = account.accountKey,
+                    service = account.service as ListsService,
+                    listId = listId
+                )
             } ?: emptyFlow()
         }.cachedIn(viewModelScope)
     }
@@ -62,7 +68,11 @@ class ListsUserViewModel(
     private val subscribers by lazy {
         account.flatMapLatest {
             it?.let { account ->
-                listsUsersRepository.fetchSubscribers(account = account, listId = listId)
+                listsUsersRepository.fetchSubscribers(
+                    accountKey = account.accountKey,
+                    service = account.service as ListsService,
+                    listId = listId
+                )
             } ?: emptyFlow()
         }.cachedIn(viewModelScope)
     }
@@ -77,7 +87,7 @@ class ListsUserViewModel(
             viewModelScope.launch {
                 account.lastOrNull()?.let { account ->
                     listsUsersRepository.removeMember(
-                        account = account,
+                        service = account.service as ListsService,
                         listId = listId,
                         user = user
                     )
@@ -110,7 +120,7 @@ class ListsAddMemberViewModel(
                     listsUsersRepository.addMember(
                         listId = listId,
                         user = user,
-                        account = account
+                        service = account.service as ListsService,
                     )
                     pendingMap[user.userKey] = user
                 }
@@ -119,7 +129,7 @@ class ListsAddMemberViewModel(
             loadingRequest {
                 account.firstOrNull()?.let { account ->
                     listsUsersRepository.removeMember(
-                        account = account,
+                        service = account.service as ListsService,
                         listId = listId,
                         user = user
                     )

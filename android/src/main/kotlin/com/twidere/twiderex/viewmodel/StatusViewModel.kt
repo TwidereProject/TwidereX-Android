@@ -52,7 +52,12 @@ class StatusViewModel @AssistedInject constructor(
     val source by lazy {
         account.flatMapLatest {
             if (it != null) {
-                statusRepository.conversation(statusKey = statusKey, account = it)
+                statusRepository.conversation(
+                    statusKey = statusKey,
+                    accountKey = it.accountKey,
+                    platformType = it.type,
+                    service = it.service
+                )
             } else {
                 emptyFlow()
             }

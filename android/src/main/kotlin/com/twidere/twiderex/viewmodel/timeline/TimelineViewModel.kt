@@ -31,6 +31,7 @@ import com.twidere.twiderex.extensions.toUi
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.paging.mediator.paging.PagingWithGapMediator
 import com.twidere.twiderex.paging.mediator.paging.pager
+import com.twidere.twiderex.paging.mediator.paging.toUi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
@@ -45,7 +46,7 @@ abstract class TimelineViewModel(
 ) : ViewModel() {
     val source by lazy {
         pagingMediator.flatMapLatest {
-            it?.pager()?.toUi(accountKey = it.accountKey) ?: emptyFlow()
+            it?.pager()?.toUi() ?: emptyFlow()
         }.cachedIn(viewModelScope)
     }
     abstract val pagingMediator: Flow<PagingWithGapMediator?>

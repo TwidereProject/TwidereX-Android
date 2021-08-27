@@ -21,10 +21,9 @@
 package com.twidere.twiderex.jobs.status
 
 import com.twidere.services.microblog.StatusService
-import com.twidere.twiderex.db.mapper.toDbStatusWithReference
+import com.twidere.twiderex.dataprovider.mapper.toUi
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.job.StatusResult
-import com.twidere.twiderex.model.transform.toUi
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.AccountRepository
@@ -43,8 +42,8 @@ class LikeStatusJob(
         status: UiStatus
     ): StatusResult {
         val newStatus = service.like(status.statusId)
-            .toDbStatusWithReference(accountKey = accountKey)
-            .toUi(accountKey = accountKey).let {
+            .toUi(accountKey = accountKey)
+            .let {
                 it.retweet ?: it
             }
         return StatusResult(

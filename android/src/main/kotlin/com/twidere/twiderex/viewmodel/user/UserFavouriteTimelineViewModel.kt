@@ -22,6 +22,7 @@ package com.twidere.twiderex.viewmodel.user
 
 import androidx.paging.cachedIn
 import com.twidere.twiderex.ext.asStateIn
+import com.twidere.services.microblog.TimelineService
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.TimelineRepository
@@ -42,7 +43,12 @@ class UserFavouriteTimelineViewModel(
     val source by lazy {
         account.flatMapLatest {
             if (it != null) {
-                repository.favouriteTimeline(userKey = userKey, account = it)
+                repository.favouriteTimeline(
+                    userKey = userKey,
+                    accountKey = it.accountKey,
+                    platformType = it.type,
+                    service = it.service as TimelineService
+                )
             } else {
                 emptyFlow()
             }

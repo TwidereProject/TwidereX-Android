@@ -23,6 +23,7 @@ package com.twidere.twiderex.viewmodel.lists
 import androidx.paging.cachedIn
 import androidx.paging.filter
 import com.twidere.twiderex.ext.asStateIn
+import com.twidere.services.microblog.ListsService
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.ListsMode
 import com.twidere.twiderex.model.ui.UiList
@@ -51,7 +52,10 @@ class ListsViewModel(
     val source by lazy {
         account.flatMapLatest {
             it?.let { account ->
-                listsRepository.fetchLists(account = account)
+                listsRepository.fetchLists(
+                    accountKey = account.accountKey,
+                    service = account.service as ListsService
+                )
             } ?: emptyFlow()
         }.cachedIn(viewModelScope)
     }
@@ -123,10 +127,11 @@ class ListsCreateViewModel(
         loadingRequest(onResult) {
             account.lastOrNull()?.let { account ->
                 listsRepository.createLists(
-                    account = account,
+                    accountKey = account.accountKey,
+                    service = account.service as ListsService,
                     title = title,
                     description = description,
-                    mode = if (private) ListsMode.PRIVATE.value else ListsMode.PUBLIC.value
+                    mode = if (private)ListsMode.PRIVATE.value else ListsMode.PUBLIC.value
                 )
             }
         }
@@ -150,7 +155,10 @@ class ListsModifyViewModel(
     val source by lazy {
         account.flatMapLatest {
             it?.let { account ->
-                listsRepository.findListWithListKey(account = account, listKey = listKey)
+                listsRepository.findListWithListKey(
+                    accountKey = account.accountKey,
+                    listKey = listKey
+                )
             } ?: emptyFlow()
         }
     }
@@ -175,11 +183,12 @@ class ListsModifyViewModel(
         loadingRequest(onResult) {
             account.lastOrNull()?.let { account ->
                 listsRepository.updateLists(
-                    account = account,
+                    accountKey = account.accountKey,
+                    service = account.service as ListsService,
                     listId = listId,
                     title = title,
                     description = description,
-                    mode = if (private) ListsMode.PRIVATE.value else ListsMode.PUBLIC.value
+                    mode = if (private)ListsMode.PRIVATE.value else ListsMode.PUBLIC.value
                 )
             }
         }
@@ -193,7 +202,8 @@ class ListsModifyViewModel(
         loadingRequest(onResult) {
             account.lastOrNull()?.let { account ->
                 listsRepository.deleteLists(
-                    account = account,
+                    accountKey = account.accountKey,
+                    service = account.service as ListsService,
                     listKey = listKey,
                     listId = listId,
                 )
@@ -208,7 +218,8 @@ class ListsModifyViewModel(
         loadingRequest(onResult) {
             account.lastOrNull()?.let { account ->
                 listsRepository.subscribeLists(
-                    account = account,
+                    accountKey = account.accountKey,
+                    service = account.service as ListsService,
                     listKey = listKey
                 )
             }
@@ -222,7 +233,8 @@ class ListsModifyViewModel(
         loadingRequest(onResult) {
             account.lastOrNull()?.let { account ->
                 listsRepository.unsubscribeLists(
-                    account = account,
+                    accountKey = account.accountKey,
+                    service = account.service as ListsService,
                     listKey = listKey
                 )
             }

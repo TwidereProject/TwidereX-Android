@@ -27,11 +27,11 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.OverwritingInputMerger
 import androidx.work.WorkerParameters
 import androidx.work.setInputMerger
+import com.twidere.twiderex.db.transform.toWorkData
 import com.twidere.twiderex.extensions.getNullableBoolean
 import com.twidere.twiderex.extensions.getNullableLong
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.job.StatusResult
-import com.twidere.twiderex.model.transform.toWorkData
 import com.twidere.twiderex.repository.ReactionRepository
 import com.twidere.twiderex.repository.StatusRepository
 import dagger.assisted.Assisted
@@ -66,21 +66,14 @@ class UpdateStatusWorker @AssistedInject constructor(
         val retweeted = inputData.getNullableBoolean("retweeted")
         val retweetCount = inputData.getNullableLong("retweetCount")
         val likeCount = inputData.getNullableLong("likeCount")
-        repository.updateReaction(accountKey = accountKey, statusKey = statusKey) {
-            if (liked != null) {
-                it.liked = liked
-            }
-            if (retweeted != null) {
-                it.retweeted = retweeted
-            }
-        }
-        statusRepository.updateStatus(statusKey = statusKey) {
-            if (retweetCount != null) {
-                it.retweetCount = retweetCount
-            }
-            if (likeCount != null) {
-                it.likeCount = likeCount
-            }
+        repository.updateReaction(accountKey = accountKey, statusKey = statusKey, liked = liked, retweet = retweeted)
+        statusRepository.updateStatus(statusKey = statusKey, accountKey = accountKey) {
+            it.copy(
+                metrics = it.metrics.copy(
+                    retweet = retweetCount ?: it.metrics.retweet,
+                    like = likeCount ?: it.metrics.like
+                )
+            )
         }
         return Result.success()
     }

@@ -21,6 +21,7 @@
 package com.twidere.twiderex.viewmodel.trend
 
 import androidx.paging.cachedIn
+import com.twidere.services.microblog.TrendService
 import com.twidere.twiderex.ext.asStateIn
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.TrendRepository
@@ -40,7 +41,10 @@ class TrendViewModel(
     val source by lazy {
         account.flatMapLatest {
             if (it != null) {
-                repository.trendsSource(it)
+                repository.trendsSource(
+                    accountKey = it.accountKey,
+                    service = it.service as TrendService
+                )
             } else {
                 emptyFlow()
             }

@@ -22,20 +22,18 @@ package com.twidere.twiderex.jobs.compose
 
 import android.content.Context
 import com.twidere.services.twitter.TwitterService
+import com.twidere.twiderex.dataprovider.mapper.toUi
 import com.twidere.twiderex.db.CacheDatabase
-import com.twidere.twiderex.db.mapper.toDbStatusWithReference
-import com.twidere.twiderex.db.model.saveToDb
 import com.twidere.twiderex.kmp.ExifScrambler
 import com.twidere.twiderex.kmp.FileResolver
 import com.twidere.twiderex.kmp.RemoteNavigator
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.enums.ComposeType
 import com.twidere.twiderex.model.job.ComposeData
-import com.twidere.twiderex.model.transform.toUi
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.notification.AppNotificationManager
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.StatusRepository
-import com.twidere.twiderex.viewmodel.compose.ComposeType
 
 class TwitterComposeJob constructor(
     context: Context,
@@ -80,9 +78,9 @@ class TwitterComposeJob constructor(
             lat = lat,
             long = long,
             exclude_reply_user_ids = composeData.excludedReplyUserIds
-        ).toDbStatusWithReference(accountKey)
-        listOf(result).saveToDb(cacheDatabase)
-        return result.toUi(accountKey)
+        ).toUi(accountKey)
+        cacheDatabase.statusDao().insertAll(listOf = listOf(result), accountKey = accountKey)
+        return result
     }
 
     override suspend fun uploadImage(

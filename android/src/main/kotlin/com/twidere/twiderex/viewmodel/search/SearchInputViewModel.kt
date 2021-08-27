@@ -20,9 +20,9 @@
  */
 package com.twidere.twiderex.viewmodel.search
 
-import com.twidere.twiderex.db.model.DbSearch
 import com.twidere.twiderex.ext.asStateIn
 import com.twidere.twiderex.repository.AccountRepository
+import com.twidere.twiderex.model.ui.UiSearch
 import com.twidere.twiderex.repository.SearchRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
@@ -58,7 +58,7 @@ class SearchInputViewModel(
 
     val expandSearch = MutableStateFlow(false)
 
-    fun remove(item: DbSearch) = viewModelScope.launch {
+    fun remove(item: UiSearch) = viewModelScope.launch {
         repository.remove(item)
     }
 
