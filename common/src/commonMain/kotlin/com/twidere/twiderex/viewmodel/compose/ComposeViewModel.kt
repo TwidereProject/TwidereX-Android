@@ -34,9 +34,9 @@ import androidx.work.WorkManager
 import com.twidere.services.microblog.LookupService
 import com.twidere.twiderex.action.ComposeAction
 import com.twidere.twiderex.ext.asStateIn
+import com.twidere.twiderex.ext.getTextAfterSelection
+import com.twidere.twiderex.ext.getTextBeforeSelection
 import com.twidere.twiderex.extensions.getCachedLocation
-import com.twidere.twiderex.extensions.getTextAfterSelection
-import com.twidere.twiderex.extensions.getTextBeforeSelection
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.ComposeType
 import com.twidere.twiderex.model.enums.MastodonVisibility
@@ -263,18 +263,18 @@ open class ComposeViewModel(
                                 composeType == ComposeType.Reply
                             ) {
                                 val mentions =
-                                    status.mastodonExtra?.mentions?.mapNotNull { it.acct }
-                                        ?.filter { it != account.user.screenName }
-                                        ?.map { "@$it" }
-                                        ?.let {
+                                    status.mastodonExtra.mentions.mapNotNull { it.acct }
+                                        .filter { it != account.user.screenName }
+                                        .map { "@$it" }
+                                        .let {
                                             if (status.user.userKey != account.user.userKey) {
                                                 listOf(status.user.getDisplayScreenName(account.accountKey.host)) + it
                                             } else {
                                                 it
                                             }
                                         }
-                                        ?.distinctBy { it }
-                                        ?.takeIf { it.any() }
+                                        .distinctBy { it }
+                                        .takeIf { it.any() }
                                         ?.joinToString(" ", postfix = " ") { it }
                                 if (mentions != null) {
                                     setText(
