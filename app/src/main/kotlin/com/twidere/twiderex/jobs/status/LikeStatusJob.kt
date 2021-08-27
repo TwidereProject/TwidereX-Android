@@ -42,9 +42,11 @@ class LikeStatusJob(
         service: StatusService,
         status: UiStatus
     ): StatusResult {
-        val newStatus = service.like(id = status.statusId)
+        val newStatus = service.like(status.statusId)
             .toDbStatusWithReference(accountKey = accountKey)
-            .toUi(accountKey)
+            .toUi(accountKey = accountKey).let {
+                it.retweet ?: it
+            }
         return StatusResult(
             statusKey = newStatus.statusKey,
             accountKey = accountKey,

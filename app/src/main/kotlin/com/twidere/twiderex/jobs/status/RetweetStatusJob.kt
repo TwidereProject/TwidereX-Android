@@ -42,9 +42,11 @@ class RetweetStatusJob(
         service: StatusService,
         status: UiStatus
     ): StatusResult {
-        val newStatus = service.retweet(id = status.statusId)
+        val newStatus = service.retweet(status.statusId)
             .toDbStatusWithReference(accountKey = accountKey)
-            .toUi(accountKey)
+            .toUi(accountKey = accountKey).let {
+                it.retweet ?: it
+            }
         return StatusResult(
             statusKey = newStatus.statusKey,
             accountKey = accountKey,

@@ -42,9 +42,11 @@ class UnlikeStatusJob(
         service: StatusService,
         status: UiStatus
     ): StatusResult {
-        val newStatus = service.unlike(id = status.statusId)
+        val newStatus = service.unlike(status.statusId)
             .toDbStatusWithReference(accountKey = accountKey)
-            .toUi(accountKey)
+            .toUi(accountKey = accountKey).let {
+                it.retweet ?: it
+            }
         return StatusResult(
             statusKey = newStatus.statusKey,
             accountKey = accountKey,
