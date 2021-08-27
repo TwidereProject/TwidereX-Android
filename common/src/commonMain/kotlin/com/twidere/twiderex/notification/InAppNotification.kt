@@ -18,17 +18,29 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.ext
+package com.twidere.twiderex.notification
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.stateIn
+import androidx.compose.runtime.Composable
+import com.twidere.twiderex.extensions.observeAsState
+import com.twidere.twiderex.utils.Event
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 
-fun <T> Flow<T>.asStateIn(
-    scope: CoroutineScope,
-    initialValue: T
-): StateFlow<T> {
-    return stateIn(scope, SharingStarted.Lazily, initialValue)
+interface NotificationEvent {
+    @Composable
+    fun getMessage(): String
+}
+
+class InAppNotification {
+    private val _source = MutableStateFlow<Event<NotificationEvent?>?>(null)
+    val source
+        get() = _source.asSharedFlow()
+
+    fun show(event: NotificationEvent) {
+        _source.value = ((Event(event)))
+    }
+
+    @Composable
+    fun observeAsState(initial: Event<NotificationEvent?>? = null) =
+        source.observeAsState(initial = initial)
 }

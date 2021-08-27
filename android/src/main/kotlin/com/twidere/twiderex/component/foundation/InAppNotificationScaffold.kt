@@ -48,7 +48,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.Dp
-import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.notification.EventActionContext
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.notification.NotificationWithActionEvent
@@ -71,9 +70,13 @@ fun ApplyNotification(
         }
     }
     val context = LocalContext.current
-    val navigator = LocalNavigator.current
+    // val navigator = LocalNavigator.current
     val actionContext = remember {
-        EventActionContext(context = context, navigator = navigator)
+        EventActionContext(
+            context = context,
+            // TODO: add navigator
+            // navigator = navigator,
+        )
     }
     LaunchedEffect(event) {
         message?.let {
