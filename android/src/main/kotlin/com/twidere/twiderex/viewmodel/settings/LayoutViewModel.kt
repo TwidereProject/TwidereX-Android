@@ -78,13 +78,6 @@ class LayoutViewModel(
         )
     }
 
-    @dagger.assisted.AssistedFactory
-    interface AssistedFactory {
-        fun create(
-            account: AccountDetails,
-        ): LayoutViewModel
-    }
-
     val user by lazy {
         account.map {
             it?.toUi()
