@@ -24,9 +24,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.lifecycle.flowWithLifecycle
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.collect
+import moe.tlaster.precompose.lifecycle.Lifecycle
+import moe.tlaster.precompose.lifecycle.repeatOnLifecycle
+import moe.tlaster.precompose.ui.LocalLifecycleOwner
 
 @Composable
 fun <T> Flow<T>.observeAsState(initial: T): State<T> {
@@ -34,4 +38,16 @@ fun <T> Flow<T>.observeAsState(initial: T): State<T> {
     return remember(this, lifecycleOwner) {
         flowWithLifecycle(lifecycleOwner.lifecycle)
     }.collectAsState(initial = initial)
+}
+
+@OptIn(ExperimentalCoroutinesApi::class)
+fun <T> Flow<T>.flowWithLifecycle(
+    lifecycle: Lifecycle,
+): Flow<T> = callbackFlow {
+    lifecycle.repeatOnLifecycle {
+        this@flowWithLifecycle.collect {
+            send(it)
+        }
+    }
+    close()
 }
