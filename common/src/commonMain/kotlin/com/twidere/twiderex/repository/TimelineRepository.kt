@@ -53,7 +53,7 @@ class TimelineRepository(
             accountKey = accountKey,
             service = service,
         )
-        return mediator.pager().toUi(accountKey = accountKey)
+        return mediator.pager().toUi()
     }
 
     fun userTimeline(
@@ -68,7 +68,7 @@ class TimelineRepository(
             accountKey = accountKey,
             service = service,
             exclude_replies = exclude_replies,
-        ).pager().toUi(accountKey = accountKey)
+        ).pager().toUi()
     }
 
     fun listTimeline(
@@ -81,7 +81,7 @@ class TimelineRepository(
             database = database,
             listKey = listKey,
             service = service
-        ).pager().toUi(accountKey = accountKey)
+        ).pager().toUi()
     }
 
     fun mastodonHashtagTimeline(
@@ -95,6 +95,6 @@ class TimelineRepository(
             accountKey = accountKey,
             database = database
         )
-        return mediator.pager().toUi(accountKey = accountKey)
+        return mediator.pager().toUi()
     }
 }

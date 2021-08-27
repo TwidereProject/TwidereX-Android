@@ -104,6 +104,6 @@ class StatusRepository(
                 database = database,
             )
         }
-        return remoteMediator.pager().toUi(accountKey = accountKey)
+        return remoteMediator.pager().toUi()
     }
 }
