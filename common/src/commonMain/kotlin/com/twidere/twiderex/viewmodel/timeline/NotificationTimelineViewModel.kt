@@ -22,19 +22,17 @@ package com.twidere.twiderex.viewmodel.timeline
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
-import com.twidere.services.microblog.TimelineService
+import com.twidere.services.microblog.NotificationService
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.ext.asStateIn
-import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.enums.NotificationCursorType
-import com.twidere.twiderex.paging.mediator.paging.PagingWithGapMediator
-import com.twidere.twiderex.paging.mediator.timeline.MentionTimelineMediator
+import com.twidere.twiderex.paging.mediator.timeline.NotificationTimelineMediator
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.NotificationRepository
 import kotlinx.coroutines.flow.map
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
-class MentionsTimelineViewModel(
+class NotificationTimelineViewModel(
     dataStore: DataStore<Preferences>,
     database: CacheDatabase,
     notificationRepository: NotificationRepository,
@@ -44,30 +42,32 @@ class MentionsTimelineViewModel(
         accountRepository.activeAccount.asStateIn(viewModelScope, null)
     }
 
-    override val pagingMediator = account.map {
-        if (it != null) {
-            MentionTimelineMediator(
-                service = it.service as TimelineService,
-                accountKey = it.accountKey,
-                database = database,
-                addCursorIfNeed = { data, accountKey ->
-                    notificationRepository.addCursorIfNeeded(
-                        accountKey,
-                        NotificationCursorType.Mentions,
-                        data.status.statusId,
-                        data.status.timestamp,
-                    )
-                }
-            )
-        } else {
-            null
+    override val pagingMediator by lazy {
+        account.map {
+            if (it != null) {
+                NotificationTimelineMediator(
+                    service = it.service as NotificationService,
+                    accountKey = it.accountKey,
+                    database = database,
+                    addCursorIfNeed = { data, accountKey ->
+                        notificationRepository.addCursorIfNeeded(
+                            accountKey,
+                            NotificationCursorType.General,
+                            data.status.statusId,
+                            data.status.timestamp
+                        )
+                    }
+                )
+            } else {
+                null
+            }
         }
     }
     override val savedStateKey = account.map {
-        if (it != null) {
-            "${it.accountKey}_mentions"
-        } else {
+        if (it == null) {
             null
+        } else {
+            "${it.accountKey}_notification"
         }
     }
 }

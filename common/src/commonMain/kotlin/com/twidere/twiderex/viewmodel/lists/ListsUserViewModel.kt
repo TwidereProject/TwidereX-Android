@@ -23,9 +23,8 @@ package com.twidere.twiderex.viewmodel.lists
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import com.twidere.twiderex.ext.asStateIn
 import com.twidere.services.microblog.ListsService
-import com.twidere.twiderex.model.AccountDetails
+import com.twidere.twiderex.ext.asStateIn
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.notification.InAppNotification

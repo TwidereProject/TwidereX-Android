@@ -18,49 +18,37 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.viewmodel
+package com.twidere.twiderex.viewmodel.lists
 
 import androidx.paging.cachedIn
+import com.twidere.services.microblog.TimelineService
 import com.twidere.twiderex.ext.asStateIn
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.repository.AccountRepository
-import com.twidere.twiderex.repository.StatusRepository
-import dagger.assisted.AssistedInject
+import com.twidere.twiderex.repository.TimelineRepository
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
-class StatusViewModel @AssistedInject constructor(
-    private val statusRepository: StatusRepository,
+class ListsTimelineViewModel(
+    repository: TimelineRepository,
     private val accountRepository: AccountRepository,
-    private val statusKey: MicroBlogKey,
+    listKey: MicroBlogKey,
 ) : ViewModel() {
     private val account by lazy {
         accountRepository.activeAccount.asStateIn(viewModelScope, null)
     }
-    val status by lazy {
-        account.flatMapLatest {
-            if (it != null) {
-                statusRepository.loadStatus(statusKey = statusKey, accountKey = it.accountKey)
-            } else {
-                emptyFlow()
-            }
-        }.asStateIn(viewModelScope, null)
-    }
 
     val source by lazy {
         account.flatMapLatest {
-            if (it != null) {
-                statusRepository.conversation(
-                    statusKey = statusKey,
+            it?.let {
+                repository.listTimeline(
+                    listKey = listKey,
                     accountKey = it.accountKey,
-                    platformType = it.type,
-                    service = it.service
+                    service = it.service as TimelineService
                 )
-            } else {
-                emptyFlow()
-            }
+            } ?: emptyFlow()
         }.cachedIn(viewModelScope)
     }
 }

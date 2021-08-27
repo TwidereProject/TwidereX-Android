@@ -18,12 +18,27 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.repository
+package com.twidere.twiderex.viewmodel
 
-import com.twidere.twiderex.model.ui.UiUser
+import androidx.core.app.NotificationManagerCompat
+import androidx.work.WorkManager
+import com.twidere.twiderex.model.ui.UiDraft
+import com.twidere.twiderex.repository.DraftRepository
+import com.twidere.twiderex.worker.draft.RemoveDraftWorker
+import moe.tlaster.precompose.viewmodel.ViewModel
 
-actual class AccountUpdateRepository {
-    actual fun updateAccount(user: UiUser) {
-        TODO("NOT IMPLEMENT YET")
+class DraftViewModel(
+    private val repository: DraftRepository,
+    private val workManager: WorkManager,
+    private val notificationManagerCompat: NotificationManagerCompat,
+) : ViewModel() {
+
+    fun delete(it: UiDraft) {
+        workManager.beginWith(RemoveDraftWorker.create(it.draftId)).enqueue()
+        notificationManagerCompat.cancel(it.draftId.hashCode())
+    }
+
+    val source by lazy {
+        repository.source
     }
 }

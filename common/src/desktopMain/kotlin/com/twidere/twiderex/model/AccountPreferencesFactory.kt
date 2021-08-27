@@ -18,12 +18,10 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.repository
+package com.twidere.twiderex.model
 
-import com.twidere.twiderex.model.ui.UiUser
-
-actual class AccountUpdateRepository {
-    actual fun updateAccount(user: UiUser) {
-        TODO("NOT IMPLEMENT YET")
+actual class AccountPreferencesFactory {
+    actual fun create(accountKey: MicroBlogKey): AccountPreferences {
+        TODO("Not yet implemented")
     }
 }

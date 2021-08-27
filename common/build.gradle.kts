@@ -64,6 +64,8 @@ kotlin {
                 implementation("androidx.room:room-paging:${Versions.room}")
                 kapt("androidx.room:room-compiler:${Versions.room}")
                 implementation("io.coil-kt:coil-base:${Versions.coil}")
+                api("androidx.datastore:datastore:${Versions.datastore}")
+                api("androidx.datastore:datastore-preferences:${Versions.datastore}")
             }
         }
         val androidAndroidTest by getting {

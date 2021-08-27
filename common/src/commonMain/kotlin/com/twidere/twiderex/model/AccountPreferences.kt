@@ -20,18 +20,12 @@
  */
 package com.twidere.twiderex.model
 
-import android.content.Context
 import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
-import androidx.datastore.preferences.preferencesDataStoreFile
-import com.twidere.twiderex.scenes.home.HomeMenus
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.map
 
@@ -84,27 +78,8 @@ class AccountPreferences(
             it[homeMenuOrderKey] = data.joinToString(",") { it.first.name }
         }
     }
+}
 
-    class Factory(
-        private val context: Context,
-    ) {
-        fun create(accountKey: MicroBlogKey) = createAccountPreferences(context, accountKey)
-
-        private fun createAccountPreferences(
-            context: Context,
-            accountKey: MicroBlogKey,
-        ): AccountPreferences {
-            val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
-            return AccountPreferences(
-                dataStore = PreferenceDataStoreFactory.create(
-                    corruptionHandler = null,
-                    migrations = listOf(),
-                    scope = scope
-                ) {
-                    context.applicationContext.preferencesDataStoreFile(accountKey.toString())
-                },
-                scope = scope
-            )
-        }
-    }
+expect class AccountPreferencesFactory {
+    fun create(accountKey: MicroBlogKey): AccountPreferences
 }

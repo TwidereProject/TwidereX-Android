@@ -18,53 +18,48 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.viewmodel.search
+package com.twidere.twiderex.viewmodel
 
+import androidx.paging.cachedIn
 import com.twidere.twiderex.ext.asStateIn
+import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.repository.AccountRepository
-import com.twidere.twiderex.model.ui.UiSearch
-import com.twidere.twiderex.repository.SearchRepository
-import kotlinx.coroutines.flow.MutableStateFlow
+import com.twidere.twiderex.repository.StatusRepository
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.lastOrNull
-import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
-class SearchInputViewModel(
-    private val repository: SearchRepository,
+class StatusViewModel(
+    private val statusRepository: StatusRepository,
     private val accountRepository: AccountRepository,
+    private val statusKey: MicroBlogKey,
 ) : ViewModel() {
     private val account by lazy {
         accountRepository.activeAccount.asStateIn(viewModelScope, null)
     }
+    val status by lazy {
+        account.flatMapLatest {
+            if (it != null) {
+                statusRepository.loadStatus(statusKey = statusKey, accountKey = it.accountKey)
+            } else {
+                emptyFlow()
+            }
+        }.asStateIn(viewModelScope, null)
+    }
 
     val source by lazy {
         account.flatMapLatest {
-            it?.let {
-                repository.searchHistory(it.accountKey)
-            } ?: flowOf(emptyList())
-        }
-    }
-
-    val savedSource by lazy {
-        account.flatMapLatest {
-            it?.let {
-                repository.savedSearch(it.accountKey)
-            } ?: flowOf(emptyList())
-        }
-    }
-
-    val expandSearch = MutableStateFlow(false)
-
-    fun remove(item: UiSearch) = viewModelScope.launch {
-        repository.remove(item)
-    }
-
-    fun addOrUpgrade(content: String) = viewModelScope.launch {
-        account.lastOrNull()?.let {
-            repository.addOrUpgrade(content, it.accountKey)
-        }
+            if (it != null) {
+                statusRepository.conversation(
+                    statusKey = statusKey,
+                    accountKey = it.accountKey,
+                    platformType = it.type,
+                    service = it.service
+                )
+            } else {
+                emptyFlow()
+            }
+        }.cachedIn(viewModelScope)
     }
 }

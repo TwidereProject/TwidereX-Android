@@ -1,0 +1,59 @@
+/*
+ *  Twidere X
+ *
+ *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
+ * 
+ *  This file is part of Twidere X.
+ * 
+ *  Twidere X is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ * 
+ *  Twidere X is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ * 
+ *  You should have received a copy of the GNU General Public License
+ *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
+ */
+package com.twidere.twiderex.repository
+
+import android.accounts.Account
+import com.twidere.twiderex.model.AccountDetails
+import com.twidere.twiderex.model.AccountPreferences
+import com.twidere.twiderex.model.AmUser
+import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.cred.CredentialsType
+import com.twidere.twiderex.model.enums.PlatformType
+import com.twidere.twiderex.model.ui.UiUser
+import kotlinx.coroutines.flow.SharedFlow
+
+expect class AccountRepository {
+    val activeAccount: SharedFlow<AccountDetails?>
+    val accounts: SharedFlow<List<AccountDetails>>
+    fun updateAccount(user: UiUser)
+    fun getAccounts(): List<Account>
+    fun hasAccount(): Boolean
+    fun findByAccountKey(accountKey: MicroBlogKey): Account?
+    fun setCurrentAccount(detail: AccountDetails)
+    fun addAccount(
+        account: Account,
+        type: PlatformType,
+        accountKey: MicroBlogKey,
+        credentials_type: CredentialsType,
+        credentials_json: String,
+        extras_json: String,
+        user: AmUser,
+        lastActive: Long,
+    )
+    fun getAccountDetails(
+        account: Account,
+    ): AccountDetails
+    fun getAccountPreferences(accountKey: MicroBlogKey): AccountPreferences
+    fun containsAccount(key: MicroBlogKey): Boolean
+    fun updateAccount(detail: AccountDetails)
+    fun delete(detail: AccountDetails)
+    fun getFirstByType(type: PlatformType): AccountDetails?
+}

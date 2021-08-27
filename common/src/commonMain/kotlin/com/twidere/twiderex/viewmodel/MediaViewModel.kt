@@ -33,7 +33,6 @@ import com.twidere.twiderex.repository.StatusRepository
 import com.twidere.twiderex.utils.FileProviderHelper
 import com.twidere.twiderex.worker.DownloadMediaWorker
 import com.twidere.twiderex.worker.ShareMediaWorker
-import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
@@ -42,7 +41,7 @@ import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
-class MediaViewModel @AssistedInject constructor(
+class MediaViewModel(
     private val repository: StatusRepository,
     private val accountRepository: AccountRepository,
     private val inAppNotification: InAppNotification,

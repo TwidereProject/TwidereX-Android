@@ -18,23 +18,23 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.viewmodel.lists
+package com.twidere.twiderex.viewmodel.search
 
-import androidx.paging.cachedIn
 import com.twidere.twiderex.ext.asStateIn
-import com.twidere.services.microblog.TimelineService
-import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.ui.UiSearch
 import com.twidere.twiderex.repository.AccountRepository
-import com.twidere.twiderex.repository.TimelineRepository
-import kotlinx.coroutines.flow.emptyFlow
+import com.twidere.twiderex.repository.SearchRepository
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.lastOrNull
+import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
-class ListsTimelineViewModel(
-    repository: TimelineRepository,
+class SearchInputViewModel(
+    private val repository: SearchRepository,
     private val accountRepository: AccountRepository,
-    listKey: MicroBlogKey,
 ) : ViewModel() {
     private val account by lazy {
         accountRepository.activeAccount.asStateIn(viewModelScope, null)
@@ -43,12 +43,28 @@ class ListsTimelineViewModel(
     val source by lazy {
         account.flatMapLatest {
             it?.let {
-                repository.listTimeline(
-                    listKey = listKey,
-                    accountKey = it.accountKey,
-                    service = it.service as TimelineService
-                )
-            } ?: emptyFlow()
-        }.cachedIn(viewModelScope)
+                repository.searchHistory(it.accountKey)
+            } ?: flowOf(emptyList())
+        }
+    }
+
+    val savedSource by lazy {
+        account.flatMapLatest {
+            it?.let {
+                repository.savedSearch(it.accountKey)
+            } ?: flowOf(emptyList())
+        }
+    }
+
+    val expandSearch = MutableStateFlow(false)
+
+    fun remove(item: UiSearch) = viewModelScope.launch {
+        repository.remove(item)
+    }
+
+    fun addOrUpgrade(content: String) = viewModelScope.launch {
+        account.lastOrNull()?.let {
+            repository.addOrUpgrade(content, it.accountKey)
+        }
     }
 }

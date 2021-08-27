@@ -20,11 +20,14 @@
  */
 package com.twidere.twiderex.di
 
+import android.accounts.AccountManager
+import android.content.Context
 import com.twidere.services.nitter.NitterService
 import com.twidere.twiderex.cache.FileCacheHandler
 import com.twidere.twiderex.db.AppDatabase
 import com.twidere.twiderex.db.CacheDatabase
-import com.twidere.twiderex.repository.AccountUpdateRepository
+import com.twidere.twiderex.model.AccountPreferencesFactory
+import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.CacheRepository
 import com.twidere.twiderex.repository.DirectMessageRepository
 import com.twidere.twiderex.repository.DraftRepository
@@ -41,16 +44,23 @@ import com.twidere.twiderex.repository.UserRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
 object RepositoryModule {
+    @Provides
+    fun provideAccountPreferencesFactory(@ApplicationContext context: Context): AccountPreferencesFactory =
+        AccountPreferencesFactory(context = context)
+
     @Singleton
     @Provides
-    fun provideAccountUpdateRepository(): AccountUpdateRepository =
-        AccountUpdateRepository()
+    fun provideAccountRepository(
+        accountPreferencesFactory: AccountPreferencesFactory,
+        accountManager: AccountManager,
+    ): AccountRepository = AccountRepository(accountManager, accountPreferencesFactory)
 
     @Singleton
     @Provides
@@ -92,7 +102,7 @@ object RepositoryModule {
     @Provides
     fun provideUserRepository(
         database: CacheDatabase,
-        accountRepository: AccountUpdateRepository
+        accountRepository: AccountRepository
     ): UserRepository = UserRepository(database = database, accountRepository = accountRepository)
 
     @Provides

@@ -56,8 +56,7 @@ import com.twidere.twiderex.component.lazy.ItemHeader
 import com.twidere.twiderex.component.status.UserName
 import com.twidere.twiderex.component.status.UserScreenName
 import com.twidere.twiderex.di.assisted.assistedViewModel
-import com.twidere.twiderex.extensions.observeAsState
-import com.twidere.twiderex.scenes.home.HomeMenus
+import com.twidere.twiderex.model.HomeMenus
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.settings.LayoutViewModel

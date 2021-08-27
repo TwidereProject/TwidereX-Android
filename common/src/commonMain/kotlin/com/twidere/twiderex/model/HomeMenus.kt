@@ -18,12 +18,9 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.scenes.home
+package com.twidere.twiderex.model
 
 import com.twidere.twiderex.model.enums.PlatformType
-import com.twidere.twiderex.scenes.home.mastodon.FederatedTimelineItem
-import com.twidere.twiderex.scenes.home.mastodon.LocalTimelineItem
-import com.twidere.twiderex.scenes.home.mastodon.MastodonNotificationItem
 
 enum class HomeMenus(
     val item: HomeNavigationItem,

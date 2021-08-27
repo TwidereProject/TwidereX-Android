@@ -181,7 +181,7 @@ class TwidereXActivity : ComponentActivity() {
     private fun App() {
         val windowInsetsControllerCompat =
             remember { WindowInsetsControllerCompat(window, window.decorView) }
-        val accountViewModel = com.twidere.twiderex.di.ext.getViewModel<ActiveAccountViewModel>()
+        val accountViewModel = com.twidere.twiderex.di.ext.getViewModel<com.twidere.twiderex.viewmodel.ActiveAccountViewModel>()
         val account by accountViewModel.account.observeAsState(null)
         val isActiveNetworkMetered by isActiveNetworkMetered.observeAsState(initial = false)
         CompositionLocalProvider(
