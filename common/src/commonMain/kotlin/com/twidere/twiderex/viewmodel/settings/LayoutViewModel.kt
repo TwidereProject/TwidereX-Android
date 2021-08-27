@@ -21,8 +21,8 @@
 package com.twidere.twiderex.viewmodel.settings
 
 import com.twidere.twiderex.ext.asStateIn
+import com.twidere.twiderex.model.HomeMenus
 import com.twidere.twiderex.repository.AccountRepository
-import com.twidere.twiderex.scenes.home.HomeMenus
 import kotlinx.coroutines.flow.lastOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
