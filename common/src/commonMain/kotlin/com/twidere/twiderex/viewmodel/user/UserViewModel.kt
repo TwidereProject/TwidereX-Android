@@ -29,8 +29,6 @@ import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.UserRepository
 import com.twidere.twiderex.utils.notify
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.lastOrNull
 import kotlinx.coroutines.flow.map
@@ -38,11 +36,11 @@ import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
-class UserViewModel @AssistedInject constructor(
+class UserViewModel(
     private val repository: UserRepository,
     private val accountRepository: AccountRepository,
     private val inAppNotification: InAppNotification,
-    @Assisted private val userKey: MicroBlogKey,
+    private val userKey: MicroBlogKey,
 ) : ViewModel() {
 
     private val account by lazy {

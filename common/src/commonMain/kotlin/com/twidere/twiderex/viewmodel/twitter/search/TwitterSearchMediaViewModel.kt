@@ -28,21 +28,15 @@ import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.paging.mediator.paging.pager
 import com.twidere.twiderex.paging.mediator.search.SearchMediaMediator
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.map
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
-class TwitterSearchMediaViewModel @AssistedInject constructor(
+class TwitterSearchMediaViewModel(
     val database: CacheDatabase,
-    @Assisted private val account: AccountDetails,
-    @Assisted keyword: String,
+    private val account: AccountDetails,
+    keyword: String,
 ) : ViewModel() {
-    @dagger.assisted.AssistedFactory
-    interface AssistedFactory {
-        fun create(account: AccountDetails, keyword: String): TwitterSearchMediaViewModel
-    }
 
     private val service by lazy {
         account.service as TwitterService
