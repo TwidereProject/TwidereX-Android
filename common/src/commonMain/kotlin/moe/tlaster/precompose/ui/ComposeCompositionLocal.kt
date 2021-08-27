@@ -24,7 +24,7 @@ import androidx.compose.runtime.compositionLocalOf
 import moe.tlaster.precompose.lifecycle.LifecycleOwner
 import moe.tlaster.precompose.viewmodel.ViewModelStoreOwner
 
-val LocalLifecycleOwner = compositionLocalOf<LifecycleOwner?> { null }
+val LocalLifecycleOwner = compositionLocalOf<LifecycleOwner> { noLocalProvidedFor("LocalLifecycleOwner") }
 
 val LocalViewModelStoreOwner = compositionLocalOf<ViewModelStoreOwner> { noLocalProvidedFor("ViewModelStoreOwner") }
 
