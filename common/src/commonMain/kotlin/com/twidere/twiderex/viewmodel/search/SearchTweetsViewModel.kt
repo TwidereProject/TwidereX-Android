@@ -24,7 +24,7 @@ import androidx.paging.cachedIn
 import androidx.paging.map
 import com.twidere.services.microblog.SearchService
 import com.twidere.twiderex.db.CacheDatabase
-import com.twidere.twiderex.ext.asStateIn
+import com.twidere.twiderex.extensions.asStateIn
 import com.twidere.twiderex.paging.mediator.paging.pager
 import com.twidere.twiderex.paging.mediator.search.SearchStatusMediator
 import com.twidere.twiderex.repository.AccountRepository

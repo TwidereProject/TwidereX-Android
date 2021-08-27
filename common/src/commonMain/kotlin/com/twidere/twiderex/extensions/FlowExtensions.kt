@@ -24,10 +24,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.stateIn
 import moe.tlaster.precompose.lifecycle.Lifecycle
 import moe.tlaster.precompose.lifecycle.repeatOnLifecycle
 import moe.tlaster.precompose.ui.LocalLifecycleOwner
@@ -50,4 +54,12 @@ fun <T> Flow<T>.flowWithLifecycle(
         }
     }
     close()
+}
+
+
+fun <T> Flow<T>.asStateIn(
+    scope: CoroutineScope,
+    initialValue: T
+): StateFlow<T> {
+    return stateIn(scope, SharingStarted.Lazily, initialValue)
 }

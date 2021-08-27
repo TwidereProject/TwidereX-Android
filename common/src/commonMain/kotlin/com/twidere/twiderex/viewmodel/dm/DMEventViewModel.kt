@@ -21,11 +21,10 @@
 package com.twidere.twiderex.viewmodel.dm
 
 import android.net.Uri
-import androidx.paging.cachedIn
 import com.twidere.services.microblog.DirectMessageService
 import com.twidere.services.microblog.LookupService
 import com.twidere.twiderex.action.DirectMessageAction
-import com.twidere.twiderex.ext.asStateIn
+import com.twidere.twiderex.extensions.asStateIn
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.job.DirectMessageDeleteData
@@ -35,9 +34,7 @@ import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.DirectMessageRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.lastOrNull
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope

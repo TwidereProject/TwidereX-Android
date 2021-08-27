@@ -20,10 +20,9 @@
  */
 package com.twidere.twiderex.viewmodel.settings
 
-import com.twidere.twiderex.ext.asStateIn
+import com.twidere.twiderex.extensions.asStateIn
 import com.twidere.twiderex.model.HomeMenus
 import com.twidere.twiderex.repository.AccountRepository
-import kotlinx.coroutines.flow.lastOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel

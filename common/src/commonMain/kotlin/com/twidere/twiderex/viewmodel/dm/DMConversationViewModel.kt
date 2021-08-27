@@ -23,7 +23,7 @@ package com.twidere.twiderex.viewmodel.dm
 import androidx.paging.cachedIn
 import com.twidere.services.microblog.DirectMessageService
 import com.twidere.services.microblog.LookupService
-import com.twidere.twiderex.ext.asStateIn
+import com.twidere.twiderex.extensions.asStateIn
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.DirectMessageRepository
 import kotlinx.coroutines.flow.emptyFlow

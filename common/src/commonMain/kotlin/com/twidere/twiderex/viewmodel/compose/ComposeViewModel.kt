@@ -33,9 +33,9 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.work.WorkManager
 import com.twidere.services.microblog.LookupService
 import com.twidere.twiderex.action.ComposeAction
-import com.twidere.twiderex.ext.asStateIn
-import com.twidere.twiderex.ext.getTextAfterSelection
-import com.twidere.twiderex.ext.getTextBeforeSelection
+import com.twidere.twiderex.extensions.asStateIn
+import com.twidere.twiderex.extensions.getTextAfterSelection
+import com.twidere.twiderex.extensions.getTextBeforeSelection
 import com.twidere.twiderex.extensions.getCachedLocation
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.ComposeType
@@ -60,7 +60,6 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.lastOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel

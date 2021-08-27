@@ -24,7 +24,7 @@ import android.content.Context
 import android.net.Uri
 import androidx.work.WorkManager
 import com.twidere.twiderex.R
-import com.twidere.twiderex.ext.asStateIn
+import com.twidere.twiderex.extensions.asStateIn
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.notification.InAppNotification

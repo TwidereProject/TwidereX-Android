@@ -22,7 +22,7 @@ package com.twidere.twiderex.viewmodel.trend
 
 import androidx.paging.cachedIn
 import com.twidere.services.microblog.TrendService
-import com.twidere.twiderex.ext.asStateIn
+import com.twidere.twiderex.extensions.asStateIn
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.TrendRepository
 import kotlinx.coroutines.flow.emptyFlow

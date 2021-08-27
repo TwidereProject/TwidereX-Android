@@ -23,7 +23,7 @@ package com.twidere.twiderex.viewmodel.user
 import com.twidere.services.microblog.LookupService
 import com.twidere.services.microblog.RelationshipService
 import com.twidere.services.microblog.model.IRelationship
-import com.twidere.twiderex.ext.asStateIn
+import com.twidere.twiderex.extensions.asStateIn
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.AccountRepository

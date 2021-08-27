@@ -24,7 +24,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import com.twidere.services.microblog.TimelineService
 import com.twidere.twiderex.db.CacheDatabase
-import com.twidere.twiderex.ext.asStateIn
+import com.twidere.twiderex.extensions.asStateIn
 import com.twidere.twiderex.paging.mediator.timeline.HomeTimelineMediator
 import com.twidere.twiderex.repository.AccountRepository
 import kotlinx.coroutines.flow.map

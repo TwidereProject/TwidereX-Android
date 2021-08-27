@@ -20,7 +20,7 @@
  */
 package com.twidere.twiderex.viewmodel.search
 
-import com.twidere.twiderex.ext.asStateIn
+import com.twidere.twiderex.extensions.asStateIn
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.SearchRepository
 import kotlinx.coroutines.flow.MutableStateFlow

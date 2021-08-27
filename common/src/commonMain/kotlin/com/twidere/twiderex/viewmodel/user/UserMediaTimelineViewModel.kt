@@ -27,7 +27,7 @@ import androidx.paging.flatMap
 import androidx.paging.map
 import com.twidere.services.microblog.TimelineService
 import com.twidere.twiderex.db.CacheDatabase
-import com.twidere.twiderex.ext.asStateIn
+import com.twidere.twiderex.extensions.asStateIn
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.model.ui.UiStatus

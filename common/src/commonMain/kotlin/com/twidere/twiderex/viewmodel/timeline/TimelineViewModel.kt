@@ -26,7 +26,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.paging.cachedIn
 import com.twidere.twiderex.defaultLoadCount
-import com.twidere.twiderex.ext.asStateIn
+import com.twidere.twiderex.extensions.asStateIn
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.paging.mediator.paging.PagingWithGapMediator
 import com.twidere.twiderex.paging.mediator.paging.pager

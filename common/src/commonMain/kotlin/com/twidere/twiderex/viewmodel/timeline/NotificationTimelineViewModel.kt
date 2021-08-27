@@ -24,7 +24,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import com.twidere.services.microblog.NotificationService
 import com.twidere.twiderex.db.CacheDatabase
-import com.twidere.twiderex.ext.asStateIn
+import com.twidere.twiderex.extensions.asStateIn
 import com.twidere.twiderex.model.enums.NotificationCursorType
 import com.twidere.twiderex.paging.mediator.timeline.NotificationTimelineMediator
 import com.twidere.twiderex.repository.AccountRepository

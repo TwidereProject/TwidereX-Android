@@ -25,7 +25,7 @@ import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
 import com.twidere.services.microblog.SearchService
 import com.twidere.twiderex.defaultLoadCount
-import com.twidere.twiderex.ext.asStateIn
+import com.twidere.twiderex.extensions.asStateIn
 import com.twidere.twiderex.paging.source.SearchUserPagingSource
 import com.twidere.twiderex.repository.AccountRepository
 import kotlinx.coroutines.flow.MutableStateFlow

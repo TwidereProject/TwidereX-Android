@@ -20,9 +20,8 @@
  */
 package com.twidere.twiderex.viewmodel.mastodon
 
-import androidx.paging.cachedIn
 import com.twidere.services.mastodon.MastodonService
-import com.twidere.twiderex.ext.asStateIn
+import com.twidere.twiderex.extensions.asStateIn
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.TimelineRepository
 import kotlinx.coroutines.flow.emptyFlow
