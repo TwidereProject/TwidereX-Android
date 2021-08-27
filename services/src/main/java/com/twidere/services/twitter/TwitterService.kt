@@ -324,6 +324,14 @@ class TwitterService(
         }
     }
 
+    override suspend fun searchMedia(query: String, count: Int, nextPage: String?): ISearchResponse {
+        return try {
+            searchV2("$query has:media -is:retweet", count = count, nextPage = nextPage)
+        } catch (e: TwitterApiExceptionV2) {
+            searchV1("$query filter:media -filter:retweets", count = count, max_id = nextPage)
+        }
+    }
+
     suspend fun searchV2(
         query: String,
         count: Int,

@@ -306,9 +306,10 @@ fun StatusMediaPreviewItem(
                     }
                 }
             MediaType.video, MediaType.animated_gif -> media.mediaUrl?.let {
-                if (sensitive && media.previewUrl != null) {
+                val previewUrl = media.previewUrl
+                if (sensitive && previewUrl != null) {
                     NetworkBlurImage(
-                        data = media.previewUrl,
+                        data = previewUrl,
                         modifier = Modifier
                             .fillMaxSize(),
                         placeholder = {
@@ -328,7 +329,7 @@ fun StatusMediaPreviewItem(
                         showControls = false,
                         volume = 0F
                     ) {
-                        media.previewUrl?.let {
+                        previewUrl?.let {
                             NetworkImage(
                                 data = it,
                                 modifier = Modifier

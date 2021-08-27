@@ -64,10 +64,10 @@ import com.twidere.twiderex.action.LocalStatusActions
 import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.extensions.humanizedCount
 import com.twidere.twiderex.extensions.shareText
+import com.twidere.twiderex.model.enums.ComposeType
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.ui.LocalActiveAccount
-import com.twidere.twiderex.viewmodel.compose.ComposeType
 
 private val rippleSize = 24.dp
 

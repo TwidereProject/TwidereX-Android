@@ -25,6 +25,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import com.twidere.services.microblog.ListsService
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiUser
@@ -50,11 +51,17 @@ class ListsUserViewModel @AssistedInject constructor(
     }
 
     private val members by lazy {
-        listsUsersRepository.fetchMembers(account = account, listId = listId).cachedIn(viewModelScope)
+        listsUsersRepository.fetchMembers(
+            accountKey = account.accountKey,
+            service = account.service as ListsService, listId = listId
+        ).cachedIn(viewModelScope)
     }
 
     private val subscribers by lazy {
-        listsUsersRepository.fetchSubscribers(account = account, listId = listId).cachedIn(viewModelScope)
+        listsUsersRepository.fetchSubscribers(
+            accountKey = account.accountKey,
+            service = account.service as ListsService, listId = listId
+        ).cachedIn(viewModelScope)
     }
 
     override val source: Flow<PagingData<UiUser>>
@@ -66,7 +73,7 @@ class ListsUserViewModel @AssistedInject constructor(
         try {
             viewModelScope.launch {
                 listsUsersRepository.removeMember(
-                    account = account,
+                    service = account.service as ListsService,
                     listId = listId,
                     user = user
                 )
@@ -99,14 +106,14 @@ class ListsAddMemberViewModel @AssistedInject constructor(
                 listsUsersRepository.addMember(
                     listId = listId,
                     user = user,
-                    account = account
+                    service = account.service as ListsService,
                 )
                 pendingMap[user.userKey] = user
             }
         } else {
             loadingRequest {
                 listsUsersRepository.removeMember(
-                    account = account,
+                    service = account.service as ListsService,
                     listId = listId,
                     user = user
                 )

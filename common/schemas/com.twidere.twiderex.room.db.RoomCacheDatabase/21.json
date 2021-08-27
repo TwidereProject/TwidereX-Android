@@ -1,0 +1,1095 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 21,
+    "identityHash": "15dfea2ff6653926f388915d097c8bc6",
+    "entities": [
+      {
+        "tableName": "status",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` TEXT NOT NULL, `statusId` TEXT NOT NULL, `statusKey` TEXT NOT NULL, `htmlText` TEXT NOT NULL, `rawText` TEXT NOT NULL, `timestamp` INTEGER NOT NULL, `retweetCount` INTEGER NOT NULL, `likeCount` INTEGER NOT NULL, `replyCount` INTEGER NOT NULL, `placeString` TEXT, `source` TEXT NOT NULL, `hasMedia` INTEGER NOT NULL, `userKey` TEXT NOT NULL, `lang` TEXT, `is_possibly_sensitive` INTEGER NOT NULL, `platformType` TEXT NOT NULL, `previewCard` TEXT, `inReplyToUserId` TEXT, `inReplyToStatusId` TEXT, `poll` TEXT, `spoilerText` TEXT, `extra` TEXT NOT NULL, PRIMARY KEY(`_id`))",
+        "fields": [
+          {
+            "fieldPath": "_id",
+            "columnName": "_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "statusId",
+            "columnName": "statusId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "statusKey",
+            "columnName": "statusKey",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "htmlText",
+            "columnName": "htmlText",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "rawText",
+            "columnName": "rawText",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "timestamp",
+            "columnName": "timestamp",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "retweetCount",
+            "columnName": "retweetCount",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "likeCount",
+            "columnName": "likeCount",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "replyCount",
+            "columnName": "replyCount",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "placeString",
+            "columnName": "placeString",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "source",
+            "columnName": "source",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "hasMedia",
+            "columnName": "hasMedia",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "userKey",
+            "columnName": "userKey",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lang",
+            "columnName": "lang",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "is_possibly_sensitive",
+            "columnName": "is_possibly_sensitive",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "platformType",
+            "columnName": "platformType",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "previewCard",
+            "columnName": "previewCard",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "inReplyToUserId",
+            "columnName": "inReplyToUserId",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "inReplyToStatusId",
+            "columnName": "inReplyToStatusId",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "poll",
+            "columnName": "poll",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "spoilerText",
+            "columnName": "spoilerText",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "extra",
+            "columnName": "extra",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "_id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_status_statusKey",
+            "unique": true,
+            "columnNames": [
+              "statusKey"
+            ],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_status_statusKey` ON `${TABLE_NAME}` (`statusKey`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "media",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` TEXT NOT NULL, `belongToKey` TEXT NOT NULL, `url` TEXT, `mediaUrl` TEXT, `previewUrl` TEXT, `type` TEXT NOT NULL, `width` INTEGER NOT NULL, `height` INTEGER NOT NULL, `pageUrl` TEXT, `altText` TEXT NOT NULL, `order` INTEGER NOT NULL, PRIMARY KEY(`_id`))",
+        "fields": [
+          {
+            "fieldPath": "_id",
+            "columnName": "_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "belongToKey",
+            "columnName": "belongToKey",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "url",
+            "columnName": "url",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mediaUrl",
+            "columnName": "mediaUrl",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "previewUrl",
+            "columnName": "previewUrl",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "width",
+            "columnName": "width",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "height",
+            "columnName": "height",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "pageUrl",
+            "columnName": "pageUrl",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "altText",
+            "columnName": "altText",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "order",
+            "columnName": "order",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "_id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_media_belongToKey_order",
+            "unique": true,
+            "columnNames": [
+              "belongToKey",
+              "order"
+            ],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_media_belongToKey_order` ON `${TABLE_NAME}` (`belongToKey`, `order`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "user",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` TEXT NOT NULL, `userId` TEXT NOT NULL, `name` TEXT NOT NULL, `userKey` TEXT NOT NULL, `acct` TEXT NOT NULL, `screenName` TEXT NOT NULL, `profileImage` TEXT NOT NULL, `profileBackgroundImage` TEXT, `followersCount` INTEGER NOT NULL, `friendsCount` INTEGER NOT NULL, `listedCount` INTEGER NOT NULL, `htmlDesc` TEXT NOT NULL, `rawDesc` TEXT NOT NULL, `website` TEXT, `location` TEXT, `verified` INTEGER NOT NULL, `isProtected` INTEGER NOT NULL, `platformType` TEXT NOT NULL, `statusesCount` INTEGER NOT NULL, `extra` TEXT NOT NULL, PRIMARY KEY(`_id`))",
+        "fields": [
+          {
+            "fieldPath": "_id",
+            "columnName": "_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "userId",
+            "columnName": "userId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "userKey",
+            "columnName": "userKey",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "acct",
+            "columnName": "acct",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "screenName",
+            "columnName": "screenName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "profileImage",
+            "columnName": "profileImage",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "profileBackgroundImage",
+            "columnName": "profileBackgroundImage",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "followersCount",
+            "columnName": "followersCount",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "friendsCount",
+            "columnName": "friendsCount",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "listedCount",
+            "columnName": "listedCount",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "htmlDesc",
+            "columnName": "htmlDesc",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "rawDesc",
+            "columnName": "rawDesc",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "website",
+            "columnName": "website",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "location",
+            "columnName": "location",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "verified",
+            "columnName": "verified",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isProtected",
+            "columnName": "isProtected",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "platformType",
+            "columnName": "platformType",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "statusesCount",
+            "columnName": "statusesCount",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "extra",
+            "columnName": "extra",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "_id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_user_userKey",
+            "unique": true,
+            "columnNames": [
+              "userKey"
+            ],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_user_userKey` ON `${TABLE_NAME}` (`userKey`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "status_reactions",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` TEXT NOT NULL, `statusKey` TEXT NOT NULL, `accountKey` TEXT NOT NULL, `liked` INTEGER NOT NULL, `retweeted` INTEGER NOT NULL, PRIMARY KEY(`_id`))",
+        "fields": [
+          {
+            "fieldPath": "_id",
+            "columnName": "_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "statusKey",
+            "columnName": "statusKey",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "accountKey",
+            "columnName": "accountKey",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "liked",
+            "columnName": "liked",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "retweeted",
+            "columnName": "retweeted",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "_id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_status_reactions_statusKey_accountKey",
+            "unique": true,
+            "columnNames": [
+              "statusKey",
+              "accountKey"
+            ],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_status_reactions_statusKey_accountKey` ON `${TABLE_NAME}` (`statusKey`, `accountKey`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "paging_timeline",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` TEXT NOT NULL, `accountKey` TEXT NOT NULL, `pagingKey` TEXT NOT NULL, `statusKey` TEXT NOT NULL, `timestamp` INTEGER NOT NULL, `sortId` INTEGER NOT NULL, `isGap` INTEGER NOT NULL, PRIMARY KEY(`_id`))",
+        "fields": [
+          {
+            "fieldPath": "_id",
+            "columnName": "_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "accountKey",
+            "columnName": "accountKey",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "pagingKey",
+            "columnName": "pagingKey",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "statusKey",
+            "columnName": "statusKey",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "timestamp",
+            "columnName": "timestamp",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sortId",
+            "columnName": "sortId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isGap",
+            "columnName": "isGap",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "_id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_paging_timeline_accountKey_statusKey_pagingKey",
+            "unique": true,
+            "columnNames": [
+              "accountKey",
+              "statusKey",
+              "pagingKey"
+            ],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_paging_timeline_accountKey_statusKey_pagingKey` ON `${TABLE_NAME}` (`accountKey`, `statusKey`, `pagingKey`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "url_entity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` TEXT NOT NULL, `statusKey` TEXT NOT NULL, `url` TEXT NOT NULL, `expandedUrl` TEXT NOT NULL, `displayUrl` TEXT NOT NULL, `title` TEXT, `description` TEXT, `image` TEXT, PRIMARY KEY(`_id`))",
+        "fields": [
+          {
+            "fieldPath": "_id",
+            "columnName": "_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "statusKey",
+            "columnName": "statusKey",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "url",
+            "columnName": "url",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "expandedUrl",
+            "columnName": "expandedUrl",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "displayUrl",
+            "columnName": "displayUrl",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "title",
+            "columnName": "title",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "description",
+            "columnName": "description",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "image",
+            "columnName": "image",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "_id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_url_entity_statusKey_url",
+            "unique": true,
+            "columnNames": [
+              "statusKey",
+              "url"
+            ],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_url_entity_statusKey_url` ON `${TABLE_NAME}` (`statusKey`, `url`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "status_reference",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` TEXT NOT NULL, `referenceType` TEXT NOT NULL, `statusKey` TEXT NOT NULL, `referenceStatusKey` TEXT NOT NULL, PRIMARY KEY(`_id`))",
+        "fields": [
+          {
+            "fieldPath": "_id",
+            "columnName": "_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "referenceType",
+            "columnName": "referenceType",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "statusKey",
+            "columnName": "statusKey",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "referenceStatusKey",
+            "columnName": "referenceStatusKey",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "_id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_status_reference_referenceType_statusKey_referenceStatusKey",
+            "unique": true,
+            "columnNames": [
+              "referenceType",
+              "statusKey",
+              "referenceStatusKey"
+            ],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_status_reference_referenceType_statusKey_referenceStatusKey` ON `${TABLE_NAME}` (`referenceType`, `statusKey`, `referenceStatusKey`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "lists",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` TEXT NOT NULL, `listId` TEXT NOT NULL, `ownerId` TEXT NOT NULL, `accountKey` TEXT NOT NULL, `listKey` TEXT NOT NULL, `title` TEXT NOT NULL, `description` TEXT NOT NULL, `mode` TEXT NOT NULL, `replyPolicy` TEXT NOT NULL, `isFollowed` INTEGER NOT NULL, `allowToSubscribe` INTEGER NOT NULL, PRIMARY KEY(`_id`))",
+        "fields": [
+          {
+            "fieldPath": "_id",
+            "columnName": "_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "listId",
+            "columnName": "listId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "ownerId",
+            "columnName": "ownerId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "accountKey",
+            "columnName": "accountKey",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "listKey",
+            "columnName": "listKey",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "title",
+            "columnName": "title",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "description",
+            "columnName": "description",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mode",
+            "columnName": "mode",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "replyPolicy",
+            "columnName": "replyPolicy",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isFollowed",
+            "columnName": "isFollowed",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "allowToSubscribe",
+            "columnName": "allowToSubscribe",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "_id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_lists_accountKey_listKey",
+            "unique": true,
+            "columnNames": [
+              "accountKey",
+              "listKey"
+            ],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_lists_accountKey_listKey` ON `${TABLE_NAME}` (`accountKey`, `listKey`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "notification_cursor",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` TEXT NOT NULL, `accountKey` TEXT NOT NULL, `type` TEXT NOT NULL, `value` TEXT NOT NULL, `timestamp` INTEGER NOT NULL, PRIMARY KEY(`_id`))",
+        "fields": [
+          {
+            "fieldPath": "_id",
+            "columnName": "_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "accountKey",
+            "columnName": "accountKey",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "value",
+            "columnName": "value",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "timestamp",
+            "columnName": "timestamp",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "_id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_notification_cursor_accountKey_type",
+            "unique": true,
+            "columnNames": [
+              "accountKey",
+              "type"
+            ],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_notification_cursor_accountKey_type` ON `${TABLE_NAME}` (`accountKey`, `type`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "trends",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` TEXT NOT NULL, `trendKey` TEXT NOT NULL, `accountKey` TEXT NOT NULL, `displayName` TEXT NOT NULL, `url` TEXT NOT NULL, `query` TEXT NOT NULL, `volume` INTEGER NOT NULL, PRIMARY KEY(`_id`))",
+        "fields": [
+          {
+            "fieldPath": "_id",
+            "columnName": "_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "trendKey",
+            "columnName": "trendKey",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "accountKey",
+            "columnName": "accountKey",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "displayName",
+            "columnName": "displayName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "url",
+            "columnName": "url",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "query",
+            "columnName": "query",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "volume",
+            "columnName": "volume",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "_id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_trends_trendKey_url",
+            "unique": true,
+            "columnNames": [
+              "trendKey",
+              "url"
+            ],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_trends_trendKey_url` ON `${TABLE_NAME}` (`trendKey`, `url`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "trend_histories",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` TEXT NOT NULL, `trendKey` TEXT NOT NULL, `day` INTEGER NOT NULL, `uses` INTEGER NOT NULL, `accounts` INTEGER NOT NULL, `accountKey` TEXT NOT NULL, PRIMARY KEY(`_id`))",
+        "fields": [
+          {
+            "fieldPath": "_id",
+            "columnName": "_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "trendKey",
+            "columnName": "trendKey",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "day",
+            "columnName": "day",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "uses",
+            "columnName": "uses",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "accounts",
+            "columnName": "accounts",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "accountKey",
+            "columnName": "accountKey",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "_id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_trend_histories_trendKey_day",
+            "unique": true,
+            "columnNames": [
+              "trendKey",
+              "day"
+            ],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_trend_histories_trendKey_day` ON `${TABLE_NAME}` (`trendKey`, `day`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "dm_conversation",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` TEXT NOT NULL, `accountKey` TEXT NOT NULL, `conversationId` TEXT NOT NULL, `conversationKey` TEXT NOT NULL, `conversationAvatar` TEXT NOT NULL, `conversationName` TEXT NOT NULL, `conversationSubName` TEXT NOT NULL, `conversationType` TEXT NOT NULL, `recipientKey` TEXT NOT NULL, PRIMARY KEY(`_id`))",
+        "fields": [
+          {
+            "fieldPath": "_id",
+            "columnName": "_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "accountKey",
+            "columnName": "accountKey",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "conversationId",
+            "columnName": "conversationId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "conversationKey",
+            "columnName": "conversationKey",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "conversationAvatar",
+            "columnName": "conversationAvatar",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "conversationName",
+            "columnName": "conversationName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "conversationSubName",
+            "columnName": "conversationSubName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "conversationType",
+            "columnName": "conversationType",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "recipientKey",
+            "columnName": "recipientKey",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "_id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_dm_conversation_accountKey_conversationKey",
+            "unique": true,
+            "columnNames": [
+              "accountKey",
+              "conversationKey"
+            ],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_dm_conversation_accountKey_conversationKey` ON `${TABLE_NAME}` (`accountKey`, `conversationKey`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "dm_event",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` TEXT NOT NULL, `accountKey` TEXT NOT NULL, `sortId` INTEGER NOT NULL, `conversationKey` TEXT NOT NULL, `messageId` TEXT NOT NULL, `messageKey` TEXT NOT NULL, `htmlText` TEXT NOT NULL, `originText` TEXT NOT NULL, `createdTimestamp` INTEGER NOT NULL, `messageType` TEXT NOT NULL, `senderAccountKey` TEXT NOT NULL, `recipientAccountKey` TEXT NOT NULL, `sendStatus` TEXT NOT NULL, PRIMARY KEY(`_id`))",
+        "fields": [
+          {
+            "fieldPath": "_id",
+            "columnName": "_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "accountKey",
+            "columnName": "accountKey",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sortId",
+            "columnName": "sortId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "conversationKey",
+            "columnName": "conversationKey",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "messageId",
+            "columnName": "messageId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "messageKey",
+            "columnName": "messageKey",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "htmlText",
+            "columnName": "htmlText",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "originText",
+            "columnName": "originText",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdTimestamp",
+            "columnName": "createdTimestamp",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "messageType",
+            "columnName": "messageType",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "senderAccountKey",
+            "columnName": "senderAccountKey",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "recipientAccountKey",
+            "columnName": "recipientAccountKey",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sendStatus",
+            "columnName": "sendStatus",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "_id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_dm_event_accountKey_conversationKey_messageKey",
+            "unique": true,
+            "columnNames": [
+              "accountKey",
+              "conversationKey",
+              "messageKey"
+            ],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_dm_event_accountKey_conversationKey_messageKey` ON `${TABLE_NAME}` (`accountKey`, `conversationKey`, `messageKey`)"
+          }
+        ],
+        "foreignKeys": []
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '15dfea2ff6653926f388915d097c8bc6')"
+    ]
+  }
+}

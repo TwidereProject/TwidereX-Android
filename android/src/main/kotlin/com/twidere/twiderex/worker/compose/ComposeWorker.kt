@@ -24,9 +24,9 @@ import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.twidere.services.microblog.MicroBlogService
+import com.twidere.twiderex.db.transform.toComposeData
 import com.twidere.twiderex.jobs.compose.ComposeJob
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.transform.toComposeData
 
 abstract class ComposeWorker<T : MicroBlogService>(
     protected val context: Context,

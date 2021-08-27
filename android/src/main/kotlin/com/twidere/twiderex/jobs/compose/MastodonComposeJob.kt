@@ -25,20 +25,18 @@ import com.twidere.services.mastodon.MastodonService
 import com.twidere.services.mastodon.model.PostPoll
 import com.twidere.services.mastodon.model.PostStatus
 import com.twidere.services.mastodon.model.Visibility
+import com.twidere.twiderex.dataprovider.mapper.toUi
 import com.twidere.twiderex.db.CacheDatabase
-import com.twidere.twiderex.db.mapper.toDbStatusWithReference
-import com.twidere.twiderex.db.model.saveToDb
 import com.twidere.twiderex.kmp.ExifScrambler
 import com.twidere.twiderex.kmp.FileResolver
 import com.twidere.twiderex.kmp.RemoteNavigator
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.enums.ComposeType
 import com.twidere.twiderex.model.enums.MastodonVisibility
 import com.twidere.twiderex.model.job.ComposeData
-import com.twidere.twiderex.model.transform.toUi
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.notification.AppNotificationManager
 import com.twidere.twiderex.repository.AccountRepository
-import com.twidere.twiderex.viewmodel.compose.ComposeType
 import java.io.File
 import java.net.URI
 
@@ -63,7 +61,7 @@ class MastodonComposeJob(
         accountKey: MicroBlogKey,
         mediaIds: ArrayList<String>
     ): UiStatus {
-        val result = service.compose(
+        return service.compose(
             PostStatus(
                 status = composeData.content,
                 inReplyToID = if (composeData.composeType == ComposeType.Reply || composeData.composeType == ComposeType.Thread) composeData.statusKey?.id else null,
@@ -84,9 +82,9 @@ class MastodonComposeJob(
                     )
                 }
             )
-        ).toDbStatusWithReference(accountKey)
-        listOf(result).saveToDb(cacheDatabase)
-        return result.toUi(accountKey)
+        ).toUi(accountKey).also {
+            cacheDatabase.statusDao().insertAll(listOf = listOf(it), accountKey = accountKey)
+        }
     }
 
     override suspend fun uploadImage(

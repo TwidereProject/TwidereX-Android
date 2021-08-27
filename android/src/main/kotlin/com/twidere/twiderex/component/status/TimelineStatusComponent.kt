@@ -89,8 +89,8 @@ fun TimelineStatusComponent(
         data.platformType == PlatformType.Mastodon &&
             data.mastodonExtra != null
             && (
-                data.mastodonExtra.type == MastodonStatusType.NotificationFollowRequest ||
-                    data.mastodonExtra.type == MastodonStatusType.NotificationFollow
+                data.mastodonExtra?.type == MastodonStatusType.NotificationFollowRequest ||
+                    data.mastodonExtra?.type == MastodonStatusType.NotificationFollow
                 ) -> {
             MastodonFollowStatus(data)
         }
@@ -225,7 +225,9 @@ private fun StatusThread(threadStyle: StatusThreadStyle, data: UiStatus) {
 private fun StatusHeader(data: UiStatus) {
     when {
         data.platformType == PlatformType.Mastodon && data.mastodonExtra != null -> {
-            MastodonStatusHeader(data.mastodonExtra, data)
+            data.mastodonExtra?.let {
+                MastodonStatusHeader(it, data)
+            }
         }
         data.retweet != null -> {
             RetweetHeader(data = data)
@@ -474,11 +476,12 @@ fun StatusContent(
                     CompositionLocalProvider(
                         LocalContentAlpha provides ContentAlpha.disabled
                     ) {
-                        if (status.platformType == PlatformType.Mastodon && status.mastodonExtra != null) {
+                        val mastodonExtra = status.mastodonExtra
+                        if (status.platformType == PlatformType.Mastodon && mastodonExtra != null) {
                             Icon(
                                 modifier = Modifier.size(LocalTextStyle.current.fontSize.value.dp),
-                                painter = status.mastodonExtra.visibility.icon(),
-                                contentDescription = status.mastodonExtra.visibility.name
+                                painter = mastodonExtra.visibility.icon(),
+                                contentDescription = mastodonExtra.visibility.name
                             )
                             Spacer(modifier = Modifier.width(StatusContentDefaults.Mastodon.VisibilitySpacing))
                         }

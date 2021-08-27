@@ -22,8 +22,8 @@ package com.twidere.twiderex.viewmodel.search
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.twidere.twiderex.db.model.DbSearch
 import com.twidere.twiderex.model.AccountDetails
+import com.twidere.twiderex.model.ui.UiSearch
 import com.twidere.twiderex.repository.SearchRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -50,7 +50,7 @@ class SearchInputViewModel @AssistedInject constructor(
 
     val expandSearch = MutableStateFlow(false)
 
-    fun remove(item: DbSearch) = viewModelScope.launch {
+    fun remove(item: UiSearch) = viewModelScope.launch {
         repository.remove(item)
     }
 
