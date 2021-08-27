@@ -77,7 +77,6 @@ import com.twidere.twiderex.component.status.StatusMediaDefaults
 import com.twidere.twiderex.component.status.StatusMediaPreviewItem
 import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.component.status.UserAvatarDefaults
-import com.twidere.twiderex.db.model.DbDMEvent
 import com.twidere.twiderex.model.ui.UiDMEvent
 import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.navigation.RootRoute
@@ -139,15 +138,15 @@ private fun DMOutComeEvent(onResend: (event: UiDMEvent) -> Unit = {}, event: UiD
         Column(horizontalAlignment = Alignment.End) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 when (event.sendStatus) {
-                    DbDMEvent.SendStatus.PENDING -> {
+                    UiDMEvent.SendStatus.PENDING -> {
                         CircularProgressIndicator(
                             modifier = Modifier.size(DMOutComeEventDefaults.Loading.size),
                             strokeWidth = DMOutComeEventDefaults.Loading.width,
                             color = MaterialTheme.colors.primary
                         )
                     }
-                    DbDMEvent.SendStatus.SUCCESS -> {}
-                    DbDMEvent.SendStatus.FAILED -> {
+                    UiDMEvent.SendStatus.SUCCESS -> {}
+                    UiDMEvent.SendStatus.FAILED -> {
                         Box(
                             modifier = Modifier
                                 .clip(shape = CircleShape)

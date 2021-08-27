@@ -21,8 +21,8 @@
 package com.twidere.twiderex.model.job
 
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.enums.ComposeType
 import com.twidere.twiderex.model.enums.MastodonVisibility
-import com.twidere.twiderex.viewmodel.compose.ComposeType
 import com.twidere.twiderex.viewmodel.compose.VoteExpired
 import java.util.UUID
 

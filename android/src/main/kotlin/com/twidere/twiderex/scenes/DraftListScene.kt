@@ -90,7 +90,7 @@ fun DraftListSceneContent(
     LazyColumn(
         state = listState
     ) {
-        items(items = source, key = { it._id.hashCode() }) {
+        items(items = source, key = { it.draftId.hashCode() }) {
             ListItem(
                 text = {
                     Text(text = it.content)
@@ -112,7 +112,7 @@ fun DraftListSceneContent(
                         ) {
                             DropdownMenuItem(
                                 onClick = {
-                                    navController.navigate(RootRoute.Draft.Compose(it._id))
+                                    navController.navigate(RootRoute.Draft.Compose(it.draftId))
                                 }
                             ) {
                                 Text(text = stringResource(id = R.string.scene_drafts_actions_edit_draft))

@@ -29,8 +29,8 @@ import javax.inject.Inject
 class PlatformResolver @Inject constructor(
     private val database: CacheDatabase,
 ) {
-    suspend fun resolveStatus(statusKey: MicroBlogKey): PlatformType? {
-        return database.statusDao().findWithStatusKey(key = statusKey)?.platformType
+    suspend fun resolveStatus(statusKey: MicroBlogKey, accountKey: MicroBlogKey): PlatformType? {
+        return database.statusDao().findWithStatusKey(statusKey = statusKey, accountKey = accountKey)?.platformType
     }
 
     suspend fun resolveUser(userKey: MicroBlogKey): PlatformType? {

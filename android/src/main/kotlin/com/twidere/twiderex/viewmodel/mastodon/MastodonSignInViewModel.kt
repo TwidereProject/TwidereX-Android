@@ -25,13 +25,13 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.twidere.services.mastodon.MastodonOAuthService
-import com.twidere.twiderex.db.mapper.toDbUser
+import com.twidere.twiderex.dataprovider.mapper.toAmUser
+import com.twidere.twiderex.dataprovider.mapper.toUi
 import com.twidere.twiderex.http.TwidereServiceFactory
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.cred.CredentialsType
 import com.twidere.twiderex.model.cred.OAuth2Credentials
 import com.twidere.twiderex.model.enums.PlatformType
-import com.twidere.twiderex.model.transform.toAmUser
 import com.twidere.twiderex.navigation.RootDeepLinksRoute
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.ACCOUNT_TYPE
@@ -106,7 +106,7 @@ class MastodonSignInViewModel @AssistedInject constructor(
                                 credentials_type = CredentialsType.OAuth2,
                                 credentials_json = credentials_json,
                                 extras_json = "",
-                                user = user.toDbUser(accountKey = internalKey).toAmUser(),
+                                user = user.toUi(accountKey = internalKey).toAmUser(),
                                 lastActive = System.currentTimeMillis()
                             )
                         }

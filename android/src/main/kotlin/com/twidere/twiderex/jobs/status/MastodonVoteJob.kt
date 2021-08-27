@@ -21,15 +21,13 @@
 package com.twidere.twiderex.jobs.status
 
 import com.twidere.services.mastodon.MastodonService
-import com.twidere.services.mastodon.model.Poll
-import com.twidere.twiderex.db.model.DbMastodonStatusExtra
+import com.twidere.twiderex.dataprovider.mapper.toUi
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.PlatformType
+import com.twidere.twiderex.model.ui.UiPoll
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.StatusRepository
-import com.twidere.twiderex.utils.fromJson
-import com.twidere.twiderex.utils.json
 import com.twidere.twiderex.utils.notify
 
 class MastodonVoteJob(
@@ -39,7 +37,8 @@ class MastodonVoteJob(
 ) {
     suspend fun execute(votes: List<Int>, accountKey: MicroBlogKey, statusKey: MicroBlogKey) {
         val status = statusRepository.loadFromCache(statusKey, accountKey = accountKey) ?: throw Error("Can't find any status matches:$statusKey")
-        if (status.poll == null || status.platformType != PlatformType.Mastodon) {
+        val pollId = status.poll?.id
+        if (status.poll == null || status.platformType != PlatformType.Mastodon || pollId == null) {
             throw Error()
         }
         val service = accountRepository.findByAccountKey(accountKey)?.let {
@@ -48,32 +47,28 @@ class MastodonVoteJob(
             it.service as? MastodonService
         } ?: throw Error()
 
-        val pollId = status.poll.id
-        var originPoll: Poll? = null
-        statusRepository.updateStatus(statusKey = status.statusKey) {
-            it.extra = it.extra.fromJson<DbMastodonStatusExtra>()
-                .let { extra ->
-                    originPoll = extra.poll
-                    extra.copy(
-                        poll = extra.poll?.copy(
-                            voted = true,
-                            ownVotes = votes
-                        )
-                    )
-                }.json()
+        var originPoll: UiPoll? = null
+        statusRepository.updateStatus(statusKey = status.statusKey, accountKey = accountKey) {
+            originPoll = it.poll
+            it.copy(
+                poll = it.poll?.copy(
+                    voted = true,
+                    ownVotes = votes
+                )
+            )
         }
         try {
-            val newPoll = service.vote(pollId, votes)
-            statusRepository.updateStatus(statusKey = status.statusKey) {
-                it.extra = it.extra.fromJson<DbMastodonStatusExtra>().copy(
+            val newPoll = service.vote(pollId, votes).toUi()
+            statusRepository.updateStatus(statusKey = status.statusKey, accountKey = accountKey) {
+                it.copy(
                     poll = newPoll
-                ).json()
+                )
             }
         } catch (e: Throwable) {
-            statusRepository.updateStatus(statusKey = status.statusKey) {
-                it.extra = it.extra.fromJson<DbMastodonStatusExtra>().copy(
+            statusRepository.updateStatus(statusKey = status.statusKey, accountKey = accountKey) {
+                it.copy(
                     poll = originPoll
-                ).json()
+                )
             }
             e.notify(inAppNotification)
             throw e

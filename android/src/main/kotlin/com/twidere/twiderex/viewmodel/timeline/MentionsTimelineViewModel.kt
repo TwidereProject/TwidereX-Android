@@ -24,6 +24,7 @@ import android.content.SharedPreferences
 import com.twidere.services.microblog.TimelineService
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.model.AccountDetails
+import com.twidere.twiderex.model.enums.NotificationCursorType
 import com.twidere.twiderex.paging.mediator.paging.PagingWithGapMediator
 import com.twidere.twiderex.paging.mediator.timeline.MentionTimelineMediator
 import com.twidere.twiderex.repository.NotificationRepository
@@ -46,7 +47,14 @@ class MentionsTimelineViewModel @AssistedInject constructor(
             service = account.service as TimelineService,
             accountKey = account.accountKey,
             database = database,
-            notificationRepository = notificationRepository
+            addCursorIfNeed = { data, accountKey ->
+                notificationRepository.addCursorIfNeeded(
+                    accountKey,
+                    NotificationCursorType.Mentions,
+                    data.status.statusId,
+                    data.status.timestamp,
+                )
+            }
         )
     override val savedStateKey: String = "${account.accountKey}_mentions"
 }

@@ -44,7 +44,12 @@ class StatusViewModel @AssistedInject constructor(
     }
 
     val source by lazy {
-        statusRepository.conversation(statusKey = statusKey, account = account)
+        statusRepository.conversation(
+            statusKey = statusKey,
+            accountKey = account.accountKey,
+            platformType = account.type,
+            service = account.service
+        )
             .cachedIn(viewModelScope)
     }
 }

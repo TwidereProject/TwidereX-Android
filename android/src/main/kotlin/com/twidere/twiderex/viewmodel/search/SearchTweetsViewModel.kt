@@ -27,7 +27,6 @@ import androidx.paging.map
 import com.twidere.services.microblog.SearchService
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.model.AccountDetails
-import com.twidere.twiderex.model.transform.toUi
 import com.twidere.twiderex.paging.mediator.paging.pager
 import com.twidere.twiderex.paging.mediator.search.SearchStatusMediator
 import dagger.assisted.Assisted
@@ -50,6 +49,6 @@ class SearchTweetsViewModel @AssistedInject constructor(
 
     val source by lazy {
         SearchStatusMediator(keyword, database, account.accountKey, service).pager()
-            .flow.map { it.map { it.status.toUi(account.accountKey) } }.cachedIn(viewModelScope)
+            .flow.map { it.map { it.status } }.cachedIn(viewModelScope)
     }
 }

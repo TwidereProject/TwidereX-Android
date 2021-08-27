@@ -20,13 +20,11 @@
  */
 package com.twidere.twiderex.di
 
-import android.content.Context
-import coil.imageLoader
-import coil.util.CoilUtils
 import com.twidere.services.nitter.NitterService
+import com.twidere.twiderex.cache.FileCacheHandler
 import com.twidere.twiderex.db.AppDatabase
 import com.twidere.twiderex.db.CacheDatabase
-import com.twidere.twiderex.repository.AccountRepository
+import com.twidere.twiderex.repository.AccountUpdateRepository
 import com.twidere.twiderex.repository.CacheRepository
 import com.twidere.twiderex.repository.DirectMessageRepository
 import com.twidere.twiderex.repository.DraftRepository
@@ -43,13 +41,17 @@ import com.twidere.twiderex.repository.UserRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
 object RepositoryModule {
+    @Singleton
+    @Provides
+    fun provideAccountUpdateRepository(): AccountUpdateRepository =
+        AccountUpdateRepository()
+
     @Singleton
     @Provides
     fun provideDraftRepository(database: AppDatabase): DraftRepository =
@@ -63,13 +65,11 @@ object RepositoryModule {
     fun provideCacheRepository(
         database: CacheDatabase,
         appDatabase: AppDatabase,
-        @ApplicationContext context: Context,
+        fileCacheHandler: FileCacheHandler
     ): CacheRepository = CacheRepository(
-        database = database,
-        appDatabase = appDatabase,
-        cache = CoilUtils.createDefaultCache(context),
-        imageLoader = context.imageLoader,
-        cacheDirs = listOf(context.cacheDir, *context.externalCacheDirs),
+        fileCache = fileCacheHandler,
+        cacheDatabase = database,
+        appDatabase = appDatabase
     )
 
     @Provides
@@ -92,7 +92,7 @@ object RepositoryModule {
     @Provides
     fun provideUserRepository(
         database: CacheDatabase,
-        accountRepository: AccountRepository
+        accountRepository: AccountUpdateRepository
     ): UserRepository = UserRepository(database = database, accountRepository = accountRepository)
 
     @Provides
@@ -121,5 +121,5 @@ object RepositoryModule {
     @Provides
     fun provideDirectMediaRepository(
         database: CacheDatabase
-    ) = MediaRepository(database = database)
+    ) = MediaRepository(database)
 }

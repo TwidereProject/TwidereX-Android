@@ -23,6 +23,7 @@ package com.twidere.twiderex.viewmodel.lists
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
+import com.twidere.services.microblog.TimelineService
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.repository.TimelineRepository
@@ -46,7 +47,8 @@ class ListsTimelineViewModel @AssistedInject constructor(
     val source by lazy {
         repository.listTimeline(
             listKey = listKey,
-            account = account,
+            accountKey = account.accountKey,
+            service = account.service as TimelineService
         ).cachedIn(viewModelScope)
     }
 }

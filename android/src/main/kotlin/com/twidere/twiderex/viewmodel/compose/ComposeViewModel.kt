@@ -38,15 +38,16 @@ import androidx.work.WorkManager
 import com.twidere.services.microblog.LookupService
 import com.twidere.twiderex.R
 import com.twidere.twiderex.action.ComposeAction
-import com.twidere.twiderex.db.model.DbDraft
 import com.twidere.twiderex.extensions.getCachedLocation
 import com.twidere.twiderex.extensions.getTextAfterSelection
 import com.twidere.twiderex.extensions.getTextBeforeSelection
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.enums.ComposeType
 import com.twidere.twiderex.model.enums.MastodonVisibility
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.job.ComposeData
+import com.twidere.twiderex.model.ui.UiDraft
 import com.twidere.twiderex.model.ui.UiEmoji
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.notification.InAppNotification
@@ -67,13 +68,6 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import java.util.UUID
-
-enum class ComposeType {
-    New,
-    Reply,
-    Quote,
-    Thread,
-}
 
 class DraftItemViewModel @AssistedInject constructor(
     private val repository: DraftRepository,
@@ -103,7 +97,7 @@ class DraftComposeViewModel @AssistedInject constructor(
     workManager: WorkManager,
     inAppNotification: InAppNotification,
     @Assisted account: AccountDetails,
-    @Assisted private val draft: DbDraft,
+    @Assisted private val draft: UiDraft,
 ) : ComposeViewModel(
     draftRepository,
     locationManager,
@@ -117,7 +111,7 @@ class DraftComposeViewModel @AssistedInject constructor(
     draft.composeType,
 ) {
 
-    override val draftId: String = draft._id
+    override val draftId: String = draft.draftId
 
     init {
         setText(TextFieldValue(draft.content))
@@ -129,7 +123,7 @@ class DraftComposeViewModel @AssistedInject constructor(
     interface AssistedFactory {
         fun create(
             account: AccountDetails,
-            draft: DbDraft,
+            draft: UiDraft,
         ): DraftComposeViewModel
     }
 }
@@ -300,14 +294,18 @@ open class ComposeViewModel @AssistedInject constructor(
                             composeType == ComposeType.Reply
                         ) {
                             val mentions =
-                                status.mastodonExtra.mentions.mapNotNull { it.acct }
-                                    .filter { it != account.user.screenName }.map { "@$it" }.let {
+                                status.mastodonExtra?.mentions?.mapNotNull { it.acct }
+                                    ?.filter { it != account.user.screenName }
+                                    ?.map { "@$it" }
+                                    ?.let {
                                         if (status.user.userKey != account.user.userKey) {
                                             listOf(status.user.getDisplayScreenName(account.accountKey.host)) + it
                                         } else {
                                             it
                                         }
-                                    }.distinctBy { it }.takeIf { it.any() }
+                                    }
+                                    ?.distinctBy { it }
+                                    ?.takeIf { it.any() }
                                     ?.joinToString(" ", postfix = " ") { it }
                             if (mentions != null) {
                                 setText(

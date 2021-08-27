@@ -37,10 +37,10 @@ import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.lazy.LazyListController
 import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.model.enums.ComposeType
 import com.twidere.twiderex.navigation.RootRoute
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.TwidereScene
-import com.twidere.twiderex.viewmodel.compose.ComposeType
 import com.twidere.twiderex.viewmodel.timeline.HomeTimelineViewModel
 
 class HomeTimelineItem : HomeNavigationItem() {

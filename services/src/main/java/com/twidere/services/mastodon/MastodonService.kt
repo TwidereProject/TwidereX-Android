@@ -253,6 +253,17 @@ class MastodonService(
         ).accounts ?: emptyList()
     }
 
+    override suspend fun searchMedia(
+        query: String,
+        count: Int,
+        nextPage: String?
+    ): ISearchResponse {
+        return BasicSearchResponse(
+            nextPage = null,
+            status = emptyList()
+        )
+    }
+
     suspend fun hashtagTimeline(
         query: String,
         count: Int? = null,

@@ -30,6 +30,7 @@ import com.twidere.twiderex.extensions.toUi
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.paging.mediator.paging.PagingWithGapMediator
 import com.twidere.twiderex.paging.mediator.paging.pager
+import com.twidere.twiderex.paging.mediator.paging.toUi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
@@ -37,7 +38,7 @@ abstract class TimelineViewModel(
     private val preferences: SharedPreferences,
 ) : ViewModel() {
     val source by lazy {
-        pagingMediator.pager().toUi(accountKey = pagingMediator.accountKey).cachedIn(viewModelScope)
+        pagingMediator.pager().toUi().cachedIn(viewModelScope)
     }
     abstract val pagingMediator: PagingWithGapMediator
     abstract val savedStateKey: String

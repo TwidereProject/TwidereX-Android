@@ -31,7 +31,6 @@ import com.twidere.services.microblog.TimelineService
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.transform.toUi
 import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.paging.mediator.paging.PagingMediator
@@ -65,7 +64,7 @@ class UserMediaTimelineViewModel @AssistedInject constructor(
             )
         ).flow.map { pagingData ->
             pagingData.map {
-                it.toUi(pagingMediator.accountKey)
+                it.status
             }
         }.cachedIn(viewModelScope).map {
             it.flatMap {

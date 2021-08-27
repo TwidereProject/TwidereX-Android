@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.Constraints
 import com.twidere.twiderex.component.RequireAuthorization
 import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.enums.ComposeType
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.scenes.DraftListScene
 import com.twidere.twiderex.scenes.HomeScene
@@ -91,7 +92,6 @@ import com.twidere.twiderex.ui.LocalActiveAccountViewModel
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.utils.LocalPlatformResolver
-import com.twidere.twiderex.viewmodel.compose.ComposeType
 import moe.tlaster.precompose.navigation.BackStackEntry
 import moe.tlaster.precompose.navigation.RouteBuilder
 import moe.tlaster.precompose.navigation.path
@@ -102,7 +102,6 @@ import moe.tlaster.precompose.navigation.transition.fadeScaleDestroyTransition
 import java.net.URLDecoder
 
 const val initialRoute = RootRouteDefinition.Home
-const val twidereXSchema = "twiderex"
 
 fun RouteBuilder.authorizedScene(
     route: String,
@@ -157,10 +156,11 @@ fun ProvideStatusPlatform(
     content: @Composable (platformType: PlatformType) -> Unit,
 ) {
     val platformResolver = LocalPlatformResolver.current
+    val account = LocalActiveAccount.current ?: return
     ProvidePlatformType(
         key = statusKey,
         provider = {
-            platformResolver.resolveStatus(statusKey = statusKey)
+            platformResolver.resolveStatus(statusKey = statusKey, account.accountKey)
         },
         content = content
     )

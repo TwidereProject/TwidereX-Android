@@ -24,6 +24,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
 import androidx.paging.filter
+import com.twidere.services.microblog.ListsService
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.ListsMode
@@ -48,7 +49,10 @@ class ListsViewModel @AssistedInject constructor(
     }
 
     val source by lazy {
-        listsRepository.fetchLists(account = account).cachedIn(viewModelScope)
+        listsRepository.fetchLists(
+            accountKey = account.accountKey,
+            service = account.service as ListsService
+        ).cachedIn(viewModelScope)
     }
 
     val ownerSource by lazy {
@@ -107,7 +111,8 @@ class ListsCreateViewModel @AssistedInject constructor(
     ) {
         loadingRequest(onResult) {
             listsRepository.createLists(
-                account = account,
+                accountKey = account.accountKey,
+                service = account.service as ListsService,
                 title = title,
                 description = description,
                 mode = if (private)ListsMode.PRIVATE.value else ListsMode.PUBLIC.value
@@ -133,7 +138,7 @@ class ListsModifyViewModel @AssistedInject constructor(
     var editPrivate = MutableStateFlow(false)
 
     val source by lazy {
-        listsRepository.findListWithListKey(account = account, listKey = listKey)
+        listsRepository.findListWithListKey(accountKey = account.accountKey, listKey = listKey)
     }
 
     init {
@@ -155,7 +160,8 @@ class ListsModifyViewModel @AssistedInject constructor(
     ) {
         loadingRequest(onResult) {
             listsRepository.updateLists(
-                account = account,
+                accountKey = account.accountKey,
+                service = account.service as ListsService,
                 listId = listId,
                 title = title,
                 description = description,
@@ -171,7 +177,8 @@ class ListsModifyViewModel @AssistedInject constructor(
     ) {
         loadingRequest(onResult) {
             listsRepository.deleteLists(
-                account = account,
+                accountKey = account.accountKey,
+                service = account.service as ListsService,
                 listKey = listKey,
                 listId = listId,
             )
@@ -184,7 +191,8 @@ class ListsModifyViewModel @AssistedInject constructor(
     ) {
         loadingRequest(onResult) {
             listsRepository.subscribeLists(
-                account = account,
+                accountKey = account.accountKey,
+                service = account.service as ListsService,
                 listKey = listKey
             )
         }
@@ -196,7 +204,8 @@ class ListsModifyViewModel @AssistedInject constructor(
     ) {
         loadingRequest(onResult) {
             listsRepository.unsubscribeLists(
-                account = account,
+                accountKey = account.accountKey,
+                service = account.service as ListsService,
                 listKey = listKey
             )
         }

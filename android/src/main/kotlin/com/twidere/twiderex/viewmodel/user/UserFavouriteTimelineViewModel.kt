@@ -23,6 +23,7 @@ package com.twidere.twiderex.viewmodel.user
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
+import com.twidere.services.microblog.TimelineService
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.repository.TimelineRepository
@@ -44,6 +45,11 @@ class UserFavouriteTimelineViewModel @AssistedInject constructor(
     }
 
     val source by lazy {
-        repository.favouriteTimeline(userKey = userKey, account = account).cachedIn(viewModelScope)
+        repository.favouriteTimeline(
+            userKey = userKey,
+            accountKey = account.accountKey,
+            platformType = account.type,
+            service = account.service as TimelineService
+        ).cachedIn(viewModelScope)
     }
 }
