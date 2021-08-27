@@ -21,8 +21,10 @@
 package com.twidere.twiderex.jobs.status
 
 import com.twidere.services.microblog.StatusService
+import com.twidere.twiderex.db.mapper.toDbStatusWithReference
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.job.StatusResult
+import com.twidere.twiderex.model.transform.toUi
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.AccountRepository
@@ -40,13 +42,15 @@ class UnRetweetStatusJob(
         service: StatusService,
         status: UiStatus
     ): StatusResult {
-        val retweeted = service.unRetweet(id = status.statusId)
+        val newStatus = service.unRetweet(id = status.statusId)
+            .toDbStatusWithReference(accountKey = accountKey)
+            .toUi(accountKey)
         return StatusResult(
-            statusKey = status.statusKey,
+            statusKey = newStatus.statusKey,
             accountKey = accountKey,
-            retweeted = retweeted,
-            retweetCount = if (retweeted) status.metrics.retweet else status.metrics.retweet - 1,
-            likeCount = status.metrics.like,
+            retweeted = false,
+            retweetCount = newStatus.metrics.retweet,
+            likeCount = newStatus.metrics.like,
         )
     }
     override fun fallback(

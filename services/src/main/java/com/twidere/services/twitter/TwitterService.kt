@@ -379,38 +379,47 @@ class TwitterService(
         resources.unfollow(user_id)
     }
 
-    override suspend fun like(id: String): Boolean {
+    override suspend fun like(id: String): IStatus {
         return try {
             resources.likeV2(userId = accountId, body = TwitterReactionRequestBody(tweet_id = id))
-                .data?.liked ?: false
+                .run {
+                    lookupStatus(id)
+                }
         } catch (e: TwitterApiExceptionV2) {
-            resources.like(id).favorited ?: false
+            resources.like(id)
         }
     }
 
-    override suspend fun unlike(id: String): Boolean {
+    override suspend fun unlike(id: String): IStatus {
         return try {
-            resources.unlikeV2(userId = accountId, tweetId = id).data?.liked ?: false
+            resources.unlikeV2(userId = accountId, tweetId = id)
+                .run {
+                    lookupStatus(id)
+                }
         } catch (e: TwitterApiExceptionV2) {
-            resources.unlike(id).favorited ?: false
+            resources.unlike(id)
         }
     }
 
-    override suspend fun retweet(id: String): Boolean {
+    override suspend fun retweet(id: String): IStatus {
         return try {
             resources.retweetV2(userId = accountId, body = TwitterReactionRequestBody(tweet_id = id))
-                .data?.retweeted ?: false
+                .run {
+                    lookupStatus(id)
+                }
         } catch (e: TwitterApiExceptionV2) {
-            resources.retweet(id).retweeted ?: false
+            resources.retweet(id)
         }
     }
 
-    override suspend fun unRetweet(id: String): Boolean {
+    override suspend fun unRetweet(id: String): IStatus {
         return try {
             resources.unRetweetV2(userId = accountId, tweetId = id)
-                .data?.retweeted ?: false
+                .run {
+                    lookupStatus(id)
+                }
         } catch (e: TwitterApiExceptionV2) {
-            resources.unretweet(id).retweeted ?: false
+            resources.unretweet(id)
         }
     }
 
