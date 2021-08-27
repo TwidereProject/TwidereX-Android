@@ -20,7 +20,6 @@
  */
 package com.twidere.twiderex.repository
 
-import android.accounts.Account
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.AccountPreferences
 import com.twidere.twiderex.model.AmUser
@@ -34,12 +33,12 @@ expect class AccountRepository {
     val activeAccount: SharedFlow<AccountDetails?>
     val accounts: SharedFlow<List<AccountDetails>>
     fun updateAccount(user: UiUser)
-    fun getAccounts(): List<Account>
+    fun getAccounts(): List<AccountDetails>
     fun hasAccount(): Boolean
-    fun findByAccountKey(accountKey: MicroBlogKey): Account?
+    fun findByAccountKey(accountKey: MicroBlogKey): AccountDetails?
     fun setCurrentAccount(detail: AccountDetails)
     fun addAccount(
-        account: Account,
+        displayKey: MicroBlogKey,
         type: PlatformType,
         accountKey: MicroBlogKey,
         credentials_type: CredentialsType,
@@ -48,9 +47,6 @@ expect class AccountRepository {
         user: AmUser,
         lastActive: Long,
     )
-    fun getAccountDetails(
-        account: Account,
-    ): AccountDetails
     fun getAccountPreferences(accountKey: MicroBlogKey): AccountPreferences
     fun containsAccount(key: MicroBlogKey): Boolean
     fun updateAccount(detail: AccountDetails)

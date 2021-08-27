@@ -39,8 +39,6 @@ class DownloadMediaJob(
     ) {
         val accountDetails = accountKey.let {
             accountRepository.findByAccountKey(accountKey = it)
-        }?.let {
-            accountRepository.getAccountDetails(it)
         } ?: throw Error("Can't find any account matches:$$accountKey")
         val service = accountDetails.service
         if (service !is DownloadMediaService) {

@@ -68,7 +68,7 @@ class NotificationChannelInitializer : Initializer<NotificationChannelInitialize
 
     private fun updateAccountChannelsAndGroups(context: Context) {
         val notificationManagerCompat = NotificationManagerCompat.from(context)
-        val accounts = repository.getAccounts().map { repository.getAccountDetails(it) }
+        val accounts = repository.getAccounts()
         val specs = NotificationChannelSpec.values().filter { it.grouped }
 
         val addedChannels = mutableListOf<String>()

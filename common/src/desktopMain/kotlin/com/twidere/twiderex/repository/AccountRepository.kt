@@ -20,7 +20,6 @@
  */
 package com.twidere.twiderex.repository
 
-import android.accounts.Account
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.AccountPreferences
 import com.twidere.twiderex.model.AmUser
@@ -42,7 +41,7 @@ actual class AccountRepository {
     actual fun updateAccount(detail: AccountDetails) {
     }
 
-    actual fun getAccounts(): List<Account> {
+    actual fun getAccounts(): List<AccountDetails> {
         TODO("Not yet implemented")
     }
 
@@ -50,7 +49,7 @@ actual class AccountRepository {
         TODO("Not yet implemented")
     }
 
-    actual fun findByAccountKey(accountKey: MicroBlogKey): Account? {
+    actual fun findByAccountKey(accountKey: MicroBlogKey): AccountDetails? {
         TODO("Not yet implemented")
     }
 
@@ -58,7 +57,7 @@ actual class AccountRepository {
     }
 
     actual fun addAccount(
-        account: Account,
+        displayKey: MicroBlogKey,
         type: PlatformType,
         accountKey: MicroBlogKey,
         credentials_type: CredentialsType,
@@ -67,10 +66,6 @@ actual class AccountRepository {
         user: AmUser,
         lastActive: Long
     ) {
-    }
-
-    actual fun getAccountDetails(account: Account): AccountDetails {
-        TODO("Not yet implemented")
     }
 
     actual fun getAccountPreferences(accountKey: MicroBlogKey): AccountPreferences {

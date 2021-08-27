@@ -41,8 +41,6 @@ abstract class StatusJob(
             statusRepository.loadFromCache(it, accountKey = accountKey)
         } ?: throw Error("can't find any status matches:$statusKey")
         val service = accountRepository.findByAccountKey(accountKey)?.let {
-            accountRepository.getAccountDetails(it)
-        }?.let {
             it.service as? StatusService
         } ?: throw Error("account service is not StatusService")
         return try {

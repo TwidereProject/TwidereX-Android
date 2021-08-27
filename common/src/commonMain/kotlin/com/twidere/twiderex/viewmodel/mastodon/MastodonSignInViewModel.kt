@@ -20,7 +20,6 @@
  */
 package com.twidere.twiderex.viewmodel.mastodon
 
-import android.accounts.Account
 import androidx.compose.ui.text.input.TextFieldValue
 import com.twidere.services.mastodon.MastodonOAuthService
 import com.twidere.twiderex.dataprovider.mapper.toAmUser
@@ -32,7 +31,6 @@ import com.twidere.twiderex.model.cred.OAuth2Credentials
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.navigation.RootDeepLinksRoute
 import com.twidere.twiderex.notification.InAppNotification
-import com.twidere.twiderex.repository.ACCOUNT_TYPE
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.utils.json
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -87,14 +85,12 @@ class MastodonSignInViewModel(
                         ).json()
                         if (repository.containsAccount(internalKey)) {
                             repository.findByAccountKey(internalKey)?.let {
-                                repository.getAccountDetails(it)
-                            }?.let {
                                 it.credentials_json = credentials_json
                                 repository.updateAccount(it)
                             }
                         } else {
                             repository.addAccount(
-                                account = Account(displayKey.toString(), ACCOUNT_TYPE),
+                                displayKey = displayKey,
                                 type = PlatformType.Mastodon,
                                 accountKey = internalKey,
                                 credentials_type = CredentialsType.OAuth2,

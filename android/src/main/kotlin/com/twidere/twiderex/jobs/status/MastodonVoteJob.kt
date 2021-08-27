@@ -42,8 +42,6 @@ class MastodonVoteJob(
             throw Error()
         }
         val service = accountRepository.findByAccountKey(accountKey)?.let {
-            accountRepository.getAccountDetails(it)
-        }?.let {
             it.service as? MastodonService
         } ?: throw Error()
 

@@ -23,6 +23,7 @@ package com.twidere.twiderex.repository
 import android.accounts.Account
 import android.accounts.AccountManager
 import android.os.Build
+import com.twidere.twiderex.dataprovider.mapper.toAmUser
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.AccountPreferences
 import com.twidere.twiderex.model.AccountPreferencesFactory
@@ -56,8 +57,10 @@ actual class AccountRepository(
     private val accountPreferencesFactory: AccountPreferencesFactory,
 ) {
     actual fun updateAccount(user: UiUser) {
-        findByAccountKey(user.userKey)?.let {
-            getAccountDetails(it).copy()
+        findByAccountKey(user.userKey)?.copy(
+            user = user.toAmUser()
+        )?.let {
+            updateAccount(it)
         }
     }
 
@@ -69,30 +72,14 @@ actual class AccountRepository(
         get() = _activeAccount.asSharedFlow()
 
     private val _accounts = MutableStateFlow(
-        getAccounts().map {
-            getAccountDetails(it)
-        }
+        getAccounts()
     )
 
     actual val accounts
         get() = _accounts.asSharedFlow()
 
-    actual fun getAccounts(): List<Account> {
-        return manager.getAccountsByType(ACCOUNT_TYPE).toList()
-    }
-
     actual fun hasAccount(): Boolean {
         return getAccounts().isNotEmpty()
-    }
-
-    // Note that UserKey that being used in AccountRepository is idStr@domain, not screenName@domain
-    actual fun findByAccountKey(accountKey: MicroBlogKey): Account? {
-        for (account in getAccounts()) {
-            if (accountKey == getAccountKey(account)) {
-                return account
-            }
-        }
-        return null
     }
 
     actual fun setCurrentAccount(detail: AccountDetails) {
@@ -102,12 +89,11 @@ actual class AccountRepository(
     }
 
     private fun getCurrentAccount(): AccountDetails? {
-        return getAccounts()
-            .map { getAccountDetails(it) }.maxByOrNull { it.lastActive }
+        return getAccounts().maxByOrNull { it.lastActive }
     }
 
     actual fun addAccount(
-        account: Account,
+        displayKey: MicroBlogKey,
         type: PlatformType,
         accountKey: MicroBlogKey,
         credentials_type: CredentialsType,
@@ -116,6 +102,7 @@ actual class AccountRepository(
         user: AmUser,
         lastActive: Long,
     ) {
+        val account = Account(displayKey.toString(), ACCOUNT_TYPE)
         manager.addAccountExplicitly(account, null, null)
         val detail = AccountDetails(
             account = account.toTwidere(),
@@ -130,31 +117,7 @@ actual class AccountRepository(
         )
         updateAccount(detail)
         setCurrentAccount(detail)
-        _accounts.value = getAccounts().map {
-            getAccountDetails(it)
-        }
-    }
-
-    actual fun getAccountDetails(
-        account: Account,
-    ): AccountDetails {
-        return AccountDetails(
-            account = account.toTwidere(),
-            type = PlatformType.valueOf(manager.getUserData(account, ACCOUNT_USER_DATA_TYPE)),
-            accountKey = getAccountKey(account),
-            credentials_type = CredentialsType.valueOf(
-                manager.getUserData(
-                    account,
-                    ACCOUNT_USER_DATA_CREDS_TYPE
-                )
-            ),
-            credentials_json = manager.peekAuthToken(account, ACCOUNT_AUTH_TOKEN_TYPE),
-            extras_json = manager.getUserData(account, ACCOUNT_USER_DATA_EXTRAS),
-            user = manager.getUserData(account, ACCOUNT_USER_DATA_USER).fromJson(),
-            lastActive = manager.getUserData(account, ACCOUNT_USER_DATA_LAST_ACTIVE)?.toLongOrNull()
-                ?: 0,
-            preferences = getAccountPreferences(getAccountKey(account))
-        )
+        _accounts.value = getAccounts()
     }
 
     actual fun getAccountPreferences(accountKey: MicroBlogKey): AccountPreferences {
@@ -188,17 +151,13 @@ actual class AccountRepository(
             detail.lastActive.toString()
         )
         _activeAccount.value = getCurrentAccount()
-        _accounts.value = getAccounts().map {
-            getAccountDetails(it)
-        }
+        _accounts.value = getAccounts()
     }
 
     actual fun delete(detail: AccountDetails) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
             manager.removeAccountExplicitly(detail.account.toAndroid())
-            _accounts.value = getAccounts().map {
-                getAccountDetails(it)
-            }
+            _accounts.value = getAccounts()
             _activeAccount.value = getCurrentAccount()
             preferencesCache.remove(detail.accountKey)?.close()
         }
@@ -206,5 +165,43 @@ actual class AccountRepository(
 
     actual fun getFirstByType(type: PlatformType): AccountDetails? {
         return _accounts.value.sortedByDescending { it.lastActive }.firstOrNull { it.type == type }
+    }
+
+    actual fun getAccounts(): List<AccountDetails> {
+        return manager.getAccountsByType(ACCOUNT_TYPE).map {
+            getAccountDetails(it)
+        }
+    }
+
+    // Note that UserKey that being used in AccountRepository is idStr@domain, not screenName@domain
+    actual fun findByAccountKey(accountKey: MicroBlogKey): AccountDetails? {
+        for (account in getAccounts()) {
+            if (accountKey == getAccountKey(account.account.toAndroid())) {
+                return account
+            }
+        }
+        return null
+    }
+
+    private fun getAccountDetails(
+        account: Account,
+    ): AccountDetails {
+        return AccountDetails(
+            account = account.toTwidere(),
+            type = PlatformType.valueOf(manager.getUserData(account, ACCOUNT_USER_DATA_TYPE)),
+            accountKey = getAccountKey(account),
+            credentials_type = CredentialsType.valueOf(
+                manager.getUserData(
+                    account,
+                    ACCOUNT_USER_DATA_CREDS_TYPE
+                )
+            ),
+            credentials_json = manager.peekAuthToken(account, ACCOUNT_AUTH_TOKEN_TYPE),
+            extras_json = manager.getUserData(account, ACCOUNT_USER_DATA_EXTRAS),
+            user = manager.getUserData(account, ACCOUNT_USER_DATA_USER).fromJson(),
+            lastActive = manager.getUserData(account, ACCOUNT_USER_DATA_LAST_ACTIVE)?.toLongOrNull()
+                ?: 0,
+            preferences = getAccountPreferences(getAccountKey(account))
+        )
     }
 }

@@ -20,7 +20,6 @@
  */
 package com.twidere.twiderex.viewmodel.twitter
 
-import android.accounts.Account
 import com.twidere.services.http.MicroBlogException
 import com.twidere.services.twitter.TwitterOAuthService
 import com.twidere.services.twitter.TwitterService
@@ -34,7 +33,6 @@ import com.twidere.twiderex.model.cred.OAuthCredentials
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.navigation.RootDeepLinksRoute
 import com.twidere.twiderex.notification.InAppNotification
-import com.twidere.twiderex.repository.ACCOUNT_TYPE
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.utils.json
 import com.twidere.twiderex.utils.notify
@@ -112,14 +110,12 @@ class TwitterSignInViewModel(
                         ).json()
                         if (repository.containsAccount(internalKey)) {
                             repository.findByAccountKey(internalKey)?.let {
-                                repository.getAccountDetails(it)
-                            }?.let {
                                 it.credentials_json = credentials_json
                                 repository.updateAccount(it)
                             }
                         } else {
                             repository.addAccount(
-                                account = Account(displayKey.toString(), ACCOUNT_TYPE),
+                                displayKey = displayKey,
                                 type = PlatformType.Twitter,
                                 accountKey = internalKey,
                                 credentials_type = CredentialsType.OAuth,

@@ -40,8 +40,6 @@ class DeleteStatusJob(
             statusRepository.loadFromCache(it, accountKey = accountKey)
         } ?: throw Error("Can't find any status matches:$statusKey")
         val service = accountRepository.findByAccountKey(accountKey)?.let {
-            accountRepository.getAccountDetails(it)
-        }?.let {
             it.service as? StatusService
         } ?: throw Error()
         try {

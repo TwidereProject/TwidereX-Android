@@ -52,7 +52,7 @@ class NotificationJob(
 ) {
     suspend fun execute(enableNotification: Boolean) = coroutineScope {
         if (!enableNotification) {
-            accountRepository.getAccounts().map { accountRepository.getAccountDetails(it) }
+            accountRepository.getAccounts()
                 .filter {
                     it.preferences.isNotificationEnabled.first()
                 }

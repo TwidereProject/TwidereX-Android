@@ -33,8 +33,6 @@ class DirectMessageDeleteJob(
     suspend fun execute(deleteData: DirectMessageDeleteData, accountKey: MicroBlogKey) {
         val accountDetails = accountKey.let {
             accountRepository.findByAccountKey(accountKey = it)
-        }?.let {
-            accountRepository.getAccountDetails(it)
         } ?: throw Error("Can't find any account matches:$$accountKey")
         repository.deleteMessage(
             accountKey = deleteData.accountKey,

@@ -52,8 +52,6 @@ abstract class ComposeJob<T : MicroBlogService>(
             .setProgress(100, 0, false)
         val accountDetails = accountKey.let {
             accountRepository.findByAccountKey(accountKey = it)
-        }?.let {
-            accountRepository.getAccountDetails(it)
         } ?: throw Error("Can't find any account matches:$$accountKey")
         val notificationId = composeData.draftId.hashCode()
         @Suppress("UNCHECKED_CAST")
