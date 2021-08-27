@@ -25,6 +25,7 @@ import com.twidere.services.http.config.HttpConfigClientFactory
 import com.twidere.services.mastodon.MastodonService
 import com.twidere.services.microblog.MicroBlogService
 import com.twidere.services.twitter.TwitterService
+import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.cred.Credentials
 import com.twidere.twiderex.model.cred.OAuth2Credentials
 import com.twidere.twiderex.model.cred.OAuthCredentials
@@ -39,7 +40,7 @@ class TwidereServiceFactory(private val configProvider: TwidereHttpConfigProvide
             instance = TwidereServiceFactory(configProvider)
         }
 
-        fun createApiService(type: PlatformType, credentials: Credentials, host: String = ""): MicroBlogService {
+        fun createApiService(type: PlatformType, credentials: Credentials, accountKey: MicroBlogKey): MicroBlogService {
             return instance?.let {
                 when (type) {
                     PlatformType.Twitter -> {
@@ -51,7 +52,8 @@ class TwidereServiceFactory(private val configProvider: TwidereHttpConfigProvide
                                 consumer_secret = it.consumer_secret,
                                 access_token = it.access_token,
                                 access_token_secret = it.access_token_secret,
-                                httpClientFactory = createHttpClientFactory()
+                                httpClientFactory = createHttpClientFactory(),
+                                accountId = accountKey.id
                             )
                         }
                     }
@@ -62,7 +64,7 @@ class TwidereServiceFactory(private val configProvider: TwidereHttpConfigProvide
                             it as OAuth2Credentials
                         }.let {
                             MastodonService(
-                                host,
+                                accountKey.host,
                                 it.access_token,
                                 httpClientFactory = createHttpClientFactory()
                             )
