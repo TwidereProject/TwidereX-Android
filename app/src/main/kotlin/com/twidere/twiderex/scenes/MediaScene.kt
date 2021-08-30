@@ -83,6 +83,7 @@ import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.LoadingProgress
 import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.foundation.VideoPlayer
+import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.component.status.LikeButton
 import com.twidere.twiderex.component.status.ReplyButton
 import com.twidere.twiderex.component.status.RetweetButton
@@ -297,6 +298,7 @@ private fun StatusMediaInfo(
     currentMedia: UiMedia
 ) {
     val context = LocalContext.current
+    val navigator = LocalNavigator.current
     Column(
         modifier = Modifier
             .padding(StatusMediaInfoDefaults.ContentPadding),
@@ -357,6 +359,16 @@ private fun StatusMediaInfo(
                 ) {
                     Text(
                         text = stringResource(id = R.string.common_controls_actions_share_media),
+                    )
+                }
+                DropdownMenuItem(
+                    onClick = {
+                        callback.invoke()
+                        navigator.status(status = status)
+                    }
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.common_controls_actions_go_to_status),
                     )
                 }
             }

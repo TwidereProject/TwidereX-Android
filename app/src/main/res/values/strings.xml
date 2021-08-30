@@ -103,6 +103,7 @@
     <string name="common_controls_actions_cancel">Cancel</string>
     <string name="common_controls_actions_preview">Preview</string>
     <string name="common_controls_actions_share_media">Share media</string>
+    <string name="common_controls_actions_go_to_status">Go to tweet</string>
     <string name="common_controls_actions_edit">Edit</string>
     <string name="common_controls_actions_open_in_safari">Open in Safari</string>
     <string name="common_controls_actions_yes">Yes</string>
