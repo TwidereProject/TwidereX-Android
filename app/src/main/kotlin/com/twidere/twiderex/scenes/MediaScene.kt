@@ -158,6 +158,7 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewM
     var controlVisibility by remember { mutableStateOf(true) }
     val controlPanelColor = MaterialTheme.colors.surface.copy(alpha = 0.6f)
     val navController = LocalNavController.current
+    val navigator = LocalNavigator.current
     val pagerState = rememberPagerState(
         initialPage = selectedIndex,
         pageCount = status.media.size,
@@ -208,7 +209,8 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewM
                     Box(
                         modifier = Modifier
                             .background(color = controlPanelColor)
-                            .navigationBarsPadding(),
+                            .navigationBarsPadding()
+                            .clickable { navigator.status(status = status) },
                     ) {
                         StatusMediaInfo(videoControl, status, viewModel, currentMedia)
                     }
@@ -298,7 +300,6 @@ private fun StatusMediaInfo(
     currentMedia: UiMedia
 ) {
     val context = LocalContext.current
-    val navigator = LocalNavigator.current
     Column(
         modifier = Modifier
             .padding(StatusMediaInfoDefaults.ContentPadding),
@@ -359,16 +360,6 @@ private fun StatusMediaInfo(
                 ) {
                     Text(
                         text = stringResource(id = R.string.common_controls_actions_share_media),
-                    )
-                }
-                DropdownMenuItem(
-                    onClick = {
-                        callback.invoke()
-                        navigator.status(status = status)
-                    }
-                ) {
-                    Text(
-                        text = stringResource(id = R.string.common_controls_actions_go_to_status),
                     )
                 }
             }
