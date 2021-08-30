@@ -20,19 +20,13 @@
  */
 package com.twidere.twiderex.viewmodel
 
-import android.content.Context
 import android.net.Uri
-import androidx.work.WorkManager
-import com.twidere.twiderex.R
+import com.twidere.twiderex.action.MediaAction
 import com.twidere.twiderex.extensions.asStateIn
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiMedia
-import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.StatusRepository
-import com.twidere.twiderex.utils.FileProviderHelper
-import com.twidere.twiderex.worker.DownloadMediaWorker
-import com.twidere.twiderex.worker.ShareMediaWorker
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
@@ -44,8 +38,7 @@ import moe.tlaster.precompose.viewmodel.viewModelScope
 class MediaViewModel(
     private val repository: StatusRepository,
     private val accountRepository: AccountRepository,
-    private val inAppNotification: InAppNotification,
-    private val workManager: WorkManager,
+    private val mediaAction: MediaAction,
     private val statusKey: MicroBlogKey,
 ) : ViewModel() {
     private val account by lazy {
@@ -55,33 +48,21 @@ class MediaViewModel(
     fun saveFile(currentMedia: UiMedia, target: Uri) = viewModelScope.launch {
         val account = account.lastOrNull() ?: return@launch
         currentMedia.mediaUrl?.let {
-            DownloadMediaWorker.create(
+            mediaAction.download(
                 accountKey = account.accountKey,
                 source = it,
-                target = target
+                target = target.toString()
             )
-        }?.let {
-            workManager.enqueue(it)
         }
     }
 
-    fun shareMedia(currentMedia: UiMedia, target: String, context: Context) = viewModelScope.launch {
+    fun shareMedia(currentMedia: UiMedia) = viewModelScope.launch {
         val account = account.lastOrNull() ?: return@launch
-        val uri = FileProviderHelper.getUriFromMedia(target, context)
-        inAppNotification.show(R.string.common_alerts_media_sharing_title)
         currentMedia.mediaUrl?.let {
-            DownloadMediaWorker.create(
-                accountKey = account.accountKey,
+            mediaAction.share(
                 source = it,
-                target = uri
+                accountKey = account.accountKey
             )
-        }?.let {
-            workManager.beginWith(it)
-                .then(
-                    ShareMediaWorker.create(
-                        target = uri
-                    )
-                ).enqueue()
         }
     }
 

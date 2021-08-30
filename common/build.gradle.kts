@@ -1,4 +1,3 @@
-import Versions.ksp
 import org.jetbrains.compose.compose
 
 plugins {
@@ -57,6 +56,7 @@ kotlin {
             dependencies {
                 api("androidx.lifecycle:lifecycle-runtime-ktx:${Versions.lifecycle}")
                 api("androidx.savedstate:savedstate-ktx:1.1.0")
+                implementation("androidx.core:core-ktx:1.7.0-alpha01")
                 api("io.insert-koin:koin-android:${Versions.koin}")
                 api("io.insert-koin:koin-androidx-workmanager:${Versions.koin}")
                 implementation("androidx.room:room-runtime:${Versions.room}")
@@ -66,6 +66,7 @@ kotlin {
                 implementation("io.coil-kt:coil-base:${Versions.coil}")
                 api("androidx.datastore:datastore:${Versions.datastore}")
                 api("androidx.datastore:datastore-preferences:${Versions.datastore}")
+                implementation("androidx.exifinterface:exifinterface:${Versions.androidx_exifinterface}")
             }
         }
         val androidAndroidTest by getting {

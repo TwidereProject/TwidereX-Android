@@ -31,15 +31,6 @@ interface NotificationWithActionEvent : NotificationEvent {
     val action: EventActionContext.() -> Unit
 }
 
-class StringNotificationEvent(
-    private val message: String,
-) : NotificationEvent {
-    @Composable
-    override fun getMessage(): String {
-        return message
-    }
-}
-
 open class StringResNotificationEvent(
     @StringRes val messageId: Int,
 ) : NotificationEvent {

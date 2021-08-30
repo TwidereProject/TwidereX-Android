@@ -20,22 +20,18 @@
  */
 package com.twidere.twiderex.viewmodel
 
-import androidx.core.app.NotificationManagerCompat
-import androidx.work.WorkManager
+import com.twidere.twiderex.action.DraftAction
 import com.twidere.twiderex.model.ui.UiDraft
 import com.twidere.twiderex.repository.DraftRepository
-import com.twidere.twiderex.worker.draft.RemoveDraftWorker
 import moe.tlaster.precompose.viewmodel.ViewModel
 
 class DraftViewModel(
     private val repository: DraftRepository,
-    private val workManager: WorkManager,
-    private val notificationManagerCompat: NotificationManagerCompat,
+    private val draftAction: DraftAction
 ) : ViewModel() {
 
     fun delete(it: UiDraft) {
-        workManager.beginWith(RemoveDraftWorker.create(it.draftId)).enqueue()
-        notificationManagerCompat.cancel(it.draftId.hashCode())
+        draftAction.delete(it.draftId)
     }
 
     val source by lazy {

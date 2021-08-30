@@ -20,23 +20,15 @@
  */
 package com.twidere.twiderex.viewmodel.compose
 
-import android.Manifest.permission
-import android.location.Criteria
-import android.location.Location
-import android.location.LocationListener
-import android.location.LocationManager
-import android.net.Uri
-import android.os.Bundle
-import androidx.annotation.RequiresPermission
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.work.WorkManager
 import com.twidere.services.microblog.LookupService
 import com.twidere.twiderex.action.ComposeAction
+import com.twidere.twiderex.action.DraftAction
 import com.twidere.twiderex.extensions.asStateIn
 import com.twidere.twiderex.extensions.getTextAfterSelection
 import com.twidere.twiderex.extensions.getTextBeforeSelection
-import com.twidere.twiderex.extensions.getCachedLocation
+import com.twidere.twiderex.kmp.LocationProvider
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.ComposeType
 import com.twidere.twiderex.model.enums.MastodonVisibility
@@ -51,8 +43,7 @@ import com.twidere.twiderex.repository.DraftRepository
 import com.twidere.twiderex.repository.StatusRepository
 import com.twidere.twiderex.repository.UserRepository
 import com.twidere.twiderex.utils.MastodonEmojiCache
-import com.twidere.twiderex.utils.notify
-import com.twidere.twiderex.worker.draft.SaveDraftWorker
+import com.twidere.twiderex.utils.notifyError
 import com.twitter.twittertext.Extractor
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
@@ -60,6 +51,7 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.lastOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
@@ -80,32 +72,32 @@ class DraftItemViewModel(
 
 class DraftComposeViewModel(
     draftRepository: DraftRepository,
-    locationManager: LocationManager,
     composeAction: ComposeAction,
     repository: StatusRepository,
     userRepository: UserRepository,
-    workManager: WorkManager,
+    draftAction: DraftAction,
     inAppNotification: InAppNotification,
     accountRepository: AccountRepository,
+    locationProvider: LocationProvider,
     draft: UiDraft,
 ) : ComposeViewModel(
-    draftRepository,
-    locationManager,
-    composeAction,
-    repository,
-    userRepository,
-    workManager,
-    inAppNotification,
-    accountRepository,
-    draft.statusKey,
-    draft.composeType,
+    draftRepository = draftRepository,
+    composeAction = composeAction,
+    repository = repository,
+    userRepository = userRepository,
+    draftAction = draftAction,
+    inAppNotification = inAppNotification,
+    accountRepository = accountRepository,
+    locationProvider = locationProvider,
+    statusKey = draft.statusKey,
+    composeType = draft.composeType,
 ) {
 
     override val draftId: String = draft.draftId
 
     init {
         setText(TextFieldValue(draft.content))
-        putImages(draft.media.map { Uri.parse(it) })
+        putImages(draft.media)
         excludedReplyUserIds.value = draft.excludedReplyUserIds ?: emptyList()
     }
 }
@@ -155,16 +147,16 @@ class VoteState {
 
 open class ComposeViewModel(
     protected val draftRepository: DraftRepository,
-    private val locationManager: LocationManager,
-    protected val composeAction: ComposeAction,
+    private val composeAction: ComposeAction,
     protected val repository: StatusRepository,
     private val userRepository: UserRepository,
-    private val workManager: WorkManager,
+    private val draftAction: DraftAction,
     private val inAppNotification: InAppNotification,
     private val accountRepository: AccountRepository,
+    private val locationProvider: LocationProvider,
     protected val statusKey: MicroBlogKey?,
     val composeType: ComposeType,
-) : ViewModel(), LocationListener {
+) : ViewModel() {
     private val account by lazy {
         accountRepository.activeAccount.asStateIn(viewModelScope, null)
     }
@@ -187,7 +179,9 @@ open class ComposeViewModel(
         draftRepository.sourceCount
     }
 
-    val location = MutableStateFlow<Location?>(null)
+    val location by lazy {
+        locationProvider.location.asStateIn(viewModelScope, null)
+    }
     val excludedReplyUserIds = MutableStateFlow<List<String>>(emptyList())
     val replyToUserName by lazy {
         combine(account, status) { account, status ->
@@ -219,7 +213,7 @@ open class ComposeViewModel(
                             lookupService = account.service as LookupService,
                         )
                     } catch (e: Throwable) {
-                        e.notify(inAppNotification)
+                        inAppNotification.notifyError(e)
                         emptyList()
                     } finally {
                         loadingReplyUser.value = false
@@ -240,7 +234,7 @@ open class ComposeViewModel(
     val isContentWarningEnabled = MutableStateFlow(false)
     val contentWarningTextFieldValue = MutableStateFlow(TextFieldValue())
     val textFieldValue = MutableStateFlow(TextFieldValue())
-    val images = MutableStateFlow<List<Uri>>(emptyList())
+    val images = MutableStateFlow<List<String>>(emptyList())
     val canSend = textFieldValue
         .combine(images) { text, imgs -> text.text.isNotEmpty() || !imgs.isNullOrEmpty() }
         .asStateIn(viewModelScope, false)
@@ -341,20 +335,14 @@ open class ComposeViewModel(
 
     fun saveDraft() {
         textFieldValue.value.text.let { text ->
-            workManager
-                .beginWith(
-                    SaveDraftWorker.create(
-                        buildComposeData(text)
-                    )
-                )
-                .enqueue()
+            draftAction.save(buildComposeData(text))
         }
     }
 
     private fun buildComposeData(text: String) = ComposeData(
         content = text,
         draftId = draftId,
-        images = images.value.map { it.toString() },
+        images = images.value,
         composeType = composeType,
         statusKey = statusKey,
         lat = location.value?.latitude,
@@ -369,7 +357,7 @@ open class ComposeViewModel(
         isThreadMode = enableThreadMode.value,
     )
 
-    fun putImages(value: List<Uri>) = viewModelScope.launch {
+    fun putImages(value: List<String>) = viewModelScope.launch {
         val imageLimit = imageLimit.lastOrNull() ?: 4
         images.value.let {
             value + it
@@ -390,42 +378,18 @@ open class ComposeViewModel(
         }.asStateIn(viewModelScope, 4)
     }
 
-    @RequiresPermission(anyOf = [permission.ACCESS_COARSE_LOCATION, permission.ACCESS_FINE_LOCATION])
     fun trackingLocation() {
         locationEnabled.value = true
-        val criteria = Criteria()
-        criteria.accuracy = Criteria.ACCURACY_FINE
-        val provider = locationManager.getBestProvider(criteria, true) ?: return
-        locationManager.requestLocationUpdates(provider, 0, 0f, this)
-        locationManager.getCachedLocation()?.let {
-            location.value = it
-        }
+        locationProvider.enable()
     }
 
     fun disableLocation() {
-        location.value = null
         locationEnabled.value = false
-        locationManager.removeUpdates(this)
+        locationProvider.disable()
     }
 
-    override fun onLocationChanged(location: Location) {
-        this.location.value = location
-    }
-
-    // compatibility fix for Api < 22
-    override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {
-    }
-
-    override fun onCleared() {
-        if (locationEnabled.value) {
-            locationManager.removeUpdates(this)
-        }
-    }
-
-    fun removeImage(item: Uri) {
-        images.value.let {
-            it - item
-        }.let {
+    fun removeImage(item: String) {
+        (images.value - item).let {
             images.value = it
         }
     }
@@ -455,5 +419,9 @@ open class ComposeViewModel(
 
     fun insertEmoji(emoji: UiEmoji) {
         insertText("${if (textFieldValue.value.selection.start != 0) " " else ""}:${emoji.shortcode}: ")
+    }
+
+    override fun onCleared() {
+        locationProvider.disable()
     }
 }

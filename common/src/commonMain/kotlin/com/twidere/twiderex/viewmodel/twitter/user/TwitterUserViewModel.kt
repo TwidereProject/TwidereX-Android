@@ -25,7 +25,7 @@ import com.twidere.twiderex.extensions.asStateIn
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.UserRepository
-import com.twidere.twiderex.utils.notify
+import com.twidere.twiderex.utils.notifyError
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import moe.tlaster.precompose.viewmodel.ViewModel
@@ -54,7 +54,7 @@ class TwitterUserViewModel(
                         lookupService = it.service as LookupService,
                     )
                 } catch (e: Throwable) {
-                    e.notify(inAppNotification)
+                    inAppNotification.notifyError(e)
                     error.value = e
                     null
                 }

@@ -31,6 +31,15 @@ interface NotificationEvent {
     fun getMessage(): String
 }
 
+class StringNotificationEvent(
+    private val message: String,
+) : NotificationEvent {
+    @Composable
+    override fun getMessage(): String {
+        return message
+    }
+}
+
 class InAppNotification {
     private val _source = MutableStateFlow<Event<NotificationEvent?>?>(null)
     val source

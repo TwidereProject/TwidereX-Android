@@ -348,9 +348,7 @@ private fun StatusMediaInfo(
                         callback.invoke()
                         currentMedia.fileName?.let {
                             viewModel.shareMedia(
-                                currentMedia = currentMedia,
-                                target = it,
-                                context = context
+                                currentMedia = currentMedia
                             )
                         }
                     }

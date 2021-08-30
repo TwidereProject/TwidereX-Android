@@ -34,13 +34,13 @@ import com.twidere.twiderex.db.AppDatabase
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.http.TwidereHttpConfigProvider
 import com.twidere.twiderex.http.TwidereServiceFactory
+import com.twidere.twiderex.kmp.AndroidExifScrambler
+import com.twidere.twiderex.kmp.AndroidFileResolver
+import com.twidere.twiderex.kmp.AndroidNotificationManager
+import com.twidere.twiderex.kmp.AndroidRemoteNavigator
 import com.twidere.twiderex.kmp.ExifScrambler
 import com.twidere.twiderex.kmp.FileResolver
 import com.twidere.twiderex.kmp.RemoteNavigator
-import com.twidere.twiderex.kmp.android.AndroidExifScrambler
-import com.twidere.twiderex.kmp.android.AndroidFileResolver
-import com.twidere.twiderex.kmp.android.AndroidNotificationManager
-import com.twidere.twiderex.kmp.android.AndroidRemoteNavigator
 import com.twidere.twiderex.model.AccountPreferences
 import com.twidere.twiderex.notification.AppNotificationManager
 import com.twidere.twiderex.notification.InAppNotification

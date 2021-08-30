@@ -30,7 +30,7 @@ import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.ListsUsersRepository
-import com.twidere.twiderex.utils.notify
+import com.twidere.twiderex.utils.notifyError
 import com.twidere.twiderex.viewmodel.user.UserListViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -148,7 +148,7 @@ class ListsAddMemberViewModel(
             runCatching {
                 request()
             }.onFailure {
-                it.notify(inAppNotification)
+                inAppNotification.notifyError(it)
                 loading.value = false
             }.onSuccess {
                 loading.value = false

@@ -33,6 +33,7 @@ import com.twidere.twiderex.navigation.RootDeepLinksRoute
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.utils.json
+import com.twidere.twiderex.utils.notifyError
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
@@ -105,7 +106,7 @@ class MastodonSignInViewModel(
                 }
             }
         }.onFailure {
-            inAppNotification.show(it.message.toString())
+            inAppNotification.notifyError(it)
         }
         loading.value = false
         finished.invoke(false)

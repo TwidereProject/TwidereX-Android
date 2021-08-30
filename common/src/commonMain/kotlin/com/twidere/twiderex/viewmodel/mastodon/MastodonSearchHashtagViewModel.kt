@@ -22,6 +22,7 @@ package com.twidere.twiderex.viewmodel.mastodon
 
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
+import androidx.paging.cachedIn
 import com.twidere.services.mastodon.MastodonService
 import com.twidere.twiderex.defaultLoadCount
 import com.twidere.twiderex.extensions.asStateIn

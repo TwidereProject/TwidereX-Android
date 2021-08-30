@@ -28,7 +28,7 @@ import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.UserRepository
-import com.twidere.twiderex.utils.notify
+import com.twidere.twiderex.utils.notifyError
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.lastOrNull
 import kotlinx.coroutines.flow.map
@@ -67,7 +67,7 @@ class UserViewModel(
                 lookupService = account.service as LookupService,
             )
         }.onFailure {
-            it.notify(inAppNotification)
+            inAppNotification.notifyError(it)
         }
         refreshing.value = false
     }
@@ -82,7 +82,7 @@ class UserViewModel(
             loadRelationShip()
         }.onFailure {
             loadingRelationship.value = false
-            it.notify(inAppNotification)
+            inAppNotification.notifyError(it)
         }
     }
 
@@ -96,7 +96,7 @@ class UserViewModel(
             loadRelationShip()
         }.onFailure {
             loadingRelationship.value = false
-            it.notify(inAppNotification)
+            inAppNotification.notifyError(it)
         }
     }
 

@@ -20,7 +20,6 @@
  */
 package com.twidere.twiderex.viewmodel.twitter
 
-import com.twidere.services.http.MicroBlogException
 import com.twidere.services.twitter.TwitterOAuthService
 import com.twidere.services.twitter.TwitterService
 import com.twidere.twiderex.BuildConfig
@@ -35,13 +34,11 @@ import com.twidere.twiderex.navigation.RootDeepLinksRoute
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.utils.json
-import com.twidere.twiderex.utils.notify
+import com.twidere.twiderex.utils.notifyError
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
-import retrofit2.HttpException
-import java.io.IOException
 
 class TwitterSignInViewModel(
     private val repository: AccountRepository,
@@ -129,12 +126,8 @@ class TwitterSignInViewModel(
                     }
                 }
             }
-        } catch (e: MicroBlogException) {
-            e.notify(inAppNotification)
-        } catch (e: IOException) {
-            e.message?.let { inAppNotification.show(it) }
-        } catch (e: HttpException) {
-            e.message?.let { inAppNotification.show(it) }
+        } catch (e: Throwable) {
+            inAppNotification.notifyError(e)
         }
         loading.value = false
         return false

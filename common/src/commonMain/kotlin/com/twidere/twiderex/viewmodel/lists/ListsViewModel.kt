@@ -30,7 +30,7 @@ import com.twidere.twiderex.model.ui.UiList
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.ListsRepository
-import com.twidere.twiderex.utils.notify
+import com.twidere.twiderex.utils.notifyError
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.firstOrNull
@@ -98,7 +98,7 @@ abstract class ListsOperatorViewModel(
                 modifySuccess.value = true
                 onResult(true, result)
             }.onFailure {
-                it.notify(inAppNotification)
+                inAppNotification.notifyError(it)
                 modifySuccess.value = false
                 onResult(false, null)
                 loading.value = false

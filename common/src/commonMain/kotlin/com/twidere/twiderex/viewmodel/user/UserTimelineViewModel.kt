@@ -20,6 +20,7 @@
  */
 package com.twidere.twiderex.viewmodel.user
 
+import androidx.paging.cachedIn
 import com.twidere.services.microblog.TimelineService
 import com.twidere.twiderex.extensions.asStateIn
 import com.twidere.twiderex.model.MicroBlogKey
@@ -28,6 +29,7 @@ import com.twidere.twiderex.repository.TimelineRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flattenMerge
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
