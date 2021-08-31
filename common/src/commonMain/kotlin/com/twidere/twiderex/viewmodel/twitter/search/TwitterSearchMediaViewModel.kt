@@ -21,33 +21,29 @@
 package com.twidere.twiderex.viewmodel.twitter.search
 
 import androidx.paging.cachedIn
-import androidx.paging.flatMap
-import androidx.paging.map
-import com.twidere.services.twitter.TwitterService
-import com.twidere.twiderex.db.CacheDatabase
-import com.twidere.twiderex.model.AccountDetails
-import com.twidere.twiderex.paging.mediator.paging.pager
-import com.twidere.twiderex.paging.mediator.search.SearchMediaMediator
-import kotlinx.coroutines.flow.map
+import com.twidere.services.microblog.SearchService
+import com.twidere.twiderex.extensions.asStateIn
+import com.twidere.twiderex.repository.AccountRepository
+import com.twidere.twiderex.repository.SearchRepository
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flatMapLatest
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class TwitterSearchMediaViewModel(
-    val database: CacheDatabase,
-    private val account: AccountDetails,
+    private val repository: SearchRepository,
+    private val accountRepository: AccountRepository,
     keyword: String,
 ) : ViewModel() {
-
-    private val service by lazy {
-        account.service as TwitterService
+    private val account by lazy {
+        accountRepository.activeAccount.asStateIn(viewModelScope, null)
     }
+
     val source by lazy {
-        SearchMediaMediator(keyword, database, account.accountKey, service).pager()
-            .flow.map { it.map { it.status } }.cachedIn(viewModelScope)
-            .map {
-                it.flatMap {
-                    it.media.map { media -> media to it }
-                }
-            }
+        account.flatMapLatest {
+            it?.let {
+                repository.media(keyword, it.accountKey, it.service as SearchService)
+            } ?: emptyFlow()
+        }.cachedIn(viewModelScope)
     }
 }
