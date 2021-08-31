@@ -440,9 +440,7 @@ fun UserInfo(
                         user = user,
                         size = UserInfoDefaults.AvatarSize
                     ) {
-                        if (user.profileImage is String) {
-                            navController.navigate(RootRoute.Media.Raw(user.profileImage.toString()))
-                        }
+                        navController.navigate(RootRoute.Media.Raw(user.profileImage))
                     }
                 }
             }

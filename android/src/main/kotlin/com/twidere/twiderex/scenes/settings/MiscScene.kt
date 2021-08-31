@@ -202,7 +202,11 @@ fun ColumnScope.ProxyPreference(
             inputTitle.value = portTitle
             inputValue.value = proxyPort?.toString() ?: ""
             inputChanged.value = {
-                viewModel.setProxyPort(it)
+                it.toIntOrNull()?.let {
+                    viewModel.setProxyPort(it)
+                } ?: run {
+                    // TODO: show error
+                }
             }
             showProxyInputDialog.value = true
         }

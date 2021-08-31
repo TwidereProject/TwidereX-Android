@@ -20,7 +20,6 @@
  */
 package com.twidere.twiderex.jobs.dm
 
-import android.content.Context
 import com.twidere.services.microblog.DirectMessageService
 import com.twidere.services.microblog.LookupService
 import com.twidere.twiderex.R
@@ -37,7 +36,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 
 class DirectMessageFetchJob(
-    private val applicationContext: Context,
     private val repository: DirectMessageRepository,
     private val accountRepository: AccountRepository,
     private val notificationManager: AppNotificationManager,

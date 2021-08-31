@@ -41,7 +41,9 @@ class NotificationWorker @AssistedInject constructor(
 ) : CoroutineWorker(appContext, params) {
     override suspend fun doWork(): Result {
         return try {
-            notificationJob.execute(notificationPreferences.data.first().enableNotification)
+            if (notificationPreferences.data.first().enableNotification) {
+                notificationJob.execute()
+            }
             Result.success()
         } catch (e: Throwable) {
             e.printStackTrace()

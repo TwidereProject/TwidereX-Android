@@ -20,7 +20,6 @@
  */
 package com.twidere.twiderex.jobs.compose
 
-import android.content.Context
 import com.twidere.services.mastodon.MastodonService
 import com.twidere.services.mastodon.model.PostPoll
 import com.twidere.services.mastodon.model.PostStatus
@@ -41,7 +40,6 @@ import java.io.File
 import java.net.URI
 
 class MastodonComposeJob(
-    context: Context,
     accountRepository: AccountRepository,
     notificationManager: AppNotificationManager,
     exifScrambler: ExifScrambler,
@@ -49,7 +47,6 @@ class MastodonComposeJob(
     private val fileResolver: FileResolver,
     private val cacheDatabase: CacheDatabase,
 ) : ComposeJob<MastodonService>(
-    context,
     accountRepository,
     notificationManager,
     exifScrambler,

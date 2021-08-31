@@ -20,17 +20,17 @@
  */
 package com.twidere.twiderex.notification
 
-import android.graphics.Bitmap
-import java.util.concurrent.TimeUnit
+import kotlin.time.Duration
+import kotlin.time.ExperimentalTime
 
 expect class AppNotificationManager {
     fun notify(notificationId: Int, appNotification: AppNotification)
 
+    @OptIn(ExperimentalTime::class)
     fun notifyTransient(
         notificationId: Int,
         appNotification: AppNotification,
-        duration: Long = 5,
-        durationTimeUnit: TimeUnit = TimeUnit.SECONDS
+        duration: Duration = Duration.Companion.seconds(5),
     )
 }
 
@@ -38,7 +38,7 @@ class AppNotification(
     val channelId: String,
     val title: CharSequence? = null,
     val content: CharSequence? = null,
-    val largeIcon: Bitmap? = null,
+    val largeIcon: String? = null,
     val deepLink: String? = null,
     val ongoing: Boolean = false,
     val progress: Int = 0,
@@ -49,7 +49,7 @@ class AppNotification(
     class Builder(private var channelId: String) {
         private var title: CharSequence? = null
         private var content: CharSequence? = null
-        private var largeIcon: Bitmap? = null
+        private var largeIcon: String? = null
         private var deepLink: String? = null
         private var ongoing: Boolean = false
         private var progress: Int = 0
@@ -65,7 +65,7 @@ class AppNotification(
             this.content = content
         }
 
-        fun setLargeIcon(largeIcon: Bitmap?) = this.apply {
+        fun setLargeIcon(largeIcon: String?) = this.apply {
             this.largeIcon = largeIcon
         }
 

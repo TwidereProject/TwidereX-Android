@@ -20,7 +20,6 @@
  */
 package com.twidere.twiderex.jobs.dm
 
-import android.content.Context
 import android.graphics.BitmapFactory
 import com.twidere.services.microblog.MicroBlogService
 import com.twidere.twiderex.R
@@ -41,7 +40,6 @@ import com.twidere.twiderex.repository.AccountRepository
 import java.net.URI
 
 abstract class DirectMessageSendJob<T : MicroBlogService>(
-    private val applicationContext: Context,
     protected val cacheDatabase: CacheDatabase,
     private val accountRepository: AccountRepository,
     private val notificationManager: AppNotificationManager,

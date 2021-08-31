@@ -20,7 +20,6 @@
  */
 package com.twidere.twiderex.jobs.dm
 
-import android.content.Context
 import com.twidere.services.microblog.LookupService
 import com.twidere.services.twitter.TwitterService
 import com.twidere.twiderex.dataprovider.mapper.autolink
@@ -35,13 +34,12 @@ import com.twidere.twiderex.notification.AppNotificationManager
 import com.twidere.twiderex.repository.AccountRepository
 
 class TwitterDirectMessageSendJob(
-    context: Context,
     accountRepository: AccountRepository,
     notificationManager: AppNotificationManager,
     fileResolver: FileResolver,
     cacheDatabase: CacheDatabase,
 ) : DirectMessageSendJob<TwitterService>(
-    context, cacheDatabase, accountRepository, notificationManager, fileResolver
+    cacheDatabase, accountRepository, notificationManager, fileResolver
 ) {
 
     override suspend fun sendMessage(

@@ -20,19 +20,11 @@
  */
 package com.twidere.twiderex.jobs.common
 
-import android.content.Context
-import androidx.core.graphics.drawable.toBitmap
-import androidx.core.text.HtmlCompat
-import coil.Coil
-import coil.request.ImageRequest
-import coil.request.SuccessResult
-import com.twidere.twiderex.R
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.enums.MastodonStatusType
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.enums.ReferenceType
 import com.twidere.twiderex.model.ui.UiStatus
-import com.twidere.twiderex.navigation.RootDeepLinksRoute
 import com.twidere.twiderex.notification.AppNotification
 import com.twidere.twiderex.notification.AppNotificationManager
 import com.twidere.twiderex.notification.NotificationChannelSpec
@@ -45,44 +37,40 @@ import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 
 class NotificationJob(
-    private val applicationContext: Context,
     private val repository: NotificationRepository,
     private val accountRepository: AccountRepository,
     private val notificationManager: AppNotificationManager,
 ) {
-    suspend fun execute(enableNotification: Boolean) = coroutineScope {
-        if (!enableNotification) {
-            accountRepository.getAccounts()
-                .filter {
-                    it.preferences.isNotificationEnabled.first()
-                }
-                .map { account ->
-                    launch {
-                        val activities = try {
-                            repository.activities(
-                                accountKey = account.accountKey,
-                                service = account.service
-                            )
-                        } catch (e: Throwable) {
-                            // Ignore any exception cause there's no needs ot handle it
-                            emptyList()
-                        }
-                        activities.forEach { status ->
-                            notify(account, status)
-                        }
+    suspend fun execute() = coroutineScope {
+        accountRepository.getAccounts()
+            .filter {
+                it.preferences.isNotificationEnabled.first()
+            }
+            .map { account ->
+                launch {
+                    val activities = try {
+                        repository.activities(
+                            accountKey = account.accountKey,
+                            service = account.service
+                        )
+                    } catch (e: Throwable) {
+                        // Ignore any exception cause there's no needs ot handle it
+                        emptyList()
                     }
-                }.joinAll()
-        }
+                    activities.forEach { status ->
+                        notify(account, status)
+                    }
+                }
+            }.joinAll()
     }
 
     private suspend fun notify(account: AccountDetails, status: UiStatus) {
         val notificationId = "${account.accountKey}_${status.statusKey}"
-        val builder = AppNotification
-            .Builder(
-                account.accountKey.notificationChannelId(
-                    NotificationChannelSpec.ContentInteractions.id
-                )
+        val builder = AppNotification.Builder(
+            account.accountKey.notificationChannelId(
+                NotificationChannelSpec.ContentInteractions.id
             )
+        )
 
         val notificationData = when (status.platformType) {
             PlatformType.Twitter -> {
@@ -107,25 +95,13 @@ class NotificationJob(
         if (notificationData != null) {
             builder.setContentTitle(notificationData.title)
             if (notificationData.htmlContent != null) {
-                val html = HtmlCompat.fromHtml(
-                    notificationData.htmlContent,
-                    HtmlCompat.FROM_HTML_MODE_COMPACT
-                )
-                builder
-                    .setContentText(html)
+                builder.setContentText(notificationData.htmlContent)
             }
             if (notificationData.deepLink != null) {
                 builder.setDeepLink(notificationData.deepLink)
             }
             if (notificationData.profileImage != null) {
-                val result = Coil.execute(
-                    ImageRequest.Builder(applicationContext)
-                        .data(notificationData.profileImage)
-                        .build()
-                )
-                if (result is SuccessResult) {
-                    builder.setLargeIcon(result.drawable.toBitmap())
-                }
+                builder.setLargeIcon(notificationData.profileImage)
             }
             notificationManager.notify(notificationId.hashCode(), builder.build())
         }
@@ -138,7 +114,7 @@ class NotificationJob(
         if (status.mastodonExtra == null || actualStatus == null) {
             return null
         }
-        return when (status.mastodonExtra?.type) {
+        return when (status.mastodonExtra.type) {
             MastodonStatusType.Status -> null
             MastodonStatusType.NotificationFollow -> {
                 NotificationData(
@@ -205,9 +181,9 @@ class NotificationJob(
     }
 }
 
-private data class NotificationData(
+data class NotificationData(
     val title: String,
-    val profileImage: Any? = null,
+    val profileImage: String? = null,
     val htmlContent: String? = null,
     val deepLink: String? = null,
 )

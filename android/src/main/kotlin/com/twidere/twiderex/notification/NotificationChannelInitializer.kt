@@ -21,7 +21,6 @@
 package com.twidere.twiderex.notification
 
 import android.content.Context
-import android.net.Uri
 import androidx.core.app.NotificationChannelCompat
 import androidx.core.app.NotificationChannelGroupCompat
 import androidx.core.app.NotificationManagerCompat
@@ -119,12 +118,4 @@ class NotificationChannelInitializer : Initializer<NotificationChannelInitialize
     override fun dependencies(): List<Class<out Initializer<*>>> {
         return emptyList()
     }
-}
-
-fun MicroBlogKey.notificationChannelId(id: String): String {
-    return "${id}_${Uri.encode(toString())}"
-}
-
-fun MicroBlogKey.notificationChannelGroupId(): String {
-    return Uri.encode(toString())
 }

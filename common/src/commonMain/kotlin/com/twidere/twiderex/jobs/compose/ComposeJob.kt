@@ -20,7 +20,6 @@
  */
 package com.twidere.twiderex.jobs.compose
 
-import android.content.Context
 import com.twidere.services.microblog.MicroBlogService
 import com.twidere.twiderex.R
 import com.twidere.twiderex.kmp.ExifScrambler
@@ -37,7 +36,6 @@ import com.twidere.twiderex.repository.AccountRepository
 import kotlin.math.roundToInt
 
 abstract class ComposeJob<T : MicroBlogService>(
-    private val applicationContext: Context,
     private val accountRepository: AccountRepository,
     private val notificationManager: AppNotificationManager,
     private val exifScrambler: ExifScrambler,

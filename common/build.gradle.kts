@@ -67,6 +67,8 @@ kotlin {
                 api("androidx.datastore:datastore:${Versions.datastore}")
                 api("androidx.datastore:datastore-preferences:${Versions.datastore}")
                 implementation("androidx.exifinterface:exifinterface:${Versions.androidx_exifinterface}")
+                implementation("io.coil-kt:coil-compose:${Versions.coil}")
+                implementation("io.coil-kt:coil-gif:${Versions.coil}")
             }
         }
         val androidAndroidTest by getting {
@@ -80,7 +82,10 @@ kotlin {
                 implementation("androidx.room:room-testing:${Versions.room}")
             }
         }
-        val desktopMain by getting
+        val desktopMain by getting {
+            dependencies {
+            }
+        }
         val desktopTest by getting
     }
 }

@@ -20,7 +20,6 @@
  */
 package com.twidere.twiderex.jobs.compose
 
-import android.content.Context
 import com.twidere.services.twitter.TwitterService
 import com.twidere.twiderex.dataprovider.mapper.toUi
 import com.twidere.twiderex.db.CacheDatabase
@@ -36,7 +35,6 @@ import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.StatusRepository
 
 class TwitterComposeJob constructor(
-    context: Context,
     accountRepository: AccountRepository,
     notificationManager: AppNotificationManager,
     exifScrambler: ExifScrambler,
@@ -45,7 +43,6 @@ class TwitterComposeJob constructor(
     private val fileResolver: FileResolver,
     private val cacheDatabase: CacheDatabase,
 ) : ComposeJob<TwitterService>(
-    context,
     accountRepository,
     notificationManager,
     exifScrambler,

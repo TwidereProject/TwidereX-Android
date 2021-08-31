@@ -34,7 +34,7 @@ data class UiUser(
     val acct: MicroBlogKey,
     val name: String,
     val screenName: String,
-    val profileImage: Any,
+    val profileImage: String,
     val profileBackgroundImage: String?,
     val metrics: UserMetrics,
     val rawDesc: String,

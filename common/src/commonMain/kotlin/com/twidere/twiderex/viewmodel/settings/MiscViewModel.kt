@@ -21,7 +21,6 @@
 package com.twidere.twiderex.viewmodel.settings
 
 import androidx.datastore.core.DataStore
-import com.twidere.twiderex.R
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.preferences.model.MiscPreferences
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -110,13 +109,8 @@ class MiscViewModel(
         }
     }
 
-    fun setProxyPort(value: String) {
-        try {
-            proxyPort.value = value.toInt()
-        } catch (e: NumberFormatException) {
-            inAppNotification.show(R.string.scene_settings_misc_proxy_port_error)
-            return
-        }
+    fun setProxyPort(value: Int) {
+        proxyPort.value = value
         viewModelScope.launch {
             miscPreferences.updateData {
                 it.copy(proxyPort = value.toInt())

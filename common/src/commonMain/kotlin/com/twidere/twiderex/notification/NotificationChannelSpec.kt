@@ -20,15 +20,11 @@
  */
 package com.twidere.twiderex.notification
 
-import androidx.annotation.StringRes
-import androidx.core.app.NotificationManagerCompat
-import com.twidere.twiderex.R
+import android.net.Uri
+import com.twidere.twiderex.model.MicroBlogKey
 
 enum class NotificationChannelSpec(
     val id: String,
-    @StringRes val nameRes: Int,
-    @StringRes val descriptionRes: Int = 0,
-    val importance: Int,
     val showBadge: Boolean = false,
     val grouped: Boolean = false
 ) {
@@ -38,22 +34,25 @@ enum class NotificationChannelSpec(
      */
     BackgroundProgresses(
         "background_progresses",
-        R.string.common_notification_channel_background_progresses_name,
-        importance = NotificationManagerCompat.IMPORTANCE_HIGH
     ),
 
     ContentInteractions(
-        "content_interactions", R.string.common_notification_channel_content_interactions_name,
-        descriptionRes = R.string.common_notification_channel_content_interactions_description,
-        importance = NotificationManagerCompat.IMPORTANCE_HIGH, showBadge = true, grouped = true
+        "content_interactions",
+        showBadge = true,
+        grouped = true
     ),
 
     ContentMessages(
         "content_messages",
-        R.string.common_notification_channel_content_messages_name,
-        descriptionRes = R.string.common_notification_channel_content_messages_description,
-        importance = NotificationManagerCompat.IMPORTANCE_HIGH,
         showBadge = true,
         grouped = true
     )
+}
+
+fun MicroBlogKey.notificationChannelId(id: String): String {
+    return "${id}_${Uri.encode(toString())}"
+}
+
+fun MicroBlogKey.notificationChannelGroupId(): String {
+    return Uri.encode(toString())
 }
