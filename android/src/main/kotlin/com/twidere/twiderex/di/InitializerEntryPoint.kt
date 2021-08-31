@@ -22,9 +22,9 @@ package com.twidere.twiderex.di
 
 import android.content.Context
 import com.twidere.twiderex.http.TwidereServiceInitializer
-import com.twidere.twiderex.notification.NotificationChannelInitializer
-import com.twidere.twiderex.notification.NotificationInitializer
-import com.twidere.twiderex.worker.dm.DirectMessageInitializer
+import com.twidere.twiderex.initializer.DirectMessageInitializer
+import com.twidere.twiderex.initializer.NotificationChannelInitializer
+import com.twidere.twiderex.initializer.NotificationInitializer
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
