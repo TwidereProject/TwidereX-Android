@@ -22,20 +22,16 @@ package com.twidere.twiderex.worker
 
 import android.content.Context
 import android.net.Uri
-import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.Data
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkerParameters
 import com.twidere.twiderex.jobs.common.DownloadMediaJob
 import com.twidere.twiderex.model.MicroBlogKey
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedInject
 
-@HiltWorker
-class DownloadMediaWorker @AssistedInject constructor(
-    @Assisted context: Context,
-    @Assisted workerParams: WorkerParameters,
+class DownloadMediaWorker(
+    context: Context,
+    workerParams: WorkerParameters,
     private val downloadMediaJob: DownloadMediaJob,
 ) : CoroutineWorker(context, workerParams) {
 

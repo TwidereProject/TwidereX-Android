@@ -20,24 +20,18 @@
  */
 package com.twidere.twiderex.worker
 
-import android.content.ContentResolver
 import android.content.Context
 import android.net.Uri
-import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.Data
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkerParameters
 import com.twidere.twiderex.jobs.common.ShareMediaJob
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedInject
 
-@HiltWorker
-class ShareMediaWorker @AssistedInject constructor(
-    @Assisted private val context: Context,
-    @Assisted workerParams: WorkerParameters,
+class ShareMediaWorker(
+    context: Context,
+    workerParams: WorkerParameters,
     private val shareMediaJob: ShareMediaJob,
-    private val contentResolver: ContentResolver,
 ) : CoroutineWorker(context, workerParams) {
 
     companion object {

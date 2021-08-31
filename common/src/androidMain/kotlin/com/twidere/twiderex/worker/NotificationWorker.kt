@@ -22,19 +22,15 @@ package com.twidere.twiderex.worker
 
 import android.content.Context
 import androidx.datastore.core.DataStore
-import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.twidere.twiderex.jobs.common.NotificationJob
 import com.twidere.twiderex.preferences.model.NotificationPreferences
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.first
 
-@HiltWorker
-class NotificationWorker @AssistedInject constructor(
-    @Assisted appContext: Context,
-    @Assisted params: WorkerParameters,
+class NotificationWorker(
+    appContext: Context,
+    params: WorkerParameters,
     private val notificationPreferences: DataStore<NotificationPreferences>,
     private val notificationJob: NotificationJob
 

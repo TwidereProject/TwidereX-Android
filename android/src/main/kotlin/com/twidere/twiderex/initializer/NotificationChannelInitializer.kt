@@ -18,7 +18,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.notification
+package com.twidere.twiderex.initializer
 
 import android.content.Context
 import androidx.core.app.NotificationChannelCompat
@@ -27,6 +27,10 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.startup.Initializer
 import com.twidere.twiderex.di.InitializerEntryPoint
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.notification.NotificationChannelSpec
+import com.twidere.twiderex.notification.importance
+import com.twidere.twiderex.notification.notificationChannelGroupId
+import com.twidere.twiderex.notification.notificationChannelId
 import com.twidere.twiderex.repository.AccountRepository
 import javax.inject.Inject
 

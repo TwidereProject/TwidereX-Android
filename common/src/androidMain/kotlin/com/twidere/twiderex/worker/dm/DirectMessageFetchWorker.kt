@@ -21,19 +21,15 @@
 package com.twidere.twiderex.worker.dm
 
 import android.content.Context
-import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkerParameters
 import com.twidere.twiderex.jobs.dm.DirectMessageFetchJob
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedInject
 import java.util.concurrent.TimeUnit
 
-@HiltWorker
-class DirectMessageFetchWorker @AssistedInject constructor(
-    @Assisted context: Context,
-    @Assisted workerParams: WorkerParameters,
+class DirectMessageFetchWorker(
+    context: Context,
+    workerParams: WorkerParameters,
     private val directMessageFetchJob: DirectMessageFetchJob
 ) : CoroutineWorker(
     context,

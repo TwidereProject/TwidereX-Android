@@ -21,15 +21,11 @@
 package com.twidere.twiderex.worker.status
 
 import android.content.Context
-import androidx.hilt.work.HiltWorker
 import androidx.work.WorkerParameters
 import com.twidere.twiderex.jobs.status.UnRetweetStatusJob
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedInject
 
-@HiltWorker
-class UnRetweetWorker @AssistedInject constructor(
-    @Assisted appContext: Context,
-    @Assisted params: WorkerParameters,
+class UnRetweetWorker(
+    appContext: Context,
+    params: WorkerParameters,
     unRetweetStatusJob: UnRetweetStatusJob
 ) : StatusWorker(appContext, params, unRetweetStatusJob)

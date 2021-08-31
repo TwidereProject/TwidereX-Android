@@ -21,20 +21,16 @@
 package com.twidere.twiderex.worker.dm
 
 import android.content.Context
-import androidx.hilt.work.HiltWorker
 import androidx.work.Data
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkerParameters
 import com.twidere.twiderex.db.transform.toWorkData
 import com.twidere.twiderex.jobs.dm.TwitterDirectMessageSendJob
 import com.twidere.twiderex.model.job.DirectMessageSendData
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedInject
 
-@HiltWorker
-class TwitterDirectMessageSendWorker @AssistedInject constructor(
-    @Assisted context: Context,
-    @Assisted workerParams: WorkerParameters,
+class TwitterDirectMessageSendWorker(
+    context: Context,
+    workerParams: WorkerParameters,
     twitterDirectMessageSendJob: TwitterDirectMessageSendJob
 ) : DirectMessageSendWorker(
     context,

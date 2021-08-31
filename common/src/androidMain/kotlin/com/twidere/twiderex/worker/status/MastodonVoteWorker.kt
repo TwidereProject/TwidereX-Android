@@ -21,20 +21,16 @@
 package com.twidere.twiderex.worker.status
 
 import android.content.Context
-import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.twidere.twiderex.jobs.status.MastodonVoteJob
 import com.twidere.twiderex.model.MicroBlogKey
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedInject
 
-@HiltWorker
-class MastodonVoteWorker @AssistedInject constructor(
-    @Assisted appContext: Context,
-    @Assisted params: WorkerParameters,
+class MastodonVoteWorker(
+    appContext: Context,
+    params: WorkerParameters,
     private val mastodonVoteJob: MastodonVoteJob
 ) : CoroutineWorker(appContext, params) {
 

@@ -21,20 +21,16 @@
 package com.twidere.twiderex.worker.database
 
 import android.content.Context
-import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.twidere.twiderex.jobs.database.DeleteDbStatusJob
 import com.twidere.twiderex.model.MicroBlogKey
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedInject
 
-@HiltWorker
-class DeleteDbStatusWorker @AssistedInject constructor(
-    @Assisted appContext: Context,
-    @Assisted params: WorkerParameters,
+class DeleteDbStatusWorker(
+    appContext: Context,
+    params: WorkerParameters,
     private val deleteDbStatusJob: DeleteDbStatusJob,
 ) : CoroutineWorker(appContext, params) {
 

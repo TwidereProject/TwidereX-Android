@@ -21,15 +21,11 @@
 package com.twidere.twiderex.worker.status
 
 import android.content.Context
-import androidx.hilt.work.HiltWorker
 import androidx.work.WorkerParameters
 import com.twidere.twiderex.jobs.status.LikeStatusJob
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedInject
 
-@HiltWorker
-class LikeWorker @AssistedInject constructor(
-    @Assisted appContext: Context,
-    @Assisted params: WorkerParameters,
+class LikeWorker(
+    appContext: Context,
+    params: WorkerParameters,
     likeStatusJob: LikeStatusJob,
 ) : StatusWorker(appContext, params, likeStatusJob)

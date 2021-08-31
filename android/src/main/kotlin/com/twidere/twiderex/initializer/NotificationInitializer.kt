@@ -18,7 +18,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.notification
+package com.twidere.twiderex.initializer
 
 import android.content.Context
 import androidx.startup.Initializer

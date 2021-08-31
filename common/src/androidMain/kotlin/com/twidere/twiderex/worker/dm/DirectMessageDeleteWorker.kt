@@ -21,7 +21,6 @@
 package com.twidere.twiderex.worker.dm
 
 import android.content.Context
-import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkerParameters
@@ -30,13 +29,10 @@ import com.twidere.twiderex.db.transform.toWorkData
 import com.twidere.twiderex.jobs.dm.DirectMessageDeleteJob
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.job.DirectMessageDeleteData
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedInject
 
-@HiltWorker
-class DirectMessageDeleteWorker @AssistedInject constructor(
-    @Assisted context: Context,
-    @Assisted workerParams: WorkerParameters,
+class DirectMessageDeleteWorker(
+    context: Context,
+    workerParams: WorkerParameters,
     private val deleteJob: DirectMessageDeleteJob
 ) : CoroutineWorker(
     context,

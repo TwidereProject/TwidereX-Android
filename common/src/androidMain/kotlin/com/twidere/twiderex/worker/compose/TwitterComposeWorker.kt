@@ -21,7 +21,6 @@
 package com.twidere.twiderex.worker.compose
 
 import android.content.Context
-import androidx.hilt.work.HiltWorker
 import androidx.work.Data
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkerParameters
@@ -30,13 +29,10 @@ import com.twidere.twiderex.db.transform.toWorkData
 import com.twidere.twiderex.jobs.compose.TwitterComposeJob
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.job.ComposeData
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedInject
 
-@HiltWorker
-class TwitterComposeWorker @AssistedInject constructor(
-    @Assisted context: Context,
-    @Assisted workerParams: WorkerParameters,
+class TwitterComposeWorker(
+    context: Context,
+    workerParams: WorkerParameters,
     twitterComposeJob: TwitterComposeJob,
 ) : ComposeWorker<TwitterService>(
     context,

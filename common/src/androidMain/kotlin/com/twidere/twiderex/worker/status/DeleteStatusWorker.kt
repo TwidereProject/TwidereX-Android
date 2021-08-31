@@ -21,7 +21,6 @@
 package com.twidere.twiderex.worker.status
 
 import android.content.Context
-import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkerParameters
@@ -29,13 +28,10 @@ import androidx.work.workDataOf
 import com.twidere.twiderex.jobs.status.DeleteStatusJob
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiStatus
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedInject
 
-@HiltWorker
-class DeleteStatusWorker @AssistedInject constructor(
-    @Assisted appContext: Context,
-    @Assisted params: WorkerParameters,
+class DeleteStatusWorker(
+    appContext: Context,
+    params: WorkerParameters,
     private val deleteStatusJob: DeleteStatusJob
 ) : CoroutineWorker(appContext, params) {
     companion object {

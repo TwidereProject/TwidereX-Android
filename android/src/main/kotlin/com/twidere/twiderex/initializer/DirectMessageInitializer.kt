@@ -18,13 +18,14 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.worker.dm
+package com.twidere.twiderex.initializer
 
 import android.content.Context
 import androidx.startup.Initializer
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.WorkManager
 import com.twidere.twiderex.di.InitializerEntryPoint
+import com.twidere.twiderex.worker.dm.DirectMessageFetchWorker
 import javax.inject.Inject
 
 class DirectMessageInitializerHolder
