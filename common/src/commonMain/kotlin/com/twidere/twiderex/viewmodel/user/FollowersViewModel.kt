@@ -20,31 +20,30 @@
  */
 package com.twidere.twiderex.viewmodel.user
 
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
 import com.twidere.services.microblog.RelationshipService
-import com.twidere.twiderex.defaultLoadCount
-import com.twidere.twiderex.model.AccountDetails
+import com.twidere.twiderex.extensions.asStateIn
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.paging.source.FollowersPagingSource
+import com.twidere.twiderex.repository.AccountRepository
+import com.twidere.twiderex.repository.UserListRepository
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flatMapLatest
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class FollowersViewModel(
-    private val account: AccountDetails,
-    private val userKey: MicroBlogKey
+    private val accountRepository: AccountRepository,
+    private val repository: UserListRepository,
+    private val userKey: MicroBlogKey,
 ) : UserListViewModel() {
+    private val account by lazy {
+        accountRepository.activeAccount.asStateIn(viewModelScope, null)
+    }
+
     override val source by lazy {
-        Pager(
-            config = PagingConfig(
-                pageSize = defaultLoadCount,
-                enablePlaceholders = false,
-            )
-        ) {
-            FollowersPagingSource(
-                userKey = userKey,
-                account.service as RelationshipService
-            )
-        }.flow.cachedIn(viewModelScope)
+        account.flatMapLatest {
+            it?.let { account ->
+                repository.followers(userKey, account.service as RelationshipService)
+            } ?: emptyFlow()
+        }.cachedIn(viewModelScope)
     }
 }
