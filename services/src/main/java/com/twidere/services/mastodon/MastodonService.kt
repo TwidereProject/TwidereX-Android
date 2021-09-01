@@ -183,7 +183,7 @@ class MastodonService(
         MastodonPaging.from(it)
     }
 
-    override suspend fun blocking(id: String) = resources.block(id = id)
+    override suspend fun block(id: String) = resources.block(id = id)
         .toIRelationShip()
 
     override suspend fun unblock(id: String) = resources.unblock(id = id)

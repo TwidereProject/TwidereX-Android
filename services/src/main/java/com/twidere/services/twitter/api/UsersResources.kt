@@ -45,7 +45,7 @@ interface UsersResources {
 
     @POST("/2/users/{sourceId}/blocking")
     suspend fun block(
-        @Path(value = "id") sourceId: String,
+        @Path(value = "sourceId") sourceId: String,
         @Body target: BlockV2Request
     ): TwitterResponseV2<BlockV2>
 

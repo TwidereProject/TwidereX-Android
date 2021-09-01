@@ -497,7 +497,7 @@ class TwitterService(
         TwitterPaging(it.data ?: emptyList(), it.meta?.nextToken)
     }
 
-    override suspend fun blocking(
+    override suspend fun block(
         id: String
     ) = resources.block(
         sourceId = accountId,

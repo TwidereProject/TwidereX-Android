@@ -20,11 +20,22 @@
  */
 package com.twidere.twiderex.scenes.user
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.material.AlertDialog
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
+import androidx.compose.material.TextButton
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -65,6 +76,10 @@ fun UserScene(
     }
     val user by viewModel.user.observeAsState(initial = null)
     val navController = LocalNavController.current
+    var expanded by remember { mutableStateOf(false) }
+    var showBlockAlert by remember { mutableStateOf(false) }
+    val relationship by viewModel.relationship.observeAsState(initial = null)
+    val loadingRelationship by viewModel.loadingRelationship.observeAsState(initial = false)
     TwidereScene {
         InAppNotificationScaffold(
             // TODO: Show top bar with actions
@@ -101,6 +116,48 @@ fun UserScene(
                                 }
                             }
                         }
+                        Box {
+                            if (userKey != account.accountKey) {
+                                IconButton(
+                                    onClick = {
+                                        expanded = true
+                                    }
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.MoreHoriz,
+                                        contentDescription = stringResource(
+                                            id = R.string.accessibility_common_more
+                                        ),
+                                        tint = MaterialTheme.colors.onSurface
+                                    )
+                                }
+                            }
+
+                            DropdownMenu(
+                                expanded = expanded,
+                                onDismissRequest = { expanded = false },
+                            ) {
+                                relationship.takeIf { !loadingRelationship }
+                                    ?.blocking?.let { blocking ->
+                                        DropdownMenuItem(
+                                            onClick = {
+                                                if (blocking)
+                                                    viewModel.unblock()
+                                                else
+                                                    showBlockAlert = true
+                                                expanded = false
+                                            }
+                                        ) {
+                                            Text(
+                                                text = stringResource(
+                                                    id = if (blocking) R.string.common_controls_friendship_actions_unblock
+                                                    else R.string.common_controls_friendship_actions_block
+                                                )
+                                            )
+                                        }
+                                    }
+                            }
+                        }
                     },
                     elevation = 0.dp,
                     title = {
@@ -111,7 +168,58 @@ fun UserScene(
                 )
             }
         ) {
-            UserComponent(userKey)
+            Box {
+                UserComponent(userKey)
+                if (showBlockAlert) {
+                    user?.let {
+                        BlockAlert(
+                            screenName = it.getDisplayScreenName(it.userKey.host),
+                            onDismissRequest = { showBlockAlert = false },
+                            onConfirm = {
+                                viewModel.block()
+                            }
+                        )
+                    }
+                }
+            }
         }
     }
+}
+
+@Composable
+fun BlockAlert(
+    screenName: String,
+    onDismissRequest: () -> Unit,
+    onConfirm: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = {
+            onDismissRequest.invoke()
+        },
+        title = {
+            Text(
+                text = "Block $screenName?",
+                style = MaterialTheme.typography.subtitle1
+            )
+        },
+        dismissButton = {
+            TextButton(
+                onClick = {
+                    onDismissRequest.invoke()
+                }
+            ) {
+                Text(text = stringResource(id = R.string.common_controls_actions_cancel))
+            }
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    onConfirm()
+                    onDismissRequest.invoke()
+                }
+            ) {
+                Text(text = stringResource(id = R.string.common_controls_actions_yes))
+            }
+        },
+    )
 }

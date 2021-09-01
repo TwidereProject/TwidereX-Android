@@ -632,58 +632,73 @@ private fun UserRelationship(viewModel: UserViewModel) {
     val relationship by viewModel.relationship.observeAsState(initial = null)
     val loadingRelationship by viewModel.loadingRelationship.observeAsState(initial = false)
     val shape = RoundedCornerShape(percent = 50)
-    relationship?.takeIf { !loadingRelationship }?.let { relationshipResult ->
-        Surface(
-            modifier = Modifier
-                .clip(RoundedCornerShape(percent = 50))
-                .let {
-                    if (relationshipResult.followedBy) {
-                        it
-                    } else {
-                        it.border(
-                            1.dp,
-                            MaterialTheme.colors.primary,
-                            shape = shape,
-                        )
+    val blockingBackgroundColor = Color(0xFFFF2D55)
+    relationship?.takeIf { !loadingRelationship }
+        ?.takeIf { !it.blockedBy }
+        ?.let { relationshipResult ->
+            Surface(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(percent = 50))
+                    .let {
+                        if (relationshipResult.followedBy) {
+                            it
+                        } else {
+                            it.border(
+                                1.dp,
+                                if (relationshipResult.blocking) blockingBackgroundColor else MaterialTheme.colors.primary,
+                                shape = shape,
+                            )
+                        }
+                    }
+                    .clip(shape),
+                contentColor = when {
+                    relationshipResult.blocking -> MaterialTheme.colors.onPrimary
+                    relationshipResult.followedBy -> contentColorFor(backgroundColor = MaterialTheme.colors.primary)
+                    else -> MaterialTheme.colors.primary
+                },
+                color = when {
+                    relationshipResult.blocking -> blockingBackgroundColor
+                    relationshipResult.followedBy -> MaterialTheme.colors.primary
+                    else -> MaterialTheme.colors.background
+                },
+                onClick = {
+                    when {
+                        relationshipResult.blocking -> {
+                            viewModel.unblock()
+                        }
+                        relationshipResult.followedBy -> {
+                            viewModel.unfollow()
+                        }
+                        else -> {
+                            viewModel.follow()
+                        }
                     }
                 }
-                .clip(shape),
-            contentColor = if (relationshipResult.followedBy) {
-                contentColorFor(backgroundColor = MaterialTheme.colors.primary)
-            } else {
-                MaterialTheme.colors.primary
-            },
-            color = if (relationshipResult.followedBy) {
-                MaterialTheme.colors.primary
-            } else {
-                MaterialTheme.colors.background
-            },
-            onClick = {
-                if (relationshipResult.followedBy) {
-                    viewModel.unfollow()
-                } else {
-                    viewModel.follow()
-                }
+            ) {
+                Text(
+                    modifier = Modifier
+                        .padding(ButtonDefaults.ContentPadding),
+                    text = when {
+                        relationshipResult.blocking -> {
+                            "Blocked"
+                        }
+                        relationshipResult.followedBy -> {
+                            stringResource(id = R.string.common_controls_friendship_actions_unfollow)
+                        }
+                        else -> {
+                            stringResource(id = R.string.common_controls_friendship_actions_follow)
+                        }
+                    },
+                )
             }
-        ) {
-            Text(
-                modifier = Modifier
-                    .padding(ButtonDefaults.ContentPadding),
-                text = if (relationshipResult.followedBy) {
-                    stringResource(id = R.string.common_controls_friendship_actions_unfollow)
-                } else {
-                    stringResource(id = R.string.common_controls_friendship_actions_follow)
-                },
-            )
-        }
-        Spacer(modifier = Modifier.height(UserRelationshipDefaults.FollowingSpacing))
-        if (relationshipResult.following) {
-            Text(
-                text = stringResource(id = R.string.common_controls_friendship_follows_you),
-                style = MaterialTheme.typography.caption,
-            )
-        }
-    } ?: run {
+            Spacer(modifier = Modifier.height(UserRelationshipDefaults.FollowingSpacing))
+            if (relationshipResult.following) {
+                Text(
+                    text = stringResource(id = R.string.common_controls_friendship_follows_you),
+                    style = MaterialTheme.typography.caption,
+                )
+            }
+        } ?: run {
         CircularProgressIndicator()
     }
 }
