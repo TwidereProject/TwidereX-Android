@@ -58,7 +58,7 @@ data class AccountDetails(
         TwidereServiceFactory.createApiService(
             type = type,
             credentials = credentials,
-            host = accountKey.host
+            accountKey = accountKey
         )
     }
 

@@ -21,6 +21,11 @@
 package com.twidere.services.twitter.api
 
 import com.twidere.services.twitter.model.Status
+import com.twidere.services.twitter.model.StatusReactionsV2
+import com.twidere.services.twitter.model.TwitterResponseV2
+import com.twidere.services.twitter.model.request.TwitterReactionRequestBody
+import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -55,4 +60,16 @@ interface StatusResources {
 
     @POST("/1.1/statuses/destroy/{id}.json")
     suspend fun destroy(@Path(value = "id") id: String): Status
+
+    @POST("/2/users/{userId}/retweets")
+    suspend fun retweetV2(@Path(value = "userId") userId: String, @Body body: TwitterReactionRequestBody): TwitterResponseV2<StatusReactionsV2>
+
+    @DELETE("/2/users/{userId}/retweets/{tweetId}")
+    suspend fun unRetweetV2(@Path(value = "userId") userId: String, @Path(value = "tweetId") tweetId: String): TwitterResponseV2<StatusReactionsV2>
+
+    @POST("/2/users/{userId}/likes")
+    suspend fun likeV2(@Path(value = "userId") userId: String, @Body body: TwitterReactionRequestBody): TwitterResponseV2<StatusReactionsV2>
+
+    @DELETE("/2/users/{userId}/likes/{tweetId}")
+    suspend fun unlikeV2(@Path(value = "userId") userId: String, @Path(value = "tweetId") tweetId: String): TwitterResponseV2<StatusReactionsV2>
 }
