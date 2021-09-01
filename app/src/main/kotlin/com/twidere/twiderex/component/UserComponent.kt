@@ -246,7 +246,11 @@ private fun UserTimeline(viewModel: UserViewModel, content: @Composable () -> Un
 @Composable
 private fun PermissionDeniedInfo(title: String, message: String) {
     CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.disabled) {
-        Row(modifier = Modifier.fillMaxSize().padding(PermissionDeniedInfoDefaults.contentPaddingValues)) {
+        Row(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(PermissionDeniedInfoDefaults.contentPaddingValues)
+        ) {
             Icon(painter = painterResource(id = R.drawable.ic_eye_off), contentDescription = title)
             Spacer(modifier = Modifier.width(PermissionDeniedInfoDefaults.contentSpacing))
             Column {
@@ -716,8 +720,7 @@ private fun UserRelationship(viewModel: UserViewModel) {
                         .padding(ButtonDefaults.ContentPadding),
                     text = when {
                         relationshipResult.blocking -> {
-                            // TODO LOCALIZE
-                            "Blocked"
+                            stringResource(id = R.string.common_controls_friendship_actions_blocked)
                         }
                         relationshipResult.followedBy -> {
                             stringResource(id = R.string.common_controls_friendship_actions_unfollow)
