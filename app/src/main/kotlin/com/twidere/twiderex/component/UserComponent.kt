@@ -211,7 +211,9 @@ fun UserComponent(
                             modifier = Modifier.fillMaxSize(),
                             contentAlignment = Alignment.TopCenter,
                         ) {
-                            tabs[page].compose.invoke()
+                            UserTimeline(viewModel = viewModel) {
+                                tabs[page].compose.invoke()
+                            }
                         }
                     }
                 }
@@ -225,6 +227,40 @@ data class UserTabComponent(
     val title: String,
     val compose: @Composable () -> Unit,
 )
+
+@Composable
+private fun UserTimeline(viewModel: UserViewModel, content: @Composable () -> Unit) {
+    val relationship by viewModel.relationship.observeAsState(initial = null)
+    val loadingRelationship by viewModel.loadingRelationship.observeAsState(initial = false)
+    relationship.takeIf { !loadingRelationship }?.let {
+        when {
+            it.blockedBy -> PermissionDeniedInfo(
+                title = stringResource(id = R.string.scene_profile_permission_denied_profile_blocked_title),
+                message = stringResource(id = R.string.scene_profile_permission_denied_profile_blocked_message)
+            )
+            else -> content.invoke()
+        }
+    } ?: content.invoke()
+}
+
+@Composable
+private fun PermissionDeniedInfo(title: String, message: String) {
+    CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.disabled) {
+        Row(modifier = Modifier.fillMaxSize().padding(PermissionDeniedInfoDefaults.contentPaddingValues)) {
+            Icon(painter = painterResource(id = R.drawable.ic_eye_off), contentDescription = title)
+            Spacer(modifier = Modifier.width(PermissionDeniedInfoDefaults.contentSpacing))
+            Column {
+                Text(text = title, style = MaterialTheme.typography.subtitle2)
+                Text(text = message, style = MaterialTheme.typography.caption)
+            }
+        }
+    }
+}
+
+private object PermissionDeniedInfoDefaults {
+    val contentPaddingValues = PaddingValues(22.dp)
+    val contentSpacing = 16.dp
+}
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -634,7 +670,7 @@ private fun UserRelationship(viewModel: UserViewModel) {
     val shape = RoundedCornerShape(percent = 50)
     val blockingBackgroundColor = Color(0xFFFF2D55)
     relationship?.takeIf { !loadingRelationship }
-        ?.takeIf { !it.blockedBy }
+        ?.takeIf { !it.blockedBy || it.blocking }
         ?.let { relationshipResult ->
             Surface(
                 modifier = Modifier
@@ -680,6 +716,7 @@ private fun UserRelationship(viewModel: UserViewModel) {
                         .padding(ButtonDefaults.ContentPadding),
                     text = when {
                         relationshipResult.blocking -> {
+                            // TODO LOCALIZE
                             "Blocked"
                         }
                         relationshipResult.followedBy -> {

@@ -197,8 +197,9 @@ fun BlockAlert(
             onDismissRequest.invoke()
         },
         title = {
+            // TODO LOCALIZE
             Text(
-                text = "Block $screenName?",
+                text = "Do you want to block $screenName?",
                 style = MaterialTheme.typography.subtitle1
             )
         },
