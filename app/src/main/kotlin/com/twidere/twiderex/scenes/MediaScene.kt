@@ -83,6 +83,7 @@ import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.LoadingProgress
 import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.foundation.VideoPlayer
+import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.component.status.LikeButton
 import com.twidere.twiderex.component.status.ReplyButton
 import com.twidere.twiderex.component.status.RetweetButton
@@ -157,6 +158,7 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewM
     var controlVisibility by remember { mutableStateOf(true) }
     val controlPanelColor = MaterialTheme.colors.surface.copy(alpha = 0.6f)
     val navController = LocalNavController.current
+    val navigator = LocalNavigator.current
     val pagerState = rememberPagerState(
         initialPage = selectedIndex,
         pageCount = status.media.size,
@@ -207,7 +209,8 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewM
                     Box(
                         modifier = Modifier
                             .background(color = controlPanelColor)
-                            .navigationBarsPadding(),
+                            .navigationBarsPadding()
+                            .clickable { navigator.status(status = status) },
                     ) {
                         StatusMediaInfo(videoControl, status, viewModel, currentMedia)
                     }
