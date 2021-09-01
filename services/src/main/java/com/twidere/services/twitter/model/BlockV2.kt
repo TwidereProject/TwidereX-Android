@@ -18,17 +18,19 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.services.microblog
+package com.twidere.services.twitter.model
 
-import com.twidere.services.microblog.model.IRelationship
-import com.twidere.services.microblog.model.IUser
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-interface RelationshipService {
-    suspend fun showRelationship(target_id: String): IRelationship
-    suspend fun follow(user_id: String)
-    suspend fun unfollow(user_id: String)
-    suspend fun followers(user_id: String, nextPage: String? = null): List<IUser>
-    suspend fun following(user_id: String, nextPage: String? = null): List<IUser>
-    suspend fun blocking(id: String): IRelationship
-    suspend fun unblock(id: String): IRelationship
-}
+@Serializable
+data class BlockV2(
+    @SerialName("blocking")
+    val blocking: Boolean? = null
+)
+
+@Serializable
+data class BlockV2Request(
+    @SerialName("target_user_id")
+    val targetUserId: String
+)
