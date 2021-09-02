@@ -171,7 +171,7 @@ fun generateLocalization(appJson: File, target: File) {
             """<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">""" + System.lineSeparator() +
                 result.map {
                     "    <string name=\"${it.key}\">${
-                        it.value.replace("'", "\\'").replace(System.lineSeparator(), "\\n")
+                    it.value.replace("'", "\\'").replace(System.lineSeparator(), "\\n")
                     }</string>"
                 }.joinToString(System.lineSeparator()) + System.lineSeparator() +
                 "</resources>"
