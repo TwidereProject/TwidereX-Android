@@ -68,6 +68,7 @@ import com.twidere.twiderex.extensions.setOnSystemBarsVisibilityChangeListener
 import com.twidere.twiderex.extensions.showControls
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.MediaType
+import com.twidere.twiderex.preferences.LocalDisplayPreferences
 import com.twidere.twiderex.preferences.proto.DisplayPreferences
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.LocalVideoPlayback
@@ -117,9 +118,9 @@ fun PureMediaScene(belongToKey: MicroBlogKey, selectedIndex: Int) {
                         navController.popBackStack()
                     },
                 )
+                val display = LocalDisplayPreferences.current
                 var isMute by remember {
-                    // todo use settings
-                    mutableStateOf(false)
+                    mutableStateOf(display.muteByDefault)
                 }
                 InAppNotificationScaffold(
                     backgroundColor = Color.Transparent,

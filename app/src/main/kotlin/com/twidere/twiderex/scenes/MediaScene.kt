@@ -101,6 +101,7 @@ import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.MediaType
 import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.model.ui.UiStatus
+import com.twidere.twiderex.preferences.LocalDisplayPreferences
 import com.twidere.twiderex.preferences.proto.DisplayPreferences
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalNavController
@@ -174,9 +175,9 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewM
             null
         }
     }
+    val display = LocalDisplayPreferences.current
     var isMute by remember {
-        // todo use settings
-        mutableStateOf(false)
+        mutableStateOf(display.muteByDefault)
     }
     val swiperState = rememberSwiperState(
         onDismiss = {

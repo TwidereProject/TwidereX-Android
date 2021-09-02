@@ -16,16 +16,18 @@
         android:gravity="center_vertical"
         android:orientation="horizontal">
         <ImageButton android:id="@id/exo_play"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
             style="@style/ExoMediaButton.Play"/>
 
         <ImageButton android:id="@id/exo_pause"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
             style="@style/ExoMediaButton.Pause"/>
 
         <com.twidere.twiderex.component.foundation.RemainingTimeBar
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
             android:id="@id/exo_progress"
             android:layout_width="0dp"
             android:layout_weight="1"
@@ -36,8 +38,6 @@
             android:layout_height="wrap_content"
             android:textSize="14sp"
             android:textStyle="bold"
-            android:paddingLeft="4dp"
-            android:paddingRight="4dp"
             android:includeFontPadding="false"
             android:textColor="#FFBEBEBE"/>
     </LinearLayout>

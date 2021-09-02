@@ -71,4 +71,10 @@ class DisplayViewModel @AssistedInject constructor(
             it.toBuilder().setFontScale(value).build()
         }
     }
+
+    fun setMuteByDefault(value: Boolean) = viewModelScope.launch {
+        displayPreferences.updateData {
+            it.toBuilder().setMuteByDefault(value).build()
+        }
+    }
 }

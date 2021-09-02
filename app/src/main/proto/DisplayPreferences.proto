@@ -21,4 +21,5 @@ message DisplayPreferences {
   bool mediaPreview = 4;
   AutoPlayback autoPlayback = 5;
   bool urlPreview = 6;
+  bool muteByDefault = 7;
 }

@@ -183,6 +183,15 @@ fun DisplayScene() {
                         Text(text = stringResource(id = R.string.scene_settings_display_media_media_previews))
                     }
                 )
+                switchItem(
+                    value = display.muteByDefault,
+                    onChanged = {
+                        viewModel.setMuteByDefault(it)
+                    },
+                    title = {
+                        Text(text = stringResource(id = R.string.scene_settings_display_media_mute_by_default))
+                    }
+                )
                 if (display.mediaPreview) {
                     RadioItem(
                         options = listOf(
