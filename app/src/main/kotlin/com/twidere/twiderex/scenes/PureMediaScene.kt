@@ -53,7 +53,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
 import com.google.accompanist.insets.navigationBarsPadding
 import com.google.accompanist.insets.statusBarsPadding
 import com.google.accompanist.pager.ExperimentalPagerApi
@@ -61,6 +60,7 @@ import com.google.accompanist.pager.rememberPagerState
 import com.google.android.exoplayer2.ui.PlayerControlView
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
+import com.twidere.twiderex.component.foundation.VideoPlayerController
 import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.extensions.hideControls
 import com.twidere.twiderex.extensions.observeAsState
@@ -117,6 +117,10 @@ fun PureMediaScene(belongToKey: MicroBlogKey, selectedIndex: Int) {
                         navController.popBackStack()
                     },
                 )
+                var isMute by remember {
+                    // todo use settings
+                    mutableStateOf(false)
+                }
                 InAppNotificationScaffold(
                     backgroundColor = Color.Transparent,
                     contentColor = contentColorFor(backgroundColor = MaterialTheme.colors.background),
@@ -125,7 +129,9 @@ fun PureMediaScene(belongToKey: MicroBlogKey, selectedIndex: Int) {
                             controlVisibility = controlVisibility,
                             swiperState = swiperState,
                             controlPanelColor = controlPanelColor,
-                            videoControl = videoControl
+                            videoControl = videoControl,
+                            mute = isMute,
+                            onMute = { isMute = it }
                         )
                     }
                 ) {
@@ -155,6 +161,7 @@ fun PureMediaScene(belongToKey: MicroBlogKey, selectedIndex: Int) {
                             swiperState = swiperState,
                             customControl = videoControl,
                             pagerState = pagerState,
+                            volume = if (isMute) 0f else 1f
                         )
                         DisposableEffect(Unit) {
                             window.setOnSystemBarsVisibilityChangeListener { visibility ->
@@ -181,7 +188,14 @@ fun PureMediaScene(belongToKey: MicroBlogKey, selectedIndex: Int) {
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun PureMediaBottomInfo(controlVisibility: Boolean, swiperState: SwiperState, controlPanelColor: Color, videoControl: PlayerControlView?) {
+fun PureMediaBottomInfo(
+    controlVisibility: Boolean,
+    swiperState: SwiperState,
+    controlPanelColor: Color,
+    videoControl: PlayerControlView?,
+    mute: Boolean,
+    onMute: (Boolean) -> Unit
+) {
     AnimatedVisibility(
         visible = controlVisibility && swiperState.progress == 0f,
         enter = fadeIn() + expandVertically(),
@@ -195,7 +209,11 @@ fun PureMediaBottomInfo(controlVisibility: Boolean, swiperState: SwiperState, co
                 .navigationBarsPadding(),
         ) {
             if (videoControl != null) {
-                AndroidView(factory = { videoControl })
+                VideoPlayerController(
+                    videoControl = videoControl,
+                    mute = mute,
+                    onMute = onMute
+                )
             }
         }
     }

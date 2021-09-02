@@ -96,51 +96,52 @@ fun VideoPlayer(
     Box {
         if (playInitial) {
             val player = remember(url) {
-                SimpleExoPlayer.Builder(context)
-                    .apply {
-                        if (httpConfig.proxyConfig.enable) {
-                            // replace DataSource
-                            OkHttpDataSource.Factory(
-                                TwidereServiceFactory
-                                    .createHttpClientFactory()
-                                    .createHttpClientBuilder()
-                                    .build()
-                            )
-                                .let {
-                                    DefaultDataSourceFactory(context, it)
-                                }.let {
-                                    DefaultMediaSourceFactory(it)
-                                }.let {
-                                    setMediaSourceFactory(it)
-                                }
-                        }
-                    }
-                    .build().apply {
-                        repeatMode = Player.REPEAT_MODE_ALL
-                        playWhenReady = autoPlay
-                        addListener(object : Player.Listener {
-                            override fun onPlaybackStateChanged(state: Int) {
-                                shouldShowThumb = state != Player.STATE_READY
+                RemainingTimeExoPlayer(
+                    SimpleExoPlayer.Builder(context)
+                        .apply {
+                            if (httpConfig.proxyConfig.enable) {
+                                // replace DataSource
+                                OkHttpDataSource.Factory(
+                                    TwidereServiceFactory
+                                        .createHttpClientFactory()
+                                        .createHttpClientBuilder()
+                                        .build()
+                                )
+                                    .let {
+                                        DefaultDataSourceFactory(context, it)
+                                    }.let {
+                                        DefaultMediaSourceFactory(it)
+                                    }.let {
+                                        setMediaSourceFactory(it)
+                                    }
                             }
-
-                            override fun onIsPlayingChanged(isPlaying: Boolean) {
-                                playing = isPlaying
-                            }
-                        })
-
-                        setVolume(volume)
-                        ProgressiveMediaSource.Factory(
-                            CacheDataSourceFactory(
-                                context,
-                                5L * 1024L * 1024L,
-                            )
-                        ).createMediaSource(MediaItem.fromUri(url)).also {
-                            setMediaSource(it)
                         }
-                        prepare()
-                        seekTo(VideoPool.get(url))
+                ).apply {
+                    repeatMode = Player.REPEAT_MODE_ALL
+                    playWhenReady = autoPlay
+                    addListener(object : Player.Listener {
+                        override fun onPlaybackStateChanged(state: Int) {
+                            shouldShowThumb = state != Player.STATE_READY
+                        }
+
+                        override fun onIsPlayingChanged(isPlaying: Boolean) {
+                            playing = isPlaying
+                        }
+                    })
+
+                    ProgressiveMediaSource.Factory(
+                        CacheDataSourceFactory(
+                            context,
+                            5L * 1024L * 1024L,
+                        )
+                    ).createMediaSource(MediaItem.fromUri(url)).also {
+                        setMediaSource(it)
                     }
+                    prepare()
+                    seekTo(VideoPool.get(url))
+                }
             }
+            player.volume = volume
 
             fun updateState() {
                 autoPlay = player.playWhenReady
