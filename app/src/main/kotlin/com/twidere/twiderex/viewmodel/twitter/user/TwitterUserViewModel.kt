@@ -23,6 +23,7 @@ package com.twidere.twiderex.viewmodel.twitter.user
 import androidx.lifecycle.ViewModel
 import com.twidere.services.microblog.LookupService
 import com.twidere.twiderex.model.AccountDetails
+import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.UserRepository
 import com.twidere.twiderex.utils.notify
@@ -48,7 +49,7 @@ class TwitterUserViewModel @AssistedInject constructor(
 
     val error = MutableStateFlow<Throwable?>(null)
 
-    val user = flow {
+    val user = flow<UiUser?> {
         runCatching {
             repository.lookupUserByName(
                 screenName,

@@ -20,6 +20,7 @@
  */
 package com.twidere.twiderex.paging.trend
 
+import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
 import androidx.paging.PagingConfig
 import androidx.paging.PagingState
@@ -44,6 +45,7 @@ class TrendMediatorTest {
 
     private var mockService = MockCenter.mockTrendService() as TrendService
 
+    @OptIn(ExperimentalPagingApi::class)
     @Test
     fun load_saveToDatabaseWhenSuccess() {
         runBlocking {

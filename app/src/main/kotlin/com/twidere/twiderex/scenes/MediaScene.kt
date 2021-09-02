@@ -371,6 +371,7 @@ private object StatusMediaInfoDefaults {
     val NameSpacing = 8.dp
 }
 
+@OptIn(ExperimentalPagerApi::class)
 @Composable
 fun RawMediaScene(url: String) {
     TwidereDialog(

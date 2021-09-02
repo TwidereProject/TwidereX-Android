@@ -20,6 +20,7 @@
  */
 package com.twidere.twiderex.paging.crud
 
+import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
 import androidx.paging.PagingConfig
 import androidx.paging.PagingSource
@@ -41,6 +42,7 @@ class TestMemoryCachePagingMediator(pagingMemoryCache: PagingMemoryCache<String>
 class MemoryCachePagingMediatorTest {
     private val pagingMemoryCache = PagingMemoryCache<String>()
 
+    @OptIn(ExperimentalPagingApi::class)
     @Test
     fun load_saveToPagingMemoryCacheAfterSuccess() = runBlocking {
         val mediator = TestMemoryCachePagingMediator(pagingMemoryCache)

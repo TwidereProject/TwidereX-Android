@@ -20,6 +20,7 @@
  */
 package com.twidere.twiderex.utils
 
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -32,8 +33,10 @@ private val JSON by lazy {
     }
 }
 
+@OptIn(ExperimentalSerializationApi::class)
 internal inline fun <reified T> T.json(): String =
     JSON.encodeToString<T>(this)
 
+@OptIn(ExperimentalSerializationApi::class)
 internal inline fun <reified T> String.fromJson() =
     JSON.decodeFromString<T>(this)
