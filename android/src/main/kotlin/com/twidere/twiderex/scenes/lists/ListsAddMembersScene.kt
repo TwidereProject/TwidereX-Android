@@ -114,12 +114,12 @@ fun ListsAddMembersScene(
                                 ) {
                                     Icon(
                                         imageVector = Icons.Default.Close,
-                                        contentDescription = stringResource(id = R.string.accessibility_common_back)
+                                        contentDescription = stringResource(id = com.twidere.common.R.string.accessibility_common_back)
                                     )
                                 }
                             },
                             title = {
-                                Text(text = stringResource(id = R.string.scene_lists_users_add_title))
+                                Text(text = stringResource(id = com.twidere.common.R.string.scene_lists_users_add_title))
                             },
                             elevation = 0.dp,
                         )
@@ -129,13 +129,13 @@ fun ListsAddMembersScene(
                         ) {
                             Icon(
                                 painter = painterResource(id = R.drawable.ic_search),
-                                contentDescription = stringResource(id = R.string.scene_search_title),
+                                contentDescription = stringResource(id = com.twidere.common.R.string.scene_search_title),
                                 modifier = Modifier.padding(ListsAddMembersSceneDefaults.SearchInput.Icon.Padding)
                             )
                             TextInput(
                                 value = keyword,
                                 placeholder = {
-                                    Text(text = stringResource(id = R.string.scene_lists_users_add_search))
+                                    Text(text = stringResource(id = com.twidere.common.R.string.scene_lists_users_add_search))
                                 },
                                 onValueChange = {
                                     searchViewModel.text.value = it
@@ -188,13 +188,13 @@ private fun SearchResultsContent(source: LazyPagingItems<UiUser>, onAction: (use
                     val pending = statusChecker(it)
                     if (pending) {
                         Text(
-                            text = stringResource(id = R.string.scene_lists_users_menu_actions_remove),
+                            text = stringResource(id = com.twidere.common.R.string.scene_lists_users_menu_actions_remove),
                             style = MaterialTheme.typography.button,
                             color = Color(0xFFFF3B30),
                         )
                     } else {
                         Text(
-                            text = stringResource(id = R.string.scene_lists_users_menu_actions_add),
+                            text = stringResource(id = com.twidere.common.R.string.scene_lists_users_menu_actions_add),
                             style = MaterialTheme.typography.button,
                             color = MaterialTheme.colors.primary,
                         )

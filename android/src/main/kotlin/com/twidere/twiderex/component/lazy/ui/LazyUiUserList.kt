@@ -96,7 +96,7 @@ fun LazyUiUserList(
                                 Row {
                                     Text(
                                         text = stringResource(
-                                            id = R.string.common_controls_profile_dashboard_followers,
+                                            id = com.twidere.common.R.string.common_controls_profile_dashboard_followers,
                                         )
                                     )
                                     Spacer(modifier = Modifier.width(UiUserListDefaults.HorizontalPadding))

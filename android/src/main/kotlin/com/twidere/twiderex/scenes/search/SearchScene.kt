@@ -149,7 +149,7 @@ fun SearchScene(keyword: String) {
                                                 Icon(
                                                     painter = painterResource(id = R.drawable.ic_device_floppy),
                                                     contentDescription = stringResource(
-                                                        id = R.string.accessibility_scene_search_save
+                                                        id = com.twidere.common.R.string.accessibility_scene_search_save
                                                     )
                                                 )
                                             }

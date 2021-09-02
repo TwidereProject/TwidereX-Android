@@ -54,7 +54,7 @@ fun DMConversationListScene() {
                         AppBarNavigationButton()
                     },
                     title = {
-                        Text(text = stringResource(id = R.string.scene_messages_title))
+                        Text(text = stringResource(id = com.twidere.common.R.string.scene_messages_title))
                     },
                 )
             },
@@ -78,7 +78,7 @@ fun DMConversationListSceneFab() {
         Icon(
             painter = painterResource(id = R.drawable.ic_add),
             contentDescription = stringResource(
-                id = R.string.scene_lists_icons_create
+                id = com.twidere.common.R.string.scene_lists_icons_create
             ),
         )
     }

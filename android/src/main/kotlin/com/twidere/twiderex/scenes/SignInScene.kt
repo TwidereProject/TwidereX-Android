@@ -96,13 +96,13 @@ private fun MastodonSignIn() {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_mastodon_logo_blue),
                     contentDescription = stringResource(
-                        id = R.string.accessibility_common_logo_mastodon
+                        id = com.twidere.common.R.string.accessibility_common_logo_mastodon
                     )
                 )
             },
             text = {
                 Text(
-                    text = stringResource(id = R.string.scene_sign_in_sign_in_with_mastodon)
+                    text = stringResource(id = com.twidere.common.R.string.scene_sign_in_sign_in_with_mastodon)
                 )
             },
             trailing = {
@@ -113,7 +113,7 @@ private fun MastodonSignIn() {
                     Icon(
                         imageVector = Icons.Default.KeyboardArrowRight,
                         contentDescription = stringResource(
-                            id = R.string.scene_sign_in_sign_in_with_mastodon
+                            id = com.twidere.common.R.string.scene_sign_in_sign_in_with_mastodon
                         )
                     )
                 }
@@ -158,20 +158,20 @@ private fun TwitterSignIn() {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_twitter_logo_white),
                     contentDescription = stringResource(
-                        id = R.string.accessibility_common_logo_twitter
+                        id = com.twidere.common.R.string.accessibility_common_logo_twitter
                     )
                 )
             },
             text = {
                 Text(
-                    text = stringResource(id = R.string.scene_sign_in_sign_in_with_twitter)
+                    text = stringResource(id = com.twidere.common.R.string.scene_sign_in_sign_in_with_twitter)
                 )
             },
             trailing = {
                 IconButton(onClick = { showKeyConfiguration = true }) {
                     Icon(
                         imageVector = Icons.Default.MoreHoriz,
-                        contentDescription = stringResource(id = R.string.accessibility_common_more)
+                        contentDescription = stringResource(id = com.twidere.common.R.string.accessibility_common_more)
                     )
                 }
             }
@@ -192,11 +192,11 @@ private fun TwitterCustomKeySignIn(
             onDismissRequest.invoke()
         },
         title = {
-            Text(text = stringResource(id = R.string.scene_sign_in_twitter_options_sign_in_with_custom_twitter_key))
+            Text(text = stringResource(id = com.twidere.common.R.string.scene_sign_in_twitter_options_sign_in_with_custom_twitter_key))
         },
         text = {
             Column {
-                Text(text = stringResource(id = R.string.scene_sign_in_twitter_options_twitter_api_v2_access_is_required))
+                Text(text = stringResource(id = com.twidere.common.R.string.scene_sign_in_twitter_options_twitter_api_v2_access_is_required))
                 OutlinedTextField(
                     modifier = Modifier.fillMaxWidth(),
                     value = apiKey,
@@ -221,7 +221,7 @@ private fun TwitterCustomKeySignIn(
                     onDismissRequest.invoke()
                 }
             ) {
-                Text(text = stringResource(id = R.string.common_controls_actions_cancel))
+                Text(text = stringResource(id = com.twidere.common.R.string.common_controls_actions_cancel))
             }
         },
         confirmButton = {
@@ -244,7 +244,7 @@ private fun TwitterCustomKeySignIn(
                 },
                 enabled = apiKey.isNotEmpty() && apiSecret.isNotEmpty()
             ) {
-                Text(text = stringResource(id = R.string.scene_drawer_sign_in))
+                Text(text = stringResource(id = com.twidere.common.R.string.scene_drawer_sign_in))
             }
         },
     )

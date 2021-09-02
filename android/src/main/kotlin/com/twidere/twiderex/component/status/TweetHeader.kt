@@ -50,7 +50,7 @@ fun RetweetHeader(
         icon = {
             Icon(
                 painter = painterResource(id = R.drawable.ic_repeat),
-                contentDescription = stringResource(id = R.string.accessibility_common_status_retweeted),
+                contentDescription = stringResource(id = com.twidere.common.R.string.accessibility_common_status_retweeted),
                 tint = Color(0xFF4C9EEB)
             )
         },
@@ -58,7 +58,7 @@ fun RetweetHeader(
             Text(
                 style = MaterialTheme.typography.caption,
                 text = stringResource(
-                    id = R.string.common_controls_status_user_retweeted,
+                    id = com.twidere.common.R.string.common_controls_status_user_retweeted,
                     data.user.displayName
                 ),
             )

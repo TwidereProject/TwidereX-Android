@@ -47,4 +47,5 @@ object Versions {
     const val extJUnitVersion = "1.1.3-rc01"
     const val espressoVersion = "3.4.0-rc01"
     const val koin = "3.1.2"
+    const val moko = "0.17.2"
 }

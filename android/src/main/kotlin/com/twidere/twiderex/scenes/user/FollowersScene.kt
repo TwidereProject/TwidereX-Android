@@ -53,7 +53,7 @@ fun FollowersScene(
                         AppBarNavigationButton()
                     },
                     title = {
-                        Text(stringResource(id = R.string.scene_followers_title))
+                        Text(stringResource(id = com.twidere.common.R.string.scene_followers_title))
                     }
                 )
             },

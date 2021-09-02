@@ -53,41 +53,41 @@ data class SettingItem(
 fun SettingsScene() {
     val settings =
         mapOf(
-            stringResource(id = R.string.scene_settings_section_header_general) to listOf(
+            stringResource(id = com.twidere.common.R.string.scene_settings_section_header_general) to listOf(
                 SettingItem(
-                    stringResource(id = R.string.scene_settings_appearance_title),
+                    stringResource(id = com.twidere.common.R.string.scene_settings_appearance_title),
                     painterResource(id = R.drawable.ic_shirt),
                     route = RootRoute.Settings.Appearance,
                 ),
                 SettingItem(
-                    stringResource(id = R.string.scene_settings_display_title),
+                    stringResource(id = com.twidere.common.R.string.scene_settings_display_title),
                     painterResource(id = R.drawable.ic_template),
                     route = RootRoute.Settings.Display,
                 ),
                 SettingItem(
-                    stringResource(id = R.string.scene_settings_layout_title),
+                    stringResource(id = com.twidere.common.R.string.scene_settings_layout_title),
                     painterResource(id = R.drawable.ic_layout_sidebar),
                     route = RootRoute.Settings.Layout,
                 ),
                 SettingItem(
-                    stringResource(id = R.string.scene_settings_notification_title),
+                    stringResource(id = com.twidere.common.R.string.scene_settings_notification_title),
                     painterResource(id = R.drawable.ic_settings_notification),
                     route = RootRoute.Settings.Notification,
                 ),
                 SettingItem(
-                    stringResource(id = R.string.scene_settings_storage_title),
+                    stringResource(id = com.twidere.common.R.string.scene_settings_storage_title),
                     painterResource(id = R.drawable.ic_database),
                     route = RootRoute.Settings.Storage,
                 ),
                 SettingItem(
-                    stringResource(id = R.string.scene_settings_misc_title),
+                    stringResource(id = com.twidere.common.R.string.scene_settings_misc_title),
                     painterResource(id = R.drawable.ic_triangle_square_circle),
                     route = RootRoute.Settings.Misc,
                 ),
             ),
-            stringResource(id = R.string.scene_settings_section_header_about) to listOf(
+            stringResource(id = com.twidere.common.R.string.scene_settings_section_header_about) to listOf(
                 SettingItem(
-                    stringResource(id = R.string.scene_settings_about_title),
+                    stringResource(id = com.twidere.common.R.string.scene_settings_about_title),
                     painterResource(id = R.drawable.ic_info_circle),
                     route = RootRoute.Settings.About,
                 ),
@@ -102,7 +102,7 @@ fun SettingsScene() {
                         AppBarNavigationButton()
                     },
                     title = {
-                        Text(text = stringResource(id = R.string.scene_settings_title))
+                        Text(text = stringResource(id = com.twidere.common.R.string.scene_settings_title))
                     }
                 )
             }

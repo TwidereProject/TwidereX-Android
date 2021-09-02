@@ -33,7 +33,7 @@ import com.twidere.twiderex.scenes.lists.ListsSceneFab
 class ListsNavigationItem : HomeNavigationItem() {
     @Composable
     override fun name(): String {
-        return stringResource(id = R.string.scene_lists_title)
+        return stringResource(id = com.twidere.common.R.string.scene_lists_title)
     }
 
     override val route: String

@@ -71,7 +71,7 @@ fun TwitterListsEditScene(
                     AppBar(
                         navigationIcon = { AppBarNavigationButton(Icons.Default.Close) },
                         title = {
-                            Text(text = stringResource(id = R.string.scene_lists_modify_edit_title))
+                            Text(text = stringResource(id = com.twidere.common.R.string.scene_lists_modify_edit_title))
                         },
                         actions = {
                             IconButton(
@@ -89,7 +89,7 @@ fun TwitterListsEditScene(
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.Done,
-                                    contentDescription = stringResource(id = R.string.common_controls_actions_confirm),
+                                    contentDescription = stringResource(id = com.twidere.common.R.string.common_controls_actions_confirm),
                                     tint = if (name.isNotEmpty()) MaterialTheme.colors.primary else LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
                                 )
                             }

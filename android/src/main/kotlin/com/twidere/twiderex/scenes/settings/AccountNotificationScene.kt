@@ -72,7 +72,7 @@ fun AccountNotificationScene(
             topBar = {
                 AppBar(
                     title = {
-                        Text(text = stringResource(id = R.string.scene_settings_notification_title))
+                        Text(text = stringResource(id = com.twidere.common.R.string.scene_settings_notification_title))
                     },
                     navigationIcon = {
                         AppBarNavigationButton()

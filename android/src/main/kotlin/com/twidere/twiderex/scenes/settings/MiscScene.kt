@@ -82,7 +82,7 @@ fun MiscScene() {
                         AppBarNavigationButton()
                     },
                     title = {
-                        Text(text = stringResource(id = R.string.scene_settings_misc_title))
+                        Text(text = stringResource(id = com.twidere.common.R.string.scene_settings_misc_title))
                     }
                 )
             }
@@ -156,7 +156,7 @@ fun ColumnScope.ProxyPreference(
     val proxyPassword by viewModel.proxyPassword.observeAsState("")
 
     ItemHeader {
-        Text(text = stringResource(id = R.string.scene_settings_misc_proxy_title))
+        Text(text = stringResource(id = com.twidere.common.R.string.scene_settings_misc_proxy_title))
     }
     switchItem(
         value = useProxy,
@@ -164,21 +164,21 @@ fun ColumnScope.ProxyPreference(
             viewModel.setUseProxy(it)
         },
         describe = {
-            Text(text = stringResource(id = R.string.scene_settings_misc_proxy_enable_description))
+            Text(text = stringResource(id = com.twidere.common.R.string.scene_settings_misc_proxy_enable_description))
         }
     ) {
-        Text(text = stringResource(id = R.string.scene_settings_misc_proxy_enable_title))
+        Text(text = stringResource(id = com.twidere.common.R.string.scene_settings_misc_proxy_enable_title))
     }
     ItemProxy(
         enable = useProxy,
-        title = stringResource(id = R.string.scene_settings_misc_proxy_type_title),
+        title = stringResource(id = com.twidere.common.R.string.scene_settings_misc_proxy_type_title),
         content = proxyTypeValue(type = proxyType),
         onClick = {
             showProxyTypeDialog.value = true
         }
     )
 
-    val serverTitle = stringResource(id = R.string.scene_settings_misc_proxy_server)
+    val serverTitle = stringResource(id = com.twidere.common.R.string.scene_settings_misc_proxy_server)
     ItemProxy(
         enable = useProxy,
         title = serverTitle,
@@ -193,7 +193,7 @@ fun ColumnScope.ProxyPreference(
         }
     )
 
-    val portTitle = stringResource(id = R.string.scene_settings_misc_proxy_port_title)
+    val portTitle = stringResource(id = com.twidere.common.R.string.scene_settings_misc_proxy_port_title)
     ItemProxy(
         enable = useProxy,
         title = portTitle,
@@ -208,7 +208,7 @@ fun ColumnScope.ProxyPreference(
         }
     )
 
-    val userNameTitle = stringResource(id = R.string.scene_settings_misc_proxy_username)
+    val userNameTitle = stringResource(id = com.twidere.common.R.string.scene_settings_misc_proxy_username)
     ItemProxy(
         enable = useProxy,
         title = userNameTitle,
@@ -223,7 +223,7 @@ fun ColumnScope.ProxyPreference(
         }
     )
 
-    val passwordTitle = stringResource(id = R.string.scene_settings_misc_proxy_password)
+    val passwordTitle = stringResource(id = com.twidere.common.R.string.scene_settings_misc_proxy_password)
     ItemProxy(
         enable = useProxy,
         title = passwordTitle,
@@ -242,9 +242,9 @@ fun ColumnScope.ProxyPreference(
 @Composable
 fun proxyTypeValue(type: MiscPreferences.ProxyType): String {
     return when (type) {
-        MiscPreferences.ProxyType.HTTP -> stringResource(id = R.string.scene_settings_misc_proxy_type_http)
-        MiscPreferences.ProxyType.REVERSE -> stringResource(id = R.string.scene_settings_misc_proxy_type_reverse)
-        else -> stringResource(id = R.string.scene_settings_misc_proxy_type_http)
+        MiscPreferences.ProxyType.HTTP -> stringResource(id = com.twidere.common.R.string.scene_settings_misc_proxy_type_http)
+        MiscPreferences.ProxyType.REVERSE -> stringResource(id = com.twidere.common.R.string.scene_settings_misc_proxy_type_reverse)
+        else -> stringResource(id = com.twidere.common.R.string.scene_settings_misc_proxy_type_http)
     }
 }
 
@@ -314,7 +314,7 @@ fun NitterPreference(viewModel: MiscViewModel) {
             }
         }
     ) {
-        Text(text = stringResource(id = R.string.scene_settings_misc_nitter_title))
+        Text(text = stringResource(id = com.twidere.common.R.string.scene_settings_misc_nitter_title))
     }
     ListItem(
         text = {
@@ -323,7 +323,7 @@ fun NitterPreference(viewModel: MiscViewModel) {
                 onValueChange = { viewModel.setNitterInstance(it) },
                 placeholder = {
                     Text(
-                        text = stringResource(id = R.string.scene_settings_misc_nitter_input_placeholder)
+                        text = stringResource(id = com.twidere.common.R.string.scene_settings_misc_nitter_input_placeholder)
                     )
                 },
                 trailingIcon = {
@@ -341,7 +341,7 @@ fun NitterPreference(viewModel: MiscViewModel) {
             )
         },
         secondaryText = {
-            Text(text = stringResource(id = R.string.scene_settings_misc_nitter_input_description))
+            Text(text = stringResource(id = com.twidere.common.R.string.scene_settings_misc_nitter_input_description))
         }
     )
 }
@@ -354,14 +354,14 @@ fun NitterUsageDialog(
     AlertDialog(
         onDismissRequest = onDismissRequest,
         title = {
-            Text(text = stringResource(id = R.string.scene_settings_misc_nitter_dialog_usage_title))
+            Text(text = stringResource(id = com.twidere.common.R.string.scene_settings_misc_nitter_dialog_usage_title))
         },
         text = {
-            Text(text = stringResource(id = R.string.scene_settings_misc_nitter_dialog_usage_content))
+            Text(text = stringResource(id = com.twidere.common.R.string.scene_settings_misc_nitter_dialog_usage_content))
         },
         confirmButton = {
             TextButton(onClick = onDismissRequest) {
-                Text(text = stringResource(id = R.string.common_controls_actions_ok))
+                Text(text = stringResource(id = com.twidere.common.R.string.common_controls_actions_ok))
             }
         },
         dismissButton = {
@@ -373,7 +373,7 @@ fun NitterUsageDialog(
                     )
                 }
             ) {
-                Text(text = stringResource(id = R.string.scene_settings_misc_nitter_dialog_usage_project_button))
+                Text(text = stringResource(id = com.twidere.common.R.string.scene_settings_misc_nitter_dialog_usage_project_button))
             }
         }
     )
@@ -388,16 +388,16 @@ fun NitterInformationDialog(
             onDismissRequest.invoke()
         },
         title = {
-            Text(text = stringResource(id = R.string.scene_settings_misc_nitter_dialog_information_title))
+            Text(text = stringResource(id = com.twidere.common.R.string.scene_settings_misc_nitter_dialog_information_title))
         },
         text = {
-            Text(text = stringResource(id = R.string.scene_settings_misc_nitter_dialog_information_content))
+            Text(text = stringResource(id = com.twidere.common.R.string.scene_settings_misc_nitter_dialog_information_content))
         },
         confirmButton = {
             TextButton(
                 onClick = onDismissRequest,
             ) {
-                Text(text = stringResource(id = R.string.common_controls_actions_ok))
+                Text(text = stringResource(id = com.twidere.common.R.string.common_controls_actions_ok))
             }
         }
     )
@@ -415,7 +415,7 @@ fun ProxyTypeSelectDialog(
     AlertDialog(
         onDismissRequest = onDismissRequest,
         title = {
-            Text(text = stringResource(id = R.string.scene_settings_misc_proxy_type_title))
+            Text(text = stringResource(id = com.twidere.common.R.string.scene_settings_misc_proxy_type_title))
         },
         text = {
             Column {
@@ -444,7 +444,7 @@ fun ProxyTypeSelectDialog(
                     onDismissRequest.invoke()
                 }
             ) {
-                Text(text = stringResource(id = R.string.common_controls_actions_ok))
+                Text(text = stringResource(id = com.twidere.common.R.string.common_controls_actions_ok))
             }
         }
     )
@@ -491,7 +491,7 @@ fun ProxyInputDialog(
                     onDismissRequest.invoke()
                 }
             ) {
-                Text(text = stringResource(id = R.string.common_controls_actions_ok))
+                Text(text = stringResource(id = com.twidere.common.R.string.common_controls_actions_ok))
             }
         }
     )

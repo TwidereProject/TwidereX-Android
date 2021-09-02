@@ -253,7 +253,7 @@ private fun LoadMoreButton(
         Text(
             modifier = Modifier.padding(12.dp),
             text = stringResource(
-                id = R.string.common_controls_timeline_load_more
+                id = com.twidere.common.R.string.common_controls_timeline_load_more
             ),
             color = MaterialTheme.colors.primary,
         )
@@ -269,12 +269,12 @@ private fun EmptyStatusList() {
     ) {
         Icon(
             painter = painterResource(id = R.drawable.ic_empty_status),
-            contentDescription = stringResource(id = R.string.common_alerts_no_tweets_found_title)
+            contentDescription = stringResource(id = com.twidere.common.R.string.common_alerts_no_tweets_found_title)
         )
         Spacer(modifier = Modifier.height(EmptyStatusListDefaults.VerticalPadding))
         CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.disabled) {
             Text(
-                text = stringResource(id = R.string.common_alerts_no_tweets_found_title),
+                text = stringResource(id = com.twidere.common.R.string.common_alerts_no_tweets_found_title),
                 style = MaterialTheme.typography.h6
             )
         }

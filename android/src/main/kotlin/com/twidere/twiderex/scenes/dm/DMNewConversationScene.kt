@@ -83,7 +83,7 @@ fun DMNewConversationScene() {
                             )
                         },
                         title = {
-                            Text(text = stringResource(id = R.string.scene_messages_new_conversation_title))
+                            Text(text = stringResource(id = com.twidere.common.R.string.scene_messages_new_conversation_title))
                         },
                         elevation = 0.dp
                     )
@@ -124,7 +124,7 @@ fun SearchInput(modifier: Modifier = Modifier, input: String, onValueChanged: (v
         Icon(
             painter = painterResource(id = R.drawable.ic_search),
             contentDescription = stringResource(
-                id = R.string.scene_search_title
+                id = com.twidere.common.R.string.scene_search_title
             )
         )
         Spacer(modifier = Modifier.width(SearchInputDefaults.ContentSpacing))
@@ -132,7 +132,7 @@ fun SearchInput(modifier: Modifier = Modifier, input: String, onValueChanged: (v
             value = input,
             onValueChange = onValueChanged, modifier = Modifier.weight(1f),
             placeholder = {
-                Text(text = stringResource(id = R.string.scene_messages_new_conversation_search))
+                Text(text = stringResource(id = com.twidere.common.R.string.scene_messages_new_conversation_search))
             },
             maxLines = 1
         )

@@ -241,7 +241,7 @@ fun PureMediaControlPanel(
                     Icon(
                         painter = painterResource(id = R.drawable.ic_x),
                         contentDescription = stringResource(
-                            id = R.string.accessibility_common_close
+                            id = com.twidere.common.R.string.accessibility_common_close
                         )
                     )
                 }

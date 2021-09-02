@@ -86,7 +86,7 @@ abstract class DirectMessageSendJob<T : MicroBlogService>(
                         NotificationChannelSpec.ContentMessages.id
                     )
                 )
-                .setContentTitle(applicationContext.getString(R.string.common_alerts_failed_to_send_message_message))
+                .setContentTitle(applicationContext.getString(com.twidere.common.R.string.common_alerts_failed_to_send_message_message))
                 .setContentText(sendData.text)
                 .setDeepLink(RootDeepLinksRoute.Conversation(sendData.conversationKey))
             notificationManager.notify(notificationId, builder.build())

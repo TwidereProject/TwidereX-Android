@@ -52,7 +52,7 @@ fun ListsSubscribersScene(
                         AppBarNavigationButton()
                     },
                     title = {
-                        Text(text = stringResource(id = R.string.scene_lists_details_tabs_subscriber))
+                        Text(text = stringResource(id = com.twidere.common.R.string.scene_lists_details_tabs_subscriber))
                     }
                 )
             },

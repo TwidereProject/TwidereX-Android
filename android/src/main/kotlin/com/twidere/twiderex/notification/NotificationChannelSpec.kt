@@ -22,7 +22,6 @@ package com.twidere.twiderex.notification
 
 import androidx.annotation.StringRes
 import androidx.core.app.NotificationManagerCompat
-import com.twidere.twiderex.R
 
 enum class NotificationChannelSpec(
     val id: String,
@@ -38,20 +37,20 @@ enum class NotificationChannelSpec(
      */
     BackgroundProgresses(
         "background_progresses",
-        R.string.common_notification_channel_background_progresses_name,
+        com.twidere.common.R.string.common_notification_channel_background_progresses_name,
         importance = NotificationManagerCompat.IMPORTANCE_HIGH
     ),
 
     ContentInteractions(
-        "content_interactions", R.string.common_notification_channel_content_interactions_name,
-        descriptionRes = R.string.common_notification_channel_content_interactions_description,
+        "content_interactions", com.twidere.common.R.string.common_notification_channel_content_interactions_name,
+        descriptionRes = com.twidere.common.R.string.common_notification_channel_content_interactions_description,
         importance = NotificationManagerCompat.IMPORTANCE_HIGH, showBadge = true, grouped = true
     ),
 
     ContentMessages(
         "content_messages",
-        R.string.common_notification_channel_content_messages_name,
-        descriptionRes = R.string.common_notification_channel_content_messages_description,
+        com.twidere.common.R.string.common_notification_channel_content_messages_name,
+        descriptionRes = com.twidere.common.R.string.common_notification_channel_content_messages_description,
         importance = NotificationManagerCompat.IMPORTANCE_HIGH,
         showBadge = true,
         grouped = true
