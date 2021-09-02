@@ -98,6 +98,32 @@ class UserViewModel @AssistedInject constructor(
         }
     }
 
+    fun block() = viewModelScope.launch {
+        loadingRelationship.value = true
+        runCatching {
+            relationshipService.block(id = userKey.id)
+        }.onSuccess {
+            relationship.value = it
+            loadingRelationship.value = false
+        }.onFailure {
+            it.notify(inAppNotification)
+            loadingRelationship.value = false
+        }
+    }
+
+    fun unblock() = viewModelScope.launch {
+        loadingRelationship.value = true
+        runCatching {
+            relationshipService.unblock(id = userKey.id)
+        }.onSuccess {
+            relationship.value = it
+            loadingRelationship.value = false
+        }.onFailure {
+            it.notify(inAppNotification)
+            loadingRelationship.value = false
+        }
+    }
+
     private fun loadRelationShip() = viewModelScope.launch {
         loadingRelationship.value = true
         try {

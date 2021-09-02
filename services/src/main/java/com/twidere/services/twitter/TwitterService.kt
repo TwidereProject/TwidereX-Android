@@ -42,6 +42,7 @@ import com.twidere.services.microblog.model.Relationship
 import com.twidere.services.twitter.api.TwitterResources
 import com.twidere.services.twitter.api.UploadResources
 import com.twidere.services.twitter.model.Attachment
+import com.twidere.services.twitter.model.BlockV2Request
 import com.twidere.services.twitter.model.DirectMessageEvent
 import com.twidere.services.twitter.model.DirectMessageEventObject
 import com.twidere.services.twitter.model.MessageCreate
@@ -368,6 +369,8 @@ class TwitterService(
         return Relationship(
             followedBy = response.relationship?.target?.followedBy ?: false,
             following = response.relationship?.target?.following ?: false,
+            blocking = response.relationship?.source?.blocking ?: false,
+            blockedBy = response.relationship?.source?.blockedBy ?: false
         )
     }
 
@@ -493,6 +496,22 @@ class TwitterService(
     ).let {
         TwitterPaging(it.data ?: emptyList(), it.meta?.nextToken)
     }
+
+    override suspend fun block(
+        id: String
+    ) = resources.block(
+        sourceId = accountId,
+        target = BlockV2Request(targetUserId = id)
+    ).run {
+        showRelationship(target_id = id)
+    }
+
+    override suspend fun unblock(
+        id: String
+    ) = resources.unblock(sourceId = accountId, targetId = id)
+        .run {
+            showRelationship(target_id = id)
+        }
 
     suspend fun verifyCredentials(): User? {
         return resources.verifyCredentials()

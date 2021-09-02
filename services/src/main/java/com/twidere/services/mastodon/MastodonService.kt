@@ -34,6 +34,7 @@ import com.twidere.services.mastodon.model.PostAccounts
 import com.twidere.services.mastodon.model.PostList
 import com.twidere.services.mastodon.model.PostStatus
 import com.twidere.services.mastodon.model.PostVote
+import com.twidere.services.mastodon.model.RelationshipResponse
 import com.twidere.services.mastodon.model.SearchType
 import com.twidere.services.mastodon.model.UploadResponse
 import com.twidere.services.mastodon.model.exceptions.MastodonException
@@ -162,12 +163,10 @@ class MastodonService(
     }
 
     override suspend fun showRelationship(target_id: String): IRelationship {
-        val response = resources.showFriendships(listOf(target_id)).firstOrNull()
+        return resources.showFriendships(listOf(target_id))
+            .firstOrNull()
+            ?.toIRelationShip()
             ?: throw MastodonException("can not fetch relationship")
-        return Relationship(
-            followedBy = response.following ?: false,
-            following = response.followedBy ?: false,
-        )
     }
 
     override suspend fun followers(user_id: String, nextPage: String?) = resources.followers(
@@ -183,6 +182,12 @@ class MastodonService(
     ).let {
         MastodonPaging.from(it)
     }
+
+    override suspend fun block(id: String) = resources.block(id = id)
+        .toIRelationShip()
+
+    override suspend fun unblock(id: String) = resources.unblock(id = id)
+        .toIRelationShip()
 
     override suspend fun follow(user_id: String) {
         resources.follow(user_id)
@@ -418,4 +423,11 @@ class MastodonService(
             remote = false,
         )
     }
+
+    private fun RelationshipResponse.toIRelationShip() = Relationship(
+        followedBy = following ?: false,
+        following = followedBy ?: false,
+        blocking = blocking ?: false,
+        blockedBy = blockedBy ?: false
+    )
 }
