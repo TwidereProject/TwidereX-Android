@@ -375,7 +375,7 @@ private object StatusMediaInfoDefaults {
 }
 
 @Composable
-fun RawMediaScene(url: String) {
+fun RawMediaScene(url: String, type: MediaType) {
     TwidereDialog(
         requireDarkTheme = true,
         extendViewIntoStatusBar = true,
@@ -390,7 +390,7 @@ fun RawMediaScene(url: String) {
                     navController.popBackStack()
                 },
             )
-            MediaView(media = listOf(MediaData(url, MediaType.photo)), swiperState = swiperState)
+            MediaView(media = listOf(MediaData(url, type)), swiperState = swiperState)
         }
     }
 }

@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.Constraints
 import com.twidere.twiderex.component.RequireAuthorization
 import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.enums.MediaType
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.scenes.DraftListScene
 import com.twidere.twiderex.scenes.HomeScene
@@ -402,10 +403,12 @@ fun RouteBuilder.route(constraints: Constraints) {
     authorizedDialog(
         RootRouteDefinition.Media.Raw,
     ) { backStackEntry ->
-        backStackEntry.path<String>("url")?.let {
+        val url = backStackEntry.path<String>("url")?.let {
             URLDecoder.decode(it, "UTF-8")
-        }?.let {
-            RawMediaScene(url = it)
+        }
+        val type = MediaType.valueOf(backStackEntry.path<String>("type") ?: MediaType.photo.name)
+        url?.let {
+            RawMediaScene(url = it, type = type)
         }
     }
 

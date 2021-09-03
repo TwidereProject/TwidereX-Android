@@ -62,7 +62,7 @@ class MediaViewModel @AssistedInject constructor(
     }
 
     fun shareMedia(currentMedia: UiMedia, target: String, context: Context) {
-        val uri = FileProviderHelper.getUriFromMedia(target, context)
+        val uri = FileProviderHelper.getUriFromShares(target, context)
         inAppNotification.show(R.string.common_alerts_media_sharing_title)
         currentMedia.mediaUrl?.let {
             DownloadMediaWorker.create(

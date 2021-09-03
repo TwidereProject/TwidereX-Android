@@ -70,10 +70,7 @@ class AndroidExifScrambler(private val context: Context) : ExifScrambler {
                     }
                 }
                 ImageType.UNKNOWN -> {
-                    imageCache.outputStream().use {
-                        bitmap.compress(Bitmap.CompressFormat.JPEG, compress, it)
-                        it.flush()
-                    }
+                    return uri.toString()
                 }
             }
             return imageCache.toUri().toString()

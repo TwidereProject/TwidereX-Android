@@ -20,6 +20,9 @@
  */
 package com.twidere.twiderex.component.media
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
@@ -35,18 +38,51 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.twidere.twiderex.R
 import com.twidere.twiderex.model.enums.MediaInsertType
+import com.twidere.twiderex.utils.FileProviderHelper
+import java.util.UUID
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun MediaInsertMenu(
     modifier: Modifier = Modifier,
     disableList: List<MediaInsertType> = emptyList(),
-    onSelect: (MediaInsertType) -> Unit
+    onResult: (List<Uri>) -> Unit
 ) {
+    val context = LocalContext.current
+    val filePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenMultipleDocuments(),
+        onResult = {
+            onResult(it)
+        },
+    )
+
+    var cameraTempUri by remember {
+        mutableStateOf(Uri.EMPTY)
+    }
+
+    val cameraLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicture(),
+        onResult = {
+            if (it) onResult(listOf(cameraTempUri))
+        },
+    )
+
+    var videoTempUri by remember {
+        mutableStateOf(Uri.EMPTY)
+    }
+
+    val videoRecordLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.CaptureVideo(),
+        onResult = {
+            if (it) onResult(listOf(videoTempUri))
+        },
+    )
+
     var showDropdown by remember {
         mutableStateOf(false)
     }
@@ -56,7 +92,18 @@ fun MediaInsertMenu(
                 if (!disableList.contains(it)) {
                     DropdownMenuItem(
                         onClick = {
-                            onSelect(it)
+                            when (it) {
+                                MediaInsertType.CAMERA -> {
+                                    cameraTempUri = FileProviderHelper.getUriFromMedias(mediaFileName = UUID.randomUUID().toString(), context)
+                                    cameraLauncher.launch(cameraTempUri)
+                                }
+                                MediaInsertType.RECORD_VIDEO -> {
+                                    videoTempUri = FileProviderHelper.getUriFromMedias(mediaFileName = UUID.randomUUID().toString(), context)
+                                    videoRecordLauncher.launch(videoTempUri)
+                                }
+                                MediaInsertType.LIBRARY -> filePickerLauncher.launch(arrayOf("image/*", "video/*"))
+                                MediaInsertType.GIF -> TODO()
+                            }
                             showDropdown = false
                         }
                     ) {

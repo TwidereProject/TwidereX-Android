@@ -28,12 +28,29 @@ import java.io.File
 object FileProviderHelper {
     private const val providerName = "com.twidere.twiderex.fileprovider"
     private const val shareDir = "shares/"
+    private const val mediaDir = "medias/"
 
-    fun getUriFromMedia(mediaFileName: String, context: Context): Uri {
-        val shareDir = File(context.externalCacheDir, shareDir).apply {
+    fun getUriFromShares(mediaFileName: String, context: Context): Uri {
+        return getUri(
+            fileName = mediaFileName,
+            dir = shareDir,
+            context = context
+        )
+    }
+
+    fun getUriFromMedias(mediaFileName: String, context: Context): Uri {
+        return getUri(
+            fileName = mediaFileName,
+            dir = mediaDir,
+            context = context
+        )
+    }
+
+    private fun getUri(fileName: String, dir: String, context: Context): Uri {
+        val dirFile = File(context.externalCacheDir, dir).apply {
             if (!exists()) mkdirs()
         }
-        val file = File(shareDir, mediaFileName).apply {
+        val file = File(dirFile, fileName).apply {
             if (!exists()) createNewFile()
         }
         return FileProvider.getUriForFile(context, providerName, file)

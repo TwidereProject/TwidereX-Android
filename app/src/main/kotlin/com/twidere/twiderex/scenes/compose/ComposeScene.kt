@@ -22,6 +22,7 @@ package com.twidere.twiderex.scenes.compose
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Context
 import android.location.Location
 import android.net.Uri
 import androidx.activity.compose.BackHandler
@@ -30,6 +31,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -76,6 +78,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -95,6 +98,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
@@ -121,13 +125,14 @@ import com.twidere.twiderex.component.status.UserName
 import com.twidere.twiderex.component.status.UserScreenName
 import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.extensions.icon
+import com.twidere.twiderex.extensions.mediaType
 import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.extensions.stringName
 import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.MastodonVisibility
-import com.twidere.twiderex.model.enums.MediaInsertType
+import com.twidere.twiderex.model.enums.MediaType
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiEmojiCategory
 import com.twidere.twiderex.navigation.RootRoute
@@ -448,6 +453,7 @@ private fun ComposeImageList(
     images: List<Uri>,
     viewModel: ComposeViewModel
 ) {
+    val context = LocalContext.current
     Spacer(modifier = Modifier.height(ComposeImageListDefaults.Spacing))
     LazyRow(
         modifier = Modifier.padding(ComposeImageListDefaults.ContentPadding),
@@ -455,7 +461,7 @@ private fun ComposeImageList(
         itemsIndexed(
             items = images,
         ) { index, item ->
-            ComposeImage(item, viewModel)
+            ComposeImage(item, viewModel, context)
             if (index != images.lastIndex) {
                 Spacer(modifier = Modifier.width(ComposeImageListDefaults.ItemSpacing))
             }
@@ -1147,12 +1153,6 @@ private fun ComposeActions(
     }
     val scope = rememberCoroutineScope()
     val navController = LocalNavController.current
-    val filePickerLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetMultipleContents(),
-        onResult = {
-            viewModel.putImages(it)
-        },
-    )
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions(),
         onResult = {
@@ -1166,13 +1166,8 @@ private fun ComposeActions(
         Row {
             AnimatedVisibility(visible = allowImage) {
                 MediaInsertMenu(
-                    onSelect = {
-                        when (it) {
-                            MediaInsertType.CAMERA -> TODO()
-                            MediaInsertType.RECORD_VIDEO -> TODO()
-                            MediaInsertType.LIBRARY -> { scope.launch { filePickerLauncher.launch("image/*") } }
-                            MediaInsertType.GIF -> TODO()
-                        }
+                    onResult = {
+                        viewModel.putImages(it)
                     }
                 )
             }
@@ -1331,8 +1326,10 @@ private object ComposeActionsDefaults {
 }
 
 @Composable
-private fun ComposeImage(item: Uri, viewModel: ComposeViewModel) {
+private fun ComposeImage(item: Uri, viewModel: ComposeViewModel, context: Context) {
     var expanded by remember { mutableStateOf(false) }
+    val type = item.mediaType(context)
+    val navController = LocalNavController.current
     Box {
         Box(
             modifier = Modifier
@@ -1345,12 +1342,41 @@ private fun ComposeImage(item: Uri, viewModel: ComposeViewModel) {
                 )
                 .clickable(
                     onClick = {
-                        expanded = true
+                        navController.navigate(RootRoute.Media.Raw(if (type == MediaType.video) MediaType.video else MediaType.photo, item.toString()))
                     }
                 )
                 .clip(MaterialTheme.shapes.small),
         ) {
             NetworkImage(data = item)
+            when (type) {
+                MediaType.animated_gif ->
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_media_tag_bg),
+                        contentDescription = type.name,
+                        modifier = Modifier.align(Alignment.BottomStart)
+                            .width(ComposeImageDefaults.Tag.Width)
+                            .height(ComposeImageDefaults.Tag.Height)
+                            .padding(ComposeImageDefaults.Tag.Padding)
+                    )
+                MediaType.video -> Icon(
+                    imageVector = Icons.Default.PlayArrow,
+                    tint = Color.White.copy(alpha = LocalContentAlpha.current),
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .size(ComposeImageDefaults.VideoIconSize)
+                        .background(MaterialTheme.colors.primary, CircleShape),
+                    contentDescription = type.name
+                )
+                else -> {}
+            }
+            Image(
+                painter = painterResource(id = R.drawable.ic_dots_circle_horiz),
+                contentDescription = type.name,
+                modifier = Modifier.align(Alignment.BottomEnd)
+                    .size(ComposeImageDefaults.Menu.Size)
+                    .padding(ComposeImageDefaults.Menu.Padding)
+                    .clickable { expanded = !expanded }
+            )
         }
         DropdownMenu(
             expanded = expanded,
@@ -1373,4 +1399,15 @@ private fun ComposeImage(item: Uri, viewModel: ComposeViewModel) {
 
 private object ComposeImageDefaults {
     val ImageSize = 72.dp
+
+    object Tag {
+        val Width = 24.dp
+        val Height = 18.dp
+        val Padding = PaddingValues(start = 6.dp, bottom = 6.dp)
+    }
+    object Menu {
+        val Size = 24.dp
+        val Padding = PaddingValues(end = 6.dp, bottom = 3.dp)
+    }
+    val VideoIconSize = 30.dp
 }
