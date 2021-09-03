@@ -39,7 +39,7 @@ import com.twidere.twiderex.viewmodel.timeline.MentionsTimelineViewModel
 
 class MentionItem : HomeNavigationItem() {
     @Composable
-    override fun name(): String = stringResource(R.string.scene_mentions_title)
+    override fun name(): String = stringResource(com.twidere.common.R.string.scene_mentions_title)
     override val route: String
         get() = RootRoute.Mentions
 
@@ -69,7 +69,7 @@ fun MentionScene() {
             topBar = {
                 AppBar(
                     title = {
-                        Text(text = stringResource(id = R.string.scene_mentions_title))
+                        Text(text = stringResource(id = com.twidere.common.R.string.scene_mentions_title))
                     },
                     navigationIcon = {
                         AppBarNavigationButton()

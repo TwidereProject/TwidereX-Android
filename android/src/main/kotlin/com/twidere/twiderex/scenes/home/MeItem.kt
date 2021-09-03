@@ -37,7 +37,7 @@ import com.twidere.twiderex.ui.TwidereScene
 class MeItem : HomeNavigationItem() {
 
     @Composable
-    override fun name(): String = stringResource(R.string.scene_profile_title)
+    override fun name(): String = stringResource(com.twidere.common.R.string.scene_profile_title)
     override val route: String
         get() = RootRoute.Me
 
@@ -60,7 +60,7 @@ fun MeScene() {
             topBar = {
                 AppBar(
                     title = {
-                        Text(text = stringResource(id = R.string.scene_profile_title))
+                        Text(text = stringResource(id = com.twidere.common.R.string.scene_profile_title))
                     },
                     navigationIcon = {
                         AppBarNavigationButton()

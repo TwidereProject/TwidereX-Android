@@ -39,7 +39,7 @@ fun LazyListScope.loadState(
             ListItem(
                 modifier = Modifier.clickable(onClick = { onReloadRequested.invoke() }),
                 text = {
-//                        Text(text = stringResource(id = R.string.list_load_state_error))
+//                        Text(text = stringResource(id = com.twidere.common.R.string.list_load_state_error))
                 }
             )
         }

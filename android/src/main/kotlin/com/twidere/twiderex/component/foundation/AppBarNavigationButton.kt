@@ -42,7 +42,7 @@ fun AppBarNavigationButton(
     ) {
         Icon(
             imageVector = icon,
-            contentDescription = stringResource(id = R.string.accessibility_common_back)
+            contentDescription = stringResource(id = com.twidere.common.R.string.accessibility_common_back)
         )
     }
 }

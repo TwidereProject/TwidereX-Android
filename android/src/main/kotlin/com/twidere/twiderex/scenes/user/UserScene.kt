@@ -93,7 +93,7 @@ fun UserScene(
                                         Icon(
                                             painter = painterResource(id = R.drawable.ic_mail),
                                             contentDescription = stringResource(
-                                                id = R.string.scene_messages_title
+                                                id = com.twidere.common.R.string.scene_messages_title
                                             ),
                                             tint = MaterialTheme.colors.onSurface
                                         )

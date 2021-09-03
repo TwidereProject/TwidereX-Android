@@ -122,7 +122,7 @@ class MiscViewModel @AssistedInject constructor(
         try {
             proxyPort.value = value.toInt()
         } catch (e: NumberFormatException) {
-            inAppNotification.show(R.string.scene_settings_misc_proxy_port_error)
+            inAppNotification.show(com.twidere.common.R.string.scene_settings_misc_proxy_port_error)
             return
         }
         viewModelScope.launch {

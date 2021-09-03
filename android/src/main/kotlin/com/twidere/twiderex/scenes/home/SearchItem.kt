@@ -67,7 +67,7 @@ import com.twidere.twiderex.viewmodel.trend.TrendViewModel
 class SearchItem : HomeNavigationItem() {
 
     @Composable
-    override fun name(): String = stringResource(R.string.scene_search_title)
+    override fun name(): String = stringResource(com.twidere.common.R.string.scene_search_title)
     override val route: String
         get() = RootRoute.Search.Home
 
@@ -90,7 +90,7 @@ fun SearchScene() {
             topBar = {
                 AppBar(
                     title = {
-                        Text(text = stringResource(id = R.string.scene_search_title))
+                        Text(text = stringResource(id = com.twidere.common.R.string.scene_search_title))
                     },
                     navigationIcon = {
                         AppBarNavigationButton()
@@ -144,7 +144,7 @@ fun SearchSceneContent() {
                                     modifier = Modifier
                                         .weight(1F)
                                         .align(Alignment.CenterVertically),
-                                    text = stringResource(id = R.string.scene_search_search_bar_placeholder),
+                                    text = stringResource(id = com.twidere.common.R.string.scene_search_search_bar_placeholder),
                                 )
                             }
                             IconButton(
@@ -155,7 +155,7 @@ fun SearchSceneContent() {
                                 Icon(
                                     painter = painterResource(id = R.drawable.ic_search),
                                     contentDescription = stringResource(
-                                        id = R.string.scene_search_title
+                                        id = com.twidere.common.R.string.scene_search_title
                                     )
                                 )
                             }
@@ -169,7 +169,7 @@ fun SearchSceneContent() {
             item {
                 if (source.isNotEmpty()) ListItem {
                     Text(
-                        text = stringResource(id = R.string.scene_search_saved_search),
+                        text = stringResource(id = com.twidere.common.R.string.scene_search_saved_search),
                         style = MaterialTheme.typography.button
                     )
                 }
@@ -191,7 +191,7 @@ fun SearchSceneContent() {
                             Icon(
                                 painter = painterResource(id = R.drawable.ic_trash_can),
                                 contentDescription = stringResource(
-                                    id = R.string.common_controls_actions_remove
+                                    id = com.twidere.common.R.string.common_controls_actions_remove
                                 )
                             )
                         }
@@ -211,7 +211,7 @@ fun SearchSceneContent() {
                     }
                 ) {
                     Text(
-                        text = if (expandSearch) stringResource(id = R.string.scene_search_show_less) else stringResource(id = R.string.scene_search_show_more),
+                        text = if (expandSearch) stringResource(id = com.twidere.common.R.string.scene_search_show_less) else stringResource(id = com.twidere.common.R.string.scene_search_show_more),
                         style = MaterialTheme.typography.subtitle1,
                         color = MaterialTheme.colors.primary
                     )
@@ -225,14 +225,14 @@ fun SearchSceneContent() {
                             when (account.type) {
                                 PlatformType.Twitter ->
                                     Text(
-                                        text = stringResource(id = R.string.scene_trends_world_wide),
+                                        text = stringResource(id = com.twidere.common.R.string.scene_trends_world_wide),
                                         style = MaterialTheme.typography.button
                                     )
                                 PlatformType.StatusNet -> TODO()
                                 PlatformType.Fanfou -> TODO()
                                 PlatformType.Mastodon ->
                                     Text(
-                                        text = stringResource(id = R.string.scene_trends_world_wide),
+                                        text = stringResource(id = com.twidere.common.R.string.scene_trends_world_wide),
                                         style = MaterialTheme.typography.button
                                     )
                             }

@@ -207,7 +207,7 @@ fun VideoPlayer(
                         .align(Alignment.Center)
                         .size(UserAvatarDefaults.AvatarSize)
                         .background(MaterialTheme.colors.primary, CircleShape),
-                    contentDescription = stringResource(id = R.string.accessibility_common_video_play)
+                    contentDescription = stringResource(id = com.twidere.common.R.string.accessibility_common_video_play)
                 )
             }
         }

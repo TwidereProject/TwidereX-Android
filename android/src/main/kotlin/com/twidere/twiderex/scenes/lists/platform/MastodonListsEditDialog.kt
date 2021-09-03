@@ -71,7 +71,7 @@ fun MastodonListsEditDialog(listKey: MicroBlogKey, onDismissRequest: () -> Unit)
             }
             MastodonListsModifyComponent(
                 onDismissRequest = { dismiss() },
-                title = stringResource(id = R.string.scene_lists_modify_dialog_edit),
+                title = stringResource(id = com.twidere.common.R.string.scene_lists_modify_dialog_edit),
                 name = name,
                 onNameChanged = { name = it }
             ) {

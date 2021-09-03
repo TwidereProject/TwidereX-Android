@@ -49,6 +49,6 @@ class DownloadMediaJob(
         fileResolver.openOutputStream(target)?.use {
             service.download(target = source).copyTo(it)
         } ?: throw Error("Download failed")
-        inAppNotification.show(R.string.common_controls_actions_save)
+        inAppNotification.show(com.twidere.common.R.string.common_controls_actions_save)
     }
 }

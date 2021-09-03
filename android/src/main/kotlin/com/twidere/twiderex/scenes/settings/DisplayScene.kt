@@ -75,7 +75,7 @@ fun DisplayScene() {
                         AppBarNavigationButton()
                     },
                     title = {
-                        Text(text = stringResource(id = R.string.scene_settings_display_title))
+                        Text(text = stringResource(id = com.twidere.common.R.string.scene_settings_display_title))
                     }
                 )
             }
@@ -87,7 +87,7 @@ fun DisplayScene() {
                     )
             ) {
                 ItemHeader() {
-                    Text(text = stringResource(id = R.string.scene_settings_display_section_header_preview))
+                    Text(text = stringResource(id = com.twidere.common.R.string.scene_settings_display_section_header_preview))
                 }
                 CompositionLocalProvider(
                     LocalNavigator provides FakeNavigator,
@@ -97,7 +97,7 @@ fun DisplayScene() {
                 }
                 ItemDivider()
                 ItemHeader() {
-                    Text(text = stringResource(id = R.string.scene_settings_display_section_header_text))
+                    Text(text = stringResource(id = com.twidere.common.R.string.scene_settings_display_section_header_text))
                 }
                 switchItem(
                     value = display.useSystemFontSize,
@@ -105,7 +105,7 @@ fun DisplayScene() {
                         viewModel.setUseSystemFontSize(it)
                     },
                     title = {
-                        Text(text = stringResource(id = R.string.scene_settings_display_text_use_the_system_font_size))
+                        Text(text = stringResource(id = com.twidere.common.R.string.scene_settings_display_text_use_the_system_font_size))
                     },
                 )
                 if (!display.useSystemFontSize) {
@@ -114,7 +114,7 @@ fun DisplayScene() {
                             Icon(
                                 modifier = Modifier.size(12.dp),
                                 imageVector = Icons.Default.TextFields,
-                                contentDescription = stringResource(id = R.string.accessibility_scene_settings_display_font_size)
+                                contentDescription = stringResource(id = com.twidere.common.R.string.accessibility_scene_settings_display_font_size)
                             )
                         },
                         text = {
@@ -132,7 +132,7 @@ fun DisplayScene() {
                         trailing = {
                             Icon(
                                 imageVector = Icons.Default.TextFields,
-                                contentDescription = stringResource(id = R.string.accessibility_scene_settings_display_font_size)
+                                contentDescription = stringResource(id = com.twidere.common.R.string.accessibility_scene_settings_display_font_size)
                             )
                         }
                     )
@@ -148,14 +148,14 @@ fun DisplayScene() {
                         viewModel.setAvatarStyle(it)
                     },
                     title = {
-                        Text(text = stringResource(id = R.string.scene_settings_display_text_avatar_style))
+                        Text(text = stringResource(id = com.twidere.common.R.string.scene_settings_display_text_avatar_style))
                     },
                     itemContent = {
                         Text(
                             text = stringResource(
                                 arrayOf(
-                                    R.string.scene_settings_display_text_circle,
-                                    R.string.scene_settings_display_text_rounded_square,
+                                    com.twidere.common.R.string.scene_settings_display_text_circle,
+                                    com.twidere.common.R.string.scene_settings_display_text_rounded_square,
                                 )[it.ordinal]
                             )
                         )
@@ -163,7 +163,7 @@ fun DisplayScene() {
                 )
                 ItemDivider()
                 ItemHeader() {
-                    Text(text = stringResource(id = R.string.scene_settings_display_section_header_media))
+                    Text(text = stringResource(id = com.twidere.common.R.string.scene_settings_display_section_header_media))
                 }
                 switchItem(
                     value = display.urlPreview,
@@ -171,7 +171,7 @@ fun DisplayScene() {
                         viewModel.setUrlPreview(it)
                     },
                     title = {
-                        Text(text = stringResource(id = R.string.scene_settings_display_url_preview))
+                        Text(text = stringResource(id = com.twidere.common.R.string.scene_settings_display_url_preview))
                     }
                 )
                 switchItem(
@@ -180,7 +180,7 @@ fun DisplayScene() {
                         viewModel.setMediaPreview(it)
                     },
                     title = {
-                        Text(text = stringResource(id = R.string.scene_settings_display_media_media_previews))
+                        Text(text = stringResource(id = com.twidere.common.R.string.scene_settings_display_media_media_previews))
                     }
                 )
                 if (display.mediaPreview) {
@@ -195,15 +195,15 @@ fun DisplayScene() {
                             viewModel.setAutoPlayback(it)
                         },
                         title = {
-                            Text(text = stringResource(id = R.string.scene_settings_display_media_auto_playback))
+                            Text(text = stringResource(id = com.twidere.common.R.string.scene_settings_display_media_auto_playback))
                         },
                         itemContent = {
                             Text(
                                 text = stringResource(
                                     arrayOf(
-                                        R.string.scene_settings_display_media_automatic,
-                                        R.string.scene_settings_display_media_always,
-                                        R.string.scene_settings_display_media_off,
+                                        com.twidere.common.R.string.scene_settings_display_media_automatic,
+                                        com.twidere.common.R.string.scene_settings_display_media_always,
+                                        com.twidere.common.R.string.scene_settings_display_media_off,
                                     )[it.ordinal]
                                 )
                             )

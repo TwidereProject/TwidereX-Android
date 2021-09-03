@@ -147,13 +147,13 @@ enum class VoteExpired(val value: Long) {
     @Composable
     fun stringName(): String {
         return when (this) {
-            Min_5 -> stringResource(id = R.string.scene_compose_vote_expiration_5_Min)
-            Min_30 -> stringResource(id = R.string.scene_compose_vote_expiration_30_Min)
-            Hour_1 -> stringResource(id = R.string.scene_compose_vote_expiration_1_Hour)
-            Hour_6 -> stringResource(id = R.string.scene_compose_vote_expiration_6_Hour)
-            Day_1 -> stringResource(id = R.string.scene_compose_vote_expiration_1_Day)
-            Day_3 -> stringResource(id = R.string.scene_compose_vote_expiration_3_Day)
-            Day_7 -> stringResource(id = R.string.scene_compose_vote_expiration_7_Day)
+            Min_5 -> stringResource(id = com.twidere.common.R.string.scene_compose_vote_expiration_5_Min)
+            Min_30 -> stringResource(id = com.twidere.common.R.string.scene_compose_vote_expiration_30_Min)
+            Hour_1 -> stringResource(id = com.twidere.common.R.string.scene_compose_vote_expiration_1_Hour)
+            Hour_6 -> stringResource(id = com.twidere.common.R.string.scene_compose_vote_expiration_6_Hour)
+            Day_1 -> stringResource(id = com.twidere.common.R.string.scene_compose_vote_expiration_1_Day)
+            Day_3 -> stringResource(id = com.twidere.common.R.string.scene_compose_vote_expiration_3_Day)
+            Day_7 -> stringResource(id = com.twidere.common.R.string.scene_compose_vote_expiration_7_Day)
         }
     }
 }

@@ -53,7 +53,7 @@ fun FollowingScene(
                         AppBarNavigationButton()
                     },
                     title = {
-                        Text(stringResource(id = R.string.scene_following_title))
+                        Text(stringResource(id = com.twidere.common.R.string.scene_following_title))
                     }
                 )
             },

@@ -72,7 +72,7 @@ fun NetworkImage(
         painter = painter,
         modifier = modifier,
         contentScale = contentScale,
-        contentDescription = stringResource(id = R.string.accessibility_common_network_image)
+        contentDescription = stringResource(id = com.twidere.common.R.string.accessibility_common_network_image)
     )
 }
 

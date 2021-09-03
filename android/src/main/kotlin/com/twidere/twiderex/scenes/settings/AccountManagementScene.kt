@@ -64,7 +64,7 @@ fun AccountManagementScene() {
                         AppBarNavigationButton()
                     },
                     title = {
-                        Text(text = stringResource(id = R.string.scene_manage_accounts_title))
+                        Text(text = stringResource(id = com.twidere.common.R.string.scene_manage_accounts_title))
                     },
                     actions = {
                         val navController = LocalNavController.current
@@ -76,7 +76,7 @@ fun AccountManagementScene() {
                             Icon(
                                 imageVector = Icons.Default.Add,
                                 contentDescription = stringResource(
-                                    id = R.string.accessibility_scene_manage_accounts_add
+                                    id = com.twidere.common.R.string.accessibility_scene_manage_accounts_add
                                 )
                             )
                         }
@@ -113,7 +113,7 @@ fun AccountManagementScene() {
                                         Icon(
                                             imageVector = Icons.Default.MoreVert,
                                             contentDescription = stringResource(
-                                                id = R.string.accessibility_common_more
+                                                id = com.twidere.common.R.string.accessibility_common_more
                                             )
                                         )
                                     }
@@ -127,7 +127,7 @@ fun AccountManagementScene() {
                                             },
                                         ) {
                                             Text(
-                                                text = stringResource(id = R.string.common_controls_actions_remove),
+                                                text = stringResource(id = com.twidere.common.R.string.common_controls_actions_remove),
                                                 color = Color.Red,
                                             )
                                         }

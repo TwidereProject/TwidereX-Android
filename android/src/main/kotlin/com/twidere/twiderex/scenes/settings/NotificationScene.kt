@@ -69,7 +69,7 @@ fun NotificationScene() {
             topBar = {
                 AppBar(
                     title = {
-                        Text(text = stringResource(id = R.string.scene_settings_notification_title))
+                        Text(text = stringResource(id = com.twidere.common.R.string.scene_settings_notification_title))
                     },
                     navigationIcon = {
                         AppBarNavigationButton()
@@ -86,7 +86,7 @@ fun NotificationScene() {
                             viewModel.setEnabled(!notificationEnabled)
                         },
                         text = {
-                            Text(text = stringResource(id = R.string.scene_settings_notification_notification_switch))
+                            Text(text = stringResource(id = com.twidere.common.R.string.scene_settings_notification_notification_switch))
                         },
                         trailing = {
                             ColoredSwitch(
@@ -102,7 +102,7 @@ fun NotificationScene() {
                     )
                 }
                 ItemHeader {
-                    Text(text = stringResource(id = R.string.scene_settings_notification_accounts))
+                    Text(text = stringResource(id = com.twidere.common.R.string.scene_settings_notification_accounts))
                 }
                 val navController = LocalNavController.current
                 LazyColumn {

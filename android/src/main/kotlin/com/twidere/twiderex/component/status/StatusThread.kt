@@ -48,7 +48,7 @@ fun StatusThreadWithAvatar(modifier: Modifier = Modifier, data: UiStatus, onClic
                 .height(StatusThreadDefaults.AvatarSize)
         ) {
             Text(
-                text = stringResource(id = R.string.common_controls_status_thread_show),
+                text = stringResource(id = com.twidere.common.R.string.common_controls_status_thread_show),
                 style = MaterialTheme.typography.body2
             )
         }
@@ -62,7 +62,7 @@ fun StatusThreadTextOnly(modifier: Modifier = Modifier, onClick: () -> Unit) {
             onClick = onClick,
         ) {
             Text(
-                text = stringResource(id = R.string.common_controls_status_thread_show),
+                text = stringResource(id = com.twidere.common.R.string.common_controls_status_thread_show),
                 style = MaterialTheme.typography.body2
             )
         }

@@ -87,7 +87,7 @@ fun ListsMembersScene(
                         AppBarNavigationButton()
                     },
                     title = {
-                        Text(text = stringResource(id = R.string.scene_lists_details_tabs_members))
+                        Text(text = stringResource(id = com.twidere.common.R.string.scene_lists_details_tabs_members))
                     }
                 )
             },
@@ -107,12 +107,12 @@ fun ListsMembersScene(
                         Icon(
                             painter = painterResource(id = R.drawable.ic_add),
                             contentDescription = stringResource(
-                                id = R.string.scene_lists_details_add_members
+                                id = com.twidere.common.R.string.scene_lists_details_add_members
                             ),
                             modifier = Modifier.padding(ListsMembersSceneDefaults.Fab.IconPadding)
                         )
                         Text(
-                            text = stringResource(id = R.string.scene_lists_users_add_title)
+                            text = stringResource(id = com.twidere.common.R.string.scene_lists_users_add_title)
                                 .uppercase(Locale.getDefault()),
                             style = MaterialTheme.typography.button
                         )
@@ -138,7 +138,7 @@ fun ListsMembersScene(
                             Icon(
                                 imageVector = Icons.Default.MoreVert,
                                 contentDescription = stringResource(
-                                    id = R.string.scene_lists_users_menu_actions_remove
+                                    id = com.twidere.common.R.string.scene_lists_users_menu_actions_remove
                                 )
                             )
                         }
@@ -153,7 +153,7 @@ fun ListsMembersScene(
                             ) {
                                 Text(
                                     text = stringResource(
-                                        R.string.scene_lists_users_menu_actions_remove
+                                        com.twidere.common.R.string.scene_lists_users_menu_actions_remove
                                     )
                                 )
                             }

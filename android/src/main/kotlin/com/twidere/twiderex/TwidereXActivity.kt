@@ -170,7 +170,7 @@ class TwidereXActivity : ComponentActivity() {
                 ) {
                     Image(
                         painter = painterResource(id = R.drawable.ic_login_logo),
-                        contentDescription = stringResource(id = R.string.accessibility_common_logo_twidere)
+                        contentDescription = stringResource(id = com.twidere.common.R.string.accessibility_common_logo_twidere)
                     )
                 }
             }

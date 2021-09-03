@@ -42,7 +42,7 @@ import com.twidere.twiderex.viewmodel.timeline.mastodon.FederatedTimelineViewMod
 class FederatedTimelineItem : HomeNavigationItem() {
     @Composable
     override fun name(): String {
-        return stringResource(id = R.string.scene_federated_title)
+        return stringResource(id = com.twidere.common.R.string.scene_federated_title)
     }
 
     override val route: String

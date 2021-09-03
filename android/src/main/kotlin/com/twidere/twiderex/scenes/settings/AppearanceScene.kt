@@ -88,7 +88,7 @@ fun AppearanceScene() {
                         AppBarNavigationButton()
                     },
                     title = {
-                        Text(text = stringResource(id = R.string.scene_settings_appearance_title))
+                        Text(text = stringResource(id = com.twidere.common.R.string.scene_settings_appearance_title))
                     },
                 )
             }
@@ -114,7 +114,7 @@ fun AppearanceScene() {
                         }
                     ),
                     text = {
-                        Text(text = stringResource(id = R.string.scene_settings_appearance_highlight_color))
+                        Text(text = stringResource(id = com.twidere.common.R.string.scene_settings_appearance_highlight_color))
                     },
                     trailing = {
                         Box(
@@ -139,14 +139,14 @@ fun AppearanceScene() {
                         viewModel.setTabPosition(it)
                     },
                     title = {
-                        Text(text = stringResource(id = R.string.scene_settings_appearance_section_header_tab_position))
+                        Text(text = stringResource(id = com.twidere.common.R.string.scene_settings_appearance_section_header_tab_position))
                     },
                     itemContent = {
                         Text(
                             text = stringResource(
                                 arrayOf(
-                                    R.string.scene_settings_appearance_tab_position_top,
-                                    R.string.scene_settings_appearance_tab_position_bottom
+                                    com.twidere.common.R.string.scene_settings_appearance_tab_position_top,
+                                    com.twidere.common.R.string.scene_settings_appearance_tab_position_bottom
                                 )[it.ordinal]
                             )
                         )
@@ -155,7 +155,7 @@ fun AppearanceScene() {
                 ItemDivider()
                 // Scrolling Timeline
                 ItemHeader() {
-                    Text(text = stringResource(id = R.string.scene_settings_appearance_section_header_scrolling_timeline))
+                    Text(text = stringResource(id = com.twidere.common.R.string.scene_settings_appearance_section_header_scrolling_timeline))
                 }
                 switchItem(
                     value = appearance.hideTabBarWhenScroll,
@@ -163,7 +163,7 @@ fun AppearanceScene() {
                         viewModel.setHideTabBarWhenScrolling(it)
                     },
                     title = {
-                        Text(text = stringResource(id = R.string.scene_settings_appearance_scrolling_timeline_tab_bar))
+                        Text(text = stringResource(id = com.twidere.common.R.string.scene_settings_appearance_scrolling_timeline_tab_bar))
                     },
                 )
                 switchItem(
@@ -172,7 +172,7 @@ fun AppearanceScene() {
                         viewModel.setHideAppBarWhenScrolling(it)
                     },
                     title = {
-                        Text(text = stringResource(id = R.string.scene_settings_appearance_scrolling_timeline_app_bar))
+                        Text(text = stringResource(id = com.twidere.common.R.string.scene_settings_appearance_scrolling_timeline_app_bar))
                     },
                 )
                 switchItem(
@@ -181,7 +181,7 @@ fun AppearanceScene() {
                         viewModel.setHideFabWhenScrolling(it)
                     },
                     title = {
-                        Text(text = stringResource(id = R.string.scene_settings_appearance_scrolling_timeline_fab))
+                        Text(text = stringResource(id = com.twidere.common.R.string.scene_settings_appearance_scrolling_timeline_fab))
                     },
                 )
                 ItemDivider()
@@ -196,15 +196,15 @@ fun AppearanceScene() {
                         viewModel.setTheme(it)
                     },
                     title = {
-                        Text(text = stringResource(id = R.string.scene_settings_appearance_section_header_theme))
+                        Text(text = stringResource(id = com.twidere.common.R.string.scene_settings_appearance_section_header_theme))
                     },
                     itemContent = {
                         Text(
                             text = stringResource(
                                 arrayOf(
-                                    R.string.scene_settings_appearance_theme_auto,
-                                    R.string.scene_settings_appearance_theme_light,
-                                    R.string.scene_settings_appearance_theme_dark,
+                                    com.twidere.common.R.string.scene_settings_appearance_theme_auto,
+                                    com.twidere.common.R.string.scene_settings_appearance_theme_light,
+                                    com.twidere.common.R.string.scene_settings_appearance_theme_dark,
                                 )[it.ordinal]
                             )
                         )
@@ -218,7 +218,7 @@ fun AppearanceScene() {
                             viewModel.setIsDarkModePureBlack(it)
                         },
                     ) {
-                        Text(text = stringResource(id = R.string.scene_settings_appearance_AMOLED_optimized_mode))
+                        Text(text = stringResource(id = com.twidere.common.R.string.scene_settings_appearance_AMOLED_optimized_mode))
                     }
                 }
             }
@@ -241,7 +241,7 @@ fun PrimaryColorDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         title = {
-            Text(text = stringResource(id = R.string.scene_settings_appearance_pick_color))
+            Text(text = stringResource(id = com.twidere.common.R.string.scene_settings_appearance_pick_color))
         },
         text = {
             Row(
@@ -278,7 +278,7 @@ fun PrimaryColorDialog(
         },
         confirmButton = {
             TextButton(onClick = onDismiss) {
-                Text(text = stringResource(id = R.string.common_controls_actions_ok))
+                Text(text = stringResource(id = com.twidere.common.R.string.common_controls_actions_ok))
             }
         }
     )

@@ -66,7 +66,7 @@ fun MastodonListsModifyComponent(
                     onValueChange = onNameChanged,
                     placeholder = {
                         Text(
-                            text = stringResource(id = R.string.scene_lists_modify_name),
+                            text = stringResource(id = com.twidere.common.R.string.scene_lists_modify_name),
                             style = MaterialTheme.typography.subtitle1,
                         )
                     },
@@ -79,7 +79,7 @@ fun MastodonListsModifyComponent(
                     onDismissRequest.invoke()
                 }
             ) {
-                Text(text = stringResource(id = R.string.common_controls_actions_cancel))
+                Text(text = stringResource(id = com.twidere.common.R.string.common_controls_actions_cancel))
             }
         },
         confirmButton = {
@@ -88,7 +88,7 @@ fun MastodonListsModifyComponent(
                     onConfirm(name)
                 }
             ) {
-                Text(text = stringResource(id = R.string.common_controls_actions_ok))
+                Text(text = stringResource(id = com.twidere.common.R.string.common_controls_actions_ok))
             }
         },
         shape = RoundedCornerShape(0.dp)

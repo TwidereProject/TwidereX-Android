@@ -72,7 +72,7 @@ fun StorageScene() {
                         AppBarNavigationButton()
                     },
                     title = {
-                        Text(text = stringResource(id = R.string.scene_settings_storage_title))
+                        Text(text = stringResource(id = com.twidere.common.R.string.scene_settings_storage_title))
                     }
                 )
             }
@@ -86,7 +86,7 @@ fun StorageScene() {
                             viewModel.clearSearchHistory()
                         },
                 ) {
-                    Text(text = stringResource(id = R.string.scene_settings_storage_search_title))
+                    Text(text = stringResource(id = com.twidere.common.R.string.scene_settings_storage_search_title))
                 }
                 ListItem(
                     modifier = Modifier
@@ -94,10 +94,10 @@ fun StorageScene() {
                             viewModel.clearImageCache()
                         },
                     text = {
-                        Text(text = stringResource(id = R.string.scene_settings_storage_media_title))
+                        Text(text = stringResource(id = com.twidere.common.R.string.scene_settings_storage_media_title))
                     },
                     secondaryText = {
-                        Text(text = stringResource(id = R.string.scene_settings_storage_media_sub_title))
+                        Text(text = stringResource(id = com.twidere.common.R.string.scene_settings_storage_media_sub_title))
                     },
                 )
                 ListItem(
@@ -106,10 +106,10 @@ fun StorageScene() {
                             viewModel.clearDatabaseCache()
                         },
                     text = {
-                        Text(text = stringResource(id = R.string.scene_settings_storage_all_title), color = Color.Red)
+                        Text(text = stringResource(id = com.twidere.common.R.string.scene_settings_storage_all_title), color = Color.Red)
                     },
                     secondaryText = {
-                        Text(text = stringResource(id = R.string.scene_settings_storage_all_sub_title))
+                        Text(text = stringResource(id = com.twidere.common.R.string.scene_settings_storage_all_sub_title))
                     },
                 )
             }

@@ -119,7 +119,7 @@
     <string name="common_controls_status_thread_show">Bu konuyu göster</string>
     <string name="common_controls_status_actions_share_link">Linki paylaş</string>
     <string name="common_controls_status_actions_delete_tweet">Tweeti sil</string>
-    <string name="common_controls_status_actions_quote">Alıntıla</string>
+    <string name="common_controls_status_actions_quote">Alıntı</string>
     <string name="common_controls_status_actions_copy_text">Metni kopyala</string>
     <string name="common_controls_status_actions_vote">Oy ver</string>
     <string name="common_controls_status_actions_copy_link">Linki kopyala</string>
@@ -221,7 +221,6 @@
     <string name="scene_settings_about_license">Lisans</string>
     <string name="scene_settings_about_description">Android 5.0+ için yeni nesil Twidere. \nHala erken aşamada.</string>
     <string name="scene_settings_about_logo_background">Sayfa arka plan logosu hakkında</string>
-    <string name="scene_settings_about_title">Hakkında</string>
     <string name="scene_settings_about_version">Sür %s</string>
     <string name="scene_settings_storage_all_sub_title">Tüm Twidere X önbelleğini sil. Hesap kimliğiniz kaybolmaz.</string>
     <string name="scene_settings_storage_all_title">Tüm önbelleği temizle</string>

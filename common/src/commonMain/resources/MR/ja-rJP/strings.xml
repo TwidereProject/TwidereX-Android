@@ -26,10 +26,13 @@
     <string name="common_alerts_no_tweets_found_title">ツイートが見つかりませんでした</string>
     <string name="common_alerts_media_saving_title">メディアの保存</string>
     <string name="common_alerts_failed_to_login_timeout_title">ログインに失敗しました</string>
+    <string name="common_alerts_failed_to_login_timeout_message">接続がタイムアウトしました。</string>
     <string name="common_alerts_unblock_user_success_title">%s はブロック解除されました</string>
     <string name="common_alerts_mute_user_success_title">%s はミュートされました</string>
     <string name="common_alerts_permission_denied_not_authorized_title">権限がありません</string>
     <string name="common_alerts_permission_denied_not_authorized_message">権限がありません</string>
+    <string name="common_alerts_failed_to_send_message_title">メッセージの送信</string>
+    <string name="common_alerts_failed_to_send_message_message">メッセージの送信に失敗しました</string>
     <string name="common_alerts_failed_to_unmute_user_title">%s のミュート解除に失敗</string>
     <string name="common_alerts_failed_to_unmute_user_message">もう一度やり直してください</string>
     <string name="common_alerts_rate_limit_exceeded_title">レート制限を超えました</string>
@@ -136,7 +139,7 @@
     <string name="accessibility_scene_home_compose">新規作成</string>
     <string name="accessibility_scene_home_drawer_account_dropdown">アカウント ドロップダウン</string>
     <string name="accessibility_scene_home_menu">メニュー</string>
-    <string name="scene_lists_modify_private">プライベート</string>
+    <string name="scene_lists_modify_private">フォロワー限定</string>
     <string name="scene_lists_modify_edit_title">リストを編集</string>
     <string name="scene_lists_modify_name">名前</string>
     <string name="scene_lists_modify_create_title">新規リスト</string>
