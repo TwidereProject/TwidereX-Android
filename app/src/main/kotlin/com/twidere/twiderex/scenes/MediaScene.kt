@@ -67,7 +67,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
 import com.google.accompanist.insets.navigationBarsHeight
 import com.google.accompanist.insets.navigationBarsPadding
 import com.google.accompanist.insets.statusBarsPadding
@@ -83,6 +82,7 @@ import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.LoadingProgress
 import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.foundation.VideoPlayer
+import com.twidere.twiderex.component.foundation.VideoPlayerController
 import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.component.status.LikeButton
 import com.twidere.twiderex.component.status.ReplyButton
@@ -101,6 +101,7 @@ import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.MediaType
 import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.model.ui.UiStatus
+import com.twidere.twiderex.preferences.LocalDisplayPreferences
 import com.twidere.twiderex.preferences.proto.DisplayPreferences
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalNavController
@@ -174,6 +175,10 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewM
             null
         }
     }
+    val display = LocalDisplayPreferences.current
+    var isMute by remember {
+        mutableStateOf(display.muteByDefault)
+    }
     val swiperState = rememberSwiperState(
         onDismiss = {
             navController.popBackStack()
@@ -212,7 +217,12 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewM
                             .navigationBarsPadding()
                             .clickable { navigator.status(status = status) },
                     ) {
-                        StatusMediaInfo(videoControl, status, viewModel, currentMedia)
+                        StatusMediaInfo(
+                            videoControl, status, viewModel, currentMedia, isMute,
+                            onMute = {
+                                isMute = it
+                            }
+                        )
                     }
                 }
             }
@@ -244,6 +254,7 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewM
                 swiperState = swiperState,
                 customControl = videoControl,
                 pagerState = pagerState,
+                volume = if (isMute) 0f else 1f
             )
             DisposableEffect(Unit) {
                 window.setOnSystemBarsVisibilityChangeListener { visibility ->
@@ -297,7 +308,9 @@ private fun StatusMediaInfo(
     videoControl: PlayerControlView?,
     status: UiStatus,
     viewModel: MediaViewModel,
-    currentMedia: UiMedia
+    currentMedia: UiMedia,
+    mute: Boolean,
+    onMute: (isMute: Boolean) -> Unit
 ) {
     val context = LocalContext.current
     Column(
@@ -305,7 +318,7 @@ private fun StatusMediaInfo(
             .padding(StatusMediaInfoDefaults.ContentPadding),
     ) {
         if (videoControl != null) {
-            AndroidView(factory = { videoControl })
+            VideoPlayerController(videoControl = videoControl, mute = mute, onMute = onMute)
         }
         StatusText(status = status, maxLines = 2, showMastodonPoll = false)
         Spacer(modifier = Modifier.height(StatusMediaInfoDefaults.TextSpacing))
@@ -411,6 +424,7 @@ fun MediaView(
         pageCount = media.size,
     ),
     customControl: PlayerControlView? = null,
+    volume: Float = 1f
 ) {
     Box(
         modifier = Modifier
@@ -449,7 +463,8 @@ fun MediaView(
                             customControl = customControl,
                             showControls = false,
                             zOrderMediaOverlay = true,
-                            keepScreenOn = true
+                            keepScreenOn = true,
+                            volume = volume
                         )
                     }
                 MediaType.other -> Unit
