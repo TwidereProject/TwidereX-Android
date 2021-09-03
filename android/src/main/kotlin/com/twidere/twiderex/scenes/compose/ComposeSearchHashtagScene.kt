@@ -80,7 +80,7 @@ fun ComposeSearchHashtagScene() {
                                 },
                                 maxLines = 1,
                                 placeholder = {
-                                    Text(text = stringResource(id = R.string.scene_compose_hashtag_search_search_placeholder))
+                                    Text(text = stringResource(id = com.twidere.common.R.string.scene_compose_hashtag_search_search_placeholder))
                                 },
                                 autoFocus = true,
                                 alignment = Alignment.CenterStart,
@@ -107,7 +107,7 @@ fun ComposeSearchHashtagScene() {
                             Icon(
                                 imageVector = Icons.Default.Done,
                                 contentDescription = stringResource(
-                                    id = R.string.accessibility_common_done
+                                    id = com.twidere.common.R.string.accessibility_common_done
                                 )
                             )
                         }

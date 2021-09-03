@@ -259,7 +259,7 @@ private fun MastodonStatusHeader(
                 text = {
                     Text(
                         text = stringResource(
-                            id = R.string.common_notification_follow,
+                            id = com.twidere.common.R.string.common_notification_follow,
                             data.user.displayName
                         )
                     )
@@ -279,7 +279,7 @@ private fun MastodonStatusHeader(
                 text = {
                     Text(
                         text = stringResource(
-                            id = R.string.common_notification_follow_request,
+                            id = com.twidere.common.R.string.common_notification_follow_request,
                             data.user.displayName
                         )
                     )
@@ -304,7 +304,7 @@ private fun MastodonStatusHeader(
                 text = {
                     Text(
                         text = stringResource(
-                            id = R.string.common_notification_favourite,
+                            id = com.twidere.common.R.string.common_notification_favourite,
                             data.user.displayName
                         )
                     )
@@ -325,11 +325,11 @@ private fun MastodonStatusHeader(
                     val text =
                         if (LocalActiveAccount.current?.let { it.accountKey == data.user.userKey } == true) {
                             stringResource(
-                                id = R.string.common_notification_own_poll,
+                                id = com.twidere.common.R.string.common_notification_own_poll,
                             )
                         } else {
                             stringResource(
-                                id = R.string.common_notification_poll,
+                                id = com.twidere.common.R.string.common_notification_poll,
                             )
                         }
 
@@ -352,7 +352,7 @@ private fun MastodonStatusHeader(
                 text = {
                     Text(
                         text = stringResource(
-                            id = R.string.common_notification_status,
+                            id = com.twidere.common.R.string.common_notification_status,
                             data.user.displayName
                         )
                     )
@@ -619,7 +619,7 @@ fun ColumnScope.StatusBody(
                 Icon(
                     modifier = Modifier.size(16.dp),
                     painter = painterResource(id = R.drawable.ic_map_pin),
-                    contentDescription = stringResource(id = R.string.accessibility_common_status_location)
+                    contentDescription = stringResource(id = com.twidere.common.R.string.accessibility_common_status_location)
                 )
                 Box(modifier = Modifier.width(StatusBodyDefaults.PlaceSpacing))
                 Text(text = status.geo.name)
@@ -723,11 +723,11 @@ fun MediaPreviewButton(
         Icon(
             painter = painterResource(id = R.drawable.ic_photo),
             contentDescription = stringResource(
-                id = R.string.accessibility_common_status_media
+                id = com.twidere.common.R.string.accessibility_common_status_media
             )
         )
         Spacer(modifier = Modifier.width(MediaPreviewButtonDefaults.IconSpacing))
-        Text(text = stringResource(id = R.string.common_controls_status_media))
+        Text(text = stringResource(id = com.twidere.common.R.string.common_controls_status_media))
     }
 }
 

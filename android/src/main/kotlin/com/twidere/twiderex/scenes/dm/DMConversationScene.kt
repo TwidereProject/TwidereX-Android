@@ -112,7 +112,7 @@ fun DMConversationScene(conversationKey: MicroBlogKey) {
             },
         ) {
             if (!account.supportDirectMessage) {
-                Text(text = stringResource(id = R.string.scene_messages_error_not_supported))
+                Text(text = stringResource(id = com.twidere.common.R.string.scene_messages_error_not_supported))
             } else {
                 // user might enter this page by notifications after switch platform
                 NormalContent(viewModel)
@@ -130,7 +130,7 @@ fun NormalContent(viewModel: DMEventViewModel) {
             viewModel.inputImage.value = it
         },
     )
-    val copyText = stringResource(id = R.string.scene_messages_action_copy_text)
+    val copyText = stringResource(id = com.twidere.common.R.string.scene_messages_action_copy_text)
     val source = viewModel.source.collectAsLazyPagingItems()
     val input by viewModel.input.observeAsState(initial = "")
     val inputImage by viewModel.inputImage.observeAsState(null)
@@ -214,7 +214,7 @@ fun MessageActionComponent(
                             onDismissRequest()
                         }
                     ) {
-                        Text(text = stringResource(id = R.string.scene_messages_action_copy_text))
+                        Text(text = stringResource(id = com.twidere.common.R.string.scene_messages_action_copy_text))
                     }
                     ListItem(
                         modifier = Modifier.clickable {
@@ -222,7 +222,7 @@ fun MessageActionComponent(
                             onDismissRequest()
                         }
                     ) {
-                        Text(text = stringResource(id = R.string.scene_messages_action_delete))
+                        Text(text = stringResource(id = com.twidere.common.R.string.scene_messages_action_delete))
                     }
                 }
             }
@@ -262,7 +262,7 @@ fun InputPhotoPreview(inputImage: Uri?, onRemove: () -> Unit) {
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_x),
-                contentDescription = stringResource(id = R.string.common_controls_actions_remove),
+                contentDescription = stringResource(id = com.twidere.common.R.string.common_controls_actions_remove),
                 tint = MaterialTheme.colors.surface,
                 modifier = Modifier.padding(InputPhotoPreviewDefaults.IconPadding)
             )
@@ -303,7 +303,7 @@ fun InputComponent(
                 Icon(
                     painter = painterResource(id = R.drawable.ic_camera),
                     contentDescription = stringResource(
-                        id = R.string.accessibility_scene_compose_image
+                        id = com.twidere.common.R.string.accessibility_scene_compose_image
                     )
                 )
             }
@@ -323,7 +323,7 @@ fun InputComponent(
             Icon(
                 painter = painterResource(id = R.drawable.ic_send),
                 contentDescription = stringResource(
-                    id = R.string.accessibility_scene_compose_send
+                    id = com.twidere.common.R.string.accessibility_scene_compose_send
                 ),
                 tint = if (enableSend) MaterialTheme.colors.primary else LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
             )

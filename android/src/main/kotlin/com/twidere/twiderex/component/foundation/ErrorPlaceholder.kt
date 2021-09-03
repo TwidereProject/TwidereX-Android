@@ -60,7 +60,7 @@ fun ErrorPlaceholder(
             ) {
                 Text(
                     text = message
-                        ?: stringResource(id = R.string.common_alerts_failed_to_load_title),
+                        ?: stringResource(id = com.twidere.common.R.string.common_alerts_failed_to_load_title),
                 )
             }
         }

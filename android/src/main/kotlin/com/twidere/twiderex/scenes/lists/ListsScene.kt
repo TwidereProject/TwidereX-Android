@@ -61,7 +61,7 @@ fun ListsScene() {
                         AppBarNavigationButton()
                     },
                     title = {
-                        Text(text = stringResource(id = R.string.scene_lists_title))
+                        Text(text = stringResource(id = com.twidere.common.R.string.scene_lists_title))
                     },
                 )
             },
@@ -96,12 +96,12 @@ fun ListsSceneFab() {
             Icon(
                 painter = painterResource(id = R.drawable.ic_add),
                 contentDescription = stringResource(
-                    id = R.string.scene_lists_icons_create
+                    id = com.twidere.common.R.string.scene_lists_icons_create
                 ),
                 modifier = Modifier.padding(ListsSceneDefaults.Fab.IconPadding)
             )
             Text(
-                text = stringResource(id = R.string.scene_lists_modify_create_title)
+                text = stringResource(id = com.twidere.common.R.string.scene_lists_modify_create_title)
                     .uppercase(Locale.getDefault()),
                 style = MaterialTheme.typography.button
             )

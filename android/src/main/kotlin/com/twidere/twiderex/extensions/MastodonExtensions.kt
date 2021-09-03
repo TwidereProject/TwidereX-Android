@@ -40,9 +40,9 @@ fun MastodonVisibility.icon(): Painter {
 @Composable
 fun MastodonVisibility.stringName(): String {
     return when (this) {
-        MastodonVisibility.Public -> stringResource(id = R.string.scene_compose_visibility_public)
-        MastodonVisibility.Unlisted -> stringResource(id = R.string.scene_compose_visibility_unlisted)
-        MastodonVisibility.Private -> stringResource(id = R.string.scene_compose_visibility_private)
-        MastodonVisibility.Direct -> stringResource(id = R.string.scene_compose_visibility_direct)
+        MastodonVisibility.Public -> stringResource(id = com.twidere.common.R.string.scene_compose_visibility_public)
+        MastodonVisibility.Unlisted -> stringResource(id = com.twidere.common.R.string.scene_compose_visibility_unlisted)
+        MastodonVisibility.Private -> stringResource(id = com.twidere.common.R.string.scene_compose_visibility_private)
+        MastodonVisibility.Direct -> stringResource(id = com.twidere.common.R.string.scene_compose_visibility_direct)
     }
 }

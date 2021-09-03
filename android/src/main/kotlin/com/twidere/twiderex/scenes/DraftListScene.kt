@@ -63,7 +63,7 @@ fun DraftListScene() {
                         AppBarNavigationButton()
                     },
                     title = {
-                        Text(text = stringResource(id = R.string.scene_drafts_title))
+                        Text(text = stringResource(id = com.twidere.common.R.string.scene_drafts_title))
                     }
                 )
             }
@@ -102,7 +102,7 @@ fun DraftListSceneContent(
                             Icon(
                                 imageVector = Icons.Default.MoreVert,
                                 contentDescription = stringResource(
-                                    id = R.string.accessibility_common_more
+                                    id = com.twidere.common.R.string.accessibility_common_more
                                 )
                             )
                         }
@@ -115,7 +115,7 @@ fun DraftListSceneContent(
                                     navController.navigate(RootRoute.Draft.Compose(it.draftId))
                                 }
                             ) {
-                                Text(text = stringResource(id = R.string.scene_drafts_actions_edit_draft))
+                                Text(text = stringResource(id = com.twidere.common.R.string.scene_drafts_actions_edit_draft))
                             }
                             DropdownMenuItem(
                                 onClick = {
@@ -123,7 +123,7 @@ fun DraftListSceneContent(
                                 }
                             ) {
                                 Text(
-                                    text = stringResource(id = R.string.common_controls_actions_remove),
+                                    text = stringResource(id = com.twidere.common.R.string.common_controls_actions_remove),
                                     color = Color.Red,
                                 )
                             }

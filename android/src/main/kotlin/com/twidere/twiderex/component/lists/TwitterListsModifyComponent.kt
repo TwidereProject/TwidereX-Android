@@ -84,7 +84,7 @@ fun TwitterListsModifyComponent(
         }
         CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.disabled) {
             Text(
-                text = stringResource(id = R.string.scene_lists_modify_name),
+                text = stringResource(id = com.twidere.common.R.string.scene_lists_modify_name),
                 style = MaterialTheme.typography.caption,
                 modifier = Modifier.padding(TwitterListsModifyComponentDefaults.TextFieldTitle.ContentPadding)
             )
@@ -119,7 +119,7 @@ fun TwitterListsModifyComponent(
         Spacer(modifier = Modifier.height(TwitterListsModifyComponentDefaults.VerticalPadding))
         CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.disabled) {
             Text(
-                text = stringResource(id = R.string.scene_lists_modify_description),
+                text = stringResource(id = com.twidere.common.R.string.scene_lists_modify_description),
                 style = MaterialTheme.typography.caption,
                 modifier = Modifier.padding(TwitterListsModifyComponentDefaults.TextFieldTitle.ContentPadding)
             )
@@ -152,7 +152,7 @@ fun TwitterListsModifyComponent(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            Text(text = stringResource(id = R.string.scene_lists_modify_private), style = MaterialTheme.typography.body1)
+            Text(text = stringResource(id = com.twidere.common.R.string.scene_lists_modify_private), style = MaterialTheme.typography.body1)
             ColoredSwitch(
                 checked = isPrivate,
                 onCheckedChange = onPrivateChanged,

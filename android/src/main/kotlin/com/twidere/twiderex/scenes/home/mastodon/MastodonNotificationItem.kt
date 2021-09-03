@@ -49,7 +49,7 @@ import kotlinx.coroutines.launch
 class MastodonNotificationItem : HomeNavigationItem() {
     @Composable
     override fun name(): String {
-        return stringResource(id = R.string.scene_notification_title)
+        return stringResource(id = com.twidere.common.R.string.scene_notification_title)
     }
 
     override val route: String
@@ -79,7 +79,7 @@ fun MastodonNotificationScene() {
             topBar = {
                 AppBar(
                     title = {
-                        Text(text = stringResource(id = R.string.scene_notification_title))
+                        Text(text = stringResource(id = com.twidere.common.R.string.scene_notification_title))
                     },
                     navigationIcon = {
                         AppBarNavigationButton()

@@ -46,7 +46,7 @@ import com.twidere.twiderex.viewmodel.timeline.HomeTimelineViewModel
 class HomeTimelineItem : HomeNavigationItem() {
 
     @Composable
-    override fun name(): String = stringResource(R.string.scene_timeline_title)
+    override fun name(): String = stringResource(com.twidere.common.R.string.scene_timeline_title)
     override val route: String
         get() = RootRoute.HomeTimeline
 
@@ -76,7 +76,7 @@ fun HomeTimelineScene() {
             topBar = {
                 AppBar(
                     title = {
-                        Text(text = stringResource(id = R.string.scene_timeline_title))
+                        Text(text = stringResource(id = com.twidere.common.R.string.scene_timeline_title))
                     },
                     navigationIcon = {
                         AppBarNavigationButton()
@@ -103,7 +103,7 @@ private fun HomeTimelineFab() {
         Icon(
             painter = painterResource(id = R.drawable.ic_feather),
             contentDescription = stringResource(
-                id = R.string.accessibility_scene_home_compose
+                id = com.twidere.common.R.string.accessibility_scene_home_compose
             )
         )
     }

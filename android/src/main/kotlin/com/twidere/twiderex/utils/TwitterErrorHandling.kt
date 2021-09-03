@@ -42,7 +42,7 @@ fun Throwable.generateNotificationEvent(): NotificationEvent? {
         is MicroBlogHttpException -> {
             when (this.httpCode) {
                 HttpErrorCodes.TooManyRequests -> {
-                    return StringResNotificationEvent(messageId = R.string.common_alerts_too_many_requests_title)
+                    return StringResNotificationEvent(messageId = com.twidere.common.R.string.common_alerts_too_many_requests_title)
                 }
                 else -> null
             }
@@ -54,9 +54,9 @@ fun Throwable.generateNotificationEvent(): NotificationEvent? {
             when (this.errors?.firstOrNull()?.code) {
                 TwitterErrorCodes.TemporarilyLocked -> {
                     StringResWithActionNotificationEvent(
-                        R.string.common_alerts_account_temporarily_locked_title,
-                        R.string.common_alerts_account_temporarily_locked_message,
-                        actionId = R.string.common_controls_actions_ok
+                        com.twidere.common.R.string.common_alerts_account_temporarily_locked_title,
+                        com.twidere.common.R.string.common_alerts_account_temporarily_locked_message,
+                        actionId = com.twidere.common.R.string.common_controls_actions_ok
                     ) {
                         context.startActivity(
                             Intent(

@@ -35,7 +35,7 @@ import com.twidere.twiderex.viewmodel.search.SearchTweetsViewModel
 class SearchTweetsItem : SearchSceneItem {
     @Composable
     override fun name(): String {
-        return stringResource(id = R.string.scene_search_tabs_tweets)
+        return stringResource(id = com.twidere.common.R.string.scene_search_tabs_tweets)
     }
 
     @Composable

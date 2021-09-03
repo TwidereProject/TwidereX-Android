@@ -40,7 +40,7 @@ import com.twidere.twiderex.viewmodel.timeline.NotificationTimelineViewModel
 class AllNotificationItem : HomeNavigationItem() {
     @Composable
     override fun name(): String {
-        return stringResource(id = R.string.scene_notification_tabs_all)
+        return stringResource(id = com.twidere.common.R.string.scene_notification_tabs_all)
     }
 
     override val route: String
@@ -68,7 +68,7 @@ fun AllNotificationScene() {
             topBar = {
                 AppBar(
                     title = {
-                        Text(text = stringResource(id = R.string.scene_notification_tabs_all))
+                        Text(text = stringResource(id = com.twidere.common.R.string.scene_notification_tabs_all))
                     },
                     navigationIcon = {
                         AppBarNavigationButton()

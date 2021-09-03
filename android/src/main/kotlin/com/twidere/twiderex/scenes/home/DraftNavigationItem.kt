@@ -31,7 +31,7 @@ import com.twidere.twiderex.scenes.DraftListSceneContent
 class DraftNavigationItem : HomeNavigationItem() {
     @Composable
     override fun name(): String {
-        return stringResource(id = R.string.scene_drafts_title)
+        return stringResource(id = com.twidere.common.R.string.scene_drafts_title)
     }
 
     override val route: String

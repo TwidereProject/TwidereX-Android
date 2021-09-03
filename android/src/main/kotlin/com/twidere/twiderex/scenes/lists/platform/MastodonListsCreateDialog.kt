@@ -81,7 +81,7 @@ fun MastodonListsCreateDialog(onDismissRequest: () -> Unit) {
     if (showMastodonComponent) {
         MastodonListsModifyComponent(
             onDismissRequest = { dismiss() },
-            title = stringResource(id = R.string.scene_lists_modify_dialog_create),
+            title = stringResource(id = com.twidere.common.R.string.scene_lists_modify_dialog_create),
             name = name,
             onNameChanged = { name = it }
         ) {

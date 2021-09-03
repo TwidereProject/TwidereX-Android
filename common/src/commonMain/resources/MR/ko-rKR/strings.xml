@@ -96,7 +96,7 @@
     <string name="common_controls_friendship_actions_unfollow">팔로우 끊기</string>
     <string name="common_controls_profile_dashboard_followers">팔로워</string>
     <string name="common_controls_profile_dashboard_listed">담긴 리스트</string>
-    <string name="common_controls_profile_dashboard_following">팔로우하는 계정</string>
+    <string name="common_controls_profile_dashboard_following">팔로우 중</string>
     <string name="common_controls_timeline_load_more">더 불러오기</string>
     <string name="common_controls_ios_photo_library">갤러리</string>
     <string name="common_controls_actions_add">새로 만들기</string>
@@ -322,7 +322,7 @@
     <string name="scene_drafts_actions_edit_draft">다시 쓰기</string>
     <string name="scene_compose_user_search_search_placeholder">사용자 찾기</string>
     <string name="scene_bookmark_title">즐겨찾기</string>
-    <string name="scene_followers_title">나를 팔로우하는 계정</string>
+    <string name="scene_followers_title">팔로워</string>
     <string name="scene_listed_title">담긴 리스트</string>
     <string name="scene_compose_save_draft_action">임시 저장하기</string>
     <string name="scene_compose_save_draft_message">임시 저장할까요?</string>
@@ -354,7 +354,7 @@
     <string name="scene_lists_icons_private">잠근 계정 보기</string>
     <string name="scene_lists_icons_create">리스트 만들기</string>
     <string name="scene_mentions_title">답글</string>
-    <string name="scene_following_title">내가 팔로우하는 계정</string>
+    <string name="scene_following_title">팔로우 중</string>
     <string name="scene_timeline_title">타임라인</string>
     <string name="scene_messages_expanded_photo">[사진]</string>
     <string name="scene_messages_new_conversation_search">사람 찾기</string>

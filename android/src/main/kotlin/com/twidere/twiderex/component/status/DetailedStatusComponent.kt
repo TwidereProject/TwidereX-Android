@@ -93,7 +93,7 @@ fun DetailedStatusComponent(
                                     modifier = Modifier.size(MaterialTheme.typography.body1.fontSize.value.dp),
                                     painter = painterResource(id = R.drawable.ic_map_pin),
                                     contentDescription = stringResource(
-                                        id = R.string.accessibility_common_status_location
+                                        id = com.twidere.common.R.string.accessibility_common_status_location
                                     )
                                 )
                                 Text(text = status.geo.name)
@@ -126,7 +126,7 @@ fun DetailedStatusComponent(
                                 count = status.metrics.reply,
                                 icon = painterResource(id = R.drawable.ic_corner_up_left),
                                 contentDescription = stringResource(
-                                    id = R.string.scene_status_reply_mutiple,
+                                    id = com.twidere.common.R.string.scene_status_reply_mutiple,
                                     status.metrics.reply,
                                 ),
                             )
@@ -135,7 +135,7 @@ fun DetailedStatusComponent(
                                 count = status.metrics.retweet,
                                 icon = painterResource(id = R.drawable.ic_repeat),
                                 contentDescription = stringResource(
-                                    id = R.string.scene_status_retweet_mutiple,
+                                    id = com.twidere.common.R.string.scene_status_retweet_mutiple,
                                     status.metrics.retweet,
                                 ),
                             )
@@ -152,7 +152,7 @@ fun DetailedStatusComponent(
                                 count = status.metrics.like,
                                 icon = painterResource(id = R.drawable.ic_heart),
                                 contentDescription = stringResource(
-                                    id = R.string.scene_status_like_multiple,
+                                    id = com.twidere.common.R.string.scene_status_like_multiple,
                                     status.metrics.like,
                                 ),
                             )

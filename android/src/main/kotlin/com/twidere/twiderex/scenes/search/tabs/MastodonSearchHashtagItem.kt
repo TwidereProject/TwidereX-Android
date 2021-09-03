@@ -42,7 +42,7 @@ import com.twidere.twiderex.viewmodel.mastodon.MastodonSearchHashtagViewModel
 class MastodonSearchHashtagItem : SearchSceneItem {
     @Composable
     override fun name(): String {
-        return stringResource(id = R.string.scene_search_tabs_hashtag)
+        return stringResource(id = com.twidere.common.R.string.scene_search_tabs_hashtag)
     }
 
     @OptIn(ExperimentalMaterialApi::class)
