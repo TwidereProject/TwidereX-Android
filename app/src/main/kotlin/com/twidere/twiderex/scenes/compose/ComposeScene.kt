@@ -112,6 +112,7 @@ import com.twidere.twiderex.component.foundation.InAppNotificationBottomSheetSca
 import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.foundation.TextInput
 import com.twidere.twiderex.component.lazy.itemsGridIndexed
+import com.twidere.twiderex.component.media.MediaInsertMenu
 import com.twidere.twiderex.component.status.StatusLineComponent
 import com.twidere.twiderex.component.status.TimelineStatusComponent
 import com.twidere.twiderex.component.status.UserAvatar
@@ -126,6 +127,7 @@ import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.MastodonVisibility
+import com.twidere.twiderex.model.enums.MediaInsertType
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiEmojiCategory
 import com.twidere.twiderex.navigation.RootRoute
@@ -1163,20 +1165,16 @@ private fun ComposeActions(
     Box {
         Row {
             AnimatedVisibility(visible = allowImage) {
-                IconButton(
-                    onClick = {
-                        scope.launch {
-                            filePickerLauncher.launch("image/*")
+                MediaInsertMenu(
+                    onSelect = {
+                        when (it) {
+                            MediaInsertType.CAMERA -> TODO()
+                            MediaInsertType.RECORD_VIDEO -> TODO()
+                            MediaInsertType.LIBRARY -> { scope.launch { filePickerLauncher.launch("image/*") } }
+                            MediaInsertType.GIF -> TODO()
                         }
                     }
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_camera),
-                        contentDescription = stringResource(
-                            id = R.string.accessibility_scene_compose_image
-                        )
-                    )
-                }
+                )
             }
             if (account.type == PlatformType.Mastodon) {
                 IconButton(
