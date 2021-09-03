@@ -36,7 +36,7 @@ import com.twidere.twiderex.viewmodel.search.SearchUserViewModel
 class SearchUserItem : SearchSceneItem {
     @Composable
     override fun name(): String {
-        return stringResource(id = R.string.scene_search_tabs_users)
+        return stringResource(id = com.twidere.common.R.string.scene_search_tabs_users)
     }
 
     @Composable

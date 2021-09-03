@@ -458,7 +458,7 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
                                 }
                             ),
                             text = {
-                                Text(text = stringResource(id = R.string.scene_drawer_sign_in))
+                                Text(text = stringResource(id = com.twidere.common.R.string.scene_drawer_sign_in))
                             }
                         )
                     }
@@ -471,7 +471,7 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
                                 }
                             ),
                             text = {
-                                Text(text = stringResource(id = R.string.scene_manage_accounts_title))
+                                Text(text = stringResource(id = com.twidere.common.R.string.scene_manage_accounts_title))
                             }
                         )
                     }
@@ -520,12 +520,12 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_adjustments_horizontal),
                     contentDescription = stringResource(
-                        id = R.string.scene_settings_title
+                        id = com.twidere.common.R.string.scene_settings_title
                     )
                 )
             },
             text = {
-                Text(text = stringResource(id = R.string.scene_settings_title))
+                Text(text = stringResource(id = com.twidere.common.R.string.scene_settings_title))
             }
         )
     }
@@ -601,7 +601,7 @@ private fun DrawerUserHeader(
                     modifier = Modifier.rotate(rotate),
                     imageVector = Icons.Default.ArrowDropDown,
                     contentDescription = stringResource(
-                        id = R.string.accessibility_scene_home_drawer_account_dropdown
+                        id = com.twidere.common.R.string.accessibility_scene_home_drawer_account_dropdown
                     )
                 )
             }

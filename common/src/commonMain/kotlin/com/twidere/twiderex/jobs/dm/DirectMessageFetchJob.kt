@@ -62,8 +62,8 @@ class DirectMessageFetchJob(
                     NotificationChannelSpec.ContentMessages.id
                 )
             )
-            .setContentTitle(applicationContext.getString(R.string.common_notification_messages_title))
-            .setContentText(applicationContext.getString(R.string.common_notification_messages_content, message.latestMessage.sender.displayName))
+            .setContentTitle(applicationContext.getString(com.twidere.common.R.string.common_notification_messages_title))
+            .setContentText(applicationContext.getString(com.twidere.common.R.string.common_notification_messages_content, message.latestMessage.sender.displayName))
             .setDeepLink(RootDeepLinksRoute.Conversation(message.conversation.conversationKey))
         notificationManager.notify(message.latestMessage.messageKey.hashCode(), builder.build())
     }

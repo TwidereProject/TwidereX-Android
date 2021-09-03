@@ -155,7 +155,7 @@ private fun DMOutComeEvent(onResend: (event: UiDMEvent) -> Unit = {}, event: UiD
                         ) {
                             Icon(
                                 painter = painterResource(id = R.drawable.ic_alert),
-                                contentDescription = stringResource(id = R.string.scene_messages_icon_failed),
+                                contentDescription = stringResource(id = com.twidere.common.R.string.scene_messages_icon_failed),
                                 tint = Color.Unspecified,
                                 modifier = Modifier.size(DMOutComeEventDefaults.Error.size)
                             )

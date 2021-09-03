@@ -88,7 +88,7 @@ fun LazyUiListsList(
             if (listType == ListType.All) {
                 item {
                     LazyUiListTitleItem(
-                        title = stringResource(id = R.string.scene_lists_tabs_created).uppercase(
+                        title = stringResource(id = com.twidere.common.R.string.scene_lists_tabs_created).uppercase(
                             Locale.getDefault()
                         )
                     )
@@ -115,7 +115,7 @@ fun LazyUiListsList(
             if (listType == ListType.All) {
                 item {
                     LazyUiListTitleItem(
-                        title = stringResource(id = R.string.scene_lists_tabs_subscribed).uppercase(
+                        title = stringResource(id = com.twidere.common.R.string.scene_lists_tabs_subscribed).uppercase(
                             Locale.getDefault()
                         ),
                         divider = true
@@ -186,7 +186,7 @@ private fun LazyUiListItem(uiList: UiList, onItemClicked: (UiList) -> Unit = {})
             if (uiList.isPrivate) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_lock),
-                    contentDescription = stringResource(id = R.string.scene_lists_icons_private),
+                    contentDescription = stringResource(id = com.twidere.common.R.string.scene_lists_icons_private),
                     modifier = Modifier
                         .alpha(ContentAlpha.disabled)
                         .size(LazyUiListsItemDefaults.LockIconSize)
@@ -254,7 +254,7 @@ private fun EmptyList() {
     ) {
         Icon(
             painter = painterResource(id = R.drawable.ic_empty_list),
-            contentDescription = stringResource(id = R.string.common_alerts_no_tweets_found_title)
+            contentDescription = stringResource(id = com.twidere.common.R.string.common_alerts_no_tweets_found_title)
         )
     }
 }

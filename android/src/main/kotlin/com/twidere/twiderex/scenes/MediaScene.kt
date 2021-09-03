@@ -278,7 +278,7 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewM
                             Icon(
                                 painter = painterResource(id = R.drawable.ic_x),
                                 contentDescription = stringResource(
-                                    id = R.string.accessibility_common_close
+                                    id = com.twidere.common.R.string.accessibility_common_close
                                 )
                             )
                         }
@@ -340,7 +340,7 @@ private fun StatusMediaInfo(
                     }
                 ) {
                     Text(
-                        text = stringResource(id = R.string.common_controls_actions_save),
+                        text = stringResource(id = com.twidere.common.R.string.common_controls_actions_save),
                     )
                 }
                 DropdownMenuItem(
@@ -354,7 +354,7 @@ private fun StatusMediaInfo(
                     }
                 ) {
                     Text(
-                        text = stringResource(id = R.string.common_controls_actions_share_media),
+                        text = stringResource(id = com.twidere.common.R.string.common_controls_actions_share_media),
                     )
                 }
             }

@@ -108,12 +108,12 @@ fun MastodonSignInScene() {
                         Icon(
                             painter = painterResource(id = R.drawable.ic_mastodon_logo_white),
                             contentDescription = stringResource(
-                                id = R.string.accessibility_common_logo_mastodon
+                                id = com.twidere.common.R.string.accessibility_common_logo_mastodon
                             )
                         )
                     },
                     text = {
-                        Text(text = stringResource(id = R.string.scene_sign_in_sign_in_with_mastodon))
+                        Text(text = stringResource(id = com.twidere.common.R.string.scene_sign_in_sign_in_with_mastodon))
                     },
                     trailing = {
                         IconButton(
@@ -123,7 +123,7 @@ fun MastodonSignInScene() {
                             Icon(
                                 imageVector = Icons.Default.KeyboardArrowRight,
                                 contentDescription = stringResource(
-                                    id = R.string.scene_sign_in_sign_in_with_mastodon
+                                    id = com.twidere.common.R.string.scene_sign_in_sign_in_with_mastodon
                                 )
                             )
                         }

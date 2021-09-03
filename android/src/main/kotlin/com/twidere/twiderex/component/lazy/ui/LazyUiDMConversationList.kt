@@ -161,7 +161,7 @@ private fun UiDMEvent.resolveLink(
         entity != null -> {
             if (entity.displayUrl.contains("pic.twitter.com")) {
                 ResolvedLink(
-                    expanded = context.getString(R.string.scene_messages_expanded_photo),
+                    expanded = context.getString(com.twidere.common.R.string.scene_messages_expanded_photo),
                     clickable = false
                 )
             } else {

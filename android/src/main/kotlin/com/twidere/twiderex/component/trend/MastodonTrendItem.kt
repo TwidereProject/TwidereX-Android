@@ -61,7 +61,7 @@ fun MastodonTrendItem(trend: UiTrend, onClick: (UiTrend) -> Unit) {
             ListItem(
                 modifier = Modifier.weight(1f),
                 secondaryText = {
-                    Text(text = stringResource(id = R.string.scene_trends_accounts, trend.dailyAccounts), style = MaterialTheme.typography.body2)
+                    Text(text = stringResource(id = com.twidere.common.R.string.scene_trends_accounts, trend.dailyAccounts), style = MaterialTheme.typography.body2)
                 },
                 text = {
                     Text(text = trend.displayName, style = MaterialTheme.typography.subtitle1)

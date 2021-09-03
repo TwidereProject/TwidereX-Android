@@ -100,14 +100,14 @@ fun ListTimeLineScene(
                     title = {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(
-                                text = source?.title ?: stringResource(id = R.string.scene_lists_details_title),
+                                text = source?.title ?: stringResource(id = com.twidere.common.R.string.scene_lists_details_title),
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis
                             )
                             if (source?.isPrivate == true)
                                 Icon(
                                     painter = painterResource(id = R.drawable.ic_lock),
-                                    contentDescription = stringResource(id = R.string.scene_lists_icons_private),
+                                    contentDescription = stringResource(id = com.twidere.common.R.string.scene_lists_icons_private),
                                     modifier = Modifier
                                         .alpha(ContentAlpha.disabled)
                                         .padding(start = ListTimelineSceneDefaults.LockIconPadding)
@@ -123,7 +123,7 @@ fun ListTimeLineScene(
                             Icon(
                                 imageVector = Icons.Default.MoreVert,
                                 contentDescription = stringResource(
-                                    id = R.string.scene_lists_details_menu_actions_edit_list
+                                    id = com.twidere.common.R.string.scene_lists_details_menu_actions_edit_list
                                 )
                             )
                         }
@@ -147,9 +147,9 @@ fun ListTimeLineScene(
                                         Text(
                                             text = stringResource(
                                                 id = if (following)
-                                                    R.string.scene_lists_details_menu_actions_unfollow
+                                                    com.twidere.common.R.string.scene_lists_details_menu_actions_unfollow
                                                 else
-                                                    R.string.scene_lists_details_menu_actions_follow
+                                                    com.twidere.common.R.string.scene_lists_details_menu_actions_follow
                                             )
                                         )
                                     }
@@ -166,7 +166,7 @@ fun ListTimeLineScene(
                                         )
                                     }
                                 ) {
-                                    Text(text = stringResource(id = R.string.scene_lists_details_tabs_members))
+                                    Text(text = stringResource(id = com.twidere.common.R.string.scene_lists_details_tabs_members))
                                 }
 
                                 if (uiList.allowToSubscribe) {
@@ -180,7 +180,7 @@ fun ListTimeLineScene(
                                             )
                                         }
                                     ) {
-                                        Text(text = stringResource(id = R.string.scene_lists_details_tabs_subscriber))
+                                        Text(text = stringResource(id = com.twidere.common.R.string.scene_lists_details_tabs_subscriber))
                                     }
                                 }
 
@@ -198,9 +198,9 @@ fun ListTimeLineScene(
                                     ) {
                                         Text(
                                             text = if (account.type == PlatformType.Mastodon)
-                                                stringResource(id = R.string.scene_lists_details_menu_actions_rename_list)
+                                                stringResource(id = com.twidere.common.R.string.scene_lists_details_menu_actions_rename_list)
                                             else
-                                                stringResource(id = R.string.scene_lists_details_menu_actions_edit_list)
+                                                stringResource(id = com.twidere.common.R.string.scene_lists_details_menu_actions_edit_list)
                                         )
                                     }
                                 }
@@ -212,7 +212,7 @@ fun ListTimeLineScene(
                                             showDeleteConfirmDialog = true
                                         }
                                     ) {
-                                        Text(text = stringResource(id = R.string.scene_lists_details_menu_actions_delete_list))
+                                        Text(text = stringResource(id = com.twidere.common.R.string.scene_lists_details_menu_actions_delete_list))
                                     }
                                 }
                             }
@@ -281,7 +281,7 @@ private fun ListDeleteConfirmDialog(title: String, onDismissRequest: () -> Unit,
         },
         title = {
             Text(
-                text = stringResource(id = R.string.scene_lists_details_delete_list_title, title),
+                text = stringResource(id = com.twidere.common.R.string.scene_lists_details_delete_list_title, title),
                 style = MaterialTheme.typography.subtitle1
             )
         },
@@ -296,7 +296,7 @@ private fun ListDeleteConfirmDialog(title: String, onDismissRequest: () -> Unit,
                     onDismissRequest.invoke()
                 }
             ) {
-                Text(text = stringResource(id = R.string.common_controls_actions_cancel))
+                Text(text = stringResource(id = com.twidere.common.R.string.common_controls_actions_cancel))
             }
         },
         confirmButton = {
@@ -306,7 +306,7 @@ private fun ListDeleteConfirmDialog(title: String, onDismissRequest: () -> Unit,
                     onDismissRequest.invoke()
                 }
             ) {
-                Text(text = stringResource(id = R.string.common_controls_actions_yes))
+                Text(text = stringResource(id = com.twidere.common.R.string.common_controls_actions_yes))
             }
         },
 

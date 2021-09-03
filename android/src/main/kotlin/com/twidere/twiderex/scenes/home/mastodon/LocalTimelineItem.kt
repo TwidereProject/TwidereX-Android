@@ -42,7 +42,7 @@ import com.twidere.twiderex.viewmodel.timeline.mastodon.LocalTimelineViewModel
 class LocalTimelineItem : HomeNavigationItem() {
     @Composable
     override fun name(): String {
-        return stringResource(id = R.string.scene_local_title)
+        return stringResource(id = com.twidere.common.R.string.scene_local_title)
     }
 
     override val route: String

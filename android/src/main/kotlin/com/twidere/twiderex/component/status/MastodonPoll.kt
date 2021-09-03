@@ -129,24 +129,24 @@ fun MastodonPoll(status: UiStatus) {
         val countText = status.poll?.votersCount?.let {
             if (it > 1) {
                 stringResource(
-                    id = R.string.common_controls_status_poll_total_people,
+                    id = com.twidere.common.R.string.common_controls_status_poll_total_people,
                     it,
                 )
             } else {
                 stringResource(
-                    id = R.string.common_controls_status_poll_total_person,
+                    id = com.twidere.common.R.string.common_controls_status_poll_total_person,
                     it,
                 )
             }
         } ?: status.poll?.votesCount?.let {
             if (it > 1) {
                 stringResource(
-                    id = R.string.common_controls_status_poll_total_votes,
+                    id = com.twidere.common.R.string.common_controls_status_poll_total_votes,
                     it,
                 )
             } else {
                 stringResource(
-                    id = R.string.common_controls_status_poll_total_vote,
+                    id = com.twidere.common.R.string.common_controls_status_poll_total_vote,
                     it,
                 )
             }
@@ -163,7 +163,7 @@ fun MastodonPoll(status: UiStatus) {
                 }
                 Spacer(modifier = Modifier.width(MastodonPollDefaults.VoteTimeSpacing))
                 if (status.poll?.expired == true) {
-                    Text(text = stringResource(id = R.string.common_controls_status_poll_expired))
+                    Text(text = stringResource(id = com.twidere.common.R.string.common_controls_status_poll_expired))
                 } else {
                     Text(text = status.poll?.expiresAt?.humanizedTimestamp() ?: "")
                 }
@@ -178,7 +178,7 @@ fun MastodonPoll(status: UiStatus) {
                 },
                 enabled = voteState.isNotEmpty(),
             ) {
-                Text(text = stringResource(id = R.string.common_controls_status_actions_vote))
+                Text(text = stringResource(id = com.twidere.common.R.string.common_controls_status_actions_vote))
             }
         }
     }

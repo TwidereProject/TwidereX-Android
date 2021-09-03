@@ -105,7 +105,7 @@ fun LayoutScene() {
                         AppBarNavigationButton()
                     },
                     title = {
-                        Text(text = stringResource(id = R.string.scene_settings_layout_title))
+                        Text(text = stringResource(id = com.twidere.common.R.string.scene_settings_layout_title))
                     }
                 )
             }
@@ -130,10 +130,10 @@ fun LayoutScene() {
                 }
                 ListItem(
                     text = {
-                        Text(text = stringResource(id = R.string.scene_settings_layout_desc_title))
+                        Text(text = stringResource(id = com.twidere.common.R.string.scene_settings_layout_desc_title))
                     },
                     secondaryText = {
-                        Text(text = stringResource(id = R.string.scene_settings_layout_desc_content))
+                        Text(text = stringResource(id = com.twidere.common.R.string.scene_settings_layout_desc_content))
                     }
                 )
                 ReorderableColumn(
@@ -173,9 +173,9 @@ private fun LayoutItemContent(
             ItemHeader {
                 Text(
                     text = if (it) {
-                        stringResource(id = R.string.scene_settings_layout_actions_tabbar)
+                        stringResource(id = com.twidere.common.R.string.scene_settings_layout_actions_tabbar)
                     } else {
-                        stringResource(id = R.string.scene_settings_layout_actions_drawer)
+                        stringResource(id = com.twidere.common.R.string.scene_settings_layout_actions_drawer)
                     }
                 )
             }

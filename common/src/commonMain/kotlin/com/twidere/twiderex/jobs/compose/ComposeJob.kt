@@ -44,7 +44,7 @@ abstract class ComposeJob<T : MicroBlogService>(
     suspend fun execute(composeData: ComposeData, accountKey: MicroBlogKey) {
         val builder = AppNotification
             .Builder(NotificationChannelSpec.BackgroundProgresses.id)
-            .setContentTitle(applicationContext.getString(R.string.common_alerts_tweet_sending_title))
+            .setContentTitle(applicationContext.getString(com.twidere.common.R.string.common_alerts_tweet_sending_title))
             .setOngoing(true)
             .setSilent(true)
             .setProgress(100, 0, false)
@@ -77,7 +77,7 @@ abstract class ComposeJob<T : MicroBlogService>(
             builder.setOngoing(false)
                 .setProgress(0, 0, false)
                 .setSilent(false)
-                .setContentTitle(applicationContext.getString(R.string.common_alerts_tweet_sent_title))
+                .setContentTitle(applicationContext.getString(com.twidere.common.R.string.common_alerts_tweet_sent_title))
             notificationManager.notifyTransient(notificationId, builder.build())
             if (composeData.isThreadMode) {
                 // open compose scene in thread mode
@@ -91,7 +91,7 @@ abstract class ComposeJob<T : MicroBlogService>(
             builder.setOngoing(false)
                 .setProgress(0, 0, false)
                 .setSilent(false)
-                .setContentTitle(applicationContext.getString(R.string.common_alerts_tweet_fail_title))
+                .setContentTitle(applicationContext.getString(com.twidere.common.R.string.common_alerts_tweet_fail_title))
                 .setContentText(composeData.content)
                 .setDeepLink(RootDeepLinksRoute.Draft(composeData.draftId))
             notificationManager.notify(notificationId, builder.build())

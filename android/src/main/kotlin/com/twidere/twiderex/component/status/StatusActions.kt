@@ -79,7 +79,7 @@ fun ReplyButton(
 ) {
     val navigator = LocalNavigator.current
     val icon = painterResource(id = R.drawable.ic_corner_up_left)
-    val contentDescription = stringResource(id = R.string.accessibility_common_status_actions_reply)
+    val contentDescription = stringResource(id = com.twidere.common.R.string.accessibility_common_status_actions_reply)
     val action = {
         navigator.compose(ComposeType.Reply, statusKey = status.statusKey)
     }
@@ -124,7 +124,7 @@ fun LikeButton(
     } else {
         LocalContentColor.current
     }
-    val contentDescription = stringResource(id = R.string.accessibility_common_status_actions_like)
+    val contentDescription = stringResource(id = com.twidere.common.R.string.accessibility_common_status_actions_like)
     val icon = painterResource(id = R.drawable.ic_heart)
     val action = {
         if (account != null) {
@@ -174,7 +174,7 @@ fun RetweetButton(
     }
     val icon = painterResource(id = R.drawable.ic_repeat)
     val contentDescription =
-        stringResource(id = R.string.accessibility_common_status_actions_retweet)
+        stringResource(id = com.twidere.common.R.string.accessibility_common_status_actions_retweet)
     var expanded by remember { mutableStateOf(false) }
     val retweetAction = {
         if (status.platformType == PlatformType.Twitter) {
@@ -200,7 +200,7 @@ fun RetweetButton(
                     expanded = false
                 }
             ) {
-                Text(text = stringResource(id = R.string.common_controls_status_actions_retweet))
+                Text(text = stringResource(id = com.twidere.common.R.string.common_controls_status_actions_retweet))
             }
             val navigator = LocalNavigator.current
             DropdownMenuItem(
@@ -209,7 +209,7 @@ fun RetweetButton(
                 }
             ) {
                 Text(
-                    text = stringResource(id = R.string.common_controls_status_actions_quote),
+                    text = stringResource(id = com.twidere.common.R.string.common_controls_status_actions_quote),
                 )
             }
         }
@@ -260,7 +260,7 @@ fun ShareButton(
         linkResolver = { data.resolveLink(it) },
     )
     val clipboardManager = LocalClipboardManager.current
-    val contentDescription = stringResource(id = R.string.accessibility_common_more)
+    val contentDescription = stringResource(id = com.twidere.common.R.string.accessibility_common_more)
     Box(
         modifier = modifier,
     ) {
@@ -316,7 +316,7 @@ fun ShareButton(
                 }
             ) {
                 Text(
-                    text = stringResource(id = R.string.common_controls_status_actions_copy_text),
+                    text = stringResource(id = com.twidere.common.R.string.common_controls_status_actions_copy_text),
                 )
             }
             DropdownMenuItem(
@@ -330,7 +330,7 @@ fun ShareButton(
                 }
             ) {
                 Text(
-                    text = stringResource(id = R.string.common_controls_status_actions_copy_link),
+                    text = stringResource(id = com.twidere.common.R.string.common_controls_status_actions_copy_link),
                 )
             }
             DropdownMenuItem(
@@ -340,7 +340,7 @@ fun ShareButton(
                 }
             ) {
                 Text(
-                    text = stringResource(id = R.string.common_controls_status_actions_share_link),
+                    text = stringResource(id = com.twidere.common.R.string.common_controls_status_actions_share_link),
                 )
             }
             if (data.user.userKey == accountKey) {
@@ -351,7 +351,7 @@ fun ShareButton(
                     }
                 ) {
                     Text(
-                        text = stringResource(id = R.string.common_controls_actions_remove),
+                        text = stringResource(id = com.twidere.common.R.string.common_controls_actions_remove),
                         color = Color.Red,
                     )
                 }

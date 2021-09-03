@@ -77,7 +77,7 @@ fun AboutScene() {
                         AppBarNavigationButton()
                     },
                     title = {
-                        Text(text = stringResource(id = R.string.scene_settings_about_title))
+                        Text(text = stringResource(id = com.twidere.common.R.string.scene_settings_about_title))
                     }
                 )
             }
@@ -117,7 +117,7 @@ private fun AboutContent() {
                 backContent = {
                     BlurImage(
                         resource = R.drawable.ic_about_gray_logo_shadow,
-                        contentDescription = stringResource(id = R.string.scene_settings_about_logo_background_shadow),
+                        contentDescription = stringResource(id = com.twidere.common.R.string.scene_settings_about_logo_background_shadow),
                         modifier = Modifier
                             .aspectRatio(aspectRatio)
                             .fillMaxHeight()
@@ -131,7 +131,7 @@ private fun AboutContent() {
             ) {
                 Image(
                     painter = grayLogoPainter,
-                    contentDescription = stringResource(id = R.string.scene_settings_about_logo_background),
+                    contentDescription = stringResource(id = com.twidere.common.R.string.scene_settings_about_logo_background),
                     modifier = Modifier
                         .aspectRatio(aspectRatio)
                         .fillMaxHeight()
@@ -169,14 +169,14 @@ private fun AboutContent() {
             ) {
                 Text(
                     text = stringResource(
-                        id = R.string.scene_settings_about_version,
+                        id = com.twidere.common.R.string.scene_settings_about_version,
                         BuildConfig.VERSION_NAME
                     ),
                 )
                 Box(modifier = Modifier.height(AboutContentDefaults.VersionName.Spacing))
                 CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
                     Text(
-                        text = stringResource(id = R.string.scene_settings_about_description),
+                        text = stringResource(id = com.twidere.common.R.string.scene_settings_about_description),
                         style = MaterialTheme.typography.body2,
                     )
                 }
@@ -199,7 +199,7 @@ private fun AboutContent() {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_twitter),
                         tint = MaterialTheme.colors.onBackground,
-                        contentDescription = stringResource(id = R.string.accessibility_common_logo_twitter)
+                        contentDescription = stringResource(id = com.twidere.common.R.string.accessibility_common_logo_twitter)
                     )
                 }
                 Box(modifier = Modifier.width(AboutContentDefaults.Icon.Spacing))
@@ -211,7 +211,7 @@ private fun AboutContent() {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_github),
                         tint = MaterialTheme.colors.onBackground,
-                        contentDescription = stringResource(id = R.string.accessibility_common_logo_github)
+                        contentDescription = stringResource(id = com.twidere.common.R.string.accessibility_common_logo_github)
                     )
                 }
                 Box(modifier = Modifier.width(AboutContentDefaults.Icon.Spacing))
@@ -223,7 +223,7 @@ private fun AboutContent() {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_telegram),
                         tint = MaterialTheme.colors.onBackground,
-                        contentDescription = stringResource(id = R.string.accessibility_common_logo_github)
+                        contentDescription = stringResource(id = com.twidere.common.R.string.accessibility_common_logo_github)
                     )
                 }
             }
@@ -240,7 +240,7 @@ private fun AboutContent() {
                         .width(IntrinsicSize.Max)
                 ) {
                     Text(
-                        text = stringResource(id = R.string.scene_settings_about_license),
+                        text = stringResource(id = com.twidere.common.R.string.scene_settings_about_license),
                         style = MaterialTheme.typography.body1,
                         modifier = Modifier
                             .padding(AboutContentDefaults.License.TextPadding)

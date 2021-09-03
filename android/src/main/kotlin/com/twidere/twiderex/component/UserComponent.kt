@@ -133,13 +133,13 @@ fun UserComponent(
     val tabs = listOf(
         UserTabComponent(
             painterResource(id = R.drawable.ic_float_left),
-            stringResource(id = R.string.accessibility_scene_user_tab_status)
+            stringResource(id = com.twidere.common.R.string.accessibility_scene_user_tab_status)
         ) {
             UserStatusTimeline(userKey = userKey, viewModel = viewModel)
         },
         UserTabComponent(
             painterResource(id = R.drawable.ic_photo),
-            stringResource(id = R.string.accessibility_scene_user_tab_media)
+            stringResource(id = com.twidere.common.R.string.accessibility_scene_user_tab_media)
         ) {
             UserMediaTimeline(userKey = userKey)
         },
@@ -147,7 +147,7 @@ fun UserComponent(
         if (viewModel.isMe || userKey.host == MicroBlogKey.TwitterHost) {
             it + UserTabComponent(
                 painterResource(id = R.drawable.ic_heart),
-                stringResource(id = R.string.accessibility_scene_user_tab_favourite)
+                stringResource(id = com.twidere.common.R.string.accessibility_scene_user_tab_favourite)
             ) {
                 UserFavouriteTimeline(userKey = userKey)
             }
@@ -277,12 +277,12 @@ private fun UserStatusTimelineFilter(
             modifier = Modifier.weight(1f),
             text = if (user.metrics.status > 1) {
                 stringResource(
-                    id = R.string.common_countable_tweet_single,
+                    id = com.twidere.common.R.string.common_countable_tweet_single,
                     user.metrics.status
                 )
             } else {
                 stringResource(
-                    id = R.string.common_countable_tweet_multiple,
+                    id = com.twidere.common.R.string.common_countable_tweet_multiple,
                     user.metrics.status
                 )
             }
@@ -312,7 +312,7 @@ private fun UserStatusTimelineFilter(
                             )
                         }
                     ) {
-                        Text(text = stringResource(id = R.string.scene_profile_filter_all))
+                        Text(text = stringResource(id = com.twidere.common.R.string.scene_profile_filter_all))
                     }
                 }
                 DropdownMenuItem(
@@ -332,7 +332,7 @@ private fun UserStatusTimelineFilter(
                             )
                         }
                     ) {
-                        Text(text = stringResource(id = R.string.scene_profile_filter_exclude_replies))
+                        Text(text = stringResource(id = com.twidere.common.R.string.scene_profile_filter_exclude_replies))
                     }
                 }
             }
@@ -472,7 +472,7 @@ fun UserInfo(
                         .fillMaxWidth(),
                     painter = painterResource(id = R.drawable.ic_globe),
                     contentDescription = stringResource(
-                        id = R.string.accessibility_scene_user_website
+                        id = com.twidere.common.R.string.accessibility_scene_user_website
                     ),
                     text = it,
                     textColor = MaterialTheme.colors.primary,
@@ -483,7 +483,7 @@ fun UserInfo(
                 ProfileItem(
                     painter = painterResource(id = R.drawable.ic_map_pin),
                     contentDescription = stringResource(
-                        id = R.string.accessibility_scene_user_location
+                        id = com.twidere.common.R.string.accessibility_scene_user_location
                     ),
                     text = it
                 )
@@ -668,16 +668,16 @@ private fun UserRelationship(viewModel: UserViewModel) {
                 modifier = Modifier
                     .padding(ButtonDefaults.ContentPadding),
                 text = if (relationshipResult.followedBy) {
-                    stringResource(id = R.string.common_controls_friendship_actions_unfollow)
+                    stringResource(id = com.twidere.common.R.string.common_controls_friendship_actions_unfollow)
                 } else {
-                    stringResource(id = R.string.common_controls_friendship_actions_follow)
+                    stringResource(id = com.twidere.common.R.string.common_controls_friendship_actions_follow)
                 },
             )
         }
         Spacer(modifier = Modifier.height(UserRelationshipDefaults.FollowingSpacing))
         if (relationshipResult.following) {
             Text(
-                text = stringResource(id = R.string.common_controls_friendship_follows_you),
+                text = stringResource(id = com.twidere.common.R.string.common_controls_friendship_follows_you),
                 style = MaterialTheme.typography.caption,
             )
         }
@@ -731,7 +731,7 @@ fun UserMetrics(
                     navController.navigate(RootRoute.Following(user.userKey))
                 },
             primaryText = user.metrics.follow.toString(),
-            secondaryText = stringResource(id = R.string.common_controls_profile_dashboard_following),
+            secondaryText = stringResource(id = com.twidere.common.R.string.common_controls_profile_dashboard_following),
         )
         HorizontalDivider(
             modifier = Modifier.height(LocalTextStyle.current.fontSize.value.dp * 2)
@@ -743,7 +743,7 @@ fun UserMetrics(
                     navController.navigate(RootRoute.Followers(user.userKey))
                 },
             primaryText = user.metrics.fans.toString(),
-            secondaryText = stringResource(id = R.string.common_controls_profile_dashboard_followers),
+            secondaryText = stringResource(id = com.twidere.common.R.string.common_controls_profile_dashboard_followers),
         )
         if (user.platformType == PlatformType.Twitter) {
             HorizontalDivider(
@@ -753,7 +753,7 @@ fun UserMetrics(
                 modifier = Modifier
                     .weight(1f),
                 primaryText = user.metrics.listed.toString(),
-                secondaryText = stringResource(id = R.string.common_controls_profile_dashboard_listed),
+                secondaryText = stringResource(id = com.twidere.common.R.string.common_controls_profile_dashboard_listed),
             )
         }
     }

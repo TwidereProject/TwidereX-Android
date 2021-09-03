@@ -96,7 +96,7 @@
     <string name="common_controls_friendship_actions_unfollow">取消关注</string>
     <string name="common_controls_profile_dashboard_followers">关注者</string>
     <string name="common_controls_profile_dashboard_listed">列表中</string>
-    <string name="common_controls_profile_dashboard_following">正在关注</string>
+    <string name="common_controls_profile_dashboard_following">已关注</string>
     <string name="common_controls_timeline_load_more">加载更多</string>
     <string name="common_controls_ios_photo_library">照片库</string>
     <string name="common_controls_actions_add">添加</string>
@@ -356,7 +356,7 @@
     <string name="scene_lists_icons_private">私有可见性</string>
     <string name="scene_lists_icons_create">创建列表</string>
     <string name="scene_mentions_title">提及</string>
-    <string name="scene_following_title">正在关注</string>
+    <string name="scene_following_title">已关注</string>
     <string name="scene_timeline_title">时间线</string>
     <string name="scene_messages_expanded_photo">[照片]</string>
     <string name="scene_messages_new_conversation_search">搜索用户</string>

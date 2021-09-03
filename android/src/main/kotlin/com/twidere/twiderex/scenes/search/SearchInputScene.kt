@@ -110,7 +110,7 @@ fun SearchInputScene(initial: String? = null) {
                                 },
                                 maxLines = 1,
                                 placeholder = {
-                                    Text(text = stringResource(id = R.string.scene_search_search_bar_placeholder))
+                                    Text(text = stringResource(id = com.twidere.common.R.string.scene_search_search_bar_placeholder))
                                 },
                                 autoFocus = true,
                                 alignment = Alignment.CenterStart,
@@ -140,7 +140,7 @@ fun SearchInputScene(initial: String? = null) {
                             Icon(
                                 painter = painterResource(id = R.drawable.ic_search),
                                 contentDescription = stringResource(
-                                    id = R.string.scene_search_title
+                                    id = com.twidere.common.R.string.scene_search_title
                                 )
                             )
                         }
@@ -161,7 +161,7 @@ fun SearchInputScene(initial: String? = null) {
                             Icon(
                                 imageVector = Icons.Default.History,
                                 contentDescription = stringResource(
-                                    id = R.string.accessibility_scene_search_history
+                                    id = com.twidere.common.R.string.accessibility_scene_search_history
                                 )
                             )
                         },
@@ -174,7 +174,7 @@ fun SearchInputScene(initial: String? = null) {
                                 Icon(
                                     painter = painterResource(id = R.drawable.ic_x),
                                     contentDescription = stringResource(
-                                        id = R.string.common_controls_actions_remove
+                                        id = com.twidere.common.R.string.common_controls_actions_remove
                                     )
                                 )
                             }

@@ -101,7 +101,7 @@ fun SignInScaffold(
                     modifier = Modifier
                         .weight(1F)
                         .align(Alignment.Start),
-                    text = stringResource(id = R.string.scene_sign_in_hello_sign_in_to_get_started),
+                    text = stringResource(id = com.twidere.common.R.string.scene_sign_in_hello_sign_in_to_get_started),
                     fontWeight = FontWeight.Bold,
                     style = MaterialTheme.typography.h3,
                     color = MaterialTheme.colors.primary,

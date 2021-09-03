@@ -32,7 +32,7 @@ import com.twidere.twiderex.scenes.dm.DMConversationListSceneFab
 class DMConversationListItem : HomeNavigationItem() {
     @Composable
     override fun name(): String {
-        return stringResource(id = R.string.scene_messages_title)
+        return stringResource(id = com.twidere.common.R.string.scene_messages_title)
     }
 
     override val route: String

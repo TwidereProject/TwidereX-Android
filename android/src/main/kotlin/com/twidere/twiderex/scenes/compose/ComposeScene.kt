@@ -243,9 +243,9 @@ private fun ComposeBody(
                     title = {
                         Text(
                             text = when (composeType) {
-                                ComposeType.Reply -> stringResource(id = R.string.scene_compose_title_reply)
-                                ComposeType.Quote -> stringResource(id = R.string.scene_compose_title_quote)
-                                else -> stringResource(id = R.string.scene_compose_title_compose)
+                                ComposeType.Reply -> stringResource(id = com.twidere.common.R.string.scene_compose_title_reply)
+                                ComposeType.Quote -> stringResource(id = com.twidere.common.R.string.scene_compose_title_quote)
+                                else -> stringResource(id = com.twidere.common.R.string.scene_compose_title_compose)
                             }
                         )
                     },
@@ -262,7 +262,7 @@ private fun ComposeBody(
                             Icon(
                                 painter = painterResource(id = R.drawable.ic_x),
                                 contentDescription = stringResource(
-                                    id = R.string.accessibility_common_close
+                                    id = com.twidere.common.R.string.accessibility_common_close
                                 )
                             )
                         }
@@ -279,7 +279,7 @@ private fun ComposeBody(
                             Icon(
                                 painter = painterResource(id = if (enableThreadMode) R.drawable.ic_send_thread else R.drawable.ic_send),
                                 contentDescription = stringResource(
-                                    id = if (enableThreadMode) R.string.accessibility_scene_compose_thread else R.string.accessibility_scene_compose_send
+                                    id = if (enableThreadMode) com.twidere.common.R.string.accessibility_scene_compose_thread else com.twidere.common.R.string.accessibility_scene_compose_send
                                 ),
                                 tint = if (canSend) MaterialTheme.colors.primary else LocalContentColor.current.copy(
                                     alpha = LocalContentAlpha.current
@@ -627,7 +627,7 @@ private fun LocationDisplay(it: Location) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_map_pin),
                 contentDescription = stringResource(
-                    id = R.string.accessibility_common_status_location
+                    id = com.twidere.common.R.string.accessibility_common_status_location
                 )
             )
             Text(text = "${it.latitude}, ${it.longitude}")
@@ -771,13 +771,13 @@ private fun ReplySheetContent(
                 Icon(
                     painter = painterResource(id = R.drawable.ic_x),
                     contentDescription = stringResource(
-                        id = R.string.accessibility_common_close
+                        id = com.twidere.common.R.string.accessibility_common_close
                     )
                 )
             }
         },
         text = {
-            Text(text = stringResource(id = R.string.scene_compose_replying_to))
+            Text(text = stringResource(id = com.twidere.common.R.string.scene_compose_replying_to))
         }
     )
     status?.let {
@@ -806,7 +806,7 @@ private fun ReplySheetContent(
     }
     if (replyToUser.any()) {
         ListItem {
-            Text(text = stringResource(id = R.string.scene_compose_others_in_this_conversation))
+            Text(text = stringResource(id = com.twidere.common.R.string.scene_compose_others_in_this_conversation))
         }
         Divider(modifier = Modifier.padding(horizontal = 16.dp))
         replyToUser.forEach { user ->
@@ -861,18 +861,18 @@ private fun ConfirmDraftDialog(
         onDismissRequest = onDismiss,
         text = {
             Text(
-                text = stringResource(id = R.string.scene_compose_save_draft_message),
+                text = stringResource(id = com.twidere.common.R.string.scene_compose_save_draft_message),
                 style = MaterialTheme.typography.body2
             )
         },
         dismissButton = {
             TextButton(onClick = onCancel) {
-                Text(text = stringResource(id = R.string.common_controls_actions_cancel))
+                Text(text = stringResource(id = com.twidere.common.R.string.common_controls_actions_cancel))
             }
         },
         confirmButton = {
             TextButton(onClick = onConfirm) {
-                Text(text = stringResource(id = R.string.scene_compose_save_draft_action))
+                Text(text = stringResource(id = com.twidere.common.R.string.scene_compose_save_draft_action))
             }
         },
     )
@@ -919,7 +919,7 @@ private fun ComposeInput(
                     autoFocus = autoFocus,
                     placeholder = {
                         CompositionLocalProvider(LocalContentAlpha.provides(ContentAlpha.medium)) {
-                            Text(text = stringResource(id = R.string.scene_compose_placeholder))
+                            Text(text = stringResource(id = com.twidere.common.R.string.scene_compose_placeholder))
                         }
                     },
                     keyboardOptions = KeyboardOptions(
@@ -969,7 +969,7 @@ private fun ColumnScope.MastodonContentWarningInput(viewModel: ComposeViewModel)
                         CompositionLocalProvider(
                             LocalContentAlpha provides ContentAlpha.disabled,
                         ) {
-                            Text(text = stringResource(id = R.string.scene_compose_cw_placeholder))
+                            Text(text = stringResource(id = com.twidere.common.R.string.scene_compose_cw_placeholder))
                         }
                     },
                     keyboardOptions = KeyboardOptions(
@@ -1106,7 +1106,7 @@ private fun ComposeVote(voteState: VoteState) {
             modifier = Modifier.fillMaxWidth(),
             checked = multiple,
             onCheckedChange = { voteState.setMultiple(!multiple) },
-            text = stringResource(id = R.string.scene_compose_vote_multiple)
+            text = stringResource(id = com.twidere.common.R.string.scene_compose_vote_multiple)
         )
     }
 }
@@ -1169,7 +1169,7 @@ private fun ComposeActions(
                     Icon(
                         painter = painterResource(id = R.drawable.ic_camera),
                         contentDescription = stringResource(
-                            id = R.string.accessibility_scene_compose_image
+                            id = com.twidere.common.R.string.accessibility_scene_compose_image
                         )
                     )
                 }
@@ -1227,7 +1227,7 @@ private fun ComposeActions(
                     Icon(
                         painter = painterResource(id = R.drawable.ic_at_sign),
                         contentDescription = stringResource(
-                            id = R.string.accessibility_scene_compose_add_mention,
+                            id = com.twidere.common.R.string.accessibility_scene_compose_add_mention,
                         )
                     )
                 }
@@ -1269,9 +1269,9 @@ private fun ComposeActions(
                         painter = painterResource(id = R.drawable.ic_map_pin),
                         contentDescription = stringResource(
                             id = if (locationEnabled) {
-                                R.string.accessibility_scene_compose_location_disable
+                                com.twidere.common.R.string.accessibility_scene_compose_location_disable
                             } else {
-                                R.string.accessibility_scene_compose_location_enable
+                                com.twidere.common.R.string.accessibility_scene_compose_location_enable
                             }
                         )
                     )
@@ -1284,7 +1284,7 @@ private fun ComposeActions(
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_thread_mode),
-                    contentDescription = stringResource(id = R.string.accessibility_scene_compose_thread),
+                    contentDescription = stringResource(id = com.twidere.common.R.string.accessibility_scene_compose_thread),
                     tint = if (enableThreadMode) MaterialTheme.colors.primary else LocalContentColor.current.copy(
                         alpha = LocalContentAlpha.current
                     )
@@ -1306,7 +1306,7 @@ private fun ComposeActions(
                                     R.drawable.ic_draft_number
                             ),
                             contentDescription = stringResource(
-                                id = R.string.accessibility_scene_compose_draft
+                                id = com.twidere.common.R.string.accessibility_scene_compose_draft
                             )
                         )
                         if (draftCount.value < 9) {
@@ -1364,7 +1364,7 @@ private fun ComposeImage(item: Uri, viewModel: ComposeViewModel) {
                 }
             ) {
                 Text(
-                    text = stringResource(id = R.string.common_controls_actions_remove),
+                    text = stringResource(id = com.twidere.common.R.string.common_controls_actions_remove),
                     color = Color.Red,
                 )
             }

@@ -610,7 +610,7 @@ internal class RouteParser {
             }
             val len = pattern.length
             var key = 0
-            val paths = hashMapOf<Int, StringBuilder>()
+            val paths = linkedMapOf<Int, StringBuilder>()
             val pathAppender = { index: Int, segment: StringBuilder ->
                 for (i in index until index - 1) {
                     paths[i]?.append(segment)
