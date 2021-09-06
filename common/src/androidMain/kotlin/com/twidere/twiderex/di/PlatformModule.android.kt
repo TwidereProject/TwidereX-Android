@@ -20,9 +20,11 @@
  */
 package com.twidere.twiderex.di
 
-import org.koin.core.KoinApplication
+import com.twidere.twiderex.kmp.ResLoader
+import org.koin.dsl.module
 
-fun KoinApplication.setupModules() {
-    modules(preferencesModule)
-    modules(platformModule)
+internal actual val platformModule = module {
+    single {
+        ResLoader(get())
+    }
 }

@@ -20,9 +20,6 @@
  */
 package com.twidere.twiderex.di
 
-import org.koin.core.KoinApplication
+import org.koin.core.module.Module
 
-fun KoinApplication.setupModules() {
-    modules(preferencesModule)
-    modules(platformModule)
-}
+internal expect val platformModule: Module
