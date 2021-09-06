@@ -32,6 +32,7 @@ import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.ListsUsersRepository
 import com.twidere.twiderex.utils.notifyError
 import com.twidere.twiderex.viewmodel.user.UserListViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
@@ -52,6 +53,7 @@ class ListsUserViewModel(
         accountRepository.activeAccount.asStateIn(viewModelScope, null)
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     private val members by lazy {
         account.flatMapLatest {
             it?.let { account ->
@@ -64,6 +66,7 @@ class ListsUserViewModel(
         }.cachedIn(viewModelScope)
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     private val subscribers by lazy {
         account.flatMapLatest {
             it?.let { account ->

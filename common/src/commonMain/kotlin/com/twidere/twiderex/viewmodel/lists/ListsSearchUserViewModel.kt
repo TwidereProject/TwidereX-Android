@@ -28,6 +28,8 @@ import com.twidere.twiderex.defaultLoadCount
 import com.twidere.twiderex.extensions.asStateIn
 import com.twidere.twiderex.paging.source.SearchUserPagingSource
 import com.twidere.twiderex.repository.AccountRepository
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.emptyFlow
@@ -45,6 +47,7 @@ class ListsSearchUserViewModel(
 
     val text = MutableStateFlow("")
 
+    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     val source = text.debounce(666L).flatMapLatest {
         it.takeIf { it.isNotEmpty() }?.let {
             account.flatMapLatest { account ->

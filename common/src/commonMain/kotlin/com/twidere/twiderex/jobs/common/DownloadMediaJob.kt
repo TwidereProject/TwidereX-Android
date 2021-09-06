@@ -21,16 +21,18 @@
 package com.twidere.twiderex.jobs.common
 
 import com.twidere.services.microblog.DownloadMediaService
-import com.twidere.twiderex.R
 import com.twidere.twiderex.kmp.FileResolver
+import com.twidere.twiderex.kmp.ResLoader
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.notification.InAppNotification
+import com.twidere.twiderex.notification.StringNotificationEvent.Companion.show
 import com.twidere.twiderex.repository.AccountRepository
 
 class DownloadMediaJob(
     private val accountRepository: AccountRepository,
     private val inAppNotification: InAppNotification,
     private val fileResolver: FileResolver,
+    private val resLoader: ResLoader,
 ) {
     suspend fun execute(
         target: String,
@@ -47,6 +49,6 @@ class DownloadMediaJob(
         fileResolver.openOutputStream(target)?.use {
             service.download(target = source).copyTo(it)
         } ?: throw Error("Download failed")
-        inAppNotification.show(com.twidere.common.R.string.common_controls_actions_save)
+        inAppNotification.show(resLoader.getString(com.twidere.twiderex.MR.strings.common_controls_actions_save))
     }
 }

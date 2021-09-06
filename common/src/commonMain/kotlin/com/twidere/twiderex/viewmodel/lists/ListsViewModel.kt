@@ -31,6 +31,7 @@ import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.ListsRepository
 import com.twidere.twiderex.utils.notifyError
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.firstOrNull
@@ -49,6 +50,7 @@ class ListsViewModel(
         accountRepository.activeAccount.asStateIn(viewModelScope, null)
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     val source by lazy {
         account.flatMapLatest {
             it?.let { account ->
@@ -60,6 +62,7 @@ class ListsViewModel(
         }.cachedIn(viewModelScope)
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     val ownerSource by lazy {
         account.flatMapLatest {
             it?.let { account ->
@@ -70,6 +73,7 @@ class ListsViewModel(
         }.cachedIn(viewModelScope)
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     val subscribedSource by lazy {
         account.flatMapLatest {
             it?.let { account ->
@@ -152,6 +156,7 @@ class ListsModifyViewModel(
     var editDesc = MutableStateFlow("")
     var editPrivate = MutableStateFlow(false)
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     val source by lazy {
         account.flatMapLatest {
             it?.let { account ->

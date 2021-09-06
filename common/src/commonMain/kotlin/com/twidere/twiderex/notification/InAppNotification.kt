@@ -38,6 +38,12 @@ class StringNotificationEvent(
     override fun getMessage(): String {
         return message
     }
+
+    companion object {
+        fun InAppNotification.show(message: String) {
+            show(StringNotificationEvent(message = message))
+        }
+    }
 }
 
 class InAppNotification {

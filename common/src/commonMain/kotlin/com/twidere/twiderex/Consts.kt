@@ -29,3 +29,8 @@ val twitterHosts = listOf(
     "http://mobile.twitter.com",
     "http://www.twitter.com",
 )
+
+object DefaultConfig {
+    val ConsumerKey = "wmtrtTaVOjUnH5pWQp4LDI5Qs"
+    val ConsumerSecret = "E9Q9u2yK0COJae2tLcNEdY75OPA3bxqJiGZQztraHaQUtoI2cu"
+}

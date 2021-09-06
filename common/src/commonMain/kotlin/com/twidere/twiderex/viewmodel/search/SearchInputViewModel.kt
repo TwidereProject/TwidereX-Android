@@ -24,6 +24,7 @@ import com.twidere.twiderex.extensions.asStateIn
 import com.twidere.twiderex.model.ui.UiSearch
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.SearchRepository
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
@@ -40,6 +41,7 @@ class SearchInputViewModel(
         accountRepository.activeAccount.asStateIn(viewModelScope, null)
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     val source by lazy {
         account.flatMapLatest {
             it?.let {
@@ -48,6 +50,7 @@ class SearchInputViewModel(
         }
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     val savedSource by lazy {
         account.flatMapLatest {
             it?.let {

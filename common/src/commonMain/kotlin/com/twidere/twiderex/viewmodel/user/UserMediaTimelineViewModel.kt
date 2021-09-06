@@ -34,6 +34,7 @@ import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.paging.mediator.paging.pager
 import com.twidere.twiderex.paging.mediator.user.UserMediaMediator
 import com.twidere.twiderex.repository.AccountRepository
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
@@ -50,6 +51,7 @@ class UserMediaTimelineViewModel(
         repository.activeAccount.asStateIn(viewModelScope, null)
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     val source: Flow<PagingData<Pair<UiMedia, UiStatus>>> by lazy {
         pagingMediator.flatMapLatest {
             it?.let { pagingMediator ->

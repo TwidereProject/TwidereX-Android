@@ -22,7 +22,7 @@ package com.twidere.twiderex.jobs.dm
 
 import com.twidere.services.microblog.DirectMessageService
 import com.twidere.services.microblog.LookupService
-import com.twidere.twiderex.R
+import com.twidere.twiderex.kmp.ResLoader
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.ui.UiDMConversationWithLatestMessage
 import com.twidere.twiderex.navigation.RootDeepLinksRoute
@@ -39,6 +39,7 @@ class DirectMessageFetchJob(
     private val repository: DirectMessageRepository,
     private val accountRepository: AccountRepository,
     private val notificationManager: AppNotificationManager,
+    private val resLoader: ResLoader,
 ) {
     suspend fun execute() {
         accountRepository.activeAccount.firstOrNull()?.takeIf {
@@ -62,8 +63,13 @@ class DirectMessageFetchJob(
                     NotificationChannelSpec.ContentMessages.id
                 )
             )
-            .setContentTitle(applicationContext.getString(com.twidere.common.R.string.common_notification_messages_title))
-            .setContentText(applicationContext.getString(com.twidere.common.R.string.common_notification_messages_content, message.latestMessage.sender.displayName))
+            .setContentTitle(resLoader.getString(com.twidere.twiderex.MR.strings.common_notification_messages_title))
+            .setContentText(
+                resLoader.getString(
+                    com.twidere.twiderex.MR.strings.common_notification_messages_content,
+                    message.latestMessage.sender.displayName
+                )
+            )
             .setDeepLink(RootDeepLinksRoute.Conversation(message.conversation.conversationKey))
         notificationManager.notify(message.latestMessage.messageKey.hashCode(), builder.build())
     }

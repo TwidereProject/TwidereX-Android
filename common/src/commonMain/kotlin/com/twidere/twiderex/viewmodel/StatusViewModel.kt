@@ -25,6 +25,7 @@ import com.twidere.twiderex.extensions.asStateIn
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.StatusRepository
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import moe.tlaster.precompose.viewmodel.ViewModel
@@ -38,6 +39,7 @@ class StatusViewModel(
     private val account by lazy {
         accountRepository.activeAccount.asStateIn(viewModelScope, null)
     }
+    @OptIn(ExperimentalCoroutinesApi::class)
     val status by lazy {
         account.flatMapLatest {
             if (it != null) {
@@ -48,6 +50,7 @@ class StatusViewModel(
         }.asStateIn(viewModelScope, null)
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     val source by lazy {
         account.flatMapLatest {
             if (it != null) {

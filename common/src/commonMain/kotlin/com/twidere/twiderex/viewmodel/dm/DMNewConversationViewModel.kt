@@ -31,6 +31,8 @@ import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.paging.source.SearchUserPagingSource
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.DirectMessageRepository
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.emptyFlow
@@ -50,6 +52,7 @@ class DMNewConversationViewModel(
 
     val input = MutableStateFlow("")
 
+    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     val sourceFlow = input.debounce(666L).flatMapLatest {
         it.takeIf { it.isNotEmpty() }?.let { str ->
             account.flatMapLatest {

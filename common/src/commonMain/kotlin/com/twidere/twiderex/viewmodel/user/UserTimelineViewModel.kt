@@ -26,6 +26,7 @@ import com.twidere.twiderex.extensions.asStateIn
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.TimelineRepository
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emptyFlow
@@ -48,6 +49,7 @@ class UserTimelineViewModel(
         _excludeReplies.value = value
     }
 
+    @OptIn(FlowPreview::class)
     val source by lazy {
         combine(account, _excludeReplies) { account, excludeReplies ->
             if (account != null) {

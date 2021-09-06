@@ -29,6 +29,7 @@ import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.kmp.ExifScrambler
 import com.twidere.twiderex.kmp.FileResolver
 import com.twidere.twiderex.kmp.RemoteNavigator
+import com.twidere.twiderex.kmp.ResLoader
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.ComposeType
 import com.twidere.twiderex.model.enums.MastodonVisibility
@@ -44,13 +45,15 @@ class MastodonComposeJob(
     notificationManager: AppNotificationManager,
     exifScrambler: ExifScrambler,
     remoteNavigator: RemoteNavigator,
+    resLoader: ResLoader,
     private val fileResolver: FileResolver,
     private val cacheDatabase: CacheDatabase,
 ) : ComposeJob<MastodonService>(
     accountRepository,
     notificationManager,
     exifScrambler,
-    remoteNavigator
+    remoteNavigator,
+    resLoader,
 ) {
     override suspend fun compose(
         service: MastodonService,

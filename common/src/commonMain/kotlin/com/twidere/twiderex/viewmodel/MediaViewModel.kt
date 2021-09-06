@@ -27,6 +27,7 @@ import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.StatusRepository
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
@@ -67,6 +68,7 @@ class MediaViewModel(
     }
 
     val loading = MutableStateFlow(false)
+    @OptIn(ExperimentalCoroutinesApi::class)
     val status by lazy {
         account.flatMapLatest {
             if (it != null) {

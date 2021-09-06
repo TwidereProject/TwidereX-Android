@@ -20,11 +20,13 @@
  */
 package com.twidere.twiderex.jobs.common
 
+import com.twidere.twiderex.kmp.ResLoader
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.enums.MastodonStatusType
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.enums.ReferenceType
 import com.twidere.twiderex.model.ui.UiStatus
+import com.twidere.twiderex.navigation.RootDeepLinksRoute
 import com.twidere.twiderex.notification.AppNotification
 import com.twidere.twiderex.notification.AppNotificationManager
 import com.twidere.twiderex.notification.NotificationChannelSpec
@@ -40,6 +42,7 @@ class NotificationJob(
     private val repository: NotificationRepository,
     private val accountRepository: AccountRepository,
     private val notificationManager: AppNotificationManager,
+    private val resLoader: ResLoader,
 ) {
     suspend fun execute() = coroutineScope {
         accountRepository.getAccounts()
@@ -75,8 +78,8 @@ class NotificationJob(
         val notificationData = when (status.platformType) {
             PlatformType.Twitter -> {
                 NotificationData(
-                    title = applicationContext.getString(
-                        com.twidere.common.R.string.common_notification_mentions,
+                    title = resLoader.getString(
+                        com.twidere.twiderex.MR.strings.common_notification_mentions,
                         status.user.displayName
                     ),
                     htmlContent = status.htmlText,
@@ -118,8 +121,8 @@ class NotificationJob(
             MastodonStatusType.Status -> null
             MastodonStatusType.NotificationFollow -> {
                 NotificationData(
-                    title = applicationContext.getString(
-                        com.twidere.common.R.string.common_notification_follow,
+                    title = resLoader.getString(
+                        com.twidere.twiderex.MR.strings.common_notification_follow,
                         actualStatus.user.displayName
                     ),
                     deepLink = RootDeepLinksRoute.User(actualStatus.user.userKey),
@@ -128,8 +131,8 @@ class NotificationJob(
             }
             MastodonStatusType.NotificationFollowRequest -> {
                 NotificationData(
-                    title = applicationContext.getString(
-                        com.twidere.common.R.string.common_notification_follow_request,
+                    title = resLoader.getString(
+                        com.twidere.twiderex.MR.strings.common_notification_follow_request,
                         actualStatus.user.displayName
                     ),
                     deepLink = RootDeepLinksRoute.User(actualStatus.user.userKey)
@@ -137,8 +140,8 @@ class NotificationJob(
             }
             MastodonStatusType.NotificationMention -> {
                 NotificationData(
-                    title = applicationContext.getString(
-                        com.twidere.common.R.string.common_notification_mentions,
+                    title = resLoader.getString(
+                        com.twidere.twiderex.MR.strings.common_notification_mentions,
                         actualStatus.user.displayName
                     ),
                     htmlContent = actualStatus.htmlText,
@@ -148,8 +151,8 @@ class NotificationJob(
             }
             MastodonStatusType.NotificationReblog -> {
                 NotificationData(
-                    title = applicationContext.getString(
-                        com.twidere.common.R.string.common_notification_reblog,
+                    title = resLoader.getString(
+                        com.twidere.twiderex.MR.strings.common_notification_reblog,
                         actualStatus.user.displayName
                     ),
                     deepLink = RootDeepLinksRoute.Status(actualStatus.statusKey),
@@ -158,8 +161,8 @@ class NotificationJob(
             }
             MastodonStatusType.NotificationFavourite -> {
                 NotificationData(
-                    title = applicationContext.getString(
-                        com.twidere.common.R.string.common_notification_favourite,
+                    title = resLoader.getString(
+                        com.twidere.twiderex.MR.strings.common_notification_favourite,
                         actualStatus.user.displayName
                     ),
                     deepLink = RootDeepLinksRoute.Status(actualStatus.statusKey),
@@ -168,15 +171,14 @@ class NotificationJob(
             }
             MastodonStatusType.NotificationPoll -> {
                 NotificationData(
-                    title = applicationContext.getString(
-                        com.twidere.common.R.string.common_notification_poll,
+                    title = resLoader.getString(
+                        com.twidere.twiderex.MR.strings.common_notification_poll,
                     ),
                     deepLink = RootDeepLinksRoute.Status(actualStatus.statusKey),
                     profileImage = actualStatus.user.profileImage,
                 )
             }
             MastodonStatusType.NotificationStatus -> null
-            else -> null
         }
     }
 }

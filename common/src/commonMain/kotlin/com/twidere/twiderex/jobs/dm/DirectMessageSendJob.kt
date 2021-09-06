@@ -22,9 +22,9 @@ package com.twidere.twiderex.jobs.dm
 
 import android.graphics.BitmapFactory
 import com.twidere.services.microblog.MicroBlogService
-import com.twidere.twiderex.R
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.kmp.FileResolver
+import com.twidere.twiderex.kmp.ResLoader
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.MediaType
@@ -44,6 +44,7 @@ abstract class DirectMessageSendJob<T : MicroBlogService>(
     private val accountRepository: AccountRepository,
     private val notificationManager: AppNotificationManager,
     protected val fileResolver: FileResolver,
+    private val resLoader: ResLoader,
 ) {
     suspend fun execute(sendData: DirectMessageSendData, accountKey: MicroBlogKey) {
         val accountDetails = accountKey.let {
@@ -82,7 +83,7 @@ abstract class DirectMessageSendJob<T : MicroBlogService>(
                         NotificationChannelSpec.ContentMessages.id
                     )
                 )
-                .setContentTitle(applicationContext.getString(com.twidere.common.R.string.common_alerts_failed_to_send_message_message))
+                .setContentTitle(resLoader.getString(com.twidere.twiderex.MR.strings.common_alerts_failed_to_send_message_message))
                 .setContentText(sendData.text)
                 .setDeepLink(RootDeepLinksRoute.Conversation(sendData.conversationKey))
             notificationManager.notify(notificationId, builder.build())

@@ -22,7 +22,7 @@ package com.twidere.twiderex.viewmodel.twitter
 
 import com.twidere.services.twitter.TwitterOAuthService
 import com.twidere.services.twitter.TwitterService
-import com.twidere.twiderex.BuildConfig
+import com.twidere.twiderex.DefaultConfig
 import com.twidere.twiderex.dataprovider.mapper.toAmUser
 import com.twidere.twiderex.dataprovider.mapper.toUi
 import com.twidere.twiderex.http.TwidereServiceFactory
@@ -134,7 +134,7 @@ class TwitterSignInViewModel(
     }
 
     private fun isBuiltInKey(): Boolean {
-        return consumerKey == BuildConfig.CONSUMERKEY && consumerSecret == BuildConfig.CONSUMERSECRET
+        return consumerKey == DefaultConfig.ConsumerKey && consumerSecret == DefaultConfig.ConsumerSecret
     }
 
     fun cancel() {

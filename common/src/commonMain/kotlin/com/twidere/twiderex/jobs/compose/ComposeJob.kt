@@ -21,9 +21,9 @@
 package com.twidere.twiderex.jobs.compose
 
 import com.twidere.services.microblog.MicroBlogService
-import com.twidere.twiderex.R
 import com.twidere.twiderex.kmp.ExifScrambler
 import com.twidere.twiderex.kmp.RemoteNavigator
+import com.twidere.twiderex.kmp.ResLoader
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.ComposeType
 import com.twidere.twiderex.model.job.ComposeData
@@ -40,11 +40,12 @@ abstract class ComposeJob<T : MicroBlogService>(
     private val notificationManager: AppNotificationManager,
     private val exifScrambler: ExifScrambler,
     private val remoteNavigator: RemoteNavigator,
+    private val resLoader: ResLoader,
 ) {
     suspend fun execute(composeData: ComposeData, accountKey: MicroBlogKey) {
         val builder = AppNotification
             .Builder(NotificationChannelSpec.BackgroundProgresses.id)
-            .setContentTitle(applicationContext.getString(com.twidere.common.R.string.common_alerts_tweet_sending_title))
+            .setContentTitle(resLoader.getString(com.twidere.twiderex.MR.strings.common_alerts_tweet_sending_title))
             .setOngoing(true)
             .setSilent(true)
             .setProgress(100, 0, false)
@@ -52,6 +53,7 @@ abstract class ComposeJob<T : MicroBlogService>(
             accountRepository.findByAccountKey(accountKey = it)
         } ?: throw Error("Can't find any account matches:$$accountKey")
         val notificationId = composeData.draftId.hashCode()
+
         @Suppress("UNCHECKED_CAST")
         val service = accountDetails.service as T
         notificationManager.notify(notificationId, builder.build())
@@ -77,7 +79,7 @@ abstract class ComposeJob<T : MicroBlogService>(
             builder.setOngoing(false)
                 .setProgress(0, 0, false)
                 .setSilent(false)
-                .setContentTitle(applicationContext.getString(com.twidere.common.R.string.common_alerts_tweet_sent_title))
+                .setContentTitle(resLoader.getString(com.twidere.twiderex.MR.strings.common_alerts_tweet_sent_title))
             notificationManager.notifyTransient(notificationId, builder.build())
             if (composeData.isThreadMode) {
                 // open compose scene in thread mode
@@ -91,7 +93,7 @@ abstract class ComposeJob<T : MicroBlogService>(
             builder.setOngoing(false)
                 .setProgress(0, 0, false)
                 .setSilent(false)
-                .setContentTitle(applicationContext.getString(com.twidere.common.R.string.common_alerts_tweet_fail_title))
+                .setContentTitle(resLoader.getString(com.twidere.twiderex.MR.strings.common_alerts_tweet_fail_title))
                 .setContentText(composeData.content)
                 .setDeepLink(RootDeepLinksRoute.Draft(composeData.draftId))
             notificationManager.notify(notificationId, builder.build())

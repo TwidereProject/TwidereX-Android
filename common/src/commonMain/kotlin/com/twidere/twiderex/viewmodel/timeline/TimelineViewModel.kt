@@ -31,6 +31,7 @@ import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.paging.mediator.paging.PagingWithGapMediator
 import com.twidere.twiderex.paging.mediator.paging.pager
 import com.twidere.twiderex.paging.mediator.paging.toUi
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
@@ -43,6 +44,7 @@ import moe.tlaster.precompose.viewmodel.viewModelScope
 abstract class TimelineViewModel(
     private val dataStore: DataStore<Preferences>
 ) : ViewModel() {
+    @OptIn(ExperimentalCoroutinesApi::class)
     val source by lazy {
         pagingMediator.flatMapLatest {
             it?.pager()?.toUi() ?: emptyFlow()
@@ -50,9 +52,11 @@ abstract class TimelineViewModel(
     }
     abstract val pagingMediator: Flow<PagingWithGapMediator?>
     abstract val savedStateKey: Flow<String?>
+    @OptIn(ExperimentalCoroutinesApi::class)
     val loadingBetween: Flow<List<MicroBlogKey>>
         get() = pagingMediator.flatMapLatest { it?.loadingBetween ?: emptyFlow() }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     val timelineScrollState by lazy {
         savedStateKey.flatMapLatest {
             val firstVisibleItemIndexKey = intPreferencesKey("${it}_firstVisibleItemIndex")

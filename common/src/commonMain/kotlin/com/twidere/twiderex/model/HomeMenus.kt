@@ -23,57 +23,46 @@ package com.twidere.twiderex.model
 import com.twidere.twiderex.model.enums.PlatformType
 
 enum class HomeMenus(
-    val item: HomeNavigationItem,
     val showDefault: Boolean,
     val supportedPlatformType: List<PlatformType>,
 ) {
     HomeTimeline(
-        item = HomeTimelineItem(),
         showDefault = true,
         supportedPlatformType = PlatformType.values().toList(),
     ),
     MastodonNotification(
-        item = MastodonNotificationItem(),
         showDefault = true,
         supportedPlatformType = listOf(PlatformType.Mastodon),
     ),
     Mention(
-        item = MentionItem(),
         showDefault = true,
         supportedPlatformType = listOf(PlatformType.Twitter),
     ),
     Search(
-        item = SearchItem(),
         showDefault = true,
         supportedPlatformType = PlatformType.values().toList(),
     ),
     Me(
-        item = MeItem(),
         showDefault = true,
         supportedPlatformType = PlatformType.values().toList(),
     ),
     Message(
-        item = DMConversationListItem(),
         showDefault = false,
         supportedPlatformType = listOf(PlatformType.Twitter),
     ),
     LocalTimeline(
-        item = LocalTimelineItem(),
         showDefault = false,
         supportedPlatformType = listOf(PlatformType.Mastodon),
     ),
     FederatedTimeline(
-        item = FederatedTimelineItem(),
         showDefault = false,
         supportedPlatformType = listOf(PlatformType.Mastodon),
     ),
     Draft(
-        item = DraftNavigationItem(),
         showDefault = false,
         supportedPlatformType = PlatformType.values().toList(),
     ),
     Lists(
-        item = ListsNavigationItem(),
         showDefault = false,
         supportedPlatformType = PlatformType.values().toList(),
     )

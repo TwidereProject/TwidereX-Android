@@ -26,6 +26,7 @@ import com.twidere.twiderex.dataprovider.mapper.autolink
 import com.twidere.twiderex.dataprovider.mapper.toUi
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.kmp.FileResolver
+import com.twidere.twiderex.kmp.ResLoader
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.job.DirectMessageSendData
 import com.twidere.twiderex.model.ui.UiDMEvent
@@ -38,8 +39,13 @@ class TwitterDirectMessageSendJob(
     notificationManager: AppNotificationManager,
     fileResolver: FileResolver,
     cacheDatabase: CacheDatabase,
+    resLoader: ResLoader,
 ) : DirectMessageSendJob<TwitterService>(
-    cacheDatabase, accountRepository, notificationManager, fileResolver
+    cacheDatabase,
+    accountRepository,
+    notificationManager,
+    fileResolver,
+    resLoader,
 ) {
 
     override suspend fun sendMessage(

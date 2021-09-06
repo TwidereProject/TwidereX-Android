@@ -45,6 +45,7 @@ import com.twidere.twiderex.repository.UserRepository
 import com.twidere.twiderex.utils.MastodonEmojiCache
 import com.twidere.twiderex.utils.notifyError
 import com.twitter.twittertext.Extractor
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emptyFlow
@@ -163,6 +164,7 @@ open class ComposeViewModel(
 
     open val draftId: String = UUID.randomUUID().toString()
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     val emojis by lazy {
         account.flatMapLatest {
             it?.let { account ->
@@ -243,6 +245,7 @@ open class ComposeViewModel(
         .asStateIn(viewModelScope, false)
     val locationEnabled = MutableStateFlow(false)
     val enableThreadMode = MutableStateFlow(composeType == ComposeType.Thread)
+    @OptIn(ExperimentalCoroutinesApi::class)
     val status by lazy {
         account.flatMapLatest {
             if (statusKey != null) {

@@ -33,6 +33,7 @@ import com.twidere.twiderex.model.job.DirectMessageSendData
 import com.twidere.twiderex.model.ui.UiDMEvent
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.DirectMessageRepository
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.firstOrNull
@@ -53,6 +54,7 @@ class DMEventViewModel(
         accountRepository.activeAccount.asStateIn(viewModelScope, null)
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     val conversation by lazy {
         account.flatMapLatest {
             it?.let { account ->
@@ -64,6 +66,7 @@ class DMEventViewModel(
         }
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     val source by lazy {
         account.flatMapLatest {
             it?.let { account ->
