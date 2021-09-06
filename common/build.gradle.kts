@@ -137,8 +137,8 @@ android {
     }
 }
 
-afterEvaluate {
-    tasks.register("generateTranslation") {
+tasks.create("generateTranslation") {
+    doLast {
         val localizationFolder = File(rootDir, "localization")
         val appJson = File(localizationFolder, "app.json")
         val target = project.file("src/commonMain/resources/MR/base/strings.xml").apply {
@@ -149,8 +149,10 @@ afterEvaluate {
         }
         generateLocalization(appJson, target)
     }
+}
 
-    tasks.register("generateTranslationFromZip") {
+tasks.create("generateTranslationFromZip") {
+    doLast {
         val zip = File(rootProject.buildDir, "Twidere X (translations).zip")
         val unzipTarget = rootProject.buildDir
         org.gradle.kotlin.dsl.support.unzipTo(unzipTarget, zip)
