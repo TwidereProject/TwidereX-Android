@@ -38,10 +38,10 @@ class GiphyService(
             authorization = EmptyAuthorization()
         )
 
-    override suspend fun trending(nextPage: String, limit: Int) = resource.getTrending(
+    override suspend fun trending(nextPage: String?, limit: Int) = resource.getTrending(
         apiKey = apiKey,
         limit = limit,
-        offset = nextPage.toInt()
+        offset = nextPage?.toInt() ?: 0
     ).let {
         GifPaging(
             data = it.data ?: emptyList(),
@@ -63,12 +63,12 @@ class GiphyService(
     override suspend fun search(
         query: String,
         lang: String,
-        nextPage: String,
+        nextPage: String?,
         limit: Int
     ) = resource.search(
         apiKey = apiKey,
         limit = limit,
-        offset = nextPage.toInt(),
+        offset = nextPage?.toInt() ?: 0,
         query = query,
         lang = lang
     ).let {

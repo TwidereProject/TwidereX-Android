@@ -18,12 +18,9 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.services.gif
+package com.twidere.twiderex.model.ui
 
-import com.twidere.services.gif.model.GifPaging
-
-interface GifService {
-    suspend fun trending(nextPage: String?, limit: Int = 25): GifPaging
-
-    suspend fun search(query: String, lang: String = "en", nextPage: String?, limit: Int = 25): GifPaging
-}
+data class UiGif(
+    val url: String,
+    val preview: String,
+)

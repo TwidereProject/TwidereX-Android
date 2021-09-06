@@ -18,12 +18,10 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.services.gif
+package com.twidere.twiderex.paging.source.gif
 
-import com.twidere.services.gif.model.GifPaging
+import com.twidere.services.gif.GifService
 
-interface GifService {
-    suspend fun trending(nextPage: String?, limit: Int = 25): GifPaging
-
-    suspend fun search(query: String, lang: String = "en", nextPage: String?, limit: Int = 25): GifPaging
+class GifTrendingPagingSource(gifService: GifService) : GifPagingSource(gifService) {
+    override suspend fun loadFromService(key: String?, loadSize: Int) = service.trending(nextPage = key, limit = loadSize)
 }
