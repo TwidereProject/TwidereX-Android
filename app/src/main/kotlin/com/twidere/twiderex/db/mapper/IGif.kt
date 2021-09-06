@@ -23,14 +23,17 @@ package com.twidere.twiderex.db.mapper
 import com.twidere.services.gif.giphy.GifObject
 import com.twidere.services.gif.model.IGif
 import com.twidere.twiderex.model.ui.UiGif
+import java.util.UUID
 
 typealias GiphyGif = GifObject
 
 fun IGif.toUi(): UiGif {
     return when (this) {
         is GiphyGif -> UiGif(
+            id = this.id ?: UUID.randomUUID().toString(),
             url = this.images?.original?.url ?: "",
-            preview = this.images?.previewGif?.url ?: ""
+            preview = this.images?.previewGif?.url ?: "",
+            type = this.type ?: "gif"
         )
         else -> throw NotImplementedError()
     }

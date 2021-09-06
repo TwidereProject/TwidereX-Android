@@ -20,6 +20,8 @@
  */
 package com.twidere.twiderex.viewmodel.gif
 
+import android.content.Context
+import android.net.Uri
 import androidx.compose.ui.text.intl.Locale
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -27,11 +29,14 @@ import androidx.paging.cachedIn
 import com.twidere.twiderex.http.TwidereServiceFactory
 import com.twidere.twiderex.model.ui.UiGif
 import com.twidere.twiderex.repository.GifRepository
+import com.twidere.twiderex.utils.FileProviderHelper
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
+import okhttp3.internal.notify
 
 class GifViewModel @AssistedInject constructor(
     private val gifRepository: GifRepository,
@@ -62,4 +67,25 @@ class GifViewModel @AssistedInject constructor(
     }
 
     val trendSource = gifRepository.gifTrending(service = service).cachedIn(viewModelScope)
+
+    private val _commitLoading = MutableStateFlow(false)
+
+    val commitLoading get() = _commitLoading
+
+    fun commit(context: Context, onSuccess: (uri: Uri) -> Unit) {
+        selectedItem.value?.let {
+            viewModelScope.launch {
+                _commitLoading.value = true
+                try {
+                    val target = FileProviderHelper.getUriFromMedias("${it.id}.${it.type}", context)
+                    gifRepository.download(target = target.toString(), source = it.url, service = service)
+                    onSuccess(target)
+                } catch (e: Throwable) {
+                    e.notify()
+                } finally {
+                    _commitLoading.value = false
+                }
+            }
+        }
+    }
 }

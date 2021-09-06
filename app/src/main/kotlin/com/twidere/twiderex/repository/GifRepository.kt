@@ -23,11 +23,15 @@ package com.twidere.twiderex.repository
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import com.twidere.services.gif.GifService
+import com.twidere.services.microblog.DownloadMediaService
 import com.twidere.twiderex.defaultLoadCount
+import com.twidere.twiderex.kmp.FileResolver
 import com.twidere.twiderex.paging.source.gif.GifSearchPagingSource
 import com.twidere.twiderex.paging.source.gif.GifTrendingPagingSource
 
-class GifRepository {
+class GifRepository(
+    private val fileResolver: FileResolver
+) {
     fun gifTrending(service: GifService) = Pager(
         config = PagingConfig(
             pageSize = defaultLoadCount,
@@ -55,4 +59,10 @@ class GifRepository {
             lang = lang
         )
     }.flow
+
+    suspend fun download(target: String, source: String, service: DownloadMediaService) {
+        fileResolver.openOutputStream(target)?.use {
+            service.download(target = source).copyTo(it)
+        } ?: throw Error("Download failed")
+    }
 }

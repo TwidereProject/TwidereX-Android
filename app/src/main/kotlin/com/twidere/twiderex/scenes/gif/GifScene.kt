@@ -20,6 +20,7 @@
  */
 package com.twidere.twiderex.scenes.gif
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -42,20 +43,24 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
+import com.twidere.twiderex.component.foundation.LoadingProgress
 import com.twidere.twiderex.component.foundation.TextInput
 import com.twidere.twiderex.component.lazy.ui.LazyUiGifList
 import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.model.ui.UiGif
+import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.gif.GifViewModel
 
@@ -65,6 +70,9 @@ fun GifScene() {
         it.create()
     }
     val enable by viewModel.enable.collectAsState(initial = false)
+    val context = LocalContext.current
+    val navController = LocalNavController.current
+    val commitLoading by viewModel.commitLoading.collectAsState(initial = false)
     TwidereScene {
         InAppNotificationScaffold(
             topBar = {
@@ -77,7 +85,14 @@ fun GifScene() {
                     },
                     actions = {
                         IconButton(
-                            onClick = { TODO("Download gif and return uri to caller") },
+                            onClick = {
+                                viewModel.commit(
+                                    context = context,
+                                    onSuccess = {
+                                        navController.goBackWith(it)
+                                    }
+                                )
+                            },
                             enabled = enable
                         ) {
                             Icon(
@@ -90,8 +105,20 @@ fun GifScene() {
                 )
             },
         ) {
-            GifContent(viewModel = viewModel)
+            Box {
+                GifContent(viewModel = viewModel)
+                if (commitLoading) {
+                    LoadingView()
+                }
+            }
         }
+    }
+}
+
+@Composable
+fun LoadingView() {
+    Dialog(onDismissRequest = { }) {
+        LoadingProgress()
     }
 }
 

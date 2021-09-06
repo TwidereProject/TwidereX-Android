@@ -26,6 +26,7 @@ import coil.util.CoilUtils
 import com.twidere.services.nitter.NitterService
 import com.twidere.twiderex.db.AppDatabase
 import com.twidere.twiderex.db.CacheDatabase
+import com.twidere.twiderex.kmp.FileResolver
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.CacheRepository
 import com.twidere.twiderex.repository.DirectMessageRepository
@@ -125,5 +126,7 @@ object RepositoryModule {
     ) = MediaRepository(database = database)
 
     @Provides
-    fun provideGifRepository() = GifRepository()
+    fun provideGifRepository(
+        fileResolver: FileResolver
+    ) = GifRepository(fileResolver = fileResolver)
 }

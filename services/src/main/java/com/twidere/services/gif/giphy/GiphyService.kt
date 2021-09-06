@@ -24,6 +24,9 @@ import com.twidere.services.gif.GifService
 import com.twidere.services.gif.model.GifPaging
 import com.twidere.services.http.HttpClientFactory
 import com.twidere.services.http.authorization.Authorization
+import com.twidere.services.utils.await
+import okhttp3.Request
+import java.io.InputStream
 
 private const val GIPHY_BASE_URL = "https://api.giphy.com/"
 class GiphyService(
@@ -76,6 +79,21 @@ class GiphyService(
             data = it.data ?: emptyList(),
             nextPage = generateNextPage(it.pagination)
         )
+    }
+
+    override suspend fun download(target: String): InputStream {
+        return httpClientFactory.createHttpClientBuilder()
+            .build()
+            .newCall(
+                Request
+                    .Builder()
+                    .url(target)
+                    .get()
+                    .build()
+            )
+            .await()
+            .body
+            ?.byteStream() ?: throw IllegalArgumentException()
     }
 
     class EmptyAuthorization : Authorization {
