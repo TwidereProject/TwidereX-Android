@@ -20,11 +20,14 @@
  */
 package com.twidere.twiderex.http
 
+import com.twidere.services.gif.GifService
+import com.twidere.services.gif.giphy.GiphyService
 import com.twidere.services.http.HttpClientFactory
 import com.twidere.services.http.config.HttpConfigClientFactory
 import com.twidere.services.mastodon.MastodonService
 import com.twidere.services.microblog.MicroBlogService
 import com.twidere.services.twitter.TwitterService
+import com.twidere.twiderex.BuildConfig
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.cred.Credentials
 import com.twidere.twiderex.model.cred.OAuth2Credentials
@@ -76,6 +79,15 @@ class TwidereServiceFactory(private val configProvider: TwidereHttpConfigProvide
         fun createHttpClientFactory(): HttpClientFactory {
             return instance?.let {
                 HttpConfigClientFactory(it.configProvider)
+            } ?: throw Error("Factory needs to be initiate")
+        }
+
+        fun createGifService(): GifService {
+            return instance?.let {
+                GiphyService(
+                    apiKey = BuildConfig.GIPHYKEY,
+                    httpClientFactory = createHttpClientFactory()
+                )
             } ?: throw Error("Factory needs to be initiate")
         }
     }
