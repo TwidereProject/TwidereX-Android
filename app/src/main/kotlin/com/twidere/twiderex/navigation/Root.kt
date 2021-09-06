@@ -112,4 +112,8 @@ interface Root {
         fun Conversation(conversationKey: MicroBlogKey): String
         val NewConversation: String
     }
+
+    interface Gif {
+        val Home: String
+    }
 }

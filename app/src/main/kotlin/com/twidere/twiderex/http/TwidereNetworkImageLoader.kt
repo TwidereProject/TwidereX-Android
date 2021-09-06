@@ -21,8 +21,6 @@
 package com.twidere.twiderex.http
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.media.MediaMetadataRetriever
 import android.net.Uri
 import coil.ImageLoader
 import coil.bitmap.BitmapPool
@@ -37,7 +35,6 @@ import com.twidere.twiderex.model.cred.OAuthCredentials
 import com.twidere.twiderex.model.enums.PlatformType
 import okhttp3.Headers
 import okhttp3.Request
-import java.lang.Exception
 import java.net.URL
 
 class TwidereNetworkImageLoader(
@@ -91,30 +88,9 @@ class TwidereNetworkImageLoader(
                 )
             ).build()
         } else {
-            if (data is Uri && context.contentResolver.getType(data)?.startsWith("video") == true) {
-                data = getThumbVideo(context = context, videoUri = data) ?: data
-            }
             request.newBuilder(request.context)
                 .data(data)
                 .build()
         }
-    }
-
-    private fun getThumbVideo(context: Context, videoUri: Uri): Bitmap? {
-        var bitmap: Bitmap? = null
-        var mediaMetadataRetriever: MediaMetadataRetriever? = null
-        try {
-            mediaMetadataRetriever = MediaMetadataRetriever()
-            mediaMetadataRetriever.setDataSource(context, videoUri)
-            bitmap = mediaMetadataRetriever.getFrameAtTime(
-                1000,
-                MediaMetadataRetriever.OPTION_CLOSEST_SYNC
-            )
-        } catch (e: Exception) {
-            e.printStackTrace()
-        } finally {
-            mediaMetadataRetriever?.release()
-        }
-        return bitmap
     }
 }

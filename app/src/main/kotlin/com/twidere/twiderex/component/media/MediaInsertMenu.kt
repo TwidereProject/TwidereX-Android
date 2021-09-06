@@ -36,6 +36,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -43,7 +44,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.twidere.twiderex.R
 import com.twidere.twiderex.model.enums.MediaInsertType
+import com.twidere.twiderex.navigation.RootRoute
+import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.utils.FileProviderHelper
+import kotlinx.coroutines.launch
 import java.util.UUID
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -60,6 +64,8 @@ fun MediaInsertMenu(
             onResult(it)
         },
     )
+    val navController = LocalNavController.current
+    val scope = rememberCoroutineScope()
 
     var cameraTempUri by remember {
         mutableStateOf(Uri.EMPTY)
@@ -102,7 +108,12 @@ fun MediaInsertMenu(
                                     videoRecordLauncher.launch(videoTempUri)
                                 }
                                 MediaInsertType.LIBRARY -> filePickerLauncher.launch(arrayOf("image/*", "video/*"))
-                                MediaInsertType.GIF -> TODO()
+                                MediaInsertType.GIF -> scope.launch {
+                                    navController.navigateForResult(RootRoute.Gif.Home)
+                                        ?.let { result ->
+                                            onResult(listOf(result as Uri))
+                                        }
+                                }
                             }
                             showDropdown = false
                         }

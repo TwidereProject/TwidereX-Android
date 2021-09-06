@@ -23,7 +23,9 @@ package com.twidere.twiderex.scenes.compose
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Bitmap
 import android.location.Location
+import android.media.MediaMetadataRetriever
 import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -153,6 +155,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import java.lang.Exception
 import kotlin.math.max
 
 @Composable
@@ -1347,11 +1350,11 @@ private fun ComposeImage(item: Uri, viewModel: ComposeViewModel, context: Contex
                 )
                 .clip(MaterialTheme.shapes.small),
         ) {
-            NetworkImage(data = item)
+            NetworkImage(data = getThumb(context, item) ?: item)
             when (type) {
                 MediaType.animated_gif ->
                     Image(
-                        painter = painterResource(id = R.drawable.ic_media_tag_bg),
+                        painter = painterResource(id = R.drawable.ic_gif_tag),
                         contentDescription = type.name,
                         modifier = Modifier.align(Alignment.BottomStart)
                             .width(ComposeImageDefaults.Tag.Width)
@@ -1395,6 +1398,26 @@ private fun ComposeImage(item: Uri, viewModel: ComposeViewModel, context: Contex
             }
         }
     }
+}
+
+private fun getThumb(context: Context, uri: Uri): Bitmap? {
+    return if (context.contentResolver.getType(uri)?.startsWith("video") == true) {
+        var bitmap: Bitmap? = null
+        var mediaMetadataRetriever: MediaMetadataRetriever? = null
+        try {
+            mediaMetadataRetriever = MediaMetadataRetriever()
+            mediaMetadataRetriever.setDataSource(context, uri)
+            bitmap = mediaMetadataRetriever.getFrameAtTime(
+                1000,
+                MediaMetadataRetriever.OPTION_CLOSEST_SYNC
+            )
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            mediaMetadataRetriever?.release()
+        }
+        bitmap
+    } else null
 }
 
 private object ComposeImageDefaults {

@@ -48,6 +48,7 @@ import com.twidere.twiderex.scenes.compose.DraftComposeScene
 import com.twidere.twiderex.scenes.dm.DMConversationListScene
 import com.twidere.twiderex.scenes.dm.DMConversationScene
 import com.twidere.twiderex.scenes.dm.DMNewConversationScene
+import com.twidere.twiderex.scenes.gif.GifScene
 import com.twidere.twiderex.scenes.home.HomeTimelineScene
 import com.twidere.twiderex.scenes.home.MeScene
 import com.twidere.twiderex.scenes.home.MentionScene
@@ -641,5 +642,9 @@ fun RouteBuilder.route(constraints: Constraints) {
         backStackEntry.path<String>("conversationKey")?.let {
             DMConversationScene(conversationKey = MicroBlogKey.valueOf(it))
         }
+    }
+
+    authorizedScene(RootRouteDefinition.Gif.Home) {
+        GifScene()
     }
 }
