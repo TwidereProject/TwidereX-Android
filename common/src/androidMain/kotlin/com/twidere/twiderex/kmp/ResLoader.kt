@@ -18,11 +18,18 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.di
+package com.twidere.twiderex.kmp
 
-import org.koin.core.KoinApplication
+import android.content.Context
+import dev.icerock.moko.resources.StringResource
 
-fun KoinApplication.setupModules() {
-    modules(preferencesModule)
-    modules(platformModule)
+actual class ResLoader(
+    private val context: Context,
+) {
+    actual fun getString(
+        res: StringResource,
+        vararg args: Any
+    ): String {
+        return context.getString(res.resourceId, *args)
+    }
 }
