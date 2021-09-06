@@ -46,6 +46,7 @@ import androidx.core.graphics.drawable.toBitmap
 import androidx.core.graphics.drawable.toDrawable
 import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat
 import coil.ImageLoader
+import coil.annotation.ExperimentalCoilApi
 import coil.bitmap.BitmapPool
 import coil.compose.rememberImagePainter
 import coil.memory.MemoryCache
@@ -89,6 +90,7 @@ fun BlurImage(
     )
 }
 
+@OptIn(ExperimentalCoilApi::class)
 @Composable
 fun NetworkBlurImage(
     data: Any,

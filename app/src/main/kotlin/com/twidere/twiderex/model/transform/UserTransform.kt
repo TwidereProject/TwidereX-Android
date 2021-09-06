@@ -31,6 +31,7 @@ import com.twidere.twiderex.model.ui.UserMetrics
 import com.twidere.twiderex.model.ui.mastodon.Field
 import com.twidere.twiderex.model.ui.mastodon.MastodonUserExtra
 import com.twidere.twiderex.model.ui.twitter.TwitterUserExtra
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 
@@ -52,6 +53,7 @@ fun DbUser.toAmUser() =
         isProtected = isProtected,
     )
 
+@OptIn(ExperimentalSerializationApi::class)
 fun DbUser.toUi() =
     UiUser(
         id = userId,

@@ -51,6 +51,7 @@ import java.net.Proxy
 class HttpConfigClientFactory(private val configProvider: HttpConfigProvider) : HttpClientFactory {
     private val resourceCache = mutableMapOf<Class<*>, Pair<*, CacheIdentifier>>()
 
+    @OptIn(ExperimentalSerializationApi::class)
     @Suppress("UNCHECKED_CAST")
     override fun <T> createResources(
         clazz: Class<T>,

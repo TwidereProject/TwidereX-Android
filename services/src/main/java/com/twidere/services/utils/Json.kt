@@ -21,6 +21,7 @@
 package com.twidere.services.utils
 
 import com.twidere.services.http.MicroBlogException
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromJsonElement
@@ -35,6 +36,7 @@ internal val JSON by lazy {
 
 class MicroBlogJsonException(override val microBlogErrorMessage: String?) : MicroBlogException()
 
+@OptIn(ExperimentalSerializationApi::class)
 internal inline fun <reified T> T.encodeJson(): String =
     JSON.encodeToString<T>(this)
 

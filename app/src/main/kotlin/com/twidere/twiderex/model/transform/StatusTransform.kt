@@ -45,9 +45,11 @@ import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.model.ui.mastodon.MastodonMention
 import com.twidere.twiderex.model.ui.mastodon.MastodonStatusExtra
 import com.twidere.twiderex.model.ui.twitter.TwitterStatusExtra
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 
+@OptIn(ExperimentalSerializationApi::class)
 fun DbStatusV2.toUi(
     user: UiUser,
     media: List<UiMedia>,

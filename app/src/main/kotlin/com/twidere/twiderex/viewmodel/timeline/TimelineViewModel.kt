@@ -44,6 +44,7 @@ abstract class TimelineViewModel(
     val loadingBetween: Flow<List<MicroBlogKey>>
         get() = pagingMediator.loadingBetween
 
+    @OptIn(androidx.paging.ExperimentalPagingApi::class)
     fun loadBetween(
         maxStatusKey: MicroBlogKey,
         sinceStatueKey: MicroBlogKey,
