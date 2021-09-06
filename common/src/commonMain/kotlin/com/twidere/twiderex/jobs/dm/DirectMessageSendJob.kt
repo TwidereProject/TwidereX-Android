@@ -20,10 +20,10 @@
  */
 package com.twidere.twiderex.jobs.dm
 
-import android.graphics.BitmapFactory
 import com.twidere.services.microblog.MicroBlogService
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.kmp.FileResolver
+import com.twidere.twiderex.kmp.MediaSize
 import com.twidere.twiderex.kmp.ResLoader
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
@@ -134,15 +134,17 @@ abstract class DirectMessageSendJob<T : MicroBlogService>(
                     recipientAccountKey = sendData.recipientUserKey,
                     sendStatus = UiDMEvent.SendStatus.PENDING,
                     media = images.mapIndexed { index, uri ->
-                        val imageSize = getImageSize(URI.create(uri).path)
+                        val imageSize = URI.create(uri).path?.let {
+                            getImageSize(it)
+                        }
                         UiMedia(
                             belongToKey = sendData.draftMessageKey,
                             url = uri,
                             mediaUrl = uri,
                             previewUrl = uri,
                             type = getMediaType(uri),
-                            width = imageSize[0],
-                            height = imageSize[1],
+                            width = imageSize?.width ?: 0L,
+                            height = imageSize?.height ?: 0L,
                             altText = "",
                             order = index,
                             pageUrl = null,
@@ -171,16 +173,8 @@ abstract class DirectMessageSendJob<T : MicroBlogService>(
         }
     }
 
-    private fun getImageSize(path: String?): Array<Long> {
-        return path?.let {
-            val options = BitmapFactory.Options()
-            options.inJustDecodeBounds = true
-            BitmapFactory.decodeFile(it, options)
-            arrayOf(
-                options.outWidth.toLong(),
-                options.outHeight.toLong()
-            )
-        } ?: arrayOf(0, 0)
+    private fun getImageSize(path: String): MediaSize {
+        return fileResolver.getMediaSize(path)
     }
 
     protected abstract suspend fun sendMessage(

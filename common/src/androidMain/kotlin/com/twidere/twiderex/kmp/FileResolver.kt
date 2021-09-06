@@ -21,6 +21,7 @@
 package com.twidere.twiderex.kmp
 
 import android.content.ContentResolver
+import android.graphics.BitmapFactory
 import android.net.Uri
 import java.io.InputStream
 import java.io.OutputStream
@@ -40,5 +41,15 @@ actual class FileResolver(private val contentResolver: ContentResolver) {
 
     actual fun openOutputStream(file: String): OutputStream? {
         return contentResolver.openOutputStream(Uri.parse(file))
+    }
+
+    actual fun getMediaSize(file: String): MediaSize {
+        val options = BitmapFactory.Options()
+        options.inJustDecodeBounds = true
+        BitmapFactory.decodeFile(file, options)
+        return MediaSize(
+            width = options.outWidth.toLong(),
+            height = options.outHeight.toLong()
+        )
     }
 }

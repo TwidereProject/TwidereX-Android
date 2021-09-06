@@ -39,4 +39,8 @@ actual class FileResolver {
     actual fun openOutputStream(file: String): OutputStream? {
         TODO("Not yet implemented")
     }
+
+    actual fun getMediaSize(file: String): MediaSize {
+        TODO("Not yet implemented")
+    }
 }

@@ -21,6 +21,7 @@
 package com.twidere.twiderex.notification
 
 import kotlin.time.Duration
+import kotlin.time.ExperimentalTime
 
 actual class AppNotificationManager {
     actual fun notify(
@@ -29,6 +30,7 @@ actual class AppNotificationManager {
     ) {
     }
 
+    @OptIn(ExperimentalTime::class)
     actual fun notifyTransient(
         notificationId: Int,
         appNotification: AppNotification,

@@ -31,4 +31,11 @@ expect class FileResolver {
     fun openInputStream(file: String): InputStream?
 
     fun openOutputStream(file: String): OutputStream?
+
+    fun getMediaSize(file: String): MediaSize
 }
+
+data class MediaSize(
+    val width: Long,
+    val height: Long,
+)

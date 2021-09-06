@@ -20,8 +20,8 @@
  */
 package com.twidere.twiderex.notification
 
-import android.net.Uri
 import com.twidere.twiderex.model.MicroBlogKey
+import java.net.URLEncoder
 
 enum class NotificationChannelSpec(
     val id: String,
@@ -50,9 +50,9 @@ enum class NotificationChannelSpec(
 }
 
 fun MicroBlogKey.notificationChannelId(id: String): String {
-    return "${id}_${Uri.encode(toString())}"
+    return "${id}_${URLEncoder.encode(toString(), "UTF-8")}"
 }
 
 fun MicroBlogKey.notificationChannelGroupId(): String {
-    return Uri.encode(toString())
+    return URLEncoder.encode(toString(), "UTF-8")
 }

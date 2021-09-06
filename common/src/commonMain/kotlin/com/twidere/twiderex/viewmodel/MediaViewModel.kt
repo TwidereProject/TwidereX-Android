@@ -20,7 +20,6 @@
  */
 package com.twidere.twiderex.viewmodel
 
-import android.net.Uri
 import com.twidere.twiderex.action.MediaAction
 import com.twidere.twiderex.extensions.asStateIn
 import com.twidere.twiderex.model.MicroBlogKey
@@ -46,13 +45,13 @@ class MediaViewModel(
         accountRepository.activeAccount.asStateIn(viewModelScope, null)
     }
 
-    fun saveFile(currentMedia: UiMedia, target: Uri) = viewModelScope.launch {
+    fun saveFile(currentMedia: UiMedia, target: String) = viewModelScope.launch {
         val account = account.lastOrNull() ?: return@launch
         currentMedia.mediaUrl?.let {
             mediaAction.download(
                 accountKey = account.accountKey,
                 source = it,
-                target = target.toString()
+                target = target
             )
         }
     }

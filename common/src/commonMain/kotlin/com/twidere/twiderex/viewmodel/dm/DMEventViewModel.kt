@@ -20,7 +20,6 @@
  */
 package com.twidere.twiderex.viewmodel.dm
 
-import android.net.Uri
 import androidx.paging.cachedIn
 import com.twidere.services.microblog.DirectMessageService
 import com.twidere.services.microblog.LookupService
@@ -82,7 +81,7 @@ class DMEventViewModel(
 
     // input
     val input = MutableStateFlow("")
-    val inputImage = MutableStateFlow<Uri?>(null)
+    val inputImage = MutableStateFlow<String?>(null)
     val firstEventKey = MutableStateFlow<String?>(null)
     val pendingActionMessage = MutableStateFlow<UiDMEvent?>(null)
 
