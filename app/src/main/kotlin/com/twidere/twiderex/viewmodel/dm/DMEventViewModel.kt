@@ -20,7 +20,6 @@
  */
 package com.twidere.twiderex.viewmodel.dm
 
-import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
@@ -33,6 +32,7 @@ import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.job.DirectMessageDeleteData
 import com.twidere.twiderex.model.job.DirectMessageSendData
 import com.twidere.twiderex.model.ui.UiDMEvent
+import com.twidere.twiderex.model.ui.UiMediaInsert
 import com.twidere.twiderex.repository.DirectMessageRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -71,7 +71,7 @@ class DMEventViewModel @AssistedInject constructor(
 
     // input
     val input = MutableStateFlow("")
-    val inputImage = MutableStateFlow<Uri?>(null)
+    val inputImage = MutableStateFlow<UiMediaInsert?>(null)
     val firstEventKey = MutableStateFlow<String?>(null)
     val pendingActionMessage = MutableStateFlow<UiDMEvent?>(null)
 
@@ -83,7 +83,7 @@ class DMEventViewModel @AssistedInject constructor(
                     account.type,
                     data = DirectMessageSendData(
                         text = input.value,
-                        images = inputImage.value?.toString()?.let { uri -> listOf(uri) }
+                        images = inputImage.value?.uri?.toString()?.let { uri -> listOf(uri) }
                             ?: emptyList(),
                         recipientUserKey = it.recipientKey,
                         draftMessageKey = when (account.type) {

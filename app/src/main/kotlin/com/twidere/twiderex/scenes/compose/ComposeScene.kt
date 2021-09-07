@@ -23,9 +23,7 @@ package com.twidere.twiderex.scenes.compose
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.Bitmap
 import android.location.Location
-import android.media.MediaMetadataRetriever
 import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -137,6 +135,7 @@ import com.twidere.twiderex.model.enums.MediaType
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiEmojiCategory
 import com.twidere.twiderex.model.ui.UiMediaInsert
+import com.twidere.twiderex.model.ui.UiMediaInsert.Companion.getVideoThumb
 import com.twidere.twiderex.navigation.RootRoute
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalNavController
@@ -1354,7 +1353,7 @@ private fun ComposeImage(item: UiMediaInsert, viewModel: ComposeViewModel, conte
                 )
                 .clip(MaterialTheme.shapes.small),
         ) {
-            NetworkImage(data = getThumb(context, item) ?: item.uri)
+            NetworkImage(data = item.getVideoThumb(context) ?: item.uri)
             when (type) {
                 MediaType.animated_gif ->
                     Image(
@@ -1404,26 +1403,6 @@ private fun ComposeImage(item: UiMediaInsert, viewModel: ComposeViewModel, conte
             }
         }
     }
-}
-
-private fun getThumb(context: Context, item: UiMediaInsert): Bitmap? {
-    return if (item.type == MediaType.video) {
-        var bitmap: Bitmap? = null
-        var mediaMetadataRetriever: MediaMetadataRetriever? = null
-        try {
-            mediaMetadataRetriever = MediaMetadataRetriever()
-            mediaMetadataRetriever.setDataSource(context, item.uri)
-            bitmap = mediaMetadataRetriever.getFrameAtTime(
-                1000,
-                MediaMetadataRetriever.OPTION_CLOSEST_SYNC
-            )
-        } catch (e: Exception) {
-            e.printStackTrace()
-        } finally {
-            mediaMetadataRetriever?.release()
-        }
-        bitmap
-    } else null
 }
 
 private object ComposeImageDefaults {

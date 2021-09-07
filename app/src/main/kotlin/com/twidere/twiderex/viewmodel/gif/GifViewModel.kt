@@ -27,6 +27,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
 import com.twidere.twiderex.http.TwidereServiceFactory
+import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiGif
 import com.twidere.twiderex.repository.GifRepository
 import com.twidere.twiderex.utils.FileProviderHelper
@@ -72,13 +73,22 @@ class GifViewModel @AssistedInject constructor(
 
     val commitLoading get() = _commitLoading
 
-    fun commit(context: Context, onSuccess: (uri: Uri) -> Unit) {
+    fun commit(context: Context, onSuccess: (uri: Uri) -> Unit, platform: PlatformType) {
         selectedItem.value?.let {
+            // mastodon support image/video only
+            val url = when (platform) {
+                PlatformType.Mastodon -> it.mp4
+                else -> it.url
+            }
+            val suffix = when (platform) {
+                PlatformType.Mastodon -> "mp4"
+                else -> it.type
+            }
             viewModelScope.launch {
                 _commitLoading.value = true
                 try {
-                    val target = FileProviderHelper.getUriFromMedias("${it.id}.${it.type}", context)
-                    gifRepository.download(target = target.toString(), source = it.url, service = service)
+                    val target = FileProviderHelper.getUriFromMedias("${it.id}.$suffix", context)
+                    gifRepository.download(target = target.toString(), source = url, service = service)
                     onSuccess(target)
                 } catch (e: Throwable) {
                     e.notify()

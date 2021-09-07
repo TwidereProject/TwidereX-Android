@@ -59,7 +59,9 @@ import com.twidere.twiderex.component.foundation.LoadingProgress
 import com.twidere.twiderex.component.foundation.TextInput
 import com.twidere.twiderex.component.lazy.ui.LazyUiGifList
 import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiGif
+import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.gif.GifViewModel
@@ -71,6 +73,7 @@ fun GifScene() {
     }
     val enable by viewModel.enable.collectAsState(initial = false)
     val context = LocalContext.current
+    val account = LocalActiveAccount.current
     val navController = LocalNavController.current
     val commitLoading by viewModel.commitLoading.collectAsState(initial = false)
     TwidereScene {
@@ -88,6 +91,7 @@ fun GifScene() {
                             onClick = {
                                 viewModel.commit(
                                     context = context,
+                                    platform = account?.type ?: PlatformType.Twitter,
                                     onSuccess = {
                                         navController.goBackWith(it)
                                     }

@@ -32,6 +32,7 @@ fun IGif.toUi(): UiGif {
         is GiphyGif -> UiGif(
             id = this.id ?: UUID.randomUUID().toString(),
             url = this.images?.original?.url ?: "",
+            mp4 = this.images?.original?.mp4 ?: "",
             preview = this.images?.previewGif?.url ?: "",
             type = this.type ?: "gif"
         )
