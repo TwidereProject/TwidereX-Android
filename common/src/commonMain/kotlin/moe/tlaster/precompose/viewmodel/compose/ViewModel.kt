@@ -37,6 +37,6 @@ inline fun <reified VM : ViewModel> viewModel(
     if (key == null) {
         it.getViewModel(creator)
     } else {
-        it.getViewModel(key, creator)
+        it.getViewModel(key, VM::class, creator)
     }
 }
