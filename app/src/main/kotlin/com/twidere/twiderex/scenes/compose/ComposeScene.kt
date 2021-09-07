@@ -127,7 +127,6 @@ import com.twidere.twiderex.component.status.UserName
 import com.twidere.twiderex.component.status.UserScreenName
 import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.extensions.icon
-import com.twidere.twiderex.extensions.mediaType
 import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.extensions.stringName
 import com.twidere.twiderex.extensions.withElevation
@@ -137,6 +136,7 @@ import com.twidere.twiderex.model.enums.MastodonVisibility
 import com.twidere.twiderex.model.enums.MediaType
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiEmojiCategory
+import com.twidere.twiderex.model.ui.UiMediaInsert
 import com.twidere.twiderex.navigation.RootRoute
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalNavController
@@ -155,7 +155,6 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import java.lang.Exception
 import kotlin.math.max
 
 @Composable
@@ -409,7 +408,7 @@ private fun ComposeBody(
                             viewModel = viewModel,
                         )
                         CompositionLocalProvider(LocalContentAlpha.provides(ContentAlpha.medium)) {
-                            MastodonExtraActions(images, viewModel)
+                            MastodonExtraActions(images.map { it.uri }, viewModel)
                         }
                     } else {
                         Spacer(modifier = Modifier.weight(1F))
@@ -453,7 +452,7 @@ private fun ComposeBody(
 
 @Composable
 private fun ComposeImageList(
-    images: List<Uri>,
+    images: List<UiMediaInsert>,
     viewModel: ComposeViewModel
 ) {
     val context = LocalContext.current
@@ -1165,13 +1164,17 @@ private fun ComposeActions(
         },
     )
     val draftCount = viewModel.draftCount.observeAsState(0)
+    val insertMode by viewModel.mediaInsertMode.observeAsState(initial = ComposeViewModel.MediaInsertMode.All)
     Box {
         Row {
             AnimatedVisibility(visible = allowImage) {
                 MediaInsertMenu(
                     onResult = {
                         viewModel.putImages(it)
-                    }
+                    },
+                    supportMultipleSelect = insertMode.multiSelect,
+                    disableList = insertMode.disabledInsertType,
+                    librariesSupported = insertMode.librarySupportedType.toTypedArray()
                 )
             }
             if (account.type == PlatformType.Mastodon) {
@@ -1207,10 +1210,6 @@ private fun ComposeActions(
                     )
                 }
             }
-            // TODO:
-//            IconButton(onClick = {}) {
-//                Icon(painter = painterResource(id = R.drawable.ic_gif))
-//            }
             if (account.type == PlatformType.Mastodon || account.type == PlatformType.Twitter) {
                 IconButton(
                     onClick = {
@@ -1329,9 +1328,9 @@ private object ComposeActionsDefaults {
 }
 
 @Composable
-private fun ComposeImage(item: Uri, viewModel: ComposeViewModel, context: Context) {
+private fun ComposeImage(item: UiMediaInsert, viewModel: ComposeViewModel, context: Context) {
     var expanded by remember { mutableStateOf(false) }
-    val type = item.mediaType(context)
+    val type = item.type
     val navController = LocalNavController.current
     Box {
         Box(
@@ -1345,18 +1344,24 @@ private fun ComposeImage(item: Uri, viewModel: ComposeViewModel, context: Contex
                 )
                 .clickable(
                     onClick = {
-                        navController.navigate(RootRoute.Media.Raw(if (type == MediaType.video) MediaType.video else MediaType.photo, item.toString()))
+                        navController.navigate(
+                            RootRoute.Media.Raw(
+                                if (type == MediaType.video) MediaType.video else MediaType.photo,
+                                item.uri.toString()
+                            )
+                        )
                     }
                 )
                 .clip(MaterialTheme.shapes.small),
         ) {
-            NetworkImage(data = getThumb(context, item) ?: item)
+            NetworkImage(data = getThumb(context, item) ?: item.uri)
             when (type) {
                 MediaType.animated_gif ->
                     Image(
                         painter = painterResource(id = R.drawable.ic_gif_tag),
                         contentDescription = type.name,
-                        modifier = Modifier.align(Alignment.BottomStart)
+                        modifier = Modifier
+                            .align(Alignment.BottomStart)
                             .width(ComposeImageDefaults.Tag.Width)
                             .height(ComposeImageDefaults.Tag.Height)
                             .padding(ComposeImageDefaults.Tag.Padding)
@@ -1375,7 +1380,8 @@ private fun ComposeImage(item: Uri, viewModel: ComposeViewModel, context: Contex
             Image(
                 painter = painterResource(id = R.drawable.ic_dots_circle_horiz),
                 contentDescription = type.name,
-                modifier = Modifier.align(Alignment.BottomEnd)
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
                     .size(ComposeImageDefaults.Menu.Size)
                     .padding(ComposeImageDefaults.Menu.Padding)
                     .clickable { expanded = !expanded }
@@ -1388,7 +1394,7 @@ private fun ComposeImage(item: Uri, viewModel: ComposeViewModel, context: Contex
             DropdownMenuItem(
                 onClick = {
                     expanded = false
-                    viewModel.removeImage(item)
+                    viewModel.removeImage(item.uri)
                 }
             ) {
                 Text(
@@ -1400,13 +1406,13 @@ private fun ComposeImage(item: Uri, viewModel: ComposeViewModel, context: Contex
     }
 }
 
-private fun getThumb(context: Context, uri: Uri): Bitmap? {
-    return if (context.contentResolver.getType(uri)?.startsWith("video") == true) {
+private fun getThumb(context: Context, item: UiMediaInsert): Bitmap? {
+    return if (item.type == MediaType.video) {
         var bitmap: Bitmap? = null
         var mediaMetadataRetriever: MediaMetadataRetriever? = null
         try {
             mediaMetadataRetriever = MediaMetadataRetriever()
-            mediaMetadataRetriever.setDataSource(context, uri)
+            mediaMetadataRetriever.setDataSource(context, item.uri)
             bitmap = mediaMetadataRetriever.getFrameAtTime(
                 1000,
                 MediaMetadataRetriever.OPTION_CLOSEST_SYNC
