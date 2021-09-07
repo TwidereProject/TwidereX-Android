@@ -39,6 +39,7 @@ import com.twidere.twiderex.paging.mediator.paging.toUi
 import com.twidere.twiderex.paging.mediator.status.MastodonStatusContextMediator
 import com.twidere.twiderex.paging.mediator.status.TwitterConversationMediator
 import com.twidere.twiderex.preferences.model.MiscPreferences
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flattenMerge
@@ -89,7 +90,7 @@ class StatusRepository(
         )
     }
 
-    @OptIn(ExperimentalPagingApi::class)
+    @OptIn(ExperimentalPagingApi::class, FlowPreview::class)
     fun conversation(
         statusKey: MicroBlogKey,
         platformType: PlatformType,
