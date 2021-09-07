@@ -21,7 +21,6 @@
 package com.twidere.twiderex.worker
 
 import android.content.Context
-import android.net.Uri
 import androidx.work.CoroutineWorker
 import androidx.work.Data
 import androidx.work.OneTimeWorkRequestBuilder
@@ -39,13 +38,13 @@ class DownloadMediaWorker(
         fun create(
             accountKey: MicroBlogKey,
             source: String,
-            target: Uri,
+            target: String,
         ) = OneTimeWorkRequestBuilder<DownloadMediaWorker>()
             .setInputData(
                 Data.Builder()
                     .putString("accountKey", accountKey.toString())
                     .putString("source", source)
-                    .putString("target", target.toString())
+                    .putString("target", target)
                     .build()
             )
             .build()

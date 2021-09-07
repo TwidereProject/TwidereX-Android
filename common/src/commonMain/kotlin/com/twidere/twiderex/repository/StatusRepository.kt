@@ -20,6 +20,7 @@
  */
 package com.twidere.twiderex.repository
 
+import androidx.datastore.core.DataStore
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.PagingData
 import com.twidere.services.mastodon.MastodonService
@@ -29,6 +30,7 @@ import com.twidere.services.nitter.NitterService
 import com.twidere.services.twitter.TwitterService
 import com.twidere.twiderex.dataprovider.mapper.toUi
 import com.twidere.twiderex.db.CacheDatabase
+import com.twidere.twiderex.http.TwidereServiceFactory
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiStatus
@@ -36,11 +38,15 @@ import com.twidere.twiderex.paging.mediator.paging.pager
 import com.twidere.twiderex.paging.mediator.paging.toUi
 import com.twidere.twiderex.paging.mediator.status.MastodonStatusContextMediator
 import com.twidere.twiderex.paging.mediator.status.TwitterConversationMediator
+import com.twidere.twiderex.preferences.model.MiscPreferences
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flattenMerge
+import kotlinx.coroutines.flow.flow
 
 class StatusRepository(
     private val database: CacheDatabase,
-    private val nitterService: NitterService?,
+    private val preferences: DataStore<MiscPreferences>,
 ) {
     fun loadStatus(
         statusKey: MicroBlogKey,
@@ -53,7 +59,11 @@ class StatusRepository(
         return database.statusDao().findWithStatusKey(statusKey, accountKey)
     }
 
-    suspend fun updateStatus(statusKey: MicroBlogKey, accountKey: MicroBlogKey, action: (UiStatus) -> UiStatus) {
+    suspend fun updateStatus(
+        statusKey: MicroBlogKey,
+        accountKey: MicroBlogKey,
+        action: (UiStatus) -> UiStatus
+    ) {
         database.statusDao().findWithStatusKey(statusKey, accountKey = accountKey)?.let {
             database.statusDao().insertAll(listOf(action.invoke(it)), accountKey)
         }
@@ -85,12 +95,18 @@ class StatusRepository(
         platformType: PlatformType,
         service: MicroBlogService,
         accountKey: MicroBlogKey
-    ): Flow<PagingData<UiStatus>> {
+    ): Flow<PagingData<UiStatus>> = flow {
         // TODO: remove usage of `when`
         val remoteMediator = when (platformType) {
             PlatformType.Twitter -> TwitterConversationMediator(
                 service = service as TwitterService,
-                nitterService = nitterService,
+                nitterService = preferences.data.first().nitterInstance.takeIf { it.isNotEmpty() }
+                    ?.let {
+                        NitterService(
+                            it.trimEnd('/'),
+                            TwidereServiceFactory.createHttpClientFactory()
+                        )
+                    },
                 statusKey = statusKey,
                 accountKey = accountKey,
                 database = database,
@@ -104,6 +120,6 @@ class StatusRepository(
                 database = database,
             )
         }
-        return remoteMediator.pager().toUi()
-    }
+        emit(remoteMediator.pager().toUi())
+    }.flattenMerge()
 }

@@ -18,14 +18,14 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.di
+package com.twidere.twiderex.di.modules
 
-import org.koin.core.scope.Scope
-import java.io.File
+import com.twidere.twiderex.dataprovider.DataProvider
+import org.koin.dsl.module
 
-internal actual fun Scope.createDataStoreFile(name: String): File {
-    return File(
-        File(System.getProperty("user.home")),
-        "TwidereX/datastore/$name"
-    )
+val dataBaseModule = module {
+    single { DataProvider.create() }
+    single { get<DataProvider>().appDatabase }
+    single { get<DataProvider>().cacheDatabase }
+    single { get<DataProvider>().fileCacheHandler }
 }

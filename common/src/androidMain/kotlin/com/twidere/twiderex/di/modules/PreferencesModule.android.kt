@@ -18,13 +18,16 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.di
+package com.twidere.twiderex.di.modules
 
-import com.twidere.twiderex.kmp.ResLoader
-import org.koin.dsl.module
+import android.content.Context
+import org.koin.core.scope.Scope
+import java.io.File
 
-internal actual val platformModule = module {
-    single {
-        ResLoader()
-    }
+internal actual fun Scope.createDataStoreFile(name: String): File {
+    val context = get<Context>()
+    return File(
+        context.applicationContext.filesDir,
+        "datastore/$name"
+    )
 }

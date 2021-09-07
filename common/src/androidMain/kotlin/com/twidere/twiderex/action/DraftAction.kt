@@ -20,12 +20,28 @@
  */
 package com.twidere.twiderex.action
 
+import androidx.core.app.NotificationManagerCompat
+import androidx.work.WorkManager
 import com.twidere.twiderex.model.job.ComposeData
+import com.twidere.twiderex.worker.draft.RemoveDraftWorker
+import com.twidere.twiderex.worker.draft.SaveDraftWorker
 
-actual class DraftAction {
+actual class DraftAction(
+    private val workManager: WorkManager,
+    private val notificationManagerCompat: NotificationManagerCompat,
+) {
     actual fun delete(id: String) {
+        workManager.beginWith(RemoveDraftWorker.create(id)).enqueue()
+        notificationManagerCompat.cancel(id.hashCode())
     }
 
     actual fun save(composeData: ComposeData) {
+        workManager
+            .beginWith(
+                SaveDraftWorker.create(
+                    composeData
+                )
+            )
+            .enqueue()
     }
 }

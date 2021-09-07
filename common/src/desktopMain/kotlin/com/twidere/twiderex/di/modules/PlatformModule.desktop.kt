@@ -18,8 +18,13 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.di
+package com.twidere.twiderex.di.modules
 
-import org.koin.core.module.Module
+import com.twidere.twiderex.kmp.ResLoader
+import org.koin.dsl.module
 
-internal expect val platformModule: Module
+internal actual val platformModule = module {
+    single {
+        ResLoader()
+    }
+}

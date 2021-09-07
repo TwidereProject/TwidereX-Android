@@ -20,14 +20,17 @@
  */
 package com.twidere.twiderex.di
 
-import android.content.Context
-import org.koin.core.scope.Scope
-import java.io.File
+import com.twidere.twiderex.action.ComposeAction
+import com.twidere.twiderex.action.DirectMessageAction
+import com.twidere.twiderex.action.DraftAction
+import com.twidere.twiderex.action.MediaAction
+import com.twidere.twiderex.action.StatusActions
+import org.koin.dsl.module
 
-internal actual fun Scope.createDataStoreFile(name: String): File {
-    val context = get<Context>()
-    return File(
-        context.applicationContext.filesDir,
-        "datastore/$name"
-    )
+actual val actionModule = module {
+    single { ComposeAction(get()) }
+    single { DirectMessageAction(get()) }
+    single { DraftAction(get(), get()) }
+    single { MediaAction(get(), get()) }
+    single { StatusActions(get()) }
 }

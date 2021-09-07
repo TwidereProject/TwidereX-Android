@@ -18,33 +18,24 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package moe.tlaster.precompose.viewmodel
+package com.twidere.twiderex.extensions
 
-import kotlin.reflect.KClass
+import moe.tlaster.precompose.viewmodel.ViewModel
+import org.koin.core.definition.Definition
+import org.koin.core.instance.InstanceFactory
+import org.koin.core.instance.newInstance
+import org.koin.core.module.Module
+import org.koin.core.qualifier.Qualifier
 
-inline fun <reified T : ViewModel> ViewModelStore.getViewModel(
-    noinline creator: () -> T,
-): T {
-    val key = T::class.qualifiedName.toString()
-    return getViewModel(key, T::class, creator)
+inline fun <reified T : ViewModel> Module.viewModel(
+    qualifier: Qualifier? = null,
+    noinline definition: Definition<T>
+): Pair<Module, InstanceFactory<T>> {
+    return factory(qualifier, definition)
 }
 
-fun <T : ViewModel> ViewModelStore.getViewModel(
-    key: String,
-    clazz: KClass<T>,
-    creator: () -> T,
-): T {
-    val existing = get(key)
-    if (existing != null && clazz.isInstance(existing)) {
-        @Suppress("UNCHECKED_CAST")
-        return existing as T
-    } else {
-        @Suppress("ControlFlowWithEmptyBody")
-        if (existing != null) {
-            // TODO: log a warning.
-        }
-    }
-    val viewModel = creator.invoke()
-    put(key, viewModel)
-    return viewModel
+inline fun <reified T : ViewModel> Module.viewModel(
+    qualifier: Qualifier? = null
+): Pair<Module, InstanceFactory<T>> {
+    return factory(qualifier) { newInstance(it) }
 }

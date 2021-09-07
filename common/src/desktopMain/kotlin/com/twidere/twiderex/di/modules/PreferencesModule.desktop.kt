@@ -18,33 +18,14 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package moe.tlaster.precompose.viewmodel
+package com.twidere.twiderex.di.modules
 
-import kotlin.reflect.KClass
+import org.koin.core.scope.Scope
+import java.io.File
 
-inline fun <reified T : ViewModel> ViewModelStore.getViewModel(
-    noinline creator: () -> T,
-): T {
-    val key = T::class.qualifiedName.toString()
-    return getViewModel(key, T::class, creator)
-}
-
-fun <T : ViewModel> ViewModelStore.getViewModel(
-    key: String,
-    clazz: KClass<T>,
-    creator: () -> T,
-): T {
-    val existing = get(key)
-    if (existing != null && clazz.isInstance(existing)) {
-        @Suppress("UNCHECKED_CAST")
-        return existing as T
-    } else {
-        @Suppress("ControlFlowWithEmptyBody")
-        if (existing != null) {
-            // TODO: log a warning.
-        }
-    }
-    val viewModel = creator.invoke()
-    put(key, viewModel)
-    return viewModel
+internal actual fun Scope.createDataStoreFile(name: String): File {
+    return File(
+        File(System.getProperty("user.home")),
+        "TwidereX/datastore/$name"
+    )
 }

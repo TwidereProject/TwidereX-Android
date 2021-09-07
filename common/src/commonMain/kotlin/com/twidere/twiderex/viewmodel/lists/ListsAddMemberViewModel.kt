@@ -20,76 +20,76 @@
  */
 package com.twidere.twiderex.viewmodel.lists
 
-import androidx.paging.PagingData
-import androidx.paging.cachedIn
+import androidx.compose.runtime.mutableStateMapOf
 import com.twidere.services.microblog.ListsService
 import com.twidere.twiderex.extensions.asStateIn
+import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiUser
+import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.ListsUsersRepository
-import com.twidere.twiderex.viewmodel.user.UserListViewModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.lastOrNull
+import com.twidere.twiderex.utils.notifyError
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
+import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
-class ListsUserViewModel(
+class ListsAddMemberViewModel(
     private val listsUsersRepository: ListsUsersRepository,
+    private val inAppNotification: InAppNotification,
     private val accountRepository: AccountRepository,
     private val listId: String,
-    private val viewMembers: Boolean = true,
-) : UserListViewModel() {
+) : ViewModel() {
     private val account by lazy {
         accountRepository.activeAccount.asStateIn(viewModelScope, null)
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    private val members by lazy {
-        account.flatMapLatest {
-            it?.let { account ->
-                listsUsersRepository.fetchMembers(
-                    accountKey = account.accountKey,
-                    service = account.service as ListsService,
-                    listId = listId
-                )
-            } ?: emptyFlow()
-        }.cachedIn(viewModelScope)
-    }
+    val loading = MutableStateFlow(false)
+    val pendingMap = mutableStateMapOf<MicroBlogKey, UiUser>()
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    private val subscribers by lazy {
-        account.flatMapLatest {
-            it?.let { account ->
-                listsUsersRepository.fetchSubscribers(
-                    accountKey = account.accountKey,
-                    service = account.service as ListsService,
-                    listId = listId
-                )
-            } ?: emptyFlow()
-        }.cachedIn(viewModelScope)
-    }
-
-    override val source: Flow<PagingData<UiUser>>
-        get() {
-            return if (viewMembers) members else subscribers
-        }
-
-    fun removeMember(user: UiUser) {
-        try {
-            viewModelScope.launch {
-                account.lastOrNull()?.let { account ->
+    fun addToOrRemove(user: UiUser) {
+        if (pendingMap[user.userKey] == null) {
+            loading.value = true
+            loadingRequest {
+                account.firstOrNull()?.let { account ->
+                    listsUsersRepository.addMember(
+                        listId = listId,
+                        user = user,
+                        service = account.service as ListsService,
+                    )
+                    pendingMap[user.userKey] = user
+                }
+            }
+        } else {
+            loadingRequest {
+                account.firstOrNull()?.let { account ->
                     listsUsersRepository.removeMember(
                         service = account.service as ListsService,
                         listId = listId,
                         user = user
                     )
+                    pendingMap.remove(user.userKey)
                 }
             }
-        } catch (e: Exception) {
-            e.printStackTrace()
+        }
+    }
+
+    fun isInPendingList(user: UiUser): Boolean {
+        return pendingMap[user.userKey] != null
+    }
+
+    private fun loadingRequest(request: suspend () -> Unit) {
+        loading.value = true
+        viewModelScope.launch {
+            runCatching {
+                request()
+            }.onFailure {
+                inAppNotification.notifyError(it)
+                loading.value = false
+            }.onSuccess {
+                loading.value = false
+            }
         }
     }
 }
