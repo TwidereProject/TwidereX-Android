@@ -177,10 +177,10 @@ private fun List<Uri>.toUi(context: Context) = map {
 
 @Composable
 private fun MediaInsertType.stringName() = when (this) {
-    MediaInsertType.CAMERA -> "Take Photo"
-    MediaInsertType.RECORD_VIDEO -> "Record Video"
-    MediaInsertType.LIBRARY -> "Browse Library"
-    MediaInsertType.GIF -> "Add GIF"
+    MediaInsertType.CAMERA -> stringResource(id = R.string.accessibility_scene_compose_media_insert_camera)
+    MediaInsertType.RECORD_VIDEO -> stringResource(id = R.string.accessibility_scene_compose_media_insert_record_video)
+    MediaInsertType.LIBRARY -> stringResource(id = R.string.accessibility_scene_compose_media_insert_library)
+    MediaInsertType.GIF -> stringResource(id = R.string.accessibility_scene_compose_media_insert_gif)
 }
 
 @Composable

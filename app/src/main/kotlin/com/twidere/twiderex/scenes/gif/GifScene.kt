@@ -84,7 +84,7 @@ fun GifScene() {
                         AppBarNavigationButton()
                     },
                     title = {
-                        Text(text = "GIPHY")
+                        Text(text = stringResource(id = R.string.accessibility_scene_gif_title))
                     },
                     actions = {
                         IconButton(
@@ -168,7 +168,7 @@ private fun SearchInput(modifier: Modifier = Modifier, input: String, onValueCha
             value = input,
             onValueChange = onValueChanged, modifier = Modifier.weight(1f),
             placeholder = {
-                Text(text = "Search GIF")
+                Text(text = stringResource(id = R.string.accessibility_scene_gif_search))
             },
             maxLines = 1,
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done)
