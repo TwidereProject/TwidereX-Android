@@ -23,6 +23,7 @@ package com.twidere.twiderex
 import android.content.Context
 import androidx.startup.AppInitializer
 import com.twidere.twiderex.initializer.DirectMessageInitializer
+import com.twidere.twiderex.initializer.NotificationChannelInitializer
 import com.twidere.twiderex.initializer.NotificationInitializer
 import com.twidere.twiderex.initializer.TwidereServiceInitializer
 
@@ -37,6 +38,7 @@ class TwidereApp : TwidereApplication() {
         // manually setup NotificationInitializer since it require HiltWorkerFactory
         AppInitializer.getInstance(this)
             .apply {
+                initializeComponent(NotificationChannelInitializer::class.java)
                 initializeComponent(NotificationInitializer::class.java)
                 initializeComponent(DirectMessageInitializer::class.java)
                 initializeComponent(TwidereServiceInitializer::class.java)

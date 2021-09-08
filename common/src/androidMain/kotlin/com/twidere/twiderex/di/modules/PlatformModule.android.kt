@@ -26,9 +26,13 @@ import android.location.LocationManager
 import android.net.ConnectivityManager
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.WorkManager
+import com.twidere.twiderex.http.TwidereHttpConfigProvider
 import com.twidere.twiderex.kmp.ResLoader
 import com.twidere.twiderex.model.AccountPreferencesFactory
+import com.twidere.twiderex.notification.InAppNotification
+import com.twidere.twiderex.preferences.PreferencesHolder
 import com.twidere.twiderex.repository.AccountRepository
+import com.twidere.twiderex.utils.PlatformResolver
 import com.twidere.twiderex.worker.DownloadMediaWorker
 import com.twidere.twiderex.worker.NotificationWorker
 import com.twidere.twiderex.worker.ShareMediaWorker
@@ -63,12 +67,15 @@ internal actual val platformModule = module {
     single { get<Context>().contentResolver }
     single { NotificationManagerCompat.from(get()) }
     single { WorkManager.getInstance(get()) }
+    single { TwidereHttpConfigProvider(get<PreferencesHolder>().miscPreferences) }
+    single { InAppNotification() }
+    single { PlatformResolver(get()) }
     workManager()
 }
 
 private fun Module.workManager() {
     worker { ShareMediaWorker(get(), get(), get()) }
-    worker { NotificationWorker(get(), get(), get(), get()) }
+    worker { NotificationWorker(get(), get(), get<PreferencesHolder>().notificationPreferences, get()) }
     worker { DownloadMediaWorker(get(), get(), get()) }
     worker { DeleteStatusWorker(get(), get(), get()) }
     worker { LikeWorker(get(), get(), get()) }

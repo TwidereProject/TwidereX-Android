@@ -28,8 +28,6 @@ import android.net.NetworkRequest
 import android.net.Uri
 import android.os.Bundle
 import android.view.WindowManager
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.fadeIn
@@ -79,10 +77,13 @@ import com.twidere.twiderex.utils.CustomTabSignInChannel
 import com.twidere.twiderex.utils.LocalPlatformResolver
 import com.twidere.twiderex.utils.PlatformResolver
 import kotlinx.coroutines.flow.MutableStateFlow
+import moe.tlaster.precompose.lifecycle.PreComposeActivity
+import moe.tlaster.precompose.lifecycle.setContent
 import moe.tlaster.precompose.navigation.NavController
-import org.koin.android.ext.android.inject
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
-class TwidereXActivity : ComponentActivity() {
+class TwidereXActivity : PreComposeActivity(), KoinComponent {
 
     private val navController by lazy {
         NavController()
@@ -101,15 +102,15 @@ class TwidereXActivity : ComponentActivity() {
         }
     }
 
-    val statusActions: StatusActions by inject()
+    private val statusActions: StatusActions by inject()
 
-    val preferencesHolder: PreferencesHolder by inject()
+    private val preferencesHolder: PreferencesHolder by inject()
 
-    val inAppNotification: InAppNotification by inject()
+    private val inAppNotification: InAppNotification by inject()
 
-    val connectivityManager: ConnectivityManager by inject()
+    private val connectivityManager: ConnectivityManager by inject()
 
-    val platformResolver: PlatformResolver by inject()
+    private val platformResolver: PlatformResolver by inject()
 
     @OptIn(ExperimentalAnimationApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {

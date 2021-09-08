@@ -28,9 +28,7 @@ import com.twidere.twiderex.di.modules.platformModule
 import com.twidere.twiderex.di.modules.preferencesModule
 import com.twidere.twiderex.di.modules.repositoryModule
 import com.twidere.twiderex.di.modules.viewModelModule
-import com.twidere.twiderex.notification.InAppNotification
 import org.koin.core.KoinApplication
-import org.koin.dsl.module
 
 fun KoinApplication.setupModules() {
     modules(preferencesModule)
@@ -41,7 +39,4 @@ fun KoinApplication.setupModules() {
     modules(actionModule)
     modules(jobsModule)
     modules(kmpModule)
-    module {
-        single { InAppNotification() }
-    }
 }
