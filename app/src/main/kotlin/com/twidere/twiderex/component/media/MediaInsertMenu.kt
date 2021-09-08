@@ -20,7 +20,6 @@
  */
 package com.twidere.twiderex.component.media
 
-import android.content.Context
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -47,15 +46,16 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.twidere.twiderex.R
 import com.twidere.twiderex.model.enums.MediaInsertType
-import com.twidere.twiderex.model.enums.MediaType
 import com.twidere.twiderex.model.ui.UiMediaInsert
 import com.twidere.twiderex.navigation.RootRoute
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.utils.FileProviderHelper
+import com.twidere.twiderex.utils.media.MediaInsertProvider
 import kotlinx.coroutines.launch
 import java.util.UUID
 
 private const val VideoSuffix = ".mp4"
+private const val ImageSuffix = ".jpg"
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -67,19 +67,26 @@ fun MediaInsertMenu(
     onResult: (List<UiMediaInsert>) -> Unit
 ) {
     val context = LocalContext.current
+    val mediaInsertProvider = remember {
+        MediaInsertProvider(context)
+    }
+    val scope = rememberCoroutineScope()
     val filePickerLauncher = if (supportMultipleSelect) rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenMultipleDocuments(),
         onResult = {
-            onResult(it.filterNotNull().toUi(context))
+            scope.launch {
+                onResult(it.filterNotNull().toUi(mediaInsertProvider))
+            }
         },
     ) else rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocument(),
         onResult = {
-            onResult(listOfNotNull(it).toUi(context))
+            scope.launch {
+                onResult(listOfNotNull(it).toUi(mediaInsertProvider))
+            }
         },
     )
     val navController = LocalNavController.current
-    val scope = rememberCoroutineScope()
 
     var cameraTempUri by remember {
         mutableStateOf(Uri.EMPTY)
@@ -88,7 +95,9 @@ fun MediaInsertMenu(
     val cameraLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicture(),
         onResult = {
-            if (it) onResult(listOf(cameraTempUri).toUi(context))
+            scope.launch {
+                if (it) onResult(listOf(cameraTempUri).toUi(mediaInsertProvider))
+            }
         },
     )
 
@@ -99,7 +108,9 @@ fun MediaInsertMenu(
     val videoRecordLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.CaptureVideo(),
         onResult = {
-            if (it) onResult(listOf(UiMediaInsert(videoTempUri, MediaType.video)))
+            scope.launch {
+                if (it) onResult(listOf(mediaInsertProvider.provideUiMediaInsert(videoTempUri)))
+            }
         },
     )
 
@@ -114,7 +125,7 @@ fun MediaInsertMenu(
                     onClick = {
                         when (it) {
                             MediaInsertType.CAMERA -> {
-                                cameraTempUri = FileProviderHelper.getUriFromMedias(mediaFileName = UUID.randomUUID().toString(), context)
+                                cameraTempUri = FileProviderHelper.getUriFromMedias(mediaFileName = "${System.currentTimeMillis()}$ImageSuffix", context)
                                 cameraLauncher.launch(cameraTempUri)
                             }
                             MediaInsertType.RECORD_VIDEO -> {
@@ -125,7 +136,7 @@ fun MediaInsertMenu(
                             MediaInsertType.GIF -> scope.launch {
                                 navController.navigateForResult(RootRoute.Gif.Home)
                                     ?.let { result ->
-                                        onResult(listOf(result as Uri).toUi(context))
+                                        onResult(listOf(result as Uri).toUi(mediaInsertProvider))
                                     }
                             }
                         }
@@ -163,16 +174,8 @@ fun MediaInsertMenu(
     }
 }
 
-private fun List<Uri>.toUi(context: Context) = map {
-    val mimeType = context.contentResolver.getType(it) ?: "image/*"
-    UiMediaInsert(
-        uri = it,
-        type = when {
-            mimeType.startsWith("video") -> MediaType.video
-            mimeType == "image/gif" -> MediaType.animated_gif
-            else -> MediaType.photo
-        }
-    )
+private suspend fun List<Uri>.toUi(mediaInsertProvider: MediaInsertProvider) = map {
+    mediaInsertProvider.provideUiMediaInsert(it)
 }
 
 @Composable

@@ -22,7 +22,6 @@ package com.twidere.twiderex.scenes.compose
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.content.Context
 import android.location.Location
 import android.net.Uri
 import androidx.activity.compose.BackHandler
@@ -98,7 +97,6 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
@@ -135,7 +133,6 @@ import com.twidere.twiderex.model.enums.MediaType
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiEmojiCategory
 import com.twidere.twiderex.model.ui.UiMediaInsert
-import com.twidere.twiderex.model.ui.UiMediaInsert.Companion.getVideoThumb
 import com.twidere.twiderex.navigation.RootRoute
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalNavController
@@ -454,7 +451,6 @@ private fun ComposeImageList(
     images: List<UiMediaInsert>,
     viewModel: ComposeViewModel
 ) {
-    val context = LocalContext.current
     Spacer(modifier = Modifier.height(ComposeImageListDefaults.Spacing))
     LazyRow(
         modifier = Modifier.padding(ComposeImageListDefaults.ContentPadding),
@@ -462,7 +458,7 @@ private fun ComposeImageList(
         itemsIndexed(
             items = images,
         ) { index, item ->
-            ComposeImage(item, viewModel, context)
+            ComposeImage(item, viewModel)
             if (index != images.lastIndex) {
                 Spacer(modifier = Modifier.width(ComposeImageListDefaults.ItemSpacing))
             }
@@ -1327,7 +1323,7 @@ private object ComposeActionsDefaults {
 }
 
 @Composable
-private fun ComposeImage(item: UiMediaInsert, viewModel: ComposeViewModel, context: Context) {
+private fun ComposeImage(item: UiMediaInsert, viewModel: ComposeViewModel) {
     var expanded by remember { mutableStateOf(false) }
     val type = item.type
     val navController = LocalNavController.current
@@ -1353,7 +1349,7 @@ private fun ComposeImage(item: UiMediaInsert, viewModel: ComposeViewModel, conte
                 )
                 .clip(MaterialTheme.shapes.small),
         ) {
-            NetworkImage(data = item.getVideoThumb(context) ?: item.uri)
+            NetworkImage(data = item.preview)
             when (type) {
                 MediaType.animated_gif ->
                     Image(

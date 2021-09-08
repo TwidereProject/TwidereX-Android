@@ -78,7 +78,6 @@ import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiDMEvent
 import com.twidere.twiderex.model.ui.UiMediaInsert
-import com.twidere.twiderex.model.ui.UiMediaInsert.Companion.getVideoThumb
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.dm.DMEventViewModel
@@ -237,7 +236,6 @@ private object MessageActionComponentDefaults {
 @Composable
 fun InputMediaPreview(inputImage: UiMediaInsert?, onRemove: () -> Unit) {
     if (inputImage == null) return
-    val context = LocalContext.current
     Box(modifier = Modifier.padding(InputPhotoPreviewDefaults.ContentPadding)) {
         Box(
             modifier = Modifier
@@ -250,7 +248,7 @@ fun InputMediaPreview(inputImage: UiMediaInsert?, onRemove: () -> Unit) {
                 )
                 .clip(MaterialTheme.shapes.small),
         ) {
-            NetworkImage(data = inputImage.getVideoThumb(context) ?: inputImage.uri)
+            NetworkImage(data = inputImage.preview)
         }
         Box(
             modifier = Modifier

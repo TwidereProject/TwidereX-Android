@@ -20,35 +20,11 @@
  */
 package com.twidere.twiderex.model.ui
 
-import android.content.Context
-import android.graphics.Bitmap
-import android.media.MediaMetadataRetriever
 import android.net.Uri
 import com.twidere.twiderex.model.enums.MediaType
 
 data class UiMediaInsert(
     val uri: Uri,
+    val preview: Any,
     val type: MediaType
-) {
-    companion object {
-        fun UiMediaInsert.getVideoThumb(context: Context): Bitmap? {
-            return if (type == MediaType.video) {
-                var bitmap: Bitmap? = null
-                var mediaMetadataRetriever: MediaMetadataRetriever? = null
-                try {
-                    mediaMetadataRetriever = MediaMetadataRetriever()
-                    mediaMetadataRetriever.setDataSource(context, uri)
-                    bitmap = mediaMetadataRetriever.getFrameAtTime(
-                        1000,
-                        MediaMetadataRetriever.OPTION_CLOSEST_SYNC
-                    )
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                } finally {
-                    mediaMetadataRetriever?.release()
-                }
-                bitmap
-            } else null
-        }
-    }
-}
+)

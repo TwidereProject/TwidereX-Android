@@ -42,6 +42,7 @@ import com.twidere.twiderex.notification.AppNotificationManager
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.preferences.proto.MiscPreferences
 import com.twidere.twiderex.utils.PlatformResolver
+import com.twidere.twiderex.utils.media.MediaInsertProvider
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -107,4 +108,9 @@ object TwidereModule {
     fun provideRemoteNavigator(@ApplicationContext context: Context): RemoteNavigator = AndroidRemoteNavigator(
         context = context
     )
+
+    @Provides
+    fun provideMediaInsertProvider(@ApplicationContext context: Context): MediaInsertProvider {
+        return MediaInsertProvider(context = context)
+    }
 }

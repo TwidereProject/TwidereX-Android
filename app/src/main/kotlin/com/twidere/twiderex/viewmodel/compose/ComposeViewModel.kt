@@ -21,7 +21,6 @@
 package com.twidere.twiderex.viewmodel.compose
 
 import android.Manifest.permission
-import android.content.Context
 import android.location.Criteria
 import android.location.Location
 import android.location.LocationListener
@@ -58,12 +57,12 @@ import com.twidere.twiderex.repository.DraftRepository
 import com.twidere.twiderex.repository.StatusRepository
 import com.twidere.twiderex.repository.UserRepository
 import com.twidere.twiderex.utils.MastodonEmojiCache
+import com.twidere.twiderex.utils.media.MediaInsertProvider
 import com.twidere.twiderex.utils.notify
 import com.twidere.twiderex.worker.draft.SaveDraftWorker
 import com.twitter.twittertext.Extractor
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
@@ -71,6 +70,7 @@ import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import java.util.UUID
 
 enum class ComposeType {
@@ -106,7 +106,7 @@ class DraftComposeViewModel @AssistedInject constructor(
     repository: StatusRepository,
     userRepository: UserRepository,
     workManager: WorkManager,
-    @ApplicationContext context: Context,
+    mediaInsertProvider: MediaInsertProvider,
     inAppNotification: InAppNotification,
     @Assisted account: AccountDetails,
     @Assisted private val draft: DbDraft,
@@ -127,20 +127,13 @@ class DraftComposeViewModel @AssistedInject constructor(
 
     init {
         setText(TextFieldValue(draft.content))
-        putImages(
-            draft.media.map {
-                val uri = Uri.parse(it)
-                val mimeType = context.contentResolver.getType(uri) ?: "image/*"
-                UiMediaInsert(
-                    Uri.parse(it),
-                    type = when {
-                        mimeType.startsWith("video") -> MediaType.video
-                        mimeType == "image/gif" -> MediaType.animated_gif
-                        else -> MediaType.photo
-                    }
-                )
-            }
-        )
+        viewModelScope.launch {
+            putImages(
+                draft.media.map {
+                    mediaInsertProvider.provideUiMediaInsert(Uri.parse(it))
+                }
+            )
+        }
         excludedReplyUserIds.value = draft.excludedReplyUserIds ?: emptyList()
     }
 
