@@ -43,33 +43,33 @@ import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.LoadingProgress
 import com.twidere.twiderex.component.lists.TwitterListsModifyComponent
-import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.observeAsState
+import com.twidere.twiderex.model.ui.UiList
 import com.twidere.twiderex.navigation.RootRoute
-import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.lists.ListsCreateViewModel
 import moe.tlaster.precompose.navigation.NavOptions
 import moe.tlaster.precompose.navigation.PopUpTo
+import org.koin.core.parameter.parametersOf
 
 @Composable
 fun TwitterListsCreateScene() {
-    val account = LocalActiveAccount.current ?: return
     val navController = LocalNavController.current
-    val listsCreateViewModel = assistedViewModel<ListsCreateViewModel.AssistedFactory, ListsCreateViewModel>(
-        account
-    ) {
-        it.create(account) { success, list ->
-            if (success) list?.apply {
-                navController.navigate(
-                    RootRoute.Lists.Timeline(listKey),
-                    options = NavOptions(
-                        popUpTo = PopUpTo(RootRoute.Lists.Home)
+    val listsCreateViewModel: ListsCreateViewModel = getViewModel {
+        parametersOf(
+            { success: Boolean, list: UiList? ->
+                if (success) list?.apply {
+                    navController.navigate(
+                        RootRoute.Lists.Timeline(listKey),
+                        options = NavOptions(
+                            popUpTo = PopUpTo(RootRoute.Lists.Home)
+                        )
                     )
-                )
+                }
             }
-        }
+        )
     }
     val loading by listsCreateViewModel.loading.observeAsState(initial = false)
 
@@ -104,7 +104,9 @@ fun TwitterListsCreateScene() {
                             Icon(
                                 imageVector = Icons.Default.Done,
                                 contentDescription = stringResource(id = com.twidere.common.R.string.common_controls_actions_confirm),
-                                tint = if (name.isNotEmpty()) MaterialTheme.colors.primary else LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
+                                tint = if (name.isNotEmpty()) MaterialTheme.colors.primary else LocalContentColor.current.copy(
+                                    alpha = LocalContentAlpha.current
+                                )
                             )
                         }
                     }

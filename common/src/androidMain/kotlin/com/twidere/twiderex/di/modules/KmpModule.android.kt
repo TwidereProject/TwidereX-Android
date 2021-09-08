@@ -25,6 +25,7 @@ import com.twidere.twiderex.kmp.FileResolver
 import com.twidere.twiderex.kmp.LocationProvider
 import com.twidere.twiderex.kmp.RemoteNavigator
 import com.twidere.twiderex.kmp.ResLoader
+import com.twidere.twiderex.notification.AppNotificationManager
 import org.koin.dsl.module
 
 actual val kmpModule = module {
@@ -33,4 +34,5 @@ actual val kmpModule = module {
     single { LocationProvider(get()) }
     single { RemoteNavigator(get()) }
     single { ResLoader(get()) }
+    single { AppNotificationManager(get(), get()) }
 }

@@ -30,16 +30,16 @@ import androidx.compose.ui.window.Dialog
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.LoadingProgress
 import com.twidere.twiderex.component.lists.MastodonListsModifyComponent
-import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.observeAsState
+import com.twidere.twiderex.model.ui.UiList
 import com.twidere.twiderex.navigation.RootRoute
-import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.viewmodel.lists.ListsCreateViewModel
+import org.koin.core.parameter.parametersOf
 
 @Composable
 fun MastodonListsCreateDialog(onDismissRequest: () -> Unit) {
-    val account = LocalActiveAccount.current ?: return
     val navController = LocalNavController.current
     var showMastodonComponent by remember {
         mutableStateOf(true)
@@ -51,19 +51,19 @@ fun MastodonListsCreateDialog(onDismissRequest: () -> Unit) {
     var name by remember {
         mutableStateOf("")
     }
-    val listsCreateViewModel = assistedViewModel<ListsCreateViewModel.AssistedFactory, ListsCreateViewModel>(
-        account
-    ) {
-        it.create(account) { success, list ->
-            dismiss()
-            if (success) {
-                list?.apply {
-                    navController.navigate(
-                        RootRoute.Lists.Timeline(listKey),
-                    )
+    val listsCreateViewModel: ListsCreateViewModel = getViewModel {
+        parametersOf(
+            { success: Boolean, list: UiList? ->
+                dismiss()
+                if (success) {
+                    list?.apply {
+                        navController.navigate(
+                            RootRoute.Lists.Timeline(listKey),
+                        )
+                    }
                 }
             }
-        }
+        )
     }
     val loading by listsCreateViewModel.loading.observeAsState(initial = false)
 

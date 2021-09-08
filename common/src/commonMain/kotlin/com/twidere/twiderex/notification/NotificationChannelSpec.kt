@@ -20,13 +20,17 @@
  */
 package com.twidere.twiderex.notification
 
+import com.twidere.twiderex.MR
 import com.twidere.twiderex.model.MicroBlogKey
+import dev.icerock.moko.resources.StringResource
 import java.net.URLEncoder
 
 enum class NotificationChannelSpec(
     val id: String,
     val showBadge: Boolean = false,
-    val grouped: Boolean = false
+    val grouped: Boolean = false,
+    val nameRes: StringResource,
+    val descriptionRes: StringResource? = null,
 ) {
     /**
      * For notifications indicate that some lengthy operations are performing in the background.
@@ -34,18 +38,23 @@ enum class NotificationChannelSpec(
      */
     BackgroundProgresses(
         "background_progresses",
+        nameRes = MR.strings.common_notification_channel_background_progresses_name,
     ),
 
     ContentInteractions(
         "content_interactions",
         showBadge = true,
-        grouped = true
+        grouped = true,
+        nameRes = MR.strings.common_notification_channel_content_interactions_name,
+        descriptionRes = MR.strings.common_notification_channel_content_interactions_description,
     ),
 
     ContentMessages(
         "content_messages",
         showBadge = true,
-        grouped = true
+        grouped = true,
+        nameRes = MR.strings.common_notification_channel_content_messages_name,
+        descriptionRes = MR.strings.common_notification_channel_content_messages_description,
     )
 }
 

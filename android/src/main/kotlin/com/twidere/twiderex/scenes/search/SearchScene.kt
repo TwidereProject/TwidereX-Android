@@ -59,7 +59,7 @@ import com.twidere.twiderex.component.foundation.AppBarDefaults
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.navigation.LocalNavigator
-import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.model.enums.PlatformType
@@ -71,6 +71,7 @@ import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.search.SearchSaveViewModel
 import kotlinx.coroutines.launch
+import org.koin.core.parameter.parametersOf
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalPagerApi::class)
 @Composable
@@ -78,12 +79,9 @@ fun SearchScene(keyword: String) {
     val account = LocalActiveAccount.current ?: return
     val navigator = LocalNavigator.current
 
-    val viewModel =
-        assistedViewModel<SearchSaveViewModel.AssistedFactory, SearchSaveViewModel>(
-            account, keyword
-        ) {
-            it.create(account, keyword)
-        }
+    val viewModel: SearchSaveViewModel = getViewModel {
+        parametersOf(keyword)
+    }
 
     val tabs = remember {
         when (account.type) {
@@ -135,7 +133,8 @@ fun SearchScene(keyword: String) {
                                         )
                                         if (loading) {
                                             CircularProgressIndicator(
-                                                modifier = Modifier.size(SearchSceneDefaults.Loading.size)
+                                                modifier = Modifier
+                                                    .size(SearchSceneDefaults.Loading.size)
                                                     .padding(SearchSceneDefaults.Loading.padding),
                                                 strokeWidth = SearchSceneDefaults.Loading.width,
                                                 color = MaterialTheme.colors.onSurface.copy(0.08f)

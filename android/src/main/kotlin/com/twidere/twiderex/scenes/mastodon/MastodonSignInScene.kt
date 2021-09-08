@@ -54,7 +54,7 @@ import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.SignInButton
 import com.twidere.twiderex.component.foundation.SignInScaffold
-import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.utils.CustomTabSignInChannel
@@ -64,16 +64,13 @@ import moe.tlaster.precompose.navigation.NavController
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun MastodonSignInScene() {
-    val viewModel =
-        assistedViewModel<MastodonSignInViewModel.AssistedFactory, MastodonSignInViewModel> {
-            it.create()
-        }
+    val viewModel: MastodonSignInViewModel = getViewModel()
     val host by viewModel.host.observeAsState(initial = TextFieldValue())
     val loading by viewModel.loading.observeAsState(initial = false)
     val navController = LocalNavController.current
     val context = LocalContext.current
     SignInScaffold {
-        if (loading == true) {
+        if (loading) {
             CircularProgressIndicator()
         } else {
             val focusRequester = remember { FocusRequester() }

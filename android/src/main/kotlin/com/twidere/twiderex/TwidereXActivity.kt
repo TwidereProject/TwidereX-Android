@@ -63,7 +63,6 @@ import com.google.accompanist.insets.ProvideWindowInsets
 import com.twidere.twiderex.action.LocalStatusActions
 import com.twidere.twiderex.action.StatusActions
 import com.twidere.twiderex.component.foundation.LocalInAppNotification
-import com.twidere.twiderex.di.assisted.ProvideAssistedFactory
 import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.navigation.Router
 import com.twidere.twiderex.notification.InAppNotification
@@ -79,15 +78,10 @@ import com.twidere.twiderex.ui.LocalWindowInsetsController
 import com.twidere.twiderex.utils.CustomTabSignInChannel
 import com.twidere.twiderex.utils.LocalPlatformResolver
 import com.twidere.twiderex.utils.PlatformResolver
-import com.twidere.twiderex.viewmodel.ActiveAccountViewModel
-import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.MutableStateFlow
 import moe.tlaster.precompose.navigation.NavController
 import org.koin.android.ext.android.inject
-import org.koin.androidx.viewmodel.ext.android.getViewModel
-import javax.inject.Inject
 
-@AndroidEntryPoint
 class TwidereXActivity : ComponentActivity() {
 
     private val navController by lazy {
@@ -107,22 +101,15 @@ class TwidereXActivity : ComponentActivity() {
         }
     }
 
-    @Inject
-    lateinit var viewModelHolder: TwidereXActivityAssistedViewModelHolder
-
-    @Inject
-    lateinit var statusActions: StatusActions
+    val statusActions: StatusActions by inject()
 
     val preferencesHolder: PreferencesHolder by inject()
 
-    @Inject
-    lateinit var inAppNotification: InAppNotification
+    val inAppNotification: InAppNotification by inject()
 
-    @Inject
-    lateinit var connectivityManager: ConnectivityManager
+    val connectivityManager: ConnectivityManager by inject()
 
-    @Inject
-    lateinit var platformResolver: PlatformResolver
+    val platformResolver: PlatformResolver by inject()
 
     @OptIn(ExperimentalAnimationApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -181,7 +168,8 @@ class TwidereXActivity : ComponentActivity() {
     private fun App() {
         val windowInsetsControllerCompat =
             remember { WindowInsetsControllerCompat(window, window.decorView) }
-        val accountViewModel = com.twidere.twiderex.di.ext.getViewModel<com.twidere.twiderex.viewmodel.ActiveAccountViewModel>()
+        val accountViewModel =
+            com.twidere.twiderex.di.ext.getViewModel<com.twidere.twiderex.viewmodel.ActiveAccountViewModel>()
         val account by accountViewModel.account.observeAsState(null)
         val isActiveNetworkMetered by isActiveNetworkMetered.observeAsState(initial = false)
         CompositionLocalProvider(
@@ -199,16 +187,12 @@ class TwidereXActivity : ComponentActivity() {
             ProvidePreferences(
                 preferencesHolder,
             ) {
-                ProvideAssistedFactory(
-                    viewModelHolder.factory,
+                ProvideWindowInsets(
+                    windowInsetsAnimationsEnabled = true
                 ) {
-                    ProvideWindowInsets(
-                        windowInsetsAnimationsEnabled = true
-                    ) {
-                        Router(
-                            navController = navController
-                        )
-                    }
+                    Router(
+                        navController = navController
+                    )
                 }
             }
         }

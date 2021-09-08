@@ -24,9 +24,8 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.PlatformType
-import javax.inject.Inject
 
-class PlatformResolver @Inject constructor(
+class PlatformResolver(
     private val database: CacheDatabase,
 ) {
     suspend fun resolveStatus(statusKey: MicroBlogKey, accountKey: MicroBlogKey): PlatformType? {

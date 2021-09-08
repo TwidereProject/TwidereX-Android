@@ -54,9 +54,8 @@ import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.TextInput
 import com.twidere.twiderex.component.navigation.LocalNavigator
-import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.observeAsState
-import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.search.SearchInputViewModel
 
@@ -76,13 +75,7 @@ val fadeResumeTransition: GraphicsLayerScope.(factor: Float) -> Unit = { factor 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun SearchInputScene(initial: String? = null) {
-    val account = LocalActiveAccount.current ?: return
-    val viewModel =
-        assistedViewModel<SearchInputViewModel.AssistedFactory, SearchInputViewModel>(
-            account
-        ) {
-            it.create(account = account)
-        }
+    val viewModel: SearchInputViewModel = getViewModel()
     val source by viewModel.source.observeAsState(initial = emptyList())
     val initialText = initial ?: ""
     var textFieldValue by remember {

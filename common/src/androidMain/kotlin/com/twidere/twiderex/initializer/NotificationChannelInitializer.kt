@@ -25,32 +25,29 @@ import androidx.core.app.NotificationChannelCompat
 import androidx.core.app.NotificationChannelGroupCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.startup.Initializer
-import com.twidere.twiderex.di.InitializerEntryPoint
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.notification.NotificationChannelSpec
 import com.twidere.twiderex.notification.importance
 import com.twidere.twiderex.notification.notificationChannelGroupId
 import com.twidere.twiderex.notification.notificationChannelId
 import com.twidere.twiderex.repository.AccountRepository
-import javax.inject.Inject
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
 class NotificationChannelInitializerHolder
 
-class NotificationChannelInitializer : Initializer<NotificationChannelInitializerHolder> {
-    @Inject
-    lateinit var repository: AccountRepository
+class NotificationChannelInitializer : Initializer<NotificationChannelInitializerHolder>, KoinComponent {
+    private val repository: AccountRepository by inject()
 
     override fun create(context: Context): NotificationChannelInitializerHolder {
-        InitializerEntryPoint.resolve(context).inject(this)
-
         val notificationManagerCompat = NotificationManagerCompat.from(context)
         val addedChannels = mutableListOf<String>()
         for (spec in NotificationChannelSpec.values().filter { !it.grouped }) {
             val builder = NotificationChannelCompat.Builder(spec.id, spec.importance)
-                .setName(context.getString(spec.nameRes))
+                .setName(context.getString(spec.nameRes.resourceId))
 
-            if (spec.descriptionRes != 0) {
-                builder.setDescription(context.getString(spec.descriptionRes))
+            if (spec.descriptionRes != null) {
+                builder.setDescription(context.getString(spec.descriptionRes.resourceId))
             }
             builder.setShowBadge(spec.showBadge)
             val channel = builder.build()
@@ -89,10 +86,10 @@ class NotificationChannelInitializer : Initializer<NotificationChannelInitialize
             for (spec in specs) {
                 val channel = NotificationChannelCompat
                     .Builder(account.accountKey.notificationChannelId(spec.id), spec.importance)
-                    .setName(context.getString(spec.nameRes))
+                    .setName(context.getString(spec.nameRes.resourceId))
                     .let {
-                        if (spec.descriptionRes != 0) {
-                            it.setDescription(context.getString(spec.descriptionRes))
+                        if (spec.descriptionRes != null) {
+                            it.setDescription(context.getString(spec.descriptionRes.resourceId))
                         } else {
                             it
                         }

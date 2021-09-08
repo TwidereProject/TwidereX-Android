@@ -53,15 +53,15 @@ import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
 import com.twidere.twiderex.component.lazy.ui.LazyUiUserList
 import com.twidere.twiderex.component.navigation.LocalNavigator
-import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.refreshOrRetry
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.navigation.RootRoute
-import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.lists.ListsUserViewModel
 import kotlinx.coroutines.launch
+import org.koin.core.parameter.parametersOf
 import java.util.Locale
 
 @Composable
@@ -69,12 +69,9 @@ fun ListsMembersScene(
     listKey: MicroBlogKey,
     owned: Boolean,
 ) {
-    val account = LocalActiveAccount.current ?: return
     val navController = LocalNavController.current
-    val viewModel = assistedViewModel<ListsUserViewModel.AssistedFactory, ListsUserViewModel>(
-        account
-    ) {
-        it.create(account, listKey.id)
+    val viewModel: ListsUserViewModel = getViewModel {
+        parametersOf(listKey.id)
     }
     val source = viewModel.source.collectAsLazyPagingItems()
     val navigator = LocalNavigator.current
@@ -95,7 +92,8 @@ fun ListsMembersScene(
                 if (owned) FloatingActionButton(
                     onClick = {
                         scope.launch {
-                            val result = navController.navigateForResult(RootRoute.Lists.AddMembers(listKey = listKey)) as? List<*>?
+                            val result =
+                                navController.navigateForResult(RootRoute.Lists.AddMembers(listKey = listKey)) as? List<*>?
                             if (result != null && result.isNotEmpty()) source.refresh()
                         }
                     }

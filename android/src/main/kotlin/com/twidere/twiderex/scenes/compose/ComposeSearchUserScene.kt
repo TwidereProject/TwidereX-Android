@@ -37,15 +37,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.paging.compose.collectAsLazyPagingItems
-import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.TextInput
 import com.twidere.twiderex.component.lazy.loadState
 import com.twidere.twiderex.component.lazy.ui.LazyUiUserList
+import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.observeAsState
-import com.twidere.twiderex.extensions.viewModel
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
@@ -56,9 +55,7 @@ import com.twidere.twiderex.viewmodel.compose.ComposeSearchUserViewModel
 fun ComposeSearchUserScene() {
     val account = LocalActiveAccount.current ?: return
     val navController = LocalNavController.current
-    val viewModel = viewModel(account) {
-        ComposeSearchUserViewModel(account = account)
-    }
+    val viewModel: ComposeSearchUserViewModel = getViewModel()
     val text by viewModel.text.observeAsState(initial = "")
     val source = viewModel.source.collectAsLazyPagingItems()
     TwidereScene {

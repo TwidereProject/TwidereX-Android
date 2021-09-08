@@ -51,6 +51,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.paging.LoadState
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
@@ -58,9 +59,8 @@ import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.LoadingProgress
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
 import com.twidere.twiderex.component.lazy.ui.LazyUiStatusList
-import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.observeAsState
-import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.navigation.RootRoute
@@ -70,6 +70,7 @@ import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.lists.ListsModifyViewModel
 import com.twidere.twiderex.viewmodel.lists.ListsTimelineViewModel
+import org.koin.core.parameter.parametersOf
 
 @Composable
 fun ListTimeLineScene(
@@ -77,10 +78,8 @@ fun ListTimeLineScene(
 ) {
     val account = LocalActiveAccount.current ?: return
     val navController = LocalNavController.current
-    val viewModel = assistedViewModel<ListsModifyViewModel.AssistedFactory, ListsModifyViewModel>(
-        account, listKey
-    ) {
-        it.create(account, listKey)
+    val viewModel: ListsModifyViewModel = getViewModel {
+        parametersOf(listKey)
     }
     val source by viewModel.source.observeAsState(initial = null)
     val loading by viewModel.loading.observeAsState(initial = false)
@@ -100,7 +99,8 @@ fun ListTimeLineScene(
                     title = {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(
-                                text = source?.title ?: stringResource(id = com.twidere.common.R.string.scene_lists_details_title),
+                                text = source?.title
+                                    ?: stringResource(id = com.twidere.common.R.string.scene_lists_details_title),
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis
                             )
@@ -189,7 +189,9 @@ fun ListTimeLineScene(
                                         onClick = {
                                             menuExpand = false
                                             when (account.type) {
-                                                PlatformType.Twitter -> navController.navigate(RootRoute.Lists.TwitterEdit(listKey = listKey))
+                                                PlatformType.Twitter -> navController.navigate(
+                                                    RootRoute.Lists.TwitterEdit(listKey = listKey)
+                                                )
                                                 PlatformType.StatusNet -> TODO()
                                                 PlatformType.Fanfou -> TODO()
                                                 PlatformType.Mastodon -> showEditDialog = true
@@ -222,7 +224,7 @@ fun ListTimeLineScene(
             },
         ) {
             Box {
-                ListTimelineComponent(account, listKey)
+                ListTimelineComponent(listKey)
                 if (showEditDialog) {
                     MastodonListsEditDialog(listKey) {
                         showEditDialog = false
@@ -253,11 +255,9 @@ fun ListTimeLineScene(
 }
 
 @Composable
-private fun ListTimelineComponent(account: AccountDetails, listKey: MicroBlogKey) {
-    val viewModel = assistedViewModel<ListsTimelineViewModel.AssistedFactory, ListsTimelineViewModel>(
-        account, listKey
-    ) {
-        it.create(account, listKey)
+private fun ListTimelineComponent(listKey: MicroBlogKey) {
+    val viewModel: ListsTimelineViewModel = getViewModel {
+        parametersOf(listKey)
     }
     val timelineSource = viewModel.source.collectAsLazyPagingItems()
     // FIXME: 2021/2/20 Recover the scroll position require visiting the loadState once, have no idea why
@@ -274,14 +274,21 @@ private fun ListTimelineComponent(account: AccountDetails, listKey: MicroBlogKey
 }
 
 @Composable
-private fun ListDeleteConfirmDialog(title: String, onDismissRequest: () -> Unit, onConfirm: () -> Unit) {
+private fun ListDeleteConfirmDialog(
+    title: String,
+    onDismissRequest: () -> Unit,
+    onConfirm: () -> Unit
+) {
     AlertDialog(
         onDismissRequest = {
             onDismissRequest.invoke()
         },
         title = {
             Text(
-                text = stringResource(id = com.twidere.common.R.string.scene_lists_details_delete_list_title, title),
+                text = stringResource(
+                    id = com.twidere.common.R.string.scene_lists_details_delete_list_title,
+                    title
+                ),
                 style = MaterialTheme.typography.subtitle1
             )
         },

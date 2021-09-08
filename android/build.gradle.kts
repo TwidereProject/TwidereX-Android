@@ -7,7 +7,6 @@ buildscript {
     }
 
     dependencies {
-        classpath("com.google.dagger:hilt-android-gradle-plugin:${Versions.hilt}")
 
         if (enableGoogleVariant) {
             // START Non-FOSS component
@@ -33,7 +32,6 @@ if (enableGoogleVariant) {
     apply(plugin = "com.google.firebase.crashlytics")
     // END Non-FOSS component
 }
-apply(plugin = "dagger.hilt.android.plugin")
 
 android {
     compileSdk = AndroidSdk.compile
@@ -163,13 +161,12 @@ dependencies {
     kotlinCoroutines()
     implementation(projects.services)
     implementation(projects.common)
-    ksp(projects.assistedProcessor)
+    // ksp(projects.assistedProcessor)
     implementation(projects.routeProcessor)
     ksp(projects.routeProcessor)
     compose()
     paging()
     datastore()
-    hilt()
     accompanist()
     widget()
     misc()

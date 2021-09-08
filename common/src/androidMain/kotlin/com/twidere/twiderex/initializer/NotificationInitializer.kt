@@ -25,21 +25,19 @@ import androidx.startup.Initializer
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
-import com.twidere.twiderex.di.InitializerEntryPoint
 import com.twidere.twiderex.worker.NotificationWorker
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 
 class NotificationInitializerHolder
 
 private const val NotificationWorkName = "twiderex_notification"
 
-class NotificationInitializer : Initializer<NotificationInitializerHolder> {
-    @Inject
-    lateinit var workManager: WorkManager
+class NotificationInitializer : Initializer<NotificationInitializerHolder>, KoinComponent {
+    private val workManager: WorkManager by inject()
 
     override fun create(context: Context): NotificationInitializerHolder {
-        InitializerEntryPoint.resolve(context).inject(this)
         val request = PeriodicWorkRequestBuilder<NotificationWorker>(15, TimeUnit.MINUTES)
             .build()
         workManager.enqueueUniquePeriodicWork(

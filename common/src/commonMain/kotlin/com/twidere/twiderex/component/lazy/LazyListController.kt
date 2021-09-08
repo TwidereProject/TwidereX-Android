@@ -18,8 +18,14 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.utils
+package com.twidere.twiderex.component.lazy
 
-object HttpErrorCodes {
-    const val TooManyRequests = 429
+import androidx.compose.foundation.lazy.LazyListState
+
+class LazyListController {
+    var listState: LazyListState? = null
+
+    suspend fun scrollToTop() {
+        listState?.scrollToItem(0)
+    }
 }

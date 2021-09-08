@@ -31,13 +31,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.items
-import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
 import com.twidere.twiderex.component.navigation.LocalNavigator
+import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.refreshOrRetry
-import com.twidere.twiderex.extensions.viewModel
-import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.viewmodel.mastodon.MastodonSearchHashtagViewModel
+import org.koin.core.parameter.parametersOf
 
 class MastodonSearchHashtagItem : SearchSceneItem {
     @Composable
@@ -48,12 +47,8 @@ class MastodonSearchHashtagItem : SearchSceneItem {
     @OptIn(ExperimentalMaterialApi::class)
     @Composable
     override fun Content(keyword: String) {
-        val account = LocalActiveAccount.current ?: return
-        val viewModel = viewModel(
-            keyword,
-            account,
-        ) {
-            MastodonSearchHashtagViewModel(account, keyword)
+        val viewModel: MastodonSearchHashtagViewModel = getViewModel {
+            parametersOf(keyword)
         }
         val source = viewModel.source.collectAsLazyPagingItems()
         val navigator = LocalNavigator.current

@@ -32,18 +32,18 @@
                 android:value="androidx.startup"
                 tools:node="remove" />
             <meta-data
-                android:name="com.twidere.twiderex.notification.NotificationChannelInitializer"
+                android:name="com.twidere.twiderex.initializer.NotificationChannelInitializer"
                 android:value="androidx.startup" />
             <meta-data
-                android:name="com.twidere.twiderex.worker.dm.DirectMessageInitializer"
+                android:name="com.twidere.twiderex.initializer.DirectMessageInitializer"
                 android:value="androidx.startup"
                 tools:node="remove"/>
             <meta-data
-                android:name="com.twidere.twiderex.notification.NotificationInitializer"
+                android:name="com.twidere.twiderex.initializer.NotificationInitializer"
                 android:value="androidx.startup"
                 tools:node="remove" />
             <meta-data
-                android:name="com.twidere.twiderex.http.TwidereServiceInitializer"
+                android:name="com.twidere.twiderex.initializer.TwidereServiceInitializer"
                 android:value="androidx.startup"
                 tools:node="remove" />
         </provider>

@@ -40,14 +40,18 @@ import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
+typealias OauthVerifierProvider = suspend (url: String) -> String?
+typealias PinCodeProvider = suspend (url: String) -> String?
+typealias OnResult = (success: Boolean) -> Unit
+
 class TwitterSignInViewModel(
     private val repository: AccountRepository,
     private val inAppNotification: InAppNotification,
     private val consumerKey: String,
     private val consumerSecret: String,
-    private val oauthVerifierProvider: suspend (url: String) -> String?,
-    private val pinCodeProvider: suspend (url: String) -> String?,
-    private val onResult: (success: Boolean) -> Unit,
+    private val oauthVerifierProvider: OauthVerifierProvider,
+    private val pinCodeProvider: PinCodeProvider,
+    private val onResult: OnResult,
 ) : ViewModel() {
 
     val success = MutableStateFlow(false)

@@ -23,7 +23,6 @@ package com.twidere.twiderex.scenes.compose
 import android.Manifest
 import android.annotation.SuppressLint
 import android.location.Location
-import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -118,7 +117,7 @@ import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.component.status.UserAvatarDefaults
 import com.twidere.twiderex.component.status.UserName
 import com.twidere.twiderex.component.status.UserScreenName
-import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.icon
 import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.extensions.stringName
@@ -146,6 +145,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import org.koin.core.parameter.parametersOf
 import kotlin.math.max
 
 @Composable
@@ -153,19 +153,17 @@ fun DraftComposeScene(
     draftId: String,
 ) {
     val account = LocalActiveAccount.current ?: return
-    val draftItemViewModel =
-        assistedViewModel<DraftItemViewModel.AssistedFactory, DraftItemViewModel> {
-            it.create(draftId = draftId)
-        }
+    val draftItemViewModel: DraftItemViewModel = getViewModel {
+        parametersOf(draftId)
+    }
     val data by draftItemViewModel.draft.observeAsState(null)
     data?.let { draft ->
-        val viewModel =
-            assistedViewModel<DraftComposeViewModel.AssistedFactory, DraftComposeViewModel> {
-                it.create(
-                    account = account,
-                    draft = draft,
-                )
-            }
+        val viewModel: DraftComposeViewModel = getViewModel {
+            parametersOf(
+                account,
+                draft
+            )
+        }
         ComposeBody(viewModel = viewModel, account = account)
     }
 }
@@ -176,8 +174,8 @@ fun ComposeScene(
     composeType: ComposeType = ComposeType.New,
 ) {
     val account = LocalActiveAccount.current ?: return
-    val viewModel = assistedViewModel<ComposeViewModel.AssistedFactory, ComposeViewModel> {
-        it.create(account, statusKey, composeType)
+    val viewModel: ComposeViewModel = getViewModel {
+        parametersOf(statusKey, composeType)
     }
     ComposeBody(viewModel = viewModel, account = account)
 }
@@ -445,7 +443,7 @@ private fun ComposeBody(
 
 @Composable
 private fun ComposeImageList(
-    images: List<Uri>,
+    images: List<String>,
     viewModel: ComposeViewModel
 ) {
     Spacer(modifier = Modifier.height(ComposeImageListDefaults.Spacing))
@@ -575,7 +573,7 @@ object EmojiListDefaults {
 
 @Composable
 private fun MastodonExtraActions(
-    images: List<Uri>,
+    images: List<String>,
     viewModel: ComposeViewModel
 ) {
     if (images.any()) {
@@ -619,7 +617,7 @@ private fun MastodonExtraActions(
 }
 
 @Composable
-private fun LocationDisplay(it: Location) {
+private fun LocationDisplay(it: com.twidere.twiderex.model.kmp.Location) {
     CompositionLocalProvider(
         LocalContentAlpha provides ContentAlpha.medium
     ) {
@@ -1144,7 +1142,7 @@ private fun ComposeActions(
     val filePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetMultipleContents(),
         onResult = {
-            viewModel.putImages(it)
+            viewModel.putImages(it.map { it.toString() })
         },
     )
     val permissionLauncher = rememberLauncherForActivityResult(
@@ -1332,7 +1330,7 @@ private object ComposeActionsDefaults {
 }
 
 @Composable
-private fun ComposeImage(item: Uri, viewModel: ComposeViewModel) {
+private fun ComposeImage(item: String, viewModel: ComposeViewModel) {
     var expanded by remember { mutableStateOf(false) }
     Box {
         Box(

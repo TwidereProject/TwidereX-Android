@@ -20,27 +20,13 @@
  */
 package com.twidere.twiderex
 
-import android.app.Application
 import android.content.Context
-import androidx.hilt.work.HiltWorkerFactory
 import androidx.startup.AppInitializer
-import androidx.work.Configuration
-import com.twidere.twiderex.http.TwidereServiceInitializer
-import com.twidere.twiderex.notification.NotificationInitializer
-import com.twidere.twiderex.worker.dm.DirectMessageInitializer
-import dagger.hilt.android.HiltAndroidApp
-import javax.inject.Inject
+import com.twidere.twiderex.initializer.DirectMessageInitializer
+import com.twidere.twiderex.initializer.NotificationInitializer
+import com.twidere.twiderex.initializer.TwidereServiceInitializer
 
-@HiltAndroidApp
-class TwidereApp : Application(), Configuration.Provider {
-    @Inject
-    lateinit var workerFactory: HiltWorkerFactory
-
-    override fun getWorkManagerConfiguration() =
-        Configuration.Builder()
-            .setWorkerFactory(workerFactory)
-            .build()
-
+class TwidereApp : TwidereApplication() {
     override fun onCreate() {
         super.onCreate()
         // Note:Installs with missing splits are now blocked on devices which have Play Protect active or run on Android 10.

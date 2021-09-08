@@ -18,23 +18,30 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.http
+package com.twidere.twiderex.initializer
 
 import android.content.Context
 import androidx.startup.Initializer
-import com.twidere.twiderex.di.InitializerEntryPoint
-import javax.inject.Inject
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.WorkManager
+import com.twidere.twiderex.worker.dm.DirectMessageFetchWorker
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
-class TwidereserviceInitializerHolder
+class DirectMessageInitializerHolder
 
-class TwidereServiceInitializer : Initializer<TwidereserviceInitializerHolder> {
-    @Inject
-    lateinit var configProvider: TwidereHttpConfigProvider
+private const val DirectMessageWorkName = "twiderex_direct_message"
 
-    override fun create(context: Context): TwidereserviceInitializerHolder {
-        InitializerEntryPoint.resolve(context).inject(this)
-        TwidereServiceFactory.initiate(configProvider)
-        return TwidereserviceInitializerHolder()
+class DirectMessageInitializer : Initializer<DirectMessageInitializerHolder>, KoinComponent {
+    private val workManager: WorkManager by inject()
+
+    override fun create(context: Context): DirectMessageInitializerHolder {
+        workManager.enqueueUniquePeriodicWork(
+            DirectMessageWorkName,
+            ExistingPeriodicWorkPolicy.KEEP,
+            DirectMessageFetchWorker.createRepeatableWorker()
+        )
+        return DirectMessageInitializerHolder()
     }
 
     override fun dependencies(): MutableList<Class<out Initializer<*>>> {

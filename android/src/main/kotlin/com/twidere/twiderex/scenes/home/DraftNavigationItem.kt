@@ -25,6 +25,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.twidere.twiderex.R
+import com.twidere.twiderex.model.HomeNavigationItem
 import com.twidere.twiderex.navigation.RootRoute
 import com.twidere.twiderex.scenes.DraftListSceneContent
 

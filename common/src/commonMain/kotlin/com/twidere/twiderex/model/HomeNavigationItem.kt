@@ -18,7 +18,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.scenes.home
+package com.twidere.twiderex.model
 
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.sizeIn

@@ -42,7 +42,7 @@ import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
 import com.twidere.twiderex.component.lazy.ui.LazyUiListsList
-import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.navigation.RootRoute
 import com.twidere.twiderex.ui.LocalActiveAccount
@@ -114,11 +114,7 @@ fun ListsSceneContent() {
     val account = LocalActiveAccount.current ?: return
     val navController = LocalNavController.current
     // if list type is all , display title of each type
-    val listsViewMode = assistedViewModel<ListsViewModel.AssistedFactory, ListsViewModel>(
-        account,
-    ) {
-        it.create(account)
-    }
+    val listsViewMode: ListsViewModel = getViewModel()
     val ownerItems = listsViewMode.ownerSource.collectAsLazyPagingItems()
     val subscribeItems = listsViewMode.subscribedSource.collectAsLazyPagingItems()
     val sourceItems = listsViewMode.source.collectAsLazyPagingItems()

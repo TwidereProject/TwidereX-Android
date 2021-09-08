@@ -18,33 +18,26 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.di
+package com.twidere.twiderex.initializer
 
 import android.content.Context
-import dagger.Module
-import dagger.Provides
-import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
-import dagger.hilt.components.SingletonComponent
-import org.koin.android.ext.koin.androidContext
-import org.koin.android.ext.koin.androidLogger
-import org.koin.core.Koin
-import org.koin.core.context.startKoin
-import org.koin.mp.KoinPlatformTools
-import javax.inject.Singleton
+import androidx.startup.Initializer
+import com.twidere.twiderex.http.TwidereHttpConfigProvider
+import com.twidere.twiderex.http.TwidereServiceFactory
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
-@Deprecated("Use koin directly")
-@Module
-@InstallIn(SingletonComponent::class)
-object KoinModule {
-    @Singleton
-    @Provides
-    fun getKoin(@ApplicationContext context: Context): Koin {
-        startKoin {
-            androidLogger()
-            androidContext(context)
-            setupModules()
-        }
-        return KoinPlatformTools.defaultContext().get()
+class TwidereserviceInitializerHolder
+
+class TwidereServiceInitializer : Initializer<TwidereserviceInitializerHolder>, KoinComponent {
+    private val configProvider: TwidereHttpConfigProvider by inject()
+
+    override fun create(context: Context): TwidereserviceInitializerHolder {
+        TwidereServiceFactory.initiate(configProvider)
+        return TwidereserviceInitializerHolder()
+    }
+
+    override fun dependencies(): MutableList<Class<out Initializer<*>>> {
+        return mutableListOf()
     }
 }

@@ -56,10 +56,9 @@ import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
 import com.twidere.twiderex.component.foundation.TextInput
 import com.twidere.twiderex.component.lazy.ui.LazyUiUserList
 import com.twidere.twiderex.component.navigation.LocalNavigator
-import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.extensions.refreshOrRetry
-import com.twidere.twiderex.extensions.viewModel
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiUser
@@ -68,16 +67,15 @@ import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.lists.ListsAddMemberViewModel
 import com.twidere.twiderex.viewmodel.lists.ListsSearchUserViewModel
+import org.koin.core.parameter.parametersOf
 
 @Composable
 fun ListsAddMembersScene(
     listKey: MicroBlogKey,
 ) {
     val account = LocalActiveAccount.current ?: return
-    val viewModel = assistedViewModel<ListsAddMemberViewModel.AssistedFactory, ListsAddMemberViewModel>(
-        account, listKey.id
-    ) {
-        it.create(account, listKey.id)
+    val viewModel: ListsAddMemberViewModel = getViewModel {
+        parametersOf(listKey.id)
     }
 
     val loading by viewModel.loading.observeAsState(initial = false)
@@ -87,10 +85,8 @@ fun ListsAddMembersScene(
         else -> false
     }
 
-    val searchViewModel = viewModel(
-        account,
-    ) {
-        ListsSearchUserViewModel(account, onlySearchFollowing)
+    val searchViewModel: ListsSearchUserViewModel = getViewModel {
+        parametersOf(onlySearchFollowing)
     }
 
     val keyword by searchViewModel.text.observeAsState(initial = "")

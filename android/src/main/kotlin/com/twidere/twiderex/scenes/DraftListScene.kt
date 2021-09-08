@@ -41,12 +41,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.lazy.LazyListController
-import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.navigation.RootRoute
 import com.twidere.twiderex.ui.LocalNavController
@@ -78,9 +77,7 @@ fun DraftListScene() {
 fun DraftListSceneContent(
     lazyListController: LazyListController? = null,
 ) {
-    val viewModel = assistedViewModel<DraftViewModel.AssistedFactory, DraftViewModel> {
-        it.create()
-    }
+    val viewModel: DraftViewModel = getViewModel()
     val source by viewModel.source.observeAsState(initial = emptyList())
     val navController = LocalNavController.current
     val listState = rememberLazyListState()

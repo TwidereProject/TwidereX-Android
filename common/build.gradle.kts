@@ -45,7 +45,7 @@ kotlin {
                 implementation("org.jsoup:jsoup:1.13.1")
                 implementation(projects.routeProcessor)
                 ksp(projects.routeProcessor)
-                implementation("dev.icerock.moko:resources:${Versions.moko}")
+                api("dev.icerock.moko:resources:${Versions.moko}")
             }
         }
         val commonTest by getting {
@@ -72,6 +72,7 @@ kotlin {
                 implementation("androidx.exifinterface:exifinterface:${Versions.androidx_exifinterface}")
                 implementation("io.coil-kt:coil-compose:${Versions.coil}")
                 implementation("io.coil-kt:coil-gif:${Versions.coil}")
+                implementation("androidx.startup:startup-runtime:${Versions.startup}")
             }
         }
         val androidAndroidTest by getting {
