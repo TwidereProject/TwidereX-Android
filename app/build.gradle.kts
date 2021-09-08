@@ -66,6 +66,7 @@ android {
             apiKeyProp.load(apiKeyProperties.inputStream())
             buildConfigField("String", "CONSUMERKEY", apiKeyProp.getProperty("ConsumerKey"))
             buildConfigField("String", "CONSUMERSECRET", apiKeyProp.getProperty("ConsumerSecret"))
+            buildConfigField("String", "GIPHYKEY", apiKeyProp.getProperty("GiphyKey"))
         }
     }
 

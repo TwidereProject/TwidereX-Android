@@ -45,15 +45,19 @@ import com.twidere.twiderex.extensions.getTextBeforeSelection
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.MastodonVisibility
+import com.twidere.twiderex.model.enums.MediaInsertType
+import com.twidere.twiderex.model.enums.MediaType
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.job.ComposeData
 import com.twidere.twiderex.model.ui.UiEmoji
+import com.twidere.twiderex.model.ui.UiMediaInsert
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.DraftRepository
 import com.twidere.twiderex.repository.StatusRepository
 import com.twidere.twiderex.repository.UserRepository
 import com.twidere.twiderex.utils.MastodonEmojiCache
+import com.twidere.twiderex.utils.media.MediaInsertProvider
 import com.twidere.twiderex.utils.notify
 import com.twidere.twiderex.worker.draft.SaveDraftWorker
 import com.twitter.twittertext.Extractor
@@ -66,6 +70,7 @@ import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import java.util.UUID
 
 enum class ComposeType {
@@ -101,6 +106,7 @@ class DraftComposeViewModel @AssistedInject constructor(
     repository: StatusRepository,
     userRepository: UserRepository,
     workManager: WorkManager,
+    mediaInsertProvider: MediaInsertProvider,
     inAppNotification: InAppNotification,
     @Assisted account: AccountDetails,
     @Assisted private val draft: DbDraft,
@@ -121,7 +127,13 @@ class DraftComposeViewModel @AssistedInject constructor(
 
     init {
         setText(TextFieldValue(draft.content))
-        putImages(draft.media.map { Uri.parse(it) })
+        viewModelScope.launch {
+            putImages(
+                draft.media.map {
+                    mediaInsertProvider.provideUiMediaInsert(Uri.parse(it))
+                }
+            )
+        }
         excludedReplyUserIds.value = draft.excludedReplyUserIds ?: emptyList()
     }
 
@@ -282,7 +294,7 @@ open class ComposeViewModel @AssistedInject constructor(
     val isContentWarningEnabled = MutableStateFlow(false)
     val contentWarningTextFieldValue = MutableStateFlow(TextFieldValue())
     val textFieldValue = MutableStateFlow(TextFieldValue())
-    val images = MutableStateFlow<List<Uri>>(emptyList())
+    val images = MutableStateFlow<List<UiMediaInsert>>(emptyList())
     val canSend = textFieldValue.combine(images) { text, imgs -> text.text.isNotEmpty() || !imgs.isNullOrEmpty() }
     val canSaveDraft =
         textFieldValue.combine(images) { text, imgs -> text.text.isNotEmpty() || !imgs.isNullOrEmpty() }
@@ -325,6 +337,8 @@ open class ComposeViewModel @AssistedInject constructor(
             emit(null)
         }
     }
+
+    val mediaInsertMode = MutableStateFlow(MediaInsertMode.All)
 
     fun setText(value: TextFieldValue) {
         textFieldValue.value = value
@@ -384,7 +398,7 @@ open class ComposeViewModel @AssistedInject constructor(
     private fun buildComposeData(text: String) = ComposeData(
         content = text,
         draftId = draftId,
-        images = images.value.map { it.toString() },
+        images = images.value.map { it.uri.toString() },
         composeType = composeType,
         statusKey = statusKey,
         lat = location.value?.latitude,
@@ -399,11 +413,21 @@ open class ComposeViewModel @AssistedInject constructor(
         isThreadMode = enableThreadMode.value,
     )
 
-    fun putImages(value: List<Uri>) {
+    fun putImages(value: List<UiMediaInsert>) {
+        val allowType = images.value.firstOrNull()?.type ?: value.firstOrNull()?.type ?: return
         images.value.let {
-            value + it
-        }.take(imageLimit).let {
+            value + it.filter { media -> media.type == allowType }
+        }.take(if (allowType == MediaType.photo) imageLimit else 1).let {
             images.value = it
+        }
+        when (allowType) {
+            MediaType.video, MediaType.animated_gif -> mediaInsertMode.value = MediaInsertMode.Disabled
+            else -> {
+                mediaInsertMode.value = if (images.value.size == imageLimit)
+                    MediaInsertMode.Disabled
+                else
+                    MediaInsertMode.ImageOnly
+            }
         }
     }
 
@@ -449,9 +473,16 @@ open class ComposeViewModel @AssistedInject constructor(
 
     fun removeImage(item: Uri) {
         images.value.let {
-            it - item
+            it.toMutableList().apply {
+                removeAll { media -> media.uri == item }
+            }
         }.let {
             images.value = it
+        }
+        if (images.value.isEmpty()) {
+            mediaInsertMode.value = MediaInsertMode.All
+        } else if (images.value.first().type == MediaType.photo) {
+            mediaInsertMode.value = MediaInsertMode.ImageOnly
         }
     }
 
@@ -480,5 +511,23 @@ open class ComposeViewModel @AssistedInject constructor(
 
     fun insertEmoji(emoji: UiEmoji) {
         insertText("${if (textFieldValue.value.selection.start != 0) " " else ""}:${emoji.shortcode}: ")
+    }
+
+    data class MediaInsertMode(
+        val disabledInsertType: List<MediaInsertType>,
+        val multiSelect: Boolean,
+        val librarySupportedType: List<String>
+    ) {
+        companion object {
+            val All = MediaInsertMode(emptyList(), false, listOf("image/*", "video/*"))
+            val ImageOnly = MediaInsertMode(
+                listOf(
+                    MediaInsertType.GIF,
+                    MediaInsertType.RECORD_VIDEO
+                ),
+                true, listOf("image/*")
+            )
+            val Disabled = MediaInsertMode(MediaInsertType.values().toList(), true, listOf("image/*"))
+        }
     }
 }

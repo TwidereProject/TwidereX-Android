@@ -22,6 +22,7 @@ package com.twidere.twiderex.navigation
 
 import com.twidere.route.processor.AppRoute
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.enums.MediaType
 import com.twidere.twiderex.viewmodel.compose.ComposeType
 
 @AppRoute
@@ -49,7 +50,7 @@ interface Root {
 
     interface Media {
         fun Status(statusKey: MicroBlogKey, selectedIndex: Int?): String
-        fun Raw(url: String): String
+        fun Raw(type: MediaType, url: String): String
         fun Pure(belongToKey: MicroBlogKey, selectedIndex: Int?): String
     }
 
@@ -110,5 +111,9 @@ interface Root {
         val Home: String
         fun Conversation(conversationKey: MicroBlogKey): String
         val NewConversation: String
+    }
+
+    interface Gif {
+        val Home: String
     }
 }

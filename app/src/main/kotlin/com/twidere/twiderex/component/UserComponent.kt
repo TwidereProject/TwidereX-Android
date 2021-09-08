@@ -101,6 +101,7 @@ import com.twidere.twiderex.di.assisted.assistedViewModel
 import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.enums.MediaType
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiUrlEntity
 import com.twidere.twiderex.model.ui.UiUser
@@ -481,7 +482,7 @@ fun UserInfo(
                         size = UserInfoDefaults.AvatarSize
                     ) {
                         if (user.profileImage is String) {
-                            navController.navigate(RootRoute.Media.Raw(user.profileImage))
+                            navController.navigate(RootRoute.Media.Raw(MediaType.photo, user.profileImage))
                         }
                     }
                 }
@@ -757,7 +758,7 @@ private fun UserBanner(
             .heightIn(max = maxBannerSize)
             .clickable(
                 onClick = {
-                    navController.navigate(RootRoute.Media.Raw(bannerUrl))
+                    navController.navigate(RootRoute.Media.Raw(MediaType.photo, bannerUrl))
                 },
                 indication = null,
                 interactionSource = remember { MutableInteractionSource() },
