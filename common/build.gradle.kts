@@ -36,6 +36,7 @@ kotlin {
                 api(compose.material)
                 implementation(projects.services)
                 api("androidx.paging:paging-common:${Versions.paging}")
+                api("androidx.paging:paging-compose:${Versions.paging_compose}")
                 api("androidx.datastore:datastore-core:${Versions.datastore}")
                 api("androidx.datastore:datastore-preferences-core:${Versions.datastore}")
                 api("org.jetbrains.kotlinx:kotlinx-serialization-json:${Versions.Kotlin.serialization}")
