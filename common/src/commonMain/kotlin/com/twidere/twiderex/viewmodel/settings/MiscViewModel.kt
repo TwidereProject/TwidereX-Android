@@ -21,7 +21,6 @@
 package com.twidere.twiderex.viewmodel.settings
 
 import androidx.datastore.core.DataStore
-import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.preferences.model.MiscPreferences
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
@@ -31,7 +30,6 @@ import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class MiscViewModel(
     private val miscPreferences: DataStore<MiscPreferences>,
-    private val inAppNotification: InAppNotification,
 ) : ViewModel() {
     val nitter by lazy {
         MutableStateFlow("")
