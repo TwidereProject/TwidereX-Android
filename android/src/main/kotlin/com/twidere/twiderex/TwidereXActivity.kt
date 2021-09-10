@@ -79,6 +79,7 @@ import com.twidere.twiderex.utils.LocalPlatformResolver
 import com.twidere.twiderex.utils.PlatformResolver
 import kotlinx.coroutines.flow.MutableStateFlow
 import moe.tlaster.precompose.lifecycle.PreComposeActivity
+import moe.tlaster.precompose.lifecycle.setContent
 import moe.tlaster.precompose.navigation.NavController
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
