@@ -25,6 +25,7 @@ import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.ComposeType
 import com.twidere.twiderex.model.ui.UiDraft
 import com.twidere.twiderex.model.ui.UiList
+import com.twidere.twiderex.preferences.PreferencesHolder
 import com.twidere.twiderex.viewmodel.ActiveAccountViewModel
 import com.twidere.twiderex.viewmodel.DraftViewModel
 import com.twidere.twiderex.viewmodel.MediaViewModel
@@ -181,11 +182,11 @@ private fun Module.search() {
 
 private fun Module.settings() {
     viewModel { AccountNotificationViewModel(get()) }
-    viewModel { AppearanceViewModel(get()) }
-    viewModel { DisplayViewModel(get()) }
+    viewModel { AppearanceViewModel(get<PreferencesHolder>().appearancePreferences) }
+    viewModel { DisplayViewModel(get<PreferencesHolder>().displayPreferences) }
     viewModel { LayoutViewModel(get()) }
-    viewModel { MiscViewModel(get(), get()) }
-    viewModel { NotificationViewModel(get()) }
+    viewModel { MiscViewModel(get<PreferencesHolder>().miscPreferences) }
+    viewModel { NotificationViewModel(get<PreferencesHolder>().notificationPreferences) }
     viewModel { StorageViewModel(get()) }
 }
 

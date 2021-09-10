@@ -22,6 +22,7 @@ package com.twidere.twiderex.di.modules
 
 import androidx.datastore.core.DataStoreFactory
 import androidx.datastore.core.Serializer
+import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import com.twidere.twiderex.preferences.PreferencesHolder
 import com.twidere.twiderex.preferences.serializer.AppearancePreferencesSerializer
 import com.twidere.twiderex.preferences.serializer.DisplayPreferencesSerializer
@@ -45,6 +46,11 @@ internal val preferencesModule = module {
                 NotificationPreferencesSerializer
             ),
         )
+    }
+    single {
+        PreferenceDataStoreFactory.create {
+            createDataStoreFile("perferences.preferences_pb")
+        }
     }
 }
 
