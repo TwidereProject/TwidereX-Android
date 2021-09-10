@@ -21,6 +21,14 @@
 package com.twidere.twiderex.kmp
 
 import android.content.Context
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.painter.Painter
+import coil.compose.LocalImageLoader
+import coil.compose.rememberImagePainter
+import coil.decode.SvgDecoder
+import com.twidere.twiderex.di.ext.get
+import dev.icerock.moko.resources.FileResource
+import dev.icerock.moko.resources.ImageResource
 import dev.icerock.moko.resources.StringResource
 
 actual class ResLoader(
@@ -31,5 +39,26 @@ actual class ResLoader(
         vararg args: Any
     ): String {
         return context.getString(res.resourceId, *args)
+    }
+
+    actual companion object {
+        actual val get: ResLoader
+            get() = get()
+    }
+
+    @Composable
+    actual fun getSvg(res: FileResource): Painter {
+        val data = "android.resource://${context.packageName}/raw/${context.resources.getResourceEntryName(res.rawResId)}"
+        return rememberImagePainter(
+            data,
+            LocalImageLoader.current
+                .newBuilder().componentRegistry { add(SvgDecoder(context)) }.build()
+        )
+    }
+
+    @Composable
+    actual fun getImage(res: ImageResource): Painter {
+        val data = "android.resource://${context.packageName}/drawable/${context.resources.getResourceEntryName(res.drawableResId)}"
+        return rememberImagePainter(data)
     }
 }

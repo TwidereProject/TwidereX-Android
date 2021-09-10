@@ -18,23 +18,33 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.kmp
+package com.twidere.twiderex.component
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.painter.Painter
+import com.twidere.twiderex.kmp.ResLoader
 import dev.icerock.moko.resources.FileResource
 import dev.icerock.moko.resources.ImageResource
 import dev.icerock.moko.resources.StringResource
 
-expect class ResLoader {
-    companion object {
-        val get: ResLoader
+@Composable
+fun stringResource(res: StringResource, vararg formatArgs: Any): String {
+    return ResLoader.get.getString(res, *formatArgs)
+}
+
+@Composable
+fun stringResource(res: StringResource): String {
+    return ResLoader.get.getString(res)
+}
+
+/**
+ * res: FileResource:svg, ImageResource
+ */
+@Composable
+fun painterResource(res: Any): Painter {
+    return when (res) {
+        is FileResource -> ResLoader.get.getSvg(res)
+        is ImageResource -> ResLoader.get.getImage(res)
+        else -> throw NotImplementedError()
     }
-    fun getString(res: StringResource, vararg args: Any): String
-
-    @Composable
-    fun getSvg(res: FileResource): Painter
-
-    @Composable
-    fun getImage(res: ImageResource): Painter
 }

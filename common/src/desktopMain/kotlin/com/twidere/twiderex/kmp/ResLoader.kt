@@ -20,6 +20,12 @@
  */
 package com.twidere.twiderex.kmp
 
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.res.painterResource
+import com.twidere.twiderex.di.ext.get
+import dev.icerock.moko.resources.FileResource
+import dev.icerock.moko.resources.ImageResource
 import dev.icerock.moko.resources.StringResource
 
 actual class ResLoader {
@@ -28,5 +34,20 @@ actual class ResLoader {
         vararg args: Any
     ): String {
         return res.localized(args = args)
+    }
+
+    actual companion object {
+        actual val get: ResLoader
+            get() = get()
+    }
+
+    @Composable
+    actual fun getSvg(res: FileResource): Painter {
+        return painterResource(res.filePath)
+    }
+
+    @Composable
+    actual fun getImage(res: ImageResource): Painter {
+        return painterResource(res.filePath)
     }
 }
