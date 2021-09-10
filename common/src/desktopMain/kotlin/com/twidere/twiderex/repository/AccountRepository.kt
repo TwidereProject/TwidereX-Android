@@ -27,12 +27,12 @@ import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.cred.CredentialsType
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiUser
-import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.Flow
 
 actual class AccountRepository {
-    actual val activeAccount: SharedFlow<AccountDetails?>
+    actual val activeAccount: Flow<AccountDetails?>
         get() = TODO("Not yet implemented")
-    actual val accounts: SharedFlow<List<AccountDetails>>
+    actual val accounts: Flow<List<AccountDetails>>
         get() = TODO("Not yet implemented")
 
     actual fun updateAccount(user: UiUser) {

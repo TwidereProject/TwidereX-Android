@@ -27,11 +27,11 @@ import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.cred.CredentialsType
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiUser
-import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.Flow
 
 expect class AccountRepository {
-    val activeAccount: SharedFlow<AccountDetails?>
-    val accounts: SharedFlow<List<AccountDetails>>
+    val activeAccount: Flow<AccountDetails?>
+    val accounts: Flow<List<AccountDetails>>
     fun updateAccount(user: UiUser)
     fun getAccounts(): List<AccountDetails>
     fun hasAccount(): Boolean

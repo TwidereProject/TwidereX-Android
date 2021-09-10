@@ -36,6 +36,7 @@ import com.twidere.twiderex.room.db.transform.toAndroid
 import com.twidere.twiderex.room.db.transform.toTwidere
 import com.twidere.twiderex.utils.fromJson
 import com.twidere.twiderex.utils.json
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 
@@ -68,14 +69,14 @@ actual class AccountRepository(
     private val _activeAccount =
         MutableStateFlow(if (hasAccount()) getCurrentAccount() else null)
 
-    actual val activeAccount
+    actual val activeAccount: Flow<AccountDetails?>
         get() = _activeAccount.asSharedFlow()
 
     private val _accounts = MutableStateFlow(
         getAccounts()
     )
 
-    actual val accounts
+    actual val accounts: Flow<List<AccountDetails>>
         get() = _accounts.asSharedFlow()
 
     actual fun hasAccount(): Boolean {
