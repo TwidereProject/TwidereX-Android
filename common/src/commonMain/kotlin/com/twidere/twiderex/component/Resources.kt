@@ -22,19 +22,19 @@ package com.twidere.twiderex.component
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.painter.Painter
-import com.twidere.twiderex.kmp.ResLoader
+import com.twidere.twiderex.compose.LocalResLoader
 import dev.icerock.moko.resources.FileResource
 import dev.icerock.moko.resources.ImageResource
 import dev.icerock.moko.resources.StringResource
 
 @Composable
 fun stringResource(res: StringResource, vararg formatArgs: Any): String {
-    return ResLoader.get.getString(res, *formatArgs)
+    return LocalResLoader.current.getString(res, *formatArgs)
 }
 
 @Composable
 fun stringResource(res: StringResource): String {
-    return ResLoader.get.getString(res)
+    return LocalResLoader.current.getString(res)
 }
 
 /**
@@ -43,8 +43,8 @@ fun stringResource(res: StringResource): String {
 @Composable
 fun painterResource(res: Any): Painter {
     return when (res) {
-        is FileResource -> ResLoader.get.getSvg(res)
-        is ImageResource -> ResLoader.get.getImage(res)
+        is FileResource -> LocalResLoader.current.getSvg(res)
+        is ImageResource -> LocalResLoader.current.getImage(res)
         else -> throw NotImplementedError()
     }
 }

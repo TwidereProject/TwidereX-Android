@@ -27,9 +27,6 @@ import dev.icerock.moko.resources.ImageResource
 import dev.icerock.moko.resources.StringResource
 
 expect class ResLoader {
-    companion object {
-        val get: ResLoader
-    }
     fun getString(res: StringResource, vararg args: Any): String
 
     @Composable

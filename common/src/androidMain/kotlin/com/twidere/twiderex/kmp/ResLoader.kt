@@ -27,7 +27,6 @@ import coil.compose.LocalImageLoader
 import coil.compose.rememberImagePainter
 import coil.decode.SvgDecoder
 import com.twidere.twiderex.component.painterResource
-import com.twidere.twiderex.di.ext.get
 import dev.icerock.moko.resources.FileResource
 import dev.icerock.moko.resources.ImageResource
 import dev.icerock.moko.resources.StringResource
@@ -40,11 +39,6 @@ actual class ResLoader(
         vararg args: Any
     ): String {
         return context.getString(res.resourceId, *args)
-    }
-
-    actual companion object {
-        actual val get: ResLoader
-            get() = get()
     }
 
     @Composable
