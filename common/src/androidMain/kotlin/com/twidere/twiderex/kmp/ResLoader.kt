@@ -26,6 +26,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import coil.compose.LocalImageLoader
 import coil.compose.rememberImagePainter
 import coil.decode.SvgDecoder
+import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.di.ext.get
 import dev.icerock.moko.resources.FileResource
 import dev.icerock.moko.resources.ImageResource
@@ -58,7 +59,6 @@ actual class ResLoader(
 
     @Composable
     actual fun getImage(res: ImageResource): Painter {
-        val data = "android.resource://${context.packageName}/drawable/${context.resources.getResourceEntryName(res.drawableResId)}"
-        return rememberImagePainter(data)
+        return painterResource(res.drawableResId)
     }
 }
