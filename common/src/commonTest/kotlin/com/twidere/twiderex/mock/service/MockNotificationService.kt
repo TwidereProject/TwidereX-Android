@@ -25,6 +25,7 @@ import com.twidere.services.microblog.NotificationService
 import com.twidere.services.microblog.model.INotification
 import com.twidere.twiderex.mock.model.mockINotification
 import com.twidere.twiderex.mock.model.toIPaging
+import kotlinx.coroutines.delay
 import org.jetbrains.annotations.TestOnly
 
 internal class MockNotificationService @TestOnly constructor() : NotificationService, ErrorService(), MicroBlogService {
@@ -36,8 +37,9 @@ internal class MockNotificationService @TestOnly constructor() : NotificationSer
         checkError()
         val list = mutableListOf<INotification>()
         for (i in 0 until count) {
+            delay(1)
             list.add(mockINotification())
         }
-        return list.toIPaging()
+        return list.reversed().toIPaging()
     }
 }
