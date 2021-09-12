@@ -37,10 +37,13 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.boundsInWindow
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
@@ -66,6 +69,9 @@ import com.twidere.twiderex.ui.LocalIsActiveNetworkMetered
 import com.twidere.twiderex.ui.LocalVideoPlayback
 import com.twidere.twiderex.utils.video.CacheDataSourceFactory
 import com.twidere.twiderex.utils.video.VideoPool
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun VideoPlayer(
@@ -76,6 +82,7 @@ fun VideoPlayer(
     showControls: Boolean = customControl == null,
     zOrderMediaOverlay: Boolean = false,
     keepScreenOn: Boolean = false,
+    isListItem: Boolean = true,
     thumb: @Composable (() -> Unit)? = null,
 ) {
     var playing by remember { mutableStateOf(false) }
@@ -92,7 +99,6 @@ fun VideoPlayer(
     val context = LocalContext.current
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     val httpConfig = LocalHttpConfig.current
-
     Box {
         if (playInitial) {
             val player = remember(url) {
@@ -174,12 +180,44 @@ fun VideoPlayer(
                 onDispose {
                     updateState()
                     player.release()
+                    VideoPool.removeRect(url)
                     lifecycle.removeObserver(observer)
                 }
             }
 
+            var middleLine = 0.0f
+            val composableScope = rememberCoroutineScope()
+
+            var isMostCenter by remember(url) {
+                mutableStateOf(false)
+            }
+            var debounceJob: Job? = null
             AndroidView(
-                modifier = modifier,
+                modifier = modifier.onGloballyPositioned { coordinates ->
+                    if (middleLine == 0.0f) {
+                        var rootCoordinates = coordinates
+                        while (rootCoordinates.parentCoordinates != null) {
+                            rootCoordinates = rootCoordinates.parentCoordinates!!
+                        }
+                        rootCoordinates.boundsInWindow().run {
+                            middleLine = (top + bottom) / 2
+                        }
+                    }
+                    coordinates.boundsInWindow().run {
+                        VideoPool.setRect(url, this)
+                        if (!isMostCenter && VideoPool.containsMiddleLine(url, middleLine)) {
+                            debounceJob?.cancel()
+                            debounceJob = composableScope.launch {
+                                delay(VideoPool.DEBOUNCE_DELAY)
+                                if (VideoPool.containsMiddleLine(url, middleLine)) {
+                                    isMostCenter = true
+                                }
+                            }
+                        } else if (isMostCenter && !VideoPool.isMostCenter(url, middleLine)) {
+                            isMostCenter = false
+                        }
+                    }
+                },
                 factory = { context ->
                     StyledPlayerView(context).also { playerView ->
                         (playerView.videoSurfaceView as? SurfaceView)?.setZOrderMediaOverlay(zOrderMediaOverlay)
@@ -189,9 +227,15 @@ fun VideoPlayer(
                 }
             ) {
                 it.player = player
-                if (isResume) {
+                if (isResume && isMostCenter) {
+                    if (isListItem) {
+                        player.playWhenReady = autoPlay
+                    }
                     it.onResume()
                 } else {
+                    if (isListItem) {
+                        player.playWhenReady = false
+                    }
                     it.onPause()
                 }
             }

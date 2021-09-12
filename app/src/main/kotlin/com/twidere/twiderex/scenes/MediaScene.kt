@@ -157,9 +157,9 @@ fun StatusMediaScene(statusKey: MicroBlogKey, selectedIndex: Int) {
 fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewModel) {
     val window = LocalWindow.current
     var controlVisibility by remember { mutableStateOf(true) }
+    val navigator = LocalNavigator.current
     val controlPanelColor = MaterialTheme.colors.surface.copy(alpha = 0.6f)
     val navController = LocalNavController.current
-    val navigator = LocalNavigator.current
     val pagerState = rememberPagerState(
         initialPage = selectedIndex,
         pageCount = status.media.size,
@@ -254,7 +254,6 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewM
                 swiperState = swiperState,
                 customControl = videoControl,
                 pagerState = pagerState,
-                volume = if (isMute) 0f else 1f
             )
             DisposableEffect(Unit) {
                 window.setOnSystemBarsVisibilityChangeListener { visibility ->
