@@ -24,12 +24,19 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import com.twidere.twiderex.compose.LocalResLoader
+import com.twidere.twiderex.di.ext.get
 
 @Composable
 fun App() {
-    MaterialTheme {
-        Scaffold {
-            Text("Twidere X!")
+    CompositionLocalProvider(
+        LocalResLoader provides get()
+    ) {
+        MaterialTheme {
+            Scaffold {
+                Text("Twidere X!")
+            }
         }
     }
 }

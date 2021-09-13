@@ -18,15 +18,11 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.component
+package com.twidere.twiderex.compose
 
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.staticCompositionLocalOf
+import com.twidere.twiderex.kmp.ResLoader
 
-@Composable
-actual fun stringResource(id: Int, vararg formatArgs: Any) = androidx.compose.ui.res.stringResource(id, *formatArgs)
-
-@Composable
-actual fun stringResource(id: Int) = androidx.compose.ui.res.stringResource(id)
-
-@Composable
-actual fun painterResource(id: Int) = androidx.compose.ui.res.painterResource(id)
+val LocalResLoader = staticCompositionLocalOf<ResLoader> {
+    error("No ResLoader")
+}
