@@ -47,6 +47,10 @@ kotlin {
                 implementation(projects.routeProcessor)
                 ksp(projects.routeProcessor)
                 implementation("dev.icerock.moko:resources:${Versions.moko}")
+                implementation("com.mxalbert.zoomable:zoomable:${Versions.zoomable}")
+                implementation("com.github.Tlaster:NestedScrollView:${ Versions.nestedScrollView}")
+                implementation("com.github.Tlaster:Swiper:${Versions.swiper}")
+                implementation("com.github.Tlaster:Placeholder:${Versions.placeholder}")
             }
         }
         val commonTest by getting {
