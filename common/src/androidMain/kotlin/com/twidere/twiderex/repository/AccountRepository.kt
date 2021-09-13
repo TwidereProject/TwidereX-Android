@@ -38,7 +38,6 @@ import com.twidere.twiderex.utils.fromJson
 import com.twidere.twiderex.utils.json
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 
 private const val ACCOUNT_TYPE = "com.twidere.twiderex.account"
 private const val ACCOUNT_AUTH_TOKEN_TYPE = "com.twidere.twiderex.account.token"
@@ -70,14 +69,14 @@ actual class AccountRepository(
         MutableStateFlow(if (hasAccount()) getCurrentAccount() else null)
 
     actual val activeAccount: Flow<AccountDetails?>
-        get() = _activeAccount.asSharedFlow()
+        get() = _activeAccount
 
     private val _accounts = MutableStateFlow(
         getAccounts()
     )
 
     actual val accounts: Flow<List<AccountDetails>>
-        get() = _accounts.asSharedFlow()
+        get() = _accounts
 
     actual fun hasAccount(): Boolean {
         return getAccounts().isNotEmpty()

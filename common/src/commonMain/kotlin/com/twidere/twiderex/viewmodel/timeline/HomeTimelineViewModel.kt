@@ -27,7 +27,8 @@ import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.extensions.asStateIn
 import com.twidere.twiderex.paging.mediator.timeline.HomeTimelineMediator
 import com.twidere.twiderex.repository.AccountRepository
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.mapLatest
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class HomeTimelineViewModel(
@@ -39,20 +40,25 @@ class HomeTimelineViewModel(
         accountRepository.activeAccount.asStateIn(viewModelScope, null)
     }
 
-    override val pagingMediator = account.map {
-        if (it != null) {
-            HomeTimelineMediator(
-                it.service as TimelineService,
-                it.accountKey,
-                database,
-            )
-        } else {
-            null
-        }
+    @OptIn(ExperimentalCoroutinesApi::class)
+    override val pagingMediator by lazy {
+        account.mapLatest {
+            it?.let {
+                HomeTimelineMediator(
+                    it.service as TimelineService,
+                    it.accountKey,
+                    database,
+                )
+            }
+        }.asStateIn(viewModelScope, null)
     }
-    override val savedStateKey = account.map {
-        it?.let {
-            "${it.accountKey}_home"
-        }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    override val savedStateKey by lazy {
+        account.mapLatest {
+            it?.let {
+                "${it.accountKey}_home"
+            }
+        }.asStateIn(viewModelScope, null)
     }
 }

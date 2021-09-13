@@ -28,7 +28,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.stateIn
@@ -59,6 +58,10 @@ fun <T> Flow<T>.flowWithLifecycle(
 fun <T> Flow<T>.asStateIn(
     scope: CoroutineScope,
     initialValue: T
-): StateFlow<T> {
-    return stateIn(scope, SharingStarted.Lazily, initialValue)
+): Flow<T> {
+    return stateIn(
+        scope = scope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = initialValue
+    )
 }

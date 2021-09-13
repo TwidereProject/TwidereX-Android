@@ -44,7 +44,7 @@ class NotificationTimelineViewModel(
 
     override val pagingMediator by lazy {
         account.map {
-            if (it != null) {
+            it?.let {
                 NotificationTimelineMediator(
                     service = it.service as NotificationService,
                     accountKey = it.accountKey,
@@ -58,16 +58,14 @@ class NotificationTimelineViewModel(
                         )
                     }
                 )
-            } else {
-                null
             }
-        }
+        }.asStateIn(viewModelScope, null)
     }
-    override val savedStateKey = account.map {
-        if (it == null) {
-            null
-        } else {
-            "${it.accountKey}_notification"
-        }
+    override val savedStateKey by lazy {
+        account.map {
+            it?.let {
+                "${it.accountKey}_notification"
+            }
+        }.asStateIn(viewModelScope, null)
     }
 }

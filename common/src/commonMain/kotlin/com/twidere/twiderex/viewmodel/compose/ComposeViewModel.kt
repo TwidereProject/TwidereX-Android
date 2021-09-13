@@ -47,6 +47,7 @@ import com.twidere.twiderex.utils.notifyError
 import com.twitter.twittertext.Extractor
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
@@ -54,6 +55,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.lastOrNull
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
@@ -182,7 +184,11 @@ open class ComposeViewModel(
     }
 
     val location by lazy {
-        locationProvider.location.asStateIn(viewModelScope, null)
+        locationProvider.location.stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            null
+        )
     }
     val excludedReplyUserIds = MutableStateFlow<List<String>>(emptyList())
     val replyToUserName by lazy {
@@ -245,6 +251,7 @@ open class ComposeViewModel(
         .asStateIn(viewModelScope, false)
     val locationEnabled = MutableStateFlow(false)
     val enableThreadMode = MutableStateFlow(composeType == ComposeType.Thread)
+
     @OptIn(ExperimentalCoroutinesApi::class)
     val status by lazy {
         account.flatMapLatest {

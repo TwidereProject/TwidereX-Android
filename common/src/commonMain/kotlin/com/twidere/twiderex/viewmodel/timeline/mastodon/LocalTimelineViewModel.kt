@@ -49,12 +49,14 @@ class LocalTimelineViewModel(
                     database,
                 )
             }
-        }
+        }.asStateIn(viewModelScope, null)
     }
 
-    override val savedStateKey = account.map {
-        it?.let {
-            "${it.accountKey}_local"
-        }
+    override val savedStateKey by lazy {
+        account.map {
+            it?.let {
+                "${it.accountKey}_local"
+            }
+        }.asStateIn(viewModelScope, null)
     }
 }

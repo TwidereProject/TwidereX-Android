@@ -42,30 +42,30 @@ class MentionsTimelineViewModel(
         accountRepository.activeAccount.asStateIn(viewModelScope, null)
     }
 
-    override val pagingMediator = account.map {
-        if (it != null) {
-            MentionTimelineMediator(
-                service = it.service as TimelineService,
-                accountKey = it.accountKey,
-                database = database,
-                addCursorIfNeed = { data, accountKey ->
-                    notificationRepository.addCursorIfNeeded(
-                        accountKey,
-                        NotificationCursorType.Mentions,
-                        data.status.statusId,
-                        data.status.timestamp,
-                    )
-                }
-            )
-        } else {
-            null
-        }
+    override val pagingMediator by lazy {
+        account.map {
+            it?.let {
+                MentionTimelineMediator(
+                    service = it.service as TimelineService,
+                    accountKey = it.accountKey,
+                    database = database,
+                    addCursorIfNeed = { data, accountKey ->
+                        notificationRepository.addCursorIfNeeded(
+                            accountKey,
+                            NotificationCursorType.Mentions,
+                            data.status.statusId,
+                            data.status.timestamp,
+                        )
+                    }
+                )
+            }
+        }.asStateIn(viewModelScope, null)
     }
-    override val savedStateKey = account.map {
-        if (it != null) {
-            "${it.accountKey}_mentions"
-        } else {
-            null
-        }
+    override val savedStateKey by lazy {
+        account.map {
+            it?.let {
+                "${it.accountKey}_mentions"
+            }
+        }.asStateIn(viewModelScope, null)
     }
 }
