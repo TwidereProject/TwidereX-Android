@@ -254,6 +254,7 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewM
                 swiperState = swiperState,
                 customControl = videoControl,
                 pagerState = pagerState,
+                volume = if (isMute) 0f else 1f
             )
             DisposableEffect(Unit) {
                 window.setOnSystemBarsVisibilityChangeListener { visibility ->
