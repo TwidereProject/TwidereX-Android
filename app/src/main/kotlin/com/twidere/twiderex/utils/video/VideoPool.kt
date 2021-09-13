@@ -40,11 +40,11 @@ object VideoPool {
 
     private val positionPool = ConcurrentHashMap<String, Rect>()
 
-    fun setRect(url: String, rect: Rect) {
+    fun setRect(videoKey: String, rect: Rect) {
         if (rect.top <= 0.0f && rect.bottom <= 0.0f) {
-            removeRect(url)
+            removeRect(videoKey)
         } else {
-            positionPool[url] = rect
+            positionPool[videoKey] = rect
         }
     }
 
@@ -52,21 +52,21 @@ object VideoPool {
         positionPool.remove(url)
     }
 
-    fun containsMiddleLine(url: String, middle: Float): Boolean {
-        positionPool[url]?.let {
+    fun containsMiddleLine(videoKey: String, middle: Float): Boolean {
+        positionPool[videoKey]?.let {
             return it.top <= middle && it.bottom >= middle
         }
         return false
     }
 
-    fun isMostCenter(url: String, middle: Float): Boolean {
+    fun isMostCenter(videoKey: String, middle: Float): Boolean {
         if (positionPool.size == 0) {
             return false
         }
         if (positionPool.size == 1) {
             return true
         }
-        var centerUrl = url
+        var centerUrl = videoKey
         var minGap = Float.MAX_VALUE
         positionPool.forEach {
             abs((it.value.top + it.value.bottom) / 2 - middle).let { curGap ->
@@ -76,6 +76,6 @@ object VideoPool {
                 }
             }
         }
-        return url == centerUrl
+        return videoKey == centerUrl
     }
 }

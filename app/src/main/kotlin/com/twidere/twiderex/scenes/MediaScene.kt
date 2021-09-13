@@ -464,7 +464,8 @@ fun MediaView(
                             showControls = false,
                             zOrderMediaOverlay = true,
                             keepScreenOn = true,
-                            volume = volume
+                            volume = volume,
+                            isListItem = false
                         )
                     }
                 MediaType.other -> Unit

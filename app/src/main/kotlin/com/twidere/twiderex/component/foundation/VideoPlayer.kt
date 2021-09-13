@@ -162,6 +162,9 @@ fun VideoPlayer(
             var isResume by remember {
                 mutableStateOf(true)
             }
+            val videoKey by remember {
+                mutableStateOf(url + System.currentTimeMillis())
+            }
             DisposableEffect(Unit) {
                 val observer = object : LifecycleObserver {
                     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
@@ -180,7 +183,7 @@ fun VideoPlayer(
                 onDispose {
                     updateState()
                     player.release()
-                    VideoPool.removeRect(url)
+                    VideoPool.removeRect(videoKey)
                     lifecycle.removeObserver(observer)
                 }
             }
@@ -204,16 +207,16 @@ fun VideoPlayer(
                         }
                     }
                     coordinates.boundsInWindow().run {
-                        VideoPool.setRect(url, this)
-                        if (!isMostCenter && VideoPool.containsMiddleLine(url, middleLine)) {
+                        VideoPool.setRect(videoKey, this)
+                        if (!isMostCenter && VideoPool.containsMiddleLine(videoKey, middleLine)) {
                             debounceJob?.cancel()
                             debounceJob = composableScope.launch {
                                 delay(VideoPool.DEBOUNCE_DELAY)
-                                if (VideoPool.containsMiddleLine(url, middleLine)) {
+                                if (VideoPool.containsMiddleLine(videoKey, middleLine)) {
                                     isMostCenter = true
                                 }
                             }
-                        } else if (isMostCenter && !VideoPool.isMostCenter(url, middleLine)) {
+                        } else if (isMostCenter && !VideoPool.isMostCenter(videoKey, middleLine)) {
                             isMostCenter = false
                         }
                     }
