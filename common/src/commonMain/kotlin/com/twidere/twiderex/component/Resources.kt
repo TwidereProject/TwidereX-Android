@@ -54,9 +54,9 @@ class ImageBlur(
     val bitmapScale: Float,
 ) {
     companion object {
-        val Default = ImageBlur(
-            blurRadius = 12f,
-            bitmapScale = 0.5f
+        val Sensitive = ImageBlur(
+            blurRadius = 25f,
+            bitmapScale = 0.4f
         )
     }
 }

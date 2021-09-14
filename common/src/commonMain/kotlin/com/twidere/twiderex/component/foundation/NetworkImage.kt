@@ -23,6 +23,8 @@ package com.twidere.twiderex.component.foundation
 import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
@@ -42,6 +44,9 @@ fun NetworkImage(
     blur: ImageBlur? = null,
     placeholder: @Composable (() -> Unit)? = null,
 ) {
+    val state = remember {
+        mutableStateOf(NetworkImageState.LOADING)
+    }
     val painter = if (data is Painter) {
         data
     } else {
@@ -65,9 +70,12 @@ fun NetworkImage(
             authorization = auth,
             blur = blur,
             onImageStateChanged = {
-                if (it == NetworkImageState.LOADING) placeholder?.invoke()
+                state.value = it
             }
         )
+    }
+    if (state.value == NetworkImageState.LOADING) {
+        placeholder?.invoke()
     }
     Image(
         painter = painter,
@@ -78,7 +86,6 @@ fun NetworkImage(
 }
 
 internal enum class NetworkImageState {
-    EMPTY,
     LOADING,
     SUCCESS,
     ERROR

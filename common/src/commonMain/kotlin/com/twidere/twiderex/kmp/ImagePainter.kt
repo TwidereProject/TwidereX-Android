@@ -33,5 +33,5 @@ internal expect fun rememberNetworkImagePainter(
     authorization: Authorization,
     httpConfig: HttpConfig,
     blur: ImageBlur?,
-    onImageStateChanged: @Composable (NetworkImageState) -> Unit
+    onImageStateChanged: (NetworkImageState) -> Unit
 ): Painter

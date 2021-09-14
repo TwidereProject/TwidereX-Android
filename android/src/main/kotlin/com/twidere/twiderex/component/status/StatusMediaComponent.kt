@@ -278,7 +278,7 @@ fun StatusMediaPreviewItem(
                     ) {
                         NetworkImage(
                             data = it,
-                            blur = ImageBlur.Default,
+                            blur = ImageBlur.Sensitive,
                             modifier = Modifier
                                 .fillMaxSize(),
                             placeholder = {
@@ -311,7 +311,7 @@ fun StatusMediaPreviewItem(
                 if (sensitive && previewUrl != null) {
                     NetworkImage(
                         data = previewUrl,
-                        blur = ImageBlur.Default,
+                        blur = ImageBlur.Sensitive,
                         modifier = Modifier
                             .fillMaxSize(),
                         placeholder = {

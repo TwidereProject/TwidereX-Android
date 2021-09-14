@@ -25,6 +25,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
 import coil.ImageLoader
+import coil.annotation.ExperimentalCoilApi
 import coil.compose.LocalImageLoader
 import coil.compose.rememberImagePainter
 import coil.decode.GifDecoder
@@ -35,9 +36,10 @@ import com.twidere.services.http.authorization.Authorization
 import com.twidere.services.http.config.HttpConfig
 import com.twidere.twiderex.component.ImageBlur
 import com.twidere.twiderex.component.foundation.NetworkImageState
-import com.twidere.twiderex.http.TwidereNetworkImageLoader
 import com.twidere.twiderex.http.TwidereServiceFactory
 import com.twidere.twiderex.preferences.LocalHttpConfig
+import okhttp3.Request
+import java.net.URL
 
 @Composable
 internal actual fun rememberNetworkImagePainter(
@@ -45,16 +47,12 @@ internal actual fun rememberNetworkImagePainter(
     authorization: Authorization,
     httpConfig: HttpConfig,
     blur: ImageBlur?,
-    onImageStateChanged: @Composable (NetworkImageState) -> Unit
+    onImageStateChanged: (NetworkImageState) -> Unit
 ): Painter {
     val context = LocalContext.current
     return rememberImagePainter(
         data = data,
-        imageLoader = TwidereNetworkImageLoader(
-            buildRealImageLoader(),
-            context,
-            authorization = authorization,
-        ),
+        imageLoader = buildImageLoader(),
         builder = {
             crossfade(true)
             if (blur != null) {
@@ -66,32 +64,44 @@ internal actual fun rememberNetworkImagePainter(
                     )
                 )
             }
+            listener(
+                onSuccess = { _, _ -> onImageStateChanged(NetworkImageState.SUCCESS) },
+                onError = { _, _ -> onImageStateChanged(NetworkImageState.ERROR) },
+                onStart = { onImageStateChanged(NetworkImageState.LOADING) }
+            )
+            if (authorization.hasAuthorization) {
+                addHeader(
+                    "Authorization",
+                    authorization.getAuthorizationHeader(
+                        Request.Builder()
+                            .url(URL(data.toString()))
+                            .build()
+                    )
+                )
+            }
         },
     )
 }
 
+@OptIn(ExperimentalCoilApi::class)
 @Composable
-fun buildRealImageLoader(): ImageLoader {
+private fun buildImageLoader(): ImageLoader {
     val context = LocalContext.current
     val httpConfig = LocalHttpConfig.current
-    return (
-        if (httpConfig.proxyConfig.enable &&
-            httpConfig.proxyConfig.server.isNotEmpty()
-        ) {
-            LocalImageLoader.current
-                .newBuilder()
-                .callFactory(
+    return LocalImageLoader.current
+        .newBuilder()
+        .apply {
+            if (httpConfig.proxyConfig.enable &&
+                httpConfig.proxyConfig.server.isNotEmpty()
+            ) {
+                callFactory(
                     TwidereServiceFactory.createHttpClientFactory()
                         .createHttpClientBuilder()
                         .cache(CoilUtils.createDefaultCache(context))
                         .build()
                 )
-                .build()
-        } else {
-            LocalImageLoader.current
-        }
-        ).newBuilder()
-        .componentRegistry {
+            }
+        }.componentRegistry {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                 add(ImageDecoderDecoder(context))
             } else {
