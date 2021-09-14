@@ -157,9 +157,9 @@ fun StatusMediaScene(statusKey: MicroBlogKey, selectedIndex: Int) {
 fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewModel) {
     val window = LocalWindow.current
     var controlVisibility by remember { mutableStateOf(true) }
+    val navigator = LocalNavigator.current
     val controlPanelColor = MaterialTheme.colors.surface.copy(alpha = 0.6f)
     val navController = LocalNavController.current
-    val navigator = LocalNavigator.current
     val pagerState = rememberPagerState(
         initialPage = selectedIndex,
         pageCount = status.media.size,
@@ -465,7 +465,8 @@ fun MediaView(
                             showControls = false,
                             zOrderMediaOverlay = true,
                             keepScreenOn = true,
-                            volume = volume
+                            volume = volume,
+                            isListItem = false
                         )
                     }
                 MediaType.other -> Unit
