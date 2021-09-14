@@ -20,14 +20,10 @@
  */
 package com.twidere.twiderex.action
 
-import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.job.ComposeData
 
 actual class ComposeAction {
     actual fun commit(
-        accountKey: MicroBlogKey,
-        platformType: PlatformType,
         data: ComposeData,
     ) {
     }

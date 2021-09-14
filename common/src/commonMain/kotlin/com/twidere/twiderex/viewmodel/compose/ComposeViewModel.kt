@@ -329,16 +329,11 @@ open class ComposeViewModel(
         isInVoteMode.value = value
     }
 
-    fun compose() = viewModelScope.launch {
-        val account = account.lastOrNull()
-        if (account != null) {
-            textFieldValue.value.text.let {
-                composeAction.commit(
-                    account.accountKey,
-                    account.type,
-                    buildComposeData(it)
-                )
-            }
+    fun compose() {
+        textFieldValue.value.text.let {
+            composeAction.commit(
+                buildComposeData(it)
+            )
         }
     }
 

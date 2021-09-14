@@ -26,8 +26,6 @@ import com.twidere.twiderex.model.job.ComposeData
 
 expect class ComposeAction {
     fun commit(
-        accountKey: MicroBlogKey,
-        platformType: PlatformType,
         data: ComposeData,
     )
 }
