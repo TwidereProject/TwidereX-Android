@@ -54,8 +54,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.R
+import com.twidere.twiderex.component.ImageBlur
 import com.twidere.twiderex.component.foundation.GridLayout
-import com.twidere.twiderex.component.foundation.NetworkBlurImage
 import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.foundation.VideoPlayer
 import com.twidere.twiderex.component.navigation.LocalNavigator
@@ -276,8 +276,9 @@ fun StatusMediaPreviewItem(
                         enter = fadeIn(),
                         exit = fadeOut()
                     ) {
-                        NetworkBlurImage(
+                        NetworkImage(
                             data = it,
+                            blur = ImageBlur.Default,
                             modifier = Modifier
                                 .fillMaxSize(),
                             placeholder = {
@@ -308,8 +309,9 @@ fun StatusMediaPreviewItem(
             MediaType.video, MediaType.animated_gif -> media.mediaUrl?.let {
                 val previewUrl = media.previewUrl
                 if (sensitive && previewUrl != null) {
-                    NetworkBlurImage(
+                    NetworkImage(
                         data = previewUrl,
+                        blur = ImageBlur.Default,
                         modifier = Modifier
                             .fillMaxSize(),
                         placeholder = {

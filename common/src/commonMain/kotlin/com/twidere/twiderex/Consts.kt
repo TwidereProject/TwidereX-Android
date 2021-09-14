@@ -29,3 +29,5 @@ val twitterHosts = listOf(
     "http://mobile.twitter.com",
     "http://www.twitter.com",
 )
+
+internal const val twitterTonApiHost = "ton.twitter.com"

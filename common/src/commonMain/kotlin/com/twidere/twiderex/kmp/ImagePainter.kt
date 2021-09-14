@@ -22,17 +22,16 @@ package com.twidere.twiderex.kmp
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.painter.Painter
+import com.twidere.services.http.authorization.Authorization
+import com.twidere.services.http.config.HttpConfig
 import com.twidere.twiderex.component.ImageBlur
-import dev.icerock.moko.resources.FileResource
-import dev.icerock.moko.resources.ImageResource
-import dev.icerock.moko.resources.StringResource
+import com.twidere.twiderex.component.foundation.NetworkImageState
 
-expect class ResLoader {
-    fun getString(res: StringResource, vararg args: Any): String
-
-    @Composable
-    fun getSvg(res: FileResource, blur: ImageBlur?): Painter
-
-    @Composable
-    fun getImage(res: ImageResource, blur: ImageBlur?): Painter
-}
+@Composable
+internal expect fun rememberNetworkImagePainter(
+    data: Any,
+    authorization: Authorization,
+    httpConfig: HttpConfig,
+    blur: ImageBlur?,
+    onImageStateChanged: @Composable (NetworkImageState) -> Unit
+): Painter

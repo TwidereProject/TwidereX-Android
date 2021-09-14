@@ -41,10 +41,22 @@ fun stringResource(res: StringResource): String {
  * res: FileResource:svg, ImageResource
  */
 @Composable
-fun painterResource(res: Any): Painter {
+fun painterResource(res: Any, blur: ImageBlur? = null): Painter {
     return when (res) {
-        is FileResource -> LocalResLoader.current.getSvg(res)
-        is ImageResource -> LocalResLoader.current.getImage(res)
+        is FileResource -> LocalResLoader.current.getSvg(res, blur)
+        is ImageResource -> LocalResLoader.current.getImage(res, blur)
         else -> throw NotImplementedError()
+    }
+}
+
+class ImageBlur(
+    val blurRadius: Float,
+    val bitmapScale: Float,
+) {
+    companion object {
+        val Default = ImageBlur(
+            blurRadius = 12f,
+            bitmapScale = 0.5f
+        )
     }
 }

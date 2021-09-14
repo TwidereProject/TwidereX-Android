@@ -18,61 +18,55 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.component.foundation
+package com.twidere.twiderex.kmp
 
 import android.os.Build
-import androidx.compose.foundation.Image
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import coil.ImageLoader
-import coil.annotation.ExperimentalCoilApi
-import coil.compose.ImagePainter
 import coil.compose.LocalImageLoader
 import coil.compose.rememberImagePainter
 import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
+import coil.transform.BlurTransformation
 import coil.util.CoilUtils
-import com.twidere.twiderex.R
+import com.twidere.services.http.authorization.Authorization
+import com.twidere.services.http.config.HttpConfig
+import com.twidere.twiderex.component.ImageBlur
+import com.twidere.twiderex.component.foundation.NetworkImageState
 import com.twidere.twiderex.http.TwidereNetworkImageLoader
 import com.twidere.twiderex.http.TwidereServiceFactory
 import com.twidere.twiderex.preferences.LocalHttpConfig
-import com.twidere.twiderex.ui.LocalActiveAccount
 
-@OptIn(ExperimentalCoilApi::class)
 @Composable
-fun NetworkImage(
+internal actual fun rememberNetworkImagePainter(
     data: Any,
-    modifier: Modifier = Modifier,
-    contentScale: ContentScale = ContentScale.Crop,
-    placeholder: @Composable (() -> Unit)? = null,
-) {
-    val painter = if (data is Painter) {
-        data
-    } else {
-        rememberImagePainter(
-            data = data,
-            imageLoader = TwidereNetworkImageLoader(
-                buildRealImageLoader(),
-                LocalContext.current,
-                LocalActiveAccount.current
-            ),
-            builder = {
-                crossfade(true)
-            },
-        )
-    }
-    if (painter is ImagePainter && painter.state is ImagePainter.State.Loading) {
-        placeholder?.invoke()
-    }
-    Image(
-        painter = painter,
-        modifier = modifier,
-        contentScale = contentScale,
-        contentDescription = stringResource(id = com.twidere.common.R.string.accessibility_common_network_image)
+    authorization: Authorization,
+    httpConfig: HttpConfig,
+    blur: ImageBlur?,
+    onImageStateChanged: @Composable (NetworkImageState) -> Unit
+): Painter {
+    val context = LocalContext.current
+    return rememberImagePainter(
+        data = data,
+        imageLoader = TwidereNetworkImageLoader(
+            buildRealImageLoader(),
+            context,
+            authorization = authorization,
+        ),
+        builder = {
+            crossfade(true)
+            if (blur != null) {
+                transformations(
+                    BlurTransformation(
+                        context = context,
+                        radius = blur.blurRadius,
+                        sampling = blur.bitmapScale
+                    )
+                )
+            }
+        },
     )
 }
 

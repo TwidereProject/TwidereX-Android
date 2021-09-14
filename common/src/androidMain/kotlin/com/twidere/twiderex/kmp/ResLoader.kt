@@ -26,7 +26,8 @@ import androidx.compose.ui.graphics.painter.Painter
 import coil.compose.LocalImageLoader
 import coil.compose.rememberImagePainter
 import coil.decode.SvgDecoder
-import com.twidere.twiderex.component.painterResource
+import coil.transform.BlurTransformation
+import com.twidere.twiderex.component.ImageBlur
 import dev.icerock.moko.resources.FileResource
 import dev.icerock.moko.resources.ImageResource
 import dev.icerock.moko.resources.StringResource
@@ -42,17 +43,46 @@ actual class ResLoader(
     }
 
     @Composable
-    actual fun getSvg(res: FileResource): Painter {
+    actual fun getSvg(res: FileResource, blur: ImageBlur?): Painter {
         val data = "android.resource://${context.packageName}/raw/${context.resources.getResourceEntryName(res.rawResId)}"
         return rememberImagePainter(
-            data,
-            LocalImageLoader.current
-                .newBuilder().componentRegistry { add(SvgDecoder(context)) }.build()
+            data = data,
+            imageLoader = LocalImageLoader.current.newBuilder()
+                .componentRegistry { add(SvgDecoder(context)) }
+                .build(),
+            builder = {
+                if (blur != null) {
+                    transformations(
+                        BlurTransformation(
+                            context = context,
+                            radius = blur.blurRadius,
+                            sampling = blur.bitmapScale
+                        )
+                    )
+                }
+            }
         )
     }
 
     @Composable
-    actual fun getImage(res: ImageResource): Painter {
-        return painterResource(res.drawableResId)
+    actual fun getImage(res: ImageResource, blur: ImageBlur?): Painter {
+        val data = "android.resource://${context.packageName}/drawable/${context.resources.getResourceEntryName(res.drawableResId)}"
+        return rememberImagePainter(
+            data = data,
+            imageLoader = LocalImageLoader.current.newBuilder()
+                .componentRegistry { add(SvgDecoder(context)) }
+                .build(),
+            builder = {
+                if (blur != null) {
+                    transformations(
+                        BlurTransformation(
+                            context = context,
+                            radius = blur.blurRadius,
+                            sampling = blur.bitmapScale
+                        )
+                    )
+                }
+            }
+        )
     }
 }
