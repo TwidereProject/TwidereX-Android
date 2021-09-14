@@ -23,7 +23,6 @@ package com.twidere.twiderex.viewmodel.user
 import com.twidere.services.microblog.LookupService
 import com.twidere.services.microblog.RelationshipService
 import com.twidere.services.microblog.model.IRelationship
-import com.twidere.twiderex.extensions.asStateIn
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.AccountRepository
@@ -44,7 +43,7 @@ class UserViewModel(
 ) : ViewModel() {
 
     private val account by lazy {
-        accountRepository.activeAccount.asStateIn(viewModelScope, null)
+        accountRepository.activeAccount
     }
 
     val refreshing = MutableStateFlow(false)
@@ -54,7 +53,7 @@ class UserViewModel(
     val isMe by lazy {
         account.map {
             userKey == it?.accountKey
-        }.asStateIn(viewModelScope, false)
+        }
     }
 
     fun refresh() = viewModelScope.launch {

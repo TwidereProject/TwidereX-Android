@@ -65,7 +65,6 @@ import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -230,10 +229,10 @@ fun UserStatusTimeline(
     viewModel: UserViewModel,
 ) {
     val user by viewModel.user.observeAsState(initial = null)
-    var excludeReplies by rememberSaveable { mutableStateOf(false) }
     val timelineViewModel: UserTimelineViewModel = getViewModel {
-        parametersOf(userKey, excludeReplies)
+        parametersOf(userKey)
     }
+    val excludeReplies by timelineViewModel.excludeReplies.observeAsState(initial = false)
     val timelineSource = timelineViewModel.source.collectAsLazyPagingItems()
     // FIXME: 2021/2/20 Recover the scroll position require visiting the loadState once, have no idea why
     @Suppress("UNUSED_VARIABLE")
@@ -244,7 +243,7 @@ fun UserStatusTimeline(
             user?.let { user ->
                 item {
                     UserStatusTimelineFilter(user, excludeReplies) {
-                        excludeReplies = it
+                        timelineViewModel.setExcludeReplies(it)
                     }
                 }
             }

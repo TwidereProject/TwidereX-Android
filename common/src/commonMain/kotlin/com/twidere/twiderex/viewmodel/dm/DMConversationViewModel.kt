@@ -20,24 +20,21 @@
  */
 package com.twidere.twiderex.viewmodel.dm
 
-import androidx.paging.cachedIn
 import com.twidere.services.microblog.DirectMessageService
 import com.twidere.services.microblog.LookupService
-import com.twidere.twiderex.extensions.asStateIn
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.DirectMessageRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import moe.tlaster.precompose.viewmodel.ViewModel
-import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class DMConversationViewModel(
     private val repository: DirectMessageRepository,
     private val accountRepository: AccountRepository,
 ) : ViewModel() {
     private val account by lazy {
-        accountRepository.activeAccount.asStateIn(viewModelScope, null)
+        accountRepository.activeAccount
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -50,6 +47,6 @@ class DMConversationViewModel(
                     lookupService = account.service as LookupService
                 )
             } ?: emptyFlow()
-        }.cachedIn(viewModelScope)
+        }
     }
 }

@@ -20,11 +20,9 @@
  */
 package com.twidere.twiderex.viewmodel.dm
 
-import androidx.paging.cachedIn
 import com.twidere.services.microblog.DirectMessageService
 import com.twidere.services.microblog.LookupService
 import com.twidere.twiderex.action.DirectMessageAction
-import com.twidere.twiderex.extensions.asStateIn
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.job.DirectMessageDeleteData
@@ -50,7 +48,7 @@ class DMEventViewModel(
     private val conversationKey: MicroBlogKey,
 ) : ViewModel() {
     private val account by lazy {
-        accountRepository.activeAccount.asStateIn(viewModelScope, null)
+        accountRepository.activeAccount
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -76,7 +74,7 @@ class DMEventViewModel(
                     lookupService = account.service as LookupService
                 )
             } ?: emptyFlow()
-        }.cachedIn(viewModelScope)
+        }
     }
 
     // input

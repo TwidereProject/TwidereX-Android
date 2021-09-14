@@ -20,8 +20,6 @@
  */
 package com.twidere.twiderex.viewmodel
 
-import androidx.paging.cachedIn
-import com.twidere.twiderex.extensions.asStateIn
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.StatusRepository
@@ -29,7 +27,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import moe.tlaster.precompose.viewmodel.ViewModel
-import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class StatusViewModel(
     private val statusRepository: StatusRepository,
@@ -37,7 +34,7 @@ class StatusViewModel(
     private val statusKey: MicroBlogKey,
 ) : ViewModel() {
     private val account by lazy {
-        accountRepository.activeAccount.asStateIn(viewModelScope, null)
+        accountRepository.activeAccount
     }
     @OptIn(ExperimentalCoroutinesApi::class)
     val status by lazy {
@@ -47,7 +44,7 @@ class StatusViewModel(
             } else {
                 emptyFlow()
             }
-        }.asStateIn(viewModelScope, null)
+        }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -63,6 +60,6 @@ class StatusViewModel(
             } else {
                 emptyFlow()
             }
-        }.cachedIn(viewModelScope)
+        }
     }
 }

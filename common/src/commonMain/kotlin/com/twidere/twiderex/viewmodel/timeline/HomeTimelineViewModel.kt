@@ -24,12 +24,10 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import com.twidere.services.microblog.TimelineService
 import com.twidere.twiderex.db.CacheDatabase
-import com.twidere.twiderex.extensions.asStateIn
 import com.twidere.twiderex.paging.mediator.timeline.HomeTimelineMediator
 import com.twidere.twiderex.repository.AccountRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.mapLatest
-import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class HomeTimelineViewModel(
     dataStore: DataStore<Preferences>,
@@ -37,7 +35,7 @@ class HomeTimelineViewModel(
     private val accountRepository: AccountRepository,
 ) : TimelineViewModel(dataStore) {
     private val account by lazy {
-        accountRepository.activeAccount.asStateIn(viewModelScope, null)
+        accountRepository.activeAccount
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -50,7 +48,7 @@ class HomeTimelineViewModel(
                     database,
                 )
             }
-        }.asStateIn(viewModelScope, null)
+        }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -59,6 +57,6 @@ class HomeTimelineViewModel(
             it?.let {
                 "${it.accountKey}_home"
             }
-        }.asStateIn(viewModelScope, null)
+        }
     }
 }

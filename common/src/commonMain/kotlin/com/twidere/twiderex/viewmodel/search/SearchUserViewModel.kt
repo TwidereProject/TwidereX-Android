@@ -22,17 +22,14 @@ package com.twidere.twiderex.viewmodel.search
 
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
-import androidx.paging.cachedIn
 import com.twidere.services.microblog.SearchService
 import com.twidere.twiderex.defaultLoadCount
-import com.twidere.twiderex.extensions.asStateIn
 import com.twidere.twiderex.paging.source.SearchUserPagingSource
 import com.twidere.twiderex.repository.AccountRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import moe.tlaster.precompose.viewmodel.ViewModel
-import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class SearchUserViewModel(
     private val accountRepository: AccountRepository,
@@ -40,7 +37,7 @@ class SearchUserViewModel(
     following: Boolean = false,
 ) : ViewModel() {
     private val account by lazy {
-        accountRepository.activeAccount.asStateIn(viewModelScope, null)
+        accountRepository.activeAccount
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -61,6 +58,6 @@ class SearchUserViewModel(
                     )
                 }.flow
             } ?: emptyFlow()
-        }.cachedIn(viewModelScope)
+        }
     }
 }

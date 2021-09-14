@@ -24,9 +24,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
-import androidx.paging.cachedIn
 import com.twidere.twiderex.defaultLoadCount
-import com.twidere.twiderex.extensions.asStateIn
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.paging.mediator.paging.PagingWithGapMediator
 import com.twidere.twiderex.paging.mediator.paging.pager
@@ -56,13 +54,12 @@ abstract class TimelineViewModel(
             it?.let {
                 emitAll(it.pager().toUi())
             }
-        }.cachedIn(viewModelScope)
+        }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val loadingBetween: Flow<List<MicroBlogKey>> by lazy {
         pagingMediator.flatMapLatest { it?.loadingBetween ?: emptyFlow() }
-            .asStateIn(viewModelScope, emptyList())
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -79,7 +76,7 @@ abstract class TimelineViewModel(
                     firstVisibleItemScrollOffset = firstVisibleItemScrollOffset,
                 )
             }
-        }.asStateIn(viewModelScope, TimelineScrollState.Zero)
+        }
     }
 
     fun loadBetween(

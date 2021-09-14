@@ -24,12 +24,10 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import com.twidere.services.mastodon.MastodonService
 import com.twidere.twiderex.db.CacheDatabase
-import com.twidere.twiderex.extensions.asStateIn
 import com.twidere.twiderex.paging.mediator.timeline.mastodon.LocalTimelineMediator
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.viewmodel.timeline.TimelineViewModel
 import kotlinx.coroutines.flow.map
-import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class LocalTimelineViewModel(
     dataStore: DataStore<Preferences>,
@@ -37,7 +35,7 @@ class LocalTimelineViewModel(
     private val accountRepository: AccountRepository,
 ) : TimelineViewModel(dataStore) {
     private val account by lazy {
-        accountRepository.activeAccount.asStateIn(viewModelScope, null)
+        accountRepository.activeAccount
     }
 
     override val pagingMediator by lazy {
@@ -49,7 +47,7 @@ class LocalTimelineViewModel(
                     database,
                 )
             }
-        }.asStateIn(viewModelScope, null)
+        }
     }
 
     override val savedStateKey by lazy {
@@ -57,6 +55,6 @@ class LocalTimelineViewModel(
             it?.let {
                 "${it.accountKey}_local"
             }
-        }.asStateIn(viewModelScope, null)
+        }
     }
 }

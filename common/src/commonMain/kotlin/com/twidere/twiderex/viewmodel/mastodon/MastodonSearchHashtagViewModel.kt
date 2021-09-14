@@ -22,24 +22,21 @@ package com.twidere.twiderex.viewmodel.mastodon
 
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
-import androidx.paging.cachedIn
 import com.twidere.services.mastodon.MastodonService
 import com.twidere.twiderex.defaultLoadCount
-import com.twidere.twiderex.extensions.asStateIn
 import com.twidere.twiderex.paging.source.MastodonSearchHashtagPagingSource
 import com.twidere.twiderex.repository.AccountRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import moe.tlaster.precompose.viewmodel.ViewModel
-import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class MastodonSearchHashtagViewModel(
     private val accountRepository: AccountRepository,
     keyword: String,
 ) : ViewModel() {
     private val account by lazy {
-        accountRepository.activeAccount.asStateIn(viewModelScope, null)
+        accountRepository.activeAccount
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -58,6 +55,6 @@ class MastodonSearchHashtagViewModel(
                     )
                 }.flow
             } ?: emptyFlow()
-        }.cachedIn(viewModelScope)
+        }
     }
 }

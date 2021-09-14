@@ -22,12 +22,10 @@ package com.twidere.twiderex.viewmodel.user
 
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
-import androidx.paging.cachedIn
 import androidx.paging.flatMap
 import androidx.paging.map
 import com.twidere.services.microblog.TimelineService
 import com.twidere.twiderex.db.CacheDatabase
-import com.twidere.twiderex.extensions.asStateIn
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.model.ui.UiStatus
@@ -40,7 +38,6 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import moe.tlaster.precompose.viewmodel.ViewModel
-import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class UserMediaTimelineViewModel(
     private val database: CacheDatabase,
@@ -48,7 +45,7 @@ class UserMediaTimelineViewModel(
     private val userKey: MicroBlogKey,
 ) : ViewModel() {
     private val account by lazy {
-        repository.activeAccount.asStateIn(viewModelScope, null)
+        repository.activeAccount
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -65,7 +62,7 @@ class UserMediaTimelineViewModel(
                     pagingData.map {
                         it.status
                     }
-                }.cachedIn(viewModelScope).map {
+                }.map {
                     it.flatMap {
                         it.media.map { media -> media to it }
                     }
@@ -84,6 +81,6 @@ class UserMediaTimelineViewModel(
                     service = it.service as TimelineService
                 )
             }
-        }.asStateIn(viewModelScope, null)
+        }
     }
 }

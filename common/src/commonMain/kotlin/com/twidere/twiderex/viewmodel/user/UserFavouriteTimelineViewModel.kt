@@ -20,9 +20,7 @@
  */
 package com.twidere.twiderex.viewmodel.user
 
-import androidx.paging.cachedIn
 import com.twidere.services.microblog.TimelineService
-import com.twidere.twiderex.extensions.asStateIn
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.TimelineRepository
@@ -30,7 +28,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import moe.tlaster.precompose.viewmodel.ViewModel
-import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class UserFavouriteTimelineViewModel(
     private val repository: TimelineRepository,
@@ -38,7 +35,7 @@ class UserFavouriteTimelineViewModel(
     private val userKey: MicroBlogKey,
 ) : ViewModel() {
     private val account by lazy {
-        accountRepository.activeAccount.asStateIn(viewModelScope, null)
+        accountRepository.activeAccount
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -54,6 +51,6 @@ class UserFavouriteTimelineViewModel(
             } else {
                 emptyFlow()
             }
-        }.cachedIn(viewModelScope)
+        }
     }
 }

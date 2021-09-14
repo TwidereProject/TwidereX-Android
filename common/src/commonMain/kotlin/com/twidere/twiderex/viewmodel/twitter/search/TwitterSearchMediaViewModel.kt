@@ -20,16 +20,13 @@
  */
 package com.twidere.twiderex.viewmodel.twitter.search
 
-import androidx.paging.cachedIn
 import com.twidere.services.microblog.SearchService
-import com.twidere.twiderex.extensions.asStateIn
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.SearchRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import moe.tlaster.precompose.viewmodel.ViewModel
-import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class TwitterSearchMediaViewModel(
     private val repository: SearchRepository,
@@ -37,7 +34,7 @@ class TwitterSearchMediaViewModel(
     keyword: String,
 ) : ViewModel() {
     private val account by lazy {
-        accountRepository.activeAccount.asStateIn(viewModelScope, null)
+        accountRepository.activeAccount
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -46,6 +43,6 @@ class TwitterSearchMediaViewModel(
             it?.let {
                 repository.media(keyword, it.accountKey, it.service as SearchService)
             } ?: emptyFlow()
-        }.cachedIn(viewModelScope)
+        }
     }
 }

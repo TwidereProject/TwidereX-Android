@@ -24,13 +24,11 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import com.twidere.services.microblog.NotificationService
 import com.twidere.twiderex.db.CacheDatabase
-import com.twidere.twiderex.extensions.asStateIn
 import com.twidere.twiderex.model.enums.NotificationCursorType
 import com.twidere.twiderex.paging.mediator.timeline.NotificationTimelineMediator
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.NotificationRepository
 import kotlinx.coroutines.flow.map
-import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class NotificationTimelineViewModel(
     dataStore: DataStore<Preferences>,
@@ -39,7 +37,7 @@ class NotificationTimelineViewModel(
     private val accountRepository: AccountRepository,
 ) : TimelineViewModel(dataStore) {
     private val account by lazy {
-        accountRepository.activeAccount.asStateIn(viewModelScope, null)
+        accountRepository.activeAccount
     }
 
     override val pagingMediator by lazy {
@@ -59,13 +57,13 @@ class NotificationTimelineViewModel(
                     }
                 )
             }
-        }.asStateIn(viewModelScope, null)
+        }
     }
     override val savedStateKey by lazy {
         account.map {
             it?.let {
                 "${it.accountKey}_notification"
             }
-        }.asStateIn(viewModelScope, null)
+        }
     }
 }
