@@ -21,6 +21,7 @@
 package com.twidere.twiderex.viewmodel
 
 import com.twidere.twiderex.action.MediaAction
+import com.twidere.twiderex.extensions.asStateIn
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.repository.AccountRepository
@@ -41,7 +42,7 @@ class MediaViewModel(
     private val statusKey: MicroBlogKey,
 ) : ViewModel() {
     private val account by lazy {
-        accountRepository.activeAccount
+        accountRepository.activeAccount.asStateIn(viewModelScope, null)
     }
 
     fun saveFile(currentMedia: UiMedia, target: String) = viewModelScope.launch {

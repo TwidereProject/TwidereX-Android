@@ -20,13 +20,16 @@
  */
 package com.twidere.twiderex.viewmodel.mastodon
 
+import androidx.paging.cachedIn
 import com.twidere.services.mastodon.MastodonService
+import com.twidere.twiderex.extensions.asStateIn
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.TimelineRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import moe.tlaster.precompose.viewmodel.ViewModel
+import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class MastodonHashtagViewModel(
     private val repository: TimelineRepository,
@@ -34,7 +37,7 @@ class MastodonHashtagViewModel(
     keyword: String,
 ) : ViewModel() {
     private val account by lazy {
-        accountRepository.activeAccount
+        accountRepository.activeAccount.asStateIn(viewModelScope, null)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -47,6 +50,6 @@ class MastodonHashtagViewModel(
                     service = it.service as MastodonService
                 )
             } ?: emptyFlow()
-        }
+        }.cachedIn(viewModelScope)
     }
 }

@@ -20,16 +20,19 @@
  */
 package com.twidere.twiderex.viewmodel.user
 
+import androidx.paging.cachedIn
 import com.twidere.services.microblog.TimelineService
+import com.twidere.twiderex.extensions.asStateIn
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.TimelineRepository
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flattenMerge
-import kotlinx.coroutines.flow.mapNotNull
 import moe.tlaster.precompose.viewmodel.ViewModel
+import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class UserTimelineViewModel(
     private val repository: TimelineRepository,
@@ -37,9 +40,9 @@ class UserTimelineViewModel(
     userKey: MicroBlogKey,
 ) : ViewModel() {
     private val _excludeReplies = MutableStateFlow(false)
-    val excludeReplies = _excludeReplies
+    val excludeReplies = _excludeReplies.asStateIn(viewModelScope, false)
     private val account by lazy {
-        accountRepository.activeAccount
+        accountRepository.activeAccount.asStateIn(viewModelScope, null)
     }
 
     fun setExcludeReplies(value: Boolean) {
@@ -48,13 +51,17 @@ class UserTimelineViewModel(
 
     @OptIn(FlowPreview::class)
     val source by lazy {
-        combine(account.mapNotNull { it }, _excludeReplies) { account, excludeReplies ->
-            repository.userTimeline(
-                userKey = userKey,
-                accountKey = account.accountKey,
-                service = account.service as TimelineService,
-                exclude_replies = excludeReplies,
-            )
-        }.flattenMerge()
+        combine(account, _excludeReplies) { account, excludeReplies ->
+            if (account != null) {
+                repository.userTimeline(
+                    userKey = userKey,
+                    accountKey = account.accountKey,
+                    service = account.service as TimelineService,
+                    exclude_replies = excludeReplies,
+                )
+            } else {
+                emptyFlow()
+            }
+        }.flattenMerge().cachedIn(viewModelScope)
     }
 }

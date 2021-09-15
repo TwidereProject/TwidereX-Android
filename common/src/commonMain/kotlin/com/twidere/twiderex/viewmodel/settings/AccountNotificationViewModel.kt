@@ -20,6 +20,7 @@
  */
 package com.twidere.twiderex.viewmodel.settings
 
+import com.twidere.twiderex.extensions.asStateIn
 import com.twidere.twiderex.repository.AccountRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flatMapLatest
@@ -34,7 +35,7 @@ class AccountNotificationViewModel(
     private val accountRepository: AccountRepository,
 ) : ViewModel() {
     val account by lazy {
-        accountRepository.activeAccount
+        accountRepository.activeAccount.asStateIn(viewModelScope, null)
     }
 
     val preferences by lazy {
@@ -42,12 +43,13 @@ class AccountNotificationViewModel(
             it?.let {
                 accountRepository.getAccountPreferences(it.accountKey)
             }
-        }
+        }.asStateIn(viewModelScope, null)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val isNotificationEnabled by lazy {
         preferences.flatMapLatest { it?.isNotificationEnabled ?: flowOf(false) }
+            .asStateIn(viewModelScope, false)
     }
 
     fun setIsNotificationEnabled(value: Boolean) = viewModelScope.launch {

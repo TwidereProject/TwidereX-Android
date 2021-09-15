@@ -20,6 +20,7 @@
  */
 package com.twidere.twiderex.viewmodel.search
 
+import com.twidere.twiderex.extensions.asStateIn
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.SearchRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -34,7 +35,7 @@ class SearchSaveViewModel(
     private val content: String,
 ) : ViewModel() {
     private val account by lazy {
-        accountRepository.activeAccount
+        accountRepository.activeAccount.asStateIn(viewModelScope, null)
     }
 
     val loading = MutableStateFlow(false)

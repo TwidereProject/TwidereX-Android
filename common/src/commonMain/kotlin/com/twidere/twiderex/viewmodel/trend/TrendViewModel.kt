@@ -20,20 +20,23 @@
  */
 package com.twidere.twiderex.viewmodel.trend
 
+import androidx.paging.cachedIn
 import com.twidere.services.microblog.TrendService
+import com.twidere.twiderex.extensions.asStateIn
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.TrendRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import moe.tlaster.precompose.viewmodel.ViewModel
+import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class TrendViewModel(
     private val repository: TrendRepository,
     private val accountRepository: AccountRepository,
 ) : ViewModel() {
     private val account by lazy {
-        accountRepository.activeAccount
+        accountRepository.activeAccount.asStateIn(viewModelScope, null)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -47,6 +50,6 @@ class TrendViewModel(
             } else {
                 emptyFlow()
             }
-        }
+        }.cachedIn(viewModelScope)
     }
 }

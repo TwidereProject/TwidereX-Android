@@ -22,8 +22,10 @@ package com.twidere.twiderex.viewmodel.dm
 
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
+import androidx.paging.cachedIn
 import com.twidere.services.microblog.SearchService
 import com.twidere.twiderex.defaultLoadCount
+import com.twidere.twiderex.extensions.asStateIn
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.paging.source.SearchUserPagingSource
@@ -45,7 +47,7 @@ class DMNewConversationViewModel(
     private val accountRepository: AccountRepository,
 ) : ViewModel() {
     private val account by lazy {
-        accountRepository.activeAccount
+        accountRepository.activeAccount.asStateIn(viewModelScope, null)
     }
 
     val input = MutableStateFlow("")
@@ -70,7 +72,7 @@ class DMNewConversationViewModel(
                 } ?: emptyFlow()
             }
         } ?: emptyFlow()
-    }
+    }.cachedIn(viewModelScope)
 
     fun createNewConversation(receiver: UiUser, onResult: (key: MicroBlogKey?) -> Unit) {
         viewModelScope.launch {

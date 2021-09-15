@@ -20,8 +20,10 @@
  */
 package com.twidere.twiderex.viewmodel.lists
 
+import androidx.paging.cachedIn
 import androidx.paging.filter
 import com.twidere.services.microblog.ListsService
+import com.twidere.twiderex.extensions.asStateIn
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.ListsMode
 import com.twidere.twiderex.model.ui.UiList
@@ -45,7 +47,7 @@ class ListsViewModel(
     private val accountRepository: AccountRepository,
 ) : ViewModel() {
     private val account by lazy {
-        accountRepository.activeAccount
+        accountRepository.activeAccount.asStateIn(viewModelScope, null)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -57,7 +59,7 @@ class ListsViewModel(
                     service = account.service as ListsService
                 )
             } ?: emptyFlow()
-        }
+        }.cachedIn(viewModelScope)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -68,7 +70,7 @@ class ListsViewModel(
                     it.filter { it.isOwner(account.user.userId) }
                 }
             } ?: emptyFlow()
-        }
+        }.cachedIn(viewModelScope)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -79,7 +81,7 @@ class ListsViewModel(
                     pagingData.filter { !it.isOwner(account.user.userId) && it.isFollowed }
                 }
             } ?: emptyFlow()
-        }
+        }.cachedIn(viewModelScope)
     }
 }
 
@@ -118,7 +120,7 @@ class ListsCreateViewModel(
     private val onResult: (success: Boolean, list: UiList?) -> Unit
 ) : ListsOperatorViewModel(inAppNotification) {
     private val account by lazy {
-        accountRepository.activeAccount
+        accountRepository.activeAccount.asStateIn(viewModelScope, null)
     }
 
     fun createList(
@@ -147,7 +149,7 @@ class ListsModifyViewModel(
     private val listKey: MicroBlogKey,
 ) : ListsOperatorViewModel(inAppNotification) {
     private val account by lazy {
-        accountRepository.activeAccount
+        accountRepository.activeAccount.asStateIn(viewModelScope, null)
     }
 
     val editName = MutableStateFlow("")

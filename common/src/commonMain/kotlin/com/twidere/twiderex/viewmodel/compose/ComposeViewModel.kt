@@ -25,6 +25,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import com.twidere.services.microblog.LookupService
 import com.twidere.twiderex.action.ComposeAction
 import com.twidere.twiderex.action.DraftAction
+import com.twidere.twiderex.extensions.asStateIn
 import com.twidere.twiderex.extensions.getTextAfterSelection
 import com.twidere.twiderex.extensions.getTextBeforeSelection
 import com.twidere.twiderex.kmp.LocationProvider
@@ -160,7 +161,7 @@ open class ComposeViewModel(
     val composeType: ComposeType,
 ) : ViewModel() {
     private val account by lazy {
-        accountRepository.activeAccount
+        accountRepository.activeAccount.asStateIn(viewModelScope, null)
     }
 
     open val draftId: String = UUID.randomUUID().toString()
@@ -175,7 +176,7 @@ open class ComposeViewModel(
                     emptyFlow()
                 }
             } ?: emptyFlow()
-        }
+        }.asStateIn(viewModelScope, emptyList())
     }
 
     val draftCount by lazy {
@@ -203,7 +204,7 @@ open class ComposeViewModel(
             } else {
                 emptyList()
             }
-        }
+        }.asStateIn(viewModelScope, emptyList())
     }
 
     val loadingReplyUser = MutableStateFlow(false)
@@ -231,7 +232,7 @@ open class ComposeViewModel(
             } else {
                 emptyList()
             }
-        }
+        }.asStateIn(viewModelScope, emptyList())
     }
 
     val voteState = MutableStateFlow<VoteState?>(null)
@@ -244,10 +245,10 @@ open class ComposeViewModel(
     val images = MutableStateFlow<List<String>>(emptyList())
     val canSend = textFieldValue
         .combine(images) { text, imgs -> text.text.isNotEmpty() || !imgs.isNullOrEmpty() }
-
+        .asStateIn(viewModelScope, false)
     val canSaveDraft = textFieldValue
         .combine(images) { text, imgs -> text.text.isNotEmpty() || !imgs.isNullOrEmpty() }
-
+        .asStateIn(viewModelScope, false)
     val locationEnabled = MutableStateFlow(false)
     val enableThreadMode = MutableStateFlow(composeType == ComposeType.Thread)
 
@@ -293,7 +294,7 @@ open class ComposeViewModel(
             } else {
                 flowOf(null)
             }
-        }
+        }.asStateIn(viewModelScope, null)
     }
 
     fun setText(value: TextFieldValue) {
@@ -379,7 +380,7 @@ open class ComposeViewModel(
                 PlatformType.Mastodon -> 4
                 else -> 4
             }
-        }
+        }.asStateIn(viewModelScope, 4)
     }
 
     fun trackingLocation() {

@@ -20,6 +20,7 @@
  */
 package com.twidere.twiderex.viewmodel.search
 
+import com.twidere.twiderex.extensions.asStateIn
 import com.twidere.twiderex.model.ui.UiSearch
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.SearchRepository
@@ -37,7 +38,7 @@ class SearchInputViewModel(
     private val accountRepository: AccountRepository,
 ) : ViewModel() {
     private val account by lazy {
-        accountRepository.activeAccount
+        accountRepository.activeAccount.asStateIn(viewModelScope, null)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)

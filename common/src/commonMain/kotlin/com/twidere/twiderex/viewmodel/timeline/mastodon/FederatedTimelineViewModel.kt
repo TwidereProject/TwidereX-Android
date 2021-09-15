@@ -24,10 +24,12 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import com.twidere.services.mastodon.MastodonService
 import com.twidere.twiderex.db.CacheDatabase
+import com.twidere.twiderex.extensions.asStateIn
 import com.twidere.twiderex.paging.mediator.timeline.mastodon.FederatedTimelineMediator
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.viewmodel.timeline.TimelineViewModel
 import kotlinx.coroutines.flow.map
+import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class FederatedTimelineViewModel(
     dataStore: DataStore<Preferences>,
@@ -35,7 +37,7 @@ class FederatedTimelineViewModel(
     private val accountRepository: AccountRepository,
 ) : TimelineViewModel(dataStore) {
     private val account by lazy {
-        accountRepository.activeAccount
+        accountRepository.activeAccount.asStateIn(viewModelScope, null)
     }
 
     override val pagingMediator by lazy {
@@ -47,7 +49,7 @@ class FederatedTimelineViewModel(
                     database,
                 )
             }
-        }
+        }.asStateIn(viewModelScope, null)
     }
 
     override val savedStateKey by lazy {
@@ -55,6 +57,6 @@ class FederatedTimelineViewModel(
             it?.let {
                 "${it.accountKey}_federated"
             }
-        }
+        }.asStateIn(viewModelScope, null)
     }
 }

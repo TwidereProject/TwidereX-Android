@@ -21,7 +21,9 @@
 package com.twidere.twiderex.viewmodel.lists
 
 import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import com.twidere.services.microblog.ListsService
+import com.twidere.twiderex.extensions.asStateIn
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.ListsUsersRepository
@@ -41,7 +43,7 @@ class ListsUserViewModel(
     private val viewMembers: Boolean = true,
 ) : UserListViewModel() {
     private val account by lazy {
-        accountRepository.activeAccount
+        accountRepository.activeAccount.asStateIn(viewModelScope, null)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -54,7 +56,7 @@ class ListsUserViewModel(
                     listId = listId
                 )
             } ?: emptyFlow()
-        }
+        }.cachedIn(viewModelScope)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -67,7 +69,7 @@ class ListsUserViewModel(
                     listId = listId
                 )
             } ?: emptyFlow()
-        }
+        }.cachedIn(viewModelScope)
     }
 
     override val source: Flow<PagingData<UiUser>>

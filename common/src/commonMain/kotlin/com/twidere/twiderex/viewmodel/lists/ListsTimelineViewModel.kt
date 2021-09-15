@@ -20,7 +20,9 @@
  */
 package com.twidere.twiderex.viewmodel.lists
 
+import androidx.paging.cachedIn
 import com.twidere.services.microblog.TimelineService
+import com.twidere.twiderex.extensions.asStateIn
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.TimelineRepository
@@ -28,6 +30,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import moe.tlaster.precompose.viewmodel.ViewModel
+import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class ListsTimelineViewModel(
     repository: TimelineRepository,
@@ -35,7 +38,7 @@ class ListsTimelineViewModel(
     listKey: MicroBlogKey,
 ) : ViewModel() {
     private val account by lazy {
-        accountRepository.activeAccount
+        accountRepository.activeAccount.asStateIn(viewModelScope, null)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -48,6 +51,6 @@ class ListsTimelineViewModel(
                     service = it.service as TimelineService
                 )
             } ?: emptyFlow()
-        }
+        }.cachedIn(viewModelScope)
     }
 }
