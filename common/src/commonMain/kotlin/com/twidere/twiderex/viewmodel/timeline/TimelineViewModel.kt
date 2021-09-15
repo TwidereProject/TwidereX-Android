@@ -36,9 +36,9 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.lastOrNull
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
@@ -65,13 +65,12 @@ abstract class TimelineViewModel(
             .asStateIn(viewModelScope, emptyList())
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val timelineScrollState by lazy {
-        savedStateKey.flatMapLatest {
+    suspend fun provideScrollState(): TimelineScrollState {
+        return savedStateKey.firstOrNull()?.let {
             val firstVisibleItemIndexKey = intPreferencesKey("${it}_firstVisibleItemIndex")
             val firstVisibleItemScrollOffsetKey =
                 intPreferencesKey("${it}_firstVisibleItemScrollOffset")
-            dataStore.data.map {
+            dataStore.data.firstOrNull()?.let {
                 val firstVisibleItemIndex = it[firstVisibleItemIndexKey] ?: 0
                 val firstVisibleItemScrollOffset = it[firstVisibleItemScrollOffsetKey] ?: 0
                 TimelineScrollState(
@@ -79,7 +78,7 @@ abstract class TimelineViewModel(
                     firstVisibleItemScrollOffset = firstVisibleItemScrollOffset,
                 )
             }
-        }.asStateIn(viewModelScope, TimelineScrollState.Zero)
+        } ?: TimelineScrollState.Zero
     }
 
     fun loadBetween(
@@ -93,13 +92,15 @@ abstract class TimelineViewModel(
         )
     }
 
-    fun saveScrollState(offset: TimelineScrollState) = viewModelScope.launch {
-        dataStore.edit {
-            val firstVisibleItemIndexKey = intPreferencesKey("${it}_firstVisibleItemIndex")
-            val firstVisibleItemScrollOffsetKey =
-                intPreferencesKey("${it}_firstVisibleItemScrollOffset")
-            it[firstVisibleItemIndexKey] = offset.firstVisibleItemIndex
-            it[firstVisibleItemScrollOffsetKey] = offset.firstVisibleItemScrollOffset
+    suspend fun saveScrollState(offset: TimelineScrollState) {
+        dataStore.edit { preferences ->
+            savedStateKey.firstOrNull()?.let {
+                val firstVisibleItemIndexKey = intPreferencesKey("${it}_firstVisibleItemIndex")
+                val firstVisibleItemScrollOffsetKey =
+                    intPreferencesKey("${it}_firstVisibleItemScrollOffset")
+                preferences[firstVisibleItemIndexKey] = offset.firstVisibleItemIndex
+                preferences[firstVisibleItemScrollOffsetKey] = offset.firstVisibleItemScrollOffset
+            }
         }
     }
 }

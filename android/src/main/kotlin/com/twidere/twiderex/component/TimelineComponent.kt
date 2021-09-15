@@ -55,18 +55,21 @@ fun TimelineComponent(
         },
         refreshIndicatorPadding = contentPadding
     ) {
-        val scrollState by viewModel.timelineScrollState.observeAsState(
-            initial = TimelineScrollState.Zero
-        )
         val listState = rememberLazyListState()
         LaunchedEffect(Unit) {
-            snapshotFlow { scrollState }
+            var inited = false
+            snapshotFlow { listState.layoutInfo.totalItemsCount }
                 .distinctUntilChanged()
+                .filter { it != 0 }
+                .filter { !inited }
                 .collect {
-                    listState.scrollToItem(
-                        it.firstVisibleItemIndex,
-                        it.firstVisibleItemScrollOffset
-                    )
+                    inited = true
+                    viewModel.provideScrollState().let {
+                        listState.scrollToItem(
+                            it.firstVisibleItemIndex,
+                            it.firstVisibleItemScrollOffset
+                        )
+                    }
                 }
         }
         if (items.itemCount > 0) {
@@ -78,6 +81,8 @@ fun TimelineComponent(
             snapshotFlow { listState.isScrollInProgress }
                 .distinctUntilChanged()
                 .filter { !it }
+                .filter { listState.layoutInfo.totalItemsCount != 0 }
+                .filter { listState.firstVisibleItemIndex != 0 && listState.firstVisibleItemScrollOffset != 0 }
                 .collect {
                     viewModel.saveScrollState(
                         TimelineScrollState(
