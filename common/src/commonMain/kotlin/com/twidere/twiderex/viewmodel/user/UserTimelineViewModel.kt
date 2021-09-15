@@ -29,8 +29,8 @@ import com.twidere.twiderex.repository.TimelineRepository
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flattenMerge
+import kotlinx.coroutines.flow.mapNotNull
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
@@ -51,17 +51,13 @@ class UserTimelineViewModel(
 
     @OptIn(FlowPreview::class)
     val source by lazy {
-        combine(account, _excludeReplies) { account, excludeReplies ->
-            if (account != null) {
-                repository.userTimeline(
-                    userKey = userKey,
-                    accountKey = account.accountKey,
-                    service = account.service as TimelineService,
-                    exclude_replies = excludeReplies,
-                )
-            } else {
-                emptyFlow()
-            }
+        combine(account.mapNotNull { it }, _excludeReplies) { account, excludeReplies ->
+            repository.userTimeline(
+                userKey = userKey,
+                accountKey = account.accountKey,
+                service = account.service as TimelineService,
+                exclude_replies = excludeReplies,
+            )
         }.flattenMerge().cachedIn(viewModelScope)
     }
 }

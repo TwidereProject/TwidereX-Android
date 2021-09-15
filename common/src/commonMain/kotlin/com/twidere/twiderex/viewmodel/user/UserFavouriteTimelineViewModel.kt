@@ -27,8 +27,8 @@ import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.TimelineRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.mapNotNull
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
@@ -43,17 +43,13 @@ class UserFavouriteTimelineViewModel(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val source by lazy {
-        account.flatMapLatest {
-            if (it != null) {
-                repository.favouriteTimeline(
-                    userKey = userKey,
-                    accountKey = it.accountKey,
-                    platformType = it.type,
-                    service = it.service as TimelineService
-                )
-            } else {
-                emptyFlow()
-            }
+        account.mapNotNull { it }.flatMapLatest {
+            repository.favouriteTimeline(
+                userKey = userKey,
+                accountKey = it.accountKey,
+                platformType = it.type,
+                service = it.service as TimelineService
+            )
         }.cachedIn(viewModelScope)
     }
 }

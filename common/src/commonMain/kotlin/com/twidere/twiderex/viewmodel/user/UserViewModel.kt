@@ -29,9 +29,10 @@ import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.UserRepository
 import com.twidere.twiderex.utils.notifyError
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.lastOrNull
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
@@ -51,9 +52,13 @@ class UserViewModel(
     val loadingRelationship = MutableStateFlow(false)
     val user = repository.getUserFlow(userKey)
     val relationship = MutableStateFlow<IRelationship?>(null)
+
+    @OptIn(ExperimentalCoroutinesApi::class)
     val isMe by lazy {
-        account.map {
-            userKey == it?.accountKey
+        account.transformLatest {
+            it?.let {
+                emit(it.accountKey == userKey)
+            }
         }.asStateIn(viewModelScope, false)
     }
 
