@@ -18,20 +18,26 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.kmp
+package com.twidere.twiderex.component.image
 
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.painter.Painter
-import com.twidere.services.http.authorization.Authorization
-import com.twidere.services.http.config.HttpConfig
-import com.twidere.twiderex.component.foundation.NetworkImageState
-import com.twidere.twiderex.component.image.ImageEffects
+class ImageEffects private constructor(
+    val blur: ImageBlur?,
+    val crossFade: Boolean
+) {
+    class Builder {
+        private var blur: ImageBlur? = null
+        private var crossFade: Boolean = true
+        fun blur(blur: ImageBlur) {
+            this.blur = blur
+        }
 
-@Composable
-internal expect fun rememberNetworkImagePainter(
-    data: Any,
-    authorization: Authorization,
-    httpConfig: HttpConfig,
-    effects: ImageEffects,
-    onImageStateChanged: (NetworkImageState) -> Unit
-): Painter
+        fun crossFade(crossFade: Boolean) {
+            this.crossFade = crossFade
+        }
+
+        fun build() = ImageEffects(
+            blur = blur,
+            crossFade = crossFade
+        )
+    }
+}

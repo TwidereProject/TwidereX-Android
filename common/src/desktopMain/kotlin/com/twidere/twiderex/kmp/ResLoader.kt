@@ -23,7 +23,6 @@ package com.twidere.twiderex.kmp
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
-import com.twidere.twiderex.component.ImageBlur
 import dev.icerock.moko.resources.FileResource
 import dev.icerock.moko.resources.ImageResource
 import dev.icerock.moko.resources.StringResource
@@ -37,12 +36,12 @@ actual class ResLoader {
     }
 
     @Composable
-    actual fun getSvg(res: FileResource, blur: ImageBlur?): Painter {
+    actual fun getSvg(res: FileResource): Painter {
         return painterResource(res.filePath)
     }
 
     @Composable
-    actual fun getImage(res: ImageResource, blur: ImageBlur?): Painter {
+    actual fun getImage(res: ImageResource): Painter {
         return painterResource(res.filePath)
     }
 }

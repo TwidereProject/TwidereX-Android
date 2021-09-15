@@ -34,8 +34,8 @@ import coil.transform.BlurTransformation
 import coil.util.CoilUtils
 import com.twidere.services.http.authorization.Authorization
 import com.twidere.services.http.config.HttpConfig
-import com.twidere.twiderex.component.ImageBlur
 import com.twidere.twiderex.component.foundation.NetworkImageState
+import com.twidere.twiderex.component.image.ImageEffects
 import com.twidere.twiderex.http.TwidereServiceFactory
 import com.twidere.twiderex.preferences.LocalHttpConfig
 import okhttp3.Request
@@ -46,7 +46,7 @@ internal actual fun rememberNetworkImagePainter(
     data: Any,
     authorization: Authorization,
     httpConfig: HttpConfig,
-    blur: ImageBlur?,
+    effects: ImageEffects,
     onImageStateChanged: (NetworkImageState) -> Unit
 ): Painter {
     val context = LocalContext.current
@@ -54,13 +54,13 @@ internal actual fun rememberNetworkImagePainter(
         data = data,
         imageLoader = buildImageLoader(),
         builder = {
-            crossfade(true)
-            if (blur != null) {
+            crossfade(effects.crossFade)
+            if (effects.blur != null) {
                 transformations(
                     BlurTransformation(
                         context = context,
-                        radius = blur.blurRadius,
-                        sampling = blur.bitmapScale
+                        radius = effects.blur.blurRadius,
+                        sampling = effects.blur.bitmapScale
                     )
                 )
             }

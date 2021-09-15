@@ -18,20 +18,16 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.kmp
+package com.twidere.twiderex.component.image
 
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.painter.Painter
-import com.twidere.services.http.authorization.Authorization
-import com.twidere.services.http.config.HttpConfig
-import com.twidere.twiderex.component.foundation.NetworkImageState
-import com.twidere.twiderex.component.image.ImageEffects
-
-@Composable
-internal expect fun rememberNetworkImagePainter(
-    data: Any,
-    authorization: Authorization,
-    httpConfig: HttpConfig,
-    effects: ImageEffects,
-    onImageStateChanged: (NetworkImageState) -> Unit
-): Painter
+class ImageBlur(
+    val blurRadius: Float,
+    val bitmapScale: Float,
+) {
+    companion object {
+        val Sensitive = ImageBlur(
+            blurRadius = 25f,
+            bitmapScale = 0.4f
+        )
+    }
+}

@@ -30,7 +30,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import com.twidere.services.http.authorization.EmptyAuthorization
 import com.twidere.twiderex.MR
-import com.twidere.twiderex.component.ImageBlur
+import com.twidere.twiderex.component.image.ImageEffects
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.kmp.rememberNetworkImagePainter
 import com.twidere.twiderex.preferences.LocalHttpConfig
@@ -41,7 +41,7 @@ fun NetworkImage(
     data: Any,
     modifier: Modifier = Modifier,
     contentScale: ContentScale = ContentScale.Crop,
-    blur: ImageBlur? = null,
+    effects: ImageEffects.Builder.() -> Unit = { crossFade(true) },
     placeholder: @Composable (() -> Unit)? = null,
 ) {
     val state = remember {
@@ -68,7 +68,7 @@ fun NetworkImage(
             data = data,
             httpConfig = httpConfig,
             authorization = auth,
-            blur = blur,
+            effects = ImageEffects.Builder().apply(effects).build(),
             onImageStateChanged = {
                 state.value = it
             }

@@ -18,33 +18,30 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.component
+package com.twidere.twiderex.kmp
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.graphics.painter.Painter
-import com.twidere.twiderex.compose.LocalResLoader
-import dev.icerock.moko.resources.FileResource
-import dev.icerock.moko.resources.ImageResource
-import dev.icerock.moko.resources.StringResource
+import com.twidere.services.http.authorization.Authorization
+import com.twidere.services.http.config.HttpConfig
+import com.twidere.twiderex.component.foundation.NetworkImageState
+import com.twidere.twiderex.component.image.ImageEffects
+import com.twidere.twiderex.image.ImagePainter
+import kotlinx.coroutines.Dispatchers
 
+// TODO 1 PROXY
+// TODO 2 authorize
+// TODO 3 effects
 @Composable
-fun stringResource(res: StringResource, vararg formatArgs: Any): String {
-    return LocalResLoader.current.getString(res, *formatArgs)
-}
-
-@Composable
-fun stringResource(res: StringResource): String {
-    return LocalResLoader.current.getString(res)
-}
-
-/**
- * res: FileResource:svg, ImageResource
- */
-@Composable
-fun painterResource(res: Any): Painter {
-    return when (res) {
-        is FileResource -> LocalResLoader.current.getSvg(res)
-        is ImageResource -> LocalResLoader.current.getImage(res)
-        else -> throw NotImplementedError()
-    }
+internal actual fun rememberNetworkImagePainter(
+    data: Any,
+    authorization: Authorization,
+    httpConfig: HttpConfig,
+    effects: ImageEffects,
+    onImageStateChanged: (NetworkImageState) -> Unit
+): Painter {
+    val scope = rememberCoroutineScope { Dispatchers.IO }
+    return remember(data) { ImagePainter(data, scope) }
 }

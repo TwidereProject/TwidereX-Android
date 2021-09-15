@@ -54,10 +54,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.R
-import com.twidere.twiderex.component.ImageBlur
 import com.twidere.twiderex.component.foundation.GridLayout
 import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.foundation.VideoPlayer
+import com.twidere.twiderex.component.image.ImageBlur
 import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.model.enums.MediaType
 import com.twidere.twiderex.model.enums.PlatformType
@@ -278,7 +278,7 @@ fun StatusMediaPreviewItem(
                     ) {
                         NetworkImage(
                             data = it,
-                            blur = ImageBlur.Sensitive,
+                            effects = { blur(ImageBlur.Sensitive) },
                             modifier = Modifier
                                 .fillMaxSize(),
                             placeholder = {
@@ -311,7 +311,7 @@ fun StatusMediaPreviewItem(
                 if (sensitive && previewUrl != null) {
                     NetworkImage(
                         data = previewUrl,
-                        blur = ImageBlur.Sensitive,
+                        effects = { blur(ImageBlur.Sensitive) },
                         modifier = Modifier
                             .fillMaxSize(),
                         placeholder = {
