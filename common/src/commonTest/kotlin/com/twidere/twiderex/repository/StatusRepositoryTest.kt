@@ -43,7 +43,7 @@ class StatusRepositoryTest {
         val status = mockIStatus().toUi(accountKey)
         StatusRepository(
             database = database,
-            nitterService = null
+            preferences = null,
         ).let {
             database.statusDao().insertAll(listOf(status), accountKey)
             it.updateStatus(
@@ -67,7 +67,7 @@ class StatusRepositoryTest {
         }.toUi(accountKey)
         StatusRepository(
             database = database,
-            nitterService = null
+            preferences = null,
         ).let {
             val statusFlow = it.loadStatus(statusKey = status.statusKey, accountKey = accountKey)
             assertEquals(status.statusKey, statusFlow.first()?.statusKey)
@@ -86,7 +86,7 @@ class StatusRepositoryTest {
         val accountKey = MicroBlogKey.twitter("test")
         val repo = StatusRepository(
             database = database,
-            nitterService = null
+            preferences = null,
         )
         val mockStatus = mockIStatus().toUi(accountKey)
 

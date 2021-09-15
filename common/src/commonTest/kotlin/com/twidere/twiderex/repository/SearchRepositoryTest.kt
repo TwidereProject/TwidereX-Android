@@ -21,6 +21,7 @@
 package com.twidere.twiderex.repository
 
 import com.twidere.twiderex.mock.db.MockAppDatabase
+import com.twidere.twiderex.mock.db.MockCacheDatabase
 import com.twidere.twiderex.model.MicroBlogKey
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -31,7 +32,7 @@ internal class SearchRepositoryTest {
     @Test
     fun addToSearchHistoryWhenSavedIsFalse() = runBlocking {
         val accountKey = MicroBlogKey.twitter("test")
-        val repo = SearchRepository(MockAppDatabase())
+        val repo = SearchRepository(MockAppDatabase(), MockCacheDatabase())
         repo.addOrUpgrade(content = "query1", accountKey = accountKey)
         repo.addOrUpgrade(content = "query2", accountKey = accountKey)
         repo.addOrUpgrade(content = "query3", accountKey = accountKey, saved = true)
@@ -45,7 +46,7 @@ internal class SearchRepositoryTest {
     @Test
     fun addOrUpdateToSavedSearchWhenSavedIsTrue() = runBlocking {
         val accountKey = MicroBlogKey.twitter("test")
-        val repo = SearchRepository(MockAppDatabase())
+        val repo = SearchRepository(MockAppDatabase(), MockCacheDatabase())
         repo.addOrUpgrade(content = "query1", accountKey = accountKey, saved = false)
         assert(repo.savedSearch(accountKey).first().isEmpty())
         repo.addOrUpgrade(content = "query1", accountKey = accountKey, saved = true)
@@ -60,7 +61,7 @@ internal class SearchRepositoryTest {
     @Test
     fun canNotSetSavedToFalseOnSavedSearch() = runBlocking {
         val accountKey = MicroBlogKey.twitter("test")
-        val repo = SearchRepository(MockAppDatabase())
+        val repo = SearchRepository(MockAppDatabase(), MockCacheDatabase())
         repo.addOrUpgrade(content = "query", accountKey = accountKey, saved = true)
         repo.addOrUpgrade(content = "query", accountKey = accountKey, saved = false)
         val savedSearch = repo.savedSearch(accountKey).first()
@@ -70,7 +71,7 @@ internal class SearchRepositoryTest {
     @Test
     fun deleteFromDbAfterRemove() = runBlocking {
         val accountKey = MicroBlogKey.twitter("test")
-        val repo = SearchRepository(MockAppDatabase())
+        val repo = SearchRepository(MockAppDatabase(), MockCacheDatabase())
         val savedSearchFlow = repo.savedSearch(accountKey)
         val searchHistoryFlow = repo.searchHistory(accountKey)
         repo.addOrUpgrade(content = "query saved", accountKey = accountKey, saved = true)

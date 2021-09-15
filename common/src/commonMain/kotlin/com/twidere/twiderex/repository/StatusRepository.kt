@@ -47,7 +47,7 @@ import kotlinx.coroutines.flow.flow
 
 class StatusRepository(
     private val database: CacheDatabase,
-    private val preferences: DataStore<MiscPreferences>,
+    private val preferences: DataStore<MiscPreferences>?,
 ) {
     fun loadStatus(
         statusKey: MicroBlogKey,
@@ -101,7 +101,7 @@ class StatusRepository(
         val remoteMediator = when (platformType) {
             PlatformType.Twitter -> TwitterConversationMediator(
                 service = service as TwitterService,
-                nitterService = preferences.data.first().nitterInstance.takeIf { it.isNotEmpty() }
+                nitterService = preferences?.data?.first()?.nitterInstance?.takeIf { it.isNotEmpty() }
                     ?.let {
                         NitterService(
                             it.trimEnd('/'),
