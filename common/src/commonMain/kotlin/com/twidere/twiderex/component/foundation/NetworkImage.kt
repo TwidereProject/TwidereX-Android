@@ -20,7 +20,6 @@
  */
 package com.twidere.twiderex.component.foundation
 
-import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -34,7 +33,6 @@ import com.twidere.twiderex.component.image.ImageEffects
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.kmp.rememberNetworkImagePainter
 import com.twidere.twiderex.preferences.LocalHttpConfig
-import com.twidere.twiderex.twitterTonApiHost
 
 @Composable
 fun NetworkImage(
@@ -51,19 +49,20 @@ fun NetworkImage(
         data
     } else {
         val httpConfig = LocalHttpConfig.current
-        val auth = if (data is Uri && twitterTonApiHost == data.host) {
-            TODO("Waiting for LocalActiveAccount")
-            // (account.credentials as OAuthCredentials).let {
-            //     OAuth1Authorization(
-            //         consumerKey = it.consumer_key,
-            //         consumerSecret = it.consumer_secret,
-            //         accessToken = it.access_token,
-            //         accessSecret = it.access_token_secret,
-            //     )
-            // }
-        } else {
-            EmptyAuthorization()
-        }
+        val auth = EmptyAuthorization()
+        // if (data is Uri && twitterTonApiHost == data.host) {
+        //  TODO "Waiting for LocalActiveAccount")
+        // (account.credentials as OAuthCredentials).let {
+        //     OAuth1Authorization(
+        //         consumerKey = it.consumer_key,
+        //         consumerSecret = it.consumer_secret,
+        //         accessToken = it.access_token,
+        //         accessSecret = it.access_token_secret,
+        //     )
+        // }
+        // } else {
+
+        // }
         rememberNetworkImagePainter(
             data = data,
             httpConfig = httpConfig,

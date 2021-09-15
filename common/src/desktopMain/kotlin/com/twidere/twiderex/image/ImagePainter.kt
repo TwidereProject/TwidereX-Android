@@ -107,7 +107,7 @@ internal class ImagePainter(
                 painter.value = GifPainter(Codec.makeFromData(Data.makeFromBytes(input.readAllBytes())), parentScope)
             } else {
                 ImageIO.read(input)?.let {
-                    painter = it.asPainter()
+                    painter.value = it.asPainter()
                 }
             }
         } catch (e: Exception) {
