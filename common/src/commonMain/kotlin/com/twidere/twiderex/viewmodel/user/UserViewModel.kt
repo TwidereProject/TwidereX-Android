@@ -22,7 +22,6 @@ package com.twidere.twiderex.viewmodel.user
 
 import com.twidere.services.microblog.LookupService
 import com.twidere.services.microblog.RelationshipService
-import com.twidere.services.microblog.model.IRelationship
 import com.twidere.twiderex.extensions.asStateIn
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.notification.InAppNotification
@@ -31,11 +30,14 @@ import com.twidere.twiderex.repository.UserRepository
 import com.twidere.twiderex.utils.notifyError
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.lastOrNull
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
+import java.util.UUID
 
 class UserViewModel(
     private val repository: UserRepository,
@@ -43,7 +45,7 @@ class UserViewModel(
     private val inAppNotification: InAppNotification,
     private val userKey: MicroBlogKey,
 ) : ViewModel() {
-
+    private val refreshFlow = MutableStateFlow(UUID.randomUUID())
     private val account by lazy {
         accountRepository.activeAccount.asStateIn(viewModelScope, null)
     }
@@ -51,7 +53,17 @@ class UserViewModel(
     val refreshing = MutableStateFlow(false)
     val loadingRelationship = MutableStateFlow(false)
     val user = repository.getUserFlow(userKey)
-    val relationship = MutableStateFlow<IRelationship?>(null)
+    val relationship = combine(account.mapNotNull { it }, refreshFlow) { account, _ ->
+        loadingRelationship.value = true
+        val relationshipService = account.service as RelationshipService
+        try {
+            relationshipService.showRelationship(userKey.id)
+        } catch (e: Throwable) {
+            null
+        } finally {
+            loadingRelationship.value = false
+        }
+    }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val isMe by lazy {
@@ -62,29 +74,30 @@ class UserViewModel(
         }.asStateIn(viewModelScope, false)
     }
 
-    fun refresh() = viewModelScope.launch {
-        refreshing.value = true
-        val account = account.lastOrNull() ?: return@launch
-        runCatching {
-            repository.lookupUserById(
-                userKey.id,
-                accountKey = account.accountKey,
-                lookupService = account.service as LookupService,
-            )
-        }.onFailure {
-            inAppNotification.notifyError(it)
+    private fun collectUser() = viewModelScope.launch {
+        combine(account.mapNotNull { it }, refreshFlow) { account, _ ->
+            refreshing.value = true
+            runCatching {
+                repository.lookupUserById(
+                    userKey.id,
+                    accountKey = account.accountKey,
+                    lookupService = account.service as LookupService,
+                )
+            }.onFailure {
+                inAppNotification.notifyError(it)
+            }
+            refreshing.value = false
         }
-        refreshing.value = false
     }
 
     fun follow() = viewModelScope.launch {
         loadingRelationship.value = true
-        val account = account.lastOrNull() ?: return@launch
+        val account = account.firstOrNull() ?: return@launch
         val relationshipService = account.service as? RelationshipService ?: return@launch
         runCatching {
             relationshipService.follow(userKey.id)
         }.onSuccess {
-            loadRelationShip()
+            refresh()
         }.onFailure {
             loadingRelationship.value = false
             inAppNotification.notifyError(it)
@@ -93,33 +106,23 @@ class UserViewModel(
 
     fun unfollow() = viewModelScope.launch {
         loadingRelationship.value = true
-        val account = account.lastOrNull() ?: return@launch
+        val account = account.firstOrNull() ?: return@launch
         val relationshipService = account.service as? RelationshipService ?: return@launch
         runCatching {
             relationshipService.unfollow(userKey.id)
         }.onSuccess {
-            loadRelationShip()
+            refresh()
         }.onFailure {
             loadingRelationship.value = false
             inAppNotification.notifyError(it)
         }
     }
 
-    private fun loadRelationShip() = viewModelScope.launch {
-        loadingRelationship.value = true
-        val account = account.lastOrNull() ?: return@launch
-        val relationshipService = account.service as? RelationshipService ?: return@launch
-        try {
-            relationshipService.showRelationship(userKey.id).let {
-                relationship.value = it
-            }
-        } catch (e: Exception) {
-        }
-        loadingRelationship.value = false
+    fun refresh() {
+        refreshFlow.value = UUID.randomUUID()
     }
 
     init {
-        refresh()
-        loadRelationShip()
+        collectUser()
     }
 }
