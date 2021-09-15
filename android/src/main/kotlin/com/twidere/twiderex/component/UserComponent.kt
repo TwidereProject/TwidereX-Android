@@ -430,7 +430,7 @@ fun UserInfo(
             user?.let { user ->
                 UserInfoName(user)
             }
-            if (isMe) {
+            if (!isMe) {
                 Spacer(modifier = Modifier.height(UserInfoDefaults.RelationshipSpacing))
                 UserRelationship(viewModel)
             }
