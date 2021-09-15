@@ -26,9 +26,9 @@ import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.SearchRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.lastOrNull
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
@@ -66,7 +66,7 @@ class SearchInputViewModel(
     }
 
     fun addOrUpgrade(content: String) = viewModelScope.launch {
-        account.lastOrNull()?.let {
+        account.firstOrNull()?.let {
             repository.addOrUpgrade(content, it.accountKey)
         }
     }

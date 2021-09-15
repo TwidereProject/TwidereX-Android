@@ -31,8 +31,8 @@ import com.twidere.twiderex.viewmodel.user.UserListViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.lastOrNull
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
@@ -80,7 +80,7 @@ class ListsUserViewModel(
     fun removeMember(user: UiUser) {
         try {
             viewModelScope.launch {
-                account.lastOrNull()?.let { account ->
+                account.firstOrNull()?.let { account ->
                     listsUsersRepository.removeMember(
                         service = account.service as ListsService,
                         listId = listId,

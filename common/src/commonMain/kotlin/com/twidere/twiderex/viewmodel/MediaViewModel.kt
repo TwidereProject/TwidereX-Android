@@ -29,8 +29,8 @@ import com.twidere.twiderex.repository.StatusRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.lastOrNull
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
@@ -46,7 +46,7 @@ class MediaViewModel(
     }
 
     fun saveFile(currentMedia: UiMedia, target: String) = viewModelScope.launch {
-        val account = account.lastOrNull() ?: return@launch
+        val account = account.firstOrNull() ?: return@launch
         currentMedia.mediaUrl?.let {
             mediaAction.download(
                 accountKey = account.accountKey,
@@ -57,7 +57,7 @@ class MediaViewModel(
     }
 
     fun shareMedia(currentMedia: UiMedia) = viewModelScope.launch {
-        val account = account.lastOrNull() ?: return@launch
+        val account = account.firstOrNull() ?: return@launch
         currentMedia.mediaUrl?.let {
             mediaAction.share(
                 source = it,

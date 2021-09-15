@@ -36,7 +36,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.lastOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
@@ -129,7 +128,7 @@ class ListsCreateViewModel(
         private: Boolean = false
     ) {
         loadingRequest(onResult) {
-            account.lastOrNull()?.let { account ->
+            account.firstOrNull()?.let { account ->
                 listsRepository.createLists(
                     accountKey = account.accountKey,
                     service = account.service as ListsService,
@@ -186,7 +185,7 @@ class ListsModifyViewModel(
         onResult: (success: Boolean, list: UiList?) -> Unit = { _, _ -> }
     ) {
         loadingRequest(onResult) {
-            account.lastOrNull()?.let { account ->
+            account.firstOrNull()?.let { account ->
                 listsRepository.updateLists(
                     accountKey = account.accountKey,
                     service = account.service as ListsService,
@@ -205,7 +204,7 @@ class ListsModifyViewModel(
         onResult: (success: Boolean, list: UiList?) -> Unit = { _, _ -> }
     ) {
         loadingRequest(onResult) {
-            account.lastOrNull()?.let { account ->
+            account.firstOrNull()?.let { account ->
                 listsRepository.deleteLists(
                     accountKey = account.accountKey,
                     service = account.service as ListsService,
@@ -221,7 +220,7 @@ class ListsModifyViewModel(
         onResult: (success: Boolean, list: UiList?) -> Unit = { _, _ -> }
     ) {
         loadingRequest(onResult) {
-            account.lastOrNull()?.let { account ->
+            account.firstOrNull()?.let { account ->
                 listsRepository.subscribeLists(
                     accountKey = account.accountKey,
                     service = account.service as ListsService,
@@ -236,7 +235,7 @@ class ListsModifyViewModel(
         onResult: (success: Boolean, list: UiList?) -> Unit = { _, _ -> }
     ) {
         loadingRequest(onResult) {
-            account.lastOrNull()?.let { account ->
+            account.firstOrNull()?.let { account ->
                 listsRepository.unsubscribeLists(
                     accountKey = account.accountKey,
                     service = account.service as ListsService,

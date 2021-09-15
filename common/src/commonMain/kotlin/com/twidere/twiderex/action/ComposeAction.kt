@@ -20,8 +20,6 @@
  */
 package com.twidere.twiderex.action
 
-import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.job.ComposeData
 
 expect class ComposeAction {

@@ -36,8 +36,8 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.lastOrNull
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
@@ -77,7 +77,7 @@ class DMNewConversationViewModel(
     fun createNewConversation(receiver: UiUser, onResult: (key: MicroBlogKey?) -> Unit) {
         viewModelScope.launch {
             kotlin.runCatching {
-                account.lastOrNull()?.let { account ->
+                account.firstOrNull()?.let { account ->
                     dmRepository.createNewConversation(
                         receiver = receiver,
                         accountKey = account.accountKey,

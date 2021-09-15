@@ -24,7 +24,7 @@ import com.twidere.twiderex.extensions.asStateIn
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.SearchRepository
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.lastOrNull
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
@@ -44,7 +44,7 @@ class SearchSaveViewModel(
 
     init {
         viewModelScope.launch {
-            account.lastOrNull()?.let {
+            account.firstOrNull()?.let {
                 isSaved.value = repository.get(content, it.accountKey)?.saved ?: false
             }
         }
@@ -54,7 +54,7 @@ class SearchSaveViewModel(
         viewModelScope.launch {
             loading.value = true
             try {
-                account.lastOrNull()?.let {
+                account.firstOrNull()?.let {
                     repository.addOrUpgrade(
                         content = content,
                         accountKey = it.accountKey,

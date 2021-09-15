@@ -28,7 +28,6 @@ import com.twidere.twiderex.extensions.asStateIn
 import com.twidere.twiderex.paging.mediator.timeline.HomeTimelineMediator
 import com.twidere.twiderex.repository.AccountRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.mapLatest
 import moe.tlaster.precompose.viewmodel.viewModelScope
 

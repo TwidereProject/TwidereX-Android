@@ -37,7 +37,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.lastOrNull
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
@@ -88,7 +87,7 @@ class DMEventViewModel(
     fun sendMessage() {
         if (input.value.isEmpty() && inputImage.value == null) return
         viewModelScope.launch {
-            account.lastOrNull()?.let { account ->
+            account.firstOrNull()?.let { account ->
                 conversation.firstOrNull()?.let {
                     messageAction.send(
                         account.type,
@@ -117,7 +116,7 @@ class DMEventViewModel(
     }
 
     fun sendDraftMessage(event: UiDMEvent) = viewModelScope.launch {
-        account.lastOrNull()?.let { account ->
+        account.firstOrNull()?.let { account ->
             messageAction.send(
                 account.type,
                 data = DirectMessageSendData(
@@ -133,7 +132,7 @@ class DMEventViewModel(
     }
 
     fun deleteMessage(event: UiDMEvent) = viewModelScope.launch {
-        account.lastOrNull()?.let { account ->
+        account.firstOrNull()?.let { account ->
             messageAction.delete(
                 data = DirectMessageDeleteData(
                     messageId = event.messageId,
