@@ -27,6 +27,8 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.asPainter
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.painter.Painter
+import com.twidere.twiderex.component.foundation.NetworkImageState
+import com.twidere.twiderex.component.image.ImageEffects
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
@@ -44,7 +46,10 @@ import javax.imageio.ImageIO
  */
 internal class ImagePainter(
     private val request: Any,
-    private val parentScope: CoroutineScope
+    private val parentScope: CoroutineScope,
+    private val imageEffects: ImageEffects,
+    private val httpConnection: (URL) -> HttpURLConnection = { it.openConnection() as HttpURLConnection },
+    private val onImageStateChanged: (NetworkImageState) -> Unit
 ) : Painter(), RememberObserver {
     private var painter = mutableStateOf<Painter?>(null)
 
@@ -89,29 +94,38 @@ internal class ImagePainter(
         rememberScope?.cancel()
         val context = parentScope.coroutineContext
         rememberScope = CoroutineScope(parentScope.coroutineContext + SupervisorJob(context[Job]))
-
+        onImageStateChanged(NetworkImageState.LOADING)
         rememberScope?.launch {
-            execute()
+            try {
+                execute()
+                onImageStateChanged(NetworkImageState.SUCCESS)
+            } catch (e: Throwable) {
+                onImageStateChanged(NetworkImageState.ERROR)
+            }
         }
     }
 
     private fun networkRequest(url: URL) {
         var connection: HttpURLConnection? = null
         var input: InputStream? = null
+        var error: Throwable? = null
         try {
-            connection = url.openConnection() as HttpURLConnection
-            connection.connectTimeout = 5000
+            connection = httpConnection(url)
             connection.connect()
             input = connection.inputStream
             if (connection.contentType == "image/gif") {
                 painter.value = GifPainter(Codec.makeFromData(Data.makeFromBytes(input.readAllBytes())), parentScope)
             } else {
-                ImageIO.read(input)?.let {
+                ImageIO.read(input)?.let { image ->
+                    imageEffects.blur?.let {
+                        ImageEffectsFilter.applyBlurFilter(image, it.blurRadius.toInt(), it.bitmapScale)
+                    } ?: image
+                }?.let {
                     painter.value = it.asPainter()
                 }
             }
-        } catch (e: Exception) {
-            e.printStackTrace()
+        } catch (e: Throwable) {
+            error = e
         } finally {
             try {
                 input?.close()
@@ -120,6 +134,7 @@ internal class ImagePainter(
                 e.printStackTrace()
             }
         }
+        if (error != null) throw error
     }
 
     private fun execute() {
