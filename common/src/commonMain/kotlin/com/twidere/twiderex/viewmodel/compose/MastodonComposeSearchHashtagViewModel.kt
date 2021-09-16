@@ -32,8 +32,9 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.mapNotNull
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
@@ -47,23 +48,19 @@ class MastodonComposeSearchHashtagViewModel(
     val text = MutableStateFlow("")
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
-    val source = text.debounce(666L).flatMapLatest {
-        it.takeIf { it.isNotEmpty() }?.let { str ->
-            account.flatMapLatest {
-                it?.let { account ->
-                    Pager(
-                        config = PagingConfig(
-                            pageSize = defaultLoadCount,
-                            enablePlaceholders = false,
-                        )
-                    ) {
-                        MastodonSearchHashtagPagingSource(
-                            str,
-                            account.service as MastodonService
-                        )
-                    }.flow
-                } ?: emptyFlow()
-            }
-        } ?: emptyFlow()
+    val source = text.debounce(666L).filterNot { it.isEmpty() }.flatMapLatest { str ->
+        account.mapNotNull { it }.flatMapLatest { account ->
+            Pager(
+                config = PagingConfig(
+                    pageSize = defaultLoadCount,
+                    enablePlaceholders = false,
+                )
+            ) {
+                MastodonSearchHashtagPagingSource(
+                    str,
+                    account.service as MastodonService
+                )
+            }.flow
+        }
     }.cachedIn(viewModelScope)
 }

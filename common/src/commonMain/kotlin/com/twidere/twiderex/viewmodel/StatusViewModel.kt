@@ -26,8 +26,8 @@ import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.StatusRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.mapNotNull
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
@@ -39,30 +39,23 @@ class StatusViewModel(
     private val account by lazy {
         accountRepository.activeAccount.asStateIn(viewModelScope, null)
     }
+
     @OptIn(ExperimentalCoroutinesApi::class)
     val status by lazy {
-        account.flatMapLatest {
-            if (it != null) {
-                statusRepository.loadStatus(statusKey = statusKey, accountKey = it.accountKey)
-            } else {
-                emptyFlow()
-            }
+        account.mapNotNull { it }.flatMapLatest {
+            statusRepository.loadStatus(statusKey = statusKey, accountKey = it.accountKey)
         }.asStateIn(viewModelScope, null)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val source by lazy {
-        account.flatMapLatest {
-            if (it != null) {
-                statusRepository.conversation(
-                    statusKey = statusKey,
-                    accountKey = it.accountKey,
-                    platformType = it.type,
-                    service = it.service
-                )
-            } else {
-                emptyFlow()
-            }
+        account.mapNotNull { it }.flatMapLatest {
+            statusRepository.conversation(
+                statusKey = statusKey,
+                accountKey = it.accountKey,
+                platformType = it.type,
+                service = it.service
+            )
         }.cachedIn(viewModelScope)
     }
 }

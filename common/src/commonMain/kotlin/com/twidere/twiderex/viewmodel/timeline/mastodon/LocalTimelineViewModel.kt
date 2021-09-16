@@ -28,7 +28,9 @@ import com.twidere.twiderex.extensions.asStateIn
 import com.twidere.twiderex.paging.mediator.timeline.mastodon.LocalTimelineMediator
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.viewmodel.timeline.TimelineViewModel
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.mapNotNull
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class LocalTimelineViewModel(
@@ -40,23 +42,21 @@ class LocalTimelineViewModel(
         accountRepository.activeAccount.asStateIn(viewModelScope, null)
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     override val pagingMediator by lazy {
-        account.map {
-            it?.let {
-                LocalTimelineMediator(
-                    it.service as MastodonService,
-                    it.accountKey,
-                    database,
-                )
-            }
+        account.mapNotNull { it }.mapLatest {
+            LocalTimelineMediator(
+                it.service as MastodonService,
+                it.accountKey,
+                database,
+            )
         }.asStateIn(viewModelScope, null)
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     override val savedStateKey by lazy {
-        account.map {
-            it?.let {
-                "${it.accountKey}_local"
-            }
+        account.mapNotNull { it }.mapLatest {
+            "${it.accountKey}_local"
         }.asStateIn(viewModelScope, null)
     }
 }

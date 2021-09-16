@@ -55,6 +55,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.lastOrNull
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
@@ -192,15 +193,11 @@ open class ComposeViewModel(
     }
     val excludedReplyUserIds = MutableStateFlow<List<String>>(emptyList())
     val replyToUserName by lazy {
-        combine(account, status) { account, status ->
-            if (account != null && status != null) {
-                if (account.type == PlatformType.Twitter && composeType == ComposeType.Reply && statusKey != null) {
-                    Extractor().extractMentionedScreennames(
-                        status.htmlText
-                    ).filter { it != account.user.screenName && it != status.user.screenName }
-                } else {
-                    emptyList()
-                }
+        combine(account.mapNotNull { it }, status.mapNotNull { it }) { account, status ->
+            if (account.type == PlatformType.Twitter && composeType == ComposeType.Reply && statusKey != null) {
+                Extractor().extractMentionedScreennames(
+                    status.htmlText
+                ).filter { it != account.user.screenName && it != status.user.screenName }
             } else {
                 emptyList()
             }
@@ -210,24 +207,20 @@ open class ComposeViewModel(
     val loadingReplyUser = MutableStateFlow(false)
 
     val replyToUser by lazy {
-        combine(account, replyToUserName) { account, list ->
-            if (account != null) {
-                if (list.isNotEmpty()) {
-                    loadingReplyUser.value = true
-                    try {
-                        userRepository.lookupUsersByName(
-                            list,
-                            accountKey = account.accountKey,
-                            lookupService = account.service as LookupService,
-                        )
-                    } catch (e: Throwable) {
-                        inAppNotification.notifyError(e)
-                        emptyList()
-                    } finally {
-                        loadingReplyUser.value = false
-                    }
-                } else {
+        combine(account.mapNotNull { it }, replyToUserName) { account, list ->
+            if (list.isNotEmpty()) {
+                loadingReplyUser.value = true
+                try {
+                    userRepository.lookupUsersByName(
+                        list,
+                        accountKey = account.accountKey,
+                        lookupService = account.service as LookupService,
+                    )
+                } catch (e: Throwable) {
+                    inAppNotification.notifyError(e)
                     emptyList()
+                } finally {
+                    loadingReplyUser.value = false
                 }
             } else {
                 emptyList()
@@ -254,43 +247,41 @@ open class ComposeViewModel(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val status by lazy {
-        account.flatMapLatest {
+        account.mapNotNull { it }.flatMapLatest { account ->
             if (statusKey != null) {
-                it?.let { account ->
-                    repository.loadStatus(statusKey, accountKey = account.accountKey)
-                        .map { status ->
-                            if (status != null &&
-                                textFieldValue.value.text.isEmpty() &&
-                                status.platformType == PlatformType.Mastodon &&
-                                status.mastodonExtra?.mentions != null &&
-                                composeType == ComposeType.Reply
-                            ) {
-                                val mentions =
-                                    status.mastodonExtra.mentions.mapNotNull { it.acct }
-                                        .filter { it != account.user.screenName }
-                                        .map { "@$it" }
-                                        .let {
-                                            if (status.user.userKey != account.user.userKey) {
-                                                listOf(status.user.getDisplayScreenName(account.accountKey.host)) + it
-                                            } else {
-                                                it
-                                            }
+                repository.loadStatus(statusKey, accountKey = account.accountKey)
+                    .map { status ->
+                        if (status != null &&
+                            textFieldValue.value.text.isEmpty() &&
+                            status.platformType == PlatformType.Mastodon &&
+                            status.mastodonExtra?.mentions != null &&
+                            composeType == ComposeType.Reply
+                        ) {
+                            val mentions =
+                                status.mastodonExtra.mentions.mapNotNull { it.acct }
+                                    .filter { it != account.user.screenName }
+                                    .map { "@$it" }
+                                    .let {
+                                        if (status.user.userKey != account.user.userKey) {
+                                            listOf(status.user.getDisplayScreenName(account.accountKey.host)) + it
+                                        } else {
+                                            it
                                         }
-                                        .distinctBy { it }
-                                        .takeIf { it.any() }
-                                        ?.joinToString(" ", postfix = " ") { it }
-                                if (mentions != null) {
-                                    setText(
-                                        TextFieldValue(
-                                            mentions,
-                                            selection = TextRange(mentions.length)
-                                        )
+                                    }
+                                    .distinctBy { it }
+                                    .takeIf { it.any() }
+                                    ?.joinToString(" ", postfix = " ") { it }
+                            if (mentions != null) {
+                                setText(
+                                    TextFieldValue(
+                                        mentions,
+                                        selection = TextRange(mentions.length)
                                     )
-                                }
+                                )
                             }
-                            status
                         }
-                } ?: flowOf(null)
+                        status
+                    }
             } else {
                 flowOf(null)
             }

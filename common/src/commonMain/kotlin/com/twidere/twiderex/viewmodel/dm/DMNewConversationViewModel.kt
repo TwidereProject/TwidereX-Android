@@ -35,9 +35,10 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
@@ -53,30 +54,26 @@ class DMNewConversationViewModel(
     val input = MutableStateFlow("")
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
-    val sourceFlow = input.debounce(666L).flatMapLatest {
-        it.takeIf { it.isNotEmpty() }?.let { str ->
-            account.flatMapLatest {
-                it?.let { account ->
-                    Pager(
-                        config = PagingConfig(
-                            pageSize = defaultLoadCount,
-                            enablePlaceholders = false,
-                        )
-                    ) {
-                        SearchUserPagingSource(
-                            accountKey = account.accountKey,
-                            str,
-                            account.service as SearchService,
-                        )
-                    }.flow
-                } ?: emptyFlow()
-            }
-        } ?: emptyFlow()
+    val sourceFlow = input.debounce(666L).filterNot { it.isEmpty() }.flatMapLatest { str ->
+        account.mapNotNull { it }.flatMapLatest { account ->
+            Pager(
+                config = PagingConfig(
+                    pageSize = defaultLoadCount,
+                    enablePlaceholders = false,
+                )
+            ) {
+                SearchUserPagingSource(
+                    accountKey = account.accountKey,
+                    str,
+                    account.service as SearchService,
+                )
+            }.flow
+        }
     }.cachedIn(viewModelScope)
 
     fun createNewConversation(receiver: UiUser, onResult: (key: MicroBlogKey?) -> Unit) {
         viewModelScope.launch {
-            kotlin.runCatching {
+            runCatching {
                 account.firstOrNull()?.let { account ->
                     dmRepository.createNewConversation(
                         receiver = receiver,

@@ -37,6 +37,7 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
@@ -51,35 +52,29 @@ class ListsViewModel(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val source by lazy {
-        account.flatMapLatest {
-            it?.let { account ->
-                listsRepository.fetchLists(
-                    accountKey = account.accountKey,
-                    service = account.service as ListsService
-                )
-            } ?: emptyFlow()
+        account.mapNotNull { it }.flatMapLatest { account ->
+            listsRepository.fetchLists(
+                accountKey = account.accountKey,
+                service = account.service as ListsService
+            )
         }.cachedIn(viewModelScope)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val ownerSource by lazy {
-        account.flatMapLatest {
-            it?.let { account ->
-                source.map {
-                    it.filter { it.isOwner(account.user.userId) }
-                }
-            } ?: emptyFlow()
+        account.mapNotNull { it }.flatMapLatest { account ->
+            source.map {
+                it.filter { it.isOwner(account.user.userId) }
+            }
         }.cachedIn(viewModelScope)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val subscribedSource by lazy {
-        account.flatMapLatest {
-            it?.let { account ->
-                source.map { pagingData ->
-                    pagingData.filter { !it.isOwner(account.user.userId) && it.isFollowed }
-                }
-            } ?: emptyFlow()
+        account.mapNotNull { it }.flatMapLatest { account ->
+            source.map { pagingData ->
+                pagingData.filter { !it.isOwner(account.user.userId) && it.isFollowed }
+            }
         }.cachedIn(viewModelScope)
     }
 }
@@ -134,7 +129,7 @@ class ListsCreateViewModel(
                     service = account.service as ListsService,
                     title = title,
                     description = description,
-                    mode = if (private)ListsMode.PRIVATE.value else ListsMode.PUBLIC.value
+                    mode = if (private) ListsMode.PRIVATE.value else ListsMode.PUBLIC.value
                 )
             }
         }
@@ -192,7 +187,7 @@ class ListsModifyViewModel(
                     listId = listId,
                     title = title,
                     description = description,
-                    mode = if (private)ListsMode.PRIVATE.value else ListsMode.PUBLIC.value
+                    mode = if (private) ListsMode.PRIVATE.value else ListsMode.PUBLIC.value
                 )
             }
         }
