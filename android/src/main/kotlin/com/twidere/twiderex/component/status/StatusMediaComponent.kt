@@ -271,40 +271,20 @@ fun StatusMediaPreviewItem(
         when (media.type) {
             MediaType.photo ->
                 media.previewUrl?.let {
-                    AnimatedVisibility(
-                        visible = sensitive,
-                        enter = fadeIn(),
-                        exit = fadeOut()
-                    ) {
-                        NetworkImage(
-                            data = it,
-                            effects = { blur(ImageBlur.Sensitive) },
-                            modifier = Modifier
-                                .fillMaxSize(),
-                            placeholder = {
-                                Placeholder(modifier = Modifier.fillMaxSize())
-                            },
-                        )
-                    }
-                    AnimatedVisibility(
-                        visible = !sensitive,
-                        enter = fadeIn(),
-                        exit = fadeOut()
-                    ) {
-                        NetworkImage(
-                            data = it,
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .clickable(
-                                    onClick = {
-                                        onClick(media)
-                                    }
-                                ),
-                            placeholder = {
-                                Placeholder(modifier = Modifier.fillMaxSize())
-                            },
-                        )
-                    }
+                    NetworkImage(
+                        data = it,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .clickable(
+                                onClick = {
+                                    onClick(media)
+                                }
+                            ),
+                        effects = { if (sensitive) blur(ImageBlur.Sensitive) },
+                        placeholder = {
+                            Placeholder(modifier = Modifier.fillMaxSize())
+                        },
+                    )
                 }
             MediaType.video, MediaType.animated_gif -> media.mediaUrl?.let {
                 val previewUrl = media.previewUrl

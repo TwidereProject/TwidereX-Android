@@ -20,6 +20,7 @@
  */
 package com.twidere.twiderex.component.foundation
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -69,7 +70,8 @@ fun NetworkImage(
             authorization = auth,
             effects = ImageEffects.Builder().apply(effects).build(),
             onImageStateChanged = {
-                state.value = it
+                Log.d("Image", "onStateChange:$it")
+                if (state.value == NetworkImageState.LOADING) state.value = it
             }
         )
     }
