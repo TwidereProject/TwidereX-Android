@@ -36,7 +36,6 @@ kotlin {
                 api(compose.material)
                 implementation(projects.services)
                 api("androidx.paging:paging-common:${Versions.paging}")
-                api("androidx.paging:paging-compose:${Versions.paging_compose}")
                 api("androidx.datastore:datastore-core:${Versions.datastore}")
                 api("androidx.datastore:datastore-preferences-core:${Versions.datastore}")
                 api("org.jetbrains.kotlinx:kotlinx-serialization-json:${Versions.Kotlin.serialization}")
@@ -47,10 +46,6 @@ kotlin {
                 implementation(projects.routeProcessor)
                 ksp(projects.routeProcessor)
                 implementation("dev.icerock.moko:resources:${Versions.moko}")
-                implementation("com.mxalbert.zoomable:zoomable:${Versions.zoomable}")
-                implementation("com.github.Tlaster:NestedScrollView:${ Versions.nestedScrollView}")
-                implementation("com.github.Tlaster:Swiper:${Versions.swiper}")
-                implementation("com.github.Tlaster:Placeholder:${Versions.placeholder}")
             }
         }
         val commonTest by getting {
