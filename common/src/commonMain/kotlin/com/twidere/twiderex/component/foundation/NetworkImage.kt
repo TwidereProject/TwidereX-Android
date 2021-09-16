@@ -20,7 +20,6 @@
  */
 package com.twidere.twiderex.component.foundation
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -34,6 +33,9 @@ import com.twidere.twiderex.component.image.ImageEffects
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.kmp.rememberNetworkImagePainter
 import com.twidere.twiderex.preferences.LocalHttpConfig
+import com.twidere.twiderex.twitterTonApiHost
+import java.net.MalformedURLException
+import java.net.URL
 
 @Composable
 fun NetworkImage(
@@ -50,27 +52,30 @@ fun NetworkImage(
         data
     } else {
         val httpConfig = LocalHttpConfig.current
-        val auth = EmptyAuthorization()
-        // if (data is Uri && twitterTonApiHost == data.host) {
-        //  TODO "Waiting for LocalActiveAccount")
-        // (account.credentials as OAuthCredentials).let {
-        //     OAuth1Authorization(
-        //         consumerKey = it.consumer_key,
-        //         consumerSecret = it.consumer_secret,
-        //         accessToken = it.access_token,
-        //         accessSecret = it.access_token_secret,
-        //     )
-        // }
-        // } else {
-
-        // }
+        val auth = try {
+            val url = URL(data.toString())
+            if (url.host == twitterTonApiHost) {
+                // (account.credentials as OAuthCredentials).let {
+                //     OAuth1Authorization(
+                //         consumerKey = it.consumer_key,
+                //         consumerSecret = it.consumer_secret,
+                //         accessToken = it.access_token,
+                //         accessSecret = it.access_token_secret,
+                //     )
+                // }
+                TODO("Waiting for LocalActiveAccount")
+            } else {
+                EmptyAuthorization()
+            }
+        } catch (e: MalformedURLException) {
+            EmptyAuthorization()
+        }
         rememberNetworkImagePainter(
             data = data,
             httpConfig = httpConfig,
             authorization = auth,
             effects = ImageEffects.Builder().apply(effects).build(),
             onImageStateChanged = {
-                Log.d("Image", "onStateChange:$it")
                 if (state.value == NetworkImageState.LOADING) state.value = it
             }
         )
