@@ -53,6 +53,9 @@ kotlin {
                 implementation(kotlin("test"))
                 implementation("io.insert-koin:koin-test:${Versions.koin}")
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:${Versions.Kotlin.coroutines}")
+                implementation("io.mockk:mockk-common:1.12.0")
+                implementation("io.mockk:mockk:1.12.0")
+                implementation("org.jetbrains.kotlin:kotlin-reflect:${Versions.Kotlin.lang}")
             }
         }
         val androidMain by getting {
@@ -84,6 +87,7 @@ kotlin {
                 implementation("androidx.test.ext:junit-ktx:${Versions.extJUnitVersion}")
                 implementation("androidx.test.espresso:espresso-core:${Versions.espressoVersion}")
                 implementation("androidx.room:room-testing:${Versions.room}")
+                implementation("io.mockk:mockk-android:1.12.0")
             }
         }
         val desktopMain by getting {

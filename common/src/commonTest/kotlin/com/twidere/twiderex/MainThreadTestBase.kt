@@ -41,5 +41,6 @@ internal open class MainThreadTestBase {
     @After
     open fun tearDown() {
         Dispatchers.resetMain() // reset main dispatcher to the original Main dispatcher
+        mainThreadSurrogate.close()
     }
 }
