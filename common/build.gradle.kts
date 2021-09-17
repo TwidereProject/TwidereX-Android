@@ -9,6 +9,18 @@ plugins {
     kotlin("kapt")
     id("com.google.devtools.ksp").version(Versions.ksp)
     id("dev.icerock.mobile.multiplatform-resources") version Versions.moko
+    id("com.squareup.sqldelight")
+}
+
+sqldelight {
+    database("SqlDelightAppDatabase") {
+        packageName = "${Package.id}.sqldelight"
+        sourceFolders = listOf("sqldelight/app")
+    }
+    database("SqlDelightCacheDatabase") {
+        packageName = "${Package.id}.sqldelight"
+        sourceFolders = listOf("sqldelight/cache")
+    }
 }
 
 group = Package.group
@@ -23,9 +35,6 @@ kotlin {
     jvm("desktop") {
         compilations.all {
             kotlinOptions.jvmTarget = Versions.Java.jvmTarget
-        }
-        testRuns["test"].executionTask.configure {
-            useJUnitPlatform()
         }
     }
     sourceSets {
@@ -80,7 +89,11 @@ kotlin {
                 implementation("androidx.room:room-testing:${Versions.room}")
             }
         }
-        val desktopMain by getting
+        val desktopMain by getting {
+            dependencies {
+                implementation("com.squareup.sqldelight:sqlite-driver:${Versions.sqlDelight}")
+            }
+        }
         val desktopTest by getting
     }
 }

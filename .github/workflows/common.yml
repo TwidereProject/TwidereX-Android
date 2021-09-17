@@ -22,7 +22,7 @@ jobs:
           java-version: 11
 
       - name: Build with Gradle
-        run: ./gradlew :common:spotlessCheck :desktop:build
+        run: ./gradlew :common:spotlessCheck :common:build
 
       - name: Upload build reports
         uses: actions/upload-artifact@v2
@@ -45,8 +45,11 @@ jobs:
       - name: Set up Android SDK License
         run: yes | /usr/local/lib/android/sdk/tools/bin/sdkmanager --licenses
 
-      - name: Build with Gradle
+      - name: Run test in commonTest and androidTest
         run: ./gradlew :common:test
+
+      - name: Run test in desktopTest
+        run: ./gradlew :common:desktopTest
 
       - name: Upload test results
         if: always()
