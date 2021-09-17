@@ -21,15 +21,12 @@
 package com.twidere.twiderex.viewmodel.lists
 
 import androidx.paging.PagingData
+import com.twidere.services.microblog.MicroBlogService
 import com.twidere.twiderex.mock.paging.collectDataForTest
 import com.twidere.twiderex.mock.service.MockListsService
-import com.twidere.twiderex.model.AccountDetails
-import com.twidere.twiderex.model.AmUser
-import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiList
-import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.ListsRepository
-import com.twidere.twiderex.viewmodel.ViewModelTestBase
+import com.twidere.twiderex.viewmodel.AccountViewModelTestBase
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.Dispatchers
@@ -40,19 +37,12 @@ import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import kotlin.test.assertEquals
 
-internal class ListsViewModelTest : ViewModelTestBase() {
+internal class ListsViewModelTest : AccountViewModelTestBase() {
+    override val mockService: MicroBlogService
+        get() = MockListsService()
 
     @MockK
     private lateinit var mockRepository: ListsRepository
-
-    @MockK
-    private lateinit var mockAccountRepository: AccountRepository
-
-    @MockK
-    private lateinit var mockAccount: AccountDetails
-
-    @MockK
-    private lateinit var mockUser: AmUser
 
     @MockK
     private lateinit var ownerList: UiList
@@ -74,16 +64,11 @@ internal class ListsViewModelTest : ViewModelTestBase() {
                 )
             )
         )
-        every { mockAccountRepository.activeAccount }.returns(flowOf(mockAccount))
         every { ownerList.isOwner(any()) }.returns(true)
         every { subscribeList.isOwner(any()) }.returns(false)
         every { ownerList.title }.returns("owner")
         every { subscribeList.title }.returns("subscribe")
         every { subscribeList.isFollowed }.returns(true)
-        every { mockAccount.user }.returns(mockUser)
-        every { mockAccount.accountKey }.returns(MicroBlogKey.twitter("123"))
-        every { mockAccount.service }.returns(MockListsService())
-        every { mockUser.userId }.returns("123")
         viewModel = ListsViewModel(mockRepository, mockAccountRepository)
     }
 

@@ -20,24 +20,21 @@
  */
 package com.twidere.twiderex.viewmodel.lists
 
+import com.twidere.services.microblog.MicroBlogService
 import com.twidere.twiderex.mock.Observer
 import com.twidere.twiderex.mock.db.MockCacheDatabase
 import com.twidere.twiderex.mock.service.MockListsService
-import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.notification.NotificationEvent
-import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.ListsRepository
-import com.twidere.twiderex.viewmodel.ViewModelTestBase
+import com.twidere.twiderex.viewmodel.AccountViewModelTestBase
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
-import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert
@@ -45,20 +42,14 @@ import org.junit.Test
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-internal class ListsModifyViewModelTest : ViewModelTestBase() {
+internal class ListsModifyViewModelTest : AccountViewModelTestBase() {
+    override val mockService: MicroBlogService
+        get() = MockListsService()
 
     private var mockRepository: ListsRepository = ListsRepository(MockCacheDatabase())
 
     @MockK
     private lateinit var mockAppNotification: InAppNotification
-
-    @MockK
-    private lateinit var mockAccountRepository: AccountRepository
-
-    private val mockAccount: AccountDetails = mockk {
-        every { service }.returns(MockListsService())
-        every { accountKey }.returns(MicroBlogKey.twitter("123"))
-    }
 
     @MockK
     private lateinit var mockSuccessObserver: Observer<Boolean>
@@ -187,7 +178,6 @@ internal class ListsModifyViewModelTest : ViewModelTestBase() {
 
     override fun setUp() {
         super.setUp()
-        every { mockAccountRepository.activeAccount }.returns(flowOf(mockAccount))
         modifyViewModel = ListsModifyViewModel(
             mockRepository,
             mockAppNotification,
