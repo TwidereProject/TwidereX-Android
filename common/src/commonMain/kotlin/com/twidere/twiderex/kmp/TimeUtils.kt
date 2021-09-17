@@ -18,24 +18,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.component
-
-import androidx.compose.foundation.Image
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import com.twidere.twiderex.R
-
-@Composable
-fun LoginLogo(
-    modifier: Modifier = Modifier,
-) {
-    Image(
-        modifier = modifier,
-        contentScale = ContentScale.FillWidth,
-        painter = painterResource(id = R.drawable.ic_login_logo),
-        contentDescription = stringResource(id = com.twidere.common.R.string.accessibility_common_logo_twidere)
-    )
+package com.twidere.twiderex.kmp
+expect object TimeUtils {
+    fun humanizedTimestamp(time: Long): String
 }

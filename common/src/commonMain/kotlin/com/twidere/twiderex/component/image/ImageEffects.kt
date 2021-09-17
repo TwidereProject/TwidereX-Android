@@ -18,16 +18,26 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex
+package com.twidere.twiderex.component.image
 
-const val defaultLoadCount = 20
-val twitterHosts = listOf(
-    "https://twitter.com",
-    "https://mobile.twitter.com",
-    "https://www.twitter.com",
-    "http://twitter.com",
-    "http://mobile.twitter.com",
-    "http://www.twitter.com",
-)
+class ImageEffects private constructor(
+    val blur: ImageBlur?,
+    val crossFade: Boolean
+) {
+    class Builder {
+        private var blur: ImageBlur? = null
+        private var crossFade: Boolean = true
+        fun blur(blur: ImageBlur) {
+            this.blur = blur
+        }
 
-internal const val twitterTonApiHost = "ton.twitter.com"
+        fun crossFade(crossFade: Boolean) {
+            this.crossFade = crossFade
+        }
+
+        fun build() = ImageEffects(
+            blur = blur,
+            crossFade = crossFade
+        )
+    }
+}

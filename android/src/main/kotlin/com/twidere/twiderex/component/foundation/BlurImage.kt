@@ -43,19 +43,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.core.graphics.drawable.toBitmap
-import androidx.core.graphics.drawable.toDrawable
 import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat
-import coil.ImageLoader
-import coil.bitmap.BitmapPool
-import coil.compose.rememberImagePainter
-import coil.memory.MemoryCache
-import coil.request.DefaultRequestOptions
-import coil.request.Disposable
-import coil.request.ImageRequest
-import coil.request.ImageResult
-import coil.request.SuccessResult
-import com.twidere.twiderex.http.TwidereNetworkImageLoader
-import com.twidere.twiderex.ui.LocalActiveAccount
 
 @Composable
 fun BlurImage(
@@ -89,38 +77,6 @@ fun BlurImage(
     )
 }
 
-@Composable
-fun NetworkBlurImage(
-    data: Any,
-    modifier: Modifier = Modifier,
-    contentScale: ContentScale = ContentScale.Crop,
-    blurRadius: Float = 12f,
-    bitmapScale: Float = 0.5f,
-    placeholder: @Composable (() -> Unit)? = null,
-) {
-    val context = LocalContext.current
-    val accountDetails = LocalActiveAccount.current
-    val painter = rememberImagePainter(
-        data = data,
-        imageLoader = BlurImageLoader(
-            context,
-            blurRadius,
-            bitmapScale,
-            TwidereNetworkImageLoader(
-                realImageLoader = buildRealImageLoader(),
-                context = context,
-                account = accountDetails
-            )
-        )
-    )
-    NetworkImage(
-        data = if (blurRadius != 0f || bitmapScale != 1f) painter else data,
-        modifier = modifier,
-        contentScale = contentScale,
-        placeholder = placeholder
-    )
-}
-
 private fun applyBlurFilter(src: Bitmap, context: Context, blurRadius: Float, bitmapScale: Float): Bitmap {
     val rs = RenderScript.create(context.applicationContext)
 
@@ -142,38 +98,4 @@ private fun applyBlurFilter(src: Bitmap, context: Context, blurRadius: Float, bi
     script.forEach(output)
     output.copyTo(scaleBitmap)
     return scaleBitmap
-}
-
-class BlurImageLoader(
-    private val context: Context,
-    private val blurRadius: Float,
-    private val bitmapScale: Float,
-    private val realPainter: ImageLoader
-) : ImageLoader {
-    override val bitmapPool: BitmapPool
-        get() = realPainter.bitmapPool
-    override val defaults: DefaultRequestOptions
-        get() = realPainter.defaults
-    override val memoryCache: MemoryCache
-        get() = realPainter.memoryCache
-
-    override fun enqueue(request: ImageRequest): Disposable {
-        return realPainter.enqueue(request)
-    }
-
-    override suspend fun execute(request: ImageRequest): ImageResult {
-        val result = realPainter.execute(request)
-        if (result !is SuccessResult) return result
-        return result.drawable.let {
-            applyBlurFilter(it.toBitmap(), context, blurRadius, bitmapScale)
-        }.let {
-            SuccessResult(it.toDrawable(context.resources), request, result.metadata)
-        }
-    }
-
-    override fun shutdown() {
-        realPainter.shutdown()
-    }
-
-    override fun newBuilder() = ImageLoader.Builder(context)
 }

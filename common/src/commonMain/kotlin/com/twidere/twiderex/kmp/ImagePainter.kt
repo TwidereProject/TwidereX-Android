@@ -18,16 +18,20 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex
+package com.twidere.twiderex.kmp
 
-const val defaultLoadCount = 20
-val twitterHosts = listOf(
-    "https://twitter.com",
-    "https://mobile.twitter.com",
-    "https://www.twitter.com",
-    "http://twitter.com",
-    "http://mobile.twitter.com",
-    "http://www.twitter.com",
-)
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.painter.Painter
+import com.twidere.services.http.authorization.Authorization
+import com.twidere.services.http.config.HttpConfig
+import com.twidere.twiderex.component.foundation.NetworkImageState
+import com.twidere.twiderex.component.image.ImageEffects
 
-internal const val twitterTonApiHost = "ton.twitter.com"
+@Composable
+internal expect fun rememberNetworkImagePainter(
+    data: Any,
+    authorization: Authorization,
+    httpConfig: HttpConfig,
+    effects: ImageEffects,
+    onImageStateChanged: (NetworkImageState) -> Unit
+): Painter

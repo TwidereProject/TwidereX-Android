@@ -18,16 +18,15 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex
+package com.twidere.twiderex.kmp
 
-const val defaultLoadCount = 20
-val twitterHosts = listOf(
-    "https://twitter.com",
-    "https://mobile.twitter.com",
-    "https://www.twitter.com",
-    "http://twitter.com",
-    "http://mobile.twitter.com",
-    "http://www.twitter.com",
-)
-
-internal const val twitterTonApiHost = "ton.twitter.com"
+import android.text.format.DateUtils
+actual object TimeUtils {
+    actual fun humanizedTimestamp(time: Long): String {
+        return DateUtils.getRelativeTimeSpanString(
+            time, System.currentTimeMillis(),
+            DateUtils.MINUTE_IN_MILLIS,
+            DateUtils.FORMAT_ABBREV_ALL
+        ).toString()
+    }
+}

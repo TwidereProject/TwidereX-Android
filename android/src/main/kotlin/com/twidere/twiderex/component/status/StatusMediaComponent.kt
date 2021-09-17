@@ -55,9 +55,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.GridLayout
-import com.twidere.twiderex.component.foundation.NetworkBlurImage
 import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.foundation.VideoPlayer
+import com.twidere.twiderex.component.image.ImageBlur
 import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.model.enums.MediaType
 import com.twidere.twiderex.model.enums.PlatformType
@@ -271,45 +271,27 @@ fun StatusMediaPreviewItem(
         when (media.type) {
             MediaType.photo ->
                 media.previewUrl?.let {
-                    AnimatedVisibility(
-                        visible = sensitive,
-                        enter = fadeIn(),
-                        exit = fadeOut()
-                    ) {
-                        NetworkBlurImage(
-                            data = it,
-                            modifier = Modifier
-                                .fillMaxSize(),
-                            placeholder = {
-                                Placeholder(modifier = Modifier.fillMaxSize())
-                            },
-                        )
-                    }
-                    AnimatedVisibility(
-                        visible = !sensitive,
-                        enter = fadeIn(),
-                        exit = fadeOut()
-                    ) {
-                        NetworkImage(
-                            data = it,
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .clickable(
-                                    onClick = {
-                                        onClick(media)
-                                    }
-                                ),
-                            placeholder = {
-                                Placeholder(modifier = Modifier.fillMaxSize())
-                            },
-                        )
-                    }
+                    NetworkImage(
+                        data = it,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .clickable(
+                                onClick = {
+                                    onClick(media)
+                                }
+                            ),
+                        effects = { if (sensitive) blur(ImageBlur.Sensitive) },
+                        placeholder = {
+                            Placeholder(modifier = Modifier.fillMaxSize())
+                        },
+                    )
                 }
             MediaType.video, MediaType.animated_gif -> media.mediaUrl?.let {
                 val previewUrl = media.previewUrl
                 if (sensitive && previewUrl != null) {
-                    NetworkBlurImage(
+                    NetworkImage(
                         data = previewUrl,
+                        effects = { blur(ImageBlur.Sensitive) },
                         modifier = Modifier
                             .fillMaxSize(),
                         placeholder = {

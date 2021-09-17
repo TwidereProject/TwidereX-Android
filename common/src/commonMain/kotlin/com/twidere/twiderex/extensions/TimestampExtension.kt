@@ -20,17 +20,13 @@
  */
 package com.twidere.twiderex.extensions
 
-import android.text.format.DateUtils
+import com.twidere.twiderex.kmp.TimeUtils
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
 fun Long.humanizedTimestamp(): String {
-    return DateUtils.getRelativeTimeSpanString(
-        this, System.currentTimeMillis(),
-        DateUtils.MINUTE_IN_MILLIS,
-        DateUtils.FORMAT_ABBREV_ALL
-    ).toString()
+    return TimeUtils.humanizedTimestamp(this)
 }
 
 fun Long.formattedTimestamp(): String {
