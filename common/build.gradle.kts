@@ -69,6 +69,8 @@ kotlin {
                 implementation("io.coil-kt:coil-compose:${Versions.coil}")
                 implementation("io.coil-kt:coil-gif:${Versions.coil}")
                 implementation("io.coil-kt:coil-svg:${Versions.coil}")
+                implementation("com.google.android.exoplayer:exoplayer:${Versions.exoplayer}")
+                implementation("com.google.android.exoplayer:extension-okhttp:${Versions.exoplayer}")
             }
         }
         val androidAndroidTest by getting {

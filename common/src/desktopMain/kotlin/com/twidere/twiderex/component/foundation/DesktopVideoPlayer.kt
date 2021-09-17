@@ -21,8 +21,6 @@
 package com.twidere.twiderex.component.foundation
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
@@ -35,7 +33,6 @@ import androidx.compose.ui.awt.SwingPanel
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.utils.video.VideoPool
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -45,7 +42,6 @@ import moe.tlaster.precompose.lifecycle.LifecycleObserver
 import moe.tlaster.precompose.ui.LocalLifecycleOwner
 import uk.co.caprica.vlcj.factory.discovery.NativeDiscovery
 import uk.co.caprica.vlcj.player.base.MediaPlayer
-import uk.co.caprica.vlcj.player.base.MediaPlayerEventAdapter
 import uk.co.caprica.vlcj.player.component.CallbackMediaPlayerComponent
 import uk.co.caprica.vlcj.player.component.EmbeddedMediaPlayerComponent
 import java.util.Locale
@@ -62,7 +58,6 @@ actual fun VideoPlayerImpl(
     isListItem: Boolean,
     thumb: @Composable (() -> Unit)?
 ) {
-
     NativeDiscovery().discover()
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     var active by remember(url) {
@@ -89,20 +84,7 @@ actual fun VideoPlayerImpl(
         mutableStateOf(false)
     }
     DisposableEffect(url) {
-        val listener = object : MediaPlayerEventAdapter() {
-            override fun positionChanged(mediaPlayer: MediaPlayer?, newPosition: Float) {
-                super.positionChanged(mediaPlayer, newPosition)
-            }
 
-            override fun playing(mediaPlayer: MediaPlayer?) {
-                super.playing(mediaPlayer)
-            }
-
-            override fun mediaPlayerReady(mediaPlayer: MediaPlayer?) {
-                super.mediaPlayerReady(mediaPlayer)
-            }
-        }
-        mediaPlayerComponent.mediaPlayer().events().addMediaPlayerEventListener(listener)
         mediaPlayerComponent.mediaPlayer().media().prepare(url)
 
         val lifecycleObserver = object : LifecycleObserver {
@@ -132,7 +114,7 @@ actual fun VideoPlayerImpl(
     }
 
     return Box(
-        modifier = Modifier.width(500.dp).height(500.dp).onGloballyPositioned { coordinates ->
+        modifier = modifier.onGloballyPositioned { coordinates ->
             if (middleLine == 0.0f) {
                 var rootCoordinates = coordinates
                 while (rootCoordinates.parentCoordinates != null) {

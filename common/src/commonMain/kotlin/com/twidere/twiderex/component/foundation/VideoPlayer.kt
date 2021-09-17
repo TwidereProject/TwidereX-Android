@@ -22,7 +22,9 @@ package com.twidere.twiderex.component.foundation
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -78,6 +80,7 @@ fun VideoPreview() {
                 ) {
                     VideoPlayer(
                         url = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+                        modifier = Modifier.width(500.dp).height(500.dp)
                     )
                 }
             }
