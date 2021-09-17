@@ -18,16 +18,16 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex
+package com.twidere.twiderex.component.image
 
-const val defaultLoadCount = 20
-val twitterHosts = listOf(
-    "https://twitter.com",
-    "https://mobile.twitter.com",
-    "https://www.twitter.com",
-    "http://twitter.com",
-    "http://mobile.twitter.com",
-    "http://www.twitter.com",
-)
-
-internal const val twitterTonApiHost = "ton.twitter.com"
+class ImageBlur(
+    val blurRadius: Float,
+    val bitmapScale: Float,
+) {
+    companion object {
+        val Sensitive = ImageBlur(
+            blurRadius = 25f,
+            bitmapScale = 0.4f
+        )
+    }
+}
