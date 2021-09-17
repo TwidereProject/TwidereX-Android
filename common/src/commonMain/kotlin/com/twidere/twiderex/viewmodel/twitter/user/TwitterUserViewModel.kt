@@ -28,6 +28,7 @@ import com.twidere.twiderex.repository.UserRepository
 import com.twidere.twiderex.utils.notifyError
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
@@ -39,26 +40,22 @@ class TwitterUserViewModel(
 ) : ViewModel() {
 
     private val account by lazy {
-        accountRepository.activeAccount.asStateIn(viewModelScope, null)
+        accountRepository.activeAccount.asStateIn(viewModelScope, null).mapNotNull { it }
     }
 
     val error = MutableStateFlow<Throwable?>(null)
 
     val user by lazy {
         account.map {
-            if (it != null) {
-                try {
-                    repository.lookupUserByName(
-                        screenName,
-                        accountKey = it.accountKey,
-                        lookupService = it.service as LookupService,
-                    )
-                } catch (e: Throwable) {
-                    inAppNotification.notifyError(e)
-                    error.value = e
-                    null
-                }
-            } else {
+            try {
+                repository.lookupUserByName(
+                    screenName,
+                    accountKey = it.accountKey,
+                    lookupService = it.service as LookupService,
+                )
+            } catch (e: Throwable) {
+                inAppNotification.notifyError(e)
+                error.value = e
                 null
             }
         }

@@ -29,6 +29,7 @@ import com.twidere.twiderex.paging.mediator.timeline.mastodon.FederatedTimelineM
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.viewmodel.timeline.TimelineViewModel
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class FederatedTimelineViewModel(
@@ -37,26 +38,22 @@ class FederatedTimelineViewModel(
     private val accountRepository: AccountRepository,
 ) : TimelineViewModel(dataStore) {
     private val account by lazy {
-        accountRepository.activeAccount.asStateIn(viewModelScope, null)
+        accountRepository.activeAccount.asStateIn(viewModelScope, null).mapNotNull { it }
     }
 
     override val pagingMediator by lazy {
         account.map {
-            it?.let {
-                FederatedTimelineMediator(
-                    it.service as MastodonService,
-                    it.accountKey,
-                    database,
-                )
-            }
+            FederatedTimelineMediator(
+                it.service as MastodonService,
+                it.accountKey,
+                database,
+            )
         }.asStateIn(viewModelScope, null)
     }
 
     override val savedStateKey by lazy {
         account.map {
-            it?.let {
-                "${it.accountKey}_federated"
-            }
+            "${it.accountKey}_federated"
         }.asStateIn(viewModelScope, null)
     }
 }

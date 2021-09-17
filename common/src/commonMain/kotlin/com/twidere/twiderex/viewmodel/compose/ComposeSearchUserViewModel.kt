@@ -34,6 +34,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.mapNotNull
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
@@ -41,7 +42,7 @@ class ComposeSearchUserViewModel(
     private val accountRepository: AccountRepository,
 ) : ViewModel() {
     private val account by lazy {
-        accountRepository.activeAccount.asStateIn(viewModelScope, null)
+        accountRepository.activeAccount.asStateIn(viewModelScope, null).mapNotNull { it }
     }
 
     val text = MutableStateFlow("")
@@ -49,21 +50,19 @@ class ComposeSearchUserViewModel(
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     val source = text.debounce(666L).flatMapLatest {
         it.takeIf { it.isNotEmpty() }?.let { str ->
-            account.flatMapLatest {
-                it?.let { account ->
-                    Pager(
-                        config = PagingConfig(
-                            pageSize = defaultLoadCount,
-                            enablePlaceholders = false,
-                        )
-                    ) {
-                        SearchUserPagingSource(
-                            accountKey = account.accountKey,
-                            str,
-                            account.service as SearchService
-                        )
-                    }.flow
-                } ?: emptyFlow()
+            account.flatMapLatest { account ->
+                Pager(
+                    config = PagingConfig(
+                        pageSize = defaultLoadCount,
+                        enablePlaceholders = false,
+                    )
+                ) {
+                    SearchUserPagingSource(
+                        accountKey = account.accountKey,
+                        str,
+                        account.service as SearchService
+                    )
+                }.flow
             }
         } ?: emptyFlow()
     }.cachedIn(viewModelScope)

@@ -29,8 +29,8 @@ import com.twidere.twiderex.extensions.asStateIn
 import com.twidere.twiderex.paging.source.SearchUserPagingSource
 import com.twidere.twiderex.repository.AccountRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.mapNotNull
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
@@ -40,27 +40,25 @@ class SearchUserViewModel(
     following: Boolean = false,
 ) : ViewModel() {
     private val account by lazy {
-        accountRepository.activeAccount.asStateIn(viewModelScope, null)
+        accountRepository.activeAccount.asStateIn(viewModelScope, null).mapNotNull { it }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val source by lazy {
-        account.flatMapLatest {
-            it?.let { account ->
-                Pager(
-                    config = PagingConfig(
-                        pageSize = defaultLoadCount,
-                        enablePlaceholders = false,
-                    )
-                ) {
-                    SearchUserPagingSource(
-                        accountKey = account.accountKey,
-                        keyword,
-                        account.service as SearchService,
-                        following = following
-                    )
-                }.flow
-            } ?: emptyFlow()
+        account.flatMapLatest { account ->
+            Pager(
+                config = PagingConfig(
+                    pageSize = defaultLoadCount,
+                    enablePlaceholders = false,
+                )
+            ) {
+                SearchUserPagingSource(
+                    accountKey = account.accountKey,
+                    keyword,
+                    account.service as SearchService,
+                    following = following
+                )
+            }.flow
         }.cachedIn(viewModelScope)
     }
 }

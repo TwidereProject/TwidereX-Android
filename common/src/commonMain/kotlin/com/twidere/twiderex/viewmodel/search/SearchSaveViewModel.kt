@@ -25,6 +25,7 @@ import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.SearchRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
@@ -35,7 +36,7 @@ class SearchSaveViewModel(
     private val content: String,
 ) : ViewModel() {
     private val account by lazy {
-        accountRepository.activeAccount.asStateIn(viewModelScope, null)
+        accountRepository.activeAccount.asStateIn(viewModelScope, null).mapNotNull { it }
     }
 
     val loading = MutableStateFlow(false)

@@ -48,7 +48,7 @@ class DMNewConversationViewModel(
     private val accountRepository: AccountRepository,
 ) : ViewModel() {
     private val account by lazy {
-        accountRepository.activeAccount.asStateIn(viewModelScope, null)
+        accountRepository.activeAccount.asStateIn(viewModelScope, null).mapNotNull { it }
     }
 
     val input = MutableStateFlow("")

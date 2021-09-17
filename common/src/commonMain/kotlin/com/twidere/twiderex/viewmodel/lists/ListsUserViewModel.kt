@@ -30,9 +30,9 @@ import com.twidere.twiderex.repository.ListsUsersRepository
 import com.twidere.twiderex.viewmodel.user.UserListViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
@@ -43,32 +43,28 @@ class ListsUserViewModel(
     private val viewMembers: Boolean = true,
 ) : UserListViewModel() {
     private val account by lazy {
-        accountRepository.activeAccount.asStateIn(viewModelScope, null)
+        accountRepository.activeAccount.asStateIn(viewModelScope, null).mapNotNull { it }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val members by lazy {
-        account.flatMapLatest {
-            it?.let { account ->
-                listsUsersRepository.fetchMembers(
-                    accountKey = account.accountKey,
-                    service = account.service as ListsService,
-                    listId = listId
-                )
-            } ?: emptyFlow()
+        account.flatMapLatest { account ->
+            listsUsersRepository.fetchMembers(
+                accountKey = account.accountKey,
+                service = account.service as ListsService,
+                listId = listId
+            )
         }.cachedIn(viewModelScope)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val subscribers by lazy {
-        account.flatMapLatest {
-            it?.let { account ->
-                listsUsersRepository.fetchSubscribers(
-                    accountKey = account.accountKey,
-                    service = account.service as ListsService,
-                    listId = listId
-                )
-            } ?: emptyFlow()
+        account.flatMapLatest { account ->
+            listsUsersRepository.fetchSubscribers(
+                accountKey = account.accountKey,
+                service = account.service as ListsService,
+                listId = listId
+            )
         }.cachedIn(viewModelScope)
     }
 

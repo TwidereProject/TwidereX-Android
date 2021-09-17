@@ -28,9 +28,9 @@ import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.StatusRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
@@ -42,7 +42,7 @@ class MediaViewModel(
     private val statusKey: MicroBlogKey,
 ) : ViewModel() {
     private val account by lazy {
-        accountRepository.activeAccount.asStateIn(viewModelScope, null)
+        accountRepository.activeAccount.asStateIn(viewModelScope, null).mapNotNull { it }
     }
 
     fun saveFile(currentMedia: UiMedia, target: String) = viewModelScope.launch {
@@ -70,14 +70,10 @@ class MediaViewModel(
     @OptIn(ExperimentalCoroutinesApi::class)
     val status by lazy {
         account.flatMapLatest {
-            if (it != null) {
-                repository.loadStatus(
-                    statusKey = statusKey,
-                    accountKey = it.accountKey,
-                )
-            } else {
-                emptyFlow()
-            }
+            repository.loadStatus(
+                statusKey = statusKey,
+                accountKey = it.accountKey,
+            )
         }
     }
 

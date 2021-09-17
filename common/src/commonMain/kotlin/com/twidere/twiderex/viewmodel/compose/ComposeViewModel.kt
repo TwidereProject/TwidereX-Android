@@ -162,21 +162,19 @@ open class ComposeViewModel(
     val composeType: ComposeType,
 ) : ViewModel() {
     private val account by lazy {
-        accountRepository.activeAccount.asStateIn(viewModelScope, null)
+        accountRepository.activeAccount.asStateIn(viewModelScope, null).mapNotNull { it }
     }
 
     open val draftId: String = UUID.randomUUID().toString()
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val emojis by lazy {
-        account.flatMapLatest {
-            it?.let { account ->
-                if (account.type == PlatformType.Mastodon) {
-                    MastodonEmojiCache.get(account)
-                } else {
-                    emptyFlow()
-                }
-            } ?: emptyFlow()
+        account.flatMapLatest { account ->
+            if (account.type == PlatformType.Mastodon) {
+                MastodonEmojiCache.get(account)
+            } else {
+                emptyFlow()
+            }
         }.asStateIn(viewModelScope, emptyList())
     }
 
@@ -364,12 +362,11 @@ open class ComposeViewModel(
 
     private val imageLimit by lazy {
         account.map {
-            when (it?.type) {
+            when (it.type) {
                 PlatformType.Twitter -> 4
                 PlatformType.StatusNet -> TODO()
                 PlatformType.Fanfou -> TODO()
                 PlatformType.Mastodon -> 4
-                else -> 4
             }
         }.asStateIn(viewModelScope, 4)
     }

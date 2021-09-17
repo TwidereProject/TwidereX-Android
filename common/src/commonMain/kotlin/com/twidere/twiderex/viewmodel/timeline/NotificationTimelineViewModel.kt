@@ -30,6 +30,7 @@ import com.twidere.twiderex.paging.mediator.timeline.NotificationTimelineMediato
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.NotificationRepository
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class NotificationTimelineViewModel(
@@ -39,33 +40,29 @@ class NotificationTimelineViewModel(
     private val accountRepository: AccountRepository,
 ) : TimelineViewModel(dataStore) {
     private val account by lazy {
-        accountRepository.activeAccount.asStateIn(viewModelScope, null)
+        accountRepository.activeAccount.asStateIn(viewModelScope, null).mapNotNull { it }
     }
 
     override val pagingMediator by lazy {
         account.map {
-            it?.let {
-                NotificationTimelineMediator(
-                    service = it.service as NotificationService,
-                    accountKey = it.accountKey,
-                    database = database,
-                    addCursorIfNeed = { data, accountKey ->
-                        notificationRepository.addCursorIfNeeded(
-                            accountKey,
-                            NotificationCursorType.General,
-                            data.status.statusId,
-                            data.status.timestamp
-                        )
-                    }
-                )
-            }
+            NotificationTimelineMediator(
+                service = it.service as NotificationService,
+                accountKey = it.accountKey,
+                database = database,
+                addCursorIfNeed = { data, accountKey ->
+                    notificationRepository.addCursorIfNeeded(
+                        accountKey,
+                        NotificationCursorType.General,
+                        data.status.statusId,
+                        data.status.timestamp
+                    )
+                }
+            )
         }.asStateIn(viewModelScope, null)
     }
     override val savedStateKey by lazy {
         account.map {
-            it?.let {
-                "${it.accountKey}_notification"
-            }
+            "${it.accountKey}_notification"
         }.asStateIn(viewModelScope, null)
     }
 }

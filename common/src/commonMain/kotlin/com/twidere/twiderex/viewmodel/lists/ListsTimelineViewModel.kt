@@ -29,6 +29,7 @@ import com.twidere.twiderex.repository.TimelineRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.mapNotNull
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
@@ -38,19 +39,17 @@ class ListsTimelineViewModel(
     listKey: MicroBlogKey,
 ) : ViewModel() {
     private val account by lazy {
-        accountRepository.activeAccount.asStateIn(viewModelScope, null)
+        accountRepository.activeAccount.asStateIn(viewModelScope, null).mapNotNull { it }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val source by lazy {
         account.flatMapLatest {
-            it?.let {
-                repository.listTimeline(
-                    listKey = listKey,
-                    accountKey = it.accountKey,
-                    service = it.service as TimelineService
-                )
-            } ?: emptyFlow()
+            repository.listTimeline(
+                listKey = listKey,
+                accountKey = it.accountKey,
+                service = it.service as TimelineService
+            )
         }.cachedIn(viewModelScope)
     }
 }

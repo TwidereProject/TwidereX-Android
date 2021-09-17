@@ -47,7 +47,7 @@ class UserViewModel(
 ) : ViewModel() {
     private val refreshFlow = MutableStateFlow(UUID.randomUUID())
     private val account by lazy {
-        accountRepository.activeAccount.asStateIn(viewModelScope, null)
+        accountRepository.activeAccount.asStateIn(viewModelScope, null).mapNotNull { it }
     }
 
     val refreshing = MutableStateFlow(false)
@@ -68,9 +68,7 @@ class UserViewModel(
     @OptIn(ExperimentalCoroutinesApi::class)
     val isMe by lazy {
         account.transformLatest {
-            it?.let {
-                emit(it.accountKey == userKey)
-            }
+            emit(it.accountKey == userKey)
         }.asStateIn(viewModelScope, false)
     }
 

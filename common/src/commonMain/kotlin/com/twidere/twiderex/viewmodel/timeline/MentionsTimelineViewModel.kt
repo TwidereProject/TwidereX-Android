@@ -30,6 +30,7 @@ import com.twidere.twiderex.paging.mediator.timeline.MentionTimelineMediator
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.NotificationRepository
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class MentionsTimelineViewModel(
@@ -39,33 +40,29 @@ class MentionsTimelineViewModel(
     private val accountRepository: AccountRepository,
 ) : TimelineViewModel(dataStore) {
     private val account by lazy {
-        accountRepository.activeAccount.asStateIn(viewModelScope, null)
+        accountRepository.activeAccount.asStateIn(viewModelScope, null).mapNotNull { it }
     }
 
     override val pagingMediator by lazy {
         account.map {
-            it?.let {
-                MentionTimelineMediator(
-                    service = it.service as TimelineService,
-                    accountKey = it.accountKey,
-                    database = database,
-                    addCursorIfNeed = { data, accountKey ->
-                        notificationRepository.addCursorIfNeeded(
-                            accountKey,
-                            NotificationCursorType.Mentions,
-                            data.status.statusId,
-                            data.status.timestamp,
-                        )
-                    }
-                )
-            }
+            MentionTimelineMediator(
+                service = it.service as TimelineService,
+                accountKey = it.accountKey,
+                database = database,
+                addCursorIfNeed = { data, accountKey ->
+                    notificationRepository.addCursorIfNeeded(
+                        accountKey,
+                        NotificationCursorType.Mentions,
+                        data.status.statusId,
+                        data.status.timestamp,
+                    )
+                }
+            )
         }.asStateIn(viewModelScope, null)
     }
     override val savedStateKey by lazy {
         account.map {
-            it?.let {
-                "${it.accountKey}_mentions"
-            }
+            "${it.accountKey}_mentions"
         }.asStateIn(viewModelScope, null)
     }
 }

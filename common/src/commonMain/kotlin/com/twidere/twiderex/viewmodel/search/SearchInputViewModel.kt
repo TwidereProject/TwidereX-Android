@@ -28,7 +28,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
@@ -38,24 +38,20 @@ class SearchInputViewModel(
     private val accountRepository: AccountRepository,
 ) : ViewModel() {
     private val account by lazy {
-        accountRepository.activeAccount.asStateIn(viewModelScope, null)
+        accountRepository.activeAccount.asStateIn(viewModelScope, null).mapNotNull { it }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val source by lazy {
         account.flatMapLatest {
-            it?.let {
-                repository.searchHistory(it.accountKey)
-            } ?: flowOf(emptyList())
+            repository.searchHistory(it.accountKey)
         }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val savedSource by lazy {
         account.flatMapLatest {
-            it?.let {
-                repository.savedSearch(it.accountKey)
-            } ?: flowOf(emptyList())
+            repository.savedSearch(it.accountKey)
         }
     }
 

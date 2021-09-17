@@ -26,8 +26,8 @@ import com.twidere.twiderex.extensions.asStateIn
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.TimelineRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.mapNotNull
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
@@ -37,19 +37,17 @@ class MastodonHashtagViewModel(
     keyword: String,
 ) : ViewModel() {
     private val account by lazy {
-        accountRepository.activeAccount.asStateIn(viewModelScope, null)
+        accountRepository.activeAccount.asStateIn(viewModelScope, null).mapNotNull { it }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val source by lazy {
         account.flatMapLatest {
-            it?.let {
-                repository.mastodonHashtagTimeline(
-                    keyword = keyword,
-                    accountKey = it.accountKey,
-                    service = it.service as MastodonService
-                )
-            } ?: emptyFlow()
+            repository.mastodonHashtagTimeline(
+                keyword = keyword,
+                accountKey = it.accountKey,
+                service = it.service as MastodonService
+            )
         }.cachedIn(viewModelScope)
     }
 }

@@ -29,9 +29,9 @@ import com.twidere.twiderex.paging.mediator.paging.pager
 import com.twidere.twiderex.paging.mediator.search.SearchStatusMediator
 import com.twidere.twiderex.repository.AccountRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
@@ -41,20 +41,18 @@ class SearchTweetsViewModel(
     keyword: String,
 ) : ViewModel() {
     private val account by lazy {
-        accountRepository.activeAccount.asStateIn(viewModelScope, null)
+        accountRepository.activeAccount.asStateIn(viewModelScope, null).mapNotNull { it }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val source by lazy {
-        account.flatMapLatest {
-            it?.let { account ->
-                SearchStatusMediator(
-                    keyword,
-                    database,
-                    account.accountKey,
-                    account.service as SearchService
-                ).pager().flow.map { it.map { it.status } }.cachedIn(viewModelScope)
-            } ?: emptyFlow()
+        account.flatMapLatest { account ->
+            SearchStatusMediator(
+                keyword,
+                database,
+                account.accountKey,
+                account.service as SearchService
+            ).pager().flow.map { it.map { it.status } }.cachedIn(viewModelScope)
         }.cachedIn(viewModelScope)
     }
 }

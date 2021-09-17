@@ -25,6 +25,7 @@ import com.twidere.twiderex.model.HomeMenus
 import com.twidere.twiderex.repository.AccountRepository
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
@@ -36,7 +37,7 @@ class LayoutViewModel(
     private val accountRepository: AccountRepository,
 ) : ViewModel() {
     private val account by lazy {
-        accountRepository.activeAccount.asStateIn(viewModelScope, null)
+        accountRepository.activeAccount.asStateIn(viewModelScope, null).mapNotNull { it }
     }
 
     fun updateHomeMenu(oldIndex: Int, newIndex: Int, menus: List<Any>) = viewModelScope.launch {
@@ -79,7 +80,7 @@ class LayoutViewModel(
 
     val user by lazy {
         account.map {
-            it?.toUi()
+            it.toUi()
         }
     }
 }

@@ -29,8 +29,8 @@ import com.twidere.twiderex.extensions.asStateIn
 import com.twidere.twiderex.paging.source.MastodonSearchHashtagPagingSource
 import com.twidere.twiderex.repository.AccountRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.mapNotNull
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
@@ -39,25 +39,23 @@ class MastodonSearchHashtagViewModel(
     keyword: String,
 ) : ViewModel() {
     private val account by lazy {
-        accountRepository.activeAccount.asStateIn(viewModelScope, null)
+        accountRepository.activeAccount.asStateIn(viewModelScope, null).mapNotNull { it }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val source by lazy {
         account.flatMapLatest {
-            it?.let {
-                Pager(
-                    config = PagingConfig(
-                        pageSize = defaultLoadCount,
-                        enablePlaceholders = false,
-                    )
-                ) {
-                    MastodonSearchHashtagPagingSource(
-                        keyword,
-                        it.service as MastodonService
-                    )
-                }.flow
-            } ?: emptyFlow()
+            Pager(
+                config = PagingConfig(
+                    pageSize = defaultLoadCount,
+                    enablePlaceholders = false,
+                )
+            ) {
+                MastodonSearchHashtagPagingSource(
+                    keyword,
+                    it.service as MastodonService
+                )
+            }.flow
         }.cachedIn(viewModelScope)
     }
 }

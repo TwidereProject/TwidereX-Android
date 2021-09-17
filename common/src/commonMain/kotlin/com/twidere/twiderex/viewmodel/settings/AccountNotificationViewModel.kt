@@ -27,6 +27,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.lastOrNull
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
@@ -35,14 +36,12 @@ class AccountNotificationViewModel(
     private val accountRepository: AccountRepository,
 ) : ViewModel() {
     val account by lazy {
-        accountRepository.activeAccount.asStateIn(viewModelScope, null)
+        accountRepository.activeAccount.asStateIn(viewModelScope, null).mapNotNull { it }
     }
 
     val preferences by lazy {
         account.map {
-            it?.let {
-                accountRepository.getAccountPreferences(it.accountKey)
-            }
+            accountRepository.getAccountPreferences(it.accountKey)
         }.asStateIn(viewModelScope, null)
     }
 

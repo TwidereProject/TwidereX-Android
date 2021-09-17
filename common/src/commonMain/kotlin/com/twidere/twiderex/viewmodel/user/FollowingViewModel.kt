@@ -29,6 +29,7 @@ import com.twidere.twiderex.repository.UserListRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.mapNotNull
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class FollowingViewModel(
@@ -37,15 +38,13 @@ class FollowingViewModel(
     private val userKey: MicroBlogKey,
 ) : UserListViewModel() {
     private val account by lazy {
-        accountRepository.activeAccount.asStateIn(viewModelScope, null)
+        accountRepository.activeAccount.asStateIn(viewModelScope, null).mapNotNull { it }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override val source by lazy {
-        account.flatMapLatest {
-            it?.let { account ->
-                repository.following(userKey, account.service as RelationshipService)
-            } ?: emptyFlow()
+        account.flatMapLatest { account ->
+            repository.following(userKey, account.service as RelationshipService)
         }.cachedIn(viewModelScope)
     }
 }

@@ -33,7 +33,6 @@ import com.twidere.twiderex.repository.ListsRepository
 import com.twidere.twiderex.utils.notifyError
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
@@ -47,7 +46,7 @@ class ListsViewModel(
     private val accountRepository: AccountRepository,
 ) : ViewModel() {
     private val account by lazy {
-        accountRepository.activeAccount.asStateIn(viewModelScope, null)
+        accountRepository.activeAccount.asStateIn(viewModelScope, null).mapNotNull { it }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -114,7 +113,7 @@ class ListsCreateViewModel(
     private val onResult: (success: Boolean, list: UiList?) -> Unit
 ) : ListsOperatorViewModel(inAppNotification) {
     private val account by lazy {
-        accountRepository.activeAccount.asStateIn(viewModelScope, null)
+        accountRepository.activeAccount.asStateIn(viewModelScope, null).mapNotNull { it }
     }
 
     fun createList(
@@ -143,7 +142,7 @@ class ListsModifyViewModel(
     private val listKey: MicroBlogKey,
 ) : ListsOperatorViewModel(inAppNotification) {
     private val account by lazy {
-        accountRepository.activeAccount.asStateIn(viewModelScope, null)
+        accountRepository.activeAccount.asStateIn(viewModelScope, null).mapNotNull { it }
     }
 
     val editName = MutableStateFlow("")
@@ -152,13 +151,11 @@ class ListsModifyViewModel(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val source by lazy {
-        account.flatMapLatest {
-            it?.let { account ->
-                listsRepository.findListWithListKey(
-                    accountKey = account.accountKey,
-                    listKey = listKey
-                )
-            } ?: emptyFlow()
+        account.flatMapLatest { account ->
+            listsRepository.findListWithListKey(
+                accountKey = account.accountKey,
+                listKey = listKey
+            )
         }
     }
 

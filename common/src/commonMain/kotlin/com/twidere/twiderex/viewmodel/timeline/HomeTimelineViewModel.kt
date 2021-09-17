@@ -38,7 +38,7 @@ class HomeTimelineViewModel(
     private val accountRepository: AccountRepository,
 ) : TimelineViewModel(dataStore) {
     private val account by lazy {
-        accountRepository.activeAccount.asStateIn(viewModelScope, null)
+        accountRepository.activeAccount.asStateIn(viewModelScope, null).mapNotNull { it }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)

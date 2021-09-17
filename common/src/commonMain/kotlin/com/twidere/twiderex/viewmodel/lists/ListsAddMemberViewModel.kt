@@ -31,6 +31,7 @@ import com.twidere.twiderex.repository.ListsUsersRepository
 import com.twidere.twiderex.utils.notifyError
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
@@ -42,7 +43,7 @@ class ListsAddMemberViewModel(
     private val listId: String,
 ) : ViewModel() {
     private val account by lazy {
-        accountRepository.activeAccount.asStateIn(viewModelScope, null)
+        accountRepository.activeAccount.asStateIn(viewModelScope, null).mapNotNull { it }
     }
 
     val loading = MutableStateFlow(false)
