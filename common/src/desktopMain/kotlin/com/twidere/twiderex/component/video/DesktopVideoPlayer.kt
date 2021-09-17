@@ -25,7 +25,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,14 +35,14 @@ import androidx.compose.ui.awt.SwingPanel
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.rememberWindowState
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import moe.tlaster.precompose.lifecycle.Lifecycle
+import moe.tlaster.precompose.lifecycle.LifecycleObserver
+import moe.tlaster.precompose.ui.LocalLifecycleOwner
 import uk.co.caprica.vlcj.factory.discovery.NativeDiscovery
-import uk.co.caprica.vlcj.media.MediaEventAdapter
 import uk.co.caprica.vlcj.player.base.MediaPlayer
 import uk.co.caprica.vlcj.player.base.MediaPlayerEventAdapter
 import uk.co.caprica.vlcj.player.component.CallbackMediaPlayerComponent
@@ -57,11 +56,12 @@ actual fun VideoPlayerImpl(
     height: Int,
     isPlaying: Boolean
 ) {
-//    println("Video player for $url")
+
     NativeDiscovery().discover()
-    // var resumed by remember(url) {
-    //     mutableStateOf(false)
-    // }
+    val lifecycle = LocalLifecycleOwner.current.lifecycle
+    var active by remember(url) {
+        mutableStateOf(true)
+    }
     val mediaPlayerComponent = remember(url) {
         // see https://github.com/caprica/vlcj/issues/887#issuecomment-503288294
         // for why we're using CallbackMediaPlayerComponent for macOS.
@@ -71,23 +71,7 @@ actual fun VideoPlayerImpl(
             EmbeddedMediaPlayerComponent()
         }
     }
-    var windowInfo = LocalWindowInfo.current
 
-    var windowState = rememberWindowState()
-
-    LaunchedEffect(url) {
-        while (true) {
-            delay(1000)
-            println(windowState.isMinimized)
-            println(windowInfo.isWindowFocused)
-        }
-    }
-//    rememberWindowState.
-
-//    Local
-
-//    val windowFocus = Listener
-//    current.isWindowFocused
     var middleLine = 0.0f
     val composableScope = rememberCoroutineScope()
 
@@ -112,11 +96,24 @@ actual fun VideoPlayerImpl(
                 super.mediaPlayerReady(mediaPlayer)
             }
         }
-        mediaPlayerComponent.mediaPlayer().events()
-            .addMediaEventListener(object : MediaEventAdapter() {
-            })
         mediaPlayerComponent.mediaPlayer().events().addMediaPlayerEventListener(listener)
         mediaPlayerComponent.mediaPlayer().media().prepare(url)
+
+        val lifecycleObserver = object : LifecycleObserver {
+            override fun onStateChanged(state: Lifecycle.State) {
+                when (state) {
+                    Lifecycle.State.Active -> {
+                        active = true
+                    }
+                    Lifecycle.State.InActive -> {
+                        active = false
+                    }
+                    else -> {}
+                }
+            }
+        }
+        lifecycle.addObserver(lifecycleObserver)
+
         onDispose {
             mediaPlayerComponent.mediaPlayer().events().removeMediaPlayerEventListener(listener)
             mediaPlayerComponent.mediaPlayer().release()
@@ -162,7 +159,7 @@ actual fun VideoPlayerImpl(
         ) {
             val player = it.mediaPlayer()
             val controls = player.controls()
-            if (isPlaying && isMostCenter && !windowState.isMinimized) {
+            if (isPlaying && isMostCenter && active) {
                 controls.play()
             } else {
                 controls.setPause(true)
