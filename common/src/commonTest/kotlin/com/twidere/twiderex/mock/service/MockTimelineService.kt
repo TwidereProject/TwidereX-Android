@@ -84,6 +84,6 @@ internal class MockTimelineService @TestOnly constructor() : TimelineService, Mi
         for (i in 0 until count) {
             list.add(create())
         }
-        return list.toIPaging()
+        return list.reversed().toIPaging()
     }
 }

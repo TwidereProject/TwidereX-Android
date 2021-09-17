@@ -18,25 +18,33 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex
+package com.twidere.twiderex.component
 
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.graphics.painter.Painter
 import com.twidere.twiderex.compose.LocalResLoader
-import com.twidere.twiderex.di.ext.get
+import dev.icerock.moko.resources.FileResource
+import dev.icerock.moko.resources.ImageResource
+import dev.icerock.moko.resources.StringResource
 
 @Composable
-fun App() {
-    CompositionLocalProvider(
-        LocalResLoader provides get()
-    ) {
-        MaterialTheme {
-            Scaffold {
-                Text("Twidere X!")
-            }
-        }
+fun stringResource(res: StringResource, vararg formatArgs: Any): String {
+    return LocalResLoader.current.getString(res, *formatArgs)
+}
+
+@Composable
+fun stringResource(res: StringResource): String {
+    return LocalResLoader.current.getString(res)
+}
+
+/**
+ * res: FileResource:svg, ImageResource
+ */
+@Composable
+fun painterResource(res: Any): Painter {
+    return when (res) {
+        is FileResource -> LocalResLoader.current.getSvg(res)
+        is ImageResource -> LocalResLoader.current.getImage(res)
+        else -> throw NotImplementedError()
     }
 }
