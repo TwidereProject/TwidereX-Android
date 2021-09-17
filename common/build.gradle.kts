@@ -82,7 +82,11 @@ kotlin {
                 implementation("androidx.room:room-testing:${Versions.room}")
             }
         }
-        val desktopMain by getting
+        val desktopMain by getting {
+            dependencies {
+                implementation("uk.co.caprica:vlcj:4.7.1")
+            }
+        }
         val desktopTest by getting
     }
 }
