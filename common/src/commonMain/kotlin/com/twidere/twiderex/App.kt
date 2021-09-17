@@ -20,20 +20,13 @@
  */
 package com.twidere.twiderex
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
-import com.twidere.twiderex.component.video.VideoPlayer
+import com.twidere.twiderex.component.video.VideoPreview
 import com.twidere.twiderex.compose.LocalResLoader
 import com.twidere.twiderex.di.ext.get
 
@@ -46,19 +39,7 @@ fun App() {
             Scaffold {
                 Column {
                     Text("Twidere X!")
-                    LazyColumn {
-                        for (i in 0..5) {
-                            item {
-                                Box(modifier = Modifier.background(Color.DarkGray).padding(100.dp)) {
-                                    VideoPlayer(
-                                        url = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-                                        width = 640,
-                                        height = 480
-                                    )
-                                }
-                            }
-                        }
-                    }
+                    VideoPreview()
                 }
             }
         }
