@@ -21,12 +21,18 @@
 package com.twidere.twiderex.component.video
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 
 @Composable
 actual fun VideoPlayerImpl(
+    modifier: Modifier,
     url: String,
-    width: Int,
-    height: Int,
-    isPlaying: Boolean
+    volume: Float,
+    customControl: Any?,
+    showControls: Boolean,
+    zOrderMediaOverlay: Boolean,
+    keepScreenOn: Boolean,
+    isListItem: Boolean,
+    thumb: @Composable (() -> Unit)?
 ) {
 }

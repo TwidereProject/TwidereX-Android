@@ -51,10 +51,15 @@ import java.util.Locale
 
 @Composable
 actual fun VideoPlayerImpl(
+    modifier: Modifier,
     url: String,
-    width: Int,
-    height: Int,
-    isPlaying: Boolean
+    volume: Float,
+    customControl: Any?,
+    showControls: Boolean,
+    zOrderMediaOverlay: Boolean,
+    keepScreenOn: Boolean,
+    isListItem: Boolean,
+    thumb: @Composable (() -> Unit)?
 ) {
 
     NativeDiscovery().discover()
@@ -158,9 +163,8 @@ actual fun VideoPlayerImpl(
                 mediaPlayerComponent
             }
         ) {
-            val player = it.mediaPlayer()
-            val controls = player.controls()
-            if (isPlaying && isMostCenter && active) {
+            val controls = it.mediaPlayer().controls()
+            if (isMostCenter && active) {
                 controls.play()
             } else {
                 controls.setPause(true)

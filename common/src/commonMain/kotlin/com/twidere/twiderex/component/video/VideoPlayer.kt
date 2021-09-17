@@ -22,58 +22,48 @@ package com.twidere.twiderex.component.video
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.Button
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 expect fun VideoPlayerImpl(
+    modifier: Modifier = Modifier,
     url: String,
-    width: Int,
-    height: Int,
-    isPlaying: Boolean
+    volume: Float = 1f,
+    customControl: Any? = null,
+    showControls: Boolean = customControl == null,
+    zOrderMediaOverlay: Boolean = false,
+    keepScreenOn: Boolean = false,
+    isListItem: Boolean = true,
+    thumb: @Composable (() -> Unit)? = null,
 )
 
 @Composable
-fun VideoPlayer(url: String, width: Int, height: Int) {
-    Column {
-        var isPlaying by remember {
-            mutableStateOf(true)
-        }
-        VideoPlayerImpl(
-            url,
-            width,
-            height,
-            isPlaying
-        )
-        Row {
-            Button(
-                onClick = {
-                    isPlaying = true
-                }
-            ) {
-                Text("play")
-            }
-
-            Button(
-                onClick = {
-                    isPlaying = false
-                }
-            ) {
-                Text("pause")
-            }
-        }
-    }
+fun VideoPlayer(
+    modifier: Modifier = Modifier,
+    url: String,
+    volume: Float = 1f,
+    customControl: Any? = null,
+    showControls: Boolean = customControl == null,
+    zOrderMediaOverlay: Boolean = false,
+    keepScreenOn: Boolean = false,
+    isListItem: Boolean = true,
+    thumb: @Composable (() -> Unit)? = null,
+) {
+    VideoPlayerImpl(
+        modifier = modifier,
+        url = url,
+        volume = volume,
+        customControl = customControl,
+        showControls = showControls,
+        zOrderMediaOverlay = zOrderMediaOverlay,
+        keepScreenOn = keepScreenOn,
+        isListItem = isListItem,
+        thumb = thumb
+    )
 }
 
 @Composable
@@ -81,11 +71,13 @@ fun VideoPreview() {
     LazyColumn {
         for (i in 0..5) {
             item {
-                Box(modifier = Modifier.background(Color.DarkGray).padding(100.dp)) {
+                Box(
+                    modifier = Modifier
+                        .background(Color.DarkGray)
+                        .padding(100.dp)
+                ) {
                     VideoPlayer(
                         url = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-                        width = 640,
-                        height = 480
                     )
                 }
             }
