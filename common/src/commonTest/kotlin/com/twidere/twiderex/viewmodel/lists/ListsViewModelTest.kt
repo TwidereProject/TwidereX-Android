@@ -21,7 +21,6 @@
 package com.twidere.twiderex.viewmodel.lists
 
 import androidx.paging.PagingData
-import com.twidere.twiderex.MainThreadTestBase
 import com.twidere.twiderex.mock.paging.collectDataForTest
 import com.twidere.twiderex.mock.service.MockListsService
 import com.twidere.twiderex.model.AccountDetails
@@ -30,7 +29,7 @@ import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiList
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.ListsRepository
-import io.mockk.MockKAnnotations
+import com.twidere.twiderex.viewmodel.ViewModelTestBase
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.Dispatchers
@@ -41,7 +40,7 @@ import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import kotlin.test.assertEquals
 
-internal class ListsViewModelTest : MainThreadTestBase() {
+internal class ListsViewModelTest : ViewModelTestBase() {
 
     @MockK
     private lateinit var mockRepository: ListsRepository
@@ -65,7 +64,6 @@ internal class ListsViewModelTest : MainThreadTestBase() {
 
     override fun setUp() {
         super.setUp()
-        MockKAnnotations.init(this, relaxUnitFun = true)
         every { mockRepository.fetchLists(any(), any()) }.returns(
             flowOf(
                 PagingData.from(

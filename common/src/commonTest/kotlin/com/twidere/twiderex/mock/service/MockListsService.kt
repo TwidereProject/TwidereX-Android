@@ -25,6 +25,7 @@ import com.twidere.services.microblog.MicroBlogService
 import com.twidere.services.microblog.model.IListModel
 import com.twidere.services.microblog.model.IUser
 import com.twidere.services.twitter.model.TwitterList
+import com.twidere.services.twitter.model.exceptions.TwitterApiException
 import com.twidere.twiderex.dataprovider.mapper.toUi
 import com.twidere.twiderex.mock.model.mockIListModel
 import com.twidere.twiderex.mock.model.mockIUser
@@ -81,6 +82,7 @@ internal class MockListsService : ListsService, MicroBlogService, ErrorService()
 
     override suspend fun destroyList(listId: String) {
         checkError()
+        if (listId == "error") throw TwitterApiException(error = "throw exception intentional")
         // do nothing
     }
 
