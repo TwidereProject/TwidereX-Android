@@ -103,7 +103,6 @@ actual fun VideoPlayerImpl(
         lifecycle.addObserver(lifecycleObserver)
 
         onDispose {
-            mediaPlayerComponent.mediaPlayer().events().removeMediaPlayerEventListener(listener)
             lifecycle.removeObserver(lifecycleObserver)
             mediaPlayerComponent.mediaPlayer().release()
         }
