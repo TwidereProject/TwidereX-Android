@@ -20,7 +20,9 @@
  */
 package com.twidere.twiderex.component.foundation
 
+import android.content.Context
 import android.view.SurfaceView
+import android.view.View
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -48,6 +50,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.ui.viewinterop.NoOpUpdate
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
@@ -151,7 +154,10 @@ actual fun VideoPlayerImpl(
                 mutableStateOf(false)
             }
             var debounceJob: Job? = null
-            AndroidView(
+            PlatformView(
+                zOrderMediaOverlay = zOrderMediaOverlay,
+                showControls = showControls,
+                keepScreenOn = keepScreenOn,
                 modifier = modifier.onGloballyPositioned { coordinates ->
                     if (middleLine == 0.0f) {
                         var rootCoordinates = coordinates
@@ -177,25 +183,18 @@ actual fun VideoPlayerImpl(
                         }
                     }
                 },
-                factory = { context ->
-                    StyledPlayerView(context).also { playerView ->
-                        (playerView.videoSurfaceView as? SurfaceView)?.setZOrderMediaOverlay(zOrderMediaOverlay)
-                        playerView.useController = showControls
-                        playerView.keepScreenOn = keepScreenOn
-                    }
-                }
             ) {
                 it.player = player
                 if (isResume && isMostCenter) {
                     if (isListItem) {
                         player.playWhenReady = autoPlay
                     }
-                    it.onResume()
+                    it.resume()
                 } else {
                     if (isListItem) {
                         player.playWhenReady = false
                     }
-                    it.onPause()
+                    it.pause()
                 }
             }
         }
@@ -215,6 +214,66 @@ actual fun VideoPlayerImpl(
                     contentDescription = resLoder.getString(accessibility_common_video_play)
                 )
             }
+        }
+    }
+}
+
+@Composable
+fun PlatformView(
+    zOrderMediaOverlay: Boolean,
+    showControls: Boolean,
+    keepScreenOn: Boolean,
+    modifier: Modifier = Modifier,
+    update: (NativePlayer) -> Unit = {}
+) {
+    val nativePlayer = remember {
+        nativeViewFactory(
+            zOrderMediaOverlay,
+            showControls,
+            keepScreenOn
+        )
+    }
+    AndroidView(
+        factory = {
+            nativePlayer.player as View
+        },
+        modifier = modifier,
+        update = {
+            update.invoke(nativePlayer)
+        }
+    )
+}
+
+class  NativePlayer {
+    var player: Any?= null
+
+    fun setP(p: Any) {
+
+    }
+
+    fun resume() {
+
+    }
+    fun pause() {
+
+    }
+
+    fun update() {
+
+    }
+}
+
+fun nativeViewFactory(
+    zOrderMediaOverlay: Boolean,
+    showControls: Boolean,
+    keepScreenOn: Boolean
+): NativePlayer {
+    val context = LocalContext.current
+    return NativePlayer().apply {
+        player = StyledPlayerView(context).also { playerView ->
+            (playerView.videoSurfaceView as? SurfaceView)?.setZOrderMediaOverlay(zOrderMediaOverlay)
+            playerView.useController = showControls
+            playerView.keepScreenOn = keepScreenOn
         }
     }
 }
