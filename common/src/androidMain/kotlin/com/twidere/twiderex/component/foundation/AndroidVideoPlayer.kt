@@ -20,7 +20,6 @@
  */
 package com.twidere.twiderex.component.foundation
 
-import android.content.Context
 import android.view.SurfaceView
 import android.view.View
 import androidx.compose.foundation.background
@@ -50,7 +49,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.compose.ui.viewinterop.NoOpUpdate
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
@@ -67,9 +65,6 @@ import com.twidere.twiderex.MR.strings.accessibility_common_video_play
 import com.twidere.twiderex.compose.LocalResLoader
 import com.twidere.twiderex.http.TwidereServiceFactory
 import com.twidere.twiderex.preferences.LocalHttpConfig
-import com.twidere.twiderex.preferences.model.DisplayPreferences
-import com.twidere.twiderex.ui.LocalIsActiveNetworkMetered
-import com.twidere.twiderex.ui.LocalVideoPlayback
 import com.twidere.twiderex.utils.video.CacheDataSourceFactory
 import com.twidere.twiderex.utils.video.VideoPool
 import kotlinx.coroutines.Job
@@ -97,7 +92,7 @@ actual fun VideoPlayerImpl(
     Box {
         if (playInitial) {
             val player = remember(url) {
-                getPlater(
+                getNativePlater(
                     url = url,
                     autoPlay = autoPlay,
                     setShowThumb = {
@@ -108,11 +103,11 @@ actual fun VideoPlayerImpl(
                     }
                 )
             }
-            player.volume = volume
+            player.setVolume(volume)
 
             fun updateState() {
                 autoPlay = player.playWhenReady
-                VideoPool.set(url, 0L.coerceAtLeast(player.contentPosition))
+                VideoPool.set(url, 0L.coerceAtLeast(player.contentPosition()))
             }
 
             LaunchedEffect(customControl) {
@@ -224,7 +219,7 @@ fun PlatformView(
     showControls: Boolean,
     keepScreenOn: Boolean,
     modifier: Modifier = Modifier,
-    update: (NativePlayer) -> Unit = {}
+    update: (NativePlayerView) -> Unit = {}
 ) {
     val nativePlayer = remember {
         nativeViewFactory(
@@ -235,7 +230,7 @@ fun PlatformView(
     }
     AndroidView(
         factory = {
-            nativePlayer.player as View
+            nativePlayer.playerView as View
         },
         modifier = modifier,
         update = {
@@ -244,22 +239,54 @@ fun PlatformView(
     )
 }
 
+class NativePlayerView() {
+    var playerView: Any?= null
+    var player: NativePlayer?= null
+
+    private fun realPlayerView() = playerView as? StyledPlayerView
+
+    fun resume() = realPlayerView()?.onResume()
+
+    fun pause() = realPlayerView()?.onPause()
+}
+
 class  NativePlayer {
     var player: Any?= null
+
+    private fun realPlayer() = player as? RemainingTimeExoPlayer
+
+    // var playWhenReady = realPlayer as
+
+    var playWhenReady: Boolean
+        get() = realPlayer()?.playWhenReady ?: false
+        set(value) {
+            realPlayer()?.playWhenReady = value
+        }
+
+    fun contentPosition(): Long = realPlayer()?.contentPosition?:0L
 
     fun setP(p: Any) {
 
     }
 
     fun resume() {
-
+        // getRealPlayer()?.res
     }
-    fun pause() {
 
+    fun pause() {
+        realPlayer()?.pause()
     }
 
     fun update() {
 
+    }
+
+    fun setVolume(volume: Float) {
+        realPlayer()?.volume = volume
+    }
+
+    fun release() {
+        realPlayer()?.release()
     }
 }
 
@@ -267,10 +294,10 @@ fun nativeViewFactory(
     zOrderMediaOverlay: Boolean,
     showControls: Boolean,
     keepScreenOn: Boolean
-): NativePlayer {
+): NativePlayerView {
     val context = LocalContext.current
-    return NativePlayer().apply {
-        player = StyledPlayerView(context).also { playerView ->
+    return NativePlayerView().apply {
+        playerView = StyledPlayerView(context).also { playerView ->
             (playerView.videoSurfaceView as? SurfaceView)?.setZOrderMediaOverlay(zOrderMediaOverlay)
             playerView.useController = showControls
             playerView.keepScreenOn = keepScreenOn
@@ -278,57 +305,59 @@ fun nativeViewFactory(
     }
 }
 
-fun getPlater(
+fun getNativePlater(
     url: String,
     autoPlay: Boolean,
     setShowThumb: (Boolean) -> Unit,
     setPLaying: (Boolean) -> Unit,
-): RemainingTimeExoPlayer {
+): NativePlayer {
     val context = LocalContext.current
     val httpConfig = LocalHttpConfig.current
-    return RemainingTimeExoPlayer(
-        SimpleExoPlayer.Builder(context)
-            .apply {
-                if (httpConfig.proxyConfig.enable) {
-                    // replace DataSource
-                    OkHttpDataSource.Factory(
-                        TwidereServiceFactory
-                            .createHttpClientFactory()
-                            .createHttpClientBuilder()
-                            .build()
-                    )
-                        .let {
-                            DefaultDataSourceFactory(context, it)
-                        }.let {
-                            DefaultMediaSourceFactory(it)
-                        }.let {
-                            setMediaSourceFactory(it)
-                        }
+    return NativePlayer().apply {
+        player = RemainingTimeExoPlayer(
+            SimpleExoPlayer.Builder(context)
+                .apply {
+                    if (httpConfig.proxyConfig.enable) {
+                        // replace DataSource
+                        OkHttpDataSource.Factory(
+                            TwidereServiceFactory
+                                .createHttpClientFactory()
+                                .createHttpClientBuilder()
+                                .build()
+                        )
+                            .let {
+                                DefaultDataSourceFactory(context, it)
+                            }.let {
+                                DefaultMediaSourceFactory(it)
+                            }.let {
+                                setMediaSourceFactory(it)
+                            }
+                    }
                 }
-            }
-    ).apply {
-        repeatMode = Player.REPEAT_MODE_ALL
-        playWhenReady = autoPlay
-        addListener(object : Player.Listener {
-            override fun onPlaybackStateChanged(state: Int) {
-                setShowThumb(state != Player.STATE_READY)
-            }
+        ).apply {
+            repeatMode = Player.REPEAT_MODE_ALL
+            playWhenReady = autoPlay
+            addListener(object : Player.Listener {
+                override fun onPlaybackStateChanged(state: Int) {
+                    setShowThumb(state != Player.STATE_READY)
+                }
 
-            override fun onIsPlayingChanged(isPlaying: Boolean) {
-                setPLaying(isPlaying)
-            }
-        })
+                override fun onIsPlayingChanged(isPlaying: Boolean) {
+                    setPLaying(isPlaying)
+                }
+            })
 
-        ProgressiveMediaSource.Factory(
-            CacheDataSourceFactory(
-                context,
-                5L * 1024L * 1024L,
-            )
-        ).createMediaSource(MediaItem.fromUri(url)).also {
-            setMediaSource(it)
+            ProgressiveMediaSource.Factory(
+                CacheDataSourceFactory(
+                    context,
+                    5L * 1024L * 1024L,
+                )
+            ).createMediaSource(MediaItem.fromUri(url)).also {
+                setMediaSource(it)
+            }
+            prepare()
+            seekTo(VideoPool.get(url))
         }
-        prepare()
-        seekTo(VideoPool.get(url))
     }
 }
 
