@@ -79,7 +79,7 @@ fun VideoPlayer(
     val httpConfig = httpConfig()
     Box {
         if (playInitial) {
-            val player = remember(url) {
+            val nativePlayer = remember(url) {
                 getNativePlayer(
                     url = url,
                     autoPlay = autoPlay,
@@ -93,15 +93,15 @@ fun VideoPlayer(
                     }
                 )
             }
-            player.setVolume(volume)
+            nativePlayer.setVolume(volume)
 
             fun updateState() {
-                autoPlay = player.playWhenReady
-                VideoPool.set(url, 0L.coerceAtLeast(player.contentPosition()))
+                autoPlay = nativePlayer.playWhenReady
+                VideoPool.set(url, 0L.coerceAtLeast(nativePlayer.contentPosition()))
             }
 
             LaunchedEffect(customControl) {
-                player.setCustomControl(customControl)
+                nativePlayer.setCustomControl(customControl)
             }
             var isResume by remember {
                 mutableStateOf(true)
@@ -115,12 +115,12 @@ fun VideoPlayer(
                         when (state) {
                             Lifecycle.State.Active -> {
                                 isResume = true
-                                player.playWhenReady = autoPlay
+                                nativePlayer.playWhenReady = autoPlay
                             }
                             Lifecycle.State.InActive -> {
                                 isResume = false
                                 updateState()
-                                player.playWhenReady = false
+                                nativePlayer.playWhenReady = false
                             }
                             else -> {}
                         }
@@ -129,7 +129,7 @@ fun VideoPlayer(
                 lifecycle.addObserver(observer)
                 onDispose {
                     updateState()
-                    player.release()
+                    nativePlayer.release()
                     VideoPool.removeRect(videoKey)
                     lifecycle.removeObserver(observer)
                 }
@@ -146,7 +146,7 @@ fun VideoPlayer(
                 zOrderMediaOverlay = zOrderMediaOverlay,
                 showControls = showControls,
                 keepScreenOn = keepScreenOn,
-                player = player,
+                player = nativePlayer.player,
                 modifier = modifier.onGloballyPositioned { coordinates ->
                     if (middleLine == 0.0f) {
                         var rootCoordinates = coordinates
@@ -173,15 +173,15 @@ fun VideoPlayer(
                     }
                 },
             ) {
-                it.player = player
+                it.player = nativePlayer
                 if (isResume && isMostCenter) {
                     if (isListItem) {
-                        player.playWhenReady = autoPlay
+                        nativePlayer.playWhenReady = autoPlay
                     }
                     it.resume()
                 } else {
                     if (isListItem) {
-                        player.playWhenReady = false
+                        nativePlayer.playWhenReady = false
                     }
                     it.pause()
                 }

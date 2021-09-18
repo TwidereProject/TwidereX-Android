@@ -119,7 +119,7 @@ actual fun PlatformView(
     }
     SwingPanel(
         factory = {
-            nativePlayer.playerView as Component
+            nativePlayer.playerView as CallbackMediaPlayerComponent
         },
         modifier = modifier,
         update = {
