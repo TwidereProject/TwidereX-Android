@@ -28,7 +28,6 @@ import uk.co.caprica.vlcj.player.base.MediaPlayer
 import uk.co.caprica.vlcj.player.component.CallbackMediaPlayerComponent
 import uk.co.caprica.vlcj.player.component.EmbeddedMediaPlayerComponent
 import uk.co.caprica.vlcj.player.component.MediaPlayerComponent
-import java.awt.Component
 import java.util.Locale
 
 actual class NativePlayer {
@@ -91,10 +90,12 @@ actual fun getNativePlayer(
     setPLaying: (Boolean) -> Unit
 ): NativePlayer {
     return NativePlayer().apply {
-        player = if (isMacOS()) {
+        player = (if (isMacOS()) {
             CallbackMediaPlayerComponent()
         } else {
             EmbeddedMediaPlayerComponent()
+        }).apply {
+            mediaPlayer().media().prepare(url)
         }
     }
 }
@@ -119,7 +120,11 @@ actual fun PlatformView(
     }
     SwingPanel(
         factory = {
-            nativePlayer.playerView as CallbackMediaPlayerComponent
+            if (isMacOS()) {
+                nativePlayer.playerView as CallbackMediaPlayerComponent
+            } else {
+                nativePlayer.playerView as EmbeddedMediaPlayerComponent
+            }
         },
         modifier = modifier,
         update = {
