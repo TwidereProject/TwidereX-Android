@@ -20,16 +20,8 @@
  */
 package com.twidere.twiderex.component.foundation
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.preferences.model.DisplayPreferences
 import com.twidere.twiderex.ui.LocalIsActiveNetworkMetered
 import com.twidere.twiderex.ui.LocalVideoPlayback
@@ -77,22 +69,45 @@ internal fun getPlayInitial() = when(LocalVideoPlayback.current) {
     DisplayPreferences.AutoPlayback.Off -> false
 }
 
-@Composable
-fun VideoPreview() {
-    LazyColumn {
-        for (i in 0..5) {
-            item {
-                Box(
-                    modifier = Modifier
-                        .background(Color.DarkGray)
-                        .padding(100.dp)
-                ) {
-                    VideoPlayer(
-                        url = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-                        modifier = Modifier.width(500.dp).height(500.dp)
-                    )
-                }
-            }
-        }
-    }
+expect class NativePlayerView() {
+    var playerView: Any?
+    var player: NativePlayer?
+    fun resume(): Unit?
+    fun pause(): Unit?
 }
+
+expect class NativePlayer {
+
+    // var playWhenReady = realPlayer as
+    var player: Any?
+    var playWhenReady: Boolean
+    fun contentPosition(): Long
+    fun setCustomControl(customControl: Any?)
+    fun resume()
+    fun pause()
+    fun update()
+    fun setVolume(volume: Float)
+    fun release()
+}
+
+expect fun nativeViewFactory(
+    zOrderMediaOverlay: Boolean,
+    showControls: Boolean,
+    keepScreenOn: Boolean
+): NativePlayerView
+
+expect fun getNativePlayer(
+    url: String,
+    autoPlay: Boolean,
+    setShowThumb: (Boolean) -> Unit,
+    setPLaying: (Boolean) -> Unit
+): NativePlayer
+
+@Composable
+expect fun PlatformView(
+    zOrderMediaOverlay: Boolean,
+    showControls: Boolean,
+    keepScreenOn: Boolean,
+    modifier: Modifier,
+    update: (NativePlayerView) -> Unit
+)

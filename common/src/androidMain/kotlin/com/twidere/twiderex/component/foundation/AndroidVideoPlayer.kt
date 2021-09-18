@@ -91,7 +91,7 @@ actual fun VideoPlayerImpl(
     Box {
         if (playInitial) {
             val player = remember(url) {
-                getNativePlater(
+                getNativePlayer(
                     url = url,
                     autoPlay = autoPlay,
                     setShowThumb = {
@@ -216,12 +216,12 @@ actual fun VideoPlayerImpl(
 }
 
 @Composable
-fun PlatformView(
+actual fun PlatformView(
     zOrderMediaOverlay: Boolean,
     showControls: Boolean,
     keepScreenOn: Boolean,
-    modifier: Modifier = Modifier,
-    update: (NativePlayerView) -> Unit = {}
+    modifier: Modifier,
+    update: (NativePlayerView) -> Unit
 ) {
     val nativePlayer = remember {
         nativeViewFactory(
@@ -242,58 +242,56 @@ fun PlatformView(
 }
 
 
-class NativePlayerView() {
-    var playerView: Any?= null
+actual class NativePlayerView actual constructor() {
+    actual var playerView: Any?= null
     var player: NativePlayer?= null
 
     private fun realPlayerView() = playerView as? StyledPlayerView
 
-    fun resume() = realPlayerView()?.onResume()
+    actual fun resume() = realPlayerView()?.onResume()
 
-    fun pause() = realPlayerView()?.onPause()
+    actual fun pause() = realPlayerView()?.onPause()
 }
 
-class  NativePlayer {
-    var player: Any?= null
+actual class  NativePlayer {
+    actual var player: Any?= null
 
-    private fun realPlayer() = player as? RemainingTimeExoPlayer
+    fun realPlayer() = player as? RemainingTimeExoPlayer
 
-    // var playWhenReady = realPlayer as
-
-    var playWhenReady: Boolean
+    actual var playWhenReady: Boolean
         get() = realPlayer()?.playWhenReady ?: false
         set(value) {
             realPlayer()?.playWhenReady = value
         }
 
-    fun contentPosition(): Long = realPlayer()?.contentPosition?:0L
+    actual fun contentPosition(): Long = realPlayer()?.contentPosition?:0L
 
-    fun setCustomControl(customControl: Any?) {
+    actual fun setCustomControl(customControl: Any?) {
         (customControl as? PlayerControlView)?.player = realPlayer()
     }
 
-    fun resume() {
+    actual fun resume() {
         // getRealPlayer()?.res
     }
 
-    fun pause() {
+    actual fun pause() {
         realPlayer()?.pause()
     }
 
-    fun update() {
+    actual fun update() {
 
     }
 
-    fun setVolume(volume: Float) {
+    actual fun setVolume(volume: Float) {
         realPlayer()?.volume = volume
     }
 
-    fun release() {
+    actual fun release() {
         realPlayer()?.release()
     }
 }
 
-fun nativeViewFactory(
+actual fun nativeViewFactory(
     zOrderMediaOverlay: Boolean,
     showControls: Boolean,
     keepScreenOn: Boolean
@@ -308,7 +306,7 @@ fun nativeViewFactory(
     }
 }
 
-fun getNativePlater(
+actual fun getNativePlayer(
     url: String,
     autoPlay: Boolean,
     setShowThumb: (Boolean) -> Unit,

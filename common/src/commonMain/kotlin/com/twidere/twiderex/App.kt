@@ -20,13 +20,11 @@
  */
 package com.twidere.twiderex
 
-import androidx.compose.foundation.layout.Column
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import com.twidere.twiderex.component.foundation.VideoPreview
 import com.twidere.twiderex.compose.LocalResLoader
 import com.twidere.twiderex.di.ext.get
 
@@ -37,10 +35,7 @@ fun App() {
     ) {
         MaterialTheme {
             Scaffold {
-                Column {
-                    Text("Twidere X!")
-                    VideoPreview()
-                }
+                Text("Twidere X!")
             }
         }
     }
