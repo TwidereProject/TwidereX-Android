@@ -46,12 +46,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.OnLifecycleEvent
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SimpleExoPlayer
@@ -70,6 +66,9 @@ import com.twidere.twiderex.utils.video.VideoPool
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import moe.tlaster.precompose.lifecycle.Lifecycle
+import moe.tlaster.precompose.lifecycle.LifecycleObserver
+import moe.tlaster.precompose.ui.LocalLifecycleOwner
 
 @Composable
 actual fun VideoPlayerImpl(
@@ -121,16 +120,19 @@ actual fun VideoPlayerImpl(
             }
             DisposableEffect(Unit) {
                 val observer = object : LifecycleObserver {
-                    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
-                    fun onResume() {
-                        isResume = true
-                        player.playWhenReady = autoPlay
-                    }
-                    @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
-                    fun onPause() {
-                        isResume = false
-                        updateState()
-                        player.playWhenReady = false
+                    override fun onStateChanged(state: Lifecycle.State) {
+                        when(state) {
+                            Lifecycle.State.Active -> {
+                                isResume = true
+                                player.playWhenReady = autoPlay
+                            }
+                            Lifecycle.State.InActive -> {
+                                isResume = false
+                                updateState()
+                                player.playWhenReady = false
+                            }
+                            else -> {}
+                        }
                     }
                 }
                 lifecycle.addObserver(observer)
