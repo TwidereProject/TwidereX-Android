@@ -18,24 +18,24 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.db.base
+package com.twidere.twiderex.sqldelight.adapter
 
-import com.squareup.sqldelight.sqlite.driver.JdbcSqliteDriver
-import com.twidere.twiderex.sqldelight.SqlDelightAppDatabase
-import com.twidere.twiderex.sqldelight.adapter.DraftAdapterFactory
-import com.twidere.twiderex.sqldelight.adapter.SearchAdapterFactory
-import org.junit.Before
+import com.twidere.twiderex.model.MicroBlogKey
+import org.junit.Test
+import kotlin.test.assertEquals
 
-internal open class BaseAppDatabaseTest {
-    protected lateinit var database: SqlDelightAppDatabase
-    @Before
-    fun setUp() {
-        val driver = JdbcSqliteDriver(JdbcSqliteDriver.IN_MEMORY)
-        SqlDelightAppDatabase.Schema.create(driver)
-        database = SqlDelightAppDatabase(
-            driver = driver,
-            draftAdapter = DraftAdapterFactory.create(),
-            searchAdapter = SearchAdapterFactory.create()
-        )
+internal class MicroBlogKeyColumnAdapterTest {
+    private val adapter = MicroBlogKeyColumnAdapter()
+    @Test
+    fun decode_GenerateCorrectHostAndId() {
+        val key = adapter.decode("123@twitter.com")
+        assertEquals("123", key.id)
+        assertEquals("twitter.com", key.host)
+    }
+
+    @Test
+    fun encode_CombineIdAndHostToString() {
+        val string = adapter.encode(MicroBlogKey(id = "123", host = "twitter.com"))
+        assertEquals("123@twitter.com", string)
     }
 }

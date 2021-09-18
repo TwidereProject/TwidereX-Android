@@ -24,15 +24,15 @@ import com.squareup.sqldelight.ColumnAdapter
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.ComposeType
 
-internal class StringListColumnAdapter : ColumnAdapter<List<String>, String> {
+internal class StringListColumnAdapter(private val separator: String = ",") : ColumnAdapter<List<String>, String> {
     override fun decode(databaseValue: String) =
         if (databaseValue.isEmpty()) {
             listOf()
         } else {
-            databaseValue.split(",")
+            databaseValue.split(separator)
         }
 
-    override fun encode(value: List<String>) = value.joinToString { "," }
+    override fun encode(value: List<String>) = value.joinToString(separator = separator) { it }
 }
 
 internal class ComposeTypeColumnAdapter : ColumnAdapter<ComposeType, String> {

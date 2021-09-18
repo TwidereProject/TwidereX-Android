@@ -18,9 +18,9 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.db
+package com.twidere.twiderex.sqldelight
 
-import com.twidere.twiderex.db.base.BaseAppDatabaseTest
+import com.twidere.twiderex.base.BaseAppDatabaseTest
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.sqldelight.table.Search
 import com.twidere.twiderex.sqldelight.table.SearchQueries
