@@ -111,7 +111,7 @@ actual fun VideoPlayerImpl(
             }
 
             LaunchedEffect(customControl) {
-                (customControl as? PlayerControlView)?.player = player
+                player.setCustomControl(customControl)
             }
             var isResume by remember {
                 mutableStateOf(true)
@@ -239,6 +239,7 @@ fun PlatformView(
     )
 }
 
+
 class NativePlayerView() {
     var playerView: Any?= null
     var player: NativePlayer?= null
@@ -265,8 +266,8 @@ class  NativePlayer {
 
     fun contentPosition(): Long = realPlayer()?.contentPosition?:0L
 
-    fun setP(p: Any) {
-
+    fun setCustomControl(customControl: Any?) {
+        (customControl as? PlayerControlView)?.player = realPlayer()
     }
 
     fun resume() {
