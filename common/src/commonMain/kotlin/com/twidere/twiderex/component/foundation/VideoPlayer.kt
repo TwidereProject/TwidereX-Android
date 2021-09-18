@@ -30,6 +30,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.twidere.twiderex.preferences.model.DisplayPreferences
+import com.twidere.twiderex.ui.LocalIsActiveNetworkMetered
+import com.twidere.twiderex.ui.LocalVideoPlayback
 
 expect fun VideoPlayerImpl(
     modifier: Modifier = Modifier,
@@ -66,6 +69,12 @@ fun VideoPlayer(
         isListItem = isListItem,
         thumb = thumb
     )
+}
+
+internal fun getPlayInitial() = when(LocalVideoPlayback.current) {
+    DisplayPreferences.AutoPlayback.Auto -> !LocalIsActiveNetworkMetered.current
+    DisplayPreferences.AutoPlayback.Always -> true
+    DisplayPreferences.AutoPlayback.Off -> false
 }
 
 @Composable

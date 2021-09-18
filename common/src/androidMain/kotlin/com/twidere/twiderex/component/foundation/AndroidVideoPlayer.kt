@@ -86,66 +86,24 @@ actual fun VideoPlayerImpl(
     thumb: @Composable (() -> Unit)?
 ) {
     var playing by remember { mutableStateOf(false) }
-    val playBackMode = LocalVideoPlayback.current
-    val isActiveNetworkMetered = LocalIsActiveNetworkMetered.current
     var shouldShowThumb by remember { mutableStateOf(false) }
-    val playInitial = when (playBackMode) {
-        DisplayPreferences.AutoPlayback.Auto -> !isActiveNetworkMetered
-        DisplayPreferences.AutoPlayback.Always -> true
-        DisplayPreferences.AutoPlayback.Off -> false
-    }
+    val playInitial = getPlayInitial()
     var autoPlay by remember(url) { mutableStateOf(playInitial) }
-    val context = LocalContext.current
     val lifecycle = LocalLifecycleOwner.current.lifecycle
-    val httpConfig = LocalHttpConfig.current
     val resLoder = LocalResLoader.current
     Box {
         if (playInitial) {
             val player = remember(url) {
-                RemainingTimeExoPlayer(
-                    SimpleExoPlayer.Builder(context)
-                        .apply {
-                            if (httpConfig.proxyConfig.enable) {
-                                // replace DataSource
-                                OkHttpDataSource.Factory(
-                                    TwidereServiceFactory
-                                        .createHttpClientFactory()
-                                        .createHttpClientBuilder()
-                                        .build()
-                                )
-                                    .let {
-                                        DefaultDataSourceFactory(context, it)
-                                    }.let {
-                                        DefaultMediaSourceFactory(it)
-                                    }.let {
-                                        setMediaSourceFactory(it)
-                                    }
-                            }
-                        }
-                ).apply {
-                    repeatMode = Player.REPEAT_MODE_ALL
-                    playWhenReady = autoPlay
-                    addListener(object : Player.Listener {
-                        override fun onPlaybackStateChanged(state: Int) {
-                            shouldShowThumb = state != Player.STATE_READY
-                        }
-
-                        override fun onIsPlayingChanged(isPlaying: Boolean) {
-                            playing = isPlaying
-                        }
-                    })
-
-                    ProgressiveMediaSource.Factory(
-                        CacheDataSourceFactory(
-                            context,
-                            5L * 1024L * 1024L,
-                        )
-                    ).createMediaSource(MediaItem.fromUri(url)).also {
-                        setMediaSource(it)
+                getPlater(
+                    url = url,
+                    autoPlay = autoPlay,
+                    setShowThumb = {
+                        shouldShowThumb = it
+                    },
+                    setPLaying = {
+                        playing = it
                     }
-                    prepare()
-                    seekTo(VideoPool.get(url))
-                }
+                )
             }
             player.volume = volume
 
@@ -260,6 +218,61 @@ actual fun VideoPlayerImpl(
         }
     }
 }
+
+fun getPlater(
+    url: String,
+    autoPlay: Boolean,
+    setShowThumb: (Boolean) -> Unit,
+    setPLaying: (Boolean) -> Unit,
+): RemainingTimeExoPlayer {
+    val context = LocalContext.current
+    val httpConfig = LocalHttpConfig.current
+    return RemainingTimeExoPlayer(
+        SimpleExoPlayer.Builder(context)
+            .apply {
+                if (httpConfig.proxyConfig.enable) {
+                    // replace DataSource
+                    OkHttpDataSource.Factory(
+                        TwidereServiceFactory
+                            .createHttpClientFactory()
+                            .createHttpClientBuilder()
+                            .build()
+                    )
+                        .let {
+                            DefaultDataSourceFactory(context, it)
+                        }.let {
+                            DefaultMediaSourceFactory(it)
+                        }.let {
+                            setMediaSourceFactory(it)
+                        }
+                }
+            }
+    ).apply {
+        repeatMode = Player.REPEAT_MODE_ALL
+        playWhenReady = autoPlay
+        addListener(object : Player.Listener {
+            override fun onPlaybackStateChanged(state: Int) {
+                setShowThumb(state != Player.STATE_READY)
+            }
+
+            override fun onIsPlayingChanged(isPlaying: Boolean) {
+                setPLaying(isPlaying)
+            }
+        })
+
+        ProgressiveMediaSource.Factory(
+            CacheDataSourceFactory(
+                context,
+                5L * 1024L * 1024L,
+            )
+        ).createMediaSource(MediaItem.fromUri(url)).also {
+            setMediaSource(it)
+        }
+        prepare()
+        seekTo(VideoPool.get(url))
+    }
+}
+
 object UserAvatarDefaults {
     val AvatarSize = 44.dp
 }
