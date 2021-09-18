@@ -58,6 +58,7 @@ import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.ui.PlayerControlView
 import com.google.android.exoplayer2.ui.StyledPlayerView
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
+import com.twidere.services.http.config.HttpConfig
 import com.twidere.twiderex.MR.strings.accessibility_common_video_play
 import com.twidere.twiderex.compose.LocalResLoader
 import com.twidere.twiderex.http.TwidereServiceFactory
@@ -89,12 +90,16 @@ actual fun VideoPlayerImpl(
     var autoPlay by remember(url) { mutableStateOf(playInitial) }
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     val resLoder = LocalResLoader.current
+    val context = getContext()
+    val httpConfig = httpConfig()
     Box {
         if (playInitial) {
             val player = remember(url) {
                 getNativePlayer(
                     url = url,
                     autoPlay = autoPlay,
+                    context = context,
+                    httpConfig = httpConfig,
                     setShowThumb = {
                         shouldShowThumb = it
                     },
@@ -309,19 +314,29 @@ actual fun nativeViewFactory(
     }
 }
 
+@Composable
+actual fun getContext(): Any {
+    return LocalContext.current
+}
+
+@Composable
+actual fun httpConfig(): Any {
+    return LocalHttpConfig.current
+}
+
 actual fun getNativePlayer(
     url: String,
     autoPlay: Boolean,
+    context: Any,
+    httpConfig: Any,
     setShowThumb: (Boolean) -> Unit,
     setPLaying: (Boolean) -> Unit,
 ): NativePlayer {
-    val context = LocalContext.current
-    val httpConfig = LocalHttpConfig.current
     return NativePlayer().apply {
         player = RemainingTimeExoPlayer(
-            SimpleExoPlayer.Builder(context)
+            SimpleExoPlayer.Builder(context as Context)
                 .apply {
-                    if (httpConfig.proxyConfig.enable) {
+                    if ((httpConfig as HttpConfig).proxyConfig.enable) {
                         // replace DataSource
                         OkHttpDataSource.Factory(
                             TwidereServiceFactory

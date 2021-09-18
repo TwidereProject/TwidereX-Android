@@ -86,12 +86,16 @@ fun VideoPlayer(
     var autoPlay by remember(url) { mutableStateOf(playInitial) }
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     val resLoder = LocalResLoader.current
+    val context = getContext()
+    val httpConfig = httpConfig()
     Box {
         if (playInitial) {
             val player = remember(url) {
                 getNativePlayer(
                     url = url,
                     autoPlay = autoPlay,
+                    httpConfig = httpConfig,
+                    context = context,
                     setShowThumb = {
                         shouldShowThumb = it
                     },
@@ -213,6 +217,7 @@ fun VideoPlayer(
     }
 }
 
+@Composable
 internal fun getPlayInitial() = when(LocalVideoPlayback.current) {
     DisplayPreferences.AutoPlayback.Auto -> !LocalIsActiveNetworkMetered.current
     DisplayPreferences.AutoPlayback.Always -> true
@@ -250,6 +255,8 @@ expect fun nativeViewFactory(
 expect fun getNativePlayer(
     url: String,
     autoPlay: Boolean,
+    context: Any,
+    httpConfig: Any,
     setShowThumb: (Boolean) -> Unit,
     setPLaying: (Boolean) -> Unit
 ): NativePlayer
@@ -262,3 +269,9 @@ expect fun PlatformView(
     modifier: Modifier,
     update: (NativePlayerView) -> Unit
 )
+
+@Composable
+expect fun getContext(): Any
+
+@Composable
+expect fun httpConfig(): Any
