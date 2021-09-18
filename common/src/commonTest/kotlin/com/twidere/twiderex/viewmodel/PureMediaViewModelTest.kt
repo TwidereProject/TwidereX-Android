@@ -26,7 +26,6 @@ import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
@@ -55,7 +54,7 @@ internal class PureMediaViewModelTest : ViewModelTestBase() {
     }
 
     @Test
-    fun loadSource_success(): Unit = runBlocking(Dispatchers.Main) {
+    fun loadSource_success(): Unit = runBlocking {
         viewModel.source.firstOrNull().let {
             assertNotNull(it)
             assertEquals(4, it.size)

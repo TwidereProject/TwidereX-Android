@@ -55,7 +55,6 @@ kotlin {
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:${Versions.Kotlin.coroutines}")
                 implementation("io.mockk:mockk-common:1.12.0")
                 implementation("io.mockk:mockk:1.12.0")
-                implementation("org.jetbrains.kotlin:kotlin-reflect:${Versions.Kotlin.lang}")
             }
         }
         val androidMain by getting {

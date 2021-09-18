@@ -56,6 +56,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -106,6 +107,7 @@ import com.twidere.twiderex.ui.LocalVideoPlayback
 import com.twidere.twiderex.ui.LocalWindow
 import com.twidere.twiderex.ui.TwidereDialog
 import com.twidere.twiderex.viewmodel.MediaViewModel
+import kotlinx.coroutines.launch
 import moe.tlaster.swiper.Swiper
 import moe.tlaster.swiper.SwiperState
 import moe.tlaster.swiper.rememberSwiperState
@@ -295,6 +297,7 @@ private fun StatusMediaInfo(
     viewModel: MediaViewModel,
     currentMedia: UiMedia
 ) {
+    val scope = rememberCoroutineScope()
     Column(
         modifier = Modifier
             .padding(StatusMediaInfoDefaults.ContentPadding),
@@ -325,7 +328,9 @@ private fun StatusMediaInfo(
                 contract = ActivityResultContracts.CreateDocument()
             ) {
                 it?.let {
-                    viewModel.saveFile(currentMedia, it.toString())
+                    scope.launch {
+                        viewModel.saveFile(currentMedia, it.toString())
+                    }
                 }
             }
             ShareButton(status = status) { callback ->
@@ -345,9 +350,11 @@ private fun StatusMediaInfo(
                     onClick = {
                         callback.invoke()
                         currentMedia.fileName?.let {
-                            viewModel.shareMedia(
-                                currentMedia = currentMedia
-                            )
+                            scope.launch {
+                                viewModel.shareMedia(
+                                    currentMedia = currentMedia
+                                )
+                            }
                         }
                     }
                 ) {

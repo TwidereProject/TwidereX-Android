@@ -27,9 +27,9 @@ import com.twidere.twiderex.repository.StatusRepository
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.justRun
 import io.mockk.mockk
 import io.mockk.verify
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
@@ -62,10 +62,11 @@ internal class MediaViewModelTest : AccountViewModelTestBase() {
                 }
             )
         )
+        justRun { mediaAction.download(any(), any(), any()) }
     }
 
     @Test
-    fun load_status(): Unit = runBlocking(Dispatchers.Main) {
+    fun load_status(): Unit = runBlocking {
         viewModel.status.firstOrNull().let {
             assertNotNull(it)
             assertEquals(MicroBlogKey.twitter("123"), it.statusKey)
@@ -73,18 +74,24 @@ internal class MediaViewModelTest : AccountViewModelTestBase() {
     }
 
     @Test
-    fun saveFile_success(): Unit = runBlocking(Dispatchers.Main) {
+    fun saveFile_success(): Unit = runBlocking {
         viewModel.saveFile(
             mockk {
                 every { mediaUrl }.returns("123")
             },
             "target",
         )
-        verify(exactly = 1) { mediaAction.download("123", "target", MicroBlogKey.twitter("123")) }
+        verify(exactly = 1) {
+            mediaAction.download(
+                "123",
+                "target",
+                MicroBlogKey.twitter("123")
+            )
+        }
     }
 
     @Test
-    fun shareMedia_success(): Unit = runBlocking(Dispatchers.Main) {
+    fun shareMedia_success(): Unit = runBlocking {
         viewModel.shareMedia(
             mockk {
                 every { mediaUrl }.returns("123")

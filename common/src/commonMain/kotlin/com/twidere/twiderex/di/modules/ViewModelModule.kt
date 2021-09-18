@@ -24,7 +24,6 @@ import com.twidere.twiderex.extensions.viewModel
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.ComposeType
 import com.twidere.twiderex.model.ui.UiDraft
-import com.twidere.twiderex.model.ui.UiList
 import com.twidere.twiderex.preferences.PreferencesHolder
 import com.twidere.twiderex.viewmodel.ActiveAccountViewModel
 import com.twidere.twiderex.viewmodel.DraftViewModel
@@ -156,12 +155,11 @@ private fun Module.lists() {
         )
     }
     viewModel { ListsViewModel(get(), get()) }
-    viewModel { (onResult: (success: Boolean, list: UiList?) -> Unit) ->
+    viewModel {
         ListsCreateViewModel(
             get(),
             get(),
             get(),
-            onResult
         )
     }
     viewModel { (listKey: MicroBlogKey) -> ListsModifyViewModel(get(), get(), get(), listKey) }

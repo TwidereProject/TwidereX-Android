@@ -33,7 +33,6 @@ import io.mockk.impl.annotations.MockK
 import io.mockk.verify
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -51,9 +50,6 @@ internal class ListsCreateViewModelTest : AccountViewModelTestBase() {
     private lateinit var mockAppNotification: InAppNotification
 
     @MockK
-    private lateinit var mockSuccessObserver: Observer<Boolean>
-
-    @MockK
     private lateinit var mockLoadingObserver: Observer<Boolean>
 
     private var errorNotification: NotificationEvent? = null
@@ -68,14 +64,11 @@ internal class ListsCreateViewModelTest : AccountViewModelTestBase() {
             mockAppNotification,
             mockRepository,
             mockAccountRepository
-        ) { success, _ ->
-            mockSuccessObserver.onChanged(success)
-        }
+        )
         every { mockAppNotification.show(any()) }.answers {
             errorNotification = arg(0)
         }
         errorNotification = null
-        mockSuccessObserver.onChanged(false)
         scope.launch {
             createViewModel.loading.collect {
                 mockLoadingObserver.onChanged(it)
@@ -85,39 +78,32 @@ internal class ListsCreateViewModelTest : AccountViewModelTestBase() {
 
     @Test
     fun createList_successExpectTrue(): Unit = runBlocking(Dispatchers.Main) {
-        verifySuccessAndLoadingBefore(mockLoadingObserver, mockSuccessObserver)
-        async {
-            createViewModel.createList(title = "title", private = false)
-        }.await()
-        verifySuccessAndLoadingAfter(mockLoadingObserver, mockSuccessObserver, true)
+        verifySuccessAndLoadingBefore(mockLoadingObserver)
+        val result = createViewModel.createList(title = "title", private = false)
+        assertNotNull(result)
+        verifySuccessAndLoadingAfter(mockLoadingObserver)
     }
 
     @Test
     fun createList_failedExpectFalseAndShowNotification(): Unit = runBlocking(Dispatchers.Main) {
-        verifySuccessAndLoadingBefore(mockLoadingObserver, mockSuccessObserver)
+        verifySuccessAndLoadingBefore(mockLoadingObserver)
         assertNull(errorNotification)
-        async {
-            createViewModel.createList(title = "error", private = false)
-        }.await()
-        verifySuccessAndLoadingAfter(mockLoadingObserver, mockSuccessObserver, false)
+        val result = createViewModel.createList(title = "error", private = false)
+        assertNull(result)
+        verifySuccessAndLoadingAfter(mockLoadingObserver)
         assertNotNull(errorNotification)
     }
 
     private fun verifySuccessAndLoadingBefore(
         loadingObserver: Observer<Boolean>,
-        successObserver: Observer<Boolean>
     ) {
         verify(exactly = 1) { loadingObserver.onChanged(false) }
-        verify { successObserver.onChanged(false) }
     }
 
     private fun verifySuccessAndLoadingAfter(
         loadingObserver: Observer<Boolean>,
-        successObserver: Observer<Boolean>,
-        success: Boolean
     ) {
         verify(exactly = 1) { loadingObserver.onChanged(true) }
         verify(exactly = 1) { loadingObserver.onChanged(false) }
-        verify(exactly = if (success) 1 else 2) { successObserver.onChanged(success) }
     }
 }

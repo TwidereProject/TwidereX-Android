@@ -110,18 +110,18 @@ class ListsCreateViewModel(
     inAppNotification: InAppNotification,
     private val listsRepository: ListsRepository,
     private val accountRepository: AccountRepository,
-    private val onResult: (success: Boolean, list: UiList?) -> Unit
 ) : ListsOperatorViewModel(inAppNotification) {
     private val account by lazy {
         accountRepository.activeAccount.asStateIn(viewModelScope, null).mapNotNull { it }
     }
 
-    fun createList(
+    suspend fun createList(
         title: String,
         description: String? = null,
         private: Boolean = false
-    ) {
-        loadingRequest(onResult) {
+    ): UiList? {
+        loading.value = true
+        return try {
             account.firstOrNull()?.let { account ->
                 listsRepository.createLists(
                     accountKey = account.accountKey,
@@ -130,7 +130,16 @@ class ListsCreateViewModel(
                     description = description,
                     mode = if (private) ListsMode.PRIVATE.value else ListsMode.PUBLIC.value
                 )
+            }.let {
+                modifySuccess.value = true
+                it
             }
+        } catch (e: Throwable) {
+            inAppNotification.notifyError(e)
+            modifySuccess.value = false
+            null
+        } finally {
+            loading.value = false
         }
     }
 }

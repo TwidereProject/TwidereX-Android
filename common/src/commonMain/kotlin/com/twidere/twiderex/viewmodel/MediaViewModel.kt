@@ -31,7 +31,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.mapNotNull
-import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
@@ -45,8 +44,8 @@ class MediaViewModel(
         accountRepository.activeAccount.asStateIn(viewModelScope, null).mapNotNull { it }
     }
 
-    fun saveFile(currentMedia: UiMedia, target: String) = viewModelScope.launch {
-        val account = account.firstOrNull() ?: return@launch
+    suspend fun saveFile(currentMedia: UiMedia, target: String) {
+        val account = account.firstOrNull() ?: return
         currentMedia.mediaUrl?.let {
             mediaAction.download(
                 accountKey = account.accountKey,
@@ -56,8 +55,8 @@ class MediaViewModel(
         }
     }
 
-    fun shareMedia(currentMedia: UiMedia) = viewModelScope.launch {
-        val account = account.firstOrNull() ?: return@launch
+    suspend fun shareMedia(currentMedia: UiMedia) {
+        val account = account.firstOrNull() ?: return
         currentMedia.mediaUrl?.let {
             mediaAction.share(
                 source = it,
@@ -67,6 +66,7 @@ class MediaViewModel(
     }
 
     val loading = MutableStateFlow(false)
+
     @OptIn(ExperimentalCoroutinesApi::class)
     val status by lazy {
         account.flatMapLatest {

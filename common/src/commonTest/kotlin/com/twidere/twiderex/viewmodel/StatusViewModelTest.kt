@@ -28,7 +28,6 @@ import com.twidere.twiderex.repository.StatusRepository
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
@@ -60,7 +59,7 @@ internal class StatusViewModelTest : AccountViewModelTestBase() {
     }
 
     @Test
-    fun source_loadConversation(): Unit = runBlocking(Dispatchers.Main) {
+    fun source_loadConversation(): Unit = runBlocking {
         viewModel.source.first().let {
             val data = it.collectDataForTest()
             assertEquals(5, data.size)

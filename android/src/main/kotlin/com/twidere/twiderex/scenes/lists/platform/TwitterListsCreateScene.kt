@@ -34,6 +34,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.window.Dialog
@@ -50,6 +51,7 @@ import com.twidere.twiderex.navigation.RootRoute
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.lists.ListsCreateViewModel
+import kotlinx.coroutines.launch
 import moe.tlaster.precompose.navigation.NavOptions
 import moe.tlaster.precompose.navigation.PopUpTo
 import org.koin.core.parameter.parametersOf
@@ -57,20 +59,8 @@ import org.koin.core.parameter.parametersOf
 @Composable
 fun TwitterListsCreateScene() {
     val navController = LocalNavController.current
-    val listsCreateViewModel: ListsCreateViewModel = getViewModel {
-        parametersOf(
-            { success: Boolean, list: UiList? ->
-                if (success) list?.apply {
-                    navController.navigate(
-                        RootRoute.Lists.Timeline(listKey),
-                        options = NavOptions(
-                            popUpTo = PopUpTo(RootRoute.Lists.Home)
-                        )
-                    )
-                }
-            }
-        )
-    }
+    val scope = rememberCoroutineScope()
+    val listsCreateViewModel: ListsCreateViewModel = getViewModel()
     val loading by listsCreateViewModel.loading.observeAsState(initial = false)
 
     TwidereScene {
@@ -94,11 +84,20 @@ fun TwitterListsCreateScene() {
                         IconButton(
                             enabled = name.isNotEmpty(),
                             onClick = {
-                                listsCreateViewModel.createList(
-                                    title = name,
-                                    description = desc,
-                                    private = isPrivate
-                                )
+                                scope.launch {
+                                    listsCreateViewModel.createList(
+                                        title = name,
+                                        description = desc,
+                                        private = isPrivate
+                                    )?.let {
+                                        navController.navigate(
+                                            RootRoute.Lists.Timeline(it.listKey),
+                                            options = NavOptions(
+                                                popUpTo = PopUpTo(RootRoute.Lists.Home)
+                                            )
+                                        )
+                                    }
+                                }
                             }
                         ) {
                             Icon(
