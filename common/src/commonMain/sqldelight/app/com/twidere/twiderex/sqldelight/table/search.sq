@@ -1,15 +1,18 @@
+import com.twidere.twiderex.model.MicroBlogKey;
+import java.lang.Boolean;
+
 CREATE TABLE search (
     content TEXT NOT NULL,
     lastActive INTEGER NOT NULL,
-    saved INTEGER DEFAULT 0 NOT NULL,
-    accountKey TEXT NOT NULL
+    saved INTEGER AS Boolean DEFAULT 0 NOT NULL,
+    accountKey TEXT AS MicroBlogKey NOT NULL
 );
 
 CREATE UNIQUE INDEX IF NOT EXISTS index_search_content_accountKey ON search (content, accountKey);
 
 insert:
-INSERT INTO search(content, lastActive, saved, accountKey)
-VALUES(?, ?, ?, ?);
+INSERT OR REPLACE INTO search(content, lastActive, saved, accountKey)
+VALUES ?;
 
 get:
 SELECT * FROM search WHERE content == :content AND accountKey == :accountKey;

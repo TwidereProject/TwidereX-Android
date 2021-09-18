@@ -18,24 +18,12 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.db.base
+package com.twidere.twiderex.sqldelight.adapter
 
-import com.squareup.sqldelight.sqlite.driver.JdbcSqliteDriver
-import com.twidere.twiderex.sqldelight.SqlDelightAppDatabase
-import com.twidere.twiderex.sqldelight.adapter.DraftAdapterFactory
-import com.twidere.twiderex.sqldelight.adapter.SearchAdapterFactory
-import org.junit.Before
+import com.twidere.twiderex.sqldelight.table.Search
 
-internal open class BaseAppDatabaseTest {
-    protected lateinit var database: SqlDelightAppDatabase
-    @Before
-    fun setUp() {
-        val driver = JdbcSqliteDriver(JdbcSqliteDriver.IN_MEMORY)
-        SqlDelightAppDatabase.Schema.create(driver)
-        database = SqlDelightAppDatabase(
-            driver = driver,
-            draftAdapter = DraftAdapterFactory.create(),
-            searchAdapter = SearchAdapterFactory.create()
-        )
-    }
+internal object SearchAdapterFactory {
+    fun create() = Search.Adapter(
+        accountKeyAdapter = MicroBlogKeyColumnAdapter()
+    )
 }

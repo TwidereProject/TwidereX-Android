@@ -92,6 +92,7 @@ kotlin {
         val desktopMain by getting {
             dependencies {
                 implementation("com.squareup.sqldelight:sqlite-driver:${Versions.sqlDelight}")
+                implementation("com.squareup.sqldelight:coroutines-extensions-jvm:${Versions.sqlDelight}")
             }
         }
         val desktopTest by getting
