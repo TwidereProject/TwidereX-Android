@@ -57,18 +57,6 @@ import moe.tlaster.precompose.lifecycle.Lifecycle
 import moe.tlaster.precompose.lifecycle.LifecycleObserver
 import moe.tlaster.precompose.ui.LocalLifecycleOwner
 
-expect fun VideoPlayerImpl(
-    modifier: Modifier = Modifier,
-    url: String,
-    volume: Float = 1f,
-    customControl: Any? = null,
-    showControls: Boolean = customControl == null,
-    zOrderMediaOverlay: Boolean = false,
-    keepScreenOn: Boolean = false,
-    isListItem: Boolean = true,
-    thumb: @Composable (() -> Unit)? = null,
-)
-
 @Composable
 fun VideoPlayer(
     modifier: Modifier = Modifier,
@@ -124,7 +112,7 @@ fun VideoPlayer(
             DisposableEffect(Unit) {
                 val observer = object : LifecycleObserver {
                     override fun onStateChanged(state: Lifecycle.State) {
-                        when(state) {
+                        when (state) {
                             Lifecycle.State.Active -> {
                                 isResume = true
                                 player.playWhenReady = autoPlay
@@ -158,6 +146,7 @@ fun VideoPlayer(
                 zOrderMediaOverlay = zOrderMediaOverlay,
                 showControls = showControls,
                 keepScreenOn = keepScreenOn,
+                player = player,
                 modifier = modifier.onGloballyPositioned { coordinates ->
                     if (middleLine == 0.0f) {
                         var rootCoordinates = coordinates
@@ -219,7 +208,7 @@ fun VideoPlayer(
 }
 
 @Composable
-internal fun getPlayInitial() = when(LocalVideoPlayback.current) {
+internal fun getPlayInitial() = when (LocalVideoPlayback.current) {
     DisplayPreferences.AutoPlayback.Auto -> !LocalIsActiveNetworkMetered.current
     DisplayPreferences.AutoPlayback.Always -> true
     DisplayPreferences.AutoPlayback.Off -> false
@@ -250,7 +239,8 @@ expect fun nativeViewFactory(
     zOrderMediaOverlay: Boolean,
     showControls: Boolean,
     keepScreenOn: Boolean,
-    context: Any
+    context: Any,
+    player: Any? = null
 ): NativePlayerView
 
 expect fun getNativePlayer(
@@ -268,6 +258,7 @@ expect fun PlatformView(
     showControls: Boolean,
     keepScreenOn: Boolean,
     modifier: Modifier,
+    player: Any? = null,
     update: (NativePlayerView) -> Unit
 )
 

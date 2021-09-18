@@ -27,7 +27,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
@@ -50,6 +49,7 @@ actual fun PlatformView(
     showControls: Boolean,
     keepScreenOn: Boolean,
     modifier: Modifier,
+    player: Any?,
     update: (NativePlayerView) -> Unit
 ) {
     val context = LocalContext.current
@@ -72,10 +72,9 @@ actual fun PlatformView(
     )
 }
 
-
 actual class NativePlayerView actual constructor() {
-    actual var playerView: Any?= null
-    actual var player: NativePlayer?= null
+    actual var playerView: Any? = null
+    actual var player: NativePlayer? = null
 
     private fun realPlayerView() = playerView as? StyledPlayerView
 
@@ -84,8 +83,8 @@ actual class NativePlayerView actual constructor() {
     actual fun pause() = realPlayerView()?.onPause()
 }
 
-actual class  NativePlayer {
-    actual var player: Any?= null
+actual class NativePlayer {
+    actual var player: Any? = null
 
     fun realPlayer() = player as? RemainingTimeExoPlayer
 
@@ -95,7 +94,7 @@ actual class  NativePlayer {
             realPlayer()?.playWhenReady = value
         }
 
-    actual fun contentPosition(): Long = realPlayer()?.contentPosition?:0L
+    actual fun contentPosition(): Long = realPlayer()?.contentPosition ?: 0L
 
     actual fun setCustomControl(customControl: Any?) {
         (customControl as? PlayerControlView)?.player = realPlayer()
@@ -110,7 +109,6 @@ actual class  NativePlayer {
     }
 
     actual fun update() {
-
     }
 
     actual fun setVolume(volume: Float) {
@@ -126,7 +124,8 @@ actual fun nativeViewFactory(
     zOrderMediaOverlay: Boolean,
     showControls: Boolean,
     keepScreenOn: Boolean,
-    context: Any
+    context: Any,
+    player: Any?,
 ): NativePlayerView {
     return NativePlayerView().apply {
         playerView = StyledPlayerView(context as Context).also { playerView ->
