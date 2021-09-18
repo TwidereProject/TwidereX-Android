@@ -5,9 +5,9 @@ import kotlin.collections.List;
 CREATE TABLE draft (
     id TEXT NOT NULL PRIMARY KEY,
     content TEXT NOT NULL,
-    media TEXT AS List<String>,
+    media TEXT AS List<String> NOT NULL,
     createAt INTEGER NOT NULL,
-    composeType TEXT AS ComposeType,
+    composeType TEXT AS ComposeType NOT NULL,
     statusKey TEXT AS MicroBlogKey DEFAULT NULL,
     excludedReplyUserIds TEXT AS List<String> DEFAULT NULL
 );
