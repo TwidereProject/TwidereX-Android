@@ -202,7 +202,3 @@ actual fun getNativePlayer(
         }
     }
 }
-
-object UserAvatarDefaults {
-    val AvatarSize = 44.dp
-}

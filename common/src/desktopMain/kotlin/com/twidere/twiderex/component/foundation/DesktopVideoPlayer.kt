@@ -155,6 +155,91 @@ actual fun VideoPlayerImpl(
     }
 }
 
+actual class NativePlayer {
+    actual var player: Any? = null
+        get() = TODO("Not yet implemented")
+    actual var playWhenReady: Boolean = false
+        get() = TODO("Not yet implemented")
+
+    actual fun contentPosition(): Long {
+        TODO("Not yet implemented")
+    }
+
+    actual fun setCustomControl(customControl: Any?) {
+    }
+
+    actual fun resume() {
+    }
+
+    actual fun pause() {
+    }
+
+    actual fun update() {
+    }
+
+    actual fun setVolume(volume: Float) {
+    }
+
+    actual fun release() {
+    }
+
+}
+
+actual class NativePlayerView actual constructor() {
+    actual var playerView: Any? = null
+        get() = TODO("Not yet implemented")
+    actual var player: NativePlayer? = null
+        get() = TODO("Not yet implemented")
+
+    actual fun resume(): Unit? {
+        TODO("Not yet implemented")
+    }
+
+    actual fun pause(): Unit? {
+        TODO("Not yet implemented")
+    }
+}
+
+actual fun nativeViewFactory(
+    zOrderMediaOverlay: Boolean,
+    showControls: Boolean,
+    keepScreenOn: Boolean,
+    context: Any
+): NativePlayerView {
+    TODO("Not yet implemented")
+}
+
+actual fun getNativePlayer(
+    url: String,
+    autoPlay: Boolean,
+    context: Any,
+    httpConfig: Any,
+    setShowThumb: (Boolean) -> Unit,
+    setPLaying: (Boolean) -> Unit
+): NativePlayer {
+    TODO("Not yet implemented")
+}
+
+@Composable
+actual fun PlatformView(
+    zOrderMediaOverlay: Boolean,
+    showControls: Boolean,
+    keepScreenOn: Boolean,
+    modifier: Modifier,
+    update: (NativePlayerView) -> Unit
+) {
+}
+
+@Composable
+actual fun getContext(): Any {
+    TODO("Not yet implemented")
+}
+
+@Composable
+actual fun httpConfig(): Any {
+    TODO("Not yet implemented")
+}
+
 /**
  * To return mediaPlayer from player components.
  * The method names are same, but they don't share the same parent/interface.

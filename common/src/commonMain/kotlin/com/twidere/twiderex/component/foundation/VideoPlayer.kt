@@ -43,6 +43,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.MR
 import com.twidere.twiderex.compose.LocalResLoader
 import com.twidere.twiderex.preferences.model.DisplayPreferences
@@ -275,3 +276,7 @@ expect fun getContext(): Any
 
 @Composable
 expect fun httpConfig(): Any
+
+object UserAvatarDefaults {
+    val AvatarSize = 44.dp
+}
