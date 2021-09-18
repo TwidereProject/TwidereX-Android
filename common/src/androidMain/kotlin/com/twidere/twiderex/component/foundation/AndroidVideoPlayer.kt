@@ -20,6 +20,7 @@
  */
 package com.twidere.twiderex.component.foundation
 
+import android.content.Context
 import android.view.SurfaceView
 import android.view.View
 import androidx.compose.foundation.background
@@ -223,11 +224,13 @@ actual fun PlatformView(
     modifier: Modifier,
     update: (NativePlayerView) -> Unit
 ) {
+    val context = LocalContext.current
     val nativePlayer = remember {
         nativeViewFactory(
             zOrderMediaOverlay,
             showControls,
-            keepScreenOn
+            keepScreenOn,
+            context
         )
     }
     AndroidView(
@@ -244,7 +247,7 @@ actual fun PlatformView(
 
 actual class NativePlayerView actual constructor() {
     actual var playerView: Any?= null
-    var player: NativePlayer?= null
+    actual var player: NativePlayer?= null
 
     private fun realPlayerView() = playerView as? StyledPlayerView
 
@@ -294,11 +297,11 @@ actual class  NativePlayer {
 actual fun nativeViewFactory(
     zOrderMediaOverlay: Boolean,
     showControls: Boolean,
-    keepScreenOn: Boolean
+    keepScreenOn: Boolean,
+    context: Any
 ): NativePlayerView {
-    val context = LocalContext.current
     return NativePlayerView().apply {
-        playerView = StyledPlayerView(context).also { playerView ->
+        playerView = StyledPlayerView(context as Context).also { playerView ->
             (playerView.videoSurfaceView as? SurfaceView)?.setZOrderMediaOverlay(zOrderMediaOverlay)
             playerView.useController = showControls
             playerView.keepScreenOn = keepScreenOn

@@ -20,11 +20,41 @@
  */
 package com.twidere.twiderex.component.foundation
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.Icon
+import androidx.compose.material.LocalContentAlpha
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.boundsInWindow
+import androidx.compose.ui.layout.onGloballyPositioned
+import com.twidere.twiderex.MR
+import com.twidere.twiderex.compose.LocalResLoader
 import com.twidere.twiderex.preferences.model.DisplayPreferences
 import com.twidere.twiderex.ui.LocalIsActiveNetworkMetered
 import com.twidere.twiderex.ui.LocalVideoPlayback
+import com.twidere.twiderex.utils.video.VideoPool
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import moe.tlaster.precompose.lifecycle.Lifecycle
+import moe.tlaster.precompose.lifecycle.LifecycleObserver
+import moe.tlaster.precompose.ui.LocalLifecycleOwner
 
 expect fun VideoPlayerImpl(
     modifier: Modifier = Modifier,
@@ -50,17 +80,137 @@ fun VideoPlayer(
     isListItem: Boolean = true,
     thumb: @Composable (() -> Unit)? = null,
 ) {
-    VideoPlayerImpl(
-        modifier = modifier,
-        url = url,
-        volume = volume,
-        customControl = customControl,
-        showControls = showControls,
-        zOrderMediaOverlay = zOrderMediaOverlay,
-        keepScreenOn = keepScreenOn,
-        isListItem = isListItem,
-        thumb = thumb
-    )
+    var playing by remember { mutableStateOf(false) }
+    var shouldShowThumb by remember { mutableStateOf(false) }
+    val playInitial = getPlayInitial()
+    var autoPlay by remember(url) { mutableStateOf(playInitial) }
+    val lifecycle = LocalLifecycleOwner.current.lifecycle
+    val resLoder = LocalResLoader.current
+    Box {
+        if (playInitial) {
+            val player = remember(url) {
+                getNativePlayer(
+                    url = url,
+                    autoPlay = autoPlay,
+                    setShowThumb = {
+                        shouldShowThumb = it
+                    },
+                    setPLaying = {
+                        playing = it
+                    }
+                )
+            }
+            player.setVolume(volume)
+
+            fun updateState() {
+                autoPlay = player.playWhenReady
+                VideoPool.set(url, 0L.coerceAtLeast(player.contentPosition()))
+            }
+
+            LaunchedEffect(customControl) {
+                player.setCustomControl(customControl)
+            }
+            var isResume by remember {
+                mutableStateOf(true)
+            }
+            val videoKey by remember {
+                mutableStateOf(url + System.currentTimeMillis())
+            }
+            DisposableEffect(Unit) {
+                val observer = object : LifecycleObserver {
+                    override fun onStateChanged(state: Lifecycle.State) {
+                        when(state) {
+                            Lifecycle.State.Active -> {
+                                isResume = true
+                                player.playWhenReady = autoPlay
+                            }
+                            Lifecycle.State.InActive -> {
+                                isResume = false
+                                updateState()
+                                player.playWhenReady = false
+                            }
+                            else -> {}
+                        }
+                    }
+                }
+                lifecycle.addObserver(observer)
+                onDispose {
+                    updateState()
+                    player.release()
+                    VideoPool.removeRect(videoKey)
+                    lifecycle.removeObserver(observer)
+                }
+            }
+
+            var middleLine = 0.0f
+            val composableScope = rememberCoroutineScope()
+
+            var isMostCenter by remember(url) {
+                mutableStateOf(false)
+            }
+            var debounceJob: Job? = null
+            PlatformView(
+                zOrderMediaOverlay = zOrderMediaOverlay,
+                showControls = showControls,
+                keepScreenOn = keepScreenOn,
+                modifier = modifier.onGloballyPositioned { coordinates ->
+                    if (middleLine == 0.0f) {
+                        var rootCoordinates = coordinates
+                        while (rootCoordinates.parentCoordinates != null) {
+                            rootCoordinates = rootCoordinates.parentCoordinates!!
+                        }
+                        rootCoordinates.boundsInWindow().run {
+                            middleLine = (top + bottom) / 2
+                        }
+                    }
+                    coordinates.boundsInWindow().run {
+                        VideoPool.setRect(videoKey, this)
+                        if (!isMostCenter && VideoPool.containsMiddleLine(videoKey, middleLine)) {
+                            debounceJob?.cancel()
+                            debounceJob = composableScope.launch {
+                                delay(VideoPool.DEBOUNCE_DELAY)
+                                if (VideoPool.containsMiddleLine(videoKey, middleLine)) {
+                                    isMostCenter = true
+                                }
+                            }
+                        } else if (isMostCenter && !VideoPool.isMostCenter(videoKey, middleLine)) {
+                            isMostCenter = false
+                        }
+                    }
+                },
+            ) {
+                it.player = player
+                if (isResume && isMostCenter) {
+                    if (isListItem) {
+                        player.playWhenReady = autoPlay
+                    }
+                    it.resume()
+                } else {
+                    if (isListItem) {
+                        player.playWhenReady = false
+                    }
+                    it.pause()
+                }
+            }
+        }
+        if ((shouldShowThumb || !playing) && thumb != null) {
+            thumb()
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+            ) {
+                Icon(
+                    imageVector = Icons.Default.PlayArrow,
+                    tint = Color.White.copy(alpha = LocalContentAlpha.current),
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .size(UserAvatarDefaults.AvatarSize)
+                        .background(MaterialTheme.colors.primary, CircleShape),
+                    contentDescription = resLoder.getString(MR.strings.accessibility_common_video_play)
+                )
+            }
+        }
+    }
 }
 
 internal fun getPlayInitial() = when(LocalVideoPlayback.current) {
@@ -93,7 +243,8 @@ expect class NativePlayer {
 expect fun nativeViewFactory(
     zOrderMediaOverlay: Boolean,
     showControls: Boolean,
-    keepScreenOn: Boolean
+    keepScreenOn: Boolean,
+    context: Any
 ): NativePlayerView
 
 expect fun getNativePlayer(
