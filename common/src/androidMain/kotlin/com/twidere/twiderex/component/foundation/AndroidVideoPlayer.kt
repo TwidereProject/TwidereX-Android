@@ -24,7 +24,6 @@ import android.content.Context
 import android.view.SurfaceView
 import android.view.View
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
@@ -34,7 +33,6 @@ import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.ext.okhttp.OkHttpDataSource
 import com.google.android.exoplayer2.source.DefaultMediaSourceFactory
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
-import com.google.android.exoplayer2.ui.PlayerControlView
 import com.google.android.exoplayer2.ui.StyledPlayerView
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.twidere.services.http.config.HttpConfig
@@ -61,19 +59,19 @@ actual fun PlatformView(
 }
 
 actual class NativePlayerView {
-    actual var player: Any? = null
 
-    private fun realPlayerView() = player as? StyledPlayerView
+    actual var player: Any = Any()
 
+    private fun realPlayerView() = player as StyledPlayerView
 
     actual var playWhenReady: Boolean = false
 
     actual fun resume() {
-        realPlayerView()?.onResume()
+        realPlayerView().onResume()
     }
 
     actual fun pause() {
-        realPlayerView()?.onPause()
+        realPlayerView().onPause()
     }
 
     actual fun contentPosition(): Long = 0L
@@ -85,10 +83,9 @@ actual class NativePlayerView {
     }
 
     actual fun release() {
-        realPlayerView()?.player?.release()
+        realPlayerView().player?.release()
     }
 }
-
 
 @Composable
 actual fun getContext(): Any {
@@ -112,7 +109,7 @@ actual fun getNativePlayerView(
     setPLaying: (Boolean) -> Unit,
 ): NativePlayerView {
     return NativePlayerView().apply {
-        StyledPlayerView(context as Context).also { playerView ->
+        this.player = StyledPlayerView(context as Context).also { playerView ->
             (playerView.videoSurfaceView as? SurfaceView)?.setZOrderMediaOverlay(zOrderMediaOverlay)
             playerView.useController = showControls
             playerView.keepScreenOn = keepScreenOn
@@ -162,6 +159,5 @@ actual fun getNativePlayerView(
                 seekTo(VideoPool.get(url))
             }
         }
-
     }
 }

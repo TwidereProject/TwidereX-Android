@@ -29,9 +29,9 @@ import uk.co.caprica.vlcj.player.component.EmbeddedMediaPlayerComponent
 import uk.co.caprica.vlcj.player.component.MediaPlayerComponent
 import java.util.Locale
 
-actual class NativePlayerView  {
+actual class NativePlayerView {
 
-    actual var player: Any?= null
+    actual var player: Any = Any()
 
     actual var playWhenReady: Boolean = false
 

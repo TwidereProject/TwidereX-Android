@@ -222,7 +222,7 @@ internal fun getPlayInitial() = when (LocalVideoPlayback.current) {
 }
 
 expect class NativePlayerView {
-    var player: Any?
+    var player: Any
     var playWhenReady: Boolean
     fun resume()
     fun pause()
