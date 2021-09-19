@@ -79,12 +79,15 @@ fun VideoPlayer(
     val httpConfig = httpConfig()
     Box {
         if (playInitial) {
-            val nativePlayer = remember(url) {
-                getNativePlayer(
+            val nativePlayerView = remember(url) {
+                getNativePlayerView(
                     url = url,
                     autoPlay = autoPlay,
                     httpConfig = httpConfig,
                     context = context,
+                    zOrderMediaOverlay = zOrderMediaOverlay,
+                    showControls = showControls,
+                    keepScreenOn = keepScreenOn,
                     setShowThumb = {
                         shouldShowThumb = it
                     },
@@ -93,15 +96,16 @@ fun VideoPlayer(
                     }
                 )
             }
-            nativePlayer.setVolume(volume)
+
+            nativePlayerView.setVolume(volume)
 
             fun updateState() {
-                autoPlay = nativePlayer.playWhenReady
-                VideoPool.set(url, 0L.coerceAtLeast(nativePlayer.contentPosition()))
+                autoPlay = nativePlayerView.playWhenReady
+                VideoPool.set(url, 0L.coerceAtLeast(nativePlayerView.contentPosition()))
             }
 
             LaunchedEffect(customControl) {
-                nativePlayer.setCustomControl(customControl)
+                // nativePlayerView.setCustomControl(customControl)
             }
             var isResume by remember {
                 mutableStateOf(true)
@@ -115,12 +119,12 @@ fun VideoPlayer(
                         when (state) {
                             Lifecycle.State.Active -> {
                                 isResume = true
-                                nativePlayer.playWhenReady = autoPlay
+                                nativePlayerView.playWhenReady = autoPlay
                             }
                             Lifecycle.State.InActive -> {
                                 isResume = false
                                 updateState()
-                                nativePlayer.playWhenReady = false
+                                nativePlayerView.playWhenReady = false
                             }
                             else -> {}
                         }
@@ -129,7 +133,7 @@ fun VideoPlayer(
                 lifecycle.addObserver(observer)
                 onDispose {
                     updateState()
-                    nativePlayer.release()
+                    nativePlayerView.release()
                     VideoPool.removeRect(videoKey)
                     lifecycle.removeObserver(observer)
                 }
@@ -170,21 +174,17 @@ fun VideoPlayer(
                 }
             ) {
                 PlatformView(
-                    zOrderMediaOverlay = zOrderMediaOverlay,
-                    showControls = showControls,
-                    keepScreenOn = keepScreenOn,
-                    player = nativePlayer.player,
+                    nativePLayerView = nativePlayerView,
                     modifier = modifier,
                 ) {
-                    it.player = nativePlayer
                     if (isResume && isMostCenter) {
                         if (isListItem) {
-                            nativePlayer.playWhenReady = autoPlay
+                            nativePlayerView.playWhenReady = autoPlay
                         }
                         it.resume()
                     } else {
                         if (isListItem) {
-                            nativePlayer.playWhenReady = false
+                            nativePlayerView.playWhenReady = false
                         }
                         it.pause()
                     }
@@ -221,51 +221,33 @@ internal fun getPlayInitial() = when (LocalVideoPlayback.current) {
     DisplayPreferences.AutoPlayback.Off -> false
 }
 
-expect class NativePlayerView() {
-    var playerView: Any?
-    var player: NativePlayer?
-    fun resume(): Unit?
-    fun pause(): Unit?
-}
-
-expect class NativePlayer {
-
-    // var playWhenReady = realPlayer as
+expect class NativePlayerView {
     var player: Any?
     var playWhenReady: Boolean
-    fun contentPosition(): Long
-    fun setCustomControl(customControl: Any?)
     fun resume()
     fun pause()
+    fun contentPosition(): Long
     fun update()
     fun setVolume(volume: Float)
     fun release()
 }
 
-expect fun nativeViewFactory(
-    zOrderMediaOverlay: Boolean,
-    showControls: Boolean,
-    keepScreenOn: Boolean,
-    context: Any,
-    player: Any? = null
-): NativePlayerView
-
-expect fun getNativePlayer(
+expect fun getNativePlayerView(
     url: String,
     autoPlay: Boolean,
     context: Any,
     httpConfig: Any,
-    setShowThumb: (Boolean) -> Unit,
-    setPLaying: (Boolean) -> Unit
-): NativePlayer
-
-@Composable
-expect fun PlatformView(
     zOrderMediaOverlay: Boolean,
     showControls: Boolean,
     keepScreenOn: Boolean,
+    setShowThumb: (Boolean) -> Unit,
+    setPLaying: (Boolean) -> Unit
+): NativePlayerView
+
+@Composable
+expect fun PlatformView(
     modifier: Modifier,
-    player: Any? = null,
+    nativePLayerView: NativePlayerView,
     update: (NativePlayerView) -> Unit
 )
 

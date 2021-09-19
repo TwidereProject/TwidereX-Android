@@ -45,96 +45,50 @@ import com.twidere.twiderex.utils.video.VideoPool
 
 @Composable
 actual fun PlatformView(
-    zOrderMediaOverlay: Boolean,
-    showControls: Boolean,
-    keepScreenOn: Boolean,
     modifier: Modifier,
-    player: Any?,
+    nativePLayerView: NativePlayerView,
     update: (NativePlayerView) -> Unit
 ) {
-    val context = LocalContext.current
-    val nativePlayer = remember {
-        nativeViewFactory(
-            zOrderMediaOverlay,
-            showControls,
-            keepScreenOn,
-            context
-        )
-    }
     AndroidView(
         factory = {
-            nativePlayer.playerView as View
+            nativePLayerView.player as View
         },
         modifier = modifier,
         update = {
-            update.invoke(nativePlayer)
+            update.invoke(nativePLayerView)
         }
     )
 }
 
-actual class NativePlayerView actual constructor() {
-    actual var playerView: Any? = null
-    actual var player: NativePlayer? = null
-
-    private fun realPlayerView() = playerView as? StyledPlayerView
-
-    actual fun resume() = realPlayerView()?.onResume()
-
-    actual fun pause() = realPlayerView()?.onPause()
-}
-
-actual class NativePlayer {
+actual class NativePlayerView {
     actual var player: Any? = null
 
-    fun realPlayer() = player as? RemainingTimeExoPlayer
+    private fun realPlayerView() = player as? StyledPlayerView
 
-    actual var playWhenReady: Boolean
-        get() = realPlayer()?.playWhenReady ?: false
-        set(value) {
-            realPlayer()?.playWhenReady = value
-        }
 
-    actual fun contentPosition(): Long = realPlayer()?.contentPosition ?: 0L
-
-    actual fun setCustomControl(customControl: Any?) {
-        (customControl as? PlayerControlView)?.player = realPlayer()
-    }
+    actual var playWhenReady: Boolean = false
 
     actual fun resume() {
-        // getRealPlayer()?.res
+        realPlayerView()?.onResume()
     }
 
     actual fun pause() {
-        realPlayer()?.pause()
+        realPlayerView()?.onPause()
     }
+
+    actual fun contentPosition(): Long = 0L
 
     actual fun update() {
     }
 
     actual fun setVolume(volume: Float) {
-        realPlayer()?.volume = volume
     }
 
     actual fun release() {
-        realPlayer()?.release()
+        realPlayerView()?.player?.release()
     }
 }
 
-actual fun nativeViewFactory(
-    zOrderMediaOverlay: Boolean,
-    showControls: Boolean,
-    keepScreenOn: Boolean,
-    context: Any,
-    player: Any?,
-): NativePlayerView {
-    return NativePlayerView().apply {
-        playerView = StyledPlayerView(context as Context).also { playerView ->
-            (playerView.videoSurfaceView as? SurfaceView)?.setZOrderMediaOverlay(zOrderMediaOverlay)
-            playerView.useController = showControls
-            playerView.keepScreenOn = keepScreenOn
-        }
-    }
-}
 
 @Composable
 actual fun getContext(): Any {
@@ -146,58 +100,68 @@ actual fun httpConfig(): Any {
     return LocalHttpConfig.current
 }
 
-actual fun getNativePlayer(
+actual fun getNativePlayerView(
     url: String,
     autoPlay: Boolean,
     context: Any,
     httpConfig: Any,
+    zOrderMediaOverlay: Boolean,
+    showControls: Boolean,
+    keepScreenOn: Boolean,
     setShowThumb: (Boolean) -> Unit,
     setPLaying: (Boolean) -> Unit,
-): NativePlayer {
-    return NativePlayer().apply {
-        player = RemainingTimeExoPlayer(
-            SimpleExoPlayer.Builder(context as Context)
-                .apply {
-                    if ((httpConfig as HttpConfig).proxyConfig.enable) {
-                        // replace DataSource
-                        OkHttpDataSource.Factory(
-                            TwidereServiceFactory
-                                .createHttpClientFactory()
-                                .createHttpClientBuilder()
-                                .build()
-                        )
-                            .let {
-                                DefaultDataSourceFactory(context, it)
-                            }.let {
-                                DefaultMediaSourceFactory(it)
-                            }.let {
-                                setMediaSourceFactory(it)
-                            }
+): NativePlayerView {
+    return NativePlayerView().apply {
+        StyledPlayerView(context as Context).also { playerView ->
+            (playerView.videoSurfaceView as? SurfaceView)?.setZOrderMediaOverlay(zOrderMediaOverlay)
+            playerView.useController = showControls
+            playerView.keepScreenOn = keepScreenOn
+        }.apply {
+            player = RemainingTimeExoPlayer(
+                SimpleExoPlayer.Builder(context as Context)
+                    .apply {
+                        if ((httpConfig as HttpConfig).proxyConfig.enable) {
+                            // replace DataSource
+                            OkHttpDataSource.Factory(
+                                TwidereServiceFactory
+                                    .createHttpClientFactory()
+                                    .createHttpClientBuilder()
+                                    .build()
+                            )
+                                .let {
+                                    DefaultDataSourceFactory(context, it)
+                                }.let {
+                                    DefaultMediaSourceFactory(it)
+                                }.let {
+                                    setMediaSourceFactory(it)
+                                }
+                        }
                     }
-                }
-        ).apply {
-            repeatMode = Player.REPEAT_MODE_ALL
-            playWhenReady = autoPlay
-            addListener(object : Player.Listener {
-                override fun onPlaybackStateChanged(state: Int) {
-                    setShowThumb(state != Player.STATE_READY)
-                }
+            ).apply {
+                repeatMode = Player.REPEAT_MODE_ALL
+                playWhenReady = autoPlay
+                addListener(object : Player.Listener {
+                    override fun onPlaybackStateChanged(state: Int) {
+                        setShowThumb(state != Player.STATE_READY)
+                    }
 
-                override fun onIsPlayingChanged(isPlaying: Boolean) {
-                    setPLaying(isPlaying)
-                }
-            })
+                    override fun onIsPlayingChanged(isPlaying: Boolean) {
+                        setPLaying(isPlaying)
+                    }
+                })
 
-            ProgressiveMediaSource.Factory(
-                CacheDataSourceFactory(
-                    context,
-                    5L * 1024L * 1024L,
-                )
-            ).createMediaSource(MediaItem.fromUri(url)).also {
-                setMediaSource(it)
+                ProgressiveMediaSource.Factory(
+                    CacheDataSourceFactory(
+                        context,
+                        5L * 1024L * 1024L,
+                    )
+                ).createMediaSource(MediaItem.fromUri(url)).also {
+                    setMediaSource(it)
+                }
+                prepare()
+                seekTo(VideoPool.get(url))
             }
-            prepare()
-            seekTo(VideoPool.get(url))
         }
+
     }
 }

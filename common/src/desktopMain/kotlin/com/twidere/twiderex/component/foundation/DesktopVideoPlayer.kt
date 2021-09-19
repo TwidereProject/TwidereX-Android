@@ -21,7 +21,6 @@
 package com.twidere.twiderex.component.foundation
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.SwingPanel
 import uk.co.caprica.vlcj.player.base.MediaPlayer
@@ -30,23 +29,23 @@ import uk.co.caprica.vlcj.player.component.EmbeddedMediaPlayerComponent
 import uk.co.caprica.vlcj.player.component.MediaPlayerComponent
 import java.util.Locale
 
-actual class NativePlayer {
-    actual var player: Any? = null
+actual class NativePlayerView  {
+
+    actual var player: Any?= null
 
     actual var playWhenReady: Boolean = false
 
-    actual fun contentPosition(): Long {
-        return 0L
-    }
-
-    actual fun setCustomControl(customControl: Any?) {
-    }
+    private fun realPlayerView() = player as? MediaPlayerComponent
 
     actual fun resume() {
+        realPlayerView()?.mediaPlayer()?.controls()?.play()
     }
 
     actual fun pause() {
+        realPlayerView()?.mediaPlayer()?.controls()?.pause()
     }
+
+    actual fun contentPosition(): Long = 0L
 
     actual fun update() {
     }
@@ -58,38 +57,18 @@ actual class NativePlayer {
     }
 }
 
-actual class NativePlayerView actual constructor() {
-    actual var playerView: Any? = null
-    actual var player: NativePlayer? = null
-
-    private fun realPlayerView() = playerView as? MediaPlayerComponent
-
-    actual fun resume() = realPlayerView()?.mediaPlayer()?.controls()?.play()
-
-    actual fun pause() = realPlayerView()?.mediaPlayer()?.controls()?.pause()
-}
-
-actual fun nativeViewFactory(
-    zOrderMediaOverlay: Boolean,
-    showControls: Boolean,
-    keepScreenOn: Boolean,
-    context: Any,
-    player: Any?,
-): NativePlayerView {
-    return NativePlayerView().apply {
-        playerView = player
-    }
-}
-
-actual fun getNativePlayer(
+actual fun getNativePlayerView(
     url: String,
     autoPlay: Boolean,
     context: Any,
     httpConfig: Any,
+    zOrderMediaOverlay: Boolean,
+    showControls: Boolean,
+    keepScreenOn: Boolean,
     setShowThumb: (Boolean) -> Unit,
-    setPLaying: (Boolean) -> Unit
-): NativePlayer {
-    return NativePlayer().apply {
+    setPLaying: (Boolean) -> Unit,
+): NativePlayerView {
+    return NativePlayerView().apply {
         player = (
             if (isMacOS()) {
                 CallbackMediaPlayerComponent()
@@ -106,33 +85,21 @@ actual fun getNativePlayer(
 
 @Composable
 actual fun PlatformView(
-    zOrderMediaOverlay: Boolean,
-    showControls: Boolean,
-    keepScreenOn: Boolean,
     modifier: Modifier,
-    player: Any?,
+    nativePLayerView: NativePlayerView,
     update: (NativePlayerView) -> Unit
 ) {
-    val nativePlayer = remember {
-        nativeViewFactory(
-            zOrderMediaOverlay,
-            showControls,
-            keepScreenOn,
-            Any(),
-            player
-        )
-    }
     SwingPanel(
         factory = {
             if (isMacOS()) {
-                nativePlayer.playerView as CallbackMediaPlayerComponent
+                nativePLayerView.player as CallbackMediaPlayerComponent
             } else {
-                nativePlayer.playerView as EmbeddedMediaPlayerComponent
+                nativePLayerView.player as EmbeddedMediaPlayerComponent
             }
         },
         modifier = modifier,
         update = {
-            update.invoke(nativePlayer)
+            update.invoke(nativePLayerView)
         }
     )
 }
