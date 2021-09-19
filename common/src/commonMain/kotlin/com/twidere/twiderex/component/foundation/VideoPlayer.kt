@@ -142,12 +142,8 @@ fun VideoPlayer(
                 mutableStateOf(false)
             }
             var debounceJob: Job? = null
-            PlatformView(
-                zOrderMediaOverlay = zOrderMediaOverlay,
-                showControls = showControls,
-                keepScreenOn = keepScreenOn,
-                player = nativePlayer.player,
-                modifier = modifier.onGloballyPositioned { coordinates ->
+            Box(
+                modifier = Modifier.onGloballyPositioned { coordinates ->
                     if (middleLine == 0.0f) {
                         var rootCoordinates = coordinates
                         while (rootCoordinates.parentCoordinates != null) {
@@ -171,22 +167,31 @@ fun VideoPlayer(
                             isMostCenter = false
                         }
                     }
-                },
+                }
             ) {
-                it.player = nativePlayer
-                if (isResume && isMostCenter) {
-                    if (isListItem) {
-                        nativePlayer.playWhenReady = autoPlay
+                PlatformView(
+                    zOrderMediaOverlay = zOrderMediaOverlay,
+                    showControls = showControls,
+                    keepScreenOn = keepScreenOn,
+                    player = nativePlayer.player,
+                    modifier = modifier,
+                ) {
+                    it.player = nativePlayer
+                    if (isResume && isMostCenter) {
+                        if (isListItem) {
+                            nativePlayer.playWhenReady = autoPlay
+                        }
+                        it.resume()
+                    } else {
+                        if (isListItem) {
+                            nativePlayer.playWhenReady = false
+                        }
+                        it.pause()
                     }
-                    it.resume()
-                } else {
-                    if (isListItem) {
-                        nativePlayer.playWhenReady = false
-                    }
-                    it.pause()
                 }
             }
         }
+
         if ((shouldShowThumb || !playing) && thumb != null) {
             thumb()
             Box(
@@ -200,7 +205,9 @@ fun VideoPlayer(
                         .align(Alignment.Center)
                         .size(UserAvatarDefaults.AvatarSize)
                         .background(MaterialTheme.colors.primary, CircleShape),
-                    contentDescription = resLoder.getString(MR.strings.accessibility_common_video_play)
+                    contentDescription = resLoder.getString(
+                        MR.strings.accessibility_common_video_play
+                    )
                 )
             }
         }

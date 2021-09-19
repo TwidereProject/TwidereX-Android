@@ -90,12 +90,16 @@ actual fun getNativePlayer(
     setPLaying: (Boolean) -> Unit
 ): NativePlayer {
     return NativePlayer().apply {
-        player = (if (isMacOS()) {
-            CallbackMediaPlayerComponent()
-        } else {
-            EmbeddedMediaPlayerComponent()
-        }).apply {
-            mediaPlayer().media().prepare(url)
+        player = (
+            if (isMacOS()) {
+                CallbackMediaPlayerComponent()
+            } else {
+                EmbeddedMediaPlayerComponent()
+            }
+            ).apply {
+            mediaPlayer().apply {
+                media().prepare(url)
+            }
         }
     }
 }
