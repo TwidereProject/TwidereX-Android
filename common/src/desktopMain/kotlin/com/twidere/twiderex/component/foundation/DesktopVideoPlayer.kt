@@ -54,6 +54,7 @@ actual class NativePlayerView  {
     }
 
     actual fun release() {
+        realPlayerView()?.mediaPlayer()?.release()
     }
 }
 
