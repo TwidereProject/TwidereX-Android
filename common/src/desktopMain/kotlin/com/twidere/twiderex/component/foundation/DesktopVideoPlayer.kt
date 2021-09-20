@@ -29,9 +29,29 @@ import uk.co.caprica.vlcj.player.component.EmbeddedMediaPlayerComponent
 import uk.co.caprica.vlcj.player.component.MediaPlayerComponent
 import java.util.Locale
 
-actual class NativePlayerView {
+actual class NativePlayerView actual constructor(
+    url: String,
+    autoPlay: Boolean,
+    context: Any,
+    httpConfig: Any,
+    zOrderMediaOverlay: Boolean,
+    showControls: Boolean,
+    keepScreenOn: Boolean,
+    setShowThumb: (Boolean) -> Unit,
+    setPLaying: (Boolean) -> Unit,
+) {
 
-    actual var player: Any = Any()
+    actual var player: Any = (
+        if (isMacOS()) {
+            CallbackMediaPlayerComponent()
+        } else {
+            EmbeddedMediaPlayerComponent()
+        }
+        ).apply {
+        mediaPlayer().apply {
+            media().prepare(url)
+        }
+    }
 
     actual var playWhenReady: Boolean = false
 
@@ -55,32 +75,6 @@ actual class NativePlayerView {
 
     actual fun release() {
         realPlayerView()?.mediaPlayer()?.release()
-    }
-}
-
-actual fun getNativePlayerView(
-    url: String,
-    autoPlay: Boolean,
-    context: Any,
-    httpConfig: Any,
-    zOrderMediaOverlay: Boolean,
-    showControls: Boolean,
-    keepScreenOn: Boolean,
-    setShowThumb: (Boolean) -> Unit,
-    setPLaying: (Boolean) -> Unit,
-): NativePlayerView {
-    return NativePlayerView().apply {
-        player = (
-            if (isMacOS()) {
-                CallbackMediaPlayerComponent()
-            } else {
-                EmbeddedMediaPlayerComponent()
-            }
-            ).apply {
-            mediaPlayer().apply {
-                media().prepare(url)
-            }
-        }
     }
 }
 

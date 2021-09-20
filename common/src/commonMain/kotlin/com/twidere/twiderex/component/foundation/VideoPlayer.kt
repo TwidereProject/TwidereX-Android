@@ -32,7 +32,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -62,7 +61,7 @@ fun VideoPlayer(
     modifier: Modifier = Modifier,
     url: String,
     volume: Float = 1f,
-    customControl: Any? = null,
+    customControl: @Composable ((NativePlayerView) -> Unit)? = null,
     showControls: Boolean = customControl == null,
     zOrderMediaOverlay: Boolean = false,
     keepScreenOn: Boolean = false,
@@ -80,7 +79,7 @@ fun VideoPlayer(
     Box {
         if (playInitial) {
             val nativePlayerView = remember(url) {
-                getNativePlayerView(
+                NativePlayerView(
                     url = url,
                     autoPlay = autoPlay,
                     httpConfig = httpConfig,
@@ -104,9 +103,6 @@ fun VideoPlayer(
                 VideoPool.set(url, 0L.coerceAtLeast(nativePlayerView.contentPosition()))
             }
 
-            LaunchedEffect(customControl) {
-                // nativePlayerView.setCustomControl(customControl)
-            }
             var isResume by remember {
                 mutableStateOf(true)
             }
@@ -189,6 +185,7 @@ fun VideoPlayer(
                         it.pause()
                     }
                 }
+                customControl?.invoke(nativePlayerView)
             }
         }
 
@@ -221,18 +218,7 @@ internal fun getPlayInitial() = when (LocalVideoPlayback.current) {
     DisplayPreferences.AutoPlayback.Off -> false
 }
 
-expect class NativePlayerView {
-    var player: Any
-    var playWhenReady: Boolean
-    fun resume()
-    fun pause()
-    fun contentPosition(): Long
-    fun update()
-    fun setVolume(volume: Float)
-    fun release()
-}
-
-expect fun getNativePlayerView(
+expect class NativePlayerView(
     url: String,
     autoPlay: Boolean,
     context: Any,
@@ -242,7 +228,16 @@ expect fun getNativePlayerView(
     keepScreenOn: Boolean,
     setShowThumb: (Boolean) -> Unit,
     setPLaying: (Boolean) -> Unit
-): NativePlayerView
+) {
+    var player: Any
+    var playWhenReady: Boolean
+    fun resume()
+    fun pause()
+    fun contentPosition(): Long
+    fun update()
+    fun setVolume(volume: Float)
+    fun release()
+}
 
 @Composable
 expect fun PlatformView(
