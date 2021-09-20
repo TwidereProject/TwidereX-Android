@@ -175,12 +175,12 @@ fun VideoPlayer(
                 ) {
                     if (isResume && isMostCenter) {
                         if (isListItem) {
-                            nativePlayerView.playWhenReady = autoPlay
+                            it.playWhenReady = autoPlay
                         }
                         it.resume()
                     } else {
                         if (isListItem) {
-                            nativePlayerView.playWhenReady = false
+                            it.playWhenReady = false
                         }
                         it.pause()
                     }

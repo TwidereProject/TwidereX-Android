@@ -132,7 +132,7 @@ actual class NativePlayerView actual constructor(
         realPlayerView().onPause()
     }
 
-    actual fun contentPosition(): Long = realPlayerView().player?.contentPosition?:0
+    actual fun contentPosition(): Long = realPlayerView().player?.contentPosition ?: 0
 
     actual fun update() {
     }

@@ -49,7 +49,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -67,7 +66,6 @@ import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.extensions.setOnSystemBarsVisibilityChangeListener
 import com.twidere.twiderex.extensions.showControls
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.enums.MediaType
 import com.twidere.twiderex.preferences.model.DisplayPreferences
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.LocalVideoPlayback
@@ -101,17 +99,19 @@ fun PureMediaScene(belongToKey: MicroBlogKey, selectedIndex: Int) {
                     initialPage = selectedIndex,
                     pageCount = medias.size,
                 )
-                val currentMedia = medias[pagerState.currentPage]
-                val context = LocalContext.current
-                val videoControl = remember(pagerState.currentPage) {
-                    if (currentMedia.type == MediaType.video) {
-                        PlayerControlView(context).apply {
-                            showTimeoutMs = 0
-                        }
-                    } else {
-                        null
-                    }
-                }
+                // val currentMedia = medias[pagerState.currentPage]
+                // val context = LocalContext.current
+                // todo use redefine custom control view by compose
+                val videoControl = null
+                //     remember(pagerState.currentPage) {
+                //     if (currentMedia.type == MediaType.video) {
+                //         PlayerControlView(context).apply {
+                //             showTimeoutMs = 0
+                //         }
+                //     } else {
+                //         null
+                //     }
+                // }
                 val swiperState = rememberSwiperState(
                     onDismiss = {
                         navController.popBackStack()
