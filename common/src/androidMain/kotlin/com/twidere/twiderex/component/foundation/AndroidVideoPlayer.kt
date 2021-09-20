@@ -75,7 +75,7 @@ actual class NativePlayerView actual constructor(
         playerView.keepScreenOn = keepScreenOn
     }.apply {
         player = RemainingTimeExoPlayer(
-            SimpleExoPlayer.Builder(context as Context)
+            SimpleExoPlayer.Builder(context)
                 .apply {
                     if ((httpConfig as HttpConfig).proxyConfig.enable) {
                         // replace DataSource
@@ -132,7 +132,7 @@ actual class NativePlayerView actual constructor(
         realPlayerView().onPause()
     }
 
-    actual fun contentPosition(): Long = 0L
+    actual fun contentPosition(): Long = realPlayerView().player?.contentPosition?:0
 
     actual fun update() {
     }

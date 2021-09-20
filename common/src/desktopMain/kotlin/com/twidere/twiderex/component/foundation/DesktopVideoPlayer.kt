@@ -23,10 +23,11 @@ package com.twidere.twiderex.component.foundation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.SwingPanel
+import com.twidere.twiderex.utils.video.VideoPool
 import uk.co.caprica.vlcj.player.base.MediaPlayer
+import uk.co.caprica.vlcj.player.base.MediaPlayerEventAdapter
 import uk.co.caprica.vlcj.player.component.CallbackMediaPlayerComponent
 import uk.co.caprica.vlcj.player.component.EmbeddedMediaPlayerComponent
-import uk.co.caprica.vlcj.player.component.MediaPlayerComponent
 import java.util.Locale
 
 actual class NativePlayerView actual constructor(
@@ -49,23 +50,27 @@ actual class NativePlayerView actual constructor(
         }
         ).apply {
         mediaPlayer().apply {
+            events().addMediaPlayerEventListener(object : MediaPlayerEventAdapter() {
+                override fun opening(mediaPlayer: MediaPlayer?) {
+                    super.opening(mediaPlayer)
+                    mediaPlayer?.controls()?.skipTime(VideoPool.get(url))
+                }
+            })
             media().prepare(url)
         }
     }
 
     actual var playWhenReady: Boolean = false
 
-    private fun realPlayerView() = player as? MediaPlayerComponent
-
     actual fun resume() {
-        realPlayerView()?.mediaPlayer()?.controls()?.play()
+        player.mediaPlayer().controls()?.play()
     }
 
     actual fun pause() {
-        realPlayerView()?.mediaPlayer()?.controls()?.pause()
+        player.mediaPlayer().controls()?.pause()
     }
 
-    actual fun contentPosition(): Long = 0L
+    actual fun contentPosition(): Long = player.mediaPlayer().status().time()
 
     actual fun update() {
     }
@@ -74,7 +79,7 @@ actual class NativePlayerView actual constructor(
     }
 
     actual fun release() {
-        realPlayerView()?.mediaPlayer()?.release()
+        player.mediaPlayer().release()
     }
 }
 
