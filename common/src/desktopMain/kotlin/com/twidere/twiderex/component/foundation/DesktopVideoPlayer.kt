@@ -38,8 +38,10 @@ actual class NativePlayerView actual constructor(
     zOrderMediaOverlay: Boolean,
     showControls: Boolean,
     keepScreenOn: Boolean,
-    playerCallBack: PlayerCallBack?
 ) {
+    actual var playerCallBack: PlayerCallBack? = null
+
+    actual var playerProgressCallBack: PlayerProgressCallBack? = null
 
     actual var player: Any = (
         if (isMacOS()) {
@@ -58,6 +60,11 @@ actual class NativePlayerView actual constructor(
                 override fun mediaPlayerReady(mediaPlayer: MediaPlayer?) {
                     super.mediaPlayerReady(mediaPlayer)
                     playerCallBack?.onprepare()
+                }
+
+                override fun timeChanged(mediaPlayer: MediaPlayer?, newTime: Long) {
+                    super.timeChanged(mediaPlayer, newTime)
+                    playerProgressCallBack?.onTimeChanged(newTime)
                 }
             })
             media().prepare(url)
@@ -83,6 +90,8 @@ actual class NativePlayerView actual constructor(
     }
 
     actual fun release() {
+        playerCallBack = null
+        playerProgressCallBack = null
         player.mediaPlayer().release()
     }
 

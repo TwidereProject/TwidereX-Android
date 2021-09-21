@@ -26,6 +26,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import com.twidere.twiderex.component.foundation.NativePlayerView
+import com.twidere.twiderex.component.foundation.PlayerProgressCallBack
 import com.twidere.twiderex.component.foundation.SeekBar
 import com.twidere.twiderex.component.foundation.SeekBarState
 
@@ -42,10 +43,15 @@ fun CustomVideoControl(
         }
     }
     var playerState = true
+    player.playerProgressCallBack = object : PlayerProgressCallBack {
+        override fun onTimeChanged(time: Long) {
+            seekBarState.onTimeChange(time)
+        }
+    }
     Row {
         Button(
             onClick = {
-                if (playerState) {
+                if (!playerState) {
                     player.resume()
                 } else {
                     player.pause()

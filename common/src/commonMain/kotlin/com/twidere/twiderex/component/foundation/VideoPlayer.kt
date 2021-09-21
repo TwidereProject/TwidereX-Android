@@ -92,6 +92,7 @@ fun VideoPlayer(
                     zOrderMediaOverlay = zOrderMediaOverlay,
                     showControls = showControls,
                     keepScreenOn = keepScreenOn,
+                ).apply {
                     playerCallBack = object : PlayerCallBack {
                         override fun showThumb(showThunb: Boolean) {
                             shouldShowThumb = showThunb
@@ -105,7 +106,7 @@ fun VideoPlayer(
                             mediaPrepared = true
                         }
                     }
-                )
+                }
             }
 
             nativePlayerView.setVolume(volume)
@@ -240,6 +241,10 @@ interface PlayerCallBack {
     fun onprepare()
 }
 
+interface PlayerProgressCallBack {
+    fun onTimeChanged(time: Long)
+}
+
 expect class NativePlayerView(
     url: String,
     autoPlay: Boolean,
@@ -248,10 +253,11 @@ expect class NativePlayerView(
     zOrderMediaOverlay: Boolean,
     showControls: Boolean,
     keepScreenOn: Boolean,
-    playerCallBack: PlayerCallBack? = null
 ) {
     var player: Any
     var playWhenReady: Boolean
+    var playerCallBack: PlayerCallBack?
+    var playerProgressCallBack: PlayerProgressCallBack?
     fun resume()
     fun pause()
     fun contentPosition(): Long

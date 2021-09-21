@@ -40,6 +40,11 @@ import com.twidere.twiderex.http.TwidereServiceFactory
 import com.twidere.twiderex.preferences.LocalHttpConfig
 import com.twidere.twiderex.utils.video.CacheDataSourceFactory
 import com.twidere.twiderex.utils.video.VideoPool
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlin.coroutines.EmptyCoroutineContext
 
 @Composable
 actual fun PlatformView(
@@ -66,8 +71,13 @@ actual class NativePlayerView actual constructor(
     zOrderMediaOverlay: Boolean,
     showControls: Boolean,
     keepScreenOn: Boolean,
-    playerCallBack: PlayerCallBack?
 ) {
+    actual var playerCallBack: PlayerCallBack? = null
+
+    actual var playerProgressCallBack: PlayerProgressCallBack? = null
+
+    private var job: Job? = null
+
     actual var player: Any = StyledPlayerView(context as Context).also { playerView ->
         (playerView.videoSurfaceView as? SurfaceView)?.setZOrderMediaOverlay(zOrderMediaOverlay)
         playerView.useController = showControls
@@ -103,6 +113,15 @@ actual class NativePlayerView actual constructor(
 
                 override fun onIsPlayingChanged(isPlaying: Boolean) {
                     playerCallBack?.setPlaying(isPlaying)
+                    job?.cancel()
+                    if (isPlaying) {
+                        job = CoroutineScope(EmptyCoroutineContext).launch {
+                            while (true) {
+                                delay(1000)
+                                playerProgressCallBack?.onTimeChanged(contentPosition)
+                            }
+                        }
+                    }
                 }
             })
 
@@ -140,6 +159,9 @@ actual class NativePlayerView actual constructor(
     }
 
     actual fun release() {
+        job?.cancel()
+        playerCallBack = null
+        playerProgressCallBack = null
         realPlayerView().player?.release()
     }
 
