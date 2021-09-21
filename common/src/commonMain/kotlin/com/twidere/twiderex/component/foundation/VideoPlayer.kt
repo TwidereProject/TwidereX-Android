@@ -22,9 +22,12 @@ package com.twidere.twiderex.component.foundation
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.MaterialTheme
@@ -76,8 +79,10 @@ fun VideoPlayer(
     val resLoder = LocalResLoader.current
     val context = getContext()
     val httpConfig = httpConfig()
+    var mediaPrepared by remember { mutableStateOf(false) }
     Box {
         if (playInitial) {
+
             val nativePlayerView = remember(url) {
                 NativePlayerView(
                     url = url,
@@ -87,11 +92,18 @@ fun VideoPlayer(
                     zOrderMediaOverlay = zOrderMediaOverlay,
                     showControls = showControls,
                     keepScreenOn = keepScreenOn,
-                    setShowThumb = {
-                        shouldShowThumb = it
-                    },
-                    setPLaying = {
-                        playing = it
+                    playerCallBack = object : PlayerCallBack {
+                        override fun showThumb(showThunb: Boolean) {
+                            shouldShowThumb = showThunb
+                        }
+
+                        override fun setPlaying(isPlaying: Boolean) {
+                            playing = isPlaying
+                        }
+
+                        override fun onprepare() {
+                            mediaPrepared = true
+                        }
                     }
                 )
             }
@@ -122,7 +134,8 @@ fun VideoPlayer(
                                 updateState()
                                 nativePlayerView.playWhenReady = false
                             }
-                            else -> {}
+                            else -> {
+                            }
                         }
                     }
                 }
@@ -142,7 +155,7 @@ fun VideoPlayer(
                 mutableStateOf(false)
             }
             var debounceJob: Job? = null
-            Box(
+            Column(
                 modifier = Modifier.onGloballyPositioned { coordinates ->
                     if (middleLine == 0.0f) {
                         var rootCoordinates = coordinates
@@ -185,7 +198,10 @@ fun VideoPlayer(
                         it.pause()
                     }
                 }
-                customControl?.invoke(nativePlayerView)
+                if (mediaPrepared) {
+                    Divider(Modifier.height(30.dp))
+                    customControl?.invoke(nativePlayerView)
+                }
             }
         }
 
@@ -218,6 +234,12 @@ internal fun getPlayInitial() = when (LocalVideoPlayback.current) {
     DisplayPreferences.AutoPlayback.Off -> false
 }
 
+interface PlayerCallBack {
+    fun showThumb(showThunb: Boolean)
+    fun setPlaying(isPlaying: Boolean)
+    fun onprepare()
+}
+
 expect class NativePlayerView(
     url: String,
     autoPlay: Boolean,
@@ -226,14 +248,15 @@ expect class NativePlayerView(
     zOrderMediaOverlay: Boolean,
     showControls: Boolean,
     keepScreenOn: Boolean,
-    setShowThumb: (Boolean) -> Unit,
-    setPLaying: (Boolean) -> Unit
+    playerCallBack: PlayerCallBack? = null
 ) {
     var player: Any
     var playWhenReady: Boolean
     fun resume()
     fun pause()
     fun contentPosition(): Long
+    fun duration(): Long
+    fun seekTo(time: Long)
     fun update()
     fun setVolume(volume: Float)
     fun release()

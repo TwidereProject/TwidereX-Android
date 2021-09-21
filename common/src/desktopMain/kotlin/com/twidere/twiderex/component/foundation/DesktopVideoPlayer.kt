@@ -38,8 +38,7 @@ actual class NativePlayerView actual constructor(
     zOrderMediaOverlay: Boolean,
     showControls: Boolean,
     keepScreenOn: Boolean,
-    setShowThumb: (Boolean) -> Unit,
-    setPLaying: (Boolean) -> Unit,
+    playerCallBack: PlayerCallBack?
 ) {
 
     actual var player: Any = (
@@ -54,6 +53,11 @@ actual class NativePlayerView actual constructor(
                 override fun opening(mediaPlayer: MediaPlayer?) {
                     super.opening(mediaPlayer)
                     mediaPlayer?.controls()?.skipTime(VideoPool.get(url))
+                }
+
+                override fun mediaPlayerReady(mediaPlayer: MediaPlayer?) {
+                    super.mediaPlayerReady(mediaPlayer)
+                    playerCallBack?.onprepare()
                 }
             })
             media().prepare(url)
@@ -80,6 +84,13 @@ actual class NativePlayerView actual constructor(
 
     actual fun release() {
         player.mediaPlayer().release()
+    }
+
+    // only can get this value after prepare
+    actual fun duration(): Long = player.mediaPlayer().media().info().duration()
+
+    actual fun seekTo(time: Long) {
+        player.mediaPlayer().controls().setTime(time)
     }
 }
 

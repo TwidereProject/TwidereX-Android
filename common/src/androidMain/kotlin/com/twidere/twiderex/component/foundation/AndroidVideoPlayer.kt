@@ -66,8 +66,7 @@ actual class NativePlayerView actual constructor(
     zOrderMediaOverlay: Boolean,
     showControls: Boolean,
     keepScreenOn: Boolean,
-    setShowThumb: (Boolean) -> Unit,
-    setPLaying: (Boolean) -> Unit,
+    playerCallBack: PlayerCallBack?
 ) {
     actual var player: Any = StyledPlayerView(context as Context).also { playerView ->
         (playerView.videoSurfaceView as? SurfaceView)?.setZOrderMediaOverlay(zOrderMediaOverlay)
@@ -99,11 +98,11 @@ actual class NativePlayerView actual constructor(
             playWhenReady = autoPlay
             addListener(object : Player.Listener {
                 override fun onPlaybackStateChanged(state: Int) {
-                    setShowThumb(state != Player.STATE_READY)
+                    playerCallBack?.showThumb(state != Player.STATE_READY)
                 }
 
                 override fun onIsPlayingChanged(isPlaying: Boolean) {
-                    setPLaying(isPlaying)
+                    playerCallBack?.setPlaying(isPlaying)
                 }
             })
 
@@ -142,6 +141,11 @@ actual class NativePlayerView actual constructor(
 
     actual fun release() {
         realPlayerView().player?.release()
+    }
+
+    actual fun duration(): Long = realPlayerView().player?.duration ?: 0
+    actual fun seekTo(time: Long) {
+        realPlayerView().player?.seekTo(time)
     }
 }
 
