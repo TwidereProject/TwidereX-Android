@@ -32,8 +32,8 @@ import kotlinx.coroutines.flow.mapNotNull
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class FollowingViewModel(
-    private val accountRepository: AccountRepository,
     private val repository: UserListRepository,
+    private val accountRepository: AccountRepository,
     private val userKey: MicroBlogKey,
 ) : UserListViewModel() {
     private val account by lazy {

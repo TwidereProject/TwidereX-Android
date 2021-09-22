@@ -51,7 +51,7 @@ class UserTimelineViewModel(
 
     @OptIn(FlowPreview::class)
     val source by lazy {
-        combine(account.mapNotNull { it }, _excludeReplies) { account, excludeReplies ->
+        combine(account, _excludeReplies) { account, excludeReplies ->
             repository.userTimeline(
                 userKey = userKey,
                 accountKey = account.accountKey,

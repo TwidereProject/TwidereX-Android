@@ -33,12 +33,10 @@ import com.twidere.twiderex.component.foundation.LoadingProgress
 import com.twidere.twiderex.component.lists.MastodonListsModifyComponent
 import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.observeAsState
-import com.twidere.twiderex.model.ui.UiList
 import com.twidere.twiderex.navigation.RootRoute
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.viewmodel.lists.ListsCreateViewModel
 import kotlinx.coroutines.launch
-import org.koin.core.parameter.parametersOf
 
 @Composable
 fun MastodonListsCreateDialog(onDismissRequest: () -> Unit) {

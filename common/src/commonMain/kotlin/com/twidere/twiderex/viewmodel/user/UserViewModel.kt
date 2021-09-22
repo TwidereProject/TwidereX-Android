@@ -32,8 +32,8 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.mapNotNull
-import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
@@ -53,27 +53,27 @@ class UserViewModel(
     val refreshing = MutableStateFlow(false)
     val loadingRelationship = MutableStateFlow(false)
     val user = repository.getUserFlow(userKey)
-    val relationship = combine(account.mapNotNull { it }, refreshFlow) { account, _ ->
-        loadingRelationship.value = true
+    val relationship = combine(account, refreshFlow) { account, _ ->
+        loadingRelationship.compareAndSet(expect = false, update = true)
         val relationshipService = account.service as RelationshipService
         try {
             relationshipService.showRelationship(userKey.id)
         } catch (e: Throwable) {
             null
         } finally {
-            loadingRelationship.value = false
+            loadingRelationship.compareAndSet(expect = true, update = false)
         }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val isMe by lazy {
-        account.transformLatest {
-            emit(it.accountKey == userKey)
-        }.asStateIn(viewModelScope, false)
+        account.mapLatest {
+            it.accountKey == userKey
+        }
     }
 
     private fun collectUser() = viewModelScope.launch {
-        combine(account.mapNotNull { it }, refreshFlow) { account, _ ->
+        combine(account, refreshFlow) { account, _ ->
             refreshing.value = true
             runCatching {
                 repository.lookupUserById(
@@ -89,30 +89,30 @@ class UserViewModel(
     }
 
     fun follow() = viewModelScope.launch {
-        loadingRelationship.value = true
+        loadingRelationship.compareAndSet(expect = false, update = true)
         val account = account.firstOrNull() ?: return@launch
         val relationshipService = account.service as? RelationshipService ?: return@launch
-        runCatching {
+        try {
             relationshipService.follow(userKey.id)
-        }.onSuccess {
             refresh()
-        }.onFailure {
-            loadingRelationship.value = false
-            inAppNotification.notifyError(it)
+        } catch (e: Throwable) {
+            inAppNotification.notifyError(e)
+        } finally {
+            loadingRelationship.compareAndSet(expect = true, update = false)
         }
     }
 
     fun unfollow() = viewModelScope.launch {
-        loadingRelationship.value = true
+        loadingRelationship.compareAndSet(expect = false, update = true)
         val account = account.firstOrNull() ?: return@launch
         val relationshipService = account.service as? RelationshipService ?: return@launch
-        runCatching {
+        try {
             relationshipService.unfollow(userKey.id)
-        }.onSuccess {
             refresh()
-        }.onFailure {
-            loadingRelationship.value = false
-            inAppNotification.notifyError(it)
+        } catch (e: Throwable) {
+            inAppNotification.notifyError(e)
+        } finally {
+            loadingRelationship.compareAndSet(expect = true, update = false)
         }
     }
 

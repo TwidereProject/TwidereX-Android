@@ -27,7 +27,6 @@ import com.twidere.twiderex.repository.StatusRepository
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
-import io.mockk.justRun
 import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.flow.firstOrNull
@@ -62,7 +61,6 @@ internal class MediaViewModelTest : AccountViewModelTestBase() {
                 }
             )
         )
-        justRun { mediaAction.download(any(), any(), any()) }
     }
 
     @Test

@@ -43,7 +43,7 @@ class UserFavouriteTimelineViewModel(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val source by lazy {
-        account.mapNotNull { it }.flatMapLatest {
+        account.flatMapLatest {
             repository.favouriteTimeline(
                 userKey = userKey,
                 accountKey = it.accountKey,
