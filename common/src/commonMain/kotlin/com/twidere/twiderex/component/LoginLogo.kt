@@ -18,25 +18,22 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex
+package com.twidere.twiderex.component
 
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
+import androidx.compose.foundation.Image
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import com.twidere.twiderex.compose.LocalResLoader
-import com.twidere.twiderex.di.ext.get
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
+import com.twidere.twiderex.MR
 
 @Composable
-fun App() {
-    CompositionLocalProvider(
-        LocalResLoader provides get()
-    ) {
-        MaterialTheme {
-            Scaffold {
-                Text("Twidere X!")
-            }
-        }
-    }
+fun LoginLogo(
+    modifier: Modifier = Modifier,
+) {
+    Image(
+        modifier = modifier,
+        contentScale = ContentScale.FillWidth,
+        painter = painterResource(res = MR.files.ic_login_logo),
+        contentDescription = stringResource(res = MR.strings.accessibility_common_logo_twidere)
+    )
 }
