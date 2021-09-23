@@ -265,6 +265,8 @@ expect class NativePlayerView(
     fun seekTo(time: Long)
     fun update()
     fun setVolume(volume: Float)
+    fun mute()
+    fun unMute()
     fun release()
 }
 

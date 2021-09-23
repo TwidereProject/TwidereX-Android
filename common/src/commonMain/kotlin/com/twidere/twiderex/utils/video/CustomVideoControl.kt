@@ -20,19 +20,31 @@
  */
 package com.twidere.twiderex.utils.video
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.material.Button
-import androidx.compose.material.Text
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import com.twidere.twiderex.MR
 import com.twidere.twiderex.component.foundation.NativePlayerView
 import com.twidere.twiderex.component.foundation.PlayerProgressCallBack
 import com.twidere.twiderex.component.foundation.SeekBar
 import com.twidere.twiderex.component.foundation.SeekBarState
+import com.twidere.twiderex.component.painterResource
 
 @Composable
 fun CustomVideoControl(
-    player: NativePlayerView
+    player: NativePlayerView,
+    playing: Boolean = true,
+    mute: Boolean = false,
+    modifier: Modifier = Modifier
 ) {
     val seekBarState = remember {
         SeekBarState(
@@ -42,27 +54,74 @@ fun CustomVideoControl(
             player.seekTo(seekTime)
         }
     }
-    var playerState = true
+    var isPlaying by remember {
+        mutableStateOf(playing)
+    }
+    var isMute by remember {
+        mutableStateOf(mute)
+    }
     player.playerProgressCallBack = object : PlayerProgressCallBack {
         override fun onTimeChanged(time: Long) {
             seekBarState.onTimeChange(time)
         }
     }
-    Row {
-        Button(
+
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+
+        IconButton(
             onClick = {
-                if (!playerState) {
+                if (!isPlaying) {
                     player.resume()
                 } else {
                     player.pause()
                 }
-                playerState = !playerState
-            }
+                isPlaying = !isPlaying
+            },
         ) {
-            Text("play/pause")
+            if (isPlaying) {
+                Icon(
+                    painter = painterResource(res = MR.files.ic_player_pause),
+                    ""
+                )
+            } else {
+                Icon(
+                    painter = painterResource(res = MR.files.ic_player_play),
+                    ""
+                )
+            }
         }
-        SeekBar(
-            state = seekBarState
-        )
+
+        Box(modifier.weight(1f)) {
+            SeekBar(
+                state = seekBarState
+            )
+        }
+
+        IconButton(
+            onClick = {
+                if (!isMute) {
+                    player.mute()
+                } else {
+                    player.unMute()
+                }
+                isMute = !isMute
+            },
+        ) {
+            if (isMute) {
+                Icon(
+                    painter = painterResource(res = MR.files.ic_volume_mute),
+                    ""
+                )
+            } else {
+                Icon(
+                    painter = painterResource(res = MR.files.ic_volume_unmute),
+                    ""
+                )
+            }
+        }
     }
 }

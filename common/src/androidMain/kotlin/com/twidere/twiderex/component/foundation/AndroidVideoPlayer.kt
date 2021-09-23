@@ -169,6 +169,14 @@ actual class NativePlayerView actual constructor(
     actual fun seekTo(time: Long) {
         realPlayerView().player?.seekTo(time)
     }
+
+    actual fun mute() {
+        realPlayerView().player?.volume = 0f
+    }
+
+    actual fun unMute() {
+        realPlayerView().player?.volume = 1f
+    }
 }
 
 @Composable

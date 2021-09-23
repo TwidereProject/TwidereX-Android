@@ -101,6 +101,14 @@ actual class NativePlayerView actual constructor(
     actual fun seekTo(time: Long) {
         player.mediaPlayer().controls().setTime(time)
     }
+
+    actual fun mute() {
+        player.mediaPlayer().audio().isMute = true
+    }
+
+    actual fun unMute() {
+        player.mediaPlayer().audio().isMute = false
+    }
 }
 
 @Composable
