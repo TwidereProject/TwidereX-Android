@@ -18,25 +18,20 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex
+package com.twidere.twiderex.kmp
 
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import com.twidere.twiderex.compose.LocalResLoader
-import com.twidere.twiderex.di.ext.get
+import androidx.compose.ui.graphics.painter.Painter
+import com.twidere.services.http.authorization.Authorization
+import com.twidere.services.http.config.HttpConfig
+import com.twidere.twiderex.component.foundation.NetworkImageState
+import com.twidere.twiderex.component.image.ImageEffects
 
 @Composable
-fun App() {
-    CompositionLocalProvider(
-        LocalResLoader provides get()
-    ) {
-        MaterialTheme {
-            Scaffold {
-                Text("Twidere X!")
-            }
-        }
-    }
-}
+internal expect fun rememberNetworkImagePainter(
+    data: Any,
+    authorization: Authorization,
+    httpConfig: HttpConfig,
+    effects: ImageEffects,
+    onImageStateChanged: (NetworkImageState) -> Unit
+): Painter

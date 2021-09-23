@@ -69,11 +69,12 @@ kotlin {
                 implementation("androidx.room:room-paging:${Versions.room}")
                 kapt("androidx.room:room-compiler:${Versions.room}")
                 implementation("io.coil-kt:coil-base:${Versions.coil}")
+                implementation("io.coil-kt:coil-compose:${Versions.coil}")
+                implementation("io.coil-kt:coil-gif:${Versions.coil}")
+                implementation("io.coil-kt:coil-svg:${Versions.coil}")
                 api("androidx.datastore:datastore:${Versions.datastore}")
                 api("androidx.datastore:datastore-preferences:${Versions.datastore}")
                 implementation("androidx.exifinterface:exifinterface:${Versions.androidx_exifinterface}")
-                implementation("io.coil-kt:coil-compose:${Versions.coil}")
-                implementation("io.coil-kt:coil-gif:${Versions.coil}")
                 implementation("androidx.startup:startup-runtime:${Versions.startup}")
             }
         }

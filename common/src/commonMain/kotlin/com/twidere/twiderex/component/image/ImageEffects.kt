@@ -18,25 +18,26 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex
+package com.twidere.twiderex.component.image
 
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import com.twidere.twiderex.compose.LocalResLoader
-import com.twidere.twiderex.di.ext.get
-
-@Composable
-fun App() {
-    CompositionLocalProvider(
-        LocalResLoader provides get()
-    ) {
-        MaterialTheme {
-            Scaffold {
-                Text("Twidere X!")
-            }
+class ImageEffects private constructor(
+    val blur: ImageBlur?,
+    val crossFade: Boolean
+) {
+    class Builder {
+        private var blur: ImageBlur? = null
+        private var crossFade: Boolean = true
+        fun blur(blur: ImageBlur) {
+            this.blur = blur
         }
+
+        fun crossFade(crossFade: Boolean) {
+            this.crossFade = crossFade
+        }
+
+        fun build() = ImageEffects(
+            blur = blur,
+            crossFade = crossFade
+        )
     }
 }

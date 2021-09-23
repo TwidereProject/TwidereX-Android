@@ -62,7 +62,9 @@ import com.google.accompanist.insets.ProvideWindowInsets
 import com.twidere.twiderex.action.LocalStatusActions
 import com.twidere.twiderex.action.StatusActions
 import com.twidere.twiderex.component.foundation.LocalInAppNotification
+import com.twidere.twiderex.compose.LocalResLoader
 import com.twidere.twiderex.extensions.observeAsState
+import com.twidere.twiderex.kmp.ResLoader
 import com.twidere.twiderex.navigation.Router
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.preferences.PreferencesHolder
@@ -185,6 +187,7 @@ class TwidereXActivity : PreComposeActivity(), KoinComponent {
             LocalActiveAccountViewModel provides accountViewModel,
             LocalIsActiveNetworkMetered provides isActiveNetworkMetered,
             LocalPlatformResolver provides platformResolver,
+            LocalResLoader provides ResLoader(this)
         ) {
             ProvidePreferences(
                 preferencesHolder,
