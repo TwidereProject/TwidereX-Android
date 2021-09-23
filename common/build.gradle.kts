@@ -59,11 +59,11 @@ kotlin {
         }
         val androidMain by getting {
             dependencies {
-                api("androidx.lifecycle:lifecycle-runtime-ktx:${Versions.lifecycle}")
-                api("androidx.savedstate:savedstate-ktx:1.1.0")
+                implementation("androidx.lifecycle:lifecycle-runtime-ktx:${Versions.lifecycle}")
+                implementation("androidx.savedstate:savedstate-ktx:1.1.0")
                 implementation("androidx.core:core-ktx:1.7.0-alpha01")
-                api("io.insert-koin:koin-android:${Versions.koin}")
-                api("io.insert-koin:koin-androidx-workmanager:${Versions.koin}")
+                implementation("io.insert-koin:koin-android:${Versions.koin}")
+                implementation("io.insert-koin:koin-androidx-workmanager:${Versions.koin}")
                 implementation("androidx.room:room-runtime:${Versions.room}")
                 implementation("androidx.room:room-ktx:${Versions.room}")
                 implementation("androidx.room:room-paging:${Versions.room}")
@@ -72,8 +72,8 @@ kotlin {
                 implementation("io.coil-kt:coil-compose:${Versions.coil}")
                 implementation("io.coil-kt:coil-gif:${Versions.coil}")
                 implementation("io.coil-kt:coil-svg:${Versions.coil}")
-                api("androidx.datastore:datastore:${Versions.datastore}")
-                api("androidx.datastore:datastore-preferences:${Versions.datastore}")
+                implementation("androidx.datastore:datastore:${Versions.datastore}")
+                implementation("androidx.datastore:datastore-preferences:${Versions.datastore}")
                 implementation("androidx.exifinterface:exifinterface:${Versions.androidx_exifinterface}")
                 implementation("androidx.startup:startup-runtime:${Versions.startup}")
             }
