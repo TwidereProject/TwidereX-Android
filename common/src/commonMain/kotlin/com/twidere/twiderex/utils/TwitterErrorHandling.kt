@@ -26,9 +26,12 @@ import com.twidere.services.twitter.TwitterErrorCodes
 import com.twidere.services.twitter.model.exceptions.TwitterApiException
 import com.twidere.services.twitter.model.exceptions.TwitterApiExceptionV2
 import com.twidere.services.utils.MicroBlogJsonException
+import com.twidere.twiderex.MR
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.notification.NotificationEvent
 import com.twidere.twiderex.notification.StringNotificationEvent
+import com.twidere.twiderex.notification.StringResNotificationEvent
+import com.twidere.twiderex.notification.StringResWithActionNotificationEvent
 import java.util.concurrent.CancellationException
 
 internal fun InAppNotification.notifyError(e: Throwable) {
@@ -43,8 +46,7 @@ fun Throwable.generateNotificationEvent(): NotificationEvent? {
         is MicroBlogHttpException -> {
             when (this.httpCode) {
                 HttpErrorCodes.TooManyRequests -> {
-                    TODO("Implementation")
-                    // return StringResNotificationEvent(messageId = R.string.common_alerts_too_many_requests_title)
+                    return StringResNotificationEvent(message = MR.strings.common_alerts_too_many_requests_title)
                 }
                 else -> null
             }
@@ -55,19 +57,19 @@ fun Throwable.generateNotificationEvent(): NotificationEvent? {
         is TwitterApiException -> {
             when (this.errors?.firstOrNull()?.code) {
                 TwitterErrorCodes.TemporarilyLocked -> {
-                    TODO("Implementation")
-                    // StringResWithActionNotificationEvent(
-                    //     R.string.common_alerts_account_temporarily_locked_title,
-                    //     R.string.common_alerts_account_temporarily_locked_message,
-                    //     actionId = R.string.common_controls_actions_ok
-                    // ) {
-                    //     context.startActivity(
-                    //         Intent(
-                    //             Intent.ACTION_VIEW,
-                    //             Uri.parse("https://twitter.com/login")
-                    //         )
-                    //     )
-                    // }
+                    StringResWithActionNotificationEvent(
+                        MR.strings.common_alerts_account_temporarily_locked_title,
+                        MR.strings.common_alerts_account_temporarily_locked_message,
+                        actionStr = MR.strings.common_controls_actions_ok
+                    ) {
+                        // TODO FIXME: 2021/9/23 Implementation
+                        // context.startActivity(
+                        //     Intent(
+                        //         Intent.ACTION_VIEW,
+                        //         Uri.parse("https://twitter.com/login")
+                        //     )
+                        // )
+                    }
                 }
                 TwitterErrorCodes.RateLimitExceeded -> null
                 else -> microBlogErrorMessage?.let { StringNotificationEvent(it) }
