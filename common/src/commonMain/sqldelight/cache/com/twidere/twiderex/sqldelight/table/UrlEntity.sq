@@ -1,0 +1,17 @@
+import com.twidere.twiderex.model.MicroBlogKey;
+
+CREATE TABLE UrlEntity (
+    id TEXT PRIMARY KEY NOT NULL,
+    belongToKey TEXT AS MicroBlogKey NOT NULL,
+    url TEXT NOT NULL,
+    expandedUrl TEXT NOT NULL,
+    displayUrl TEXT NOT NULL,
+    title TEXT,
+    description TEXT,
+    image TEXT
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS index_belongToKey_url ON UrlEntity (belongToKey, url);
+
+insert:
+INSERT OR REPLACE INTO UrlEntity(id, belongToKey, url, expandedUrl, displayUrl, title, description, image) VALUES ?;

@@ -1,0 +1,24 @@
+import com.twidere.twiderex.model.MicroBlogKey;
+import com.twidere.twiderex.model.enums.PlatformType;
+import com.twidere.twiderex.model.ui.UserExtra;
+import com.twidere.twiderex.model.ui.UserMetrics;
+import java.lang.Boolean;
+
+CREATE TABLE User (
+    id TEXT NOT NULL,
+    userKey TEXT AS MicroBlogKey NOT NULL,
+    acct TEXT AS MicroBlogKey NOT NULL,
+    name TEXT NOT NULL,
+    screenName TEXT NOT NULL,
+    profileImage TEXT NOT NULL,
+    profileBackgroundImage TEXT,
+    metrics TEXT AS UserMetrics NOT NULL,
+    rawDesc TEXT NOT NULL,
+    htmlDesc TEXT NOT NULL,
+    website TEXT,
+    location TEXT,
+    verified INTEGER AS Boolean NOT NULL,
+    protected INTEGER AS Boolean NOT NULL,
+    platformType TEXT AS PlatformType NOT NULL,
+    extra TEXT AS UserExtra
+);
