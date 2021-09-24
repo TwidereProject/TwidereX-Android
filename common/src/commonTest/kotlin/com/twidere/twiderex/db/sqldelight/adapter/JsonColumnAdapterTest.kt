@@ -18,18 +18,27 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.db.sqldelight.dao
+package com.twidere.twiderex.db.sqldelight.adapter
 
-import com.twidere.twiderex.db.dao.MediaDao
-import com.twidere.twiderex.db.sqldelight.transform.toUi
-import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.ui.UiMedia
-import com.twidere.twiderex.sqldelight.table.MediaQueries
+import kotlinx.serialization.Serializable
+import org.junit.Test
+import kotlin.test.assertEquals
+@Serializable
+private data class JsonObject(
+    val arg1: String,
+    val arg2: Int,
+    val arg3: Boolean
+)
+class JsonColumnAdapterTest {
 
-internal class MediaDaoImpl(private val mediaQueries: MediaQueries) : MediaDao {
-    override suspend fun findMediaByBelongToKey(belongToKey: MicroBlogKey): List<UiMedia> {
-        return mediaQueries.findMediaByBelongToKey(belongToKey).executeAsList().map {
-            it.toUi()
-        }
+    @Test
+    fun decodeAndEncodeDataClass() {
+        val adapter = JsonColumnAdapter(JsonObject.serializer())
+        val origin = JsonObject(arg1 = "test", arg2 = 2, arg3 = true)
+        val string = adapter.encode(origin)
+        val obj = adapter.decode(string)
+        assertEquals(origin.arg1, obj.arg1)
+        assertEquals(origin.arg2, obj.arg2)
+        assertEquals(origin.arg3, obj.arg3)
     }
 }

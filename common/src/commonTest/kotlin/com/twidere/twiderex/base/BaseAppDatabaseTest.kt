@@ -20,8 +20,7 @@
  */
 package com.twidere.twiderex.base
 
-import com.twidere.twiderex.db.sqldelight.adapter.DraftAdapterFactory
-import com.twidere.twiderex.db.sqldelight.adapter.SearchAdapterFactory
+import com.twidere.twiderex.db.sqldelight.createAppDataBase
 import com.twidere.twiderex.sqldelight.SqlDelightAppDatabase
 import org.junit.After
 import org.junit.Before
@@ -31,12 +30,7 @@ internal open class BaseAppDatabaseTest {
     private val driver = SqlDriverFactory.create(SqlDelightAppDatabase.Schema)
     @Before
     fun setUp() {
-        SqlDelightAppDatabase.Schema.create(driver)
-        database = SqlDelightAppDatabase(
-            driver = driver,
-            draftAdapter = DraftAdapterFactory.create(),
-            searchAdapter = SearchAdapterFactory.create()
-        )
+        database = createAppDataBase(driver)
     }
 
     @After

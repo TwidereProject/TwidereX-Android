@@ -18,17 +18,18 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.db.sqldelight.adapter
+package com.twidere.twiderex.db.sqldelight.dao
 
-import com.squareup.sqldelight.EnumColumnAdapter
-import com.twidere.twiderex.sqldelight.table.User
+import com.twidere.twiderex.db.dao.MediaDao
+import com.twidere.twiderex.db.sqldelight.transform.toUi
+import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.ui.UiMedia
+import com.twidere.twiderex.sqldelight.table.MediaQueries
 
-internal object UserAdapterFactory {
-    fun create() = MicroBlogKeyColumnAdapter().let {
-        User.Adapter(
-            userKeyAdapter = it,
-            acctAdapter = it,
-            platformTypeAdapter = EnumColumnAdapter(),
-        )
+internal class SqlDelightMediaDaoImpl(private val mediaQueries: MediaQueries) : MediaDao {
+    override suspend fun findMediaByBelongToKey(belongToKey: MicroBlogKey): List<UiMedia> {
+        return mediaQueries.findMediaByBelongToKey(belongToKey).executeAsList().map {
+            it.toUi()
+        }
     }
 }

@@ -22,8 +22,6 @@ package com.twidere.twiderex.db.sqldelight.adapter
 
 import com.squareup.sqldelight.ColumnAdapter
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.enums.ComposeType
-import com.twidere.twiderex.model.enums.MediaType
 import com.twidere.twiderex.utils.fromJson
 import com.twidere.twiderex.utils.json
 import kotlinx.serialization.KSerializer
@@ -39,22 +37,10 @@ internal class StringListColumnAdapter(private val separator: String = ",") : Co
     override fun encode(value: List<String>) = value.joinToString(separator = separator) { it }
 }
 
-internal class ComposeTypeColumnAdapter : ColumnAdapter<ComposeType, String> {
-    override fun decode(databaseValue: String) = ComposeType.valueOf(databaseValue)
-
-    override fun encode(value: ComposeType) = value.name
-}
-
 internal class MicroBlogKeyColumnAdapter : ColumnAdapter<MicroBlogKey, String> {
     override fun decode(databaseValue: String) = MicroBlogKey.valueOf(databaseValue)
 
     override fun encode(value: MicroBlogKey) = value.toString()
-}
-
-internal class MediaTypeColumnAdapter : ColumnAdapter<MediaType, String> {
-    override fun decode(databaseValue: String) = MediaType.valueOf(databaseValue)
-
-    override fun encode(value: MediaType) = value.name
 }
 
 internal class JsonColumnAdapter<T : Any>(private val serializer: KSerializer<T>) : ColumnAdapter<T, String> {

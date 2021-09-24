@@ -33,7 +33,7 @@ import com.twidere.twiderex.sqldelight.table.SearchQueries
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-internal class SearchDaoImpl(private val queries: SearchQueries) : SearchDao {
+internal class SqlDelightSearchDaoImpl(private val queries: SearchQueries) : SearchDao {
     override suspend fun insertAll(search: List<UiSearch>) {
         queries.transaction {
             search.forEach {

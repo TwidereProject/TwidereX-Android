@@ -21,14 +21,17 @@
 package com.twidere.twiderex.db.sqldelight.adapter
 
 import com.squareup.sqldelight.EnumColumnAdapter
-import com.twidere.twiderex.sqldelight.table.User
+import com.twidere.twiderex.sqldelight.table.DMEvent
 
-internal object UserAdapterFactory {
+object DMEventAdapterFactory {
     fun create() = MicroBlogKeyColumnAdapter().let {
-        User.Adapter(
-            userKeyAdapter = it,
-            acctAdapter = it,
-            platformTypeAdapter = EnumColumnAdapter(),
+        DMEvent.Adapter(
+            accountKeyAdapter = it,
+            conversationKeyAdapter = it,
+            messageKeyAdapter = it,
+            senderAccountKeyAdapter = it,
+            recipientAccountKeyAdapter = it,
+            sendStatusAdapter = EnumColumnAdapter()
         )
     }
 }

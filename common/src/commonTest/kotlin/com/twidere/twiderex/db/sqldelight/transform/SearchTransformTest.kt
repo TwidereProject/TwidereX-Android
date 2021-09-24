@@ -18,17 +18,15 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.sqldelight.transform
+package com.twidere.twiderex.db.sqldelight.transform
 
-import com.twidere.twiderex.db.sqldelight.transform.toDbSearch
-import com.twidere.twiderex.db.sqldelight.transform.toUi
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiSearch
 import com.twidere.twiderex.sqldelight.table.Search
 import org.junit.Test
 import kotlin.test.assertEquals
 
-class SearchTransformTest {
+internal class SearchTransformTest {
     @Test
     fun searchToUi() {
         val search = Search(

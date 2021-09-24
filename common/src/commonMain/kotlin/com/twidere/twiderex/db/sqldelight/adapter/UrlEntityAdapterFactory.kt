@@ -20,15 +20,10 @@
  */
 package com.twidere.twiderex.db.sqldelight.adapter
 
-import com.squareup.sqldelight.EnumColumnAdapter
-import com.twidere.twiderex.sqldelight.table.User
+import com.twidere.twiderex.sqldelight.table.UrlEntity
 
-internal object UserAdapterFactory {
-    fun create() = MicroBlogKeyColumnAdapter().let {
-        User.Adapter(
-            userKeyAdapter = it,
-            acctAdapter = it,
-            platformTypeAdapter = EnumColumnAdapter(),
-        )
-    }
+internal object UrlEntityAdapterFactory {
+    fun create() = UrlEntity.Adapter(
+        belongToKeyAdapter = MicroBlogKeyColumnAdapter(),
+    )
 }

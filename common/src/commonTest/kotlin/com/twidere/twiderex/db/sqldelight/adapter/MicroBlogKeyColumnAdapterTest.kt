@@ -18,28 +18,24 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.sqldelight.adapter
+package com.twidere.twiderex.db.sqldelight.adapter
 
-import com.twidere.twiderex.db.sqldelight.adapter.ComposeTypeColumnAdapter
-import com.twidere.twiderex.model.enums.ComposeType
+import com.twidere.twiderex.model.MicroBlogKey
 import org.junit.Test
 import kotlin.test.assertEquals
 
-internal class ComposeTypeColumnAdapterTest {
-    private val adapter = ComposeTypeColumnAdapter()
+internal class MicroBlogKeyColumnAdapterTest {
+    private val adapter = MicroBlogKeyColumnAdapter()
     @Test
-    fun decode_TypeMatchesToName() {
-        assertEquals(ComposeType.New, adapter.decode("New"))
-        assertEquals(ComposeType.Quote, adapter.decode("Quote"))
-        assertEquals(ComposeType.Reply, adapter.decode("Reply"))
-        assertEquals(ComposeType.Thread, adapter.decode("Thread"))
+    fun decode_GenerateCorrectHostAndId() {
+        val key = adapter.decode("123@twitter.com")
+        assertEquals("123", key.id)
+        assertEquals("twitter.com", key.host)
     }
 
     @Test
-    fun encode_NameMatchesToType() {
-        assertEquals("New", adapter.encode(ComposeType.New))
-        assertEquals("Quote", adapter.encode(ComposeType.Quote))
-        assertEquals("Reply", adapter.encode(ComposeType.Reply))
-        assertEquals("Thread", adapter.encode(ComposeType.Thread))
+    fun encode_CombineIdAndHostToString() {
+        val string = adapter.encode(MicroBlogKey(id = "123", host = "twitter.com"))
+        assertEquals("123@twitter.com", string)
     }
 }

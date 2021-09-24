@@ -21,7 +21,7 @@
 package com.twidere.twiderex.db.dao
 
 import com.twidere.twiderex.base.BaseAppDatabaseTest
-import com.twidere.twiderex.db.sqldelight.dao.SearchDaoImpl
+import com.twidere.twiderex.db.sqldelight.dao.SqlDelightSearchDaoImpl
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiSearch
 import kotlinx.coroutines.flow.firstOrNull
@@ -30,11 +30,11 @@ import org.junit.Test
 import java.util.UUID
 import kotlin.test.assertEquals
 
-internal class SearchDaoImplTest : BaseAppDatabaseTest() {
+internal class SqlDelightSearchDaoImplTest : BaseAppDatabaseTest() {
     @Test
     fun getAll_ReturnsFlowAndUpdateAfterDbUpdated() = runBlocking {
         val accountKey = MicroBlogKey.twitter("test")
-        val searchDao = SearchDaoImpl(database.searchQueries)
+        val searchDao = SqlDelightSearchDaoImpl(database.searchQueries)
         val flow = searchDao.getAll(accountKey)
         assert(flow.firstOrNull()?.isEmpty() ?: false)
         searchDao.insertAll(createSearchList(accountKey = accountKey, count = 1))
@@ -44,7 +44,7 @@ internal class SearchDaoImplTest : BaseAppDatabaseTest() {
     @Test
     fun insertAll_InsertAllDataInGivenList() = runBlocking {
         val accountKey = MicroBlogKey.twitter("test")
-        val searchDao = SearchDaoImpl(database.searchQueries)
+        val searchDao = SqlDelightSearchDaoImpl(database.searchQueries)
         val flow = searchDao.getAll(accountKey)
         assert(flow.firstOrNull()?.isEmpty() ?: false)
         val count = 10
@@ -55,7 +55,7 @@ internal class SearchDaoImplTest : BaseAppDatabaseTest() {
     @Test
     fun getHistories_ReturnsFlowWithNotSavedSearchAndUpdateAfterDbUpdated() = runBlocking {
         val accountKey = MicroBlogKey.twitter("test")
-        val searchDao = SearchDaoImpl(database.searchQueries)
+        val searchDao = SqlDelightSearchDaoImpl(database.searchQueries)
         val flow = searchDao.getAllHistory(accountKey)
         assert(flow.firstOrNull()?.isEmpty() ?: false)
         searchDao.insertAll(createSearchList(count = 5, accountKey = accountKey))
@@ -73,7 +73,7 @@ internal class SearchDaoImplTest : BaseAppDatabaseTest() {
     @Test
     fun getSaved_ReturnsFlowWithSavedSearchAndUpdateAfterDbUpdated() = runBlocking {
         val accountKey = MicroBlogKey.twitter("test")
-        val searchDao = SearchDaoImpl(database.searchQueries)
+        val searchDao = SqlDelightSearchDaoImpl(database.searchQueries)
         val flow = searchDao.getAllSaved(accountKey)
         assert(flow.firstOrNull()?.isEmpty() ?: false)
         searchDao.insertAll(createSearchList(count = 5, accountKey = accountKey))

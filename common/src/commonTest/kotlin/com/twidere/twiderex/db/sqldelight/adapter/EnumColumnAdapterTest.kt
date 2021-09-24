@@ -18,25 +18,27 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.sqldelight.adapter
+package com.twidere.twiderex.db.sqldelight.adapter
 
-import com.twidere.twiderex.db.sqldelight.adapter.MicroBlogKeyColumnAdapter
-import com.twidere.twiderex.model.MicroBlogKey
+import com.squareup.sqldelight.EnumColumnAdapter
+import kotlinx.serialization.Serializable
 import org.junit.Test
 import kotlin.test.assertEquals
 
-internal class MicroBlogKeyColumnAdapterTest {
-    private val adapter = MicroBlogKeyColumnAdapter()
-    @Test
-    fun decode_GenerateCorrectHostAndId() {
-        val key = adapter.decode("123@twitter.com")
-        assertEquals("123", key.id)
-        assertEquals("twitter.com", key.host)
-    }
+@Serializable
+private enum class JsonEnum {
+    ENUM_ONE,
+    ENUM_TWO,
+    ENUM_THREE
+}
+class EnumColumnAdapterTest {
 
     @Test
-    fun encode_CombineIdAndHostToString() {
-        val string = adapter.encode(MicroBlogKey(id = "123", host = "twitter.com"))
-        assertEquals("123@twitter.com", string)
+    fun decodeAndEncodeEnumClass() {
+        val adapter = EnumColumnAdapter<JsonEnum>()
+        val origin = JsonEnum.ENUM_TWO
+        val string = adapter.encode(origin)
+        val obj = adapter.decode(string)
+        assertEquals(origin, obj)
     }
 }

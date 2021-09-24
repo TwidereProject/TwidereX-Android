@@ -15,3 +15,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS index_belongToKey_url ON UrlEntity (belongToKe
 
 insert:
 INSERT OR REPLACE INTO UrlEntity(id, belongToKey, url, expandedUrl, displayUrl, title, description, image) VALUES ?;
+
+
+findByBelongToKey:
+SELECT * FROM UrlEntity WHERE belongToKey == :belongToKey;

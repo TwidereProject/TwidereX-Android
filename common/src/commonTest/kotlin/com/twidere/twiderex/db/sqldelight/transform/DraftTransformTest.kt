@@ -18,10 +18,8 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.sqldelight.transform
+package com.twidere.twiderex.db.sqldelight.transform
 
-import com.twidere.twiderex.db.sqldelight.transform.toDbDraft
-import com.twidere.twiderex.db.sqldelight.transform.toUi
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.ComposeType
 import com.twidere.twiderex.model.ui.UiDraft
@@ -31,7 +29,7 @@ import java.util.UUID
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 
-class DraftTransformTest {
+internal class DraftTransformTest {
     @Test
     fun draftToUi() {
         val draft = Draft(

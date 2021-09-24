@@ -18,17 +18,24 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.db.sqldelight.adapter
+package com.twidere.twiderex.base
 
-import com.squareup.sqldelight.EnumColumnAdapter
-import com.twidere.twiderex.sqldelight.table.User
+import com.twidere.twiderex.db.sqldelight.createCacheDataBase
+import com.twidere.twiderex.sqldelight.SqlDelightCacheDatabase
+import org.junit.After
+import org.junit.Before
 
-internal object UserAdapterFactory {
-    fun create() = MicroBlogKeyColumnAdapter().let {
-        User.Adapter(
-            userKeyAdapter = it,
-            acctAdapter = it,
-            platformTypeAdapter = EnumColumnAdapter(),
-        )
+internal open class BaseCacheDatabaseTest {
+    protected lateinit var database: SqlDelightCacheDatabase
+    private val driver = SqlDriverFactory.create(SqlDelightCacheDatabase.Schema)
+    @Before
+    fun setUp() {
+        database = createCacheDataBase(driver)
+    }
+
+    @After
+    fun tearDown() {
+        database.cacheDropQueries.clearAllTables()
+        driver.close()
     }
 }

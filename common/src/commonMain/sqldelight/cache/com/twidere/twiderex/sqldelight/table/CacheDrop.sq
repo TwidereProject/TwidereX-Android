@@ -1,0 +1,6 @@
+clearAllTables{
+    DELETE FROM DMEvent;
+    DELETE FROM Media;
+    DELETE FROM UrlEntity;
+    DELETE FROM User;
+}

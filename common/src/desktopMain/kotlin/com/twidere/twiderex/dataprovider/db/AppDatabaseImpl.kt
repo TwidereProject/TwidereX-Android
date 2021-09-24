@@ -21,8 +21,8 @@
 package com.twidere.twiderex.dataprovider.db
 
 import com.twidere.twiderex.db.AppDatabase
-import com.twidere.twiderex.db.sqldelight.dao.SearchDaoImpl
 import com.twidere.twiderex.db.sqldelight.dao.SqlDelightDraftDaoImpl
+import com.twidere.twiderex.db.sqldelight.dao.SqlDelightSearchDaoImpl
 import com.twidere.twiderex.sqldelight.SqlDelightAppDatabase
 import kotlinx.coroutines.runBlocking
 
@@ -30,7 +30,7 @@ internal class AppDatabaseImpl(private val database: SqlDelightAppDatabase) : Ap
     private val draftDao = SqlDelightDraftDaoImpl(database.draftQueries)
     override fun draftDao() = draftDao
 
-    private val searchDao = SearchDaoImpl(database.searchQueries)
+    private val searchDao = SqlDelightSearchDaoImpl(database.searchQueries)
     override fun searchDao() = searchDao
 
     override suspend fun clearAllTables() {
