@@ -4,7 +4,7 @@ import com.twidere.twiderex.model.ui.UserExtra;
 import com.twidere.twiderex.model.ui.UserMetrics;
 import java.lang.Boolean;
 
-CREATE TABLE User (
+CREATE TABLE IF NOT EXISTS User (
     id TEXT NOT NULL,
     userKey TEXT AS MicroBlogKey NOT NULL,
     acct TEXT AS MicroBlogKey NOT NULL,

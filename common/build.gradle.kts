@@ -77,6 +77,8 @@ kotlin {
                 implementation("io.coil-kt:coil-compose:${Versions.coil}")
                 implementation("io.coil-kt:coil-gif:${Versions.coil}")
                 implementation("io.coil-kt:coil-svg:${Versions.coil}")
+                implementation("com.squareup.sqldelight:android-driver:${Versions.sqlDelight}")
+                implementation("com.squareup.sqldelight:sqlite-driver:${Versions.sqlDelight}")
             }
         }
         val androidAndroidTest by getting {
@@ -90,6 +92,7 @@ kotlin {
                 implementation("androidx.room:room-testing:${Versions.room}")
             }
         }
+        val androidTest by getting
         val desktopMain by getting {
             dependencies {
                 implementation("com.squareup.sqldelight:sqlite-driver:${Versions.sqlDelight}")

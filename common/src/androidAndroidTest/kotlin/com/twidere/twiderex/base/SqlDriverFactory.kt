@@ -20,28 +20,12 @@
  */
 package com.twidere.twiderex.base
 
-import com.twidere.twiderex.db.sqldelight.adapter.DraftAdapterFactory
-import com.twidere.twiderex.db.sqldelight.adapter.SearchAdapterFactory
-import com.twidere.twiderex.sqldelight.SqlDelightAppDatabase
-import org.junit.After
-import org.junit.Before
+import androidx.test.core.app.ApplicationProvider
+import com.squareup.sqldelight.android.AndroidSqliteDriver
+import com.squareup.sqldelight.db.SqlDriver
 
-internal open class BaseAppDatabaseTest {
-    protected lateinit var database: SqlDelightAppDatabase
-    private val driver = SqlDriverFactory.create(SqlDelightAppDatabase.Schema)
-    @Before
-    fun setUp() {
-        SqlDelightAppDatabase.Schema.create(driver)
-        database = SqlDelightAppDatabase(
-            driver = driver,
-            draftAdapter = DraftAdapterFactory.create(),
-            searchAdapter = SearchAdapterFactory.create()
-        )
-    }
-
-    @After
-    fun tearDown() {
-        database.dropQueries.clearAllTables()
-        driver.close()
+actual object SqlDriverFactory {
+    actual fun create(schema: SqlDriver.Schema): SqlDriver {
+        return AndroidSqliteDriver(schema, ApplicationProvider.getApplicationContext(), "sqldelight_test.db")
     }
 }

@@ -1,7 +1,7 @@
 import com.twidere.twiderex.model.MicroBlogKey;
 import java.lang.Boolean;
 
-CREATE TABLE search (
+CREATE TABLE IF NOT EXISTS search  (
     content TEXT NOT NULL,
     lastActive INTEGER NOT NULL,
     saved INTEGER AS Boolean DEFAULT 0 NOT NULL,

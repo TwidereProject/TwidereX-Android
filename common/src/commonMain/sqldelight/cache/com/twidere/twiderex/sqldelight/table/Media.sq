@@ -1,7 +1,7 @@
 import com.twidere.twiderex.model.MicroBlogKey;
 import com.twidere.twiderex.model.enums.MediaType;
 
-CREATE TABLE Media(
+CREATE TABLE IF NOT EXISTS Media(
     belongToKey TEXT AS MicroBlogKey NOT NULL,
     url TEXT,
     mediaUrl TEXT,

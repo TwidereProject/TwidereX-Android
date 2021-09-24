@@ -2,7 +2,7 @@ import com.twidere.twiderex.model.MicroBlogKey;
 import com.twidere.twiderex.model.enums.ComposeType;
 import kotlin.collections.List;
 
-CREATE TABLE draft (
+CREATE TABLE IF NOT EXISTS draft (
     id TEXT NOT NULL PRIMARY KEY,
     content TEXT NOT NULL,
     media TEXT AS List<String> NOT NULL,

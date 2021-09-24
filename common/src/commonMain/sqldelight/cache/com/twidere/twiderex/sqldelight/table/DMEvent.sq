@@ -1,7 +1,7 @@
 import com.twidere.twiderex.model.MicroBlogKey;
 import com.twidere.twiderex.model.ui.UiDMEvent.SendStatus;
 
-CREATE TABLE DMEvent (
+CREATE TABLE IF NOT EXISTS DMEvent (
     id TEXT PRIMARY KEY NOT NULL,
     accountKey TEXT AS MicroBlogKey NOT NULL,
     sortId INTEGER NOT NULL,

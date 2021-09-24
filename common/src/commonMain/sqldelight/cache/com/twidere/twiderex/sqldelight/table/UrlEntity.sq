@@ -1,6 +1,6 @@
 import com.twidere.twiderex.model.MicroBlogKey;
 
-CREATE TABLE UrlEntity (
+CREATE TABLE IF NOT EXISTS UrlEntity (
     id TEXT PRIMARY KEY NOT NULL,
     belongToKey TEXT AS MicroBlogKey NOT NULL,
     url TEXT NOT NULL,

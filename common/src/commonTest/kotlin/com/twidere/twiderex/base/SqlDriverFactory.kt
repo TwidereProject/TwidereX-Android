@@ -23,5 +23,5 @@ package com.twidere.twiderex.base
 import com.squareup.sqldelight.db.SqlDriver
 
 expect object SqlDriverFactory {
-    fun create(): SqlDriver
+    fun create(schema: SqlDriver.Schema): SqlDriver
 }
