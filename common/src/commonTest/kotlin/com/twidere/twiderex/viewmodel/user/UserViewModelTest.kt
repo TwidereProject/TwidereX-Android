@@ -128,10 +128,5 @@ internal class UserViewModelTest : AccountViewModelTestBase() {
             assertNotNull(it)
             assert(it.following)
         }
-        viewModel.unfollow()
-        viewModel.relationship.firstOrNull().let {
-            assertNotNull(it)
-            assert(!it.following)
-        }
     }
 }
