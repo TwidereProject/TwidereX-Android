@@ -20,6 +20,7 @@
  */
 package com.twidere.twiderex.viewmodel.user
 
+import app.cash.turbine.test
 import com.twidere.services.microblog.MicroBlogService
 import com.twidere.twiderex.mock.service.MockRelationshipService
 import com.twidere.twiderex.model.MicroBlogKey
@@ -36,7 +37,9 @@ import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
+import kotlin.time.ExperimentalTime
 
+@OptIn(ExperimentalTime::class)
 internal class UserViewModelTest : AccountViewModelTestBase() {
     override val mockService: MicroBlogService
         get() = MockRelationshipService()
@@ -67,9 +70,11 @@ internal class UserViewModelTest : AccountViewModelTestBase() {
             inAppNotification,
             mockAccount.accountKey
         )
-        viewModel.user.firstOrNull().let {
+        viewModel.user.test {
+            val it = awaitItem()
             assertNotNull(it)
             assertEquals(mockAccount.accountKey, it.userKey)
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -124,9 +129,11 @@ internal class UserViewModelTest : AccountViewModelTestBase() {
             MicroBlogKey.twitter("321")
         )
         viewModel.follow()
-        viewModel.relationship.firstOrNull().let {
-            assertNotNull(it)
-            assert(it.following)
+        viewModel.relationship.test {
+            val item = awaitItem()
+            assertNotNull(item)
+            assert(item.following)
+            cancelAndIgnoreRemainingEvents()
         }
     }
 }

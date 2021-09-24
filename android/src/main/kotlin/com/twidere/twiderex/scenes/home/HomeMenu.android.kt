@@ -21,20 +21,25 @@
 package com.twidere.twiderex.scenes.home
 
 import com.twidere.twiderex.model.HomeMenus
+import com.twidere.twiderex.model.HomeNavigationItem
 import com.twidere.twiderex.scenes.home.mastodon.FederatedTimelineItem
 import com.twidere.twiderex.scenes.home.mastodon.LocalTimelineItem
 import com.twidere.twiderex.scenes.home.mastodon.MastodonNotificationItem
 
-val HomeMenus.item
-    get() = when (this) {
-        HomeMenus.HomeTimeline -> HomeTimelineItem()
-        HomeMenus.MastodonNotification -> MastodonNotificationItem()
-        HomeMenus.Mention -> MentionItem()
-        HomeMenus.Search -> SearchItem()
-        HomeMenus.Me -> MeItem()
-        HomeMenus.Message -> DMConversationListItem()
-        HomeMenus.LocalTimeline -> LocalTimelineItem()
-        HomeMenus.FederatedTimeline -> FederatedTimelineItem()
-        HomeMenus.Draft -> DraftNavigationItem()
-        HomeMenus.Lists -> ListsNavigationItem()
-    }
+private val itemMap by lazy {
+    mutableMapOf(
+        HomeMenus.HomeTimeline to HomeTimelineItem(),
+        HomeMenus.MastodonNotification to MastodonNotificationItem(),
+        HomeMenus.Mention to MentionItem(),
+        HomeMenus.Search to SearchItem(),
+        HomeMenus.Me to MeItem(),
+        HomeMenus.Message to DMConversationListItem(),
+        HomeMenus.LocalTimeline to LocalTimelineItem(),
+        HomeMenus.FederatedTimeline to FederatedTimelineItem(),
+        HomeMenus.Draft to DraftNavigationItem(),
+        HomeMenus.Lists to ListsNavigationItem(),
+    )
+}
+
+val HomeMenus.item: HomeNavigationItem
+    get() = itemMap.getValue(this)

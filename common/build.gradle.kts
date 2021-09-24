@@ -46,6 +46,7 @@ kotlin {
                 implementation(projects.routeProcessor)
                 ksp(projects.routeProcessor)
                 api("dev.icerock.moko:resources:${Versions.moko}")
+                implementation("app.cash.turbine:turbine:0.6.1")
             }
         }
         val commonTest by getting {
