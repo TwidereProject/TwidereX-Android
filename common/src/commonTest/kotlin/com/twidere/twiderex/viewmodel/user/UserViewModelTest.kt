@@ -34,7 +34,7 @@ import io.mockk.mockk
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
-import org.junit.Test
+import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.time.ExperimentalTime
@@ -93,9 +93,8 @@ internal class UserViewModelTest : AccountViewModelTestBase() {
             inAppNotification,
             mockAccount.accountKey
         )
-        viewModel.isMe.firstOrNull().let {
-            assertNotNull(it)
-            assert(it)
+        viewModel.isMe.test {
+            assert(awaitItem())
         }
     }
 
@@ -128,7 +127,12 @@ internal class UserViewModelTest : AccountViewModelTestBase() {
             inAppNotification,
             MicroBlogKey.twitter("321")
         )
-        viewModel.follow()
+        viewModel.loadingRelationship.test {
+            assert(!awaitItem())
+            viewModel.follow()
+            assert(awaitItem())
+            assert(!awaitItem())
+        }
         viewModel.relationship.test {
             val item = awaitItem()
             assertNotNull(item)

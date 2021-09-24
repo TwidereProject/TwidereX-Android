@@ -20,8 +20,8 @@
  */
 package com.twidere.twiderex.viewmodel.lists
 
+import app.cash.turbine.test
 import com.twidere.services.microblog.MicroBlogService
-import com.twidere.twiderex.mock.Observer
 import com.twidere.twiderex.mock.db.MockCacheDatabase
 import com.twidere.twiderex.mock.service.MockListsService
 import com.twidere.twiderex.notification.InAppNotification
@@ -30,16 +30,14 @@ import com.twidere.twiderex.repository.ListsRepository
 import com.twidere.twiderex.viewmodel.AccountViewModelTestBase
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
-import io.mockk.verify
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import org.junit.Test
+import kotlin.test.Test
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
+import kotlin.time.ExperimentalTime
 
+@OptIn(ExperimentalTime::class)
 internal class ListsCreateViewModelTest : AccountViewModelTestBase() {
     override val mockService: MicroBlogService
         get() = MockListsService()
@@ -49,14 +47,9 @@ internal class ListsCreateViewModelTest : AccountViewModelTestBase() {
     @MockK
     private lateinit var mockAppNotification: InAppNotification
 
-    @MockK
-    private lateinit var mockLoadingObserver: Observer<Boolean>
-
     private var errorNotification: NotificationEvent? = null
 
     private lateinit var createViewModel: ListsCreateViewModel
-
-    private val scope = CoroutineScope(Dispatchers.Main)
 
     override fun setUp() {
         super.setUp()
@@ -69,41 +62,35 @@ internal class ListsCreateViewModelTest : AccountViewModelTestBase() {
             errorNotification = arg(0)
         }
         errorNotification = null
-        scope.launch {
-            createViewModel.loading.collect {
-                mockLoadingObserver.onChanged(it)
-            }
-        }
     }
 
     @Test
-    fun createList_successExpectTrue(): Unit = runBlocking(Dispatchers.Main) {
-        verifySuccessAndLoadingBefore(mockLoadingObserver)
-        val result = createViewModel.createList(title = "title", private = false)
-        assertNotNull(result)
-        verifySuccessAndLoadingAfter(mockLoadingObserver)
-    }
-
-    @Test
-    fun createList_failedExpectFalseAndShowNotification(): Unit = runBlocking(Dispatchers.Main) {
-        verifySuccessAndLoadingBefore(mockLoadingObserver)
+    fun createList_successExpectTrue(): Unit = runBlocking {
         assertNull(errorNotification)
-        val result = createViewModel.createList(title = "error", private = false)
-        assertNull(result)
-        verifySuccessAndLoadingAfter(mockLoadingObserver)
+        createViewModel.loading.test {
+            assert(!awaitItem())
+            launch {
+                val result = createViewModel.createList(title = "title", private = false)
+                assertNotNull(result)
+            }
+            assert(awaitItem())
+            assert(!awaitItem())
+        }
+        assertNull(errorNotification)
+    }
+
+    @Test
+    fun createList_failedExpectFalseAndShowNotification(): Unit = runBlocking {
+        assertNull(errorNotification)
+        createViewModel.loading.test {
+            assert(!awaitItem())
+            launch {
+                val result = createViewModel.createList(title = "error", private = false)
+                assertNull(result)
+            }
+            assert(awaitItem())
+            assert(!awaitItem())
+        }
         assertNotNull(errorNotification)
-    }
-
-    private fun verifySuccessAndLoadingBefore(
-        loadingObserver: Observer<Boolean>,
-    ) {
-        verify(exactly = 1) { loadingObserver.onChanged(false) }
-    }
-
-    private fun verifySuccessAndLoadingAfter(
-        loadingObserver: Observer<Boolean>,
-    ) {
-        verify(exactly = 1) { loadingObserver.onChanged(true) }
-        verify(exactly = 1) { loadingObserver.onChanged(false) }
     }
 }

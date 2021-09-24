@@ -29,7 +29,7 @@ import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.paging.saveToDb
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
-import org.junit.Test
+import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull

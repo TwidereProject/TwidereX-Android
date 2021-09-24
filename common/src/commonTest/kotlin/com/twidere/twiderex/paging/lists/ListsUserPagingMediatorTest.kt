@@ -33,7 +33,7 @@ import com.twidere.twiderex.paging.crud.PagingMemoryCache
 import com.twidere.twiderex.paging.mediator.list.ListsUserPagingMediator
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert
-import org.junit.Test
+import kotlin.test.Test
 
 /**
  * instead of testing pagination, we should focus on our code logic

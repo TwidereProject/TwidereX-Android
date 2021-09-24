@@ -33,7 +33,7 @@ import io.mockk.mockk
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
-import org.junit.Test
+import kotlin.test.Test
 import kotlin.test.assertNotNull
 
 internal class UserFavouriteTimelineViewModelTest : AccountViewModelTestBase() {

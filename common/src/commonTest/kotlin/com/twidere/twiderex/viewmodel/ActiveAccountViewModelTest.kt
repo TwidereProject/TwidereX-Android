@@ -26,7 +26,7 @@ import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
 import io.mockk.verify
-import org.junit.Test
+import kotlin.test.Test
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 

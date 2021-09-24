@@ -38,7 +38,7 @@ import com.twidere.twiderex.model.paging.saveToDb
 import com.twidere.twiderex.paging.mediator.paging.PagingWithGapMediator
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
-import org.junit.Test
+import kotlin.test.Test
 import kotlin.test.assertEquals
 
 internal class PagingWithGapMediatorTest {

@@ -32,7 +32,7 @@ import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.paging.PagingTimeLineWithStatus
 import com.twidere.twiderex.paging.mediator.user.UserFavouriteMediator
 import kotlinx.coroutines.runBlocking
-import org.junit.Test
+import kotlin.test.Test
 
 class UserFavoriteMediatorTest {
     @OptIn(ExperimentalPagingApi::class)
