@@ -22,7 +22,9 @@ package com.twidere.twiderex.model.ui.twitter
 
 import com.twidere.twiderex.model.ui.UiUrlEntity
 import com.twidere.twiderex.model.ui.UserExtra
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class TwitterUserExtra(
     val pinned_tweet_id: String?,
     val url: List<UiUrlEntity>,

@@ -4,7 +4,7 @@ import java.lang.Boolean;
 
 CREATE TABLE IF NOT EXISTS User (
     id TEXT NOT NULL,
-    userKey TEXT AS MicroBlogKey NOT NULL,
+    userKey TEXT  AS MicroBlogKey NOT NULL PRIMARY KEY,
     acct TEXT AS MicroBlogKey NOT NULL,
     name TEXT NOT NULL,
     screenName TEXT NOT NULL,
@@ -23,3 +23,14 @@ CREATE TABLE IF NOT EXISTS User (
     platformType TEXT AS PlatformType NOT NULL,
     extra TEXT
 );
+
+insert:
+INSERT OR REPLACE INTO User(
+    id, userKey, acct, name, screenName, profileImage,
+    profileBackgroundImage, fans, follow, status, listed,
+    rawDesc, htmlDesc, website,location, verified, protected,
+    platformType, extra
+) VALUES ?;
+
+findWithUserKey:
+SELECT * FROM User WHERE userKey == :userKey;
