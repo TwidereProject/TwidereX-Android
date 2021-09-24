@@ -42,4 +42,10 @@ allprojects {
             licenseHeaderFile(rootProject.file("spotless/license"))
         }
     }
+
+    configurations.all {
+        resolutionStrategy {
+            force("org.objenesis:objenesis:3.2")
+        }
+    }
 }
