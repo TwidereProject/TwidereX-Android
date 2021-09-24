@@ -21,28 +21,28 @@
 package com.twidere.twiderex.db.sqldelight
 
 import com.twidere.twiderex.base.BaseCacheDatabaseTest
-import com.twidere.twiderex.db.sqldelight.transform.toDbMedia
-import com.twidere.twiderex.mock.model.mockUiMedia
+import com.twidere.twiderex.db.sqldelight.transform.toDbUrlEntity
+import com.twidere.twiderex.mock.model.mockUiUrlEntity
 import com.twidere.twiderex.model.MicroBlogKey
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import kotlin.test.assertEquals
 
-internal class MediaQueriesImplTest : BaseCacheDatabaseTest() {
+internal class UrlEntityQueriesImplTest : BaseCacheDatabaseTest() {
     @Test
-    fun insertMediaAndReturnResultWithGivenBelongToKey() = runBlocking {
+    fun insertUrlAndReturnResultWithGivenBelongToKey() = runBlocking {
         val belongToKey = MicroBlogKey.valueOf("test")
-        assert(database.mediaQueries.findMediaByBelongToKey(belongToKey).executeAsList().isEmpty())
-        database.mediaQueries.insert(mockUiMedia(belongToKey = belongToKey).toDbMedia())
-        assert(database.mediaQueries.findMediaByBelongToKey(belongToKey).executeAsList().isNotEmpty())
-        assert(database.mediaQueries.findMediaByBelongToKey(MicroBlogKey.valueOf("test_not_insert")).executeAsList().isEmpty())
+        assert(database.urlEntityQueries.findByBelongToKey(belongToKey).executeAsList().isEmpty())
+        database.urlEntityQueries.insert(mockUiUrlEntity().toDbUrlEntity(belongToKey = belongToKey))
+        assert(database.urlEntityQueries.findByBelongToKey(belongToKey).executeAsList().isNotEmpty())
+        assert(database.urlEntityQueries.findByBelongToKey(MicroBlogKey.valueOf("test_not_insert")).executeAsList().isEmpty())
     }
 
     @Test
-    fun insert_ReplaceWhenBelongToKeyAndUrlAndOrderEquals() = runBlocking {
+    fun insert_ReplaceWhenBelongToKeyAndUrlEquals() = runBlocking {
         val belongToKey = MicroBlogKey.valueOf("test")
-        database.mediaQueries.insert(mockUiMedia(url = "url", belongToKey = belongToKey, order = 0).toDbMedia())
-        database.mediaQueries.insert(mockUiMedia(url = "url", belongToKey = belongToKey, order = 0).toDbMedia())
-        assertEquals(1, database.mediaQueries.findMediaByBelongToKey(belongToKey).executeAsList().size)
+        database.urlEntityQueries.insert(mockUiUrlEntity(url = "url").toDbUrlEntity(belongToKey = belongToKey))
+        database.urlEntityQueries.insert(mockUiUrlEntity(url = "url").toDbUrlEntity(belongToKey = belongToKey))
+        assertEquals(1, database.urlEntityQueries.findByBelongToKey(belongToKey).executeAsList().size)
     }
 }

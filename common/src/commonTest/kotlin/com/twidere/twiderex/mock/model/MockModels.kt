@@ -54,12 +54,13 @@ import com.twidere.twiderex.model.enums.MediaType
 import com.twidere.twiderex.model.ui.UiDraft
 import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.model.ui.UiSearch
+import com.twidere.twiderex.model.ui.UiUrlEntity
 import org.jetbrains.annotations.TestOnly
 import java.util.Date
 import java.util.UUID
 
 @TestOnly
-fun mockUiMedia(url: String = "", belongToKey: MicroBlogKey = MicroBlogKey.Empty) = UiMedia(
+fun mockUiMedia(url: String = "", belongToKey: MicroBlogKey = MicroBlogKey.Empty, order: Int = 0) = UiMedia(
     url = url,
     belongToKey = belongToKey,
     mediaUrl = url,
@@ -69,7 +70,7 @@ fun mockUiMedia(url: String = "", belongToKey: MicroBlogKey = MicroBlogKey.Empty
     height = 100,
     pageUrl = "",
     altText = "",
-    order = 0
+    order = order
 )
 
 @TestOnly
@@ -220,3 +221,13 @@ fun mockIDirectMessage(id: String = UUID.randomUUID().toString(), accountId: Str
         )
     )
 }
+
+@TestOnly
+fun mockUiUrlEntity(url: String = "") = UiUrlEntity(
+    url = url,
+    displayUrl = "displayUrl",
+    expandedUrl = "expandedUrl",
+    title = "title",
+    description = "description",
+    image = "image"
+)
