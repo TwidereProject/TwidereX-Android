@@ -18,7 +18,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.dataprovider.db
+package com.twidere.twiderex.db.sqldelight
 
 import com.twidere.twiderex.db.AppDatabase
 import com.twidere.twiderex.db.sqldelight.dao.SearchDaoImpl
@@ -26,7 +26,7 @@ import com.twidere.twiderex.db.sqldelight.dao.SqlDelightDraftDaoImpl
 import com.twidere.twiderex.sqldelight.SqlDelightAppDatabase
 import kotlinx.coroutines.runBlocking
 
-internal class AppDatabaseImpl(private val database: SqlDelightAppDatabase) : AppDatabase {
+internal class SqlDelightAppDatabaseImpl(private val database: SqlDelightAppDatabase) : AppDatabase {
     private val draftDao = SqlDelightDraftDaoImpl(database.draftQueries)
     override fun draftDao() = draftDao
 

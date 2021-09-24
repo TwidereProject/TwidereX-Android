@@ -55,6 +55,7 @@ kotlin {
                 implementation(projects.routeProcessor)
                 ksp(projects.routeProcessor)
                 implementation("dev.icerock.moko:resources:${Versions.moko}")
+                implementation("com.squareup.sqldelight:coroutines-extensions-jvm:${Versions.sqlDelight}")
             }
         }
         val commonTest by getting {
@@ -92,7 +93,6 @@ kotlin {
         val desktopMain by getting {
             dependencies {
                 implementation("com.squareup.sqldelight:sqlite-driver:${Versions.sqlDelight}")
-                implementation("com.squareup.sqldelight:coroutines-extensions-jvm:${Versions.sqlDelight}")
             }
         }
         val desktopTest by getting
