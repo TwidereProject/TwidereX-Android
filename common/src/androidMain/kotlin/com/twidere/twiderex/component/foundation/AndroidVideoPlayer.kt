@@ -41,6 +41,7 @@ import com.twidere.twiderex.preferences.LocalHttpConfig
 import com.twidere.twiderex.utils.video.CacheDataSourceFactory
 import com.twidere.twiderex.utils.video.VideoPool
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -109,16 +110,21 @@ actual class NativePlayerView actual constructor(
             addListener(object : Player.Listener {
                 override fun onPlaybackStateChanged(state: Int) {
                     playerCallBack?.showThumb(state != Player.STATE_READY)
+                    if (state == Player.STATE_READY) {
+                        playerCallBack?.onprepare()
+                    }
                 }
 
                 override fun onIsPlayingChanged(isPlaying: Boolean) {
                     playerCallBack?.setPlaying(isPlaying)
                     job?.cancel()
                     if (isPlaying) {
-                        job = CoroutineScope(EmptyCoroutineContext).launch {
+                        job = CoroutineScope(EmptyCoroutineContext).launch(
+                            Dispatchers.Main
+                        ) {
                             while (true) {
                                 delay(1000)
-                                playerProgressCallBack?.onTimeChanged(contentPosition)
+                                playerProgressCallBack?.onTimeChanged(contentPosition())
                             }
                         }
                     }
@@ -141,6 +147,10 @@ actual class NativePlayerView actual constructor(
     private fun realPlayerView() = player as StyledPlayerView
 
     actual var playWhenReady: Boolean = false
+        set(value) {
+            realPlayerView().player?.playWhenReady = value
+            field = value
+        }
 
     actual fun resume() {
         realPlayerView().onResume()
@@ -150,12 +160,13 @@ actual class NativePlayerView actual constructor(
         realPlayerView().onPause()
     }
 
-    actual fun contentPosition(): Long = realPlayerView().player?.contentPosition ?: 0
+    actual fun contentPosition(): Long = 0L.coerceAtLeast((realPlayerView().player?.currentPosition) ?: 0)
 
     actual fun update() {
     }
 
     actual fun setVolume(volume: Float) {
+        realPlayerView().player?.volume = volume
     }
 
     actual fun release() {
@@ -170,12 +181,8 @@ actual class NativePlayerView actual constructor(
         realPlayerView().player?.seekTo(time)
     }
 
-    actual fun mute() {
-        realPlayerView().player?.volume = 0f
-    }
-
-    actual fun unMute() {
-        realPlayerView().player?.volume = 1f
+    actual fun setMute(mute: Boolean) {
+        realPlayerView().player?.volume = if (mute) 0f else 1f
     }
 }
 

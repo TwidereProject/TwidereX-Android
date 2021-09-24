@@ -23,11 +23,11 @@ package com.twidere.twiderex.component.foundation
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.MaterialTheme
@@ -51,6 +51,7 @@ import com.twidere.twiderex.compose.LocalResLoader
 import com.twidere.twiderex.preferences.model.DisplayPreferences
 import com.twidere.twiderex.ui.LocalIsActiveNetworkMetered
 import com.twidere.twiderex.ui.LocalVideoPlayback
+import com.twidere.twiderex.utils.video.CustomVideoControl
 import com.twidere.twiderex.utils.video.VideoPool
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -106,10 +107,9 @@ fun VideoPlayer(
                             mediaPrepared = true
                         }
                     }
+                    setVolume(volume)
                 }
             }
-
-            nativePlayerView.setVolume(volume)
 
             fun updateState() {
                 autoPlay = nativePlayerView.playWhenReady
@@ -155,6 +155,9 @@ fun VideoPlayer(
             var isMostCenter by remember(url) {
                 mutableStateOf(false)
             }
+            var playEnabled by remember(url) {
+                mutableStateOf(true)
+            }
             var debounceJob: Job? = null
             Column(
                 modifier = Modifier.onGloballyPositioned { coordinates ->
@@ -187,7 +190,7 @@ fun VideoPlayer(
                     nativePLayerView = nativePlayerView,
                     modifier = modifier,
                 ) {
-                    if (isResume && isMostCenter) {
+                    if (isResume && isMostCenter && playEnabled) {
                         if (isListItem) {
                             it.playWhenReady = autoPlay
                         }
@@ -200,8 +203,11 @@ fun VideoPlayer(
                     }
                 }
                 if (mediaPrepared) {
-                    Divider(Modifier.height(30.dp))
-                    customControl?.invoke(nativePlayerView)
+                    Spacer(Modifier.height(30.dp))
+                    // customControl?.invoke(nativePlayerView)
+                    CustomVideoControl(nativePlayerView) {
+                        playEnabled = it
+                    }
                 }
             }
         }
@@ -265,8 +271,7 @@ expect class NativePlayerView(
     fun seekTo(time: Long)
     fun update()
     fun setVolume(volume: Float)
-    fun mute()
-    fun unMute()
+    fun setMute(mute: Boolean)
     fun release()
 }
 

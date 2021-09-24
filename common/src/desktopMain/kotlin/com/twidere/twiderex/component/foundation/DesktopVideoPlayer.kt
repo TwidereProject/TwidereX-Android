@@ -102,12 +102,8 @@ actual class NativePlayerView actual constructor(
         player.mediaPlayer().controls().setTime(time)
     }
 
-    actual fun mute() {
-        player.mediaPlayer().audio().isMute = true
-    }
-
-    actual fun unMute() {
-        player.mediaPlayer().audio().isMute = false
+    actual fun setMute(mute: Boolean) {
+        player.mediaPlayer().audio().isMute = mute
     }
 }
 

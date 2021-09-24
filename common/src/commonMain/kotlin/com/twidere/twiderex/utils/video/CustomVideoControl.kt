@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -38,13 +39,15 @@ import com.twidere.twiderex.component.foundation.PlayerProgressCallBack
 import com.twidere.twiderex.component.foundation.SeekBar
 import com.twidere.twiderex.component.foundation.SeekBarState
 import com.twidere.twiderex.component.painterResource
+import com.twidere.twiderex.component.stringResource
 
 @Composable
 fun CustomVideoControl(
     player: NativePlayerView,
     playing: Boolean = true,
     mute: Boolean = false,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onPlayPause: ((Boolean) -> Unit)? = null
 ) {
     val seekBarState = remember {
         SeekBarState(
@@ -74,25 +77,16 @@ fun CustomVideoControl(
 
         IconButton(
             onClick = {
-                if (!isPlaying) {
-                    player.resume()
-                } else {
-                    player.pause()
+                isPlaying = (!isPlaying).apply {
+                    onPlayPause?.invoke(this)
                 }
-                isPlaying = !isPlaying
             },
         ) {
-            if (isPlaying) {
-                Icon(
-                    painter = painterResource(res = MR.files.ic_player_pause),
-                    ""
-                )
-            } else {
-                Icon(
-                    painter = painterResource(res = MR.files.ic_player_play),
-                    ""
-                )
-            }
+            Icon(
+                painter = painterResource(res = if (isPlaying) MR.files.ic_player_pause else MR.files.ic_player_play),
+                contentDescription = stringResource(res = MR.strings.accessibility_common_video_play),
+                tint = MaterialTheme.colors.onSurface
+            )
         }
 
         Box(modifier.weight(1f)) {
@@ -103,25 +97,16 @@ fun CustomVideoControl(
 
         IconButton(
             onClick = {
-                if (!isMute) {
-                    player.mute()
-                } else {
-                    player.unMute()
+                isMute = (!isMute).apply {
+                    player.setMute(this)
                 }
-                isMute = !isMute
             },
         ) {
-            if (isMute) {
-                Icon(
-                    painter = painterResource(res = MR.files.ic_volume_mute),
-                    ""
-                )
-            } else {
-                Icon(
-                    painter = painterResource(res = MR.files.ic_volume_unmute),
-                    ""
-                )
-            }
+            Icon(
+                painter = painterResource(res = if (isMute) MR.files.ic_volume_mute else MR.files.ic_volume),
+                contentDescription = stringResource(res = MR.strings.accessibility_common_video_play),
+                tint = MaterialTheme.colors.onSurface
+            )
         }
     }
 }
