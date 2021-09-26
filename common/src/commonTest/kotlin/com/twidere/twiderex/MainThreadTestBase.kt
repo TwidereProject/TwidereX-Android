@@ -26,19 +26,20 @@ import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.newSingleThreadContext
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
-import org.junit.After
-import org.junit.Before
+import kotlin.test.AfterTest
+import kotlin.test.BeforeTest
+
 @OptIn(ExperimentalCoroutinesApi::class)
 internal open class MainThreadTestBase {
     @OptIn(ObsoleteCoroutinesApi::class)
     private val mainThreadSurrogate = newSingleThreadContext("UI thread")
 
-    @Before
+    @BeforeTest
     open fun setUp() {
         Dispatchers.setMain(mainThreadSurrogate)
     }
 
-    @After
+    @AfterTest
     open fun tearDown() {
         Dispatchers.resetMain() // reset main dispatcher to the original Main dispatcher
         mainThreadSurrogate.close()
