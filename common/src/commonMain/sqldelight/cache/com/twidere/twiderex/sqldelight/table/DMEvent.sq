@@ -26,3 +26,12 @@ INSERT OR REPLACE INTO DMEvent(
     messageKey, htmlText, originText, createdTimestamp, messageType,
     senderAccountKey, recipientAccountKey, sendStatus
 ) VALUES ?;
+
+findWithMessageKey:
+SELECT * FROM DMEvent WHERE accountKey == :accountKey AND conversationKey == :conversationKey AND messageKey == :messageKey;
+
+delete:
+DELETE FROM DMEvent WHERE  accountKey == :accountKey AND conversationKey == :conversationKey AND messageKey == :messageKey;
+
+getMessageCount:
+SELECT COUNT(*) FROM DMEvent WHERE  accountKey == :accountKey AND conversationKey == :conversationKey;
