@@ -35,3 +35,6 @@ DELETE FROM DMEvent WHERE  accountKey == :accountKey AND conversationKey == :con
 
 getMessageCount:
 SELECT COUNT(*) FROM DMEvent WHERE  accountKey == :accountKey AND conversationKey == :conversationKey;
+
+getMessageByConversationKey:
+SELECT * FROM DMEvent WHERE  accountKey == :accountKey AND conversationKey == :conversationKey LIMIT :limit OFFSET :offset;

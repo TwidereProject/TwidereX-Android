@@ -21,9 +21,9 @@
 package com.twidere.twiderex.db.sqldelight.dao
 
 import androidx.paging.PagingSource
-import com.squareup.sqldelight.android.paging3.QueryPagingSource
 import com.twidere.twiderex.db.dao.DirectMessageEventDao
 import com.twidere.twiderex.db.sqldelight.model.DbDMEventWithAttachments
+import com.twidere.twiderex.db.sqldelight.paging.QueryPagingSource
 import com.twidere.twiderex.db.sqldelight.query.flatMap
 import com.twidere.twiderex.db.sqldelight.transform.toDbEventWithAttachments
 import com.twidere.twiderex.db.sqldelight.transform.toUi
@@ -45,13 +45,13 @@ internal class SqlDelightDirectMessageEventDaoImpl(
     override fun getPagingSource(
         accountKey: MicroBlogKey,
         conversationKey: MicroBlogKey
-    ): PagingSource<Long, UiDMEvent> {
+    ): PagingSource<Int, UiDMEvent> {
         return QueryPagingSource(
             countQuery = dmEventQueries.getMessageCount(accountKey = accountKey, conversationKey = conversationKey),
             transacter = dmEventQueries,
             dispatcher = Dispatchers.IO,
-            queryProvider = {limit, offset ->
-                dmEventQueries.getMessagesByConversation(
+            queryProvider = { limit, offset ->
+                dmEventQueries.getMessageByConversationKey(
                     accountKey = accountKey,
                     conversationKey = conversationKey,
                     limit = limit,

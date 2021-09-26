@@ -29,12 +29,12 @@ internal open class BaseCacheDatabaseTest {
     protected lateinit var database: SqlDelightCacheDatabase
     private val driver = SqlDriverFactory.create(SqlDelightCacheDatabase.Schema)
     @Before
-    fun setUp() {
+    open fun setUp() {
         database = createCacheDataBase(driver)
     }
 
     @After
-    fun tearDown() {
+    open fun tearDown() {
         database.cacheDropQueries.clearAllTables()
         driver.close()
     }
