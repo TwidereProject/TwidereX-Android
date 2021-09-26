@@ -18,10 +18,11 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.db.sqldelight.transform
+package com.twidere.twiderex.db.sqldelight
 
 import com.twidere.twiderex.base.BaseCacheDatabaseTest
 import com.twidere.twiderex.dataprovider.mapper.toUi
+import com.twidere.twiderex.db.sqldelight.transform.toDbEventWithAttachments
 import com.twidere.twiderex.mock.model.mockIDirectMessage
 import com.twidere.twiderex.mock.model.mockIUser
 import com.twidere.twiderex.model.MicroBlogKey

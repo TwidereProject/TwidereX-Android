@@ -28,7 +28,7 @@ class SqlDelightDirectMessageEventDaoImpl : DirectMessageEventDao {
     override fun getPagingSource(
         accountKey: MicroBlogKey,
         conversationKey: MicroBlogKey
-    ): PagingSource<Int, UiDMEvent> {
+    ): PagingSource<Long, UiDMEvent> {
         TODO("Not yet implemented")
     }
 

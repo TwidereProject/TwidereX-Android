@@ -21,8 +21,10 @@
 package com.twidere.twiderex.db.sqldelight.dao
 
 import androidx.paging.PagingSource
+import com.squareup.sqldelight.android.paging3.QueryPagingSource
 import com.twidere.twiderex.db.dao.DirectMessageEventDao
 import com.twidere.twiderex.db.sqldelight.model.DbDMEventWithAttachments
+import com.twidere.twiderex.db.sqldelight.query.flatMap
 import com.twidere.twiderex.db.sqldelight.transform.toDbEventWithAttachments
 import com.twidere.twiderex.db.sqldelight.transform.toUi
 import com.twidere.twiderex.model.MicroBlogKey
@@ -32,6 +34,7 @@ import com.twidere.twiderex.sqldelight.table.DMEventQueries
 import com.twidere.twiderex.sqldelight.table.MediaQueries
 import com.twidere.twiderex.sqldelight.table.UrlEntityQueries
 import com.twidere.twiderex.sqldelight.table.UserQueries
+import kotlinx.coroutines.Dispatchers
 
 internal class SqlDelightDirectMessageEventDaoImpl(
     private val dmEventQueries: DMEventQueries,
@@ -42,8 +45,22 @@ internal class SqlDelightDirectMessageEventDaoImpl(
     override fun getPagingSource(
         accountKey: MicroBlogKey,
         conversationKey: MicroBlogKey
-    ): PagingSource<Int, UiDMEvent> {
-        TODO("Not yet implemented")
+    ): PagingSource<Long, UiDMEvent> {
+        return QueryPagingSource(
+            countQuery = dmEventQueries.getMessageCount(accountKey = accountKey, conversationKey = conversationKey),
+            transacter = dmEventQueries,
+            dispatcher = Dispatchers.IO,
+            queryProvider = {limit, offset ->
+                dmEventQueries.getMessagesByConversation(
+                    accountKey = accountKey,
+                    conversationKey = conversationKey,
+                    limit = limit,
+                    offset = offset
+                ).flatMap {
+                    it.withAttachments().toUi()
+                }
+            }
+        )
     }
 
     override suspend fun findWithMessageKey(
