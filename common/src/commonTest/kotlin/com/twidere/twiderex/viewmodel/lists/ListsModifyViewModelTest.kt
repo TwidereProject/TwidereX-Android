@@ -61,7 +61,9 @@ internal class ListsModifyViewModelTest : AccountViewModelTestBase() {
 
     private lateinit var modifyViewModel: ListsModifyViewModel
 
-    private val scope = CoroutineScope(Dispatchers.Main)
+    private val scope by lazy {
+        CoroutineScope(Dispatchers.Main)
+    }
 
     @Test
     fun updateList_successExpectTrue(): Unit = runBlocking(Dispatchers.Main) {

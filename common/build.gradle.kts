@@ -35,6 +35,7 @@ kotlin {
                 api(compose.foundation)
                 api(compose.material)
                 implementation(projects.services)
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.Kotlin.coroutines}")
                 api("androidx.paging:paging-common:${Versions.paging}")
                 api("androidx.datastore:datastore-core:${Versions.datastore}")
                 api("androidx.datastore:datastore-preferences-core:${Versions.datastore}")
