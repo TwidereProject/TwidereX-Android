@@ -54,7 +54,7 @@ kotlin {
                 implementation(kotlin("test"))
                 implementation("io.insert-koin:koin-test:${Versions.koin}")
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:${Versions.Kotlin.coroutines}")
-                implementation("io.mockk:mockk:1.11.0")
+                implementation("io.mockk:mockk:1.12.0")
             }
         }
         val androidMain by getting {
@@ -80,14 +80,12 @@ kotlin {
         }
         val androidAndroidTest by getting {
             dependencies {
-                implementation(kotlin("test-junit"))
                 implementation("androidx.arch.core:core-testing:2.1.0")
                 implementation("androidx.test:core:${Versions.androidx_test}")
                 implementation("androidx.test:runner:${Versions.androidx_test}")
                 implementation("androidx.test.ext:junit-ktx:${Versions.extJUnitVersion}")
                 implementation("androidx.test.espresso:espresso-core:${Versions.espressoVersion}")
                 implementation("androidx.room:room-testing:${Versions.room}")
-                implementation("io.mockk:mockk-android:1.11.0")
             }
         }
         val desktopMain by getting {
@@ -117,6 +115,7 @@ android {
         minSdk = AndroidSdk.min
         targetSdk = AndroidSdk.target
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunnerArguments["notPackage"] = "com.twidere.twiderex.viewmodel"
 
         javaCompileOptions {
             annotationProcessorOptions {
