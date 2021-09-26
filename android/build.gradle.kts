@@ -152,7 +152,6 @@ android {
 }
 
 // TODO: workaround for https://github.com/google/ksp/issues/518
-evaluationDependsOn(":assistedProcessor")
 evaluationDependsOn(":routeProcessor")
 
 dependencies {
@@ -161,7 +160,6 @@ dependencies {
     kotlinCoroutines()
     implementation(projects.services)
     implementation(projects.common)
-    // ksp(projects.assistedProcessor)
     implementation(projects.routeProcessor)
     ksp(projects.routeProcessor)
     compose()
