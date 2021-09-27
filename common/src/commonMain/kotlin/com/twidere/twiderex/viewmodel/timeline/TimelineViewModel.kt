@@ -38,7 +38,6 @@ import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.lastOrNull
 import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
@@ -85,7 +84,7 @@ abstract class TimelineViewModel(
         maxStatusKey: MicroBlogKey,
         sinceStatueKey: MicroBlogKey,
     ) = viewModelScope.launch {
-        pagingMediator.lastOrNull()?.loadBetween(
+        pagingMediator.firstOrNull()?.loadBetween(
             defaultLoadCount,
             maxStatusKey = maxStatusKey,
             sinceStatusKey = sinceStatueKey

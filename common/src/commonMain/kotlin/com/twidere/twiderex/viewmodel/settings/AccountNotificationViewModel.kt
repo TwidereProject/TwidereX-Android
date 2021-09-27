@@ -23,9 +23,9 @@ package com.twidere.twiderex.viewmodel.settings
 import com.twidere.twiderex.extensions.asStateIn
 import com.twidere.twiderex.repository.AccountRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.lastOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
@@ -52,6 +52,6 @@ class AccountNotificationViewModel(
     }
 
     fun setIsNotificationEnabled(value: Boolean) = viewModelScope.launch {
-        preferences.lastOrNull()?.setIsNotificationEnabled(value)
+        preferences.firstOrNull()?.setIsNotificationEnabled(value)
     }
 }

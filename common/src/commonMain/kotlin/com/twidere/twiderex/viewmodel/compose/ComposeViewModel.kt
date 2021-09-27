@@ -50,10 +50,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.lastOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.stateIn
@@ -352,10 +352,8 @@ open class ComposeViewModel(
     )
 
     fun putImages(value: List<String>) = viewModelScope.launch {
-        val imageLimit = imageLimit.lastOrNull() ?: 4
-        images.value.let {
-            value + it
-        }.take(imageLimit).let {
+        val imageLimit = imageLimit.firstOrNull() ?: 4
+        (images.value + value).take(imageLimit).let {
             images.value = it
         }
     }
