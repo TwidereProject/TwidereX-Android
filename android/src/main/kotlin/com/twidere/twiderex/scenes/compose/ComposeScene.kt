@@ -160,8 +160,7 @@ fun DraftComposeScene(
     data?.let { draft ->
         val viewModel: DraftComposeViewModel = getViewModel {
             parametersOf(
-                account,
-                draft
+                draft,
             )
         }
         ComposeBody(viewModel = viewModel, account = account)
