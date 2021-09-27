@@ -20,16 +20,53 @@
  */
 package com.twidere.twiderex.action
 
+import com.twidere.twiderex.extensions.launchCatching
+import com.twidere.twiderex.jobs.common.DownloadMediaJob
+import com.twidere.twiderex.jobs.common.ShareMediaJob
 import com.twidere.twiderex.model.MicroBlogKey
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import java.io.File
+import java.net.URI
 
-actual class MediaAction {
+actual class MediaAction(
+    private val downloadMediaJob: DownloadMediaJob,
+    private val shareMediaJob: ShareMediaJob,
+) {
+    private val scope = CoroutineScope(Dispatchers.IO)
     actual fun download(
         source: String,
         target: String,
         accountKey: MicroBlogKey
     ) {
+        scope.launchCatching {
+            downloadMediaJob.execute(
+                target = target,
+                source = source,
+                accountKey = accountKey,
+            )
+        }
     }
 
     actual fun share(source: String, accountKey: MicroBlogKey) {
+        scope.launchCatching {
+            val f = File(URI(source))
+            val target = File.createTempFile(
+                f.nameWithoutExtension,
+                f.extension.let {
+                    if (it.isEmpty()) {
+                        null
+                    } else {
+                        ".$it"
+                    }
+                },
+            ).absolutePath
+            downloadMediaJob.execute(
+                target = target,
+                source = source,
+                accountKey = accountKey,
+            )
+            shareMediaJob.execute(target)
+        }
     }
 }

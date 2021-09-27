@@ -29,16 +29,14 @@ import androidx.work.setInputMerger
 import com.twidere.twiderex.db.transform.toWorkData
 import com.twidere.twiderex.extensions.getNullableBoolean
 import com.twidere.twiderex.extensions.getNullableLong
+import com.twidere.twiderex.jobs.status.UpdateStatusJob
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.job.StatusResult
-import com.twidere.twiderex.repository.ReactionRepository
-import com.twidere.twiderex.repository.StatusRepository
 
 class UpdateStatusWorker(
     appContext: Context,
     params: WorkerParameters,
-    private val repository: ReactionRepository,
-    private val statusRepository: StatusRepository,
+    private val updateStatusJob: UpdateStatusJob,
 ) : CoroutineWorker(appContext, params) {
     companion object {
         fun create(statusResult: StatusResult? = null) = OneTimeWorkRequestBuilder<UpdateStatusWorker>()
@@ -62,15 +60,14 @@ class UpdateStatusWorker(
         val retweeted = inputData.getNullableBoolean("retweeted")
         val retweetCount = inputData.getNullableLong("retweetCount")
         val likeCount = inputData.getNullableLong("likeCount")
-        repository.updateReaction(accountKey = accountKey, statusKey = statusKey, liked = liked, retweet = retweeted)
-        statusRepository.updateStatus(statusKey = statusKey, accountKey = accountKey) {
-            it.copy(
-                metrics = it.metrics.copy(
-                    retweet = retweetCount ?: it.metrics.retweet,
-                    like = likeCount ?: it.metrics.like
-                )
-            )
-        }
+        updateStatusJob.execute(
+            accountKey = accountKey,
+            statusKey = statusKey,
+            liked = liked,
+            likeCount = likeCount,
+            retweeted = retweeted,
+            retweetCount = retweetCount,
+        )
         return Result.success()
     }
 }

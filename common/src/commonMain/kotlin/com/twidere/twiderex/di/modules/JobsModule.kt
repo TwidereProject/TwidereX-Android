@@ -37,6 +37,7 @@ import com.twidere.twiderex.jobs.status.MastodonVoteJob
 import com.twidere.twiderex.jobs.status.RetweetStatusJob
 import com.twidere.twiderex.jobs.status.UnRetweetStatusJob
 import com.twidere.twiderex.jobs.status.UnlikeStatusJob
+import com.twidere.twiderex.jobs.status.UpdateStatusJob
 import org.koin.core.module.Module
 import org.koin.dsl.module
 
@@ -56,6 +57,7 @@ private fun Module.status() {
     single { RetweetStatusJob(get(), get(), get()) }
     single { UnlikeStatusJob(get(), get(), get()) }
     single { UnRetweetStatusJob(get(), get(), get()) }
+    single { UpdateStatusJob(get(), get()) }
 }
 
 private fun Module.draft() {

@@ -21,11 +21,13 @@
 package com.twidere.twiderex.kmp
 
 import com.twidere.twiderex.model.kmp.Location
-import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 
+// TODO: implementation
 actual class LocationProvider {
-    actual val location: SharedFlow<Location?>
-        get() = TODO("Not yet implemented")
+    actual val location: Flow<Location?>
+        get() = flowOf(null)
 
     actual fun enable() {
     }

@@ -20,7 +20,17 @@
  */
 package com.twidere.twiderex.di.modules
 
+import com.twidere.twiderex.kmp.ExifScrambler
+import com.twidere.twiderex.kmp.FileResolver
+import com.twidere.twiderex.kmp.LocationProvider
+import com.twidere.twiderex.kmp.RemoteNavigator
+import com.twidere.twiderex.notification.AppNotificationManager
 import org.koin.dsl.module
 
 actual val kmpModule = module {
+    single { FileResolver() }
+    single { RemoteNavigator() }
+    single { LocationProvider() }
+    single { ExifScrambler() }
+    single { AppNotificationManager() }
 }

@@ -31,7 +31,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.mapNotNull
 import moe.tlaster.precompose.viewmodel.ViewModel
@@ -48,23 +48,21 @@ class ListsSearchUserViewModel(
     val text = MutableStateFlow("")
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
-    val source = text.debounce(666L).flatMapLatest {
-        it.takeIf { it.isNotEmpty() }?.let {
-            account.flatMapLatest { account ->
-                Pager(
-                    config = PagingConfig(
-                        pageSize = defaultLoadCount,
-                        enablePlaceholders = false,
-                    )
-                ) {
-                    SearchUserPagingSource(
-                        accountKey = account.accountKey,
-                        it,
-                        account.service as SearchService,
-                        following = following
-                    )
-                }.flow
-            }
-        } ?: emptyFlow()
+    val source = text.debounce(666L).filterNot { it.isEmpty() }.flatMapLatest {
+        account.flatMapLatest { account ->
+            Pager(
+                config = PagingConfig(
+                    pageSize = defaultLoadCount,
+                    enablePlaceholders = false,
+                )
+            ) {
+                SearchUserPagingSource(
+                    accountKey = account.accountKey,
+                    it,
+                    account.service as SearchService,
+                    following = following
+                )
+            }.flow
+        }
     }.cachedIn(viewModelScope)
 }

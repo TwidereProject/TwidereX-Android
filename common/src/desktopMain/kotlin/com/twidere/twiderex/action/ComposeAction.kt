@@ -20,11 +20,44 @@
  */
 package com.twidere.twiderex.action
 
+import com.twidere.twiderex.extensions.launchCatching
+import com.twidere.twiderex.jobs.compose.MastodonComposeJob
+import com.twidere.twiderex.jobs.compose.TwitterComposeJob
+import com.twidere.twiderex.jobs.draft.RemoveDraftJob
+import com.twidere.twiderex.jobs.draft.SaveDraftJob
+import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.job.ComposeData
+import com.twidere.twiderex.repository.AccountRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.firstOrNull
 
-actual class ComposeAction {
+actual class ComposeAction(
+    private val repository: AccountRepository,
+    private val saveDraftJob: SaveDraftJob,
+    private val removeDraftJob: RemoveDraftJob,
+    private val twitterComposeJob: TwitterComposeJob,
+    private val mastodonComposeJob: MastodonComposeJob,
+) {
+
+    private val scope = CoroutineScope(Dispatchers.IO)
+
     actual fun commit(
         data: ComposeData,
     ) {
+        scope.launchCatching {
+            repository.activeAccount.firstOrNull()?.toUi()?.let { account ->
+                val platformType = account.platformType
+                val accountKey = account.userKey
+                saveDraftJob.execute(data)
+                when (platformType) {
+                    PlatformType.Twitter -> twitterComposeJob.execute(data, accountKey)
+                    PlatformType.StatusNet -> TODO()
+                    PlatformType.Fanfou -> TODO()
+                    PlatformType.Mastodon -> mastodonComposeJob.execute(data, accountKey)
+                }
+                removeDraftJob.execute(data.draftId)
+            }
+        }
     }
 }

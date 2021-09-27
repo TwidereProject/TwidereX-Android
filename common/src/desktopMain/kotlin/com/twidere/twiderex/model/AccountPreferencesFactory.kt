@@ -20,8 +20,27 @@
  */
 package com.twidere.twiderex.model
 
+import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import java.io.File
+
 actual class AccountPreferencesFactory {
     actual fun create(accountKey: MicroBlogKey): AccountPreferences {
-        TODO("Not yet implemented")
+        val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+        return AccountPreferences(
+            dataStore = PreferenceDataStoreFactory.create(
+                corruptionHandler = null,
+                migrations = listOf(),
+                scope = scope
+            ) {
+                File(
+                    File(System.getProperty("user.home")),
+                    "TwidereX/datastore/preferences/$accountKey"
+                )
+            },
+            scope = scope
+        )
     }
 }

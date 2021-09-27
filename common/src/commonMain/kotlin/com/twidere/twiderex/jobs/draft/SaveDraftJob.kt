@@ -40,7 +40,6 @@ class SaveDraftJob(
                     draftId = draftId,
                     excludedReplyUserIds = excludedReplyUserIds,
                 )
-                true
             } catch (e: Throwable) {
                 inAppNotification.notifyError(e)
                 throw e

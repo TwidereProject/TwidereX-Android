@@ -83,7 +83,7 @@ private fun Module.workManager() {
     worker { RetweetWorker(get(), get(), get()) }
     worker { UnLikeWorker(get(), get(), get()) }
     worker { UnRetweetWorker(get(), get(), get()) }
-    worker { UpdateStatusWorker(get(), get(), get(), get()) }
+    worker { UpdateStatusWorker(get(), get(), get()) }
     worker { RemoveDraftWorker(get(), get(), get()) }
     worker { SaveDraftWorker(get(), get(), get()) }
     worker { DirectMessageDeleteWorker(get(), get(), get()) }

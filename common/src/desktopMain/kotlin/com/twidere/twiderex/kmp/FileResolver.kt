@@ -20,27 +20,49 @@
  */
 package com.twidere.twiderex.kmp
 
+import java.io.File
+import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
+import java.nio.file.Files
+import javax.imageio.ImageIO
+import javax.imageio.stream.FileImageInputStream
 
 actual class FileResolver {
     actual fun getMimeType(file: String): String? {
-        TODO("Not yet implemented")
+        return File(file).takeIf { it.exists() && it.isFile }?.let {
+            Files.probeContentType(it.toPath())
+        }
     }
 
     actual fun getFileSize(file: String): Long? {
-        TODO("Not yet implemented")
+        return File(file).takeIf { it.exists() && it.isFile }?.length()
     }
 
     actual fun openInputStream(file: String): InputStream? {
-        TODO("Not yet implemented")
+        return File(file).takeIf { it.exists() && it.isFile }?.inputStream()
     }
 
     actual fun openOutputStream(file: String): OutputStream? {
-        TODO("Not yet implemented")
+        return File(file).takeIf { it.exists() && it.isFile }?.outputStream()
     }
 
     actual fun getMediaSize(file: String): MediaSize {
-        TODO("Not yet implemented")
+        val imgFile = File(file)
+        val iter = ImageIO.getImageReadersBySuffix(imgFile.extension)
+        while (iter.hasNext()) {
+            val reader = iter.next()
+            try {
+                val stream = FileImageInputStream(imgFile)
+                reader.input = stream
+                val width = reader.getWidth(reader.minIndex)
+                val height = reader.getHeight(reader.minIndex)
+                return MediaSize(width.toLong(), height.toLong())
+            } catch (e: IOException) {
+            } finally {
+                reader.dispose()
+            }
+        }
+        throw IOException("Not a known image file: " + imgFile.absolutePath)
     }
 }

@@ -21,10 +21,10 @@
 package com.twidere.twiderex.di.modules
 
 import com.twidere.twiderex.kmp.ResLoader
+import com.twidere.twiderex.model.AccountPreferencesFactory
 import org.koin.dsl.module
 
 internal actual val platformModule = module {
-    single {
-        ResLoader()
-    }
+    single { ResLoader() }
+    single { AccountPreferencesFactory() }
 }

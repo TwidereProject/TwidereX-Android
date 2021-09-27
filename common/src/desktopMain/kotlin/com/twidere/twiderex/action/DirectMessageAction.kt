@@ -20,19 +20,36 @@
  */
 package com.twidere.twiderex.action
 
+import com.twidere.twiderex.extensions.launchCatching
+import com.twidere.twiderex.jobs.dm.DirectMessageDeleteJob
+import com.twidere.twiderex.jobs.dm.TwitterDirectMessageSendJob
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.job.DirectMessageDeleteData
 import com.twidere.twiderex.model.job.DirectMessageSendData
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 
-actual class DirectMessageAction {
+actual class DirectMessageAction(
+    private val twitterDirectMessageSendJob: TwitterDirectMessageSendJob,
+    private val directMessageDeleteJob: DirectMessageDeleteJob,
+) {
+    private val scope = CoroutineScope(Dispatchers.IO)
     actual fun send(
         platformType: PlatformType,
         data: DirectMessageSendData,
     ) {
+        scope.launchCatching {
+            if (platformType == PlatformType.Twitter) {
+                twitterDirectMessageSendJob.execute(data, data.accountKey)
+            }
+        }
     }
 
     actual fun delete(
         data: DirectMessageDeleteData
     ) {
+        scope.launchCatching {
+            directMessageDeleteJob.execute(data, data.accountKey)
+        }
     }
 }

@@ -34,11 +34,9 @@ import com.twidere.twiderex.paging.mediator.paging.toUi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emitAll
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.transformLatest
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
@@ -51,16 +49,14 @@ abstract class TimelineViewModel(
 
     @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
     val source by lazy {
-        pagingMediator.transformLatest {
-            it?.let {
-                emitAll(it.pager().toUi())
-            }
+        pagingMediator.mapNotNull { it }.flatMapLatest {
+            it.pager().toUi()
         }.cachedIn(viewModelScope)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val loadingBetween: Flow<List<MicroBlogKey>> by lazy {
-        pagingMediator.flatMapLatest { it?.loadingBetween ?: emptyFlow() }
+        pagingMediator.mapNotNull { it }.flatMapLatest { it.loadingBetween }
             .asStateIn(viewModelScope, emptyList())
     }
 

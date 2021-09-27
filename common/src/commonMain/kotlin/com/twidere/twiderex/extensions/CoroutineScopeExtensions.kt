@@ -18,25 +18,23 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.kmp
+package com.twidere.twiderex.extensions
 
-import java.awt.Desktop
-import java.net.URI
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 
-actual class RemoteNavigator {
-    actual fun openDeepLink(deeplink: String, fromBackground: Boolean) {
-        Desktop.getDesktop().browse(URI(deeplink))
-    }
-
-    actual fun shareMedia(
-        filePath: String,
-        mimeType: String,
-        fromBackground: Boolean
-    ) {
-        // TODO: Show native UI for sharing
-    }
-
-    actual fun shareText(content: String, fromBackground: Boolean) {
-        // TODO: Show native UI for sharing
+fun CoroutineScope.launchCatching(
+    context: CoroutineContext = EmptyCoroutineContext,
+    start: CoroutineStart = CoroutineStart.DEFAULT,
+    block: suspend CoroutineScope.() -> Unit
+): Job = launch(
+    context, start
+) {
+    runCatching {
+        block()
     }
 }

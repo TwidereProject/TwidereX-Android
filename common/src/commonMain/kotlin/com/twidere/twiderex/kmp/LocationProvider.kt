@@ -21,10 +21,10 @@
 package com.twidere.twiderex.kmp
 
 import com.twidere.twiderex.model.kmp.Location
-import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.Flow
 
 expect class LocationProvider {
-    val location: SharedFlow<Location?>
+    val location: Flow<Location?>
     fun enable()
     fun disable()
 }

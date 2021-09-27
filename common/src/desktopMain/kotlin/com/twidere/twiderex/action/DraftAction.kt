@@ -20,12 +20,27 @@
  */
 package com.twidere.twiderex.action
 
+import com.twidere.twiderex.extensions.launchCatching
+import com.twidere.twiderex.jobs.draft.RemoveDraftJob
+import com.twidere.twiderex.jobs.draft.SaveDraftJob
 import com.twidere.twiderex.model.job.ComposeData
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 
-actual class DraftAction {
+actual class DraftAction(
+    private val removeDraftJob: RemoveDraftJob,
+    private val saveDraftJob: SaveDraftJob,
+) {
+    private val scope = CoroutineScope(Dispatchers.IO)
     actual fun delete(id: String) {
+        scope.launchCatching {
+            removeDraftJob.execute(id)
+        }
     }
 
     actual fun save(composeData: ComposeData) {
+        scope.launchCatching {
+            saveDraftJob.execute(composeData)
+        }
     }
 }

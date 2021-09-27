@@ -20,11 +20,19 @@
  */
 package com.twidere.twiderex.kmp
 
+import java.io.File
+import javax.imageio.ImageIO
+
 actual class ExifScrambler {
     actual fun removeExifData(file: String, compress: Int): String {
-        TODO("Not yet implemented")
+        val imgFile = File(file)
+        val image = ImageIO.read(imgFile)
+        val result = File.createTempFile(imgFile.name, null)
+        ImageIO.write(image, imgFile.extension, result)
+        return result.absolutePath
     }
 
     actual fun deleteCacheFile(file: String) {
+        File(file).takeIf { it.exists() && it.isFile }?.delete()
     }
 }

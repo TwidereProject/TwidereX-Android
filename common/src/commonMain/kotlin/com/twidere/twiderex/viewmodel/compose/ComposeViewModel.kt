@@ -49,7 +49,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
@@ -169,13 +169,10 @@ open class ComposeViewModel(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val emojis by lazy {
-        account.flatMapLatest { account ->
-            if (account.type == PlatformType.Mastodon) {
-                MastodonEmojiCache.get(account)
-            } else {
-                emptyFlow()
-            }
-        }.asStateIn(viewModelScope, emptyList())
+        account
+            .filter { it.type == PlatformType.Mastodon }
+            .flatMapLatest { MastodonEmojiCache.get(it) }
+            .asStateIn(viewModelScope, emptyList())
     }
 
     val draftCount by lazy {

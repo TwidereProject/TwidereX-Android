@@ -20,7 +20,17 @@
  */
 package com.twidere.twiderex.di.modules
 
+import com.twidere.twiderex.action.ComposeAction
+import com.twidere.twiderex.action.DirectMessageAction
+import com.twidere.twiderex.action.DraftAction
+import com.twidere.twiderex.action.MediaAction
+import com.twidere.twiderex.action.StatusActions
 import org.koin.dsl.module
 
 actual val actionModule = module {
+    single { ComposeAction(get(), get(), get(), get(), get()) }
+    single { DirectMessageAction(get(), get()) }
+    single { DraftAction(get(), get()) }
+    single { MediaAction(get(), get()) }
+    single { StatusActions(get(), get(), get(), get(), get(), get(), get(), get()) }
 }

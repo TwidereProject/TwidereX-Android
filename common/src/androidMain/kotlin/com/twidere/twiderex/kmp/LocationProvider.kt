@@ -27,15 +27,16 @@ import android.location.LocationManager
 import android.os.Bundle
 import androidx.annotation.RequiresPermission
 import com.twidere.twiderex.model.kmp.Location
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 
 actual class LocationProvider(
     private val locationManager: LocationManager,
 ) : LocationListener {
     private val _location = MutableStateFlow<Location?>(null)
-    actual val location: SharedFlow<Location?> = _location.asSharedFlow()
+    actual val location: Flow<Location?>
+        get() = _location.asSharedFlow()
 
     @RequiresPermission(anyOf = [Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION])
     actual fun enable() {
