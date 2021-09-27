@@ -1,0 +1,47 @@
+/*
+ *  Twidere X
+ *
+ *  Copyright (C) 2020-2021 Tlaster <tlaster@outlook.com>
+ * 
+ *  This file is part of Twidere X.
+ * 
+ *  Twidere X is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ * 
+ *  Twidere X is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ * 
+ *  You should have received a copy of the GNU General Public License
+ *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
+ */
+package com.twidere.twiderex.db.sqldelight.model
+
+import com.twidere.twiderex.sqldelight.SqlDelightCacheDatabase
+import com.twidere.twiderex.sqldelight.table.Trend
+import com.twidere.twiderex.sqldelight.table.TrendHistory
+
+internal data class DbTrendWithHistory(
+    val trend: Trend,
+    val history: List<TrendHistory>
+) {
+    companion object {
+        fun List<DbTrendWithHistory>.saveToDb(database: SqlDelightCacheDatabase) {
+            database.transaction {
+                forEach { database.trendQueries.insert(it.trend) }
+                map { it.history }.flatten().forEach { database.trendHistoryQueries.insert(it) }
+            }
+        }
+
+        fun Trend.withHistory(database: SqlDelightCacheDatabase) = DbTrendWithHistory(
+            trend = this,
+            history = database.trendHistoryQueries.findWithTrendKey(
+                trendKey = trendKey,
+                accountKey = accountKey
+            ).executeAsList()
+        )
+    }
+}

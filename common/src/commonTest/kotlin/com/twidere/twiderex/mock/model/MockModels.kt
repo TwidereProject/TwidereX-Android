@@ -113,9 +113,9 @@ fun mockIUser(id: String = UUID.randomUUID().toString(), name: String = ""): IUs
 }
 
 @TestOnly
-fun mockITrend(): ITrend {
+fun mockITrend(name: String = "trend timestamp:${System.currentTimeMillis()}"): ITrend {
     return Trend(
-        name = "trend timestamp:${System.currentTimeMillis()}",
+        name = name,
         url = "https://trend",
 
         history = mutableListOf(
