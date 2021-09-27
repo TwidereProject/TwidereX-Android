@@ -29,6 +29,7 @@ import com.twidere.twiderex.model.enums.NotificationCursorType
 import com.twidere.twiderex.paging.mediator.timeline.NotificationTimelineMediator
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.NotificationRepository
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import moe.tlaster.precompose.viewmodel.viewModelScope
@@ -41,6 +42,7 @@ class NotificationTimelineViewModel(
 ) : TimelineViewModel(dataStore) {
     private val account by lazy {
         accountRepository.activeAccount.mapNotNull { it }
+            .filter { it.service is NotificationService }
     }
 
     override val pagingMediator by lazy {
