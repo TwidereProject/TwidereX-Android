@@ -24,7 +24,6 @@ import androidx.paging.cachedIn
 import androidx.paging.map
 import com.twidere.services.microblog.SearchService
 import com.twidere.twiderex.db.CacheDatabase
-import com.twidere.twiderex.extensions.asStateIn
 import com.twidere.twiderex.paging.mediator.paging.pager
 import com.twidere.twiderex.paging.mediator.search.SearchStatusMediator
 import com.twidere.twiderex.repository.AccountRepository
@@ -41,7 +40,7 @@ class SearchTweetsViewModel(
     keyword: String,
 ) : ViewModel() {
     private val account by lazy {
-        accountRepository.activeAccount.asStateIn(viewModelScope, null).mapNotNull { it }
+        accountRepository.activeAccount.mapNotNull { it }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)

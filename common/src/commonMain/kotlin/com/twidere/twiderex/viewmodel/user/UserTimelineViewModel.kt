@@ -42,7 +42,7 @@ class UserTimelineViewModel(
     private val _excludeReplies = MutableStateFlow(false)
     val excludeReplies = _excludeReplies.asStateIn(viewModelScope, false)
     private val account by lazy {
-        accountRepository.activeAccount.asStateIn(viewModelScope, null).mapNotNull { it }
+        accountRepository.activeAccount.mapNotNull { it }
     }
 
     fun setExcludeReplies(value: Boolean) {

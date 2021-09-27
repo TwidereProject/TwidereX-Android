@@ -23,7 +23,6 @@ package com.twidere.twiderex.viewmodel.lists
 import androidx.paging.cachedIn
 import androidx.paging.filter
 import com.twidere.services.microblog.ListsService
-import com.twidere.twiderex.extensions.asStateIn
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.ListsMode
 import com.twidere.twiderex.model.ui.UiList
@@ -46,7 +45,7 @@ class ListsViewModel(
     private val accountRepository: AccountRepository,
 ) : ViewModel() {
     private val account by lazy {
-        accountRepository.activeAccount.asStateIn(viewModelScope, null).mapNotNull { it }
+        accountRepository.activeAccount.mapNotNull { it }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -112,7 +111,7 @@ class ListsCreateViewModel(
     private val accountRepository: AccountRepository,
 ) : ListsOperatorViewModel(inAppNotification) {
     private val account by lazy {
-        accountRepository.activeAccount.asStateIn(viewModelScope, null).mapNotNull { it }
+        accountRepository.activeAccount.mapNotNull { it }
     }
 
     suspend fun createList(
@@ -151,7 +150,7 @@ class ListsModifyViewModel(
     private val listKey: MicroBlogKey,
 ) : ListsOperatorViewModel(inAppNotification) {
     private val account by lazy {
-        accountRepository.activeAccount.asStateIn(viewModelScope, null).mapNotNull { it }
+        accountRepository.activeAccount.mapNotNull { it }
     }
 
     val editName = MutableStateFlow("")

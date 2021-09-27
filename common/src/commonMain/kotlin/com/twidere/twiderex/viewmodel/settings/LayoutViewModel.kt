@@ -20,7 +20,6 @@
  */
 package com.twidere.twiderex.viewmodel.settings
 
-import com.twidere.twiderex.extensions.asStateIn
 import com.twidere.twiderex.model.HomeMenus
 import com.twidere.twiderex.repository.AccountRepository
 import kotlinx.coroutines.flow.firstOrNull
@@ -37,7 +36,7 @@ class LayoutViewModel(
     private val accountRepository: AccountRepository,
 ) : ViewModel() {
     private val account by lazy {
-        accountRepository.activeAccount.asStateIn(viewModelScope, null).mapNotNull { it }
+        accountRepository.activeAccount.mapNotNull { it }
     }
 
     fun updateHomeMenu(oldIndex: Int, newIndex: Int, menus: List<Any>) = viewModelScope.launch {

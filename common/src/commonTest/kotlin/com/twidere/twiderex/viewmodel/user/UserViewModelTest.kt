@@ -95,6 +95,7 @@ internal class UserViewModelTest : AccountViewModelTestBase() {
         )
         viewModel.isMe.test {
             assert(awaitItem())
+            cancelAndIgnoreRemainingEvents()
         }
     }
 

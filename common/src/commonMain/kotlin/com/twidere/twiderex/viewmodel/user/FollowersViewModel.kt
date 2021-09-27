@@ -22,7 +22,6 @@ package com.twidere.twiderex.viewmodel.user
 
 import androidx.paging.cachedIn
 import com.twidere.services.microblog.RelationshipService
-import com.twidere.twiderex.extensions.asStateIn
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.UserListRepository
@@ -37,7 +36,7 @@ class FollowersViewModel(
     private val userKey: MicroBlogKey,
 ) : UserListViewModel() {
     private val account by lazy {
-        accountRepository.activeAccount.asStateIn(viewModelScope, null).mapNotNull { it }
+        accountRepository.activeAccount.mapNotNull { it }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)

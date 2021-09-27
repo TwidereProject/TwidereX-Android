@@ -25,7 +25,6 @@ import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
 import com.twidere.services.microblog.SearchService
 import com.twidere.twiderex.defaultLoadCount
-import com.twidere.twiderex.extensions.asStateIn
 import com.twidere.twiderex.paging.source.SearchUserPagingSource
 import com.twidere.twiderex.repository.AccountRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -43,7 +42,7 @@ class ListsSearchUserViewModel(
     following: Boolean = false,
 ) : ViewModel() {
     private val account by lazy {
-        accountRepository.activeAccount.asStateIn(viewModelScope, null).mapNotNull { it }
+        accountRepository.activeAccount.mapNotNull { it }
     }
 
     val text = MutableStateFlow("")

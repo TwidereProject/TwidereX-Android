@@ -22,7 +22,6 @@ package com.twidere.twiderex.viewmodel.mastodon
 
 import androidx.paging.cachedIn
 import com.twidere.services.mastodon.MastodonService
-import com.twidere.twiderex.extensions.asStateIn
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.TimelineRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -37,7 +36,7 @@ class MastodonHashtagViewModel(
     keyword: String,
 ) : ViewModel() {
     private val account by lazy {
-        accountRepository.activeAccount.asStateIn(viewModelScope, null).mapNotNull { it }
+        accountRepository.activeAccount.mapNotNull { it }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)

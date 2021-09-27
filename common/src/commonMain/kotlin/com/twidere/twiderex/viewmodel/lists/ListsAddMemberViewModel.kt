@@ -22,7 +22,6 @@ package com.twidere.twiderex.viewmodel.lists
 
 import androidx.compose.runtime.mutableStateMapOf
 import com.twidere.services.microblog.ListsService
-import com.twidere.twiderex.extensions.asStateIn
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.notification.InAppNotification
@@ -43,7 +42,7 @@ class ListsAddMemberViewModel(
     private val listId: String,
 ) : ViewModel() {
     private val account by lazy {
-        accountRepository.activeAccount.asStateIn(viewModelScope, null).mapNotNull { it }
+        accountRepository.activeAccount.mapNotNull { it }
     }
 
     val loading = MutableStateFlow(false)

@@ -20,16 +20,14 @@
  */
 package com.twidere.twiderex.viewmodel
 
-import com.twidere.twiderex.extensions.asStateIn
 import com.twidere.twiderex.repository.AccountRepository
 import kotlinx.coroutines.flow.mapNotNull
 import moe.tlaster.precompose.viewmodel.ViewModel
-import moe.tlaster.precompose.viewmodel.viewModelScope
 
 abstract class AccountViewModel(
     private val accountRepository: AccountRepository,
 ) : ViewModel() {
     protected val account by lazy {
-        accountRepository.activeAccount.asStateIn(viewModelScope, null).mapNotNull { it }
+        accountRepository.activeAccount.mapNotNull { it }
     }
 }

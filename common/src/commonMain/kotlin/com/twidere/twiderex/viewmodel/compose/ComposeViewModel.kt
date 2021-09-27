@@ -162,7 +162,7 @@ open class ComposeViewModel(
     val composeType: ComposeType,
 ) : ViewModel() {
     private val account by lazy {
-        accountRepository.activeAccount.asStateIn(viewModelScope, null).mapNotNull { it }
+        accountRepository.activeAccount.mapNotNull { it }
     }
 
     open val draftId: String = UUID.randomUUID().toString()

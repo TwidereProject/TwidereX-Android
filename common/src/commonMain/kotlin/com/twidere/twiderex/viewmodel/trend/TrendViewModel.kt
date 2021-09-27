@@ -22,7 +22,6 @@ package com.twidere.twiderex.viewmodel.trend
 
 import androidx.paging.cachedIn
 import com.twidere.services.microblog.TrendService
-import com.twidere.twiderex.extensions.asStateIn
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.TrendRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -36,7 +35,7 @@ class TrendViewModel(
     private val accountRepository: AccountRepository,
 ) : ViewModel() {
     private val account by lazy {
-        accountRepository.activeAccount.asStateIn(viewModelScope, null).mapNotNull { it }
+        accountRepository.activeAccount.mapNotNull { it }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)

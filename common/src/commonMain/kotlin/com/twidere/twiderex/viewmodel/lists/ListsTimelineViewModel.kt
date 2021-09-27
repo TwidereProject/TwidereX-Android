@@ -22,7 +22,6 @@ package com.twidere.twiderex.viewmodel.lists
 
 import androidx.paging.cachedIn
 import com.twidere.services.microblog.TimelineService
-import com.twidere.twiderex.extensions.asStateIn
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.TimelineRepository
@@ -38,7 +37,7 @@ class ListsTimelineViewModel(
     listKey: MicroBlogKey,
 ) : ViewModel() {
     private val account by lazy {
-        accountRepository.activeAccount.asStateIn(viewModelScope, null).mapNotNull { it }
+        accountRepository.activeAccount.mapNotNull { it }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)

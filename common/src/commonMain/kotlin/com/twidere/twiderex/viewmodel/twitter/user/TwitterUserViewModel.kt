@@ -21,7 +21,6 @@
 package com.twidere.twiderex.viewmodel.twitter.user
 
 import com.twidere.services.microblog.LookupService
-import com.twidere.twiderex.extensions.asStateIn
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.UserRepository
@@ -30,7 +29,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import moe.tlaster.precompose.viewmodel.ViewModel
-import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class TwitterUserViewModel(
     private val repository: UserRepository,
@@ -40,7 +38,7 @@ class TwitterUserViewModel(
 ) : ViewModel() {
 
     private val account by lazy {
-        accountRepository.activeAccount.asStateIn(viewModelScope, null).mapNotNull { it }
+        accountRepository.activeAccount.mapNotNull { it }
     }
 
     val error = MutableStateFlow<Throwable?>(null)

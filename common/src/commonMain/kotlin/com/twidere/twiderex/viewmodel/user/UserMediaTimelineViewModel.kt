@@ -23,7 +23,6 @@ package com.twidere.twiderex.viewmodel.user
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.twidere.services.microblog.TimelineService
-import com.twidere.twiderex.extensions.asStateIn
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.model.ui.UiStatus
@@ -42,7 +41,7 @@ class UserMediaTimelineViewModel(
     private val userKey: MicroBlogKey,
 ) : ViewModel() {
     private val account by lazy {
-        accountRepository.activeAccount.asStateIn(viewModelScope, null).mapNotNull { it }
+        accountRepository.activeAccount.mapNotNull { it }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)

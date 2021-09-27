@@ -36,7 +36,7 @@ class AccountNotificationViewModel(
     private val accountRepository: AccountRepository,
 ) : ViewModel() {
     val account by lazy {
-        accountRepository.activeAccount.asStateIn(viewModelScope, null).mapNotNull { it }
+        accountRepository.activeAccount.mapNotNull { it }
     }
 
     val preferences by lazy {

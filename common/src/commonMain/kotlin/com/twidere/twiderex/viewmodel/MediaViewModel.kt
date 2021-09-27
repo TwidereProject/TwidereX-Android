@@ -21,7 +21,6 @@
 package com.twidere.twiderex.viewmodel
 
 import com.twidere.twiderex.action.MediaAction
-import com.twidere.twiderex.extensions.asStateIn
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.repository.AccountRepository
@@ -32,7 +31,6 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.mapNotNull
 import moe.tlaster.precompose.viewmodel.ViewModel
-import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class MediaViewModel(
     private val repository: StatusRepository,
@@ -41,7 +39,7 @@ class MediaViewModel(
     private val statusKey: MicroBlogKey,
 ) : ViewModel() {
     private val account by lazy {
-        accountRepository.activeAccount.asStateIn(viewModelScope, null).mapNotNull { it }
+        accountRepository.activeAccount.mapNotNull { it }
     }
 
     suspend fun saveFile(currentMedia: UiMedia, target: String) {
