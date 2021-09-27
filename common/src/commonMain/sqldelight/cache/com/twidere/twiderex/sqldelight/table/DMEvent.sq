@@ -33,8 +33,29 @@ SELECT * FROM DMEvent WHERE accountKey == :accountKey AND conversationKey == :co
 delete:
 DELETE FROM DMEvent WHERE  accountKey == :accountKey AND conversationKey == :conversationKey AND messageKey == :messageKey;
 
-getMessageCount:
+getMessagesPagingCount:
 SELECT COUNT(*) FROM DMEvent WHERE  accountKey == :accountKey AND conversationKey == :conversationKey;
 
-getMessageByConversationKey:
-SELECT * FROM DMEvent WHERE  accountKey == :accountKey AND conversationKey == :conversationKey LIMIT :limit OFFSET :offset;
+getMessagesPagingList:
+SELECT * FROM DMEvent WHERE  accountKey == :accountKey AND conversationKey == :conversationKey ORDER BY sortId DESC LIMIT :limit OFFSET :offset;
+
+getLatestMessagesInEachConversation:
+SELECT event.* FROM DMEvent AS event
+JOIN (SELECT conversationKey, MAX(sortId) AS sortId FROM DMEvent WHERE accountKey == :accountKey GROUP BY conversationKey) AS conversation
+ON event.conversationKey = conversation.conversationKey AND event.sortId = conversation.sortId
+WHERE event.accountKey == :accountKey ORDER BY event.sortId DESC;
+
+getLatestMessagesInEachConversationPagingList:
+SELECT event.* FROM DMEvent AS event
+JOIN (SELECT conversationKey, MAX(sortId) AS sortId FROM DMEvent WHERE accountKey == :accountKey GROUP BY conversationKey) AS conversation
+ON event.conversationKey = conversation.conversationKey AND event.sortId = conversation.sortId
+WHERE event.accountKey == :accountKey ORDER BY event.sortId DESC LIMIT :limit OFFSET :offset;
+
+getLatestMessagesInEachConversationPagingCount:
+SELECT COUNT(*) FROM DMEvent AS event
+JOIN (SELECT conversationKey, MAX(sortId) AS sortId FROM DMEvent WHERE accountKey == :accountKey GROUP BY conversationKey) AS conversation
+ON event.conversationKey = conversation.conversationKey AND event.sortId = conversation.sortId
+WHERE event.accountKey == :accountKey;
+
+clearByConversationKey:
+DELETE FROM DMEvent WHERE accountKey == :accountKey AND conversationKey == :conversationKey;

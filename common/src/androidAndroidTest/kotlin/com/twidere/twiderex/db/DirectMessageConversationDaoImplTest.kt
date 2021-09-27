@@ -26,9 +26,8 @@ import com.twidere.twiderex.dataprovider.mapper.toUi
 import com.twidere.twiderex.db.base.CacheDatabaseDaoTest
 import com.twidere.twiderex.mock.model.mockIDirectMessage
 import com.twidere.twiderex.mock.model.mockIUser
+import com.twidere.twiderex.mock.model.toConversation
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.model.ui.UiDMConversation
-import com.twidere.twiderex.model.ui.UiDMEvent
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
@@ -37,17 +36,6 @@ import kotlin.test.assertNull
 
 internal class DirectMessageConversationDaoImplTest : CacheDatabaseDaoTest() {
     val accountKey = MicroBlogKey.twitter("test")
-
-    private fun UiDMEvent.toConversation() = UiDMConversation(
-        accountKey = accountKey,
-        conversationId = conversationKey.id,
-        conversationKey = conversationKey,
-        conversationAvatar = sender.profileImage.toString(),
-        conversationName = sender.name,
-        conversationSubName = sender.screenName,
-        conversationType = UiDMConversation.Type.ONE_TO_ONE,
-        recipientKey = conversationUserKey
-    )
 
     @Test
     fun delete() = runBlocking {

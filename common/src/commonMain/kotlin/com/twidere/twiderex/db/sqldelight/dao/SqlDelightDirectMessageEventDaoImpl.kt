@@ -22,42 +22,37 @@ package com.twidere.twiderex.db.sqldelight.dao
 
 import androidx.paging.PagingSource
 import com.twidere.twiderex.db.dao.DirectMessageEventDao
-import com.twidere.twiderex.db.sqldelight.model.DbDMEventWithAttachments
+import com.twidere.twiderex.db.sqldelight.model.DbDMEventWithAttachments.Companion.saveToDb
+import com.twidere.twiderex.db.sqldelight.model.DbDMEventWithAttachments.Companion.withAttachments
 import com.twidere.twiderex.db.sqldelight.paging.QueryPagingSource
 import com.twidere.twiderex.db.sqldelight.query.flatMap
 import com.twidere.twiderex.db.sqldelight.transform.toDbEventWithAttachments
 import com.twidere.twiderex.db.sqldelight.transform.toUi
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiDMEvent
-import com.twidere.twiderex.sqldelight.table.DMEvent
-import com.twidere.twiderex.sqldelight.table.DMEventQueries
-import com.twidere.twiderex.sqldelight.table.MediaQueries
-import com.twidere.twiderex.sqldelight.table.UrlEntityQueries
-import com.twidere.twiderex.sqldelight.table.UserQueries
+import com.twidere.twiderex.sqldelight.SqlDelightCacheDatabase
 import kotlinx.coroutines.Dispatchers
 
 internal class SqlDelightDirectMessageEventDaoImpl(
-    private val dmEventQueries: DMEventQueries,
-    private val urlEntityQueries: UrlEntityQueries,
-    private val mediaQueries: MediaQueries,
-    private val userQueries: UserQueries
+    private val database: SqlDelightCacheDatabase
 ) : DirectMessageEventDao {
+    private val dmEventQueries = database.dMEventQueries
     override fun getPagingSource(
         accountKey: MicroBlogKey,
         conversationKey: MicroBlogKey
     ): PagingSource<Int, UiDMEvent> {
         return QueryPagingSource(
-            countQuery = dmEventQueries.getMessageCount(accountKey = accountKey, conversationKey = conversationKey),
+            countQuery = dmEventQueries.getMessagesPagingCount(accountKey = accountKey, conversationKey = conversationKey),
             transacter = dmEventQueries,
             dispatcher = Dispatchers.IO,
             queryProvider = { limit, offset ->
-                dmEventQueries.getMessageByConversationKey(
+                dmEventQueries.getMessagesPagingList(
                     accountKey = accountKey,
                     conversationKey = conversationKey,
                     limit = limit,
                     offset = offset
                 ).flatMap {
-                    it.withAttachments().toUi()
+                    it.withAttachments(database).toUi()
                 }
             }
         )
@@ -71,7 +66,7 @@ internal class SqlDelightDirectMessageEventDaoImpl(
         accountKey = accountKey,
         conversationKey = conversationKey,
         messageKey = messageKey
-    ).executeAsOneOrNull()?.withAttachments()?.toUi()
+    ).executeAsOneOrNull()?.withAttachments(database)?.toUi()
 
     override suspend fun delete(message: UiDMEvent) {
         dmEventQueries.delete(
@@ -85,30 +80,10 @@ internal class SqlDelightDirectMessageEventDaoImpl(
         accountKey: MicroBlogKey,
         conversationKey: MicroBlogKey
     ): Long {
-        return dmEventQueries.getMessageCount(accountKey = accountKey, conversationKey = conversationKey).executeAsOne()
+        return dmEventQueries.getMessagesPagingCount(accountKey = accountKey, conversationKey = conversationKey).executeAsOne()
     }
 
     override suspend fun insertAll(events: List<UiDMEvent>) {
-        dmEventQueries.transaction {
-            events.map { it.toDbEventWithAttachments() }.let { list ->
-                list.forEach {
-                    dmEventQueries.insert(it.event)
-                    it.media.forEach { media -> mediaQueries.insert(media) }
-                    userQueries.insert(it.sender)
-                    it.url.forEach { url -> urlEntityQueries.insert(url) }
-                }
-            }
-        }
-    }
-
-    private fun DMEvent.withAttachments(): DbDMEventWithAttachments {
-        return dmEventQueries.transactionWithResult {
-            DbDMEventWithAttachments(
-                event = this@withAttachments,
-                url = urlEntityQueries.findByBelongToKey(messageKey).executeAsList(),
-                media = mediaQueries.findMediaByBelongToKey(messageKey).executeAsList(),
-                sender = userQueries.findWithUserKey(senderAccountKey).executeAsOne()
-            )
-        }
+        events.map { it.toDbEventWithAttachments() }.saveToDb(database)
     }
 }

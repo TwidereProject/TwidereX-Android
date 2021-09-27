@@ -51,6 +51,8 @@ import com.twidere.services.twitter.model.UserV2
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.ComposeType
 import com.twidere.twiderex.model.enums.MediaType
+import com.twidere.twiderex.model.ui.UiDMConversation
+import com.twidere.twiderex.model.ui.UiDMEvent
 import com.twidere.twiderex.model.ui.UiDraft
 import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.model.ui.UiSearch
@@ -230,4 +232,16 @@ fun mockUiUrlEntity(url: String = "") = UiUrlEntity(
     title = "title",
     description = "description",
     image = "image"
+)
+
+@TestOnly
+fun UiDMEvent.toConversation() = UiDMConversation(
+    accountKey = accountKey,
+    conversationId = conversationKey.id,
+    conversationKey = conversationKey,
+    conversationAvatar = sender.profileImage.toString(),
+    conversationName = sender.name,
+    conversationSubName = sender.screenName,
+    conversationType = UiDMConversation.Type.ONE_TO_ONE,
+    recipientKey = conversationUserKey
 )

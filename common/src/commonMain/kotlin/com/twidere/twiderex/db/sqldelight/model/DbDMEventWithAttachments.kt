@@ -20,6 +20,7 @@
  */
 package com.twidere.twiderex.db.sqldelight.model
 
+import com.twidere.twiderex.sqldelight.SqlDelightCacheDatabase
 import com.twidere.twiderex.sqldelight.table.DMEvent
 import com.twidere.twiderex.sqldelight.table.Media
 import com.twidere.twiderex.sqldelight.table.UrlEntity
@@ -30,4 +31,28 @@ internal data class DbDMEventWithAttachments(
     val media: List<Media>,
     val url: List<UrlEntity>,
     val sender: User
-)
+) {
+    companion object {
+        fun DMEvent.withAttachments(database: SqlDelightCacheDatabase): DbDMEventWithAttachments {
+            return database.transactionWithResult {
+                DbDMEventWithAttachments(
+                    event = this@withAttachments,
+                    url = database.urlEntityQueries.findByBelongToKey(messageKey).executeAsList(),
+                    media = database.mediaQueries.findMediaByBelongToKey(messageKey).executeAsList(),
+                    sender = database.userQueries.findWithUserKey(senderAccountKey).executeAsOne()
+                )
+            }
+        }
+
+        fun List<DbDMEventWithAttachments>.saveToDb(database: SqlDelightCacheDatabase) {
+            database.transaction {
+                forEach {
+                    database.dMEventQueries.insert(it.event)
+                    it.media.forEach { media -> database.mediaQueries.insert(media) }
+                    database.userQueries.insert(it.sender)
+                    it.url.forEach { url -> database.urlEntityQueries.insert(url) }
+                }
+            }
+        }
+    }
+}

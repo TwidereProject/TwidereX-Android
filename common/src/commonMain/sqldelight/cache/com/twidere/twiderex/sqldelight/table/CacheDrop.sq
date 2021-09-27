@@ -3,4 +3,5 @@ clearAllTables{
     DELETE FROM Media;
     DELETE FROM UrlEntity;
     DELETE FROM User;
+    DELETE FROM DMConversation;
 }

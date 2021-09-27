@@ -21,6 +21,7 @@
 package com.twidere.twiderex.db.sqldelight
 
 import com.squareup.sqldelight.db.SqlDriver
+import com.twidere.twiderex.db.sqldelight.adapter.DMConversationAdapterFactory
 import com.twidere.twiderex.db.sqldelight.adapter.DMEventAdapterFactory
 import com.twidere.twiderex.db.sqldelight.adapter.DraftAdapterFactory
 import com.twidere.twiderex.db.sqldelight.adapter.MediaAdapterFactory
@@ -46,6 +47,7 @@ internal fun createCacheDataBase(driver: SqlDriver): SqlDelightCacheDatabase {
         DMEventAdapter = DMEventAdapterFactory.create(),
         MediaAdapter = MediaAdapterFactory.create(),
         UrlEntityAdapter = UrlEntityAdapterFactory.create(),
-        UserAdapter = UserAdapterFactory.create()
+        UserAdapter = UserAdapterFactory.create(),
+        DMConversationAdapter = DMConversationAdapterFactory.create()
     )
 }

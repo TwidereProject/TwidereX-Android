@@ -37,10 +37,7 @@ internal class SqlDelightDirectMessageEventDaoImplTest : BaseCacheDatabaseTest()
     override fun setUp() {
         super.setUp()
         dao = SqlDelightDirectMessageEventDaoImpl(
-            dmEventQueries = database.dMEventQueries,
-            urlEntityQueries = database.urlEntityQueries,
-            mediaQueries = database.mediaQueries,
-            userQueries = database.userQueries
+            database = database
         )
     }
 
