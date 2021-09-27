@@ -28,7 +28,6 @@ import android.net.NetworkRequest
 import android.net.Uri
 import android.os.Bundle
 import android.view.WindowManager
-import androidx.activity.compose.setContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.fadeIn
@@ -64,6 +63,8 @@ import com.twidere.twiderex.action.StatusActions
 import com.twidere.twiderex.component.foundation.LocalInAppNotification
 import com.twidere.twiderex.compose.LocalResLoader
 import com.twidere.twiderex.extensions.observeAsState
+import com.twidere.twiderex.kmp.LocalRemoteNavigator
+import com.twidere.twiderex.kmp.RemoteNavigator
 import com.twidere.twiderex.kmp.ResLoader
 import com.twidere.twiderex.navigation.Router
 import com.twidere.twiderex.notification.InAppNotification
@@ -114,6 +115,8 @@ class TwidereXActivity : PreComposeActivity(), KoinComponent {
     private val connectivityManager: ConnectivityManager by inject()
 
     private val platformResolver: PlatformResolver by inject()
+
+    private val remoteNavigator: RemoteNavigator by inject()
 
     @OptIn(ExperimentalAnimationApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -187,7 +190,8 @@ class TwidereXActivity : PreComposeActivity(), KoinComponent {
             LocalActiveAccountViewModel provides accountViewModel,
             LocalIsActiveNetworkMetered provides isActiveNetworkMetered,
             LocalPlatformResolver provides platformResolver,
-            LocalResLoader provides ResLoader(this)
+            LocalResLoader provides ResLoader(this),
+            LocalRemoteNavigator provides remoteNavigator,
         ) {
             ProvidePreferences(
                 preferencesHolder,

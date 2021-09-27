@@ -62,13 +62,7 @@ fun Throwable.generateNotificationEvent(): NotificationEvent? {
                         MR.strings.common_alerts_account_temporarily_locked_message,
                         actionStr = MR.strings.common_controls_actions_ok
                     ) {
-                        // TODO FIXME: 2021/9/23 Implementation
-                        // context.startActivity(
-                        //     Intent(
-                        //         Intent.ACTION_VIEW,
-                        //         Uri.parse("https://twitter.com/login")
-                        //     )
-                        // )
+                        remoteNavigator.openDeepLink("https://twitter.com/login")
                     }
                 }
                 TwitterErrorCodes.RateLimitExceeded -> null

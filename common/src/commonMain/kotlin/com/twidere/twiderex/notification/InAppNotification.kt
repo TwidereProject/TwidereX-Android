@@ -23,6 +23,7 @@ package com.twidere.twiderex.notification
 import androidx.compose.runtime.Composable
 import com.twidere.twiderex.compose.LocalResLoader
 import com.twidere.twiderex.extensions.observeAsState
+import com.twidere.twiderex.kmp.RemoteNavigator
 import com.twidere.twiderex.utils.Event
 import dev.icerock.moko.resources.StringResource
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -33,8 +34,7 @@ interface NotificationEvent {
     fun getMessage(): String
 }
 data class EventActionContext(
-    // TODO FIXME: 2021/9/23  Replace with native navigator
-    val TODO: Any,
+    val remoteNavigator: RemoteNavigator
 )
 interface NotificationWithActionEvent : NotificationEvent {
     @Composable

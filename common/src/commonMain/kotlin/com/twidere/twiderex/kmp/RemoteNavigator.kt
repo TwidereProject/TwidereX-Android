@@ -20,6 +20,8 @@
  */
 package com.twidere.twiderex.kmp
 
+import androidx.compose.runtime.staticCompositionLocalOf
+
 expect class RemoteNavigator {
     fun openDeepLink(deeplink: String, fromBackground: Boolean = false)
 
@@ -27,3 +29,5 @@ expect class RemoteNavigator {
 
     fun shareText(content: String, fromBackground: Boolean = false)
 }
+
+val LocalRemoteNavigator = staticCompositionLocalOf<RemoteNavigator> { error("No RemoteNavigator") }
