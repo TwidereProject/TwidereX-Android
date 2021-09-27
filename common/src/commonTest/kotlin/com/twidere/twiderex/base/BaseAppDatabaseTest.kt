@@ -26,11 +26,10 @@ import org.junit.After
 import org.junit.Before
 
 internal open class BaseAppDatabaseTest {
-    protected lateinit var database: SqlDelightAppDatabase
     private val driver = SqlDriverFactory.create(SqlDelightAppDatabase.Schema)
+    protected val database: SqlDelightAppDatabase = createAppDataBase(driver)
     @Before
     fun setUp() {
-        database = createAppDataBase(driver)
     }
 
     @After

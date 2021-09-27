@@ -26,11 +26,10 @@ import org.junit.After
 import org.junit.Before
 
 internal open class BaseCacheDatabaseTest {
-    protected lateinit var database: SqlDelightCacheDatabase
     private val driver = SqlDriverFactory.create(SqlDelightCacheDatabase.Schema)
+    protected val database: SqlDelightCacheDatabase = createCacheDataBase(driver)
     @Before
     open fun setUp() {
-        database = createCacheDataBase(driver)
     }
 
     @After

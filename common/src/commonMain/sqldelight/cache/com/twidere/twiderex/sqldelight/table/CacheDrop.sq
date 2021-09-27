@@ -4,4 +4,6 @@ clearAllTables{
     DELETE FROM UrlEntity;
     DELETE FROM User;
     DELETE FROM DMConversation;
+    DELETE FROM Trend;
+    DELETE FROM TrendHistory;
 }
