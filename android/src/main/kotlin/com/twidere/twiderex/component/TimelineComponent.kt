@@ -58,18 +58,17 @@ fun TimelineComponent(
         val listState = rememberLazyListState()
         LaunchedEffect(Unit) {
             var inited = false
+            val scrollState = viewModel.provideScrollState()
             snapshotFlow { listState.layoutInfo.totalItemsCount }
                 .distinctUntilChanged()
                 .filter { it != 0 }
                 .filter { !inited }
                 .collect {
                     inited = true
-                    viewModel.provideScrollState().let {
-                        listState.scrollToItem(
-                            it.firstVisibleItemIndex,
-                            it.firstVisibleItemScrollOffset
-                        )
-                    }
+                    listState.scrollToItem(
+                        scrollState.firstVisibleItemIndex,
+                        scrollState.firstVisibleItemScrollOffset
+                    )
                 }
         }
         if (items.itemCount > 0) {
