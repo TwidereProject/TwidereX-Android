@@ -18,30 +18,18 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex
+package moe.tlaster.precompose.lifecycle
 
-import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.compose.ui.window.application
-import com.twidere.twiderex.di.setupModules
-import moe.tlaster.precompose.PreComposeWindow
-import org.koin.core.context.startKoin
-import org.koin.core.context.stopKoin
+interface Lifecycle {
+    enum class State {
+        Initialized,
+        Active,
+        InActive,
+        Destroyed,
+    }
 
-@ExperimentalComposeUiApi
-fun main() {
-    startKoin {
-        printLogger()
-        setupModules()
-    }
-    application {
-        PreComposeWindow(
-            onCloseRequest = {
-                stopKoin()
-                exitApplication()
-            },
-            title = "Twidere X"
-        ) {
-            App()
-        }
-    }
+    val currentState: State
+    fun removeObserver(observer: LifecycleObserver)
+    fun addObserver(observer: LifecycleObserver)
+    fun hasObserver(): Boolean
 }

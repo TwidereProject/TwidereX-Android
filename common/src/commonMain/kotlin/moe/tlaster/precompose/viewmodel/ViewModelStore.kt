@@ -18,30 +18,28 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex
+package moe.tlaster.precompose.viewmodel
 
-import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.compose.ui.window.application
-import com.twidere.twiderex.di.setupModules
-import moe.tlaster.precompose.PreComposeWindow
-import org.koin.core.context.startKoin
-import org.koin.core.context.stopKoin
+class ViewModelStore {
+    private val map = hashMapOf<String, ViewModel>()
 
-@ExperimentalComposeUiApi
-fun main() {
-    startKoin {
-        printLogger()
-        setupModules()
+    fun put(key: String, viewModel: ViewModel) {
+        val oldViewModel = map.put(key, viewModel)
+        oldViewModel?.clear()
     }
-    application {
-        PreComposeWindow(
-            onCloseRequest = {
-                stopKoin()
-                exitApplication()
-            },
-            title = "Twidere X"
-        ) {
-            App()
+
+    operator fun get(key: String): ViewModel? {
+        return map[key]
+    }
+
+    fun keys(): Set<String> {
+        return HashSet(map.keys)
+    }
+
+    fun clear() {
+        for (vm in map.values) {
+            vm.clear()
         }
+        map.clear()
     }
 }

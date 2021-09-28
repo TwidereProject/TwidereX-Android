@@ -18,30 +18,10 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex
+package moe.tlaster.precompose.navigation.route
 
-import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.compose.ui.window.application
-import com.twidere.twiderex.di.setupModules
-import moe.tlaster.precompose.PreComposeWindow
-import org.koin.core.context.startKoin
-import org.koin.core.context.stopKoin
-
-@ExperimentalComposeUiApi
-fun main() {
-    startKoin {
-        printLogger()
-        setupModules()
-    }
-    application {
-        PreComposeWindow(
-            onCloseRequest = {
-                stopKoin()
-                exitApplication()
-            },
-            title = "Twidere X"
-        ) {
-            App()
-        }
-    }
+interface Route {
+    val route: String
+    @Deprecated("store path key in route node in order to match different links in one route")
+    val pathKeys: List<String>
 }

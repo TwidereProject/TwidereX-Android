@@ -18,30 +18,16 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex
+package moe.tlaster.precompose.ui
 
-import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.compose.ui.window.application
-import com.twidere.twiderex.di.setupModules
-import moe.tlaster.precompose.PreComposeWindow
-import org.koin.core.context.startKoin
-import org.koin.core.context.stopKoin
+import androidx.compose.runtime.compositionLocalOf
+import moe.tlaster.precompose.lifecycle.LifecycleOwner
+import moe.tlaster.precompose.viewmodel.ViewModelStoreOwner
 
-@ExperimentalComposeUiApi
-fun main() {
-    startKoin {
-        printLogger()
-        setupModules()
-    }
-    application {
-        PreComposeWindow(
-            onCloseRequest = {
-                stopKoin()
-                exitApplication()
-            },
-            title = "Twidere X"
-        ) {
-            App()
-        }
-    }
+val LocalLifecycleOwner = compositionLocalOf<LifecycleOwner> { noLocalProvidedFor("LocalLifecycleOwner") }
+
+val LocalViewModelStoreOwner = compositionLocalOf<ViewModelStoreOwner> { noLocalProvidedFor("ViewModelStoreOwner") }
+
+private fun noLocalProvidedFor(name: String): Nothing {
+    error("CompositionLocal $name not present")
 }

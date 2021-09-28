@@ -57,6 +57,8 @@ kotlin {
         }
         val androidMain by getting {
             dependencies {
+                api("androidx.lifecycle:lifecycle-runtime-ktx:${Versions.lifecycle}")
+                api("androidx.savedstate:savedstate-ktx:1.1.0")
                 api("io.insert-koin:koin-android:${Versions.koin}")
                 api("io.insert-koin:koin-androidx-workmanager:${Versions.koin}")
                 implementation("androidx.room:room-runtime:${Versions.room}")
