@@ -24,25 +24,6 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import com.twidere.twiderex.preferences.LocalAppearancePreferences
 import com.twidere.twiderex.preferences.model.AppearancePreferences
-import moe.tlaster.precompose.viewmodel.ViewModel
-import moe.tlaster.precompose.viewmodel.compose.viewModel
-
-@Composable
-inline fun <reified VM : ViewModel> viewModel(
-    vararg dependsOn: Any,
-    noinline creator: () -> VM,
-): VM {
-    return viewModel(
-        key = if (dependsOn.any()) {
-            dependsOn.joinToString { it.hashCode().toString() } + VM::class.java.canonicalName
-        } else {
-            null
-        },
-        creator = {
-            creator.invoke()
-        }
-    )
-}
 
 @Composable
 fun isDarkTheme(): Boolean {
