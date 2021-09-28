@@ -71,7 +71,7 @@ fun ListsMembersScene(
 ) {
     val navController = LocalNavController.current
     val viewModel: ListsUserViewModel = getViewModel {
-        parametersOf(listKey.id)
+        parametersOf(listKey.id, true)
     }
     val source = viewModel.source.collectAsLazyPagingItems()
     val navigator = LocalNavigator.current
