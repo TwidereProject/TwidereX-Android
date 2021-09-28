@@ -96,7 +96,7 @@ data class UiStatus(
         @Composable
         fun sample() = UiStatus(
             statusId = "",
-            htmlText = "", // stringResource(id = com.twidere.common.R.string.scene_settings_display_preview_thank_for_using_twidere_x),
+            htmlText = "", // stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_display_preview_thank_for_using_twidere_x),
             timestamp = System.currentTimeMillis(),
             metrics = StatusMetrics(
                 retweet = 1200,

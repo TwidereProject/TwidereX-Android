@@ -48,6 +48,8 @@ kotlin {
                 ksp(projects.routeProcessor)
                 api("dev.icerock.moko:resources:${Versions.moko}")
                 implementation("app.cash.turbine:turbine:0.6.1")
+                implementation("ca.gosyer:accompanist-pager:${Versions.accompanist_jb}")
+                implementation("ca.gosyer:accompanist-pager-indicators:${Versions.accompanist_jb}")
             }
         }
         val commonTest by getting {

@@ -33,7 +33,7 @@ fun LoginLogo(
     Image(
         modifier = modifier,
         contentScale = ContentScale.FillWidth,
-        painter = painterResource(res = MR.files.ic_login_logo),
+        painter = painterResource(res = com.twidere.twiderex.MR.files.ic_login_logo),
         contentDescription = stringResource(res = MR.strings.accessibility_common_logo_twidere)
     )
 }

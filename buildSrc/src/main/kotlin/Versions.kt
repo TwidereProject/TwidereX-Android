@@ -39,6 +39,7 @@ object Versions {
     const val startup = "1.1.0"
     const val coil = "1.3.0"
     const val accompanist = "0.15.0"
+    const val accompanist_jb = "0.18.1"
     const val androidx_exifinterface = "1.3.2"
     const val exoplayer = "2.14.2"
     const val browser = "1.3.0"
