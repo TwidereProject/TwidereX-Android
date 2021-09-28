@@ -34,7 +34,7 @@ import com.twidere.twiderex.model.ui.UiTrend
 import com.twidere.twiderex.paging.mediator.trend.TrendMediator
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
-import org.junit.Test
+import kotlin.test.Test
 
 /**
  * instead of testing pagination, we should focus on our code logic

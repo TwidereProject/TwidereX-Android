@@ -37,7 +37,7 @@ import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
 import com.twidere.twiderex.component.lazy.LazyListController
 import com.twidere.twiderex.component.lazy.ui.LazyUiDMConversationList
-import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.navigation.RootRoute
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalNavController
@@ -91,12 +91,7 @@ fun DMConversationListSceneContent(
     val account = LocalActiveAccount.current ?: return
     val navController = LocalNavController.current
     if (!account.supportDirectMessage) return
-    val viewModel =
-        assistedViewModel<DMConversationViewModel.AssistedFactory, DMConversationViewModel>(
-            account,
-        ) {
-            it.create(account)
-        }
+    val viewModel: DMConversationViewModel = getViewModel()
     val source = viewModel.source.collectAsLazyPagingItems()
     val listState = rememberLazyListState()
     LaunchedEffect(lazyListController) {

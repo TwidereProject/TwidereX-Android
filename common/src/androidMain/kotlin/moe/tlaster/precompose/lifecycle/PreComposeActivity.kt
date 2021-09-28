@@ -20,16 +20,13 @@
  */
 package moe.tlaster.precompose.lifecycle
 
-import android.app.Activity
-import android.os.Bundle
 import android.view.ViewGroup
+import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionContext
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.platform.ComposeView
 import androidx.lifecycle.ViewTreeLifecycleOwner
-import androidx.savedstate.SavedStateRegistry
-import androidx.savedstate.SavedStateRegistryController
 import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.ViewTreeSavedStateRegistryOwner
 import moe.tlaster.precompose.ui.BackDispatcher
@@ -41,12 +38,13 @@ import moe.tlaster.precompose.viewmodel.ViewModelStore
 import moe.tlaster.precompose.viewmodel.ViewModelStoreOwner
 
 open class PreComposeActivity :
-    Activity(),
+    ComponentActivity(),
     LifecycleOwner,
     ViewModelStoreOwner,
     androidx.lifecycle.LifecycleOwner,
     SavedStateRegistryOwner,
-    BackDispatcherOwner {
+    BackDispatcherOwner,
+    androidx.lifecycle.LifecycleObserver {
     override val lifecycle by lazy {
         LifecycleRegistry()
     }
@@ -55,59 +53,19 @@ open class PreComposeActivity :
         ViewModelStore()
     }
 
-    private val androidLifecycle by lazy {
-        androidx.lifecycle.LifecycleRegistry(this)
-    }
-
-    private val savedStateRegistryController by lazy {
-        SavedStateRegistryController.create(this)
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        savedStateRegistryController.performRestore(savedInstanceState)
-        super.onCreate(savedInstanceState)
-        androidLifecycle.handleLifecycleEvent(androidx.lifecycle.Lifecycle.Event.ON_CREATE)
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        savedStateRegistryController.performSave(outState)
-    }
-
-    override fun onStart() {
-        super.onStart()
-        androidLifecycle.handleLifecycleEvent(androidx.lifecycle.Lifecycle.Event.ON_START)
-    }
-
     override fun onResume() {
         super.onResume()
-        androidLifecycle.handleLifecycleEvent(androidx.lifecycle.Lifecycle.Event.ON_RESUME)
         lifecycle.currentState = Lifecycle.State.Active
     }
 
     override fun onPause() {
         super.onPause()
         lifecycle.currentState = Lifecycle.State.InActive
-        androidLifecycle.handleLifecycleEvent(androidx.lifecycle.Lifecycle.Event.ON_PAUSE)
-    }
-
-    override fun onStop() {
-        super.onStop()
-        androidLifecycle.handleLifecycleEvent(androidx.lifecycle.Lifecycle.Event.ON_STOP)
     }
 
     override fun onDestroy() {
         super.onDestroy()
         lifecycle.currentState = Lifecycle.State.Destroyed
-        androidLifecycle.handleLifecycleEvent(androidx.lifecycle.Lifecycle.Event.ON_DESTROY)
-    }
-
-    override fun getLifecycle(): androidx.lifecycle.Lifecycle {
-        return androidLifecycle
-    }
-
-    override fun getSavedStateRegistry(): SavedStateRegistry {
-        return savedStateRegistryController.savedStateRegistry
     }
 
     override val backDispatcher by lazy {

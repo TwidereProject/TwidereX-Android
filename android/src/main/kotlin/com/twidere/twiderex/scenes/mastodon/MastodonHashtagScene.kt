@@ -29,22 +29,17 @@ import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
 import com.twidere.twiderex.component.lazy.ui.LazyUiStatusList
-import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.refreshOrRetry
-import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.mastodon.MastodonHashtagViewModel
+import org.koin.core.parameter.parametersOf
 
 @Composable
 fun MastodonHashtagScene(keyword: String) {
-    val account = LocalActiveAccount.current ?: return
-    val viewModel =
-        assistedViewModel<MastodonHashtagViewModel.AssistedFactory, MastodonHashtagViewModel>(
-            keyword,
-            account,
-        ) {
-            it.create(keyword = keyword, account = account)
-        }
+    val viewModel: MastodonHashtagViewModel = getViewModel {
+        parametersOf(keyword)
+    }
     val source = viewModel.source.collectAsLazyPagingItems()
     TwidereScene {
         InAppNotificationScaffold(

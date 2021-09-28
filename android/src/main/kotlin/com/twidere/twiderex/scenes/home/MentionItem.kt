@@ -31,9 +31,9 @@ import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.lazy.LazyListController
-import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.di.ext.getViewModel
+import com.twidere.twiderex.model.HomeNavigationItem
 import com.twidere.twiderex.navigation.RootRoute
-import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.timeline.MentionsTimelineViewModel
 
@@ -48,13 +48,7 @@ class MentionItem : HomeNavigationItem() {
 
     @Composable
     override fun Content() {
-        val account = LocalActiveAccount.current ?: return
-        val viewModel =
-            assistedViewModel<MentionsTimelineViewModel.AssistedFactory, MentionsTimelineViewModel>(
-                account
-            ) {
-                it.create(account)
-            }
+        val viewModel: MentionsTimelineViewModel = getViewModel()
         TimelineComponent(
             viewModel = viewModel,
             lazyListController = lazyListController,
@@ -86,13 +80,7 @@ fun MentionScene() {
 fun MentionSceneContent(
     lazyListController: LazyListController? = null
 ) {
-    val account = LocalActiveAccount.current ?: return
-    val viewModel =
-        assistedViewModel<MentionsTimelineViewModel.AssistedFactory, MentionsTimelineViewModel>(
-            account
-        ) {
-            it.create(account)
-        }
+    val viewModel: MentionsTimelineViewModel = getViewModel()
     TimelineComponent(
         viewModel = viewModel,
         lazyListController = lazyListController,

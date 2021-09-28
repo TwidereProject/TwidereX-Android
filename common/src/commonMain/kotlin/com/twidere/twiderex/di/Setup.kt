@@ -20,9 +20,23 @@
  */
 package com.twidere.twiderex.di
 
+import com.twidere.twiderex.di.modules.actionModule
+import com.twidere.twiderex.di.modules.dataBaseModule
+import com.twidere.twiderex.di.modules.jobsModule
+import com.twidere.twiderex.di.modules.kmpModule
+import com.twidere.twiderex.di.modules.platformModule
+import com.twidere.twiderex.di.modules.preferencesModule
+import com.twidere.twiderex.di.modules.repositoryModule
+import com.twidere.twiderex.di.modules.viewModelModule
 import org.koin.core.KoinApplication
 
 fun KoinApplication.setupModules() {
     modules(preferencesModule)
     modules(platformModule)
+    modules(dataBaseModule)
+    modules(viewModelModule)
+    modules(repositoryModule)
+    modules(actionModule)
+    modules(jobsModule)
+    modules(kmpModule)
 }

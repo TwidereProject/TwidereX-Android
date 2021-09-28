@@ -20,6 +20,7 @@
  */
 package com.twidere.twiderex.mock.service
 
+import com.twidere.services.microblog.MicroBlogService
 import com.twidere.services.microblog.RelationshipService
 import com.twidere.services.microblog.model.IRelationship
 import com.twidere.services.microblog.model.IUser
@@ -28,7 +29,8 @@ import com.twidere.twiderex.mock.model.mockIUser
 import com.twidere.twiderex.mock.model.toIPaging
 import org.jetbrains.annotations.TestOnly
 
-internal class MockRelationshipService @TestOnly constructor() : RelationshipService,
+internal class MockRelationshipService @TestOnly constructor() : MicroBlogService,
+    RelationshipService,
     ErrorService() {
     private val followings = mutableListOf<String>()
     private val followers = mutableListOf<String>()

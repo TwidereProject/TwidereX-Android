@@ -25,7 +25,7 @@ import com.twidere.twiderex.mock.db.MockCacheDatabase
 import com.twidere.twiderex.mock.model.mockIStatus
 import com.twidere.twiderex.model.MicroBlogKey
 import kotlinx.coroutines.runBlocking
-import org.junit.Test
+import kotlin.test.Test
 import kotlin.test.assertEquals
 
 internal class ReactionRepositoryTest {

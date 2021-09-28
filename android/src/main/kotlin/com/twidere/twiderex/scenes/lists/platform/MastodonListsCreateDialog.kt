@@ -24,23 +24,24 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.window.Dialog
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.LoadingProgress
 import com.twidere.twiderex.component.lists.MastodonListsModifyComponent
-import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.navigation.RootRoute
-import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.viewmodel.lists.ListsCreateViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun MastodonListsCreateDialog(onDismissRequest: () -> Unit) {
-    val account = LocalActiveAccount.current ?: return
     val navController = LocalNavController.current
+    val scope = rememberCoroutineScope()
     var showMastodonComponent by remember {
         mutableStateOf(true)
     }
@@ -51,20 +52,7 @@ fun MastodonListsCreateDialog(onDismissRequest: () -> Unit) {
     var name by remember {
         mutableStateOf("")
     }
-    val listsCreateViewModel = assistedViewModel<ListsCreateViewModel.AssistedFactory, ListsCreateViewModel>(
-        account
-    ) {
-        it.create(account) { success, list ->
-            dismiss()
-            if (success) {
-                list?.apply {
-                    navController.navigate(
-                        RootRoute.Lists.Timeline(listKey),
-                    )
-                }
-            }
-        }
-    }
+    val listsCreateViewModel: ListsCreateViewModel = getViewModel()
     val loading by listsCreateViewModel.loading.observeAsState(initial = false)
 
     if (loading) {
@@ -85,9 +73,17 @@ fun MastodonListsCreateDialog(onDismissRequest: () -> Unit) {
             name = name,
             onNameChanged = { name = it }
         ) {
-            listsCreateViewModel.createList(
-                title = it
-            )
+            scope.launch {
+                val result = listsCreateViewModel.createList(
+                    title = it
+                )
+                dismiss()
+                if (result != null) {
+                    navController.navigate(
+                        RootRoute.Lists.Timeline(result.listKey),
+                    )
+                }
+            }
         }
     }
 }

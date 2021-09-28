@@ -32,7 +32,7 @@ import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiList
 import com.twidere.twiderex.paging.mediator.list.ListsMediator
 import kotlinx.coroutines.runBlocking
-import org.junit.Test
+import kotlin.test.Test
 
 /**
  * instead of testing pagination, we should focus on our code logic

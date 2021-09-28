@@ -55,8 +55,9 @@ import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.component.trend.MastodonTrendItem
 import com.twidere.twiderex.component.trend.TwitterTrendItem
-import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.observeAsState
+import com.twidere.twiderex.model.HomeNavigationItem
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.navigation.RootRoute
 import com.twidere.twiderex.ui.LocalActiveAccount
@@ -107,17 +108,8 @@ fun SearchScene() {
 @Composable
 fun SearchSceneContent() {
     val account = LocalActiveAccount.current ?: return
-    val viewModel =
-        assistedViewModel<SearchInputViewModel.AssistedFactory, SearchInputViewModel>(
-            account
-        ) {
-            it.create(account = account)
-        }
-    val trendViewModel = assistedViewModel<TrendViewModel.AssistedFactory, TrendViewModel>(
-        account
-    ) {
-        it.create(account = account)
-    }
+    val viewModel: SearchInputViewModel = getViewModel()
+    val trendViewModel: TrendViewModel = getViewModel()
     val source by viewModel.savedSource.observeAsState(initial = emptyList())
     val trends = trendViewModel.source.collectAsLazyPagingItems()
     val navigator = LocalNavigator.current

@@ -22,7 +22,7 @@ package moe.tlaster.precompose.navigation
 
 import moe.tlaster.precompose.navigation.route.SceneRoute
 import org.junit.Assert
-import org.junit.Test
+import kotlin.test.Test
 
 class RouteParserTest {
     @Test

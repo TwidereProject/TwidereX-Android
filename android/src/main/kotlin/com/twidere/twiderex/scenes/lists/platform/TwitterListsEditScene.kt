@@ -34,30 +34,26 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.window.Dialog
-import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.LoadingProgress
 import com.twidere.twiderex.component.lists.TwitterListsModifyComponent
-import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.lists.ListsModifyViewModel
+import org.koin.core.parameter.parametersOf
 
 @Composable
 fun TwitterListsEditScene(
     listKey: MicroBlogKey
 ) {
-    val account = LocalActiveAccount.current ?: return
     val navController = LocalNavController.current
-    val listsEditViewModel = assistedViewModel<ListsModifyViewModel.AssistedFactory, ListsModifyViewModel>(
-        account, listKey
-    ) {
-        it.create(account, listKey)
+    val listsEditViewModel: ListsModifyViewModel = getViewModel {
+        parametersOf(listKey)
     }
     val loading by listsEditViewModel.loading.observeAsState(initial = false)
     val source by listsEditViewModel.source.observeAsState(null)
@@ -90,7 +86,9 @@ fun TwitterListsEditScene(
                                 Icon(
                                     imageVector = Icons.Default.Done,
                                     contentDescription = stringResource(id = com.twidere.common.R.string.common_controls_actions_confirm),
-                                    tint = if (name.isNotEmpty()) MaterialTheme.colors.primary else LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
+                                    tint = if (name.isNotEmpty()) MaterialTheme.colors.primary else LocalContentColor.current.copy(
+                                        alpha = LocalContentAlpha.current
+                                    )
                                 )
                             }
                         }

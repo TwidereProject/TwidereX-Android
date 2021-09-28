@@ -46,7 +46,7 @@ import com.twidere.twiderex.component.lazy.ItemHeader
 import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.component.status.UserName
 import com.twidere.twiderex.component.status.UserScreenName
-import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.navigation.RootRoute
 import com.twidere.twiderex.ui.LocalActiveAccountViewModel
@@ -59,10 +59,7 @@ import com.twidere.twiderex.viewmodel.settings.NotificationViewModel
 fun NotificationScene() {
     val activeAccountViewModel = LocalActiveAccountViewModel.current
     val accounts by activeAccountViewModel.allAccounts.observeAsState(initial = emptyList())
-    val viewModel =
-        assistedViewModel<NotificationViewModel.AssistedFactory, NotificationViewModel> {
-            it.create()
-        }
+    val viewModel: NotificationViewModel = getViewModel()
     val notificationEnabled by viewModel.enabled.observeAsState(initial = true)
     TwidereScene {
         InAppNotificationScaffold(

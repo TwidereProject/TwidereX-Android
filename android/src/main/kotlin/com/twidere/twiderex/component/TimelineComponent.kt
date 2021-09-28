@@ -25,7 +25,6 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
@@ -56,22 +55,33 @@ fun TimelineComponent(
         },
         refreshIndicatorPadding = contentPadding
     ) {
-        val lastScrollState = remember {
-            viewModel.restoreScrollState()
+        val listState = rememberLazyListState()
+        LaunchedEffect(Unit) {
+            var inited = false
+            val scrollState = viewModel.provideScrollState()
+            snapshotFlow { listState.layoutInfo.totalItemsCount }
+                .distinctUntilChanged()
+                .filter { it != 0 }
+                .filter { !inited }
+                .collect {
+                    inited = true
+                    listState.scrollToItem(
+                        scrollState.firstVisibleItemIndex,
+                        scrollState.firstVisibleItemScrollOffset
+                    )
+                }
         }
-        val listState = rememberLazyListState(
-            initialFirstVisibleItemIndex = lastScrollState.firstVisibleItemIndex,
-            initialFirstVisibleItemScrollOffset = lastScrollState.firstVisibleItemScrollOffset,
-        )
         if (items.itemCount > 0) {
             LaunchedEffect(lazyListController) {
                 lazyListController?.listState = listState
             }
         }
-        LaunchedEffect(listState) {
+        LaunchedEffect(Unit) {
             snapshotFlow { listState.isScrollInProgress }
                 .distinctUntilChanged()
                 .filter { !it }
+                .filter { listState.layoutInfo.totalItemsCount != 0 }
+                .filter { listState.firstVisibleItemIndex != 0 && listState.firstVisibleItemScrollOffset != 0 }
                 .collect {
                     viewModel.saveScrollState(
                         TimelineScrollState(

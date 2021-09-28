@@ -20,21 +20,24 @@
  */
 package moe.tlaster.precompose.viewmodel
 
-internal inline fun <reified T : ViewModel> ViewModelStore.getViewModel(
-    creator: () -> T,
+import kotlin.reflect.KClass
+
+inline fun <reified T : ViewModel> ViewModelStore.getViewModel(
+    noinline creator: () -> T,
 ): T {
     val key = T::class.qualifiedName.toString()
-    return getViewModel(key, creator)
+    return getViewModel(key, T::class, creator)
 }
 
-internal inline fun <reified T : ViewModel> ViewModelStore.getViewModel(
+fun <T : ViewModel> ViewModelStore.getViewModel(
     key: String,
+    clazz: KClass<T>,
     creator: () -> T,
 ): T {
     val existing = get(key)
-    if (existing != null && existing is T) {
+    if (existing != null && clazz.isInstance(existing)) {
         @Suppress("UNCHECKED_CAST")
-        return existing
+        return existing as T
     } else {
         @Suppress("ControlFlowWithEmptyBody")
         if (existing != null) {

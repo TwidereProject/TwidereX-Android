@@ -35,6 +35,7 @@ kotlin {
                 api(compose.foundation)
                 api(compose.material)
                 implementation(projects.services)
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.Kotlin.coroutines}")
                 api("androidx.paging:paging-common:${Versions.paging}")
                 api("androidx.datastore:datastore-core:${Versions.datastore}")
                 api("androidx.datastore:datastore-preferences-core:${Versions.datastore}")
@@ -45,7 +46,8 @@ kotlin {
                 implementation("org.jsoup:jsoup:1.13.1")
                 implementation(projects.routeProcessor)
                 ksp(projects.routeProcessor)
-                implementation("dev.icerock.moko:resources:${Versions.moko}")
+                api("dev.icerock.moko:resources:${Versions.moko}")
+                implementation("app.cash.turbine:turbine:0.6.1")
             }
         }
         val commonTest by getting {
@@ -53,14 +55,16 @@ kotlin {
                 implementation(kotlin("test"))
                 implementation("io.insert-koin:koin-test:${Versions.koin}")
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:${Versions.Kotlin.coroutines}")
+                implementation("io.mockk:mockk:1.12.0")
             }
         }
         val androidMain by getting {
             dependencies {
-                api("androidx.lifecycle:lifecycle-runtime-ktx:${Versions.lifecycle}")
-                api("androidx.savedstate:savedstate-ktx:1.1.0")
-                api("io.insert-koin:koin-android:${Versions.koin}")
-                api("io.insert-koin:koin-androidx-workmanager:${Versions.koin}")
+                implementation("androidx.lifecycle:lifecycle-runtime-ktx:${Versions.lifecycle}")
+                implementation("androidx.savedstate:savedstate-ktx:1.1.0")
+                implementation("androidx.core:core-ktx:1.7.0-alpha01")
+                implementation("io.insert-koin:koin-android:${Versions.koin}")
+                implementation("io.insert-koin:koin-androidx-workmanager:${Versions.koin}")
                 implementation("androidx.room:room-runtime:${Versions.room}")
                 implementation("androidx.room:room-ktx:${Versions.room}")
                 implementation("androidx.room:room-paging:${Versions.room}")
@@ -69,11 +73,14 @@ kotlin {
                 implementation("io.coil-kt:coil-compose:${Versions.coil}")
                 implementation("io.coil-kt:coil-gif:${Versions.coil}")
                 implementation("io.coil-kt:coil-svg:${Versions.coil}")
+                implementation("androidx.datastore:datastore:${Versions.datastore}")
+                implementation("androidx.datastore:datastore-preferences:${Versions.datastore}")
+                implementation("androidx.exifinterface:exifinterface:${Versions.androidx_exifinterface}")
+                implementation("androidx.startup:startup-runtime:${Versions.startup}")
             }
         }
         val androidAndroidTest by getting {
             dependencies {
-                implementation(kotlin("test-junit"))
                 implementation("androidx.arch.core:core-testing:2.1.0")
                 implementation("androidx.test:core:${Versions.androidx_test}")
                 implementation("androidx.test:runner:${Versions.androidx_test}")
@@ -82,8 +89,10 @@ kotlin {
                 implementation("androidx.room:room-testing:${Versions.room}")
             }
         }
-        val desktopMain by getting
-        val desktopTest by getting
+        val desktopMain by getting {
+            dependencies {
+            }
+        }
     }
 }
 
@@ -107,6 +116,7 @@ android {
         minSdk = AndroidSdk.min
         targetSdk = AndroidSdk.target
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunnerArguments["notPackage"] = "com.twidere.twiderex.viewmodel"
 
         javaCompileOptions {
             annotationProcessorOptions {

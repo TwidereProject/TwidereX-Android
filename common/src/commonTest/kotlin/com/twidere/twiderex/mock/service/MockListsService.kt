@@ -25,6 +25,7 @@ import com.twidere.services.microblog.MicroBlogService
 import com.twidere.services.microblog.model.IListModel
 import com.twidere.services.microblog.model.IUser
 import com.twidere.services.twitter.model.TwitterList
+import com.twidere.services.twitter.model.exceptions.TwitterApiException
 import com.twidere.twiderex.dataprovider.mapper.toUi
 import com.twidere.twiderex.mock.model.mockIListModel
 import com.twidere.twiderex.mock.model.mockIUser
@@ -55,6 +56,7 @@ internal class MockListsService : ListsService, MicroBlogService, ErrorService()
         repliesPolicy: String?
     ): IListModel {
         checkError()
+        if (name == "error") throw TwitterApiException(error = "throw exception intentional")
         return mockIListModel(
             name = name,
             description = description,
@@ -70,6 +72,7 @@ internal class MockListsService : ListsService, MicroBlogService, ErrorService()
         repliesPolicy: String?
     ): IListModel {
         checkError()
+        if (listId == "error") throw TwitterApiException(error = "throw exception intentional")
         return TwitterList(
             id = listId.toLong(),
             idStr = listId,
@@ -81,11 +84,13 @@ internal class MockListsService : ListsService, MicroBlogService, ErrorService()
 
     override suspend fun destroyList(listId: String) {
         checkError()
+        if (listId == "error") throw TwitterApiException(error = "throw exception intentional")
         // do nothing
     }
 
     override suspend fun listMembers(listId: String, count: Int, cursor: String?): List<IUser> {
         checkError()
+        if (listId == "error") throw TwitterApiException(error = "throw exception intentional")
         val list = mutableListOf<IUser>()
         for (i in 0 until count) {
             list.add(
@@ -97,17 +102,20 @@ internal class MockListsService : ListsService, MicroBlogService, ErrorService()
 
     override suspend fun addMember(listId: String, userId: String, screenName: String) {
         checkError()
+        if (listId == "error") throw TwitterApiException(error = "throw exception intentional")
         // do nothing
     }
 
     override suspend fun removeMember(listId: String, userId: String, screenName: String) {
         checkError()
+        if (listId == "error") throw TwitterApiException(error = "throw exception intentional")
         // do nothing
     }
 
     private val subscribers = mutableListOf<String>()
     override suspend fun listSubscribers(listId: String, count: Int, cursor: String?): List<IUser> {
         checkError()
+        if (listId == "error") throw TwitterApiException(error = "throw exception intentional")
         val list = mutableListOf<IUser>()
         for (i in 0 until count) {
             list.add(
@@ -125,6 +133,7 @@ internal class MockListsService : ListsService, MicroBlogService, ErrorService()
 
     override suspend fun unsubscribeList(listId: String): IListModel {
         checkError()
+        if (listId == "error") throw TwitterApiException(error = "throw exception intentional")
         return TwitterList(
             id = listId.toLong(),
             idStr = listId,
@@ -135,6 +144,7 @@ internal class MockListsService : ListsService, MicroBlogService, ErrorService()
 
     override suspend fun subscribeList(listId: String): IListModel {
         checkError()
+        if (listId == "error") throw TwitterApiException(error = "throw exception intentional")
         return TwitterList(
             id = listId.toLong(),
             idStr = listId,

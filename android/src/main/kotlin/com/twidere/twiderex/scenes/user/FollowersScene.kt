@@ -23,27 +23,22 @@ package com.twidere.twiderex.scenes.user
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
-import com.twidere.twiderex.R
 import com.twidere.twiderex.component.UserListComponent
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
-import com.twidere.twiderex.extensions.viewModel
+import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.user.FollowersViewModel
+import org.koin.core.parameter.parametersOf
 
 @Composable
 fun FollowersScene(
     userKey: MicroBlogKey,
 ) {
-    val account = LocalActiveAccount.current ?: return
-    val viewModel = viewModel(
-        account,
-        userKey,
-    ) {
-        FollowersViewModel(account, userKey)
+    val viewModel: FollowersViewModel = getViewModel {
+        parametersOf(userKey)
     }
     TwidereScene {
         InAppNotificationScaffold(

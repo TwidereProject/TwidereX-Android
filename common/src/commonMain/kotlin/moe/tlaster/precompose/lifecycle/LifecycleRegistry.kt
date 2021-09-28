@@ -43,6 +43,7 @@ class LifecycleRegistry : Lifecycle {
 
     override fun addObserver(observer: LifecycleObserver) {
         observers.add(observer)
+        observer.onStateChanged(currentState)
     }
 
     override fun hasObserver(): Boolean {

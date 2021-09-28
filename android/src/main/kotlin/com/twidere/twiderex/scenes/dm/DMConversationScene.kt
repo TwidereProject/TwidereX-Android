@@ -76,7 +76,7 @@ import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.foundation.TextInput
 import com.twidere.twiderex.component.lazy.ui.LazyUiDMEventList
-import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiDMEvent
@@ -85,15 +85,14 @@ import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.dm.DMEventViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import org.koin.core.parameter.parametersOf
 
 @OptIn(ExperimentalAnimatedInsets ::class)
 @Composable
 fun DMConversationScene(conversationKey: MicroBlogKey) {
     val account = LocalActiveAccount.current ?: return
-    val viewModel = assistedViewModel<DMEventViewModel.AssistedFactory, DMEventViewModel>(
-        account, conversationKey
-    ) {
-        it.create(account, conversationKey)
+    val viewModel: DMEventViewModel = getViewModel {
+        parametersOf(conversationKey)
     }
     val conversation by viewModel.conversation.observeAsState(null)
     TwidereScene {
@@ -127,7 +126,7 @@ fun NormalContent(viewModel: DMEventViewModel) {
     val filePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocument(),
         onResult = {
-            viewModel.inputImage.value = it
+            viewModel.inputImage.value = it.toString()
         },
     )
     val copyText = stringResource(id = com.twidere.common.R.string.scene_messages_action_copy_text)
@@ -235,7 +234,7 @@ private object MessageActionComponentDefaults {
 }
 
 @Composable
-fun InputPhotoPreview(inputImage: Uri?, onRemove: () -> Unit) {
+fun InputPhotoPreview(inputImage: String?, onRemove: () -> Unit) {
     if (inputImage == null) return
     Box(modifier = Modifier.padding(InputPhotoPreviewDefaults.ContentPadding)) {
         Box(

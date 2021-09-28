@@ -24,14 +24,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
-import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
 import com.twidere.twiderex.component.lazy.ui.LazyUiUserList
 import com.twidere.twiderex.component.navigation.LocalNavigator
+import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.refreshOrRetry
-import com.twidere.twiderex.extensions.viewModel
-import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.viewmodel.search.SearchUserViewModel
+import org.koin.core.parameter.parametersOf
 
 class SearchUserItem : SearchSceneItem {
     @Composable
@@ -41,12 +40,8 @@ class SearchUserItem : SearchSceneItem {
 
     @Composable
     override fun Content(keyword: String) {
-        val account = LocalActiveAccount.current ?: return
-        val viewModel = viewModel(
-            account,
-            keyword,
-        ) {
-            SearchUserViewModel(account, keyword)
+        val viewModel: SearchUserViewModel = getViewModel {
+            parametersOf(keyword)
         }
         val source = viewModel.source.collectAsLazyPagingItems()
         val navigator = LocalNavigator.current

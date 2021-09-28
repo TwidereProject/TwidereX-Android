@@ -40,7 +40,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.twidere.twiderex.R
 import com.twidere.twiderex.action.FakeStatusActions
 import com.twidere.twiderex.action.LocalStatusActions
 import com.twidere.twiderex.component.foundation.AppBar
@@ -53,7 +52,7 @@ import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.component.settings.RadioItem
 import com.twidere.twiderex.component.settings.switchItem
 import com.twidere.twiderex.component.status.TimelineStatusComponent
-import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.preferences.LocalDisplayPreferences
 import com.twidere.twiderex.preferences.model.DisplayPreferences
@@ -63,9 +62,7 @@ import com.twidere.twiderex.viewmodel.settings.DisplayViewModel
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun DisplayScene() {
-    val viewModel = assistedViewModel<DisplayViewModel.AssistedFactory, DisplayViewModel> {
-        it.create()
-    }
+    val viewModel: DisplayViewModel = getViewModel()
     val display = LocalDisplayPreferences.current
     TwidereScene {
         InAppNotificationScaffold(

@@ -34,6 +34,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.window.Dialog
@@ -43,34 +44,21 @@ import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.LoadingProgress
 import com.twidere.twiderex.component.lists.TwitterListsModifyComponent
-import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.navigation.RootRoute
-import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.lists.ListsCreateViewModel
+import kotlinx.coroutines.launch
 import moe.tlaster.precompose.navigation.NavOptions
 import moe.tlaster.precompose.navigation.PopUpTo
 
 @Composable
 fun TwitterListsCreateScene() {
-    val account = LocalActiveAccount.current ?: return
     val navController = LocalNavController.current
-    val listsCreateViewModel = assistedViewModel<ListsCreateViewModel.AssistedFactory, ListsCreateViewModel>(
-        account
-    ) {
-        it.create(account) { success, list ->
-            if (success) list?.apply {
-                navController.navigate(
-                    RootRoute.Lists.Timeline(listKey),
-                    options = NavOptions(
-                        popUpTo = PopUpTo(RootRoute.Lists.Home)
-                    )
-                )
-            }
-        }
-    }
+    val scope = rememberCoroutineScope()
+    val listsCreateViewModel: ListsCreateViewModel = getViewModel()
     val loading by listsCreateViewModel.loading.observeAsState(initial = false)
 
     TwidereScene {
@@ -94,17 +82,28 @@ fun TwitterListsCreateScene() {
                         IconButton(
                             enabled = name.isNotEmpty(),
                             onClick = {
-                                listsCreateViewModel.createList(
-                                    title = name,
-                                    description = desc,
-                                    private = isPrivate
-                                )
+                                scope.launch {
+                                    listsCreateViewModel.createList(
+                                        title = name,
+                                        description = desc,
+                                        private = isPrivate
+                                    )?.let {
+                                        navController.navigate(
+                                            RootRoute.Lists.Timeline(it.listKey),
+                                            options = NavOptions(
+                                                popUpTo = PopUpTo(RootRoute.Lists.Home)
+                                            )
+                                        )
+                                    }
+                                }
                             }
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Done,
                                 contentDescription = stringResource(id = com.twidere.common.R.string.common_controls_actions_confirm),
-                                tint = if (name.isNotEmpty()) MaterialTheme.colors.primary else LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
+                                tint = if (name.isNotEmpty()) MaterialTheme.colors.primary else LocalContentColor.current.copy(
+                                    alpha = LocalContentAlpha.current
+                                )
                             )
                         }
                     }

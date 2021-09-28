@@ -32,7 +32,8 @@ import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.lazy.LazyListController
-import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.di.ext.getViewModel
+import com.twidere.twiderex.model.HomeNavigationItem
 import com.twidere.twiderex.navigation.RootRoute
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.TwidereScene
@@ -83,12 +84,7 @@ fun NotificationContent(
     if (account.service !is NotificationService) {
         return
     }
-    val viewModel =
-        assistedViewModel<NotificationTimelineViewModel.AssistedFactory, NotificationTimelineViewModel>(
-            account
-        ) {
-            it.create(account)
-        }
+    val viewModel: NotificationTimelineViewModel = getViewModel()
     TimelineComponent(
         viewModel = viewModel,
         lazyListController = lazyListController,

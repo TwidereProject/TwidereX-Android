@@ -32,7 +32,8 @@ import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.lazy.LazyListController
-import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.di.ext.getViewModel
+import com.twidere.twiderex.model.HomeNavigationItem
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.timeline.NotificationTimelineViewModel
@@ -85,13 +86,7 @@ fun AllNotificationScene() {
 fun AllNotificationSceneContent(
     lazyListController: LazyListController? = null,
 ) {
-    val account = LocalActiveAccount.current ?: return
-    val viewModel =
-        assistedViewModel<NotificationTimelineViewModel.AssistedFactory, NotificationTimelineViewModel>(
-            account
-        ) {
-            it.create(account = account)
-        }
+    val viewModel: NotificationTimelineViewModel = getViewModel()
     TimelineComponent(
         viewModel = viewModel,
         lazyListController = lazyListController,

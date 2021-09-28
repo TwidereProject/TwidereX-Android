@@ -36,7 +36,6 @@ import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -46,7 +45,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.paging.LoadState
-import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.twidere.twiderex.R
@@ -58,10 +56,9 @@ import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
 import com.twidere.twiderex.component.foundation.TextInput
 import com.twidere.twiderex.component.lazy.ui.LazyUiUserList
 import com.twidere.twiderex.component.navigation.LocalNavigator
-import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.extensions.refreshOrRetry
-import com.twidere.twiderex.extensions.viewModel
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiUser
@@ -70,17 +67,15 @@ import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.lists.ListsAddMemberViewModel
 import com.twidere.twiderex.viewmodel.lists.ListsSearchUserViewModel
-import kotlinx.coroutines.flow.flowOf
+import org.koin.core.parameter.parametersOf
 
 @Composable
 fun ListsAddMembersScene(
     listKey: MicroBlogKey,
 ) {
     val account = LocalActiveAccount.current ?: return
-    val viewModel = assistedViewModel<ListsAddMemberViewModel.AssistedFactory, ListsAddMemberViewModel>(
-        account, listKey.id
-    ) {
-        it.create(account, listKey.id)
+    val viewModel: ListsAddMemberViewModel = getViewModel {
+        parametersOf(listKey.id)
     }
 
     val loading by viewModel.loading.observeAsState(initial = false)
@@ -90,15 +85,12 @@ fun ListsAddMembersScene(
         else -> false
     }
 
-    val searchViewModel = viewModel(
-        account,
-    ) {
-        ListsSearchUserViewModel(account, onlySearchFollowing)
+    val searchViewModel: ListsSearchUserViewModel = getViewModel {
+        parametersOf(onlySearchFollowing)
     }
 
     val keyword by searchViewModel.text.observeAsState(initial = "")
-    val searchSourceState by searchViewModel.sourceFlow.collectAsState(initial = null)
-    val searchSource = searchSourceState?.collectAsLazyPagingItems()
+    val searchSource = searchViewModel.source.collectAsLazyPagingItems()
     TwidereScene {
         InAppNotificationScaffold(
             topBar = {
@@ -150,7 +142,7 @@ fun ListsAddMembersScene(
             Box(modifier = Modifier.fillMaxSize()) {
                 // search result
                 SearchResultsContent(
-                    source = searchSource ?: flowOf(PagingData.from(viewModel.pendingMap.values.toMutableList())).collectAsLazyPagingItems(),
+                    source = searchSource,
                     onAction = {
                         viewModel.addToOrRemove(it)
                     },

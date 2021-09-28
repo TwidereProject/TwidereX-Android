@@ -25,6 +25,7 @@ import androidx.compose.runtime.remember
 import moe.tlaster.precompose.ui.LocalViewModelStoreOwner
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.ViewModelStoreOwner
+import moe.tlaster.precompose.viewmodel.getViewModel
 import org.koin.core.parameter.ParametersDefinition
 import org.koin.core.qualifier.Qualifier
 import org.koin.mp.KoinPlatformTools
@@ -72,5 +73,7 @@ fun <T : ViewModel> ViewModelStoreOwner.getViewModel(
     clazz: KClass<T>,
     parameters: ParametersDefinition? = null,
 ): T {
-    return KoinPlatformTools.defaultContext().get().get(clazz, qualifier, parameters)
+    return this.viewModelStore.getViewModel(qualifier?.value ?: clazz.toString(), clazz) {
+        KoinPlatformTools.defaultContext().get().get(clazz, qualifier, parameters)
+    }
 }
