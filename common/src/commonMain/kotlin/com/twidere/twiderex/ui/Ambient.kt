@@ -25,13 +25,10 @@ import android.app.Application
 import android.view.Window
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.staticCompositionLocalOf
-import androidx.core.view.WindowInsetsControllerCompat
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.preferences.model.DisplayPreferences
 import moe.tlaster.precompose.navigation.NavController
 
-val LocalWindowInsetsController =
-    staticCompositionLocalOf<WindowInsetsControllerCompat> { error("No WindowInsetsControllerCompat") }
 val LocalWindow = staticCompositionLocalOf<Window> { error("No Window") }
 val LocalNavController = staticCompositionLocalOf<NavController> { error("No NavController") }
 val LocalActiveAccount = compositionLocalOf<AccountDetails?> { null }

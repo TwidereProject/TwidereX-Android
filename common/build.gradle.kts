@@ -82,6 +82,7 @@ kotlin {
                 implementation("androidx.datastore:datastore-preferences:${Versions.datastore}")
                 implementation("androidx.exifinterface:exifinterface:${Versions.androidx_exifinterface}")
                 implementation("androidx.startup:startup-runtime:${Versions.startup}")
+                implementation("com.google.accompanist:accompanist-insets:${Versions.accompanist}")
             }
         }
         val androidAndroidTest by getting {

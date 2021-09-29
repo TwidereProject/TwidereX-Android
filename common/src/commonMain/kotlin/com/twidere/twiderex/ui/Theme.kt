@@ -22,14 +22,7 @@ package com.twidere.twiderex.ui
 
 import android.os.Build
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Colors
 import androidx.compose.material.LocalElevationOverlay
 import androidx.compose.material.MaterialTheme
@@ -38,25 +31,12 @@ import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.zIndex
-import com.google.accompanist.insets.HorizontalSide
-import com.google.accompanist.insets.Insets
-import com.google.accompanist.insets.LocalWindowInsets
-import com.google.accompanist.insets.navigationBarsHeight
-import com.google.accompanist.insets.navigationBarsPadding
-import com.google.accompanist.insets.navigationBarsWidth
-import com.google.accompanist.insets.statusBarsHeight
+import com.twidere.twiderex.component.NativeInsetsColor
+import com.twidere.twiderex.component.NativeInsetsControl
+import com.twidere.twiderex.component.PlatformInsets
 import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.preferences.LocalAppearancePreferences
 import com.twidere.twiderex.preferences.LocalDisplayPreferences
@@ -99,14 +79,6 @@ fun TwidereDialog(
     },
     content: @Composable () -> Unit,
 ) {
-    val currentDarkTheme = isDarkTheme(requireDarkTheme = false)
-    val windowInsetsController = LocalWindowInsetsController.current
-    DisposableEffect(currentDarkTheme) {
-        onDispose {
-            windowInsetsController.isAppearanceLightStatusBars = !currentDarkTheme
-            windowInsetsController.isAppearanceLightNavigationBars = !currentDarkTheme
-        }
-    }
     TwidereScene(
         requireDarkTheme,
         extendViewIntoStatusBar,
@@ -132,11 +104,6 @@ fun TwidereScene(
 ) {
     val darkTheme = isDarkTheme(requireDarkTheme)
     TwidereTheme(darkTheme = darkTheme) {
-        val windowInsetsController = LocalWindowInsetsController.current
-        LaunchedEffect(darkTheme) {
-            windowInsetsController.isAppearanceLightStatusBars = !darkTheme
-            windowInsetsController.isAppearanceLightNavigationBars = !darkTheme
-        }
         val statusBarColor = statusBarColorProvider.invoke()
         val navigationBarColor = navigationBarColorProvider.invoke().let {
             val surface = MaterialTheme.colors.surface
@@ -146,130 +113,26 @@ fun TwidereScene(
                 it
             }
         }
-        Box {
-            val actual = provideSystemInsets(
-                extendViewIntoNavigationBar,
-                extendViewIntoStatusBar
-            )
-            Box(
-                modifier = Modifier
-                    .padding(
-                        actual.let {
-                            with(LocalDensity.current) {
-                                val layoutDirection = LocalLayoutDirection.current
-                                PaddingValues(
-                                    top = it.top.toDp(),
-                                    bottom = it.bottom.toDp(),
-                                    start = when (layoutDirection) {
-                                        LayoutDirection.Ltr -> it.left.toDp()
-                                        LayoutDirection.Rtl -> it.right.toDp()
-                                    },
-                                    end = when (layoutDirection) {
-                                        LayoutDirection.Ltr -> it.right.toDp()
-                                        LayoutDirection.Rtl -> it.left.toDp()
-                                    },
-                                )
-                            }
-                        }
-                    )
-                    .align(Alignment.Center)
-            ) {
-                content()
-            }
-            Spacer(
-                modifier = if (!extendViewIntoStatusBar) {
-                    Modifier
-                        .statusBarsHeight()
-                        .navigationBarsPadding(bottom = false)
-                        .zIndex(999F)
-                        .fillMaxWidth()
-                        .background(statusBarColor)
-                } else {
-                    Modifier
-                }.align(Alignment.TopCenter)
-            )
-            Spacer(
-                modifier = if (!extendViewIntoNavigationBar) {
-                    Modifier
-                        .navigationBarsWidth(HorizontalSide.Left)
-                        .zIndex(999F)
-                        .fillMaxHeight()
-                        .background(navigationBarColor)
-                } else {
-                    Modifier
-                }.align(Alignment.CenterStart)
-            )
-            Spacer(
-                modifier = if (!extendViewIntoNavigationBar) {
-                    Modifier
-                        .navigationBarsWidth(HorizontalSide.Right)
-                        .fillMaxHeight()
-                        .zIndex(999F)
-                        .background(navigationBarColor)
-                } else {
-                    Modifier
-                }.align(Alignment.CenterEnd)
-            )
-            Spacer(
-                modifier = if (!extendViewIntoNavigationBar) {
-                    Modifier
-                        .navigationBarsHeight()
-                        .zIndex(999F)
-                        .fillMaxWidth()
-                        .background(navigationBarColor)
-                } else {
-                    Modifier
-                }.align(Alignment.BottomCenter)
-            )
-        }
-    }
-}
-
-@Composable
-private fun provideSystemInsets(
-    extendViewIntoNavigationBar: Boolean,
-    extendViewIntoStatusBar: Boolean
-): Insets {
-    val ime = LocalWindowInsets.current.ime
-    val navigation = LocalWindowInsets.current.navigationBars
-    val status = LocalWindowInsets.current.statusBars
-    return key(
-        ime,
-        ime.isVisible,
-        navigation,
-        status
-    ) {
-        ime.copy(
-            left = if (extendViewIntoNavigationBar) {
-                0
-            } else {
-                ime.left.coerceAtLeast(navigation.left)
-            },
-            right = if (extendViewIntoNavigationBar) {
-                0
-            } else {
-                ime.right.coerceAtLeast(navigation.right)
-            },
-            bottom = if (extendViewIntoNavigationBar) {
-                0
-            } else {
-                ime.bottom.coerceAtLeast(navigation.bottom)
-            },
-            top = if (extendViewIntoNavigationBar) {
-                0
-            } else {
-                ime.top.coerceAtLeast(navigation.top)
-            } + if (extendViewIntoStatusBar) {
-                0
-            } else {
-                status.top
-            },
+        PlatformInsets(
+            control = NativeInsetsControl(
+                extendToTop = extendViewIntoStatusBar,
+                extendToBottom = extendViewIntoNavigationBar,
+                extendToStart = extendViewIntoNavigationBar,
+                extendToEnd = extendViewIntoNavigationBar,
+            ),
+            color = NativeInsetsColor(
+                top = statusBarColor,
+                start = navigationBarColor,
+                end = navigationBarColor,
+                bottom = navigationBarColor,
+            ),
+            content = content,
         )
     }
 }
 
 @Composable
-private fun isDarkTheme(requireDarkTheme: Boolean = false): Boolean {
+fun isDarkTheme(requireDarkTheme: Boolean = false): Boolean {
     val appearance = LocalAppearancePreferences.current
     val theme = appearance.theme
     return if (requireDarkTheme) {
@@ -279,7 +142,6 @@ private fun isDarkTheme(requireDarkTheme: Boolean = false): Boolean {
             AppearancePreferences.Theme.Auto -> isSystemInDarkTheme()
             AppearancePreferences.Theme.Light -> false
             AppearancePreferences.Theme.Dark -> true
-            else -> false
         }
     }
 }
