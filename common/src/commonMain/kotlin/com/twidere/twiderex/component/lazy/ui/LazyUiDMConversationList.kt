@@ -20,7 +20,6 @@
  */
 package com.twidere.twiderex.component.lazy.ui
 
-import android.content.Context
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -38,7 +37,6 @@ import androidx.compose.material.ListItem
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.items
@@ -49,6 +47,8 @@ import com.twidere.twiderex.component.status.ResolvedLink
 import com.twidere.twiderex.component.status.RoundAvatar
 import com.twidere.twiderex.component.status.UserName
 import com.twidere.twiderex.component.status.UserScreenName
+import com.twidere.twiderex.compose.LocalResLoader
+import com.twidere.twiderex.kmp.ResLoader
 import com.twidere.twiderex.model.ui.UiDMConversationWithLatestMessage
 import com.twidere.twiderex.model.ui.UiDMEvent
 
@@ -63,7 +63,7 @@ fun LazyUiDMConversationList(
     header: LazyListScope.() -> Unit = {},
     action: @Composable (user: UiDMConversationWithLatestMessage) -> Unit = {}
 ) {
-    val context = LocalContext.current
+    val resLoader = LocalResLoader.current
     LazyUiList(items = items) {
         LazyColumn(
             modifier = modifier,
@@ -94,7 +94,11 @@ fun LazyUiDMConversationList(
                             text = {
                                 Row {
                                     UserName(userName = it.conversation.conversationName)
-                                    Spacer(modifier = Modifier.width(LazyUiDMConversationListDefaults.HorizontalPadding))
+                                    Spacer(
+                                        modifier = Modifier.width(
+                                            LazyUiDMConversationListDefaults.HorizontalPadding
+                                        )
+                                    )
                                     UserScreenName(name = it.conversation.conversationSubName)
                                 }
                             },
@@ -102,8 +106,12 @@ fun LazyUiDMConversationList(
                                 HtmlText(
                                     htmlText = it.latestMessage.htmlText,
                                     maxLines = 1,
-                                    linkResolver = { href -> it.latestMessage.resolveLink(href, context) },
-
+                                    linkResolver = { href ->
+                                        it.latestMessage.resolveLink(
+                                            href,
+                                            resLoader
+                                        )
+                                    },
                                 )
                             },
                         )
@@ -146,7 +154,7 @@ private fun LoadingUserPlaceholder() {
 
 private fun UiDMEvent.resolveLink(
     href: String,
-    context: Context
+    resLoader: ResLoader,
 ): ResolvedLink {
     val entity = urlEntity.firstOrNull { it.url == href }
     val media = media.firstOrNull { it.url == href }
@@ -160,7 +168,7 @@ private fun UiDMEvent.resolveLink(
         entity != null -> {
             if (entity.displayUrl.contains("pic.twitter.com")) {
                 ResolvedLink(
-                    expanded = context.getString(com.twidere.twiderex.MR.strings.scene_messages_expanded_photo),
+                    expanded = resLoader.getString(com.twidere.twiderex.MR.strings.scene_messages_expanded_photo),
                     clickable = false
                 )
             } else {

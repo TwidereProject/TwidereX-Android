@@ -66,7 +66,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.paging.compose.collectAsLazyPagingItems
-import com.google.accompanist.insets.ExperimentalAnimatedInsets
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
@@ -86,7 +85,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.koin.core.parameter.parametersOf
 
-@OptIn(ExperimentalAnimatedInsets ::class)
 @Composable
 fun DMConversationScene(conversationKey: MicroBlogKey) {
     val account = LocalActiveAccount.current ?: return
