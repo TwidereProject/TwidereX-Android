@@ -44,14 +44,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
-import com.twidere.twiderex.component.painterResource
-import com.twidere.twiderex.component.stringResource
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.items
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.navigation.LocalNavigator
+import com.twidere.twiderex.component.painterResource
+import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.component.trend.MastodonTrendItem
 import com.twidere.twiderex.component.trend.TwitterTrendItem
 import com.twidere.twiderex.di.ext.getViewModel

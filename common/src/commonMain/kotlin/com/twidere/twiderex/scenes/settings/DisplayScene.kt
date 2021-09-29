@@ -38,7 +38,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import com.twidere.twiderex.component.stringResource
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.action.FakeStatusActions
 import com.twidere.twiderex.action.LocalStatusActions
@@ -52,6 +51,7 @@ import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.component.settings.RadioItem
 import com.twidere.twiderex.component.settings.switchItem
 import com.twidere.twiderex.component.status.TimelineStatusComponent
+import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.preferences.LocalDisplayPreferences

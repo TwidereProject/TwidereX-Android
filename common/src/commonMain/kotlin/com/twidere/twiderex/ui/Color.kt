@@ -24,7 +24,6 @@ import androidx.compose.material.ContentAlpha
 import androidx.compose.material.LocalContentColor
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import com.twidere.twiderex.extensions.isDarkTheme
 import com.twidere.twiderex.preferences.LocalAppearancePreferences
 
 val mediumEmphasisContentContentColor: Color

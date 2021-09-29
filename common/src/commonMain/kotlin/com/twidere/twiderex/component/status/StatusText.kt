@@ -43,8 +43,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import com.twidere.twiderex.component.painterResource
 import androidx.compose.ui.unit.dp
+import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiStatus
 

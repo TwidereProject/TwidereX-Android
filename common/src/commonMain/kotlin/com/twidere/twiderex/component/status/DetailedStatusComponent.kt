@@ -43,10 +43,10 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
-import com.twidere.twiderex.component.painterResource
-import com.twidere.twiderex.component.stringResource
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.component.FormattedTime
+import com.twidere.twiderex.component.painterResource
+import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.extensions.humanizedCount
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiStatus

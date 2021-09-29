@@ -44,15 +44,14 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import com.twidere.twiderex.component.painterResource
-import com.twidere.twiderex.component.stringResource
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.items
 import com.twidere.twiderex.component.lazy.loadState
+import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.status.StatusDivider
+import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.model.enums.ListType
 import com.twidere.twiderex.model.ui.UiList
 import moe.tlaster.placeholder.TextPlaceHolder
@@ -237,7 +236,6 @@ private fun DividerListItem(
         )
     }
 }
-
 
 @Composable
 private fun EmptyList() {

@@ -43,7 +43,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
-import com.twidere.twiderex.component.stringResource
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
@@ -58,6 +57,7 @@ import com.google.android.exoplayer2.ui.PlayerControlView
 import com.google.android.exoplayer2.ui.StyledPlayerView
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.twidere.twiderex.component.status.UserAvatarDefaults
+import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.http.TwidereServiceFactory
 import com.twidere.twiderex.preferences.LocalHttpConfig
 import com.twidere.twiderex.preferences.model.DisplayPreferences

@@ -96,8 +96,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import com.twidere.twiderex.component.painterResource
-import com.twidere.twiderex.component.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.TextFieldValue
@@ -110,12 +108,14 @@ import com.twidere.twiderex.component.foundation.InAppNotificationBottomSheetSca
 import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.foundation.TextInput
 import com.twidere.twiderex.component.lazy.itemsGridIndexed
+import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.status.StatusLineComponent
 import com.twidere.twiderex.component.status.TimelineStatusComponent
 import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.component.status.UserAvatarDefaults
 import com.twidere.twiderex.component.status.UserName
 import com.twidere.twiderex.component.status.UserScreenName
+import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.icon
 import com.twidere.twiderex.extensions.observeAsState
@@ -275,7 +275,7 @@ private fun ComposeBody(
                             Icon(
                                 painter = painterResource(res = if (enableThreadMode) com.twidere.twiderex.MR.files.send_thread else com.twidere.twiderex.MR.files.send),
                                 contentDescription = stringResource(
-                                    id = if (enableThreadMode) com.twidere.twiderex.MR.strings.accessibility_scene_compose_thread else com.twidere.twiderex.MR.strings.accessibility_scene_compose_send
+                                    res = if (enableThreadMode) com.twidere.twiderex.MR.strings.accessibility_scene_compose_thread else com.twidere.twiderex.MR.strings.accessibility_scene_compose_send
                                 ),
                                 tint = if (canSend) MaterialTheme.colors.primary else LocalContentColor.current.copy(
                                     alpha = LocalContentAlpha.current
@@ -1264,7 +1264,7 @@ private fun ComposeActions(
                     Icon(
                         painter = painterResource(res = com.twidere.twiderex.MR.files.map_pin),
                         contentDescription = stringResource(
-                            id = if (locationEnabled) {
+                            res = if (locationEnabled) {
                                 com.twidere.twiderex.MR.strings.accessibility_scene_compose_location_disable
                             } else {
                                 com.twidere.twiderex.MR.strings.accessibility_scene_compose_location_enable
@@ -1296,7 +1296,7 @@ private fun ComposeActions(
                     Box {
                         Icon(
                             painter = painterResource(
-                                id = if (draftCount.value > 9)
+                                res = if (draftCount.value > 9)
                                     com.twidere.twiderex.MR.files.drafts_more
                                 else
                                     com.twidere.twiderex.MR.files.draft_number

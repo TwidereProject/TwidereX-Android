@@ -48,6 +48,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import com.google.accompanist.insets.HorizontalSide
 import com.google.accompanist.insets.Insets
@@ -268,7 +269,7 @@ private fun provideSystemInsets(
 }
 
 @Composable
-private fun isDarkTheme(requireDarkTheme: Boolean): Boolean {
+private fun isDarkTheme(requireDarkTheme: Boolean = false): Boolean {
     val appearance = LocalAppearancePreferences.current
     val theme = appearance.theme
     return if (requireDarkTheme) {
@@ -289,14 +290,14 @@ private fun provideTypography(): Typography {
     val useSystemFontSize = display.useSystemFontSize
     val fontScale = display.fontScale
     val baseTypography = Typography()
-    // classical text rendering (like the old twidere)
-    // .let {
-    //     it.copy(
-    //         body1 = it.body1.copy(fontSize = 14.sp, letterSpacing = 0.sp),
-    //         body2 = it.body2.copy(letterSpacing = 0.sp),
-    //         caption = it.caption.copy(letterSpacing = 0.sp),
-    //     )
-    // }
+        // classical text rendering (like the old twidere)
+        .let {
+            it.copy(
+                body1 = it.body1.copy(fontSize = 14.sp, letterSpacing = 0.sp),
+                body2 = it.body2.copy(letterSpacing = 0.sp),
+                caption = it.caption.copy(letterSpacing = 0.sp),
+            )
+        }
     return if (useSystemFontSize) {
         baseTypography
     } else {

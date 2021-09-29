@@ -28,8 +28,8 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.twidere.twiderex.component.stringResource
 import androidx.compose.ui.unit.dp
+import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.model.ui.UiStatus
 
 @Composable

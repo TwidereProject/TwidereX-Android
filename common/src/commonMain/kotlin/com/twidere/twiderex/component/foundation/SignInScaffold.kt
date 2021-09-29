@@ -43,10 +43,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
-import com.twidere.twiderex.component.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.component.LoginLogo
+import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.ui.TwidereScene
 
 @Composable

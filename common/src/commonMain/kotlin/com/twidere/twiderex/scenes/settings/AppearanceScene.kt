@@ -53,7 +53,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import com.twidere.twiderex.component.stringResource
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
@@ -63,11 +62,12 @@ import com.twidere.twiderex.component.lazy.ItemHeader
 import com.twidere.twiderex.component.settings.RadioItem
 import com.twidere.twiderex.component.settings.switchItem
 import com.twidere.twiderex.component.status.UserAvatarDefaults
+import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.di.ext.getViewModel
-import com.twidere.twiderex.extensions.isDarkTheme
 import com.twidere.twiderex.preferences.LocalAppearancePreferences
 import com.twidere.twiderex.preferences.model.AppearancePreferences
 import com.twidere.twiderex.ui.TwidereScene
+import com.twidere.twiderex.ui.isDarkTheme
 import com.twidere.twiderex.ui.primaryColors
 import com.twidere.twiderex.viewmodel.settings.AppearanceViewModel
 

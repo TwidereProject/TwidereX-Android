@@ -25,10 +25,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import com.twidere.twiderex.component.stringResource
 import androidx.compose.ui.window.Dialog
 import com.twidere.twiderex.component.foundation.LoadingProgress
 import com.twidere.twiderex.component.lists.MastodonListsModifyComponent
+import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.model.MicroBlogKey

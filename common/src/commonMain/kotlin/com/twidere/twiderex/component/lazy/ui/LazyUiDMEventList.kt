@@ -62,13 +62,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import com.twidere.twiderex.component.painterResource
-import com.twidere.twiderex.component.stringResource
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.items
 import com.twidere.twiderex.component.lazy.loadState
+import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.placeholder.UiUserPlaceholder
 import com.twidere.twiderex.component.status.HtmlText
 import com.twidere.twiderex.component.status.ResolvedLink
@@ -76,6 +75,7 @@ import com.twidere.twiderex.component.status.StatusMediaDefaults
 import com.twidere.twiderex.component.status.StatusMediaPreviewItem
 import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.component.status.UserAvatarDefaults
+import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.model.ui.UiDMEvent
 import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.navigation.RootRoute

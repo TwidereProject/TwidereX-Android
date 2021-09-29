@@ -22,27 +22,26 @@ package com.twidere.twiderex.extensions
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import com.twidere.twiderex.R
+import com.twidere.twiderex.component.painterResource
+import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.model.enums.MastodonVisibility
 
 @Composable
 fun MastodonVisibility.icon(): Painter {
     return when (this) {
-        MastodonVisibility.Public -> painterResource(id = R.drawable.ic_globe)
-        MastodonVisibility.Unlisted -> painterResource(id = R.drawable.ic_lock_open)
-        MastodonVisibility.Private -> painterResource(id = R.drawable.ic_lock)
-        MastodonVisibility.Direct -> painterResource(id = R.drawable.ic_mail)
+        MastodonVisibility.Public -> painterResource(res = com.twidere.twiderex.MR.files.globe)
+        MastodonVisibility.Unlisted -> painterResource(res = com.twidere.twiderex.MR.files.lock_open)
+        MastodonVisibility.Private -> painterResource(res = com.twidere.twiderex.MR.files.lock)
+        MastodonVisibility.Direct -> painterResource(res = com.twidere.twiderex.MR.files.mail)
     }
 }
 
 @Composable
 fun MastodonVisibility.stringName(): String {
     return when (this) {
-        MastodonVisibility.Public -> stringResource(id = com.twidere.common.R.string.scene_compose_visibility_public)
-        MastodonVisibility.Unlisted -> stringResource(id = com.twidere.common.R.string.scene_compose_visibility_unlisted)
-        MastodonVisibility.Private -> stringResource(id = com.twidere.common.R.string.scene_compose_visibility_private)
-        MastodonVisibility.Direct -> stringResource(id = com.twidere.common.R.string.scene_compose_visibility_direct)
+        MastodonVisibility.Public -> stringResource(res = com.twidere.twiderex.MR.strings.scene_compose_visibility_public)
+        MastodonVisibility.Unlisted -> stringResource(res = com.twidere.twiderex.MR.strings.scene_compose_visibility_unlisted)
+        MastodonVisibility.Private -> stringResource(res = com.twidere.twiderex.MR.strings.scene_compose_visibility_private)
+        MastodonVisibility.Direct -> stringResource(res = com.twidere.twiderex.MR.strings.scene_compose_visibility_direct)
     }
 }

@@ -27,8 +27,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.graphics.painter.Painter
-import com.twidere.twiderex.component.painterResource
-import com.twidere.twiderex.component.stringResource
 import com.twidere.services.microblog.NotificationService
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
@@ -37,6 +35,8 @@ import com.twidere.twiderex.component.foundation.Pager
 import com.twidere.twiderex.component.foundation.TextTabsComponent
 import com.twidere.twiderex.component.foundation.rememberPagerState
 import com.twidere.twiderex.component.lazy.LazyListController
+import com.twidere.twiderex.component.painterResource
+import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.model.HomeNavigationItem
 import com.twidere.twiderex.navigation.RootRoute
 import com.twidere.twiderex.scenes.home.AllNotificationItem

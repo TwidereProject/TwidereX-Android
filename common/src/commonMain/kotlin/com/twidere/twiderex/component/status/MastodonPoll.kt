@@ -64,9 +64,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import com.twidere.twiderex.component.stringResource
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.action.LocalStatusActions
+import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.extensions.humanizedTimestamp
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.Option

@@ -38,7 +38,6 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.twidere.twiderex.component.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.items
@@ -47,6 +46,7 @@ import com.twidere.twiderex.component.placeholder.UiUserPlaceholder
 import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.component.status.UserName
 import com.twidere.twiderex.component.status.UserScreenName
+import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.model.ui.UiUser
 
 @OptIn(ExperimentalMaterialApi::class)

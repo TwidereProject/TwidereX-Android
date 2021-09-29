@@ -22,11 +22,11 @@ package com.twidere.twiderex.scenes.lists
 
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.component.UserListComponent
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
+import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.ui.TwidereScene

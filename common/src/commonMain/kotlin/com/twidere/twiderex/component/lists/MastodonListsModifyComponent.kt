@@ -34,8 +34,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import com.twidere.twiderex.component.stringResource
 import androidx.compose.ui.unit.dp
+import com.twidere.twiderex.component.stringResource
 
 @Composable
 fun MastodonListsModifyComponent(

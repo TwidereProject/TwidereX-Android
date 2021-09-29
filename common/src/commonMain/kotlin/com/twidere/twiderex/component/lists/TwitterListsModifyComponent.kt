@@ -49,13 +49,13 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import com.twidere.twiderex.component.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.component.foundation.ColoredSwitch
+import com.twidere.twiderex.component.stringResource
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
