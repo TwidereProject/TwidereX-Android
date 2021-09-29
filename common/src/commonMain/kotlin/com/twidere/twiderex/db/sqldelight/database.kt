@@ -24,7 +24,9 @@ import com.squareup.sqldelight.db.SqlDriver
 import com.twidere.twiderex.db.sqldelight.adapter.DMConversationAdapterFactory
 import com.twidere.twiderex.db.sqldelight.adapter.DMEventAdapterFactory
 import com.twidere.twiderex.db.sqldelight.adapter.DraftAdapterFactory
+import com.twidere.twiderex.db.sqldelight.adapter.ListAdapterFactory
 import com.twidere.twiderex.db.sqldelight.adapter.MediaAdapterFactory
+import com.twidere.twiderex.db.sqldelight.adapter.NotificationCursorAdapterFactory
 import com.twidere.twiderex.db.sqldelight.adapter.SearchAdapterFactory
 import com.twidere.twiderex.db.sqldelight.adapter.TrendAdapterFactory
 import com.twidere.twiderex.db.sqldelight.adapter.TrendHistoryAdapterFactory
@@ -52,6 +54,8 @@ internal fun createCacheDataBase(driver: SqlDriver): SqlDelightCacheDatabase {
         UserAdapter = UserAdapterFactory.create(),
         DMConversationAdapter = DMConversationAdapterFactory.create(),
         TrendAdapter = TrendAdapterFactory.create(),
-        TrendHistoryAdapter = TrendHistoryAdapterFactory.create()
+        TrendHistoryAdapter = TrendHistoryAdapterFactory.create(),
+        DbNotificationCursorAdapter = NotificationCursorAdapterFactory.create(),
+        ListAdapter = ListAdapterFactory.create()
     )
 }
