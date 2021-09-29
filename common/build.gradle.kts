@@ -18,6 +18,9 @@ repositories {
     google()
 }
 
+// TODO: workaround for https://github.com/google/ksp/issues/518
+evaluationDependsOn(":routeProcessor")
+
 kotlin {
     android()
     jvm("desktop") {
