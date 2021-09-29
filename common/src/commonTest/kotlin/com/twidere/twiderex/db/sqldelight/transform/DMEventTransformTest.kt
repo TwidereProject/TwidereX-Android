@@ -21,7 +21,6 @@
 package com.twidere.twiderex.db.sqldelight.transform
 
 import com.twidere.twiderex.dataprovider.mapper.toUi
-import com.twidere.twiderex.db.sqldelight.model.DbDMEventWithAttachments
 import com.twidere.twiderex.mock.model.mockIUser
 import com.twidere.twiderex.mock.model.mockUiMedia
 import com.twidere.twiderex.mock.model.mockUiUrlEntity
@@ -53,27 +52,7 @@ internal class DMEventTransformTest {
         )
         val id = UUID.randomUUID().toString()
         val db = ui.toDbEventWithAttachments(dbId = id)
-        assertSuccess(db, ui)
-
-        val uiFromDb = db.toUi()
-        assertSuccess(db, uiFromDb)
-    }
-
-    private fun assertSuccess(db: DbDMEventWithAttachments, ui: UiDMEvent) {
-        assertEquals(db.event.accountKey, ui.accountKey)
-        assertEquals(db.sender.userKey, ui.sender.userKey)
-        assertEquals(db.event.sortId, ui.sortId)
-        assertEquals(db.event.conversationKey, ui.conversationKey)
-        assertEquals(db.event.messageId, ui.messageId)
-        assertEquals(db.event.messageKey, ui.messageKey)
-        assertEquals(db.event.htmlText, ui.htmlText)
-        assertEquals(db.event.originText, ui.originText)
-        assertEquals(db.event.createdTimestamp, ui.createdTimestamp)
-        assertEquals(db.event.messageType, ui.messageType)
-        assertEquals(db.event.senderAccountKey, ui.senderAccountKey)
-        assertEquals(db.event.recipientAccountKey, ui.recipientAccountKey)
-        assertEquals(db.event.sendStatus, ui.sendStatus)
-        assertEquals(db.media.first().url, ui.media.first().url)
-        assertEquals(db.url.first().url, ui.urlEntity.first().url)
+        assertEquals(ui, db.toUi())
+        assertEquals(id, db.event.id)
     }
 }

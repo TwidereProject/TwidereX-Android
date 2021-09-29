@@ -23,39 +23,12 @@ package com.twidere.twiderex.db.sqldelight.transform
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.MediaType
 import com.twidere.twiderex.model.ui.UiMedia
-import com.twidere.twiderex.sqldelight.table.Media
 import org.junit.Test
 import kotlin.test.assertEquals
 
 internal class MediaTransformTest {
     @Test
-    fun mediaToUi() {
-        val db = Media(
-            belongToKey = MicroBlogKey.valueOf("test"),
-            url = "url",
-            mediaUrl = "mediaUrl",
-            previewUrl = "previewUrl",
-            type = MediaType.video,
-            width = 100,
-            height = 100,
-            pageUrl = "pageUrl",
-            altText = "altText",
-            orderIndex = 5
-        )
-        val ui = db.toUi()
-        assertEquals(db.belongToKey, ui.belongToKey)
-        assertEquals(db.url, ui.url)
-        assertEquals(db.mediaUrl, ui.mediaUrl)
-        assertEquals(db.type, ui.type)
-        assertEquals(db.width, ui.width)
-        assertEquals(db.height, ui.height)
-        assertEquals(db.pageUrl, ui.pageUrl)
-        assertEquals(db.altText, ui.altText)
-        assertEquals(db.orderIndex.toInt(), ui.order)
-    }
-
-    @Test
-    fun uiToMedia() {
+    fun transform() {
         val ui = UiMedia(
             belongToKey = MicroBlogKey.valueOf("test"),
             url = "url",
@@ -69,14 +42,6 @@ internal class MediaTransformTest {
             order = 5
         )
         val db = ui.toDbMedia()
-        assertEquals(db.belongToKey, ui.belongToKey)
-        assertEquals(db.url, ui.url)
-        assertEquals(db.mediaUrl, ui.mediaUrl)
-        assertEquals(db.type, ui.type)
-        assertEquals(db.width, ui.width)
-        assertEquals(db.height, ui.height)
-        assertEquals(db.pageUrl, ui.pageUrl)
-        assertEquals(db.altText, ui.altText)
-        assertEquals(db.orderIndex.toInt(), ui.order)
+        assertEquals(ui, db.toUi())
     }
 }

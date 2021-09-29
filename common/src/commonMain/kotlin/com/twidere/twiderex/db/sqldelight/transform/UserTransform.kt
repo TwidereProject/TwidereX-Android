@@ -26,11 +26,11 @@ import com.twidere.twiderex.model.ui.UserExtra
 import com.twidere.twiderex.model.ui.UserMetrics
 import com.twidere.twiderex.model.ui.mastodon.MastodonUserExtra
 import com.twidere.twiderex.model.ui.twitter.TwitterUserExtra
-import com.twidere.twiderex.sqldelight.table.User
+import com.twidere.twiderex.sqldelight.table.DbUser
 import com.twidere.twiderex.utils.fromJson
 import com.twidere.twiderex.utils.json
 
-fun UiUser.toDbUser() = User(
+fun UiUser.toDbUser() = DbUser(
     id = id,
     userKey = userKey,
     acct = acct,
@@ -60,7 +60,7 @@ fun UserExtra.toDbUserExtra(): String {
     }
 }
 
-fun User.toUi() = UiUser(
+fun DbUser.toUi() = UiUser(
     id = id,
     userKey = userKey,
     acct = acct,

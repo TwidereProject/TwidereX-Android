@@ -48,14 +48,14 @@ internal fun createCacheDataBase(driver: SqlDriver): SqlDelightCacheDatabase {
     SqlDelightCacheDatabase.Schema.create(driver)
     return SqlDelightCacheDatabase(
         driver = driver,
-        DMEventAdapter = DMEventAdapterFactory.create(),
-        MediaAdapter = MediaAdapterFactory.create(),
-        UrlEntityAdapter = UrlEntityAdapterFactory.create(),
-        UserAdapter = UserAdapterFactory.create(),
-        DMConversationAdapter = DMConversationAdapterFactory.create(),
-        TrendAdapter = TrendAdapterFactory.create(),
-        TrendHistoryAdapter = TrendHistoryAdapterFactory.create(),
+        DbDMEventAdapter = DMEventAdapterFactory.create(),
+        DbMediaAdapter = MediaAdapterFactory.create(),
+        DbUrlEntityAdapter = UrlEntityAdapterFactory.create(),
+        DbUserAdapter = UserAdapterFactory.create(),
+        DbDMConversationAdapter = DMConversationAdapterFactory.create(),
+        DbTrendAdapter = TrendAdapterFactory.create(),
+        DbTrendHistoryAdapter = TrendHistoryAdapterFactory.create(),
         DbNotificationCursorAdapter = NotificationCursorAdapterFactory.create(),
-        ListAdapter = ListAdapterFactory.create()
+        DbListAdapter = ListAdapterFactory.create()
     )
 }

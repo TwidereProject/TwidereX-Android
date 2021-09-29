@@ -20,12 +20,12 @@
  */
 package com.twidere.twiderex.db.sqldelight.adapter
 
-import com.twidere.twiderex.sqldelight.table.Trend
-import com.twidere.twiderex.sqldelight.table.TrendHistory
+import com.twidere.twiderex.sqldelight.table.DbTrend
+import com.twidere.twiderex.sqldelight.table.DbTrendHistory
 
 object TrendAdapterFactory {
     fun create() = MicroBlogKeyColumnAdapter().let {
-        Trend.Adapter(
+        DbTrend.Adapter(
             trendKeyAdapter = it,
             accountKeyAdapter = it,
         )
@@ -34,7 +34,7 @@ object TrendAdapterFactory {
 
 object TrendHistoryAdapterFactory {
     fun create() = MicroBlogKeyColumnAdapter().let {
-        TrendHistory.Adapter(
+        DbTrendHistory.Adapter(
             trendKeyAdapter = it,
             accountKeyAdapter = it,
         )

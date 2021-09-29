@@ -22,11 +22,11 @@ package com.twidere.twiderex.db.sqldelight.transform
 
 import com.twidere.twiderex.db.sqldelight.model.DbDMEventWithAttachments
 import com.twidere.twiderex.model.ui.UiDMEvent
-import com.twidere.twiderex.sqldelight.table.DMEvent
+import com.twidere.twiderex.sqldelight.table.DbDMEvent
 import java.util.UUID
 
 internal fun UiDMEvent.toDbEventWithAttachments(dbId: String = UUID.randomUUID().toString()) = DbDMEventWithAttachments(
-    event = DMEvent(
+    event = DbDMEvent(
         id = dbId,
         accountKey = accountKey,
         sortId = sortId,

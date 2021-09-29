@@ -21,12 +21,12 @@
 package com.twidere.twiderex.db.sqldelight.model
 
 import com.twidere.twiderex.sqldelight.SqlDelightCacheDatabase
-import com.twidere.twiderex.sqldelight.table.Trend
-import com.twidere.twiderex.sqldelight.table.TrendHistory
+import com.twidere.twiderex.sqldelight.table.DbTrend
+import com.twidere.twiderex.sqldelight.table.DbTrendHistory
 
 internal data class DbTrendWithHistory(
-    val trend: Trend,
-    val history: List<TrendHistory>
+    val trend: DbTrend,
+    val history: List<DbTrendHistory>
 ) {
     companion object {
         fun List<DbTrendWithHistory>.saveToDb(database: SqlDelightCacheDatabase) {
@@ -36,7 +36,7 @@ internal data class DbTrendWithHistory(
             }
         }
 
-        fun Trend.withHistory(database: SqlDelightCacheDatabase) = DbTrendWithHistory(
+        fun DbTrend.withHistory(database: SqlDelightCacheDatabase) = DbTrendWithHistory(
             trend = this,
             history = database.trendHistoryQueries.findWithTrendKey(
                 trendKey = trendKey,

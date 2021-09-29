@@ -24,10 +24,10 @@ import com.twidere.twiderex.db.sqldelight.model.DbTrendWithHistory
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiTrend
 import com.twidere.twiderex.model.ui.UiTrendHistory
-import com.twidere.twiderex.sqldelight.table.Trend
-import com.twidere.twiderex.sqldelight.table.TrendHistory
+import com.twidere.twiderex.sqldelight.table.DbTrend
+import com.twidere.twiderex.sqldelight.table.DbTrendHistory
 
-internal fun UiTrendHistory.toDbTrendHistory(accountKey: MicroBlogKey) = TrendHistory(
+internal fun UiTrendHistory.toDbTrendHistory(accountKey: MicroBlogKey) = DbTrendHistory(
     trendKey = trendKey,
     accountKey = accountKey,
     day = day,
@@ -36,7 +36,7 @@ internal fun UiTrendHistory.toDbTrendHistory(accountKey: MicroBlogKey) = TrendHi
 )
 
 internal fun UiTrend.toDbTrendWithHistory() = DbTrendWithHistory(
-    trend = Trend(
+    trend = DbTrend(
         trendKey = trendKey,
         accountKey = accountKey,
         displayName = displayName,
@@ -47,7 +47,7 @@ internal fun UiTrend.toDbTrendWithHistory() = DbTrendWithHistory(
     history = history.map { it.toDbTrendHistory(accountKey) }
 )
 
-internal fun TrendHistory.toUi() = UiTrendHistory(
+internal fun DbTrendHistory.toUi() = UiTrendHistory(
     trendKey = trendKey,
     day = day,
     uses = uses,

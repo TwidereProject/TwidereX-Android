@@ -1,11 +1,11 @@
 clearAllTables{
-    DELETE FROM DMEvent;
-    DELETE FROM Media;
-    DELETE FROM UrlEntity;
-    DELETE FROM User;
-    DELETE FROM DMConversation;
-    DELETE FROM Trend;
-    DELETE FROM TrendHistory;
+    DELETE FROM DbDMEvent;
+    DELETE FROM DbMedia;
+    DELETE FROM DbUrlEntity;
+    DELETE FROM DbUser;
+    DELETE FROM DbDMConversation;
+    DELETE FROM DbTrend;
+    DELETE FROM DbTrendHistory;
     DELETE FROM DbNotificationCursor;
-    DELETE FROM List;
+    DELETE FROM DbList;
 }

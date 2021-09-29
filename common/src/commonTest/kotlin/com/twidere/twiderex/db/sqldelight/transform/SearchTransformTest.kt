@@ -22,28 +22,13 @@ package com.twidere.twiderex.db.sqldelight.transform
 
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiSearch
-import com.twidere.twiderex.sqldelight.table.Search
 import org.junit.Test
 import kotlin.test.assertEquals
 
 internal class SearchTransformTest {
-    @Test
-    fun searchToUi() {
-        val search = Search(
-            content = "search",
-            lastActive = System.currentTimeMillis(),
-            accountKey = MicroBlogKey.valueOf("test"),
-            saved = true
-        )
-        val uiSearch = search.toUi()
-        assertEquals(search.content, uiSearch.content)
-        assertEquals(search.lastActive, uiSearch.lastActive)
-        assertEquals(search.accountKey, uiSearch.accountKey)
-        assertEquals(search.saved, uiSearch.saved)
-    }
 
     @Test
-    fun uiTosearch() {
+    fun transform() {
         val uiSearch = UiSearch(
             content = "search",
             lastActive = System.currentTimeMillis(),
@@ -51,9 +36,6 @@ internal class SearchTransformTest {
             saved = true
         )
         val search = uiSearch.toDbSearch()
-        assertEquals(search.content, uiSearch.content)
-        assertEquals(search.lastActive, uiSearch.lastActive)
-        assertEquals(search.accountKey, uiSearch.accountKey)
-        assertEquals(search.saved, uiSearch.saved)
+        assertEquals(uiSearch, search.toUi())
     }
 }

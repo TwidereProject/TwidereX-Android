@@ -21,9 +21,9 @@
 package com.twidere.twiderex.db.sqldelight.transform
 
 import com.twidere.twiderex.model.ui.UiMedia
-import com.twidere.twiderex.sqldelight.table.Media
+import com.twidere.twiderex.sqldelight.table.DbMedia
 
-internal fun Media.toUi() = UiMedia(
+internal fun DbMedia.toUi() = UiMedia(
     url = url,
     belongToKey = belongToKey,
     mediaUrl = mediaUrl,
@@ -36,7 +36,7 @@ internal fun Media.toUi() = UiMedia(
     order = orderIndex.toInt()
 )
 
-internal fun UiMedia.toDbMedia() = Media(
+internal fun UiMedia.toDbMedia() = DbMedia(
     url = url,
     belongToKey = belongToKey,
     mediaUrl = mediaUrl,

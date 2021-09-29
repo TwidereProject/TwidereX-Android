@@ -21,19 +21,19 @@
 package com.twidere.twiderex.db.sqldelight.model
 
 import com.twidere.twiderex.sqldelight.SqlDelightCacheDatabase
-import com.twidere.twiderex.sqldelight.table.DMEvent
-import com.twidere.twiderex.sqldelight.table.Media
-import com.twidere.twiderex.sqldelight.table.UrlEntity
-import com.twidere.twiderex.sqldelight.table.User
+import com.twidere.twiderex.sqldelight.table.DbDMEvent
+import com.twidere.twiderex.sqldelight.table.DbMedia
+import com.twidere.twiderex.sqldelight.table.DbUrlEntity
+import com.twidere.twiderex.sqldelight.table.DbUser
 
 internal data class DbDMEventWithAttachments(
-    val event: DMEvent,
-    val media: List<Media>,
-    val url: List<UrlEntity>,
-    val sender: User
+    val event: DbDMEvent,
+    val media: List<DbMedia>,
+    val url: List<DbUrlEntity>,
+    val sender: DbUser
 ) {
     companion object {
-        fun DMEvent.withAttachments(database: SqlDelightCacheDatabase): DbDMEventWithAttachments {
+        fun DbDMEvent.withAttachments(database: SqlDelightCacheDatabase): DbDMEventWithAttachments {
             return database.transactionWithResult {
                 DbDMEventWithAttachments(
                     event = this@withAttachments,

@@ -22,7 +22,6 @@ package com.twidere.twiderex.db.sqldelight.transform
 
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiList
-import com.twidere.twiderex.sqldelight.table.List
 import org.junit.Test
 import kotlin.test.assertEquals
 
@@ -42,22 +41,6 @@ internal class ListTransformTest {
             allowToSubscribe = false
         )
         val db = ui.toDbList()
-        assertSuccess(db, ui)
-
-        val uiFromDb = db.toUi()
-        assertSuccess(db, uiFromDb)
-    }
-
-    private fun assertSuccess(db: List, ui: UiList) {
-        assertEquals(db.accountKey, ui.accountKey)
-        assertEquals(db.listId, ui.id)
-        assertEquals(db.ownerId, ui.ownerId)
-        assertEquals(db.title, ui.title)
-        assertEquals(db.descriptions, ui.descriptions)
-        assertEquals(db.mode, ui.mode)
-        assertEquals(db.replyPolicy, ui.replyPolicy)
-        assertEquals(db.listKey, ui.listKey)
-        assertEquals(db.isFollowed, ui.isFollowed)
-        assertEquals(db.allowToSubscribe, ui.allowToSubscribe)
+        assertEquals(ui, db.toUi())
     }
 }

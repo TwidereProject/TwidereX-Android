@@ -1,6 +1,6 @@
 import com.twidere.twiderex.model.MicroBlogKey;
 
-CREATE TABLE IF NOT EXISTS UrlEntity (
+CREATE TABLE IF NOT EXISTS DbUrlEntity (
     id TEXT PRIMARY KEY NOT NULL,
     belongToKey TEXT AS MicroBlogKey NOT NULL,
     url TEXT NOT NULL,
@@ -11,11 +11,11 @@ CREATE TABLE IF NOT EXISTS UrlEntity (
     image TEXT
 );
 
-CREATE UNIQUE INDEX IF NOT EXISTS index_belongToKey_url ON UrlEntity (belongToKey, url);
+CREATE UNIQUE INDEX IF NOT EXISTS index_belongToKey_url ON DbUrlEntity (belongToKey, url);
 
 insert:
-INSERT OR REPLACE INTO UrlEntity(id, belongToKey, url, expandedUrl, displayUrl, title, description, image) VALUES ?;
+INSERT OR REPLACE INTO DbUrlEntity(id, belongToKey, url, expandedUrl, displayUrl, title, description, image) VALUES ?;
 
 
 findByBelongToKey:
-SELECT * FROM UrlEntity WHERE belongToKey == :belongToKey;
+SELECT * FROM DbUrlEntity WHERE belongToKey == :belongToKey;

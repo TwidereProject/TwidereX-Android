@@ -20,10 +20,10 @@
  */
 package com.twidere.twiderex.db.sqldelight.adapter
 
-import com.twidere.twiderex.sqldelight.table.UrlEntity
+import com.twidere.twiderex.sqldelight.table.DbUrlEntity
 
 internal object UrlEntityAdapterFactory {
-    fun create() = UrlEntity.Adapter(
+    fun create() = DbUrlEntity.Adapter(
         belongToKeyAdapter = MicroBlogKeyColumnAdapter(),
     )
 }

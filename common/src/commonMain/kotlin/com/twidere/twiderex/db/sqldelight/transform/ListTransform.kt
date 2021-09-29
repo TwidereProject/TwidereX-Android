@@ -21,9 +21,9 @@
 package com.twidere.twiderex.db.sqldelight.transform
 
 import com.twidere.twiderex.model.ui.UiList
-import com.twidere.twiderex.sqldelight.table.List
+import com.twidere.twiderex.sqldelight.table.DbList
 
-internal fun UiList.toDbList() = List(
+internal fun UiList.toDbList() = DbList(
     listId = id,
     ownerId = ownerId,
     title = title,
@@ -36,7 +36,7 @@ internal fun UiList.toDbList() = List(
     allowToSubscribe = allowToSubscribe
 )
 
-internal fun List.toUi() = UiList(
+internal fun DbList.toUi() = UiList(
     id = listId,
     ownerId = ownerId,
     title = title,

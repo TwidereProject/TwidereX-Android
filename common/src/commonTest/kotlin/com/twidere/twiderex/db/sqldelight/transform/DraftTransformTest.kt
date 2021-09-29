@@ -23,36 +23,14 @@ package com.twidere.twiderex.db.sqldelight.transform
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.ComposeType
 import com.twidere.twiderex.model.ui.UiDraft
-import com.twidere.twiderex.sqldelight.table.Draft
 import org.junit.Test
 import java.util.UUID
-import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 
 internal class DraftTransformTest {
-    @Test
-    fun draftToUi() {
-        val draft = Draft(
-            id = UUID.randomUUID().toString(),
-            content = "draft",
-            media = listOf("media"),
-            createAt = System.currentTimeMillis(),
-            composeType = ComposeType.New,
-            statusKey = MicroBlogKey.valueOf("status"),
-            excludedReplyUserIds = listOf("userId")
-        )
-        val uiDraft = draft.toUi()
-        assertEquals(draft.id, uiDraft.draftId)
-        assertEquals(draft.content, uiDraft.content)
-        assertEquals(draft.createAt, uiDraft.createdAt)
-        assertEquals(draft.composeType, uiDraft.composeType)
-        assertEquals(draft.statusKey, uiDraft.statusKey)
-        assertContentEquals(draft.media, uiDraft.media)
-        assertContentEquals(draft.excludedReplyUserIds, uiDraft.excludedReplyUserIds)
-    }
 
     @Test
-    fun uiToDraft() {
+    fun transform() {
         val uiDraft = UiDraft(
             draftId = UUID.randomUUID().toString(),
             content = "draft",
@@ -63,12 +41,6 @@ internal class DraftTransformTest {
             excludedReplyUserIds = listOf("userId")
         )
         val draft = uiDraft.toDbDraft()
-        assertEquals(draft.id, uiDraft.draftId)
-        assertEquals(draft.content, uiDraft.content)
-        assertEquals(draft.createAt, uiDraft.createdAt)
-        assertEquals(draft.composeType, uiDraft.composeType)
-        assertEquals(draft.statusKey, uiDraft.statusKey)
-        assertContentEquals(draft.media, uiDraft.media)
-        assertContentEquals(draft.excludedReplyUserIds, uiDraft.excludedReplyUserIds)
+        assertEquals(uiDraft, draft.toUi())
     }
 }

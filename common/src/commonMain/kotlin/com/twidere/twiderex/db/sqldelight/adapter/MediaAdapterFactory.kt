@@ -21,10 +21,10 @@
 package com.twidere.twiderex.db.sqldelight.adapter
 
 import com.squareup.sqldelight.EnumColumnAdapter
-import com.twidere.twiderex.sqldelight.table.Media
+import com.twidere.twiderex.sqldelight.table.DbMedia
 
 internal object MediaAdapterFactory {
-    fun create() = Media.Adapter(
+    fun create() = DbMedia.Adapter(
         belongToKeyAdapter = MicroBlogKeyColumnAdapter(),
         typeAdapter = EnumColumnAdapter()
     )

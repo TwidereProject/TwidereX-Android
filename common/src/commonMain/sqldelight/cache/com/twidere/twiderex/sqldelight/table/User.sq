@@ -2,7 +2,7 @@ import com.twidere.twiderex.model.MicroBlogKey;
 import com.twidere.twiderex.model.enums.PlatformType;
 import java.lang.Boolean;
 
-CREATE TABLE IF NOT EXISTS User (
+CREATE TABLE IF NOT EXISTS DbUser (
     id TEXT NOT NULL,
     userKey TEXT  AS MicroBlogKey NOT NULL PRIMARY KEY,
     acct TEXT AS MicroBlogKey NOT NULL,
@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS User (
 );
 
 insert:
-INSERT OR REPLACE INTO User(
+INSERT OR REPLACE INTO DbUser(
     id, userKey, acct, name, screenName, profileImage,
     profileBackgroundImage, fans, follow, status, listed,
     rawDesc, htmlDesc, website,location, verified, protected,
@@ -33,4 +33,4 @@ INSERT OR REPLACE INTO User(
 ) VALUES ?;
 
 findWithUserKey:
-SELECT * FROM User WHERE userKey == :userKey;
+SELECT * FROM DbUser WHERE userKey == :userKey;

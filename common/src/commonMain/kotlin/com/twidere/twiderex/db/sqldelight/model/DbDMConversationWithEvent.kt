@@ -22,15 +22,15 @@ package com.twidere.twiderex.db.sqldelight.model
 
 import com.twidere.twiderex.db.sqldelight.model.DbDMEventWithAttachments.Companion.withAttachments
 import com.twidere.twiderex.sqldelight.SqlDelightCacheDatabase
-import com.twidere.twiderex.sqldelight.table.DMConversation
-import com.twidere.twiderex.sqldelight.table.DMEvent
+import com.twidere.twiderex.sqldelight.table.DbDMConversation
+import com.twidere.twiderex.sqldelight.table.DbDMEvent
 
 internal data class DbDMConversationWithEvent(
     val event: DbDMEventWithAttachments,
-    val conversation: DMConversation
+    val conversation: DbDMConversation
 ) {
     companion object {
-        fun DMEvent.toDbDMConversationWithEvent(database: SqlDelightCacheDatabase): DbDMConversationWithEvent {
+        fun DbDMEvent.toDbDMConversationWithEvent(database: SqlDelightCacheDatabase): DbDMConversationWithEvent {
             return withAttachments(database)
                 .let {
                     DbDMConversationWithEvent(

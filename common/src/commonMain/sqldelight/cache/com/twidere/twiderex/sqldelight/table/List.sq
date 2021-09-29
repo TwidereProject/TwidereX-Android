@@ -1,7 +1,7 @@
 import com.twidere.twiderex.model.MicroBlogKey;
 import java.lang.Boolean;
 
-CREATE TABLE IF NOT EXISTS  List (
+CREATE TABLE IF NOT EXISTS DbList (
     listId TEXT NOT NULL,
     ownerId TEXT NOT NULL,
     title TEXT NOT NULL,
@@ -14,25 +14,25 @@ CREATE TABLE IF NOT EXISTS  List (
     allowToSubscribe INTEGER AS Boolean NOT NULL
 );
 
-CREATE UNIQUE INDEX IF NOT EXISTS index_listKey_accountKey ON List (listKey, accountKey);
+CREATE UNIQUE INDEX IF NOT EXISTS index_listKey_accountKey ON DbList (listKey, accountKey);
 
 insert:
-INSERT OR REPLACE INTO List(
+INSERT OR REPLACE INTO DbList(
     listId, listKey, title, ownerId, descriptions, mode,
     replyPolicy, accountKey, listKey, isFollowed, allowToSubscribe
 ) VALUES ?;
 
 findWithListKey:
-SELECT * FROM List WHERE accountKey == :accountKey AND listKey == :listKey;
+SELECT * FROM DbList WHERE accountKey == :accountKey AND listKey == :listKey;
 
 getPagingList:
-SELECT * FROM List WHERE accountKey == :accountKey LIMIT :limit OFFSET :offSet;
+SELECT * FROM DbList WHERE accountKey == :accountKey LIMIT :limit OFFSET :offSet;
 
 getPagingCount:
-SELECT COUNT(*) FROM List WHERE accountKey == :accountKey;
+SELECT COUNT(*) FROM DbList WHERE accountKey == :accountKey;
 
 delete:
-DELETE FROM List WHERE accountKey == :accountKey AND listKey == :listKey;
+DELETE FROM DbList WHERE accountKey == :accountKey AND listKey == :listKey;
 
 clearAll:
-DELETE FROM List WHERE accountKey == :accountKey;
+DELETE FROM DbList WHERE accountKey == :accountKey;

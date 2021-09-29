@@ -20,7 +20,6 @@
  */
 package com.twidere.twiderex.db.sqldelight.transform
 
-import com.twidere.twiderex.db.sqldelight.model.DbTrendWithHistory
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiTrend
 import com.twidere.twiderex.model.ui.UiTrendHistory
@@ -47,22 +46,6 @@ internal class TrendTransformTest {
             )
         )
         val db = ui.toDbTrendWithHistory()
-        assertSuccess(db, ui)
-
-        val uiFromDb = db.toUi()
-        assertSuccess(db, uiFromDb)
-    }
-
-    private fun assertSuccess(db: DbTrendWithHistory, ui: UiTrend) {
-        assertEquals(db.trend.accountKey, ui.accountKey)
-        assertEquals(db.trend.trendKey, ui.trendKey)
-        assertEquals(db.trend.displayName, ui.displayName)
-        assertEquals(db.trend.query, ui.query)
-        assertEquals(db.trend.url, ui.url)
-        assertEquals(db.trend.volume, ui.volume)
-        assertEquals(db.history.first().trendKey, ui.history.first().trendKey)
-        assertEquals(db.history.first().day, ui.history.first().day)
-        assertEquals(db.history.first().uses, ui.history.first().uses)
-        assertEquals(db.history.first().accounts, ui.history.first().accounts)
+        assertEquals(ui, db.toUi())
     }
 }

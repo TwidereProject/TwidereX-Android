@@ -21,11 +21,11 @@
 package com.twidere.twiderex.db.sqldelight.adapter
 
 import com.squareup.sqldelight.EnumColumnAdapter
-import com.twidere.twiderex.sqldelight.table.DMConversation
+import com.twidere.twiderex.sqldelight.table.DbDMConversation
 
 object DMConversationAdapterFactory {
     fun create() = MicroBlogKeyColumnAdapter().let {
-        DMConversation.Adapter(
+        DbDMConversation.Adapter(
             accountKeyAdapter = it,
             conversationKeyAdapter = it,
             recipientKeyAdapter = it,

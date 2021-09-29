@@ -23,9 +23,9 @@ package com.twidere.twiderex.db.sqldelight.transform
 import com.twidere.twiderex.db.sqldelight.model.DbDMConversationWithEvent
 import com.twidere.twiderex.model.ui.UiDMConversation
 import com.twidere.twiderex.model.ui.UiDMConversationWithLatestMessage
-import com.twidere.twiderex.sqldelight.table.DMConversation
+import com.twidere.twiderex.sqldelight.table.DbDMConversation
 
-internal fun UiDMConversation.toDbDMConversation() = DMConversation(
+internal fun UiDMConversation.toDbDMConversation() = DbDMConversation(
     accountKey = accountKey,
     conversationKey = conversationKey,
     recipientKey = recipientKey,
@@ -36,7 +36,7 @@ internal fun UiDMConversation.toDbDMConversation() = DMConversation(
     conversationType = conversationType
 )
 
-internal fun DMConversation.toUi() = UiDMConversation(
+internal fun DbDMConversation.toUi() = UiDMConversation(
     accountKey = accountKey,
     conversationKey = conversationKey,
     recipientKey = recipientKey,

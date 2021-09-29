@@ -26,7 +26,6 @@ import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.model.ui.UserMetrics
 import com.twidere.twiderex.model.ui.twitter.TwitterUserExtra
-import com.twidere.twiderex.sqldelight.table.User
 import org.junit.Test
 import java.util.UUID
 import kotlin.test.assertEquals
@@ -61,30 +60,6 @@ internal class UserTransformTest {
             )
         )
         val db = ui.toDbUser()
-        assertSuccess(db, ui)
-
-        val uiFromDb = db.toUi()
-        assertSuccess(db, uiFromDb)
-    }
-
-    private fun assertSuccess(db: User, ui: UiUser) {
-        assertEquals(db.userKey, ui.userKey)
-        assertEquals(db.id, ui.id)
-        assertEquals(db.acct, ui.acct)
-        assertEquals(db.name, ui.name)
-        assertEquals(db.screenName, ui.screenName)
-        assertEquals(db.profileImage, ui.profileImage)
-        assertEquals(db.profileBackgroundImage, ui.profileBackgroundImage)
-        assertEquals(db.fans, ui.metrics.fans)
-        assertEquals(db.follow, ui.metrics.follow)
-        assertEquals(db.status, ui.metrics.status)
-        assertEquals(db.listed, ui.metrics.listed)
-        assertEquals(db.rawDesc, ui.rawDesc)
-        assertEquals(db.htmlDesc, ui.htmlDesc)
-        assertEquals(db.location, ui.location)
-        assertEquals(db.verified, ui.verified)
-        assertEquals(db.protected_, ui.protected)
-        assertEquals(db.platformType, ui.platformType)
-        assertEquals(db.extra, ui.extra?.toDbUserExtra())
+        assertEquals(ui, db.toUi())
     }
 }

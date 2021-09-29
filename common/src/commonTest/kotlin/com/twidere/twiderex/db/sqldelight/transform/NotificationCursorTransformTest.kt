@@ -23,7 +23,6 @@ package com.twidere.twiderex.db.sqldelight.transform
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.NotificationCursorType
 import com.twidere.twiderex.model.paging.NotificationCursor
-import com.twidere.twiderex.sqldelight.table.DbNotificationCursor
 import org.junit.Test
 import java.util.UUID
 import kotlin.test.assertEquals
@@ -39,17 +38,6 @@ internal class NotificationCursorTransformTest {
             timestamp = System.currentTimeMillis()
         )
         val db = ui.toDb()
-        assertSuccess(db, ui)
-
-        val uiFromDb = db.toUi()
-        assertSuccess(db, uiFromDb)
-    }
-
-    private fun assertSuccess(db: DbNotificationCursor, ui: NotificationCursor) {
-        assertEquals(db.accountKey, ui.accountKey)
-        assertEquals(db.id, ui._id)
-        assertEquals(db.type, ui.type)
-        assertEquals(db.value, ui.value)
-        assertEquals(db.timestamp, ui.timestamp)
+        assertEquals(ui, db.toUi())
     }
 }

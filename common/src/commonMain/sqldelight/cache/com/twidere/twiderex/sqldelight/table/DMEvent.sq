@@ -1,7 +1,7 @@
 import com.twidere.twiderex.model.MicroBlogKey;
 import com.twidere.twiderex.model.ui.UiDMEvent.SendStatus;
 
-CREATE TABLE IF NOT EXISTS DMEvent (
+CREATE TABLE IF NOT EXISTS DbDMEvent (
     id TEXT PRIMARY KEY NOT NULL,
     accountKey TEXT AS MicroBlogKey NOT NULL,
     sortId INTEGER NOT NULL,
@@ -17,45 +17,45 @@ CREATE TABLE IF NOT EXISTS DMEvent (
     sendStatus TEXT AS SendStatus NOT NULL
 );
 
-CREATE UNIQUE INDEX IF NOT EXISTS index_accountKey_conversationKey_messageKey ON DMEvent (accountKey, conversationKey, messageKey);
+CREATE UNIQUE INDEX IF NOT EXISTS index_accountKey_conversationKey_messageKey ON DbDMEvent (accountKey, conversationKey, messageKey);
 
 
 insert:
-INSERT OR REPLACE INTO DMEvent(
+INSERT OR REPLACE INTO DbDMEvent(
     id, accountKey, sortId, conversationKey, messageId,
     messageKey, htmlText, originText, createdTimestamp, messageType,
     senderAccountKey, recipientAccountKey, sendStatus
 ) VALUES ?;
 
 findWithMessageKey:
-SELECT * FROM DMEvent WHERE accountKey == :accountKey AND conversationKey == :conversationKey AND messageKey == :messageKey;
+SELECT * FROM DbDMEvent WHERE accountKey == :accountKey AND conversationKey == :conversationKey AND messageKey == :messageKey;
 
 delete:
-DELETE FROM DMEvent WHERE  accountKey == :accountKey AND conversationKey == :conversationKey AND messageKey == :messageKey;
+DELETE FROM DbDMEvent WHERE  accountKey == :accountKey AND conversationKey == :conversationKey AND messageKey == :messageKey;
 
 getMessagesPagingCount:
-SELECT COUNT(*) FROM DMEvent WHERE  accountKey == :accountKey AND conversationKey == :conversationKey;
+SELECT COUNT(*) FROM DbDMEvent WHERE  accountKey == :accountKey AND conversationKey == :conversationKey;
 
 getMessagesPagingList:
-SELECT * FROM DMEvent WHERE  accountKey == :accountKey AND conversationKey == :conversationKey ORDER BY sortId DESC LIMIT :limit OFFSET :offset;
+SELECT * FROM DbDMEvent WHERE  accountKey == :accountKey AND conversationKey == :conversationKey ORDER BY sortId DESC LIMIT :limit OFFSET :offset;
 
 getLatestMessagesInEachConversation:
-SELECT event.* FROM DMEvent AS event
-JOIN (SELECT conversationKey, MAX(sortId) AS sortId FROM DMEvent WHERE accountKey == :accountKey GROUP BY conversationKey) AS conversation
+SELECT event.* FROM DbDMEvent AS event
+JOIN (SELECT conversationKey, MAX(sortId) AS sortId FROM DbDMEvent WHERE accountKey == :accountKey GROUP BY conversationKey) AS conversation
 ON event.conversationKey = conversation.conversationKey AND event.sortId = conversation.sortId
 WHERE event.accountKey == :accountKey ORDER BY event.sortId DESC;
 
 getLatestMessagesInEachConversationPagingList:
-SELECT event.* FROM DMEvent AS event
-JOIN (SELECT conversationKey, MAX(sortId) AS sortId FROM DMEvent WHERE accountKey == :accountKey GROUP BY conversationKey) AS conversation
+SELECT event.* FROM DbDMEvent AS event
+JOIN (SELECT conversationKey, MAX(sortId) AS sortId FROM DbDMEvent WHERE accountKey == :accountKey GROUP BY conversationKey) AS conversation
 ON event.conversationKey = conversation.conversationKey AND event.sortId = conversation.sortId
 WHERE event.accountKey == :accountKey ORDER BY event.sortId DESC LIMIT :limit OFFSET :offset;
 
 getLatestMessagesInEachConversationPagingCount:
-SELECT COUNT(*) FROM DMEvent AS event
-JOIN (SELECT conversationKey, MAX(sortId) AS sortId FROM DMEvent WHERE accountKey == :accountKey GROUP BY conversationKey) AS conversation
+SELECT COUNT(*) FROM DbDMEvent AS event
+JOIN (SELECT conversationKey, MAX(sortId) AS sortId FROM DbDMEvent WHERE accountKey == :accountKey GROUP BY conversationKey) AS conversation
 ON event.conversationKey = conversation.conversationKey AND event.sortId = conversation.sortId
 WHERE event.accountKey == :accountKey;
 
 clearByConversationKey:
-DELETE FROM DMEvent WHERE accountKey == :accountKey AND conversationKey == :conversationKey;
+DELETE FROM DbDMEvent WHERE accountKey == :accountKey AND conversationKey == :conversationKey;

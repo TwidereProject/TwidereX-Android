@@ -25,7 +25,7 @@ import com.twidere.twiderex.dataprovider.mapper.toUi
 import com.twidere.twiderex.db.sqldelight.transform.toDbTrendWithHistory
 import com.twidere.twiderex.mock.model.mockITrend
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.sqldelight.table.Trend
+import com.twidere.twiderex.sqldelight.table.DbTrend
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import kotlin.test.assertEquals
@@ -43,7 +43,7 @@ internal class TrendQueriesImplTest : BaseCacheDatabaseTest() {
 
     @Test
     fun getTrendPagingList_ReturnResultsWithGiveOffsetAndLimit() = runBlocking {
-        val list = mutableListOf<Trend>()
+        val list = mutableListOf<DbTrend>()
         for (i in 0 until 10) {
             list.add(mockITrend().toUi(accountKey).toDbTrendWithHistory().trend.copy(trendKey = MicroBlogKey.valueOf(i.toString()), displayName = i.toString()))
         }

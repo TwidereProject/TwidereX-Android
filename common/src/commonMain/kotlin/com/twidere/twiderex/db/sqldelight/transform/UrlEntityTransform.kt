@@ -22,10 +22,10 @@ package com.twidere.twiderex.db.sqldelight.transform
 
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiUrlEntity
-import com.twidere.twiderex.sqldelight.table.UrlEntity
+import com.twidere.twiderex.sqldelight.table.DbUrlEntity
 import java.util.UUID
 
-fun UiUrlEntity.toDbUrlEntity(belongToKey: MicroBlogKey, id: String = UUID.randomUUID().toString()) = UrlEntity(
+fun UiUrlEntity.toDbUrlEntity(belongToKey: MicroBlogKey, id: String = UUID.randomUUID().toString()) = DbUrlEntity(
     id = id,
     url = url,
     belongToKey = belongToKey,
@@ -36,7 +36,7 @@ fun UiUrlEntity.toDbUrlEntity(belongToKey: MicroBlogKey, id: String = UUID.rando
     image = image
 )
 
-fun UrlEntity.toUi() = UiUrlEntity(
+fun DbUrlEntity.toUi() = UiUrlEntity(
     url = url,
     expandedUrl = expandedUrl,
     displayUrl = displayUrl,
