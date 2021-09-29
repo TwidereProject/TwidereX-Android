@@ -1,7 +1,7 @@
 import com.twidere.twiderex.model.MicroBlogKey;
 import com.twidere.twiderex.model.ui.UiDMConversation;
 
-CREATE TABLE DMConversation (
+CREATE TABLE IF NOT EXISTS DMConversation (
     accountKey TEXT AS MicroBlogKey NOT NULL,
     conversationKey TEXT AS MicroBlogKey NOT NULL,
     recipientKey TEXT AS MicroBlogKey NOT NULL,

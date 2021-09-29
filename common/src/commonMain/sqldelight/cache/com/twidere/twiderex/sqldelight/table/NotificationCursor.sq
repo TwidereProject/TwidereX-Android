@@ -1,7 +1,7 @@
 import com.twidere.twiderex.model.MicroBlogKey;
 import com.twidere.twiderex.model.enums.NotificationCursorType;
 
-CREATE TABLE DbNotificationCursor (
+CREATE TABLE IF NOT EXISTS DbNotificationCursor (
     id TEXT NOT NULL PRIMARY KEY,
     accountKey TEXT AS MicroBlogKey NOT NULL,
     type TEXT AS NotificationCursorType NOT NULL,

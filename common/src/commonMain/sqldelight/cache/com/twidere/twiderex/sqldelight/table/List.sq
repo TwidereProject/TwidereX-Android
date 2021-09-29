@@ -1,7 +1,7 @@
 import com.twidere.twiderex.model.MicroBlogKey;
 import java.lang.Boolean;
 
-CREATE TABLE List (
+CREATE TABLE IF NOT EXISTS  List (
     listId TEXT NOT NULL,
     ownerId TEXT NOT NULL,
     title TEXT NOT NULL,

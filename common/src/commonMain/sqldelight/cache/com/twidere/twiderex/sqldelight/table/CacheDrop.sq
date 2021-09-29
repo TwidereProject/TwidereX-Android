@@ -6,4 +6,6 @@ clearAllTables{
     DELETE FROM DMConversation;
     DELETE FROM Trend;
     DELETE FROM TrendHistory;
+    DELETE FROM DbNotificationCursor;
+    DELETE FROM List;
 }

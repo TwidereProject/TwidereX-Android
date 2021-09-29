@@ -1,6 +1,6 @@
 import com.twidere.twiderex.model.MicroBlogKey;
 
-CREATE TABLE TrendHistory (
+CREATE TABLE IF NOT EXISTS TrendHistory (
     trendKey TEXT AS MicroBlogKey NOT NULL,
     accountKey TEXT AS MicroBlogKey NOT NULL,
     day Integer NOT NULL,
