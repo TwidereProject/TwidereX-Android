@@ -27,6 +27,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,7 +45,7 @@ import com.twidere.twiderex.component.stringResource
 @Composable
 fun CustomVideoControl(
     player: NativePlayerView,
-    playing: Boolean = true,
+    playEnabled: Boolean = true,
     mute: Boolean = false,
     modifier: Modifier = Modifier,
     onPlayPause: ((Boolean) -> Unit)? = null
@@ -58,14 +59,16 @@ fun CustomVideoControl(
         }
     }
     var isPlaying by remember {
-        mutableStateOf(playing)
+        mutableStateOf(playEnabled)
     }
     var isMute by remember {
         mutableStateOf(mute)
     }
-    player.playerProgressCallBack = object : PlayerProgressCallBack {
-        override fun onTimeChanged(time: Long) {
-            seekBarState.onTimeChange(time)
+    LaunchedEffect(player) {
+        player.playerProgressCallBack = object : PlayerProgressCallBack {
+            override fun onTimeChanged(time: Long) {
+                seekBarState.onTimeChange(time)
+            }
         }
     }
 

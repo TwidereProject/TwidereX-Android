@@ -105,7 +105,7 @@ class SeekBarState(
     }
 
     fun progressTimeText(
-        pattern: String = "mm:ss"
+        pattern: String = SeekBarDefaults.SeekBarDefaultTimeFormat
     ): String = SimpleDateFormat(
         pattern,
         Locale.getDefault()
@@ -116,7 +116,7 @@ class SeekBarState(
     )
 
     fun fullTimeText(
-        pattern: String = "mm:ss"
+        pattern: String = SeekBarDefaults.SeekBarDefaultTimeFormat
     ): String = SimpleDateFormat(
         pattern, Locale.getDefault()
     ).format(
@@ -144,7 +144,7 @@ fun SeekBar(
     pointColor: Color = Color.White,
     progressLineColor: Color = Color.White,
     backgroundLineColor: Color = Color.Gray.copy(alpha = 0.4f),
-    strokeWidth: Dp = 8.dp,
+    strokeWidth: Dp = SeekBarDefaults.SeekBarStrokeWidth,
     showText: Boolean = true,
     state: SeekBarState,
 ) {
@@ -156,13 +156,13 @@ fun SeekBar(
             Text(
                 text = state.progressTimeText(),
                 modifier = Modifier
-                    .padding(horizontal = 16.dp)
+                    .padding(horizontal = SeekBarDefaults.SeekBarInnerPaddings)
             )
         }
 
         Box(
             modifier = Modifier
-                .height(20.dp).weight(1f)
+                .height(SeekBarDefaults.SeekDefaultHeight).weight(1f)
                 .draggable(
                     rememberDraggableState { delta ->
                         state.onDragChange(delta)
@@ -211,9 +211,16 @@ fun SeekBar(
                 text = state.fullTimeText(),
                 modifier = Modifier
                     .padding(
-                        horizontal = 16.dp
+                        horizontal = SeekBarDefaults.SeekBarInnerPaddings
                     )
             )
         }
     }
+}
+
+object SeekBarDefaults {
+    val SeekBarInnerPaddings = 16.dp
+    val SeekBarStrokeWidth = 8.dp
+    val SeekDefaultHeight = 20.dp
+    val SeekBarDefaultTimeFormat = "mm:ss"
 }

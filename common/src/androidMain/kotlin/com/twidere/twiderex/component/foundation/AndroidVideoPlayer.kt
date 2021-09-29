@@ -45,7 +45,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlin.coroutines.EmptyCoroutineContext
 
 @Composable
 actual fun PlatformView(
@@ -78,6 +77,8 @@ actual class NativePlayerView actual constructor(
     actual var playerProgressCallBack: PlayerProgressCallBack? = null
 
     private var job: Job? = null
+
+    private val scope = CoroutineScope(Dispatchers.Main)
 
     actual var player: Any = StyledPlayerView(context as Context).also { playerView ->
         (playerView.videoSurfaceView as? SurfaceView)?.setZOrderMediaOverlay(zOrderMediaOverlay)
@@ -119,9 +120,7 @@ actual class NativePlayerView actual constructor(
                     playerCallBack?.setPlaying(isPlaying)
                     job?.cancel()
                     if (isPlaying) {
-                        job = CoroutineScope(EmptyCoroutineContext).launch(
-                            Dispatchers.Main
-                        ) {
+                        job = scope.launch {
                             while (true) {
                                 delay(1000)
                                 playerProgressCallBack?.onTimeChanged(contentPosition())
