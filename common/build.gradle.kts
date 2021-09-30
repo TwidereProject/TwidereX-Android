@@ -83,6 +83,7 @@ kotlin {
                 implementation("androidx.exifinterface:exifinterface:${Versions.androidx_exifinterface}")
                 implementation("androidx.startup:startup-runtime:${Versions.startup}")
                 implementation("com.google.accompanist:accompanist-insets:${Versions.accompanist}")
+                implementation("androidx.browser:browser:${Versions.browser}")
             }
         }
         val androidAndroidTest by getting {

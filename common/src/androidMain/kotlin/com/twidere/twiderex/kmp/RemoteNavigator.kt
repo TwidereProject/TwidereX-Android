@@ -23,6 +23,7 @@ package com.twidere.twiderex.kmp
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import androidx.browser.customtabs.CustomTabsIntent
 import com.twidere.twiderex.extensions.shareMedia
 import com.twidere.twiderex.extensions.shareText
 
@@ -51,5 +52,11 @@ actual class RemoteNavigator(private val context: Context) {
             content = content,
             fromOutsideOfActivity = fromBackground
         )
+    }
+
+    actual fun launchOAuthUri(uri: String) {
+        CustomTabsIntent.Builder()
+            .setShareState(CustomTabsIntent.SHARE_STATE_OFF)
+            .build().launchUrl(context, Uri.parse(uri))
     }
 }

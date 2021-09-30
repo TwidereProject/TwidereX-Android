@@ -18,29 +18,20 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.kmp
+package com.twidere.twiderex.utils
 
-import java.awt.Desktop
-import java.net.URI
+import com.twidere.twiderex.kmp.RemoteNavigator
+import moe.tlaster.precompose.navigation.QueryString
+import moe.tlaster.precompose.navigation.query
 
-actual class RemoteNavigator {
-    actual fun openDeepLink(deeplink: String, fromBackground: Boolean) {
-        Desktop.getDesktop().browse(URI(deeplink))
-    }
-
-    actual fun shareMedia(
-        filePath: String,
-        mimeType: String,
-        fromBackground: Boolean
-    ) {
-        // TODO: Show native UI for sharing
-    }
-
-    actual fun shareText(content: String, fromBackground: Boolean) {
-        // TODO: Show native UI for sharing
-    }
-
-    actual fun launchOAuthUri(uri: String) {
-        Desktop.getDesktop().browse(URI(uri))
+class OAuthLauncher(
+    private val navigator: RemoteNavigator
+) {
+    suspend fun launchOAuth(
+        uri: String,
+        queryParameterName: String,
+    ): String {
+        navigator.launchOAuthUri(uri)
+        return QueryString(CustomTabSignInChannel.waitOne()).query(queryParameterName, "") ?: ""
     }
 }

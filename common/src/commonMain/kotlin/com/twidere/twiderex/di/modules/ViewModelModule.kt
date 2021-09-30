@@ -168,7 +168,7 @@ private fun Module.lists() {
 private fun Module.mastodon() {
     viewModel { (keyword: String) -> MastodonHashtagViewModel(get(), get(), keyword) }
     viewModel { (keyword: String) -> MastodonSearchHashtagViewModel(get(), keyword) }
-    viewModel { MastodonSignInViewModel(get(), get()) }
+    viewModel { MastodonSignInViewModel(get(), get(), get()) }
 }
 
 private fun Module.search() {
@@ -204,7 +204,6 @@ private fun Module.twitter() {
     viewModel { (
         consumerKey: String,
         consumerSecret: String,
-        oauthVerifierProvider: suspend (url: String) -> String?,
         pinCodeProvider: suspend (url: String) -> String?,
         onResult: (success: Boolean) -> Unit,
     ) ->
@@ -213,7 +212,7 @@ private fun Module.twitter() {
             get(),
             consumerKey,
             consumerSecret,
-            oauthVerifierProvider,
+            get(),
             pinCodeProvider,
             onResult,
         )

@@ -20,9 +20,6 @@
  */
 package com.twidere.twiderex.scenes.mastodon
 
-import android.content.Context
-import android.net.Uri
-import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -44,7 +41,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
@@ -56,7 +52,6 @@ import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.ui.LocalNavController
-import com.twidere.twiderex.utils.CustomTabSignInChannel
 import com.twidere.twiderex.viewmodel.mastodon.MastodonSignInViewModel
 import moe.tlaster.precompose.navigation.NavController
 
@@ -67,7 +62,6 @@ fun MastodonSignInScene() {
     val host by viewModel.host.observeAsState(initial = TextFieldValue())
     val loading by viewModel.loading.observeAsState(initial = false)
     val navController = LocalNavController.current
-    val context = LocalContext.current
     SignInScaffold {
         if (loading) {
             CircularProgressIndicator()
@@ -89,14 +83,14 @@ fun MastodonSignInScene() {
                 ),
                 keyboardActions = KeyboardActions(
                     onGo = {
-                        signin(viewModel, context, host, navController)
+                        signin(viewModel, host, navController)
                     }
                 )
             )
             Spacer(modifier = Modifier.height(16.dp))
             SignInButton(
                 onClick = {
-                    signin(viewModel, context, host, navController)
+                    signin(viewModel, host, navController)
                 }
             ) {
                 ListItem(
@@ -132,18 +126,11 @@ fun MastodonSignInScene() {
 
 private fun signin(
     viewModel: MastodonSignInViewModel,
-    context: Context,
     host: TextFieldValue,
     navController: NavController,
 ) {
     viewModel.beginOAuth(
         host.text,
-        { target ->
-            CustomTabsIntent.Builder()
-                .setShareState(CustomTabsIntent.SHARE_STATE_OFF)
-                .build().launchUrl(context, Uri.parse(target))
-            CustomTabSignInChannel.waitOne().getQueryParameter("code")
-        },
         { success ->
             if (success) {
                 navController.goBackWith(success)
