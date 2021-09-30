@@ -25,26 +25,32 @@ import com.twidere.twiderex.model.enums.ReferenceType
 import kotlinx.serialization.Serializable
 
 @Serializable
-internal data class DbStatusReference(
+data class DbStatusReferenceList(
+    val list: List<DbStatusReference>
+)
+
+@Serializable
+data class DbStatusReference(
     val referenceType: ReferenceType,
     val statusKey: MicroBlogKey,
 )
 
 @Serializable
-internal data class DbStatusReaction(
-    var liked: Boolean,
-    var retweeted: Boolean,
+data class DbStatusMetrics(
+    val like: Long,
+    val reply: Long,
+    val retweet: Long
 )
 
 @Serializable
-internal data class DbGeo(
+data class DbGeo(
     val name: String,
     val lat: Long? = null,
     val long: Long? = null,
 )
 
 @Serializable
-internal data class DbCard(
+data class DbCard(
     val link: String,
     val displayLink: String?,
     val title: String?,
@@ -53,9 +59,9 @@ internal data class DbCard(
 )
 
 @Serializable
-internal data class UiPoll(
+data class DbPoll(
     val id: String,
-    val options: List<Option>,
+    val options: List<DbOption>,
     val expiresAt: Long?, // some instance of mastodon won't expire
     val expired: Boolean,
     val multiple: Boolean,
@@ -66,7 +72,7 @@ internal data class UiPoll(
 )
 
 @Serializable
-internal data class Option(
+data class DbOption(
     val text: String,
     val count: Long,
 )

@@ -28,6 +28,8 @@ import com.twidere.twiderex.db.sqldelight.adapter.ListAdapterFactory
 import com.twidere.twiderex.db.sqldelight.adapter.MediaAdapterFactory
 import com.twidere.twiderex.db.sqldelight.adapter.NotificationCursorAdapterFactory
 import com.twidere.twiderex.db.sqldelight.adapter.SearchAdapterFactory
+import com.twidere.twiderex.db.sqldelight.adapter.StatusAdapterFactory
+import com.twidere.twiderex.db.sqldelight.adapter.StatusReactionsFactory
 import com.twidere.twiderex.db.sqldelight.adapter.TrendAdapterFactory
 import com.twidere.twiderex.db.sqldelight.adapter.TrendHistoryAdapterFactory
 import com.twidere.twiderex.db.sqldelight.adapter.UrlEntityAdapterFactory
@@ -56,6 +58,8 @@ internal fun createCacheDataBase(driver: SqlDriver): SqlDelightCacheDatabase {
         DbTrendAdapter = TrendAdapterFactory.create(),
         DbTrendHistoryAdapter = TrendHistoryAdapterFactory.create(),
         DbNotificationCursorAdapter = NotificationCursorAdapterFactory.create(),
-        DbListAdapter = ListAdapterFactory.create()
+        DbListAdapter = ListAdapterFactory.create(),
+        DbStatusAdapter = StatusAdapterFactory.create(),
+        DbStatusReactionsAdapter = StatusReactionsFactory.create()
     )
 }
