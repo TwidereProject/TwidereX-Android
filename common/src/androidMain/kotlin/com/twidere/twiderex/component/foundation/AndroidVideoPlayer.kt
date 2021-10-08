@@ -161,9 +161,6 @@ actual class NativePlayerView actual constructor(
 
     actual fun contentPosition(): Long = 0L.coerceAtLeast((realPlayerView().player?.currentPosition) ?: 0)
 
-    actual fun update() {
-    }
-
     actual fun setVolume(volume: Float) {
         realPlayerView().player?.volume = volume
     }

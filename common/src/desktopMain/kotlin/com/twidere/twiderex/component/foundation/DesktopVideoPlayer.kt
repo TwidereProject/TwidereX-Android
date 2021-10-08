@@ -83,9 +83,6 @@ actual class NativePlayerView actual constructor(
 
     actual fun contentPosition(): Long = player.mediaPlayer().status().time()
 
-    actual fun update() {
-    }
-
     actual fun setVolume(volume: Float) {
     }
 

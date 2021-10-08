@@ -202,6 +202,7 @@ fun VideoPlayer(
                         it.pause()
                     }
                 }
+                // TODO chage this logic about when to display the controller
                 if (mediaPrepared) {
                     Spacer(Modifier.height(30.dp))
                     // customControl?.invoke(nativePlayerView)
@@ -269,7 +270,6 @@ expect class NativePlayerView(
     fun contentPosition(): Long
     fun duration(): Long
     fun seekTo(time: Long)
-    fun update()
     fun setVolume(volume: Float)
     fun setMute(mute: Boolean)
     fun release()
