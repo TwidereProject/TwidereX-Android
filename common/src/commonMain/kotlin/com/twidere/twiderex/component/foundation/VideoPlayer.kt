@@ -48,9 +48,6 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.MR
 import com.twidere.twiderex.compose.LocalResLoader
-import com.twidere.twiderex.preferences.model.DisplayPreferences
-import com.twidere.twiderex.ui.LocalIsActiveNetworkMetered
-import com.twidere.twiderex.ui.LocalVideoPlayback
 import com.twidere.twiderex.utils.video.CustomVideoControl
 import com.twidere.twiderex.utils.video.VideoPool
 import kotlinx.coroutines.Job
@@ -236,11 +233,13 @@ fun VideoPlayer(
 }
 
 @Composable
-internal fun getPlayInitial() = when (LocalVideoPlayback.current) {
-    DisplayPreferences.AutoPlayback.Auto -> !LocalIsActiveNetworkMetered.current
-    DisplayPreferences.AutoPlayback.Always -> true
-    DisplayPreferences.AutoPlayback.Off -> false
-}
+internal fun getPlayInitial() = true
+// TODO
+// when (LocalVideoPlayback.current) {
+//     DisplayPreferences.AutoPlayback.Auto -> !LocalIsActiveNetworkMetered.current
+//     DisplayPreferences.AutoPlayback.Always -> true
+//     DisplayPreferences.AutoPlayback.Off -> false
+// }
 
 interface PlayerCallBack {
     fun showThumb(showThunb: Boolean)
