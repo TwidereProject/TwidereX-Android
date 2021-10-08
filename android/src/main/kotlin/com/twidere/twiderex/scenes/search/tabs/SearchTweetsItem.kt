@@ -24,13 +24,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
-import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
 import com.twidere.twiderex.component.lazy.ui.LazyUiStatusList
-import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.refreshOrRetry
-import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.viewmodel.search.SearchTweetsViewModel
+import org.koin.core.parameter.parametersOf
 
 class SearchTweetsItem : SearchSceneItem {
     @Composable
@@ -40,11 +39,9 @@ class SearchTweetsItem : SearchSceneItem {
 
     @Composable
     override fun Content(keyword: String) {
-        val account = LocalActiveAccount.current ?: return
-        val viewModel =
-            assistedViewModel<SearchTweetsViewModel.AssistedFactory, SearchTweetsViewModel> {
-                it.create(account, keyword)
-            }
+        val viewModel: SearchTweetsViewModel = getViewModel {
+            parametersOf(keyword)
+        }
         val source = viewModel.source.collectAsLazyPagingItems()
         SwipeToRefreshLayout(
             refreshingState = source.loadState.refresh is LoadState.Loading,

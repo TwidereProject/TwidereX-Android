@@ -55,8 +55,10 @@ import com.twidere.twiderex.component.foundation.rememberReorderableColumnState
 import com.twidere.twiderex.component.lazy.ItemHeader
 import com.twidere.twiderex.component.status.UserName
 import com.twidere.twiderex.component.status.UserScreenName
-import com.twidere.twiderex.di.assisted.assistedViewModel
-import com.twidere.twiderex.scenes.home.HomeMenus
+import com.twidere.twiderex.di.ext.getViewModel
+import com.twidere.twiderex.extensions.observeAsState
+import com.twidere.twiderex.model.HomeMenus
+import com.twidere.twiderex.scenes.home.item
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.settings.LayoutViewModel
@@ -65,14 +67,8 @@ import com.twidere.twiderex.viewmodel.settings.LayoutViewModel
 @Composable
 fun LayoutScene() {
     val account = LocalActiveAccount.current ?: return
-    val viewModel = assistedViewModel<LayoutViewModel.AssistedFactory, LayoutViewModel>(
-        account
-    ) {
-        it.create(
-            account = account,
-        )
-    }
-    val user = viewModel.user
+    val viewModel: LayoutViewModel = getViewModel()
+    val user by viewModel.user.observeAsState(initial = null)
     val menuOrder by account.preferences.homeMenuOrder.collectAsState(
         initial = HomeMenus.values().map { it to it.showDefault }
     )
@@ -114,17 +110,19 @@ fun LayoutScene() {
                 modifier = Modifier
                     .verticalScroll(rememberScrollState()),
             ) {
-                Surface(
-                    color = MaterialTheme.colors.primary,
-                ) {
-                    ListItem(
-                        text = {
-                            Row {
-                                UserName(user = user)
-                                UserScreenName(user = user)
+                user?.let { user ->
+                    Surface(
+                        color = MaterialTheme.colors.primary,
+                    ) {
+                        ListItem(
+                            text = {
+                                Row {
+                                    UserName(user = user)
+                                    UserScreenName(user = user)
+                                }
                             }
-                        }
-                    )
+                        )
+                    }
                 }
                 ListItem(
                     text = {

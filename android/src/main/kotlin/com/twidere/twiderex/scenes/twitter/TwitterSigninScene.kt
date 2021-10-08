@@ -28,11 +28,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import com.twidere.twiderex.component.foundation.SignInScaffold
 import com.twidere.twiderex.component.navigation.LocalNavigator
-import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.utils.CustomTabSignInChannel
+import com.twidere.twiderex.viewmodel.twitter.OauthVerifierProvider
+import com.twidere.twiderex.viewmodel.twitter.PinCodeProvider
 import com.twidere.twiderex.viewmodel.twitter.TwitterSignInViewModel
+import org.koin.core.parameter.parametersOf
 
 @Composable
 fun TwitterSignInScene(
@@ -42,25 +45,26 @@ fun TwitterSignInScene(
     val navController = LocalNavController.current
     val context = LocalContext.current
     val navigator = LocalNavigator.current
-    val viewModel =
-        assistedViewModel<TwitterSignInViewModel.AssistedFactory, TwitterSignInViewModel> {
-            it.create(
-                consumerKey,
-                consumerSecret,
-                oauthVerifierProvider = { target ->
-                    CustomTabsIntent.Builder()
-                        .setShareState(CustomTabsIntent.SHARE_STATE_OFF)
-                        .build().launchUrl(context, Uri.parse(target))
-                    CustomTabSignInChannel.waitOne().getQueryParameter("oauth_verifier")
-                },
-                pinCodeProvider = { target ->
-                    navigator.twitterSignInWeb(target)
-                },
-                onResult = { success ->
-                    navController.goBackWith(success)
-                }
-            )
-        }
+    val oauthVerifierProvider: OauthVerifierProvider = { target ->
+        CustomTabsIntent.Builder()
+            .setShareState(CustomTabsIntent.SHARE_STATE_OFF)
+            .build().launchUrl(context, Uri.parse(target))
+        CustomTabSignInChannel.waitOne().getQueryParameter("oauth_verifier")
+    }
+    val pinCodeProvider: PinCodeProvider = { target ->
+        navigator.twitterSignInWeb(target)
+    }
+    val viewModel: TwitterSignInViewModel = getViewModel {
+        parametersOf(
+            consumerKey,
+            consumerSecret,
+            oauthVerifierProvider,
+            pinCodeProvider,
+            { success: Boolean ->
+                navController.goBackWith(success)
+            }
+        )
+    }
     val loading by viewModel.loading.observeAsState(initial = false)
 
     SignInScaffold {

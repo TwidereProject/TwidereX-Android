@@ -62,7 +62,7 @@ import com.twidere.twiderex.component.lazy.ItemHeader
 import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.component.settings.RadioItem
 import com.twidere.twiderex.component.settings.switchItem
-import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.preferences.model.MiscPreferences
 import com.twidere.twiderex.ui.TwidereScene
@@ -70,9 +70,7 @@ import com.twidere.twiderex.viewmodel.settings.MiscViewModel
 
 @Composable
 fun MiscScene() {
-    val viewModel = assistedViewModel<MiscViewModel.AssistedFactory, MiscViewModel> {
-        it.create()
-    }
+    val viewModel: MiscViewModel = getViewModel()
 
     TwidereScene {
         InAppNotificationScaffold(
@@ -202,7 +200,11 @@ fun ColumnScope.ProxyPreference(
             inputTitle.value = portTitle
             inputValue.value = proxyPort?.toString() ?: ""
             inputChanged.value = {
-                viewModel.setProxyPort(it)
+                it.toIntOrNull()?.let {
+                    viewModel.setProxyPort(it)
+                } ?: run {
+                    // TODO: show error
+                }
             }
             showProxyInputDialog.value = true
         }

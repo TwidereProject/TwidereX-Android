@@ -28,7 +28,7 @@ import com.twidere.twiderex.model.MicroBlogKey
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.runBlocking
-import org.junit.Test
+import kotlin.test.Test
 
 class CacheRepositoryTest {
     @Test

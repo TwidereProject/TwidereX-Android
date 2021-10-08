@@ -38,9 +38,9 @@ import com.twidere.twiderex.component.foundation.Pager
 import com.twidere.twiderex.component.foundation.TextTabsComponent
 import com.twidere.twiderex.component.foundation.rememberPagerState
 import com.twidere.twiderex.component.lazy.LazyListController
+import com.twidere.twiderex.model.HomeNavigationItem
 import com.twidere.twiderex.navigation.RootRoute
 import com.twidere.twiderex.scenes.home.AllNotificationItem
-import com.twidere.twiderex.scenes.home.HomeNavigationItem
 import com.twidere.twiderex.scenes.home.MentionItem
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.TwidereScene

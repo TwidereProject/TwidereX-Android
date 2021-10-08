@@ -46,25 +46,23 @@ import com.twidere.twiderex.component.foundation.ColoredSwitch
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.status.UserName
 import com.twidere.twiderex.component.status.UserScreenName
-import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.notification.NotificationChannelSpec
 import com.twidere.twiderex.notification.notificationChannelId
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.settings.AccountNotificationViewModel
+import org.koin.core.parameter.parametersOf
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun AccountNotificationScene(
     accountKey: MicroBlogKey,
 ) {
-    val viewModel =
-        assistedViewModel<AccountNotificationViewModel.AssistedFactory, AccountNotificationViewModel>(
-            accountKey
-        ) {
-            it.create(accountKey)
-        }
+    val viewModel: AccountNotificationViewModel = getViewModel {
+        parametersOf(accountKey)
+    }
     val account by viewModel.account.observeAsState(initial = null)
     val enabled by viewModel.isNotificationEnabled.observeAsState(initial = true)
     TwidereScene {
@@ -89,10 +87,10 @@ fun AccountNotificationScene(
                             viewModel.setIsNotificationEnabled(!enabled)
                         },
                         text = {
-                            UserName(user = it)
+                            UserName(user = it.toUi())
                         },
                         secondaryText = {
-                            UserScreenName(user = it)
+                            UserScreenName(user = it.toUi())
                         },
                         trailing = {
                             ColoredSwitch(
@@ -106,7 +104,7 @@ fun AccountNotificationScene(
                 }
                 val context = LocalContext.current
                 NotificationChannelSpec.values().filter { it.grouped }
-                    .sortedBy { stringResource(id = it.nameRes) }
+                    .sortedBy { stringResource(id = it.nameRes.resourceId) }
                     .forEach {
                         ListItem(
                             modifier = Modifier.clickable(
@@ -135,18 +133,20 @@ fun AccountNotificationScene(
                                         emptyArray()
                                     }
                                 ) {
-                                    Text(text = stringResource(id = it.nameRes))
+                                    Text(text = stringResource(id = it.nameRes.resourceId))
                                 }
                             },
-                            secondaryText = {
-                                CompositionLocalProvider(
-                                    *if (!enabled) {
-                                        arrayOf(LocalContentAlpha provides ContentAlpha.disabled)
-                                    } else {
-                                        emptyArray()
+                            secondaryText = it.descriptionRes?.let {
+                                {
+                                    CompositionLocalProvider(
+                                        *if (!enabled) {
+                                            arrayOf(LocalContentAlpha provides ContentAlpha.disabled)
+                                        } else {
+                                            emptyArray()
+                                        }
+                                    ) {
+                                        Text(text = stringResource(id = it.resourceId))
                                     }
-                                ) {
-                                    Text(text = stringResource(id = it.descriptionRes))
                                 }
                             }
                         )

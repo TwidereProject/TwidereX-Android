@@ -50,7 +50,6 @@ import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemsIndexed
-import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.ErrorPlaceholder
@@ -59,25 +58,21 @@ import com.twidere.twiderex.component.status.DetailedStatusComponent
 import com.twidere.twiderex.component.status.StatusDivider
 import com.twidere.twiderex.component.status.StatusThreadStyle
 import com.twidere.twiderex.component.status.TimelineStatusComponent
-import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.utils.generateNotificationEvent
 import com.twidere.twiderex.viewmodel.StatusViewModel
+import org.koin.core.parameter.parametersOf
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun StatusScene(
     statusKey: MicroBlogKey,
 ) {
-    val account = LocalActiveAccount.current ?: return
-    val viewModel = assistedViewModel<StatusViewModel.AssistedFactory, StatusViewModel>(
-        statusKey,
-        account,
-    ) {
-        it.create(account = account, statusKey = statusKey)
+    val viewModel = getViewModel<StatusViewModel> {
+        parametersOf(statusKey)
     }
     val source = viewModel.source.collectAsLazyPagingItems()
     val status by viewModel.status.observeAsState(initial = null)

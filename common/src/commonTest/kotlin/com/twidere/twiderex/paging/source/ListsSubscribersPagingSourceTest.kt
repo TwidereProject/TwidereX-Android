@@ -24,7 +24,7 @@ import androidx.paging.PagingSource
 import com.twidere.twiderex.mock.service.MockListsService
 import com.twidere.twiderex.model.MicroBlogKey
 import kotlinx.coroutines.runBlocking
-import org.junit.Test
+import kotlin.test.Test
 
 class ListsSubscribersPagingSourceTest {
     @Test

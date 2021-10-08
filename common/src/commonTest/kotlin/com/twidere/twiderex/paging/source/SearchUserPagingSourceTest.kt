@@ -25,7 +25,7 @@ import com.twidere.twiderex.mock.model.mockIUser
 import com.twidere.twiderex.mock.service.MockSearchService
 import com.twidere.twiderex.model.MicroBlogKey
 import kotlinx.coroutines.runBlocking
-import org.junit.Test
+import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 

@@ -27,11 +27,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import com.twidere.twiderex.compose.LocalResLoader
 import com.twidere.twiderex.di.ext.get
+import com.twidere.twiderex.kmp.LocalRemoteNavigator
 
 @Composable
 fun App() {
     CompositionLocalProvider(
-        LocalResLoader provides get()
+        LocalResLoader provides get(),
+        LocalRemoteNavigator provides get(),
     ) {
         MaterialTheme {
             Scaffold {

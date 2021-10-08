@@ -21,13 +21,15 @@
 package com.twidere.twiderex.mock.service
 
 import com.twidere.services.microblog.LookupService
+import com.twidere.services.microblog.MicroBlogService
 import com.twidere.services.microblog.model.IStatus
 import com.twidere.services.microblog.model.IUser
 import com.twidere.twiderex.mock.model.mockIStatus
 import com.twidere.twiderex.mock.model.mockIUser
 import org.jetbrains.annotations.TestOnly
 
-internal class MockLookUpService @TestOnly constructor() : LookupService, ErrorService() {
+internal class MockLookUpService @TestOnly constructor() : MicroBlogService, LookupService,
+    ErrorService() {
     override suspend fun lookupStatus(id: String): IStatus {
         return mockIStatus(id = id)
     }

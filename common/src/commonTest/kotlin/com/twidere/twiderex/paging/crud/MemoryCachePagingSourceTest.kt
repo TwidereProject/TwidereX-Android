@@ -22,7 +22,7 @@ package com.twidere.twiderex.paging.crud
 
 import androidx.paging.PagingSource
 import kotlinx.coroutines.runBlocking
-import org.junit.Test
+import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class MemoryCachePagingSourceTest {

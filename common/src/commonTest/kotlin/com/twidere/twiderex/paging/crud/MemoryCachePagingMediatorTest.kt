@@ -25,7 +25,7 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import kotlinx.coroutines.runBlocking
-import org.junit.Test
+import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class TestMemoryCachePagingMediator(pagingMemoryCache: PagingMemoryCache<String>) : MemoryCachePagingMediator<Int, String>(pagingMemoryCache) {

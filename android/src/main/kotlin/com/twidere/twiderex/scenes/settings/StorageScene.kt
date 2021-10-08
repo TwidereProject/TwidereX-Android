@@ -35,11 +35,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
-import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.settings.StorageViewModel
@@ -47,9 +46,7 @@ import com.twidere.twiderex.viewmodel.settings.StorageViewModel
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun StorageScene() {
-    val viewModel = assistedViewModel<StorageViewModel.AssistedFactory, StorageViewModel> {
-        it.create()
-    }
+    val viewModel: StorageViewModel = getViewModel()
     val loading by viewModel.loading.observeAsState(initial = false)
 
     if (loading) {

@@ -27,18 +27,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.window.Dialog
-import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.LoadingProgress
 import com.twidere.twiderex.component.lists.MastodonListsModifyComponent
-import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.viewmodel.lists.ListsModifyViewModel
+import org.koin.core.parameter.parametersOf
 
 @Composable
 fun MastodonListsEditDialog(listKey: MicroBlogKey, onDismissRequest: () -> Unit) {
-    val account = LocalActiveAccount.current ?: return
     var showMastodonComponent by remember {
         mutableStateOf(true)
     }
@@ -46,10 +44,8 @@ fun MastodonListsEditDialog(listKey: MicroBlogKey, onDismissRequest: () -> Unit)
         onDismissRequest.invoke()
         showMastodonComponent = true
     }
-    val listsEditViewModel = assistedViewModel<ListsModifyViewModel.AssistedFactory, ListsModifyViewModel>(
-        account
-    ) {
-        it.create(account, listKey)
+    val listsEditViewModel: ListsModifyViewModel = getViewModel {
+        parametersOf(listKey)
     }
     val source by listsEditViewModel.source.observeAsState(initial = null)
     val loading by listsEditViewModel.loading.observeAsState(initial = false)

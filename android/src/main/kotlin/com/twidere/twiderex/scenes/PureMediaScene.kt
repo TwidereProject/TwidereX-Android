@@ -60,7 +60,7 @@ import com.google.accompanist.pager.rememberPagerState
 import com.google.android.exoplayer2.ui.PlayerControlView
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
-import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.hideControls
 import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.extensions.setOnSystemBarsVisibilityChangeListener
@@ -74,12 +74,13 @@ import com.twidere.twiderex.ui.TwidereDialog
 import com.twidere.twiderex.viewmodel.PureMediaViewModel
 import moe.tlaster.swiper.SwiperState
 import moe.tlaster.swiper.rememberSwiperState
+import org.koin.core.parameter.parametersOf
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun PureMediaScene(belongToKey: MicroBlogKey, selectedIndex: Int) {
-    val viewModel = assistedViewModel<PureMediaViewModel.AssistedFactory, PureMediaViewModel> {
-        it.create(belongToKey)
+    val viewModel = getViewModel<PureMediaViewModel> {
+        parametersOf(belongToKey)
     }
     val source by viewModel.source.observeAsState(null)
     TwidereDialog(
