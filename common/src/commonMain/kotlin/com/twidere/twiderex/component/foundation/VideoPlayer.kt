@@ -76,7 +76,6 @@ fun VideoPlayer(
     var autoPlay by remember(url) { mutableStateOf(playInitial) }
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     val resLoder = LocalResLoader.current
-    val context = getContext()
     val httpConfig = LocalHttpConfig.current
     var mediaPrepared by remember { mutableStateOf(false) }
     Box {
@@ -87,7 +86,6 @@ fun VideoPlayer(
                     url = url,
                     autoPlay = autoPlay,
                     httpConfig = httpConfig,
-                    context = context,
                     zOrderMediaOverlay = zOrderMediaOverlay,
                     showControls = showControls,
                     keepScreenOn = keepScreenOn,
@@ -255,7 +253,6 @@ interface PlayerProgressCallBack {
 expect class NativePlayerView(
     url: String,
     autoPlay: Boolean,
-    context: Any,
     httpConfig: Any,
     zOrderMediaOverlay: Boolean,
     showControls: Boolean,
@@ -281,9 +278,6 @@ expect fun PlatformView(
     nativePLayerView: NativePlayerView,
     update: (NativePlayerView) -> Unit
 )
-
-@Composable
-expect fun getContext(): Any
 
 object UserAvatarDefaults {
     val AvatarSize = 44.dp

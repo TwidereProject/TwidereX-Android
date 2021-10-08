@@ -31,6 +31,7 @@ import androidx.compose.ui.window.FrameWindowScope
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.rememberWindowState
+import com.twidere.twiderex.di.ext.get
 import com.twidere.twiderex.preferences.PreferencesHolder
 import com.twidere.twiderex.preferences.ProvidePreferences
 import kotlinx.coroutines.flow.collect
@@ -45,7 +46,6 @@ import moe.tlaster.precompose.ui.LocalLifecycleOwner
 import moe.tlaster.precompose.ui.LocalViewModelStoreOwner
 import moe.tlaster.precompose.viewmodel.ViewModelStore
 import moe.tlaster.precompose.viewmodel.ViewModelStoreOwner
-import org.koin.java.KoinJavaComponent.inject
 
 @Composable
 fun PreComposeWindow(
@@ -66,7 +66,9 @@ fun PreComposeWindow(
     val holder = remember {
         PreComposeWindowHolder()
     }
-    val preferencesHolder: PreferencesHolder by inject(PreferencesHolder::class.java)
+    val preferencesHolder = remember {
+        get<PreferencesHolder>()
+    }
     LaunchedEffect(Unit) {
         snapshotFlow { state.isMinimized }
             .distinctUntilChanged()

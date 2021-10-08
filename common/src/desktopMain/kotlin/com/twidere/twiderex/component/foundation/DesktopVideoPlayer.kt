@@ -33,7 +33,6 @@ import java.util.Locale
 actual class NativePlayerView actual constructor(
     url: String,
     autoPlay: Boolean,
-    context: Any,
     httpConfig: Any,
     zOrderMediaOverlay: Boolean,
     showControls: Boolean,
@@ -123,11 +122,6 @@ actual fun PlatformView(
             update.invoke(nativePLayerView)
         }
     )
-}
-
-@Composable
-actual fun getContext(): Any {
-    return Any()
 }
 
 /**

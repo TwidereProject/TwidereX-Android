@@ -25,7 +25,6 @@ import android.view.SurfaceView
 import android.view.View
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
@@ -36,6 +35,7 @@ import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.ui.StyledPlayerView
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.twidere.services.http.config.HttpConfig
+import com.twidere.twiderex.di.ext.get
 import com.twidere.twiderex.http.TwidereServiceFactory
 import com.twidere.twiderex.utils.video.CacheDataSourceFactory
 import com.twidere.twiderex.utils.video.VideoPool
@@ -65,7 +65,6 @@ actual fun PlatformView(
 actual class NativePlayerView actual constructor(
     url: String,
     autoPlay: Boolean,
-    context: Any,
     httpConfig: Any,
     zOrderMediaOverlay: Boolean,
     showControls: Boolean,
@@ -79,7 +78,9 @@ actual class NativePlayerView actual constructor(
 
     private val scope = CoroutineScope(Dispatchers.Main)
 
-    actual var player: Any = StyledPlayerView(context as Context).also { playerView ->
+    private val context = get<Context>()
+
+    actual var player: Any = StyledPlayerView(context).also { playerView ->
         (playerView.videoSurfaceView as? SurfaceView)?.setZOrderMediaOverlay(zOrderMediaOverlay)
         playerView.useController = showControls
         playerView.keepScreenOn = keepScreenOn
@@ -179,9 +180,4 @@ actual class NativePlayerView actual constructor(
     actual fun setMute(mute: Boolean) {
         realPlayerView().player?.volume = if (mute) 0f else 1f
     }
-}
-
-@Composable
-actual fun getContext(): Any {
-    return LocalContext.current
 }
