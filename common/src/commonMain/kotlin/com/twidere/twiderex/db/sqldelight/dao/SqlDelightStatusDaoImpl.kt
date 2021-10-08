@@ -79,8 +79,8 @@ class SqlDelightStatusDaoImpl(private val database: SqlDelightCacheDatabase) : S
             ?.let {
                 database.statusReactionsQueries.insert(
                     it.copy(
-                        liked = it.liked,
-                        retweeted = it.retweeted
+                        liked = liked ?: it.liked,
+                        retweeted = retweet ?: it.retweeted
                     )
                 )
             }

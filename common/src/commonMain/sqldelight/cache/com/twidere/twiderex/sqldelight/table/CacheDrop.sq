@@ -8,4 +8,6 @@ clearAllTables{
     DELETE FROM DbTrendHistory;
     DELETE FROM DbNotificationCursor;
     DELETE FROM DbList;
+    DELETE FROM DbStatus;
+    DELETE FROM DbStatusReactions;
 }

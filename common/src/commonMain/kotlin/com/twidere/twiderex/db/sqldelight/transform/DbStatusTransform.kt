@@ -64,7 +64,11 @@ internal fun UiStatus.toDbStatusWithAttachments(accountKey: MicroBlogKey): DbSta
         inReplyToStatusId = inReplyToStatusId,
         inReplyToUserId = inReplyToUserId,
         refrenceStatus = DbStatusReferenceList(referenceStatus.map { DbStatusReference(it.key, it.value.statusKey) }),
-        extra = extra?.json(),
+        extra = when (extra) {
+            is TwitterStatusExtra -> extra.json()
+            is MastodonStatusExtra -> extra.json()
+            else -> extra.toString()
+        },
     ),
     reactions = DbStatusReactions(
         liked = liked,
