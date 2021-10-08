@@ -48,6 +48,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.MR
 import com.twidere.twiderex.compose.LocalResLoader
+import com.twidere.twiderex.preferences.LocalHttpConfig
 import com.twidere.twiderex.utils.video.CustomVideoControl
 import com.twidere.twiderex.utils.video.VideoPool
 import kotlinx.coroutines.Job
@@ -76,7 +77,7 @@ fun VideoPlayer(
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     val resLoder = LocalResLoader.current
     val context = getContext()
-    val httpConfig = httpConfig()
+    val httpConfig = LocalHttpConfig.current
     var mediaPrepared by remember { mutableStateOf(false) }
     Box {
         if (playInitial) {
@@ -283,9 +284,6 @@ expect fun PlatformView(
 
 @Composable
 expect fun getContext(): Any
-
-@Composable
-expect fun httpConfig(): Any
 
 object UserAvatarDefaults {
     val AvatarSize = 44.dp

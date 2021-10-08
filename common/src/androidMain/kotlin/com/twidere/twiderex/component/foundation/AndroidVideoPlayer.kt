@@ -37,7 +37,6 @@ import com.google.android.exoplayer2.ui.StyledPlayerView
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.twidere.services.http.config.HttpConfig
 import com.twidere.twiderex.http.TwidereServiceFactory
-import com.twidere.twiderex.preferences.LocalHttpConfig
 import com.twidere.twiderex.utils.video.CacheDataSourceFactory
 import com.twidere.twiderex.utils.video.VideoPool
 import kotlinx.coroutines.CoroutineScope
@@ -185,9 +184,4 @@ actual class NativePlayerView actual constructor(
 @Composable
 actual fun getContext(): Any {
     return LocalContext.current
-}
-
-@Composable
-actual fun httpConfig(): Any {
-    return LocalHttpConfig.current
 }

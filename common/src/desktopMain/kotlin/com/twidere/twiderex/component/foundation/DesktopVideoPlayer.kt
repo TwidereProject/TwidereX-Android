@@ -130,11 +130,6 @@ actual fun getContext(): Any {
     return Any()
 }
 
-@Composable
-actual fun httpConfig(): Any {
-    return Any()
-}
-
 /**
  * To return mediaPlayer from player components.
  * The method names are same, but they don't share the same parent/interface.
