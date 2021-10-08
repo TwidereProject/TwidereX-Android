@@ -10,4 +10,5 @@ clearAllTables{
     DELETE FROM DbList;
     DELETE FROM DbStatus;
     DELETE FROM DbStatusReactions;
+    DELETE FROM DbPagingTimeline;
 }
