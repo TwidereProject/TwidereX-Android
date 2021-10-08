@@ -150,7 +150,8 @@ fun mockIStatus(
     id: String = UUID.randomUUID().toString(),
     hasMedia: Boolean = false,
     authorId: String = UUID.randomUUID().toString(),
-    hasReference: Boolean = false
+    hasReference: Boolean = false,
+    text: String = "text"
 ): IStatus {
     return StatusV2(
         id = id,
@@ -165,7 +166,8 @@ fun mockIStatus(
                 type = ReferencedTweetType.retweeted,
                 id = UUID.randomUUID().toString()
             ).apply { status = mockIStatus() as StatusV2 }
-        ) else emptyList()
+        ) else emptyList(),
+        text = text
     ).apply {
         user = UserV2(
             id = authorId,

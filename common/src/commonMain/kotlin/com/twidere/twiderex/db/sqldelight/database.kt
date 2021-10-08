@@ -27,6 +27,7 @@ import com.twidere.twiderex.db.sqldelight.adapter.DraftAdapterFactory
 import com.twidere.twiderex.db.sqldelight.adapter.ListAdapterFactory
 import com.twidere.twiderex.db.sqldelight.adapter.MediaAdapterFactory
 import com.twidere.twiderex.db.sqldelight.adapter.NotificationCursorAdapterFactory
+import com.twidere.twiderex.db.sqldelight.adapter.PagingTimelineAdapterFactory
 import com.twidere.twiderex.db.sqldelight.adapter.SearchAdapterFactory
 import com.twidere.twiderex.db.sqldelight.adapter.StatusAdapterFactory
 import com.twidere.twiderex.db.sqldelight.adapter.StatusReactionsFactory
@@ -60,6 +61,7 @@ internal fun createCacheDataBase(driver: SqlDriver): SqlDelightCacheDatabase {
         DbNotificationCursorAdapter = NotificationCursorAdapterFactory.create(),
         DbListAdapter = ListAdapterFactory.create(),
         DbStatusAdapter = StatusAdapterFactory.create(),
-        DbStatusReactionsAdapter = StatusReactionsFactory.create()
+        DbStatusReactionsAdapter = StatusReactionsFactory.create(),
+        DbPagingTimelineAdapter = PagingTimelineAdapterFactory.create()
     )
 }
