@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Slider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -37,8 +38,6 @@ import androidx.compose.ui.Modifier
 import com.twidere.twiderex.MR
 import com.twidere.twiderex.component.foundation.NativePlayerView
 import com.twidere.twiderex.component.foundation.PlayerProgressCallBack
-import com.twidere.twiderex.component.foundation.SeekBar
-import com.twidere.twiderex.component.foundation.SeekBarState
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
 
@@ -50,24 +49,24 @@ fun CustomVideoControl(
     modifier: Modifier = Modifier,
     onPlayPause: ((Boolean) -> Unit)? = null
 ) {
-    val seekBarState = remember {
-        SeekBarState(
-            duration = player.duration(),
-            initPosition = player.contentPosition()
-        ) { seekTime ->
-            player.seekTo(seekTime)
-        }
-    }
     var isPlaying by remember {
         mutableStateOf(playEnabled)
     }
     var isMute by remember {
         mutableStateOf(mute)
     }
+    var isSeeking by remember {
+        mutableStateOf(false)
+    }
+    var sliderValue by remember {
+        mutableStateOf(player.contentPosition().toFloat())
+    }
     LaunchedEffect(player) {
         player.playerProgressCallBack = object : PlayerProgressCallBack {
             override fun onTimeChanged(time: Long) {
-                seekBarState.onTimeChange(time)
+                if (!isSeeking) {
+                    sliderValue = time.toFloat()
+                }
             }
         }
     }
@@ -93,8 +92,17 @@ fun CustomVideoControl(
         }
 
         Box(modifier.weight(1f)) {
-            SeekBar(
-                state = seekBarState
+            Slider(
+                valueRange = 0f..player.duration().toFloat(),
+                value = sliderValue,
+                onValueChange = {
+                    isSeeking = true
+                    sliderValue = it
+                },
+                onValueChangeFinished = {
+                    player.seekTo(sliderValue.toLong())
+                    isSeeking = false
+                }
             )
         }
 
