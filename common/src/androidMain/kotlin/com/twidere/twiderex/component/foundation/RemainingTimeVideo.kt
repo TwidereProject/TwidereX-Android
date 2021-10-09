@@ -18,18 +18,12 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.utils.video
+package com.twidere.twiderex.component.foundation
 
-import java.util.concurrent.ConcurrentHashMap
+import com.google.android.exoplayer2.SimpleExoPlayer
 
-object VideoPool {
-    private val pool = ConcurrentHashMap<String, Long>()
-
-    fun get(url: String): Long {
-        return pool[url] ?: 1L
-    }
-
-    fun set(url: String, position: Long) {
-        pool[url] = position
+class RemainingTimeExoPlayer(builder: Builder) : SimpleExoPlayer(builder) {
+    override fun getContentPosition(): Long {
+        return super.getContentPosition() - contentDuration
     }
 }

@@ -30,7 +30,6 @@ import com.google.android.exoplayer2.upstream.cache.CacheDataSink
 import com.google.android.exoplayer2.upstream.cache.CacheDataSource
 import com.google.android.exoplayer2.upstream.cache.SimpleCache
 import com.google.android.exoplayer2.util.Util
-import com.twidere.twiderex.R
 
 class CacheDataSourceFactory(
     private val context: Context,
@@ -50,7 +49,11 @@ class CacheDataSourceFactory(
     }
 
     init {
-        val userAgent = Util.getUserAgent(context, context.getString(R.string.app_name))
+        // todo application name
+        val userAgent = Util.getUserAgent(
+            context,
+            ""
+        )
         val bandwidthMeter = DefaultBandwidthMeter.Builder(context).build()
         defaultDatasourceFactory = DefaultDataSourceFactory(
             this.context,

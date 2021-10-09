@@ -64,7 +64,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -82,6 +81,7 @@ import com.mxalbert.zoomable.Zoomable
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.LoadingProgress
+import com.twidere.twiderex.component.foundation.NativePlayerView
 import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.foundation.VideoPlayer
 import com.twidere.twiderex.component.status.LikeButton
@@ -163,16 +163,18 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewM
         pageCount = status.media.size,
     )
     val currentMedia = status.media[pagerState.currentPage]
-    val context = LocalContext.current
-    val videoControl = remember(pagerState.currentPage) {
-        if (currentMedia.type == MediaType.video) {
-            PlayerControlView(context).apply {
-                showTimeoutMs = 0
-            }
-        } else {
-            null
-        }
-    }
+    // val context = LocalContext.current
+    // todo use redefine custom control view by compose
+    val videoControl = null
+    //     remember(pagerState.currentPage) {
+    //     if (currentMedia.type == MediaType.video) {
+    //         PlayerControlView(context).apply {
+    //             showTimeoutMs = 0
+    //         }
+    //     } else {
+    //         null
+    //     }
+    // }
     val swiperState = rememberSwiperState(
         onDismiss = {
             navController.popBackStack()
@@ -410,7 +412,7 @@ fun MediaView(
         initialPage = 0,
         pageCount = media.size,
     ),
-    customControl: PlayerControlView? = null,
+    customControl: @Composable ((NativePlayerView) -> Unit)? = null,
 ) {
     Box(
         modifier = Modifier

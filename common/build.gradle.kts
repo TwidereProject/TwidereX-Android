@@ -83,6 +83,8 @@ kotlin {
                 implementation("io.coil-kt:coil-compose:${Versions.coil}")
                 implementation("io.coil-kt:coil-gif:${Versions.coil}")
                 implementation("io.coil-kt:coil-svg:${Versions.coil}")
+                implementation("com.google.android.exoplayer:exoplayer:${Versions.exoplayer}")
+                implementation("com.google.android.exoplayer:extension-okhttp:${Versions.exoplayer}")
                 implementation("com.squareup.sqldelight:android-driver:${Versions.sqlDelight}")
                 implementation("com.squareup.sqldelight:sqlite-driver:${Versions.sqlDelight}")
                 implementation("androidx.datastore:datastore:${Versions.datastore}")
@@ -104,6 +106,7 @@ kotlin {
         val androidTest by getting
         val desktopMain by getting {
             dependencies {
+                implementation("uk.co.caprica:vlcj:4.7.1")
                 implementation("com.squareup.sqldelight:sqlite-driver:${Versions.sqlDelight}")
             }
         }
