@@ -30,6 +30,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.mapNotNull
+import moe.tlaster.kfilepicker.FilePicker
 import moe.tlaster.precompose.viewmodel.ViewModel
 
 class MediaViewModel(
@@ -42,13 +43,15 @@ class MediaViewModel(
         accountRepository.activeAccount.mapNotNull { it }
     }
 
-    suspend fun saveFile(currentMedia: UiMedia, target: String) {
+    suspend fun saveFile(currentMedia: UiMedia) {
         val account = account.firstOrNull() ?: return
+        val fileName = currentMedia.fileName ?: return
+        val file = FilePicker.createFile(fileName) ?: return
         currentMedia.mediaUrl?.let {
             mediaAction.download(
                 accountKey = account.accountKey,
                 source = it,
-                target = target
+                target = file.path
             )
         }
     }

@@ -20,8 +20,6 @@
  */
 package com.twidere.twiderex.scenes
 
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.expandVertically
@@ -323,22 +321,11 @@ private fun StatusMediaInfo(
             ReplyButton(status = status, withNumber = false)
             RetweetButton(status = status, withNumber = false)
             LikeButton(status = status, withNumber = false)
-            val saveFileLauncher = rememberLauncherForActivityResult(
-                contract = ActivityResultContracts.CreateDocument()
-            ) {
-                it?.let {
-                    scope.launch {
-                        viewModel.saveFile(currentMedia, it.toString())
-                    }
-                }
-            }
             ShareButton(status = status) { callback ->
                 DropdownMenuItem(
                     onClick = {
                         callback.invoke()
-                        currentMedia.fileName?.let {
-                            saveFileLauncher.launch(it)
-                        }
+                        viewModel.saveFile(currentMedia)
                     }
                 ) {
                     Text(
