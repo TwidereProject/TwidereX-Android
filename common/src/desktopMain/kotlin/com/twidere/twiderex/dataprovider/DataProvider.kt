@@ -32,6 +32,7 @@ import com.twidere.twiderex.db.sqldelight.createCacheDataBase
 actual class DataProvider {
     // data provide functions....
     actual companion object Factory {
+        // TODO unify storage file path with preference
         private const val APP_DATABASE = "jdbc:sqlite:app"
         private const val CACHE_DATABASE = "jdbc:sqlite:cache"
         actual fun create(): DataProvider {
