@@ -23,10 +23,6 @@ package com.twidere.twiderex.scenes.dm
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
-import android.net.Uri
-import androidx.activity.compose.ManagedActivityResultLauncher
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
@@ -81,7 +77,6 @@ import com.twidere.twiderex.model.ui.UiDMEvent
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.dm.DMEventViewModel
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.koin.core.parameter.parametersOf
 
@@ -120,20 +115,14 @@ fun DMConversationScene(conversationKey: MicroBlogKey) {
 @Composable
 fun NormalContent(viewModel: DMEventViewModel) {
     val clipboardManager = LocalContext.current.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager?
-    val filePickerLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.OpenDocument(),
-        onResult = {
-            viewModel.inputImage.value = it.toString()
-        },
-    )
     val copyText = stringResource(res = com.twidere.twiderex.MR.strings.scene_messages_action_copy_text)
     val source = viewModel.source.collectAsLazyPagingItems()
     val input by viewModel.input.observeAsState(initial = "")
     val inputImage by viewModel.inputImage.observeAsState(null)
     val listState = rememberLazyListState()
-    val scope = rememberCoroutineScope()
     val firstEventKey by viewModel.firstEventKey.observeAsState(null)
     val pendingActionMessage by viewModel.pendingActionMessage.observeAsState(null)
+    val scope = rememberCoroutineScope()
     if (source.itemCount > 0) {
         source.peek(0)?.messageKey?.let {
             viewModel.firstEventKey.value = it.toString()
@@ -172,13 +161,12 @@ fun NormalContent(viewModel: DMEventViewModel) {
         }
         InputComponent(
             modifier = Modifier.fillMaxWidth(),
-            scope = scope,
-            filePickerLauncher = filePickerLauncher,
             enableSelectPhoto = inputImage == null,
             enableSend = input.isNotEmpty() || inputImage != null,
             input = input,
             onValueChanged = { viewModel.input.value = it },
-            onSend = { viewModel.sendMessage() }
+            onSend = { viewModel.sendMessage() },
+            onPickImage = { viewModel.pickImage() }
         )
     }
     LaunchedEffect(
@@ -276,13 +264,12 @@ private object InputPhotoPreviewDefaults {
 @Composable
 fun InputComponent(
     modifier: Modifier = Modifier,
-    filePickerLauncher: ManagedActivityResultLauncher<Array<String>, Uri>,
-    scope: CoroutineScope,
     input: String,
     onValueChanged: (input: String) -> Unit,
     enableSelectPhoto: Boolean,
     enableSend: Boolean,
-    onSend: () -> Unit
+    onSend: () -> Unit,
+    onPickImage: () -> Unit,
 ) {
     Row(
         modifier = modifier.padding(InputComponentDefaults.ContentPadding),
@@ -291,9 +278,7 @@ fun InputComponent(
         AnimatedVisibility(visible = enableSelectPhoto) {
             IconButton(
                 onClick = {
-                    scope.launch {
-                        filePickerLauncher.launch(arrayOf("image/*"))
-                    }
+                    onPickImage.invoke()
                 }
             ) {
                 Icon(

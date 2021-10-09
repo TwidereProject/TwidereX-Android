@@ -81,6 +81,7 @@ import com.twidere.twiderex.utils.CustomTabSignInChannel
 import com.twidere.twiderex.utils.LocalPlatformResolver
 import com.twidere.twiderex.utils.PlatformResolver
 import kotlinx.coroutines.flow.MutableStateFlow
+import moe.tlaster.kfilepicker.FilePicker
 import moe.tlaster.precompose.lifecycle.PreComposeActivity
 import moe.tlaster.precompose.lifecycle.setContent
 import moe.tlaster.precompose.navigation.NavController
@@ -121,6 +122,7 @@ class TwidereXActivity : PreComposeActivity(), KoinComponent {
     @OptIn(ExperimentalAnimationApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        FilePicker.init(activityResultRegistry, this, contentResolver)
         isActiveNetworkMetered.value = ConnectivityManagerCompat.isActiveNetworkMetered(
             connectivityManager
         )

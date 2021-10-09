@@ -43,7 +43,9 @@ fun KoinApplication.setupModules() {
     modules(kmpModule)
     modules(
         module {
-            OAuthLauncher()
+            single {
+                OAuthLauncher(get())
+            }
         }
     )
 }

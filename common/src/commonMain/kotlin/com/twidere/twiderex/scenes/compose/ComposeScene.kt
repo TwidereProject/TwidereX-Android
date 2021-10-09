@@ -1137,12 +1137,6 @@ private fun ComposeActions(
     }
     val scope = rememberCoroutineScope()
     val navController = LocalNavController.current
-    val filePickerLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetMultipleContents(),
-        onResult = {
-            viewModel.putImages(it.map { it.toString() })
-        },
-    )
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions(),
         onResult = {
@@ -1157,9 +1151,7 @@ private fun ComposeActions(
             AnimatedVisibility(visible = allowImage) {
                 IconButton(
                     onClick = {
-                        scope.launch {
-                            filePickerLauncher.launch("image/*")
-                        }
+                        viewModel.pickImages()
                     }
                 ) {
                     Icon(
