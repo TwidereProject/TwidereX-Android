@@ -20,11 +20,15 @@
  */
 package com.twidere.twiderex.model.ui
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class UiEmojiCategory(
     val category: String?,
     val emoji: List<UiEmoji>
 )
 
+@Serializable
 data class UiEmoji(
     val shortcode: String? = null,
     val url: String? = null,

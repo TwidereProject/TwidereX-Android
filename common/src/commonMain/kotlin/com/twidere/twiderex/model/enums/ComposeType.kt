@@ -20,6 +20,9 @@
  */
 package com.twidere.twiderex.model.enums
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 enum class ComposeType {
     New,
     Reply,

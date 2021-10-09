@@ -20,6 +20,7 @@
  */
 package com.twidere.twiderex.utils
 
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -38,3 +39,7 @@ inline fun <reified T> T.json(): String =
 
 inline fun <reified T> String.fromJson() =
     JSON.decodeFromString<T>(this)
+
+fun <T> T.json(serializer: KSerializer<T>) = JSON.encodeToString(serializer, this)
+
+fun <T> String.fromJson(serializer: KSerializer<T>) = JSON.decodeFromString(serializer, this)

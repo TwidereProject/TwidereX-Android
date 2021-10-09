@@ -9,6 +9,18 @@ plugins {
     kotlin("kapt")
     id("com.google.devtools.ksp").version(Versions.ksp)
     id("dev.icerock.mobile.multiplatform-resources") version Versions.moko
+    id("com.squareup.sqldelight")
+}
+
+sqldelight {
+    database("SqlDelightAppDatabase") {
+        packageName = "${Package.id}.sqldelight"
+        sourceFolders = listOf("sqldelight/app")
+    }
+    database("SqlDelightCacheDatabase") {
+        packageName = "${Package.id}.sqldelight"
+        sourceFolders = listOf("sqldelight/cache")
+    }
 }
 
 group = Package.group
@@ -23,9 +35,6 @@ kotlin {
     jvm("desktop") {
         compilations.all {
             kotlinOptions.jvmTarget = Versions.Java.jvmTarget
-        }
-        testRuns["test"].executionTask.configure {
-            useJUnitPlatform()
         }
     }
     sourceSets {
@@ -46,6 +55,7 @@ kotlin {
                 implementation("org.jsoup:jsoup:1.13.1")
                 implementation(projects.routeProcessor)
                 ksp(projects.routeProcessor)
+                implementation("com.squareup.sqldelight:coroutines-extensions-jvm:${Versions.sqlDelight}")
                 api("dev.icerock.moko:resources:${Versions.moko}")
                 implementation("app.cash.turbine:turbine:0.6.1")
             }
@@ -73,6 +83,8 @@ kotlin {
                 implementation("io.coil-kt:coil-compose:${Versions.coil}")
                 implementation("io.coil-kt:coil-gif:${Versions.coil}")
                 implementation("io.coil-kt:coil-svg:${Versions.coil}")
+                implementation("com.squareup.sqldelight:android-driver:${Versions.sqlDelight}")
+                implementation("com.squareup.sqldelight:sqlite-driver:${Versions.sqlDelight}")
                 implementation("androidx.datastore:datastore:${Versions.datastore}")
                 implementation("androidx.datastore:datastore-preferences:${Versions.datastore}")
                 implementation("androidx.exifinterface:exifinterface:${Versions.androidx_exifinterface}")
@@ -89,10 +101,13 @@ kotlin {
                 implementation("androidx.room:room-testing:${Versions.room}")
             }
         }
+        val androidTest by getting
         val desktopMain by getting {
             dependencies {
+                implementation("com.squareup.sqldelight:sqlite-driver:${Versions.sqlDelight}")
             }
         }
+        val desktopTest by getting
     }
 }
 
