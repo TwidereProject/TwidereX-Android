@@ -31,7 +31,7 @@ import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiDMConversationWithLatestMessage
 import com.twidere.twiderex.paging.mediator.dm.DMConversationMediator
 import kotlinx.coroutines.runBlocking
-import org.junit.Test
+import kotlin.test.Test
 
 internal class DMConversationMediatorTest {
     private val accountKey = MicroBlogKey.twitter("123")

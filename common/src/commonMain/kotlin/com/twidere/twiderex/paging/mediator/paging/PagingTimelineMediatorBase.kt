@@ -25,7 +25,6 @@ import androidx.paging.LoadType
 import androidx.paging.Pager
 import androidx.paging.PagingData
 import androidx.paging.PagingState
-import androidx.paging.filter
 import androidx.paging.map
 import com.twidere.services.microblog.model.IStatus
 import com.twidere.twiderex.dataprovider.mapper.toPagingTimeline
@@ -124,9 +123,8 @@ abstract class PagingTimelineMediatorBase<T : IPagination>(
     ): List<IStatus>
 }
 
-fun Pager<Int, PagingTimeLineWithStatus>.toUi(accountKey: MicroBlogKey): Flow<PagingData<UiStatus>> {
+fun Pager<Int, PagingTimeLineWithStatus>.toUi(): Flow<PagingData<UiStatus>> {
     return flow.map { pagingData ->
-        pagingData.filter { it.timeline.accountKey == accountKey }
-            .map { it.status }
+        pagingData.map { it.status }
     }
 }

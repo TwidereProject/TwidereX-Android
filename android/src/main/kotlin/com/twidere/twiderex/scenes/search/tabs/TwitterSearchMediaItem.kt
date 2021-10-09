@@ -25,15 +25,14 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.res.stringResource
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
-import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
 import com.twidere.twiderex.component.lazy.ui.LazyUiStatusImageList
-import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.refreshOrRetry
 import com.twidere.twiderex.preferences.model.DisplayPreferences
-import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalVideoPlayback
 import com.twidere.twiderex.viewmodel.twitter.search.TwitterSearchMediaViewModel
+import org.koin.core.parameter.parametersOf
 
 class TwitterSearchMediaItem : SearchSceneItem {
     @Composable
@@ -43,11 +42,9 @@ class TwitterSearchMediaItem : SearchSceneItem {
 
     @Composable
     override fun Content(keyword: String) {
-        val account = LocalActiveAccount.current ?: return
-        val viewModel =
-            assistedViewModel<TwitterSearchMediaViewModel.AssistedFactory, TwitterSearchMediaViewModel> {
-                it.create(account, keyword)
-            }
+        val viewModel: TwitterSearchMediaViewModel = getViewModel {
+            parametersOf(keyword)
+        }
         val source = viewModel.source.collectAsLazyPagingItems()
         CompositionLocalProvider(
             LocalVideoPlayback provides DisplayPreferences.AutoPlayback.Off

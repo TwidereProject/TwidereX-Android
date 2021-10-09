@@ -31,7 +31,7 @@ import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.paging.PagingTimeLineWithStatus
 import com.twidere.twiderex.paging.mediator.user.UserStatusMediator
 import kotlinx.coroutines.runBlocking
-import org.junit.Test
+import kotlin.test.Test
 
 class UserStatusMediatorTest {
     @OptIn(ExperimentalPagingApi::class)

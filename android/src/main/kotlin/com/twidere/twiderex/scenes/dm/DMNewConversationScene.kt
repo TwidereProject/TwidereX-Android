@@ -34,7 +34,6 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -49,11 +48,10 @@ import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.TextInput
 import com.twidere.twiderex.component.lazy.ui.LazyUiUserList
-import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.navigation.RootRoute
-import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.dm.DMNewConversationViewModel
@@ -62,16 +60,10 @@ import moe.tlaster.precompose.navigation.PopUpTo
 
 @Composable
 fun DMNewConversationScene() {
-    val account = LocalActiveAccount.current ?: return
     val navController = LocalNavController.current
-    val viewModel = assistedViewModel<DMNewConversationViewModel.AssistedFactory, DMNewConversationViewModel>(
-        account
-    ) {
-        it.create(account)
-    }
+    val viewModel: DMNewConversationViewModel = getViewModel()
     val keyWord by viewModel.input.observeAsState("")
-    val sourceState by viewModel.sourceFlow.collectAsState(initial = null)
-    val searchSource = sourceState?.collectAsLazyPagingItems()
+    val source = viewModel.sourceFlow.collectAsLazyPagingItems()
     TwidereScene {
         InAppNotificationScaffold(
             topBar = {
@@ -96,31 +88,36 @@ fun DMNewConversationScene() {
                 }
             },
         ) {
-            searchSource?.let { source ->
-                SearchResult(
-                    source,
-                    onItemClick = { user ->
-                        viewModel.createNewConversation(
-                            user,
-                            onResult = { key ->
-                                key?.let {
-                                    navController.navigate(
-                                        RootRoute.Messages.Conversation(it),
-                                        NavOptions(popUpTo = PopUpTo(RootRoute.Messages.Home))
-                                    )
-                                }
+            SearchResult(
+                source,
+                onItemClick = { user ->
+                    viewModel.createNewConversation(
+                        user,
+                        onResult = { key ->
+                            key?.let {
+                                navController.navigate(
+                                    RootRoute.Messages.Conversation(it),
+                                    NavOptions(popUpTo = PopUpTo(RootRoute.Messages.Home))
+                                )
                             }
-                        )
-                    }
-                )
-            }
+                        }
+                    )
+                }
+            )
         }
     }
 }
 
 @Composable
-fun SearchInput(modifier: Modifier = Modifier, input: String, onValueChanged: (value: String) -> Unit) {
-    Row(verticalAlignment = Alignment.CenterVertically, modifier = modifier.padding(SearchInputDefaults.ContentPadding)) {
+fun SearchInput(
+    modifier: Modifier = Modifier,
+    input: String,
+    onValueChanged: (value: String) -> Unit
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier.padding(SearchInputDefaults.ContentPadding)
+    ) {
         Icon(
             painter = painterResource(id = R.drawable.ic_search),
             contentDescription = stringResource(

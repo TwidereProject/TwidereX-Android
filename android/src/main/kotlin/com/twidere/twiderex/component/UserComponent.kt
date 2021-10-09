@@ -65,7 +65,6 @@ import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -97,7 +96,7 @@ import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.component.status.UserName
 import com.twidere.twiderex.component.status.UserScreenName
 import com.twidere.twiderex.component.status.withAvatarClip
-import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.model.MicroBlogKey
@@ -106,7 +105,6 @@ import com.twidere.twiderex.model.ui.UiUrlEntity
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.navigation.RootRoute
 import com.twidere.twiderex.navigation.twidereXSchema
-import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.viewmodel.user.UserFavouriteTimelineViewModel
 import com.twidere.twiderex.viewmodel.user.UserMediaTimelineViewModel
@@ -117,19 +115,17 @@ import moe.tlaster.nestedscrollview.VerticalNestedScrollView
 import moe.tlaster.nestedscrollview.rememberNestedScrollViewState
 import moe.tlaster.placeholder.Placeholder
 import moe.tlaster.precompose.navigation.NavController
+import org.koin.core.parameter.parametersOf
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun UserComponent(
     userKey: MicroBlogKey,
 ) {
-    val account = LocalActiveAccount.current ?: return
-    val viewModel = assistedViewModel<UserViewModel.AssistedFactory, UserViewModel>(
-        account,
-        userKey,
-    ) {
-        it.create(account, userKey)
+    val viewModel: UserViewModel = getViewModel {
+        parametersOf(userKey)
     }
+    val isMe by viewModel.isMe.observeAsState(initial = false)
     val tabs = listOf(
         UserTabComponent(
             painterResource(id = R.drawable.ic_float_left),
@@ -144,7 +140,7 @@ fun UserComponent(
             UserMediaTimeline(userKey = userKey)
         },
     ).let {
-        if (viewModel.isMe || userKey.host == MicroBlogKey.TwitterHost) {
+        if (isMe || userKey.host == MicroBlogKey.TwitterHost) {
             it + UserTabComponent(
                 painterResource(id = R.drawable.ic_heart),
                 stringResource(id = com.twidere.common.R.string.accessibility_scene_user_tab_favourite)
@@ -233,16 +229,10 @@ fun UserStatusTimeline(
     viewModel: UserViewModel,
 ) {
     val user by viewModel.user.observeAsState(initial = null)
-    val account = LocalActiveAccount.current ?: return
-    var excludeReplies by rememberSaveable { mutableStateOf(false) }
-    val timelineViewModel =
-        assistedViewModel<UserTimelineViewModel.AssistedFactory, UserTimelineViewModel>(
-            account,
-            userKey,
-            excludeReplies,
-        ) {
-            it.create(account, userKey = userKey, excludeReplies)
-        }
+    val timelineViewModel: UserTimelineViewModel = getViewModel {
+        parametersOf(userKey)
+    }
+    val excludeReplies by timelineViewModel.excludeReplies.observeAsState(initial = false)
     val timelineSource = timelineViewModel.source.collectAsLazyPagingItems()
     // FIXME: 2021/2/20 Recover the scroll position require visiting the loadState once, have no idea why
     @Suppress("UNUSED_VARIABLE")
@@ -253,7 +243,7 @@ fun UserStatusTimeline(
             user?.let { user ->
                 item {
                     UserStatusTimelineFilter(user, excludeReplies) {
-                        excludeReplies = it
+                        timelineViewModel.setExcludeReplies(it)
                     }
                 }
             }
@@ -358,14 +348,9 @@ private object UserStatusTimelineFilterDefaults {
 fun UserMediaTimeline(
     userKey: MicroBlogKey,
 ) {
-    val account = LocalActiveAccount.current ?: return
-    val mediaViewModel =
-        assistedViewModel<UserMediaTimelineViewModel.AssistedFactory, UserMediaTimelineViewModel>(
-            account,
-            userKey,
-        ) {
-            it.create(account, userKey = userKey)
-        }
+    val mediaViewModel: UserMediaTimelineViewModel = getViewModel {
+        parametersOf(userKey)
+    }
     val mediaSource = mediaViewModel.source.collectAsLazyPagingItems()
     // FIXME: 2021/2/20 Recover the scroll position require visiting the loadState once, have no idea why
     @Suppress("UNUSED_VARIABLE")
@@ -377,14 +362,9 @@ fun UserMediaTimeline(
 fun UserFavouriteTimeline(
     userKey: MicroBlogKey,
 ) {
-    val account = LocalActiveAccount.current ?: return
-    val timelineViewModel =
-        assistedViewModel<UserFavouriteTimelineViewModel.AssistedFactory, UserFavouriteTimelineViewModel>(
-            account,
-            userKey,
-        ) {
-            it.create(account, userKey = userKey)
-        }
+    val timelineViewModel: UserFavouriteTimelineViewModel = getViewModel {
+        parametersOf(userKey)
+    }
     val timelineSource = timelineViewModel.source.collectAsLazyPagingItems()
     // FIXME: 2021/2/20 Recover the scroll position require visiting the loadState once, have no idea why
     @Suppress("UNUSED_VARIABLE")
@@ -402,6 +382,7 @@ fun UserInfo(
 ) {
     val user by viewModel.user.observeAsState(initial = null)
     val navController = LocalNavController.current
+    val isMe by viewModel.isMe.observeAsState(initial = false)
     Box(
         modifier = Modifier
             .background(MaterialTheme.colors.surface.withElevation())
@@ -440,9 +421,7 @@ fun UserInfo(
                         user = user,
                         size = UserInfoDefaults.AvatarSize
                     ) {
-                        if (user.profileImage is String) {
-                            navController.navigate(RootRoute.Media.Raw(user.profileImage.toString()))
-                        }
+                        navController.navigate(RootRoute.Media.Raw(user.profileImage))
                     }
                 }
             }
@@ -450,7 +429,7 @@ fun UserInfo(
             user?.let { user ->
                 UserInfoName(user)
             }
-            if (!viewModel.isMe) {
+            if (!isMe) {
                 Spacer(modifier = Modifier.height(UserInfoDefaults.RelationshipSpacing))
                 UserRelationship(viewModel)
             }

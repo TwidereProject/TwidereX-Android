@@ -56,6 +56,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -91,7 +92,7 @@ import com.twidere.twiderex.component.status.StatusText
 import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.component.status.UserName
 import com.twidere.twiderex.component.status.UserScreenName
-import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.hideControls
 import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.extensions.setOnSystemBarsVisibilityChangeListener
@@ -101,21 +102,21 @@ import com.twidere.twiderex.model.enums.MediaType
 import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.preferences.model.DisplayPreferences
-import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.LocalVideoPlayback
 import com.twidere.twiderex.ui.LocalWindow
 import com.twidere.twiderex.ui.TwidereDialog
 import com.twidere.twiderex.viewmodel.MediaViewModel
+import kotlinx.coroutines.launch
 import moe.tlaster.swiper.Swiper
 import moe.tlaster.swiper.SwiperState
 import moe.tlaster.swiper.rememberSwiperState
+import org.koin.core.parameter.parametersOf
 
 @Composable
 fun StatusMediaScene(statusKey: MicroBlogKey, selectedIndex: Int) {
-    val account = LocalActiveAccount.current ?: return
-    val viewModel = assistedViewModel<MediaViewModel.AssistedFactory, MediaViewModel> {
-        it.create(account, statusKey)
+    val viewModel = getViewModel<MediaViewModel> {
+        parametersOf(statusKey)
     }
     val status by viewModel.status.observeAsState(null)
     val loading by viewModel.loading.observeAsState(initial = false)
@@ -296,7 +297,7 @@ private fun StatusMediaInfo(
     viewModel: MediaViewModel,
     currentMedia: UiMedia
 ) {
-    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
     Column(
         modifier = Modifier
             .padding(StatusMediaInfoDefaults.ContentPadding),
@@ -327,7 +328,9 @@ private fun StatusMediaInfo(
                 contract = ActivityResultContracts.CreateDocument()
             ) {
                 it?.let {
-                    viewModel.saveFile(currentMedia, it)
+                    scope.launch {
+                        viewModel.saveFile(currentMedia, it.toString())
+                    }
                 }
             }
             ShareButton(status = status) { callback ->
@@ -347,11 +350,11 @@ private fun StatusMediaInfo(
                     onClick = {
                         callback.invoke()
                         currentMedia.fileName?.let {
-                            viewModel.shareMedia(
-                                currentMedia = currentMedia,
-                                target = it,
-                                context = context
-                            )
+                            scope.launch {
+                                viewModel.shareMedia(
+                                    currentMedia = currentMedia
+                                )
+                            }
                         }
                     }
                 ) {

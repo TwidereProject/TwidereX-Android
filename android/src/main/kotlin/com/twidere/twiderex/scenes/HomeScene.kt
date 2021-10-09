@@ -90,11 +90,12 @@ import com.twidere.twiderex.component.status.UserName
 import com.twidere.twiderex.component.status.UserScreenName
 import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.extensions.withElevation
+import com.twidere.twiderex.model.HomeMenus
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.navigation.RootRoute
 import com.twidere.twiderex.preferences.LocalAppearancePreferences
 import com.twidere.twiderex.preferences.model.AppearancePreferences
-import com.twidere.twiderex.scenes.home.HomeMenus
+import com.twidere.twiderex.scenes.home.item
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalActiveAccountViewModel
 import com.twidere.twiderex.ui.LocalNavController

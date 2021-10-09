@@ -32,7 +32,7 @@ import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.paging.PagingTimeLineWithStatus
 import com.twidere.twiderex.paging.mediator.search.SearchStatusMediator
 import kotlinx.coroutines.runBlocking
-import org.junit.Test
+import kotlin.test.Test
 
 internal class SearchStatusMediatorTest {
     @OptIn(ExperimentalPagingApi::class)

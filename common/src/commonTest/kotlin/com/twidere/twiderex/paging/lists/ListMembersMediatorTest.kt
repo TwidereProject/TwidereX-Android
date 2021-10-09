@@ -31,7 +31,7 @@ import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.paging.crud.PagingMemoryCache
 import com.twidere.twiderex.paging.mediator.list.ListsMembersMediator
 import kotlinx.coroutines.runBlocking
-import org.junit.Test
+import kotlin.test.Test
 
 class ListMembersMediatorTest {
 

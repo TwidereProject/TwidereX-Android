@@ -22,19 +22,23 @@ package com.twidere.twiderex.repository
 
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.PagingData
+import androidx.paging.flatMap
 import com.twidere.services.mastodon.MastodonService
 import com.twidere.services.microblog.TimelineService
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.PlatformType
+import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.paging.mediator.list.ListsTimelineMediator
 import com.twidere.twiderex.paging.mediator.paging.pager
 import com.twidere.twiderex.paging.mediator.paging.toUi
 import com.twidere.twiderex.paging.mediator.timeline.MastodonHashtagTimelineMediator
 import com.twidere.twiderex.paging.mediator.user.UserFavouriteMediator
+import com.twidere.twiderex.paging.mediator.user.UserMediaMediator
 import com.twidere.twiderex.paging.mediator.user.UserStatusMediator
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 @OptIn(ExperimentalPagingApi::class)
 class TimelineRepository(
@@ -53,7 +57,7 @@ class TimelineRepository(
             accountKey = accountKey,
             service = service,
         )
-        return mediator.pager().toUi(accountKey = accountKey)
+        return mediator.pager().toUi()
     }
 
     fun userTimeline(
@@ -68,7 +72,7 @@ class TimelineRepository(
             accountKey = accountKey,
             service = service,
             exclude_replies = exclude_replies,
-        ).pager().toUi(accountKey = accountKey)
+        ).pager().toUi()
     }
 
     fun listTimeline(
@@ -81,7 +85,7 @@ class TimelineRepository(
             database = database,
             listKey = listKey,
             service = service
-        ).pager().toUi(accountKey = accountKey)
+        ).pager().toUi()
     }
 
     fun mastodonHashtagTimeline(
@@ -95,6 +99,24 @@ class TimelineRepository(
             accountKey = accountKey,
             database = database
         )
-        return mediator.pager().toUi(accountKey = accountKey)
+        return mediator.pager().toUi()
+    }
+
+    fun mediaTimeline(
+        userKey: MicroBlogKey,
+        accountKey: MicroBlogKey,
+        service: TimelineService
+    ): Flow<PagingData<Pair<UiMedia, UiStatus>>> {
+        val mediator = UserMediaMediator(
+            userKey = userKey,
+            database = database,
+            accountKey = accountKey,
+            service = service
+        )
+        return mediator.pager().toUi().map {
+            it.flatMap {
+                it.media.map { media -> media to it }
+            }
+        }
     }
 }

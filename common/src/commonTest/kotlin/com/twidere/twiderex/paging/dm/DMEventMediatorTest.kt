@@ -31,7 +31,7 @@ import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiDMEvent
 import com.twidere.twiderex.paging.mediator.dm.DMEventMediator
 import kotlinx.coroutines.runBlocking
-import org.junit.Test
+import kotlin.test.Test
 
 /**
  * instead of testing pagination, we should focus on our code logic

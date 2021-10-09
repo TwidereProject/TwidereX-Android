@@ -29,7 +29,7 @@ import kotlinx.coroutines.flow.Flow
 
 class UserRepository(
     private val database: CacheDatabase,
-    private val accountRepository: AccountUpdateRepository,
+    private val accountRepository: AccountRepository,
 ) {
     suspend fun lookupUserByName(name: String, accountKey: MicroBlogKey, lookupService: LookupService): UiUser {
         return lookupService.lookupUserByName(name).toUi(accountKey).also {

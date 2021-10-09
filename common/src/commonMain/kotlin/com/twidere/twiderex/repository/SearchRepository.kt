@@ -20,16 +20,34 @@
  */
 package com.twidere.twiderex.repository
 
+import androidx.paging.flatMap
+import androidx.paging.map
+import com.twidere.services.microblog.SearchService
 import com.twidere.twiderex.db.AppDatabase
+import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiSearch
+import com.twidere.twiderex.paging.mediator.paging.pager
+import com.twidere.twiderex.paging.mediator.search.SearchMediaMediator
+import kotlinx.coroutines.flow.map
 
 class SearchRepository(
-    private val database: AppDatabase
+    private val database: AppDatabase,
+    private val cacheDatabase: CacheDatabase,
 ) {
     fun searchHistory(accountKey: MicroBlogKey) = database.searchDao().getAllHistory(accountKey)
 
     fun savedSearch(accountKey: MicroBlogKey) = database.searchDao().getAllSaved(accountKey)
+
+    fun media(keyword: String, accountKey: MicroBlogKey, service: SearchService) =
+        SearchMediaMediator(keyword, cacheDatabase, accountKey, service)
+            .pager()
+            .flow.map { it.map { it.status } }
+            .map {
+                it.flatMap {
+                    it.media.map { media -> media to it }
+                }
+            }
 
     suspend fun addOrUpgrade(
         content: String,

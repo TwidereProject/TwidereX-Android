@@ -28,8 +28,6 @@ import android.net.NetworkRequest
 import android.net.Uri
 import android.os.Bundle
 import android.view.WindowManager
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.fadeIn
@@ -59,13 +57,15 @@ import androidx.core.net.ConnectivityManagerCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.insets.ProvideWindowInsets
 import com.twidere.twiderex.action.LocalStatusActions
 import com.twidere.twiderex.action.StatusActions
 import com.twidere.twiderex.component.foundation.LocalInAppNotification
-import com.twidere.twiderex.di.assisted.ProvideAssistedFactory
+import com.twidere.twiderex.compose.LocalResLoader
 import com.twidere.twiderex.extensions.observeAsState
+import com.twidere.twiderex.kmp.LocalRemoteNavigator
+import com.twidere.twiderex.kmp.RemoteNavigator
+import com.twidere.twiderex.kmp.ResLoader
 import com.twidere.twiderex.navigation.Router
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.preferences.PreferencesHolder
@@ -80,15 +80,14 @@ import com.twidere.twiderex.ui.LocalWindowInsetsController
 import com.twidere.twiderex.utils.CustomTabSignInChannel
 import com.twidere.twiderex.utils.LocalPlatformResolver
 import com.twidere.twiderex.utils.PlatformResolver
-import com.twidere.twiderex.viewmodel.ActiveAccountViewModel
-import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.MutableStateFlow
+import moe.tlaster.precompose.lifecycle.PreComposeActivity
+import moe.tlaster.precompose.lifecycle.setContent
 import moe.tlaster.precompose.navigation.NavController
-import org.koin.android.ext.android.inject
-import javax.inject.Inject
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
-@AndroidEntryPoint
-class TwidereXActivity : ComponentActivity() {
+class TwidereXActivity : PreComposeActivity(), KoinComponent {
 
     private val navController by lazy {
         NavController()
@@ -107,22 +106,17 @@ class TwidereXActivity : ComponentActivity() {
         }
     }
 
-    @Inject
-    lateinit var viewModelHolder: TwidereXActivityAssistedViewModelHolder
+    private val statusActions: StatusActions by inject()
 
-    @Inject
-    lateinit var statusActions: StatusActions
+    private val preferencesHolder: PreferencesHolder by inject()
 
-    val preferencesHolder: PreferencesHolder by inject()
+    private val inAppNotification: InAppNotification by inject()
 
-    @Inject
-    lateinit var inAppNotification: InAppNotification
+    private val connectivityManager: ConnectivityManager by inject()
 
-    @Inject
-    lateinit var connectivityManager: ConnectivityManager
+    private val platformResolver: PlatformResolver by inject()
 
-    @Inject
-    lateinit var platformResolver: PlatformResolver
+    private val remoteNavigator: RemoteNavigator by inject()
 
     @OptIn(ExperimentalAnimationApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -181,7 +175,8 @@ class TwidereXActivity : ComponentActivity() {
     private fun App() {
         val windowInsetsControllerCompat =
             remember { WindowInsetsControllerCompat(window, window.decorView) }
-        val accountViewModel = viewModel<ActiveAccountViewModel>()
+        val accountViewModel =
+            com.twidere.twiderex.di.ext.getViewModel<com.twidere.twiderex.viewmodel.ActiveAccountViewModel>()
         val account by accountViewModel.account.observeAsState(null)
         val isActiveNetworkMetered by isActiveNetworkMetered.observeAsState(initial = false)
         CompositionLocalProvider(
@@ -195,20 +190,18 @@ class TwidereXActivity : ComponentActivity() {
             LocalActiveAccountViewModel provides accountViewModel,
             LocalIsActiveNetworkMetered provides isActiveNetworkMetered,
             LocalPlatformResolver provides platformResolver,
+            LocalResLoader provides ResLoader(this),
+            LocalRemoteNavigator provides remoteNavigator,
         ) {
             ProvidePreferences(
                 preferencesHolder,
             ) {
-                ProvideAssistedFactory(
-                    viewModelHolder.factory,
+                ProvideWindowInsets(
+                    windowInsetsAnimationsEnabled = true
                 ) {
-                    ProvideWindowInsets(
-                        windowInsetsAnimationsEnabled = true
-                    ) {
-                        Router(
-                            navController = navController
-                        )
-                    }
+                    Router(
+                        navController = navController
+                    )
                 }
             }
         }

@@ -26,7 +26,7 @@ import com.twidere.twiderex.mock.service.MockTimelineService
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.NotificationCursorType
 import kotlinx.coroutines.runBlocking
-import org.junit.Test
+import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 

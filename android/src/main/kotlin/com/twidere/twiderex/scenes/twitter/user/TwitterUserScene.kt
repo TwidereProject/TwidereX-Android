@@ -35,25 +35,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.navigation.LocalNavigator
-import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.navigation.RootDeepLinksRouteDefinition
-import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.twitter.user.TwitterUserViewModel
 import moe.tlaster.precompose.navigation.NavOptions
 import moe.tlaster.precompose.navigation.PopUpTo
+import org.koin.core.parameter.parametersOf
 
 @Composable
 fun TwitterUserScene(screenName: String) {
-    val account = LocalActiveAccount.current ?: return
-    val viewModel =
-        assistedViewModel<TwitterUserViewModel.AssistedFactory, TwitterUserViewModel>(
-            account,
-            screenName
-        ) {
-            it.create(account, screenName)
-        }
+    val viewModel: TwitterUserViewModel = getViewModel {
+        parametersOf(screenName)
+    }
     val user by viewModel.user.observeAsState(initial = null)
     val error by viewModel.error.observeAsState(initial = null)
     val navigator = LocalNavigator.current

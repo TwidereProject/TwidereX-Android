@@ -55,7 +55,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
@@ -64,7 +63,7 @@ import com.twidere.twiderex.component.lazy.ItemHeader
 import com.twidere.twiderex.component.settings.RadioItem
 import com.twidere.twiderex.component.settings.switchItem
 import com.twidere.twiderex.component.status.UserAvatarDefaults
-import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.isDarkTheme
 import com.twidere.twiderex.preferences.LocalAppearancePreferences
 import com.twidere.twiderex.preferences.model.AppearancePreferences
@@ -77,9 +76,7 @@ import com.twidere.twiderex.viewmodel.settings.AppearanceViewModel
 fun AppearanceScene() {
     var showPrimaryColorDialog by remember { mutableStateOf(false) }
     val appearance = LocalAppearancePreferences.current
-    val viewModel = assistedViewModel<AppearanceViewModel.AssistedFactory, AppearanceViewModel> {
-        it.create()
-    }
+    val viewModel: AppearanceViewModel = getViewModel()
     TwidereScene {
         InAppNotificationScaffold(
             topBar = {

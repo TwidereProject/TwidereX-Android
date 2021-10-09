@@ -32,9 +32,9 @@ import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.lazy.LazyListController
-import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.di.ext.getViewModel
+import com.twidere.twiderex.model.HomeNavigationItem
 import com.twidere.twiderex.navigation.RootRoute
-import com.twidere.twiderex.scenes.home.HomeNavigationItem
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.timeline.mastodon.LocalTimelineViewModel
@@ -89,11 +89,6 @@ fun LocalTimelineContent(
     if (account.service !is MastodonService) {
         return
     }
-    val viewModel =
-        assistedViewModel<LocalTimelineViewModel.AssistedFactory, LocalTimelineViewModel>(
-            account
-        ) {
-            it.create(account = account)
-        }
+    val viewModel: LocalTimelineViewModel = getViewModel()
     TimelineComponent(viewModel = viewModel, lazyListController = lazyListController)
 }

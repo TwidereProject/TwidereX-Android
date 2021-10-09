@@ -34,7 +34,7 @@ import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.status.UserName
-import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.model.MicroBlogKey
@@ -45,24 +45,17 @@ import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.dm.DMNewConversationViewModel
 import com.twidere.twiderex.viewmodel.user.UserViewModel
+import org.koin.core.parameter.parametersOf
 
 @Composable
 fun UserScene(
     userKey: MicroBlogKey,
 ) {
     val account = LocalActiveAccount.current ?: return
-    val viewModel = assistedViewModel<UserViewModel.AssistedFactory, UserViewModel>(
-        account,
-        userKey,
-    ) {
-        it.create(account, userKey)
+    val viewModel: UserViewModel = getViewModel {
+        parametersOf(userKey)
     }
-
-    val conversationViewModel = assistedViewModel<DMNewConversationViewModel.AssistedFactory, DMNewConversationViewModel>(
-        account,
-    ) {
-        it.create(account)
-    }
+    val conversationViewModel: DMNewConversationViewModel = getViewModel()
     val user by viewModel.user.observeAsState(initial = null)
     val navController = LocalNavController.current
     TwidereScene {
