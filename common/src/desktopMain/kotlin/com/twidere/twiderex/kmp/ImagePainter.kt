@@ -41,13 +41,14 @@ import java.net.InetSocketAddress
 import java.net.Proxy
 import java.net.URL
 
-// TODO 3 effects
+// TODO add caches
 @Composable
 internal actual fun rememberNetworkImagePainter(
     data: Any,
     authorization: Authorization,
     httpConfig: HttpConfig,
     effects: ImageEffects,
+    cacheDir: String,
     onImageStateChanged: (NetworkImageState) -> Unit
 ): Painter {
     val scope = rememberCoroutineScope { Dispatchers.IO }

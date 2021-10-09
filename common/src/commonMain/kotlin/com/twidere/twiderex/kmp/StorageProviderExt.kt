@@ -18,16 +18,11 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.di.modules
+package com.twidere.twiderex.kmp
 
-import android.content.Context
-import org.koin.core.scope.Scope
-import java.io.File
-
-internal actual fun Scope.createDataStoreFile(name: String): File {
-    val context = get<Context>()
-    return File(
-        context.applicationContext.filesDir,
-        "datastore/$name"
-    )
-}
+internal val StorageProvider.downloadDir get() = "$cacheDataDir/share"
+internal val StorageProvider.dataStoreDir get() = "$appDataDir/datastore"
+internal fun StorageProvider.appDatabasePath(name: String) = "$appDataDir/database/$name"
+internal fun StorageProvider.cacheDatabasePath(name: String) = "$cacheDataDir/database/$name"
+internal fun StorageProvider.dataStorePath(name: String) = "$dataStoreDir/$name"
+internal fun StorageProvider.downloadFilePath(name: String) = "$downloadDir/$name"

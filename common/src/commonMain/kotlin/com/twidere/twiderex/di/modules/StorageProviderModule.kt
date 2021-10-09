@@ -18,17 +18,11 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.cache
+package com.twidere.twiderex.di.modules
 
-import okhttp3.Cache
-import java.io.File
+import com.twidere.twiderex.kmp.StorageProvider
+import org.koin.dsl.module
 
-interface FileCacheHandler {
-    fun getCache(): Cache
-
-    fun getCacheDirs(): List<File>
-
-    fun clearMediaCaches()
-
-    fun clearFileCaches()
+val storageProviderModule = module {
+    single { StorageProvider.create() }
 }

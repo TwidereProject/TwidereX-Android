@@ -20,15 +20,15 @@
  */
 package com.twidere.twiderex.repository
 
-import com.twidere.twiderex.cache.FileCacheHandler
 import com.twidere.twiderex.db.AppDatabase
 import com.twidere.twiderex.db.CacheDatabase
+import com.twidere.twiderex.kmp.StorageProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
 class CacheRepository(
-    private val fileCache: FileCacheHandler,
+    private val storageProvider: StorageProvider,
     private val cacheDatabase: CacheDatabase,
     private val appDatabase: AppDatabase
 ) {
@@ -39,18 +39,14 @@ class CacheRepository(
     }
 
     suspend fun clearImageCache() = coroutineScope {
-        fileCache.clearMediaCaches()
-        // cache.directory.deleteRecursively()
+        launch(Dispatchers.IO) {
+            storageProvider.clearCaches(dir = storageProvider.mediaCacheDir)
+        }
     }
 
     suspend fun clearCacheDir() = coroutineScope {
         launch(Dispatchers.IO) {
-            fileCache.clearFileCaches()
-            // cacheDirs.forEach {
-            //     it.listFiles()?.forEach { file ->
-            //         file.deleteRecursively()
-            //     }
-            // }
+            storageProvider.clearCaches(dir = storageProvider.cacheDataDir)
         }
     }
 

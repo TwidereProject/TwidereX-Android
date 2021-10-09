@@ -20,7 +20,6 @@
  */
 package com.twidere.twiderex.dataprovider
 
-import com.twidere.twiderex.cache.FileCacheHandler
 import com.twidere.twiderex.db.AppDatabase
 import com.twidere.twiderex.db.CacheDatabase
 
@@ -36,8 +35,5 @@ actual class DataProvider {
         get() = TODO("Not yet implemented")
 
     actual val cacheDatabase: CacheDatabase
-        get() = TODO("Not yet implemented")
-
-    actual val fileCacheHandler: FileCacheHandler
         get() = TODO("Not yet implemented")
 }

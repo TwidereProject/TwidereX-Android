@@ -20,7 +20,9 @@
  */
 package com.twidere.twiderex.repository
 
-import com.twidere.twiderex.mock.cache.MockFileCacheHandler
+import androidx.test.core.app.ApplicationProvider
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.twidere.twiderex.kmp.StorageProvider
 import com.twidere.twiderex.mock.db.MockAppDatabase
 import com.twidere.twiderex.mock.db.MockCacheDatabase
 import com.twidere.twiderex.mock.model.mockUiSearch
@@ -28,22 +30,34 @@ import com.twidere.twiderex.model.MicroBlogKey
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.runBlocking
-import kotlin.test.Test
+import org.junit.Test
+import org.junit.runner.RunWith
+import java.io.File
 
-class CacheRepositoryTest {
+@RunWith(AndroidJUnit4::class)
+internal class CacheRepositoryTest {
     @Test
     fun clearAllCachesSuccess() = runBlocking {
-        val handler = MockFileCacheHandler(
-            mediaCache = mutableListOf("media"),
-            fileCache = mutableListOf("file"),
-        )
         val cacheDatabase = MockCacheDatabase()
         val appDatabase = MockAppDatabase()
-        val repository = CacheRepository(handler, cacheDatabase, appDatabase)
+        val storage = StorageProvider(ApplicationProvider.getApplicationContext())
+        val repository = CacheRepository(storage, cacheDatabase, appDatabase)
         appDatabase.searchDao().insertAll(listOf(mockUiSearch(accountKey = MicroBlogKey.twitter("1"))))
         val list = appDatabase.searchDao().getAll(MicroBlogKey.twitter("1")).first()
+        val mediaDir = File(storage.mediaCacheDir).apply {
+            if (!exists()) mkdirs()
+        }.also {
+            File(it, "test")
+        }
+        val cacheDir = File(storage.cacheDataDir).apply {
+            if (!exists()) mkdirs()
+        }.also {
+            File(it, "test")
+        }
+
         assert(list.isNotEmpty())
-        assert(!handler.isCacheCleared())
+        assert(mediaDir.listFiles()?.isNotEmpty() ?: false)
+        assert(cacheDir.listFiles()?.isNotEmpty() ?: false)
         assert(!cacheDatabase.isAllTablesCleared())
 
         repository.clearCacheDir()
@@ -51,7 +65,8 @@ class CacheRepositoryTest {
         repository.clearImageCache()
         repository.clearSearchHistory()
 
-        assert(handler.isCacheCleared())
+        assert(mediaDir.listFiles()?.isEmpty() ?: true)
+        assert(cacheDir.listFiles()?.isEmpty() ?: true)
         assert(cacheDatabase.isAllTablesCleared())
         assert(appDatabase.searchDao().getAll(MicroBlogKey.twitter("1")).firstOrNull().isNullOrEmpty())
     }
