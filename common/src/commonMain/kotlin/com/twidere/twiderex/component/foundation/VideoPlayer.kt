@@ -46,6 +46,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.dp
+import com.twidere.services.http.config.HttpConfig
 import com.twidere.twiderex.MR
 import com.twidere.twiderex.compose.LocalResLoader
 import com.twidere.twiderex.preferences.LocalHttpConfig
@@ -233,7 +234,7 @@ fun VideoPlayer(
 
 @Composable
 internal fun getPlayInitial() = true
-// TODO
+// TODO waiting for LocalVideoPlayback migration
 // when (LocalVideoPlayback.current) {
 //     DisplayPreferences.AutoPlayback.Auto -> !LocalIsActiveNetworkMetered.current
 //     DisplayPreferences.AutoPlayback.Always -> true
@@ -253,7 +254,7 @@ interface PlayerProgressCallBack {
 expect class NativePlayerView(
     url: String,
     autoPlay: Boolean,
-    httpConfig: Any,
+    httpConfig: HttpConfig,
     zOrderMediaOverlay: Boolean,
     showControls: Boolean,
     keepScreenOn: Boolean,

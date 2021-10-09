@@ -23,6 +23,7 @@ package com.twidere.twiderex.component.foundation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.SwingPanel
+import com.twidere.services.http.config.HttpConfig
 import com.twidere.twiderex.utils.video.VideoPool
 import uk.co.caprica.vlcj.player.base.MediaPlayer
 import uk.co.caprica.vlcj.player.base.MediaPlayerEventAdapter
@@ -33,7 +34,7 @@ import java.util.Locale
 actual class NativePlayerView actual constructor(
     url: String,
     autoPlay: Boolean,
-    httpConfig: Any,
+    httpConfig: HttpConfig,
     zOrderMediaOverlay: Boolean,
     showControls: Boolean,
     keepScreenOn: Boolean,

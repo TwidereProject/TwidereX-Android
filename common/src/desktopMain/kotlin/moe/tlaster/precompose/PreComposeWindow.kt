@@ -31,9 +31,6 @@ import androidx.compose.ui.window.FrameWindowScope
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.rememberWindowState
-import com.twidere.twiderex.di.ext.get
-import com.twidere.twiderex.preferences.PreferencesHolder
-import com.twidere.twiderex.preferences.ProvidePreferences
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.distinctUntilChanged
 import moe.tlaster.precompose.lifecycle.Lifecycle
@@ -66,9 +63,6 @@ fun PreComposeWindow(
     val holder = remember {
         PreComposeWindowHolder()
     }
-    val preferencesHolder = remember {
-        get<PreferencesHolder>()
-    }
     LaunchedEffect(Unit) {
         snapshotFlow { state.isMinimized }
             .distinctUntilChanged()
@@ -81,8 +75,7 @@ fun PreComposeWindow(
             }
     }
     ProvideDesktopCompositionLocals(
-        holder = holder,
-        preferencesHolder = preferencesHolder
+        holder
     ) {
         Window(
             onCloseRequest = {
@@ -112,7 +105,6 @@ private fun ProvideDesktopCompositionLocals(
     holder: PreComposeWindowHolder = remember {
         PreComposeWindowHolder()
     },
-    preferencesHolder: PreferencesHolder,
     content: @Composable () -> Unit,
 ) {
     CompositionLocalProvider(
@@ -120,9 +112,7 @@ private fun ProvideDesktopCompositionLocals(
         LocalViewModelStoreOwner provides holder,
         LocalBackDispatcherOwner provides holder,
     ) {
-        ProvidePreferences(preferencesHolder) {
-            content.invoke()
-        }
+        content.invoke()
     }
 }
 

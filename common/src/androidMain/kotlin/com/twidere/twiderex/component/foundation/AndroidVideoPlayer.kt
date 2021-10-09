@@ -65,7 +65,7 @@ actual fun PlatformView(
 actual class NativePlayerView actual constructor(
     url: String,
     autoPlay: Boolean,
-    httpConfig: Any,
+    httpConfig: HttpConfig,
     zOrderMediaOverlay: Boolean,
     showControls: Boolean,
     keepScreenOn: Boolean,
@@ -88,7 +88,7 @@ actual class NativePlayerView actual constructor(
         player = RemainingTimeExoPlayer(
             SimpleExoPlayer.Builder(context)
                 .apply {
-                    if ((httpConfig as HttpConfig).proxyConfig.enable) {
+                    if (httpConfig.proxyConfig.enable) {
                         // replace DataSource
                         OkHttpDataSource.Factory(
                             TwidereServiceFactory
