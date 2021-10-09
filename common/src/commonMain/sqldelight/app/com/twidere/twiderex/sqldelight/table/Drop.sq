@@ -1,0 +1,4 @@
+clearAllTables{
+    DELETE FROM search;
+    DELETE FROM draft;
+}

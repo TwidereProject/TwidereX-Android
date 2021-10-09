@@ -22,7 +22,9 @@ package com.twidere.twiderex.model.ui.mastodon
 
 import com.twidere.twiderex.model.ui.UiEmojiCategory
 import com.twidere.twiderex.model.ui.UserExtra
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class MastodonUserExtra(
     val fields: List<Field>,
     val emoji: List<UiEmojiCategory>,
@@ -30,6 +32,7 @@ data class MastodonUserExtra(
     val locked: Boolean,
 ) : UserExtra
 
+@Serializable
 data class Field(
     val name: String?,
     val value: String?
