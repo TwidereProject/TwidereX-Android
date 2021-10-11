@@ -27,10 +27,10 @@ import java.io.File
 
 actual class StorageProvider(private val context: Context) {
     // for persistence data
-    actual val appDataDir: String get() = context.applicationContext.filesDir.absolutePath
+    actual val appDataDir: String get() = "${context.filesDir.absolutePath}/app".mkdirs()
 
     // for cache data
-    actual val cacheDataDir: String get() = context.applicationContext.cacheDir.absolutePath
+    actual val cacheDataDir: String get() = "${context.cacheDir.absolutePath}/data".mkdirs()
 
     // for media caches e.g image, video
     actual val mediaCacheDir: String get() = CoilUtils.createDefaultCache(context).directory.absolutePath

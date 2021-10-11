@@ -20,9 +20,20 @@
  */
 package com.twidere.twiderex.kmp
 
-internal val StorageProvider.downloadDir get() = "$cacheDataDir/share"
-internal val StorageProvider.dataStoreDir get() = "$appDataDir/datastore"
-internal fun StorageProvider.appDatabasePath(name: String) = "$appDataDir/database/$name"
-internal fun StorageProvider.cacheDatabasePath(name: String) = "$cacheDataDir/database/$name"
+import java.io.File
+
+internal val StorageProvider.downloadDir get() = "$cacheDataDir/share".mkdirs()
+internal val StorageProvider.dataStoreDir get() = "$appDataDir/datastore".mkdirs()
+internal val StorageProvider.appDatabaseDir get() = "$appDataDir/database".mkdirs()
+internal val StorageProvider.cacheDatabaseDir get() = "$cacheDataDir/database".mkdirs()
+internal fun StorageProvider.appDatabasePath(name: String) = "$appDatabaseDir/$name"
+internal fun StorageProvider.cacheDatabasePath(name: String) = "$cacheDatabaseDir/$name"
 internal fun StorageProvider.dataStorePath(name: String) = "$dataStoreDir/$name"
 internal fun StorageProvider.downloadFilePath(name: String) = "$downloadDir/$name"
+
+internal fun String.mkdirs(): String {
+    File(this).apply {
+        if (!exists()) mkdirs()
+    }
+    return this
+}

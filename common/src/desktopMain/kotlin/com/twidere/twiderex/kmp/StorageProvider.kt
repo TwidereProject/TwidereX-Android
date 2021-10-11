@@ -25,13 +25,13 @@ import java.io.File
 actual class StorageProvider() {
     private val rootDir = "TwidereX"
     // for persistence data
-    actual val appDataDir: String get() = "${getWorkDirectory()}/$rootDir/app"
+    actual val appDataDir: String get() = "${getWorkDirectory()}/$rootDir/app".mkdirs()
 
     // for cache data
-    actual val cacheDataDir: String get() = "${getWorkDirectory()}/$rootDir/cache"
+    actual val cacheDataDir: String get() = "${getWorkDirectory()}/$rootDir/cache".mkdirs()
 
     // for media caches e.g image, video
-    actual val mediaCacheDir: String get() = "${getWorkDirectory()}/$rootDir/mediaCaches"
+    actual val mediaCacheDir: String get() = "${getWorkDirectory()}/$rootDir/mediaCaches".mkdirs()
 
     actual fun clearCaches(dir: String, deleteDirAlso: Boolean) {
         val cacheDir = File(dir)

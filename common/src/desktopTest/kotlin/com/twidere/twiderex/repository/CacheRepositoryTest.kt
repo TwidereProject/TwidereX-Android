@@ -33,22 +33,18 @@ import java.io.File
 
 internal class CacheRepositoryTest {
     @Test
-    fun clearAllCachesSuccess() = runBlocking {
+    fun clearDesktopCachesSuccess() = runBlocking {
         val cacheDatabase = MockCacheDatabase()
         val appDatabase = MockAppDatabase()
         val storage = StorageProvider()
         val repository = CacheRepository(storage, cacheDatabase, appDatabase)
         appDatabase.searchDao().insertAll(listOf(mockUiSearch(accountKey = MicroBlogKey.twitter("1"))))
         val list = appDatabase.searchDao().getAll(MicroBlogKey.twitter("1")).first()
-        val mediaDir = File(storage.mediaCacheDir).apply {
-            if (!exists()) mkdirs()
-        }.also {
-            File(it, "test")
+        val mediaDir = File(storage.mediaCacheDir).also {
+            File(it, "test").createNewFile()
         }
-        val cacheDir = File(storage.cacheDataDir).apply {
-            if (!exists()) mkdirs()
-        }.also {
-            File(it, "test")
+        val cacheDir = File(storage.cacheDataDir).also {
+            File(it, "test").createNewFile()
         }
 
         assert(list.isNotEmpty())
