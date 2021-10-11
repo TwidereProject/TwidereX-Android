@@ -48,4 +48,5 @@ object Versions {
     const val espressoVersion = "3.4.0-rc01"
     const val koin = "3.1.2"
     const val moko = "0.17.2"
+    const val sqlDelight = "1.5.1"
 }

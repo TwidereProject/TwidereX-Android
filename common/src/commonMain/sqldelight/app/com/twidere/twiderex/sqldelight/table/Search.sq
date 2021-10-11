@@ -1,0 +1,34 @@
+import com.twidere.twiderex.model.MicroBlogKey;
+import java.lang.Boolean;
+
+CREATE TABLE IF NOT EXISTS search  (
+    content TEXT NOT NULL,
+    lastActive INTEGER NOT NULL,
+    saved INTEGER AS Boolean DEFAULT 0 NOT NULL,
+    accountKey TEXT AS MicroBlogKey NOT NULL
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS index_search_content_accountKey ON search (content, accountKey);
+
+insert:
+INSERT OR REPLACE INTO search(content, lastActive, saved, accountKey)
+VALUES ?;
+
+get:
+SELECT * FROM search WHERE content == :content AND accountKey == :accountKey;
+
+getAll:
+SELECT * FROM search WHERE accountKey == :accountKey ORDER BY lastActive DESC;
+
+getHistories:
+SELECT * FROM search WHERE saved == 0 AND accountKey == :accountKey ORDER BY lastActive DESC;
+
+getSaved:
+SELECT * FROM search WHERE saved == 1 AND accountKey == :accountKey ORDER BY lastActive DESC;
+
+remove:
+DELETE FROM search WHERE content == :content AND accountKey == :accountKey;
+
+clear:
+DELETE FROM search WHERE saved == 0;
+

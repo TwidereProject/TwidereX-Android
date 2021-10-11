@@ -18,18 +18,14 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.utils.video
+package com.twidere.twiderex.base
 
-import java.util.concurrent.ConcurrentHashMap
+import androidx.test.core.app.ApplicationProvider
+import com.squareup.sqldelight.android.AndroidSqliteDriver
+import com.squareup.sqldelight.db.SqlDriver
 
-object VideoPool {
-    private val pool = ConcurrentHashMap<String, Long>()
-
-    fun get(url: String): Long {
-        return pool[url] ?: 1L
-    }
-
-    fun set(url: String, position: Long) {
-        pool[url] = position
+actual object SqlDriverFactory {
+    actual fun create(schema: SqlDriver.Schema): SqlDriver {
+        return AndroidSqliteDriver(schema, ApplicationProvider.getApplicationContext(), "sqldelight_test.db")
     }
 }

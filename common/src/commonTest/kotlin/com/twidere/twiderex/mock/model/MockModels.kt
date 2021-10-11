@@ -51,15 +51,18 @@ import com.twidere.services.twitter.model.UserV2
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.ComposeType
 import com.twidere.twiderex.model.enums.MediaType
+import com.twidere.twiderex.model.ui.UiDMConversation
+import com.twidere.twiderex.model.ui.UiDMEvent
 import com.twidere.twiderex.model.ui.UiDraft
 import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.model.ui.UiSearch
+import com.twidere.twiderex.model.ui.UiUrlEntity
 import org.jetbrains.annotations.TestOnly
 import java.util.Date
 import java.util.UUID
 
 @TestOnly
-fun mockUiMedia(url: String = "", belongToKey: MicroBlogKey = MicroBlogKey.Empty) = UiMedia(
+fun mockUiMedia(url: String = "", belongToKey: MicroBlogKey = MicroBlogKey.Empty, order: Int = 0) = UiMedia(
     url = url,
     belongToKey = belongToKey,
     mediaUrl = url,
@@ -69,7 +72,7 @@ fun mockUiMedia(url: String = "", belongToKey: MicroBlogKey = MicroBlogKey.Empty
     height = 100,
     pageUrl = "",
     altText = "",
-    order = 0
+    order = order
 )
 
 @TestOnly
@@ -110,9 +113,9 @@ fun mockIUser(id: String = UUID.randomUUID().toString(), name: String = ""): IUs
 }
 
 @TestOnly
-fun mockITrend(): ITrend {
+fun mockITrend(name: String = "trend timestamp:${System.currentTimeMillis()}"): ITrend {
     return Trend(
-        name = "trend timestamp:${System.currentTimeMillis()}",
+        name = name,
         url = "https://trend",
 
         history = mutableListOf(
@@ -147,7 +150,8 @@ fun mockIStatus(
     id: String = UUID.randomUUID().toString(),
     hasMedia: Boolean = false,
     authorId: String = UUID.randomUUID().toString(),
-    hasReference: Boolean = false
+    hasReference: Boolean = false,
+    text: String = "text"
 ): IStatus {
     return StatusV2(
         id = id,
@@ -162,7 +166,8 @@ fun mockIStatus(
                 type = ReferencedTweetType.retweeted,
                 id = UUID.randomUUID().toString()
             ).apply { status = mockIStatus() as StatusV2 }
-        ) else emptyList()
+        ) else emptyList(),
+        text = text
     ).apply {
         user = UserV2(
             id = authorId,
@@ -220,3 +225,25 @@ fun mockIDirectMessage(id: String = UUID.randomUUID().toString(), accountId: Str
         )
     )
 }
+
+@TestOnly
+fun mockUiUrlEntity(url: String = "") = UiUrlEntity(
+    url = url,
+    displayUrl = "displayUrl",
+    expandedUrl = "expandedUrl",
+    title = "title",
+    description = "description",
+    image = "image"
+)
+
+@TestOnly
+fun UiDMEvent.toConversation() = UiDMConversation(
+    accountKey = accountKey,
+    conversationId = conversationKey.id,
+    conversationKey = conversationKey,
+    conversationAvatar = sender.profileImage.toString(),
+    conversationName = sender.name,
+    conversationSubName = sender.screenName,
+    conversationType = UiDMConversation.Type.ONE_TO_ONE,
+    recipientKey = conversationUserKey
+)
