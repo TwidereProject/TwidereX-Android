@@ -37,3 +37,10 @@ internal fun String.mkdirs(): String {
     }
     return this
 }
+
+internal fun String.mkFile(): String {
+    File(this).apply {
+        if (!exists()) createNewFile()
+    }
+    return this
+}
