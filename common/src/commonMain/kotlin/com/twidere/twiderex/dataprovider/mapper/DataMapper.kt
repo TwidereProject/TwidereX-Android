@@ -20,6 +20,8 @@
  */
 package com.twidere.twiderex.dataprovider.mapper
 
+import com.twidere.services.gif.giphy.GifObject
+import com.twidere.services.gif.model.IGif
 import com.twidere.services.mastodon.model.Emoji
 import com.twidere.services.mastodon.model.MastodonList
 import com.twidere.services.microblog.model.IDirectMessage
@@ -33,7 +35,9 @@ import com.twidere.twiderex.model.AmUser
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiEmoji
 import com.twidere.twiderex.model.ui.UiEmojiCategory
+import com.twidere.twiderex.model.ui.UiGif
 import com.twidere.twiderex.model.ui.UiUser
+import java.util.UUID
 
 private typealias TwitterUser = com.twidere.services.twitter.model.User
 private typealias TwitterUserV2 = com.twidere.services.twitter.model.UserV2
@@ -44,6 +48,7 @@ private typealias MastodonStatus = com.twidere.services.mastodon.model.Status
 private typealias MastodonNotification = com.twidere.services.mastodon.model.Notification
 private typealias MastodonUser = com.twidere.services.mastodon.model.Account
 private typealias MastodonTrend = com.twidere.services.mastodon.model.Trend
+typealias GiphyGif = GifObject
 
 fun IUser.toUi(accountKey: MicroBlogKey) = when (this) {
     is TwitterUser -> this.toUiUser()
@@ -143,3 +148,16 @@ fun UiUser.toAmUser() =
         verified = verified,
         isProtected = protected,
     )
+
+fun IGif.toUi(): UiGif {
+    return when (this) {
+        is GiphyGif -> UiGif(
+            id = this.id ?: UUID.randomUUID().toString(),
+            url = this.images?.original?.url ?: "",
+            mp4 = this.images?.original?.mp4 ?: "",
+            preview = this.images?.previewGif?.url ?: "",
+            type = this.type ?: "gif"
+        )
+        else -> throw NotImplementedError()
+    }
+}

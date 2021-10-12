@@ -38,6 +38,7 @@ import com.twidere.twiderex.viewmodel.compose.MastodonComposeSearchHashtagViewMo
 import com.twidere.twiderex.viewmodel.dm.DMConversationViewModel
 import com.twidere.twiderex.viewmodel.dm.DMEventViewModel
 import com.twidere.twiderex.viewmodel.dm.DMNewConversationViewModel
+import com.twidere.twiderex.viewmodel.gif.GifViewModel
 import com.twidere.twiderex.viewmodel.lists.ListsAddMemberViewModel
 import com.twidere.twiderex.viewmodel.lists.ListsCreateViewModel
 import com.twidere.twiderex.viewmodel.lists.ListsModifyViewModel
@@ -94,6 +95,7 @@ val viewModelModule = module {
     lists()
     dm()
     compose()
+    gif()
 }
 
 private fun Module.compose() {
@@ -101,6 +103,7 @@ private fun Module.compose() {
     viewModel { (draftId: String) -> DraftItemViewModel(get(), draftId) }
     viewModel { (draft: UiDraft) ->
         DraftComposeViewModel(
+            get(),
             get(),
             get(),
             get(),
@@ -229,4 +232,8 @@ private fun Module.user() {
     viewModel { (userKey: MicroBlogKey) -> UserFavouriteTimelineViewModel(get(), get(), userKey) }
     viewModel { (userKey: MicroBlogKey) -> FollowingViewModel(get(), get(), userKey) }
     viewModel { (userKey: MicroBlogKey) -> FollowersViewModel(get(), get(), userKey) }
+}
+
+private fun Module.gif() {
+    viewModel { GifViewModel(get()) }
 }

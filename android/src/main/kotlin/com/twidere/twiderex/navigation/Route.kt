@@ -33,6 +33,7 @@ import com.twidere.twiderex.component.RequireAuthorization
 import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.ComposeType
+import com.twidere.twiderex.model.enums.MediaType
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.scenes.DraftListScene
 import com.twidere.twiderex.scenes.HomeScene
@@ -48,6 +49,7 @@ import com.twidere.twiderex.scenes.compose.DraftComposeScene
 import com.twidere.twiderex.scenes.dm.DMConversationListScene
 import com.twidere.twiderex.scenes.dm.DMConversationScene
 import com.twidere.twiderex.scenes.dm.DMNewConversationScene
+import com.twidere.twiderex.scenes.gif.GifScene
 import com.twidere.twiderex.scenes.home.HomeTimelineScene
 import com.twidere.twiderex.scenes.home.MeScene
 import com.twidere.twiderex.scenes.home.MentionScene
@@ -402,10 +404,12 @@ fun RouteBuilder.route(constraints: Constraints) {
     authorizedDialog(
         RootRouteDefinition.Media.Raw,
     ) { backStackEntry ->
-        backStackEntry.path<String>("url")?.let {
+        val url = backStackEntry.path<String>("url")?.let {
             URLDecoder.decode(it, "UTF-8")
-        }?.let {
-            RawMediaScene(url = it)
+        }
+        val type = MediaType.valueOf(backStackEntry.path<String>("type") ?: MediaType.photo.name)
+        url?.let {
+            RawMediaScene(url = it, type = type)
         }
     }
 
@@ -638,5 +642,9 @@ fun RouteBuilder.route(constraints: Constraints) {
         backStackEntry.path<String>("conversationKey")?.let {
             DMConversationScene(conversationKey = MicroBlogKey.valueOf(it))
         }
+    }
+
+    authorizedScene(RootRouteDefinition.Gif.Home) {
+        GifScene()
     }
 }

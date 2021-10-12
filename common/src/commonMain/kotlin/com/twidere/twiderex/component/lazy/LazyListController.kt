@@ -25,7 +25,16 @@ import androidx.compose.foundation.lazy.LazyListState
 class LazyListController {
     var listState: LazyListState? = null
 
+    companion object {
+        const val SMOOTH_THRESHOLD = 5
+    }
+
     suspend fun scrollToTop() {
-        listState?.scrollToItem(0)
+        listState?.run {
+            if (firstVisibleItemIndex > SMOOTH_THRESHOLD) {
+                scrollToItem(SMOOTH_THRESHOLD)
+            }
+            animateScrollToItem(0)
+        }
     }
 }

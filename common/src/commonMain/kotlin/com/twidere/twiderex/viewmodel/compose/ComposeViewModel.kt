@@ -32,10 +32,13 @@ import com.twidere.twiderex.kmp.LocationProvider
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.ComposeType
 import com.twidere.twiderex.model.enums.MastodonVisibility
+import com.twidere.twiderex.model.enums.MediaInsertType
+import com.twidere.twiderex.model.enums.MediaType
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.job.ComposeData
 import com.twidere.twiderex.model.ui.UiDraft
 import com.twidere.twiderex.model.ui.UiEmoji
+import com.twidere.twiderex.model.ui.UiMediaInsert
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.AccountRepository
@@ -44,13 +47,14 @@ import com.twidere.twiderex.repository.StatusRepository
 import com.twidere.twiderex.repository.UserRepository
 import com.twidere.twiderex.utils.MastodonEmojiCache
 import com.twidere.twiderex.utils.notifyError
+import com.twidere.twiderex.kmp.MediaInsertProvider
 import com.twitter.twittertext.Extractor
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
@@ -60,6 +64,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
+import java.net.URI
 import java.util.UUID
 
 class DraftItemViewModel(
@@ -80,6 +85,7 @@ class DraftComposeViewModel(
     repository: StatusRepository,
     userRepository: UserRepository,
     draftAction: DraftAction,
+    mediaInsertProvider: MediaInsertProvider,
     inAppNotification: InAppNotification,
     accountRepository: AccountRepository,
     locationProvider: LocationProvider,
@@ -101,7 +107,13 @@ class DraftComposeViewModel(
 
     init {
         setText(TextFieldValue(draft.content))
-        putImages(draft.media)
+        viewModelScope.launch {
+            putImages(
+                draft.media.map {
+                    mediaInsertProvider.provideUiMediaInsert(URI.create(it))
+                }
+            )
+        }
         excludedReplyUserIds.value = draft.excludedReplyUserIds ?: emptyList()
     }
 }
@@ -230,7 +242,7 @@ open class ComposeViewModel(
     val isContentWarningEnabled = MutableStateFlow(false)
     val contentWarningTextFieldValue = MutableStateFlow(TextFieldValue())
     val textFieldValue = MutableStateFlow(TextFieldValue())
-    val images = MutableStateFlow<List<String>>(emptyList())
+    val images = MutableStateFlow<List<UiMediaInsert>>(emptyList())
     val canSend = textFieldValue
         .combine(images) { text, imgs -> text.text.isNotEmpty() || !imgs.isNullOrEmpty() }
         .asStateIn(viewModelScope, false)
@@ -283,6 +295,8 @@ open class ComposeViewModel(
         }.asStateIn(viewModelScope, null)
     }
 
+    val mediaInsertMode = MutableStateFlow(MediaInsertMode.All)
+
     fun setText(value: TextFieldValue) {
         textFieldValue.value = value
     }
@@ -333,7 +347,7 @@ open class ComposeViewModel(
     private fun buildComposeData(text: String) = ComposeData(
         content = text,
         draftId = draftId,
-        images = images.value,
+        images = images.value.map { it.uri.toString() },
         composeType = composeType,
         statusKey = statusKey,
         lat = location.value?.latitude,
@@ -348,10 +362,21 @@ open class ComposeViewModel(
         isThreadMode = enableThreadMode.value,
     )
 
-    fun putImages(value: List<String>) = viewModelScope.launch {
-        val imageLimit = imageLimit.firstOrNull() ?: 4
-        (images.value + value).take(imageLimit).let {
+    fun putImages(value: List<UiMediaInsert>) = viewModelScope.launch {
+        val allowType = images.value.firstOrNull()?.type ?: value.firstOrNull()?.type ?: MediaType.photo
+        images.value.let {
+            value + it.filter { media -> media.type == allowType }
+        }.take(if (allowType == MediaType.photo) imageLimit.first() else 1).let {
             images.value = it
+        }
+        when (allowType) {
+            MediaType.video, MediaType.animated_gif -> mediaInsertMode.value = MediaInsertMode.Disabled
+            else -> {
+                mediaInsertMode.value = if (images.value.size == imageLimit.first())
+                    MediaInsertMode.Disabled
+                else
+                    MediaInsertMode.ImageOnly
+            }
         }
     }
 
@@ -376,9 +401,18 @@ open class ComposeViewModel(
         locationProvider.disable()
     }
 
-    fun removeImage(item: String) {
-        (images.value - item).let {
+    fun removeImage(item: URI) {
+        images.value.let {
+            it.toMutableList().apply {
+                removeAll { media -> media.uri == item }
+            }
+        }.let {
             images.value = it
+        }
+        if (images.value.isEmpty()) {
+            mediaInsertMode.value = MediaInsertMode.All
+        } else if (images.value.first().type == MediaType.photo) {
+            mediaInsertMode.value = MediaInsertMode.ImageOnly
         }
     }
 
@@ -411,5 +445,23 @@ open class ComposeViewModel(
 
     override fun onCleared() {
         locationProvider.disable()
+    }
+
+    data class MediaInsertMode(
+        val disabledInsertType: List<MediaInsertType>,
+        val multiSelect: Boolean,
+        val librarySupportedType: List<String>
+    ) {
+        companion object {
+            val All = MediaInsertMode(emptyList(), false, listOf("image/*", "video/*"))
+            val ImageOnly = MediaInsertMode(
+                listOf(
+                    MediaInsertType.GIF,
+                    MediaInsertType.RECORD_VIDEO
+                ),
+                true, listOf("image/*")
+            )
+            val Disabled = MediaInsertMode(MediaInsertType.values().toList(), true, listOf("image/*"))
+        }
     }
 }

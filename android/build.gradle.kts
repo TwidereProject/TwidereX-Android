@@ -1,4 +1,6 @@
-
+import org.gradle.kotlin.dsl.support.unzipTo
+import org.jetbrains.kotlin.gradle.internal.ensureParentDirsCreated
+import org.json.JSONObject
 import java.util.Properties
 
 buildscript {
@@ -10,8 +12,8 @@ buildscript {
 
         if (enableGoogleVariant) {
             // START Non-FOSS component
-            classpath("com.google.gms:google-services:4.3.5")
-            classpath("com.google.firebase:firebase-crashlytics-gradle:2.5.2")
+            classpath("com.google.gms:google-services:4.3.10")
+            classpath("com.google.firebase:firebase-crashlytics-gradle:2.7.1")
             // END Non-FOSS component
         }
     }
@@ -58,6 +60,7 @@ android {
             apiKeyProp.load(apiKeyProperties.inputStream())
             buildConfigField("String", "CONSUMERKEY", apiKeyProp.getProperty("ConsumerKey"))
             buildConfigField("String", "CONSUMERSECRET", apiKeyProp.getProperty("ConsumerSecret"))
+            buildConfigField("String", "GIPHYKEY", apiKeyProp.getProperty("GiphyKey"))
         }
     }
 
@@ -105,7 +108,8 @@ android {
             if (hasSigningProps) {
                 signingConfig = signingConfigs.getByName("twidere")
             }
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -172,7 +176,7 @@ dependencies {
     if (enableGoogleVariant) {
         // START Non-FOSS component
         val googleImplementation by configurations
-        googleImplementation(platform("com.google.firebase:firebase-bom:26.1.0"))
+        googleImplementation(platform("com.google.firebase:firebase-bom:28.4.0"))
         googleImplementation("com.google.firebase:firebase-analytics-ktx")
         googleImplementation("com.google.firebase:firebase-crashlytics-ktx")
         googleImplementation("com.google.android.play:core-ktx:1.8.1")
@@ -182,4 +186,70 @@ dependencies {
     junit4()
     mockito()
     androidTest()
+}
+
+tasks.register("generateTranslation") {
+    val localizationFolder = File(rootDir, "localization")
+    val appJson = File(localizationFolder, "app.json")
+    val target = project.file("src/main/res/values/strings.xml")
+    generateLocalization(appJson, target)
+}
+
+tasks.register("generateTranslationFromZip") {
+    val zip = File(rootProject.buildDir, "Twidere X (translations).zip")
+    val unzipTarget = rootProject.buildDir
+    unzipTo(unzipTarget, zip)
+    File(unzipTarget, "translation").listFiles()?.forEach { file ->
+        val source = File(file, "app.json")
+        val target = project.file(
+            "src/main/res-localized" + "/values-" + file.name.split('_')
+                .first() + "-r" + file.name.split('_').last() + "/strings.xml"
+        )
+        generateLocalization(source, target)
+    }
+}
+
+fun generateLocalization(appJson: File, target: File) {
+    val json = appJson.readText(Charsets.UTF_8)
+    val obj = JSONObject(json)
+    val result = flattenJson(obj).filter {
+        it.value.isNotEmpty() && it.value.isNotBlank()
+    }
+    if (result.isNotEmpty()) {
+        target.ensureParentDirsCreated()
+        target.createNewFile()
+        val xml =
+            """<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">""" + System.lineSeparator() +
+                result.map {
+                    "    <string name=\"${it.key}\">${
+                    it.value.replace("'", "\\'").replace(System.lineSeparator(), "\\n")
+                    }</string>"
+                }.joinToString(System.lineSeparator()) + System.lineSeparator() +
+                "</resources>"
+        target.writeText(xml)
+    }
+}
+
+fun flattenJson(obj: JSONObject): Map<String, String> {
+    return obj.toMap().toList().flatMap { it ->
+        val (key, value) = it
+        when (value) {
+            is JSONObject -> {
+                flattenJson(value).map {
+                    "${key}_${it.key}" to it.value
+                }.toList()
+            }
+            is Map<*, *> -> {
+                flattenJson(JSONObject(value)).map {
+                    "${key}_${it.key}" to it.value
+                }.toList()
+            }
+            is String -> {
+                listOf(key to value)
+            }
+            else -> {
+                listOf(key to value.toString())
+            }
+        }
+    }.toMap()
 }

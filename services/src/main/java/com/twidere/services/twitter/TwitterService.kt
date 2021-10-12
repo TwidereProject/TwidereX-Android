@@ -42,6 +42,7 @@ import com.twidere.services.microblog.model.Relationship
 import com.twidere.services.twitter.api.TwitterResources
 import com.twidere.services.twitter.api.UploadResources
 import com.twidere.services.twitter.model.Attachment
+import com.twidere.services.twitter.model.BlockV2Request
 import com.twidere.services.twitter.model.DirectMessageEvent
 import com.twidere.services.twitter.model.DirectMessageEventObject
 import com.twidere.services.twitter.model.MessageCreate
@@ -62,6 +63,7 @@ import com.twidere.services.twitter.model.fields.PlaceFields
 import com.twidere.services.twitter.model.fields.PollFields
 import com.twidere.services.twitter.model.fields.TweetFields
 import com.twidere.services.twitter.model.fields.UserFields
+import com.twidere.services.twitter.model.request.TwitterReactionRequestBody
 import com.twidere.services.utils.Base64
 import com.twidere.services.utils.await
 import com.twidere.services.utils.copyToInLength
@@ -77,7 +79,8 @@ class TwitterService(
     private val consumer_secret: String,
     private val access_token: String,
     private val access_token_secret: String,
-    private val httpClientFactory: HttpClientFactory
+    private val httpClientFactory: HttpClientFactory,
+    private val accountId: String = ""
 ) : MicroBlogService,
     TimelineService,
     LookupService,
@@ -374,6 +377,8 @@ class TwitterService(
         return Relationship(
             followedBy = response.relationship?.target?.followedBy ?: false,
             following = response.relationship?.target?.following ?: false,
+            blocking = response.relationship?.source?.blocking ?: false,
+            blockedBy = response.relationship?.source?.blockedBy ?: false
         )
     }
 
@@ -385,13 +390,49 @@ class TwitterService(
         resources.unfollow(user_id)
     }
 
-    override suspend fun like(id: String) = resources.like(id)
+    override suspend fun like(id: String): IStatus {
+        return try {
+            resources.likeV2(userId = accountId, body = TwitterReactionRequestBody(tweet_id = id))
+                .run {
+                    lookupStatus(id)
+                }
+        } catch (e: TwitterApiExceptionV2) {
+            resources.like(id)
+        }
+    }
 
-    override suspend fun unlike(id: String) = resources.unlike(id)
+    override suspend fun unlike(id: String): IStatus {
+        return try {
+            resources.unlikeV2(userId = accountId, tweetId = id)
+                .run {
+                    lookupStatus(id)
+                }
+        } catch (e: TwitterApiExceptionV2) {
+            resources.unlike(id)
+        }
+    }
 
-    override suspend fun retweet(id: String) = resources.retweet(id)
+    override suspend fun retweet(id: String): IStatus {
+        return try {
+            resources.retweetV2(userId = accountId, body = TwitterReactionRequestBody(tweet_id = id))
+                .run {
+                    lookupStatus(id)
+                }
+        } catch (e: TwitterApiExceptionV2) {
+            resources.retweet(id)
+        }
+    }
 
-    override suspend fun unRetweet(id: String) = resources.unretweet(id)
+    override suspend fun unRetweet(id: String): IStatus {
+        return try {
+            resources.unRetweetV2(userId = accountId, tweetId = id)
+                .run {
+                    lookupStatus(id)
+                }
+        } catch (e: TwitterApiExceptionV2) {
+            resources.unretweet(id)
+        }
+    }
 
     override suspend fun delete(id: String) = resources.destroy(id)
 
@@ -463,6 +504,22 @@ class TwitterService(
     ).let {
         TwitterPaging(it.data ?: emptyList(), it.meta?.nextToken)
     }
+
+    override suspend fun block(
+        id: String
+    ) = resources.block(
+        sourceId = accountId,
+        target = BlockV2Request(targetUserId = id)
+    ).run {
+        showRelationship(target_id = id)
+    }
+
+    override suspend fun unblock(
+        id: String
+    ) = resources.unblock(sourceId = accountId, targetId = id)
+        .run {
+            showRelationship(target_id = id)
+        }
 
     suspend fun verifyCredentials(): User? {
         return resources.verifyCredentials()

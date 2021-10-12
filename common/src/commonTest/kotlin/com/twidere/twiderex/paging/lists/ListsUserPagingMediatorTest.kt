@@ -55,6 +55,7 @@ class TestListsUserPagingMediator(
 }
 
 class ListsUserPagingMediatorTest {
+    @OptIn(ExperimentalPagingApi::class)
     @Test
     fun load_nextKeyIsCorrect() {
         runBlocking {

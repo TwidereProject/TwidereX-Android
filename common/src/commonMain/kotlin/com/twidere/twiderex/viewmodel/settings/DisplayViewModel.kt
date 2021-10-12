@@ -64,4 +64,10 @@ class DisplayViewModel(
             it.copy(fontScale = value)
         }
     }
+
+    fun setMuteByDefault(value: Boolean) = viewModelScope.launch {
+        displayPreferences.updateData {
+            it.copy(muteByDefault = value)
+        }
+    }
 }

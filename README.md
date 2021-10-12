@@ -23,30 +23,23 @@ Next generation of Twidere for Android 5.0+. **Still in early stage.**
 
 ## What's Happening
 
-### What's new in 1.4.0 - Jul 2021 Update
+### What's new in 1.5.0 - Aug 2021 Update
 
-- Twitter DM (Direct Message) support is here!
-- Now you can use Fido key and password manager when login.
-- Add notification setting in the application.
-- Add pure dark mode support when dark theme is selected, which is really black.
-- Fix nitter usage for viewing private tweets, now you can view private tweet thread when using nitter.
-- Fix some really old mention is being notified when using Twitter.
-- Fix when the TopBar BottomBar and FloatingButton sometimes in the intermediate state [#152](https://github.com/TwidereProject/TwidereX-Android/pull/152) by [HuixingWong](https://github.com/HuixingWong)
-- Fix the status gap algorithm, now the gap is more accurate than before.
-- Fix VideoPlayer is still playing when the app is in background [#173](https://github.com/TwidereProject/TwidereX-Android/pull/173) by [HuixingWong](https://github.com/HuixingWong)
-- Rework for text input, now the beginning word in sentences is auto-capitalized when compose.
-- Fix notification timestamp not being used, the can fix the issue where old notification still being notified.
-- Fix crashing when the user cancels adding the member to the list.
-- Fix timeline not able to refresh after changing account.
-- Fix clicking on notification opens blank app.
-- Upgrade Jetpack Compose to RC02.
+- Proxy support, you can set a proxy for all the network request in settings.
+- Tabs column editing support, you can now modify the order and count of the home tab.
+- "Tweet sent" notification will be dismissed after showing once.
+- Screen will keep on when playing media in media scene.
+- Better RTL support for tweets.
+- Fix certain crashes when requesting network.
+- [Mastodon] Add support for gif avatar support and custom emoji in user name.
+- [Mastodon] Add federated timeline and local timeline
 
-### What is being planned for 1.5.0 - Jul 2021 Update
-For 1.5.0, as we've finished the basic functionality for Twitter and Mastodon, we're now focusing on the functionality that is lacking in Twidere X, such as Tabs editing, proxy support, and UX improvement, you can check out our [milestore](https://github.com/TwidereProject/TwidereX-Android/milestone/3) for detail. Here is a shortlist:
+### What is being planned for 1.6.0 - Aug 2021 Update
+For 1.6.0, we're planning to build an experimatal desktop version, this is a big step, you can check out our [milestore](https://github.com/TwidereProject/TwidereX-Android/milestone/4) for detail. Here is a shortlist:
 
-- Proxy support.
-- Tabs editing support.
-- Internal changes that preparing for the desktop version.
+- Experimatal desktop version.
+- Mute and block support.
+- Optimizing video play for timeline.
 - Bug fixes.
 - UI/UX tweaking.
 - Stability.
