@@ -40,6 +40,7 @@ actual class ResLoader(
         return context.getString(res.resourceId, *args)
     }
 
+    @OptIn(coil.annotation.ExperimentalCoilApi::class)
     @Composable
     actual fun getSvg(res: FileResource): Painter {
         val data = "android.resource://${context.packageName}/raw/${context.resources.getResourceEntryName(res.rawResId)}"
@@ -51,6 +52,7 @@ actual class ResLoader(
         )
     }
 
+    @OptIn(coil.annotation.ExperimentalCoilApi::class)
     @Composable
     actual fun getImage(res: ImageResource): Painter {
         val data = "android.resource://${context.packageName}/drawable/${context.resources.getResourceEntryName(res.drawableResId)}"

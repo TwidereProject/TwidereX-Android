@@ -42,6 +42,7 @@ abstract class ComposeJob<T : MicroBlogService>(
     private val remoteNavigator: RemoteNavigator,
     private val resLoader: ResLoader,
 ) {
+    @OptIn(kotlin.time.ExperimentalTime::class)
     suspend fun execute(composeData: ComposeData, accountKey: MicroBlogKey) {
         val builder = AppNotification
             .Builder(NotificationChannelSpec.BackgroundProgresses.id)

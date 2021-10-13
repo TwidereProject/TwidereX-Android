@@ -68,7 +68,6 @@ import com.twidere.twiderex.extensions.showControls
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.preferences.LocalDisplayPreferences
 import com.twidere.twiderex.preferences.model.DisplayPreferences
-import com.twidere.twiderex.preferences.proto.DisplayPreferences
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.LocalVideoPlayback
 import com.twidere.twiderex.ui.LocalWindow

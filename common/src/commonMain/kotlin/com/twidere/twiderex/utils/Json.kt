@@ -34,9 +34,11 @@ val JSON by lazy {
     }
 }
 // TODO Make it internal after all android code migrate to common
+@OptIn(kotlinx.serialization.ExperimentalSerializationApi::class)
 inline fun <reified T> T.json(): String =
     JSON.encodeToString<T>(this)
 
+@OptIn(kotlinx.serialization.ExperimentalSerializationApi::class)
 inline fun <reified T> String.fromJson() =
     JSON.decodeFromString<T>(this)
 

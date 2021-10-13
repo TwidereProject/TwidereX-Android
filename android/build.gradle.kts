@@ -1,6 +1,3 @@
-import org.gradle.kotlin.dsl.support.unzipTo
-import org.jetbrains.kotlin.gradle.internal.ensureParentDirsCreated
-import org.json.JSONObject
 import java.util.Properties
 
 buildscript {
@@ -186,70 +183,4 @@ dependencies {
     junit4()
     mockito()
     androidTest()
-}
-
-tasks.register("generateTranslation") {
-    val localizationFolder = File(rootDir, "localization")
-    val appJson = File(localizationFolder, "app.json")
-    val target = project.file("src/main/res/values/strings.xml")
-    generateLocalization(appJson, target)
-}
-
-tasks.register("generateTranslationFromZip") {
-    val zip = File(rootProject.buildDir, "Twidere X (translations).zip")
-    val unzipTarget = rootProject.buildDir
-    unzipTo(unzipTarget, zip)
-    File(unzipTarget, "translation").listFiles()?.forEach { file ->
-        val source = File(file, "app.json")
-        val target = project.file(
-            "src/main/res-localized" + "/values-" + file.name.split('_')
-                .first() + "-r" + file.name.split('_').last() + "/strings.xml"
-        )
-        generateLocalization(source, target)
-    }
-}
-
-fun generateLocalization(appJson: File, target: File) {
-    val json = appJson.readText(Charsets.UTF_8)
-    val obj = JSONObject(json)
-    val result = flattenJson(obj).filter {
-        it.value.isNotEmpty() && it.value.isNotBlank()
-    }
-    if (result.isNotEmpty()) {
-        target.ensureParentDirsCreated()
-        target.createNewFile()
-        val xml =
-            """<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">""" + System.lineSeparator() +
-                result.map {
-                    "    <string name=\"${it.key}\">${
-                    it.value.replace("'", "\\'").replace(System.lineSeparator(), "\\n")
-                    }</string>"
-                }.joinToString(System.lineSeparator()) + System.lineSeparator() +
-                "</resources>"
-        target.writeText(xml)
-    }
-}
-
-fun flattenJson(obj: JSONObject): Map<String, String> {
-    return obj.toMap().toList().flatMap { it ->
-        val (key, value) = it
-        when (value) {
-            is JSONObject -> {
-                flattenJson(value).map {
-                    "${key}_${it.key}" to it.value
-                }.toList()
-            }
-            is Map<*, *> -> {
-                flattenJson(JSONObject(value)).map {
-                    "${key}_${it.key}" to it.value
-                }.toList()
-            }
-            is String -> {
-                listOf(key to value)
-            }
-            else -> {
-                listOf(key to value.toString())
-            }
-        }
-    }.toMap()
 }
