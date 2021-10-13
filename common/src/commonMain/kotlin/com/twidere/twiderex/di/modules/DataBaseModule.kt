@@ -27,5 +27,4 @@ val dataBaseModule = module {
     single { DataProvider.create() }
     single { get<DataProvider>().appDatabase }
     single { get<DataProvider>().cacheDatabase }
-    single { get<DataProvider>().fileCacheHandler }
 }

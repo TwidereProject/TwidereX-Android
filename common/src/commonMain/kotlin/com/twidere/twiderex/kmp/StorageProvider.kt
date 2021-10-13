@@ -18,31 +18,24 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.mock.cache
+package com.twidere.twiderex.kmp
 
-import com.twidere.twiderex.cache.FileCacheHandler
-import okhttp3.Cache
-import java.io.File
-
-internal class MockFileCacheHandler(
-    private val mediaCache: MutableList<Any>,
-    private val fileCache: MutableList<Any>,
-) : FileCacheHandler {
-    override fun getCache(): Cache {
-        TODO("Not yet implemented")
+expect class StorageProvider {
+    companion object {
+        fun create(): StorageProvider
     }
+    // for persistence data
+    val appDataDir: String
 
-    override fun getCacheDirs(): List<File> {
-        TODO("Not yet implemented")
-    }
+    // for cache data
+    val cacheDataDir: String
 
-    override fun clearMediaCaches() {
-        mediaCache.clear()
-    }
+    // for media caches e.g image, video
+    val mediaCacheDir: String
 
-    override fun clearFileCaches() {
-        fileCache.clear()
-    }
-
-    fun isCacheCleared() = mediaCache.isEmpty() && fileCache.isEmpty()
+    /**
+     * @param dir, cache dir needs to be clear
+     * @param deleteDirAlso, delete all files in dir include dir itself
+     */
+    fun clearCaches(dir: String, deleteDirAlso: Boolean = false)
 }

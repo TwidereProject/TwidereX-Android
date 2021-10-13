@@ -15,4 +15,4 @@ INSERT OR REPLACE INTO DbNotificationCursor(
 ) VALUES ?;
 
 find:
-SELECT * FROM DbNotificationCursor WHERE accountKey == :accountKey AND type == :type;
+SELECT * FROM DbNotificationCursor WHERE accountKey == :accountKey AND type == :type AND timestamp = (SELECT max(timestamp) FROM DbNotificationCursor);
