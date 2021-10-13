@@ -45,12 +45,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.twidere.twiderex.R
+import com.twidere.twiderex.extensions.fileProviderUri
+import com.twidere.twiderex.kmp.MediaInsertProvider
 import com.twidere.twiderex.model.enums.MediaInsertType
 import com.twidere.twiderex.model.ui.UiMediaInsert
 import com.twidere.twiderex.navigation.RootRoute
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.utils.FileProviderHelper
-import com.twidere.twiderex.kmp.MediaInsertProvider
 import kotlinx.coroutines.launch
 import java.util.UUID
 
@@ -109,7 +110,7 @@ fun MediaInsertMenu(
         contract = ActivityResultContracts.CaptureVideo(),
         onResult = {
             scope.launch {
-                if (it) onResult(listOf(mediaInsertProvider.provideUiMediaInsert(videoTempUri)))
+                if (it) onResult(listOf(mediaInsertProvider.provideUiMediaInsert(videoTempUri.toString())))
             }
         },
     )
@@ -136,7 +137,7 @@ fun MediaInsertMenu(
                             MediaInsertType.GIF -> scope.launch {
                                 navController.navigateForResult(RootRoute.Gif.Home)
                                     ?.let { result ->
-                                        onResult(listOf(result as Uri).toUi(mediaInsertProvider))
+                                        onResult(listOf(result as String).map { it.fileProviderUri(context) }.toUi(mediaInsertProvider))
                                     }
                             }
                         }
@@ -175,7 +176,7 @@ fun MediaInsertMenu(
 }
 
 private suspend fun List<Uri>.toUi(mediaInsertProvider: MediaInsertProvider) = map {
-    mediaInsertProvider.provideUiMediaInsert(it)
+    mediaInsertProvider.provideUiMediaInsert(it.toString())
 }
 
 @Composable

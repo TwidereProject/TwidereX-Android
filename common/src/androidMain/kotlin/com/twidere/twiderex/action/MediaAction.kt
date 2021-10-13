@@ -46,7 +46,7 @@ actual class MediaAction(
     }
 
     actual fun share(source: String, accountKey: MicroBlogKey) {
-        val uri = FileProviderHelper.getUriFromMedia(source, context)
+        val uri = FileProviderHelper.getUriFromMedias(source, context)
         DownloadMediaWorker.create(
             accountKey = accountKey,
             source = source,

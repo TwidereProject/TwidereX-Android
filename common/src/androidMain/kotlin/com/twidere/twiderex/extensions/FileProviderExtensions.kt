@@ -18,10 +18,22 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.kmp
+package com.twidere.twiderex.extensions
 
-import com.twidere.twiderex.model.ui.UiMediaInsert
+import android.content.Context
+import android.net.Uri
+import androidx.core.content.FileProvider
+import com.twidere.twiderex.kmp.file
+import java.io.File
 
-expect class MediaInsertProvider {
-    suspend fun provideUiMediaInsert(filePath: String): UiMediaInsert
+private const val PROVIDER_NAME = "com.twidere.twiderex.fileprovider"
+
+// TODO Make it internal after migrate ui to common
+fun String.fileProviderUri(context: Context): Uri {
+    return if (startsWith("content://")) Uri.parse(this)
+    else file().fileProviderUri(context)
+}
+
+fun File.fileProviderUri(context: Context): Uri {
+    return FileProvider.getUriForFile(context, PROVIDER_NAME, this)
 }

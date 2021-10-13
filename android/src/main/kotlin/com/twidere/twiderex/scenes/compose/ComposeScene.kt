@@ -22,7 +22,6 @@ package com.twidere.twiderex.scenes.compose
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.location.Location
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -403,7 +402,7 @@ private fun ComposeBody(
                             viewModel = viewModel,
                         )
                         CompositionLocalProvider(LocalContentAlpha.provides(ContentAlpha.medium)) {
-                            MastodonExtraActions(images.map { it.uri }, viewModel)
+                            MastodonExtraActions(images.map { it.filePath }, viewModel)
                         }
                     } else {
                         Spacer(modifier = Modifier.weight(1F))
@@ -1338,7 +1337,7 @@ private fun ComposeImage(item: UiMediaInsert, viewModel: ComposeViewModel) {
                         navController.navigate(
                             RootRoute.Media.Raw(
                                 if (type == MediaType.video) MediaType.video else MediaType.photo,
-                                item.uri.toString()
+                                item.filePath.toString()
                             )
                         )
                     }
@@ -1385,7 +1384,7 @@ private fun ComposeImage(item: UiMediaInsert, viewModel: ComposeViewModel) {
             DropdownMenuItem(
                 onClick = {
                     expanded = false
-                    viewModel.removeImage(item.uri)
+                    viewModel.removeImage(item.filePath)
                 }
             ) {
                 Text(

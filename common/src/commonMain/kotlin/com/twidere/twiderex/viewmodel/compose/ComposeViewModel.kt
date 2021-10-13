@@ -29,6 +29,7 @@ import com.twidere.twiderex.extensions.asStateIn
 import com.twidere.twiderex.extensions.getTextAfterSelection
 import com.twidere.twiderex.extensions.getTextBeforeSelection
 import com.twidere.twiderex.kmp.LocationProvider
+import com.twidere.twiderex.kmp.MediaInsertProvider
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.ComposeType
 import com.twidere.twiderex.model.enums.MastodonVisibility
@@ -47,7 +48,6 @@ import com.twidere.twiderex.repository.StatusRepository
 import com.twidere.twiderex.repository.UserRepository
 import com.twidere.twiderex.utils.MastodonEmojiCache
 import com.twidere.twiderex.utils.notifyError
-import com.twidere.twiderex.kmp.MediaInsertProvider
 import com.twitter.twittertext.Extractor
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -64,7 +64,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
-import java.net.URI
 import java.util.UUID
 
 class DraftItemViewModel(
@@ -110,7 +109,7 @@ class DraftComposeViewModel(
         viewModelScope.launch {
             putImages(
                 draft.media.map {
-                    mediaInsertProvider.provideUiMediaInsert(URI.create(it))
+                    mediaInsertProvider.provideUiMediaInsert(it)
                 }
             )
         }
@@ -347,7 +346,7 @@ open class ComposeViewModel(
     private fun buildComposeData(text: String) = ComposeData(
         content = text,
         draftId = draftId,
-        images = images.value.map { it.uri.toString() },
+        images = images.value.map { it.filePath },
         composeType = composeType,
         statusKey = statusKey,
         lat = location.value?.latitude,
@@ -401,10 +400,10 @@ open class ComposeViewModel(
         locationProvider.disable()
     }
 
-    fun removeImage(item: URI) {
+    fun removeImage(item: String) {
         images.value.let {
             it.toMutableList().apply {
-                removeAll { media -> media.uri == item }
+                removeAll { media -> media.filePath == item }
             }
         }.let {
             images.value = it

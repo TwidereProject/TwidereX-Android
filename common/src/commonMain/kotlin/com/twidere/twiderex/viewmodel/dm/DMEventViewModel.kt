@@ -29,6 +29,7 @@ import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.job.DirectMessageDeleteData
 import com.twidere.twiderex.model.job.DirectMessageSendData
 import com.twidere.twiderex.model.ui.UiDMEvent
+import com.twidere.twiderex.model.ui.UiMediaInsert
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.DirectMessageRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -75,7 +76,7 @@ class DMEventViewModel(
 
     // input
     val input = MutableStateFlow("")
-    val inputImage = MutableStateFlow<String?>(null)
+    val inputImage = MutableStateFlow<UiMediaInsert?>(null)
     val firstEventKey = MutableStateFlow<String?>(null)
     val pendingActionMessage = MutableStateFlow<UiDMEvent?>(null)
 

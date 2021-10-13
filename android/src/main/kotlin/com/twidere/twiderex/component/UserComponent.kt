@@ -713,25 +713,15 @@ private fun UserRelationship(viewModel: UserViewModel) {
                     },
                 )
             }
-        ) {
-            Text(
-                modifier = Modifier
-                    .padding(ButtonDefaults.ContentPadding),
-                text = if (relationshipResult.followedBy) {
-                    stringResource(id = com.twidere.common.R.string.common_controls_friendship_actions_unfollow)
-                } else {
-                    stringResource(id = com.twidere.common.R.string.common_controls_friendship_actions_follow)
-                },
-            )
-        }
-        Spacer(modifier = Modifier.height(UserRelationshipDefaults.FollowingSpacing))
-        if (relationshipResult.following) {
-            Text(
-                text = stringResource(id = com.twidere.common.R.string.common_controls_friendship_follows_you),
-                style = MaterialTheme.typography.caption,
-            )
-        }
-    } ?: run {
+
+            Spacer(modifier = Modifier.height(UserRelationshipDefaults.FollowingSpacing))
+            if (relationshipResult.following) {
+                Text(
+                    text = stringResource(id = com.twidere.common.R.string.common_controls_friendship_follows_you),
+                    style = MaterialTheme.typography.caption,
+                )
+            }
+        } ?: run {
         CircularProgressIndicator()
     }
 }

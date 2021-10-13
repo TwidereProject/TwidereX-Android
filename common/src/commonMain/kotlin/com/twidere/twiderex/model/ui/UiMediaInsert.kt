@@ -21,10 +21,9 @@
 package com.twidere.twiderex.model.ui
 
 import com.twidere.twiderex.model.enums.MediaType
-import java.net.URI
 
 data class UiMediaInsert(
-    val uri: URI,
+    val filePath: String,
     val preview: Any,
     val type: MediaType
 )
