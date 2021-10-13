@@ -38,7 +38,9 @@ import com.twidere.twiderex.component.foundation.NetworkImageState
 import com.twidere.twiderex.component.image.ImageEffects
 import com.twidere.twiderex.http.TwidereServiceFactory
 import com.twidere.twiderex.preferences.LocalHttpConfig
+import okhttp3.Cache
 import okhttp3.Request
+import java.io.File
 import java.net.URL
 
 @Composable
@@ -47,12 +49,13 @@ internal actual fun rememberNetworkImagePainter(
     authorization: Authorization,
     httpConfig: HttpConfig,
     effects: ImageEffects,
+    cacheDir: String,
     onImageStateChanged: (NetworkImageState) -> Unit
 ): Painter {
     val context = LocalContext.current
     return rememberImagePainter(
         data = data,
-        imageLoader = buildImageLoader(),
+        imageLoader = buildImageLoader(cacheDir),
         builder = {
             crossfade(effects.crossFade)
             if (effects.blur != null) {
@@ -85,7 +88,7 @@ internal actual fun rememberNetworkImagePainter(
 
 @OptIn(ExperimentalCoilApi::class)
 @Composable
-private fun buildImageLoader(): ImageLoader {
+private fun buildImageLoader(cacheDir: String): ImageLoader {
     val context = LocalContext.current
     val httpConfig = LocalHttpConfig.current
     return LocalImageLoader.current
@@ -97,7 +100,7 @@ private fun buildImageLoader(): ImageLoader {
                 callFactory(
                     TwidereServiceFactory.createHttpClientFactory()
                         .createHttpClientBuilder()
-                        .cache(CoilUtils.createDefaultCache(context))
+                        .cache(Cache(File(cacheDir), CoilUtils.createDefaultCache(context).maxSize()))
                         .build()
                 )
             }

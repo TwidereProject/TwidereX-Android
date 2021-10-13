@@ -41,7 +41,7 @@ import com.twidere.twiderex.mock.db.dao.MockTrendDao
 import com.twidere.twiderex.mock.db.dao.MockUserDao
 import org.jetbrains.annotations.TestOnly
 
-internal class MockCacheDatabase @TestOnly constructor() : CacheDatabase {
+class MockCacheDatabase @TestOnly constructor() : CacheDatabase {
     private val statusDao = MockStatusDao()
     override fun statusDao(): StatusDao {
         return statusDao

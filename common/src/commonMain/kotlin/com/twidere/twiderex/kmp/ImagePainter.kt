@@ -33,5 +33,6 @@ internal expect fun rememberNetworkImagePainter(
     authorization: Authorization,
     httpConfig: HttpConfig,
     effects: ImageEffects,
+    cacheDir: String,
     onImageStateChanged: (NetworkImageState) -> Unit
 ): Painter

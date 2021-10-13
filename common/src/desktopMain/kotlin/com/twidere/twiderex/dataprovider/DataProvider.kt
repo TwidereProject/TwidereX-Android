@@ -21,20 +21,23 @@
 package com.twidere.twiderex.dataprovider
 
 import com.squareup.sqldelight.sqlite.driver.JdbcSqliteDriver
-import com.twidere.twiderex.cache.FileCacheHandler
 import com.twidere.twiderex.db.AppDatabase
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.db.sqldelight.SqlDelightAppDatabaseImpl
 import com.twidere.twiderex.db.sqldelight.SqlDelightCacheDatabaseImpl
 import com.twidere.twiderex.db.sqldelight.createAppDataBase
 import com.twidere.twiderex.db.sqldelight.createCacheDataBase
+import com.twidere.twiderex.di.ext.get
+import com.twidere.twiderex.kmp.StorageProvider
+import com.twidere.twiderex.kmp.appDatabasePath
+import com.twidere.twiderex.kmp.cacheDatabasePath
 
 actual class DataProvider {
     // data provide functions....
+    private val JCDB_PREFIX = "jdbc:sqlite:"
+    private val APP_DATABASE = "$JCDB_PREFIX${get<StorageProvider>().appDatabasePath("app.db")}"
+    private val CACHE_DATABASE = "$JCDB_PREFIX${get<StorageProvider>().cacheDatabasePath("cache.db")}"
     actual companion object Factory {
-        // TODO unify storage file path with preference
-        private const val APP_DATABASE = "jdbc:sqlite:app"
-        private const val CACHE_DATABASE = "jdbc:sqlite:cache"
         actual fun create(): DataProvider {
             return DataProvider()
         }
@@ -49,7 +52,4 @@ actual class DataProvider {
         get() = SqlDelightCacheDatabaseImpl(
             database = createCacheDataBase(JdbcSqliteDriver(CACHE_DATABASE))
         )
-
-    actual val fileCacheHandler: FileCacheHandler
-        get() = TODO("Not yet implemented")
 }
