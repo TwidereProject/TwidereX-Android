@@ -28,7 +28,7 @@ import java.io.File
 
 object VideoCache {
     private var simpleCache: SimpleCache? = null
-    private const val maxCacheSize: Long = 100 * 1024 * 1024
+    private const val maxCacheSize: Long = 100 * 1024 * 1024L
     fun getInstance(context: Context): SimpleCache {
         val evictor = LeastRecentlyUsedCacheEvictor(maxCacheSize)
         if (simpleCache == null) simpleCache =

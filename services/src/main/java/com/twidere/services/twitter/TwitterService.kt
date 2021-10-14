@@ -436,7 +436,7 @@ class TwitterService(
 
     override suspend fun delete(id: String) = resources.destroy(id)
 
-    private val BULK_SIZE: Long = 512 * 1024 // 512 Kib
+    private val BULK_SIZE: Long = 512 * 1024L // 512 Kib
 
     suspend fun update(
         status: String,
