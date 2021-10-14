@@ -4,7 +4,7 @@ object Versions {
     object Kotlin {
         const val lang = "1.5.30"
         const val coroutines = "1.5.1"
-        const val serialization = "1.2.2"
+        const val serialization = "1.3.0-RC"
     }
 
     object Java {
@@ -12,7 +12,7 @@ object Versions {
         val java = JavaVersion.VERSION_11
     }
 
-    const val ksp = "${Kotlin.lang}-1.0.0-beta09"
+    const val ksp = "${Kotlin.lang}-1.0.0"
     const val agp = "7.0.1"
     const val spotless = "5.14.2"
     const val ktlint = "0.41.0"
@@ -20,7 +20,7 @@ object Versions {
     const val okhttp = "4.9.1"
     const val retrofit2 = "2.9.0"
     const val hson = "0.1.4"
-    const val compose = "1.1.0-alpha03"
+    const val compose = "1.1.0-alpha01"// todo fix crash when set to alpha 03
     const val compose_jb = "1.0.0-alpha4-build328"
     const val constraintLayout = "1.0.0-beta02"
     const val paging = "3.1.0-alpha03"

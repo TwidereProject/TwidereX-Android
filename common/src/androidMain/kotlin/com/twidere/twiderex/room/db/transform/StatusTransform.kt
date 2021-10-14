@@ -65,11 +65,15 @@ internal fun DbStatusV2.toUi(
     isGap: Boolean,
     referenceStatus: Map<ReferenceType, UiStatus> = emptyMap(),
 ): UiStatus {
-    val extra = when (platformType) {
-        PlatformType.Twitter -> extra.fromJson<DbTwitterStatusExtra>().toUi()
-        PlatformType.StatusNet -> TODO()
-        PlatformType.Fanfou -> TODO()
-        PlatformType.Mastodon -> extra.fromJson<DbMastodonStatusExtra>().toUi()
+    val extra = try {
+        when (platformType) {
+            PlatformType.Twitter -> extra.fromJson<DbTwitterStatusExtra>().toUi()
+            PlatformType.StatusNet -> TODO()
+            PlatformType.Fanfou -> TODO()
+            PlatformType.Mastodon -> extra.fromJson<DbMastodonStatusExtra>().toUi()
+        }
+    } catch (e: Throwable) {
+        null
     }
     return UiStatus(
         statusId = statusId,

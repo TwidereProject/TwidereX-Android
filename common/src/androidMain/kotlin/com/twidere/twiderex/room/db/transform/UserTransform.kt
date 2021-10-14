@@ -57,11 +57,15 @@ internal fun DbUser.toUi() =
         protected = isProtected,
         userKey = userKey,
         platformType = platformType,
-        extra = when (platformType) {
-            PlatformType.Twitter -> extra.fromJson<DbTwitterUserExtra>().toUi()
-            PlatformType.StatusNet -> TODO()
-            PlatformType.Fanfou -> TODO()
-            PlatformType.Mastodon -> extra.fromJson<DbMastodonUserExtra>().toUi()
+        extra = try {
+            when (platformType) {
+                PlatformType.Twitter -> extra.fromJson<DbTwitterUserExtra>().toUi()
+                PlatformType.StatusNet -> TODO()
+                PlatformType.Fanfou -> TODO()
+                PlatformType.Mastodon -> extra.fromJson<DbMastodonUserExtra>().toUi()
+            }
+        } catch (e: Throwable) {
+            null
         },
         acct = acct,
     )
