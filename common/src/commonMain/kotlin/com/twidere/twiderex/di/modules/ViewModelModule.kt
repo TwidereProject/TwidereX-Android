@@ -235,5 +235,5 @@ private fun Module.user() {
 }
 
 private fun Module.gif() {
-    viewModel { GifViewModel(get(), get()) }
+    viewModel { GifViewModel(get(), get(), get()) }
 }

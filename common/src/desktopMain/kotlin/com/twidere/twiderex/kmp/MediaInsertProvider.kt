@@ -20,22 +20,10 @@
  */
 package com.twidere.twiderex.kmp
 
-expect class StorageProvider {
-    companion object {
-        fun create(): StorageProvider
+import com.twidere.twiderex.model.ui.UiMediaInsert
+
+actual class MediaInsertProvider {
+    actual suspend fun provideUiMediaInsert(filePath: String): UiMediaInsert {
+        TODO("NOT IMPLEMENT YET")
     }
-    // for persistence data
-    val appDir: String
-
-    // for cache data
-    val cacheDir: String
-
-    // for media caches e.g image, video
-    val mediaCacheDir: String
-
-    /**
-     * @param dir, cache dir needs to be clear
-     * @param deleteDirAlso, delete all files in dir include dir itself
-     */
-    fun clearCaches(dir: String, deleteDirAlso: Boolean = false)
 }

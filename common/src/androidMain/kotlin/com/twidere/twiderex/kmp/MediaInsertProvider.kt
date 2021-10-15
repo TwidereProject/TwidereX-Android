@@ -24,7 +24,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.media.MediaMetadataRetriever
 import android.net.Uri
-import com.twidere.twiderex.extensions.fileProviderUri
+import com.twidere.twiderex.extensions.toUri
 import com.twidere.twiderex.model.enums.MediaType
 import com.twidere.twiderex.model.ui.UiMediaInsert
 import kotlinx.coroutines.coroutineScope
@@ -32,7 +32,7 @@ import kotlinx.coroutines.coroutineScope
 actual class MediaInsertProvider(private val context: Context) {
 
     actual suspend fun provideUiMediaInsert(filePath: String): UiMediaInsert {
-        val androidUri = filePath.fileProviderUri(context)
+        val androidUri = filePath.toUri(context)
         val type = (context.contentResolver.getType(androidUri) ?: "image/*").let {
             when {
                 it.startsWith("video") -> MediaType.video

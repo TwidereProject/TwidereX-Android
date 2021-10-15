@@ -24,11 +24,13 @@ import androidx.compose.ui.text.intl.Locale
 import androidx.paging.cachedIn
 import com.twidere.twiderex.http.TwidereServiceFactory
 import com.twidere.twiderex.kmp.StorageProvider
-import com.twidere.twiderex.kmp.downloadFilePath
+import com.twidere.twiderex.kmp.appFiles
 import com.twidere.twiderex.kmp.mkFile
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiGif
+import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.GifRepository
+import com.twidere.twiderex.utils.notifyError
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.debounce
@@ -36,11 +38,11 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
-import okhttp3.internal.notify
 
 class GifViewModel(
     private val gifRepository: GifRepository,
-    private val storageProvider: StorageProvider
+    private val storageProvider: StorageProvider,
+    private val inAppNotification: InAppNotification,
 ) : ViewModel() {
 
     val input = MutableStateFlow("")
@@ -68,7 +70,7 @@ class GifViewModel(
 
     val commitLoading get() = _commitLoading
 
-    fun commit(onSuccess: (path: String) -> Unit, platform: PlatformType) {
+    fun commit(platform: PlatformType, onSuccess: (path: String) -> Unit) {
         selectedItem.value?.let {
             // mastodon support image/video only
             val url = when (platform) {
@@ -82,11 +84,12 @@ class GifViewModel(
             viewModelScope.launch {
                 _commitLoading.value = true
                 try {
-                    val target = storageProvider.downloadFilePath("${it.id}.$suffix").mkFile()
+                    val target = storageProvider.appFiles.mediaFile("${it.id}.$suffix").mkFile()
                     gifRepository.download(target = target, source = url, service = service)
                     onSuccess(target)
                 } catch (e: Throwable) {
-                    e.notify()
+                    e.printStackTrace()
+                    inAppNotification.notifyError(e)
                 } finally {
                     _commitLoading.value = false
                 }

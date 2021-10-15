@@ -45,13 +45,16 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.twidere.twiderex.R
-import com.twidere.twiderex.extensions.fileProviderUri
+import com.twidere.twiderex.di.ext.get
+import com.twidere.twiderex.extensions.toUri
 import com.twidere.twiderex.kmp.MediaInsertProvider
+import com.twidere.twiderex.kmp.StorageProvider
+import com.twidere.twiderex.kmp.appFiles
+import com.twidere.twiderex.kmp.mkFile
 import com.twidere.twiderex.model.enums.MediaInsertType
 import com.twidere.twiderex.model.ui.UiMediaInsert
 import com.twidere.twiderex.navigation.RootRoute
 import com.twidere.twiderex.ui.LocalNavController
-import com.twidere.twiderex.utils.FileProviderHelper
 import kotlinx.coroutines.launch
 import java.util.UUID
 
@@ -68,6 +71,7 @@ fun MediaInsertMenu(
     onResult: (List<UiMediaInsert>) -> Unit
 ) {
     val context = LocalContext.current
+    val storageProvider = get<StorageProvider>()
     val mediaInsertProvider = remember {
         MediaInsertProvider(context)
     }
@@ -126,18 +130,18 @@ fun MediaInsertMenu(
                     onClick = {
                         when (it) {
                             MediaInsertType.CAMERA -> {
-                                cameraTempUri = FileProviderHelper.getUriFromMedias(mediaFileName = "${System.currentTimeMillis()}$ImageSuffix", context)
+                                cameraTempUri = storageProvider.appFiles.mediaFile("${System.currentTimeMillis()}$ImageSuffix").mkFile().toUri(context)
                                 cameraLauncher.launch(cameraTempUri)
                             }
                             MediaInsertType.RECORD_VIDEO -> {
-                                videoTempUri = FileProviderHelper.getUriFromMedias(mediaFileName = "${UUID.randomUUID()}$VideoSuffix", context)
+                                videoTempUri = storageProvider.appFiles.mediaFile("${UUID.randomUUID()}$VideoSuffix").mkFile().toUri(context)
                                 videoRecordLauncher.launch(videoTempUri)
                             }
                             MediaInsertType.LIBRARY -> filePickerLauncher.launch(librariesSupported)
                             MediaInsertType.GIF -> scope.launch {
                                 navController.navigateForResult(RootRoute.Gif.Home)
                                     ?.let { result ->
-                                        onResult(listOf(result as String).map { it.fileProviderUri(context) }.toUi(mediaInsertProvider))
+                                        onResult(listOf(result as String).map { it.toUri(context) }.toUi(mediaInsertProvider))
                                     }
                             }
                         }

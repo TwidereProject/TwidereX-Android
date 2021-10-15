@@ -34,6 +34,9 @@ internal class MockRelationshipService @TestOnly constructor() : MicroBlogServic
     ErrorService() {
     private val followings = mutableListOf<String>()
     private val followers = mutableListOf<String>()
+    override suspend fun block(id: String): IRelationship {
+        TODO("Not yet implemented")
+    }
 
     override suspend fun follow(user_id: String) {
         checkError()
@@ -65,7 +68,13 @@ internal class MockRelationshipService @TestOnly constructor() : MicroBlogServic
         return Relationship(
             followedBy = followers.contains(target_id),
             following = followings.contains(target_id),
+            blockedBy = false,
+            blocking = false
         )
+    }
+
+    override suspend fun unblock(id: String): IRelationship {
+        TODO("Not yet implemented")
     }
 
     override suspend fun unfollow(user_id: String) {
