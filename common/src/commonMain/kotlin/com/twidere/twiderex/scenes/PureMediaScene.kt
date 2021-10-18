@@ -49,7 +49,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.insets.navigationBarsPadding
 import com.google.accompanist.insets.statusBarsPadding
@@ -57,9 +56,9 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.rememberPagerState
 import com.google.android.exoplayer2.ui.PlayerControlView
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
+import com.twidere.twiderex.component.foundation.VideoPlayerController
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
-import com.twidere.twiderex.component.foundation.VideoPlayerController
 import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.hideControls
 import com.twidere.twiderex.extensions.observeAsState

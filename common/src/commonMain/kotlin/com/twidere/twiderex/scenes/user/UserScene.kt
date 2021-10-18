@@ -37,6 +37,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.dp
+import com.twidere.twiderex.MR
 import com.twidere.twiderex.component.UserComponent
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
@@ -118,7 +119,7 @@ fun UserScene(
                                     Icon(
                                         imageVector = Icons.Default.MoreHoriz,
                                         contentDescription = stringResource(
-                                            id = R.string.accessibility_common_more
+                                            res = MR.strings.accessibility_common_more
                                         ),
                                         tint = MaterialTheme.colors.onSurface
                                     )
@@ -142,8 +143,8 @@ fun UserScene(
                                         ) {
                                             Text(
                                                 text = stringResource(
-                                                    id = if (blocking) R.string.common_controls_friendship_actions_unblock
-                                                    else R.string.common_controls_friendship_actions_block
+                                                    res = if (blocking) MR.strings.common_controls_friendship_actions_unblock
+                                                    else MR.strings.common_controls_friendship_actions_block
                                                 )
                                             )
                                         }
@@ -190,7 +191,7 @@ fun BlockAlert(
         },
         title = {
             Text(
-                text = stringResource(id = R.string.common_alerts_block_user_confirm_title, screenName),
+                text = stringResource(res = MR.strings.common_alerts_block_user_confirm_title, screenName),
                 style = MaterialTheme.typography.subtitle1
             )
         },
@@ -200,7 +201,7 @@ fun BlockAlert(
                     onDismissRequest.invoke()
                 }
             ) {
-                Text(text = stringResource(id = R.string.common_controls_actions_cancel))
+                Text(text = stringResource(res = MR.strings.common_controls_actions_cancel))
             }
         },
         confirmButton = {
@@ -210,7 +211,7 @@ fun BlockAlert(
                     onDismissRequest.invoke()
                 }
             ) {
-                Text(text = stringResource(id = R.string.common_controls_actions_yes))
+                Text(text = stringResource(res = MR.strings.common_controls_actions_yes))
             }
         },
     )

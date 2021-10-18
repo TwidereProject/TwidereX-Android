@@ -103,6 +103,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.coerceAtLeast
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.insets.LocalWindowInsets
+import com.twidere.twiderex.MR
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.CheckboxItem
 import com.twidere.twiderex.component.foundation.InAppNotificationBottomSheetScaffold
@@ -110,6 +111,7 @@ import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.foundation.TextInput
 import com.twidere.twiderex.component.lazy.itemsGridIndexed
 import com.twidere.twiderex.component.media.MediaInsertMenu
+import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.status.StatusLineComponent
 import com.twidere.twiderex.component.status.TimelineStatusComponent
 import com.twidere.twiderex.component.status.UserAvatar
@@ -1346,7 +1348,7 @@ private fun ComposeImage(item: UiMediaInsert, viewModel: ComposeViewModel) {
             when (type) {
                 MediaType.animated_gif ->
                     Image(
-                        painter = painterResource(id = R.drawable.ic_gif_tag),
+                        painter = painterResource(res = MR.files.ic_gif_tag),
                         contentDescription = type.name,
                         modifier = Modifier
                             .align(Alignment.BottomStart)
@@ -1366,7 +1368,7 @@ private fun ComposeImage(item: UiMediaInsert, viewModel: ComposeViewModel) {
                 else -> {}
             }
             Image(
-                painter = painterResource(id = R.drawable.ic_dots_circle_horiz),
+                painter = painterResource(res = MR.files.ic_dots_circle_horiz),
                 contentDescription = type.name,
                 modifier = Modifier
                     .align(Alignment.BottomEnd)

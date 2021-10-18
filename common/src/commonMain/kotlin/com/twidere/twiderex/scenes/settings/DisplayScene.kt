@@ -186,7 +186,7 @@ fun DisplayScene() {
                         viewModel.setMuteByDefault(it)
                     },
                     title = {
-                        Text(text = stringResource(id = com.twidere.common.R.string.scene_settings_display_media_mute_by_default))
+                        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_display_media_mute_by_default))
                     }
                 )
                 if (display.mediaPreview) {

@@ -229,8 +229,8 @@ private fun UserTimeline(viewModel: UserViewModel, content: @Composable () -> Un
     relationship.takeIf { !loadingRelationship }?.let {
         when {
             it.blockedBy -> PermissionDeniedInfo(
-                title = stringResource(id = R.string.scene_profile_permission_denied_profile_blocked_title),
-                message = stringResource(id = R.string.scene_profile_permission_denied_profile_blocked_message)
+                title = stringResource(res = com.twidere.twiderex.MR.strings.scene_profile_permission_denied_profile_blocked_title),
+                message = stringResource(res = com.twidere.twiderex.MR.strings.scene_profile_permission_denied_profile_blocked_message)
             )
             else -> content.invoke()
         }
@@ -245,7 +245,7 @@ private fun PermissionDeniedInfo(title: String, message: String) {
                 .fillMaxSize()
                 .padding(PermissionDeniedInfoDefaults.contentPaddingValues)
         ) {
-            Icon(painter = painterResource(id = R.drawable.ic_eye_off), contentDescription = title)
+            Icon(painter = painterResource(res = com.twidere.twiderex.MR.files.ic_eye_off), contentDescription = title)
             Spacer(modifier = Modifier.width(PermissionDeniedInfoDefaults.contentSpacing))
             Column {
                 Text(text = title, style = MaterialTheme.typography.subtitle2)

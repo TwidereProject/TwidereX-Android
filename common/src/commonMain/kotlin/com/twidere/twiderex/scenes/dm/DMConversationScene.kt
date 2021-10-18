@@ -69,6 +69,8 @@ import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.foundation.TextInput
 import com.twidere.twiderex.component.lazy.ui.LazyUiDMEventList
 import com.twidere.twiderex.component.media.MediaInsertMenu
+import com.twidere.twiderex.component.painterResource
+import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.model.MicroBlogKey

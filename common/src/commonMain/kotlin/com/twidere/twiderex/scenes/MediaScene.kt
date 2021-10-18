@@ -62,7 +62,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.insets.navigationBarsHeight
 import com.google.accompanist.insets.navigationBarsPadding
@@ -79,9 +78,9 @@ import com.twidere.twiderex.component.foundation.LoadingProgress
 import com.twidere.twiderex.component.foundation.NativePlayerView
 import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.foundation.VideoPlayer
-import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.foundation.VideoPlayerController
 import com.twidere.twiderex.component.navigation.LocalNavigator
+import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.status.LikeButton
 import com.twidere.twiderex.component.status.ReplyButton
 import com.twidere.twiderex.component.status.RetweetButton
