@@ -10,29 +10,8 @@ on:
 
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Set up JDK
-        uses: actions/setup-java@v1
-        with:
-          java-version: 11
-
-      - name: Build with Gradle
-        run: ./gradlew :common:spotlessCheck :desktop:build
-
-      - name: Upload build reports
-        uses: actions/upload-artifact@v2
-        with:
-          name: build-reports
-          path: '**/build/reports'
-
   unit-test:
     runs-on: ubuntu-latest
-    needs: build
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v2
@@ -45,8 +24,11 @@ jobs:
       - name: Set up Android SDK License
         run: yes | /usr/local/lib/android/sdk/tools/bin/sdkmanager --licenses
 
-      - name: Build with Gradle
+      - name: Run test in commonTest and androidTest
         run: ./gradlew :common:test
+
+      - name: Run test in desktopTest
+        run: ./gradlew :common:desktopTest
 
       - name: Upload test results
         if: always()
@@ -57,7 +39,7 @@ jobs:
 
   connected-android-test:
     runs-on: macOS-11
-    needs: build
+    needs: unit-test
     timeout-minutes: 60
     
     strategy:

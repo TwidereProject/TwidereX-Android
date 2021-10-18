@@ -32,6 +32,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.Icon
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
@@ -84,14 +85,16 @@ fun ColumnScope.StatusText(
     }
     AnimatedVisibility(visible = expanded) {
         Column {
-            HtmlText(
-                modifier = Modifier.fillMaxWidth(),
-                htmlText = status.htmlText,
-                maxLines = maxLines,
-                linkResolver = { href ->
-                    status.resolveLink(href)
-                },
-            )
+            SelectionContainer {
+                HtmlText(
+                    modifier = Modifier.fillMaxWidth(),
+                    htmlText = status.htmlText,
+                    maxLines = maxLines,
+                    linkResolver = { href ->
+                        status.resolveLink(href)
+                    },
+                )
+            }
             if (showMastodonPoll && status.platformType == PlatformType.Mastodon && status.poll != null) {
                 Spacer(modifier = Modifier.height(StatusTextDefaults.Mastodon.PollSpacing))
                 MastodonPoll(status)

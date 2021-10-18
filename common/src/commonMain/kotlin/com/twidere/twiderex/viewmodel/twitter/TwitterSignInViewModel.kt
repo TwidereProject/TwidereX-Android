@@ -95,6 +95,7 @@ class TwitterSignInViewModel(
                             access_token = accessToken.oauth_token,
                             access_token_secret = accessToken.oauth_token_secret
                         ),
+                        accountKey = MicroBlogKey.Empty
                     ) as TwitterService
                     ).verifyCredentials()
                 if (user != null) {

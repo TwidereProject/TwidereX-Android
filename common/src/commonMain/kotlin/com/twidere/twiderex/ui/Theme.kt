@@ -22,6 +22,10 @@ package com.twidere.twiderex.ui
 
 import android.os.Build
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.LocalOverScrollConfiguration
+import androidx.compose.foundation.gestures.OverScrollConfiguration
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.Colors
 import androidx.compose.material.LocalElevationOverlay
@@ -42,6 +46,7 @@ import com.twidere.twiderex.preferences.LocalAppearancePreferences
 import com.twidere.twiderex.preferences.LocalDisplayPreferences
 import com.twidere.twiderex.preferences.model.AppearancePreferences
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun TwidereTheme(
     darkTheme: Boolean = false,
@@ -61,7 +66,15 @@ fun TwidereTheme(
             colors = colors,
             typography = typography,
             shapes = shapes,
-            content = content,
+            content = {
+                CompositionLocalProvider(
+                    LocalOverScrollConfiguration provides OverScrollConfiguration(
+                        glowColor = MaterialTheme.colors.primary,
+                    )
+                ) {
+                    content.invoke()
+                }
+            },
         )
     }
 }

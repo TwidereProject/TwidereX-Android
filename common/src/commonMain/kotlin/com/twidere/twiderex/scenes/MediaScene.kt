@@ -64,7 +64,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
 import com.google.accompanist.insets.navigationBarsHeight
 import com.google.accompanist.insets.navigationBarsPadding
 import com.google.accompanist.insets.statusBarsPadding
@@ -77,9 +76,12 @@ import com.google.android.exoplayer2.ui.PlayerControlView
 import com.mxalbert.zoomable.Zoomable
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.LoadingProgress
+import com.twidere.twiderex.component.foundation.NativePlayerView
 import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.foundation.VideoPlayer
 import com.twidere.twiderex.component.painterResource
+import com.twidere.twiderex.component.foundation.VideoPlayerController
+import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.component.status.LikeButton
 import com.twidere.twiderex.component.status.ReplyButton
 import com.twidere.twiderex.component.status.RetweetButton
@@ -98,6 +100,7 @@ import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.MediaType
 import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.model.ui.UiStatus
+import com.twidere.twiderex.preferences.LocalDisplayPreferences
 import com.twidere.twiderex.preferences.model.DisplayPreferences
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.LocalVideoPlayback
@@ -153,6 +156,7 @@ fun StatusMediaScene(statusKey: MicroBlogKey, selectedIndex: Int) {
 fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewModel) {
     val window = LocalWindow.current
     var controlVisibility by remember { mutableStateOf(true) }
+    val navigator = LocalNavigator.current
     val controlPanelColor = MaterialTheme.colors.surface.copy(alpha = 0.6f)
     val navController = LocalNavController.current
     val pagerState = rememberPagerState(
@@ -160,15 +164,21 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewM
         pageCount = status.media.size,
     )
     val currentMedia = status.media[pagerState.currentPage]
-    val context = LocalContext.current
-    val videoControl = remember(pagerState.currentPage) {
-        if (currentMedia.type == MediaType.video) {
-            PlayerControlView(context).apply {
-                showTimeoutMs = 0
-            }
-        } else {
-            null
-        }
+    // val context = LocalContext.current
+    // todo use redefine custom control view by compose
+    val videoControl = null
+    //     remember(pagerState.currentPage) {
+    //     if (currentMedia.type == MediaType.video) {
+    //         PlayerControlView(context).apply {
+    //             showTimeoutMs = 0
+    //         }
+    //     } else {
+    //         null
+    //     }
+    // }
+    val display = LocalDisplayPreferences.current
+    var isMute by remember {
+        mutableStateOf(display.muteByDefault)
     }
     val swiperState = rememberSwiperState(
         onDismiss = {
@@ -205,9 +215,15 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewM
                     Box(
                         modifier = Modifier
                             .background(color = controlPanelColor)
-                            .navigationBarsPadding(),
+                            .navigationBarsPadding()
+                            .clickable { navigator.status(status = status) },
                     ) {
-                        StatusMediaInfo(videoControl, status, viewModel, currentMedia)
+                        StatusMediaInfo(
+                            videoControl, status, viewModel, currentMedia, isMute,
+                            onMute = {
+                                isMute = it
+                            }
+                        )
                     }
                 }
             }
@@ -239,6 +255,7 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewM
                 swiperState = swiperState,
                 customControl = videoControl,
                 pagerState = pagerState,
+                volume = if (isMute) 0f else 1f
             )
             DisposableEffect(Unit) {
                 window.setOnSystemBarsVisibilityChangeListener { visibility ->
@@ -292,7 +309,9 @@ private fun StatusMediaInfo(
     videoControl: PlayerControlView?,
     status: UiStatus,
     viewModel: MediaViewModel,
-    currentMedia: UiMedia
+    currentMedia: UiMedia,
+    mute: Boolean,
+    onMute: (isMute: Boolean) -> Unit
 ) {
     val scope = rememberCoroutineScope()
     Column(
@@ -300,7 +319,7 @@ private fun StatusMediaInfo(
             .padding(StatusMediaInfoDefaults.ContentPadding),
     ) {
         if (videoControl != null) {
-            AndroidView(factory = { videoControl })
+            VideoPlayerController(videoControl = videoControl, mute = mute, onMute = onMute)
         }
         StatusText(status = status, maxLines = 2, showMastodonPoll = false)
         Spacer(modifier = Modifier.height(StatusMediaInfoDefaults.TextSpacing))
@@ -360,8 +379,9 @@ private object StatusMediaInfoDefaults {
     val NameSpacing = 8.dp
 }
 
+@OptIn(ExperimentalPagerApi::class)
 @Composable
-fun RawMediaScene(url: String) {
+fun RawMediaScene(url: String, type: MediaType) {
     TwidereDialog(
         requireDarkTheme = true,
         extendViewIntoStatusBar = true,
@@ -376,7 +396,7 @@ fun RawMediaScene(url: String) {
                     navController.popBackStack()
                 },
             )
-            MediaView(media = listOf(MediaData(url, MediaType.photo)), swiperState = swiperState)
+            MediaView(media = listOf(MediaData(url, type)), swiperState = swiperState)
         }
     }
 }
@@ -396,7 +416,8 @@ fun MediaView(
         initialPage = 0,
         pageCount = media.size,
     ),
-    customControl: PlayerControlView? = null,
+    customControl: @Composable ((NativePlayerView) -> Unit)? = null,
+    volume: Float = 1f
 ) {
     Box(
         modifier = Modifier
@@ -435,7 +456,9 @@ fun MediaView(
                             customControl = customControl,
                             showControls = false,
                             zOrderMediaOverlay = true,
-                            keepScreenOn = true
+                            keepScreenOn = true,
+                            volume = volume,
+                            isListItem = false
                         )
                     }
                 MediaType.other -> Unit

@@ -23,6 +23,7 @@ package com.twidere.twiderex.di.modules
 import com.twidere.twiderex.kmp.ExifScrambler
 import com.twidere.twiderex.kmp.FileResolver
 import com.twidere.twiderex.kmp.LocationProvider
+import com.twidere.twiderex.kmp.MediaInsertProvider
 import com.twidere.twiderex.kmp.RemoteNavigator
 import com.twidere.twiderex.kmp.ResLoader
 import com.twidere.twiderex.notification.AppNotificationManager
@@ -35,4 +36,5 @@ actual val kmpModule = module {
     single { RemoteNavigator(get()) }
     single { ResLoader(get()) }
     single { AppNotificationManager(get(), get()) }
+    single { MediaInsertProvider(get()) }
 }

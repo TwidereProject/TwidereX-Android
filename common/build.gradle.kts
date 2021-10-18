@@ -9,6 +9,18 @@ plugins {
     kotlin("kapt")
     id("com.google.devtools.ksp").version(Versions.ksp)
     id("dev.icerock.mobile.multiplatform-resources") version Versions.moko
+    id("com.squareup.sqldelight")
+}
+
+sqldelight {
+    database("SqlDelightAppDatabase") {
+        packageName = "${Package.id}.sqldelight"
+        sourceFolders = listOf("sqldelight/app")
+    }
+    database("SqlDelightCacheDatabase") {
+        packageName = "${Package.id}.sqldelight"
+        sourceFolders = listOf("sqldelight/cache")
+    }
 }
 
 group = Package.group
@@ -26,9 +38,6 @@ kotlin {
     jvm("desktop") {
         compilations.all {
             kotlinOptions.jvmTarget = Versions.Java.jvmTarget
-        }
-        testRuns["test"].executionTask.configure {
-            useJUnitPlatform()
         }
     }
     sourceSets {
@@ -49,6 +58,7 @@ kotlin {
                 implementation("org.jsoup:jsoup:1.13.1")
                 implementation(projects.routeProcessor)
                 ksp(projects.routeProcessor)
+                implementation("com.squareup.sqldelight:coroutines-extensions-jvm:${Versions.sqlDelight}")
                 api("dev.icerock.moko:resources:${Versions.moko}")
                 implementation("app.cash.turbine:turbine:0.6.1")
                 implementation("ca.gosyer:accompanist-pager:${Versions.accompanist_jb}")
@@ -79,6 +89,10 @@ kotlin {
                 implementation("io.coil-kt:coil-compose:${Versions.coil}")
                 implementation("io.coil-kt:coil-gif:${Versions.coil}")
                 implementation("io.coil-kt:coil-svg:${Versions.coil}")
+                implementation("com.google.android.exoplayer:exoplayer:${Versions.exoplayer}")
+                implementation("com.google.android.exoplayer:extension-okhttp:${Versions.exoplayer}")
+                implementation("com.squareup.sqldelight:android-driver:${Versions.sqlDelight}")
+                implementation("com.squareup.sqldelight:sqlite-driver:${Versions.sqlDelight}")
                 implementation("androidx.datastore:datastore:${Versions.datastore}")
                 implementation("androidx.datastore:datastore-preferences:${Versions.datastore}")
                 implementation("androidx.exifinterface:exifinterface:${Versions.androidx_exifinterface}")
@@ -97,10 +111,14 @@ kotlin {
                 implementation("androidx.room:room-testing:${Versions.room}")
             }
         }
+        val androidTest by getting
         val desktopMain by getting {
             dependencies {
+                implementation("uk.co.caprica:vlcj:4.7.1")
+                implementation("com.squareup.sqldelight:sqlite-driver:${Versions.sqlDelight}")
             }
         }
+        val desktopTest by getting
     }
 }
 
@@ -131,6 +149,11 @@ android {
                 argument("room.schemaLocation", "$projectDir/schemas")
             }
         }
+    }
+
+    compileOptions {
+        sourceCompatibility = Versions.Java.java
+        targetCompatibility = Versions.Java.java
     }
 
     packagingOptions {

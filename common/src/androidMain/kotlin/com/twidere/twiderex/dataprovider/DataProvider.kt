@@ -22,8 +22,6 @@ package com.twidere.twiderex.dataprovider
 
 import android.content.Context
 import androidx.room.Room
-import com.twidere.twiderex.cache.FileCacheHandler
-import com.twidere.twiderex.dataprovider.cache.FileCacheHandlerImpl
 import com.twidere.twiderex.dataprovider.db.AppDatabaseImpl
 import com.twidere.twiderex.dataprovider.db.CacheDatabaseImpl
 import com.twidere.twiderex.db.AppDatabase
@@ -54,6 +52,4 @@ actual class DataProvider private constructor(context: Context) {
     actual val appDatabase: AppDatabase = AppDatabaseImpl(roomAppDatabase)
 
     actual val cacheDatabase: CacheDatabase = CacheDatabaseImpl(roomCacheDatabase)
-
-    actual val fileCacheHandler: FileCacheHandler = FileCacheHandlerImpl(context)
 }

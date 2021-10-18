@@ -1,0 +1,30 @@
+import com.twidere.twiderex.model.MicroBlogKey;
+import com.twidere.twiderex.model.enums.ComposeType;
+import kotlin.collections.List;
+
+CREATE TABLE IF NOT EXISTS draft (
+    id TEXT NOT NULL PRIMARY KEY,
+    content TEXT NOT NULL,
+    media TEXT AS List<String> NOT NULL,
+    createAt INTEGER NOT NULL,
+    composeType TEXT AS ComposeType NOT NULL,
+    statusKey TEXT AS MicroBlogKey DEFAULT NULL,
+    excludedReplyUserIds TEXT AS List<String> DEFAULT NULL
+);
+
+insert:
+INSERT OR REPLACE INTO draft(id, content, media, createAt, composeType, statusKey, excludedReplyUserIds)
+VALUES ?;
+
+getAll:
+SELECT * FROM draft;
+
+get:
+SELECT * FROM draft WHERE id == :id;
+
+remove:
+DELETE FROM draft WHERE id == :id;
+
+getDraftCount:
+SELECT COUNT(*) FROM draft;
+

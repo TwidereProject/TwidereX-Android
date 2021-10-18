@@ -23,6 +23,8 @@ package com.twidere.twiderex.di.modules
 import androidx.datastore.core.DataStoreFactory
 import androidx.datastore.core.Serializer
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import com.twidere.twiderex.kmp.StorageProvider
+import com.twidere.twiderex.kmp.appFiles
 import com.twidere.twiderex.preferences.PreferencesHolder
 import com.twidere.twiderex.preferences.serializer.AppearancePreferencesSerializer
 import com.twidere.twiderex.preferences.serializer.DisplayPreferencesSerializer
@@ -64,4 +66,6 @@ internal inline fun <reified T : Any> Scope.createDataStore(
     },
 )
 
-internal expect fun Scope.createDataStoreFile(name: String): File
+private fun Scope.createDataStoreFile(name: String): File {
+    return File(get<StorageProvider>().appFiles.dataStoreFile(name))
+}

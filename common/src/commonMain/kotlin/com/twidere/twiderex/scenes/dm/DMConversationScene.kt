@@ -68,12 +68,12 @@ import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.foundation.TextInput
 import com.twidere.twiderex.component.lazy.ui.LazyUiDMEventList
-import com.twidere.twiderex.component.painterResource
-import com.twidere.twiderex.component.stringResource
+import com.twidere.twiderex.component.media.MediaInsertMenu
 import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiDMEvent
+import com.twidere.twiderex.model.ui.UiMediaInsert
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.dm.DMEventViewModel
@@ -156,11 +156,14 @@ fun NormalContent(viewModel: DMEventViewModel) {
             )
         }
         Divider(modifier = Modifier.fillMaxWidth())
-        InputPhotoPreview(inputImage) {
+        InputMediaPreview(inputImage) {
             viewModel.inputImage.value = null
         }
         InputComponent(
             modifier = Modifier.fillMaxWidth(),
+            onMediaInsert = {
+                viewModel.inputImage.value = it.firstOrNull()
+            },
             enableSelectPhoto = inputImage == null,
             enableSend = input.isNotEmpty() || inputImage != null,
             input = input,
@@ -169,15 +172,22 @@ fun NormalContent(viewModel: DMEventViewModel) {
             onPickImage = { viewModel.pickImage() }
         )
     }
-    LaunchedEffect(
-        key1 = firstEventKey,
-        block = {
-            if (firstEventKey == null || source.itemCount <= 0) return@LaunchedEffect
-            scope.launch {
-                listState.scrollToItem(0)
+    firstEventKey?.let {
+        LaunchedEffect(
+            key1 = firstEventKey,
+            block = {
+                if (source.itemCount <= 0) return@LaunchedEffect
+                scope.launch {
+                    try {
+                        listState.scrollToItem(0)
+                    } catch (e: Throwable) {
+                        // when viewModel is restored from cache while List hasn't init yet
+                        // might cause crash
+                    }
+                }
             }
-        }
-    )
+        )
+    }
 }
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -219,7 +229,7 @@ private object MessageActionComponentDefaults {
 }
 
 @Composable
-fun InputPhotoPreview(inputImage: String?, onRemove: () -> Unit) {
+fun InputMediaPreview(inputImage: UiMediaInsert?, onRemove: () -> Unit) {
     if (inputImage == null) return
     Box(modifier = Modifier.padding(InputPhotoPreviewDefaults.ContentPadding)) {
         Box(
@@ -233,7 +243,7 @@ fun InputPhotoPreview(inputImage: String?, onRemove: () -> Unit) {
                 )
                 .clip(MaterialTheme.shapes.small),
         ) {
-            NetworkImage(data = inputImage)
+            NetworkImage(data = inputImage.preview)
         }
         Box(
             modifier = Modifier
@@ -264,6 +274,7 @@ private object InputPhotoPreviewDefaults {
 @Composable
 fun InputComponent(
     modifier: Modifier = Modifier,
+    onMediaInsert: (List<UiMediaInsert>) -> Unit,
     input: String,
     onValueChanged: (input: String) -> Unit,
     enableSelectPhoto: Boolean,
@@ -276,18 +287,12 @@ fun InputComponent(
         verticalAlignment = Alignment.CenterVertically
     ) {
         AnimatedVisibility(visible = enableSelectPhoto) {
-            IconButton(
-                onClick = {
-                    onPickImage.invoke()
-                }
-            ) {
-                Icon(
-                    painter = painterResource(res = com.twidere.twiderex.MR.files.camera),
-                    contentDescription = stringResource(
-                        res = com.twidere.twiderex.MR.strings.accessibility_scene_compose_image
-                    )
-                )
-            }
+            MediaInsertMenu(
+                onResult = {
+                    onMediaInsert(it)
+                },
+                supportMultipleSelect = false,
+            )
         }
         Spacer(modifier = Modifier.width(InputComponentDefaults.ContentSpacing))
         TextInput(

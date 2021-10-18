@@ -1,0 +1,24 @@
+import com.twidere.twiderex.model.MicroBlogKey;
+import com.twidere.twiderex.model.enums.MediaType;
+
+CREATE TABLE IF NOT EXISTS DbMedia(
+    belongToKey TEXT AS MicroBlogKey NOT NULL,
+    url TEXT,
+    mediaUrl TEXT,
+    previewUrl TEXT,
+    type TEXT AS MediaType NOT NULL,
+    width INTEGER NOT NULL,
+    height INTEGER NOT NULL,
+    pageUrl TEXT,
+    altText TEXT NOT NULL,
+    orderIndex INTEGER NOT NULL
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS index_belongToKey_orderIndex ON DbMedia (belongToKey, orderIndex);
+
+insert:
+INSERT OR REPLACE INTO DbMedia(belongToKey, url, mediaUrl, previewUrl, type, width, height, pageUrl, altText, orderIndex)
+VALUES ?;
+
+findMediaByBelongToKey:
+SELECT * FROM DbMedia WHERE belongToKey == :belongToKey;

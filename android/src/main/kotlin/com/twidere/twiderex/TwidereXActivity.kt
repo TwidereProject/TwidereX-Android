@@ -22,9 +22,6 @@ package com.twidere.twiderex
 
 import android.content.Intent
 import android.net.ConnectivityManager
-import android.net.Network
-import android.net.NetworkCapabilities
-import android.net.NetworkRequest
 import android.net.Uri
 import android.os.Bundle
 import android.view.WindowManager
@@ -53,7 +50,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.core.net.ConnectivityManagerCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
@@ -78,6 +74,7 @@ import com.twidere.twiderex.ui.LocalIsActiveNetworkMetered
 import com.twidere.twiderex.ui.LocalWindow
 import com.twidere.twiderex.ui.LocalWindowInsetsController
 import com.twidere.twiderex.utils.CustomTabSignInChannel
+import com.twidere.twiderex.utils.IsActiveNetworkMeteredLiveData
 import com.twidere.twiderex.utils.LocalPlatformResolver
 import com.twidere.twiderex.utils.PlatformResolver
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -93,19 +90,6 @@ class TwidereXActivity : PreComposeActivity(), KoinComponent {
     private val navController by lazy {
         NavController()
     }
-    private val isActiveNetworkMetered = MutableStateFlow(false)
-    private val networkCallback by lazy {
-        object : ConnectivityManager.NetworkCallback() {
-            override fun onCapabilitiesChanged(
-                network: Network,
-                networkCapabilities: NetworkCapabilities
-            ) {
-                isActiveNetworkMetered.value = ConnectivityManagerCompat.isActiveNetworkMetered(
-                    connectivityManager
-                )
-            }
-        }
-    }
 
     private val statusActions: StatusActions by inject()
 
@@ -119,16 +103,20 @@ class TwidereXActivity : PreComposeActivity(), KoinComponent {
 
     private val remoteNavigator: RemoteNavigator by inject()
 
+    private val isActiveNetworkMetered = MutableStateFlow(false)
+    private val isActiveNetworkMeteredLiveData by lazy {
+        IsActiveNetworkMeteredLiveData(connectivityManager = connectivityManager)
+    }
+
     @OptIn(ExperimentalAnimationApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         FilePicker.init(activityResultRegistry, this, contentResolver)
-        isActiveNetworkMetered.value = ConnectivityManagerCompat.isActiveNetworkMetered(
-            connectivityManager
-        )
-
         WindowCompat.setDecorFitsSystemWindows(window, false)
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+        isActiveNetworkMeteredLiveData.observe(this) {
+            isActiveNetworkMetered.value = it
+        }
         setContent {
             var showSplash by rememberSaveable { mutableStateOf(true) }
             LaunchedEffect(Unit) {
@@ -223,19 +211,6 @@ class TwidereXActivity : PreComposeActivity(), KoinComponent {
         intent?.data?.let {
             onDeeplink(it)
         }
-    }
-
-    override fun onStart() {
-        super.onStart()
-        connectivityManager.registerNetworkCallback(
-            NetworkRequest.Builder().build(),
-            networkCallback,
-        )
-    }
-
-    override fun onStop() {
-        super.onStop()
-        connectivityManager.unregisterNetworkCallback(networkCallback)
     }
 
     override fun onResume() {

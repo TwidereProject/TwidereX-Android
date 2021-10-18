@@ -27,12 +27,14 @@ import com.twidere.twiderex.di.modules.kmpModule
 import com.twidere.twiderex.di.modules.platformModule
 import com.twidere.twiderex.di.modules.preferencesModule
 import com.twidere.twiderex.di.modules.repositoryModule
+import com.twidere.twiderex.di.modules.storageProviderModule
 import com.twidere.twiderex.di.modules.viewModelModule
 import com.twidere.twiderex.utils.OAuthLauncher
 import org.koin.core.KoinApplication
 import org.koin.dsl.module
 
 fun KoinApplication.setupModules() {
+    modules(storageProviderModule)
     modules(preferencesModule)
     modules(platformModule)
     modules(dataBaseModule)

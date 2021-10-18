@@ -115,6 +115,36 @@ class UserViewModel(
         }
     }
 
+    fun block() = viewModelScope.launch {
+        loadingRelationship.compareAndSet(expect = false, update = true)
+        val account = account.firstOrNull() ?: return@launch
+        val relationshipService = account.service as? RelationshipService ?: return@launch
+        loadingRelationship.value = true
+        try {
+            relationshipService.block(id = userKey.id)
+            refresh()
+        } catch (e: Throwable) {
+            inAppNotification.notifyError(e)
+        } finally {
+            loadingRelationship.compareAndSet(expect = true, update = false)
+        }
+    }
+
+    fun unblock() = viewModelScope.launch {
+        loadingRelationship.compareAndSet(expect = false, update = true)
+        val account = account.firstOrNull() ?: return@launch
+        val relationshipService = account.service as? RelationshipService ?: return@launch
+        loadingRelationship.value = true
+        try {
+            relationshipService.unblock(id = userKey.id)
+            refresh()
+        } catch (e: Throwable) {
+            inAppNotification.notifyError(e)
+        } finally {
+            loadingRelationship.compareAndSet(expect = true, update = false)
+        }
+    }
+
     fun refresh() {
         refreshFlow.value = UUID.randomUUID()
     }

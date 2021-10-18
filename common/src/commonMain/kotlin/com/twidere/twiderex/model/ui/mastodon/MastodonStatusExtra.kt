@@ -24,7 +24,9 @@ import com.twidere.twiderex.model.enums.MastodonStatusType
 import com.twidere.twiderex.model.enums.MastodonVisibility
 import com.twidere.twiderex.model.ui.StatusExtra
 import com.twidere.twiderex.model.ui.UiEmojiCategory
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class MastodonStatusExtra(
     val type: MastodonStatusType,
     val emoji: List<UiEmojiCategory>,
@@ -32,6 +34,7 @@ data class MastodonStatusExtra(
     val mentions: List<MastodonMention>?,
 ) : StatusExtra
 
+@Serializable
 data class MastodonMention(
     val id: String? = null,
     val username: String? = null,

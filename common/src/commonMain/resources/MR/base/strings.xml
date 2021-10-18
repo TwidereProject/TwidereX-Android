@@ -177,11 +177,17 @@
     <string name="accessibility_scene_manage_accounts_add">Add</string>
     <string name="accessibility_scene_compose_image">Add image</string>
     <string name="accessibility_scene_compose_add_mention">Add mention</string>
+    <string name="accessibility_scene_compose_media_insert_library">Browse Library</string>
+    <string name="accessibility_scene_compose_media_insert_gif">Add GIF</string>
+    <string name="accessibility_scene_compose_media_insert_camera">Take Photo</string>
+    <string name="accessibility_scene_compose_media_insert_record_video">Record Video</string>
     <string name="accessibility_scene_compose_draft">Open draft</string>
     <string name="accessibility_scene_compose_location_enable">Enable location</string>
     <string name="accessibility_scene_compose_location_disable">Disable location</string>
     <string name="accessibility_scene_compose_thread">Thread mode</string>
     <string name="accessibility_scene_compose_send">Send</string>
+    <string name="accessibility_scene_gif_search">Search GIF</string>
+    <string name="accessibility_scene_gif_title">GIPHY</string>
     <string name="accessibility_scene_timeline_load_gap">Load</string>
     <string name="accessibility_scene_user_website">Website</string>
     <string name="accessibility_scene_user_tab_media">Media</string>
@@ -279,6 +285,7 @@
     <string name="scene_settings_display_media_always">Always</string>
     <string name="scene_settings_display_media_media_previews">Media previews</string>
     <string name="scene_settings_display_media_automatic">Automatic</string>
+    <string name="scene_settings_display_media_mute_by_default">Mute by default</string>
     <string name="scene_settings_display_media_auto_playback">Auto playback</string>
     <string name="scene_settings_display_media_off">Off</string>
     <string name="scene_settings_display_title">Display</string>

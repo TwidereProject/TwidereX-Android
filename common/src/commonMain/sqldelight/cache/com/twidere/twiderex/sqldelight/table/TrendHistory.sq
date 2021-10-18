@@ -1,0 +1,22 @@
+import com.twidere.twiderex.model.MicroBlogKey;
+
+CREATE TABLE IF NOT EXISTS DbTrendHistory (
+    trendKey TEXT AS MicroBlogKey NOT NULL,
+    accountKey TEXT AS MicroBlogKey NOT NULL,
+    day Integer NOT NULL,
+    uses Integer NOT NULL,
+    accounts Integer NOT NULL
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS index_trendKey_accountKey_day ON DbTrendHistory (trendKey, day, accountKey);
+
+insert:
+INSERT OR REPLACE INTO DbTrendHistory(
+    trendKey, accountKey, day, uses, accounts
+) VALUES ?;
+
+findWithTrendKey:
+SELECT * FROM DbTrendHistory WHERE trendKey == :trendKey AND accountKey == :accountKey ORDER BY day;
+
+clear:
+DELETE FROM DbTrendHistory WHERE accountKey == :accountKey AND accountKey == :accountKey;
