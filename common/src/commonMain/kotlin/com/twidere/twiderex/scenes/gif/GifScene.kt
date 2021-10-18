@@ -54,6 +54,8 @@ import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.LoadingProgress
 import com.twidere.twiderex.component.foundation.TextInput
 import com.twidere.twiderex.component.lazy.ui.LazyUiGifList
+import com.twidere.twiderex.component.painterResource
+import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiGif
@@ -61,8 +63,6 @@ import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.gif.GifViewModel
-import com.twidere.twiderex.component.painterResource
-import com.twidere.twiderex.component.stringResource
 
 @Composable
 fun GifScene() {

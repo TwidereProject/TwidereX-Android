@@ -40,12 +40,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import com.twidere.twiderex.component.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.paging.compose.LazyPagingItems
 import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.lazy.itemsPagingGridIndexed
 import com.twidere.twiderex.component.lazy.loadState
+import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.model.enums.MediaType
 import com.twidere.twiderex.model.ui.UiGif
 

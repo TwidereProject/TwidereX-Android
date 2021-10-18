@@ -24,8 +24,6 @@ import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
-import androidx.compose.material.DropdownMenu
-import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -42,6 +40,11 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import com.twidere.twiderex.MR
+import com.twidere.twiderex.component.foundation.DropdownMenu
+import com.twidere.twiderex.component.foundation.DropdownMenuItem
+import com.twidere.twiderex.component.painterResource
+import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.di.ext.get
 import com.twidere.twiderex.extensions.toUri
 import com.twidere.twiderex.kmp.MediaInsertProvider
@@ -54,9 +57,6 @@ import com.twidere.twiderex.navigation.RootRoute
 import com.twidere.twiderex.ui.LocalNavController
 import kotlinx.coroutines.launch
 import java.util.UUID
-import com.twidere.twiderex.component.painterResource
-import com.twidere.twiderex.component.stringResource
-import com.twidere.twiderex.MR
 
 private const val VideoSuffix = ".mp4"
 private const val ImageSuffix = ".jpg"
@@ -123,6 +123,7 @@ fun MediaInsertMenu(
         mutableStateOf(false)
     }
     Box(modifier) {
+
         DropdownMenu(expanded = showDropdown, onDismissRequest = { showDropdown = false }) {
             MediaInsertType.values().forEach {
                 val enabled = !disableList.contains(it)
