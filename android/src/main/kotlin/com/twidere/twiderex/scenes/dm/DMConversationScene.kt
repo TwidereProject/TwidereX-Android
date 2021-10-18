@@ -23,10 +23,6 @@ package com.twidere.twiderex.scenes.dm
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
-import android.net.Uri
-import androidx.activity.compose.ManagedActivityResultLauncher
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
@@ -76,14 +72,15 @@ import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.foundation.TextInput
 import com.twidere.twiderex.component.lazy.ui.LazyUiDMEventList
+import com.twidere.twiderex.component.media.MediaInsertMenu
 import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiDMEvent
+import com.twidere.twiderex.model.ui.UiMediaInsert
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.dm.DMEventViewModel
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.koin.core.parameter.parametersOf
 
@@ -123,12 +120,6 @@ fun DMConversationScene(conversationKey: MicroBlogKey) {
 @Composable
 fun NormalContent(viewModel: DMEventViewModel) {
     val clipboardManager = LocalContext.current.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager?
-    val filePickerLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.OpenDocument(),
-        onResult = {
-            viewModel.inputImage.value = it.toString()
-        },
-    )
     val copyText = stringResource(id = com.twidere.common.R.string.scene_messages_action_copy_text)
     val source = viewModel.source.collectAsLazyPagingItems()
     val input by viewModel.input.observeAsState(initial = "")
@@ -170,13 +161,14 @@ fun NormalContent(viewModel: DMEventViewModel) {
             )
         }
         Divider(modifier = Modifier.fillMaxWidth())
-        InputPhotoPreview(inputImage) {
+        InputMediaPreview(inputImage) {
             viewModel.inputImage.value = null
         }
         InputComponent(
             modifier = Modifier.fillMaxWidth(),
-            scope = scope,
-            filePickerLauncher = filePickerLauncher,
+            onMediaInsert = {
+                viewModel.inputImage.value = it.firstOrNull()
+            },
             enableSelectPhoto = inputImage == null,
             enableSend = input.isNotEmpty() || inputImage != null,
             input = input,
@@ -184,15 +176,22 @@ fun NormalContent(viewModel: DMEventViewModel) {
             onSend = { viewModel.sendMessage() }
         )
     }
-    LaunchedEffect(
-        key1 = firstEventKey,
-        block = {
-            if (firstEventKey == null || source.itemCount <= 0) return@LaunchedEffect
-            scope.launch {
-                listState.scrollToItem(0)
+    firstEventKey?.let {
+        LaunchedEffect(
+            key1 = firstEventKey,
+            block = {
+                if (source.itemCount <= 0) return@LaunchedEffect
+                scope.launch {
+                    try {
+                        listState.scrollToItem(0)
+                    } catch (e: Throwable) {
+                        // when viewModel is restored from cache while List hasn't init yet
+                        // might cause crash
+                    }
+                }
             }
-        }
-    )
+        )
+    }
 }
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -234,7 +233,7 @@ private object MessageActionComponentDefaults {
 }
 
 @Composable
-fun InputPhotoPreview(inputImage: String?, onRemove: () -> Unit) {
+fun InputMediaPreview(inputImage: UiMediaInsert?, onRemove: () -> Unit) {
     if (inputImage == null) return
     Box(modifier = Modifier.padding(InputPhotoPreviewDefaults.ContentPadding)) {
         Box(
@@ -248,7 +247,7 @@ fun InputPhotoPreview(inputImage: String?, onRemove: () -> Unit) {
                 )
                 .clip(MaterialTheme.shapes.small),
         ) {
-            NetworkImage(data = inputImage)
+            NetworkImage(data = inputImage.preview)
         }
         Box(
             modifier = Modifier
@@ -279,8 +278,7 @@ private object InputPhotoPreviewDefaults {
 @Composable
 fun InputComponent(
     modifier: Modifier = Modifier,
-    filePickerLauncher: ManagedActivityResultLauncher<Array<String>, Uri>,
-    scope: CoroutineScope,
+    onMediaInsert: (List<UiMediaInsert>) -> Unit,
     input: String,
     onValueChanged: (input: String) -> Unit,
     enableSelectPhoto: Boolean,
@@ -292,20 +290,12 @@ fun InputComponent(
         verticalAlignment = Alignment.CenterVertically
     ) {
         AnimatedVisibility(visible = enableSelectPhoto) {
-            IconButton(
-                onClick = {
-                    scope.launch {
-                        filePickerLauncher.launch(arrayOf("image/*"))
-                    }
-                }
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_camera),
-                    contentDescription = stringResource(
-                        id = com.twidere.common.R.string.accessibility_scene_compose_image
-                    )
-                )
-            }
+            MediaInsertMenu(
+                onResult = {
+                    onMediaInsert(it)
+                },
+                supportMultipleSelect = false,
+            )
         }
         Spacer(modifier = Modifier.width(InputComponentDefaults.ContentSpacing))
         TextInput(

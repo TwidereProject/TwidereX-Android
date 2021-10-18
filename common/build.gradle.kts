@@ -143,6 +143,11 @@ android {
         }
     }
 
+    compileOptions {
+        sourceCompatibility = Versions.Java.java
+        targetCompatibility = Versions.Java.java
+    }
+
     packagingOptions {
         resources {
             excludes.addAll(

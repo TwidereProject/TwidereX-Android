@@ -40,4 +40,14 @@ interface FriendshipResources {
 
     @GET("/api/v1/accounts/relationships")
     suspend fun showFriendships(@Query("id[]") id: List<String>): List<RelationshipResponse>
+
+    @POST("/api/v1/accounts/{id}/block")
+    suspend fun block(
+        @Path(value = "id") id: String,
+    ): RelationshipResponse
+
+    @POST("/api/v1/accounts/{id}/unblock")
+    suspend fun unblock(
+        @Path(value = "id") id: String,
+    ): RelationshipResponse
 }

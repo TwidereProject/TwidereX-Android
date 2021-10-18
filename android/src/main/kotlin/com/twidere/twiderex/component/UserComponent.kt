@@ -100,6 +100,7 @@ import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.enums.MediaType
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiUrlEntity
 import com.twidere.twiderex.model.ui.UiUser
@@ -207,7 +208,9 @@ fun UserComponent(
                             modifier = Modifier.fillMaxSize(),
                             contentAlignment = Alignment.TopCenter,
                         ) {
-                            tabs[page].compose.invoke()
+                            UserTimeline(viewModel = viewModel) {
+                                tabs[page].compose.invoke()
+                            }
                         }
                     }
                 }
@@ -221,6 +224,44 @@ data class UserTabComponent(
     val title: String,
     val compose: @Composable () -> Unit,
 )
+
+@Composable
+private fun UserTimeline(viewModel: UserViewModel, content: @Composable () -> Unit) {
+    val relationship by viewModel.relationship.observeAsState(initial = null)
+    val loadingRelationship by viewModel.loadingRelationship.observeAsState(initial = false)
+    relationship.takeIf { !loadingRelationship }?.let {
+        when {
+            it.blockedBy -> PermissionDeniedInfo(
+                title = stringResource(id = R.string.scene_profile_permission_denied_profile_blocked_title),
+                message = stringResource(id = R.string.scene_profile_permission_denied_profile_blocked_message)
+            )
+            else -> content.invoke()
+        }
+    } ?: content.invoke()
+}
+
+@Composable
+private fun PermissionDeniedInfo(title: String, message: String) {
+    CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.disabled) {
+        Row(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(PermissionDeniedInfoDefaults.contentPaddingValues)
+        ) {
+            Icon(painter = painterResource(id = R.drawable.ic_eye_off), contentDescription = title)
+            Spacer(modifier = Modifier.width(PermissionDeniedInfoDefaults.contentSpacing))
+            Column {
+                Text(text = title, style = MaterialTheme.typography.subtitle2)
+                Text(text = message, style = MaterialTheme.typography.caption)
+            }
+        }
+    }
+}
+
+private object PermissionDeniedInfoDefaults {
+    val contentPaddingValues = PaddingValues(22.dp)
+    val contentSpacing = 16.dp
+}
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -421,7 +462,7 @@ fun UserInfo(
                         user = user,
                         size = UserInfoDefaults.AvatarSize
                     ) {
-                        navController.navigate(RootRoute.Media.Raw(user.profileImage))
+                        navController.navigate(RootRoute.Media.Raw(MediaType.photo, user.profileImage))
                     }
                 }
             }
@@ -611,58 +652,74 @@ private fun UserRelationship(viewModel: UserViewModel) {
     val relationship by viewModel.relationship.observeAsState(initial = null)
     val loadingRelationship by viewModel.loadingRelationship.observeAsState(initial = false)
     val shape = RoundedCornerShape(percent = 50)
-    relationship?.takeIf { !loadingRelationship }?.let { relationshipResult ->
-        Surface(
-            modifier = Modifier
-                .clip(RoundedCornerShape(percent = 50))
-                .let {
-                    if (relationshipResult.followedBy) {
-                        it
-                    } else {
-                        it.border(
-                            1.dp,
-                            MaterialTheme.colors.primary,
-                            shape = shape,
-                        )
+    val blockingBackgroundColor = Color(0xFFFF2D55)
+    relationship?.takeIf { !loadingRelationship }
+        ?.takeIf { !it.blockedBy || it.blocking }
+        ?.let { relationshipResult ->
+            Surface(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(percent = 50))
+                    .let {
+                        if (relationshipResult.followedBy) {
+                            it
+                        } else {
+                            it.border(
+                                1.dp,
+                                if (relationshipResult.blocking) blockingBackgroundColor else MaterialTheme.colors.primary,
+                                shape = shape,
+                            )
+                        }
+                    }
+                    .clip(shape),
+                contentColor = when {
+                    relationshipResult.blocking -> MaterialTheme.colors.onPrimary
+                    relationshipResult.followedBy -> contentColorFor(backgroundColor = MaterialTheme.colors.primary)
+                    else -> MaterialTheme.colors.primary
+                },
+                color = when {
+                    relationshipResult.blocking -> blockingBackgroundColor
+                    relationshipResult.followedBy -> MaterialTheme.colors.primary
+                    else -> MaterialTheme.colors.background
+                },
+                onClick = {
+                    when {
+                        relationshipResult.blocking -> {
+                            viewModel.unblock()
+                        }
+                        relationshipResult.followedBy -> {
+                            viewModel.unfollow()
+                        }
+                        else -> {
+                            viewModel.follow()
+                        }
                     }
                 }
-                .clip(shape),
-            contentColor = if (relationshipResult.followedBy) {
-                contentColorFor(backgroundColor = MaterialTheme.colors.primary)
-            } else {
-                MaterialTheme.colors.primary
-            },
-            color = if (relationshipResult.followedBy) {
-                MaterialTheme.colors.primary
-            } else {
-                MaterialTheme.colors.background
-            },
-            onClick = {
-                if (relationshipResult.followedBy) {
-                    viewModel.unfollow()
-                } else {
-                    viewModel.follow()
-                }
+            ) {
+                Text(
+                    modifier = Modifier
+                        .padding(ButtonDefaults.ContentPadding),
+                    text = when {
+                        relationshipResult.blocking -> {
+                            stringResource(id = R.string.common_controls_friendship_actions_blocked)
+                        }
+                        relationshipResult.followedBy -> {
+                            stringResource(id = R.string.common_controls_friendship_actions_unfollow)
+                        }
+                        else -> {
+                            stringResource(id = R.string.common_controls_friendship_actions_follow)
+                        }
+                    },
+                )
             }
-        ) {
-            Text(
-                modifier = Modifier
-                    .padding(ButtonDefaults.ContentPadding),
-                text = if (relationshipResult.followedBy) {
-                    stringResource(id = com.twidere.common.R.string.common_controls_friendship_actions_unfollow)
-                } else {
-                    stringResource(id = com.twidere.common.R.string.common_controls_friendship_actions_follow)
-                },
-            )
-        }
-        Spacer(modifier = Modifier.height(UserRelationshipDefaults.FollowingSpacing))
-        if (relationshipResult.following) {
-            Text(
-                text = stringResource(id = com.twidere.common.R.string.common_controls_friendship_follows_you),
-                style = MaterialTheme.typography.caption,
-            )
-        }
-    } ?: run {
+
+            Spacer(modifier = Modifier.height(UserRelationshipDefaults.FollowingSpacing))
+            if (relationshipResult.following) {
+                Text(
+                    text = stringResource(id = com.twidere.common.R.string.common_controls_friendship_follows_you),
+                    style = MaterialTheme.typography.caption,
+                )
+            }
+        } ?: run {
         CircularProgressIndicator()
     }
 }
@@ -681,7 +738,7 @@ private fun UserBanner(
             .heightIn(max = maxBannerSize)
             .clickable(
                 onClick = {
-                    navController.navigate(RootRoute.Media.Raw(bannerUrl))
+                    navController.navigate(RootRoute.Media.Raw(MediaType.photo, bannerUrl))
                 },
                 indication = null,
                 interactionSource = remember { MutableInteractionSource() },

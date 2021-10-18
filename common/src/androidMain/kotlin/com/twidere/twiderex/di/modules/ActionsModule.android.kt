@@ -31,6 +31,6 @@ actual val actionModule = module {
     single { ComposeAction(get(), get()) }
     single { DirectMessageAction(get()) }
     single { DraftAction(get(), get()) }
-    single { MediaAction(get(), get()) }
+    single { MediaAction(get(), get(), get()) }
     single { StatusActions(get()) }
 }

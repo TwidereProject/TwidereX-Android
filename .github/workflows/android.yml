@@ -32,7 +32,13 @@ jobs:
         with:
           name: build-reports
           path: '**/build/reports'
-          
+
+      - name: Upload build mapping
+        uses: actions/upload-artifact@v2
+        with:
+          name: build-mapping
+          path: ./app/build/outputs/mapping
+
   unit-test:
     runs-on: ubuntu-latest
     needs: build

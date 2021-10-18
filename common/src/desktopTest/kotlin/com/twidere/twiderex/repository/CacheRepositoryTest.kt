@@ -43,7 +43,7 @@ internal class CacheRepositoryTest {
         val mediaDir = File(storage.mediaCacheDir).also {
             File(it, "test").createNewFile()
         }
-        val cacheDir = File(storage.cacheDataDir).also {
+        val cacheDir = File(storage.cacheDir).also {
             File(it, "test").createNewFile()
         }
 

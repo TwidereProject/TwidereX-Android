@@ -76,6 +76,7 @@ abstract class TimelineViewModel(
         } ?: TimelineScrollState.Zero
     }
 
+    @OptIn(androidx.paging.ExperimentalPagingApi::class)
     fun loadBetween(
         maxStatusKey: MicroBlogKey,
         sinceStatueKey: MicroBlogKey,

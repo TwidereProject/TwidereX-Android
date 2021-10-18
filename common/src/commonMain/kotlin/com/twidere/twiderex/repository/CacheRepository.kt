@@ -46,7 +46,7 @@ class CacheRepository(
 
     suspend fun clearCacheDir() = coroutineScope {
         launch(Dispatchers.IO) {
-            storageProvider.clearCaches(dir = storageProvider.cacheDataDir)
+            storageProvider.clearCaches(dir = storageProvider.cacheDir)
         }
     }
 

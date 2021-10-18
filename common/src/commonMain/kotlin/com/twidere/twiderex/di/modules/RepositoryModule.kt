@@ -24,6 +24,7 @@ import com.twidere.twiderex.preferences.PreferencesHolder
 import com.twidere.twiderex.repository.CacheRepository
 import com.twidere.twiderex.repository.DirectMessageRepository
 import com.twidere.twiderex.repository.DraftRepository
+import com.twidere.twiderex.repository.GifRepository
 import com.twidere.twiderex.repository.ListsRepository
 import com.twidere.twiderex.repository.ListsUsersRepository
 import com.twidere.twiderex.repository.MediaRepository
@@ -52,4 +53,5 @@ val repositoryModule = module {
     single { TrendRepository(get()) }
     single { UserListRepository() }
     single { UserRepository(get(), get()) }
+    single { GifRepository(get()) }
 }

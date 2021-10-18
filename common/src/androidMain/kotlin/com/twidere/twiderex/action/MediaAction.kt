@@ -22,14 +22,17 @@ package com.twidere.twiderex.action
 
 import android.content.Context
 import androidx.work.WorkManager
+import com.twidere.twiderex.extensions.toUri
+import com.twidere.twiderex.kmp.StorageProvider
+import com.twidere.twiderex.kmp.cacheFiles
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.utils.FileProviderHelper
 import com.twidere.twiderex.worker.DownloadMediaWorker
 import com.twidere.twiderex.worker.ShareMediaWorker
 
 actual class MediaAction(
     private val workManager: WorkManager,
     private val context: Context,
+    private val storageProvider: StorageProvider
 ) {
     actual fun download(
         source: String,
@@ -46,7 +49,7 @@ actual class MediaAction(
     }
 
     actual fun share(source: String, accountKey: MicroBlogKey) {
-        val uri = FileProviderHelper.getUriFromMedia(source, context)
+        val uri = storageProvider.cacheFiles.mediaFile(source).toUri(context)
         DownloadMediaWorker.create(
             accountKey = accountKey,
             source = source,

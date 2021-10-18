@@ -1,4 +1,3 @@
-
 import java.util.Properties
 
 buildscript {
@@ -10,8 +9,8 @@ buildscript {
 
         if (enableGoogleVariant) {
             // START Non-FOSS component
-            classpath("com.google.gms:google-services:4.3.5")
-            classpath("com.google.firebase:firebase-crashlytics-gradle:2.5.2")
+            classpath("com.google.gms:google-services:4.3.10")
+            classpath("com.google.firebase:firebase-crashlytics-gradle:2.7.1")
             // END Non-FOSS component
         }
     }
@@ -58,6 +57,7 @@ android {
             apiKeyProp.load(apiKeyProperties.inputStream())
             buildConfigField("String", "CONSUMERKEY", apiKeyProp.getProperty("ConsumerKey"))
             buildConfigField("String", "CONSUMERSECRET", apiKeyProp.getProperty("ConsumerSecret"))
+            buildConfigField("String", "GIPHYKEY", apiKeyProp.getProperty("GiphyKey"))
         }
     }
 
@@ -105,7 +105,8 @@ android {
             if (hasSigningProps) {
                 signingConfig = signingConfigs.getByName("twidere")
             }
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -172,7 +173,7 @@ dependencies {
     if (enableGoogleVariant) {
         // START Non-FOSS component
         val googleImplementation by configurations
-        googleImplementation(platform("com.google.firebase:firebase-bom:26.1.0"))
+        googleImplementation(platform("com.google.firebase:firebase-bom:28.4.0"))
         googleImplementation("com.google.firebase:firebase-analytics-ktx")
         googleImplementation("com.google.firebase:firebase-crashlytics-ktx")
         googleImplementation("com.google.android.play:core-ktx:1.8.1")

@@ -22,25 +22,45 @@ package com.twidere.twiderex.kmp
 
 import java.io.File
 
-internal val StorageProvider.downloadDir get() = "$cacheDataDir/share".mkdirs()
-internal val StorageProvider.dataStoreDir get() = "$appDataDir/datastore".mkdirs()
-internal val StorageProvider.appDatabaseDir get() = "$appDataDir/database".mkdirs()
-internal val StorageProvider.cacheDatabaseDir get() = "$cacheDataDir/database".mkdirs()
-internal fun StorageProvider.appDatabasePath(name: String) = "$appDatabaseDir/$name"
-internal fun StorageProvider.cacheDatabasePath(name: String) = "$cacheDatabaseDir/$name"
-internal fun StorageProvider.dataStorePath(name: String) = "$dataStoreDir/$name"
-internal fun StorageProvider.downloadFilePath(name: String) = "$downloadDir/$name"
+// for media caches e.g image, video
+val StorageProvider.cacheFiles get() = CacheFiles(cacheDir = cacheDir, mediaCacheDir = mediaCacheDir)
+val StorageProvider.appFiles get() = AppFiles(appDir)
 
-internal fun String.mkdirs(): String {
+class CacheFiles(private val cacheDir: String, private val mediaCacheDir: String) {
+    fun mediaFile(name: String) = "${mediaCacheDir.mkdirs()}/$name"
+
+    val dataDir get() = "$cacheDir/data".mkdirs()
+    fun dataFile(name: String) = "$dataDir/$name"
+
+    val databaseDir get() = "$cacheDir/database".mkdirs()
+    fun databaseFile(name: String) = "$databaseDir/$name"
+}
+
+class AppFiles(private val appDir: String) {
+    val mediaDir get() = "$appDir/medias".mkdirs()
+    fun mediaFile(name: String) = "$mediaDir/$name"
+
+    val dataStoreDir get() = "$appDir/datastore".mkdirs()
+    fun dataStoreFile(name: String) = "$dataStoreDir/$name"
+
+    val databaseDir get() = "$appDir/database".mkdirs()
+    fun databaseFile(name: String) = "$databaseDir/$name"
+}
+
+fun String.mkdirs(): String {
     File(this).apply {
         if (!exists()) mkdirs()
     }
     return this
 }
 
-internal fun String.mkFile(): String {
-    File(this).apply {
-        if (!exists()) createNewFile()
+fun String.file(createIfNotExists: Boolean = true): File {
+    return File(this).apply {
+        if (createIfNotExists && !exists()) createNewFile()
     }
+}
+
+fun String.mkFile(): String {
+    file()
     return this
 }

@@ -42,7 +42,7 @@ import okhttp3.Cache
 import okhttp3.Request
 import java.io.File
 import java.net.URL
-
+@OptIn(coil.annotation.ExperimentalCoilApi::class)
 @Composable
 internal actual fun rememberNetworkImagePainter(
     data: Any,

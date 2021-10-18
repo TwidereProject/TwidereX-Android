@@ -20,27 +20,28 @@
  */
 package com.twidere.twiderex.kmp
 
-import android.content.ContentResolver
+import android.content.Context
 import android.graphics.BitmapFactory
-import android.net.Uri
+import com.twidere.twiderex.extensions.toUri
 import java.io.InputStream
 import java.io.OutputStream
 
-actual class FileResolver(private val contentResolver: ContentResolver) {
+actual class FileResolver(private val context: Context) {
+    private val contentResolver = context.contentResolver
     actual fun getMimeType(file: String): String? {
-        return contentResolver.getType(Uri.parse(file))
+        return contentResolver.getType(file.toUri(context))
     }
 
     actual fun getFileSize(file: String): Long? {
-        return contentResolver.openFileDescriptor(Uri.parse(file), "r")?.statSize
+        return contentResolver.openFileDescriptor(file.toUri(context), "r")?.statSize
     }
 
     actual fun openInputStream(file: String): InputStream? {
-        return contentResolver.openInputStream(Uri.parse(file))
+        return contentResolver.openInputStream(file.toUri(context))
     }
 
     actual fun openOutputStream(file: String): OutputStream? {
-        return contentResolver.openOutputStream(Uri.parse(file))
+        return contentResolver.openOutputStream(file.toUri(context))
     }
 
     actual fun getMediaSize(file: String): MediaSize {

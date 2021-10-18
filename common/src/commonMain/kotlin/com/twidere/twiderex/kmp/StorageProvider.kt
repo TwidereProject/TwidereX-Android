@@ -25,10 +25,10 @@ expect class StorageProvider {
         fun create(): StorageProvider
     }
     // for persistence data
-    val appDataDir: String
+    val appDir: String
 
     // for cache data
-    val cacheDataDir: String
+    val cacheDir: String
 
     // for media caches e.g image, video
     val mediaCacheDir: String

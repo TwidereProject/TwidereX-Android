@@ -21,19 +21,18 @@
 package com.twidere.twiderex.kmp
 
 import android.content.Context
-import coil.util.CoilUtils
 import com.twidere.twiderex.di.ext.get
 import java.io.File
 
 actual class StorageProvider(private val context: Context) {
     // for persistence data
-    actual val appDataDir: String get() = "${context.filesDir.absolutePath}/app".mkdirs()
+    actual val appDir: String get() = "${context.filesDir.absolutePath}/app".mkdirs()
 
     // for cache data
-    actual val cacheDataDir: String get() = "${context.cacheDir.absolutePath}/data".mkdirs()
+    actual val cacheDir: String get() = "${context.externalCacheDir?.absolutePath ?: context.cacheDir}/caches".mkdirs()
 
     // for media caches e.g image, video
-    actual val mediaCacheDir: String get() = CoilUtils.createDefaultCache(context).directory.absolutePath
+    actual val mediaCacheDir: String get() = "${context.externalCacheDir?.absolutePath ?: context.cacheDir}/mediaCaches".mkdirs()
 
     actual fun clearCaches(dir: String, deleteDirAlso: Boolean) {
         val cacheDir = File(dir)

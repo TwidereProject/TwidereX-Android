@@ -104,9 +104,10 @@ fun VideoPlayer(
                             mediaPrepared = true
                         }
                     }
-                    setVolume(volume)
                 }
             }
+
+            nativePlayerView.setVolume(volume)
 
             fun updateState() {
                 autoPlay = nativePlayerView.playWhenReady
