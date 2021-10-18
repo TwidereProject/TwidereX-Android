@@ -130,7 +130,7 @@ private fun LinkOnlyPreview(
             }
             Row {
                 Icon(
-                    painter = painterResource(res = com.twidere.twiderex.MR.files.planet),
+                    painter = painterResource(res = com.twidere.twiderex.MR.files.ic_planet),
                     contentDescription = null
                 )
                 Spacer(modifier = Modifier.width(LinkPreviewDefaults.TextPaddingStart))
@@ -154,7 +154,7 @@ private fun LinkWithTitlePreview(
         CompositionLocalProvider(
             LocalContentColor provides MaterialTheme.colors.primary
         ) {
-            Icon(painter = painterResource(res = com.twidere.twiderex.MR.files.planet), contentDescription = null)
+            Icon(painter = painterResource(res = com.twidere.twiderex.MR.files.ic_planet), contentDescription = null)
         }
         Spacer(modifier = Modifier.width(LinkPreviewDefaults.TextPaddingStart))
         Column {

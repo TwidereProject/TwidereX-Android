@@ -56,7 +56,7 @@ class MastodonNotificationItem : HomeNavigationItem() {
 
     @Composable
     override fun icon(): Painter {
-        return painterResource(res = com.twidere.twiderex.MR.files.bell)
+        return painterResource(res = com.twidere.twiderex.MR.files.ic_bell)
     }
 
     override var lazyListController: LazyListController = LazyListController()

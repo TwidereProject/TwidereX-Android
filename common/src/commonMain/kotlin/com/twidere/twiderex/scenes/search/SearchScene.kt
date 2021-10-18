@@ -145,7 +145,7 @@ fun SearchScene(keyword: String) {
                                                 }
                                             ) {
                                                 Icon(
-                                                    painter = painterResource(res = com.twidere.twiderex.MR.files.device_floppy),
+                                                    painter = painterResource(res = com.twidere.twiderex.MR.files.ic_device_floppy),
                                                     contentDescription = stringResource(
                                                         res = com.twidere.twiderex.MR.strings.accessibility_scene_search_save
                                                     )

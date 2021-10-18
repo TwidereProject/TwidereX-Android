@@ -93,7 +93,7 @@ fun ListsSceneFab() {
             modifier = Modifier.padding(ListsSceneDefaults.Fab.ContentPadding)
         ) {
             Icon(
-                painter = painterResource(res = com.twidere.twiderex.MR.files.add),
+                painter = painterResource(res = com.twidere.twiderex.MR.files.ic_add),
                 contentDescription = stringResource(
                     res = com.twidere.twiderex.MR.strings.scene_lists_icons_create
                 ),

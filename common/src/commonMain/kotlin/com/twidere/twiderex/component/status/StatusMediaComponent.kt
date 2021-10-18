@@ -194,7 +194,7 @@ fun StatusMediaComponent(
                                 .size(StatusMediaDefaults.Sensitive.BackgroundSize)
                         ) {
                             Icon(
-                                painter = painterResource(res = com.twidere.twiderex.MR.files.alert_triangle),
+                                painter = painterResource(res = com.twidere.twiderex.MR.files.ic_alert_triangle),
                                 contentDescription = null,
                                 tint = MaterialTheme.colors.onSurface,
                                 modifier = Modifier
@@ -225,7 +225,7 @@ fun StatusMediaComponent(
                                 .padding(StatusMediaDefaults.Icon.ContentPadding),
                         ) {
                             Icon(
-                                painter = painterResource(res = com.twidere.twiderex.MR.files.eye_off),
+                                painter = painterResource(res = com.twidere.twiderex.MR.files.ic_eye_off),
                                 contentDescription = null,
                                 tint = MaterialTheme.colors.onSurface,
                             )

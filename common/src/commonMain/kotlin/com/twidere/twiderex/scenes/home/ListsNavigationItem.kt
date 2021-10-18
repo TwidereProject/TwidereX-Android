@@ -41,7 +41,7 @@ class ListsNavigationItem : HomeNavigationItem() {
 
     @Composable
     override fun icon(): Painter {
-        return painterResource(res = com.twidere.twiderex.MR.files.lists)
+        return painterResource(res = com.twidere.twiderex.MR.files.ic_lists)
     }
 
     @Composable

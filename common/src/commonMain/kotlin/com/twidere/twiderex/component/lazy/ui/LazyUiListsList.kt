@@ -183,7 +183,7 @@ private fun LazyUiListItem(uiList: UiList, onItemClicked: (UiList) -> Unit = {})
         trailing = {
             if (uiList.isPrivate) {
                 Icon(
-                    painter = painterResource(res = com.twidere.twiderex.MR.files.lock),
+                    painter = painterResource(res = com.twidere.twiderex.MR.files.ic_lock),
                     contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.scene_lists_icons_private),
                     modifier = Modifier
                         .alpha(ContentAlpha.disabled)
@@ -245,7 +245,7 @@ private fun EmptyList() {
         verticalArrangement = Arrangement.Center
     ) {
         Icon(
-            painter = painterResource(res = com.twidere.twiderex.MR.files.empty_list),
+            painter = painterResource(res = com.twidere.twiderex.MR.files.ic_empty_list),
             contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.common_alerts_no_tweets_found_title)
         )
     }

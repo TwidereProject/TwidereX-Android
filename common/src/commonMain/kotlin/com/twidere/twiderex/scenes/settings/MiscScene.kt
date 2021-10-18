@@ -309,7 +309,7 @@ fun NitterPreference(viewModel: MiscViewModel) {
                 }
             ) {
                 Icon(
-                    painter = painterResource(res = com.twidere.twiderex.MR.files.info_circle),
+                    painter = painterResource(res = com.twidere.twiderex.MR.files.ic_info_circle),
                     contentDescription = null,
                 )
             }
@@ -334,7 +334,7 @@ fun NitterPreference(viewModel: MiscViewModel) {
                         }
                     ) {
                         Icon(
-                            painter = painterResource(res = com.twidere.twiderex.MR.files.info_circle),
+                            painter = painterResource(res = com.twidere.twiderex.MR.files.ic_info_circle),
                             contentDescription = null,
                         )
                     }

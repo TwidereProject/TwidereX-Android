@@ -171,7 +171,6 @@ fun NormalContent(viewModel: DMEventViewModel) {
             input = input,
             onValueChanged = { viewModel.input.value = it },
             onSend = { viewModel.sendMessage() },
-            onPickImage = { viewModel.pickImage() }
         )
     }
     firstEventKey?.let {
@@ -257,7 +256,7 @@ fun InputMediaPreview(inputImage: UiMediaInsert?, onRemove: () -> Unit) {
                 .clickable { onRemove() }
         ) {
             Icon(
-                painter = painterResource(res = com.twidere.twiderex.MR.files.x),
+                painter = painterResource(res = com.twidere.twiderex.MR.files.ic_x),
                 contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.common_controls_actions_remove),
                 tint = MaterialTheme.colors.surface,
                 modifier = Modifier.padding(InputPhotoPreviewDefaults.IconPadding)
@@ -282,7 +281,6 @@ fun InputComponent(
     enableSelectPhoto: Boolean,
     enableSend: Boolean,
     onSend: () -> Unit,
-    onPickImage: () -> Unit,
 ) {
     Row(
         modifier = modifier.padding(InputComponentDefaults.ContentPadding),
@@ -309,7 +307,7 @@ fun InputComponent(
             onClick = onSend
         ) {
             Icon(
-                painter = painterResource(res = com.twidere.twiderex.MR.files.send),
+                painter = painterResource(res = com.twidere.twiderex.MR.files.ic_send),
                 contentDescription = stringResource(
                     res = com.twidere.twiderex.MR.strings.accessibility_scene_compose_send
                 ),

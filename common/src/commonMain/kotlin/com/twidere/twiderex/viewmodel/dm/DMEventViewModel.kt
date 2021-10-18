@@ -140,9 +140,4 @@ class DMEventViewModel(
             )
         }
     }
-
-    fun pickImage() = viewModelScope.launch {
-        val files = FilePicker.pickFiles(allowedExtensions = listOf(".png", ".jpg"), false)
-        inputImage.value = files.firstOrNull()?.path
-    }
 }

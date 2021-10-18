@@ -118,7 +118,7 @@ fun SearchInput(
         modifier = modifier.padding(SearchInputDefaults.ContentPadding)
     ) {
         Icon(
-            painter = painterResource(res = com.twidere.twiderex.MR.files.search),
+            painter = painterResource(res = com.twidere.twiderex.MR.files.ic_search),
             contentDescription = stringResource(
                 res = com.twidere.twiderex.MR.strings.scene_search_title
             )

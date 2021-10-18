@@ -77,7 +77,7 @@ fun ReplyButton(
     withNumber: Boolean = true,
 ) {
     val navigator = LocalNavigator.current
-    val icon = painterResource(res = com.twidere.twiderex.MR.files.corner_up_left)
+    val icon = painterResource(res = com.twidere.twiderex.MR.files.ic_corner_up_left)
     val contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.accessibility_common_status_actions_reply)
     val action = {
         navigator.compose(ComposeType.Reply, statusKey = status.statusKey)
@@ -124,7 +124,7 @@ fun LikeButton(
         LocalContentColor.current
     }
     val contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.accessibility_common_status_actions_like)
-    val icon = painterResource(res = com.twidere.twiderex.MR.files.heart)
+    val icon = painterResource(res = com.twidere.twiderex.MR.files.ic_heart)
     val action = {
         if (account != null) {
             actionsViewModel.like(status, account)
@@ -171,7 +171,7 @@ fun RetweetButton(
     } else {
         LocalContentColor.current
     }
-    val icon = painterResource(res = com.twidere.twiderex.MR.files.repeat)
+    val icon = painterResource(res = com.twidere.twiderex.MR.files.ic_repeat)
     val contentDescription =
         stringResource(res = com.twidere.twiderex.MR.strings.accessibility_common_status_actions_retweet)
     var expanded by remember { mutableStateOf(false) }

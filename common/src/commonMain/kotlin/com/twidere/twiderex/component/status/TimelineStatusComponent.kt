@@ -250,7 +250,7 @@ private fun MastodonStatusHeader(
             TweetHeader(
                 icon = {
                     Icon(
-                        painter = painterResource(res = com.twidere.twiderex.MR.files.user_plus),
+                        painter = painterResource(res = com.twidere.twiderex.MR.files.ic_user_plus),
                         contentDescription = null,
                         tint = Color(0xFF4C9EEB),
                     )
@@ -270,7 +270,7 @@ private fun MastodonStatusHeader(
             TweetHeader(
                 icon = {
                     Icon(
-                        painter = painterResource(res = com.twidere.twiderex.MR.files.user_exclamation),
+                        painter = painterResource(res = com.twidere.twiderex.MR.files.ic_user_exclamation),
                         contentDescription = null,
                         tint = Color(0xFFFF9500),
                     )
@@ -295,7 +295,7 @@ private fun MastodonStatusHeader(
             TweetHeader(
                 icon = {
                     Icon(
-                        painter = painterResource(res = com.twidere.twiderex.MR.files.heart),
+                        painter = painterResource(res = com.twidere.twiderex.MR.files.ic_heart),
                         contentDescription = null,
                         tint = Color(0xFFFF2D55),
                     )
@@ -315,7 +315,7 @@ private fun MastodonStatusHeader(
             TweetHeader(
                 icon = {
                     Icon(
-                        painter = painterResource(res = com.twidere.twiderex.MR.files.poll),
+                        painter = painterResource(res = com.twidere.twiderex.MR.files.ic_poll),
                         contentDescription = null,
                         tint = Color(0xFF4C9EEB),
                     )
@@ -343,7 +343,7 @@ private fun MastodonStatusHeader(
             TweetHeader(
                 icon = {
                     Icon(
-                        painter = painterResource(res = com.twidere.twiderex.MR.files.bell_ringing),
+                        painter = painterResource(res = com.twidere.twiderex.MR.files.ic_bell_ringing),
                         contentDescription = null,
                         tint = Color(0xFFFF9500),
                     )
@@ -617,7 +617,7 @@ fun ColumnScope.StatusBody(
             ) {
                 Icon(
                     modifier = Modifier.size(16.dp),
-                    painter = painterResource(res = com.twidere.twiderex.MR.files.map_pin),
+                    painter = painterResource(res = com.twidere.twiderex.MR.files.ic_map_pin),
                     contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.accessibility_common_status_location)
                 )
                 Box(modifier = Modifier.width(StatusBodyDefaults.PlaceSpacing))
@@ -720,7 +720,7 @@ fun MediaPreviewButton(
             .padding(4.dp)
     ) {
         Icon(
-            painter = painterResource(res = com.twidere.twiderex.MR.files.photo),
+            painter = painterResource(res = com.twidere.twiderex.MR.files.ic_photo),
             contentDescription = stringResource(
                 res = com.twidere.twiderex.MR.strings.accessibility_common_status_media
             )

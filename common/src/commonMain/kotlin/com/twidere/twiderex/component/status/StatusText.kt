@@ -77,7 +77,7 @@ fun ColumnScope.StatusText(
         ) {
             Icon(
                 modifier = Modifier.padding(StatusTextDefaults.Mastodon.SpoilerButtonPadding),
-                painter = painterResource(res = com.twidere.twiderex.MR.files.expand_more),
+                painter = painterResource(res = com.twidere.twiderex.MR.files.ic_expand_more),
                 contentDescription = null,
                 tint = MaterialTheme.colors.primary,
             )

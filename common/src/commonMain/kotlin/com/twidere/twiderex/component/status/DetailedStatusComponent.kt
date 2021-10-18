@@ -90,7 +90,7 @@ fun DetailedStatusComponent(
                             ) {
                                 Icon(
                                     modifier = Modifier.size(MaterialTheme.typography.body1.fontSize.value.dp),
-                                    painter = painterResource(res = com.twidere.twiderex.MR.files.map_pin),
+                                    painter = painterResource(res = com.twidere.twiderex.MR.files.ic_map_pin),
                                     contentDescription = stringResource(
                                         res = com.twidere.twiderex.MR.strings.accessibility_common_status_location
                                     )
@@ -123,7 +123,7 @@ fun DetailedStatusComponent(
                         ) {
                             StatusStatistics(
                                 count = status.metrics.reply,
-                                icon = painterResource(res = com.twidere.twiderex.MR.files.corner_up_left),
+                                icon = painterResource(res = com.twidere.twiderex.MR.files.ic_corner_up_left),
                                 contentDescription = stringResource(
                                     res = com.twidere.twiderex.MR.strings.scene_status_reply_mutiple,
                                     status.metrics.reply,
@@ -132,7 +132,7 @@ fun DetailedStatusComponent(
                             Spacer(modifier = Modifier.width(DetailedStatusDefaults.StatusStatisticsSpacing))
                             StatusStatistics(
                                 count = status.metrics.retweet,
-                                icon = painterResource(res = com.twidere.twiderex.MR.files.repeat),
+                                icon = painterResource(res = com.twidere.twiderex.MR.files.ic_repeat),
                                 contentDescription = stringResource(
                                     res = com.twidere.twiderex.MR.strings.scene_status_retweet_mutiple,
                                     status.metrics.retweet,
@@ -142,14 +142,14 @@ fun DetailedStatusComponent(
                                 Spacer(modifier = Modifier.width(DetailedStatusDefaults.StatusStatisticsSpacing))
                                 StatusStatistics(
                                     count = status.twitterExtra?.quoteCount ?: 0,
-                                    icon = painterResource(res = com.twidere.twiderex.MR.files.blockquote),
+                                    icon = painterResource(res = com.twidere.twiderex.MR.files.ic_blockquote),
                                     contentDescription = null,
                                 )
                             }
                             Spacer(modifier = Modifier.width(DetailedStatusDefaults.StatusStatisticsSpacing))
                             StatusStatistics(
                                 count = status.metrics.like,
-                                icon = painterResource(res = com.twidere.twiderex.MR.files.heart),
+                                icon = painterResource(res = com.twidere.twiderex.MR.files.ic_heart),
                                 contentDescription = stringResource(
                                     res = com.twidere.twiderex.MR.strings.scene_status_like_multiple,
                                     status.metrics.like,

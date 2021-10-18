@@ -153,7 +153,7 @@ private fun DMOutComeEvent(onResend: (event: UiDMEvent) -> Unit = {}, event: UiD
                                 .padding(DMOutComeEventDefaults.Error.ContentPadding)
                         ) {
                             Icon(
-                                painter = painterResource(res = com.twidere.twiderex.MR.files.alert),
+                                painter = painterResource(res = com.twidere.twiderex.MR.files.ic_alert),
                                 contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.scene_messages_icon_failed),
                                 tint = Color.Unspecified,
                                 modifier = Modifier.size(DMOutComeEventDefaults.Error.size)

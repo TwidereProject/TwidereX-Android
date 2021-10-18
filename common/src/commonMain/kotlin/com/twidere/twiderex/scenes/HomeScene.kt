@@ -222,7 +222,7 @@ private fun EmptyColumnHomeContent(scaffoldState: ScaffoldState) {
             verticalArrangement = Arrangement.Center,
         ) {
             Icon(
-                painter = painterResource(res = com.twidere.twiderex.MR.files.empty_column),
+                painter = painterResource(res = com.twidere.twiderex.MR.files.ic_empty_column),
                 contentDescription = null,
             )
             Spacer(modifier = Modifier.height(EmptyColumnHomeContentDefaults.VerticalPadding))
@@ -519,7 +519,7 @@ private fun HomeDrawer(scaffoldState: ScaffoldState) {
             ),
             icon = {
                 Icon(
-                    painter = painterResource(res = com.twidere.twiderex.MR.files.adjustments_horizontal),
+                    painter = painterResource(res = com.twidere.twiderex.MR.files.ic_adjustments_horizontal),
                     contentDescription = stringResource(
                         res = com.twidere.twiderex.MR.strings.scene_settings_title
                     )

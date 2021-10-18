@@ -42,7 +42,7 @@ class MeItem : HomeNavigationItem() {
         get() = RootRoute.Me
 
     @Composable
-    override fun icon(): Painter = painterResource(res = com.twidere.twiderex.MR.files.user)
+    override fun icon(): Painter = painterResource(res = com.twidere.twiderex.MR.files.ic_user)
 
     override val withAppBar: Boolean
         get() = false

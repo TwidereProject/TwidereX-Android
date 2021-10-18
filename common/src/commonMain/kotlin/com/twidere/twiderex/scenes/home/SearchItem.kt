@@ -72,7 +72,7 @@ class SearchItem : HomeNavigationItem() {
         get() = RootRoute.Search.Home
 
     @Composable
-    override fun icon(): Painter = painterResource(res = com.twidere.twiderex.MR.files.search)
+    override fun icon(): Painter = painterResource(res = com.twidere.twiderex.MR.files.ic_search)
 
     override val withAppBar: Boolean
         get() = false
@@ -144,7 +144,7 @@ fun SearchSceneContent() {
                                 }
                             ) {
                                 Icon(
-                                    painter = painterResource(res = com.twidere.twiderex.MR.files.search),
+                                    painter = painterResource(res = com.twidere.twiderex.MR.files.ic_search),
                                     contentDescription = stringResource(
                                         res = com.twidere.twiderex.MR.strings.scene_search_title
                                     )
@@ -180,7 +180,7 @@ fun SearchSceneContent() {
                             }
                         ) {
                             Icon(
-                                painter = painterResource(res = com.twidere.twiderex.MR.files.trash_can),
+                                painter = painterResource(res = com.twidere.twiderex.MR.files.ic_trash_can),
                                 contentDescription = stringResource(
                                     res = com.twidere.twiderex.MR.strings.common_controls_actions_remove
                                 )

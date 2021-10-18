@@ -49,7 +49,7 @@ class FederatedTimelineItem : HomeNavigationItem() {
 
     @Composable
     override fun icon(): Painter {
-        return painterResource(res = com.twidere.twiderex.MR.files.globe)
+        return painterResource(res = com.twidere.twiderex.MR.files.ic_globe)
     }
 
     @Composable

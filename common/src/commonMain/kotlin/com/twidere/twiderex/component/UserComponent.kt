@@ -126,13 +126,13 @@ fun UserComponent(
     val isMe by viewModel.isMe.observeAsState(initial = false)
     val tabs = listOf(
         UserTabComponent(
-            painterResource(res = com.twidere.twiderex.MR.files.float_left),
+            painterResource(res = com.twidere.twiderex.MR.files.ic_float_left),
             stringResource(res = com.twidere.twiderex.MR.strings.accessibility_scene_user_tab_status)
         ) {
             UserStatusTimeline(userKey = userKey, viewModel = viewModel)
         },
         UserTabComponent(
-            painterResource(res = com.twidere.twiderex.MR.files.photo),
+            painterResource(res = com.twidere.twiderex.MR.files.ic_photo),
             stringResource(res = com.twidere.twiderex.MR.strings.accessibility_scene_user_tab_media)
         ) {
             UserMediaTimeline(userKey = userKey)
@@ -140,7 +140,7 @@ fun UserComponent(
     ).let {
         if (isMe || userKey.host == MicroBlogKey.TwitterHost) {
             it + UserTabComponent(
-                painterResource(res = com.twidere.twiderex.MR.files.heart),
+                painterResource(res = com.twidere.twiderex.MR.files.ic_heart),
                 stringResource(res = com.twidere.twiderex.MR.strings.accessibility_scene_user_tab_favourite)
             ) {
                 UserFavouriteTimeline(userKey = userKey)
@@ -370,7 +370,7 @@ private fun UserStatusTimelineFilter(
                 }
             ) {
                 Icon(
-                    painter = painterResource(res = com.twidere.twiderex.MR.files.filter),
+                    painter = painterResource(res = com.twidere.twiderex.MR.files.ic_filter),
                     contentDescription = null,
                 )
             }
@@ -489,7 +489,7 @@ fun UserInfo(
                         )
                         .padding(UserInfoDefaults.WebsitePaddingValue)
                         .fillMaxWidth(),
-                    painter = painterResource(res = com.twidere.twiderex.MR.files.globe),
+                    painter = painterResource(res = com.twidere.twiderex.MR.files.ic_globe),
                     contentDescription = stringResource(
                         res = com.twidere.twiderex.MR.strings.accessibility_scene_user_website
                     ),
@@ -500,7 +500,7 @@ fun UserInfo(
             }
             user?.location?.takeIf { it.isNotEmpty() }?.let {
                 ProfileItem(
-                    painter = painterResource(res = com.twidere.twiderex.MR.files.map_pin),
+                    painter = painterResource(res = com.twidere.twiderex.MR.files.ic_map_pin),
                     contentDescription = stringResource(
                         res = com.twidere.twiderex.MR.strings.accessibility_scene_user_location
                     ),
@@ -546,7 +546,7 @@ private fun UserInfoName(user: UiUser) {
                 LocalContentAlpha provides ContentAlpha.medium,
             ) {
                 Icon(
-                    painter = painterResource(res = com.twidere.twiderex.MR.files.lock),
+                    painter = painterResource(res = com.twidere.twiderex.MR.files.ic_lock),
                     contentDescription = null
                 )
             }

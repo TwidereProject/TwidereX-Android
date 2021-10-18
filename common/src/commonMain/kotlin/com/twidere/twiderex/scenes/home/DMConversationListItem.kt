@@ -40,7 +40,7 @@ class DMConversationListItem : HomeNavigationItem() {
 
     @Composable
     override fun icon(): Painter {
-        return painterResource(res = com.twidere.twiderex.MR.files.mail)
+        return painterResource(res = com.twidere.twiderex.MR.files.ic_mail)
     }
 
     @Composable

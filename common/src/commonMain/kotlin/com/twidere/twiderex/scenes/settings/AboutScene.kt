@@ -101,7 +101,7 @@ private fun AboutContent() {
             modifier = Modifier
                 .weight(4F)
         ) {
-            val grayLogoPainter = painterResource(res = com.twidere.twiderex.MR.files.about_gray_logo)
+            val grayLogoPainter = painterResource(res = com.twidere.twiderex.MR.files.ic_about_gray_logo)
             val aspectRatio = grayLogoPainter.intrinsicSize.width / grayLogoPainter.intrinsicSize.height
 
             ParallaxLayout(
@@ -115,7 +115,7 @@ private fun AboutContent() {
                 parallaxLayoutState = parallaxLayoutState,
                 backContent = {
                     BlurImage(
-                        resource = com.twidere.twiderex.MR.files.about_gray_logo_shadow,
+                        resource = com.twidere.twiderex.MR.files.ic_about_gray_logo_shadow,
                         contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_about_logo_background_shadow),
                         modifier = Modifier
                             .aspectRatio(aspectRatio)
@@ -196,7 +196,7 @@ private fun AboutContent() {
                     }
                 ) {
                     Icon(
-                        painter = painterResource(res = com.twidere.twiderex.MR.files.twitter),
+                        painter = painterResource(res = com.twidere.twiderex.MR.files.ic_twitter),
                         tint = MaterialTheme.colors.onBackground,
                         contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.accessibility_common_logo_twitter)
                     )
@@ -208,7 +208,7 @@ private fun AboutContent() {
                     }
                 ) {
                     Icon(
-                        painter = painterResource(res = com.twidere.twiderex.MR.files.github),
+                        painter = painterResource(res = com.twidere.twiderex.MR.files.ic_github),
                         tint = MaterialTheme.colors.onBackground,
                         contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.accessibility_common_logo_github)
                     )
@@ -220,7 +220,7 @@ private fun AboutContent() {
                     }
                 ) {
                     Icon(
-                        painter = painterResource(res = com.twidere.twiderex.MR.files.telegram),
+                        painter = painterResource(res = com.twidere.twiderex.MR.files.ic_telegram),
                         tint = MaterialTheme.colors.onBackground,
                         contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.accessibility_common_logo_github)
                     )

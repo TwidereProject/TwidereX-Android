@@ -29,10 +29,10 @@ import com.twidere.twiderex.model.enums.MastodonVisibility
 @Composable
 fun MastodonVisibility.icon(): Painter {
     return when (this) {
-        MastodonVisibility.Public -> painterResource(res = com.twidere.twiderex.MR.files.globe)
-        MastodonVisibility.Unlisted -> painterResource(res = com.twidere.twiderex.MR.files.lock_open)
-        MastodonVisibility.Private -> painterResource(res = com.twidere.twiderex.MR.files.lock)
-        MastodonVisibility.Direct -> painterResource(res = com.twidere.twiderex.MR.files.mail)
+        MastodonVisibility.Public -> painterResource(res = com.twidere.twiderex.MR.files.ic_globe)
+        MastodonVisibility.Unlisted -> painterResource(res = com.twidere.twiderex.MR.files.ic_lock_open)
+        MastodonVisibility.Private -> painterResource(res = com.twidere.twiderex.MR.files.ic_lock)
+        MastodonVisibility.Direct -> painterResource(res = com.twidere.twiderex.MR.files.ic_mail)
     }
 }
 

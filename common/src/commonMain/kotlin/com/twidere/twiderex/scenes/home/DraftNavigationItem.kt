@@ -39,7 +39,7 @@ class DraftNavigationItem : HomeNavigationItem() {
 
     @Composable
     override fun icon(): Painter {
-        return painterResource(res = com.twidere.twiderex.MR.files.note)
+        return painterResource(res = com.twidere.twiderex.MR.files.ic_note)
     }
 
     @Composable

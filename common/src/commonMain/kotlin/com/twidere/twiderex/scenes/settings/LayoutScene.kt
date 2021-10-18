@@ -202,9 +202,9 @@ private fun LayoutItemContent(
                             Image(
                                 painter = painterResource(
                                     res = if (visible) {
-                                        com.twidere.twiderex.MR.files.delete
+                                        com.twidere.twiderex.MR.files.ic_delete_colored
                                     } else {
-                                        com.twidere.twiderex.MR.files.add
+                                        com.twidere.twiderex.MR.files.ic_add
                                     }
                                 ),
                                 contentDescription = null,

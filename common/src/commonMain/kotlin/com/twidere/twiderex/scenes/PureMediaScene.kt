@@ -258,7 +258,7 @@ fun PureMediaControlPanel(
                     }
                 ) {
                     Icon(
-                        painter = painterResource(res = com.twidere.twiderex.MR.files.x),
+                        painter = painterResource(res = com.twidere.twiderex.MR.files.ic_x),
                         contentDescription = stringResource(
                             res = com.twidere.twiderex.MR.strings.accessibility_common_close
                         )

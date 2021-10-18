@@ -48,7 +48,7 @@ fun RetweetHeader(
     TweetHeader(
         icon = {
             Icon(
-                painter = painterResource(res = com.twidere.twiderex.MR.files.repeat),
+                painter = painterResource(res = com.twidere.twiderex.MR.files.ic_repeat),
                 contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.accessibility_common_status_retweeted),
                 tint = Color(0xFF4C9EEB)
             )

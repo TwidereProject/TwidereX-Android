@@ -261,7 +261,7 @@ private fun ComposeBody(
                             }
                         ) {
                             Icon(
-                                painter = painterResource(res = com.twidere.twiderex.MR.files.x),
+                                painter = painterResource(res = com.twidere.twiderex.MR.files.ic_x),
                                 contentDescription = stringResource(
                                     res = com.twidere.twiderex.MR.strings.accessibility_common_close
                                 )
@@ -278,7 +278,7 @@ private fun ComposeBody(
                             }
                         ) {
                             Icon(
-                                painter = painterResource(res = if (enableThreadMode) com.twidere.twiderex.MR.files.send_thread else com.twidere.twiderex.MR.files.send),
+                                painter = painterResource(res = if (enableThreadMode) com.twidere.twiderex.MR.files.ic_send_thread else com.twidere.twiderex.MR.files.ic_send),
                                 contentDescription = stringResource(
                                     res = if (enableThreadMode) com.twidere.twiderex.MR.strings.accessibility_scene_compose_thread else com.twidere.twiderex.MR.strings.accessibility_scene_compose_send
                                 ),
@@ -589,7 +589,7 @@ private fun MastodonExtraActions(
             }
         ) {
             Icon(
-                painter = painterResource(res = com.twidere.twiderex.MR.files.eye_off),
+                painter = painterResource(res = com.twidere.twiderex.MR.files.ic_eye_off),
                 contentDescription = null,
                 tint = if (isImageSensitive) {
                     MaterialTheme.colors.primary
@@ -608,7 +608,7 @@ private fun MastodonExtraActions(
         }
     ) {
         Icon(
-            painter = painterResource(res = com.twidere.twiderex.MR.files.alert_octagon),
+            painter = painterResource(res = com.twidere.twiderex.MR.files.ic_alert_octagon),
             contentDescription = null,
             tint = if (isContentWarning) {
                 MaterialTheme.colors.primary
@@ -626,7 +626,7 @@ private fun LocationDisplay(it: com.twidere.twiderex.model.kmp.Location) {
     ) {
         Row {
             Icon(
-                painter = painterResource(res = com.twidere.twiderex.MR.files.map_pin),
+                painter = painterResource(res = com.twidere.twiderex.MR.files.ic_map_pin),
                 contentDescription = stringResource(
                     res = com.twidere.twiderex.MR.strings.accessibility_common_status_location
                 )
@@ -770,7 +770,7 @@ private fun ReplySheetContent(
                 }
             ) {
                 Icon(
-                    painter = painterResource(res = com.twidere.twiderex.MR.files.x),
+                    painter = painterResource(res = com.twidere.twiderex.MR.files.ic_x),
                     contentDescription = stringResource(
                         res = com.twidere.twiderex.MR.strings.accessibility_common_close
                     )
@@ -958,7 +958,7 @@ private fun ColumnScope.MastodonContentWarningInput(viewModel: ComposeViewModel)
                     LocalContentAlpha provides ContentAlpha.disabled,
                 ) {
                     Icon(
-                        painter = painterResource(res = com.twidere.twiderex.MR.files.alert_octagon),
+                        painter = painterResource(res = com.twidere.twiderex.MR.files.ic_alert_octagon),
                         contentDescription = null,
                     )
                 }
@@ -1171,7 +1171,7 @@ private fun ComposeActions(
                     }
                 ) {
                     Icon(
-                        painter = painterResource(res = if (showEmoji) com.twidere.twiderex.MR.files.keyboard else com.twidere.twiderex.MR.files.mood_smile),
+                        painter = painterResource(res = if (showEmoji) com.twidere.twiderex.MR.files.ic_keyboard else com.twidere.twiderex.MR.files.ic_mood_smile),
                         contentDescription = null,
                         tint = if (showEmoji)
                             MaterialTheme.colors.primary
@@ -1187,7 +1187,7 @@ private fun ComposeActions(
                     }
                 ) {
                     Icon(
-                        painter = painterResource(res = com.twidere.twiderex.MR.files.poll),
+                        painter = painterResource(res = com.twidere.twiderex.MR.files.ic_poll),
                         contentDescription = null,
                         tint = if (isInVoteState) {
                             MaterialTheme.colors.primary
@@ -1211,7 +1211,7 @@ private fun ComposeActions(
                     }
                 ) {
                     Icon(
-                        painter = painterResource(res = com.twidere.twiderex.MR.files.at_sign),
+                        painter = painterResource(res = com.twidere.twiderex.MR.files.ic_at_sign),
                         contentDescription = stringResource(
                             res = com.twidere.twiderex.MR.strings.accessibility_scene_compose_add_mention,
                         )
@@ -1232,7 +1232,7 @@ private fun ComposeActions(
                     }
                 ) {
                     Icon(
-                        painter = painterResource(res = com.twidere.twiderex.MR.files.hash),
+                        painter = painterResource(res = com.twidere.twiderex.MR.files.ic_hash),
                         contentDescription = null
                     )
                 }
@@ -1252,7 +1252,7 @@ private fun ComposeActions(
                     },
                 ) {
                     Icon(
-                        painter = painterResource(res = com.twidere.twiderex.MR.files.map_pin),
+                        painter = painterResource(res = com.twidere.twiderex.MR.files.ic_map_pin),
                         contentDescription = stringResource(
                             res = if (locationEnabled) {
                                 com.twidere.twiderex.MR.strings.accessibility_scene_compose_location_disable
@@ -1269,7 +1269,7 @@ private fun ComposeActions(
                 },
             ) {
                 Icon(
-                    painter = painterResource(res = com.twidere.twiderex.MR.files.thread_mode),
+                    painter = painterResource(res = com.twidere.twiderex.MR.files.ic_thread_mode),
                     contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.accessibility_scene_compose_thread),
                     tint = if (enableThreadMode) MaterialTheme.colors.primary else LocalContentColor.current.copy(
                         alpha = LocalContentAlpha.current
@@ -1287,9 +1287,9 @@ private fun ComposeActions(
                         Icon(
                             painter = painterResource(
                                 res = if (draftCount.value > 9)
-                                    com.twidere.twiderex.MR.files.drafts_more
+                                    com.twidere.twiderex.MR.files.ic_drafts_more
                                 else
-                                    com.twidere.twiderex.MR.files.draft_number
+                                    com.twidere.twiderex.MR.files.ic_draft_number
                             ),
                             contentDescription = stringResource(
                                 res = com.twidere.twiderex.MR.strings.accessibility_scene_compose_draft

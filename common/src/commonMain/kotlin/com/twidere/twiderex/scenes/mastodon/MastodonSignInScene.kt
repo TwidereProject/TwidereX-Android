@@ -96,7 +96,7 @@ fun MastodonSignInScene() {
                 ListItem(
                     icon = {
                         Icon(
-                            painter = painterResource(res = com.twidere.twiderex.MR.files.mastodon_logo_white),
+                            painter = painterResource(res = com.twidere.twiderex.MR.files.ic_mastodon_logo_white),
                             contentDescription = stringResource(
                                 res = com.twidere.twiderex.MR.strings.accessibility_common_logo_mastodon
                             )

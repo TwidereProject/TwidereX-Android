@@ -99,7 +99,7 @@ fun UserScene(
                                         }
                                     ) {
                                         Icon(
-                                            painter = painterResource(res = com.twidere.twiderex.MR.files.mail),
+                                            painter = painterResource(res = com.twidere.twiderex.MR.files.ic_mail),
                                             contentDescription = stringResource(
                                                 res = com.twidere.twiderex.MR.strings.scene_messages_title
                                             ),

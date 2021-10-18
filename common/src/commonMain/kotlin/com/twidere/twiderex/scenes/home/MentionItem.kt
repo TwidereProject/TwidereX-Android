@@ -43,7 +43,7 @@ class MentionItem : HomeNavigationItem() {
         get() = RootRoute.Mentions
 
     @Composable
-    override fun icon(): Painter = painterResource(res = com.twidere.twiderex.MR.files.message_circle)
+    override fun icon(): Painter = painterResource(res = com.twidere.twiderex.MR.files.ic_message_circle)
 
     @Composable
     override fun Content() {

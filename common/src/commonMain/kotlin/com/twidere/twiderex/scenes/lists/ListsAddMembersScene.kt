@@ -119,7 +119,7 @@ fun ListsAddMembersScene(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Icon(
-                                painter = painterResource(res = com.twidere.twiderex.MR.files.search),
+                                painter = painterResource(res = com.twidere.twiderex.MR.files.ic_search),
                                 contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.scene_search_title),
                                 modifier = Modifier.padding(ListsAddMembersSceneDefaults.SearchInput.Icon.Padding)
                             )

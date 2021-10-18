@@ -62,10 +62,10 @@ fun UserAvatar(
         )
         if (withPlatformIcon) {
             val icon = when (user.platformType) {
-                PlatformType.Twitter -> painterResource(res = com.twidere.twiderex.MR.files.twitter_badge)
+                PlatformType.Twitter -> painterResource(res = com.twidere.twiderex.MR.files.ic_twitter_badge)
                 PlatformType.StatusNet -> TODO()
                 PlatformType.Fanfou -> TODO()
-                PlatformType.Mastodon -> painterResource(res = com.twidere.twiderex.MR.files.mastodon_badge)
+                PlatformType.Mastodon -> painterResource(res = com.twidere.twiderex.MR.files.ic_mastodon_badge)
             }
             Image(
                 painter = icon,

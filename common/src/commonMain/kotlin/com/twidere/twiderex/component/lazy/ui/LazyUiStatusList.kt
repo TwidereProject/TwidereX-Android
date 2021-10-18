@@ -267,7 +267,7 @@ private fun EmptyStatusList() {
         verticalArrangement = Arrangement.Center
     ) {
         Icon(
-            painter = painterResource(res = com.twidere.twiderex.MR.files.empty_status),
+            painter = painterResource(res = com.twidere.twiderex.MR.files.ic_empty_status),
             contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.common_alerts_no_tweets_found_title)
         )
         Spacer(modifier = Modifier.height(EmptyStatusListDefaults.VerticalPadding))

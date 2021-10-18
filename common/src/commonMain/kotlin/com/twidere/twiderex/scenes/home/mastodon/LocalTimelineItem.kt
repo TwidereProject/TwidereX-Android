@@ -49,7 +49,7 @@ class LocalTimelineItem : HomeNavigationItem() {
 
     @Composable
     override fun icon(): Painter {
-        return painterResource(res = com.twidere.twiderex.MR.files.users)
+        return painterResource(res = com.twidere.twiderex.MR.files.ic_users)
     }
 
     @Composable

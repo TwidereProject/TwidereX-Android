@@ -130,7 +130,7 @@ fun SearchInputScene(initial: String? = null) {
                             }
                         ) {
                             Icon(
-                                painter = painterResource(res = com.twidere.twiderex.MR.files.search),
+                                painter = painterResource(res = com.twidere.twiderex.MR.files.ic_search),
                                 contentDescription = stringResource(
                                     res = com.twidere.twiderex.MR.strings.scene_search_title
                                 )
@@ -164,7 +164,7 @@ fun SearchInputScene(initial: String? = null) {
                                 }
                             ) {
                                 Icon(
-                                    painter = painterResource(res = com.twidere.twiderex.MR.files.x),
+                                    painter = painterResource(res = com.twidere.twiderex.MR.files.ic_x),
                                     contentDescription = stringResource(
                                         res = com.twidere.twiderex.MR.strings.common_controls_actions_remove
                                     )

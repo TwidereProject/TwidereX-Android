@@ -105,7 +105,7 @@ fun ListTimeLineScene(
                             )
                             if (source?.isPrivate == true)
                                 Icon(
-                                    painter = painterResource(res = com.twidere.twiderex.MR.files.lock),
+                                    painter = painterResource(res = com.twidere.twiderex.MR.files.ic_lock),
                                     contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.scene_lists_icons_private),
                                     modifier = Modifier
                                         .alpha(ContentAlpha.disabled)

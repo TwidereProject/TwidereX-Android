@@ -50,7 +50,7 @@ class HomeTimelineItem : HomeNavigationItem() {
         get() = RootRoute.HomeTimeline
 
     @Composable
-    override fun icon(): Painter = painterResource(res = com.twidere.twiderex.MR.files.home)
+    override fun icon(): Painter = painterResource(res = com.twidere.twiderex.MR.files.ic_home)
 
     @Composable
     override fun Content() {
@@ -100,7 +100,7 @@ private fun HomeTimelineFab() {
         }
     ) {
         Icon(
-            painter = painterResource(res = com.twidere.twiderex.MR.files.feather),
+            painter = painterResource(res = com.twidere.twiderex.MR.files.ic_feather),
             contentDescription = stringResource(
                 res = com.twidere.twiderex.MR.strings.accessibility_scene_home_compose
             )
