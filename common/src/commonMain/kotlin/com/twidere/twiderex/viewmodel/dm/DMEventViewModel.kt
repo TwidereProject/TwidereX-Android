@@ -89,7 +89,7 @@ class DMEventViewModel(
                         account.type,
                         data = DirectMessageSendData(
                             text = input.value,
-                            images = inputImage.value?.toString()?.let { uri -> listOf(uri) }
+                            images = inputImage.value?.let { insert -> listOf(insert.filePath) }
                                 ?: emptyList(),
                             recipientUserKey = it.recipientKey,
                             draftMessageKey = when (account.type) {
