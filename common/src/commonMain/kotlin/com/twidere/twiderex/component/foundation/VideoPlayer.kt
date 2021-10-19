@@ -68,7 +68,6 @@ fun VideoPlayer(
     showControls: Boolean = customControl == null,
     zOrderMediaOverlay: Boolean = false,
     keepScreenOn: Boolean = false,
-    isListItem: Boolean = true,
     thumb: @Composable (() -> Unit)? = null,
 ) {
     var playing by remember { mutableStateOf(false) }
@@ -189,14 +188,10 @@ fun VideoPlayer(
                     modifier = modifier,
                 ) {
                     if (isResume && isMostCenter && playEnabled) {
-                        if (isListItem) {
-                            it.playWhenReady = autoPlay
-                        }
+                        it.playWhenReady = autoPlay
                         it.resume()
                     } else {
-                        if (isListItem) {
-                            it.playWhenReady = false
-                        }
+                        it.playWhenReady = false
                         it.pause()
                     }
                 }
