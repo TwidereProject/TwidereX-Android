@@ -260,7 +260,6 @@ expect class NativePlayerView(
     showControls: Boolean,
     keepScreenOn: Boolean,
 ) {
-    var player: Any
     var playWhenReady: Boolean
     var playerCallBack: PlayerCallBack?
     var playerProgressCallBack: PlayerProgressCallBack?
