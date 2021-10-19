@@ -18,7 +18,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.utils
+package com.twidere.twiderex.kmp
 
 import android.content.Context
 import android.hardware.Sensor
@@ -27,9 +27,8 @@ import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import kotlin.math.PI
 
-class OrientationSensorManager(
+actual class OrientationSensorManager(
     private val context: Context,
-    private val onOrientationChangedListener: (originValues: FloatArray, currentValues: FloatArray) -> Unit,
 ) : SensorEventListener {
     private val sensorManager by lazy {
         context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
@@ -108,7 +107,7 @@ class OrientationSensorManager(
 
     private fun dispatchOrientationChanged() {
         // change current to degree
-        onOrientationChangedListener(
+        onOrientationChangedListener?.invoke(
             originValues,
             currentOrientationValues.apply {
                 this[0] = toDegree(this[0])
@@ -125,4 +124,6 @@ class OrientationSensorManager(
     fun release() {
         sensorManager.unregisterListener(this)
     }
+
+    actual var onOrientationChangedListener: ((originValues: FloatArray, currentValues: FloatArray) -> Unit)? = null
 }

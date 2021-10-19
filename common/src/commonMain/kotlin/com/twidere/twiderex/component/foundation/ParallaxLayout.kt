@@ -28,6 +28,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -39,14 +40,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.twidere.twiderex.utils.OrientationSensorManager
+import com.twidere.twiderex.di.ext.get
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
+import com.twidere.twiderex.kmp.OrientationSensorManager
 
 @Composable
 fun rememberParallaxLayoutState(maxRotate: Float, maxTransition: Float): ParallaxLayoutState {
@@ -161,7 +162,6 @@ fun ParallaxLayout(
     val rotateAnimateVertical = animateFloatAsState(targetValue = parallaxLayoutState.rotateVertical, animationSpec = animateSpec)
     val transitionAnimateHorizontal = animateFloatAsState(targetValue = parallaxLayoutState.transitionHorizontal, animationSpec = animateSpec)
     val transitionAnimateVertical = animateFloatAsState(targetValue = parallaxLayoutState.transitionVertical, animationSpec = animateSpec)
-    val context = LocalContext.current
 
     Box(modifier = modifier) {
         Box(
@@ -192,45 +192,82 @@ fun ParallaxLayout(
         }
     }
 
-    DisposableEffect(key1 = true) {
-        val orientationSensorManager =
-            OrientationSensorManager(context) { originValues, currentValues ->
-
-                // calculate vertical rotation progress, make it round to int
-                val currentVerticalProgress = calculateRotateProgress(
-                    originValue = originValues[1],
-                    currentValue = currentValues[1]
-                )
-
-                // use 1% to filter the subtle jitter of orientation sensor
-                if (abs(currentVerticalProgress - parallaxLayoutState.lastVerticalProgress) >= 1) {
-                    parallaxLayoutState.lastVerticalProgress = currentVerticalProgress
-                    // calculate rotations and transitions and update
-                    parallaxLayoutState.rotateVertical = currentVerticalProgress * parallaxLayoutState.maxRotate / 100
-                    parallaxLayoutState.transitionVertical = currentVerticalProgress * parallaxLayoutState.maxTransition / 100
-                }
-
-                // calculate horizontal rotation progress, make it round to int
-                val currentHorizontalProgress = calculateRotateProgress(
-                    originValue = originValues[2],
-                    currentValue = currentValues[2]
-                )
-                // use 1% to filter the subtle jitter of orientation sensor
-                if (abs(currentHorizontalProgress - parallaxLayoutState.lastHorizontalProgress) >= 1) {
-                    parallaxLayoutState.lastHorizontalProgress = currentHorizontalProgress
-                    // calculate rotations and transitions and update
-                    parallaxLayoutState.rotateHorizontal = currentHorizontalProgress * parallaxLayoutState.maxRotate / 100
-                    // when the phone is face up and bottom face to user
-                    // and if the values[2] is positive means left is up
-                    // in this case we want to move backContent to left
-                    // so we add a "-" in front
-                    parallaxLayoutState.transitionHorizontal = -currentHorizontalProgress * parallaxLayoutState.maxTransition / 100
-                }
+    val orientationSensorManager = get<OrientationSensorManager>()
+    DisposableEffect(Unit) {
+        orientationSensorManager.onOrientationChangedListener = { originValues, currentValues ->
+            // calculate vertical rotation progress, make it round to int
+            val currentVerticalProgress = calculateRotateProgress(
+                originValue = originValues[1],
+                currentValue = currentValues[1]
+            )
+            // use 1% to filter the subtle jitter of orientation sensor
+            if (abs(currentVerticalProgress - parallaxLayoutState.lastVerticalProgress) >= 1) {
+                parallaxLayoutState.lastVerticalProgress = currentVerticalProgress
+                // calculate rotations and transitions and update
+                parallaxLayoutState.rotateVertical = currentVerticalProgress * parallaxLayoutState.maxRotate / 100
+                parallaxLayoutState.transitionVertical = currentVerticalProgress * parallaxLayoutState.maxTransition / 100
             }
+            // calculate horizontal rotation progress, make it round to int
+            val currentHorizontalProgress = calculateRotateProgress(
+                originValue = originValues[2],
+                currentValue = currentValues[2]
+            )
+            // use 1% to filter the subtle jitter of orientation sensor
+            if (abs(currentHorizontalProgress - parallaxLayoutState.lastHorizontalProgress) >= 1) {
+                parallaxLayoutState.lastHorizontalProgress = currentHorizontalProgress
+                // calculate rotations and transitions and update
+                parallaxLayoutState.rotateHorizontal = currentHorizontalProgress * parallaxLayoutState.maxRotate / 100
+                // when the phone is face up and bottom face to user
+                // and if the values[2] is positive means left is up
+                // in this case we want to move backContent to left
+                // so we add a "-" in front
+                parallaxLayoutState.transitionHorizontal = -currentHorizontalProgress * parallaxLayoutState.maxTransition / 100
+            }
+        }
         onDispose {
             orientationSensorManager.release()
         }
     }
+
+    // DisposableEffect(key1 = true) {
+    //     val orientationSensorManager =
+    //         OrientationSensorManager(context) { originValues, currentValues ->
+    //
+    //             // calculate vertical rotation progress, make it round to int
+    //             val currentVerticalProgress = calculateRotateProgress(
+    //                 originValue = originValues[1],
+    //                 currentValue = currentValues[1]
+    //             )
+    //
+    //             // use 1% to filter the subtle jitter of orientation sensor
+    //             if (abs(currentVerticalProgress - parallaxLayoutState.lastVerticalProgress) >= 1) {
+    //                 parallaxLayoutState.lastVerticalProgress = currentVerticalProgress
+    //                 // calculate rotations and transitions and update
+    //                 parallaxLayoutState.rotateVertical = currentVerticalProgress * parallaxLayoutState.maxRotate / 100
+    //                 parallaxLayoutState.transitionVertical = currentVerticalProgress * parallaxLayoutState.maxTransition / 100
+    //             }
+    //
+    //             // calculate horizontal rotation progress, make it round to int
+    //             val currentHorizontalProgress = calculateRotateProgress(
+    //                 originValue = originValues[2],
+    //                 currentValue = currentValues[2]
+    //             )
+    //             // use 1% to filter the subtle jitter of orientation sensor
+    //             if (abs(currentHorizontalProgress - parallaxLayoutState.lastHorizontalProgress) >= 1) {
+    //                 parallaxLayoutState.lastHorizontalProgress = currentHorizontalProgress
+    //                 // calculate rotations and transitions and update
+    //                 parallaxLayoutState.rotateHorizontal = currentHorizontalProgress * parallaxLayoutState.maxRotate / 100
+    //                 // when the phone is face up and bottom face to user
+    //                 // and if the values[2] is positive means left is up
+    //                 // in this case we want to move backContent to left
+    //                 // so we add a "-" in front
+    //                 parallaxLayoutState.transitionHorizontal = -currentHorizontalProgress * parallaxLayoutState.maxTransition / 100
+    //             }
+    //         }
+    //     onDispose {
+    //         orientationSensorManager.release()
+    //     }
+    // }
 }
 
 private fun calculateRotateProgress(originValue: Float, currentValue: Float, maxDegrees: Float = 90f): Int {

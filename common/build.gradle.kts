@@ -99,6 +99,7 @@ kotlin {
                 implementation("androidx.startup:startup-runtime:${Versions.startup}")
                 implementation("com.google.accompanist:accompanist-insets:${Versions.accompanist}")
                 implementation("androidx.browser:browser:${Versions.browser}")
+                implementation("androidx.vectordrawable:vectordrawable:1.1.0")
             }
         }
         val androidAndroidTest by getting {
