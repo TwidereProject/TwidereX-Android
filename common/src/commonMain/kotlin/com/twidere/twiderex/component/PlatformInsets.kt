@@ -21,6 +21,7 @@
 package com.twidere.twiderex.component
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 
 data class NativeInsetsControl(
@@ -37,6 +38,16 @@ data class NativeInsetsColor(
     val start: Color = Color.Transparent,
     val end: Color = Color.Transparent,
 )
+
+expect inline fun Modifier.topInsetsPadding(): Modifier
+expect inline fun Modifier.bottomInsetsPadding(): Modifier
+expect inline fun Modifier.startInsetsPadding(): Modifier
+expect inline fun Modifier.endInsetsPadding(): Modifier
+
+expect inline fun Modifier.topInsetsHeight(): Modifier
+expect inline fun Modifier.bottomInsetsHeight(): Modifier
+expect inline fun Modifier.startInsetsWidth(): Modifier
+expect inline fun Modifier.endInsetsWidth(): Modifier
 
 @Composable
 internal expect fun PlatformInsets(

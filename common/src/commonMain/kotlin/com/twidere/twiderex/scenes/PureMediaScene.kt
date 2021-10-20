@@ -51,19 +51,17 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.google.accompanist.insets.navigationBarsPadding
-import com.google.accompanist.insets.statusBarsPadding
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.rememberPagerState
 import com.google.android.exoplayer2.ui.PlayerControlView
+import com.twidere.twiderex.component.bottomInsetsPadding
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.VideoPlayerController
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
+import com.twidere.twiderex.component.topInsetsPadding
 import com.twidere.twiderex.di.ext.getViewModel
-import com.twidere.twiderex.extensions.hideControls
 import com.twidere.twiderex.extensions.observeAsState
-import com.twidere.twiderex.extensions.showControls
 import com.twidere.twiderex.kmp.LocalPlatformWindow
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.preferences.LocalDisplayPreferences
@@ -208,7 +206,7 @@ fun PureMediaBottomInfo(
                 .fillMaxWidth()
                 .background(color = controlPanelColor)
                 .padding(PureMediaSceneDefaults.ContentPadding)
-                .navigationBarsPadding(),
+                .bottomInsetsPadding(),
         ) {
             if (videoControl != null) {
                 VideoPlayerController(
@@ -240,7 +238,7 @@ fun PureMediaControlPanel(
     ) {
         Box(
             modifier = Modifier
-                .statusBarsPadding()
+                .topInsetsPadding()
                 .padding(16.dp),
         ) {
             Box(

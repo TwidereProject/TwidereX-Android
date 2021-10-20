@@ -63,9 +63,6 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import com.google.accompanist.insets.navigationBarsHeight
-import com.google.accompanist.insets.navigationBarsPadding
-import com.google.accompanist.insets.statusBarsPadding
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.HorizontalPagerIndicator
@@ -73,6 +70,8 @@ import com.google.accompanist.pager.PagerState
 import com.google.accompanist.pager.rememberPagerState
 import com.google.android.exoplayer2.ui.PlayerControlView
 import com.mxalbert.zoomable.Zoomable
+import com.twidere.twiderex.component.bottomInsetsHeight
+import com.twidere.twiderex.component.bottomInsetsPadding
 import com.twidere.twiderex.component.foundation.DropdownMenuItem
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.LoadingProgress
@@ -91,6 +90,7 @@ import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.component.status.UserName
 import com.twidere.twiderex.component.status.UserScreenName
 import com.twidere.twiderex.component.stringResource
+import com.twidere.twiderex.component.topInsetsPadding
 import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.hideControls
 import com.twidere.twiderex.extensions.observeAsState
@@ -203,7 +203,7 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewM
                         enter = expandVertically(),
                         exit = shrinkVertically(),
                     ) {
-                        Spacer(modifier = Modifier.navigationBarsHeight())
+                        Spacer(modifier = Modifier.bottomInsetsHeight())
                     }
                 }
                 AnimatedVisibility(
@@ -214,7 +214,7 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewM
                     Box(
                         modifier = Modifier
                             .background(color = controlPanelColor)
-                            .navigationBarsPadding()
+                            .bottomInsetsPadding()
                             .clickable { navigator.status(status = status) },
                     ) {
                         StatusMediaInfo(
@@ -272,7 +272,7 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewM
             ) {
                 Box(
                     modifier = Modifier
-                        .statusBarsPadding()
+                        .topInsetsPadding()
                         .padding(16.dp),
                 ) {
                     Box(
