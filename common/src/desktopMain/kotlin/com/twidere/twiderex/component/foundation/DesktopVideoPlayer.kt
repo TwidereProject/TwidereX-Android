@@ -43,7 +43,7 @@ actual class NativePlayerView actual constructor(
 
     actual var playerProgressCallBack: PlayerProgressCallBack? = null
 
-    actual var player: Any = (
+    var desktopPlayer = (
         if (isMacOS()) {
             CallbackMediaPlayerComponent()
         } else {
@@ -74,14 +74,14 @@ actual class NativePlayerView actual constructor(
     actual var playWhenReady: Boolean = false
 
     actual fun resume() {
-        player.mediaPlayer().controls()?.play()
+        desktopPlayer.mediaPlayer().controls()?.play()
     }
 
     actual fun pause() {
-        player.mediaPlayer().controls()?.pause()
+        desktopPlayer.mediaPlayer().controls()?.pause()
     }
 
-    actual fun contentPosition(): Long = player.mediaPlayer().status().time()
+    actual fun contentPosition(): Long = desktopPlayer.mediaPlayer().status().time()
 
     actual fun setVolume(volume: Float) {
     }
@@ -89,18 +89,18 @@ actual class NativePlayerView actual constructor(
     actual fun release() {
         playerCallBack = null
         playerProgressCallBack = null
-        player.mediaPlayer().release()
+        desktopPlayer.mediaPlayer().release()
     }
 
     // only can get this value after prepare
-    actual fun duration(): Long = player.mediaPlayer().media().info().duration()
+    actual fun duration(): Long = desktopPlayer.mediaPlayer().media().info().duration()
 
     actual fun seekTo(time: Long) {
-        player.mediaPlayer().controls().setTime(time)
+        desktopPlayer.mediaPlayer().controls().setTime(time)
     }
 
     actual fun setMute(mute: Boolean) {
-        player.mediaPlayer().audio().isMute = mute
+        desktopPlayer.mediaPlayer().audio().isMute = mute
     }
 }
 
@@ -113,9 +113,9 @@ actual fun PlatformView(
     SwingPanel(
         factory = {
             if (isMacOS()) {
-                nativePLayerView.player as CallbackMediaPlayerComponent
+                nativePLayerView.desktopPlayer as CallbackMediaPlayerComponent
             } else {
-                nativePLayerView.player as EmbeddedMediaPlayerComponent
+                nativePLayerView.desktopPlayer as EmbeddedMediaPlayerComponent
             }
         },
         modifier = modifier,
