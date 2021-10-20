@@ -18,11 +18,19 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.kmp
+package com.twidere.twiderex.navigation
 
-enum class Platform {
-    Android,
-    JVM,
+import com.twidere.twiderex.scenes.twitter.TwitterWebSignInScene
+import moe.tlaster.precompose.navigation.RouteBuilder
+import moe.tlaster.precompose.navigation.path
+import java.net.URLDecoder
+
+actual fun RouteBuilder.platformScene() {
+    scene(
+        RootRouteDefinition.SignIn.Web.Twitter,
+    ) { backStackEntry ->
+        backStackEntry.path<String>("target")?.let {
+            TwitterWebSignInScene(target = URLDecoder.decode(it, "UTF-8"))
+        }
+    }
 }
-
-expect val currentPlatform: Platform

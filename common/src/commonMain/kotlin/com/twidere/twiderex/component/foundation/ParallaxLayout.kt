@@ -28,7 +28,6 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -43,11 +42,11 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.di.ext.get
+import com.twidere.twiderex.kmp.OrientationSensorManager
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
-import com.twidere.twiderex.kmp.OrientationSensorManager
 
 @Composable
 fun rememberParallaxLayoutState(maxRotate: Float, maxTransition: Float): ParallaxLayoutState {

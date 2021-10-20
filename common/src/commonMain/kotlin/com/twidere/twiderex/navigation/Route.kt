@@ -83,7 +83,6 @@ import com.twidere.twiderex.scenes.settings.NotificationScene
 import com.twidere.twiderex.scenes.settings.SettingsScene
 import com.twidere.twiderex.scenes.settings.StorageScene
 import com.twidere.twiderex.scenes.twitter.TwitterSignInScene
-import com.twidere.twiderex.scenes.twitter.TwitterWebSignInScene
 import com.twidere.twiderex.scenes.twitter.user.TwitterUserScene
 import com.twidere.twiderex.scenes.user.FollowersScene
 import com.twidere.twiderex.scenes.user.FollowingScene
@@ -263,14 +262,6 @@ fun RouteBuilder.route(constraints: Constraints) {
 
     scene(RootRouteDefinition.SignIn.Mastodon) {
         MastodonSignInScene()
-    }
-
-    scene(
-        RootRouteDefinition.SignIn.Web.Twitter,
-    ) { backStackEntry ->
-        backStackEntry.path<String>("target")?.let {
-            TwitterWebSignInScene(target = URLDecoder.decode(it, "UTF-8"))
-        }
     }
 
     // scene(
@@ -647,4 +638,8 @@ fun RouteBuilder.route(constraints: Constraints) {
     authorizedScene(RootRouteDefinition.Gif.Home) {
         GifScene()
     }
+
+    platformScene()
 }
+
+expect fun RouteBuilder.platformScene()

@@ -50,6 +50,8 @@ import com.twidere.twiderex.component.foundation.SignInButton
 import com.twidere.twiderex.component.foundation.SignInScaffold
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
+import com.twidere.twiderex.kmp.Platform
+import com.twidere.twiderex.kmp.currentPlatform
 import com.twidere.twiderex.navigation.RootRoute
 import com.twidere.twiderex.ui.LocalNavController
 import kotlinx.coroutines.launch
@@ -166,13 +168,19 @@ private fun TwitterSignIn() {
                     text = stringResource(res = com.twidere.twiderex.MR.strings.scene_sign_in_sign_in_with_twitter)
                 )
             },
-            trailing = {
-                IconButton(onClick = { showKeyConfiguration = true }) {
-                    Icon(
-                        imageVector = Icons.Default.MoreHoriz,
-                        contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.accessibility_common_more)
-                    )
+            trailing = if (currentPlatform == Platform.Android) {
+                {
+                    IconButton(onClick = {
+                        showKeyConfiguration = true
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.MoreHoriz,
+                            contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.accessibility_common_more)
+                        )
+                    }
                 }
+            } else {
+                null
             }
         )
     }

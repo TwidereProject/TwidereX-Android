@@ -79,7 +79,7 @@ kotlin {
             dependencies {
                 implementation("androidx.lifecycle:lifecycle-runtime-ktx:${Versions.lifecycle}")
                 implementation("androidx.savedstate:savedstate-ktx:1.1.0")
-                implementation("androidx.core:core-ktx:1.7.0-alpha01")
+                implementation("androidx.core:core-ktx:1.7.0-rc01")
                 implementation("io.insert-koin:koin-android:${Versions.koin}")
                 implementation("io.insert-koin:koin-androidx-workmanager:${Versions.koin}")
                 implementation("androidx.room:room-runtime:${Versions.room}")
@@ -101,6 +101,7 @@ kotlin {
                 implementation("com.google.accompanist:accompanist-insets:${Versions.accompanist}")
                 implementation("androidx.browser:browser:${Versions.browser}")
                 implementation("androidx.vectordrawable:vectordrawable:1.1.0")
+                implementation("androidx.activity:activity-compose:1.4.0-rc01")
             }
         }
         val androidAndroidTest by getting {
