@@ -20,10 +20,13 @@
  */
 package com.twidere.twiderex
 
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.application
 import com.twidere.twiderex.di.ext.get
 import com.twidere.twiderex.di.setupModules
+import com.twidere.twiderex.kmp.LocalPlatformWindow
+import com.twidere.twiderex.kmp.PlatformWindow
 import com.twidere.twiderex.preferences.PreferencesHolder
 import com.twidere.twiderex.preferences.ProvidePreferences
 import moe.tlaster.kfilepicker.FilePicker
@@ -48,7 +51,11 @@ fun main() {
                 title = "Twidere X"
             ) {
                 FilePicker.init(window)
-                App()
+                CompositionLocalProvider(
+                    LocalPlatformWindow provides PlatformWindow()
+                ) {
+                    App()
+                }
             }
         }
     }

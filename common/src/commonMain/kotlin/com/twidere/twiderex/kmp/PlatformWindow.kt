@@ -18,19 +18,15 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.ui
+package com.twidere.twiderex.kmp
 
-import android.app.Activity
-import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.staticCompositionLocalOf
-import com.twidere.twiderex.model.AccountDetails
-import com.twidere.twiderex.preferences.model.DisplayPreferences
-import moe.tlaster.precompose.navigation.NavController
+import kotlinx.coroutines.flow.Flow
 
-val LocalNavController = staticCompositionLocalOf<NavController> { error("No NavController") }
-val LocalActiveAccount = compositionLocalOf<AccountDetails?> { null }
-val LocalActiveAccountViewModel =
-    compositionLocalOf<com.twidere.twiderex.viewmodel.ActiveAccountViewModel> { error("No ActiveAccountViewModel") }
-val LocalActivity = staticCompositionLocalOf<Activity> { error("NoActivity") }
-val LocalVideoPlayback = compositionLocalOf { DisplayPreferences.AutoPlayback.Auto }
-val LocalIsActiveNetworkMetered = compositionLocalOf { false }
+val LocalPlatformWindow = staticCompositionLocalOf<PlatformWindow> { error("No Platform Window") }
+
+expect class PlatformWindow {
+    val windowBarVisibility: Flow<Boolean>
+    fun hideControls()
+    fun showControls()
+}

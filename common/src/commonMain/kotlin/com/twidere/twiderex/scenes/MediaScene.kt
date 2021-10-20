@@ -50,6 +50,7 @@ import androidx.compose.material.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -93,8 +94,8 @@ import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.hideControls
 import com.twidere.twiderex.extensions.observeAsState
-import com.twidere.twiderex.extensions.setOnSystemBarsVisibilityChangeListener
 import com.twidere.twiderex.extensions.showControls
+import com.twidere.twiderex.kmp.LocalPlatformWindow
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.MediaType
 import com.twidere.twiderex.model.ui.UiMedia
@@ -103,7 +104,6 @@ import com.twidere.twiderex.preferences.LocalDisplayPreferences
 import com.twidere.twiderex.preferences.model.DisplayPreferences
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.LocalVideoPlayback
-import com.twidere.twiderex.ui.LocalWindow
 import com.twidere.twiderex.ui.TwidereDialog
 import com.twidere.twiderex.viewmodel.MediaViewModel
 import kotlinx.coroutines.launch
@@ -153,7 +153,7 @@ fun StatusMediaScene(statusKey: MicroBlogKey, selectedIndex: Int) {
 @OptIn(ExperimentalAnimationApi::class, ExperimentalPagerApi::class)
 @Composable
 fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewModel) {
-    val window = LocalWindow.current
+    val window = LocalPlatformWindow.current
     var controlVisibility by remember { mutableStateOf(true) }
     val navigator = LocalNavigator.current
     val controlPanelColor = MaterialTheme.colors.surface.copy(alpha = 0.6f)
@@ -256,10 +256,11 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewM
                 pagerState = pagerState,
                 volume = if (isMute) 0f else 1f
             )
+            val windowBarVisibility by window.windowBarVisibility.observeAsState(true)
+            LaunchedEffect(windowBarVisibility) {
+                controlVisibility = windowBarVisibility
+            }
             DisposableEffect(Unit) {
-                window.setOnSystemBarsVisibilityChangeListener { visibility ->
-                    controlVisibility = visibility
-                }
                 onDispose {
                     window.showControls()
                 }

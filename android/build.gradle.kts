@@ -145,6 +145,7 @@ android {
 dependencies {
     implementation("androidx.activity:activity-ktx:${Versions.activity}")
     implementation(projects.common)
+    implementation("com.google.accompanist:accompanist-insets:${Versions.accompanist}")
 
     if (enableGoogleVariant) {
         // START Non-FOSS component
