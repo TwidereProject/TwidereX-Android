@@ -46,6 +46,7 @@ kotlin {
                 api(compose.runtime)
                 api(compose.foundation)
                 api(compose.material)
+                api(compose.materialIconsExtended)
                 implementation(projects.services)
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.Kotlin.coroutines}")
                 api("androidx.paging:paging-common:${Versions.paging}")
