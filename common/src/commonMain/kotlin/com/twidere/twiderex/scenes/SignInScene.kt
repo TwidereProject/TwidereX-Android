@@ -24,7 +24,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.material.AlertDialog
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
@@ -46,6 +45,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.DefaultConfig
+import com.twidere.twiderex.MR
+import com.twidere.twiderex.component.foundation.AlertDialog
 import com.twidere.twiderex.component.foundation.SignInButton
 import com.twidere.twiderex.component.foundation.SignInScaffold
 import com.twidere.twiderex.component.painterResource
@@ -170,9 +171,11 @@ private fun TwitterSignIn() {
             },
             trailing = if (currentPlatform == Platform.Android) {
                 {
-                    IconButton(onClick = {
-                        showKeyConfiguration = true
-                    }) {
+                    IconButton(
+                        onClick = {
+                            showKeyConfiguration = true
+                        }
+                    ) {
                         Icon(
                             imageVector = Icons.Default.MoreHoriz,
                             contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.accessibility_common_more)
@@ -199,11 +202,11 @@ private fun TwitterCustomKeySignIn(
             onDismissRequest.invoke()
         },
         title = {
-            Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_sign_in_twitter_options_sign_in_with_custom_twitter_key))
+            Text(text = stringResource(res = MR.strings.scene_sign_in_twitter_options_sign_in_with_custom_twitter_key))
         },
         text = {
             Column {
-                Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_sign_in_twitter_options_twitter_api_v2_access_is_required))
+                Text(text = stringResource(res = MR.strings.scene_sign_in_twitter_options_twitter_api_v2_access_is_required))
                 OutlinedTextField(
                     modifier = Modifier.fillMaxWidth(),
                     value = apiKey,
@@ -228,7 +231,7 @@ private fun TwitterCustomKeySignIn(
                     onDismissRequest.invoke()
                 }
             ) {
-                Text(text = stringResource(res = com.twidere.twiderex.MR.strings.common_controls_actions_cancel))
+                Text(text = stringResource(res = MR.strings.common_controls_actions_cancel))
             }
         },
         confirmButton = {
@@ -251,7 +254,7 @@ private fun TwitterCustomKeySignIn(
                 },
                 enabled = apiKey.isNotEmpty() && apiSecret.isNotEmpty()
             ) {
-                Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_drawer_sign_in))
+                Text(text = stringResource(res = MR.strings.scene_drawer_sign_in))
             }
         },
     )
