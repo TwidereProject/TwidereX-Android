@@ -47,7 +47,7 @@ actual class FileResolver(private val context: Context) {
     actual fun getMediaSize(file: String): MediaSize {
         val options = BitmapFactory.Options()
         options.inJustDecodeBounds = true
-        BitmapFactory.decodeFile(file, options)
+        BitmapFactory.decodeFile(file.toUri(context).path, options)
         return MediaSize(
             width = options.outWidth.toLong(),
             height = options.outHeight.toLong()
