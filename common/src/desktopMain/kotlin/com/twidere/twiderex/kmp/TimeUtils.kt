@@ -40,4 +40,9 @@ actual object TimeUtils {
             else -> SimpleDateFormat.getDateTimeInstance().format(Date(time))
         }
     }
+
+    actual fun humanizedDateTime(time: Long): String {
+        // TODO: Implementation
+        return humanizedTimestamp(time)
+    }
 }

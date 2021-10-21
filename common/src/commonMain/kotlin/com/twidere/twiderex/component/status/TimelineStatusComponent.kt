@@ -33,11 +33,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.ExperimentalMaterialApi
@@ -55,19 +53,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.layout.layoutId
-import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.constraintlayout.compose.ConstraintSet
-import androidx.constraintlayout.compose.Dimension
-import com.twidere.twiderex.component.HumanizedTime
 import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
-import com.twidere.twiderex.extensions.icon
 import com.twidere.twiderex.model.enums.MastodonStatusType
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiCard
@@ -413,147 +403,147 @@ fun StatusContent(
     lineUpPadding: PaddingValues = PaddingValues(bottom = StatusContentDefaults.AvatarLine.Spacing - StatusDividerDefaults.ThickNess),
     footer: @Composable () -> Unit = {},
 ) {
-    val layoutDirection = LocalLayoutDirection.current
-    ConstraintLayout(
-        constraintSet = statusConstraintSets(),
-        modifier = modifier
-            .padding(
-                start = contentPadding.calculateLeftPadding(layoutDirection),
-                end = contentPadding.calculateRightPadding(layoutDirection)
-            )
-            .wrapContentHeight()
-            .fillMaxWidth()
-    ) {
-        if (lineUp) {
-            AvatarConnectLine(
-                modifier = Modifier
-                    .layoutId(StatusContentDefaults.Ref.LineUp)
-                    .padding(lineUpPadding)
-                    .offset(y = -StatusDividerDefaults.ThickNess),
-                lineShape = RoundedCornerShape(
-                    bottomStart = AvatarConnectLineDefaults.LineWidth / 2,
-                    bottomEnd = AvatarConnectLineDefaults.LineWidth / 2
-                )
-            )
-        }
-        if (lineDown) {
-            AvatarConnectLine(
-                modifier = Modifier
-                    .layoutId(StatusContentDefaults.Ref.LineDown)
-                    .padding(lineDownPadding),
-                lineShape = RoundedCornerShape(
-                    topStart = AvatarConnectLineDefaults.LineWidth / 2,
-                    topEnd = AvatarConnectLineDefaults.LineWidth / 2
-                )
-            )
-        }
-        Column(modifier = Modifier.layoutId(StatusContentDefaults.Ref.StatusHeader)) {
-            Spacer(modifier = Modifier.height(contentPadding.calculateTopPadding()))
-            StatusHeader(data)
-        }
-        val status = data.retweet ?: data
-        Box(modifier = Modifier.layoutId(StatusContentDefaults.Ref.Avatar)) {
-            UserAvatar(user = status.user)
-        }
-        Row(modifier = Modifier.layoutId(StatusContentDefaults.Ref.Content)) {
-            Spacer(modifier = Modifier.width(StatusContentDefaults.AvatarSpacing))
-            Column {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Row(
-                        modifier = Modifier.weight(1f),
-                    ) {
-                        UserName(status.user, fontWeight = FontWeight.W600)
-                        if (type == StatusContentType.Normal) {
-                            Spacer(modifier = Modifier.width(StatusContentDefaults.Normal.UserNameSpacing))
-                            UserScreenName(status.user)
-                        }
-                    }
-                    CompositionLocalProvider(
-                        LocalContentAlpha provides ContentAlpha.disabled
-                    ) {
-                        val mastodonExtra = status.mastodonExtra
-                        if (status.platformType == PlatformType.Mastodon && mastodonExtra != null) {
-                            Icon(
-                                modifier = Modifier.size(LocalTextStyle.current.fontSize.value.dp),
-                                painter = mastodonExtra.visibility.icon(),
-                                contentDescription = mastodonExtra.visibility.name
-                            )
-                            Spacer(modifier = Modifier.width(StatusContentDefaults.Mastodon.VisibilitySpacing))
-                        }
-                        if (type == StatusContentType.Normal) {
-                            HumanizedTime(time = status.timestamp)
-                        }
-                    }
-                }
-                when (type) {
-                    StatusContentType.Normal -> {
-                        Spacer(modifier = Modifier.height(StatusContentDefaults.Normal.BodySpacing))
-                        StatusBody(status, type = type)
-                    }
-                    StatusContentType.Extend -> UserScreenName(status.user)
-                }
-            }
-        }
-        if (type == StatusContentType.Extend) {
-            Column(modifier = Modifier.layoutId(StatusContentDefaults.Ref.Extend)) {
-                Spacer(modifier = Modifier.height(StatusContentDefaults.Extend.BodySpacing))
-                StatusBody(status = status, type = type)
-            }
-        }
-        Column(modifier = Modifier.layoutId(StatusContentDefaults.Ref.Footer)) {
-            Spacer(modifier = Modifier.height(StatusContentDefaults.FooterSpacing))
-            footer.invoke()
-            Spacer(modifier = Modifier.height(contentPadding.calculateBottomPadding()))
-        }
-    }
+    // val layoutDirection = LocalLayoutDirection.current
+    // ConstraintLayout(
+    //     constraintSet = statusConstraintSets(),
+    //     modifier = modifier
+    //         .padding(
+    //             start = contentPadding.calculateLeftPadding(layoutDirection),
+    //             end = contentPadding.calculateRightPadding(layoutDirection)
+    //         )
+    //         .wrapContentHeight()
+    //         .fillMaxWidth()
+    // ) {
+    //     if (lineUp) {
+    //         AvatarConnectLine(
+    //             modifier = Modifier
+    //                 .layoutId(StatusContentDefaults.Ref.LineUp)
+    //                 .padding(lineUpPadding)
+    //                 .offset(y = -StatusDividerDefaults.ThickNess),
+    //             lineShape = RoundedCornerShape(
+    //                 bottomStart = AvatarConnectLineDefaults.LineWidth / 2,
+    //                 bottomEnd = AvatarConnectLineDefaults.LineWidth / 2
+    //             )
+    //         )
+    //     }
+    //     if (lineDown) {
+    //         AvatarConnectLine(
+    //             modifier = Modifier
+    //                 .layoutId(StatusContentDefaults.Ref.LineDown)
+    //                 .padding(lineDownPadding),
+    //             lineShape = RoundedCornerShape(
+    //                 topStart = AvatarConnectLineDefaults.LineWidth / 2,
+    //                 topEnd = AvatarConnectLineDefaults.LineWidth / 2
+    //             )
+    //         )
+    //     }
+    //     Column(modifier = Modifier.layoutId(StatusContentDefaults.Ref.StatusHeader)) {
+    //         Spacer(modifier = Modifier.height(contentPadding.calculateTopPadding()))
+    //         StatusHeader(data)
+    //     }
+    //     val status = data.retweet ?: data
+    //     Box(modifier = Modifier.layoutId(StatusContentDefaults.Ref.Avatar)) {
+    //         UserAvatar(user = status.user)
+    //     }
+    //     Row(modifier = Modifier.layoutId(StatusContentDefaults.Ref.Content)) {
+    //         Spacer(modifier = Modifier.width(StatusContentDefaults.AvatarSpacing))
+    //         Column {
+    //             Row(
+    //                 verticalAlignment = Alignment.CenterVertically,
+    //             ) {
+    //                 Row(
+    //                     modifier = Modifier.weight(1f),
+    //                 ) {
+    //                     UserName(status.user, fontWeight = FontWeight.W600)
+    //                     if (type == StatusContentType.Normal) {
+    //                         Spacer(modifier = Modifier.width(StatusContentDefaults.Normal.UserNameSpacing))
+    //                         UserScreenName(status.user)
+    //                     }
+    //                 }
+    //                 CompositionLocalProvider(
+    //                     LocalContentAlpha provides ContentAlpha.disabled
+    //                 ) {
+    //                     val mastodonExtra = status.mastodonExtra
+    //                     if (status.platformType == PlatformType.Mastodon && mastodonExtra != null) {
+    //                         Icon(
+    //                             modifier = Modifier.size(LocalTextStyle.current.fontSize.value.dp),
+    //                             painter = mastodonExtra.visibility.icon(),
+    //                             contentDescription = mastodonExtra.visibility.name
+    //                         )
+    //                         Spacer(modifier = Modifier.width(StatusContentDefaults.Mastodon.VisibilitySpacing))
+    //                     }
+    //                     if (type == StatusContentType.Normal) {
+    //                         HumanizedTime(time = status.timestamp)
+    //                     }
+    //                 }
+    //             }
+    //             when (type) {
+    //                 StatusContentType.Normal -> {
+    //                     Spacer(modifier = Modifier.height(StatusContentDefaults.Normal.BodySpacing))
+    //                     StatusBody(status, type = type)
+    //                 }
+    //                 StatusContentType.Extend -> UserScreenName(status.user)
+    //             }
+    //         }
+    //     }
+    //     if (type == StatusContentType.Extend) {
+    //         Column(modifier = Modifier.layoutId(StatusContentDefaults.Ref.Extend)) {
+    //             Spacer(modifier = Modifier.height(StatusContentDefaults.Extend.BodySpacing))
+    //             StatusBody(status = status, type = type)
+    //         }
+    //     }
+    //     Column(modifier = Modifier.layoutId(StatusContentDefaults.Ref.Footer)) {
+    //         Spacer(modifier = Modifier.height(StatusContentDefaults.FooterSpacing))
+    //         footer.invoke()
+    //         Spacer(modifier = Modifier.height(contentPadding.calculateBottomPadding()))
+    //     }
+    // }
 }
-
-@Composable
-fun statusConstraintSets() = ConstraintSet {
-    val avatarRef = createRefFor(StatusContentDefaults.Ref.Avatar)
-    val statusHeaderRef = createRefFor(StatusContentDefaults.Ref.StatusHeader)
-    val contentRef = createRefFor(StatusContentDefaults.Ref.Content)
-    val extendRef = createRefFor(StatusContentDefaults.Ref.Extend)
-    val footerRef = createRefFor(StatusContentDefaults.Ref.Footer)
-    val lineUpRef = createRefFor(StatusContentDefaults.Ref.LineUp)
-    val lineDownRef = createRefFor(StatusContentDefaults.Ref.LineDown)
-    constrain(statusHeaderRef) {
-        top.linkTo(parent.top)
-        start.linkTo(parent.start)
-    }
-    constrain(avatarRef) {
-        top.linkTo(statusHeaderRef.bottom)
-        start.linkTo(parent.start)
-    }
-    constrain(contentRef) {
-        start.linkTo(avatarRef.end, margin = StatusContentDefaults.AvatarSpacing)
-        top.linkTo(avatarRef.top)
-        end.linkTo(parent.end)
-        width = Dimension.fillToConstraints
-    }
-    constrain(extendRef) {
-        top.linkTo(contentRef.bottom)
-    }
-    constrain(footerRef) {
-        top.linkTo(contentRef.bottom)
-    }
-    constrain(lineUpRef) {
-        bottom.linkTo(avatarRef.top)
-        top.linkTo(parent.top)
-        start.linkTo(avatarRef.start)
-        end.linkTo(avatarRef.end)
-        height = Dimension.fillToConstraints
-    }
-    constrain(lineDownRef) {
-        top.linkTo(avatarRef.bottom)
-        bottom.linkTo(parent.bottom)
-        start.linkTo(avatarRef.start)
-        end.linkTo(avatarRef.end)
-        height = Dimension.fillToConstraints
-    }
-}
+//
+// @Composable
+// fun statusConstraintSets() = ConstraintSet {
+//     val avatarRef = createRefFor(StatusContentDefaults.Ref.Avatar)
+//     val statusHeaderRef = createRefFor(StatusContentDefaults.Ref.StatusHeader)
+//     val contentRef = createRefFor(StatusContentDefaults.Ref.Content)
+//     val extendRef = createRefFor(StatusContentDefaults.Ref.Extend)
+//     val footerRef = createRefFor(StatusContentDefaults.Ref.Footer)
+//     val lineUpRef = createRefFor(StatusContentDefaults.Ref.LineUp)
+//     val lineDownRef = createRefFor(StatusContentDefaults.Ref.LineDown)
+//     constrain(statusHeaderRef) {
+//         top.linkTo(parent.top)
+//         start.linkTo(parent.start)
+//     }
+//     constrain(avatarRef) {
+//         top.linkTo(statusHeaderRef.bottom)
+//         start.linkTo(parent.start)
+//     }
+//     constrain(contentRef) {
+//         start.linkTo(avatarRef.end, margin = StatusContentDefaults.AvatarSpacing)
+//         top.linkTo(avatarRef.top)
+//         end.linkTo(parent.end)
+//         width = Dimension.fillToConstraints
+//     }
+//     constrain(extendRef) {
+//         top.linkTo(contentRef.bottom)
+//     }
+//     constrain(footerRef) {
+//         top.linkTo(contentRef.bottom)
+//     }
+//     constrain(lineUpRef) {
+//         bottom.linkTo(avatarRef.top)
+//         top.linkTo(parent.top)
+//         start.linkTo(avatarRef.start)
+//         end.linkTo(avatarRef.end)
+//         height = Dimension.fillToConstraints
+//     }
+//     constrain(lineDownRef) {
+//         top.linkTo(avatarRef.bottom)
+//         bottom.linkTo(parent.bottom)
+//         start.linkTo(avatarRef.start)
+//         end.linkTo(avatarRef.end)
+//         height = Dimension.fillToConstraints
+//     }
+// }
 
 object StatusContentDefaults {
     val FooterSpacing = 4.dp

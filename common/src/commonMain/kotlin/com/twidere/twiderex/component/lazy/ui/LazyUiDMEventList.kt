@@ -20,7 +20,6 @@
  */
 package com.twidere.twiderex.component.lazy.ui
 
-import android.text.format.DateUtils
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -61,7 +60,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.paging.compose.LazyPagingItems
@@ -76,6 +74,7 @@ import com.twidere.twiderex.component.status.StatusMediaPreviewItem
 import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.component.status.UserAvatarDefaults
 import com.twidere.twiderex.component.stringResource
+import com.twidere.twiderex.kmp.TimeUtils
 import com.twidere.twiderex.model.ui.UiDMEvent
 import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.navigation.RootRoute
@@ -298,15 +297,8 @@ private fun MediaMessage(media: UiMedia?, onClick: (UiMedia) -> Unit) {
 
 @Composable
 private fun ChatTime(modifier: Modifier = Modifier, time: Long) {
-    val context = LocalContext.current
     val timeString = remember(time) {
-        DateUtils.getRelativeDateTimeString(
-            context,
-            time,
-            DateUtils.MINUTE_IN_MILLIS,
-            DateUtils.DAY_IN_MILLIS,
-            DateUtils.FORMAT_ABBREV_ALL
-        ).toString()
+        TimeUtils.humanizedDateTime(time)
     }
     CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
         Text(modifier = modifier, text = timeString, style = MaterialTheme.typography.caption)

@@ -20,9 +20,6 @@
  */
 package com.twidere.twiderex.component.media
 
-import android.net.Uri
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
@@ -39,24 +36,20 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import com.twidere.twiderex.MR
 import com.twidere.twiderex.component.foundation.DropdownMenu
 import com.twidere.twiderex.component.foundation.DropdownMenuItem
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.di.ext.get
-import com.twidere.twiderex.extensions.toUri
 import com.twidere.twiderex.kmp.MediaInsertProvider
 import com.twidere.twiderex.kmp.StorageProvider
-import com.twidere.twiderex.kmp.appFiles
-import com.twidere.twiderex.kmp.mkFile
 import com.twidere.twiderex.model.enums.MediaInsertType
 import com.twidere.twiderex.model.ui.UiMediaInsert
-import com.twidere.twiderex.navigation.RootRoute
 import com.twidere.twiderex.ui.LocalNavController
 import kotlinx.coroutines.launch
-import java.util.UUID
+import com.twidere.twiderex.navigation.RootRoute
+import moe.tlaster.kfilepicker.FilePicker
 
 private const val VideoSuffix = ".mp4"
 private const val ImageSuffix = ".jpg"
@@ -70,54 +63,51 @@ fun MediaInsertMenu(
     disableList: List<MediaInsertType> = emptyList(),
     onResult: (List<UiMediaInsert>) -> Unit
 ) {
-    val context = LocalContext.current
-    val storageProvider = get<StorageProvider>()
-    val mediaInsertProvider = remember {
-        MediaInsertProvider(context)
-    }
-    val scope = rememberCoroutineScope()
-    val filePickerLauncher = if (supportMultipleSelect) rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.OpenMultipleDocuments(),
-        onResult = {
-            scope.launch {
-                onResult(it.filterNotNull().toUi(mediaInsertProvider))
-            }
-        },
-    ) else rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.OpenDocument(),
-        onResult = {
-            scope.launch {
-                onResult(listOfNotNull(it).toUi(mediaInsertProvider))
-            }
-        },
-    )
     val navController = LocalNavController.current
-
-    var cameraTempUri by remember {
-        mutableStateOf(Uri.EMPTY)
-    }
-
-    val cameraLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.TakePicture(),
-        onResult = {
-            scope.launch {
-                if (it) onResult(listOf(cameraTempUri).toUi(mediaInsertProvider))
-            }
-        },
-    )
-
-    var videoTempUri by remember {
-        mutableStateOf(Uri.EMPTY)
-    }
-
-    val videoRecordLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.CaptureVideo(),
-        onResult = {
-            scope.launch {
-                if (it) onResult(listOf(mediaInsertProvider.provideUiMediaInsert(videoTempUri.toString())))
-            }
-        },
-    )
+    val storageProvider = get<StorageProvider>()
+    val mediaInsertProvider = get<MediaInsertProvider>()
+    val scope = rememberCoroutineScope()
+    // val filePickerLauncher = if (supportMultipleSelect) rememberLauncherForActivityResult(
+    //     contract = ActivityResultContracts.OpenMultipleDocuments(),
+    //     onResult = {
+    //         scope.launch {
+    //             onResult(it.filterNotNull().toUi(mediaInsertProvider))
+    //         }
+    //     },
+    // ) else rememberLauncherForActivityResult(
+    //     contract = ActivityResultContracts.OpenDocument(),
+    //     onResult = {
+    //         scope.launch {
+    //             onResult(listOfNotNull(it).toUi(mediaInsertProvider))
+    //         }
+    //     },
+    // )
+    //
+    // var cameraTempUri by remember {
+    //     mutableStateOf(Uri.EMPTY)
+    // }
+    //
+    // val cameraLauncher = rememberLauncherForActivityResult(
+    //     contract = ActivityResultContracts.TakePicture(),
+    //     onResult = {
+    //         scope.launch {
+    //             if (it) onResult(listOf(cameraTempUri).toUi(mediaInsertProvider))
+    //         }
+    //     },
+    // )
+    //
+    // var videoTempUri by remember {
+    //     mutableStateOf(Uri.EMPTY)
+    // }
+    //
+    // val videoRecordLauncher = rememberLauncherForActivityResult(
+    //     contract = ActivityResultContracts.CaptureVideo(),
+    //     onResult = {
+    //         scope.launch {
+    //             if (it) onResult(listOf(mediaInsertProvider.provideUiMediaInsert(videoTempUri.toString())))
+    //         }
+    //     },
+    // )
 
     var showDropdown by remember {
         mutableStateOf(false)
@@ -131,18 +121,32 @@ fun MediaInsertMenu(
                     onClick = {
                         when (it) {
                             MediaInsertType.CAMERA -> {
-                                cameraTempUri = storageProvider.appFiles.mediaFile("${System.currentTimeMillis()}$ImageSuffix").mkFile().toUri(context)
-                                cameraLauncher.launch(cameraTempUri)
+                                // cameraTempUri = storageProvider.appFiles.mediaFile("${System.currentTimeMillis()}$ImageSuffix").mkFile().toUri(context)
+                                // cameraLauncher.launch(cameraTempUri)
                             }
                             MediaInsertType.RECORD_VIDEO -> {
-                                videoTempUri = storageProvider.appFiles.mediaFile("${UUID.randomUUID()}$VideoSuffix").mkFile().toUri(context)
-                                videoRecordLauncher.launch(videoTempUri)
+                                // videoTempUri = storageProvider.appFiles.mediaFile("${UUID.randomUUID()}$VideoSuffix").mkFile().toUri(context)
+                                // videoRecordLauncher.launch(videoTempUri)
                             }
-                            MediaInsertType.LIBRARY -> filePickerLauncher.launch(librariesSupported)
+                            MediaInsertType.LIBRARY -> {
+                                scope.launch {
+                                    onResult.invoke(
+                                        FilePicker.pickFiles(allowMultiple = supportMultipleSelect)
+                                            .map {
+                                                mediaInsertProvider.provideUiMediaInsert(it.path)
+                                            }
+                                    )
+                                }
+                                // filePickerLauncher.launch(librariesSupported)
+                            }
                             MediaInsertType.GIF -> scope.launch {
                                 navController.navigateForResult(RootRoute.Gif.Home)
                                     ?.let { result ->
-                                        onResult(listOf(result as String).map { it.toUri(context) }.toUi(mediaInsertProvider))
+                                        onResult(listOf(result as String).map {
+                                            mediaInsertProvider.provideUiMediaInsert(
+                                                it
+                                            )
+                                        })
                                     }
                             }
                         }
@@ -158,7 +162,9 @@ fun MediaInsertMenu(
                             Icon(
                                 painter = it.icon(),
                                 contentDescription = it.stringName(),
-                                tint = if (enabled) MaterialTheme.colors.primary else LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
+                                tint = if (enabled) MaterialTheme.colors.primary else LocalContentColor.current.copy(
+                                    alpha = LocalContentAlpha.current
+                                )
                             )
                         }
                     )
@@ -178,10 +184,6 @@ fun MediaInsertMenu(
             )
         )
     }
-}
-
-private suspend fun List<Uri>.toUi(mediaInsertProvider: MediaInsertProvider) = map {
-    mediaInsertProvider.provideUiMediaInsert(it.toString())
 }
 
 @Composable

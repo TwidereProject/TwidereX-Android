@@ -23,9 +23,9 @@ package com.twidere.twiderex.navigation
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.ui.platform.LocalContext
 import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.component.navigation.Navigator
+import com.twidere.twiderex.kmp.LocalRemoteNavigator
 import com.twidere.twiderex.ui.LocalNavController
 import moe.tlaster.precompose.navigation.NavController
 import moe.tlaster.precompose.navigation.NavHost
@@ -35,10 +35,10 @@ import moe.tlaster.precompose.navigation.rememberNavController
 fun Router(
     navController: NavController = rememberNavController()
 ) {
-    val context = LocalContext.current
+    val remoteNavigator = LocalRemoteNavigator.current
     CompositionLocalProvider(
         LocalNavController provides navController,
-        LocalNavigator provides Navigator(navController, context),
+        LocalNavigator provides Navigator(navController, remoteNavigator),
     ) {
         BoxWithConstraints {
             NavHost(navController = navController, initialRoute = initialRoute) {

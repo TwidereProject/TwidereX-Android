@@ -20,24 +20,16 @@
  */
 package com.twidere.twiderex.scenes.settings
 
-import android.content.Intent
-import android.os.Build
-import android.provider.Settings
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.ContentAlpha
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ListItem
-import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import com.twidere.twiderex.BuildConfig
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.ColoredSwitch
@@ -48,8 +40,6 @@ import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.notification.NotificationChannelSpec
-import com.twidere.twiderex.notification.notificationChannelId
 import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.viewmodel.settings.AccountNotificationViewModel
 import org.koin.core.parameter.parametersOf
@@ -101,56 +91,17 @@ fun AccountNotificationScene(
                         }
                     )
                 }
-                val context = LocalContext.current
-                NotificationChannelSpec.values().filter { it.grouped }
-                    .sortedBy { stringResource(res = it.nameRes) }
-                    .forEach {
-                        ListItem(
-                            modifier = Modifier.clickable(
-                                onClick = {
-                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                                        val intent =
-                                            Intent(Settings.ACTION_CHANNEL_NOTIFICATION_SETTINGS)
-                                                .putExtra(
-                                                    Settings.EXTRA_APP_PACKAGE,
-                                                    BuildConfig.APPLICATION_ID
-                                                )
-                                                .putExtra(
-                                                    Settings.EXTRA_CHANNEL_ID,
-                                                    accountKey.notificationChannelId(it.id)
-                                                )
-                                        context.startActivity(intent)
-                                    }
-                                },
-                                enabled = enabled
-                            ),
-                            text = {
-                                CompositionLocalProvider(
-                                    *if (!enabled) {
-                                        arrayOf(LocalContentAlpha provides ContentAlpha.disabled)
-                                    } else {
-                                        emptyArray()
-                                    }
-                                ) {
-                                    Text(text = stringResource(res = it.nameRes))
-                                }
-                            },
-                            secondaryText = it.descriptionRes?.let {
-                                {
-                                    CompositionLocalProvider(
-                                        *if (!enabled) {
-                                            arrayOf(LocalContentAlpha provides ContentAlpha.disabled)
-                                        } else {
-                                            emptyArray()
-                                        }
-                                    ) {
-                                        Text(text = stringResource(res = it))
-                                    }
-                                }
-                            }
-                        )
-                    }
+                AccountNotificationChannelDetail(
+                    enabled = enabled,
+                    accountKey = accountKey,
+                )
             }
         }
     }
 }
+
+@Composable
+expect fun AccountNotificationChannelDetail(
+    enabled: Boolean,
+    accountKey: MicroBlogKey,
+)

@@ -20,9 +20,6 @@
  */
 package com.twidere.twiderex.scenes.dm
 
-import android.content.ClipData
-import android.content.ClipboardManager
-import android.content.Context
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
@@ -58,7 +55,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -116,7 +113,7 @@ fun DMConversationScene(conversationKey: MicroBlogKey) {
 
 @Composable
 fun NormalContent(viewModel: DMEventViewModel) {
-    val clipboardManager = LocalContext.current.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager?
+    val clipboardManager = LocalClipboardManager.current
     val copyText = stringResource(res = com.twidere.twiderex.MR.strings.scene_messages_action_copy_text)
     val source = viewModel.source.collectAsLazyPagingItems()
     val input by viewModel.input.observeAsState(initial = "")
@@ -150,7 +147,7 @@ fun NormalContent(viewModel: DMEventViewModel) {
                 pendingActionMessage = pendingActionMessage,
                 onDismissRequest = { viewModel.pendingActionMessage.value = null },
                 onCopyText = { event ->
-                    clipboardManager?.setPrimaryClip(ClipData.newPlainText(copyText, event.originText))
+                    clipboardManager.setText(event.originText)
                 },
                 onDelete = {
                     viewModel.deleteMessage(it)

@@ -50,7 +50,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalClipboardManager
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.ExperimentalUnitApi
@@ -62,7 +61,7 @@ import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.extensions.humanizedCount
-import com.twidere.twiderex.extensions.shareText
+import com.twidere.twiderex.kmp.LocalRemoteNavigator
 import com.twidere.twiderex.model.enums.ComposeType
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiStatus
@@ -252,7 +251,7 @@ fun ShareButton(
     val actionsViewModel = LocalStatusActions.current
     val account = LocalActiveAccount.current
     val accountKey = account?.accountKey
-    val context = LocalContext.current
+    val remoteNavigator = LocalRemoteNavigator.current
     val icon = Icons.Default.MoreHoriz
     val text = renderContentAnnotatedString(
         htmlText = data.htmlText,
@@ -335,7 +334,7 @@ fun ShareButton(
             DropdownMenuItem(
                 onClick = {
                     expanded = false
-                    context.shareText(status.generateShareLink())
+                    remoteNavigator.shareText(status.generateShareLink())
                 }
             ) {
                 Text(

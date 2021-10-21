@@ -20,12 +20,9 @@
  */
 package com.twidere.twiderex.component.navigation
 
-import android.content.Context
-import android.content.Intent
-import android.content.Intent.ACTION_VIEW
-import android.net.Uri
 import android.webkit.CookieManager
 import androidx.compose.runtime.staticCompositionLocalOf
+import com.twidere.twiderex.kmp.RemoteNavigator
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.ComposeType
 import com.twidere.twiderex.model.enums.MastodonStatusType
@@ -67,7 +64,7 @@ interface INavigator {
 
 class Navigator(
     private val navController: NavController,
-    private val context: Context,
+    private val remoteNavigator: RemoteNavigator,
 ) : INavigator {
     override fun user(user: UiUser, navOptions: NavOptions?) {
         navController.navigate(RootRoute.User(user.userKey), navOptions)
@@ -136,7 +133,7 @@ class Navigator(
         ) {
             navController.navigate(it)
         } else {
-            context.startActivity(Intent(ACTION_VIEW, uri))
+            remoteNavigator.openDeepLink(it)
         }
     }
 

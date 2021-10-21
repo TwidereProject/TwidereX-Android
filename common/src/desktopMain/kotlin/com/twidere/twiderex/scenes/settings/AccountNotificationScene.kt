@@ -18,27 +18,16 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.kmp
+package com.twidere.twiderex.scenes.settings
 
-import android.text.format.DateUtils
-actual object TimeUtils {
-    actual fun humanizedTimestamp(time: Long): String {
-        return DateUtils.getRelativeTimeSpanString(
-            time, System.currentTimeMillis(),
-            DateUtils.MINUTE_IN_MILLIS,
-            DateUtils.FORMAT_ABBREV_ALL
-        ).toString()
-    }
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.runtime.Composable
+import com.twidere.twiderex.model.MicroBlogKey
 
-    actual fun humanizedDateTime(time: Long): String {
-        // TODO: Context
-        return humanizedTimestamp(time)
-        // return DateUtils.getRelativeDateTimeString(
-        //     context,
-        //     time,
-        //     DateUtils.MINUTE_IN_MILLIS,
-        //     DateUtils.DAY_IN_MILLIS,
-        //     DateUtils.FORMAT_ABBREV_ALL
-        // ).toString()
-    }
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+actual fun AccountNotificationChannelDetail(
+    enabled: Boolean,
+    accountKey: MicroBlogKey,
+) {
 }
