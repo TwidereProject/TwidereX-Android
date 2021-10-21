@@ -64,7 +64,7 @@ private fun gridLayoutMeasurePolicy(
             itemWidth
         }
         val placeables = measurables.map { measurable ->
-            measurable.measure(Constraints.fixed(width = itemWidth, height = itemHeight))
+            measurable.measure(if (itemWidth == Constraints.Infinity) Constraints.fixed(0, 0) else Constraints.fixed(width = itemWidth, height = itemHeight))
         }
 
         layout(
