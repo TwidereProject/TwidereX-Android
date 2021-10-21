@@ -27,6 +27,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -53,8 +54,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.twidere.twiderex.component.HumanizedTime
 import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
@@ -140,17 +144,9 @@ private fun NormalStatus(
     ) {
         StatusContent(
             contentPadding = NormalStatusDefaults.ContentPadding,
+            threadStyle = threadStyle,
             lineUp = lineUp,
             lineDown = lineDown || (threadStyle.lineDown && data.isInThread()),
-            lineDownPadding = if (threadStyle == StatusThreadStyle.WITH_AVATAR)
-                PaddingValues(
-                    top = StatusContentDefaults.AvatarLine.Spacing,
-                    bottom = NormalStatusDefaults.ThreadBottomPadding +
-                        StatusThreadDefaults.AvatarSize +
-                        StatusContentDefaults.AvatarLine.Spacing
-                )
-            else
-                PaddingValues(top = StatusContentDefaults.AvatarLine.Spacing),
             data = data,
             footer = {
                 Column {
@@ -161,10 +157,6 @@ private fun NormalStatus(
                         }
                     } else {
                         Spacer(modifier = Modifier.height(NormalStatusDefaults.ContentSpacing))
-                    }
-                    if (data.isInThread()) {
-                        StatusThread(threadStyle, data)
-                        Spacer(modifier = Modifier.height(NormalStatusDefaults.ThreadBottomPadding))
                     }
                 }
             }
@@ -181,33 +173,6 @@ object NormalStatusDefaults {
     val ContentSpacing = 8.dp
     val ThreadSpacing = 18.dp
     val ThreadBottomPadding = 6.dp
-}
-
-@Composable
-private fun StatusThread(threadStyle: StatusThreadStyle, data: UiStatus) {
-    val navigator = LocalNavigator.current
-    when (threadStyle) {
-        StatusThreadStyle.NONE -> {
-            // show nothing
-        }
-        StatusThreadStyle.WITH_AVATAR -> {
-            StatusThreadWithAvatar(
-                modifier = Modifier.padding(top = NormalStatusDefaults.ThreadSpacing),
-                data = data,
-                onClick = {
-                    navigator.status(data)
-                }
-            )
-        }
-        StatusThreadStyle.TEXT_ONLY -> {
-            StatusThreadTextOnly(
-                modifier = Modifier.padding(start = UserAvatarDefaults.AvatarSize),
-                onClick = {
-                    navigator.status(data)
-                }
-            )
-        }
-    }
 }
 
 @Composable
@@ -399,105 +364,127 @@ fun StatusContent(
     type: StatusContentType = StatusContentType.Normal,
     lineDown: Boolean = false,
     lineUp: Boolean = false,
-    lineDownPadding: PaddingValues = PaddingValues(top = StatusContentDefaults.AvatarLine.Spacing),
-    lineUpPadding: PaddingValues = PaddingValues(bottom = StatusContentDefaults.AvatarLine.Spacing - StatusDividerDefaults.ThickNess),
+    threadStyle: StatusThreadStyle = StatusThreadStyle.NONE,
     footer: @Composable () -> Unit = {},
 ) {
-    // val layoutDirection = LocalLayoutDirection.current
-    // ConstraintLayout(
-    //     constraintSet = statusConstraintSets(),
-    //     modifier = modifier
-    //         .padding(
-    //             start = contentPadding.calculateLeftPadding(layoutDirection),
-    //             end = contentPadding.calculateRightPadding(layoutDirection)
-    //         )
-    //         .wrapContentHeight()
-    //         .fillMaxWidth()
-    // ) {
-    //     if (lineUp) {
-    //         AvatarConnectLine(
-    //             modifier = Modifier
-    //                 .layoutId(StatusContentDefaults.Ref.LineUp)
-    //                 .padding(lineUpPadding)
-    //                 .offset(y = -StatusDividerDefaults.ThickNess),
-    //             lineShape = RoundedCornerShape(
-    //                 bottomStart = AvatarConnectLineDefaults.LineWidth / 2,
-    //                 bottomEnd = AvatarConnectLineDefaults.LineWidth / 2
-    //             )
-    //         )
-    //     }
-    //     if (lineDown) {
-    //         AvatarConnectLine(
-    //             modifier = Modifier
-    //                 .layoutId(StatusContentDefaults.Ref.LineDown)
-    //                 .padding(lineDownPadding),
-    //             lineShape = RoundedCornerShape(
-    //                 topStart = AvatarConnectLineDefaults.LineWidth / 2,
-    //                 topEnd = AvatarConnectLineDefaults.LineWidth / 2
-    //             )
-    //         )
-    //     }
-    //     Column(modifier = Modifier.layoutId(StatusContentDefaults.Ref.StatusHeader)) {
-    //         Spacer(modifier = Modifier.height(contentPadding.calculateTopPadding()))
-    //         StatusHeader(data)
-    //     }
-    //     val status = data.retweet ?: data
-    //     Box(modifier = Modifier.layoutId(StatusContentDefaults.Ref.Avatar)) {
-    //         UserAvatar(user = status.user)
-    //     }
-    //     Row(modifier = Modifier.layoutId(StatusContentDefaults.Ref.Content)) {
-    //         Spacer(modifier = Modifier.width(StatusContentDefaults.AvatarSpacing))
-    //         Column {
-    //             Row(
-    //                 verticalAlignment = Alignment.CenterVertically,
-    //             ) {
-    //                 Row(
-    //                     modifier = Modifier.weight(1f),
-    //                 ) {
-    //                     UserName(status.user, fontWeight = FontWeight.W600)
-    //                     if (type == StatusContentType.Normal) {
-    //                         Spacer(modifier = Modifier.width(StatusContentDefaults.Normal.UserNameSpacing))
-    //                         UserScreenName(status.user)
-    //                     }
-    //                 }
-    //                 CompositionLocalProvider(
-    //                     LocalContentAlpha provides ContentAlpha.disabled
-    //                 ) {
-    //                     val mastodonExtra = status.mastodonExtra
-    //                     if (status.platformType == PlatformType.Mastodon && mastodonExtra != null) {
-    //                         Icon(
-    //                             modifier = Modifier.size(LocalTextStyle.current.fontSize.value.dp),
-    //                             painter = mastodonExtra.visibility.icon(),
-    //                             contentDescription = mastodonExtra.visibility.name
-    //                         )
-    //                         Spacer(modifier = Modifier.width(StatusContentDefaults.Mastodon.VisibilitySpacing))
-    //                     }
-    //                     if (type == StatusContentType.Normal) {
-    //                         HumanizedTime(time = status.timestamp)
-    //                     }
-    //                 }
-    //             }
-    //             when (type) {
-    //                 StatusContentType.Normal -> {
-    //                     Spacer(modifier = Modifier.height(StatusContentDefaults.Normal.BodySpacing))
-    //                     StatusBody(status, type = type)
-    //                 }
-    //                 StatusContentType.Extend -> UserScreenName(status.user)
-    //             }
-    //         }
-    //     }
-    //     if (type == StatusContentType.Extend) {
-    //         Column(modifier = Modifier.layoutId(StatusContentDefaults.Ref.Extend)) {
-    //             Spacer(modifier = Modifier.height(StatusContentDefaults.Extend.BodySpacing))
-    //             StatusBody(status = status, type = type)
-    //         }
-    //     }
-    //     Column(modifier = Modifier.layoutId(StatusContentDefaults.Ref.Footer)) {
-    //         Spacer(modifier = Modifier.height(StatusContentDefaults.FooterSpacing))
-    //         footer.invoke()
-    //         Spacer(modifier = Modifier.height(contentPadding.calculateBottomPadding()))
-    //     }
-    // }
+    val layoutDirection = LocalLayoutDirection.current
+    val status = data.retweet ?: data
+    Column(
+        modifier = modifier
+            .padding(
+                start = contentPadding.calculateLeftPadding(layoutDirection),
+                end = contentPadding.calculateRightPadding(layoutDirection)
+            )
+            .wrapContentHeight()
+            .fillMaxWidth()
+    ) {
+        // Status header, include line up and tweet headers e.g. retweet
+        Row(modifier = Modifier.height(IntrinsicSize.Min)) {
+            if (lineUp) {
+                AvatarConnectLine(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .padding(start = UserAvatarDefaults.AvatarSize / 2 - AvatarConnectLineDefaults.LineWidth / 2),
+                    lineShape = RoundedCornerShape(
+                        bottomStart = AvatarConnectLineDefaults.LineWidth / 2,
+                        bottomEnd = AvatarConnectLineDefaults.LineWidth / 2
+                    )
+                )
+            }
+            Spacer(modifier = Modifier.width(UserAvatarDefaults.AvatarSize / 2 - AvatarConnectLineDefaults.LineWidth / 2))
+            Column {
+                Spacer(modifier = Modifier.height(contentPadding.calculateTopPadding()))
+                StatusHeader(data)
+            }
+        }
+        Row(modifier = Modifier.height(IntrinsicSize.Min)) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.fillMaxHeight()
+            ) {
+                UserAvatar(user = status.user, modifier = Modifier.padding(top = StatusContentDefaults.AvatarLine.Spacing))
+                if (lineDown) {
+                    AvatarConnectLine(
+                        modifier = Modifier
+                            .weight(1f),
+                        lineShape = RoundedCornerShape(
+                            topStart = AvatarConnectLineDefaults.LineWidth / 2,
+                            topEnd = AvatarConnectLineDefaults.LineWidth / 2
+                        )
+                    )
+                }
+                // Thread Avatar
+                if (threadStyle == StatusThreadStyle.WITH_AVATAR && data.isInThread()) {
+                    UserAvatar(
+                        user = data.user,
+                        size = StatusThreadDefaults.AvatarSize,
+                        modifier = Modifier.padding(top = StatusContentDefaults.AvatarLine.Spacing)
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.width(StatusContentDefaults.AvatarSpacing))
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+            ) {
+                Row {
+                    Column {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Row(
+                                modifier = Modifier.weight(1f),
+                            ) {
+                                UserName(status.user, fontWeight = FontWeight.W600)
+                                if (type == StatusContentType.Normal) {
+                                    Spacer(modifier = Modifier.width(StatusContentDefaults.Normal.UserNameSpacing))
+                                    UserScreenName(status.user)
+                                }
+                            }
+                            CompositionLocalProvider(
+                                LocalContentAlpha provides ContentAlpha.disabled
+                            ) {
+                                val mastodonExtra = status.mastodonExtra
+                                if (status.platformType == PlatformType.Mastodon && mastodonExtra != null) {
+                                    Icon(
+                                        modifier = Modifier.size(LocalTextStyle.current.fontSize.value.dp),
+                                        painter = mastodonExtra.visibility.icon(),
+                                        contentDescription = mastodonExtra.visibility.name
+                                    )
+                                    Spacer(modifier = Modifier.width(StatusContentDefaults.Mastodon.VisibilitySpacing))
+                                }
+                                if (type == StatusContentType.Normal) {
+                                    HumanizedTime(time = status.timestamp)
+                                }
+                            }
+                        }
+                        when (type) {
+                            StatusContentType.Normal -> {
+                                Spacer(modifier = Modifier.height(StatusContentDefaults.Normal.BodySpacing))
+                                StatusBody(status, type = type)
+                            }
+                            StatusContentType.Extend -> UserScreenName(status.user)
+                        }
+                    }
+                }
+                if (type == StatusContentType.Extend) {
+                    Column {
+                        Spacer(modifier = Modifier.height(StatusContentDefaults.Extend.BodySpacing))
+                        StatusBody(status = status, type = type)
+                    }
+                }
+                Column {
+                    Spacer(modifier = Modifier.height(StatusContentDefaults.FooterSpacing))
+                    footer.invoke()
+                    Spacer(modifier = Modifier.height(contentPadding.calculateBottomPadding()))
+                }
+                if (data.isInThread()) {
+                    StatusThread(threadStyle, data)
+                    Spacer(modifier = Modifier.height(NormalStatusDefaults.ThreadBottomPadding))
+                }
+            }
+        }
+    }
 }
 //
 // @Composable
@@ -545,6 +532,24 @@ fun StatusContent(
 //     }
 // }
 
+@Composable
+private fun StatusThread(threadStyle: StatusThreadStyle, data: UiStatus) {
+    val navigator = LocalNavigator.current
+    when (threadStyle) {
+        StatusThreadStyle.NONE -> {
+            // show nothing
+        }
+        StatusThreadStyle.WITH_AVATAR, StatusThreadStyle.TEXT_ONLY -> {
+            StatusThreadTextOnly(
+                modifier = Modifier.padding(start = UserAvatarDefaults.AvatarSize),
+                onClick = {
+                    navigator.status(data)
+                }
+            )
+        }
+    }
+}
+
 object StatusContentDefaults {
     val FooterSpacing = 4.dp
     val AvatarSpacing = 4.dp
@@ -564,16 +569,6 @@ object StatusContentDefaults {
 
     object AvatarLine {
         val Spacing = 1.dp
-    }
-
-    object Ref {
-        const val Avatar = "avatar"
-        const val StatusHeader = "statusHeader"
-        const val Content = "content"
-        const val Extend = "extend"
-        const val Footer = "footer"
-        const val LineUp = "lineUp"
-        const val LineDown = "lineDown"
     }
 }
 
