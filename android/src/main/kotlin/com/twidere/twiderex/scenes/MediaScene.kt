@@ -315,8 +315,7 @@ private fun StatusMediaInfo(
     ) {
         if (videoControl != null) {
             videoControl.setMute(mute)
-            CustomVideoControl(player = videoControl) {
-            }
+            CustomVideoControl(player = videoControl)
         }
         StatusText(status = status, maxLines = 2, showMastodonPoll = false)
         Spacer(modifier = Modifier.height(StatusMediaInfoDefaults.TextSpacing))

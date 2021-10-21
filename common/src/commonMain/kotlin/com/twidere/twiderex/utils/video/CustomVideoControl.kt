@@ -47,7 +47,6 @@ fun CustomVideoControl(
     playEnabled: Boolean = true,
     mute: Boolean = false,
     modifier: Modifier = Modifier,
-    onPlayPause: ((Boolean) -> Unit)? = null
 ) {
     var isPlaying by remember {
         mutableStateOf(playEnabled)
@@ -80,7 +79,7 @@ fun CustomVideoControl(
         IconButton(
             onClick = {
                 isPlaying = (!isPlaying).apply {
-                    onPlayPause?.invoke(this)
+                    player.enablePlaying = this
                 }
             },
         ) {

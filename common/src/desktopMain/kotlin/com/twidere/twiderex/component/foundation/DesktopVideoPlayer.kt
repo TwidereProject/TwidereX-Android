@@ -102,6 +102,16 @@ actual class NativePlayerView actual constructor(
     actual fun setMute(mute: Boolean) {
         desktopPlayer.mediaPlayer().audio().isMute = mute
     }
+
+    actual var enablePlaying: Boolean = true
+        set(value) {
+            field = value
+            if (field) {
+                resume()
+            } else {
+                pause()
+            }
+        }
 }
 
 @Composable

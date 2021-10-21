@@ -144,7 +144,7 @@ actual class NativePlayerView actual constructor(
 
     actual var playWhenReady: Boolean = false
         set(value) {
-            androidPlayer.player?.playWhenReady = value
+            androidPlayer.player?.playWhenReady = value && enablePlaying
             field = value
         }
 
@@ -177,4 +177,10 @@ actual class NativePlayerView actual constructor(
     actual fun setMute(mute: Boolean) {
         androidPlayer.player?.volume = if (mute) 0f else 1f
     }
+
+    actual var enablePlaying: Boolean = true
+        set(value) {
+            field = value
+            playWhenReady = playWhenReady
+        }
 }

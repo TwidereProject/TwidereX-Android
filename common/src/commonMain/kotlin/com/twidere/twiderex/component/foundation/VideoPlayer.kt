@@ -148,9 +148,6 @@ fun VideoPlayer(
             var isMostCenter by remember(url) {
                 mutableStateOf(false)
             }
-            var playEnabled by remember(url) {
-                mutableStateOf(true)
-            }
             var debounceJob: Job? = null
             Box(
                 modifier = Modifier.onGloballyPositioned { coordinates ->
@@ -183,7 +180,7 @@ fun VideoPlayer(
                     nativePLayerView = nativePlayerView,
                     modifier = modifier,
                 ) {
-                    if (isResume && isMostCenter && playEnabled) {
+                    if (isResume && isMostCenter) {
                         it.playWhenReady = autoPlay
                         it.resume()
                     } else {
@@ -248,6 +245,7 @@ expect class NativePlayerView(
     keepScreenOn: Boolean,
 ) {
     var playWhenReady: Boolean
+    var enablePlaying: Boolean
     var playerCallBack: PlayerCallBack?
     var playerProgressCallBack: PlayerProgressCallBack?
     fun resume()

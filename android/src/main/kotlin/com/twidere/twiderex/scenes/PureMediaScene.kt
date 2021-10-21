@@ -207,8 +207,7 @@ fun PureMediaBottomInfo(
         ) {
             if (videoControl != null) {
                 videoControl.setMute(mute)
-                CustomVideoControl(player = videoControl) {
-                }
+                CustomVideoControl(player = videoControl)
             }
         }
     }
