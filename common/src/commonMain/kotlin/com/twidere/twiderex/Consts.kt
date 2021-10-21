@@ -31,9 +31,3 @@ val twitterHosts = listOf(
 )
 
 internal const val twitterTonApiHost = "ton.twitter.com"
-
-object DefaultConfig {
-    val ConsumerKey = "wmtrtTaVOjUnH5pWQp4LDI5Qs"
-    val ConsumerSecret = "E9Q9u2yK0COJae2tLcNEdY75OPA3bxqJiGZQztraHaQUtoI2cu"
-    val GiphyKey = "uxJ0w7FGkoluJ6ZYd3dUX68y7EjlSDAd"
-}

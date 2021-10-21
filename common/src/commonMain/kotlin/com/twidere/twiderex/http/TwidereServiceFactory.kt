@@ -27,7 +27,7 @@ import com.twidere.services.http.config.HttpConfigClientFactory
 import com.twidere.services.mastodon.MastodonService
 import com.twidere.services.microblog.MicroBlogService
 import com.twidere.services.twitter.TwitterService
-import com.twidere.twiderex.DefaultConfig
+import com.twidere.twiderex.BuildConfig
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.cred.Credentials
 import com.twidere.twiderex.model.cred.OAuth2Credentials
@@ -86,7 +86,7 @@ class TwidereServiceFactory(private val configProvider: TwidereHttpConfigProvide
             return instance?.let {
                 GiphyService(
                     // TODO MERGE DEVELOP replace build config
-                    apiKey = DefaultConfig.GiphyKey,
+                    apiKey = BuildConfig.GIPHYKEY,
                     httpClientFactory = createHttpClientFactory()
                 )
             } ?: throw Error("Factory needs to be initiate")

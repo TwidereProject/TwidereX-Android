@@ -45,6 +45,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.twidere.twiderex.BuildConfig
 import com.twidere.twiderex.component.LoginLogo
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.ui.TwidereScene
@@ -92,7 +93,7 @@ fun SignInScaffold(
                     )
                     Spacer(modifier = Modifier.width(SignInScaffoldDefaults.IconSpacing))
                     Text(
-                        text = stringResource(res = com.twidere.twiderex.MR.strings.app_name),
+                        text = BuildConfig.APPLICATION_NAME,
                         style = MaterialTheme.typography.h4,
                     )
                 }

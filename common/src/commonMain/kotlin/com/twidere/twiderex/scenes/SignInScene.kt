@@ -44,7 +44,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.twidere.twiderex.DefaultConfig
+import com.twidere.twiderex.BuildConfig
 import com.twidere.twiderex.MR
 import com.twidere.twiderex.component.foundation.AlertDialog
 import com.twidere.twiderex.component.foundation.SignInButton
@@ -142,8 +142,8 @@ private fun TwitterSignIn() {
             scope.launch {
                 navController.navigateForResult(
                     RootRoute.SignIn.Twitter(
-                        DefaultConfig.ConsumerKey,
-                        DefaultConfig.ConsumerSecret,
+                        BuildConfig.CONSUMERKEY,
+                        BuildConfig.CONSUMERSECRET,
                     )
                 )?.let {
                     it as Boolean

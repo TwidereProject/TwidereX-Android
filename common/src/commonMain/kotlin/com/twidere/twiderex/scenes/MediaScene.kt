@@ -343,8 +343,10 @@ private fun StatusMediaInfo(
             ShareButton(status = status) { callback ->
                 DropdownMenuItem(
                     onClick = {
-                        callback.invoke()
-                        viewModel.saveFile(currentMedia)
+                        scope.launch {
+                            callback.invoke()
+                            viewModel.saveFile(currentMedia)
+                        }
                     }
                 ) {
                     Text(

@@ -1,5 +1,6 @@
 import org.jetbrains.compose.compose
 import org.jetbrains.kotlin.gradle.internal.ensureParentDirsCreated
+import org.jetbrains.kotlin.konan.properties.loadProperties
 
 plugins {
     kotlin("multiplatform")
@@ -10,6 +11,7 @@ plugins {
     id("com.google.devtools.ksp").version(Versions.ksp)
     id("dev.icerock.mobile.multiplatform-resources") version Versions.moko
     id("com.squareup.sqldelight")
+    id("com.codingfeline.buildkonfig") version "0.11.0"
 }
 
 sqldelight {
@@ -122,6 +124,24 @@ kotlin {
             }
         }
         val desktopTest by getting
+    }
+}
+
+buildkonfig {
+    packageName = Package.id
+    objectName = "BuildConfig"
+    defaultConfigs {
+        buildConfigField(com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING, "VERSION_NAME", Package.versionName)
+        buildConfigField(com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING, "APPLICATION_ID", Package.id)
+        buildConfigField(com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING, "APPLICATION_NAME", Package.name)
+        val apiKeyProperties = rootProject.file("apiKey.properties")
+        val hasApiKeyProps = apiKeyProperties.exists()
+        if (hasApiKeyProps) {
+            val apiKeyProp = loadProperties(apiKeyProperties.absolutePath)
+            buildConfigField(com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING, "CONSUMERKEY", apiKeyProp.getProperty("ConsumerKey"))
+            buildConfigField(com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING, "CONSUMERSECRET", apiKeyProp.getProperty("ConsumerSecret"))
+            buildConfigField(com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING, "GIPHYKEY", apiKeyProp.getProperty("GiphyKey"))
+        }
     }
 }
 
