@@ -22,8 +22,6 @@ package com.twidere.twiderex.component.foundation
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
@@ -51,7 +49,6 @@ import com.twidere.services.http.config.HttpConfig
 import com.twidere.twiderex.MR
 import com.twidere.twiderex.compose.LocalResLoader
 import com.twidere.twiderex.preferences.LocalHttpConfig
-import com.twidere.twiderex.utils.video.CustomVideoControl
 import com.twidere.twiderex.utils.video.VideoPool
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -65,7 +62,7 @@ fun VideoPlayer(
     modifier: Modifier = Modifier,
     url: String,
     volume: Float = 1f,
-    customControl: @Composable ((NativePlayerView) -> Unit)? = null,
+    customControl: ((NativePlayerView) -> Unit)? = null,
     showControls: Boolean = customControl == null,
     zOrderMediaOverlay: Boolean = false,
     keepScreenOn: Boolean = false,
@@ -157,7 +154,7 @@ fun VideoPlayer(
                 mutableStateOf(true)
             }
             var debounceJob: Job? = null
-            Layout (
+            Layout(
                 modifier = Modifier.onGloballyPositioned { coordinates ->
                     if (middleLine == 0.0f) {
                         var rootCoordinates = coordinates
@@ -196,15 +193,9 @@ fun VideoPlayer(
                             it.pause()
                         }
                     }
-                    // TODO chage this logic about when to display the controller
+
                     if (mediaPrepared) {
-                        Column {
-                            Spacer(Modifier.height(30.dp))
-                            // customControl?.invoke(nativePlayerView)
-                            CustomVideoControl(nativePlayerView) {
-                                playEnabled = it
-                            }
-                        }
+                        customControl?.invoke(nativePlayerView)
                     }
                 }
             ) { measurables, constraints ->
@@ -219,7 +210,7 @@ fun VideoPlayer(
                     yPosition = (yPosition / 2).coerceAtLeast(0)
                     var avaliableHeight = constraints.maxHeight - yPosition
                     placeables.forEach { placeable ->
-                        val xPosition = ((constraints.maxWidth - placeable.width)/2).coerceAtLeast(0)
+                        val xPosition = ((constraints.maxWidth - placeable.width) / 2).coerceAtLeast(0)
                         placeable.placeRelative(
                             x = xPosition,
                             y = if (avaliableHeight > placeable.height) {
