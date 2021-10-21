@@ -23,7 +23,6 @@ package com.twidere.twiderex.component.foundation
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Icon
@@ -41,7 +40,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.dp
@@ -154,7 +152,7 @@ fun VideoPlayer(
                 mutableStateOf(true)
             }
             var debounceJob: Job? = null
-            Layout(
+            Box(
                 modifier = Modifier.onGloballyPositioned { coordinates ->
                     if (middleLine == 0.0f) {
                         var rootCoordinates = coordinates
@@ -179,49 +177,23 @@ fun VideoPlayer(
                             isMostCenter = false
                         }
                     }
-                },
-                content = {
-                    PlatformView(
-                        nativePLayerView = nativePlayerView,
-                        modifier = modifier,
-                    ) {
-                        if (isResume && isMostCenter && playEnabled) {
-                            it.playWhenReady = autoPlay
-                            it.resume()
-                        } else {
-                            it.playWhenReady = false
-                            it.pause()
-                        }
+                }
+            ) {
+                PlatformView(
+                    nativePLayerView = nativePlayerView,
+                    modifier = modifier,
+                ) {
+                    if (isResume && isMostCenter && playEnabled) {
+                        it.playWhenReady = autoPlay
+                        it.resume()
+                    } else {
+                        it.playWhenReady = false
+                        it.pause()
                     }
+                }
 
-                    if (mediaPrepared) {
-                        customControl?.invoke(nativePlayerView)
-                    }
-                }
-            ) { measurables, constraints ->
-                val placeables = measurables.map { measurable ->
-                    measurable.measure(constraints)
-                }
-                layout(constraints.maxWidth, constraints.maxHeight) {
-                    var yPosition = constraints.maxHeight
-                    placeables.forEach {
-                        yPosition = yPosition - it.height
-                    }
-                    yPosition = (yPosition / 2).coerceAtLeast(0)
-                    var avaliableHeight = constraints.maxHeight - yPosition
-                    placeables.forEach { placeable ->
-                        val xPosition = ((constraints.maxWidth - placeable.width) / 2).coerceAtLeast(0)
-                        placeable.placeRelative(
-                            x = xPosition,
-                            y = if (avaliableHeight > placeable.height) {
-                                yPosition
-                            } else {
-                                constraints.maxHeight - placeable.height
-                            }
-                        )
-                        yPosition += placeable.height
-                        avaliableHeight -= placeable.height
-                    }
+                if (mediaPrepared) {
+                    customControl?.invoke(nativePlayerView)
                 }
             }
         }
