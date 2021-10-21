@@ -90,7 +90,7 @@ fun MastodonPoll(status: UiStatus) {
         mutableStateListOf<Int>()
     }
 
-    status.poll?.let { poll ->
+    status.poll.let { poll ->
         poll.options.forEachIndexed { index, option ->
             MastodonPollOption(
                 option,
@@ -125,7 +125,7 @@ fun MastodonPoll(status: UiStatus) {
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        val countText = status.poll?.votersCount?.let {
+        val countText = status.poll.votersCount?.let {
             if (it > 1) {
                 stringResource(
                     res = com.twidere.twiderex.MR.strings.common_controls_status_poll_total_people,
@@ -137,7 +137,7 @@ fun MastodonPoll(status: UiStatus) {
                     it,
                 )
             }
-        } ?: status.poll?.votesCount?.let {
+        } ?: status.poll.votesCount?.let {
             if (it > 1) {
                 stringResource(
                     res = com.twidere.twiderex.MR.strings.common_controls_status_poll_total_votes,
@@ -161,15 +161,15 @@ fun MastodonPoll(status: UiStatus) {
                     Text(text = countText)
                 }
                 Spacer(modifier = Modifier.width(MastodonPollDefaults.VoteTimeSpacing))
-                if (status.poll?.expired == true) {
+                if (status.poll.expired) {
                     Text(text = stringResource(res = com.twidere.twiderex.MR.strings.common_controls_status_poll_expired))
                 } else {
-                    Text(text = status.poll?.expiresAt?.humanizedTimestamp() ?: "")
+                    Text(text = status.poll.expiresAt?.humanizedTimestamp() ?: "")
                 }
             }
         }
 
-        if (status.poll?.canVote == true) {
+        if (status.poll.canVote) {
             val statusActions = LocalStatusActions.current
             TextButton(
                 onClick = {

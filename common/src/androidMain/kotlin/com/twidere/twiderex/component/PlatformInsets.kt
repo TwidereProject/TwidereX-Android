@@ -50,15 +50,15 @@ import com.google.accompanist.insets.statusBarsPadding
 val LocalWindowInsetsController =
     staticCompositionLocalOf<WindowInsetsControllerCompat> { error("No WindowInsetsControllerCompat") }
 
-actual inline fun Modifier.topInsetsPadding(): Modifier = this.statusBarsPadding()
-actual inline fun Modifier.bottomInsetsPadding(): Modifier = this.navigationBarsPadding()
-actual inline fun Modifier.startInsetsPadding(): Modifier = this
-actual inline fun Modifier.endInsetsPadding(): Modifier = this
+actual fun Modifier.topInsetsPadding(): Modifier = this.statusBarsPadding()
+actual fun Modifier.bottomInsetsPadding(): Modifier = this.navigationBarsPadding()
+actual fun Modifier.startInsetsPadding(): Modifier = this
+actual fun Modifier.endInsetsPadding(): Modifier = this
 
-actual inline fun Modifier.topInsetsHeight(): Modifier = this.statusBarsHeight()
-actual inline fun Modifier.bottomInsetsHeight(): Modifier = this.navigationBarsHeight()
-actual inline fun Modifier.startInsetsWidth(): Modifier = this.navigationBarsWidth(HorizontalSide.Left)
-actual inline fun Modifier.endInsetsWidth(): Modifier = this.navigationBarsWidth(HorizontalSide.Right)
+actual fun Modifier.topInsetsHeight(): Modifier = this.statusBarsHeight()
+actual fun Modifier.bottomInsetsHeight(): Modifier = this.navigationBarsHeight()
+actual fun Modifier.startInsetsWidth(): Modifier = this.navigationBarsWidth(HorizontalSide.Left)
+actual fun Modifier.endInsetsWidth(): Modifier = this.navigationBarsWidth(HorizontalSide.Right)
 
 @Composable
 actual fun PlatformInsets(

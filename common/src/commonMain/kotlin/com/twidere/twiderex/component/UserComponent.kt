@@ -575,7 +575,7 @@ fun MastodonUserField(user: UiUser) {
     if (user.platformType != PlatformType.Mastodon || user.mastodonExtra == null) {
         return
     }
-    user.mastodonExtra?.fields?.forEachIndexed { index, field ->
+    user.mastodonExtra.fields.forEachIndexed { index, field ->
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -593,7 +593,7 @@ fun MastodonUserField(user: UiUser) {
                 )
             }
         }
-        if (index != user.mastodonExtra?.fields?.lastIndex) {
+        if (index != user.mastodonExtra.fields.lastIndex) {
             Spacer(modifier = Modifier.height(MastodonUserFieldDefaults.ItemSpacing))
         }
     }

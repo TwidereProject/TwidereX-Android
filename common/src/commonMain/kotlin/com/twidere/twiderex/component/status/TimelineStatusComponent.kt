@@ -88,8 +88,8 @@ fun TimelineStatusComponent(
         data.platformType == PlatformType.Mastodon &&
             data.mastodonExtra != null
             && (
-                data.mastodonExtra?.type == MastodonStatusType.NotificationFollowRequest ||
-                    data.mastodonExtra?.type == MastodonStatusType.NotificationFollow
+                data.mastodonExtra.type == MastodonStatusType.NotificationFollowRequest ||
+                    data.mastodonExtra.type == MastodonStatusType.NotificationFollow
                 ) -> {
             MastodonFollowStatus(data)
         }
@@ -224,9 +224,7 @@ private fun StatusThread(threadStyle: StatusThreadStyle, data: UiStatus) {
 private fun StatusHeader(data: UiStatus) {
     when {
         data.platformType == PlatformType.Mastodon && data.mastodonExtra != null -> {
-            data.mastodonExtra?.let {
-                MastodonStatusHeader(it, data)
-            }
+            MastodonStatusHeader(data.mastodonExtra, data)
         }
         data.retweet != null -> {
             RetweetHeader(data = data)

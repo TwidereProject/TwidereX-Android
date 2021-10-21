@@ -23,15 +23,15 @@ package com.twidere.twiderex.component
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 
-actual inline fun Modifier.topInsetsPadding(): Modifier = this
-actual inline fun Modifier.bottomInsetsPadding(): Modifier = this
-actual inline fun Modifier.startInsetsPadding(): Modifier = this
-actual inline fun Modifier.endInsetsPadding(): Modifier = this
+actual fun Modifier.topInsetsPadding(): Modifier = this
+actual fun Modifier.bottomInsetsPadding(): Modifier = this
+actual fun Modifier.startInsetsPadding(): Modifier = this
+actual fun Modifier.endInsetsPadding(): Modifier = this
 
-actual inline fun Modifier.topInsetsHeight(): Modifier = this
-actual inline fun Modifier.bottomInsetsHeight(): Modifier = this
-actual inline fun Modifier.startInsetsWidth(): Modifier = this
-actual inline fun Modifier.endInsetsWidth(): Modifier = this
+actual fun Modifier.topInsetsHeight(): Modifier = this
+actual fun Modifier.bottomInsetsHeight(): Modifier = this
+actual fun Modifier.startInsetsWidth(): Modifier = this
+actual fun Modifier.endInsetsWidth(): Modifier = this
 
 @Composable
 actual fun PlatformInsets(

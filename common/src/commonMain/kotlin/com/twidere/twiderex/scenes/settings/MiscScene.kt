@@ -245,7 +245,6 @@ fun proxyTypeValue(type: MiscPreferences.ProxyType): String {
     return when (type) {
         MiscPreferences.ProxyType.HTTP -> stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_misc_proxy_type_http)
         MiscPreferences.ProxyType.REVERSE -> stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_misc_proxy_type_reverse)
-        else -> stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_misc_proxy_type_http)
     }
 }
 

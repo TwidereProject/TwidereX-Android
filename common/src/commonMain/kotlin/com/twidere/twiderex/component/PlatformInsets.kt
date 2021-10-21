@@ -39,15 +39,15 @@ data class NativeInsetsColor(
     val end: Color = Color.Transparent,
 )
 
-expect inline fun Modifier.topInsetsPadding(): Modifier
-expect inline fun Modifier.bottomInsetsPadding(): Modifier
-expect inline fun Modifier.startInsetsPadding(): Modifier
-expect inline fun Modifier.endInsetsPadding(): Modifier
+expect fun Modifier.topInsetsPadding(): Modifier
+expect fun Modifier.bottomInsetsPadding(): Modifier
+expect fun Modifier.startInsetsPadding(): Modifier
+expect fun Modifier.endInsetsPadding(): Modifier
 
-expect inline fun Modifier.topInsetsHeight(): Modifier
-expect inline fun Modifier.bottomInsetsHeight(): Modifier
-expect inline fun Modifier.startInsetsWidth(): Modifier
-expect inline fun Modifier.endInsetsWidth(): Modifier
+expect fun Modifier.topInsetsHeight(): Modifier
+expect fun Modifier.bottomInsetsHeight(): Modifier
+expect fun Modifier.startInsetsWidth(): Modifier
+expect fun Modifier.endInsetsWidth(): Modifier
 
 @Composable
 internal expect fun PlatformInsets(
