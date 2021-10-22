@@ -75,15 +75,12 @@ import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.HorizontalPagerIndicator
 import com.google.accompanist.pager.PagerState
 import com.google.accompanist.pager.rememberPagerState
-import com.google.android.exoplayer2.ui.PlayerControlView
 import com.mxalbert.zoomable.Zoomable
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.LoadingProgress
-import com.twidere.twiderex.component.foundation.NativePlayerView
 import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.foundation.VideoPlayer
-import com.twidere.twiderex.component.foundation.VideoPlayerController
 import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.component.status.LikeButton
 import com.twidere.twiderex.component.status.ReplyButton
@@ -108,6 +105,8 @@ import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.LocalVideoPlayback
 import com.twidere.twiderex.ui.LocalWindow
 import com.twidere.twiderex.ui.TwidereDialog
+import com.twidere.twiderex.utils.video.CustomVideoControl
+import com.twidere.twiderex.utils.video.VideoController
 import com.twidere.twiderex.viewmodel.MediaViewModel
 import kotlinx.coroutines.launch
 import moe.tlaster.swiper.Swiper
@@ -166,20 +165,12 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewM
         pageCount = status.media.size,
     )
     val currentMedia = status.media[pagerState.currentPage]
-    // val context = LocalContext.current
-    // todo use redefine custom control view by compose
-    val videoControl = null
-    //     remember(pagerState.currentPage) {
-    //     if (currentMedia.type == MediaType.video) {
-    //         PlayerControlView(context).apply {
-    //             showTimeoutMs = 0
-    //         }
-    //     } else {
-    //         null
-    //     }
-    // }
+
+    val videoControl = remember {
+        VideoController()
+    }
     val display = LocalDisplayPreferences.current
-    var isMute by remember {
+    val isMute by remember {
         mutableStateOf(display.muteByDefault)
     }
     val swiperState = rememberSwiperState(
@@ -221,10 +212,7 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewM
                             .clickable { navigator.status(status = status) },
                     ) {
                         StatusMediaInfo(
-                            videoControl, status, viewModel, currentMedia, isMute,
-                            onMute = {
-                                isMute = it
-                            }
+                            videoControl, status, viewModel, currentMedia,
                         )
                     }
                 }
@@ -308,12 +296,10 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewM
 
 @Composable
 private fun StatusMediaInfo(
-    videoControl: PlayerControlView?,
+    videoControl: VideoController?,
     status: UiStatus,
     viewModel: MediaViewModel,
     currentMedia: UiMedia,
-    mute: Boolean,
-    onMute: (isMute: Boolean) -> Unit
 ) {
     val scope = rememberCoroutineScope()
     Column(
@@ -321,7 +307,7 @@ private fun StatusMediaInfo(
             .padding(StatusMediaInfoDefaults.ContentPadding),
     ) {
         if (videoControl != null) {
-            VideoPlayerController(videoControl = videoControl, mute = mute, onMute = onMute)
+            CustomVideoControl(realController = videoControl)
         }
         StatusText(status = status, maxLines = 2, showMastodonPoll = false)
         Spacer(modifier = Modifier.height(StatusMediaInfoDefaults.TextSpacing))
@@ -429,7 +415,7 @@ fun MediaView(
         initialPage = 0,
         pageCount = media.size,
     ),
-    customControl: @Composable ((NativePlayerView) -> Unit)? = null,
+    customControl: VideoController? = null,
     volume: Float = 1f
 ) {
     Box(
@@ -467,7 +453,6 @@ fun MediaView(
                         VideoPlayer(
                             url = data.url,
                             customControl = customControl,
-                            showControls = false,
                             zOrderMediaOverlay = true,
                             keepScreenOn = true,
                             volume = volume,

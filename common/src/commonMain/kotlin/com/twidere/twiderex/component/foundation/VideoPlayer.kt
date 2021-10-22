@@ -22,10 +22,7 @@ package com.twidere.twiderex.component.foundation
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Icon
@@ -50,7 +47,7 @@ import com.twidere.services.http.config.HttpConfig
 import com.twidere.twiderex.MR
 import com.twidere.twiderex.compose.LocalResLoader
 import com.twidere.twiderex.preferences.LocalHttpConfig
-import com.twidere.twiderex.utils.video.CustomVideoControl
+import com.twidere.twiderex.utils.video.VideoController
 import com.twidere.twiderex.utils.video.VideoPool
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -64,8 +61,7 @@ fun VideoPlayer(
     modifier: Modifier = Modifier,
     url: String,
     volume: Float = 1f,
-    customControl: @Composable ((NativePlayerView) -> Unit)? = null,
-    showControls: Boolean = customControl == null,
+    customControl: VideoController? = null,
     zOrderMediaOverlay: Boolean = false,
     keepScreenOn: Boolean = false,
     thumb: @Composable (() -> Unit)? = null,
@@ -77,7 +73,8 @@ fun VideoPlayer(
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     val resLoder = LocalResLoader.current
     val httpConfig = LocalHttpConfig.current
-    var mediaPrepared by remember { mutableStateOf(false) }
+    // var mediaPrepared by remember { mutableStateOf(false) }
+
     Box {
         if (playInitial) {
 
@@ -87,22 +84,22 @@ fun VideoPlayer(
                     autoPlay = autoPlay,
                     httpConfig = httpConfig,
                     zOrderMediaOverlay = zOrderMediaOverlay,
-                    showControls = showControls,
                     keepScreenOn = keepScreenOn,
                 ).apply {
                     playerCallBack = object : PlayerCallBack {
-                        override fun showThumb(showThunb: Boolean) {
-                            shouldShowThumb = showThunb
+                        override fun isReady(ready: Boolean) {
+                            shouldShowThumb = ready
                         }
 
                         override fun setPlaying(isPlaying: Boolean) {
                             playing = isPlaying
                         }
 
-                        override fun onprepare() {
-                            mediaPrepared = true
+                        override fun onprepared() {
+                            customControl?.prepared()
                         }
                     }
+                    customControl?.bind(this)
                 }
             }
 
@@ -125,12 +122,10 @@ fun VideoPlayer(
                         when (state) {
                             Lifecycle.State.Active -> {
                                 isResume = true
-                                nativePlayerView.playWhenReady = autoPlay
                             }
                             Lifecycle.State.InActive -> {
                                 isResume = false
                                 updateState()
-                                nativePlayerView.playWhenReady = false
                             }
                             else -> {
                             }
@@ -152,11 +147,8 @@ fun VideoPlayer(
             var isMostCenter by remember(url) {
                 mutableStateOf(false)
             }
-            var playEnabled by remember(url) {
-                mutableStateOf(true)
-            }
             var debounceJob: Job? = null
-            Column(
+            Box(
                 modifier = Modifier.onGloballyPositioned { coordinates ->
                     if (middleLine == 0.0f) {
                         var rootCoordinates = coordinates
@@ -187,20 +179,12 @@ fun VideoPlayer(
                     nativePLayerView = nativePlayerView,
                     modifier = modifier,
                 ) {
-                    if (isResume && isMostCenter && playEnabled) {
+                    if (isResume && isMostCenter) {
                         it.playWhenReady = autoPlay
-                        it.resume()
+                        nativePlayerView.resume()
                     } else {
                         it.playWhenReady = false
-                        it.pause()
-                    }
-                }
-                // TODO chage this logic about when to display the controller
-                if (mediaPrepared) {
-                    Spacer(Modifier.height(30.dp))
-                    // customControl?.invoke(nativePlayerView)
-                    CustomVideoControl(nativePlayerView) {
-                        playEnabled = it
+                        nativePlayerView.pause()
                     }
                 }
             }
@@ -228,8 +212,12 @@ fun VideoPlayer(
     }
 }
 
+private fun VideoController.prepared() {
+    this.videoPrepared.value = true
+}
+
 @Composable
-internal fun getPlayInitial() = true
+private fun getPlayInitial() = true
 // TODO waiting for LocalVideoPlayback migration
 // when (LocalVideoPlayback.current) {
 //     DisplayPreferences.AutoPlayback.Auto -> !LocalIsActiveNetworkMetered.current
@@ -238,9 +226,9 @@ internal fun getPlayInitial() = true
 // }
 
 interface PlayerCallBack {
-    fun showThumb(showThunb: Boolean)
+    fun isReady(ready: Boolean)
     fun setPlaying(isPlaying: Boolean)
-    fun onprepare()
+    fun onprepared()
 }
 
 interface PlayerProgressCallBack {
@@ -252,10 +240,10 @@ expect class NativePlayerView(
     autoPlay: Boolean,
     httpConfig: HttpConfig,
     zOrderMediaOverlay: Boolean,
-    showControls: Boolean,
     keepScreenOn: Boolean,
 ) {
     var playWhenReady: Boolean
+    var enablePlaying: Boolean
     var playerCallBack: PlayerCallBack?
     var playerProgressCallBack: PlayerProgressCallBack?
     fun resume()

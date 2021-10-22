@@ -66,7 +66,6 @@ actual class NativePlayerView actual constructor(
     autoPlay: Boolean,
     httpConfig: HttpConfig,
     zOrderMediaOverlay: Boolean,
-    showControls: Boolean,
     keepScreenOn: Boolean,
 ) {
     actual var playerCallBack: PlayerCallBack? = null
@@ -81,7 +80,7 @@ actual class NativePlayerView actual constructor(
 
     var androidPlayer = StyledPlayerView(context).also { playerView ->
         (playerView.videoSurfaceView as? SurfaceView)?.setZOrderMediaOverlay(zOrderMediaOverlay)
-        playerView.useController = showControls
+        playerView.useController = false
         playerView.keepScreenOn = keepScreenOn
     }.apply {
         player = RemainingTimeExoPlayer(
@@ -109,9 +108,9 @@ actual class NativePlayerView actual constructor(
             playWhenReady = autoPlay
             addListener(object : Player.Listener {
                 override fun onPlaybackStateChanged(state: Int) {
-                    playerCallBack?.showThumb(state != Player.STATE_READY)
+                    playerCallBack?.isReady(state != Player.STATE_READY)
                     if (state == Player.STATE_READY) {
-                        playerCallBack?.onprepare()
+                        playerCallBack?.onprepared()
                     }
                 }
 
@@ -144,7 +143,7 @@ actual class NativePlayerView actual constructor(
 
     actual var playWhenReady: Boolean = false
         set(value) {
-            androidPlayer.player?.playWhenReady = value
+            androidPlayer.player?.playWhenReady = value && enablePlaying
             field = value
         }
 
@@ -177,4 +176,10 @@ actual class NativePlayerView actual constructor(
     actual fun setMute(mute: Boolean) {
         androidPlayer.player?.volume = if (mute) 0f else 1f
     }
+
+    actual var enablePlaying: Boolean = true
+        set(value) {
+            field = value
+            playWhenReady = playWhenReady
+        }
 }
