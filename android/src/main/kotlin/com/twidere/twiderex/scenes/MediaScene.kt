@@ -79,7 +79,6 @@ import com.mxalbert.zoomable.Zoomable
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.LoadingProgress
-import com.twidere.twiderex.component.foundation.NativePlayerView
 import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.foundation.VideoPlayer
 import com.twidere.twiderex.component.navigation.LocalNavigator
@@ -107,6 +106,7 @@ import com.twidere.twiderex.ui.LocalVideoPlayback
 import com.twidere.twiderex.ui.LocalWindow
 import com.twidere.twiderex.ui.TwidereDialog
 import com.twidere.twiderex.utils.video.CustomVideoControl
+import com.twidere.twiderex.utils.video.VideoController
 import com.twidere.twiderex.viewmodel.MediaViewModel
 import kotlinx.coroutines.launch
 import moe.tlaster.swiper.Swiper
@@ -165,15 +165,9 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewM
         pageCount = status.media.size,
     )
     val currentMedia = status.media[pagerState.currentPage]
-    var nativePlayerView: NativePlayerView? by remember {
-        mutableStateOf(null)
-    }
-    val videoControl: (
-        nativePlayer: NativePlayerView
-    ) -> Unit = remember {
-        { player ->
-            nativePlayerView = player
-        }
+
+    val videoControl = remember {
+        VideoController()
     }
     val display = LocalDisplayPreferences.current
     val isMute by remember {
@@ -218,7 +212,7 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewM
                             .clickable { navigator.status(status = status) },
                     ) {
                         StatusMediaInfo(
-                            nativePlayerView, status, viewModel, currentMedia, isMute,
+                            videoControl, status, viewModel, currentMedia,
                         )
                     }
                 }
@@ -302,11 +296,10 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewM
 
 @Composable
 private fun StatusMediaInfo(
-    videoControl: NativePlayerView?,
+    videoControl: VideoController?,
     status: UiStatus,
     viewModel: MediaViewModel,
     currentMedia: UiMedia,
-    mute: Boolean,
 ) {
     val scope = rememberCoroutineScope()
     Column(
@@ -314,8 +307,7 @@ private fun StatusMediaInfo(
             .padding(StatusMediaInfoDefaults.ContentPadding),
     ) {
         if (videoControl != null) {
-            videoControl.setMute(mute)
-            CustomVideoControl(player = videoControl)
+            CustomVideoControl(realController = videoControl)
         }
         StatusText(status = status, maxLines = 2, showMastodonPoll = false)
         Spacer(modifier = Modifier.height(StatusMediaInfoDefaults.TextSpacing))
@@ -423,7 +415,7 @@ fun MediaView(
         initialPage = 0,
         pageCount = media.size,
     ),
-    customControl: ((NativePlayerView) -> Unit)? = null,
+    customControl: VideoController? = null,
     volume: Float = 1f
 ) {
     Box(
@@ -461,7 +453,6 @@ fun MediaView(
                         VideoPlayer(
                             url = data.url,
                             customControl = customControl,
-                            showControls = false,
                             zOrderMediaOverlay = true,
                             keepScreenOn = true,
                             volume = volume,

@@ -308,7 +308,6 @@ fun StatusMediaPreviewItem(
                                 }
                             ),
                         url = it,
-                        showControls = false,
                         volume = 0F
                     ) {
                         previewUrl?.let {

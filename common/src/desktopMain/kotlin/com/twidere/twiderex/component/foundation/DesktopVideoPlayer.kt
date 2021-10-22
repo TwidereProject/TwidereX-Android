@@ -36,7 +36,6 @@ actual class NativePlayerView actual constructor(
     autoPlay: Boolean,
     httpConfig: HttpConfig,
     zOrderMediaOverlay: Boolean,
-    showControls: Boolean,
     keepScreenOn: Boolean,
 ) {
     actual var playerCallBack: PlayerCallBack? = null
@@ -59,7 +58,7 @@ actual class NativePlayerView actual constructor(
 
                 override fun mediaPlayerReady(mediaPlayer: MediaPlayer?) {
                     super.mediaPlayerReady(mediaPlayer)
-                    playerCallBack?.onprepare()
+                    playerCallBack?.onprepared()
                 }
 
                 override fun timeChanged(mediaPlayer: MediaPlayer?, newTime: Long) {

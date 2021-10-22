@@ -47,6 +47,7 @@ import com.twidere.services.http.config.HttpConfig
 import com.twidere.twiderex.MR
 import com.twidere.twiderex.compose.LocalResLoader
 import com.twidere.twiderex.preferences.LocalHttpConfig
+import com.twidere.twiderex.utils.video.VideoController
 import com.twidere.twiderex.utils.video.VideoPool
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -60,8 +61,7 @@ fun VideoPlayer(
     modifier: Modifier = Modifier,
     url: String,
     volume: Float = 1f,
-    customControl: ((NativePlayerView) -> Unit)? = null,
-    showControls: Boolean = customControl == null,
+    customControl: VideoController? = null,
     zOrderMediaOverlay: Boolean = false,
     keepScreenOn: Boolean = false,
     thumb: @Composable (() -> Unit)? = null,
@@ -73,7 +73,18 @@ fun VideoPlayer(
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     val resLoder = LocalResLoader.current
     val httpConfig = LocalHttpConfig.current
-    var mediaPrepared by remember { mutableStateOf(false) }
+    // var mediaPrepared by remember { mutableStateOf(false) }
+
+    val videoController = remember {
+        (customControl ?: VideoController()).apply {
+            videoReadyCallBack = {
+                shouldShowThumb = it
+            }
+            videoPlayingCallBack = {
+                playing = it
+            }
+        }
+    }
     Box {
         if (playInitial) {
 
@@ -83,30 +94,17 @@ fun VideoPlayer(
                     autoPlay = autoPlay,
                     httpConfig = httpConfig,
                     zOrderMediaOverlay = zOrderMediaOverlay,
-                    showControls = showControls,
                     keepScreenOn = keepScreenOn,
                 ).apply {
-                    playerCallBack = object : PlayerCallBack {
-                        override fun showThumb(showThunb: Boolean) {
-                            shouldShowThumb = showThunb
-                        }
-
-                        override fun setPlaying(isPlaying: Boolean) {
-                            playing = isPlaying
-                        }
-
-                        override fun onprepare() {
-                            mediaPrepared = true
-                        }
-                    }
+                    videoController.bind(this)
                 }
             }
 
-            nativePlayerView.setVolume(volume)
+            videoController.setVolume(volume)
 
             fun updateState() {
-                autoPlay = nativePlayerView.playWhenReady
-                VideoPool.set(url, 0L.coerceAtLeast(nativePlayerView.contentPosition()))
+                autoPlay = videoController.isAutoPlay()
+                VideoPool.set(url, 0L.coerceAtLeast(videoController.contentPosition()))
             }
 
             var isResume by remember {
@@ -121,12 +119,10 @@ fun VideoPlayer(
                         when (state) {
                             Lifecycle.State.Active -> {
                                 isResume = true
-                                nativePlayerView.playWhenReady = autoPlay
                             }
                             Lifecycle.State.InActive -> {
                                 isResume = false
                                 updateState()
-                                nativePlayerView.playWhenReady = false
                             }
                             else -> {
                             }
@@ -136,7 +132,7 @@ fun VideoPlayer(
                 lifecycle.addObserver(observer)
                 onDispose {
                     updateState()
-                    nativePlayerView.release()
+                    videoController.release()
                     VideoPool.removeRect(videoKey)
                     lifecycle.removeObserver(observer)
                 }
@@ -181,16 +177,10 @@ fun VideoPlayer(
                     modifier = modifier,
                 ) {
                     if (isResume && isMostCenter) {
-                        it.playWhenReady = autoPlay
-                        it.resume()
+                        videoController.resume(autoPlay)
                     } else {
-                        it.playWhenReady = false
-                        it.pause()
+                        videoController.pause()
                     }
-                }
-
-                if (mediaPrepared) {
-                    customControl?.invoke(nativePlayerView)
                 }
             }
         }
@@ -227,9 +217,9 @@ internal fun getPlayInitial() = true
 // }
 
 interface PlayerCallBack {
-    fun showThumb(showThunb: Boolean)
+    fun isReady(ready: Boolean)
     fun setPlaying(isPlaying: Boolean)
-    fun onprepare()
+    fun onprepared()
 }
 
 interface PlayerProgressCallBack {
@@ -241,7 +231,6 @@ expect class NativePlayerView(
     autoPlay: Boolean,
     httpConfig: HttpConfig,
     zOrderMediaOverlay: Boolean,
-    showControls: Boolean,
     keepScreenOn: Boolean,
 ) {
     var playWhenReady: Boolean

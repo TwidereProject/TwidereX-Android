@@ -37,17 +37,96 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.twidere.twiderex.MR
 import com.twidere.twiderex.component.foundation.NativePlayerView
+import com.twidere.twiderex.component.foundation.PlayerCallBack
 import com.twidere.twiderex.component.foundation.PlayerProgressCallBack
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
 
+class VideoController {
+
+    private var player: NativePlayerView? = null
+
+    var videoPraparedCallBack: (() -> Unit)? = null
+
+    var videoReadyCallBack: ((ready: Boolean) -> Unit)? = null
+
+    var videoPlayingCallBack: ((isplaying: Boolean) -> Unit)? = null
+
+    fun bind(player: NativePlayerView) {
+        val playerCallBack = object : PlayerCallBack {
+            override fun isReady(ready: Boolean) {
+                videoReadyCallBack?.invoke(ready)
+            }
+
+            override fun setPlaying(isPlaying: Boolean) {
+                videoPlayingCallBack?.invoke(isPlaying)
+            }
+
+            override fun onprepared() {
+                videoPraparedCallBack?.invoke()
+            }
+        }
+        player.playerCallBack = playerCallBack
+        this.player = player
+    }
+
+    fun isAutoPlay(): Boolean {
+        return player?.playWhenReady ?: false
+    }
+
+    fun setProgressCallBack(progressCallBack: PlayerProgressCallBack) {
+        player?.playerProgressCallBack = progressCallBack
+    }
+
+    fun enable(enable: Boolean) {
+        player?.enablePlaying = enable
+    }
+
+    fun resume(autoPlay: Boolean) {
+        player?.playWhenReady = autoPlay
+        player?.resume()
+    }
+
+    fun pause() {
+        player?.playWhenReady = false
+        player?.pause()
+    }
+
+    fun contentPosition(): Long {
+        return player?.contentPosition() ?: 0
+    }
+
+    fun duration(): Long {
+        return player?.duration()?.coerceAtLeast(0) ?: 0
+    }
+
+    fun seekTo(time: Long) {
+        player?.seekTo(time)
+    }
+
+    fun setVolume(volume: Float) {
+        player?.setVolume(volume)
+    }
+
+    fun setMute(mute: Boolean) {
+        player?.setMute(mute)
+    }
+
+    fun release() {
+        player?.release()
+    }
+}
+
 @Composable
 fun CustomVideoControl(
-    player: NativePlayerView,
+    realController: VideoController,
     playEnabled: Boolean = true,
     mute: Boolean = false,
     modifier: Modifier = Modifier,
 ) {
+    var videoPrapared by remember {
+        mutableStateOf(false)
+    }
     var isPlaying by remember {
         mutableStateOf(playEnabled)
     }
@@ -58,18 +137,23 @@ fun CustomVideoControl(
         mutableStateOf(false)
     }
     var sliderValue by remember {
-        mutableStateOf(player.contentPosition().toFloat())
+        mutableStateOf(realController.contentPosition().toFloat())
     }
-    LaunchedEffect(player) {
-        player.playerProgressCallBack = object : PlayerProgressCallBack {
+    LaunchedEffect(realController) {
+        realController.videoPraparedCallBack = {
+            videoPrapared = true
+        }
+        realController.setProgressCallBack(object : PlayerProgressCallBack {
             override fun onTimeChanged(time: Long) {
                 if (!isSeeking) {
                     sliderValue = time.toFloat()
                 }
             }
-        }
+        })
     }
-
+    if (!videoPrapared) {
+        return
+    }
     Row(
         modifier = modifier,
         horizontalArrangement = Arrangement.Center,
@@ -79,7 +163,7 @@ fun CustomVideoControl(
         IconButton(
             onClick = {
                 isPlaying = (!isPlaying).apply {
-                    player.enablePlaying = this
+                    realController.enable(this)
                 }
             },
         ) {
@@ -92,14 +176,14 @@ fun CustomVideoControl(
 
         Box(modifier.weight(1f)) {
             Slider(
-                valueRange = 0f..player.duration().toFloat(),
+                valueRange = 0f..realController.duration().toFloat(),
                 value = sliderValue,
                 onValueChange = {
                     isSeeking = true
                     sliderValue = it
                 },
                 onValueChangeFinished = {
-                    player.seekTo(sliderValue.toLong())
+                    realController.seekTo(sliderValue.toLong())
                     isSeeking = false
                 }
             )
@@ -108,7 +192,7 @@ fun CustomVideoControl(
         IconButton(
             onClick = {
                 isMute = (!isMute).apply {
-                    player.setMute(this)
+                    realController.setMute(this)
                 }
             },
         ) {
