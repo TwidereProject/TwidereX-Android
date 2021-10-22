@@ -125,9 +125,9 @@ class DirectMessageRepository(
             newConversation.removeAll { con ->
                 val needDrop = con.latestMessage.sender.userKey == accountKey ||
                     oldConversation.find {
-                    // self send message or same received message
-                    it.latestMessage.messageKey == con.latestMessage.messageKey
-                }?.let { true } ?: false
+                        // self send message or same received message
+                        it.latestMessage.messageKey == con.latestMessage.messageKey
+                    }?.let { true } ?: false
                 needDrop
             }
             newConversation

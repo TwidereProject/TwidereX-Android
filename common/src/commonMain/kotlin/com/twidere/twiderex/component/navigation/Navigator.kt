@@ -122,14 +122,12 @@ class Navigator(
     }
 
     override fun openLink(it: String, deepLink: Boolean) {
-        val uri = Uri.parse(it)
         if ((
-            uri.scheme == twidereXSchema || uri.host?.contains(
+            it.contains(twidereXSchema) || it.contains(
                     "twitter.com",
                     ignoreCase = true
-                ) == true
-            ) &&
-            deepLink
+                )
+            ) && deepLink
         ) {
             navController.navigate(it)
         } else {

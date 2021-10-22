@@ -37,6 +37,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.ExperimentalMaterialApi
@@ -62,6 +63,7 @@ import com.twidere.twiderex.component.HumanizedTime
 import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
+import com.twidere.twiderex.extensions.icon
 import com.twidere.twiderex.model.enums.MastodonStatusType
 import com.twidere.twiderex.model.enums.PlatformType
 import com.twidere.twiderex.model.ui.UiCard
@@ -80,8 +82,8 @@ fun TimelineStatusComponent(
 ) {
     when {
         data.platformType == PlatformType.Mastodon &&
-            data.mastodonExtra != null
-            && (
+            data.mastodonExtra != null &&
+            (
                 data.mastodonExtra.type == MastodonStatusType.NotificationFollowRequest ||
                     data.mastodonExtra.type == MastodonStatusType.NotificationFollow
                 ) -> {

@@ -118,7 +118,7 @@ class TwitterConversationMediator(
             val tweet = service.lookupStatus(statusKey.id)
             _targetTweet =
                 tweet.referencedTweets?.firstOrNull { it.type == ReferencedTweetType.retweeted }?.status
-                ?: tweet
+                    ?: tweet
             loadPrevious() + tweet
         } else {
             emptyList()

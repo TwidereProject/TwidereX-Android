@@ -56,6 +56,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -94,7 +95,7 @@ fun DMConversationScene(conversationKey: MicroBlogKey) {
                         AppBarNavigationButton()
                     },
                     title = {
-                        conversation ?.let {
+                        conversation?.let {
                             Text(text = it.conversationName)
                         }
                     },
@@ -114,7 +115,6 @@ fun DMConversationScene(conversationKey: MicroBlogKey) {
 @Composable
 fun NormalContent(viewModel: DMEventViewModel) {
     val clipboardManager = LocalClipboardManager.current
-    val copyText = stringResource(res = com.twidere.twiderex.MR.strings.scene_messages_action_copy_text)
     val source = viewModel.source.collectAsLazyPagingItems()
     val input by viewModel.input.observeAsState(initial = "")
     val inputImage by viewModel.inputImage.observeAsState(null)
@@ -147,7 +147,7 @@ fun NormalContent(viewModel: DMEventViewModel) {
                 pendingActionMessage = pendingActionMessage,
                 onDismissRequest = { viewModel.pendingActionMessage.value = null },
                 onCopyText = { event ->
-                    clipboardManager.setText(event.originText)
+                    clipboardManager.setText(annotatedString = buildAnnotatedString { append(event.originText) })
                 },
                 onDelete = {
                     viewModel.deleteMessage(it)
@@ -308,7 +308,9 @@ fun InputComponent(
                 contentDescription = stringResource(
                     res = com.twidere.twiderex.MR.strings.accessibility_scene_compose_send
                 ),
-                tint = if (enableSend) MaterialTheme.colors.primary else LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
+                tint = if (enableSend) MaterialTheme.colors.primary else LocalContentColor.current.copy(
+                    alpha = LocalContentAlpha.current
+                )
             )
         }
     }
