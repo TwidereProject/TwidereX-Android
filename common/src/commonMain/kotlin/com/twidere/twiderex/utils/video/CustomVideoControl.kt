@@ -37,7 +37,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.twidere.twiderex.MR
 import com.twidere.twiderex.component.foundation.NativePlayerView
-import com.twidere.twiderex.component.foundation.PlayerCallBack
 import com.twidere.twiderex.component.foundation.PlayerProgressCallBack
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
@@ -46,50 +45,18 @@ class VideoController {
 
     private var player: NativePlayerView? = null
 
-    var videoPraparedCallBack: (() -> Unit)? = null
-
-    var videoReadyCallBack: ((ready: Boolean) -> Unit)? = null
-
-    var videoPlayingCallBack: ((isplaying: Boolean) -> Unit)? = null
+    var videoPrepared = mutableStateOf(false)
 
     fun bind(player: NativePlayerView) {
-        val playerCallBack = object : PlayerCallBack {
-            override fun isReady(ready: Boolean) {
-                videoReadyCallBack?.invoke(ready)
-            }
-
-            override fun setPlaying(isPlaying: Boolean) {
-                videoPlayingCallBack?.invoke(isPlaying)
-            }
-
-            override fun onprepared() {
-                videoPraparedCallBack?.invoke()
-            }
-        }
-        player.playerCallBack = playerCallBack
         this.player = player
-    }
-
-    fun isAutoPlay(): Boolean {
-        return player?.playWhenReady ?: false
     }
 
     fun setProgressCallBack(progressCallBack: PlayerProgressCallBack) {
         player?.playerProgressCallBack = progressCallBack
     }
 
-    fun enable(enable: Boolean) {
-        player?.enablePlaying = enable
-    }
-
-    fun resume(autoPlay: Boolean) {
-        player?.playWhenReady = autoPlay
-        player?.resume()
-    }
-
-    fun pause() {
-        player?.playWhenReady = false
-        player?.pause()
+    fun playSwitch(play: Boolean) {
+        player?.enablePlaying = play
     }
 
     fun contentPosition(): Long {
@@ -104,16 +71,8 @@ class VideoController {
         player?.seekTo(time)
     }
 
-    fun setVolume(volume: Float) {
-        player?.setVolume(volume)
-    }
-
     fun setMute(mute: Boolean) {
         player?.setMute(mute)
-    }
-
-    fun release() {
-        player?.release()
     }
 }
 
@@ -124,8 +83,8 @@ fun CustomVideoControl(
     mute: Boolean = false,
     modifier: Modifier = Modifier,
 ) {
-    var videoPrapared by remember {
-        mutableStateOf(false)
+    var videoPrapared by remember(realController) {
+        realController.videoPrepared
     }
     var isPlaying by remember {
         mutableStateOf(playEnabled)
@@ -140,9 +99,6 @@ fun CustomVideoControl(
         mutableStateOf(realController.contentPosition().toFloat())
     }
     LaunchedEffect(realController) {
-        realController.videoPraparedCallBack = {
-            videoPrapared = true
-        }
         realController.setProgressCallBack(object : PlayerProgressCallBack {
             override fun onTimeChanged(time: Long) {
                 if (!isSeeking) {
@@ -163,7 +119,7 @@ fun CustomVideoControl(
         IconButton(
             onClick = {
                 isPlaying = (!isPlaying).apply {
-                    realController.enable(this)
+                    realController.playSwitch(this)
                 }
             },
         ) {

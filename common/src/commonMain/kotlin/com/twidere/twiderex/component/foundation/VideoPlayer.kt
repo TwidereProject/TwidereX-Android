@@ -75,16 +75,6 @@ fun VideoPlayer(
     val httpConfig = LocalHttpConfig.current
     // var mediaPrepared by remember { mutableStateOf(false) }
 
-    val videoController = remember {
-        (customControl ?: VideoController()).apply {
-            videoReadyCallBack = {
-                shouldShowThumb = it
-            }
-            videoPlayingCallBack = {
-                playing = it
-            }
-        }
-    }
     Box {
         if (playInitial) {
 
@@ -96,15 +86,28 @@ fun VideoPlayer(
                     zOrderMediaOverlay = zOrderMediaOverlay,
                     keepScreenOn = keepScreenOn,
                 ).apply {
-                    videoController.bind(this)
+                    playerCallBack = object : PlayerCallBack {
+                        override fun isReady(ready: Boolean) {
+                            shouldShowThumb = ready
+                        }
+
+                        override fun setPlaying(isPlaying: Boolean) {
+                            playing = isPlaying
+                        }
+
+                        override fun onprepared() {
+                            customControl?.prepared()
+                        }
+                    }
+                    customControl?.bind(this)
                 }
             }
 
-            videoController.setVolume(volume)
+            nativePlayerView.setVolume(volume)
 
             fun updateState() {
-                autoPlay = videoController.isAutoPlay()
-                VideoPool.set(url, 0L.coerceAtLeast(videoController.contentPosition()))
+                autoPlay = nativePlayerView.playWhenReady
+                VideoPool.set(url, 0L.coerceAtLeast(nativePlayerView.contentPosition()))
             }
 
             var isResume by remember {
@@ -132,7 +135,7 @@ fun VideoPlayer(
                 lifecycle.addObserver(observer)
                 onDispose {
                     updateState()
-                    videoController.release()
+                    nativePlayerView.release()
                     VideoPool.removeRect(videoKey)
                     lifecycle.removeObserver(observer)
                 }
@@ -177,9 +180,11 @@ fun VideoPlayer(
                     modifier = modifier,
                 ) {
                     if (isResume && isMostCenter) {
-                        videoController.resume(autoPlay)
+                        it.playWhenReady = autoPlay
+                        nativePlayerView.resume()
                     } else {
-                        videoController.pause()
+                        it.playWhenReady = false
+                        nativePlayerView.pause()
                     }
                 }
             }
@@ -207,8 +212,12 @@ fun VideoPlayer(
     }
 }
 
+private fun VideoController.prepared() {
+    this.videoPrepared.value = true
+}
+
 @Composable
-internal fun getPlayInitial() = true
+private fun getPlayInitial() = true
 // TODO waiting for LocalVideoPlayback migration
 // when (LocalVideoPlayback.current) {
 //     DisplayPreferences.AutoPlayback.Auto -> !LocalIsActiveNetworkMetered.current
