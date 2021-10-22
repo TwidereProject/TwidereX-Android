@@ -22,7 +22,6 @@ package com.twidere.twiderex.component.foundation
 
 import android.content.Context
 import android.view.SurfaceView
-import android.view.View
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
@@ -53,7 +52,7 @@ actual fun PlatformView(
 ) {
     AndroidView(
         factory = {
-            nativePLayerView.player as View
+            nativePLayerView.androidPlayer
         },
         modifier = modifier,
         update = {
@@ -67,7 +66,6 @@ actual class NativePlayerView actual constructor(
     autoPlay: Boolean,
     httpConfig: HttpConfig,
     zOrderMediaOverlay: Boolean,
-    showControls: Boolean,
     keepScreenOn: Boolean,
 ) {
     actual var playerCallBack: PlayerCallBack? = null
@@ -80,9 +78,9 @@ actual class NativePlayerView actual constructor(
 
     private val context = get<Context>()
 
-    actual var player: Any = StyledPlayerView(context).also { playerView ->
+    var androidPlayer = StyledPlayerView(context).also { playerView ->
         (playerView.videoSurfaceView as? SurfaceView)?.setZOrderMediaOverlay(zOrderMediaOverlay)
-        playerView.useController = showControls
+        playerView.useController = false
         playerView.keepScreenOn = keepScreenOn
     }.apply {
         player = RemainingTimeExoPlayer(
@@ -110,9 +108,9 @@ actual class NativePlayerView actual constructor(
             playWhenReady = autoPlay
             addListener(object : Player.Listener {
                 override fun onPlaybackStateChanged(state: Int) {
-                    playerCallBack?.showThumb(state != Player.STATE_READY)
+                    playerCallBack?.isReady(state != Player.STATE_READY)
                     if (state == Player.STATE_READY) {
-                        playerCallBack?.onprepare()
+                        playerCallBack?.onprepared()
                     }
                 }
 
@@ -143,41 +141,45 @@ actual class NativePlayerView actual constructor(
         }
     }
 
-    private fun realPlayerView() = player as StyledPlayerView
-
     actual var playWhenReady: Boolean = false
         set(value) {
-            realPlayerView().player?.playWhenReady = value
+            androidPlayer.player?.playWhenReady = value && enablePlaying
             field = value
         }
 
     actual fun resume() {
-        realPlayerView().onResume()
+        androidPlayer.onResume()
     }
 
     actual fun pause() {
-        realPlayerView().onPause()
+        androidPlayer.onPause()
     }
 
-    actual fun contentPosition(): Long = 0L.coerceAtLeast((realPlayerView().player?.currentPosition) ?: 0)
+    actual fun contentPosition(): Long = 0L.coerceAtLeast((androidPlayer.player?.currentPosition) ?: 0)
 
     actual fun setVolume(volume: Float) {
-        realPlayerView().player?.volume = volume
+        androidPlayer.player?.volume = volume
     }
 
     actual fun release() {
         job?.cancel()
         playerCallBack = null
         playerProgressCallBack = null
-        realPlayerView().player?.release()
+        androidPlayer.player?.release()
     }
 
-    actual fun duration(): Long = realPlayerView().player?.duration ?: 0
+    actual fun duration(): Long = androidPlayer.player?.duration ?: 0
     actual fun seekTo(time: Long) {
-        realPlayerView().player?.seekTo(time)
+        androidPlayer.player?.seekTo(time)
     }
 
     actual fun setMute(mute: Boolean) {
-        realPlayerView().player?.volume = if (mute) 0f else 1f
+        androidPlayer.player?.volume = if (mute) 0f else 1f
     }
+
+    actual var enablePlaying: Boolean = true
+        set(value) {
+            field = value
+            playWhenReady = playWhenReady
+        }
 }

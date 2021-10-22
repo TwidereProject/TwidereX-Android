@@ -37,7 +37,6 @@ import com.twidere.twiderex.notification.AppNotificationManager
 import com.twidere.twiderex.notification.NotificationChannelSpec
 import com.twidere.twiderex.notification.notificationChannelId
 import com.twidere.twiderex.repository.AccountRepository
-import java.net.URI
 
 abstract class DirectMessageSendJob<T : MicroBlogService>(
     protected val cacheDatabase: CacheDatabase,
@@ -134,17 +133,15 @@ abstract class DirectMessageSendJob<T : MicroBlogService>(
                     recipientAccountKey = sendData.recipientUserKey,
                     sendStatus = UiDMEvent.SendStatus.PENDING,
                     media = images.mapIndexed { index, uri ->
-                        val imageSize = URI.create(uri).path?.let {
-                            getImageSize(it)
-                        }
+                        val imageSize = getImageSize(uri)
                         UiMedia(
                             belongToKey = sendData.draftMessageKey,
                             url = uri,
                             mediaUrl = uri,
                             previewUrl = uri,
                             type = getMediaType(uri),
-                            width = imageSize?.width ?: 0L,
-                            height = imageSize?.height ?: 0L,
+                            width = imageSize.width,
+                            height = imageSize.height,
                             altText = "",
                             order = index,
                             pageUrl = null,

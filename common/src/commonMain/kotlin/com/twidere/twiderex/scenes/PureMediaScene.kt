@@ -69,6 +69,8 @@ import com.twidere.twiderex.preferences.model.DisplayPreferences
 import com.twidere.twiderex.ui.LocalNavController
 import com.twidere.twiderex.ui.LocalVideoPlayback
 import com.twidere.twiderex.ui.TwidereDialog
+import com.twidere.twiderex.utils.video.CustomVideoControl
+import com.twidere.twiderex.utils.video.VideoController
 import com.twidere.twiderex.viewmodel.PureMediaViewModel
 import moe.tlaster.swiper.SwiperState
 import moe.tlaster.swiper.rememberSwiperState
@@ -98,26 +100,16 @@ fun PureMediaScene(belongToKey: MicroBlogKey, selectedIndex: Int) {
                     initialPage = selectedIndex,
                     pageCount = medias.size,
                 )
-                // val currentMedia = medias[pagerState.currentPage]
-                // val context = LocalContext.current
-                // todo use redefine custom control view by compose
-                val videoControl = null
-                //     remember(pagerState.currentPage) {
-                //     if (currentMedia.type == MediaType.video) {
-                //         PlayerControlView(context).apply {
-                //             showTimeoutMs = 0
-                //         }
-                //     } else {
-                //         null
-                //     }
-                // }
+                val videoControl = remember {
+                    VideoController()
+                }
                 val swiperState = rememberSwiperState(
                     onDismiss = {
                         navController.popBackStack()
                     },
                 )
                 val display = LocalDisplayPreferences.current
-                var isMute by remember {
+                val isMute by remember {
                     mutableStateOf(display.muteByDefault)
                 }
                 InAppNotificationScaffold(
@@ -129,8 +121,6 @@ fun PureMediaScene(belongToKey: MicroBlogKey, selectedIndex: Int) {
                             swiperState = swiperState,
                             controlPanelColor = controlPanelColor,
                             videoControl = videoControl,
-                            mute = isMute,
-                            onMute = { isMute = it }
                         )
                     }
                 ) {
@@ -192,9 +182,7 @@ fun PureMediaBottomInfo(
     controlVisibility: Boolean,
     swiperState: SwiperState,
     controlPanelColor: Color,
-    videoControl: PlayerControlView?,
-    mute: Boolean,
-    onMute: (Boolean) -> Unit
+    videoControl: VideoController?,
 ) {
     AnimatedVisibility(
         visible = controlVisibility && swiperState.progress == 0f,
@@ -209,11 +197,7 @@ fun PureMediaBottomInfo(
                 .bottomInsetsPadding(),
         ) {
             if (videoControl != null) {
-                VideoPlayerController(
-                    videoControl = videoControl,
-                    mute = mute,
-                    onMute = onMute
-                )
+                CustomVideoControl(realController = videoControl)
             }
         }
     }
