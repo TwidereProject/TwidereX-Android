@@ -36,11 +36,9 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import org.jetbrains.skija.Codec
 import org.jetbrains.skija.Data
-import java.io.BufferedInputStream
 import java.io.InputStream
 import java.net.HttpURLConnection
 import java.net.URL
-import java.net.URLConnection
 import javax.imageio.ImageIO
 
 /**
@@ -108,18 +106,23 @@ internal class ImagePainter(
         }
     }
 
-    private fun networkRequest(url: URL) {
+    private suspend fun networkRequest(url: URL) {
         var connection: HttpURLConnection? = null
         var input: InputStream? = null
         var error: Throwable? = null
         try {
-            input = imageCache.fetch(url.toString())?.inputStream() ?: httpConnection(url).let {
+            var mimeType = ""
+            input = imageCache.fetch(url.toString())?.let {
+                mimeType = it.toURI().toURL().openConnection().contentType
+                it.inputStream()
+            } ?: httpConnection(url).let {
                 connection = it
                 it.connect()
-                it.inputStream
+                mimeType = it.contentType
+                imageCache.store(url.toString(), it.inputStream)?.inputStream() ?: it.inputStream
             }
             input?.let { inputStream ->
-                if (getMimeType(inputStream) == "image/gif") {
+                if (mimeType == "image/gif") {
                     painter.value = GifPainter(Codec.makeFromData(Data.makeFromBytes(inputStream.readAllBytes())), parentScope)
                 } else {
                     ImageIO.read(inputStream)?.let { image ->
@@ -130,7 +133,6 @@ internal class ImagePainter(
                         painter.value = it.asPainter()
                     }
                 }
-                imageCache.store(url.toString(), inputStream)
             }
         } catch (e: Throwable) {
             error = e
@@ -145,11 +147,7 @@ internal class ImagePainter(
         if (error != null) throw error
     }
 
-    private fun getMimeType(input: InputStream?): String {
-        return URLConnection.guessContentTypeFromStream(BufferedInputStream(input))
-    }
-
-    private fun execute() {
+    private suspend fun execute() {
         val data = when (request) {
             is URL -> {
                 request.toString()

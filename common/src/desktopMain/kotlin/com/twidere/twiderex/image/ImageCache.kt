@@ -26,20 +26,32 @@ import java.math.BigInteger
 import java.security.MessageDigest
 
 internal interface ImageCache {
-    fun store(url: String, inputStream: InputStream)
-    fun fetch(url: String): File?
+    suspend fun store(url: String, inputStream: InputStream): File?
+    suspend fun fetch(url: String): File?
 }
 
-internal class ImageCacheImpl(
+internal class ImageCacheImpl private constructor(
     private val cacheDir: String,
-    private val maxCacheSize: Int, // unit MB
-    private val cacheClearRate: Float // 0.1 - 1f, e.g. set rate to 0.2 will remove 20% caches when exceed max cache size
+    private var maxCacheSize: Int, // unit MB
+    private var cacheClearRate: Float // 0.1 - 1f, e.g. set rate to 0.2 will remove 20% caches when exceed max cache size
 ) : ImageCache {
+    companion object Factory {
+        private val caches = mutableMapOf<String, ImageCacheImpl>()
+        fun create(cacheDir: String, maxCacheSize: Int = 200, cacheClearRate: Float = 0.25f): ImageCacheImpl {
+            return caches[cacheDir]?.apply {
+                this.maxCacheSize = maxCacheSize
+                this.cacheClearRate = cacheClearRate
+            } ?: ImageCacheImpl(cacheDir, maxCacheSize, cacheClearRate).also {
+                caches[cacheDir] = it
+            }
+        }
+    }
+
     private var currentSize = -1L
 
-    override fun store(url: String, inputStream: InputStream) {
+    override suspend fun store(url: String, inputStream: InputStream): File? {
         val cache = File(cacheDir, md5(url))
-        try {
+        return try {
             if (cache.exists()) cache.delete()
             checkCacheSize()
             inputStream.use { input ->
@@ -48,12 +60,14 @@ internal class ImageCacheImpl(
                 }
             }
             currentSize += cache.length()
+            cache
         } catch (e: Throwable) {
             e.printStackTrace()
+            null
         }
     }
 
-    override fun fetch(url: String): File? {
+    override suspend fun fetch(url: String): File? {
         val cache = File(cacheDir, md5(url))
         if (!cache.exists()) return null
         return cache
@@ -95,5 +109,5 @@ internal class ImageCacheImpl(
         return BigInteger(1, md.digest(input.toByteArray())).toString(16).padStart(32, '0')
     }
 
-    private fun Long.mb() = (this / (1024 * 1024)).toInt()
+    private fun Long.mb() = (this / (1024 * 1024F))
 }

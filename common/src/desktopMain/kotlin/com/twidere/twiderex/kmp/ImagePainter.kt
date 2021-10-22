@@ -56,10 +56,8 @@ internal actual fun rememberNetworkImagePainter(
         ImagePainter(
             data,
             scope,
-            imageCache = ImageCacheImpl(
+            imageCache = ImageCacheImpl.create(
                 cacheDir = cacheDir,
-                maxCacheSize = 200,
-                cacheClearRate = 0.25f
             ),
             imageEffects = effects,
             httpConnection = {
