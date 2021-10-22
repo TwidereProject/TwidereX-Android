@@ -43,28 +43,34 @@ import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.di.ext.get
 import com.twidere.twiderex.kmp.MediaInsertProvider
-import com.twidere.twiderex.kmp.StorageProvider
 import com.twidere.twiderex.model.enums.MediaInsertType
 import com.twidere.twiderex.model.ui.UiMediaInsert
+import com.twidere.twiderex.navigation.RootRoute
 import com.twidere.twiderex.ui.LocalNavController
 import kotlinx.coroutines.launch
-import com.twidere.twiderex.navigation.RootRoute
 import moe.tlaster.kfilepicker.FilePicker
 
 private const val VideoSuffix = ".mp4"
 private const val ImageSuffix = ".jpg"
+
+enum class MediaLibraryType(
+    val extensions: List<String>,
+) {
+    Video(listOf(".mp4")),
+    Image(listOf(".jpg", ".png")),
+}
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun MediaInsertMenu(
     modifier: Modifier = Modifier,
     supportMultipleSelect: Boolean = true,
-    librariesSupported: Array<String> = arrayOf("image/*", "video/*"),
+    librariesSupported: Array<MediaLibraryType> = MediaLibraryType.values(),
     disableList: List<MediaInsertType> = emptyList(),
     onResult: (List<UiMediaInsert>) -> Unit
 ) {
     val navController = LocalNavController.current
-    val storageProvider = get<StorageProvider>()
+    // val storageProvider = get<StorageProvider>()
     val mediaInsertProvider = get<MediaInsertProvider>()
     val scope = rememberCoroutineScope()
     // val filePickerLauncher = if (supportMultipleSelect) rememberLauncherForActivityResult(
@@ -131,10 +137,12 @@ fun MediaInsertMenu(
                             MediaInsertType.LIBRARY -> {
                                 scope.launch {
                                     onResult.invoke(
-                                        FilePicker.pickFiles(allowMultiple = supportMultipleSelect)
-                                            .map {
-                                                mediaInsertProvider.provideUiMediaInsert(it.path)
-                                            }
+                                        FilePicker.pickFiles(
+                                            allowMultiple = supportMultipleSelect,
+                                            allowedExtensions = librariesSupported.flatMap { it.extensions }
+                                        ).map {
+                                            mediaInsertProvider.provideUiMediaInsert(it.path)
+                                        }
                                     )
                                 }
                                 // filePickerLauncher.launch(librariesSupported)
@@ -142,11 +150,13 @@ fun MediaInsertMenu(
                             MediaInsertType.GIF -> scope.launch {
                                 navController.navigateForResult(RootRoute.Gif.Home)
                                     ?.let { result ->
-                                        onResult(listOf(result as String).map {
-                                            mediaInsertProvider.provideUiMediaInsert(
-                                                it
-                                            )
-                                        })
+                                        onResult(
+                                            listOf(result as String).map {
+                                                mediaInsertProvider.provideUiMediaInsert(
+                                                    it
+                                                )
+                                            }
+                                        )
                                     }
                             }
                         }

@@ -25,6 +25,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import com.twidere.services.microblog.LookupService
 import com.twidere.twiderex.action.ComposeAction
 import com.twidere.twiderex.action.DraftAction
+import com.twidere.twiderex.component.media.MediaLibraryType
 import com.twidere.twiderex.extensions.asStateIn
 import com.twidere.twiderex.extensions.getTextAfterSelection
 import com.twidere.twiderex.extensions.getTextBeforeSelection
@@ -214,24 +215,24 @@ open class ComposeViewModel(
 
     val replyToUser by lazy {
         combine(account.mapNotNull { it }, replyToUserName) { account, list ->
-            if (list.isNotEmpty()) {
-                loadingReplyUser.value = true
-                try {
-                    userRepository.lookupUsersByName(
-                        list,
-                        accountKey = account.accountKey,
-                        lookupService = account.service as LookupService,
-                    )
-                } catch (e: Throwable) {
-                    inAppNotification.notifyError(e)
-                    emptyList()
-                } finally {
-                    loadingReplyUser.value = false
-                }
-            } else {
+        if (list.isNotEmpty()) {
+            loadingReplyUser.value = true
+            try {
+                userRepository.lookupUsersByName(
+                    list,
+                    accountKey = account.accountKey,
+                    lookupService = account.service as LookupService,
+                )
+            } catch (e: Throwable) {
+                inAppNotification.notifyError(e)
                 emptyList()
+            } finally {
+                loadingReplyUser.value = false
             }
-        }.asStateIn(viewModelScope, emptyList())
+        } else {
+            emptyList()
+        }
+    }.asStateIn(viewModelScope, emptyList())
     }
 
     val voteState = MutableStateFlow<VoteState?>(null)
@@ -362,14 +363,17 @@ open class ComposeViewModel(
     )
 
     fun putImages(value: List<UiMediaInsert>) = viewModelScope.launch {
-        val allowType = images.value.firstOrNull()?.type ?: value.firstOrNull()?.type ?: MediaType.photo
+        val allowType =
+            images.value.firstOrNull()?.type ?: value.firstOrNull()?.type ?: MediaType.photo
         images.value.let {
             value + it.filter { media -> media.type == allowType }
         }.take(if (allowType == MediaType.photo) imageLimit.first() else 1).let {
             images.value = it
         }
         when (allowType) {
-            MediaType.video, MediaType.animated_gif -> mediaInsertMode.value = MediaInsertMode.Disabled
+            MediaType.video, MediaType.animated_gif ->
+                mediaInsertMode.value =
+                    MediaInsertMode.Disabled
             else -> {
                 mediaInsertMode.value = if (images.value.size == imageLimit.first())
                     MediaInsertMode.Disabled
@@ -449,18 +453,22 @@ open class ComposeViewModel(
     data class MediaInsertMode(
         val disabledInsertType: List<MediaInsertType>,
         val multiSelect: Boolean,
-        val librarySupportedType: List<String>
+        val librarySupportedType: List<MediaLibraryType>
     ) {
         companion object {
-            val All = MediaInsertMode(emptyList(), false, listOf("image/*", "video/*"))
+            val All = MediaInsertMode(emptyList(), false, MediaLibraryType.values().toList())
             val ImageOnly = MediaInsertMode(
                 listOf(
                     MediaInsertType.GIF,
                     MediaInsertType.RECORD_VIDEO
                 ),
-                true, listOf("image/*")
+                true, listOf(MediaLibraryType.Image)
             )
-            val Disabled = MediaInsertMode(MediaInsertType.values().toList(), true, listOf("image/*"))
+            val Disabled = MediaInsertMode(
+                MediaInsertType.values().toList(),
+                true,
+                listOf(MediaLibraryType.Image)
+            )
         }
     }
 }
