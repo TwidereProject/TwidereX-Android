@@ -28,14 +28,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import com.twidere.services.http.authorization.EmptyAuthorization
+import com.twidere.services.http.authorization.OAuth1Authorization
 import com.twidere.twiderex.MR
 import com.twidere.twiderex.component.image.ImageEffects
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.di.ext.get
 import com.twidere.twiderex.kmp.StorageProvider
 import com.twidere.twiderex.kmp.rememberNetworkImagePainter
+import com.twidere.twiderex.model.cred.OAuthCredentials
 import com.twidere.twiderex.preferences.LocalHttpConfig
 import com.twidere.twiderex.twitterTonApiHost
+import com.twidere.twiderex.ui.LocalActiveAccount
 import java.net.MalformedURLException
 import java.net.URL
 
@@ -54,18 +57,20 @@ fun NetworkImage(
         data
     } else {
         val httpConfig = LocalHttpConfig.current
+        val account = LocalActiveAccount.current
         val auth = try {
             val url = URL(data.toString())
             if (url.host == twitterTonApiHost) {
-                // (account.credentials as OAuthCredentials).let {
-                //     OAuth1Authorization(
-                //         consumerKey = it.consumer_key,
-                //         consumerSecret = it.consumer_secret,
-                //         accessToken = it.access_token,
-                //         accessSecret = it.access_token_secret,
-                //     )
-                // }
-                TODO("Waiting for LocalActiveAccount")
+                account?.let {
+                    (it.credentials as OAuthCredentials).let { oauth ->
+                        OAuth1Authorization(
+                            consumerKey = oauth.consumer_key,
+                            consumerSecret = oauth.consumer_secret,
+                            accessToken = oauth.access_token,
+                            accessSecret = oauth.access_token_secret,
+                        )
+                    }
+                } ?: EmptyAuthorization()
             } else {
                 EmptyAuthorization()
             }
