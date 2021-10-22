@@ -24,7 +24,6 @@ import androidx.paging.PagingSource
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiTrend
 
-// TODO OPERATION
 interface TrendDao {
     suspend fun insertAll(trends: List<UiTrend>)
     fun getPagingSource(accountKey: MicroBlogKey): PagingSource<Int, UiTrend>

@@ -36,9 +36,11 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import org.jetbrains.skija.Codec
 import org.jetbrains.skija.Data
+import java.io.BufferedInputStream
 import java.io.InputStream
 import java.net.HttpURLConnection
 import java.net.URL
+import java.net.URLConnection
 import javax.imageio.ImageIO
 
 /**
@@ -47,6 +49,7 @@ import javax.imageio.ImageIO
 internal class ImagePainter(
     private val request: Any,
     private val parentScope: CoroutineScope,
+    private val imageCache: ImageCache,
     private val imageEffects: ImageEffects,
     private val httpConnection: (URL) -> HttpURLConnection = { it.openConnection() as HttpURLConnection },
     private val onImageStateChanged: (NetworkImageState) -> Unit
@@ -110,19 +113,24 @@ internal class ImagePainter(
         var input: InputStream? = null
         var error: Throwable? = null
         try {
-            connection = httpConnection(url)
-            connection.connect()
-            input = connection.inputStream
-            if (connection.contentType == "image/gif") {
-                painter.value = GifPainter(Codec.makeFromData(Data.makeFromBytes(input.readAllBytes())), parentScope)
-            } else {
-                ImageIO.read(input)?.let { image ->
-                    imageEffects.blur?.let {
-                        ImageEffectsFilter.applyBlurFilter(image, it.blurRadius.toInt(), it.bitmapScale)
-                    } ?: image
-                }?.let {
-                    painter.value = it.asPainter()
+            input = imageCache.fetch(url.toString())?.inputStream() ?: httpConnection(url).let {
+                connection = it
+                it.connect()
+                it.inputStream
+            }
+            input?.let { inputStream ->
+                if (getMimeType(inputStream) == "image/gif") {
+                    painter.value = GifPainter(Codec.makeFromData(Data.makeFromBytes(inputStream.readAllBytes())), parentScope)
+                } else {
+                    ImageIO.read(inputStream)?.let { image ->
+                        imageEffects.blur?.let {
+                            ImageEffectsFilter.applyBlurFilter(image, it.blurRadius.toInt(), it.bitmapScale)
+                        } ?: image
+                    }?.let {
+                        painter.value = it.asPainter()
+                    }
                 }
+                imageCache.store(url.toString(), inputStream)
             }
         } catch (e: Throwable) {
             error = e
@@ -135,6 +143,10 @@ internal class ImagePainter(
             }
         }
         if (error != null) throw error
+    }
+
+    private fun getMimeType(input: InputStream?): String {
+        return URLConnection.guessContentTypeFromStream(BufferedInputStream(input))
     }
 
     private fun execute() {

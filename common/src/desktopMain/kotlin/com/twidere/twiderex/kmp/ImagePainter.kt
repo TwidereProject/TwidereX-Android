@@ -30,6 +30,7 @@ import com.twidere.services.proxy.ProxyConfig
 import com.twidere.services.proxy.ReverseProxyHandler
 import com.twidere.twiderex.component.foundation.NetworkImageState
 import com.twidere.twiderex.component.image.ImageEffects
+import com.twidere.twiderex.image.ImageCacheImpl
 import com.twidere.twiderex.image.ImagePainter
 import kotlinx.coroutines.Dispatchers
 import okhttp3.Credentials
@@ -41,7 +42,6 @@ import java.net.InetSocketAddress
 import java.net.Proxy
 import java.net.URL
 
-// TODO add caches
 @Composable
 internal actual fun rememberNetworkImagePainter(
     data: Any,
@@ -56,6 +56,11 @@ internal actual fun rememberNetworkImagePainter(
         ImagePainter(
             data,
             scope,
+            imageCache = ImageCacheImpl(
+                cacheDir = cacheDir,
+                maxCacheSize = 200,
+                cacheClearRate = 0.25f
+            ),
             imageEffects = effects,
             httpConnection = {
                 generateConnection(
