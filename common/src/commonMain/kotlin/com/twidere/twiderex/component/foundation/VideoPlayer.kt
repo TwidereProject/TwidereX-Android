@@ -161,11 +161,11 @@ fun VideoPlayer(
                     }
                     coordinates.boundsInWindow().run {
                         VideoPool.setRect(videoKey, this)
-                        if (!isMostCenter && VideoPool.containsMiddleLine(videoKey, middleLine)) {
+                        if (!isMostCenter && VideoPool.fullInScreen(videoKey, coordinates.size.height)) {
                             debounceJob?.cancel()
                             debounceJob = composableScope.launch {
                                 delay(VideoPool.DEBOUNCE_DELAY)
-                                if (VideoPool.containsMiddleLine(videoKey, middleLine)) {
+                                if (VideoPool.isMostCenter(videoKey, middleLine)) {
                                     isMostCenter = true
                                 }
                             }
