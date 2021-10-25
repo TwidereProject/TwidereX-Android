@@ -99,7 +99,7 @@ kotlin {
                 implementation("androidx.datastore:datastore:${Versions.datastore}")
                 implementation("androidx.datastore:datastore-preferences:${Versions.datastore}")
                 implementation("androidx.exifinterface:exifinterface:${Versions.androidx_exifinterface}")
-                implementation("androidx.startup:startup-runtime:${Versions.startup}")
+                api("androidx.startup:startup-runtime:${Versions.startup}")
                 implementation("com.google.accompanist:accompanist-insets:${Versions.accompanist}")
                 implementation("androidx.browser:browser:${Versions.browser}")
                 implementation("androidx.vectordrawable:vectordrawable:1.1.0")
