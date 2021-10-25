@@ -41,7 +41,7 @@ object VideoPool {
     private val positionPool = ConcurrentHashMap<String, Rect>()
 
     fun setRect(videoKey: String, rect: Rect) {
-        if (rect.top <= 0.0f && rect.bottom <= 0.0f) {
+        if (rect.height <= 0) {
             removeRect(videoKey)
         } else {
             positionPool[videoKey] = rect
@@ -52,9 +52,9 @@ object VideoPool {
         positionPool.remove(url)
     }
 
-    fun containsMiddleLine(videoKey: String, middle: Float): Boolean {
+    fun fullInScreen(videoKey: String, videoHeight: Int): Boolean {
         positionPool[videoKey]?.let {
-            return it.top <= middle && it.bottom >= middle
+            return videoHeight == it.height.toInt()
         }
         return false
     }
