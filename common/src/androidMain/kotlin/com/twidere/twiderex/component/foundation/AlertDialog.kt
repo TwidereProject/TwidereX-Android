@@ -20,6 +20,8 @@
  */
 package com.twidere.twiderex.component.foundation
 
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -33,9 +35,9 @@ actual fun AlertDialog(
     dismissButton: @Composable (() -> Unit)?,
     title: @Composable (() -> Unit)?,
     text: @Composable (() -> Unit)?,
-    shape: Shape,
-    backgroundColor: Color,
-    contentColor: Color,
+    shape: Shape?,
+    backgroundColor: Color?,
+    contentColor: Color?,
 ) {
     androidx.compose.material.AlertDialog(
         onDismissRequest = onDismissRequest,
@@ -44,8 +46,10 @@ actual fun AlertDialog(
         dismissButton = dismissButton,
         title = title,
         text = text,
-        shape = shape,
-        backgroundColor = backgroundColor,
-        contentColor = contentColor,
+        shape = shape ?: MaterialTheme.shapes.medium,
+        backgroundColor = backgroundColor ?: MaterialTheme.colors.surface,
+        contentColor = contentColor ?: contentColorFor(
+            backgroundColor ?: MaterialTheme.colors.surface
+        ),
     )
 }
