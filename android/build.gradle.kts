@@ -47,15 +47,6 @@ android {
                 argument("room.schemaLocation", "$projectDir/schemas")
             }
         }
-        val apiKeyProperties = rootProject.file("apiKey.properties")
-        val hasApiKeyProps = apiKeyProperties.exists()
-        if (hasApiKeyProps) {
-            val apiKeyProp = Properties()
-            apiKeyProp.load(apiKeyProperties.inputStream())
-            buildConfigField("String", "CONSUMERKEY", apiKeyProp.getProperty("ConsumerKey"))
-            buildConfigField("String", "CONSUMERSECRET", apiKeyProp.getProperty("ConsumerSecret"))
-            buildConfigField("String", "GIPHYKEY", apiKeyProp.getProperty("GiphyKey"))
-        }
     }
 
     lint {
