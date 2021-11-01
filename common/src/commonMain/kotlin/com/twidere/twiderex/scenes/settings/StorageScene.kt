@@ -24,6 +24,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ListItem
 import androidx.compose.material.Text
@@ -35,6 +36,8 @@ import androidx.compose.ui.graphics.Color
 // import androidx.compose.ui.window.DialogProperties
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
+import com.twidere.twiderex.component.foundation.Dialog
+import com.twidere.twiderex.component.foundation.DialogProperties
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.di.ext.getViewModel
@@ -49,15 +52,15 @@ fun StorageScene() {
     val loading by viewModel.loading.observeAsState(initial = false)
 
     if (loading) {
-        // Dialog(
-        //     onDismissRequest = { },
-        //     properties = DialogProperties(
-        //         dismissOnBackPress = false,
-        //         dismissOnClickOutside = false,
-        //     )
-        // ) {
-        //     CircularProgressIndicator()
-        // }
+        Dialog(
+            onDismissRequest = { },
+            properties = DialogProperties(
+                dismissOnBackPress = false,
+                dismissOnClickOutside = false,
+            )
+        ) {
+            CircularProgressIndicator()
+        }
     }
 
     TwidereScene {

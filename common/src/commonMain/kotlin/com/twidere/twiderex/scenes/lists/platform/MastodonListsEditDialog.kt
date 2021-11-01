@@ -25,6 +25,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import com.twidere.twiderex.component.foundation.Dialog
+import com.twidere.twiderex.component.foundation.LoadingProgress
 import com.twidere.twiderex.component.lists.MastodonListsModifyComponent
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.di.ext.getViewModel
@@ -49,13 +51,13 @@ fun MastodonListsEditDialog(listKey: MicroBlogKey, onDismissRequest: () -> Unit)
     val loading by listsEditViewModel.loading.observeAsState(initial = false)
     source?.let { uiList ->
         if (loading) {
-            // Dialog(
-            //     onDismissRequest = {
-            //         dismiss()
-            //     }
-            // ) {
-            //     LoadingProgress()
-            // }
+            Dialog(
+                onDismissRequest = {
+                    dismiss()
+                }
+            ) {
+                LoadingProgress()
+            }
             return
         }
 

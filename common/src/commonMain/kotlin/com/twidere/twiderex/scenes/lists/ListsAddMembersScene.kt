@@ -47,6 +47,8 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarDefaults
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
+import com.twidere.twiderex.component.foundation.LoadingProgress
+import com.twidere.twiderex.component.foundation.Dialog
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
 import com.twidere.twiderex.component.foundation.TextInput
 import com.twidere.twiderex.component.lazy.ui.LazyUiUserList
@@ -147,9 +149,9 @@ fun ListsAddMembersScene(
                 )
 
                 if (loading) {
-                    // Dialog(onDismissRequest = { }) {
-                    //     LoadingProgress()
-                    // }
+                    Dialog(onDismissRequest = { }) {
+                        LoadingProgress()
+                    }
                 }
             }
         }

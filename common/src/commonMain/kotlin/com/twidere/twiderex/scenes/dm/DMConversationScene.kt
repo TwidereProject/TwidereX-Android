@@ -42,9 +42,11 @@ import androidx.compose.material.Divider
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.ListItem
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -54,11 +56,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.dp
-// import androidx.compose.ui.window.Dialog
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
+import com.twidere.twiderex.component.foundation.Dialog
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.foundation.TextInput
@@ -69,6 +72,7 @@ import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.di.ext.getViewModel
 import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.model.ui.UiDMEvent
 import com.twidere.twiderex.model.ui.UiMediaInsert
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.TwidereScene
@@ -139,18 +143,16 @@ fun NormalContent(viewModel: DMEventViewModel) {
                     viewModel.pendingActionMessage.value = it
                 }
             )
-            pendingActionMessage?.accountKey
-            clipboardManager.getText()
-            // MessageActionComponent(
-            //     pendingActionMessage = pendingActionMessage,
-            //     onDismissRequest = { viewModel.pendingActionMessage.value = null },
-            //     onCopyText = { event ->
-            //         clipboardManager.setText(annotatedString = buildAnnotatedString { append(event.originText) })
-            //     },
-            //     onDelete = {
-            //         viewModel.deleteMessage(it)
-            //     }
-            // )
+            MessageActionComponent(
+                pendingActionMessage = pendingActionMessage,
+                onDismissRequest = { viewModel.pendingActionMessage.value = null },
+                onCopyText = { event ->
+                    clipboardManager.setText(annotatedString = buildAnnotatedString { append(event.originText) })
+                },
+                onDelete = {
+                    viewModel.deleteMessage(it)
+                }
+            )
         }
         Divider(modifier = Modifier.fillMaxWidth())
         InputMediaPreview(inputImage) {
@@ -189,35 +191,35 @@ fun NormalContent(viewModel: DMEventViewModel) {
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun MessageActionComponent(
-    // pendingActionMessage: UiDMEvent?,
-    // onDismissRequest: () -> Unit,
-    // onCopyText: (message: UiDMEvent) -> Unit,
-    // onDelete: (message: UiDMEvent) -> Unit
+    pendingActionMessage: UiDMEvent?,
+    onDismissRequest: () -> Unit,
+    onCopyText: (message: UiDMEvent) -> Unit,
+    onDelete: (message: UiDMEvent) -> Unit
 ) {
-    // pendingActionMessage?.let {
-    // Dialog(onDismissRequest = onDismissRequest) {
-    //     Surface(shape = MaterialTheme.shapes.medium) {
-    //         Column(modifier = Modifier.padding(MessageActionComponentDefaults.ContentPadding)) {
-    //             ListItem(
-    //                 modifier = Modifier.clickable {
-    //                     onCopyText(it)
-    //                     onDismissRequest()
-    //                 }
-    //             ) {
-    //                 Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_messages_action_copy_text))
-    //             }
-    //             ListItem(
-    //                 modifier = Modifier.clickable {
-    //                     onDelete(it)
-    //                     onDismissRequest()
-    //                 }
-    //             ) {
-    //                 Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_messages_action_delete))
-    //             }
-    //         }
-    //     }
-    // }
-    // }
+    pendingActionMessage?.let {
+        Dialog(onDismissRequest = onDismissRequest) {
+            Surface(shape = MaterialTheme.shapes.medium) {
+                Column(modifier = Modifier.padding(MessageActionComponentDefaults.ContentPadding)) {
+                    ListItem(
+                        modifier = Modifier.clickable {
+                            onCopyText(it)
+                            onDismissRequest()
+                        }
+                    ) {
+                        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_messages_action_copy_text))
+                    }
+                    ListItem(
+                        modifier = Modifier.clickable {
+                            onDelete(it)
+                            onDismissRequest()
+                        }
+                    ) {
+                        Text(text = stringResource(res = com.twidere.twiderex.MR.strings.scene_messages_action_delete))
+                    }
+                }
+            }
+        }
+    }
 }
 
 private object MessageActionComponentDefaults {

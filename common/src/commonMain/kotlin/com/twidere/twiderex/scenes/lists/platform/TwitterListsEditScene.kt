@@ -34,7 +34,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
+import com.twidere.twiderex.component.foundation.Dialog
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
+import com.twidere.twiderex.component.foundation.LoadingProgress
 import com.twidere.twiderex.component.lists.TwitterListsModifyComponent
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.di.ext.getViewModel
@@ -103,9 +105,9 @@ fun TwitterListsEditScene(
                         onPrivateChanged = { listsEditViewModel.editPrivate.value = it }
                     )
                     if (loading) {
-                        // Dialog(onDismissRequest = { }) {
-                        //     LoadingProgress()
-                        // }
+                        Dialog(onDismissRequest = { }) {
+                            LoadingProgress()
+                        }
                     }
                 }
             }
