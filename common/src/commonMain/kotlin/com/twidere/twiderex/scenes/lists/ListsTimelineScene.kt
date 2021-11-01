@@ -44,7 +44,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.twidere.twiderex.component.foundation.AlertDialog
@@ -53,7 +52,6 @@ import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.DropdownMenu
 import com.twidere.twiderex.component.foundation.DropdownMenuItem
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
-import com.twidere.twiderex.component.foundation.LoadingProgress
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
 import com.twidere.twiderex.component.lazy.ui.LazyUiStatusList
 import com.twidere.twiderex.component.painterResource
@@ -230,9 +228,9 @@ fun ListTimeLineScene(
                     }
                 }
                 if (loading) {
-                    Dialog(onDismissRequest = { }) {
-                        LoadingProgress()
-                    }
+                    // Dialog(onDismissRequest = { }) {
+                    //     LoadingProgress()
+                    // }
                 }
                 source?.let {
                     if (showDeleteConfirmDialog) {

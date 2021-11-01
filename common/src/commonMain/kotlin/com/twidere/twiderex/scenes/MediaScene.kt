@@ -89,9 +89,7 @@ import com.twidere.twiderex.component.status.UserScreenName
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.component.topInsetsPadding
 import com.twidere.twiderex.di.ext.getViewModel
-import com.twidere.twiderex.extensions.hideControls
 import com.twidere.twiderex.extensions.observeAsState
-import com.twidere.twiderex.extensions.showControls
 import com.twidere.twiderex.kmp.LocalPlatformWindow
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.MediaType

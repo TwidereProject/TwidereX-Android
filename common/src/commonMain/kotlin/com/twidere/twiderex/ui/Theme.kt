@@ -20,12 +20,12 @@
  */
 package com.twidere.twiderex.ui
 
-import android.os.Build
+// import android.os.Build
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.LocalOverScrollConfiguration
-import androidx.compose.foundation.gestures.OverScrollConfiguration
+// import androidx.compose.foundation.gestures.LocalOverScrollConfiguration
+// import androidx.compose.foundation.gestures.OverScrollConfiguration
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.Colors
 import androidx.compose.material.LocalElevationOverlay
@@ -68,9 +68,9 @@ fun TwidereTheme(
             shapes = shapes,
             content = {
                 CompositionLocalProvider(
-                    LocalOverScrollConfiguration provides OverScrollConfiguration(
-                        glowColor = MaterialTheme.colors.primary,
-                    )
+                    // LocalOverScrollConfiguration provides OverScrollConfiguration(
+                    //     glowColor = MaterialTheme.colors.primary,
+                    // )
                 ) {
                     content.invoke()
                 }
@@ -119,12 +119,13 @@ fun TwidereScene(
     TwidereTheme(darkTheme = darkTheme) {
         val statusBarColor = statusBarColorProvider.invoke()
         val navigationBarColor = navigationBarColorProvider.invoke().let {
-            val surface = MaterialTheme.colors.surface
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O && !darkTheme && it == surface) {
-                MaterialTheme.colors.onSurface
-            } else {
-                it
-            }
+            // val surface = MaterialTheme.colors.surface
+            // if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O && !darkTheme && it == surface) {
+            //     MaterialTheme.colors.onSurface
+            // } else {
+            //     it
+            // }
+            Color.Red
         }
         PlatformInsets(
             control = NativeInsetsControl(

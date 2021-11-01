@@ -26,8 +26,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.window.Dialog
-import com.twidere.twiderex.component.foundation.LoadingProgress
 import com.twidere.twiderex.component.lists.MastodonListsModifyComponent
 import com.twidere.twiderex.component.stringResource
 import com.twidere.twiderex.di.ext.getViewModel
@@ -55,13 +53,13 @@ fun MastodonListsCreateDialog(onDismissRequest: () -> Unit) {
     val loading by listsCreateViewModel.loading.observeAsState(initial = false)
 
     if (loading) {
-        Dialog(
-            onDismissRequest = {
-                dismiss()
-            }
-        ) {
-            LoadingProgress()
-        }
+        // Dialog(
+        //     onDismissRequest = {
+        //         dismiss()
+        //     }
+        // ) {
+        //     LoadingProgress()
+        // }
         return
     }
 

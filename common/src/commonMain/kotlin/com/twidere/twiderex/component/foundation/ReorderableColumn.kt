@@ -20,7 +20,7 @@
  */
 package com.twidere.twiderex.component.foundation
 
-import android.view.HapticFeedbackConstants
+// import android.view.HapticFeedbackConstants
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
@@ -32,7 +32,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.platform.LocalView
+// import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.zIndex
 import kotlin.math.roundToInt
@@ -136,7 +136,7 @@ fun <T> ReorderableColumn(
     dragingContent: @Composable ((T) -> Unit)? = null,
     itemContent: @Composable (T) -> Unit,
 ) {
-    val view = LocalView.current
+    // val view = LocalView.current
     Layout(
         modifier = modifier,
         content = {
@@ -152,7 +152,7 @@ fun <T> ReorderableColumn(
                                     state.drop()
                                 },
                                 onDragStart = {
-                                    view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
+                                    // view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
                                     state.start(index)
                                 },
                                 onDrag = { _, dragAmount ->

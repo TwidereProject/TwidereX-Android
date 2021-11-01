@@ -20,7 +20,7 @@
  */
 package com.twidere.twiderex.scenes
 
-import androidx.activity.compose.BackHandler
+// import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.animateDp
@@ -124,11 +124,11 @@ fun HomeScene() {
     )
     val scaffoldState = rememberScaffoldState()
     if (scaffoldState.drawerState.isOpen) {
-        BackHandler {
-            scope.launch {
-                scaffoldState.drawerState.close()
-            }
+        // BackHandler {
+        scope.launch {
+            scaffoldState.drawerState.close()
         }
+        // }
     }
     ApplyNotification(scaffoldState.snackbarHostState)
     TwidereScene(

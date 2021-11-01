@@ -121,6 +121,7 @@ kotlin {
             dependencies {
                 implementation("uk.co.caprica:vlcj:4.7.1")
                 implementation("com.squareup.sqldelight:sqlite-driver:${Versions.sqlDelight}")
+                implementation("org.jetbrains.skija:skija-linux:0.93.1")
             }
         }
         val desktopTest by getting

@@ -20,11 +20,10 @@
  */
 package com.twidere.twiderex.scenes.compose
 
-import android.Manifest
-import android.annotation.SuppressLint
-import androidx.activity.compose.BackHandler
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
+// import android.Manifest
+// import androidx.activity.compose.BackHandler
+// import androidx.activity.compose.rememberLauncherForActivityResult
+// import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -99,7 +98,7 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.coerceAtLeast
 import androidx.compose.ui.unit.dp
-import com.google.accompanist.insets.LocalWindowInsets
+// import com.google.accompanist.insets.LocalWindowInsets
 import com.twidere.twiderex.MR
 import com.twidere.twiderex.component.foundation.AlertDialog
 import com.twidere.twiderex.component.foundation.AppBar
@@ -206,16 +205,16 @@ private fun ComposeBody(
     var showSaveDraftDialog by remember { mutableStateOf(false) }
     val scaffoldState = rememberBottomSheetScaffoldState()
     if (showSaveDraftDialog || canSaveDraft) {
-        BackHandler {
-            when {
-                showSaveDraftDialog -> {
-                    showSaveDraftDialog = false
-                }
-                canSaveDraft -> {
-                    showSaveDraftDialog = true
-                }
+        // BackHandler {
+        when {
+            showSaveDraftDialog -> {
+                showSaveDraftDialog = false
+            }
+            canSaveDraft -> {
+                showSaveDraftDialog = true
             }
         }
+        // }
     }
     TwidereScene {
         if (showSaveDraftDialog) {
@@ -415,13 +414,13 @@ private fun ComposeBody(
                 }
                 Divider()
                 var showEmoji by remember { mutableStateOf(false) }
-                val ime = LocalWindowInsets.current.ime
-                LaunchedEffect(ime) {
-                    snapshotFlow { ime.isVisible }
-                        .distinctUntilChanged()
-                        .filter { it && showEmoji }
-                        .collect { showEmoji = false }
-                }
+                // val ime = LocalWindowInsets.current.ime
+                // LaunchedEffect(ime) {
+                //     snapshotFlow { ime.isVisible }
+                //         .distinctUntilChanged()
+                //         .filter { it && showEmoji }
+                //         .collect { showEmoji = false }
+                // }
                 LaunchedEffect(showEmoji) {
                     if (showEmoji) {
                         keyboardController?.hide()
@@ -480,20 +479,21 @@ fun EmojiPanel(
     showEmoji: Boolean,
 ) {
     val items by viewModel.emojis.observeAsState(initial = emptyList())
-    val ime = LocalWindowInsets.current.ime
-    val navigation = LocalWindowInsets.current.navigationBars
+    // val ime = LocalWindowInsets.current.ime
+    // val navigation = LocalWindowInsets.current.navigationBars
     var height by remember { mutableStateOf(0) }
-    LaunchedEffect(ime) {
-        snapshotFlow { ime.bottom }
-            .distinctUntilChanged()
-            .filter { it > 0 }
-            .collect { height = max(height, it) }
-    }
+    // LaunchedEffect(ime) {
+    //     snapshotFlow { ime.bottom }
+    //         .distinctUntilChanged()
+    //         .filter { it > 0 }
+    //         .collect { height = max(height, it) }
+    // }
     val targetHeight = with(LocalDensity.current) {
         height.toDp()
     }
     val bottom = with(LocalDensity.current) {
-        ime.bottom.coerceAtLeast(navigation.bottom).toDp()
+        5.dp
+        // ime.bottom.coerceAtLeast(navigation.bottom).toDp()
     }
     var visibility by remember { mutableStateOf(false) }
     LaunchedEffect(showEmoji, bottom) {
@@ -1118,7 +1118,7 @@ private object ComposeVoteDefaults {
 }
 
 @OptIn(ExperimentalAnimationApi::class)
-@SuppressLint("MissingPermission")
+// @SuppressLint("MissingPermission")
 @Composable
 private fun ComposeActions(
     viewModel: ComposeViewModel,
@@ -1142,14 +1142,14 @@ private fun ComposeActions(
     }
     val scope = rememberCoroutineScope()
     val navController = LocalNavController.current
-    val permissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestMultiplePermissions(),
-        onResult = {
-            if (it.all { it.value }) {
-                viewModel.trackingLocation()
-            }
-        },
-    )
+    // val permissionLauncher = rememberLauncherForActivityResult(
+    //     contract = ActivityResultContracts.RequestMultiplePermissions(),
+    //     onResult = {
+    //         if (it.all { it.value }) {
+    //             viewModel.trackingLocation()
+    //         }
+    //     },
+    // )
     val draftCount = viewModel.draftCount.observeAsState(0)
     val insertMode by viewModel.mediaInsertMode.observeAsState(initial = ComposeViewModel.MediaInsertMode.All)
     Box {
@@ -1243,11 +1243,11 @@ private fun ComposeActions(
                         if (locationEnabled) {
                             viewModel.disableLocation()
                         } else {
-                            val permissions = arrayOf(
-                                Manifest.permission.ACCESS_COARSE_LOCATION,
-                                Manifest.permission.ACCESS_FINE_LOCATION
-                            )
-                            permissionLauncher.launch(permissions)
+                            // val permissions = arrayOf(
+                            //     Manifest.permission.ACCESS_COARSE_LOCATION,
+                            //     Manifest.permission.ACCESS_FINE_LOCATION
+                            // )
+                            // permissionLauncher.launch(permissions)
                         }
                     },
                 ) {

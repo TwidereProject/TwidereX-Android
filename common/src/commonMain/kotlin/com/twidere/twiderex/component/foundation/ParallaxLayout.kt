@@ -224,7 +224,7 @@ fun ParallaxLayout(
             }
         }
         onDispose {
-            orientationSensorManager.release()
+            // orientationSensorManager.release()
         }
     }
 
