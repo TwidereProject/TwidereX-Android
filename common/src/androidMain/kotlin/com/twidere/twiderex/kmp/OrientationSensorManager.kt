@@ -121,7 +121,7 @@ actual class OrientationSensorManager(
         // do nothing
     }
 
-    fun release() {
+    actual fun release() {
         sensorManager.unregisterListener(this)
     }
 
