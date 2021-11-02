@@ -22,8 +22,11 @@ package com.twidere.twiderex.image
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.asComposeImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.unit.IntSize
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
@@ -31,8 +34,8 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import org.jetbrains.skija.Bitmap
-import org.jetbrains.skija.Codec
+import org.jetbrains.skia.Bitmap
+import org.jetbrains.skia.Codec
 
 internal class GifPainter(private val codec: Codec, private val parentScope: CoroutineScope) : Painter() {
     override val intrinsicSize: Size
@@ -63,8 +66,8 @@ internal class GifPainter(private val codec: Codec, private val parentScope: Cor
     override fun DrawScope.onDraw() {
         val bitmap = recycleBitmap(codec)
         codec.readPixels(bitmap, frameIndex.value)
-        // val intSize = IntSize(size.width.toInt(), size.height.toInt())
-        // drawImage(bitmap.asImageBitmap(), dstSize = intSize)
+        val intSize = IntSize(size.width.toInt(), size.height.toInt())
+        drawImage(bitmap.asComposeImageBitmap(), dstSize = intSize)
     }
 
     private fun recycleBitmap(codec: Codec): Bitmap {

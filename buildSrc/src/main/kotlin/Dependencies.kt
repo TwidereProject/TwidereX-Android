@@ -11,7 +11,6 @@ fun Project.configRepository() {
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
         maven("https://www.jetbrains.com/intellij-repository/releases")
         maven("https://cache-redirector.jetbrains.com/intellij-dependencies")
-        maven("https://packages.jetbrains.team/maven/p/skija/maven")
     }
 }
 

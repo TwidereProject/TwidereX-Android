@@ -24,6 +24,7 @@ package com.twidere.twiderex.scenes.compose
 // import androidx.activity.compose.BackHandler
 // import androidx.activity.compose.rememberLauncherForActivityResult
 // import androidx.activity.result.contract.ActivityResultContracts
+// import com.google.accompanist.insets.LocalWindowInsets
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -98,7 +99,6 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.coerceAtLeast
 import androidx.compose.ui.unit.dp
-// import com.google.accompanist.insets.LocalWindowInsets
 import com.twidere.twiderex.MR
 import com.twidere.twiderex.component.foundation.AlertDialog
 import com.twidere.twiderex.component.foundation.AppBar
@@ -145,11 +145,10 @@ import com.twitter.twittertext.TwitterTextConfiguration
 import com.twitter.twittertext.TwitterTextParser
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import moe.tlaster.precompose.navigation.BackHandler
 import org.koin.core.parameter.parametersOf
-import kotlin.math.max
 
 @Composable
 fun DraftComposeScene(
@@ -205,16 +204,16 @@ private fun ComposeBody(
     var showSaveDraftDialog by remember { mutableStateOf(false) }
     val scaffoldState = rememberBottomSheetScaffoldState()
     if (showSaveDraftDialog || canSaveDraft) {
-        // BackHandler {
-        when {
-            showSaveDraftDialog -> {
-                showSaveDraftDialog = false
-            }
-            canSaveDraft -> {
-                showSaveDraftDialog = true
+        BackHandler {
+            when {
+                showSaveDraftDialog -> {
+                    showSaveDraftDialog = false
+                }
+                canSaveDraft -> {
+                    showSaveDraftDialog = true
+                }
             }
         }
-        // }
     }
     TwidereScene {
         if (showSaveDraftDialog) {
@@ -1142,14 +1141,7 @@ private fun ComposeActions(
     }
     val scope = rememberCoroutineScope()
     val navController = LocalNavController.current
-    // val permissionLauncher = rememberLauncherForActivityResult(
-    //     contract = ActivityResultContracts.RequestMultiplePermissions(),
-    //     onResult = {
-    //         if (it.all { it.value }) {
-    //             viewModel.trackingLocation()
-    //         }
-    //     },
-    // )
+
     val draftCount = viewModel.draftCount.observeAsState(0)
     val insertMode by viewModel.mediaInsertMode.observeAsState(initial = ComposeViewModel.MediaInsertMode.All)
     Box {
@@ -1243,11 +1235,7 @@ private fun ComposeActions(
                         if (locationEnabled) {
                             viewModel.disableLocation()
                         } else {
-                            // val permissions = arrayOf(
-                            //     Manifest.permission.ACCESS_COARSE_LOCATION,
-                            //     Manifest.permission.ACCESS_FINE_LOCATION
-                            // )
-                            // permissionLauncher.launch(permissions)
+                            viewModel.trackingLocation()
                         }
                     },
                 ) {

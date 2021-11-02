@@ -71,7 +71,6 @@ import com.twidere.twiderex.preferences.PreferencesHolder
 import com.twidere.twiderex.preferences.ProvidePreferences
 import com.twidere.twiderex.ui.LocalActiveAccount
 import com.twidere.twiderex.ui.LocalActiveAccountViewModel
-// import com.twidere.twiderex.ui.LocalActivity
 import com.twidere.twiderex.ui.LocalIsActiveNetworkMetered
 import com.twidere.twiderex.utils.CustomTabSignInChannel
 import com.twidere.twiderex.utils.IsActiveNetworkMeteredLiveData
@@ -178,7 +177,6 @@ class TwidereXActivity : PreComposeActivity(), KoinComponent {
             LocalWindowInsetsController provides windowInsetsControllerCompat,
             LocalActiveAccount provides account,
             LocalStatusActions provides statusActions,
-            // LocalActivity provides this,
             LocalActiveAccountViewModel provides accountViewModel,
             LocalIsActiveNetworkMetered provides isActiveNetworkMetered,
             LocalPlatformResolver provides platformResolver,

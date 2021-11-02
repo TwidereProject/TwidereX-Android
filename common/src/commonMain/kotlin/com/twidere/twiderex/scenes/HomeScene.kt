@@ -102,6 +102,7 @@ import com.twidere.twiderex.ui.TwidereScene
 import com.twidere.twiderex.ui.mediumEmphasisContentContentColor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import moe.tlaster.precompose.navigation.BackHandler
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
@@ -124,11 +125,11 @@ fun HomeScene() {
     )
     val scaffoldState = rememberScaffoldState()
     if (scaffoldState.drawerState.isOpen) {
-        // BackHandler {
-        scope.launch {
-            scaffoldState.drawerState.close()
+        BackHandler {
+            scope.launch {
+                scaffoldState.drawerState.close()
+            }
         }
-        // }
     }
     ApplyNotification(scaffoldState.snackbarHostState)
     TwidereScene(

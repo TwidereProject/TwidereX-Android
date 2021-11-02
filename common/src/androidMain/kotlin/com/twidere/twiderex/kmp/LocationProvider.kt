@@ -25,6 +25,8 @@ import android.location.Criteria
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresPermission
 import com.twidere.twiderex.model.kmp.Location
 import kotlinx.coroutines.flow.Flow
@@ -38,8 +40,30 @@ actual class LocationProvider(
     actual val location: Flow<Location?>
         get() = _location.asSharedFlow()
 
-    @RequiresPermission(anyOf = [Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION])
+    private val _locationEnabled = MutableStateFlow<Boolean>(false)
+    actual val locationEnabled: Flow<Boolean>
+        get() = _locationEnabled.asSharedFlow()
+
+    private val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestMultiplePermissions(),
+        onResult = {
+            if (it.all { it.value }) {
+                permissionGrantt()
+            }
+        },
+    )
+
+
     actual fun enable() {
+        val permissions = arrayOf(
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        )
+        permissionLauncher.launch(permissions)
+    }
+
+    @RequiresPermission(anyOf = [Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION])
+    private fun permissionGrantt() {
         val criteria = Criteria()
         criteria.accuracy = Criteria.ACCURACY_FINE
         val provider = locationManager.getBestProvider(criteria, true) ?: return
@@ -50,9 +74,11 @@ actual class LocationProvider(
                 longitude = it.longitude,
             )
         }
+        _locationEnabled.value = true
     }
 
     actual fun disable() {
+        _locationEnabled.value = false
         locationManager.removeUpdates(this)
     }
 

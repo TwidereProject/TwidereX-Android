@@ -34,4 +34,7 @@ actual class LocationProvider {
 
     actual fun disable() {
     }
+
+    actual val locationEnabled: Flow<Boolean>
+        get() = flowOf(false)
 }

@@ -33,8 +33,8 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
-import org.jetbrains.skija.Codec
-import org.jetbrains.skija.Data
+import org.jetbrains.skia.Codec
+import org.jetbrains.skia.Data
 import java.io.InputStream
 import java.net.HttpURLConnection
 import java.net.URL

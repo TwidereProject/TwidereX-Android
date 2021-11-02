@@ -21,3 +21,5 @@
 package com.twidere.twiderex.kmp
 
 actual val currentPlatform: Platform = Platform.JVM
+
+actual val isAndroidLessOreo: Boolean = false

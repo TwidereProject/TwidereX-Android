@@ -25,6 +25,7 @@ import kotlinx.coroutines.flow.Flow
 
 expect class LocationProvider {
     val location: Flow<Location?>
+    val locationEnabled: Flow<Boolean>
     fun enable()
     fun disable()
 }

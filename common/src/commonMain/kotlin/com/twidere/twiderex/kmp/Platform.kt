@@ -26,3 +26,5 @@ enum class Platform {
 }
 
 expect val currentPlatform: Platform
+
+expect val isAndroidLessOreo: Boolean
