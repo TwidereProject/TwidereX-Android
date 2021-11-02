@@ -97,7 +97,7 @@ fun SearchScene(keyword: String) {
             )
         }
     }
-    val pagerState = rememberPagerState(pageCount = tabs.size)
+    val pagerState = rememberPagerState()
     val scope = rememberCoroutineScope()
     val isSaved by viewModel.isSaved.observeAsState(false)
     val loading by viewModel.loading.observeAsState(initial = false)
@@ -194,7 +194,10 @@ fun SearchScene(keyword: String) {
                 Box(
                     modifier = Modifier.weight(1F),
                 ) {
-                    HorizontalPager(state = pagerState) { page ->
+                    HorizontalPager(
+                        state = pagerState,
+                        count = tabs.size
+                    ) { page ->
                         tabs[page].Content(keyword = keyword)
                     }
                 }

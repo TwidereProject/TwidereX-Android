@@ -162,7 +162,6 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewM
     val navController = LocalNavController.current
     val pagerState = rememberPagerState(
         initialPage = selectedIndex,
-        pageCount = status.media.size,
     )
     val currentMedia = status.media[pagerState.currentPage]
 
@@ -413,7 +412,6 @@ fun MediaView(
     swiperState: SwiperState = rememberSwiperState(),
     pagerState: PagerState = rememberPagerState(
         initialPage = 0,
-        pageCount = media.size,
     ),
     customControl: VideoController? = null,
     volume: Float = 1f
@@ -429,6 +427,7 @@ fun MediaView(
     ) {
         HorizontalPager(
             state = pagerState,
+            count = media.size,
         ) { page ->
             val data = media[page]
             when (data.type) {

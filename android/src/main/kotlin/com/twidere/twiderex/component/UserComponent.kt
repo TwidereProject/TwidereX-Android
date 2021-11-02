@@ -166,7 +166,7 @@ fun UserComponent(
                 UserInfo(viewModel = viewModel)
             },
             content = {
-                val pagerState = rememberPagerState(pageCount = tabs.size)
+                val pagerState = rememberPagerState(initialPage = 0)
                 Column {
                     val scope = rememberCoroutineScope()
                     TabRow(
@@ -203,6 +203,7 @@ fun UserComponent(
                     HorizontalPager(
                         modifier = Modifier.weight(1f),
                         state = pagerState,
+                        count = tabs.size
                     ) { page ->
                         Box(
                             modifier = Modifier.fillMaxSize(),

@@ -99,7 +99,6 @@ fun PureMediaScene(belongToKey: MicroBlogKey, selectedIndex: Int) {
                 val navController = LocalNavController.current
                 val pagerState = rememberPagerState(
                     initialPage = selectedIndex,
-                    pageCount = medias.size,
                 )
                 val videoControl = remember {
                     VideoController()
