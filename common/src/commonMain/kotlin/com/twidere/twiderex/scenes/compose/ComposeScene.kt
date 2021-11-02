@@ -143,6 +143,7 @@ import com.twidere.twiderex.viewmodel.compose.VoteExpired
 import com.twidere.twiderex.viewmodel.compose.VoteState
 import com.twitter.twittertext.TwitterTextConfiguration
 import com.twitter.twittertext.TwitterTextParser
+import com.twidere.twiderex.kmp.RequestLocationPermission
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -1117,7 +1118,6 @@ private object ComposeVoteDefaults {
 }
 
 @OptIn(ExperimentalAnimationApi::class)
-// @SuppressLint("MissingPermission")
 @Composable
 private fun ComposeActions(
     viewModel: ComposeViewModel,
@@ -1230,25 +1230,36 @@ private fun ComposeActions(
                 }
             }
             if (allowLocation) {
-                IconButton(
-                    onClick = {
-                        if (locationEnabled) {
-                            viewModel.disableLocation()
-                        } else {
-                            viewModel.trackingLocation()
-                        }
+                var requestPermission by remember {
+                    mutableStateOf(false)
+                }
+                RequestLocationPermission(
+                    onPermissionGrantt = {
+                        viewModel.trackingLocation()
                     },
+                    request = requestPermission,
                 ) {
-                    Icon(
-                        painter = painterResource(res = com.twidere.twiderex.MR.files.ic_map_pin),
-                        contentDescription = stringResource(
-                            res = if (locationEnabled) {
-                                com.twidere.twiderex.MR.strings.accessibility_scene_compose_location_disable
+                    IconButton(
+                        onClick = {
+                            if (locationEnabled) {
+                                viewModel.disableLocation()
+                                requestPermission = false
                             } else {
-                                com.twidere.twiderex.MR.strings.accessibility_scene_compose_location_enable
+                                requestPermission = true
                             }
+                        },
+                    ) {
+                        Icon(
+                            painter = painterResource(res = com.twidere.twiderex.MR.files.ic_map_pin),
+                            contentDescription = stringResource(
+                                res = if (locationEnabled) {
+                                    com.twidere.twiderex.MR.strings.accessibility_scene_compose_location_disable
+                                } else {
+                                    com.twidere.twiderex.MR.strings.accessibility_scene_compose_location_enable
+                                }
+                            )
                         )
-                    )
+                    }
                 }
             }
             IconButton(
