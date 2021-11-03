@@ -24,9 +24,9 @@ import androidx.compose.runtime.RememberObserver
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.asPainter
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.toPainter
 import com.twidere.twiderex.component.foundation.NetworkImageState
 import com.twidere.twiderex.component.image.ImageEffects
 import kotlinx.coroutines.CoroutineScope
@@ -34,8 +34,8 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
-import org.jetbrains.skija.Codec
-import org.jetbrains.skija.Data
+import org.jetbrains.skia.Codec
+import org.jetbrains.skia.Data
 import java.io.InputStream
 import java.net.HttpURLConnection
 import java.net.URL
@@ -121,7 +121,7 @@ internal class ImagePainter(
                         ImageEffectsFilter.applyBlurFilter(image, it.blurRadius.toInt(), it.bitmapScale)
                     } ?: image
                 }?.let {
-                    painter.value = it.asPainter()
+                    painter.value = it.toPainter()
                 }
             }
         } catch (e: Throwable) {
