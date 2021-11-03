@@ -23,7 +23,7 @@ package androidx.paging.compose
 import android.os.Parcel
 import android.os.Parcelable
 
-actual data class PagingPlaceholderKey actual constructor(actual val index: Int):
+actual data class PagingPlaceholderKey actual constructor(actual val index: Int) :
     Parcelable {
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeInt(index)
@@ -45,5 +45,3 @@ actual data class PagingPlaceholderKey actual constructor(actual val index: Int)
             }
     }
 }
-
-

@@ -21,4 +21,3 @@
 package androidx.paging.compose
 
 actual data class PagingPlaceholderKey actual constructor(actual val index: Int)
-

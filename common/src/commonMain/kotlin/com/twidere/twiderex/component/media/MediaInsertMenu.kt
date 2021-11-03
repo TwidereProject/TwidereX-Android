@@ -121,66 +121,66 @@ fun MediaInsertMenu(
     Box(modifier) {
 
         DropdownMenu(expanded = showDropdown, onDismissRequest = { showDropdown = false }, modifier = Modifier) {
-            MediaInsertType.values().forEach {
-                val enabled = !disableList.contains(it)
-                DropdownMenuItem(
-                    onClick = {
-                        when (it) {
-                            MediaInsertType.CAMERA -> {
-                                // cameraTempUri = storageProvider.appFiles.mediaFile("${System.currentTimeMillis()}$ImageSuffix").mkFile().toUri(context)
-                                // cameraLauncher.launch(cameraTempUri)
+        MediaInsertType.values().forEach {
+            val enabled = !disableList.contains(it)
+            DropdownMenuItem(
+                onClick = {
+                    when (it) {
+                        MediaInsertType.CAMERA -> {
+                            // cameraTempUri = storageProvider.appFiles.mediaFile("${System.currentTimeMillis()}$ImageSuffix").mkFile().toUri(context)
+                            // cameraLauncher.launch(cameraTempUri)
+                        }
+                        MediaInsertType.RECORD_VIDEO -> {
+                            // videoTempUri = storageProvider.appFiles.mediaFile("${UUID.randomUUID()}$VideoSuffix").mkFile().toUri(context)
+                            // videoRecordLauncher.launch(videoTempUri)
+                        }
+                        MediaInsertType.LIBRARY -> {
+                            scope.launch {
+                                onResult.invoke(
+                                    FilePicker.pickFiles(
+                                        allowMultiple = supportMultipleSelect,
+                                        allowedExtensions = librariesSupported.flatMap { it.extensions }
+                                    ).map {
+                                        mediaInsertProvider.provideUiMediaInsert(it.path)
+                                    }
+                                )
                             }
-                            MediaInsertType.RECORD_VIDEO -> {
-                                // videoTempUri = storageProvider.appFiles.mediaFile("${UUID.randomUUID()}$VideoSuffix").mkFile().toUri(context)
-                                // videoRecordLauncher.launch(videoTempUri)
-                            }
-                            MediaInsertType.LIBRARY -> {
-                                scope.launch {
-                                    onResult.invoke(
-                                        FilePicker.pickFiles(
-                                            allowMultiple = supportMultipleSelect,
-                                            allowedExtensions = librariesSupported.flatMap { it.extensions }
-                                        ).map {
-                                            mediaInsertProvider.provideUiMediaInsert(it.path)
+                            // filePickerLauncher.launch(librariesSupported)
+                        }
+                        MediaInsertType.GIF -> scope.launch {
+                            navController.navigateForResult(RootRoute.Gif.Home)
+                                ?.let { result ->
+                                    onResult(
+                                        listOf(result as String).map {
+                                            mediaInsertProvider.provideUiMediaInsert(
+                                                it
+                                            )
                                         }
                                     )
                                 }
-                                // filePickerLauncher.launch(librariesSupported)
-                            }
-                            MediaInsertType.GIF -> scope.launch {
-                                navController.navigateForResult(RootRoute.Gif.Home)
-                                    ?.let { result ->
-                                        onResult(
-                                            listOf(result as String).map {
-                                                mediaInsertProvider.provideUiMediaInsert(
-                                                    it
-                                                )
-                                            }
-                                        )
-                                    }
-                            }
                         }
-                        showDropdown = false
+                    }
+                    showDropdown = false
+                },
+                enabled = enabled
+            ) {
+                ListItem(
+                    text = {
+                        Text(text = it.stringName())
                     },
-                    enabled = enabled
-                ) {
-                    ListItem(
-                        text = {
-                            Text(text = it.stringName())
-                        },
-                        icon = {
-                            Icon(
-                                painter = it.icon(),
-                                contentDescription = it.stringName(),
-                                tint = if (enabled) MaterialTheme.colors.primary else LocalContentColor.current.copy(
-                                    alpha = LocalContentAlpha.current
-                                )
+                    icon = {
+                        Icon(
+                            painter = it.icon(),
+                            contentDescription = it.stringName(),
+                            tint = if (enabled) MaterialTheme.colors.primary else LocalContentColor.current.copy(
+                                alpha = LocalContentAlpha.current
                             )
-                        }
-                    )
-                }
+                        )
+                    }
+                )
             }
         }
+    }
     }
     IconButton(
         onClick = {

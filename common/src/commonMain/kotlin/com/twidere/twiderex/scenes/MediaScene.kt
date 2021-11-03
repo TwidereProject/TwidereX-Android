@@ -63,8 +63,6 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import com.twidere.twiderex.component.foundation.PagerState
-import com.twidere.twiderex.component.foundation.rememberPagerState
 import com.mxalbert.zoomable.Zoomable
 import com.twidere.twiderex.component.bottomInsetsHeight
 import com.twidere.twiderex.component.bottomInsetsPadding
@@ -73,7 +71,9 @@ import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.LoadingProgress
 import com.twidere.twiderex.component.foundation.NetworkImage
 import com.twidere.twiderex.component.foundation.Pager
+import com.twidere.twiderex.component.foundation.PagerState
 import com.twidere.twiderex.component.foundation.VideoPlayer
+import com.twidere.twiderex.component.foundation.rememberPagerState
 import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.status.LikeButton

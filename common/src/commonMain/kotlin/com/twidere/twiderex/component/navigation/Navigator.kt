@@ -22,6 +22,7 @@ package com.twidere.twiderex.component.navigation
 
 import androidx.compose.runtime.staticCompositionLocalOf
 import com.twidere.twiderex.kmp.RemoteNavigator
+import com.twidere.twiderex.kmp.clearCookie
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.ComposeType
 import com.twidere.twiderex.model.enums.MastodonStatusType
@@ -31,7 +32,6 @@ import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.navigation.RootRoute
 import com.twidere.twiderex.navigation.twidereXSchema
-import com.twidere.twiderex.kmp.clearCookie
 import moe.tlaster.precompose.navigation.NavController
 import moe.tlaster.precompose.navigation.NavOptions
 

@@ -58,7 +58,6 @@ actual fun RequestLocationPermission(
         )
         permissionLauncher.launch(permissions)
     }
-
 }
 
 actual class LocationProvider(

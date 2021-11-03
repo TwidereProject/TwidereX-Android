@@ -51,8 +51,8 @@ import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.Dialog
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
-import com.twidere.twiderex.component.foundation.TextInput
 import com.twidere.twiderex.component.foundation.LoadingProgress
+import com.twidere.twiderex.component.foundation.TextInput
 import com.twidere.twiderex.component.lazy.ui.LazyUiGifList
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource

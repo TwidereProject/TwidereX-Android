@@ -30,7 +30,7 @@ actual fun Dialog(
 ) {
     androidx.compose.ui.window.Dialog(
         onDismissRequest = onDismissRequest,
-        properties =  androidx.compose.ui.window.DialogProperties(
+        properties = androidx.compose.ui.window.DialogProperties(
             dismissOnBackPress = properties.dismissOnBackPress,
             dismissOnClickOutside = properties.dismissOnClickOutside
         ),

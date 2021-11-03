@@ -123,6 +123,7 @@ import com.twidere.twiderex.extensions.icon
 import com.twidere.twiderex.extensions.observeAsState
 import com.twidere.twiderex.extensions.stringName
 import com.twidere.twiderex.extensions.withElevation
+import com.twidere.twiderex.kmp.RequestLocationPermission
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.enums.ComposeType
@@ -143,7 +144,6 @@ import com.twidere.twiderex.viewmodel.compose.VoteExpired
 import com.twidere.twiderex.viewmodel.compose.VoteState
 import com.twitter.twittertext.TwitterTextConfiguration
 import com.twitter.twittertext.TwitterTextParser
-import com.twidere.twiderex.kmp.RequestLocationPermission
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
