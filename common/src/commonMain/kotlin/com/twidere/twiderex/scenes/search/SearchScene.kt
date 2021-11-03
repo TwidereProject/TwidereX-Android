@@ -47,14 +47,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.pagerTabIndicatorOffset
-import com.google.accompanist.pager.rememberPagerState
+import com.twidere.twiderex.component.foundation.rememberPagerState
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarDefaults
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
+import com.twidere.twiderex.component.foundation.Pager
 import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.component.painterResource
 import com.twidere.twiderex.component.stringResource
@@ -72,7 +71,7 @@ import com.twidere.twiderex.viewmodel.search.SearchSaveViewModel
 import kotlinx.coroutines.launch
 import org.koin.core.parameter.parametersOf
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalPagerApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SearchScene(keyword: String) {
     val account = LocalActiveAccount.current ?: return
@@ -160,12 +159,12 @@ fun SearchScene(keyword: String) {
                         TabRow(
                             selectedTabIndex = pagerState.currentPage,
                             backgroundColor = MaterialTheme.colors.surface.withElevation(),
-                            indicator = { tabPositions ->
+                            indicator = { _ ->
                                 TabRowDefaults.Indicator(
-                                    modifier = Modifier.pagerTabIndicatorOffset(
-                                        pagerState,
-                                        tabPositions
-                                    ),
+                                    // modifier = Modifier.pagerTabIndicatorOffset(
+                                    //     pagerState,
+                                    //     tabPositions
+                                    // ),
                                     color = MaterialTheme.colors.primary,
                                 )
                             }
@@ -175,7 +174,8 @@ fun SearchScene(keyword: String) {
                                     selected = pagerState.currentPage == index,
                                     onClick = {
                                         scope.launch {
-                                            pagerState.animateScrollToPage(index)
+                                            pagerState.currentPage = index
+                                            // pagerState.animateScrollToPage(index)
                                         }
                                     },
                                     content = {
@@ -193,7 +193,7 @@ fun SearchScene(keyword: String) {
                 Box(
                     modifier = Modifier.weight(1F),
                 ) {
-                    HorizontalPager(state = pagerState) { page ->
+                    Pager(state = pagerState) {
                         tabs[page].Content(keyword = keyword)
                     }
                 }

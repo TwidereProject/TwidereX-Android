@@ -120,7 +120,7 @@ fun MediaInsertMenu(
     }
     Box(modifier) {
 
-        DropdownMenu(expanded = showDropdown, onDismissRequest = { showDropdown = false }) {
+        DropdownMenu(expanded = showDropdown, onDismissRequest = { showDropdown = false }, modifier = Modifier) {
             MediaInsertType.values().forEach {
                 val enabled = !disableList.contains(it)
                 DropdownMenuItem(

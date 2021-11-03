@@ -33,6 +33,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.MR
 import com.twidere.twiderex.component.UserComponent
@@ -129,6 +130,7 @@ fun UserScene(
                             DropdownMenu(
                                 expanded = expanded,
                                 onDismissRequest = { expanded = false },
+                                modifier = Modifier
                             ) {
                                 relationship.takeIf { !loadingRelationship }
                                     ?.blocking?.let { blocking ->

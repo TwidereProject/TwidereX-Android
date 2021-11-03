@@ -63,11 +63,8 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.HorizontalPagerIndicator
-import com.google.accompanist.pager.PagerState
-import com.google.accompanist.pager.rememberPagerState
+import com.twidere.twiderex.component.foundation.PagerState
+import com.twidere.twiderex.component.foundation.rememberPagerState
 import com.mxalbert.zoomable.Zoomable
 import com.twidere.twiderex.component.bottomInsetsHeight
 import com.twidere.twiderex.component.bottomInsetsPadding
@@ -75,6 +72,7 @@ import com.twidere.twiderex.component.foundation.DropdownMenuItem
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.LoadingProgress
 import com.twidere.twiderex.component.foundation.NetworkImage
+import com.twidere.twiderex.component.foundation.Pager
 import com.twidere.twiderex.component.foundation.VideoPlayer
 import com.twidere.twiderex.component.navigation.LocalNavigator
 import com.twidere.twiderex.component.painterResource
@@ -147,7 +145,7 @@ fun StatusMediaScene(statusKey: MicroBlogKey, selectedIndex: Int) {
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class, ExperimentalPagerApi::class)
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewModel) {
     val window = LocalPlatformWindow.current
@@ -181,12 +179,12 @@ fun StatusMediaScene(status: UiStatus, selectedIndex: Int, viewModel: MediaViewM
                 modifier = Modifier.fillMaxWidth()
             ) {
                 if (status.media.size > 1) {
-                    HorizontalPagerIndicator(
-                        pagerState = pagerState,
-                        modifier = Modifier
-                            .padding(16.dp)
-                            .align(Alignment.CenterHorizontally),
-                    )
+                    // HorizontalPagerIndicator(
+                    //     pagerState = pagerState,
+                    //     modifier = Modifier
+                    //         .padding(16.dp)
+                    //         .align(Alignment.CenterHorizontally),
+                    // )
                     AnimatedVisibility(
                         visible = !(controlVisibility && swiperState.progress == 0f),
                         enter = expandVertically(),
@@ -365,7 +363,6 @@ private object StatusMediaInfoDefaults {
     val NameSpacing = 8.dp
 }
 
-@OptIn(ExperimentalPagerApi::class)
 @Composable
 fun RawMediaScene(url: String, type: MediaType) {
     TwidereDialog(
@@ -392,7 +389,6 @@ data class MediaData(
     val type: MediaType,
 )
 
-@OptIn(ExperimentalPagerApi::class)
 @Composable
 fun MediaView(
     modifier: Modifier = Modifier,
@@ -414,9 +410,9 @@ fun MediaView(
         modifier = modifier,
         state = swiperState,
     ) {
-        HorizontalPager(
+        Pager(
             state = pagerState,
-        ) { page ->
+        ) {
             val data = media[page]
             when (data.type) {
                 MediaType.photo ->

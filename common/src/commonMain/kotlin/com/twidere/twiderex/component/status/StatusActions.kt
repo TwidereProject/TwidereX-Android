@@ -189,6 +189,7 @@ fun RetweetButton(
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
+            modifier = Modifier
         ) {
             DropdownMenuItem(
                 onClick = {
@@ -303,6 +304,7 @@ fun ShareButton(
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
+            modifier = Modifier,
         ) {
             menus.invoke(this) {
                 expanded = false

@@ -78,11 +78,12 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.pagerTabIndicatorOffset
-import com.google.accompanist.pager.rememberPagerState
+import com.twidere.twiderex.component.foundation.rememberPagerState
 import com.twidere.twiderex.component.foundation.DropdownMenu
 import com.twidere.twiderex.component.foundation.DropdownMenuItem
 import com.twidere.twiderex.component.foundation.HorizontalDivider
 import com.twidere.twiderex.component.foundation.NetworkImage
+import com.twidere.twiderex.component.foundation.Pager
 import com.twidere.twiderex.component.foundation.SwipeToRefreshLayout
 import com.twidere.twiderex.component.lazy.ui.LazyUiStatusImageList
 import com.twidere.twiderex.component.lazy.ui.LazyUiStatusList
@@ -169,12 +170,12 @@ fun UserComponent(
                     TabRow(
                         selectedTabIndex = pagerState.currentPage,
                         backgroundColor = MaterialTheme.colors.surface.withElevation(),
-                        indicator = { tabPositions ->
+                        indicator = { _ ->
                             TabRowDefaults.Indicator(
-                                modifier = Modifier.pagerTabIndicatorOffset(
-                                    pagerState,
-                                    tabPositions
-                                ),
+                                // modifier = Modifier.pagerTabIndicatorOffset(
+                                //     pagerState,
+                                //     tabPositions
+                                // ),
                                 color = MaterialTheme.colors.primary,
                             )
                         }
@@ -184,7 +185,8 @@ fun UserComponent(
                                 selected = pagerState.currentPage == index,
                                 onClick = {
                                     scope.launch {
-                                        pagerState.animateScrollToPage(index)
+                                        pagerState.currentPage = index
+                                        // pagerState.animateScrollToPage(index)
                                     }
                                 },
                                 content = {
@@ -197,10 +199,10 @@ fun UserComponent(
                             )
                         }
                     }
-                    HorizontalPager(
+                    Pager(
                         modifier = Modifier.weight(1f),
                         state = pagerState,
-                    ) { page ->
+                    ) {
                         Box(
                             modifier = Modifier.fillMaxSize(),
                             contentAlignment = Alignment.TopCenter,
@@ -321,7 +323,8 @@ private fun UserStatusTimelineFilter(
             }
             DropdownMenu(
                 expanded = showDropdown,
-                onDismissRequest = { showDropdown = false }
+                onDismissRequest = { showDropdown = false },
+                modifier = Modifier
             ) {
                 DropdownMenuItem(
                     onClick = {
