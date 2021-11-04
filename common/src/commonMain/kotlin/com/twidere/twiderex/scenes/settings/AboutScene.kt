@@ -50,12 +50,12 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.unit.dp
 import com.twidere.twiderex.BuildConfig
 import com.twidere.twiderex.component.LoginLogo
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
-import com.twidere.twiderex.component.foundation.BlurImage
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.foundation.ParallaxLayout
 import com.twidere.twiderex.component.foundation.rememberParallaxLayoutState
@@ -101,8 +101,7 @@ private fun AboutContent() {
             modifier = Modifier
                 .weight(4F)
         ) {
-            val grayLogoPainter = painterResource(res = com.twidere.twiderex.MR.files.ic_about_gray_logo)
-            val aspectRatio = grayLogoPainter.intrinsicSize.width / grayLogoPainter.intrinsicSize.height
+            val aspectRatio = 1.4f // from ui design
 
             ParallaxLayout(
                 modifier = Modifier
@@ -114,10 +113,11 @@ private fun AboutContent() {
                 backContentOffsetY = AboutContentDefaults.BackContentOffsetY,
                 parallaxLayoutState = parallaxLayoutState,
                 backContent = {
-                    BlurImage(
-                        resource = com.twidere.twiderex.MR.files.ic_about_gray_logo_shadow,
+                    Image(
+                        painter = painterResource(com.twidere.twiderex.MR.files.ic_about_gray_logo_shadow),
                         contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_about_logo_background_shadow),
                         modifier = Modifier
+                            .blur(30.dp)
                             .aspectRatio(aspectRatio)
                             .fillMaxHeight()
                             .padding(
@@ -129,7 +129,7 @@ private fun AboutContent() {
                 }
             ) {
                 Image(
-                    painter = grayLogoPainter,
+                    painter = painterResource(res = com.twidere.twiderex.MR.files.ic_about_gray_logo),
                     contentDescription = stringResource(res = com.twidere.twiderex.MR.strings.scene_settings_about_logo_background),
                     modifier = Modifier
                         .aspectRatio(aspectRatio)
