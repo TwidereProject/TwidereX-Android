@@ -45,7 +45,7 @@ import com.twidere.twiderex.component.painterResource
 import dev.icerock.moko.resources.FileResource
 
 @Composable
-actual fun BlurImage(
+actual fun PlatformBlurImage(
     resource: FileResource,
     contentDescription: String?,
     modifier: Modifier,
@@ -76,7 +76,12 @@ actual fun BlurImage(
     )
 }
 
-private fun applyBlurFilter(src: Bitmap, context: Context, blurRadius: Float, bitmapScale: Float): Bitmap {
+private fun applyBlurFilter(
+    src: Bitmap,
+    context: Context,
+    blurRadius: Float,
+    bitmapScale: Float
+): Bitmap {
     val rs = RenderScript.create(context.applicationContext)
 
     val matrix = Matrix().apply {

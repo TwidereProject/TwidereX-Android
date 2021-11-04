@@ -20,9 +20,7 @@ object Versions {
     const val okhttp = "4.9.1"
     const val retrofit2 = "2.9.0"
     const val hson = "0.1.4"
-    const val compose = "1.1.0-alpha01"// todo fix crash when set to alpha 03
-    const val compose_jb = "1.0.0-beta1"
-    const val constraintLayout = "1.0.0-beta02"
+    const val compose_jb = "1.0.0-beta5"
     const val paging = "3.1.0-beta01"
     const val paging_compose = "1.0.0-alpha14"
     const val activity = "1.4.0-rc01"

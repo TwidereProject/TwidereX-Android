@@ -20,35 +20,35 @@
  */
 package com.twidere.twiderex.component.foundation
 
+import androidx.compose.foundation.Image
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.DefaultAlpha
 import androidx.compose.ui.layout.ContentScale
+import com.twidere.twiderex.component.painterResource
 import dev.icerock.moko.resources.FileResource
 
 @Composable
-fun BlurImage(
+actual fun PlatformBlurImage(
     resource: FileResource,
     contentDescription: String?,
-    modifier: Modifier = Modifier,
-    alignment: Alignment = Alignment.Center,
-    contentScale: ContentScale = ContentScale.Fit,
-    alpha: Float = DefaultAlpha,
-    colorFilter: ColorFilter? = null,
-    blurRadius: Float = 25f,
-    bitmapScale: Float = 1f
+    modifier: Modifier,
+    alignment: Alignment,
+    contentScale: ContentScale,
+    alpha: Float,
+    colorFilter: ColorFilter?,
+    blurRadius: Float,
+    bitmapScale: Float,
 ) {
-    PlatformBlurImage(
-        resource = resource,
+    // TODO: blue effect
+    Image(
+        painter = painterResource(res = resource),
         contentDescription = contentDescription,
         modifier = modifier,
         alignment = alignment,
         contentScale = contentScale,
         alpha = alpha,
-        colorFilter = colorFilter,
-        blurRadius = blurRadius,
-        bitmapScale = bitmapScale
+        colorFilter = colorFilter
     )
 }

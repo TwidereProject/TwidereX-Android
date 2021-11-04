@@ -29,7 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.DpOffset
 
 @Composable
-actual fun DropdownMenu(
+actual fun PlatformDropdownMenu(
     expanded: Boolean,
     onDismissRequest: () -> Unit,
     focusable: Boolean,
@@ -47,7 +47,7 @@ actual fun DropdownMenu(
 }
 
 @Composable
-actual fun DropdownMenuItem(
+actual fun PlatformDropdownMenuItem(
     onClick: () -> Unit,
     modifier: Modifier,
     enabled: Boolean,

@@ -20,35 +20,25 @@
  */
 package com.twidere.twiderex.component.foundation
 
-import androidx.compose.foundation.Image
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.DefaultAlpha
 import androidx.compose.ui.layout.ContentScale
-import com.twidere.twiderex.component.painterResource
 import dev.icerock.moko.resources.FileResource
 
+// TODO FIXME 2021.11.4: default values like modifier is not working on expect composable functions
+// issue tracker: https://issuetracker.google.com/issues/196413692
 @Composable
-actual fun BlurImage(
+expect fun PlatformBlurImage(
     resource: FileResource,
     contentDescription: String?,
-    modifier: Modifier,
-    alignment: Alignment,
-    contentScale: ContentScale,
-    alpha: Float,
-    colorFilter: ColorFilter?,
-    blurRadius: Float,
-    bitmapScale: Float,
-) {
-    // TODO: blue effect
-    Image(
-        painter = painterResource(res = resource),
-        contentDescription = contentDescription,
-        modifier = modifier,
-        alignment = alignment,
-        contentScale = contentScale,
-        alpha = alpha,
-        colorFilter = colorFilter
-    )
-}
+    modifier: Modifier = Modifier,
+    alignment: Alignment = Alignment.Center,
+    contentScale: ContentScale = ContentScale.Fit,
+    alpha: Float = DefaultAlpha,
+    colorFilter: ColorFilter? = null,
+    blurRadius: Float = 25f,
+    bitmapScale: Float = 1f
+)
