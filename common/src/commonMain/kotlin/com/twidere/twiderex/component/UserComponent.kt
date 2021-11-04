@@ -322,7 +322,6 @@ private fun UserStatusTimelineFilter(
             DropdownMenu(
                 expanded = showDropdown,
                 onDismissRequest = { showDropdown = false },
-                modifier = Modifier
             ) {
                 DropdownMenuItem(
                     onClick = {

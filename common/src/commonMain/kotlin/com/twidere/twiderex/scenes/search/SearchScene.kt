@@ -38,6 +38,7 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Tab
 import androidx.compose.material.TabRow
 import androidx.compose.material.TabRowDefaults
+import androidx.compose.material.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -158,12 +159,11 @@ fun SearchScene(keyword: String) {
                         TabRow(
                             selectedTabIndex = pagerState.currentPage,
                             backgroundColor = MaterialTheme.colors.surface.withElevation(),
-                            indicator = { _ ->
+                            indicator = { tabPositions ->
                                 TabRowDefaults.Indicator(
-                                    // modifier = Modifier.pagerTabIndicatorOffset(
-                                    //     pagerState,
-                                    //     tabPositions
-                                    // ),
+                                    modifier = Modifier.tabIndicatorOffset(
+                                        tabPositions[pagerState.currentPage]
+                                    ),
                                     color = MaterialTheme.colors.primary,
                                 )
                             }
